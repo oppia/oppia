@@ -18,7 +18,8 @@
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, async } from
+  '@angular/core/testing';
 import { SkillRightsBackendApiService } from
   'domain/skill/skill-rights-backend-api.service.ts';
 
@@ -41,68 +42,10 @@ describe('Skill rights backend API service', () => {
     httpTestingController.verify();
   });
 
-<<<<<<< HEAD
   it('should report a cached skill rights after caching it',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-=======
-  it('should successfully fetch a skill dict from backend', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-    var sampleResults = {
-      skill_id: '0',
-      can_edit_skill_description: ''
-    };
-
-    $httpBackend.expect('GET', '/skill_editor_handler/rights/0')
-      .respond(sampleResults);
-    SkillRightsBackendApiService.fetchSkillRights('0').then(
-      successHandler, failHandler);
-    $httpBackend.flush();
-
-    expect(successHandler).toHaveBeenCalledWith(sampleResults);
-    expect(failHandler).not.toHaveBeenCalled();
-  });
-
-  it('should use reject handler when fetching a skill dict from backend' +
-    ' fails', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect('GET', '/skill_editor_handler/rights/0')
-      .respond(500);
-    SkillRightsBackendApiService.fetchSkillRights('0').then(
-      successHandler, failHandler);
-    $httpBackend.flush();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  });
-
-  it('should successfully fetch a skill dict from backend if it\'s not' +
-    'cached', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-    var sampleResults = {
-      skill_id: '0',
-      can_edit_skill_description: ''
-    };
-
-    $httpBackend.expect('GET', '/skill_editor_handler/rights/0')
-      .respond(sampleResults);
-    SkillRightsBackendApiService.loadSkillRights('0').then(
-      successHandler, failHandler);
-    $httpBackend.flush();
-
-    expect(successHandler).toHaveBeenCalledWith(sampleResults);
-    expect(failHandler).not.toHaveBeenCalled();
-  });
-
-  it('should report a cached skill rights after caching it', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
->>>>>>> upstream/develop
 
       // The skill should not currently be cached.
       expect(skillRightsBackendApiService.isCached('0')).toBe(false);
@@ -122,6 +65,37 @@ describe('Skill rights backend API service', () => {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+
+  it('should use reject handler when fetching a skill dict from backend' +
+  ' fails', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    skillRightsBackendApiService.fetchSkillRights('0').then(
+      successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/skill_editor_handler/rights/0');
+    req.error(new ErrorEvent('Error'));
+    flushMicrotasks();
+    expect(req.request.method).toEqual('GET');
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
+
+  it('should successfully fetch a skill dict from backend if it\'s not' +
+    'cached', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    skillRightsBackendApiService.loadSkillRights('0').then(
+      successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/skill_editor_handler/rights/0');
+    req.flush(sampleSkillRights);
+    flushMicrotasks();
+    expect(skillRightsBackendApiService.isCached('0')).toBe(true);
+    expect(req.request.method).toEqual('GET');
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
   it('should fetch skills right given its skillId',
     fakeAsync(() => {

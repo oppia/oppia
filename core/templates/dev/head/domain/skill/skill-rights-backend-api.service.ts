@@ -19,6 +19,7 @@
 export interface ISkillRightCache {
   [propName: string]: ISkillRightBackendInterface
 }
+
 import { cloneDeep } from 'lodash';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
@@ -63,13 +64,23 @@ export class SkillRightsBackendApiService {
   _isCached(skillId: string) {
     return this.skillRightsCache.hasOwnProperty(skillId);
   }
-
+  /**
+    * Gets a skill's rights, given its ID.
+    */
   fetchSkillRights(skillId: string) {
     return new Promise((resolve, reject) => {
       this._fetchSkillRights(skillId, resolve, reject);
     });
   }
-
+  /**
+    * Behaves exactly as fetchSkillRights (including callback
+    * behavior and returning a promise object), except this function will
+    * attempt to see whether the given skill rights has been
+    * cached. If it has not yet been cached, it will fetch the skill
+    * rights from the backend. If it successfully retrieves the skill
+    * rights from the backend, it will store it in the cache to avoid
+    * requests from the backend in further function calls.
+    */
   loadSkillRights(skillId: string) {
     return new Promise((resolve, reject) => {
       if (this._isCached(skillId)) {
@@ -79,7 +90,7 @@ export class SkillRightsBackendApiService {
       } else {
         this._fetchSkillRights(skillId,
           (skillRights: ISkillRightBackendInterface) => {
-            this.skillRightsCache[skillId] = skillRights;
+            this.cacheSkillRights(skillId, skillRights);
             if (resolve) {
               resolve(this.skillRightsCache[skillId]);
             }
@@ -88,11 +99,12 @@ export class SkillRightsBackendApiService {
     });
   }
 
-  isCached(skillId: string) {
+  isCached(skillId: string) :boolean {
     return this._isCached(skillId);
   }
 
-  cacheSkillRights(skillId: string, skillRights: ISkillRightBackendInterface) {
+  cacheSkillRights(skillId: string,
+      skillRights: ISkillRightBackendInterface): void{
     this.skillRightsCache[skillId] = cloneDeep(skillRights);
   }
 }
