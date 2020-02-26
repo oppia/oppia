@@ -2174,7 +2174,10 @@ def can_view_any_topic_editor(handler):
         """
         if not self.user_id:
             raise self.NotLoggedInException
-        topic_domain.Topic.require_valid_topic_id(topic_id)
+        try:
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
