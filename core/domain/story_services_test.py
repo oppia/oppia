@@ -501,11 +501,115 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             exp_services.get_story_id_linked_to_exploration('2'))
 
-        story_services.delete_story(self.USER_ID, self.STORY_ID)
+        story_services.delete_story(
+            self.USER_ID, self.STORY_ID, force_deletion=True)
         self.assertIsNone(
             exp_services.get_story_id_linked_to_exploration('0'))
         self.assertIsNone(
             exp_services.get_story_id_linked_to_exploration('1'))
+        self.assertIsNone(
+            exp_services.get_story_id_linked_to_exploration('2'))
+
+        self.save_new_story(
+            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
+            self.TOPIC_ID)
+
+        # Creates node 1 -> node 2 -> node 3, links exp IDs 0, 1 and 2 with them
+        # respectively. Then, deletes 2, 3, adds node 4 (node 1 -> node 4),
+        # deletes it and adds node 5 (node 1 -> node 5).
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_ADD_STORY_NODE,
+            'node_id': 'node_1',
+            'title': 'Title 1'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_ADD_STORY_NODE,
+            'node_id': 'node_2',
+            'title': 'Title 2'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_ADD_STORY_NODE,
+            'node_id': 'node_3',
+            'title': 'Title 3'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+            'node_id': self.NODE_ID_1,
+            'old_value': [],
+            'new_value': ['node_2']
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+            'node_id': self.NODE_ID_2,
+            'old_value': [],
+            'new_value': ['node_3']
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'node_id': self.NODE_ID_1,
+            'old_value': None,
+            'new_value': '0'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'node_id': self.NODE_ID_2,
+            'old_value': None,
+            'new_value': '1'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'node_id': 'node_3',
+            'old_value': None,
+            'new_value': '2'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_DELETE_STORY_NODE,
+            'node_id': self.NODE_ID_2
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_DELETE_STORY_NODE,
+            'node_id': 'node_3'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_ADD_STORY_NODE,
+            'node_id': 'node_4',
+            'title': 'Title 4'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'node_id': 'node_4',
+            'old_value': None,
+            'new_value': '2'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_DELETE_STORY_NODE,
+            'node_id': 'node_4'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_ADD_STORY_NODE,
+            'node_id': 'node_5',
+            'title': 'Title 5'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+            'node_id': 'node_1',
+            'old_value': ['node_2'],
+            'new_value': ['node_5']
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'node_id': 'node_5',
+            'old_value': None,
+            'new_value': '1'
+        })]
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
+        self.assertEqual(
+            exp_services.get_story_id_linked_to_exploration('0'), self.STORY_ID)
+        self.assertEqual(
+            exp_services.get_story_id_linked_to_exploration('1'), self.STORY_ID)
         self.assertIsNone(
             exp_services.get_story_id_linked_to_exploration('2'))
 
