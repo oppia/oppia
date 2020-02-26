@@ -60,6 +60,19 @@
                       on-click-continue-button="showUpcomingCard()">
         </progress-nav>
       </div>
+      <div ng-if="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()" class="conversation-skin-next-lesson-wrapper">
+        <div style="cursor: default">
+          <span class="conversation-skin-next-lesson-text">Next Lesson</span>
+          <span><[recommendedExplorationSummaries[0].title]></span>
+        </div>
+        <div>
+          <a href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
+            <md-button class="md-raised" style="background-color: #0D48A1">
+              <i class="material-icons oppia-vcenter" style="color: #fff" aria-hidden="true">&#xE5C8;</i>
+            </md-button>
+          </a>
+        </div>
+      </div>
     </div>
 
     <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
@@ -97,31 +110,9 @@
   <div ng-if="recommendedExplorationSummaries !== null && (collectionSummary || recommendedExplorationSummaries.length > 0)"
        class="conversation-skin-final-recommendations">
     <div ng-if="recommendedExplorationSummaries.length > 0">
-      <span ng-if="collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
-            translate="I18N_PLAYER_NEXT_LESSON">
-      </span>
       <span ng-if="!collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
             translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS">
       </span>
-
-      <div class="oppia-exp-summary-tiles-container conversation-skin-recommended-activities-container">
-        <exploration-summary-tile ng-repeat="exp in (recommendedExplorationSummaries|limitTo:3) track by $index"
-                                  collection-id="collectionId"
-                                  exploration-id="exp.id"
-                                  exploration-title="exp.title"
-                                  node-id="nextNodeId"
-                                  parent-exploration-ids="parentExplorationIds"
-                                  last-updated-msec="exp.last_updated_msec"
-                                  objective="exp.objective"
-                                  category="exp.category"
-                                  ratings="exp.ratings"
-                                  thumbnail-icon-url="exp.thumbnail_icon_url"
-                                  thumbnail-bg-color="exp.thumbnail_bg_color"
-                                  num-views="exp.num_views"
-                                  is-community-owned="exp.community_owned"
-                                  style="margin-left: 10px;">
-        </exploration-summary-tile>
-      </div>
 
       <div ng-if="collectionSummary && !isRefresherExploration" class="conversation-skin-back-to-collection-container">
         <a ng-href="/collection/<[collectionId]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
@@ -181,6 +172,25 @@ otherwise they will interfere with the iframed conversation skin directive.
     z-index: 16;
   }
 
+  .conversation-skin-next-lesson-wrapper {
+    align-items: center;
+    background-color: white;
+    bottom: 0;
+    display: flex;
+    margin: 0 6px 6px 0;
+    position: absolute;
+    right: 0;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .conversation-skin-next-lesson-text {
+    color: #0D48A1;
+    display: block;
+    font-size: 14px;
+    font-weight: 800;
+    height: 14px;
+  }
+
   .conversation-skin-back-to-collection-container {
     margin-bottom: 92px;
     margin-top: 25px;
@@ -211,9 +221,9 @@ otherwise they will interfere with the iframed conversation skin directive.
     display: -webkit-flex;
     display: flex;
     justify-content: center;
-    margin: 0 auto 40px;
+    margin: 0 auto 0;
     max-width: 1400px;
-    padding: 56px 14px;
+    padding: 56px 14px 0;
     width: 100%;
   }
 
@@ -223,7 +233,8 @@ otherwise they will interfere with the iframed conversation skin directive.
     /* NOTE TO DEVELOPERS: If min-width is changed, max-width in media query
        below should be changed to match. */
     min-width: 360px;
-    width: 100%;
+    width: 42%;
+    position: relative;
     z-index: 3;
   }
 
@@ -326,11 +337,14 @@ otherwise they will interfere with the iframed conversation skin directive.
 
   .conversation-skin-final-ratings {
     text-align: center;
-    margin-bottom: 60px;
+    background-color: white;
+    width: 41%;
+    margin: 0 auto 60px;
+    padding: 11px;
   }
   .conversation-skin-final-ratings-header {
     color: #064b46;
-    margin: 20px 0;
+    margin: 20px 0 0;
   }
   .conversation-skin-final-ratings-display {
     color: #064b46;
@@ -357,6 +371,7 @@ otherwise they will interfere with the iframed conversation skin directive.
 
   .conversation-skin-final-summary {
     margin-bottom: 25px;
+    margin-top: 20px;
   }
 
   .conversation-skin-recommended-activities-container {
