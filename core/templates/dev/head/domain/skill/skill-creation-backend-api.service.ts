@@ -52,7 +52,7 @@ export class SkillCreationBackendApiService {
       .then((response: { skillId:string }) => {
         if (successCallback) {
           successCallback({
-            topicId: response.skillId
+            skillId: response.skillId
           });
         }
       }, (errorResponse) => {
