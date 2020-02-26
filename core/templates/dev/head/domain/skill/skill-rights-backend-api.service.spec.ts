@@ -16,130 +16,69 @@
  * @fileoverview Unit tests for SkillRightsBackendApiService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-require('App.ts');
-require('domain/skill/skill-rights-backend-api.service.ts');
-require('pages/skill-editor-page/skill-editor-page.controller.ts');
-require('services/csrf-token.service.ts');
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { SkillRightsBackendApiService } from './skill-rights-backend-api.service';
+import { SkillRightsBackendApiService } from
+  'domain/skill/skill-rights-backend-api.service.ts';
 
-
-fdescribe('Skill rights backend API service', () => {
+describe('Skill rights backend API service', () => {
   let skillRightsBackendApiService = null;
-  let httpTestingController: HttpTestingController;
+  let httpTestingController: HttpTestingController = null;
+  let sampleSkillRights = {
+    skill_id: '0',
+    can_edit_skill_description: true
+  };
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    skillRightsBackendApiService=TestBed.get(SkillRightsBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
-  })
+    skillRightsBackendApiService = TestBed.get(SkillRightsBackendApiService);
+  });
   afterEach(() => {
     httpTestingController.verify();
   });
 
-  it('should report a cached skill rights after caching it', fakeAsync(() => {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+  it('should report a cached skill rights after caching it',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-    // The skill should not currently be cached.
-    expect(skillRightsBackendApiService.isCached('0')).toBe(false);
-    // Cache a skill.
-    skillRightsBackendApiService.cacheSkillRights('0', {
-      skill_id: '0',
-      can_edit_skill_description: true
-    });
+      // The skill should not currently be cached.
+      expect(skillRightsBackendApiService.isCached('0')).toBe(false);
+      // Cache a skill.
+      skillRightsBackendApiService.cacheSkillRights('0', sampleSkillRights);
 
-    // It should now be cached.
-    expect(skillRightsBackendApiService.isCached('0')).toBe(true);
+      // It should now be cached.
+      expect(skillRightsBackendApiService.isCached('0')).toBe(true);
 
-    // A new skill should not have been fetched from the backend. Also,
-    // the returned skill should match the expected skill object.
-    skillRightsBackendApiService.loadSkillRights('0').then(
-      successHandler, failHandler);
-    flushMicrotasks();
+      // A new skill should not have been fetched from the backend. Also,
+      // the returned skill should match the expected skill object.
+      skillRightsBackendApiService.loadSkillRights('0').then(
+        successHandler, failHandler);
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith({
-      skill_id: '0',
-      can_edit_skill: true
-    });
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
+      expect(successHandler).toHaveBeenCalledWith(sampleSkillRights);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 
-})
+  it('should fetch skills right given its skillId',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-
-
-
-
-
-
-// describe('Skill rights backend API service', function() {
-//   var SkillRightsBackendApiService = null;
-//   var $rootScope = null;
-//   var $scope = null;
-//   var $httpBackend = null;
-//   var CsrfService = null;
-
-//   beforeEach(angular.mock.module('oppia'));
-//   beforeEach(angular.mock.module('oppia', function($provide) {
-//     var ugs = new UpgradedServices();
-//     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-//       $provide.value(key, value);
-//     }
-//   }));
-
-//   beforeEach(angular.mock.inject(function($injector, $q) {
-//     SkillRightsBackendApiService = $injector.get(
-//       'SkillRightsBackendApiService');
-//     $rootScope = $injector.get('$rootScope');
-//     $scope = $rootScope.$new();
-//     $httpBackend = $injector.get('$httpBackend');
-//     CsrfService = $injector.get('CsrfTokenService');
-
-//     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-//       var deferred = $q.defer();
-//       deferred.resolve('sample-csrf-token');
-//       return deferred.promise;
-//     });
-//   }));
-
-//   afterEach(function() {
-//     $httpBackend.verifyNoOutstandingExpectation();
-//     $httpBackend.verifyNoOutstandingRequest();
-//   });
-
-//   it('should report a cached skill rights after caching it', function() {
-//     var successHandler = jasmine.createSpy('success');
-//     var failHandler = jasmine.createSpy('fail');
-
-//     // The skill should not currently be cached.
-//     expect(SkillRightsBackendApiService.isCached('0')).toBe(false);
-//     // Cache a skill.
-//     SkillRightsBackendApiService.cacheSkillRights('0', {
-//       skill_id: '0',
-//       can_edit_skill: true
-//     });
-
-//     // It should now be cached.
-//     expect(SkillRightsBackendApiService.isCached('0')).toBe(true);
-
-//     // A new skill should not have been fetched from the backend. Also,
-//     // the returned skill should match the expected skill object.
-//     SkillRightsBackendApiService.loadSkillRights('0').then(
-//       successHandler, failHandler);
-//     $rootScope.$digest();
-
-//     expect(successHandler).toHaveBeenCalledWith({
-//       skill_id: '0',
-//       can_edit_skill: true
-//     });
-//     expect(failHandler).not.toHaveBeenCalled();
-//   });
-// });
+      skillRightsBackendApiService.fetchSkillRights('0').then(
+        successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/skill_editor_handler/rights/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleSkillRights);
+      flushMicrotasks();
+      expect(successHandler).toHaveBeenCalledWith(sampleSkillRights);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+});
