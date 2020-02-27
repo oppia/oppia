@@ -17,17 +17,17 @@
  *               the exploration editor.
  */
 
-export interface IExplorationData {
-  'param_changes': string[],
+export interface IExplorationDataDict {
+  'param_changes': string[];
   'states': {
     [propsName : string]: {
       'param_changes': string[]
     }
-  }
+  };
 }
-export interface IFeatureData {
-  'is_exploration_whitelisted': boolean,
-  'is_improvements_tab_enabled': boolean
+export interface IFeatureDataDict {
+  'is_exploration_whitelisted': boolean;
+  'is_improvements_tab_enabled': boolean;
 }
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -45,8 +45,8 @@ export class ExplorationFeaturesService {
     isPlaythroughRecordingEnabled: false
   };
 
-  init(explorationData: IExplorationData,
-      featuresData: IFeatureData): void {
+  init(explorationData: IExplorationDataDict,
+      featuresData: IFeatureDataDict): void {
     if (ExplorationFeaturesService.serviceIsInitialized) {
       return;
     }

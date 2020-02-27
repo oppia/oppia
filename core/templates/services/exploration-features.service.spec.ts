@@ -17,14 +17,16 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { ExplorationFeaturesService, IExplorationData, IFeatureData} from
+
+import { ExplorationFeaturesService, IExplorationDataDict,
+  IFeatureDataDict} from
   'services/exploration-features.service';
 
 describe('ExplorationFeatureService', () => {
   let explorationFeatureService: ExplorationFeaturesService = null;
-  let featureData: IFeatureData = null;
-  let explorationData: IExplorationData = null;
-  let explorationData2: IExplorationData = null;
+  let featureData: IFeatureDataDict = null;
+  let explorationData: IExplorationDataDict = null;
+  let explorationData2: IExplorationDataDict = null;
 
   beforeEach(() => {
     explorationFeatureService = TestBed.get(ExplorationFeaturesService);
