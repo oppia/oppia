@@ -16,12 +16,12 @@
  * @fileoverview Factory for creating and mutating instances of frontend
  * skill rights domain objects.
  */
-export interface ISkillRightBackendInterface {
-  'skill_id': string,
-  'can_edit_skill_description': boolean
+export interface ISkillRightBackend {
+  'can_edit_skill_description': boolean,
+  'skill_id': string
 }
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
 export class SkillRights {
   _skillId: string;
@@ -43,7 +43,7 @@ export class SkillRights {
 
   copyFromSkillRights(otherSkillRights: {
       getSkillId: () => string; canEditSkillDescription: () => boolean;
-    }): void {
+    }):void {
     this._skillId = otherSkillRights.getSkillId();
     this._skillDescriptionIsEditable =
       otherSkillRights.canEditSkillDescription();

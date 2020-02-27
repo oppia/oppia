@@ -17,14 +17,16 @@
  */
 
 export interface ISkillRightCache {
-  [propName: string]: ISkillRightBackendInterface
+  [propName: string]: ISkillRightBackend
 }
 
 import { cloneDeep } from 'lodash';
+
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ISkillRightBackendInterface } from
+
+import { ISkillRightBackend } from
   'domain/skill/SkillRightsObjectFactory.ts';
 import { SkillEditorPageConstants } from
   'pages/skill-editor-page/skill-editor-page.constants.ts';
@@ -37,13 +39,13 @@ import { UrlInterpolationService } from
 
 export class SkillRightsBackendApiService {
   skillRightsCache: ISkillRightCache = {};
-  skillRightBackendDict: ISkillRightBackendInterface = null;
+  skillRightBackendDict: ISkillRightBackend = null;
 
   constructor(
     private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService) { }
+    private urlInterpolationService: UrlInterpolationService) {}
 
-  _fetchSkillRights(skillId, successCallback, errorCallback) {
+  _fetchSkillRights(skillId:string, successCallback, errorCallback):void {
     let skillRightsUrl = this.urlInterpolationService.interpolateUrl(
       SkillEditorPageConstants.SKILL_RIGHTS_URL_TEMPLATE, {
         skill_id: skillId
@@ -61,13 +63,13 @@ export class SkillRightsBackendApiService {
       });
   }
 
-  _isCached(skillId: string) {
+  _isCached(skillId: string):boolean {
     return this.skillRightsCache.hasOwnProperty(skillId);
   }
   /**
     * Gets a skill's rights, given its ID.
     */
-  fetchSkillRights(skillId: string) {
+  fetchSkillRights(skillId: string):Promise<ISkillRightBackend> {
     return new Promise((resolve, reject) => {
       this._fetchSkillRights(skillId, resolve, reject);
     });
@@ -81,7 +83,7 @@ export class SkillRightsBackendApiService {
     * rights from the backend, it will store it in the cache to avoid
     * requests from the backend in further function calls.
     */
-  loadSkillRights(skillId: string) {
+  loadSkillRights(skillId: string):Promise<ISkillRightBackend> {
     return new Promise((resolve, reject) => {
       if (this._isCached(skillId)) {
         if (resolve) {
@@ -89,7 +91,7 @@ export class SkillRightsBackendApiService {
         }
       } else {
         this._fetchSkillRights(skillId,
-          (skillRights: ISkillRightBackendInterface) => {
+          (skillRights: ISkillRightBackend) => {
             this.cacheSkillRights(skillId, skillRights);
             if (resolve) {
               resolve(this.skillRightsCache[skillId]);
@@ -99,14 +101,14 @@ export class SkillRightsBackendApiService {
     });
   }
 
-  isCached(skillId: string) :boolean {
+  isCached(skillId: string):boolean {
     return this._isCached(skillId);
   }
 
-  cacheSkillRights(skillId: string,
-      skillRights: ISkillRightBackendInterface): void{
+  cacheSkillRights(skillId: string, skillRights: ISkillRightBackend):void {
     this.skillRightsCache[skillId] = cloneDeep(skillRights);
   }
 }
+
 angular.module('oppia').factory('SkillRightsBackendApiService',
   downgradeInjectable(SkillRightsBackendApiService));

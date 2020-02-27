@@ -20,13 +20,15 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks, async } from
   '@angular/core/testing';
-import { SkillRightsBackendApiService } from
+
+import { ISkillRightBackend } from 'domain/skill/SkillRightsObjectFactory.ts';
+import { SkillRightsBackendApiService,  } from
   'domain/skill/skill-rights-backend-api.service.ts';
 
 describe('Skill rights backend API service', () => {
-  let skillRightsBackendApiService = null;
+  let skillRightsBackendApiService:SkillRightsBackendApiService = null;
   let httpTestingController: HttpTestingController = null;
-  let sampleSkillRights = {
+  let sampleSkillRights:ISkillRightBackend = {
     skill_id: '0',
     can_edit_skill_description: true
   };
