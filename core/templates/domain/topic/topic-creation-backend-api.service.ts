@@ -17,9 +17,9 @@
  * topic_id.
  */
 
-export interface ITopicBackendInterface {
-  'name': string,
-  'abbreviated_name': string
+export interface ITopicCreationBackend {
+  'abbreviated_name': string,
+  'name': string
 }
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
@@ -36,7 +36,7 @@ export class TopicCreationBackendApiService {
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback:(reason?: any) => void,
       topicName, abbreviatedTopicName): void {
-    let postData:ITopicBackendInterface = {
+    let postData:ITopicCreationBackend = {
       name: topicName,
       abbreviated_name: abbreviatedTopicName
     };

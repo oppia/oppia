@@ -21,14 +21,14 @@ import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { TopicCreationBackendApiService } from
+import { TopicCreationBackendApiService, ITopicCreationBackend } from
   'domain/topic/topic-creation-backend-api.service.ts';
 
 describe('Topic creation backend api service', () => {
   var csrfService: CsrfTokenService = null;
   var httpTestingController: HttpTestingController = null;
   var topicCreationBackendApiService:TopicCreationBackendApiService = null;
-  var postData = {
+  var postData:ITopicCreationBackend = {
     name: 'topic-name',
     abbreviated_name: 'topic-abbr-name'
   };
