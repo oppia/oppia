@@ -169,13 +169,13 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
         self.logout()
 
-    def test_cannot_load_dummy_skill_data_in_production_mode(self):
+    def test_cannot_generate_dummy_skill_data_in_production_mode(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception, 'Cannot load dummy skills in production.')
+            Exception, 'Cannot generate dummy skills in production.')
         with assert_raises_regexp_context_manager, prod_mode_swap:
             self.post_json(
                 '/adminhandler', {
@@ -183,7 +183,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
         self.logout()
 
-    def test_non_admins_cannot_load_dummy_skill_data(self):
+    def test_non_admins_cannot_generate_dummy_skill_data(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         assert_raises_regexp = self.assertRaisesRegexp(
@@ -275,7 +275,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(questions), 3)
         self.logout()
 
-    def test_load_dummy_skill_data(self):
+    def test_generate_dummy_skill_and_questions_data(self):
         self.set_admins([self.ADMIN_USERNAME])
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()

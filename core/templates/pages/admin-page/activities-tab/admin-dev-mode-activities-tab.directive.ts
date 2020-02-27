@@ -153,14 +153,14 @@ angular.module('oppia').directive('adminDevModeActivitiesTab', [
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.loadNewSkillData = function() {
+        ctrl.generateNewSkillData = function() {
           AdminTaskManagerService.startTask();
           ctrl.setStatusMessage('Processing...');
           $http.post(ADMIN_HANDLER_URL, {
             action: 'generate_dummy_new_skill_data'
           }).then(function() {
             ctrl.setStatusMessage(
-              'Dummy new skill data generated successfully.');
+              'Dummy new skill and questions generated successfully.');
           }, function(errorResponse) {
             ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
