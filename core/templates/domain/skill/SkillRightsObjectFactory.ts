@@ -55,7 +55,7 @@ export class SkillRights {
 })
 export class SkillRightsObjectFactory {
   createFromBackendDict(
-      skillRightsBackendDict: ISkillRightBackendInterface): SkillRights {
+      skillRightsBackendDict: ISkillRightBackend): SkillRights {
     return new SkillRights(
       skillRightsBackendDict.skill_id,
       skillRightsBackendDict.can_edit_skill_description);
