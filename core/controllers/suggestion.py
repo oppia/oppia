@@ -245,8 +245,13 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
         try:
             _require_valid_suggestion_and_target_types(
                 target_type, suggestion_type)
-            suggestions = suggestion_services.get_reviewable_suggestions(
-                self.user_id, suggestion_type)
+            reviewable_suggestion_lists = map(
+                lambda suggestion_type:
+                    suggestion_services.get_reviewable_suggestions(
+                        self.user_id, suggestion_type),
+                get_all_related_suggestion_types(suggestion_type)
+            )
+            suggestions = utils.flatten_list(reviewable_suggestion_lists)
             self._render_suggestions(target_type, suggestions)
         except Exception as e:
             raise self.InvalidInputException(e)
@@ -263,12 +268,32 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
         try:
             _require_valid_suggestion_and_target_types(
                 target_type, suggestion_type)
-            suggestions = suggestion_services.get_submitted_suggestions(
-                self.user_id, suggestion_type)
+            submitted_suggestion_lists = map(
+                lambda suggestion_type:
+                    suggestion_services.get_submitted_suggestions(
+                        self.user_id, suggestion_type),
+                get_all_related_suggestion_types(suggestion_type)
+            )
+            suggestions = utils.flatten_list(submitted_suggestion_lists)
             self._render_suggestions(target_type, suggestions)
         except Exception as e:
             raise self.InvalidInputException(e)
 
+
+def get_all_related_suggestion_types(suggestion_type):
+    """Returns all suggestion types related to the given suggestion_type, i.e.
+    a suggestion_type add_easy_question, would return
+    [add_easy_question, add_medium_question, add_hard_question].
+
+    Args:
+        suggestion_type. str. Suggestion type.
+
+    Returns:
+        list(str). A list of suggestion_types.
+    """
+    if suggestion_type in constants.QUESTION_SUGGESTION_TYPES:
+        return constants.QUESTION_SUGGESTION_TYPES
+    return [suggestion_type]
 
 class SuggestionListHandler(base.BaseHandler):
     """Handles list operations on suggestions."""

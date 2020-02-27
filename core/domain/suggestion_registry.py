@@ -636,7 +636,7 @@ class SuggestionAddQuestion(BaseSuggestion):
 
     def get_skill_difficulty(self):
         """Returns the skill difficulty of the suggestion."""
-        return constants.ADD_QUESTION_SUGGESTION_TYPE_TO_SKILL_DIFFICULTY_FLOAT[
+        return constants.QUESTION_SUGGESTION_TYPE_TO_SKILL_DIFFICULTY_FLOAT[
             self.suggestion_type
         ]
 

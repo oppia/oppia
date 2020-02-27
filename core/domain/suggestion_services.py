@@ -19,6 +19,7 @@ suggestions.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -80,7 +81,7 @@ def create_suggestion(
             raise Exception(
                 'The given content_html does not match the content of the '
                 'exploration.')
-    elif suggestion_type == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
+    elif suggestion_type in constants.QUESTION_SUGGESTION_TYPES:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)

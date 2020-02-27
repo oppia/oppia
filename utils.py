@@ -692,6 +692,17 @@ def get_hashable_value(value):
     else:
         return value
 
+def flatten_list(l):
+    """Flattens a list of lists.
+
+    Args:
+        list(list(*)). A list of lists.
+
+    Returns:
+        list(*). A list composed of all the values in the sub-lists of the
+            supplied list of lists.
+    """
+    return [item for sublist in l for item in sublist]
 
 class OrderedCounter(collections.Counter, collections.OrderedDict):
     """Counter that remembers the order elements are first encountered."""
