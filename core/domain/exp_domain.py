@@ -596,7 +596,7 @@ class Exploration(python_utils.OBJECT):
         return exploration
 
     @classmethod
-    def _require_valid_state_name(cls, name):
+    def _validate_state_name(cls, name):
         """Validates name string.
 
         Args:
@@ -686,7 +686,7 @@ class Exploration(python_utils.OBJECT):
         if not self.states:
             raise utils.ValidationError('This exploration has no states.')
         for state_name in self.states:
-            self._require_valid_state_name(state_name)
+            self._validate_state_name(state_name)
             state = self.states[state_name]
             state.validate(
                 self.param_specs,
@@ -1208,7 +1208,7 @@ class Exploration(python_utils.OBJECT):
         if old_state_name == new_state_name:
             return
 
-        self._require_valid_state_name(new_state_name)
+        self._validate_state_name(new_state_name)
 
         self.states[new_state_name] = copy.deepcopy(
             self.states[old_state_name])
