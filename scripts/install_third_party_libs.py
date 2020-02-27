@@ -25,28 +25,17 @@ import sys
 # These libraries need to be installed before running or importing any script.
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
-PRE_IMPORT = [
-    ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
-    ('future', '0.17.1', os.path.join('third_party', 'future-0.17.1')),
-]
+# Download and install pyyaml.
+if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
+    subprocess.check_call([
+        sys.executable, '-m', 'pip', 'install', 'pyyaml==5.1.2', '--target',
+        os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
 
-for PACKAGE, VERSION, INSTALL_PATH in PRE_IMPORT:
-    if os.path.exists(INSTALL_PATH):
-        continue
-    COMMAND = [
-        sys.executable, '-m', 'pip', 'install', '%s==%s'
-        % (PACKAGE, VERSION), '--target', INSTALL_PATH]
-    PROCESS = subprocess.Popen(
-        COMMAND, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    STDOUT, STDERR = PROCESS.communicate()
-    if 'can\'t combine user with prefix' in STDERR:
-        subprocess.check_call([
-            sys.executable, '-m', 'pip', 'install',
-            '%s==%s' % (PACKAGE, VERSION), '--target', INSTALL_PATH,
-            '--user', '--prefix=', '--system'])
-    elif PROCESS.returncode:
-        raise Exception('Error installing package')
-
+# Download and install future.
+if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
+    subprocess.check_call([
+        sys.executable, '-m', 'pip', 'install', 'future==0.17.1', '--target',
+        os.path.join('third_party', 'future-0.17.1')])
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order

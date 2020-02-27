@@ -52,23 +52,10 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
     def setUp(self):
         super(InstallThirdPartyLibsImportTests, self).setUp()
         self.commands = []
-        #pylint: disable=unused-argument
-        #pylint: disable=super-init-not-called
         def mock_check_call(cmd_tokens, stdout=0, stderr=0):
-            class Ret(test_utils.GenericTestBase):
-                """Return object with required method."""
-                def __init__(self):
-                    pass
-                def communicate(self):
-                    """Return required method."""
-                    return '', ''
-                returncode = 0
             self.commands.extend(cmd_tokens)
-            return Ret()
-        #pylint: enable=unused-argument
-        #pylint: enable=super-init-not-called
         self.check_call_swap = self.swap(
-            subprocess, 'Popen', mock_check_call)
+             subprocess, 'check_call', mock_check_call)
 
     def test_import_with_missing_packages(self):
         def mock_exists(unused_path):
