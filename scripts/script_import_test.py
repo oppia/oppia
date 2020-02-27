@@ -52,10 +52,10 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
     def setUp(self):
         super(InstallThirdPartyLibsImportTests, self).setUp()
         self.commands = []
-        def mock_check_call(cmd_tokens, stdout=0, stderr=0):
+        def mock_check_call(cmd_tokens):
             self.commands.extend(cmd_tokens)
         self.check_call_swap = self.swap(
-             subprocess, 'check_call', mock_check_call)
+            subprocess, 'check_call', mock_check_call)
 
     def test_import_with_missing_packages(self):
         def mock_exists(unused_path):
