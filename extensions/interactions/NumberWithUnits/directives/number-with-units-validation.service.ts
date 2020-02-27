@@ -20,7 +20,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { unit } from 'mathjs';
+import { create, addDependencies } from 'mathjs'
+const { add } = create({addDependencies}, {});
 
 import { AppConstants } from 'app.constants';
 import { baseInteractionValidationService } from
