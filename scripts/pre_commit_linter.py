@@ -203,33 +203,30 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'\btoThrow\('),
+        'regexp': re.compile(r'toThrow\('),
         'message': 'Please use \'toThrowError\' instead of '
                    '\'toThrow\'',
         'excluded_files': (),
-        'excluded_dirs': ('extensions/interactions/LogicProof/static/js')
+        'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'throw\s\b(\bError|\bTypeError|\bRangeError)\('),
-        'message': 'Please use \'throw new \' instead of '
-                   '\'throw nameoferror\'',
+        'message': 'Please use \'throw new\' instead of \'throw\'',
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'throw\s\b(\bSyntaxError|\bDimensionError)\('),
-        'message': 'Please use \'throw new \' instead of '
-                   '\'throw nameoferror\'',
+        'message': 'Please use \'throw new \' instead of \'throw\'',
         'excluded_files': (),
         'excluded_dirs': ('extensions/interactions/LogicProof/static/js')
     },
     {
         'regexp': re.compile(r'\b(\bthrow\s*\'|\bthrow\s\w+;)'),
         'message': 'Please use '
-                   '\'throw new Error(message)\' '
-                   'instead of \'throw message \'',
+                   '\'throw new Error\' instead of \'throw\'',
         'excluded_files': (),
-        'excluded_dirs': ('extensions/interactions/LogicProof/static/js')
+        'excluded_dirs': ('extensions/interactions/LogicProof/static')
     },
     {
         'regexp': re.compile(r'\b(beforeEach\(inject\(function)\('),
