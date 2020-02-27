@@ -469,7 +469,9 @@ class AdminHandler(base.BaseHandler):
                 question = self._create_dummy_question(
                     question_id, question_name, [skill_id])
                 question_services.add_question(self.user_id, question)
-                question_difficulty = [feconf.EASY_SKILL_DIFFICULTY, feconf.MEDIUM_SKILL_DIFFICULTY, feconf.HARD_SKILL_DIFFICULTY]
+                question_difficulty = [feconf.EASY_SKILL_DIFFICULTY,
+                                       feconf.MEDIUM_SKILL_DIFFICULTY,
+                                       feconf.HARD_SKILL_DIFFICULTY]
                 random_difficulty = random.choice(question_difficulty)
                 question_services.create_new_question_skill_link(
                     self.user_id, question_id, skill_id, random_difficulty)
