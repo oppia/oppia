@@ -40,6 +40,8 @@ SEPARATE_MODEL_CLASSES = [
     exp_models.ExplorationCommitLogEntryModel,
     exp_models.ExplorationSnapshotMetadataModel]
 
+NUMBER_OF_MODELS_IN_TRANSACTION = 20
+
 
 class MissingUserException(Exception):
     """Exception for cases when the user doesn't exist."""
@@ -103,12 +105,17 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             model_values['user_id'] = new_user_id
             new_models.append(model_class(**model_values))
 
-        def _replace_models():
+        def _replace_models(new_models_sub, old_models_sub):
             """Replace old models with new ones."""
-            model_class.put_multi(new_models, update_last_updated_time=False)
-            model_class.delete_multi(old_models)
+            model_class.put_multi(
+                new_models_sub, update_last_updated_time=False)
+            model_class.delete_multi(old_models_sub)
 
-        transaction_services.run_in_transaction(_replace_models)
+        for i in range(0, len(old_models), NUMBER_OF_MODELS_IN_TRANSACTION):
+            transaction_services.run_in_transaction(
+                _replace_models,
+                new_models[i:i + NUMBER_OF_MODELS_IN_TRANSACTION],
+                old_models[i:i + NUMBER_OF_MODELS_IN_TRANSACTION])
 
     @staticmethod
     def _change_model_with_one_user_id_field(
