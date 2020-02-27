@@ -27,6 +27,7 @@ import { AnswerClassificationResultObjectFactory } from
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerGroupsCacheService } from
+// eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AudioLanguageObjectFactory } from
   'domain/utilities/AudioLanguageObjectFactory';
@@ -66,6 +67,7 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
 import { DragAndDropSortInputRulesService } from
+// eslint-disable-next-line max-len
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from
@@ -272,6 +274,7 @@ export class UpgradedServices {
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
+    // eslint-disable-next-line max-len
     upgradedServices['ContinueValidationService'] = new ContinueValidationService(
       upgradedServices['baseInteractionValidationService']);
     upgradedServices['CountVectorizerService'] = new CountVectorizerService();
