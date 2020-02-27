@@ -17,20 +17,20 @@
  * concept card. In the backend, this is referred to as SkillContents.
  */
 
-export interface IConceptCardBackendInterface {
-  'explanation': ISubtitledHtmlBackendInterface,
-  'worked_examples': Array<ISubtitledHtmlBackendInterface>,
-  'recorded_voiceovers': IRecordedVoiceOverBackendInterface
+export interface IConceptCardBackendDict {
+  'explanation': ISubtitledHtmlBackendDict,
+  'worked_examples': Array<ISubtitledHtmlBackendDict>,
+  'recorded_voiceovers': IRecordedVoiceOverBackendDict
 }
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers, RecordedVoiceoversObjectFactory,
-  IRecordedVoiceOverBackendInterface } from
+  IRecordedVoiceOverBackendDict } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { SubtitledHtml, SubtitledHtmlObjectFactory,
-  ISubtitledHtmlBackendInterface} from
+  ISubtitledHtmlBackendDict} from
   'domain/exploration/SubtitledHtmlObjectFactory';
 
 export class ConceptCard {
@@ -46,7 +46,7 @@ export class ConceptCard {
     this._recordedVoiceovers = recordedVoiceovers;
   }
 
-  toBackendDict(): IConceptCardBackendInterface {
+  toBackendDict(): IConceptCardBackendDict {
     return {
       explanation: this._explanation.toBackendDict(),
       worked_examples: this._workedExamples.map(
@@ -125,7 +125,7 @@ export class ConceptCardObjectFactory {
   _generateWorkedExamplesFromBackendDict(
       workedExampleDicts): Array<SubtitledHtml> {
     return workedExampleDicts.map(
-      (workedExampleDict: ISubtitledHtmlBackendInterface) => {
+      (workedExampleDict: ISubtitledHtmlBackendDict) => {
         return this.subtitledHtmlObjectFactory.createFromBackendDict(
           workedExampleDict);
       });
@@ -149,7 +149,7 @@ export class ConceptCardObjectFactory {
   }
 
   createFromBackendDict(
-      conceptCardBackendDict: IConceptCardBackendInterface): ConceptCard {
+      conceptCardBackendDict: IConceptCardBackendDict): ConceptCard {
     return new ConceptCard(
       this.subtitledHtmlObjectFactory.createFromBackendDict(
         conceptCardBackendDict.explanation),

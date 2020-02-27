@@ -16,9 +16,9 @@
  * @fileoverview Factory for creating new frontend instances of SubtitledHtml
  * domain objects.
  */
-export interface ISubtitledHtmlBackendInterface {
-  'content_id': string,
-  'html': string
+export interface ISubtitledHtmlBackendDict {
+  'content_id': string;
+  'html': string;
 }
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -47,7 +47,7 @@ export class SubtitledHtml {
     return !this._html;
   }
 
-  toBackendDict(): ISubtitledHtmlBackendInterface {
+  toBackendDict(): ISubtitledHtmlBackendDict {
     return {
       html: this._html,
       content_id: this._contentId
@@ -64,7 +64,7 @@ export class SubtitledHtml {
 })
 export class SubtitledHtmlObjectFactory {
   createFromBackendDict(
-      subtitledHtmlBackendDict: ISubtitledHtmlBackendInterface): SubtitledHtml {
+      subtitledHtmlBackendDict: ISubtitledHtmlBackendDict): SubtitledHtml {
     return new SubtitledHtml(
       subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
   }

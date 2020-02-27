@@ -17,7 +17,7 @@
  * rubrics.
  */
 
-export interface IRubricBackendInterface {
+export interface IRubricBackendDict {
   'difficulty': string,
   'explanation': string
 }
@@ -34,7 +34,7 @@ export class Rubric {
     this._explanation = explanation;
   }
 
-  toBackendDict(): IRubricBackendInterface {
+  toBackendDict(): IRubricBackendDict {
     return {
       difficulty: this._difficulty,
       explanation: this._explanation
@@ -58,7 +58,7 @@ export class Rubric {
   providedIn: 'root'
 })
 export class RubricObjectFactory {
-  createFromBackendDict(rubricBackendDict: IRubricBackendInterface): Rubric {
+  createFromBackendDict(rubricBackendDict: IRubricBackendDict): Rubric {
     return new Rubric(
       rubricBackendDict.difficulty,
       rubricBackendDict.explanation);

@@ -16,12 +16,13 @@
  * @fileoverview Factory for creating new frontend instances of
  * Voiceover domain objects.
  */
-export interface IVoiceoverInterface {
-  'filename': string,
-  'file_size_bytes': number,
-  'needs_update': boolean,
-  'duration_secs':number
+export interface IVoiceoverDict {
+  'duration_secs':number;
+  'filename': string;
+  'file_size_bytes': number;
+  'needs_update': boolean;
 }
+
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
@@ -52,7 +53,7 @@ export class Voiceover {
     return this.fileSizeBytes / NUM_BYTES_IN_MB;
   }
 
-  toBackendDict(): IVoiceoverInterface {
+  toBackendDict(): IVoiceoverDict {
     return {
       filename: this.filename,
       file_size_bytes: this.fileSizeBytes,
@@ -72,7 +73,7 @@ export class VoiceoverObjectFactory {
   }
 
   createFromBackendDict(
-      translationBackendDict: IVoiceoverInterface): Voiceover {
+      translationBackendDict: IVoiceoverDict): Voiceover {
     return new Voiceover(
       translationBackendDict.filename,
       translationBackendDict.file_size_bytes,

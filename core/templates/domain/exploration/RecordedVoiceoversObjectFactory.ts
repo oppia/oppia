@@ -16,10 +16,10 @@
  * @fileoverview Factory for creating new frontend instances of
  * RecordedVoiceovers domain objects.
  */
-export interface IRecordedVoiceOverBackendInterface {
+export interface IRecordedVoiceOverBackendDict {
   'voiceovers_mapping': {
     [propName: string]: {
-      [propName: string]: IVoiceoverInterface
+      [propName: string]: IVoiceoverDict
     }
   }
 }
@@ -36,7 +36,7 @@ export interface IVoiceoverMapping {
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { VoiceoverObjectFactory, IVoiceoverInterface, Voiceover } from
+import { VoiceoverObjectFactory, IVoiceoverDict, Voiceover } from
   'domain/exploration/VoiceoverObjectFactory';
 export class RecordedVoiceovers {
   voiceoversMapping: IVoiceoverMapping;
@@ -127,7 +127,7 @@ export class RecordedVoiceovers {
   }
 
 
-  toBackendDict(): IRecordedVoiceOverBackendInterface {
+  toBackendDict(): IRecordedVoiceOverBackendDict {
     var voiceoversMappingDict = {};
     for (var contentId in this.voiceoversMapping) {
       var languageCodeToVoiceover = this.voiceoversMapping[contentId];
@@ -151,7 +151,7 @@ export class RecordedVoiceoversObjectFactory {
   constructor(private voiceoverObjectFactory: VoiceoverObjectFactory) {}
 
   createFromBackendDict(
-      recordedVoiceoversDict: IRecordedVoiceOverBackendInterface):
+      recordedVoiceoversDict: IRecordedVoiceOverBackendDict):
         RecordedVoiceovers {
     var voiceoversMapping = {};
     var voiceoversMappingDict = recordedVoiceoversDict.voiceovers_mapping;
