@@ -1121,7 +1121,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 'topic_name': 'topic_1'
             },
             'score_category': 'question.topic_1',
-            'last_updated': utils.get_time_in_millisecs(self.fake_date)
+            'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'skill_difficulty': 0.3
         }
 
     def test_create_suggestion_add_question(self):
