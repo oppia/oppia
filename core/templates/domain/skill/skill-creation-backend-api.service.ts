@@ -21,7 +21,7 @@ export interface IRubricBackend {
   'explanation': string
 }
 
-export interface ISkillBackend {
+export interface ISkillCreationBackend {
   'description': string,
   'explanation_dict': string,
   'linked_topic_ids': string[],
@@ -44,7 +44,7 @@ export class SkillCreationBackendApiService {
       errorCallback:(reason?: any) => void,
       description:string, rubrics:IRubricBackend, explanation:string,
       linkedTopicIds:string[]): void {
-    let postData:ISkillBackend = {
+    let postData:ISkillCreationBackend = {
       description: description,
       linked_topic_ids: linkedTopicIds,
       explanation_dict: explanation,
