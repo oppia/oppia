@@ -16,14 +16,16 @@
  * @fileoverview Backend service for creating a new skills
  */
 
-export interface ISkillBackendInterface {
+export interface IRubricBackend {
+  'difficulty':string,
+  'explanation': string
+}
+
+export interface ISkillBackend {
   'description': string,
-  'linked_topic_ids': string[],
   'explanation_dict': string,
-  'rubrics': {
-    'explanation': string,
-    'difficulty':string
-  }
+  'linked_topic_ids': string[],
+  'rubrics': IRubricBackend
 }
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -35,13 +37,14 @@ import { Injectable } from '@angular/core';
 })
 
 export class SkillCreationBackendApiService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   _createSkill(
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback:(reason?: any) => void,
-      description, rubrics, explanation, linkedTopicIds): void {
-    let postData:ISkillBackendInterface = {
+      description:string, rubrics:IRubricBackend, explanation:string,
+      linkedTopicIds:string[]): void {
+    let postData:ISkillBackend = {
       description: description,
       linked_topic_ids: linkedTopicIds,
       explanation_dict: explanation,
@@ -62,7 +65,7 @@ export class SkillCreationBackendApiService {
       });
   }
 
-  createSkill(description:string, rubrics:any, explanation:string,
+  createSkill(description:string, rubrics:IRubricBackend, explanation:string,
       linkedTopicIds:string[]): PromiseLike<Object> {
     return new Promise((resolve, reject) => {
       this._createSkill(resolve, reject,
@@ -70,6 +73,7 @@ export class SkillCreationBackendApiService {
     });
   }
 }
+
 angular.module('oppia').factory('SkillCreationBackendApiService',
   downgradeInjectable(SkillCreationBackendApiService));
 

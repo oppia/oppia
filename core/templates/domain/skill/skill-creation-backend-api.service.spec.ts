@@ -20,16 +20,18 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { SkillCreationBackendApiService } from
-  'domain/skill/skill-creation-backend-api.service.ts';
+import { SkillCreationBackendApiService, IRubricBackend,
+  ISkillCreationBackend } from
+  'domain/skill/skill-creation-backend-api.service';
 
 describe('Topic creation backend api service', () => {
   let csrfService: CsrfTokenService = null;
   let httpTestingController: HttpTestingController = null;
   let skillCreationBackendApiService:SkillCreationBackendApiService = null;
-  let rubricDict = null;
-  let postData = null;
+  let rubricDict:IRubricBackend = null;
+  let postData:ISkillCreationBackend = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
