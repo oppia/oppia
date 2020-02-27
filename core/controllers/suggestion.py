@@ -186,13 +186,9 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         if action == suggestion_models.ACTION_TYPE_ACCEPT:
-            if (
-                    suggestion.suggestion_type ==
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
-                # The skill_id is passed only at the time of accepting the
-                # suggestion.
-                suggestion.change.skill_id = target_id
-            suggestion.skill_difficulty = self.payload.get('skill_difficulty')
+            # The skill_id is passed only at the time of accepting the
+            # suggestion.
+            suggestion.change.skill_id = target_id
             # Question suggestions do not use commit messages.
             suggestion_services.accept_suggestion(
                 suggestion, self.user_id, 'UNUSED_COMMIT_MESSAGE',

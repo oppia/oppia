@@ -18,12 +18,19 @@
 
 angular.module('oppia').factory('QuestionSuggestionService', [
   '$http', function($http) {
+
+    const skillDifficultyToSuggestionType = {
+      0.3: 'add_easy_question',
+      0.6: 'add_medium_question',
+      0.9: 'add_hard_question',
+    };
+
     return {
       submitSuggestion: function(
-          question, associatedSkill, topicName, onSuccess) {
+          question, associatedSkill, skillDifficulty, topicName, onSuccess) {
         var url = '/suggestionhandler/';
         var data = {
-          suggestion_type: 'add_question',
+          suggestion_type: skillDifficultyToSuggestionType[skillDifficulty],
           target_type: 'skill',
           description: 'Add new question',
           target_id: associatedSkill.getId(),

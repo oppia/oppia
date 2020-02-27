@@ -130,6 +130,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         observed_suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -144,6 +145,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -157,6 +159,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -170,6 +173,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -187,6 +191,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -204,6 +209,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -221,6 +227,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -238,6 +245,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -255,6 +263,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -272,6 +281,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -289,6 +299,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -306,6 +317,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -332,6 +344,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -351,6 +364,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -368,6 +382,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -386,6 +401,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -405,6 +421,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -422,6 +439,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -440,6 +458,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -467,6 +486,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -485,6 +505,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -508,6 +529,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -529,6 +551,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -550,6 +573,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -575,6 +599,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -633,6 +658,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         observed_suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -647,6 +673,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -660,6 +687,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -673,6 +701,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -690,6 +719,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -707,6 +737,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -724,6 +755,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -741,6 +773,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -758,6 +791,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -775,6 +809,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -792,6 +827,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -809,6 +845,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -835,6 +872,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -854,6 +892,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -871,6 +910,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -889,6 +929,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -908,6 +949,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -925,6 +967,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -943,6 +986,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -979,6 +1023,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1021,6 +1066,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1053,7 +1099,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         self.suggestion_dict = {
             'suggestion_id': 'skill1.thread1',
-            'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            'suggestion_type':
+                suggestion_models.SUGGESTION_TYPE_ADD_EASY_QUESTION,
             'target_type': suggestion_models.TARGET_TYPE_SKILL,
             'target_id': 'skill1',
             'target_version_at_submission': 1,
@@ -1082,6 +1129,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         observed_suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1096,6 +1144,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1109,6 +1158,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1123,6 +1173,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1143,6 +1194,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1163,6 +1215,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1182,6 +1235,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1202,6 +1256,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1221,6 +1276,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1248,6 +1304,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1272,6 +1329,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1301,6 +1359,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1324,6 +1383,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1337,6 +1397,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1350,6 +1411,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1367,6 +1429,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1391,6 +1454,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
@@ -1428,7 +1492,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         }
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
-            'exploration.exp1.thread1', 'exp1', 1,
+            'exploration.exp1.thread1',
+            suggestion_models.SUGGESTION_TYPE_ADD_EASY_QUESTION,'exp1', 1,
             suggestion_models.STATUS_ACCEPTED, self.author_id,
             self.reviewer_id, change,
             'question.topic_1', self.fake_date)
@@ -1439,6 +1504,63 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'old question_dict'):
             suggestion.pre_update_validate(
                 question_domain.QuestionChange(change))
+
+    def test_create_suggestion_add_question(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        observed_suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        self.assertDictEqual(
+            observed_suggestion.to_dict(), expected_suggestion_dict)
+
+    def test_get_skill_difficulty_easy_question(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        observed_suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['suggestion_type'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        self.assertEqual(observed_suggestion.get_skill_difficulty(), 0.3)
+
+    def test_get_skill_difficulty_medium_question(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        observed_suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            suggestion_models.SUGGESTION_TYPE_ADD_MEDIUM_QUESTION,
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        self.assertEqual(observed_suggestion.get_skill_difficulty(), 0.6)
+
+    def test_get_skill_difficulty_hard_question(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        observed_suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            suggestion_models.SUGGESTION_TYPE_ADD_HARD_QUESTION,
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        self.assertEqual(observed_suggestion.get_skill_difficulty(), 0.9)
 
 
 class MockInvalidVoiceoverApplication(

@@ -106,7 +106,8 @@ def get_suggestion_from_model(suggestion_model):
         suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
             suggestion_model.suggestion_type])
     return suggestion_domain_class(
-        suggestion_model.id, suggestion_model.target_id,
+        suggestion_model.id, suggestion_model.suggestion_type,
+        suggestion_model.target_id,
         suggestion_model.target_version_at_submission,
         suggestion_model.status, suggestion_model.author_id,
         suggestion_model.final_reviewer_id, suggestion_model.change_cmd,

@@ -349,6 +349,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                   ctrl.contributions = suggestionIdToSuggestions;
                   ctrl.contributionSummaries = (
                     getQuestionContributionsSummary());
+                  console.log(ctrl.contributionSummaries);
                   ctrl.contributionsDataLoading = false;
                 });
             }

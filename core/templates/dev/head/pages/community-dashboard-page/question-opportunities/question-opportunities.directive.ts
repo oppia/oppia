@@ -24,6 +24,9 @@ require(
   'components/question-directives/question-editor/' +
   'question-editor.directive.ts');
 require(
+  'components/question-directives/questions-list/' +
+  'questions-list.constants.ajs.ts');
+require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('directives/angular-html-bind.directive.ts');
@@ -32,6 +35,7 @@ require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/editable-skill-backend-api.service.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/skill/SkillDifficultyObjectFactory.ts');
 require('domain/skill/SkillObjectFactory.ts');
 require('interactions/codemirrorRequires.ts');
 require(
@@ -68,21 +72,21 @@ angular.module('oppia').directive('questionOpportunities', [
             ContributionOpportunitiesService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
             QuestionUndoRedoService, SkillObjectFactory) {
-          var ctrl = this;
-          var getOpportunity = function(skillId) {
-            for (var index in ctrl.opportunities) {
+          const ctrl = this;
+          const getOpportunity = function(skillId) {
+            for (const index in ctrl.opportunities) {
               if (ctrl.opportunities[index].id === skillId) {
                 return ctrl.opportunities[index];
               }
             }
           };
 
-          var updateWithNewOpportunities = function(opportunities, more) {
-            for (var index in opportunities) {
-              var opportunity = opportunities[index];
-              var heading = opportunity.getOpportunityHeading();
-              var subheading = opportunity.getOpportunitySubheading();
-              var progressPercentage = (
+          const updateWithNewOpportunities = function(opportunities, more) {
+            for (const index in opportunities) {
+              const opportunity = opportunities[index];
+              const heading = opportunity.getOpportunityHeading();
+              const subheading = opportunity.getOpportunitySubheading();
+              const progressPercentage = (
                 (opportunity.getQuestionCount() / MAX_QUESTIONS_PER_SKILL) *
                 100).toFixed(2);
               ctrl.opportunities.push({
@@ -97,7 +101,7 @@ angular.module('oppia').directive('questionOpportunities', [
             ctrl.opportunitiesAreLoading = false;
           };
 
-          var onSubmitSuggestionSuccess = function() {
+          const onSubmitSuggestionSuccess = function() {
             AlertsService.addSuccessMessage('Submitted question suggestion.');
           };
 
@@ -111,11 +115,74 @@ angular.module('oppia').directive('questionOpportunities', [
           };
 
           ctrl.onClickSuggestQuestionButton = function(skillId) {
-            var opportunity = getOpportunity(skillId);
-            var question =
+            const modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topic-editor-page/modal-templates/' +
+                'select-skill-and-difficulty-modal.template.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance', 'DEFAULT_SKILL_DIFFICULTY',
+                'MODE_SELECT_DIFFICULTY', 'SkillDifficultyObjectFactory',
+                function($scope, $uibModalInstance, DEFAULT_SKILL_DIFFICULTY,
+                  MODE_SELECT_DIFFICULTY, SkillDifficultyObjectFactory) {
+
+                  const init = function() {
+                    $scope.instructionMessage = (
+                      'Select the skill(s) to link the question to:');
+                    $scope.currentMode = MODE_SELECT_DIFFICULTY;
+                    $scope.linkedSkillsWithDifficulty =
+                      [SkillDifficultyObjectFactory.create(
+                        skillId, '', DEFAULT_SKILL_DIFFICULTY)];
+                    EditableSkillBackendApiService.fetchSkill(skillId)
+                      .then(function(backendSkillObject) {
+                        $scope.skill =
+                          SkillObjectFactory.createFromBackendDict(
+                            backendSkillObject.skill);
+                        $scope.skillIdToRubricsObject = {};
+                        $scope.skillIdToRubricsObject[skillId] =
+                          $scope.skill.getRubrics();
+                      }, function(error) {
+                        AlertsService.addWarning(
+                          `Error populating skill: ${error}.`);
+                      });
+                  };
+
+                  $scope.startQuestionCreation = function() {
+                    const result = {
+                      skill: $scope.skill,
+                      skillDifficulty:
+                        $scope.linkedSkillsWithDifficulty[0].getDifficulty()
+                    };
+                    $uibModalInstance.close(result);
+                  };
+
+                  $scope.cancelModal = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+
+                  $scope.closeModal = function() {
+                    $uibModalInstance.dismiss('ok');
+                  };
+
+                  init();
+                }
+              ]
+            });
+
+            modalInstance.result.then(function(result) {
+              if (AlertsService.warnings.length === 0) {
+                ctrl.createQuestion(result.skill, result.skillDifficulty);
+              }
+            });
+          };
+
+          ctrl.createQuestion = function(skill, skillDifficulty) {
+            const skillId = skill.getId();
+            const opportunity = getOpportunity(skillId);
+            const question =
               QuestionObjectFactory.createDefaultQuestion([skillId]);
-            var questionId = question.getId();
-            var questionStateData = question.getStateData();
+            const questionId = question.getId();
+            const questionStateData = question.getStateData();
 
             QuestionUndoRedoService.clearChanges();
             $uibModal.open({
@@ -133,21 +200,16 @@ angular.module('oppia').directive('questionOpportunities', [
                   $scope.question = question;
                   $scope.questionStateData = questionStateData;
                   $scope.questionId = questionId;
-                  EditableSkillBackendApiService.fetchSkill(skillId)
-                    .then(function(backendSkillObject) {
-                      $scope.associatedSkill =
-                        SkillObjectFactory.createFromBackendDict(
-                          backendSkillObject.skill);
-                      $scope.misconceptionsBySkill = {};
-                      $scope.misconceptionsBySkill[$scope.associatedSkill._id] =
-                        $scope.associatedSkill._misconceptions.map(
-                          function(misconceptionsBackendDict) {
-                            return MisconceptionObjectFactory
-                              .createFromBackendDict(misconceptionsBackendDict);
-                          });
-                    }, function(error) {
-                      AlertsService.addWarning('Error populating skill.');
-                    });
+                  $scope.skill = skill;
+                  $scope.skillDifficulty = skillDifficulty;
+                  console.log($scope.skillDifficulty);
+                  $scope.misconceptionsBySkill = {};
+                  $scope.misconceptionsBySkill[$scope.skill.getId()] =
+                    $scope.skill.getMisconceptions().map(
+                      function(misconceptionsBackendDict) {
+                        return MisconceptionObjectFactory
+                          .createFromBackendDict(misconceptionsBackendDict);
+                      });
                   $scope.removeErrors = function() {
                     $scope.validationError = null;
                   };
@@ -167,7 +229,7 @@ angular.module('oppia').directive('questionOpportunities', [
                       return;
                     }
                     QuestionSuggestionService.submitSuggestion(
-                      $scope.question, $scope.associatedSkill,
+                      $scope.question, $scope.skill, $scope.skillDifficulty,
                       opportunity.subheading, onSubmitSuggestionSuccess);
                     $uibModalInstance.close();
                   };
@@ -180,7 +242,7 @@ angular.module('oppia').directive('questionOpportunities', [
 
                   $scope.cancel = function() {
                     if (QuestionUndoRedoService.hasChanges()) {
-                      var modalInstance = $uibModal.open({
+                      const modalInstance = $uibModal.open({
                         templateUrl:
                           UrlInterpolationService.getDirectiveTemplateUrl(
                             '/components/question-directives/modal-templates/' +
@@ -210,6 +272,7 @@ angular.module('oppia').directive('questionOpportunities', [
               ]
             });
           };
+
           ctrl.$onInit = function() {
             ctrl.opportunities = [];
             ctrl.opportunitiesAreLoading = true;

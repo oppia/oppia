@@ -558,6 +558,12 @@ export = {
     "Hard": 0.9
   },
 
+  "ADD_QUESTION_SUGGESTION_TYPE_TO_SKILL_DIFFICULTY_FLOAT": {
+    "add_easy_question": 0.3,
+    "add_medium_question": 0.6,
+    "add_hard_question": 0.9
+  },
+
   "ENABLE_PREREQUISITE_SKILLS": false,
 
   // For the full new structures viewer features, both
