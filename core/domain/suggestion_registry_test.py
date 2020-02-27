@@ -1494,7 +1494,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             'exploration.exp1.thread1',
-            suggestion_models.SUGGESTION_TYPE_ADD_EASY_QUESTION,'exp1', 1,
+            suggestion_models.SUGGESTION_TYPE_ADD_EASY_QUESTION, 'exp1', 1,
             suggestion_models.STATUS_ACCEPTED, self.author_id,
             self.reviewer_id, change,
             'question.topic_1', self.fake_date)
@@ -1505,21 +1505,6 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'old question_dict'):
             suggestion.pre_update_validate(
                 question_domain.QuestionChange(change))
-
-    def test_create_suggestion_add_question(self):
-        expected_suggestion_dict = self.suggestion_dict
-
-        observed_suggestion = suggestion_registry.SuggestionAddQuestion(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['suggestion_type'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change'],
-            expected_suggestion_dict['score_category'], self.fake_date)
-
-        self.assertDictEqual(
-            observed_suggestion.to_dict(), expected_suggestion_dict)
 
     def test_get_skill_difficulty_easy_question(self):
         expected_suggestion_dict = self.suggestion_dict

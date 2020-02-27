@@ -124,8 +124,7 @@ angular.module('oppia').directive('questionOpportunities', [
                 '$scope', '$uibModalInstance', 'DEFAULT_SKILL_DIFFICULTY',
                 'MODE_SELECT_DIFFICULTY', 'SkillDifficultyObjectFactory',
                 function($scope, $uibModalInstance, DEFAULT_SKILL_DIFFICULTY,
-                  MODE_SELECT_DIFFICULTY, SkillDifficultyObjectFactory) {
-
+                    MODE_SELECT_DIFFICULTY, SkillDifficultyObjectFactory) {
                   const init = function() {
                     $scope.instructionMessage = (
                       'Select the skill(s) to link the question to:');

@@ -245,12 +245,12 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
         try:
             _require_valid_suggestion_and_target_types(
                 target_type, suggestion_type)
-            reviewable_suggestion_lists = map(
-                lambda suggestion_type:
-                    suggestion_services.get_reviewable_suggestions(
-                        self.user_id, suggestion_type),
-                get_all_related_suggestion_types(suggestion_type)
-            )
+            reviewable_suggestion_lists = [
+                suggestion_services.get_reviewable_suggestions(
+                    self.user_id, suggestion_type)
+                for suggestion_type in get_all_related_suggestion_types(
+                    suggestion_type)
+            ]
             suggestions = utils.flatten_list(reviewable_suggestion_lists)
             self._render_suggestions(target_type, suggestions)
         except Exception as e:
@@ -268,12 +268,12 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
         try:
             _require_valid_suggestion_and_target_types(
                 target_type, suggestion_type)
-            submitted_suggestion_lists = map(
-                lambda suggestion_type:
-                    suggestion_services.get_submitted_suggestions(
-                        self.user_id, suggestion_type),
-                get_all_related_suggestion_types(suggestion_type)
-            )
+            submitted_suggestion_lists = [
+                suggestion_services.get_submitted_suggestions(
+                    self.user_id, suggestion_type)
+                for suggestion_type in get_all_related_suggestion_types(
+                    suggestion_type)
+            ]
             suggestions = utils.flatten_list(submitted_suggestion_lists)
             self._render_suggestions(target_type, suggestions)
         except Exception as e:
@@ -294,6 +294,7 @@ def get_all_related_suggestion_types(suggestion_type):
     if suggestion_type in constants.QUESTION_SUGGESTION_TYPES:
         return constants.QUESTION_SUGGESTION_TYPES
     return [suggestion_type]
+
 
 class SuggestionListHandler(base.BaseHandler):
     """Handles list operations on suggestions."""

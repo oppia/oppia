@@ -18,7 +18,6 @@
 
 angular.module('oppia').factory('QuestionSuggestionService', [
   '$http', function($http) {
-
     const skillDifficultyToSuggestionType = {
       0.3: 'add_easy_question',
       0.6: 'add_medium_question',

@@ -225,7 +225,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                     const skillDifficultyFloatToLabel = invertMap(
                       SKILL_DIFFICULTY_LABEL_TO_FLOAT);
                     return skillDifficultyFloatToLabel[skillDifficulty];
-                  }
+                  };
 
                   const getRubricExplanation = skillDifficultyLabel => {
                     for (const rubric of skillRubrics) {
@@ -234,7 +234,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                       }
                     }
                     return 'This rubric has not yet been specified.';
-                  }
+                  };
 
                   const invertMap = originalMap => {
                     return Object.keys(originalMap).reduce(
