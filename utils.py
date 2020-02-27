@@ -707,6 +707,7 @@ def get_hashable_value(value):
     else:
         return value
 
+
 def flatten_list(l):
     """Flattens a list of lists.
 
@@ -718,6 +719,7 @@ def flatten_list(l):
             supplied list of lists.
     """
     return [item for sublist in l for item in sublist]
+
 
 class OrderedCounter(collections.Counter, collections.OrderedDict):
     """Counter that remembers the order elements are first encountered."""
