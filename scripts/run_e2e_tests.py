@@ -118,6 +118,11 @@ _PARSER.add_argument(
          'core/tests/protractor/accessibility.js use --suite=accessibility.'
          'For performing a full test, no argument is required.')
 
+_PARSER.add_argument(
+    '--debug_mode',
+    help='Runs the protractor test in debugging mode.',
+    action='store_true')
+
 # This list contains the sub process triggered by this script. This includes
 # the oppia web server.
 SUBPROCESSES = []
@@ -431,7 +436,10 @@ def main(args=None):
     wait_for_port_to_be_open(WEB_DRIVER_PORT)
     wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
     ensure_screenshots_dir_is_removed()
-    commands = [common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH]
+    commands = [common.NODE_BIN_PATH]
+    if parsed_args.debug_mode:
+        commands.append('--inspect-brk')
+    commands.append(PROTRACTOR_BIN_PATH)
     commands.extend(get_e2e_test_parameters(
         parsed_args.sharding_instances, parsed_args.suite, dev_mode))
 

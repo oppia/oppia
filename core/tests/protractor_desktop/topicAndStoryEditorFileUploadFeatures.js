@@ -46,10 +46,12 @@ describe('Topic editor functionality', function() {
       'creator@topicEditor.com', 'creatorTopicEditor');
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createTopic(topicName, 'abbrev');
+    users.logout();
   });
 
   beforeEach(function() {
     users.login('creator@topicEditor.com');
+    topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.editTopic(topicName);
   });
 
