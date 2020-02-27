@@ -46,11 +46,10 @@ var login = function(email, isSuperAdmin = false) {
 
 var logout = function() {
   var driver = browser.driver;
-    browser.waitForAngularEnabled(false);
+  browser.waitForAngularEnabled(false);
   driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
   driver.findElement(protractor.By.id('submit-logout')).click();
-    browser.waitForAngularEnabled(true);
-
+  browser.waitForAngularEnabled(true);
 };
 
 // The user needs to log in immediately before this method is called. Note
