@@ -16,6 +16,7 @@
  * @fileoverview unit test for RuleObjectFactory.
  */
 import { TestBed } from '@angular/core/testing';
+
 import { RuleObjectFactory, IBackendRuleDict, IRuleInput } from
   'domain/exploration/RuleObjectFactory';
 
