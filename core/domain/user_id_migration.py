@@ -22,6 +22,7 @@ import inspect
 from core import jobs
 from core.platform import models
 import feconf
+import python_utils
 
 (
     base_models, collection_models,
@@ -111,7 +112,8 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 new_models_sub, update_last_updated_time=False)
             model_class.delete_multi(old_models_sub)
 
-        for i in range(0, len(old_models), NUMBER_OF_MODELS_IN_TRANSACTION):
+        for i in python_utils.RANGE(
+                0, len(old_models), NUMBER_OF_MODELS_IN_TRANSACTION):
             transaction_services.run_in_transaction(
                 _replace_models,
                 new_models[i:i + NUMBER_OF_MODELS_IN_TRANSACTION],
