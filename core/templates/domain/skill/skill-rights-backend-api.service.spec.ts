@@ -22,7 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks, async } from
   '@angular/core/testing';
 
 import { ISkillRightBackend } from 'domain/skill/SkillRightsObjectFactory.ts';
-import { SkillRightsBackendApiService,  } from
+import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service.ts';
 
 describe('Skill rights backend API service', () => {
