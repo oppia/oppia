@@ -39,7 +39,7 @@ describe('ContributionAndReviewService', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
@@ -87,7 +87,7 @@ describe('ContributionAndReviewService', function() {
     it('should return available question suggestions and opportunity details',
       function() {
         $httpBackend.expect(
-          'GET', '/getsubmittedsuggestions/skill/add_question').respond(
+          'GET', '/getsubmittedsuggestions/skill/add_easy_question').respond(
           200, mockSuggestionsBackendObject);
 
         ContributionAndReviewService.getUserCreatedQuestionSuggestions(
@@ -103,7 +103,7 @@ describe('ContributionAndReviewService', function() {
     it('should return available question suggestions and opportunity details',
       function() {
         $httpBackend.expect(
-          'GET', '/getreviewablesuggestions/skill/add_question').respond(
+          'GET', '/getreviewablesuggestions/skill/add_easy_question').respond(
           200, mockSuggestionsBackendObject);
 
         ContributionAndReviewService.getReviewableQuestionSuggestions(

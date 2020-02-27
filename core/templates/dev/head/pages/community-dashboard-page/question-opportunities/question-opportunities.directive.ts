@@ -202,7 +202,6 @@ angular.module('oppia').directive('questionOpportunities', [
                   $scope.questionId = questionId;
                   $scope.skill = skill;
                   $scope.skillDifficulty = skillDifficulty;
-                  console.log($scope.skillDifficulty);
                   $scope.misconceptionsBySkill = {};
                   $scope.misconceptionsBySkill[$scope.skill.getId()] =
                     $scope.skill.getMisconceptions().map(

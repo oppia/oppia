@@ -328,3 +328,11 @@ class UtilsTests(test_utils.GenericTestBase):
             Exception, 'Unsupported audio language code: invalid_code'):
             utils.get_supported_audio_language_description(
                 invalid_language_code)
+
+    def test_flatten_list(self):
+        list_of_lists = [['a', 'b'], [0, 1], ['c', 'd'], []]
+
+        result = utils.flatten_list(list_of_lists)
+
+        expected = ['a', 'b', 0, 1, 'c', 'd']
+        self.assertListEqual(result, expected)

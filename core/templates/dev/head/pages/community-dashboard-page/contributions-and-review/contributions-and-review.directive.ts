@@ -50,10 +50,10 @@ angular.module('oppia').directive('contributionsAndReview', [
       controllerAs: '$ctrl',
       controller: [
         '$filter', '$uibModal', 'AlertsService', 'ContributionAndReviewService',
-        'QuestionObjectFactory', 'UserService',
+        'QuestionObjectFactory', 'QUESTION_SUGGESTION_TYPES', 'UserService',
         function(
             $filter, $uibModal, AlertsService, ContributionAndReviewService,
-            QuestionObjectFactory, UserService) {
+            QuestionObjectFactory, QUESTION_SUGGESTION_TYPES, UserService) {
           var ctrl = this;
           var SUGGESTION_LABELS = {
             review: {
@@ -144,6 +144,7 @@ angular.module('oppia').directive('contributionsAndReview', [
               suggestion.change.question_dict);
             var contentHtml = question.getStateData().content.getHtml();
             var skillRubrics = contributionDetails.skill_rubrics;
+            var skillDifficulty = suggestion.skill_difficulty;
 
             $uibModal.open({
               templateUrl: _templateUrl,
@@ -167,28 +168,31 @@ angular.module('oppia').directive('contributionsAndReview', [
                 },
                 skillRubrics: function() {
                   return skillRubrics;
+                },
+                skillDifficulty: function() {
+                  return skillDifficulty;
                 }
               },
               controller: [
                 '$scope', '$uibModalInstance', 'SuggestionModalService',
-                'question', 'reviewable', 'DEFAULT_SKILL_DIFFICULTY',
-                'SKILL_DIFFICULTIES', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
+                'question', 'reviewable', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
                 function($scope, $uibModalInstance, SuggestionModalService,
-                    question, reviewable, DEFAULT_SKILL_DIFFICULTY,
-                    SKILL_DIFFICULTIES, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
-                  $scope.authorName = authorName;
-                  $scope.contentHtml = contentHtml;
-                  $scope.reviewable = reviewable;
-                  $scope.reviewMessage = '';
-                  $scope.question = question;
-                  $scope.questionHeader = questionHeader;
-                  $scope.questionStateData = question.getStateData();
-                  $scope.questionId = question.getId();
-                  $scope.canEditQuestion = false;
-                  $scope.misconceptionsBySkill = [];
-                  $scope.skillDifficulties = SKILL_DIFFICULTIES;
-                  $scope.skillRubrics = skillRubrics;
-                  $scope.difficulty = DEFAULT_SKILL_DIFFICULTY;
+                    question, reviewable, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+                  const init = () => {
+                    $scope.authorName = authorName;
+                    $scope.contentHtml = contentHtml;
+                    $scope.reviewable = reviewable;
+                    $scope.reviewMessage = '';
+                    $scope.question = question;
+                    $scope.questionHeader = questionHeader;
+                    $scope.questionStateData = question.getStateData();
+                    $scope.questionId = question.getId();
+                    $scope.canEditQuestion = false;
+                    $scope.misconceptionsBySkill = [];
+                    $scope.skillDifficultyLabel = getSkillDifficultyLabel();
+                    $scope.skillRubricExplanation = getRubricExplanation(
+                      $scope.skillDifficultyLabel);
+                  };
 
                   $scope.questionChanged = function() {
                     $scope.validationError = null;
@@ -200,8 +204,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                       {
                         action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
                         reviewMessage: $scope.reviewMessage,
-                        skillDifficulty: SKILL_DIFFICULTY_LABEL_TO_FLOAT[
-                          $scope.difficulty]
+                        skillDifficulty: skillDifficulty
                       });
                   };
 
@@ -217,6 +220,33 @@ angular.module('oppia').directive('contributionsAndReview', [
                   $scope.cancel = function() {
                     SuggestionModalService.cancelSuggestion($uibModalInstance);
                   };
+
+                  const getSkillDifficultyLabel = () => {
+                    const skillDifficultyFloatToLabel = invertMap(
+                      SKILL_DIFFICULTY_LABEL_TO_FLOAT);
+                    return skillDifficultyFloatToLabel[skillDifficulty];
+                  }
+
+                  const getRubricExplanation = skillDifficultyLabel => {
+                    for (const rubric of skillRubrics) {
+                      if (rubric.difficulty === skillDifficultyLabel) {
+                        return rubric.explanation;
+                      }
+                    }
+                    return 'This rubric has not yet been specified.';
+                  }
+
+                  const invertMap = originalMap => {
+                    return Object.keys(originalMap).reduce(
+                      (invertedMap, key) => {
+                        invertedMap[originalMap[key]] = key;
+                        return invertedMap;
+                      },
+                      {}
+                    );
+                  };
+
+                  init();
                 }
               ]
             }).result.then(function(result) {
@@ -291,8 +321,9 @@ angular.module('oppia').directive('contributionsAndReview', [
 
           ctrl.onClickViewSuggestion = function(suggestionId) {
             var suggestion = ctrl.contributions[suggestionId].suggestion;
-            if (suggestion.suggestion_type ===
-                ctrl.SUGGESTION_TYPE_QUESTION) {
+            if (
+              QUESTION_SUGGESTION_TYPES.includes(suggestion.suggestion_type)
+            ) {
               var reviewable =
                 ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION;
               var contributionDetails =
@@ -349,7 +380,6 @@ angular.module('oppia').directive('contributionsAndReview', [
                   ctrl.contributions = suggestionIdToSuggestions;
                   ctrl.contributionSummaries = (
                     getQuestionContributionsSummary());
-                  console.log(ctrl.contributionSummaries);
                   ctrl.contributionsDataLoading = false;
                 });
             }

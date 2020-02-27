@@ -507,6 +507,17 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.score_category = score_category
         self.last_updated = last_updated
 
+    def to_dict(self):
+        """Returns a dict representation of a question suggestion object with
+            skill difficulty information.
+
+        Returns:
+            dict. A dict representation of a suggestion object.
+        """
+        base_dict = super(SuggestionAddQuestion, self).to_dict()
+        base_dict['skill_difficulty'] = self.get_skill_difficulty()
+        return base_dict
+
     def validate(self):
         """Validates a suggestion object of type SuggestionAddQuestion.
 

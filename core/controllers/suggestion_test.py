@@ -970,6 +970,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.EXP_ID = 'exp1'
         # Needs to be 12 characters long.
         self.SKILL_ID = 'skill1234567'
+        self.SKILL_ID2 = 'skill1234568'
         self.SKILL_DESCRIPTION = 'skill to link question to'
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, title='Exploration title')
@@ -1009,6 +1010,9 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.rubric_dicts = [rubric.to_dict() for rubric in self.rubrics]
         self.save_new_skill(
             self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION,
+            rubrics=self.rubrics)
+        self.save_new_skill(
+            self.SKILL_ID2, self.owner_id, description=self.SKILL_DESCRIPTION,
             rubrics=self.rubrics)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -1111,6 +1115,34 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             response['target_id_to_opportunity_dict'][self.SKILL_ID][
                 'skill_rubrics'],
             self.rubric_dicts)
+        response = self.get_json(
+            '/getsubmittedsuggestions/topic/add_easy_question')
+        self.assertEqual(response, {})
+
+    def test_skill_handler_multiple_suggestions_returns_data(self):
+        self.login(self.AUTHOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    suggestion_models.SUGGESTION_TYPE_ADD_MEDIUM_QUESTION),
+                'target_type': suggestion_models.TARGET_TYPE_SKILL,
+                'target_id': self.SKILL_ID2,
+                'target_version_at_submission': 1,
+                'change': {
+                    'cmd': (
+                        question_domain
+                        .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+                    'question_dict': self.question_dict,
+                    'skill_id': None
+                },
+                'description': 'Add new question to skill'
+            }, csrf_token=csrf_token)
+
+        response = self.get_json(
+            '/getsubmittedsuggestions/skill/add_easy_question')
+        self.assertEqual(len(response['suggestions']), 2)
+        self.assertEqual(len(response['target_id_to_opportunity_dict']), 2)
         response = self.get_json(
             '/getsubmittedsuggestions/topic/add_easy_question')
         self.assertEqual(response, {})

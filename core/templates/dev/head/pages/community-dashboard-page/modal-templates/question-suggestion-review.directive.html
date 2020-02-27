@@ -8,6 +8,9 @@
 <div class="modal-body">
   <section class="oppia-suggestion-review-container">
     <div class="oppia-question-suggestion">
+      <div>
+        Skill Difficulty: <strong><[skillDifficultyLabel]></strong> <[skillRubricExplanation]>
+      </div>
       <question-editor question-id="questionId"
                        misconceptions-by-skill="misconceptionsBySkill"
                        question-state-data="questionStateData"
@@ -17,23 +20,8 @@
       </question-editor>
     </div>
   </section>
-  <section class="oppia-reviewer-actions">
-    <div class="oppia-suggestion-review-message" ng-show="reviewable">
-      <div class="oppia-difficulty-message">
-        Skill Difficulty: <strong>Easy</strong> Easy Rubric Explanation
-      </div>
-      <!-- <md-radio-group ng-model="difficulty" ng-init="difficulty='Easy'">
-        <md-radio-button ng-repeat="rubric in skillRubrics track by $index" ng-value="rubric.difficulty">
-          <strong> <[skillDifficulties[$index]]> </strong>
-          <angular-html-bind html-data="rubric.explanation">
-          </angular-html-bind>
-          <div ng-if="rubric.explanation === ''">
-            <span class="oppia-placeholder"> This rubric has not yet been specified </span>
-          </div>
-        </md-radio-button>
-      </md-radio-group> -->
-    </div>
-    <div ng-show="reviewable" class="oppia-suggestion-review-message">
+  <section ng-show="reviewable" class="oppia-reviewer-actions">
+    <div class="oppia-suggestion-review-message">
       Review message (required if rejecting):
       <input class="protractor-test-suggestion-review-message" type="text" ng-model="reviewMessage" style="width: 100%">
     </div>
