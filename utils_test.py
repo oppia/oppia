@@ -336,3 +336,11 @@ class UtilsTests(test_utils.GenericTestBase):
 
         expected = ['a', 'b', 0, 1, 'c', 'd']
         self.assertListEqual(result, expected)
+
+    def test_snake_case_to_camel_case(self):
+        camel_case_str1 = utils.snake_case_to_camel_case('user_id_number')
+        camel_case_str2 = utils.snake_case_to_camel_case('hello_world')
+        camel_case_str3 = utils.snake_case_to_camel_case('test1')
+        self.assertEqual(camel_case_str1, 'userIdNumber')
+        self.assertEqual(camel_case_str2, 'helloWorld')
+        self.assertEqual(camel_case_str3, 'test1')
