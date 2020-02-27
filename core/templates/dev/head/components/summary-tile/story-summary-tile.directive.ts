@@ -21,6 +21,7 @@ require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 
 angular.module('oppia').directive('storySummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
+    console.log(UrlInterpolationService);
     return {
       restrict: 'E',
       scope: {},
@@ -36,6 +37,8 @@ angular.module('oppia').directive('storySummaryTile', [
         function(STORY_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.getStoryLink = function() {
+            console.log(STORY_VIEWER_URL_TEMPLATE);
+            console.log(ctrl.getStoryId());
             return UrlInterpolationService.interpolateUrl(
               STORY_VIEWER_URL_TEMPLATE, {
                 story_id: ctrl.getStoryId()
