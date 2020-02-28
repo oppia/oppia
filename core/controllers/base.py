@@ -135,66 +135,72 @@ class BaseHandler(webapp2.RequestHandler):
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
-        self.initialize(request, response)
+        try:
+            self.initialize(request, response)
 
-        self.start_time = datetime.datetime.utcnow()
+            self.start_time = datetime.datetime.utcnow()
 
-        # Initializes the return dict for the handlers.
-        self.values = {}
+            # Initializes the return dict for the handlers.
+            self.values = {}
 
-        self.gae_id = current_user_services.get_current_gae_id()
-        self.user_id = None
-        self.username = None
-        self.partially_logged_in = False
-        self.user_is_scheduled_for_deletion = False
+            self.gae_id = current_user_services.get_current_gae_id()
+            self.user_id = None
+            self.username = None
+            self.partially_logged_in = False
+            self.user_is_scheduled_for_deletion = False
 
-        if self.gae_id:
-            user_settings = user_services.get_user_settings_by_gae_id(
-                self.gae_id, strict=False)
-            if user_settings is None:
-                email = current_user_services.get_current_user_email()
-                user_settings = user_services.create_new_user(
-                    self.gae_id, email)
-            self.values['user_email'] = user_settings.email
-            self.user_id = user_settings.user_id
+            if self.gae_id:
+                user_settings = user_services.get_user_settings_by_gae_id(
+                    self.gae_id, strict=False)
+                if user_settings is None:
+                    email = current_user_services.get_current_user_email()
+                    user_settings = user_services.create_new_user(
+                        self.gae_id, email)
+                self.values['user_email'] = user_settings.email
+                self.user_id = user_settings.user_id
 
-            if user_settings.deleted:
-                self.user_is_scheduled_for_deletion = user_settings.deleted
-            elif (self.REDIRECT_UNFINISHED_SIGNUPS and not
-                  user_services.has_fully_registered(user_settings.user_id)):
-                self.partially_logged_in = True
+                if user_settings.deleted:
+                    self.user_is_scheduled_for_deletion = user_settings.deleted
+                elif (self.REDIRECT_UNFINISHED_SIGNUPS and not
+                      user_services.has_fully_registered(user_settings.user_id)):
+                    self.partially_logged_in = True
+                else:
+                    self.username = user_settings.username
+                    self.values['username'] = self.username
+                    # In order to avoid too many datastore writes, we do not bother
+                    # recording a log-in if the current time is sufficiently close
+                    # to the last log-in time.
+                    if (user_settings.last_logged_in is None or
+                            not utils.are_datetimes_close(
+                                datetime.datetime.utcnow(),
+                                user_settings.last_logged_in)):
+                        user_services.record_user_logged_in(self.user_id)
+
+            self.role = (
+                feconf.ROLE_ID_GUEST
+                if self.user_id is None else user_settings.role)
+            self.user = user_services.UserActionsInfo(self.user_id)
+
+            self.is_super_admin = (
+                current_user_services.is_current_user_super_admin())
+
+            self.values['iframed'] = False
+            self.values['is_moderator'] = user_services.is_at_least_moderator(
+                self.user_id)
+            self.values['is_admin'] = user_services.is_admin(self.user_id)
+            self.values['is_topic_manager'] = (
+                user_services.is_topic_manager(self.user_id))
+            self.values['is_super_admin'] = self.is_super_admin
+
+            if self.request.get('payload'):
+                self.payload = json.loads(self.request.get('payload'))
             else:
-                self.username = user_settings.username
-                self.values['username'] = self.username
-                # In order to avoid too many datastore writes, we do not bother
-                # recording a log-in if the current time is sufficiently close
-                # to the last log-in time.
-                if (user_settings.last_logged_in is None or
-                        not utils.are_datetimes_close(
-                            datetime.datetime.utcnow(),
-                            user_settings.last_logged_in)):
-                    user_services.record_user_logged_in(self.user_id)
+                self.payload = None
+        except Exception as e:
+            logging.error('%s: payload %s', e, self.payload)
 
-        self.role = (
-            feconf.ROLE_ID_GUEST
-            if self.user_id is None else user_settings.role)
-        self.user = user_services.UserActionsInfo(self.user_id)
-
-        self.is_super_admin = (
-            current_user_services.is_current_user_super_admin())
-
-        self.values['iframed'] = False
-        self.values['is_moderator'] = user_services.is_at_least_moderator(
-            self.user_id)
-        self.values['is_admin'] = user_services.is_admin(self.user_id)
-        self.values['is_topic_manager'] = (
-            user_services.is_topic_manager(self.user_id))
-        self.values['is_super_admin'] = self.is_super_admin
-
-        if self.request.get('payload'):
-            self.payload = json.loads(self.request.get('payload'))
-        else:
-            self.payload = None
+            self.handle_exception(e, self.app.debug)
+            return
 
     def dispatch(self):
         """Overrides dispatch method in webapp2 superclass.
@@ -205,18 +211,24 @@ class BaseHandler(webapp2.RequestHandler):
         """
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
-        if self.request.uri.startswith('https://oppiaserver.appspot.com'):
-            self.redirect(
-                b'https://oppiatestserver.appspot.com', permanent=True)
-            return
+        try:
+            if self.request.uri.startswith('https://oppiaserver.appspot.com'):
+                self.redirect(
+                    b'https://oppiatestserver.appspot.com', permanent=True)
+                return
 
-        if self.user_is_scheduled_for_deletion:
-            self.redirect(
-                '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
-            return
+            if self.user_is_scheduled_for_deletion:
+                self.redirect(
+                    '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
+                return
 
-        if self.partially_logged_in:
-            self.redirect('/logout?redirect_url=%s' % self.request.uri)
+            if self.partially_logged_in:
+                self.redirect('/logout?redirect_url=%s' % self.request.uri)
+                return
+        except Exception as e:
+            logging.error('%s: payload %s', e, self.payload)
+
+            self.handle_exception(e, self.app.debug)
             return
 
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
