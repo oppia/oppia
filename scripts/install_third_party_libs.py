@@ -33,9 +33,14 @@ PREREQUISITES = [
 
 for PACKAGE, VERSION, PATH in PREREQUISITES:
     if not os.path.exists(PATH):
-        subprocess.check_call([
+        COMMAND = [
             sys.executable, '-m', 'pip', 'install', '%s==%s'
-            % (PACKAGE, VERSION), '--target', PATH])
+            % (PACKAGE, VERSION), '--target', PATH]
+        UEXTENTION = ['--user', '--prefix=', '--system']
+        try:
+            subprocess.check_call(COMMAND)
+        except Exception:
+            subprocess.check_call(COMMAND + UEXTENTION)
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
