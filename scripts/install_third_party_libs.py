@@ -25,17 +25,17 @@ import sys
 # These libraries need to be installed before running or importing any script.
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
-# Download and install pyyaml.
-if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
-    subprocess.check_call([
-        sys.executable, '-m', 'pip', 'install', 'pyyaml==5.1.2', '--target',
-        os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
 
-# Download and install future.
-if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
-    subprocess.check_call([
-        sys.executable, '-m', 'pip', 'install', 'future==0.17.1', '--target',
-        os.path.join('third_party', 'future-0.17.1')])
+PREREQUISITES = [
+    ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
+    ('future', '0.17.1', os.path.join('third_party', 'future-0.17.1')),
+]
+
+for PACKAGE, VERSION, PATH in PREREQUISITES:
+    if not os.path.exists(PATH):
+        subprocess.check_call([
+            sys.executable, '-m', 'pip', 'install', '%s==%s'
+            % (PACKAGE, VERSION), '--target', PATH])
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
