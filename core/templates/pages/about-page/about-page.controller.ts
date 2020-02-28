@@ -32,11 +32,10 @@ angular.module('oppia').directive('aboutPage', [
         '/pages/about-page/about-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$window', 'UrlInterpolationService',
-        function($window, UrlInterpolationService) {
+        'UrlInterpolationService', 'WindowRef',
+        function(UrlInterpolationService, WindowRef) {
           var ctrl = this;
           var activeTabClass = 'oppia-about-tabs-active';
-          var hash = window.location.hash.slice(1);
           var visibleContent = 'oppia-about-visible-content';
           var listOfNamesToThank = [
             'Alex Kauffmann', 'Allison Barros',
@@ -65,11 +64,8 @@ angular.module('oppia').directive('aboutPage', [
 
           ctrl.onTabClick = function(tabName) {
             // Update hash
-            window.location.hash = '#' + tabName;
+            WindowRef.nativeWindow.location.hash = '#' + tabName;
             activateTab(tabName);
-          };
-          ctrl.getStaticImageUrl = function(imagePath) {
-            return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -80,6 +76,7 @@ angular.module('oppia').directive('aboutPage', [
             ctrl.TAB_ID_FOUNDATION = 'foundation';
             ctrl.TAB_ID_CREDITS = 'credits';
 
+            var hash = WindowRef.nativeWindow.location.hash.slice(1);
             if (hash === ctrl.TAB_ID_FOUNDATION || hash === 'license') {
               activateTab(ctrl.TAB_ID_FOUNDATION);
             }
@@ -96,19 +93,15 @@ angular.module('oppia').directive('aboutPage', [
               ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
             ctrl.aboutPageMascotImgUrl = UrlInterpolationService
               .getStaticImageUrl('/general/about_page_mascot.png');
-            ctrl.listOfNames = listOfNamesToThank
-              .slice(0, listOfNamesToThank.length - 1).join(', ') +
-              ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
-            ctrl.aboutPageMascotImgUrl = UrlInterpolationService
-              .getStaticImageUrl('/general/about_page_mascot.png');
-            window.onhashchange = function() {
-              var hashChange = window.location.hash.slice(1);
+
+            WindowRef.nativeWindow.onhashchange = function() {
+              var hashChange = WindowRef.nativeWindow.location.hash.slice(1);
               if (hashChange === ctrl.TAB_ID_FOUNDATION || (
                 hashChange === 'license')) {
                 activateTab(ctrl.TAB_ID_FOUNDATION);
                 // Ensure page goes to the license section
                 if (hashChange === 'license') {
-                  $window.reload(true);
+                  WindowRef.nativeWindow.location.reload(true);
                 }
               } else if (hashChange === ctrl.TAB_ID_CREDITS) {
                 activateTab(ctrl.TAB_ID_CREDITS);
