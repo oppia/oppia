@@ -851,7 +851,7 @@ class BuildTests(test_utils.GenericTestBase):
             build, '_ensure_files_exist', mock_ensure_files_exist)
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception,
-            'minify_third_party_libs_only should not be set in non-prod mode.')
+            'minify_third_party_libs_only should not be set in non-prod env.')
         with ensure_files_exist_swap, assert_raises_regexp_context_manager:
             build.main(args=['--minify_third_party_libs_only'])
 
