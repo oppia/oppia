@@ -135,6 +135,7 @@ class BaseHandler(webapp2.RequestHandler):
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
+
         try:
             self.initialize(request, response)
 
@@ -201,6 +202,14 @@ class BaseHandler(webapp2.RequestHandler):
 
             self.handle_exception(e, self.app.debug)
             return
+
+    def _internal_error(self, exception):
+        """Last resource error for :meth:`__call__`."""
+        logging.exception(exception)
+        if self.debug:
+            lines = ''.join(traceback.format_exception(*sys.exc_info()))
+            self._render_exception(500, {'error': python_utils.convert_to_bytes(
+                lines)})
 
     def dispatch(self):
         """Overrides dispatch method in webapp2 superclass.
@@ -409,6 +418,8 @@ class BaseHandler(webapp2.RequestHandler):
                     'error-iframed.mainpage.html',
                     iframe_restriction=None)
             else:
+                self.values['error'] = ''.join(
+                    traceback.format_exception(*sys.exc_info())).encode('utf-8')
                 self.render_template(
                     'error-page-%s.mainpage.html' % values['status_code'])
         else:
