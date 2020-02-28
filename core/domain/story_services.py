@@ -200,15 +200,12 @@ def _save_story(committer_id, story, commit_message, change_list):
 
     story.validate()
     # Validate that all explorations referenced by the story exist.
-    exp_ids = []
+    exp_ids = [
+        node.exploration_id for node in story.story_contents.nodes
+        if node.exploration_id is not None]
 
-    # Any exp ID in the story to compare categories later on.
-    exp_id = None
-    for node in story.story_contents.nodes:
-        if node.exploration_id is not None:
-            exp_ids.append(node.exploration_id)
-            if exp_id is None:
-                exp_id = node.exploration_id
+    # The first exp ID in the story to compare categories later on.
+    sample_exp_id = exp_ids[0] if exp_ids else None
 
     # Strict = False, since the existence of explorations is checked below.
     exps_dict = (
@@ -222,18 +219,15 @@ def _save_story(committer_id, story, commit_message, change_list):
                 'but found an exploration with ID: %s (was it deleted?)' %
                 node.exploration_id)
 
-    valid_interaction_ids = [
-        'Continue', 'EndExploration', 'NumericInput', 'TextInput',
-        'FractionInput', 'NumberWithUnits', 'MultipleChoiceInput',
-        'ItemSelectionInput']
     if exps_dict:
-        common_exp_category = exps_dict[exp_id].category
+        common_exp_category = exps_dict[sample_exp_id].category
         for exp_id in exps_dict:
             exp = exps_dict[exp_id]
             if exp.category != common_exp_category:
                 raise utils.ValidationError(
                     'All explorations in a story should be of the '
-                    'same category.')
+                    'same category. The explorations with ID %s and %s have'
+                    ' different categories.' % (sample_exp_id, exp_id))
             if exp.language_code != 'en':
                 raise utils.ValidationError(
                     'All explorations in a story should be in English.')
@@ -243,13 +237,11 @@ def _save_story(committer_id, story, commit_message, change_list):
                     ' it. Invalid exploration: %s' % exp.id)
             for state_name in exp.states:
                 state = exp.states[state_name]
-                if (
-                        state.interaction.id and
-                        state.interaction.id not in valid_interaction_ids):
+                if not state.interaction.is_supported_on_android_app():
                     raise utils.ValidationError(
                         'Expected explorations to only have the following '
                         'interactions: %s. Invalid exploration: %s' %
-                        (valid_interaction_ids, exp.id))
+                        (feconf.VALID_INTERACTION_IDS_FOR_ANDROID, exp.id))
 
 
     # Story model cannot be None as story is passed as parameter here and that

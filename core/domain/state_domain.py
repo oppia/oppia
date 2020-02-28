@@ -377,6 +377,19 @@ class InteractionInstance(python_utils.OBJECT):
         return self.id and interaction_registry.Registry.get_interaction_by_id(
             self.id).is_terminal
 
+    def is_supported_on_android_app(self):
+        """Determines whether the interaction is a valid interaction that is
+        supported by the Android app.
+
+        Returns.
+            bool. Whether the interaction is supported by the Android app or
+                not.
+        """
+        if self.id:
+            return self.id in feconf.VALID_INTERACTION_IDS_FOR_ANDROID
+
+        return True
+
     def get_all_outcomes(self):
         """Returns a list of all outcomes of this interaction, taking into
         consideration every answer group and the default outcome.

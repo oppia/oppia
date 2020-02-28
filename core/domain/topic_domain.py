@@ -491,6 +491,10 @@ class Topic(python_utils.OBJECT):
         if name == '':
             raise utils.ValidationError('Name field should not be empty')
 
+        if len(name) > 35:
+            raise utils.ValidationError(
+                'Topic name should be atmost 35 characters.')
+
     @classmethod
     def require_valid_abbreviated_name(cls, name):
         """Checks whether the abbreviated name of the topic is a valid one.
@@ -696,6 +700,10 @@ class Topic(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
+
+        if len(self.description) > 240:
+            raise utils.ValidationError(
+                'Topic description should be atmost 240 characters.')
 
         if not isinstance(self.subtopics, list):
             raise utils.ValidationError(
