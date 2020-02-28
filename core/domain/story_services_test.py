@@ -613,6 +613,49 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             exp_services.get_story_id_linked_to_exploration('2'))
 
+    def test_exploration_story_link_collision(self):
+        self.save_new_story(
+            'story_id_2', self.USER_ID, 'Title', 'Description', 'Notes',
+            self.TOPIC_ID)
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, 'story_id_2')
+        self.save_new_valid_exploration(
+            '0', self.user_id_admin, title='Title 1',
+            category='Mathematics', language_code='en')
+
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'node_id': self.NODE_ID_1,
+            'old_value': None,
+            'new_value': '0'
+        })]
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_ADD_STORY_NODE,
+            'node_id': self.NODE_ID_1,
+            'title': 'Title 1'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'node_id': self.NODE_ID_1,
+            'old_value': None,
+            'new_value': '0'
+        })]
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The exploration with ID 0 is already linked to story '
+            'with ID %s' % self.STORY_ID):
+            story_services.update_story(
+                self.USER_ID, 'story_id_2', change_list,
+                'Added chapter.')
+
+
     def test_cannot_update_story_acquired_skill_ids_with_invalid_node_id(self):
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,

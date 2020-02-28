@@ -223,7 +223,7 @@ def get_recently_published_exp_summaries(limit):
 
 
 def get_story_id_linked_to_exploration(exp_id):
-    """Returns the ID of the story that the exploration is a part of or None if
+    """Returns the ID of the story that the exploration is a part of, or None if
     the exploration is not part of a story.
 
     Args:

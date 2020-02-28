@@ -146,14 +146,14 @@ export = {
     "is_block_element": false,
     "customization_arg_specs": [{
       "name": "text",
-      "description": "Enter the link text to be displayed",
+      "description": "The link to be displayed",
       "schema": {
         "type": "unicode"
       },
       "default_value": ""
     }, {
       "name": "skill_id",
-      "description": "Click on skill to view concept card.",
+      "description": "The skill that this link refers to",
       "schema": {
         "type": "custom",
         "obj_type": "SkillSelector"

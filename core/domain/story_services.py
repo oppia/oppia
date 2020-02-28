@@ -302,6 +302,9 @@ def update_story(
             produce the resulting story.
         commit_message: str or None. A description of changes made to the
             story.
+
+    Raises:
+        ValidationError. Exploration is already linked to a different story.
     """
     if not commit_message:
         raise ValueError('Expected a commit message but received none.')
@@ -310,6 +313,8 @@ def update_story(
     new_story, exp_ids_removed_from_story, exp_ids_added_to_story = (
         apply_change_list(story_id, change_list))
     _save_story(committer_id, new_story, commit_message, change_list)
+    create_story_summary(new_story.id)
+    opportunity_services.update_exploration_opportunities(old_story, new_story)
 
     exploration_context_models_to_be_deleted = (
         exp_models.ExplorationContextModel.get_multi(
@@ -320,13 +325,20 @@ def update_story(
     exp_models.ExplorationContextModel.delete_multi(
         exploration_context_models_to_be_deleted)
 
+    exploration_context_models_collisions_list = (
+        exp_models.ExplorationContextModel.get_multi(
+            exp_ids_added_to_story))
+    for context_model in exploration_context_models_collisions_list:
+        if context_model is not None and context_model.story_id != story_id:
+            raise utils.ValidationError(
+                'The exploration with ID %s is already linked to story '
+                'with ID %s' % (context_model.id, context_model.story_id))
+
     new_exploration_context_models = [exp_models.ExplorationContextModel(
         id=exp_id,
         story_id=story_id
     ) for exp_id in exp_ids_added_to_story]
     exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
-    create_story_summary(new_story.id)
-    opportunity_services.update_exploration_opportunities(old_story, new_story)
 
 
 def delete_story(committer_id, story_id, force_deletion=False):
