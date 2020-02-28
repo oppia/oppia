@@ -156,7 +156,7 @@
         "downloadFormat": "files",
         "url": "https://code.angularjs.org/1.7.9",
         "targetDirPrefix": "angularjs-",
-        "files": ["angular-mocks.js", "angular-scenario.js"]
+        "files": ["angular-mocks.js"]
       },
       "angularTranslate": {
         "version": "2.18.1",
@@ -178,16 +178,6 @@
         "files": ["angular-translate-loader-static-files.min.js"],
         "bundle": {
           "js": ["angular-translate-loader-static-files.min.js"]
-        }
-      },
-      "angularCookiesRev": {
-        "version": "1.7.9",
-        "downloadFormat": "zip",
-        "url": "https://github.com/angular/bower-angular-cookies/archive/v1.7.9.zip",
-        "rootDirPrefix": "bower-angular-cookies-",
-        "targetDirPrefix": "bower-angular-cookies-",
-        "bundle": {
-          "js": ["angular-cookies.min.js"]
         }
       },
       "angularDragAndDrop": {
@@ -311,7 +301,12 @@
         "rootDir": "fontawesome-free-5.9.0-web",
         "targetDir": "fontawesome-free-5.9.0-web",
         "bundle": {
-          "css": ["css/all.css"],
+          "css": [
+            "css/fontawesome.min.css",
+            "css/brands.min.css",
+            "css/regular.min.css",
+            "css/solid.min.css"
+          ],
           "fontsPath": "webfonts"
         }
       },
@@ -346,26 +341,13 @@
         "rootDirPrefix": "guppy-",
         "targetDir": "guppy-b5055b"
       },
-      "hammerJs": {
-        "version": "2.0.8",
-        "downloadFormat": "zip",
-        "url": "https://github.com/hammerjs/hammer.js/archive/v2.0.8.zip",
-        "rootDirPrefix": "hammer.js-",
-        "targetDirPrefix": "hammer-js-",
-        "bundle": {
-          "js": ["hammer.js"]
-        }
-      },
       "headroomJs": {
         "version": "0.9.4",
         "downloadFormat": "files",
         "url": "https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4",
         "rootDirPrefix": "headroom-js-",
         "targetDirPrefix": "headroom-js-",
-        "files": ["angular.headroom.min.js", "headroom.min.js"],
-        "bundle": {
-          "js": []
-        }
+        "files": ["angular.headroom.min.js", "headroom.min.js"]
       },
       "jquery": {
         "version": "3.4.1",
@@ -373,10 +355,7 @@
         "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.4.1",
         "rootDirPrefix": "jquery-",
         "targetDirPrefix": "jquery-",
-        "files": ["jquery.js", "jquery.min.js", "jquery.min.js.map"],
-        "bundle": {
-          "js": []
-        }
+        "files": ["jquery.js", "jquery.min.js", "jquery.min.js.map"]
       },
       "jqueryUI": {
         "version": "1.12.1",
@@ -384,10 +363,7 @@
         "url": "https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1",
         "rootDirPrefix": "jqueryui-",
         "targetDirPrefix": "jqueryui-",
-        "files": ["jquery-ui.min.js"],
-        "bundle": {
-          "js": []
-        }
+        "files": ["jquery-ui.min.js"]
       },
       "jqueryUITouchPunch": {
         "version": "0.3.1",
