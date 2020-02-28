@@ -35,7 +35,7 @@ POST_COMMIT_STATUS_PUBLIC = 'public'
 POST_COMMIT_STATUS_PRIVATE = 'private'
 
 # Whether to unconditionally log info messages.
-DEBUG = False
+DEBUG = True
 
 # When DEV_MODE is true check that we are running in development environment.
 # The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
