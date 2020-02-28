@@ -29,7 +29,7 @@ IMPORTANT NOTES:
 
 2.  This script should be run from the oppia root folder:
 
-        python -m scripts.deploy --app_name=[app_name]
+        python -m scripts.release_scripts.deploy --app_name=[app_name]
 
     where [app_name] is the name of your app. Note that the root folder MUST be
     named 'oppia'.
@@ -465,8 +465,8 @@ def execute_deployment():
         raise Exception(
             'The deployment script must be run from a release or test branch.')
     if common.is_current_branch_a_test_branch() and (
-            app_name == APP_NAME_OPPIASERVER):
-        raise Exception('Test branch cannot be deployed to prod.')
+            app_name in [APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER]):
+        raise Exception('Test branch can only be deployed to backup server.')
     if custom_version is not None:
         current_release_version = custom_version.replace(
             DOT_CHAR, HYPHEN_CHAR)

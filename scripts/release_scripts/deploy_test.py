@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/deploy.py."""
+"""Unit tests for scripts/release_scripts/deploy.py."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -170,7 +170,18 @@ class DeployTests(test_utils.GenericTestBase):
         with get_branch_swap, args_swap, self.install_swap:
             with self.assertRaisesRegexp(
                 Exception,
-                'Test branch cannot be deployed to prod.'):
+                'Test branch can only be deployed to backup server.'):
+                deploy.execute_deployment()
+
+    def test_exception_is_raised_for_deploying_test_branch_to_test_server(self):
+        def mock_get_branch():
+            return 'test-deploy'
+        get_branch_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_branch)
+        with get_branch_swap, self.args_swap, self.install_swap:
+            with self.assertRaisesRegexp(
+                Exception,
+                'Test branch can only be deployed to backup server.'):
                 deploy.execute_deployment()
 
     def test_invalid_branch(self):

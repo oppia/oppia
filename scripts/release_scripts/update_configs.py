@@ -18,7 +18,7 @@ ONLY RELEASE COORDINATORS SHOULD USE THIS SCRIPT.
 
 Usage: Run this script from your oppia root folder:
 
-    python -m scripts.update_configs
+    python -m scripts.release_scripts.update_configs
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules

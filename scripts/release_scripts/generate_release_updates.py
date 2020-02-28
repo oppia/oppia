@@ -134,9 +134,9 @@ def prompt_user_to_send_announcement_email():
         'Please make sure to check that the mail ids of new authors '
         'and contributors are correct.\n' % (
             RELEASE_MAIL_MESSAGE_FILEPATH, new_contributors_mail_ids))
-
     common.open_new_tab_in_browser_if_possible(
         'https://groups.google.com/forum/#!categories/oppia/announcements')
+    common.ask_user_to_confirm('Add announcements label to the email sent.\n')
     common.ask_user_to_confirm(
         'Ensure the email sent to oppia@ is in the Announcements category')
 
