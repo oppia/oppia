@@ -123,6 +123,7 @@ describe('Answer Details Improvements', function() {
       creatorDashboardPage.navigateToExplorationEditor();
       explorationEditorPage.navigateToImprovementsTab();
 
+      improvementsTab.verifyTaskCount(1);
       var task = improvementsTab.getAnswerDetailsTask('One');
       improvementsTab.clickTaskActionButton(task, 'Review Answer Details');
       improvementsTab.verifyAnswerDetails('I liked this choi...', 1);
