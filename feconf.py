@@ -500,13 +500,11 @@ MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
 # category.
 MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
 
-# The number of easy question skill difficulty.
+# The difficulty value of easy question.
 EASY_SKILL_DIFFICULTY = 0.3
-
-# The number of medium question skill difficulty.
+# The difficulty value of medium question.
 MEDIUM_SKILL_DIFFICULTY = 0.6
-
-# The number of hard question skill difficulty.
+# The difficulty value of hard question.
 HARD_SKILL_DIFFICULTY = 0.9
 
 # The maximum number of skills to be requested at one time when fetching

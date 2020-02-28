@@ -459,13 +459,15 @@ class AdminHandler(base.BaseHandler):
                 raise Exception(
                     'User does not have enough rights to generate data.')
             skill_id = skill_services.get_new_skill_id()
-            skill_name = 'Dummy Skill %s' % python_utils.UNICODE(random.getrandbits(32)) # pylint: disable=line-too-long
+            skill_name = 'Dummy Skill %s' % python_utils.UNICODE(
+                random.getrandbits(32))
             skill = self._create_dummy_skill(
                 skill_id, skill_name, '<p>Dummy Explanation 1</p>')
             skill_services.save_new_skill(self.user_id, skill)
             for i in python_utils.RANGE(15):
                 question_id = question_services.get_new_question_id()
-                question_name = 'Question number %s %s' % (python_utils.UNICODE(i), skill_name) # pylint: disable=line-too-long
+                question_name = 'Question number %s %s' % (
+                    python_utils.UNICODE(i), skill_name)
                 question = self._create_dummy_question(
                     question_id, question_name, [skill_id])
                 question_services.add_question(self.user_id, question)
