@@ -207,13 +207,13 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'message': 'Please use \'toThrowError\' instead of '
                    '\'toThrow\'',
         'excluded_files': (),
-        'excluded_dirs': ()
+        'excluded_dirs': ('extensions/interactions/LogicProof/static/js')
     },
     {
         'regexp': re.compile(r'throw\s\b(\bError|\bTypeError|\bRangeError)\('),
         'message': 'Please use \'throw new\' instead of \'throw\'',
         'excluded_files': (),
-        'excluded_dirs': ()
+        'excluded_dirs': ('extensions/interactions/LogicProof/static/js')
     },
     {
         'regexp': re.compile(r'throw\s\b(\bSyntaxError|\bDimensionError)\('),
