@@ -388,6 +388,8 @@ class BaseHandler(webapp2.RequestHandler):
         """
 
         method = self.request.environ['REQUEST_METHOD']
+        values['error_stack'] = ''.join(
+            traceback.format_exception(*sys.exc_info())).encode('utf-8')
 
         if return_type == feconf.HANDLER_TYPE_HTML and (
                 method == 'GET'):
@@ -397,6 +399,7 @@ class BaseHandler(webapp2.RequestHandler):
                     'error-iframed.mainpage.html',
                     iframe_restriction=None)
             else:
+                self.values['error_stack'] = values['error_stack']
                 self.render_template(
                     'error-page-%s.mainpage.html' % values['status_code'])
         else:
