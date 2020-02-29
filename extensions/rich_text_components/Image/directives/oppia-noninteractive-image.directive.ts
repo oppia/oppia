@@ -52,7 +52,12 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
           ctrl.isTryAgainShown = false;
 
           // If viewing a concept card in the exploration player, don't use the
-          // preloader service.
+          // preloader service. Since, in that service, the image file names are
+          // extracted from the state contents to be preloaded, but when
+          // viewing a concept, the names are not available until the link is
+          // clicked, at which point an API call is done to get the skill
+          // details. So, the image file name will not be available to the
+          // preloader service beforehand.
           if (
             ImagePreloaderService.inExplorationPlayer() &&
             !ContextService.getEntityType() === ENTITY_TYPE.SKILL) {

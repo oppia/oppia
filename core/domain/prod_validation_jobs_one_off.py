@@ -2428,6 +2428,19 @@ class QuestionModelValidator(BaseModelValidator):
         }
 
 
+class ExplorationContextModelValidator(BaseModelValidator):
+    """Class for validating ExplorationContextModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'story_ids': (
+                story_models.StoryModel, [item.story_id]),
+            'exp_ids': (
+                exp_models.ExplorationModel, [item.id])
+        }
+
+
 class QuestionSkillLinkModelValidator(BaseModelValidator):
     """Class for validating QuestionSkillLinkModel."""
 
@@ -4889,6 +4902,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
     email_models.BulkEmailModel: BulkEmailModelValidator,
     email_models.GeneralFeedbackEmailReplyToIdModel: (
         GeneralFeedbackEmailReplyToIdModelValidator),
+    exp_models.ExplorationContextModel: (
+        ExplorationContextModelValidator),
     exp_models.ExplorationModel: ExplorationModelValidator,
     exp_models.ExplorationSnapshotMetadataModel: (
         ExplorationSnapshotMetadataModelValidator),
@@ -5336,6 +5351,14 @@ class QuestionSkillLinkModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [question_models.QuestionSkillLinkModel]
+
+
+class ExplorationContextModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationContextModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationContextModel]
 
 
 class QuestionSnapshotMetadataModelAuditOneOffJob(

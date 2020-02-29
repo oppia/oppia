@@ -223,47 +223,21 @@ def get_recently_published_exp_summaries(limit):
 
 
 def get_story_id_linked_to_exploration(exp_id):
-    """Returns the ID of the story that the exploration is a part of or None if
-    not.
+    """Returns the ID of the story that the exploration is a part of, or None if
+    the exploration is not part of a story.
 
     Args:
         exp_id: str. The ID of the exploration.
 
     Returns:
-        str|None. The ID of the story if the exploration is linked to some story
-            or None.
+        str|None. The ID of the story if the exploration is linked to some
+            story, otherwise None.
     """
     exploration_context_model = exp_models.ExplorationContextModel.get_by_id(
         exp_id)
     if exploration_context_model is not None:
         return exploration_context_model.story_id
     return None
-
-
-def update_exploration_story_link(old_exp_id, new_exp_id, story_id):
-    """Links a new exploration with a story and removes old linkage.
-
-    Args:
-        old_exp_id: str|None. The ID of the old exploration linked to story
-            (if any).
-        new_exp_id: str|None. The ID of the new exploration linked to story.
-        story_id: str. The ID of the story.
-    """
-    if old_exp_id and old_exp_id != '':
-        old_exploration_context_model = (
-            exp_models.ExplorationContextModel.get_by_id(
-                old_exp_id))
-        if old_exploration_context_model is not None:
-            old_exploration_context_model.delete()
-
-    if (
-            new_exp_id and new_exp_id != '' and
-            exp_fetchers.get_exploration_summary_by_id(new_exp_id) is not None):
-        new_exploration_context_model = exp_models.ExplorationContextModel(
-            id=new_exp_id,
-            story_id=story_id
-        )
-        new_exploration_context_model.put()
 
 
 def get_all_exploration_summaries():
@@ -438,6 +412,22 @@ def apply_change_list(exploration_id, change_list):
                         raise Exception(
                             'Expected recorded_voiceovers to be a dict, '
                             'received %s' % change.new_value)
+                    # Explicitly convert the duration_secs value from
+                    # int to float. Reason for this is the data from
+                    # the frontend will be able to match the backend
+                    # state model for Voiceover properly. Also js
+                    # treats any number that can be float and int as
+                    # int (no explicit types). For example,
+                    # 10.000 is not 10.000 it is 10.
+                    new_voiceovers_mapping = (
+                        change.new_value['voiceovers_mapping'])
+                    language_codes_to_audio_metadata = (
+                        new_voiceovers_mapping.values())
+                    for language_codes in language_codes_to_audio_metadata:
+                        for audio_metadata in language_codes.values():
+                            audio_metadata['duration_secs'] = (
+                                float(audio_metadata['duration_secs'])
+                            )
                     recorded_voiceovers = (
                         state_domain.RecordedVoiceovers.from_dict(
                             change.new_value))

@@ -68,6 +68,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_story(
             self.story_id_3, self.user_id, 'Title 3', 'Description 3', 'Notes',
             self.TOPIC_ID)
+        self.save_new_story(
+            self.story_id_2, self.user_id, 'Title 2', 'Description 2', 'Notes',
+            self.TOPIC_ID)
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
@@ -590,7 +593,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                             'en': {
                                 'filename': 'test.mp3',
                                 'file_size_bytes': 100,
-                                'needs_update': False
+                                'needs_update': False,
+                                'duration_secs': 0.3
                             }
                         }
                     }
@@ -631,7 +635,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                         'en': {
                             'filename': 'test.mp3',
                             'file_size_bytes': 100,
-                            'needs_update': False
+                            'needs_update': False,
+                            'duration_secs': 0.3
                         }
                     }
                 }

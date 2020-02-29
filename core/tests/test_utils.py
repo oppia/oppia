@@ -91,9 +91,9 @@ def get_filepath_from_filename(filename, rootdir):
     filename by using os.path.join(root, filename).
 
     For example signup-page.mainpage.html is present in
-    core/templates/dev/head/pages/signup-page and error-page.mainpage.html is
-    present in core/templates/dev/head/pages/error-pages. So we walk through
-    core/templates/dev/head/pages and a match for signup-page.directive.html
+    core/templates/pages/signup-page and error-page.mainpage.html is
+    present in core/templates/pages/error-pages. So we walk through
+    core/templates/pages and a match for signup-page.directive.html
     is found in signup-page subdirectory and a match for
     error-page.directive.html is found in error-pages subdirectory.
 
@@ -142,7 +142,7 @@ def mock_get_template(unused_self, filename):
         jinja2.environment.Template. The template for the given file.
     """
     filepath = get_filepath_from_filename(
-        filename, os.path.join('core', 'templates', 'dev', 'head', 'pages'))
+        filename, os.path.join('core', 'templates', 'pages'))
     with python_utils.open_file(filepath, 'r') as f:
         file_content = f.read()
     return jinja2.environment.Template(file_content)
@@ -1354,6 +1354,10 @@ tags: []
             corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Story and saves it.
+
+        NOTE: Callers are responsible for ensuring that the
+        'corresponding_topic_id' provided is valid, unless a test explicitly
+        requires it to be invalid.
 
         Args:
             story_id: str. ID for the story to be created.
