@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @fileoverview Service for inspecting and managing suggestion objects. */
+/**
+ * @fileoverview Service for inspecting and managing suggestion objects.
+ */
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';

@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @fileoverview Unit tests for SuggestionsService. */
+/**
+ * @fileoverview Unit tests for SuggestionsService.
+ */
 
 import { SuggestionsService } from 'services/suggestions.service';
 
