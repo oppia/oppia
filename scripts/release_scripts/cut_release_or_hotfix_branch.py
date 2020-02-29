@@ -20,15 +20,16 @@ Usage: Run this script from your oppia root folder:
 
 For release branch:
 
-    python -m scripts.cut_release_or_hotfix_branch --release_version="x.y.z"
+    python -m scripts.release_scripts.cut_release_or_hotfix_branch
+    --release_version="x.y.z"
 
 where x.y.z is the new version of Oppia, e.g. 2.5.3. The generated branch
 name will be release-x.y.z, e.g. release-2.5.3.
 
 For hotfix branch:
 
-    python -m scripts.cut_release_or_hotfix_branch --release_version="x.y.z"
-    --hotfix_number=d
+    python -m scripts.release_scripts.cut_release_or_hotfix_branch
+    --release_version="x.y.z" --hotfix_number=d
 
 where x.y.z is the new version of Oppia, e.g. 2.5.3,
 d is number of the hotfix being created, e.g. 1. The generated branch
@@ -42,7 +43,6 @@ import argparse
 import json
 import re
 import subprocess
-import sys
 
 import python_utils
 import release_constants
@@ -226,17 +226,19 @@ def _get_hotfix_branch_type_and_name(target_version, hotfix_number):
             target_version, hotfix_number))
 
 
-def execute_branch_cut():
-    """Pushes the new release branch to Github."""
+def execute_branch_cut(target_version, hotfix_number):
+    """Creates & pushes the new release branch to Github.
 
-    parsed_args = _PARSER.parse_args()
-    if parsed_args.release_version:
-        target_version = parsed_args.release_version
-    else:
-        raise Exception('ERROR: A "release_version" arg must be specified.')
+    Args:
+        target_version: str. The release version.
+        hotfix_number: int. The number for the hotfix branch.
+
+    Raises:
+        Exception: Travis tests are failing on the branch from which
+            the new branch is cut.
+    """
 
     # Construct the new branch name.
-    hotfix_number = int(parsed_args.hotfix_number)
     if not hotfix_number:
         new_branch_type, new_branch_name = _get_release_branch_type_and_name(
             target_version)
@@ -274,10 +276,9 @@ def execute_branch_cut():
         if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
             break
         elif answer:
-            python_utils.PRINT(
-                'Tests should pass on %s before this script is run. '
-                'Exiting.' % branch_to_check)
-            sys.exit()
+            raise Exception(
+                'Tests should pass on %s before this script is run.' % (
+                    branch_to_check))
 
     # Cut a new release or hotfix branch.
     if new_branch_type == release_constants.BRANCH_TYPE_HOTFIX:
@@ -318,8 +319,19 @@ def execute_branch_cut():
             new_branch_name))
 
 
+def main(args=None):
+    """Main method for creating a release or hotfix branch."""
+    parsed_args = _PARSER.parse_args(args=args)
+    if parsed_args.release_version:
+        target_version = parsed_args.release_version
+    else:
+        raise Exception('ERROR: A "release_version" arg must be specified.')
+    hotfix_number = int(parsed_args.hotfix_number)
+    execute_branch_cut(target_version, hotfix_number)
+
+
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when cut_release_or_hotfix_branch.py is used as a
 # script.
 if __name__ == '__main__': # pragma: no cover
-    execute_branch_cut()
+    main()
