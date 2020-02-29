@@ -72,7 +72,6 @@ describe('Classroom page functionality', function() {
   });
 
   afterEach(function() {
-    workflow.takeScreenshot(testName);
     general.checkForConsoleErrors([]);
   });
 });
