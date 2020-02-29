@@ -155,8 +155,12 @@ var ExplorationEditorImprovementsTab = function() {
     return task.all(actionButtonLocator);
   };
 
-  this.verifyTaskCount = (expectedTaskCount) => {
+  this.verifyOutstandingTaskCount = (expectedTaskCount) => {
     expect(taskCount.getText()).toMatch(String(expectedTaskCount));
+  };
+
+  this.verifyNoOutstandingTasks = () => {
+    expect(taskCount.getText()).toMatch('');
   };
 
   this.verifyAnswerDetails = (expectedDetails, expectedInfoCount) => {
