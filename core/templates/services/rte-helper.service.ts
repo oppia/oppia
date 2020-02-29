@@ -66,6 +66,12 @@ angular.module('oppia').factory('RteHelperService', [
       }
       return customizationArgsDict;
     };
+    var extractVideoIdFromVideoUrl = function(videoUrl) {
+      videoUrl = videoUrl.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
+      return ((videoUrl[2] !== undefined) ?
+               videoUrl[2].split(/[^0-9a-z_\-]/i)[0] : videoUrl[0]);
+    };
+
 
     return {
       createCustomizationArgDictFromAttrs: function(attrs) {
@@ -129,10 +135,15 @@ angular.module('oppia').factory('RteHelperService', [
                 var customizationArgsDict = {};
                 for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
                   var caName = $scope.tmpCustomizationArgs[i].name;
-                  customizationArgsDict[caName] = (
-                    $scope.tmpCustomizationArgs[i].value);
+                  if (caName === 'video_id') {
+                    var temp = $scope.tmpCustomizationArgs[i].value;
+                    customizationArgsDict[caName] = (
+                      extractVideoIdFromVideoUrl(temp.toString()));
+                  } else {
+                    customizationArgsDict[caName] = (
+                      $scope.tmpCustomizationArgs[i].value);
+                  }
                 }
-
                 $uibModalInstance.close(customizationArgsDict);
               };
             }
