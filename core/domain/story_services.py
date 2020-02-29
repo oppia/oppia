@@ -121,7 +121,9 @@ def apply_change_list(story_id, change_list):
                             exp_ids_added_to_story = [
                                 exp_id for exp_id in exp_ids_added_to_story
                                 if exp_id != node.exploration_id]
-                        exp_ids_removed_from_story.append(node.exploration_id)
+                        elif node.exploration_id:
+                            exp_ids_removed_from_story.append(
+                                node.exploration_id)
                         break
                 story.delete_node(change.node_id)
             elif (change.cmd ==
@@ -153,12 +155,20 @@ def apply_change_list(story_id, change_list):
                       story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID):
                     story.update_node_exploration_id(
                         change.node_id, change.new_value)
-                    if change.old_value in exp_ids_added_to_story:
-                        exp_ids_added_to_story = [
-                            exp_id for exp_id in exp_ids_added_to_story
-                            if exp_id != change.old_value]
-                    exp_ids_removed_from_story.append(change.old_value)
-                    exp_ids_added_to_story.append(change.new_value)
+                    if change.old_value:
+                        if change.old_value in exp_ids_added_to_story:
+                            exp_ids_added_to_story = [
+                                exp_id for exp_id in exp_ids_added_to_story
+                                if exp_id != change.old_value]
+                        else:
+                            exp_ids_removed_from_story.append(change.old_value)
+                    if change.new_value:
+                        if change.new_value in exp_ids_removed_from_story:
+                            exp_ids_removed_from_story = [
+                                exp_id for exp_id in exp_ids_removed_from_story
+                                if exp_id != change.new_value]
+                        else:
+                            exp_ids_added_to_story.append(change.new_value)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_PROPERTY:
                 if (change.property_name ==
                         story_domain.STORY_PROPERTY_TITLE):
