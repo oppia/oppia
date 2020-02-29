@@ -93,6 +93,7 @@ import { IdGenerationService } from 'services/id-generation.service';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
 import { ImprovementsDisplayService } from
+  /* eslint-disable-next-line max-len */
   'pages/exploration-editor-page/improvements-tab/services/improvements-display.service';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
