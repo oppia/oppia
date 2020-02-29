@@ -89,7 +89,9 @@ describe('Topic editor functionality', function() {
   });
 
   afterEach(function() {
+    workflow.takeScreenshot(testName);
     general.checkForConsoleErrors([]);
     users.logout();
+    workflow.takeScreenshot(testName);
   });
 });
