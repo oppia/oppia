@@ -123,7 +123,7 @@ describe('Answer Details Improvements', function() {
       creatorDashboardPage.navigateToExplorationEditor();
       explorationEditorPage.navigateToImprovementsTab();
 
-      improvementsTab.verifyTaskCount(1);
+      improvementsTab.verifyOutstandingTaskCount(1);
       var task = improvementsTab.getAnswerDetailsTask('One');
       improvementsTab.clickTaskActionButton(task, 'Review Answer Details');
       improvementsTab.verifyAnswerDetails('I liked this choi...', 1);
@@ -214,7 +214,7 @@ describe('Feedback Improvements', function() {
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
 
-    improvementsTab.verifyTaskCount(1);
+    improvementsTab.verifyOutstandingTaskCount(1);
     var task = improvementsTab.getFeedbackTask(feedback);
     improvementsTab.clickTaskActionButton(task, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual([feedback]);
@@ -262,7 +262,7 @@ describe('Feedback Improvements', function() {
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
-    improvementsTab.verifyTaskCount(1);
+    improvementsTab.verifyOutstandingTaskCount(1);
 
     // Mark thread as fixed.
     var task = improvementsTab.getFeedbackTask(feedback);
@@ -275,7 +275,7 @@ describe('Feedback Improvements', function() {
     expect(improvementsTab.getTaskStatus(task)).toEqual('Fixed');
 
     browser.driver.navigate().refresh();
-    improvementsTab.verifyTaskCount('');
+    improvementsTab.verifyNoOutstandingTasks();
 
     // Re-open the thread.
     improvementsTab.setShowOnlyOpenTasks(false);
@@ -287,7 +287,7 @@ describe('Feedback Improvements', function() {
     expect(improvementsTab.getTaskStatus(task)).toEqual('Open');
 
     browser.driver.navigate().refresh();
-    improvementsTab.verifyTaskCount(1);
+    improvementsTab.verifyOutstandingTaskCount(1);
 
     users.logout();
   });
@@ -370,7 +370,7 @@ describe('Suggestions Improvements', function() {
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
-    improvementsTab.verifyTaskCount(2);
+    improvementsTab.verifyOutstandingTaskCount(2);
 
     var taskToAccept = improvementsTab.getSuggestionTask(
       suggestionDescription1);
@@ -534,7 +534,7 @@ describe('Playthrough Improvements', function() {
         improvementsTab.confirmAction();
 
         expect(improvementsTab.getTasks().count()).toEqual(0);
-        improvementsTab.verifyTaskCount('');
+        improvementsTab.verifyNoOutstandingTasks();
       });
     });
 
@@ -561,7 +561,7 @@ describe('Playthrough Improvements', function() {
           'learners exited the exploration in less than a minute');
 
         expect(improvementsTab.getTaskActionButtons(task).count()).toEqual(0);
-        improvementsTab.verifyTaskCount('');
+        improvementsTab.verifyNoOutstandingTasks();
       });
     });
   });
