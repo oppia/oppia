@@ -92,6 +92,8 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
+import { ImprovementsDisplayService } from
+  'pages/exploration-editor-page/improvements-tab/services/improvements-display.service';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
@@ -135,6 +137,8 @@ import { PlaythroughIssueObjectFactory } from
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
+import { RatingComputationService } from
+  'components/ratings/rating-computation/rating-computation.service';
 import { ReadOnlyStoryNodeObjectFactory } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
@@ -288,6 +292,8 @@ export class UpgradedServices {
     upgradedServices['IdGenerationService'] = new IdGenerationService();
     upgradedServices['ImprovementActionButtonObjectFactory'] =
       new ImprovementActionButtonObjectFactory();
+    upgradedServices['ImprovementsDisplayService'] =
+      new ImprovementsDisplayService();
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
     upgradedServices['LearnerAnswerDetailsObjectFactory'] =
@@ -303,6 +309,8 @@ export class UpgradedServices {
       new ParamTypeObjectFactory();
     upgradedServices['PlaythroughIssueObjectFactory'] =
       new PlaythroughIssueObjectFactory();
+    upgradedServices['RatingComputationService'] =
+      new RatingComputationService();
     upgradedServices['ReadOnlyStoryNodeObjectFactory'] =
       new ReadOnlyStoryNodeObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
