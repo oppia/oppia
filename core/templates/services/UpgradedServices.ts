@@ -18,6 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 
 import { AlertsService } from 'services/alerts.service';
 import { AngularNameService } from
@@ -114,6 +115,7 @@ import { NormalizeWhitespacePunctuationAndCasePipe } from
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { PageTitleService } from 'services/page-title.service';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
@@ -355,6 +357,8 @@ export class UpgradedServices {
       upgradedServices['UtilsService']);
     upgradedServices['OutcomeObjectFactory'] =
       new OutcomeObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
+    upgradedServices['PageTitleService'] = new PageTitleService(
+      new Title(null));
     upgradedServices['ParamChangesObjectFactory'] =
       new ParamChangesObjectFactory(
         upgradedServices['ParamChangeObjectFactory']);
