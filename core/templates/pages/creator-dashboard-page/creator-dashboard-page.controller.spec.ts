@@ -19,25 +19,13 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // creator-dashboard-page.controller.ts is upgraded to Angular 8.
-import { RatingComputationService } from
-  'components/ratings/rating-computation/rating-computation.service';
-import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
-/* eslint-disable max-len */
-import { ThreadStatusDisplayService } from
-  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-/* eslint-enable max-len */
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-
-import { TranslatorProviderForTests } from 'tests/test.extras';
 
 require('pages/creator-dashboard-page/creator-dashboard-page.controller.ts');
 
 describe('Creator dashboard controller', function() {
   describe('CreatorDashboard', function() {
-    var ctrl, $httpBackend, componentController;
+    var ctrl, $httpBackend, $componentController;
     var CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data';
     var dashboardData = {
       explorations_list: [{
@@ -70,12 +58,6 @@ describe('Creator dashboard controller', function() {
       }
     };
 
-    beforeEach(
-      angular.mock.module('oppia', TranslatorProviderForTests));
-
-    beforeEach(function() {
-      angular.mock.module('oppia');
-    });
     beforeEach(angular.mock.module('oppia', function($provide) {
       var ugs = new UpgradedServices();
       for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -83,37 +65,17 @@ describe('Creator dashboard controller', function() {
       }
     }));
 
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.factory(
-        'CreatorDashboardBackendApiService', ['$http', function($http) {
-          return {
-            fetchDashboardData: function() {
-              return $http.get('/creatordashboardhandler/data');
-            }
-          };
-        }]);
-      $provide.value(
-        'RatingComputationService', new RatingComputationService());
-      $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
-      $provide.value(
-        'ThreadStatusDisplayService', new ThreadStatusDisplayService());
-      $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
-    }));
-
-    beforeEach(inject(['$componentController', function(
-        $componentController) {
-      componentController = $componentController;
-    }]));
-
     beforeEach(angular.mock.inject(function($injector) {
+      $componentController = $componentController;
       $httpBackend = $injector.get('$httpBackend');
+      $componentController = $injector.get('$componentController');
     }));
 
     beforeEach(angular.mock.inject(
       function(CreatorDashboardBackendApiService) {
         $httpBackend.expect('GET', CREATOR_DASHBOARD_DATA_URL).respond(
           dashboardData);
-        ctrl = componentController('creatorDashboardPage', null, {
+        ctrl = $componentController('creatorDashboardPage', null, {
           AlertsService: null,
           CreatorDashboardBackendApiService: CreatorDashboardBackendApiService
         });

@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for SuggestionObjectFactory.
  */
 
+import { TestBed } from '@angular/core/testing';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
 
@@ -23,7 +24,10 @@ describe('Suggestion object factory', () => {
   let suggestionObjectFactory: SuggestionObjectFactory;
 
   beforeEach(() => {
-    suggestionObjectFactory = new SuggestionObjectFactory();
+    TestBed.configureTestingModule({
+      providers: [SuggestionObjectFactory]
+    });
+    suggestionObjectFactory = TestBed.get(SuggestionObjectFactory);
   });
 
   it('should create a new suggestion from a backend dict.', () => {

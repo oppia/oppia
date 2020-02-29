@@ -385,9 +385,6 @@ export class UpgradedServices {
       new SiteAnalyticsService(upgradedServices['WindowRef']);
     upgradedServices['SuggestionObjectFactory'] = new SuggestionObjectFactory(
       upgradedServices['SuggestionsService']);
-    upgradedServices['SuggestionThreadObjectFactory'] =
-        new SuggestionThreadObjectFactory(
-          upgradedServices['SuggestionObjectFactory']);
     upgradedServices['StateClassifierMappingService'] =
       new StateClassifierMappingService(
         upgradedServices['ClassifierObjectFactory']);
@@ -489,6 +486,9 @@ export class UpgradedServices {
     upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(
       upgradedServices['AlertsService'], upgradedServices['UrlService'],
       upgradedServices['UtilsService']);
+    upgradedServices['SuggestionThreadObjectFactory'] =
+        new SuggestionThreadObjectFactory(
+          upgradedServices['SuggestionObjectFactory']);
 
     // Group 4: Services depending on groups 1,2 and 3.
     upgradedServices['ExplorationHtmlFormatterService'] =
