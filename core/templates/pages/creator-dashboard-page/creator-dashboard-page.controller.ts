@@ -186,9 +186,9 @@ angular.module('oppia').directive('creatorDashboardPage', [
               throw Error('Trying to set a non-existent thread as active.');
             }
             ctrl.activeThread = ctrl.threadsById[threadId];
+            ctrl.canReviewActiveThread = ctrl.suggestionsToReviewList.some(
+              thread => thread.threadId === ctrl.activeThread.threadId);
             ThreadDataService.fetchMessages(ctrl.activeThread);
-            ctrl.canReviewActiveThread = ctrl.suggestionsToReviewList.includes(
-              ctrl.activeThread);
           };
 
           ctrl.showSuggestionModal = function() {
