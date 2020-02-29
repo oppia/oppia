@@ -320,6 +320,7 @@ FULLY_COVERED_FILENAMES = [
     'suggestion-modal.service.ts',
     'SuggestionImprovementTaskObjectFactory.ts',
     'SuggestionObjectFactory.ts',
+    'SuggestionsService.ts',
     'SuggestionThreadObjectFactory.ts',
     'summarize-nonnegative-number.filter.ts',
     'test.extras.ts',
