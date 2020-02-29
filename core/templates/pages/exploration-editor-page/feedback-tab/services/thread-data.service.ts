@@ -22,6 +22,7 @@ require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/alerts.service.ts');
+require('services/suggestions.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');

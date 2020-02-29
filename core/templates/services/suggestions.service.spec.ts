@@ -17,11 +17,11 @@
 import { SuggestionsService } from 'services/suggestions.service';
 
 describe('SuggestionsService', () => {
-  let suggestionsService: SuggestionsService = new SuggestionsService();
+  let service: SuggestionsService = new SuggestionsService();
 
   describe('getThreadIdFromSuggestionBackendDict', () => {
     it('returns the suggestion id of the backend dict', () => {
-      expect(suggestionsService.getThreadIdFromSuggestionBackendDict({
+      expect(service.getThreadIdFromSuggestionBackendDict({
         suggestion_id: 'exploration.exp1.abc1'
       })).toEqual('exploration.exp1.abc1');
     });
