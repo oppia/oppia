@@ -202,6 +202,7 @@ import { SubtopicObjectFactory } from
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
+import { SuggestionsService } from 'services/suggestions.service';
 import { SuggestionThreadObjectFactory } from
   'domain/suggestion/SuggestionThreadObjectFactory';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
@@ -314,6 +315,7 @@ export class UpgradedServices {
     upgradedServices['SubtitledHtmlObjectFactory'] =
       new SubtitledHtmlObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
+    upgradedServices['SuggestionsService'] = new SuggestionsService();
     upgradedServices['SuggestionObjectFactory'] = new SuggestionObjectFactory();
     upgradedServices['ThreadMessageObjectFactory'] =
       new ThreadMessageObjectFactory();
