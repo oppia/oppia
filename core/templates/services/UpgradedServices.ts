@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-/* eslint-disable: max-len */
+/* eslint-disable max-len */
 import { AlertsService } from 'services/alerts.service';
 import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from 'domain/classifier/AnswerClassificationResultObjectFactory';
@@ -143,7 +143,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { WinnowingPreprocessingService } from 'classifiers/winnowing-preprocessing.service';
 import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
-/* eslint-enable: max-len */
+/* eslint-enable max-len */
 
 @Injectable({
   providedIn: 'root'
