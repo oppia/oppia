@@ -25,6 +25,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
+from core.domain import android_validation_domain
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import story_domain
@@ -228,20 +229,24 @@ def _save_story(committer_id, story, commit_message, change_list):
                     'All explorations in a story should be of the '
                     'same category. The explorations with ID %s and %s have'
                     ' different categories.' % (sample_exp_id, exp_id))
-            if exp.language_code != 'en':
+            if (
+                    exp.language_code not in
+                    android_validation_domain.StoryConstants.SUPPORTED_LANGUAGES): # pylint: disable=line-too-long
                 raise utils.ValidationError(
-                    'All explorations in a story should be in English.')
+                    'Invalid language %s found for exploration with ID %s.'
+                    % (exp.language_code, exp_id))
             if exp.param_specs or exp.param_changes:
                 raise utils.ValidationError(
                     'Expected no exploration to have parameter values in'
                     ' it. Invalid exploration: %s' % exp.id)
             for state_name in exp.states:
                 state = exp.states[state_name]
+                state.is_rte_content_supported_on_android()
+
                 if not state.interaction.is_supported_on_android_app():
                     raise utils.ValidationError(
-                        'Expected explorations to only have the following '
-                        'interactions: %s. Invalid exploration: %s' %
-                        (feconf.VALID_INTERACTION_IDS_FOR_ANDROID, exp.id))
+                        'Invalid interaction %s in exploration with ID: %s.' %
+                        (state.interaction.id, exp.id))
 
 
     # Story model cannot be None as story is passed as parameter here and that

@@ -419,15 +419,6 @@ COMMUNITY_DASHBOARD_ENABLED = False
 ALLOWED_QUESTION_INTERACTION_IDS = [
     'TextInput', 'MultipleChoiceInput', 'NumericInput']
 
-# These are the valid interactions that are allowed in an exploration that
-# is to be viewed on the Android app. If, in the future, this is changed,
-# just this array has to be modified to include the new interactions or
-# remove existing ones.
-VALID_INTERACTION_IDS_FOR_ANDROID = [
-    'Continue', 'EndExploration', 'NumericInput', 'TextInput',
-    'FractionInput', 'NumberWithUnits', 'MultipleChoiceInput',
-    'ItemSelectionInput']
-
 # Flag to disable sending emails related to reviews for suggestions. To be
 # flipped after deciding (and implementing) whether a user should be scored
 # only for curated lessons.

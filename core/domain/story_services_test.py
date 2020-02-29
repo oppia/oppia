@@ -513,7 +513,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         with self.assertRaisesRegexp(
-            Exception, 'All explorations in a story should be in English'):
+            Exception, 'Invalid language es found for exploration with '
+            'ID exp_id_1'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
@@ -535,8 +536,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected explorations to only have the following '
-            'interactions'):
+            Exception, 'Invalid interaction LogicProof in exploration with '
+            'ID: exp_id_1'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 

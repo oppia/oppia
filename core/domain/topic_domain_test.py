@@ -264,7 +264,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Name field should not be empty')
         self.topic.name = 'Very long and therefore invalid topic name'
         self._assert_validation_error(
-            'Topic name should be atmost 35 characters')
+            'Topic name should be at most 35 characters')
 
     def test_subtopic_schema_version_type_validation(self):
         self.topic.subtopic_schema_version = 'invalid_version'
@@ -298,7 +298,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'pellentesque eu,'
         )
         self._assert_validation_error(
-            'Topic description should be atmost 240 characters.')
+            'Topic description should be at most 240 characters.')
 
     def test_next_subtopic_id_validation(self):
         self.topic.next_subtopic_id = '1'

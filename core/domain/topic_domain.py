@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 
 from constants import constants
+from core.domain import android_validation_domain as android_checks
 from core.domain import change_domain
 from core.domain import user_services
 from core.platform import models
@@ -491,9 +492,11 @@ class Topic(python_utils.OBJECT):
         if name == '':
             raise utils.ValidationError('Name field should not be empty')
 
-        if len(name) > 35:
+        if (
+                len(name) >
+                android_checks.TopicConstants.MAX_CHARS_IN_TOPIC_NAME):
             raise utils.ValidationError(
-                'Topic name should be atmost 35 characters.')
+                'Topic name should be at most 35 characters.')
 
     @classmethod
     def require_valid_abbreviated_name(cls, name):
@@ -509,7 +512,9 @@ class Topic(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Abbreviated name field should not be empty.')
 
-        if len(name) > 12:
+        if (
+                len(name) >
+                android_checks.TopicConstants.MAX_CHARS_IN_ABBREVIATED_TOPIC_NAME):  # pylint: disable=line-too-long
             raise utils.ValidationError(
                 'Abbreviated name field should not exceed 12 characters.')
 
@@ -701,9 +706,11 @@ class Topic(python_utils.OBJECT):
                 'Expected description to be a string, received %s'
                 % self.description)
 
-        if len(self.description) > 240:
+        if (
+                len(self.description) >
+                android_checks.TopicConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION):
             raise utils.ValidationError(
-                'Topic description should be atmost 240 characters.')
+                'Topic description should be at most 240 characters.')
 
         if not isinstance(self.subtopics, list):
             raise utils.ValidationError(
