@@ -259,10 +259,12 @@ def build_js_files(dev_mode_setting):
             with python_utils.open_file(HASHES_FILE_PATH, 'w') as hash_file:
                 hash_file.write('{}')
         try:
-            common.run_cmd(
-                [common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
-                 'webpack.dev.config.ts'])
-        except subprocess.CalledProcessError as error:
+            webpack_process = subprocess.Popen([
+                common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
+                'webpack.dev.config.ts'])
+            # Wait for webpack compilation to complete.
+            webpack_process.wait()
+        except OSError as error:
             python_utils.PRINT(error.output)
             sys.exit(error.returncode)
     build.main(args=(['--prod_env'] if not dev_mode_setting else []))
