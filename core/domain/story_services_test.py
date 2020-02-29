@@ -610,7 +610,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             exp_services.get_story_id_linked_to_exploration('0'), 'story_id_2')
         self.assertEqual(
-            exp_services.get_story_id_linked_to_exploration('1'), 'stoy_id_2')
+            exp_services.get_story_id_linked_to_exploration('1'), 'story_id_2')
         self.assertIsNone(
             exp_services.get_story_id_linked_to_exploration('2'))
 
