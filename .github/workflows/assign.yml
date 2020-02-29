@@ -1,0 +1,16 @@
+name: Assign members based on comments
+on: [issue_comment]
+
+jobs:
+  assign:
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2 
+      - name: Auto assign on PTAL
+        uses: ./.github/actions/assign-on-ptal
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

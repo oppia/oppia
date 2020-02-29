@@ -1,0 +1,11 @@
+name: "Auto-assign thread based on PTAL"
+description: "This Github Actions auto-assigns the thread based on PTAL in comments"
+inputs:
+  repo-token:
+    description: "The GITHUB_TOKEN secret"
+outputs:
+  assignee:
+    description: 'The member(s) assigned to the thread'
+runs:
+  using: "docker"
+  image: "Dockerfile"
