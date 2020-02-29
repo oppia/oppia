@@ -28,7 +28,7 @@
 // interaction validators is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService } from
+import { BaseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
@@ -60,8 +60,8 @@ describe('Interaction validator', function() {
         new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
         new RuleObjectFactory()));
     $provide.value(
-      'baseInteractionValidationService',
-      new baseInteractionValidationService());
+      'BaseInteractionValidationService',
+      new BaseInteractionValidationService());
     $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));
@@ -73,7 +73,7 @@ describe('Interaction validator', function() {
   beforeEach(angular.mock.inject(function($injector, $rootScope) {
     scope = $rootScope.$new();
     filter = $injector.get('$filter');
-    bivs = $injector.get('baseInteractionValidationService');
+    bivs = $injector.get('BaseInteractionValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     agof = $injector.get('AnswerGroupObjectFactory');
     oof = $injector.get('OutcomeObjectFactory');

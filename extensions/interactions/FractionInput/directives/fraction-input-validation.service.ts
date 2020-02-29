@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { baseInteractionValidationService } from
+import { BaseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { AppConstants } from 'app.constants';
 
@@ -30,7 +30,7 @@ import { AppConstants } from 'app.constants';
 export class FractionInputValidationService {
   constructor(
     private fof: FractionObjectFactory,
-    private bivs: baseInteractionValidationService) {}
+    private bivs: BaseInteractionValidationService) {}
 
   getNonIntegerInputWarning(i, j) {
     return {

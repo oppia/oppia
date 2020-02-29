@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { IWarning, BaseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -33,8 +33,8 @@ import { AppConstants } from 'app.constants';
 })
 export class EndExplorationValidationService {
   constructor(
-      private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+      private BaseInteractionValidationServiceInstance:
+        BaseInteractionValidationService) {}
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'customizationArgs' is a dict with possible underscore_cased
@@ -42,7 +42,7 @@ export class EndExplorationValidationService {
   // camelCasing.
   getCustomizationArgsWarnings(customizationArgs: any): IWarning[] {
     var warningsList = [];
-    this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
+    this.BaseInteractionValidationServiceInstance.requireCustomizationArguments(
       customizationArgs, ['recommendedExplorationIds']);
 
     var recommendedExplorationIds = (

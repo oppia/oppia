@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService } from
+import { BaseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -31,8 +31,8 @@ import { Outcome } from
 })
 export class PencilCodeEditorValidationService {
   constructor(
-      private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+      private BaseInteractionValidationServiceInstance:
+        BaseInteractionValidationService) {}
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'customizationArgs' is a dict with possible underscore_cased
@@ -51,7 +51,7 @@ export class PencilCodeEditorValidationService {
       stateName: string, customizationArgs: any, answerGroups: AnswerGroup[],
       defaultOutcome: Outcome): any[] {
     return this.getCustomizationArgsWarnings(customizationArgs).concat(
-      this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
+      this.BaseInteractionValidationServiceInstance.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));
   }
 }

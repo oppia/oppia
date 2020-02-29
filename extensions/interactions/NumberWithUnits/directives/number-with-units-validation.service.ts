@@ -23,7 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { unit } from 'mathjs';
 
 import { AppConstants } from 'app.constants';
-import { baseInteractionValidationService } from
+import { BaseInteractionValidationService } from
   'interactions/base-interaction-validation.service.ts';
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory.ts';
@@ -34,7 +34,7 @@ import { NumberWithUnitsObjectFactory } from
 export class NumberWithUnitsValidationService {
   constructor(
     private unitObjectFactory: NumberWithUnitsObjectFactory,
-    private baseInteraction: baseInteractionValidationService) {}
+    private baseInteraction: BaseInteractionValidationService) {}
   // TODO(#7165): Replace 'any' with the exact type.
   getCustomizationArgsWarnings(customizationArgs: any): any {
     return [];

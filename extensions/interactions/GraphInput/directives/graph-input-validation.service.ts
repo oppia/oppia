@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { IWarning, BaseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -33,8 +33,8 @@ import { AppConstants } from 'app.constants';
 })
 export class GraphInputValidationService {
   constructor(
-      private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+      private BaseInteractionValidationServiceInstance:
+        BaseInteractionValidationService) {}
 
   VERTICES_LIMIT = 50;
 
@@ -44,7 +44,7 @@ export class GraphInputValidationService {
   // camelCasing.
   getCustomizationArgsWarnings(customizationArgs: any): IWarning[] {
     var warningsList = [];
-    this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
+    this.BaseInteractionValidationServiceInstance.requireCustomizationArguments(
       customizationArgs,
       ['graph', 'canEditEdgeWeight', 'canEditVertexLabel']);
 
@@ -92,7 +92,7 @@ export class GraphInputValidationService {
       this.getCustomizationArgsWarnings(customizationArgs));
 
     warningsList = warningsList.concat(
-      this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
+      this.BaseInteractionValidationServiceInstance.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));
 
     for (var i = 0; i < answerGroups.length; i++) {

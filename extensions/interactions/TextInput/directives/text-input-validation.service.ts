@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
-import { baseInteractionValidationService } from
+import { BaseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
@@ -33,7 +33,7 @@ interface IWarning {
   providedIn: 'root'
 })
 export class TextInputValidationService {
-  constructor(private bivs: baseInteractionValidationService) {}
+  constructor(private bivs: BaseInteractionValidationService) {}
   // TODO(#7165): Replace 'any' with the exact type.
   getCustomizationArgsWarnings(customizationArgs: any): Array<IWarning> {
     var warningsList = [];

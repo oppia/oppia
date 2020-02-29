@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, baseInteractionValidationService } from
+import { IWarning, BaseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -33,8 +33,8 @@ import { AppConstants } from 'app.constants';
 })
 export class InteractiveMapValidationService {
   constructor(
-      private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+      private BaseInteractionValidationServiceInstance:
+        BaseInteractionValidationService) {}
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'customizationArgs' is a dict with possible underscore_cased
@@ -43,7 +43,7 @@ export class InteractiveMapValidationService {
   getCustomizationArgsWarnings(customizationArgs: any): IWarning[] {
     var warningsList = [];
 
-    this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
+    this.BaseInteractionValidationServiceInstance.requireCustomizationArguments(
       customizationArgs, ['latitude', 'longitude']);
 
     if (customizationArgs.latitude.value < -90 ||
@@ -90,7 +90,7 @@ export class InteractiveMapValidationService {
     }
 
     warningsList = warningsList.concat(
-      this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
+      this.BaseInteractionValidationServiceInstance.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));
 
     return warningsList;
