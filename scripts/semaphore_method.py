@@ -19,18 +19,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import argparse
 import datetime
-import importlib
-import inspect
-import multiprocessing
-import os
-import re
-import subprocess
-import sys
 import threading
 import time
-
 import python_utils
 
 LOG_LOCK = threading.Lock()
@@ -76,6 +67,7 @@ class TaskThread(threading.Thread):
             self.exception = e
             if 'KeyboardInterrupt' not in python_utils.convert_to_bytes(
                     self.exception.args[0]):
+                log(e)
                 log('ERROR %s: %.1f secs' %
                     (self.name, time.time() - self.start_time), show_time=True)
         finally:
@@ -104,7 +96,7 @@ def _check_all_tasks(tasks):
             log(task_details)
 
 
-def _execute_tasks(tasks, semaphore):
+def execute_tasks(tasks, semaphore):
     """Starts all tasks and checks the results.
     Runs no more than the allowable limit defined in the semaphore.
 

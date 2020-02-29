@@ -73,8 +73,7 @@ import time
 
 # Install third party dependencies before proceeding.
 from . import install_third_party_libs
-from .semaphore_method import log, _execute_tasks
-from .semaphore_method import TaskThread
+from . import semaphore_method
 install_third_party_libs.main()
 
 # pylint: disable=wrong-import-position
@@ -627,7 +626,7 @@ _TARGET_STDOUT = python_utils.string_io()
 _STDOUT_LIST = multiprocessing.Manager().list()
 _FILES = multiprocessing.Manager().dict()
 
-MAX_CONCURRENT_RUNS = 25
+MAX_CONCURRENT_RUNS = 6
 
 
 class FileCache(python_utils.OBJECT):
@@ -686,8 +685,9 @@ class FileCache(python_utils.OBJECT):
 class LintingTaskSpec(python_utils.OBJECT):
     """Executes a set of tests given a test class name."""
 
-    def __init__(self, js_filepaths, ts_filepaths, py_filepaths, html_filepaths,
-        css_filepaths, verbose_mode_enabled, file_extension_type):
+    def __init__(
+            self, js_filepaths, ts_filepaths, py_filepaths, html_filepaths,
+            css_filepaths, verbose_mode_enabled, file_extension_type):
         """Constructer of LintingTaskSpec object.
 
         Args:
@@ -708,7 +708,8 @@ class LintingTaskSpec(python_utils.OBJECT):
         self.verbose_mode_enabled = verbose_mode_enabled
         self.file_extension_type = file_extension_type
 
-    def _lint_all_files(self):
+    def lint_all_files(self):
+        """Run all lint checks."""
         python_utils.PRINT('Starting Js, Ts, Python, HTML, and CSS linter...')
 
         pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
@@ -737,12 +738,14 @@ class LintingTaskSpec(python_utils.OBJECT):
                 '         or node-stylelint and its dependencies.')
             sys.exit(1)
 
+
         linting_processes = []
         result_queues = []
         stdout_queues = []
         all_messages = []
 
-        js_ts_linter = 'js' in self.file_extension_type or 'ts' in self.file_extension_type
+        js_ts_linter = 'js' in self.file_extension_type or (
+            'ts' in self.file_extension_type)
         py_linter = 'py' in self.file_extension_type
         html_linter = 'html' in self.file_extension_type
         css_linter = 'css' in self.file_extension_type
@@ -754,13 +757,13 @@ class LintingTaskSpec(python_utils.OBJECT):
 
             js_and_ts_result = multiprocessing.Queue()
 
-            _lint_js_and_ts_files(node_path, eslint_path,
-                    js_and_ts_files_to_lint, js_and_ts_result,
-                    self.verbose_mode_enabled)
+            _lint_js_and_ts_files(
+                node_path, eslint_path, js_and_ts_files_to_lint,
+                js_and_ts_result, self.verbose_mode_enabled)
             result_queues.append(js_and_ts_result)
 
-            # Pylint requires to provide paramter "this_bases" and "d", guess due to
-            # meta class.
+            # Pylint requires to provide paramter "this_bases" and "d",
+            # guess due to meta class.
             js_ts_lint_checks_manager = JsTsLintChecksManager( # pylint: disable=no-value-for-parameter
                 self.verbose_mode_enabled)
             js_message = js_ts_lint_checks_manager.perform_all_lint_checks()
@@ -771,11 +774,11 @@ class LintingTaskSpec(python_utils.OBJECT):
             css_in_html_stdout = multiprocessing.Queue()
 
             _lint_css_files(
-                    node_path,
-                    stylelint_path,
-                    config_path_for_css_in_html,
-                    self.html_filepaths, css_in_html_stdout,
-                    css_in_html_result, self.verbose_mode_enabled)
+                node_path,
+                stylelint_path,
+                config_path_for_css_in_html,
+                self.html_filepaths, css_in_html_stdout,
+                css_in_html_result, self.verbose_mode_enabled)
 
             result_queues.append(css_in_html_result)
             stdout_queues.append(css_in_html_stdout)
@@ -790,11 +793,11 @@ class LintingTaskSpec(python_utils.OBJECT):
             css_stdout = multiprocessing.Queue()
 
             _lint_css_files(
-                    node_path,
-                    stylelint_path,
-                    config_path_for_oppia_css,
-                    self.css_filepaths, css_stdout,
-                    css_result, self.verbose_mode_enabled)
+                node_path,
+                stylelint_path,
+                config_path_for_oppia_css,
+                self.css_filepaths, css_stdout,
+                css_result, self.verbose_mode_enabled)
 
             result_queues.append(css_result)
             stdout_queues.append(css_stdout)
@@ -816,8 +819,8 @@ class LintingTaskSpec(python_utils.OBJECT):
             py_result_for_python3_compatibility = multiprocessing.Queue()
 
             _lint_py_files_for_python3_compatibility(
-                    self.py_filepaths, py_result_for_python3_compatibility,
-                    self.verbose_mode_enabled)
+                self.py_filepaths, py_result_for_python3_compatibility,
+                self.verbose_mode_enabled)
 
             result_queues.append(py_result_for_python3_compatibility)
 
@@ -835,7 +838,8 @@ class LintingTaskSpec(python_utils.OBJECT):
             all_messages += other_messages
 
         if codeowner_linter:
-            code_owner_message = _check_codeowner_file(self.verbose_mode_enabled)
+            code_owner_message = _check_codeowner_file(
+                self.verbose_mode_enabled)
             all_messages += code_owner_message
 
         all_messages += _join_linting_process(
@@ -1028,7 +1032,7 @@ def _get_file_extensions(file_extension_type):
         to be linted and checked.
     """
     all_file_extensions_type = ['js', 'ts', 'py', 'html', 'css', 'other',
-        'codeowner']
+                                'codeowner']
 
     if file_extension_type is not None:
         return file_extension_type + ['codeowner']
@@ -3268,7 +3272,7 @@ def categorize_files(file_paths):
 
 
 def _join_linting_process(linting_processes, result_queues, result_stdouts):
-    """Join process spawn off by _lint_all_files and capture the outputs."""
+    """Join process spawn off by lint_all_files and capture the outputs."""
     for process in linting_processes:
         process.join()
 
@@ -3323,24 +3327,20 @@ def main(args=None):
             _FILES['.js'], _FILES['.ts'], _FILES['.py'], _FILES['.html'],
             _FILES['.css'], verbose_mode_enabled, file_extension_type)
 
-        task = TaskThread(linter._lint_all_files, verbose_mode_enabled, semaphore,
+        task = semaphore_method.TaskThread(
+            linter.lint_all_files, verbose_mode_enabled, semaphore,
             name=file_extension_type)
         task_to_taskspec[task] = linter
         tasks.append(task)
 
-    task_execution_failed = False
-    try:
-        _execute_tasks(tasks, semaphore)
-    except Exception:
-        task_execution_failed = True
+    semaphore_method.execute_tasks(tasks, semaphore)
 
+    all_messages = []
     for task in tasks:
-        if task.exception:
-            log(python_utils.convert_to_bytes(task.exception.args[0]))
+        all_messages += task.output
 
     _print_complete_summary_of_errors()
 
-    all_messages = ''
 
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):

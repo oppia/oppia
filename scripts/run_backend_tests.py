@@ -44,7 +44,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
-import datetime
 import importlib
 import inspect
 import multiprocessing
@@ -58,11 +57,9 @@ import time
 import python_utils
 
 from . import common
+from . import semaphore_method
 from . import setup
 from . import setup_gae
-
-from .semaphore_method import log, _execute_tasks
-from .semaphore_method import TaskThread
 
 
 DIRS_TO_ADD_TO_SYS_PATH = [
@@ -152,11 +149,11 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     last_stdout = last_stdout_str.split('\n')
 
     if LOG_LINE_PREFIX in last_stdout_str:
-        log('')
+        semaphore_method.log('')
         for line in last_stdout:
             if line.startswith(LOG_LINE_PREFIX):
-                log('INFO: %s' % line[len(LOG_LINE_PREFIX):])
-        log('')
+                semaphore_method.log('INFO: %s' % line[len(LOG_LINE_PREFIX):])
+        semaphore_method.log('')
 
     result = '%s%s' % (last_stdout_str, last_stderr_str)
 
@@ -315,20 +312,21 @@ def main(args=None):
     for test_target in all_test_targets:
         test = TestingTaskSpec(
             test_target, parsed_args.generate_coverage_report)
-        task = TaskThread(
+        task = semaphore_method.TaskThread(
             test.run, parsed_args.verbose, semaphore, name=test_target)
         task_to_taskspec[task] = test
         tasks.append(task)
 
     task_execution_failed = False
     try:
-        _execute_tasks(tasks, semaphore)
+        semaphore_method.execute_tasks(tasks, semaphore)
     except Exception:
         task_execution_failed = True
 
     for task in tasks:
         if task.exception:
-            log(python_utils.convert_to_bytes(task.exception.args[0]))
+            semaphore_method.log(
+                python_utils.convert_to_bytes(task.exception.args[0]))
 
     python_utils.PRINT('')
     python_utils.PRINT('+------------------+')
