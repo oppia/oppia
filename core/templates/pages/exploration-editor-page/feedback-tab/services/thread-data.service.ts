@@ -28,14 +28,16 @@ require(
 
 angular.module('oppia').factory('ThreadDataService', [
   '$http', '$q', 'AlertsService', 'ContextService',
-  'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory',
-  'ThreadMessageObjectFactory', 'UrlInterpolationService',
-  'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED', 'STATUS_IGNORED', 'STATUS_OPEN',
+  'FeedbackThreadObjectFactory', 'SuggestionsService',
+  'SuggestionThreadObjectFactory', 'ThreadMessageObjectFactory',
+  'UrlInterpolationService', 'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED',
+  'STATUS_IGNORED', 'STATUS_OPEN',
   function(
       $http, $q, AlertsService, ContextService,
-      FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
-      ThreadMessageObjectFactory, UrlInterpolationService,
-      ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED, STATUS_OPEN) {
+      FeedbackThreadObjectFactory, SuggestionsService,
+      SuggestionThreadObjectFactory, ThreadMessageObjectFactory,
+      UrlInterpolationService, ACTION_ACCEPT_SUGGESTION, STATUS_FIXED,
+      STATUS_IGNORED, STATUS_OPEN) {
     let getFeedbackStatsHandlerUrl = function() {
       return UrlInterpolationService.interpolateUrl(
         '/feedbackstatshandler/<exploration_id>', {
@@ -103,10 +105,6 @@ angular.module('oppia').factory('ThreadDataService', [
           threadBackendDict, suggestionBackendDict);
     };
 
-    let getThreadIdFromSuggestionBackendDict = function(suggestionBackendDict) {
-      return suggestionBackendDict.suggestion_id;
-    };
-
     return {
       getThread: function(threadId) {
         return getThreadById(threadId);
@@ -126,7 +124,9 @@ angular.module('oppia').factory('ThreadDataService', [
 
           let suggestionBackendDictsByThreadId = {};
           suggestionResponse.suggestions.forEach(backendDict => {
-            let threadId = getThreadIdFromSuggestionBackendDict(backendDict);
+            let threadId =
+              SuggestionsService.getThreadIdFromSuggestionBackendDict(
+                backendDict);
             suggestionBackendDictsByThreadId[threadId] = backendDict;
           });
 

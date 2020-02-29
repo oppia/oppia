@@ -66,8 +66,9 @@ angular.module('oppia').directive('creatorDashboardPage', [
         'CreatorDashboardBackendApiService', 'DateTimeFormatService',
         'ExplorationCreationService', 'RatingComputationService',
         'SuggestionModalForCreatorDashboardService', 'SuggestionObjectFactory',
-        'SuggestionThreadObjectFactory', 'ThreadDataService',
-        'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
+        'SuggestionsService', 'SuggestionThreadObjectFactory',
+        'ThreadDataService', 'ThreadStatusDisplayService',
+        'UrlInterpolationService', 'UserService',
         'ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS',
         'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR', 'EXPLORATIONS_SORT_BY_KEYS',
         'EXPLORATION_DROPDOWN_STATS', 'FATAL_ERROR_CODES',
@@ -79,8 +80,9 @@ angular.module('oppia').directive('creatorDashboardPage', [
             CreatorDashboardBackendApiService, DateTimeFormatService,
             ExplorationCreationService, RatingComputationService,
             SuggestionModalForCreatorDashboardService, SuggestionObjectFactory,
-            SuggestionThreadObjectFactory, ThreadDataService,
-            ThreadStatusDisplayService, UrlInterpolationService, UserService,
+            SuggestionsService, SuggestionThreadObjectFactory,
+            ThreadDataService, ThreadStatusDisplayService,
+            UrlInterpolationService, UserService,
             ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS,
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR, EXPLORATIONS_SORT_BY_KEYS,
             EXPLORATION_DROPDOWN_STATS, FATAL_ERROR_CODES,
@@ -274,11 +276,15 @@ angular.module('oppia').directive('creatorDashboardPage', [
 
                 let suggestionBackendDictsByThreadId = {};
                 responseData.created_suggestions_list.forEach(backendDict => {
-                  let threadId = backendDict.suggestion_id;
+                  let threadId =
+                    SuggestionsService.getThreadIdFromSuggestionBackendDict(
+                      backendDict);
                   suggestionBackendDictsByThreadId[threadId] = backendDict;
                 });
                 responseData.suggestions_to_review_list.forEach(backendDict => {
-                  let threadId = backendDict.suggestion_id;
+                  let threadId =
+                    SuggestionsService.getThreadIdFromSuggestionBackendDict(
+                      backendDict);
                   suggestionBackendDictsByThreadId[threadId] = backendDict;
                 });
 

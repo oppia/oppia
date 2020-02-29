@@ -20,9 +20,12 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { SuggestionsService } from 'services/suggestions.service';
+
 export class Suggestion {
   suggestionType: string;
   suggestionId: string;
+  threadId: string;
   targetType: string;
   targetId: string;
   status: string;
@@ -35,12 +38,13 @@ export class Suggestion {
   lastUpdated: number;
 
   constructor(
-      suggestionType: string, suggestionId: string, targetType: string,
-      targetId: string, status: string, authorName: string,
+      suggestionType: string, suggestionId: string, threadId: string,
+      targetType: string, targetId: string, status: string, authorName: string,
       stateName: string, newValue: string, oldValue: string,
       lastUpdated: number) {
     this.suggestionType = suggestionType;
     this.suggestionId = suggestionId;
+    this.threadId = threadId;
     this.targetType = targetType;
     this.targetId = targetId;
     this.status = status;
@@ -52,7 +56,7 @@ export class Suggestion {
   }
 
   getThreadId(): string {
-    return this.suggestionId;
+    return this.threadId;
   }
 }
 
@@ -65,11 +69,13 @@ export class SuggestionObjectFactory {
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
   createFromBackendDict(suggestionBackendDict: any): Suggestion {
+    var threadId = SuggestionsService.getThreadIdFromSuggestionBackendDict(
+      suggestionBackendDict);
     return new Suggestion(
       suggestionBackendDict.suggestion_type,
-      suggestionBackendDict.suggestion_id, suggestionBackendDict.target_type,
-      suggestionBackendDict.target_id, suggestionBackendDict.status,
-      suggestionBackendDict.author_name,
+      suggestionBackendDict.suggestion_id, threadId,
+      suggestionBackendDict.target_type, suggestionBackendDict.target_id,
+      suggestionBackendDict.status, suggestionBackendDict.author_name,
       suggestionBackendDict.change.state_name,
       suggestionBackendDict.change.new_value,
       suggestionBackendDict.change.old_value,
