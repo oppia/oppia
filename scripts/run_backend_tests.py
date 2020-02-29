@@ -61,6 +61,9 @@ from . import common
 from . import setup
 from . import setup_gae
 
+from .semaphore_method import log, _execute_tasks
+from .semaphore_method import TaskThread
+
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.OPPIA_TOOLS_DIR, 'pylint-1.9.4'),
@@ -99,8 +102,6 @@ COVERAGE_MODULE_PATH = os.path.join(
     'coverage-%s' % common.COVERAGE_VERSION, 'coverage')
 
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
-LOG_LOCK = threading.Lock()
-ALL_ERRORS = []
 # This should be the same as core.test_utils.LOG_LINE_PREFIX.
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
@@ -137,19 +138,6 @@ _PARSER.add_argument(
     action='store_true')
 
 
-def log(message, show_time=False):
-    """Logs a message to the terminal.
-
-    If show_time is True, prefixes the message with the current time.
-    """
-    with LOG_LOCK:
-        if show_time:
-            python_utils.PRINT(
-                datetime.datetime.utcnow().strftime('%H:%M:%S'), message)
-        else:
-            python_utils.PRINT(message)
-
-
 def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     """Runs a shell command and captures the stdout and stderr output.
 
@@ -178,39 +166,6 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     return result
 
 
-class TaskThread(threading.Thread):
-    """Runs a task in its own thread."""
-
-    def __init__(self, func, verbose, semaphore, name=None):
-        super(TaskThread, self).__init__()
-        self.func = func
-        self.output = None
-        self.exception = None
-        self.verbose = verbose
-        self.name = name
-        self.semaphore = semaphore
-        self.finished = False
-
-    def run(self):
-        try:
-            self.output = self.func()
-            if self.verbose:
-                log('LOG %s:' % self.name, show_time=True)
-                log(self.output)
-                log('----------------------------------------')
-            log('FINISHED %s: %.1f secs' %
-                (self.name, time.time() - self.start_time), show_time=True)
-        except Exception as e:
-            self.exception = e
-            if 'KeyboardInterrupt' not in python_utils.convert_to_bytes(
-                    self.exception.args[0]):
-                log('ERROR %s: %.1f secs' %
-                    (self.name, time.time() - self.start_time), show_time=True)
-        finally:
-            self.semaphore.release()
-            self.finished = True
-
-
 class TestingTaskSpec(python_utils.OBJECT):
     """Executes a set of tests given a test class name."""
 
@@ -229,59 +184,6 @@ class TestingTaskSpec(python_utils.OBJECT):
             exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
         return run_shell_cmd(exc_list)
-
-
-def _check_all_tasks(tasks):
-    """Checks the results of all tasks."""
-    running_tasks_data = []
-
-    for task in tasks:
-        if task.isAlive():
-            running_tasks_data.append('  %s (started %s)' % (
-                task.name,
-                time.strftime('%H:%M:%S', time.localtime(task.start_time))
-            ))
-
-        if task.exception:
-            ALL_ERRORS.append(task.exception)
-
-    if running_tasks_data:
-        log('----------------------------------------')
-        log('Tasks still running:')
-        for task_details in running_tasks_data:
-            log(task_details)
-
-
-def _execute_tasks(tasks, semaphore):
-    """Starts all tasks and checks the results.
-    Runs no more than the allowable limit defined in the semaphore.
-
-    Args:
-        tasks: list(TestingTaskSpec). The tasks to run.
-        semaphore: threading.Semaphore. The object that controls how many tasks
-            can run at any time.
-    """
-    remaining_tasks = [] + tasks
-    currently_running_tasks = []
-
-    while remaining_tasks:
-        task = remaining_tasks.pop()
-        semaphore.acquire()
-        task.start()
-        task.start_time = time.time()
-        currently_running_tasks.append(task)
-
-        if len(remaining_tasks) % 5 == 0:
-            if remaining_tasks:
-                log('----------------------------------------')
-                log('Number of unstarted tasks: %s' % len(remaining_tasks))
-            _check_all_tasks(currently_running_tasks)
-        log('----------------------------------------')
-
-    for task in currently_running_tasks:
-        task.join()
-
-    _check_all_tasks(currently_running_tasks)
 
 
 def _get_all_test_targets(test_path=None, include_load_tests=True):
