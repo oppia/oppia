@@ -18,6 +18,7 @@
  */
 
 var general = require('../protractor_utils/general.js');
+var workflow = require('../protractor_utils/workflow.js');
 var users = require('../protractor_utils/users.js');
 
 var TopicsAndSkillsDashboardPage =
@@ -33,6 +34,7 @@ describe('Topic editor functionality', function() {
   var topicEditorPage = null;
   var topicName = 'Topic 1';
   var explorationEditorPage = null;
+  var testName = 'topicAndStoryEditorFileUploadFeatures';
 
   beforeAll(function() {
     topicsAndSkillsDashboardPage =
@@ -42,16 +44,22 @@ describe('Topic editor functionality', function() {
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
+    workflow.takeScreenshot(testName);
     users.createAndLoginAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
+    workflow.takeScreenshot(testName);
     topicsAndSkillsDashboardPage.get();
+    workflow.takeScreenshot(testName);
     topicsAndSkillsDashboardPage.createTopic(topicName, 'abbrev');
     users.logout();
   });
 
   beforeEach(function() {
+    workflow.takeScreenshot(testName);
     users.login('creator@topicEditor.com');
+    workflow.takeScreenshot(testName);
     topicsAndSkillsDashboardPage.get();
+    workflow.takeScreenshot(testName);
     topicsAndSkillsDashboardPage.editTopic(topicName);
   });
 

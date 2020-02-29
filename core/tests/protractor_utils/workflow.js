@@ -17,6 +17,8 @@
  * carrrying out end-to-end testing with protractor.
  */
 
+var fs = require('fs');
+
 var forms = require('./forms.js');
 var users = require('./users.js');
 var waitFor = require('./waitFor.js');
@@ -264,6 +266,23 @@ var createSkillAndAssignTopic = function(
     0, topicName);
 };
 
+var _writeScreenShot = function(data, testName) {
+  browser.getCurrentUrl().then(function(url) {
+    url = url.split('/').join('_');
+    var date = new Date();
+    filename = testName + '_' + url + date.toISOString() + '.png';
+    var stream = fs.createWriteStream(filename);
+    stream.write(new Buffer.from(data, 'base64'));
+    stream.end();
+  }, function() {});
+};
+
+var takeScreenshot = function(testName){
+    browser.takeScreenshot().then(function (png) {
+        _writeScreenShot(png, testName);
+    });
+}
+
 exports.createExploration = createExploration;
 exports.createExplorationAndStartTutorial = createExplorationAndStartTutorial;
 exports.publishExploration = publishExploration;
@@ -286,3 +305,4 @@ exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;
 exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
 exports.createSkillAndAssignTopic = createSkillAndAssignTopic;
+exports.takeScreenshot = takeScreenshot

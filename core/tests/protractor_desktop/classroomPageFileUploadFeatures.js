@@ -32,6 +32,7 @@ describe('Classroom page functionality', function() {
   var classroomPage = null;
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
+  var testName = 'classroomPageFileUploadFeatures';
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
@@ -51,7 +52,9 @@ describe('Classroom page functionality', function() {
   });
 
   it('should add a new published topic to the Math classroom', function() {
+    workflow.takeScreenshot(testName);
     topicsAndSkillsDashboardPage.get();
+    workflow.takeScreenshot(testName);
     topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
     topicEditorPage.submitTopicThumbnail('../data/img.png');
     topicEditorPage.saveTopic('Added thumbnail.');
