@@ -160,7 +160,7 @@ var ExplorationEditorImprovementsTab = function() {
   };
 
   this.verifyNoOutstandingTasks = () => {
-    expect(taskCount.getText()).toMatch('');
+    expect(taskCount.isDisplayed()).toBe(false);
   };
 
   this.verifyAnswerDetails = (expectedDetails, expectedInfoCount) => {
