@@ -24,9 +24,10 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 
-describe('retrieving threads service', function() {
+describe('ThreadDataService', function() {
   let expId = 'exp1';
   let $httpBackend = null;
+  let ContextService = null;
   let ThreadDataService = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -34,13 +35,15 @@ describe('retrieving threads service', function() {
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
-
-    $provide.value('ExplorationDataService', { explorationId: expId });
   }));
 
-  beforeEach(angular.mock.inject(function(_$httpBackend_, _ThreadDataService_) {
+  beforeEach(angular.mock.inject(function(
+      _$httpBackend_, _ContextService_, _ThreadDataService_) {
     $httpBackend = _$httpBackend_;
+    ContextService = _ContextService_;
     ThreadDataService = _ThreadDataService_;
+
+    spyOn(ContextService, 'getExplorationId').and.returnValue(expId);
   }));
 
   it('should retrieve feedback threads', function(done) {
