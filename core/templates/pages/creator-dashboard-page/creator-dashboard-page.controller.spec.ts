@@ -21,6 +21,8 @@
 // creator-dashboard-page.controller.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 require('pages/creator-dashboard-page/creator-dashboard-page.controller.ts');
 
 describe('Creator dashboard controller', function() {
@@ -58,33 +60,37 @@ describe('Creator dashboard controller', function() {
       }
     };
 
+    beforeEach(angular.mock.module('oppia', TranslatorProviderForTests));
     beforeEach(angular.mock.module('oppia', function($provide) {
       var ugs = new UpgradedServices();
       for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
         $provide.value(key, value);
       }
+
+      $provide.factory('CreatorDashboardBackendApiService', ['$http', $http => {
+        return {
+          fetchDashboardData: () => $http.get('/creatordashboardhandler/data')
+        };
+      }]);
     }));
 
     beforeEach(angular.mock.inject(function($injector) {
-      $componentController = $injector.get('$componentController');
       $httpBackend = $injector.get('$httpBackend');
-    }));
+      $componentController = $injector.get('$componentController');
 
-    beforeEach(angular.mock.inject(
-      function(CreatorDashboardBackendApiService) {
-        $httpBackend.expect('GET', CREATOR_DASHBOARD_DATA_URL).respond(
-          dashboardData);
-        ctrl = $componentController('creatorDashboardPage', null, {
-          AlertsService: null,
-          CreatorDashboardBackendApiService: CreatorDashboardBackendApiService
-        });
-        // Refer: https://www.codelord.net/2017/01/09/
-        // unit-testing-angular-components-with-%24componentcontroller/
-        // Angular and $componentController does not take care of
-        // $onInit lifecycle hook, so we need to call it explicitly.
-        ctrl.$onInit();
-      }
-    ));
+      $httpBackend.expect('GET', CREATOR_DASHBOARD_DATA_URL).respond(
+        dashboardData);
+      ctrl = $componentController('creatorDashboardPage', null, {
+        AlertsService: $injector.get('AlertsService'),
+        CreatorDashboardBackendApiService: $injector.get(
+          'CreatorDashboardBackendApiService')
+      });
+      // eslint-disable-next-line max-len
+      // See: https://www.codelord.net/2017/01/09/unit-testing-angular-components-with-%24componentcontroller/
+      // Angular and $componentController do not take care of the $onInit
+      // lifecycle hook, so we need to call it explicitly.
+      ctrl.$onInit();
+    }));
 
     it('should have the correct data for creator dashboard', function() {
       $httpBackend.flush();
