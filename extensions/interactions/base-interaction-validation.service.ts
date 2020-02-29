@@ -32,7 +32,7 @@ export interface IWarning {
 @Injectable({
   providedIn: 'root'
 })
-export class baseInteractionValidationService {
+export class BaseInteractionValidationService {
   // 'argNames' is an array of top-level customization argument names (such
   // as 'chocies') used to verify the basic structure of the input
   // customization arguments object.
@@ -120,5 +120,5 @@ export class baseInteractionValidationService {
 }
 
 angular.module('oppia').factory(
-  'baseInteractionValidationService',
-  downgradeInjectable(baseInteractionValidationService));
+  'BaseInteractionValidationService',
+  downgradeInjectable(BaseInteractionValidationService));
