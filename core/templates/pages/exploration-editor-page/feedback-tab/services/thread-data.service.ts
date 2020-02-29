@@ -28,16 +28,14 @@ require(
 
 angular.module('oppia').factory('ThreadDataService', [
   '$http', '$q', 'AlertsService', 'ContextService',
-  'FeedbackThreadObjectFactory', 'SuggestionsService',
-  'SuggestionThreadObjectFactory', 'ThreadMessageObjectFactory',
-  'UrlInterpolationService', 'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED',
-  'STATUS_IGNORED', 'STATUS_OPEN',
+  'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory',
+  'SuggestionsService', 'ThreadMessageObjectFactory', 'UrlInterpolationService',
+  'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED', 'STATUS_IGNORED', 'STATUS_OPEN',
   function(
       $http, $q, AlertsService, ContextService,
-      FeedbackThreadObjectFactory, SuggestionsService,
-      SuggestionThreadObjectFactory, ThreadMessageObjectFactory,
-      UrlInterpolationService, ACTION_ACCEPT_SUGGESTION, STATUS_FIXED,
-      STATUS_IGNORED, STATUS_OPEN) {
+      FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
+      SuggestionsService, ThreadMessageObjectFactory, UrlInterpolationService,
+      ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED, STATUS_OPEN) {
     let getFeedbackStatsHandlerUrl = function() {
       return UrlInterpolationService.interpolateUrl(
         '/feedbackstatshandler/<exploration_id>', {
