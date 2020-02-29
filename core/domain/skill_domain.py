@@ -844,7 +844,7 @@ class Skill(python_utils.OBJECT):
         if self.skill_contents.explanation:
             old_content_ids = [self.skill_contents.explanation.content_id]
 
-        self.skill_contents.explanation = (explanation)
+        self.skill_contents.explanation = explanation
 
         new_content_ids = [self.skill_contents.explanation.content_id]
         self._update_content_ids_in_assets(old_content_ids, new_content_ids)
