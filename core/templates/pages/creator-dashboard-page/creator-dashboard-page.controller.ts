@@ -181,7 +181,7 @@ angular.module('oppia').directive('creatorDashboardPage', [
 
           ctrl.setActiveThread = function(threadId) {
             if (!ctrl.threadsById.hasOwnProperty(threadId)) {
-              throw Error('Trying to set a non-existant thread as active.');
+              throw Error('Trying to set a non-existent thread as active.');
             }
             ctrl.activeThread = ctrl.threadsById[threadId];
             ThreadDataService.fetchMessages(ctrl.activeThread);
