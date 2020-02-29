@@ -66,9 +66,8 @@ describe('Creator dashboard controller', function() {
     }));
 
     beforeEach(angular.mock.inject(function($injector) {
-      $componentController = $componentController;
-      $httpBackend = $injector.get('$httpBackend');
       $componentController = $injector.get('$componentController');
+      $httpBackend = $injector.get('$httpBackend');
     }));
 
     beforeEach(angular.mock.inject(
