@@ -1429,11 +1429,16 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
     @classmethod
     def _kickoff_batch_job(cls):
-        """Create and enqueue a new batch job."""
+        """Create and enqueue a new batch job.
+
+        Returns:
+            str. The unique id of the new batch job.
+        """
         job_manager = cls._get_batch_job_manager_class()
         job_id = job_manager.create_new()
         job_manager.enqueue(
             job_id, taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS)
+        return job_id
 
     @classmethod
     def _register_end_of_batch_job_and_return_status(cls):
@@ -1472,6 +1477,10 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
     def start_computation(cls):
         """(Re)starts the continuous computation corresponding to this class.
 
+        Returns:
+            str. The unique id of the new batch job beginning/continuing the
+                computation.
+
         Raises:
             Exception: The computation wasn't idle before trying to start.
         """
@@ -1501,7 +1510,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
         cls._clear_inactive_realtime_layer(datetime.datetime.utcnow())
 
-        cls._kickoff_batch_job()
+        return cls._kickoff_batch_job()
 
     @classmethod
     def stop_computation(cls, user_id):
@@ -1595,8 +1604,12 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
-        """Seam that can be overridden by tests."""
-        cls._kickoff_batch_job()
+        """Seam that can be overridden by tests.
+
+        Returns:
+            str. The unique id of the next batch job to be run.
+        """
+        return cls._kickoff_batch_job()
 
     @classmethod
     def on_batch_job_completion(cls):
