@@ -64,12 +64,13 @@ export class Suggestion {
   providedIn: 'root'
 })
 export class SuggestionObjectFactory {
+  constructor(private suggestionsService: SuggestionsService) {}
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'suggestionBackendDict' is a dict with underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
   createFromBackendDict(suggestionBackendDict: any): Suggestion {
-    var threadId = SuggestionsService.getThreadIdFromSuggestionBackendDict(
+    var threadId = this.suggestionsService.getThreadIdFromSuggestionBackendDict(
       suggestionBackendDict);
     return new Suggestion(
       suggestionBackendDict.suggestion_type,

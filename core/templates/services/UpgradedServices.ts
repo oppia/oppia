@@ -316,7 +316,6 @@ export class UpgradedServices {
       new SubtitledHtmlObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
     upgradedServices['SuggestionsService'] = new SuggestionsService();
-    upgradedServices['SuggestionObjectFactory'] = new SuggestionObjectFactory();
     upgradedServices['ThreadMessageObjectFactory'] =
       new ThreadMessageObjectFactory();
     upgradedServices['ThreadMessageSummaryObjectFactory'] =
@@ -384,6 +383,8 @@ export class UpgradedServices {
       new SidebarStatusService(upgradedServices['WindowDimensionsService']);
     upgradedServices['SiteAnalyticsService'] =
       new SiteAnalyticsService(upgradedServices['WindowRef']);
+    upgradedServices['SuggestionObjectFactory'] = new SuggestionObjectFactory(
+      upgradedServices['SuggestionsService']);
     upgradedServices['SuggestionThreadObjectFactory'] =
         new SuggestionThreadObjectFactory(
           upgradedServices['SuggestionObjectFactory']);
