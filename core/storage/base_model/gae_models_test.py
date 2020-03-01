@@ -238,8 +238,8 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
 
     def test_export_data_trivial(self):
         user_data = (base_models
-                    .BaseSnapshotMetadataModel
-                    .export_data('trivial_user'))
+                     .BaseSnapshotMetadataModel
+                     .export_data('trivial_user'))
         expected_data = {}
         self.assertEqual(user_data, expected_data)
 
@@ -252,8 +252,8 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
             commit_message='Hi this is a commit.')
         model2.put()
         user_data = (base_models
-                    .BaseSnapshotMetadataModel
-                    .export_data('committer_id'))
+                     .BaseSnapshotMetadataModel
+                     .export_data('committer_id'))
         expected_data = {
             'model_id-1': {
                 'commit_type': 'create',

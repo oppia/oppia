@@ -1159,7 +1159,7 @@ class BaseSnapshotMetadataModel(BaseModel):
             str. Version number part of snapshot id.
         """
         return self.id[self.id.rfind(_VERSION_DELIMITER) + 1:]
-   
+  
     @classmethod
     def export_data(cls, user_id):
         metadata_models = (
