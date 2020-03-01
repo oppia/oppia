@@ -47,29 +47,29 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
         backdrop: true,
         size: 'lg',
         resolve: {
+          currentContent: function() {
+            var stateName = activeThread.getSuggestionStateName();
+            var state = ExplorationStatesService.getState(stateName);
+            return state !== undefined ? state.content.getHtml() : null;
+          },
+          description: function() {
+            return activeThread.description;
+          },
+          newContent: function() {
+            return activeThread.getReplacementHtmlFromSuggestion();
+          },
           suggestionIsHandled: function() {
             return isSuggestionHandled();
           },
           suggestionIsValid: function() {
             return isSuggestionValid();
           },
-          unsavedChangesExist: function() {
-            return hasUnsavedChanges();
-          },
           suggestionStatus: function() {
             return activeThread.getSuggestionStatus();
           },
-          description: function() {
-            return activeThread.description;
+          unsavedChangesExist: function() {
+            return hasUnsavedChanges();
           },
-          currentContent: function() {
-            var stateName = activeThread.getSuggestionStateName();
-            var state = ExplorationStatesService.getState(stateName);
-            return state !== undefined ? state.content.getHtml() : null;
-          },
-          newContent: function() {
-            return activeThread.getReplacementHtmlFromSuggestion();
-          }
         },
         controller: [
           '$log', '$scope', '$uibModalInstance', 'EditabilityService',
