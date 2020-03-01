@@ -41,8 +41,6 @@ SEPARATE_MODEL_CLASSES = [
     exp_models.ExplorationCommitLogEntryModel,
     exp_models.ExplorationSnapshotMetadataModel]
 
-NUMBER_OF_MODELS_IN_TRANSACTION = 20
-
 
 class MissingUserException(Exception):
     """Exception for cases when the user doesn't exist."""
@@ -96,6 +94,7 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             old_user_id: str. The old (GAE) ID of the user being migrated.
             new_user_id: str. The newly generated ID of the user being migrated.
         """
+        max_number_of_models_in_transaction = 20
         old_models = model_class.query(
             model_class.user_id == old_user_id).fetch()
         new_models = []
@@ -107,17 +106,27 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             new_models.append(model_class(**model_values))
 
         def _replace_models(new_models_sub, old_models_sub):
-            """Replace old models with new ones."""
+            """Replace old models with new ones.
+
+            Args:
+                new_models_sub: list(BaseModel). New models that should be
+                    created.
+                old_models_sub: list(BaseModel). Old models that should be
+                    deleted.
+            """
             model_class.put_multi(
                 new_models_sub, update_last_updated_time=False)
             model_class.delete_multi(old_models_sub)
 
+        # We limit the number of models in one transaction because there is
+        # a limit on Google Cloud for the number of entity groups written to the
+        # datastore in one transaction.
         for i in python_utils.RANGE(
-                0, len(old_models), NUMBER_OF_MODELS_IN_TRANSACTION):
+                0, len(old_models), max_number_of_models_in_transaction):
             transaction_services.run_in_transaction(
                 _replace_models,
-                new_models[i:i + NUMBER_OF_MODELS_IN_TRANSACTION],
-                old_models[i:i + NUMBER_OF_MODELS_IN_TRANSACTION])
+                new_models[i:i + max_number_of_models_in_transaction],
+                old_models[i:i + max_number_of_models_in_transaction])
 
     @staticmethod
     def _change_model_with_one_user_id_field(
