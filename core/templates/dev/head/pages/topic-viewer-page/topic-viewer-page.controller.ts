@@ -57,6 +57,7 @@ angular.module('oppia').directive('topicViewerPage', [
           ctrl.checkMobileView = function() {
             return (WindowDimensionsService.getWidth() < 500);
           };
+          ctrl.canonicalStoriesList = [];
           ctrl.$onInit = function() {
             ctrl.setActiveTab('story');
             ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
@@ -73,7 +74,7 @@ angular.module('oppia').directive('topicViewerPage', [
                 ctrl.subtopics = readOnlyTopic.getSubtopics();
                 ctrl.skillDescriptions = readOnlyTopic.getSkillDescriptions();
                 $rootScope.loadingMessage = '';
-                ctrl.topicId = 9;
+                console.log(ctrl.canonicalStoriesList);
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
                 $rootScope.$apply();

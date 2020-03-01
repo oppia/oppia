@@ -40,6 +40,7 @@ angular.module('oppia').directive('storiesList', [
 
           var initCarousels = function() {
             $scope.canonicalStories = $scope.getCanonicalStories();
+            console.log($scope.canonicalStories);
             if (!$scope.canonicalStories) {
               return;
             }
@@ -119,6 +120,7 @@ angular.module('oppia').directive('storiesList', [
             $scope.leftmostCardIndices = 0;
             $scope.tileDisplayCount = 0;
             $scope.canonicalStories = $scope.getCanonicalStories();
+            console.log($scope.canonicalStories);
             var topicViewerWindowCutoffPx = 895;
             $scope.topicViewerWindowIsNarrow = (
               WindowDimensionsService.getWidth() <= topicViewerWindowCutoffPx);
@@ -130,7 +132,7 @@ angular.module('oppia').directive('storiesList', [
             });
             $timeout(function() {
               initCarousels();
-            }, 390);
+            }, 750);
             $(window).resize(function() {
               initCarousels();
               $scope.$apply();
