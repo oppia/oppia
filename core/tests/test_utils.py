@@ -249,7 +249,7 @@ class TestBase(unittest.TestCase):
         }
     }
 
-    VERSION_32_STATE_DICT = {
+    VERSION_27_STATE_DICT = {
         'content': {'content_id': u'content', 'html': u''},
         'param_changes': [],
         'content_ids_to_audio_translations': {
@@ -1596,10 +1596,10 @@ tags: []
         """
         question_model = question_models.QuestionModel(
             id=question_id,
-            question_state_data=self.VERSION_32_STATE_DICT,
+            question_state_data=self.VERSION_27_STATE_DICT,
             language_code=language_code,
             version=1,
-            question_state_data_schema_version=32,
+            question_state_data_schema_version=27,
             linked_skill_ids=linked_skill_ids
         )
         question_model.commit(
