@@ -135,14 +135,14 @@ describe('Speech Synthesis Chunker Service', () => {
     it('should properly convert the text-with-value attribute to' +
       ' speakable text', () => {
       const html = (
-        '<oppia-noninteractive-link text-with-value="&quot;">' +
+        '<oppia-noninteractive-link text-with-value="Testing&quot;">' +
         '</oppia-noninteractive-link>' +
         '<li>"Speech"</li>' +
         '<li>Text</li>'
       );
 
       expect(speechSynthesisChunkerService.convertToSpeakableText(html))
-        .toBe('Speech. Text. ');
+        .toBe('Testing Speech. Text. ');
     });
   });
 
@@ -157,7 +157,7 @@ describe('Speech Synthesis Chunker Service', () => {
     beforeEach(() => {
       spyOn(window, 'SpeechSynthesisUtterance').and.returnValue(
         // @ts-ignore mock doesn't have all property and methods of a native
-        // SpeechSynthesisUtterance
+        // SpeechSynthesisUtterance.
         mockSpeechSynthesisUtteran);
     });
 
@@ -194,6 +194,7 @@ describe('Speech Synthesis Chunker Service', () => {
     it('should speak speech twice', () => {
       // For some reason, just call install doesn't work, we need to uninstall
       // first so then actually install.
+      // Ref: https://github.com/gruntjs/grunt-contrib-jasmine/issues/213
       jasmine.clock().uninstall();
       jasmine.clock().install();
 
@@ -217,7 +218,10 @@ describe('Speech Synthesis Chunker Service', () => {
       jasmine.clock().uninstall();
     });
 
-    it('should speak once when cancel is requested', () => {
+    it('should speak speech once when cancel is requested', () => {
+      // For some reason, just call install doesn't work, we need to uninstall
+      // first so then actually install.
+      // Ref: https://github.com/gruntjs/grunt-contrib-jasmine/issues/213
       jasmine.clock().uninstall();
       jasmine.clock().install();
 
