@@ -240,7 +240,7 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
         user_data = base_models.BaseSnapshotMetadataModel.export_data('trivial_user')
         expected_data = {}
         self.assertEqual(user_data, expected_data)
-    
+   
     def test_export_data_nontrivial(self):
         model1 = base_models.BaseSnapshotMetadataModel(
             id='model_id-1', committer_id='committer_id', commit_type='create')
@@ -263,6 +263,7 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
             }
         }
         self.assertEqual(user_data, expected_data)
+
 
 class BaseSnapshotContentModelTests(test_utils.GenericTestBase):
 
