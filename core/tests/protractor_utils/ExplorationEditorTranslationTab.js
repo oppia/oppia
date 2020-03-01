@@ -118,8 +118,9 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-confirm-record'));
   var playRecordButton = element(
     by.css('.protractor-test-play-pause-audio-button'));
-  var uploadAudioButton = element(
-    by.css('.protractor-test-upload-audio'));
+  // Two such elements are in the DOM, but only the second is visible
+  var uploadAudioButton = element.all(
+    by.css('.protractor-test-upload-audio')).last();
   var audioUploadInput = element(
     by.css('.protractor-test-upload-audio-input'));
   var saveUploadedAudioButton = element(
@@ -180,12 +181,8 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-node-background'));
   var stateNodes = stateGraph.all(
     by.css('.protractor-test-node'));
-  var audioUploadInputElement = element(
-    by.css('.protractor-test-upload-audio'));
   var audioOverFiveMinutesErrorMessageElement = element(
     by.css('.protractor-test-audio-file-upload-field-error-message'));
-  var uploadAudioButton = element.all(
-    by.css('.protractor-test-upload-audio')).last();
   var saveUploadedAudioButton = element(
     by.css('.protractor-test-save-uploaded-audio'));
   var playPauseAudioButton = element(
@@ -235,7 +232,7 @@ var ExplorationEditorTranslationTab = function() {
     uploadAudioButton.click();
     absPath = path.resolve(__dirname, audioPath);
     waitFor.visibilityOf(
-      uploadAudioInput,
+      audioUploadInput,
       'Audio upload input field is not visible');
     return audioUploadInput.sendKeys(absPath);
   };
@@ -309,7 +306,7 @@ var ExplorationEditorTranslationTab = function() {
   this.uploadAudio = function(relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
-    audioUploadInputElement.sendKeys(audioAbsolutePath);
+    audioUploadInput.sendKeys(audioAbsolutePath);
     waitFor.elementToBeClickable(
       saveUploadedAudioButton, 'Save button is not clickable');
     saveUploadedAudioButton.click();
@@ -320,7 +317,7 @@ var ExplorationEditorTranslationTab = function() {
   this.expectWrongFileType = function(relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
-    audioUploadInputElement.sendKeys(audioAbsolutePath);
+    audioUploadInput.sendKeys(audioAbsolutePath);
     expect(element(by.css('div.error-message')).getText())
       .toContain('This file is not recognized as an audio file.');
   };
@@ -328,7 +325,7 @@ var ExplorationEditorTranslationTab = function() {
   this.expectAudioOverFiveMinutes = function(relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
-    audioUploadInputElement.sendKeys(audioAbsolutePath);
+    audioUploadInput.sendKeys(audioAbsolutePath);
     waitFor.elementToBeClickable(
       saveUploadedAudioButton, 'Save button is not clickable');
     saveUploadedAudioButton.click();
