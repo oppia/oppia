@@ -50,6 +50,8 @@ describe('About Page', function() {
   it('should click on about tab', function(done) {
     var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
     var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
+    var addClassSpyCalls = addClassSpy.calls;
+    var removeClassSpyCalls = removeClassSpy.calls;
 
     ctrl.$onInit();
     expect(addClassSpy).toHaveBeenCalledTimes(0);
@@ -57,7 +59,16 @@ describe('About Page', function() {
 
     ctrl.onTabClick('about');
     expect(addClassSpy).toHaveBeenCalledTimes(2);
+    expect(addClassSpyCalls.all()[0].args[0]).toEqual(
+      'oppia-about-tabs-active');
+    expect(addClassSpyCalls.all()[1].args[0]).toEqual(
+      'oppia-about-visible-content');
+
     expect(removeClassSpy).toHaveBeenCalledTimes(2);
+    expect(removeClassSpyCalls.all()[0].args[0]).toEqual(
+      'oppia-about-tabs-active');
+    expect(removeClassSpyCalls.all()[1].args[0]).toEqual(
+      'oppia-about-visible-content');
 
     // setTimeout is being used here in order to wait onhashchange event to
     // finish. setTimeout is executed only after call stack is empty.
@@ -67,9 +78,17 @@ describe('About Page', function() {
       // 2 calls for activeTab calls on onTabClick and 2 calls for
       // activeTab calls on $onInit.
       expect(addClassSpy).toHaveBeenCalledTimes(4);
+      expect(addClassSpyCalls.all()[2].args[0]).toEqual(
+        'oppia-about-tabs-active');
+      expect(addClassSpyCalls.all()[3].args[0]).toEqual(
+        'oppia-about-visible-content');
       // 2 calls for activeTab calls on onTabClick and 2 calls for
       // activeTab calls on $onInit.
       expect(removeClassSpy).toHaveBeenCalledTimes(4);
+      expect(removeClassSpyCalls.all()[2].args[0]).toEqual(
+        'oppia-about-tabs-active');
+      expect(removeClassSpyCalls.all()[3].args[0]).toEqual(
+        'oppia-about-visible-content');
       done();
     });
   });
@@ -77,14 +96,24 @@ describe('About Page', function() {
   it('should click on license tab', function(done) {
     var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
     var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
+    var addClassSpyCalls = addClassSpy.calls;
+    var removeClassSpyCalls = removeClassSpy.calls;
 
     ctrl.$onInit();
     expect(addClassSpy).toHaveBeenCalledTimes(0);
     expect(removeClassSpy).toHaveBeenCalledTimes(0);
 
     ctrl.onTabClick('license');
-    expect(addClassSpy).toHaveBeenCalledTimes(2);
+    expect(addClassSpyCalls.all()[0].args[0]).toEqual(
+      'oppia-about-tabs-active');
+    expect(addClassSpyCalls.all()[1].args[0]).toEqual(
+      'oppia-about-visible-content');
+
     expect(removeClassSpy).toHaveBeenCalledTimes(2);
+    expect(removeClassSpyCalls.all()[0].args[0]).toEqual(
+      'oppia-about-tabs-active');
+    expect(removeClassSpyCalls.all()[1].args[0]).toEqual(
+      'oppia-about-visible-content');
 
     var nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
     nativeWindowSpy.and.returnValue({
@@ -102,11 +131,17 @@ describe('About Page', function() {
       // 2 calls for activeTab calls on onTabClick and 2 calls for
       // activeTab calls on $onInit.
       expect(addClassSpy).toHaveBeenCalledTimes(4);
+      expect(addClassSpyCalls.all()[2].args[0]).toEqual(
+        'oppia-about-tabs-active');
+      expect(addClassSpyCalls.all()[3].args[0]).toEqual(
+        'oppia-about-visible-content');
       // 2 calls for activeTab calls on onTabClick and 2 calls for
       // activeTab calls on $onInit.
       expect(removeClassSpy).toHaveBeenCalledTimes(4);
-      // Reset spy in order to avoid overwriting of location.hash in others
-      // block test.
+      expect(removeClassSpyCalls.all()[2].args[0]).toEqual(
+        'oppia-about-tabs-active');
+      expect(removeClassSpyCalls.all()[3].args[0]).toEqual(
+        'oppia-about-visible-content');
       nativeWindowSpy.and.callThrough();
       done();
     });
@@ -115,14 +150,24 @@ describe('About Page', function() {
   it('should click on foundation tab', function(done) {
     var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
     var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
+    var addClassSpyCalls = addClassSpy.calls;
+    var removeClassSpyCalls = removeClassSpy.calls;
 
     ctrl.$onInit();
     expect(addClassSpy).toHaveBeenCalledTimes(0);
     expect(removeClassSpy).toHaveBeenCalledTimes(0);
 
     ctrl.onTabClick('foundation');
-    expect(addClassSpy).toHaveBeenCalledTimes(2);
+    expect(addClassSpyCalls.all()[0].args[0]).toEqual(
+      'oppia-about-tabs-active');
+    expect(addClassSpyCalls.all()[1].args[0]).toEqual(
+      'oppia-about-visible-content');
+
     expect(removeClassSpy).toHaveBeenCalledTimes(2);
+    expect(removeClassSpyCalls.all()[0].args[0]).toEqual(
+      'oppia-about-tabs-active');
+    expect(removeClassSpyCalls.all()[1].args[0]).toEqual(
+      'oppia-about-visible-content');
 
     // setTimeout is being used here in order to wait onhashchange event to
     // finish. setTimeout is executed only after call stack is empty.
@@ -132,9 +177,17 @@ describe('About Page', function() {
       // 2 calls for activeTab calls on onTabClick and 2 calls for
       // activeTab calls on $onInit.
       expect(addClassSpy).toHaveBeenCalledTimes(4);
+      expect(addClassSpyCalls.all()[2].args[0]).toEqual(
+        'oppia-about-tabs-active');
+      expect(addClassSpyCalls.all()[3].args[0]).toEqual(
+        'oppia-about-visible-content');
       // 2 calls for activeTab calls on onTabClick and 2 calls for
       // activeTab calls on $onInit.
       expect(removeClassSpy).toHaveBeenCalledTimes(4);
+      expect(removeClassSpyCalls.all()[2].args[0]).toEqual(
+        'oppia-about-tabs-active');
+      expect(removeClassSpyCalls.all()[3].args[0]).toEqual(
+        'oppia-about-visible-content');
       done();
     });
   });
@@ -142,14 +195,24 @@ describe('About Page', function() {
   it('should click on credits tab', function(done) {
     var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
     var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
+    var addClassSpyCalls = addClassSpy.calls;
+    var removeClassSpyCalls = removeClassSpy.calls;
 
     ctrl.$onInit();
     expect(addClassSpy).toHaveBeenCalledTimes(0);
     expect(removeClassSpy).toHaveBeenCalledTimes(0);
 
     ctrl.onTabClick('credits');
-    expect(addClassSpy).toHaveBeenCalledTimes(2);
+    expect(addClassSpyCalls.all()[0].args[0]).toEqual(
+      'oppia-about-tabs-active');
+    expect(addClassSpyCalls.all()[1].args[0]).toEqual(
+      'oppia-about-visible-content');
+
     expect(removeClassSpy).toHaveBeenCalledTimes(2);
+    expect(removeClassSpyCalls.all()[0].args[0]).toEqual(
+      'oppia-about-tabs-active');
+    expect(removeClassSpyCalls.all()[1].args[0]).toEqual(
+      'oppia-about-visible-content');
 
     // setTimeout is being used here in order to wait onhashchange event to
     // finish. setTimeout is executed only after call stack is empty.
@@ -159,9 +222,17 @@ describe('About Page', function() {
       // 2 calls for activeTab calls on onTabClick and 2 calls for
       // activeTab calls on $onInit.
       expect(addClassSpy).toHaveBeenCalledTimes(4);
+      expect(addClassSpyCalls.all()[2].args[0]).toEqual(
+        'oppia-about-tabs-active');
+      expect(addClassSpyCalls.all()[3].args[0]).toEqual(
+        'oppia-about-visible-content');
       // 2 calls for activeTab calls on onTabClick and 2 calls for
       // activeTab calls on $onInit.
       expect(removeClassSpy).toHaveBeenCalledTimes(4);
+      expect(removeClassSpyCalls.all()[2].args[0]).toEqual(
+        'oppia-about-tabs-active');
+      expect(removeClassSpyCalls.all()[3].args[0]).toEqual(
+        'oppia-about-visible-content');
       done();
     });
   });
