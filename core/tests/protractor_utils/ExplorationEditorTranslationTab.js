@@ -113,14 +113,14 @@ var ExplorationEditorTranslationTab = function() {
   var startRecordButton = element(
     by.css('.protractor-test-accessibility-translation-start-record'));
   var stopRecordButton = element(
-    by.css('.protractor-test-stop-record'));
+    by.css('.protractor-test-stop-record-button'));
   var confirmRecordButton = element(
     by.css('.protractor-test-confirm-record'));
   var playRecordButton = element(
     by.css('.protractor-test-play-pause-audio-button'));
   // Two such elements are in the DOM, but only the second is visible
   var uploadAudioButton = element.all(
-    by.css('.protractor-test-upload-audio')).last();
+    by.css('.protractor-test-upload-audio-button')).last();
   var audioUploadInput = element(
     by.css('.protractor-test-upload-audio-input'));
   var saveUploadedAudioButton = element(
