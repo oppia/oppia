@@ -672,7 +672,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'managed_topic_ids': [self.TOPIC_ID_1, self.TOPIC_ID_2]
         }
 
-        expected_voiceover_data = {
+        expected_voiceover_application_data = {
             'application_1_id': {
                 'target_type': 'exploration',
                 'target_id': 'exp_id',
@@ -729,7 +729,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_suggestion_data': expected_general_suggestion_data,
             'exploration_rights_data': expected_exploration_rights_data,
             'general_feedback_email_reply_to_id_data': expected_reply_to_data,
-            'general_voiceover_application_data': expected_voiceover_data,
+            'general_voiceover_application_data':
+                expected_voiceover_application_data,
             'user_contribution_scoring_data': expected_contrib_score_data
         }
 
