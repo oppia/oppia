@@ -87,7 +87,7 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
               pce.setReadOnly();
             });
             iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
-            pce = new PencilCodeEmbed(iframeDiv);
+            var pce = new PencilCodeEmbed(iframeDiv);
             ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
 
             ctrl.initialCode = ctrl.interactionIsActive ?
