@@ -35,7 +35,11 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
       ThreadDataService, UrlInterpolationService) {
     var _showEditStateContentSuggestionModal = function(
         activeThread, isSuggestionHandled, hasUnsavedChanges, isSuggestionValid,
-        setActiveThread = (threadId) => {}, threadUibModalInstance) {
+        threadUibModalInstance, setActiveThread = (threadId => {})) {
+      if (!activeThread) {
+        throw Error('Trying to show suggestion of non-existent thread.');
+      }
+
       return $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
@@ -88,14 +92,10 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
             if (!$scope.canEdit) {
               $scope.errorMessage = '';
             } else if (!$scope.isNotHandled) {
-              if (suggestionStatus === 'accepted' ||
-                  suggestionStatus === 'fixed') {
-                $scope.errorMessage =
-                  SuggestionModalService.SUGGESTION_ACCEPTED_MSG;
-              } else {
-                $scope.errorMessage =
-                  SuggestionModalService.SUGGESTION_REJECTED_MSG;
-              }
+              $scope.errorMessage =
+                ['accepted', 'fixed'].includes(suggestionStatus)
+                  ? SuggestionModalService.SUGGESTION_ACCEPTED_MSG
+                  : SuggestionModalService.SUGGESTION_REJECTED_MSG;
             } else if (!suggestionIsValid) {
               $scope.errorMessage =
                 SuggestionModalService.SUGGESTION_INVALID_MSG;
