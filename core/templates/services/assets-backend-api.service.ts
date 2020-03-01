@@ -16,6 +16,7 @@
  * @fileoverview Service to serve as the interface for fetching and uploading
  * assets from Google Cloud Storage.
  */
+// Jquery import is needed here in order to spy ajax method on unit tests.
 import $ from 'jquery';
 
 require('domain/utilities/AudioFileObjectFactory.ts');
