@@ -176,7 +176,11 @@ angular.module('oppia').directive('contributionsAndReview', [
           };
 
           let getQuestionContributionsSummary = (
-            () => Object.values(ctrl.contributions).map(contribution => {
+            // TODO(#7176): Replace 'any' with the exact type. This has been
+            // kept as 'any' because 'contribution' is a dict with
+            // underscore_cased keys which give tslint errors about accessing an
+            // unknown type.
+            () => Object.values(ctrl.contributions).map((contribution: any) => {
               let { change, status, suggestion_id: suggestionId } =
                 contribution.suggestion;
               let topicName = change.topic_name;
@@ -196,7 +200,11 @@ angular.module('oppia').directive('contributionsAndReview', [
             }));
 
           let getTranslationContributionsSummary = (
-            () => Object.values(ctrl.contributions).map(contribution => {
+            // TODO(#7176): Replace 'any' with the exact type. This has been
+            // kept as 'any' because 'contribution' is a dict with
+            // underscore_cased keys which give tslint errors about accessing an
+            // unknown type.
+            () => Object.values(ctrl.contributions).map((contribution: any) => {
               let {
                 topic_name: topicName,
                 story_title: storyTitle,
