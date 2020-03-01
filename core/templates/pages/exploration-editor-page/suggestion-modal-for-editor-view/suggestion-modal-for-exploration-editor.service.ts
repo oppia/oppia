@@ -33,13 +33,9 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
       $log, $rootScope, $uibModal, ExplorationDataService,
       ExplorationStatesService, StateObjectFactory, SuggestionModalService,
       ThreadDataService, UrlInterpolationService) {
-    var _showEditStateContentSuggestionModal = function(
+    let showEditStateContentSuggestionModal = function(
         activeThread, isSuggestionHandled, hasUnsavedChanges, isSuggestionValid,
         threadUibModalInstance, setActiveThread = (threadId => {})) {
-      if (!activeThread) {
-        throw Error('Trying to show suggestion of non-existent thread.');
-      }
-
       return $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
@@ -47,29 +43,17 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
         backdrop: true,
         size: 'lg',
         resolve: {
-          currentContent: function() {
-            var stateName = activeThread.getSuggestionStateName();
-            var state = ExplorationStatesService.getState(stateName);
+          currentContent: () => {
+            let stateName = activeThread.getSuggestionStateName();
+            let state = ExplorationStatesService.getState(stateName);
             return state !== undefined ? state.content.getHtml() : null;
           },
-          description: function() {
-            return activeThread.description;
-          },
-          newContent: function() {
-            return activeThread.getReplacementHtmlFromSuggestion();
-          },
-          suggestionIsHandled: function() {
-            return isSuggestionHandled();
-          },
-          suggestionIsValid: function() {
-            return isSuggestionValid();
-          },
-          suggestionStatus: function() {
-            return activeThread.getSuggestionStatus();
-          },
-          unsavedChangesExist: function() {
-            return hasUnsavedChanges();
-          },
+          description: () => activeThread.description,
+          newContent: () => activeThread.getReplacementHtmlFromSuggestion(),
+          suggestionIsHandled: () => isSuggestionHandled(),
+          suggestionIsValid: () => isSuggestionValid(),
+          suggestionStatus: () => activeThread.getSuggestionStatus(),
+          unsavedChangesExist: () => hasUnsavedChanges()
         },
         controller: [
           '$log', '$scope', '$uibModalInstance', 'EditabilityService',
@@ -150,10 +134,10 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
             // Immediately update editor to reflect accepted suggestion.
             if (result.action ===
                 SuggestionModalService.ACTION_ACCEPT_SUGGESTION) {
-              var suggestion = activeThread.getSuggestion();
-              var stateName = suggestion.stateName;
-              var stateDict = ExplorationDataService.data.states[stateName];
-              var state = StateObjectFactory.createFromBackendDict(
+              let suggestion = activeThread.getSuggestion();
+              let stateName = suggestion.stateName;
+              let stateDict = ExplorationDataService.data.states[stateName];
+              let state = StateObjectFactory.createFromBackendDict(
                 stateName, stateDict);
               state.content.setHtml(
                 activeThread.getReplacementHtmlFromSuggestion());
@@ -181,8 +165,11 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
       return {
         showSuggestionModal: function(
             suggestionType, extraParams, threadUibModalInstance = null) {
+          if (!extraParams.activeThread) {
+            throw Error("Trying to show suggestion of a non-existent thread.");
+          }
           if (suggestionType === 'edit_exploration_state_content') {
-            _showEditStateContentSuggestionModal(
+            showEditStateContentSuggestionModal(
               extraParams.activeThread, extraParams.isSuggestionHandled,
               extraParams.hasUnsavedChanges, extraParams.isSuggestionValid,
               extraParams.setActiveThread, threadUibModalInstance);

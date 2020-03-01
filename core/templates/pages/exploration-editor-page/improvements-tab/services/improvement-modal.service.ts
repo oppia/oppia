@@ -429,6 +429,9 @@ angular.module('oppia').factory('ImprovementModalService', [
 
       openSuggestionReviewModal: function(
           suggestionThread, threadUibModalInstance) {
+        if (!suggestionThread) {
+          throw Error('Trying to show suggestion from a non-existent thread.');
+        }
         return SuggestionModalForExplorationEditorService.showSuggestionModal(
           suggestionThread.suggestion.suggestionType, {
             activeThread: suggestionThread,
