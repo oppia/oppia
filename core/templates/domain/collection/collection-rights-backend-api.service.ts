@@ -40,9 +40,11 @@ export class CollectionRightsBackendApiService {
   private _fetchCollectionRights(collectionId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
-    let collectionRightsUrl = this.urlInterpolationService.interpolateUrl(CollectionEditorPageConstants.COLLECTION_RIGHTS_URL_TEMPLATE, {
-      collection_id: collectionId
-    });
+    let collectionRightsUrl = this.urlInterpolationService
+      .interpolateUrl(
+        CollectionEditorPageConstants.COLLECTION_RIGHTS_URL_TEMPLATE, {
+          collection_id: collectionId
+        });
 
     this.http.get(collectionRightsUrl, { observe: 'response' }).toPromise()
       .then((response) => {
