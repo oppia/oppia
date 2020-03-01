@@ -409,7 +409,16 @@
     "is_linear": false,
     "display_mode": "inline",
     "id": "SetInput",
-    "customization_arg_specs": [],
+    "customization_arg_specs": [
+      {
+        "description": "Label for the 'Add Item' button",
+        "name": "buttonText",
+        "schema": {
+          "type": "unicode"
+        },
+        "default_value": "Add item"
+      }
+    ],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {

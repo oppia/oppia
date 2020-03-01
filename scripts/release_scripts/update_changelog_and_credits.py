@@ -42,7 +42,7 @@ import github # isort:skip
 # pylint: enable=wrong-import-position
 
 ABOUT_PAGE_FILEPATH = os.path.join(
-    'core', 'templates', 'dev', 'head', 'pages', 'about-page',
+    'core', 'templates', 'pages', 'about-page',
     'about-page.directive.html')
 AUTHORS_FILEPATH = os.path.join('', 'AUTHORS')
 CHANGELOG_FILEPATH = os.path.join('', 'CHANGELOG')
