@@ -74,7 +74,8 @@ describe('About Page', function() {
 
     ctrl.$onInit();
     ctrl.onTabClick('license');
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+    var nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
+    nativeWindowSpy.and.returnValue({
       location: {
         hash: '#license',
         reload: function() {}
@@ -92,6 +93,9 @@ describe('About Page', function() {
       // 2 calls for activeTab calls on onTabClick and 2 calls for
       // activeTab calls on $onInit.
       expect(removeClassSpy).toHaveBeenCalledTimes(4);
+      // Reset spy in order to avoid overwriting of location.hash in others
+      // block test.
+      nativeWindowSpy.and.callThrough();
       done();
     });
   });
