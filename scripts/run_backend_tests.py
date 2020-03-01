@@ -46,18 +46,16 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import importlib
 import inspect
-import multiprocessing
 import os
 import re
 import subprocess
 import sys
-import threading
 import time
 
 import python_utils
 
 from . import common
-from . import semaphore_method
+from . import semaphore_utils
 from . import setup
 from . import setup_gae
 
@@ -103,8 +101,6 @@ TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
-MAX_CONCURRENT_RUNS = 25
-
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
     python -m scripts.run_backend_tests
@@ -149,11 +145,11 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     last_stdout = last_stdout_str.split('\n')
 
     if LOG_LINE_PREFIX in last_stdout_str:
-        semaphore_method.log('')
+        semaphore_utils.log('')
         for line in last_stdout:
             if line.startswith(LOG_LINE_PREFIX):
-                semaphore_method.log('INFO: %s' % line[len(LOG_LINE_PREFIX):])
-        semaphore_method.log('')
+                semaphore_utils.log('INFO: %s' % line[len(LOG_LINE_PREFIX):])
+        semaphore_utils.log('')
 
     result = '%s%s' % (last_stdout_str, last_stderr_str)
 
@@ -303,29 +299,27 @@ def main(args=None):
             test_path=parsed_args.test_path,
             include_load_tests=include_load_tests)
 
-    # Prepare tasks.
-    concurrent_count = min(multiprocessing.cpu_count(), MAX_CONCURRENT_RUNS)
-    semaphore = threading.Semaphore(concurrent_count)
+
 
     task_to_taskspec = {}
     tasks = []
     for test_target in all_test_targets:
         test = TestingTaskSpec(
             test_target, parsed_args.generate_coverage_report)
-        task = semaphore_method.TaskThread(
-            test.run, parsed_args.verbose, semaphore, name=test_target)
+        task = semaphore_utils.TaskThread(
+            test.run, parsed_args.verbose, name=test_target)
         task_to_taskspec[task] = test
         tasks.append(task)
 
     task_execution_failed = False
     try:
-        semaphore_method.execute_tasks(tasks, semaphore)
+        semaphore_utils.execute_tasks(tasks)
     except Exception:
         task_execution_failed = True
 
     for task in tasks:
         if task.exception:
-            semaphore_method.log(
+            semaphore_utils.log(
                 python_utils.convert_to_bytes(task.exception.args[0]))
 
     python_utils.PRINT('')

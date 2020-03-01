@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2018 The Oppia Authors. All Rights Reserved.
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,12 +20,19 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import multiprocessing
 import threading
 import time
 import python_utils
 
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
+
+MAX_CONCURRENT_RUNS = 25
+
+# Prepare tasks.
+CONCURRENT_COUNT = min(multiprocessing.cpu_count(), MAX_CONCURRENT_RUNS)
+SEMAPHORE = threading.Semaphore(CONCURRENT_COUNT)
 
 
 def log(message, show_time=False):
@@ -44,7 +51,7 @@ def log(message, show_time=False):
 class TaskThread(threading.Thread):
     """Runs a task in its own thread."""
 
-    def __init__(self, func, verbose, semaphore, name=None):
+    def __init__(self, func, verbose, semaphore=SEMAPHORE, name=None):
         super(TaskThread, self).__init__()
         self.func = func
         self.output = None
@@ -96,7 +103,7 @@ def _check_all_tasks(tasks):
             log(task_details)
 
 
-def execute_tasks(tasks, semaphore):
+def execute_tasks(tasks, semaphore=SEMAPHORE):
     """Starts all tasks and checks the results.
     Runs no more than the allowable limit defined in the semaphore.
 

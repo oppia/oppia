@@ -73,7 +73,7 @@ import time
 
 # Install third party dependencies before proceeding.
 from . import install_third_party_libs
-from . import semaphore_method
+from . import semaphore_utils
 install_third_party_libs.main()
 
 # pylint: disable=wrong-import-position
@@ -554,6 +554,7 @@ CODEOWNER_IMPORTANT_PATHS = [
 # NOTE TO DEVELOPERS: This should match the version of Node used in common.py.
 NODE_DIR = os.path.abspath(
     os.path.join(os.getcwd(), os.pardir, 'oppia_tools', 'node-10.18.0'))
+NODE_PATH = os.path.join(NODE_DIR, 'bin', 'node')
 
 if not os.getcwd().endswith('oppia'):
     python_utils.PRINT('')
@@ -561,6 +562,15 @@ if not os.getcwd().endswith('oppia'):
         'ERROR    Please run this script from the oppia root directory.')
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_STYLELINT_PATH = os.path.join(
+    'node_modules', 'stylelint', 'bin', 'stylelint.js')
+if not os.path.exists(_STYLELINT_PATH):
+    python_utils.PRINT('')
+    python_utils.PRINT(
+        'ERROR    Please run start.sh first to install node-stylelint ')
+    python_utils.PRINT(
+        '         and its dependencies.')
+    sys.exit(1)
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
 if not os.path.exists(_PYLINT_PATH):
     python_utils.PRINT('')
@@ -625,8 +635,6 @@ _MESSAGE_TYPE_FAILED = 'FAILED'
 _TARGET_STDOUT = python_utils.string_io()
 _STDOUT_LIST = multiprocessing.Manager().list()
 _FILES = multiprocessing.Manager().dict()
-
-MAX_CONCURRENT_RUNS = 6
 
 
 class FileCache(python_utils.OBJECT):
@@ -710,38 +718,6 @@ class LintingTaskSpec(python_utils.OBJECT):
 
     def lint_all_files(self):
         """Run all lint checks."""
-        python_utils.PRINT('Starting Js, Ts, Python, HTML, and CSS linter...')
-
-        pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
-
-        config_pylint = '--rcfile=%s' % pylintrc_path
-
-        config_pycodestyle = os.path.join(os.getcwd(), 'tox.ini')
-
-        parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-
-        node_path = os.path.join(NODE_DIR, 'bin', 'node')
-        eslint_path = os.path.join(
-            'node_modules', 'eslint', 'bin', 'eslint.js')
-        stylelint_path = os.path.join(
-            'node_modules', 'stylelint', 'bin', 'stylelint.js')
-        config_path_for_css_in_html = os.path.join(
-            parent_dir, 'oppia', '.stylelintrc')
-        config_path_for_oppia_css = os.path.join(
-            parent_dir, 'oppia', 'core', 'templates', 'dev', 'head',
-            'css', '.stylelintrc')
-        if not (os.path.exists(eslint_path) and os.path.exists(stylelint_path)):
-            python_utils.PRINT('')
-            python_utils.PRINT(
-                'ERROR    Please run start.sh first to install node-eslint ')
-            python_utils.PRINT(
-                '         or node-stylelint and its dependencies.')
-            sys.exit(1)
-
-
-        linting_processes = []
-        result_queues = []
-        stdout_queues = []
         all_messages = []
 
         js_ts_linter = 'js' in self.file_extension_type or (
@@ -750,57 +726,18 @@ class LintingTaskSpec(python_utils.OBJECT):
         html_linter = 'html' in self.file_extension_type
         css_linter = 'css' in self.file_extension_type
         other_linter = 'other' in self.file_extension_type
-        codeowner_linter = 'codeowner' in self.file_extension_type
 
         if js_ts_linter:
-            js_and_ts_files_to_lint = self.js_filepaths + self.ts_filepaths
-
-            js_and_ts_result = multiprocessing.Queue()
-
-            _lint_js_and_ts_files(
-                node_path, eslint_path, js_and_ts_files_to_lint,
-                js_and_ts_result, self.verbose_mode_enabled)
-            result_queues.append(js_and_ts_result)
-
-            # Pylint requires to provide paramter "this_bases" and "d",
-            # guess due to meta class.
             js_ts_lint_checks_manager = JsTsLintChecksManager( # pylint: disable=no-value-for-parameter
                 self.verbose_mode_enabled)
             js_message = js_ts_lint_checks_manager.perform_all_lint_checks()
             all_messages += js_message
 
         if html_linter:
-            css_in_html_result = multiprocessing.Queue()
-            css_in_html_stdout = multiprocessing.Queue()
-
-            _lint_css_files(
-                node_path,
-                stylelint_path,
-                config_path_for_css_in_html,
-                self.html_filepaths, css_in_html_stdout,
-                css_in_html_result, self.verbose_mode_enabled)
-
-            result_queues.append(css_in_html_result)
-            stdout_queues.append(css_in_html_stdout)
-
             html_lint_checks_manager = HTMLLintChecksManager(   # pylint: disable=no-value-for-parameter
                 self.verbose_mode_enabled)
             html_messages = html_lint_checks_manager.perform_all_lint_checks()
             all_messages += html_messages
-
-        if css_linter:
-            css_result = multiprocessing.Queue()
-            css_stdout = multiprocessing.Queue()
-
-            _lint_css_files(
-                node_path,
-                stylelint_path,
-                config_path_for_oppia_css,
-                self.css_filepaths, css_stdout,
-                css_result, self.verbose_mode_enabled)
-
-            result_queues.append(css_result)
-            stdout_queues.append(css_stdout)
 
         if html_linter or css_linter:
             css_lint_checks_manager = CSSLintChecksManager(   # pylint: disable=no-value-for-parameter
@@ -809,26 +746,9 @@ class LintingTaskSpec(python_utils.OBJECT):
             all_messages += css_messages
 
         if py_linter:
-            py_result = multiprocessing.Queue()
-            _lint_py_files(
-                config_pylint, config_pycodestyle, self.py_filepaths,
-                py_result, self.verbose_mode_enabled)
-
-            result_queues.append(py_result)
-
-            py_result_for_python3_compatibility = multiprocessing.Queue()
-
-            _lint_py_files_for_python3_compatibility(
-                self.py_filepaths, py_result_for_python3_compatibility,
-                self.verbose_mode_enabled)
-
-            result_queues.append(py_result_for_python3_compatibility)
-
             py_lint_checks_manager = PythonLintChecksManager( # pylint: disable=no-value-for-parameter
                 self.verbose_mode_enabled)
-
             py_messages = py_lint_checks_manager.perform_all_lint_checks()
-
             all_messages += py_messages
 
         if other_linter:
@@ -836,14 +756,6 @@ class LintingTaskSpec(python_utils.OBJECT):
                 self.verbose_mode_enabled)
             other_messages = other_lint_checks_manager.perform_all_lint_checks()
             all_messages += other_messages
-
-        if codeowner_linter:
-            code_owner_message = _check_codeowner_file(
-                self.verbose_mode_enabled)
-            all_messages += code_owner_message
-
-        all_messages += _join_linting_process(
-            linting_processes, result_queues, stdout_queues)
 
         return all_messages
 
@@ -1031,11 +943,10 @@ def _get_file_extensions(file_extension_type):
         all_file_extensions_type: list(str). The list of all file extensions
         to be linted and checked.
     """
-    all_file_extensions_type = ['js', 'ts', 'py', 'html', 'css', 'other',
-                                'codeowner']
+    all_file_extensions_type = ['js', 'py', 'html', 'css', 'other']
 
     if file_extension_type is not None:
-        return file_extension_type + ['codeowner']
+        return file_extension_type
 
     return all_file_extensions_type
 
@@ -1509,258 +1420,6 @@ def _check_codeowner_file(verbose_mode_enabled):
         python_utils.PRINT('')
 
     return summary_messages
-
-
-def _lint_css_files(
-        node_path, stylelint_path, config_path, files_to_lint, stdout, result,
-        verbose_mode_enabled):
-    """Prints a list of lint errors in the given list of CSS files.
-
-    Args:
-        node_path: str. Path to the node binary.
-        stylelint_path: str. Path to the Stylelint binary.
-        config_path: str. Path to the configuration file.
-        files_to_lint: list(str). A list of filepaths to lint.
-        stdout:  multiprocessing.Queue. A queue to store Stylelint outputs.
-        result: multiprocessing.Queue. A queue to put results of test.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
-    """
-    start_time = time.time()
-    num_files_with_errors = 0
-
-    num_css_files = len(files_to_lint)
-    if not files_to_lint:
-        result.put('')
-        python_utils.PRINT('There are no CSS files to lint.')
-        return
-
-    python_utils.PRINT('Total css files: ', num_css_files)
-    stylelint_cmd_args = [
-        node_path, stylelint_path, '--config=' + config_path]
-    result_list = []
-    if not verbose_mode_enabled:
-        python_utils.PRINT('Linting CSS files.')
-    for _, filepath in enumerate(files_to_lint):
-        if verbose_mode_enabled:
-            python_utils.PRINT('Linting: ', filepath)
-        proc_args = stylelint_cmd_args + [filepath]
-        proc = subprocess.Popen(
-            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
-        linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
-        linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
-        if linter_stderr:
-            python_utils.PRINT('LINTER FAILED')
-            python_utils.PRINT(linter_stderr)
-            sys.exit(1)
-
-        if linter_stdout:
-            num_files_with_errors += 1
-            result_list.append(linter_stdout)
-            python_utils.PRINT(linter_stdout)
-            stdout.put(linter_stdout)
-
-    if num_files_with_errors:
-        for error in result_list:
-            result.put(error)
-        result.put('%s    %s CSS file' % (
-            _MESSAGE_TYPE_FAILED, num_files_with_errors))
-    else:
-        result.put('%s   %s CSS file linted (%.1f secs)' % (
-            _MESSAGE_TYPE_SUCCESS, num_css_files, time.time() - start_time))
-
-    python_utils.PRINT('CSS linting finished.')
-
-
-def _lint_js_and_ts_files(
-        node_path, eslint_path, files_to_lint, result, verbose_mode_enabled):
-    """Prints a list of lint errors in the given list of JavaScript files.
-
-    Args:
-        node_path: str. Path to the node binary.
-        eslint_path: str. Path to the ESLint binary.
-        files_to_lint: list(str). A list of filepaths to lint.
-        result: multiprocessing.Queue. A queue to put results of test.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
-    """
-    start_time = time.time()
-    num_files_with_errors = 0
-
-    num_js_and_ts_files = len(files_to_lint)
-    if not files_to_lint:
-        result.put('')
-        python_utils.PRINT(
-            'There are no JavaScript or Typescript files to lint.')
-        return
-
-    python_utils.PRINT('Total js and ts files: ', num_js_and_ts_files)
-    eslint_cmd_args = [node_path, eslint_path, '--quiet']
-    result_list = []
-    python_utils.PRINT('Linting JS and TS files.')
-    for _, filepath in enumerate(files_to_lint):
-        if verbose_mode_enabled:
-            python_utils.PRINT('Linting: ', filepath)
-        proc_args = eslint_cmd_args + [filepath]
-        proc = subprocess.Popen(
-            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
-        linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
-        linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
-        if linter_stderr:
-            python_utils.PRINT('LINTER FAILED')
-            python_utils.PRINT(linter_stderr)
-            sys.exit(1)
-
-        if linter_stdout:
-            num_files_with_errors += 1
-            result_list.append(linter_stdout)
-
-    if num_files_with_errors:
-        for error in result_list:
-            result.put(error)
-        result.put('%s    %s JavaScript and Typescript files' % (
-            _MESSAGE_TYPE_FAILED, num_files_with_errors))
-    else:
-        result.put(
-            '%s   %s JavaScript and Typescript files linted (%.1f secs)' % (
-                _MESSAGE_TYPE_SUCCESS, num_js_and_ts_files,
-                time.time() - start_time))
-
-    python_utils.PRINT('Js and Ts linting finished.')
-
-
-def _lint_py_files(
-        config_pylint, config_pycodestyle, files_to_lint, result,
-        verbose_mode_enabled):
-    """Prints a list of lint errors in the given list of Python files.
-
-    Args:
-        config_pylint: str. Path to the .pylintrc file.
-        config_pycodestyle: str. Path to the tox.ini file.
-        files_to_lint: list(str). A list of filepaths to lint.
-        result: multiprocessing.Queue. A queue to put results of test.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
-    """
-    start_time = time.time()
-    are_there_errors = False
-
-    num_py_files = len(files_to_lint)
-    if not files_to_lint:
-        result.put('')
-        python_utils.PRINT('There are no Python files to lint.')
-        return
-
-    python_utils.PRINT('Linting %s Python files' % num_py_files)
-
-    _batch_size = 50
-    current_batch_start_index = 0
-
-    while current_batch_start_index < len(files_to_lint):
-        # Note that this index is an exclusive upper bound -- i.e., the current
-        # batch of files ranges from 'start_index' to 'end_index - 1'.
-        current_batch_end_index = min(
-            current_batch_start_index + _batch_size, len(files_to_lint))
-        current_files_to_lint = files_to_lint[
-            current_batch_start_index: current_batch_end_index]
-        if verbose_mode_enabled:
-            python_utils.PRINT('Linting Python files %s to %s...' % (
-                current_batch_start_index + 1, current_batch_end_index))
-
-        with _redirect_stdout(_TARGET_STDOUT):
-            # This line invokes Pylint and prints its output
-            # to the target stdout.
-            pylinter = lint.Run(
-                current_files_to_lint + [config_pylint],
-                exit=False).linter
-            # These lines invoke Pycodestyle and print its output
-            # to the target stdout.
-            style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
-            pycodestyle_report = style_guide.check_files(
-                paths=current_files_to_lint)
-
-        if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
-            result.put(_TARGET_STDOUT.getvalue())
-            are_there_errors = True
-
-        current_batch_start_index = current_batch_end_index
-
-    if are_there_errors:
-        result.put('%s    Python linting failed' % _MESSAGE_TYPE_FAILED)
-    else:
-        result.put('%s   %s Python files linted (%.1f secs)' % (
-            _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
-
-    python_utils.PRINT('Python linting finished.')
-
-
-def _lint_py_files_for_python3_compatibility(
-        files_to_lint, result, verbose_mode_enabled):
-    """Prints a list of Python 3 compatibility errors in the given list of
-    Python files.
-
-    Args:
-        files_to_lint: list(str). A list of filepaths to lint.
-        result: multiprocessing.Queue. A queue to put results of test.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
-    """
-    start_time = time.time()
-    any_errors = False
-
-    files_to_lint_for_python3_compatibility = [
-        file_name for file_name in files_to_lint if not re.match(
-            r'^.*python_utils.*\.py$', file_name)]
-    num_py_files = len(files_to_lint_for_python3_compatibility)
-    if not files_to_lint_for_python3_compatibility:
-        result.put('')
-        python_utils.PRINT(
-            'There are no Python files to lint for Python 3 compatibility.')
-        return
-
-    python_utils.PRINT(
-        'Linting %s Python files for Python 3 compatibility.' % num_py_files)
-
-    _batch_size = 50
-    current_batch_start_index = 0
-
-    while current_batch_start_index < len(
-            files_to_lint_for_python3_compatibility):
-        # Note that this index is an exclusive upper bound -- i.e., the current
-        # batch of files ranges from 'start_index' to 'end_index - 1'.
-        current_batch_end_index = min(
-            current_batch_start_index + _batch_size, len(
-                files_to_lint_for_python3_compatibility))
-        current_files_to_lint = files_to_lint_for_python3_compatibility[
-            current_batch_start_index: current_batch_end_index]
-        if verbose_mode_enabled:
-            python_utils.PRINT(
-                'Linting Python files for Python 3 compatibility %s to %s...'
-                % (current_batch_start_index + 1, current_batch_end_index))
-
-        with _redirect_stdout(_TARGET_STDOUT):
-            # This line invokes Pylint and prints its output
-            # to the target stdout.
-            python_utils.PRINT('Messages for Python 3 support:')
-            pylinter_for_python3 = lint.Run(
-                current_files_to_lint + ['--py3k'], exit=False).linter
-
-        if pylinter_for_python3.msg_status != 0:
-            result.put(_TARGET_STDOUT.getvalue())
-            any_errors = True
-
-        current_batch_start_index = current_batch_end_index
-
-    if any_errors:
-        result.put(
-            '%s    Python linting for Python 3 compatibility failed'
-            % _MESSAGE_TYPE_FAILED)
-    else:
-        result.put(
-            '%s   %s Python files linted for Python 3 compatibility (%.1f secs)'
-            % (_MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
-
-    python_utils.PRINT('Python linting for Python 3 compatibility finished.')
 
 
 def _check_codeowner_file(verbose_mode_enabled):
@@ -2820,6 +2479,59 @@ class JsTsLintChecksManager(LintChecksManager):
         ]
         super(JsTsLintChecksManager, self)._run_multiple_checks(*methods)
 
+    def _lint_js_and_ts_files(self, node_path, eslint_path):
+        """Prints a list of lint errors in the given list of JavaScript files.
+
+        Args:
+            node_path: str. Path to the node binary.
+            eslint_path: str. Path to the ESLint binary.
+        """
+        start_time = time.time()
+        num_files_with_errors = 0
+        files_to_lint = self.all_filepaths
+        summary_messages = []
+
+        num_js_and_ts_files = len(files_to_lint)
+        python_utils.PRINT('Total js and ts files: ', num_js_and_ts_files)
+        eslint_cmd_args = [node_path, eslint_path, '--quiet']
+        result_list = []
+        python_utils.PRINT('Linting JS and TS files.')
+        for _, filepath in enumerate(files_to_lint):
+            if self.verbose_mode_enabled:
+                python_utils.PRINT('Linting: ', filepath)
+            proc_args = eslint_cmd_args + [filepath]
+            proc = subprocess.Popen(
+                proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+            encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
+            linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
+            linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
+            if linter_stderr:
+                python_utils.PRINT('LINTER FAILED')
+                python_utils.PRINT(linter_stderr)
+                sys.exit(1)
+
+            if linter_stdout:
+                num_files_with_errors += 1
+                result_list.append(linter_stdout)
+
+        if num_files_with_errors:
+            for error in result_list:
+                python_utils.PRINT(error)
+                summary_messages.append(error)
+            summary_message = ('%s    %s JavaScript and Typescript files' % (
+                _MESSAGE_TYPE_FAILED, num_files_with_errors))
+        else:
+            summary_message = (
+                '%s   %s JavaScript and Typescript files linted (%.1f secs)' % (
+                    _MESSAGE_TYPE_SUCCESS, num_js_and_ts_files,
+                    time.time() - start_time))
+        python_utils.PRINT(summary_message)
+        summary_messages.append(summary_message)
+        self.process_manager['eslint'] = summary_messages
+
+        python_utils.PRINT('Js and Ts linting finished.')
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -2827,6 +2539,22 @@ class JsTsLintChecksManager(LintChecksManager):
         Returns:
             all_messages: str. All the messages returned by the lint checks.
         """
+
+        eslint_path = os.path.join(
+            'node_modules', 'eslint', 'bin', 'eslint.js')
+        if not os.path.exists(eslint_path):
+            python_utils.PRINT('')
+            python_utils.PRINT(
+                'ERROR    Please run start.sh first to install node-eslint ')
+            python_utils.PRINT(
+                '         and its dependencies.')
+            sys.exit(1)
+
+        if not self.all_filepaths:
+            python_utils.PRINT('')
+            python_utils.PRINT(
+                'There are no JavaScript or Typescript files to lint.')
+            return []
 
         self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
         self.parsed_expressions_in_files = (
@@ -2838,7 +2566,8 @@ class JsTsLintChecksManager(LintChecksManager):
         super(JsTsLintChecksManager, self)._run_multiple_checks(
             self._check_extra_js_files,
             self._check_js_and_ts_component_name_and_count,
-            self._check_directive_scope
+            self._check_directive_scope,
+            self._lint_js_and_ts_files(NODE_PATH, eslint_path)
         )
         self._check_dependencies()
         extra_js_files_messages = self.process_manager['extra']
@@ -2846,9 +2575,10 @@ class JsTsLintChecksManager(LintChecksManager):
         directive_scope_messages = self.process_manager['directive']
         sorted_dependencies_messages = self.process_manager['sorted']
         controller_dependency_messages = self.process_manager['line_breaks']
+        eslint_messages = self.process_manager['eslint']
 
         all_messages = (
-            common_messages + extra_js_files_messages +
+            common_messages + eslint_messages + extra_js_files_messages +
             js_and_ts_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages)
         return all_messages
@@ -2938,6 +2668,147 @@ class PythonLintChecksManager(LintChecksManager):
         """Return all filepaths."""
         return self.py_filepaths
 
+    def _lint_py_files(self, config_pylint, config_pycodestyle):
+        """Prints a list of lint errors in the given list of Python files.
+
+        Args:
+            config_pylint: str. Path to the .pylintrc file.
+            config_pycodestyle: str. Path to the tox.ini file.
+        """
+        start_time = time.time()
+        are_there_errors = False
+        files_to_lint = self.all_filepaths
+        summary_messages = []
+
+        num_py_files = len(files_to_lint)
+
+        python_utils.PRINT('Linting %s Python files' % num_py_files)
+
+        _batch_size = 50
+        current_batch_start_index = 0
+        stdout = python_utils.string_io()
+
+        while current_batch_start_index < len(files_to_lint):
+            # Note that this index is an exclusive upper bound -- i.e.,
+            # the current batch of files ranges from 'start_index' to
+            # 'end_index - 1'.
+            current_batch_end_index = min(
+                current_batch_start_index + _batch_size, len(files_to_lint))
+            current_files_to_lint = files_to_lint[
+                current_batch_start_index: current_batch_end_index]
+            if self.verbose_mode_enabled:
+                python_utils.PRINT('Linting Python files %s to %s...' % (
+                    current_batch_start_index + 1, current_batch_end_index))
+
+            with _redirect_stdout(stdout):
+                # This line invokes Pylint and prints its output
+                # to the target stdout.
+                pylinter = lint.Run(
+                    current_files_to_lint + [config_pylint],
+                    exit=False).linter
+                # These lines invoke Pycodestyle and print its output
+                # to the target stdout.
+                style_guide = pycodestyle.StyleGuide(
+                    config_file=config_pycodestyle)
+                pycodestyle_report = style_guide.check_files(
+                    paths=current_files_to_lint)
+
+            if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
+                summary_message = stdout.getvalue()
+                python_utils.PRINT(summary_message)
+                summary_messages.append(summary_message)
+                are_there_errors = True
+
+            current_batch_start_index = current_batch_end_index
+
+        if are_there_errors:
+            summary_message = ('%s    Python linting failed' % (
+                _MESSAGE_TYPE_FAILED))
+        else:
+            summary_message = ('%s   %s Python files linted (%.1f secs)' % (
+                _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
+
+        python_utils.PRINT(summary_message)
+        summary_messages.append(summary_message)
+
+        python_utils.PRINT('Python linting finished.')
+        self.process_manager['python2'] = summary_messages
+
+    def _lint_py_files_for_python3_compatibility(self):
+        """Prints a list of Python 3 compatibility errors in the given list of
+        Python files.
+        """
+        start_time = time.time()
+        any_errors = False
+        stdout = python_utils.string_io()
+        files_to_lint = self.all_filepaths
+        summary_messages = []
+
+        files_to_lint_for_python3_compatibility = [
+            file_name for file_name in files_to_lint if not re.match(
+                r'^.*python_utils.*\.py$', file_name)]
+        num_py_files = len(files_to_lint_for_python3_compatibility)
+        if not files_to_lint_for_python3_compatibility:
+            python_utils.PRINT('')
+            python_utils.PRINT(
+                'There are no Python files to lint for Python 3 compatibility.')
+            return
+
+        python_utils.PRINT(
+            'Linting %s Python files for Python 3 compatibility.' % (
+                num_py_files))
+
+        _batch_size = 50
+        current_batch_start_index = 0
+
+        while current_batch_start_index < len(
+                files_to_lint_for_python3_compatibility):
+            # Note that this index is an exclusive upper bound -- i.e.,
+            # the current batch of files ranges from 'start_index' to
+            # 'end_index - 1'.
+            current_batch_end_index = min(
+                current_batch_start_index + _batch_size, len(
+                    files_to_lint_for_python3_compatibility))
+            current_files_to_lint = files_to_lint_for_python3_compatibility[
+                current_batch_start_index: current_batch_end_index]
+            if self.verbose_mode_enabled:
+                python_utils.PRINT(
+                    'Linting Python files for Python 3 compatibility %s to %s..'
+                    % (current_batch_start_index + 1, current_batch_end_index))
+
+            with _redirect_stdout(stdout):
+                # This line invokes Pylint and prints its output
+                # to the target stdout.
+                python_utils.PRINT('Messages for Python 3 support:')
+                pylinter_for_python3 = lint.Run(
+                    current_files_to_lint + ['--py3k'], exit=False).linter
+
+            if pylinter_for_python3.msg_status != 0:
+                summary_message = stdout.getvalue()
+                python_utils.PRINT(summary_message)
+                summary_messages.append(summary_message)
+                any_errors = True
+
+            current_batch_start_index = current_batch_end_index
+
+        if any_errors:
+            summary_message = (
+                '%s    Python linting for Python 3 compatibility failed'
+                % _MESSAGE_TYPE_FAILED)
+        else:
+            summary_message = (
+                '%s   %s Python files linted for Python 3 compatibility '
+                '(%.1f secs)'
+                % (_MESSAGE_TYPE_SUCCESS, num_py_files, (
+                    time.time() - start_time)))
+
+        python_utils.PRINT(summary_message)
+        summary_messages.append(summary_message)
+
+        python_utils.PRINT(
+            'Python linting for Python 3 compatibility finished.')
+        self.process_manager['python3'] = summary_messages
+
     def _check_import_order(self):
         """This function is used to check that each file
         has imports placed in alphabetical order.
@@ -2977,8 +2848,8 @@ class PythonLintChecksManager(LintChecksManager):
                     '%s   Import order checks passed' % _MESSAGE_TYPE_SUCCESS)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
+        self.process_manager['import'] = summary_messages
         _STDOUT_LIST.append(stdout)
-        return summary_messages
 
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
@@ -2987,13 +2858,33 @@ class PythonLintChecksManager(LintChecksManager):
         Returns:
             all_messages: str. All the messages returned by the lint checks.
         """
+        pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
+
+        config_pylint = '--rcfile=%s' % pylintrc_path
+
+        config_pycodestyle = os.path.join(os.getcwd(), 'tox.ini')
+
+        if not self.all_filepaths:
+            python_utils.PRINT('')
+            python_utils.PRINT('There are no Python files to lint.')
+            return []
 
         common_messages = super(
             PythonLintChecksManager, self).perform_all_lint_checks()
 
-        import_order_messages = self._check_import_order()
+        super(PythonLintChecksManager, self)._run_multiple_checks(
+            self._lint_py_files(config_pylint, config_pycodestyle),
+            self._lint_py_files_for_python3_compatibility,
+            self._check_import_order
+        )
 
-        all_messages = common_messages + import_order_messages
+        python_file_messages = self.process_manager['python2']
+        python3_file_messages = self.process_manager['python3']
+        import_order_messages = self.process_manager['import']
+
+        all_messages = (
+            common_messages + import_order_messages + python_file_messages +
+            python3_file_messages)
 
         return all_messages
 
@@ -3135,6 +3026,13 @@ class HTMLLintChecksManager(LintChecksManager):
             all_messages: str. All the messages returned by the lint checks.
         """
 
+        config_path_for_css_in_html = os.path.join(
+            _PARENT_DIR, 'oppia', '.stylelintrc')
+        if not self.all_filepaths:
+            python_utils.PRINT('')
+            python_utils.PRINT('There are no HTML files to lint.')
+            return []
+
         common_messages = super(
             HTMLLintChecksManager, self).perform_all_lint_checks()
         # The html tags and attributes check has an additional
@@ -3143,9 +3041,16 @@ class HTMLLintChecksManager(LintChecksManager):
             self._check_html_tags_and_attributes())
         html_linter_messages = self._lint_html_files()
 
+        css_linter_messages = _lint_css_files(
+            NODE_PATH,
+            _STYLELINT_PATH,
+            config_path_for_css_in_html,
+            self.html_filepaths,
+            self.verbose_mode_enabled)
+
         all_messages = (
             common_messages + html_tag_and_attribute_messages +
-            html_linter_messages)
+            html_linter_messages + css_linter_messages)
         return all_messages
 
 
@@ -3183,10 +3088,25 @@ class CSSLintChecksManager(LintChecksManager):
             all_messages: str. All the messages returned by the lint checks.
         """
 
+        config_path_for_oppia_css = os.path.join(
+            _PARENT_DIR, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
+
+        if not self.all_filepaths:
+            python_utils.PRINT('')
+            python_utils.PRINT('There are no CSS files to lint.')
+            return []
+
         common_messages = super(
             CSSLintChecksManager, self).perform_all_lint_checks()
 
-        all_messages = common_messages
+        css_linter_messages = _lint_css_files(
+            NODE_PATH,
+            _STYLELINT_PATH,
+            config_path_for_oppia_css,
+            self.css_filepaths,
+            self.verbose_mode_enabled)
+
+        all_messages = common_messages + css_linter_messages
         return all_messages
 
 
@@ -3232,6 +3152,67 @@ class OtherLintChecksManager(LintChecksManager):
         return all_messages
 
 
+def _lint_css_files(
+        node_path, stylelint_path, config_path, files_to_lint,
+        verbose_mode_enabled):
+    """Prints a list of lint errors in the given list of CSS files.
+
+    Args:
+        node_path: str. Path to the node binary.
+        stylelint_path: str. Path to the Stylelint binary.
+        config_path: str. Path to the configuration file.
+        files_to_lint: list(str). A list of filepaths to lint.
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
+
+    Returns:
+        summary_messages: Return summary of lint checks.
+    """
+    start_time = time.time()
+    num_files_with_errors = 0
+    summary_messages = []
+
+    num_css_files = len(files_to_lint)
+    python_utils.PRINT('Total css files: ', num_css_files)
+    stylelint_cmd_args = [
+        node_path, stylelint_path, '--config=' + config_path]
+    result_list = []
+    if not verbose_mode_enabled:
+        python_utils.PRINT('Linting CSS files.')
+    for _, filepath in enumerate(files_to_lint):
+        if verbose_mode_enabled:
+            python_utils.PRINT('Linting: ', filepath)
+        proc_args = stylelint_cmd_args + [filepath]
+        proc = subprocess.Popen(
+            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
+        linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
+        linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
+        if linter_stderr:
+            python_utils.PRINT('LINTER FAILED')
+            python_utils.PRINT(linter_stderr)
+            sys.exit(1)
+
+        if linter_stdout:
+            num_files_with_errors += 1
+            result_list.append(linter_stdout)
+
+    if num_files_with_errors:
+        for error in result_list:
+            python_utils.PRINT(error)
+            summary_messages.append(error)
+        summary_message = ('%s    %s CSS file' % (
+            _MESSAGE_TYPE_FAILED, num_files_with_errors))
+    else:
+        summary_message = ('%s   %s CSS file linted (%.1f secs)' % (
+            _MESSAGE_TYPE_SUCCESS, num_css_files, time.time() - start_time))
+    python_utils.PRINT(summary_message)
+    summary_messages.append(summary_message)
+
+    python_utils.PRINT('CSS linting finished.')
+    return summary_messages
+
+
 def _print_complete_summary_of_errors():
     """Print complete summary of errors."""
     error_messages = _TARGET_STDOUT.getvalue()
@@ -3271,29 +3252,6 @@ def categorize_files(file_paths):
     _FILES.update(all_filepaths_dict)
 
 
-def _join_linting_process(linting_processes, result_queues, result_stdouts):
-    """Join process spawn off by lint_all_files and capture the outputs."""
-    for process in linting_processes:
-        process.join()
-
-    summary_messages = []
-
-    for result_queue in result_queues:
-        while not result_queue.empty():
-            summary_messages.append(result_queue.get())
-
-    for result_stdout in result_stdouts:
-        while not result_stdout.empty():
-            summary_messages.append(result_stdout.get())
-
-    with _redirect_stdout(_TARGET_STDOUT):
-        python_utils.PRINT(b'\n'.join(summary_messages))
-        python_utils.PRINT('')
-
-    python_utils.PRINT('')
-    return summary_messages
-
-
 def main(args=None):
     """Main method for pre commit linter script that lints Python, JavaScript,
     HTML, and CSS files.
@@ -3307,6 +3265,8 @@ def main(args=None):
     verbose_mode_enabled = bool(parsed_args.verbose)
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
 
+    python_utils.PRINT('Starting Linter....')
+
     if len(all_filepaths) == 0:
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('No files to check.')
@@ -3316,28 +3276,27 @@ def main(args=None):
     read_files(all_filepaths)
     categorize_files(all_filepaths)
 
-    # Prepare tasks.
-    concurrent_count = min(multiprocessing.cpu_count(), MAX_CONCURRENT_RUNS)
-    semaphore = threading.Semaphore(concurrent_count)
-
-    task_to_taskspec = {}
     tasks = []
     for file_extension_type in file_extension_types:
         linter = LintingTaskSpec(
             _FILES['.js'], _FILES['.ts'], _FILES['.py'], _FILES['.html'],
             _FILES['.css'], verbose_mode_enabled, file_extension_type)
 
-        task = semaphore_method.TaskThread(
-            linter.lint_all_files, verbose_mode_enabled, semaphore,
+        task = semaphore_utils.TaskThread(
+            linter.lint_all_files, verbose_mode_enabled,
             name=file_extension_type)
-        task_to_taskspec[task] = linter
         tasks.append(task)
 
-    semaphore_method.execute_tasks(tasks, semaphore)
+    semaphore_utils.execute_tasks(tasks)
 
     all_messages = []
+
     for task in tasks:
         all_messages += task.output
+
+    code_owner_message = _check_codeowner_file(
+        verbose_mode_enabled)
+    all_messages += code_owner_message
 
     _print_complete_summary_of_errors()
 
