@@ -59,7 +59,7 @@ export class ReadOnlyCollectionBackendApiService {
         }
       }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse);
+          errorCallback(errorResponse.error);
         }
       });
   }

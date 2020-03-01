@@ -68,7 +68,7 @@ describe('Read only collection backend API service', () => {
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
@@ -86,7 +86,7 @@ describe('Read only collection backend API service', () => {
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
       expect(failHandler).not.toHaveBeenCalled();
 
       // Loading a collection the second time should not fetch it.
@@ -114,7 +114,7 @@ describe('Read only collection backend API service', () => {
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error loading collection 0');
     })
   );
 
@@ -156,7 +156,7 @@ describe('Read only collection backend API service', () => {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(sampleDataResults.collection);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -183,7 +183,10 @@ describe('Read only collection backend API service', () => {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith({
+      id: '0',
+      nodes: []
+    });
     expect(failHandler).not.toHaveBeenCalled();
   }));
 });

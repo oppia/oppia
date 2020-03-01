@@ -65,7 +65,7 @@ export class EditableCollectionBackendApiService {
       }
     }, (errorResponse) => {
       if (errorCallback) {
-        errorCallback(errorResponse);
+        errorCallback(errorResponse.error);
       }
     });
   }
@@ -100,7 +100,7 @@ export class EditableCollectionBackendApiService {
         }
       }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse);
+          errorCallback(errorResponse.error);
         }
       });
   }

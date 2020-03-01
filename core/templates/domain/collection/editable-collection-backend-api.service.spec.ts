@@ -92,7 +92,7 @@ describe('Editable collection backend API service', () => {
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error loading collection 1');
     })
   );
 
