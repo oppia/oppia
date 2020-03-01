@@ -28,6 +28,7 @@ from core.controllers import base
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
+from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -632,3 +633,16 @@ class DataExtractionQueryHandler(base.BaseHandler):
             'data': extracted_answers
         }
         self.render_json(response)
+
+
+class SendDummyMailToAdminHandler(base.BaseHandler):
+    """This function handles sending test emails."""
+
+    @acl_decorators.can_access_admin_page
+    def post(self):
+        username = self.username
+        if feconf.CAN_SEND_EMAILS:
+            email_manager.send_dummy_mail_to_admin(username)
+            self.render_json({})
+        else:
+            raise self.InvalidInputException('This app cannot send emails.')
