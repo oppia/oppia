@@ -80,7 +80,7 @@ CMD_ADD_STATE = 'add_state'
 CMD_RENAME_STATE = 'rename_state'
 # This takes an additional 'state_name' parameter.
 CMD_DELETE_STATE = 'delete_state'
-# This takes addition 'state_name', 'content_id', 'language_code' and
+# This takes additional 'state_name', 'content_id', 'language_code' and
 # 'content_html' and 'translation_html' parameters.
 CMD_ADD_TRANSLATION = 'add_translation'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -2364,8 +2364,8 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_states_v31_dict_to_v32_dict(cls, states_dict):
         """Converts from version 31 to 32. Version 32 adds a new
-        customization arg to MultipleChoiceInput which allows
-        answer choices to be shuffled.
+        customization arg to SetInput interaction which allows
+        creators to add custom text to the "Add" button.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -2376,12 +2376,12 @@ class Exploration(python_utils.OBJECT):
             dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'MultipleChoiceInput':
+            if state_dict['interaction']['id'] == 'SetInput':
                 customization_args = state_dict[
                     'interaction']['customization_args']
                 customization_args.update({
-                    'showChoicesInShuffledOrder': {
-                        'value': True
+                    'buttonText': {
+                        'value': 'Add item'
                     }
                 })
 
@@ -3277,8 +3277,16 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v36_dict_to_v37_dict(cls, exploration_dict):
         """Converts a v36 exploration dict into a v37 exploration dict.
-        adds a new customization arg to MultipleChoiceInput which allows
-        answer choices to be shuffled.
+        Adds a new customization arg to SetInput interactions
+        which allows creators to customize the "Add item" button.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v36.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v37.
         """
         exploration_dict['schema_version'] = 37
 
@@ -3287,11 +3295,12 @@ class Exploration(python_utils.OBJECT):
         exploration_dict['states_schema_version'] = 32
 
         return exploration_dict
+<<<<<<< HEAD
+=======
 
-    @classmethod
-    def _migrate_to_latest_yaml_version(
+>>>>>>> upstream/develop
+
             cls, yaml_content, exp_id, title=None, category=None):
-        """Return the YAML content of the exploration in the latest schema
         format.
 
         Args:

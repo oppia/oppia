@@ -243,22 +243,23 @@ class Question(python_utils.OBJECT):
     @classmethod
     def _convert_state_v31_dict_to_v32_dict(cls, question_state_dict):
         """Converts from version 31 to 32. Version 32 adds a new
-        customization arg to MultipleChoiceInput which allows
-        answer choices to be shuffled.
+        customization arg to SetInput interaction which allows
+        creators to add custom text to the "Add" button.
 
         Args:
-            question_state_dict: dict. The dict representation of
-                question_state_data.
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
 
         Returns:
             dict. The converted question_state_dict.
         """
-        if question_state_dict['interaction']['id'] == 'MultipleChoiceInput':
+        if question_state_dict['interaction']['id'] == 'SetInput':
             customization_args = question_state_dict[
                 'interaction']['customization_args']
             customization_args.update({
-                'showChoicesInShuffledOrder': {
-                    'value': True
+                'buttonText': {
+                    'value': 'Add item'
                 }
             })
 

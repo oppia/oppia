@@ -5914,7 +5914,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 36
+schema_version: 37
 states:
   (untitled state):
     classifier_model_id: null
@@ -6032,7 +6032,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 31
+states_schema_version: 32
 tags: []
 title: Title
 """)
@@ -6064,7 +6064,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 36
+schema_version: 37
 states:
   (untitled state):
     classifier_model_id: null
@@ -6181,7 +6181,7 @@ states:
         content: {}
         default_outcome: {}
         hint_1: {}
-states_schema_version: 31
+states_schema_version: 32
 tags: []
 title: Title
 """)
@@ -6231,7 +6231,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 36
+schema_version: 37
 states:
   (untitled state):
     classifier_model_id: null
@@ -6355,7 +6355,7 @@ states:
         default_outcome: {}
         hint_1: {}
         solution: {}
-states_schema_version: 31
+states_schema_version: 32
 tags: []
 title: Title
 """)
@@ -6387,7 +6387,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 36
+schema_version: 37
 states:
   (untitled state):
     classifier_model_id: null
@@ -6507,7 +6507,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 31
+states_schema_version: 32
 tags: []
 title: Title
 """)
@@ -6569,7 +6569,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 36
+schema_version: 37
 states:
   (untitled state):
     classifier_model_id: null
@@ -6686,7 +6686,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 31
+states_schema_version: 32
 tags: []
 title: Title
 """)
@@ -7384,7 +7384,7 @@ title: title
 """)
 
 # pylint: disable=line-too-long
-    YAML_CONTENT_V36_IMAGE_DIMENSIONS = ("""author_notes: ''
+    YAML_CONTENT_V37_IMAGE_DIMENSIONS = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -7394,7 +7394,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 36
+schema_version: 37
 states:
   Introduction:
     classifier_model_id: null
@@ -7620,7 +7620,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-states_schema_version: 31
+states_schema_version: 32
 tags: []
 title: title
 """)
@@ -8108,7 +8108,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V36_WITH_IMAGE_CAPTION = ("""author_notes: ''
+    YAML_CONTENT_V37_WITH_IMAGE_CAPTION = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -8118,7 +8118,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 36
+schema_version: 37
 states:
   (untitled state):
     classifier_model_id: null
@@ -8232,12 +8232,12 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 31
+states_schema_version: 32
 tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V36_WITH_IMAGE_CAPTION = ("""author_notes: ''
+    YAML_CONTENT_V37_WITH_IMAGE_CAPTION = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -8247,7 +8247,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 36
+schema_version: 37
 states:
   (untitled state):
     classifier_model_id: null
@@ -8361,7 +8361,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 31
+states_schema_version: 32
 tags: []
 title: Title
 """)
