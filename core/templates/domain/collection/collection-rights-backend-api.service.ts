@@ -61,10 +61,10 @@ export class CollectionRightsBackendApiService {
   }
 
   private _setCollectionStatus(collectionId: string,
-      collectionVersion: any,
-      isPublic: Boolean,
-      successCallback: any,
-      errorCallback: any): void {
+      collectionVersion: number,
+      isPublic: boolean,
+      successCallback: Function,
+      errorCallback: Function): void {
     let collectionPublishUrl = this.urlInterpolationService
       .interpolateUrl('/collection_editor_handler/publish/<collection_id>', {
         collection_id: collectionId
