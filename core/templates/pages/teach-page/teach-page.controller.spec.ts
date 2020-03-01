@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for teachPage.
+ * @fileoverview Unit tests for the teach page.
  */
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -41,19 +41,26 @@ describe('Teach Page', function() {
 
   afterEach(function() {
     // onhashchange and location.hash are reassigned because it shares
-    // same reference to the all test blocks, making the tests unpredictable.
+    // same memory reference to all test blocks and the controller itself
+    // because $provide.value of WindowRef refers to windowRef as well.
+    // Once location.hash or onhashchange is setted in the controller,
+    // the value will be only available in the test block itself, not affecting
+    // others test block.
     windowRef.nativeWindow.onhashchange = null;
     windowRef.nativeWindow.location.hash = '';
   });
 
   it('should click on teach tab', function(done) {
-    // @ts-ignore
     var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
-    // @ts-ignore
     var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
 
     ctrl.$onInit();
+    expect(addClassSpy).toHaveBeenCalledTimes(0);
+    expect(removeClassSpy).toHaveBeenCalledTimes(0);
+
     ctrl.onTabClick('teach');
+    expect(addClassSpy).toHaveBeenCalledTimes(2);
+    expect(removeClassSpy).toHaveBeenCalledTimes(2);
 
     // setTimeout is being used here in order to wait onhashchange event to
     // finish. setTimeout is executed only after call stack is empty.
@@ -71,13 +78,16 @@ describe('Teach Page', function() {
   });
 
   it('should click on playbook tab', function(done) {
-    // @ts-ignore
     var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
-    // @ts-ignore
     var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
 
     ctrl.$onInit();
+    expect(addClassSpy).toHaveBeenCalledTimes(0);
+    expect(removeClassSpy).toHaveBeenCalledTimes(0);
+
     ctrl.onTabClick('playbook');
+    expect(addClassSpy).toHaveBeenCalledTimes(2);
+    expect(removeClassSpy).toHaveBeenCalledTimes(2);
 
     // setTimeout is being used here in order to wait onhashchange event to
     // finish. setTimeout is executed only after call stack is empty.
@@ -94,11 +104,9 @@ describe('Teach Page', function() {
     });
   });
 
-  it('should active teach tab on init', function() {
+  it('should activate teach tab on init', function() {
     windowRef.nativeWindow.location.hash = '#teach';
-    // @ts-ignore
     var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
-    // @ts-ignore
     var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
 
     ctrl.$onInit();
@@ -108,11 +116,9 @@ describe('Teach Page', function() {
     expect(removeClassSpy).toHaveBeenCalledTimes(2);
   });
 
-  it('should active playbook tab on init', function() {
+  it('should activate playbook tab on init', function() {
     windowRef.nativeWindow.location.hash = '#playbook';
-    // @ts-ignore
     var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
-    // @ts-ignore
     var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
 
     ctrl.$onInit();

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for splashPage
+ * @fileoverview Unit tests for the splash page.
  */
 
 const constants = require('constants.ts');
@@ -91,7 +91,7 @@ describe('Splash Page', function() {
     expect(clickCreateExplorationButtonEventSpy).toHaveBeenCalled();
   });
 
-  it('should evaluates if user is logged in', function() {
+  it('should evaluate if user is logged in', function() {
     spyOn(UserService, 'getUserInfoAsync').and.callFake(function() {
       var deferred = $q.defer();
       deferred.resolve({
@@ -111,7 +111,7 @@ describe('Splash Page', function() {
     expect($scope.loadingMessage).toBe('');
   });
 
-  it('should evaluates if user is not logged in', function() {
+  it('should evaluate if user is not logged in', function() {
     spyOn(UserService, 'getUserInfoAsync').and.callFake(function() {
       var deferred = $q.defer();
       deferred.resolve({

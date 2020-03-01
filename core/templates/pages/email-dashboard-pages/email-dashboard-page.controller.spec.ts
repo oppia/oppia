@@ -13,11 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for emailDashboardPage.
+ * @fileoverview Unit tests for the email dashboard page.
  */
 
 describe('Email Dashboard Page', function() {
-  var $scope = null, ctrl = null;
+  var $scope = null;
+  var ctrl = null;
   var $q = null;
   var EmailDashboardDataService = null;
   var UserService = null;
@@ -131,44 +132,49 @@ describe('Email Dashboard Page', function() {
   });
 
 
-  it('should get previous page of queries', function() {
+  it('should evaluate when next button is displayed', function() {
     expect(ctrl.showNextButton()).toBe(true);
   });
 
-  it('should get previous page of queries', function() {
+  it('should evaluate when previous button is displayed', function() {
     expect(ctrl.showPreviousButton()).toBe(true);
   });
 
-  it('should recheck query', function() {
-    spyOn(EmailDashboardDataService, 'getNextQueries').and.callFake(
+  describe('recheckStatus', function() {
+    it('should get existing query from backend to check its content',
       function() {
-        var deferred = $q.defer();
-        deferred.resolve(secondPageQueries);
-        return deferred.promise;
+        spyOn(EmailDashboardDataService, 'getNextQueries').and.callFake(
+          function() {
+            var deferred = $q.defer();
+            deferred.resolve(secondPageQueries);
+            return deferred.promise;
+          });
+
+        ctrl.getNextPageOfQueries();
+        $scope.$apply();
+
+        expect(ctrl.currentPageOfQueries).toEqual(secondPageQueries);
+
+        var updatedQuery = {id: 3, status: 'completed'};
+        spyOn(EmailDashboardDataService, 'fetchQuery').and.callFake(
+          function() {
+            var deferred = $q.defer();
+            deferred.resolve(updatedQuery);
+            return deferred.promise;
+          });
+
+        ctrl.recheckStatus(0);
+        $scope.$apply();
+
+        expect(ctrl.currentPageOfQueries[0]).toEqual(updatedQuery);
       });
 
-    ctrl.getNextPageOfQueries();
-    $scope.$apply();
-
-    expect(ctrl.currentPageOfQueries).toEqual(secondPageQueries);
-
-    var updatedQuery = {id: 3, status: 'completed'};
-    spyOn(EmailDashboardDataService, 'fetchQuery').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve(updatedQuery);
-      return deferred.promise;
+    it('should not get query backend for rechecking its content when' +
+      ' it does not exist', function() {
+      expect(ctrl.currentPageOfQueries).toBe(undefined);
+      ctrl.recheckStatus(0);
+      expect(ctrl.currentPageOfQueries).toBe(undefined);
     });
-
-    ctrl.recheckStatus(0);
-    $scope.$apply();
-
-    expect(ctrl.currentPageOfQueries[0]).toEqual(updatedQuery);
-  });
-
-  it('should not recheck query that does not exist', function() {
-    expect(ctrl.currentPageOfQueries).toBe(undefined);
-    ctrl.recheckStatus(0);
-    expect(ctrl.currentPageOfQueries).toBe(undefined);
   });
 
   it('should show link to result page', function() {

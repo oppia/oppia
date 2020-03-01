@@ -13,13 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for aboutPage.
+ * @fileoverview Unit tests for the about page.
  */
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('About Page', function() {
-  var $scope = null, ctrl = null;
+  var $scope = null;
+  var ctrl = null;
   var windowRef = new WindowRef();
 
   beforeEach(angular.mock.module('oppia'));
@@ -37,19 +38,26 @@ describe('About Page', function() {
 
   afterEach(function() {
     // onhashchange and location.hash are reassigned because it shares
-    // same reference to the all test blocks, making the tests unpredictable.
+    // same memory reference to all test blocks and the controller itself
+    // because $provide.value of WindowRef refers to windowRef as well.
+    // Once location.hash or onhashchange is setted in the controller,
+    // the value will be only available in the test block itself, not affecting
+    // others test block.
     windowRef.nativeWindow.onhashchange = null;
     windowRef.nativeWindow.location.hash = '';
   });
 
   it('should click on about tab', function(done) {
-    // @ts-ignore
     var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
-    // @ts-ignore
     var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
 
     ctrl.$onInit();
+    expect(addClassSpy).toHaveBeenCalledTimes(0);
+    expect(removeClassSpy).toHaveBeenCalledTimes(0);
+
     ctrl.onTabClick('about');
+    expect(addClassSpy).toHaveBeenCalledTimes(2);
+    expect(removeClassSpy).toHaveBeenCalledTimes(2);
 
     // setTimeout is being used here in order to wait onhashchange event to
     // finish. setTimeout is executed only after call stack is empty.
@@ -67,13 +75,17 @@ describe('About Page', function() {
   });
 
   it('should click on license tab', function(done) {
-    // @ts-ignore
     var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
-    // @ts-ignore
     var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
 
     ctrl.$onInit();
+    expect(addClassSpy).toHaveBeenCalledTimes(0);
+    expect(removeClassSpy).toHaveBeenCalledTimes(0);
+
     ctrl.onTabClick('license');
+    expect(addClassSpy).toHaveBeenCalledTimes(2);
+    expect(removeClassSpy).toHaveBeenCalledTimes(2);
+
     var nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
     nativeWindowSpy.and.returnValue({
       location: {
@@ -101,13 +113,16 @@ describe('About Page', function() {
   });
 
   it('should click on foundation tab', function(done) {
-    // @ts-ignore
     var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
-    // @ts-ignore
     var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
 
     ctrl.$onInit();
+    expect(addClassSpy).toHaveBeenCalledTimes(0);
+    expect(removeClassSpy).toHaveBeenCalledTimes(0);
+
     ctrl.onTabClick('foundation');
+    expect(addClassSpy).toHaveBeenCalledTimes(2);
+    expect(removeClassSpy).toHaveBeenCalledTimes(2);
 
     // setTimeout is being used here in order to wait onhashchange event to
     // finish. setTimeout is executed only after call stack is empty.
@@ -125,13 +140,16 @@ describe('About Page', function() {
   });
 
   it('should click on credits tab', function(done) {
-    // @ts-ignore
     var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
-    // @ts-ignore
     var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
 
     ctrl.$onInit();
+    expect(addClassSpy).toHaveBeenCalledTimes(0);
+    expect(removeClassSpy).toHaveBeenCalledTimes(0);
+
     ctrl.onTabClick('credits');
+    expect(addClassSpy).toHaveBeenCalledTimes(2);
+    expect(removeClassSpy).toHaveBeenCalledTimes(2);
 
     // setTimeout is being used here in order to wait onhashchange event to
     // finish. setTimeout is executed only after call stack is empty.
@@ -148,11 +166,9 @@ describe('About Page', function() {
     });
   });
 
-  it('should active about tab on init', function() {
+  it('should activate about tab on init', function() {
     windowRef.nativeWindow.location.hash = '#about';
-    // @ts-ignore
     var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
-    // @ts-ignore
     var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
 
     ctrl.$onInit();
@@ -162,11 +178,9 @@ describe('About Page', function() {
     expect(removeClassSpy).toHaveBeenCalledTimes(2);
   });
 
-  it('should active about license on init', function() {
+  it('should activate about license on init', function() {
     windowRef.nativeWindow.location.hash = '#license';
-    // @ts-ignore
     var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
-    // @ts-ignore
     var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
 
     ctrl.$onInit();
@@ -176,11 +190,9 @@ describe('About Page', function() {
     expect(removeClassSpy).toHaveBeenCalledTimes(2);
   });
 
-  it('should active foundation tab on init', function() {
+  it('should activate foundation tab on init', function() {
     windowRef.nativeWindow.location.hash = '#foundation';
-    // @ts-ignore
     var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
-    // @ts-ignore
     var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
 
     ctrl.$onInit();
@@ -190,11 +202,9 @@ describe('About Page', function() {
     expect(removeClassSpy).toHaveBeenCalledTimes(2);
   });
 
-  it('should active credits tab on init', function() {
+  it('should activate credits tab on init', function() {
     windowRef.nativeWindow.location.hash = '#credits';
-    // @ts-ignore
     var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
-    // @ts-ignore
     var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
 
     ctrl.$onInit();
@@ -209,7 +219,8 @@ describe('About Page', function() {
       '/assets/images/path/to/image');
   });
 
-  it('should blah when onInit is called', function() {
+  it('should initialize listOfNames and aboutPageMascotImgUrl variables' +
+    ' when onInit is called', function() {
     ctrl.$onInit();
 
     expect(ctrl.listOfNames).toBe(
