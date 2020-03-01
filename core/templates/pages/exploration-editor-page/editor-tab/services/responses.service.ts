@@ -133,7 +133,7 @@ angular.module('oppia').factory('ResponsesService', [
 
     var _makeRuleInvalid = function(answerGroupIndex, ruleIndex) {
       _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x =
-        _answerChoices.length;
+      Number.MAX_SAFE_INTEGER;
       _saveAnswerGroups(_answerGroups);
       _multiChoiceInputAnswerGroupRequiresUpdation = true;
     };

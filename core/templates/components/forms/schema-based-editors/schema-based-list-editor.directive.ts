@@ -27,14 +27,12 @@ require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('schemaBasedListEditor', [
   'FocusManagerService', 'IdGenerationService',
-  'NestedDirectivesRecursionTimeoutPreventionService', 'ResponsesService',
+  'NestedDirectivesRecursionTimeoutPreventionService',
   'SchemaDefaultValueService', 'SchemaUndefinedLastElementService',
-  'StateInteractionIdService',
   function(
       FocusManagerService, IdGenerationService,
-      NestedDirectivesRecursionTimeoutPreventionService, ResponsesService,
-      SchemaDefaultValueService, SchemaUndefinedLastElementService,
-      StateInteractionIdService) {
+      NestedDirectivesRecursionTimeoutPreventionService,
+      SchemaDefaultValueService, SchemaUndefinedLastElementService) {
     return {
       scope: {
         localValue: '=',
@@ -81,6 +79,28 @@ angular.module('oppia').directive('schemaBasedListEditor', [
             }
           }
           return false;
+        };
+
+        var oldTonewListMapping = {
+          newToOldListPosition: [],
+          deletedIndexes: []
+        };
+
+        var intializeOldTonewListMapping = function() {
+          for (var i = 0; i < $scope.localValue.length; i++) {
+            oldTonewListMapping.newToOldListPosition.push(i);
+          }
+        };
+        var updateOldTonewListMappingOnDelete = function(index) {
+          var deletedIndex = oldTonewListMapping.newToOldListPosition[index];
+          if (deletedIndex === -1) {
+            return;
+          }
+          oldTonewListMapping.newToOldListPosition.splice(index, 1);
+          oldTonewListMapping.deletedIndexes.push(deletedIndex);
+        };
+        var updateOldTonewListMappingOnAddElement = function() {
+          oldTonewListMapping.newToOldListPosition.push(-1);
         };
 
         var validate = function() {
@@ -144,6 +164,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
                 SchemaDefaultValueService.getDefaultValue($scope.itemSchema()));
               FocusManagerService.setFocus(
                 $scope.getFocusLabel($scope.localValue.length - 1));
+              updateOldTonewListMappingOnAddElement();
             };
 
             var _deleteLastElementIfUndefined = function() {
@@ -214,27 +235,14 @@ angular.module('oppia').directive('schemaBasedListEditor', [
               'submittedSchemaBasedFloatForm', $scope._onChildFormSubmit);
             $scope.$on(
               'submittedSchemaBasedUnicodeForm', $scope._onChildFormSubmit);
+            intializeOldTonewListMapping();
+            $scope.$on('updateAnswerGroupForMultiChoiceInput',
+              function(event, callback) {
+                callback(oldTonewListMapping);
+              });
 
             $scope.deleteElement = function(index) {
-              var answerGroups = ResponsesService.getAnswerGroups();
-
-              // If the interaction type is MultipleChoiceInput, we need to
-              // handle the deletion of answer choices and update the answer
-              // groups accordingly in order to match the new answer choices.
-              if (StateInteractionIdService.savedMemento ===
-                    'MultipleChoiceInput') {
-                for (var i = 0; i < answerGroups.length; i++) {
-                  var rules = answerGroups[i].rules;
-                  for (var j = 0; j < rules.length; j++) {
-                    if (index < rules[j].inputs.x) {
-                      ResponsesService.reduceRuleIndexByOne(i, j);
-                    } else if (index === rules[j].inputs.x) {
-                      ResponsesService.makeRuleInvalid(i, j);
-                    }
-                  }
-                }
-              }
-
+              updateOldTonewListMappingOnDelete(index);
               // Need to let the RTE know that HtmlContent has been changed.
               $scope.$broadcast('externalHtmlContentChange');
               $scope.localValue.splice(index, 1);

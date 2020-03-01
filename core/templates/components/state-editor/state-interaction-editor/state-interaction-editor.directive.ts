@@ -77,7 +77,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
         'StateCustomizationArgsService', 'EditabilityService',
         'InteractionDetailsCacheService', 'UrlInterpolationService',
         'ExplorationHtmlFormatterService', 'SubtitledHtmlObjectFactory',
-        'StateSolutionService', 'StateHintsService',
+        'StateSolutionService', 'StateHintsService', 'ResponsesService',
         'StateContentService', function(
             $scope, $http, $rootScope, $uibModal, $injector, $filter,
             AlertsService, HtmlEscaperService, StateEditorService,
@@ -85,7 +85,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
             StateCustomizationArgsService, EditabilityService,
             InteractionDetailsCacheService, UrlInterpolationService,
             ExplorationHtmlFormatterService, SubtitledHtmlObjectFactory,
-            StateSolutionService, StateHintsService,
+            StateSolutionService, StateHintsService, ResponsesService,
             StateContentService) {
           var ctrl = this;
           var DEFAULT_TERMINAL_STATE_CONTENT =
@@ -184,6 +184,23 @@ angular.module('oppia').directive('stateInteractionEditor', [
             $scope.recomputeGraph();
             _updateInteractionPreviewAndAnswerChoices();
           };
+
+          var updateMultiChoiceInputAnswerGroupsOnDelete =
+            function(deletedIndexes) {
+              var answerGroups = ResponsesService.getAnswerGroups();
+              deletedIndexes.forEach( function(deletedIndex) {
+                for (var i = 0; i < answerGroups.length; i++) {
+                  var rules = answerGroups[i].rules;
+                  for (var j = 0; j < rules.length; j++) {
+                    if (deletedIndex < rules[j].inputs.x) {
+                      ResponsesService.reduceRuleIndexByOne(i, j);
+                    } else if (deletedIndex === rules[j].inputs.x) {
+                      ResponsesService.makeRuleInvalid(i, j);
+                    }
+                  }
+                }
+              });
+            };
 
           $scope.openInteractionCustomizerModal = function() {
             if (EditabilityService.isEditable()) {
@@ -367,6 +384,18 @@ angular.module('oppia').directive('stateInteractionEditor', [
                     };
 
                     $scope.save = function() {
+                      // If the interaction type is MultipleChoiceInput, we
+                      // need to handle the deletion of answer choices and
+                      // update the answer groups accordingly in order to match
+                      // the new answer choices.
+                      if (StateInteractionIdService.savedMemento ===
+                             'MultipleChoiceInput') {
+                        $scope.$broadcast('updateAnswerGroupForMultiChoiceInput'
+                          , function(data) {
+                            updateMultiChoiceInputAnswerGroupsOnDelete(
+                              data.deletedIndexes);
+                          });
+                      }
                       EditorFirstTimeEventsService
                         .registerFirstSaveInteractionEvent();
                       $uibModalInstance.close();
