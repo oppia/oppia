@@ -269,41 +269,30 @@ describe('HintsAndSolutionManager service', function() {
       expect(hasms.isSolutionViewable()).toBe(false);
     });
 
-  it('should record the wrong answer', function() {
+  it('should record the wrong answer twice', function() {
     expect(hasms.isHintTooltipOpen()).toBe(false);
     expect(hasms.isHintViewable(0)).toBe(false);
     expect(hasms.isHintViewable(1)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
 
     hasms.recordWrongAnswer();
-
-    $timeout.flush();
-    $timeout.flush();
-
+    hasms.recordWrongAnswer();
+    $timeout.flush(10000);
+    $timeout.flush(60000);
     expect(hasms.isHintTooltipOpen()).toBe(true);
-    expect(hasms.isHintViewable(0)).toBe(true);
-    expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.isSolutionViewable()).toBe(false);
 
-    $timeout.verifyNoPendingTasks();
-  });
+    hasms.displayHint(0);
 
-  it('should not record the wrong answer twice', function() {
+    hasms.recordWrongAnswer();
+    $timeout.flush(10000);
+
+    $timeout.flush(60000);
+
     expect(hasms.isHintTooltipOpen()).toBe(false);
-    expect(hasms.isHintViewable(0)).toBe(false);
-    expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.isSolutionViewable()).toBe(false);
-
-    hasms.recordWrongAnswer();
-    $timeout.flush();
-    $timeout.flush();
-
-    hasms.recordWrongAnswer();
-    $timeout.verifyNoPendingTasks();
-
-    expect(hasms.isHintTooltipOpen()).toBe(true);
     expect(hasms.isHintViewable(0)).toBe(true);
-    expect(hasms.isHintViewable(1)).toBe(false);
+    expect(hasms.isHintViewable(1)).toBe(true);
     expect(hasms.isSolutionViewable()).toBe(false);
+
+    $timeout.verifyNoPendingTasks();
   });
 });
