@@ -6,4 +6,3 @@ declare var Guppy: any;
 declare var Sk: any;
 declare var MathExpression: any;
 declare var WaveSurfer: any;
-
