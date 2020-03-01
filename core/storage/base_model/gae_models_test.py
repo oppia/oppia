@@ -236,6 +236,33 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
         model1.put()
         self.assertEqual(model1.get_unversioned_instance_id(), 'model_id')
 
+    def test_export_data_trivial(self):
+        user_data = base_models.BaseSnapshotMetadataModel.export_data('trivial_user')
+        expected_data = {}
+        self.assertEqual(user_data, expected_data)
+    
+    def test_export_data_nontrivial(self):
+        model1 = base_models.BaseSnapshotMetadataModel(
+            id='model_id-1', committer_id='committer_id', commit_type='create')
+        model1.put()
+        model2 = base_models.BaseSnapshotMetadataModel(
+            id='model_id-2', committer_id='committer_id', commit_type='create', 
+            commit_message='Hi this is a commit.')
+        model2.put()
+        user_data = base_models.BaseSnapshotMetadataModel.export_data('committer_id')
+        expected_data = {
+            'model_id-1': {
+                'commit_type': 'create',
+                'commit_message': None,
+                'commit_cmds': None
+            },
+            'model_id-2': {
+                'commit_type': 'create',
+                'commit_message': 'Hi this is a commit.',
+                'commit_cmds': None
+            }
+        }
+        self.assertEqual(user_data, expected_data)
 
 class BaseSnapshotContentModelTests(test_utils.GenericTestBase):
 
