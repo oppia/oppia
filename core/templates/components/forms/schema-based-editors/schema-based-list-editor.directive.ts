@@ -93,11 +93,10 @@ angular.module('oppia').directive('schemaBasedListEditor', [
         };
         var updateOldTonewListMappingOnDelete = function(index) {
           var deletedIndex = oldTonewListMapping.newToOldListPosition[index];
-          if (deletedIndex === -1) {
-            return;
+          if (deletedIndex !== -1) {
+            oldTonewListMapping.deletedIndexes.push(deletedIndex);
           }
           oldTonewListMapping.newToOldListPosition.splice(index, 1);
-          oldTonewListMapping.deletedIndexes.push(deletedIndex);
         };
         var updateOldTonewListMappingOnAddElement = function() {
           oldTonewListMapping.newToOldListPosition.push(-1);
