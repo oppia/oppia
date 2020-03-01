@@ -124,7 +124,7 @@ var ExplorationEditorTranslationTab = function() {
   var audioUploadInput = element(
     by.css('.protractor-test-upload-audio-input'));
   var saveUploadedAudioButton = element(
-    by.css('.protractor-test-save-uploaded-audio'));
+    by.css('.protractor-test-save-uploaded-audio-button'));
   var deleteRecordButton = element(
     by.css('.protractor-test-delete-record'));
   var confirmDeleteRecordButton = element(
@@ -183,8 +183,6 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-node'));
   var audioOverFiveMinutesErrorMessageElement = element(
     by.css('.protractor-test-audio-file-upload-field-error-message'));
-  var saveUploadedAudioButton = element(
-    by.css('.protractor-test-save-uploaded-audio'));
   var playPauseAudioButton = element(
     by.css('.protractor-test-play-pause-audio-button'));
   var audioMaterialSliderDiv = element(by.css('.md-slider-wrapper'));
