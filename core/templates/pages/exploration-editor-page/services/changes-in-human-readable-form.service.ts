@@ -39,7 +39,7 @@ export class ChangesInHumanReadableFormService {
   makeRulesListHumanReadable(answerGroupValue: any): Array<HTMLElement> {
     let rulesList = [];
     answerGroupValue.rules.forEach((rule) => {
-      let ruleElm = this.document.createElement('<li></li>');
+      let ruleElm = this.document.createElement('li');
       ruleElm.html('<p>Type: ' + rule.type + '</p>');
       ruleElm.append(
         '<p>Value: ' + (
@@ -89,7 +89,7 @@ export class ChangesInHumanReadableFormService {
   }
   // TODO(#7176): Replace 'any' with the exact type.
   _makeHumanReadable(lostChanges: Array<any>): HTMLElement {
-    let outerHtml = this.document.createElement('<ul></ul>');
+    let outerHtml = this.document.createElement('ul');
     let stateWiseEditsMapping = {};
     // The letiable stateWiseEditsMapping stores the edits grouped by state.
     // For instance, you made the following edits:
@@ -108,18 +108,18 @@ export class ChangesInHumanReadableFormService {
       switch (lostChange.cmd) {
         case this.CMD_ADD_STATE:
           outerHtml.append(
-            this.document.createElement('<li></li>').html(
+            this.document.createElement('li').html(
               'Added state: ' + lostChange.state_name));
           break;
         case this.CMD_RENAME_STATE:
           outerHtml.append(
-            this.document.createElement('<li></li>').html(
+            this.document.createElement('li').html(
               'Renamed state: ' + lostChange.old_state_name + ' to ' +
                   lostChange.new_state_name));
           break;
         case this.CMD_DELETE_STATE:
           outerHtml.append(
-            this.document.createElement('<li></li>').html(
+            this.document.createElement('li').html(
               'Deleted state: ' + lostChange.state_name));
           break;
         case this.CMD_EDIT_STATE_PROPERTY: {
@@ -135,7 +135,7 @@ export class ChangesInHumanReadableFormService {
               if (newValue !== null) {
                 // TODO(sll): Also add display of audio translations here.
                 stateWiseEditsMapping[stateName].push(
-                  this.document.createElement('<div></div>').html(
+                  this.document.createElement('div').html(
                     '<strong>Edited content: </strong><div class="content">' +
                         newValue.html + '</div>')
                     .addClass('state-edit-desc'));
@@ -156,7 +156,7 @@ export class ChangesInHumanReadableFormService {
                     oldValue);
               }
               stateWiseEditsMapping[stateName].push(
-                this.document.createElement('<div></div>').html(lostChangeValue)
+                this.document.createElement('div').html(lostChangeValue)
                   .addClass('state-edit-desc'));
               break;}
 
@@ -170,7 +170,7 @@ export class ChangesInHumanReadableFormService {
                 lostChangeValue = 'Edited Interaction Customizations';
               }
               stateWiseEditsMapping[stateName].push(
-                this.document.createElement('<div></div>').html(lostChangeValue)
+                this.document.createElement('div').html(lostChangeValue)
                   .addClass('state-edit-desc'));
               break;
             }
@@ -191,17 +191,17 @@ export class ChangesInHumanReadableFormService {
                 if (rulesList.length > 0) {
                   answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';
                   let rulesListHtml = (
-                    this.document.createElement(
-                      '<ol></ol>').addClass('rules-list'));
+                    this.document.createElement('ol').addClass('rules-list'));
                   for (let rule in rulesList) {
                     rulesListHtml.html(rulesList[rule][0].outerHTML);
                   }
                   answerGroupHtml += rulesListHtml[0].outerHTML;
                 }
+                let answerGroupElement = this.document.createElement('div');
+                answerGroupElement.innerHTML = (
+                  '<strong>Added answer group: </strong>');
                 stateWiseEditsMapping[stateName].push(
-                  this.document.createElement(
-                    '<div><strong>Added answer group: ' + '</strong></div>')
-                    .append(answerGroupHtml)
+                  answerGroupElement.append(answerGroupHtml)
                     .addClass('state-edit-desc answer-group'));
               } else if (answerGroupChanges === 'edited') {
                 if (newValue.outcome.dest !== oldValue.outcome.dest) {
@@ -224,23 +224,24 @@ export class ChangesInHumanReadableFormService {
                     answerGroupHtml += (
                       '<p class="sub-edit"><i>Rules: </i></p>');
                     let rulesListHtml = (this.document.createElement(
-                      '<ol></ol>').addClass('rules-list'));
+                      'ol').addClass('rules-list'));
                     for (let rule in rulesList) {
                       rulesListHtml.html(rulesList[rule][0].outerHTML);
                     }
                     answerGroupChanges = rulesListHtml[0].outerHTML;
                   }
                 }
+                let answerGroupElement = this.document.createElement('div');
+                answerGroupElement.innerHTML = (
+                  '<strong>Edited answer group: <strong>');
                 stateWiseEditsMapping[stateName].push(
-                  this.document.createElement(
-                    '<div><strong>Edited answer group: <strong>' +
-                        '</div>')
-                    .append(answerGroupHtml)
+                  answerGroupElement.append(answerGroupHtml)
                     .addClass('state-edit-desc answer-group'));
               } else if (answerGroupChanges === 'deleted') {
+                let answerGroupElement = this.document.createElement('div');
+                answerGroupElement.innerHTML = 'Deleted answer group';
                 stateWiseEditsMapping[stateName].push(
-                  this.document.createElement('<div>Deleted answer group</div>')
-                    .addClass('state-edit-desc'));
+                  answerGroupElement.addClass('state-edit-desc'));
               }
               break;
             }
@@ -257,10 +258,10 @@ export class ChangesInHumanReadableFormService {
                   '<div class="sub-edit"><i>Feedback: </i>' +
                     '<div class="feedback">' + newValue.feedback.getHtml() +
                     '</div></div>');
+                let answerGroupElement = this.document.createElement('div');
+                answerGroupElement.innerHTML = 'Added default outcome: ';
                 stateWiseEditsMapping[stateName].push(
-                  this.document.createElement(
-                    '<div>Added default outcome: </div>')
-                    .append(defaultOutcomeHtml)
+                  answerGroupElement.append(defaultOutcomeHtml)
                     .addClass('state-edit-desc default-outcome'));
               } else if (defaultOutcomeChanges === 'edited') {
                 if (newValue.dest !== oldValue.dest) {
@@ -276,16 +277,17 @@ export class ChangesInHumanReadableFormService {
                       '<div class="feedback">' + newValue.feedback +
                       '</div></div>');
                 }
+                let answerGroupElement = this.document.createElement('div');
+                answerGroupElement.innerHTML = 'Edited default outcome: ';
                 stateWiseEditsMapping[stateName].push(
-                  this.document.createElement(
-                    '<div>Edited default outcome: </div>')
-                    .append(defaultOutcomeHtml)
+                  answerGroupElement.append(defaultOutcomeHtml)
                     .addClass('state-edit-desc default-outcome'));
               } else if (defaultOutcomeChanges === 'deleted') {
+                let answerGroupElement = this.document.createElement('div');
+                answerGroupElement.innerHTML = 'Deleted default outcome';
                 stateWiseEditsMapping[stateName].push(
-                  this.document.createElement(
-                    '<div>Deleted default outcome</div>')
-                    .addClass('state-edit-desc'));
+                  answerGroupElement
+                    .addClass('state-edit-desc default-outcome'));
               }
             }
           }
@@ -294,8 +296,8 @@ export class ChangesInHumanReadableFormService {
     });
 
     for (let stateName in stateWiseEditsMapping) {
-      let stateChangesEl = this.document.createElement(
-        '<li>Edits to state: ' + stateName + '</li>');
+      let stateChangesEl = this.document.createElement('li');
+      stateChangesEl.innerHTML = 'Edits to state: ' + stateName;
       for (let stateEdit in stateWiseEditsMapping[stateName]) {
         stateChangesEl.append(stateWiseEditsMapping[stateName][stateEdit]);
       }
@@ -310,8 +312,9 @@ export class ChangesInHumanReadableFormService {
     try {
       return this._makeHumanReadable(lostChanges);
     } catch (e) {
-      return this.document.createElement(
-        '<div>Error: Could not recover lost changes.</div>');
+      let lostChangesElement = this.document.createElement('div');
+      lostChangesElement.innerHTML = 'Error: Could not recover lost changes.';
+      return lostChangesElement;
     }
   }
 }
