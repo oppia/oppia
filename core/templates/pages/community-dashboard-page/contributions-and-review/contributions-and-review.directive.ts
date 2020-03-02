@@ -181,8 +181,9 @@ angular.module('oppia').directive('contributionsAndReview', [
             // underscore_cased keys which give tslint errors about accessing an
             // unknown type.
             () => Object.values(ctrl.contributions).map((contribution: any) => {
-              let { change, status, suggestion_id: suggestionId } =
-                contribution.suggestion;
+              let change = contribution.suggestion.change;
+              let status = contribution.suggestion.status;
+              let suggestionId = contribution.suggestion.suggestionn_id;
               let topicName = change.topic_name;
               let html = change.question_dict.question_state_data.content.html;
               let skillDescription = contribution.details.skill_description;
@@ -205,13 +206,11 @@ angular.module('oppia').directive('contributionsAndReview', [
             // underscore_cased keys which give tslint errors about accessing an
             // unknown type.
             () => Object.values(ctrl.contributions).map((contribution: any) => {
-              let {
-                topic_name: topicName,
-                story_title: storyTitle,
-                chapter_title: chapterTitle
-              } = contribution.details;
-              let { status, suggestion_id: suggestionId } =
-                contribution.suggestion;
+              let chapterTitle = contribution.details.chapter_title;
+              let storyTitle = contribution.details.story_title;
+              let topicName  = contribution.details.topic_name;
+              let status = contribution.suggestion.status;
+              let suggestionId = contribution.suggestion.suggestionn_id;
               let translationHtml =
                 contribution.suggestion.change.translation_html;
 
@@ -234,15 +233,11 @@ angular.module('oppia').directive('contributionsAndReview', [
 
           let showQuestionSuggestionModal = (
             (suggestion, contributionDetails, reviewable) => {
-              let {
-                target_id: targetId,
-                suggestion_id: suggestionId,
-                author_name: authorName
-              } = suggestion;
-              let {
-                topic_name: topicName,
-                question_dict: questionDict
-              } = suggestion.change;
+              let authorName = suggestion.author_name;
+              let suggestionId = suggestion.suggestion_id;
+              let targetId = suggestion.target_id;
+              let questionDict = suggestion.change.question_dict;
+              let topicName = suggestion.change.topic_name;
               let skillDescription = contributionDetails.skill_description;
 
               let question = QuestionObjectFactory.createFromBackendDict(
