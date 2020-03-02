@@ -14,40 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/initial_release_prep.py."""
+"""Unit tests for scripts/release_scripts/initial_release_prep.py."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
-
-import subprocess
 
 import constants
 from core.tests import test_utils
 import python_utils
 from scripts import common
+from scripts.release_scripts import cut_release_or_hotfix_branch
 from scripts.release_scripts import initial_release_prep
 
 
 class InitialReleasePrepTests(test_utils.GenericTestBase):
     """Test the methods for intial release preparation."""
-    def test_get_mail_message_template(self):
-        expected_mail_message_template = (
-            'Hi Sean,\n\n'
-            'You will need to run these jobs on the backup server:\n\n'
-            '[List of jobs formatted as: {{Job Name}} (instructions: '
-            '{{Instruction doc url}}) (Author: {{Author Name}})]\n'
-            'The specific instructions for jobs are linked with them. '
-            'The general instructions are as follows:\n\n'
-            '1. Login as admin\n'
-            '2. Navigate to the admin panel and then the jobs tab\n'
-            '3. Run the above jobs\n'
-            '4. In case of failure/success, please send the output logs for '
-            'the job to me and the job authors: {{Author names}}\n\n'
-            'Thanks!\n')
-        self.assertEqual(
-            initial_release_prep.get_mail_message_template(),
-            expected_mail_message_template)
-
     def test_exception_is_raised_if_release_journal_is_not_created(self):
         def mock_open_tab(unused_url):
             pass
@@ -153,56 +134,60 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
     def test_cut_release_branch_with_correct_version(self):
         check_function_calls = {
             'open_new_tab_in_browser_if_possible_is_called': False,
-            'check_call_is_called': False
+            'execute_branch_cut_is_called': False
         }
         expected_check_function_calls = {
             'open_new_tab_in_browser_if_possible_is_called': True,
-            'check_call_is_called': True
+            'execute_branch_cut_is_called': True
         }
         def mock_open_tab(unused_url):
             check_function_calls[
                 'open_new_tab_in_browser_if_possible_is_called'] = True
-        def mock_check_call(unused_cmd_tokens):
-            check_function_calls['check_call_is_called'] = True
+        def mock_execute_branch_cut(
+                unused_target_version, unused_hotfix_number):
+            check_function_calls['execute_branch_cut_is_called'] = True
         def mock_input():
             return '1.2.3'
 
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible',
             mock_open_tab)
-        check_call_swap = self.swap(
-            subprocess, 'check_call', mock_check_call)
+        branch_cut_swap = self.swap(
+            cut_release_or_hotfix_branch, 'execute_branch_cut',
+            mock_execute_branch_cut)
         input_swap = self.swap(
             python_utils, 'INPUT', mock_input)
-        with open_tab_swap, check_call_swap, input_swap:
+        with open_tab_swap, branch_cut_swap, input_swap:
             initial_release_prep.cut_release_branch()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_cut_release_branch_with_incorrect_version(self):
         check_function_calls = {
             'open_new_tab_in_browser_if_possible_is_called': False,
-            'check_call_is_called': False
+            'execute_branch_cut_is_called': False
         }
         expected_check_function_calls = {
             'open_new_tab_in_browser_if_possible_is_called': True,
-            'check_call_is_called': False
+            'execute_branch_cut_is_called': False
         }
         def mock_open_tab(unused_url):
             check_function_calls[
                 'open_new_tab_in_browser_if_possible_is_called'] = True
-        def mock_check_call(unused_cmd_tokens):
-            check_function_calls['check_call_is_called'] = True
+        def mock_execute_branch_cut(
+                unused_target_version, unused_hotfix_number):
+            check_function_calls['execute_branch_cut_is_called'] = True
         def mock_input():
             return 'invalid'
 
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible',
             mock_open_tab)
-        check_call_swap = self.swap(
-            subprocess, 'check_call', mock_check_call)
+        branch_cut_swap = self.swap(
+            cut_release_or_hotfix_branch, 'execute_branch_cut',
+            mock_execute_branch_cut)
         input_swap = self.swap(
             python_utils, 'INPUT', mock_input)
-        with open_tab_swap, check_call_swap, input_swap:
+        with open_tab_swap, branch_cut_swap, input_swap:
             with self.assertRaises(AssertionError):
                 initial_release_prep.cut_release_branch()
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -211,7 +196,6 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
         check_function_calls = {
             'open_new_tab_in_browser_if_possible_is_called': False,
             'ask_user_to_confirm_is_called': False,
-            'get_mail_message_template_is_called': False,
             'get_extra_jobs_due_to_schema_changes_is_called': False,
             'did_supported_audio_languages_change_is_called': False,
             'get_remote_alias_is_called': False,
@@ -221,7 +205,6 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
         expected_check_function_calls = {
             'open_new_tab_in_browser_if_possible_is_called': True,
             'ask_user_to_confirm_is_called': True,
-            'get_mail_message_template_is_called': True,
             'get_extra_jobs_due_to_schema_changes_is_called': True,
             'did_supported_audio_languages_change_is_called': True,
             'get_remote_alias_is_called': True,
@@ -240,9 +223,6 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             return 'y'
         def mock_print(msg):
             print_arr.append(msg)
-        def mock_get_mail_message_template():
-            check_function_calls['get_mail_message_template_is_called'] = True
-            return 'Mail message for testing.'
         def mock_get_extra_jobs_due_to_schema_changes(
                 unused_remote_alias, unused_previous_release_version):
             check_function_calls[
@@ -266,9 +246,6 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
         print_swap = self.swap(python_utils, 'PRINT', mock_print)
-        mail_msg_swap = self.swap(
-            initial_release_prep, 'get_mail_message_template',
-            mock_get_mail_message_template)
         get_extra_jobs_swap = self.swap(
             initial_release_prep, 'get_extra_jobs_due_to_schema_changes',
             mock_get_extra_jobs_due_to_schema_changes)
@@ -285,7 +262,7 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             mock_cut_release_branch)
 
         with open_tab_swap, ask_user_swap, input_swap, print_swap:
-            with mail_msg_swap, get_alias_swap, check_changes_swap:
+            with get_alias_swap, check_changes_swap:
                 with get_extra_jobs_swap, branch_check_swap, cut_branch_swap:
                     initial_release_prep.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)
