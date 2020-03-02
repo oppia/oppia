@@ -68,8 +68,8 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         let targetIdToDetails = res.data.target_id_to_opportunity_dict;
         let suggestionIdToSuggestions = {};
         res.data.suggestions.forEach(suggestion => {
-          let suggestionId = suggesetion.suggestion_id;
-          let targetId = suggesetion.target_id;
+          let suggestionId = suggestion.suggestion_id;
+          let targetId = suggestion.target_id;
           suggestionIdToSuggestions[suggestionId] = {
             suggestion: suggestion,
             details: targetIdToDetails[targetId]
