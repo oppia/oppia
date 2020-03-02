@@ -22,7 +22,7 @@ angular.module('oppia').factory('ExplorationIdValidationService', [
   'ExplorationSummaryBackendApiService',
   function(ExplorationSummaryBackendApiService) {
     return {
-      isExpIdValid: function(explorationId) {
+      isExpPublished: function(explorationId) {
         return ExplorationSummaryBackendApiService.
           loadPublicExplorationSummaries([explorationId]).then(
             function(summaries) {

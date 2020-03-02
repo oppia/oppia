@@ -100,7 +100,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.explorationId = $scope.getExplorationId();
             $scope.currentExplorationId = $scope.explorationId;
             $scope.expIdIsValid = true;
-            $scope.showInvalidExpError = false;
+            $scope.invalidExpErrorIsShown = false;
             $scope.nodeTitleEditorIsShown = false;
             $scope.OUTLINE_SCHEMA = {
               type: 'html',
@@ -117,7 +117,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           $scope.checkCanSaveExpId = function() {
             $scope.canSaveExpId = $scope.explorationIdPattern.test(
               $scope.explorationId);
-            $scope.showInvalidExpError = false;
+            $scope.invalidExpErrorIsShown = false;
           };
           $scope.updateTitle = function(newTitle) {
             if (newTitle === $scope.currentTitle) {
@@ -138,7 +138,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.updateExplorationId = function(explorationId) {
-            ExplorationIdValidationService.isExpIdValid(
+            ExplorationIdValidationService.isExpPublished(
               explorationId).then(function(expIdIsValid) {
               $scope.expIdIsValid = expIdIsValid;
               if ($scope.expIdIsValid) {
@@ -146,7 +146,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                   $scope.story, $scope.getId(), explorationId);
                 $scope.currentExplorationId = explorationId;
               } else {
-                $scope.showInvalidExpError = true;
+                $scope.invalidExpErrorIsShown = true;
               }
             });
           };

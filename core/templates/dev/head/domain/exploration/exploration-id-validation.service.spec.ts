@@ -82,9 +82,10 @@ describe('Exploration id validation service', function() {
     function() {
       $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond(
         invalidExpResults);
-      ExplorationIdValidationService.isExpIdValid('0').then(function(response) {
-        expect(response).toEqual(false);
-      });
+      ExplorationIdValidationService.isExpPublished('0').then(
+        function(response) {
+          expect(response).toEqual(false);
+        });
       $httpBackend.flush();
     }
   );
@@ -93,9 +94,10 @@ describe('Exploration id validation service', function() {
     function() {
       $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond(
         validExpResults);
-      ExplorationIdValidationService.isExpIdValid('0').then(function(response) {
-        expect(response).toEqual(true);
-      });
+      ExplorationIdValidationService.isExpPublished('0').then(
+        function(response) {
+          expect(response).toEqual(true);
+        });
       $httpBackend.flush();
     }
   );
