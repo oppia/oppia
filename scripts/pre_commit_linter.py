@@ -2301,15 +2301,13 @@ class JsTsLintChecksManager(LintChecksManager):
                                     # statement.
                                     body_element_type_is_not_return = (
                                         body_element.type != 'ReturnStatement')
+                                    arg_type = (
+                                        body_element.argument and
+                                        body_element.argument.type)
                                     body_element_arg_type_is_not_object = (
-                                        body_element and
-                                        body_element.argument.type != (
-                                            'ObjectExpression'))
-                                    if (
-                                            body_element_arg_type_is_not_object
-                                            or (
-                                                body_element_type_is_not_return
-                                                )):
+                                        arg_type != 'ObjectExpression')
+                                    if (body_element_arg_type_is_not_object or
+                                            body_element_type_is_not_return):
                                         continue
                                     # Separate the properties of the return
                                     # node.
@@ -2753,11 +2751,12 @@ class JsTsLintChecksManager(LintChecksManager):
             self._check_directive_scope
         )
         self._check_dependencies()
-        extra_js_files_messages = self.process_manager['extra']
-        js_and_ts_component_messages = self.process_manager['component']
-        directive_scope_messages = self.process_manager['directive']
-        sorted_dependencies_messages = self.process_manager['sorted']
-        controller_dependency_messages = self.process_manager['line_breaks']
+        extra_js_files_messages = self.process_manager.get('extra', [])
+        js_and_ts_component_messages = self.process_manager.get('component', [])
+        directive_scope_messages = self.process_manager.get('directive', [])
+        sorted_dependencies_messages = self.process_manager.get('sorted', [])
+        controller_dependency_messages = (
+            self.process_manager.get('line_breaks', []))
 
         all_messages = (
             common_messages + extra_js_files_messages +
