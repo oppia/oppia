@@ -177,9 +177,8 @@ angular.module('oppia').directive('contributionsAndReview', [
 
           let getQuestionContributionsSummary = (
             // TODO(#7176): Replace 'any' with the exact type. This has been
-            // kept as 'any' because 'contribution' is a dict with
-            // underscore_cased keys which give tslint errors about accessing an
-            // unknown type.
+            // kept as 'any' because without it typescript will fail to compile
+            // due to "trying to access property of an unknown type" error.
             () => Object.values(ctrl.contributions).map((contribution: any) => {
               let change = contribution.suggestion.change;
               let status = contribution.suggestion.status;
@@ -202,9 +201,8 @@ angular.module('oppia').directive('contributionsAndReview', [
 
           let getTranslationContributionsSummary = (
             // TODO(#7176): Replace 'any' with the exact type. This has been
-            // kept as 'any' because 'contribution' is a dict with
-            // underscore_cased keys which give tslint errors about accessing an
-            // unknown type.
+            // kept as 'any' because without it typescript will fail to compile
+            // due to "trying to access property of an unknown type" error.
             () => Object.values(ctrl.contributions).map((contribution: any) => {
               let chapterTitle = contribution.details.chapter_title;
               let storyTitle = contribution.details.story_title;
