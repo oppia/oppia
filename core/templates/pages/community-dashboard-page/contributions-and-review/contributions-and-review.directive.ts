@@ -114,7 +114,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                 },
                 switchToReviewTab: () => {
                   ContributionAndReviewService.getReviewableQuestionSuggestions(
-                    function(suggestionIdToSuggestions) {
+                    suggestionIdToSuggestions => {
                       ctrl.contributions = suggestionIdToSuggestions;
                       ctrl.contributionSummaries =
                         getQuestionContributionsSummary();
@@ -183,7 +183,7 @@ angular.module('oppia').directive('contributionsAndReview', [
             () => Object.values(ctrl.contributions).map((contribution: any) => {
               let change = contribution.suggestion.change;
               let status = contribution.suggestion.status;
-              let suggestionId = contribution.suggestion.suggestionn_id;
+              let suggestionId = contribution.suggestion.suggestion_id;
               let topicName = change.topic_name;
               let html = change.question_dict.question_state_data.content.html;
               let skillDescription = contribution.details.skill_description;
@@ -210,7 +210,7 @@ angular.module('oppia').directive('contributionsAndReview', [
               let storyTitle = contribution.details.story_title;
               let topicName = contribution.details.topic_name;
               let status = contribution.suggestion.status;
-              let suggestionId = contribution.suggestion.suggestionn_id;
+              let suggestionId = contribution.suggestion.suggestion_id;
               let translationHtml =
                 contribution.suggestion.change.translation_html;
 
