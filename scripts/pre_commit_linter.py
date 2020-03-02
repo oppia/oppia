@@ -2302,6 +2302,7 @@ class JsTsLintChecksManager(LintChecksManager):
                                     body_element_type_is_not_return = (
                                         body_element.type != 'ReturnStatement')
                                     body_element_arg_type_is_not_object = (
+                                        body_element and
                                         body_element.argument.type != (
                                             'ObjectExpression'))
                                     if (
