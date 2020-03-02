@@ -15,15 +15,15 @@
 /**
  * @fileoverview Service to change the rights of collections in the backend.
  */
+import cloneDeep from 'lodash/cloneDeep';
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { CollectionEditorPageConstants } from
   'pages/collection-editor-page/collection-editor-page.constants';
-import cloneDeep from 'lodash/cloneDeep';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 @Injectable({
   providedIn: 'root'
@@ -83,15 +83,15 @@ export class CollectionRightsBackendApiService {
       isPublic ? collectionPublishUrl : collectionUnpublishUrl);
 
     this.http.put(requestUrl, putParams).toPromise().then((response: any) => {
-      this.collectionRightsCache[collectionId] = response.data;
+      this.collectionRightsCache[collectionId] = response;
 
       if (successCallback) {
-        successCallback(response.data);
+        successCallback(response);
       }
     },
     (error) => {
       if (errorCallback) {
-        errorCallback(error.data);
+        errorCallback(error);
       }
     });
   }
@@ -151,7 +151,7 @@ export class CollectionRightsBackendApiService {
    */
   cacheCollectionRights(collectionId: string,
       collectionRights: Array<object>): void {
-    this.collectionRightsCache[collectionId] = angular.copy(collectionRights);
+    this.collectionRightsCache[collectionId] = cloneDeep(collectionRights);
   }
   /**
    * Updates a collection's rights to be have public learner access, given
