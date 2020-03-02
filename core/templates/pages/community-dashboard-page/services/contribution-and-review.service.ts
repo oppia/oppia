@@ -26,9 +26,8 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('ContributionAndReviewService', [
-  '$http', '$q', 'UrlInterpolationService', 'ACTION_ACCEPT_SUGGESTION',
-  function(
-      $http, $q, UrlInterpolationService, ACTION_ACCEPT_SUGGESTION) {
+  '$http', 'UrlInterpolationService', 'ACTION_ACCEPT_SUGGESTION',
+  function($http, UrlInterpolationService, ACTION_ACCEPT_SUGGESTION) {
     // TODO(#8016): Move this function to a backend-api.service with unit tests.
     let getSubmittedSuggestionListHandlerUrl = (targetType, suggestionType) => {
       return UrlInterpolationService.interpolateUrl(

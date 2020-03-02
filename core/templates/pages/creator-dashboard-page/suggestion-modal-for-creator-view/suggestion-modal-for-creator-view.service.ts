@@ -79,10 +79,9 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
             if (!$scope.isNotHandled) {
               $scope.isSuggestionRejected =
                 suggestionStatus !== SuggestionModalService.SUGGESTION_ACCEPTED;
-              $scope.errorMessage =
-                $scope.isSuggestionRejected
-                ? SuggestionModalService.SUGGESTION_REJECTED_MSG
-                : SuggestionModalService.SUGGESTION_ACCEPTED_MSG;
+              $scope.errorMessage = $scope.isSuggestionRejected ?
+                SuggestionModalService.SUGGESTION_REJECTED_MSG :
+                SuggestionModalService.SUGGESTION_ACCEPTED_MSG;
             } else {
               $scope.errorMessage = '';
             }
@@ -195,7 +194,7 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
     return {
       showSuggestionModal: function(suggestionType, extraParams) {
         if (!extraParams.activeThread) {
-          throw Error("Trying to show suggestion of a non-existent thread.");
+          throw Error('Trying to show suggestion of a non-existent thread.');
         }
         if (suggestionType === 'edit_exploration_state_content') {
           showEditStateContentSuggestionModal(

@@ -195,8 +195,8 @@ angular.module('oppia').directive('contributionsAndReview', [
                 labelText: SUGGESTION_LABELS[status].text,
                 labelColor: SUGGESTION_LABELS[status].color,
                 actionButtonTitle: (
-                  ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION
-                  ? 'Review' : 'View')
+                  ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION ?
+                    'Review' : 'View')
               };
             }));
 
@@ -208,7 +208,7 @@ angular.module('oppia').directive('contributionsAndReview', [
             () => Object.values(ctrl.contributions).map((contribution: any) => {
               let chapterTitle = contribution.details.chapter_title;
               let storyTitle = contribution.details.story_title;
-              let topicName  = contribution.details.topic_name;
+              let topicName = contribution.details.topic_name;
               let status = contribution.suggestion.status;
               let suggestionId = contribution.suggestion.suggestionn_id;
               let translationHtml =
@@ -221,8 +221,8 @@ angular.module('oppia').directive('contributionsAndReview', [
                 labelText: SUGGESTION_LABELS[status].text,
                 labelColor: SUGGESTION_LABELS[status].color,
                 actionButtonTitle: (
-                  ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_TRANSLATE
-                  ? 'Review' : 'View')
+                  ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_TRANSLATE ?
+                    'Review' : 'View')
               };
             }));
 
@@ -300,7 +300,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                   }
                 ]
               }).result.then(result => {
-               return ContributionAndReviewService.resolveSuggestiontoSkill(
+                return ContributionAndReviewService.resolveSuggestiontoSkill(
                   targetId, suggestionId, result.action, result.reviewMessage,
                   result.commitMessage, removeContributionToReview);
               });

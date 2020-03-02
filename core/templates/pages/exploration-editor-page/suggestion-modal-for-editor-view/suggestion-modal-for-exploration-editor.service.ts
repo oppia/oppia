@@ -77,9 +77,9 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
               $scope.errorMessage = '';
             } else if (!$scope.isNotHandled) {
               $scope.errorMessage =
-                ['accepted', 'fixed'].includes(suggestionStatus)
-                  ? SuggestionModalService.SUGGESTION_ACCEPTED_MSG
-                  : SuggestionModalService.SUGGESTION_REJECTED_MSG;
+                ['accepted', 'fixed'].includes(suggestionStatus) ?
+                  SuggestionModalService.SUGGESTION_ACCEPTED_MSG :
+                  SuggestionModalService.SUGGESTION_REJECTED_MSG;
             } else if (!suggestionIsValid) {
               $scope.errorMessage =
                 SuggestionModalService.SUGGESTION_INVALID_MSG;
@@ -154,28 +154,27 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
             }
           },
           () => $log.error('Error resolving suggestion'));
-        },
-        () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
-      };
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
+    };
 
-      return {
-        showSuggestionModal: function(
-            suggestionType, extraParams, threadUibModalInstance = null) {
-          if (!extraParams.activeThread) {
-            throw Error("Trying to show suggestion of a non-existent thread.");
-          }
-          if (suggestionType === 'edit_exploration_state_content') {
-            showEditStateContentSuggestionModal(
-              extraParams.activeThread, extraParams.isSuggestionHandled,
-              extraParams.hasUnsavedChanges, extraParams.isSuggestionValid,
-              extraParams.setActiveThread, threadUibModalInstance);
-          }
+    return {
+      showSuggestionModal: function(
+          suggestionType, extraParams, threadUibModalInstance = null) {
+        if (!extraParams.activeThread) {
+          throw Error("Trying to show suggestion of a non-existent thread.");
         }
-      };
-    }
-  ]
-);
+        if (suggestionType === 'edit_exploration_state_content') {
+          showEditStateContentSuggestionModal(
+            extraParams.activeThread, extraParams.isSuggestionHandled,
+            extraParams.hasUnsavedChanges, extraParams.isSuggestionValid,
+            extraParams.setActiveThread, threadUibModalInstance);
+        }
+      }
+    };
+  }
+]);
