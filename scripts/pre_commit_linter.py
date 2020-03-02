@@ -52,6 +52,7 @@ import collections
 import contextlib
 import fnmatch
 import glob
+import itertools
 import multiprocessing
 import os
 import re
@@ -2742,14 +2743,13 @@ class JsTsLintChecksManager(LintChecksManager):
         self.parsed_expressions_in_files = (
             self._get_expressions_from_parsed_script())
 
-        common_messages = super(
-            JsTsLintChecksManager, self).perform_all_lint_checks()
+        common_messages = (
+            super(JsTsLintChecksManager, self).perform_all_lint_checks())
 
         super(JsTsLintChecksManager, self)._run_multiple_checks(
             self._check_extra_js_files,
             self._check_js_and_ts_component_name_and_count,
-            self._check_directive_scope
-        )
+            self._check_directive_scope)
         self._check_dependencies()
         extra_js_files_messages = self.process_manager.get('extra', [])
         js_and_ts_component_messages = self.process_manager.get('component', [])
@@ -2758,10 +2758,10 @@ class JsTsLintChecksManager(LintChecksManager):
         controller_dependency_messages = (
             self.process_manager.get('line_breaks', []))
 
-        all_messages = (
-            common_messages + extra_js_files_messages +
-            js_and_ts_component_messages + directive_scope_messages +
-            sorted_dependencies_messages + controller_dependency_messages)
+        all_messages = list(itertools.chain(
+            common_messages, extra_js_files_messages,
+            js_and_ts_component_messages, directive_scope_messages,
+            sorted_dependencies_messages, controller_dependency_messages))
         return all_messages
 
     def _check_html_directive_name(self):
