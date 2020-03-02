@@ -35,7 +35,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
       ThreadDataService, UrlInterpolationService) {
     let showEditStateContentSuggestionModal = function(
         activeThread, isSuggestionHandled, hasUnsavedChanges, isSuggestionValid,
-        threadUibModalInstance, setActiveThread = (threadId => {})) {
+        threadUibModalInstance = null, setActiveThread = (threadId => {})) {
       return $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
@@ -46,7 +46,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
           currentContent: () => {
             let stateName = activeThread.getSuggestionStateName();
             let state = ExplorationStatesService.getState(stateName);
-            return state !== undefined ? state.content.getHtml() : null;
+            return state && state.content.getHtml();
           },
           description: () => activeThread.description,
           newContent: () => activeThread.getReplacementHtmlFromSuggestion(),
@@ -92,7 +92,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
             $scope.currentContent = currentContent;
             $scope.newContent = newContent;
 
-            $scope.acceptSuggestion = function() {
+            $scope.acceptSuggestion = () => {
               if (threadUibModalInstance !== null) {
                 threadUibModalInstance.close();
               }
@@ -110,19 +110,19 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
               });
             };
 
-            $scope.rejectSuggestion = function() {
+            $scope.rejectSuggestion = () => {
               if (threadUibModalInstance !== null) {
                 threadUibModalInstance.close();
               }
-              SuggestionModalService.rejectSuggestion($uibModalInstance, {
-                action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
-                reviewMessage: $scope.reviewMessage
-              });
+              return SuggestionModalService.rejectSuggestion(
+                $uibModalInstance, {
+                  action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
+                  reviewMessage: $scope.reviewMessage
+                });
             };
 
-            $scope.cancelReview = function() {
-              SuggestionModalService.cancelSuggestion($uibModalInstance);
-            };
+            $scope.cancelReview = (
+              () => SuggestionModalService.cancelSuggestion($uibModalInstance));
           }
         ]
       }).result.then(result => {
