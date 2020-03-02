@@ -28,37 +28,30 @@ require(
 angular.module('oppia').factory('ContributionAndReviewService', [
   '$http', 'UrlInterpolationService', 'ACTION_ACCEPT_SUGGESTION',
   function($http, UrlInterpolationService, ACTION_ACCEPT_SUGGESTION) {
-    let getSubmittedSuggestionListHandlerUrl = (targetType, suggestionType) => {
-      return UrlInterpolationService.interpolateUrl(
+    let getSubmittedSuggestionListHandlerUrl = (
+      (targetType, suggestionType) => UrlInterpolationService.interpolateUrl(
         '/getsubmittedsuggestions/<target_type>/<suggestion_type>', {
           target_type: targetType,
           suggestion_type: suggestionType
-        });
-    };
-
-    let getReviewableSuggestionsHandlerUrl = (targetType, suggestionType) => {
-      return UrlInterpolationService.interpolateUrl(
+        }));
+    let getReviewableSuggestionsHandlerUrl = (
+      (targetType, suggestionType) => UrlInterpolationService.interpolateUrl(
         '/getreviewablesuggestions/<target_type>/<suggestion_type>', {
           target_type: targetType,
           suggestion_type: suggestionType
-        });
-    };
-
-    let getSuggestionToExplorationActionHandlerUrl = (expId, suggestionId) => {
-      return UrlInterpolationService.interpolateUrl(
+        }));
+    let getSuggestionToExplorationActionHandlerUrl = (
+      (expId, suggestionId) => UrlInterpolationService.interpolateUrl(
         '/suggestionactionhandler/exploration/<exploration_id>/<suggestion_id>',
-        { exploration_id: expId, suggestion_id: suggestionId });
-    };
-
-    let getSuggestionToSkillActionHandlerUrl = (skillId, suggestionId) => {
-      return UrlInterpolationService.interpolateUrl(
+        { exploration_id: expId, suggestion_id: suggestionId }));
+    let getSuggestionToSkillActionHandlerUrl = (
+      (skillId, suggestionId) => UrlInterpolationService.interpolateUrl(
         '/suggestionactionhandler/skill/<skill_id>/<suggestion_id>', {
           skill_id: skillId,
           suggestion_id: suggestionId
-        });
-    };
+        }));
 
-    let getSuggestionsByIdFromResponse = (httpResponse) => {
+    let getSuggestionsByIdFromHttpResponse = httpResponse => {
       let targetIdToDetails = httpResponse.data.target_id_to_opportunity_dict;
       let suggestionsById = {};
       httpResponse.data.suggestions.forEach(suggestion => {
@@ -78,12 +71,12 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         // tests.
         return $http.get(
           getSubmittedSuggestionListHandlerUrl('skill', 'add_question'))
-          .then(getSuggestionsByIdFromResponse)
-          .then(mapping => {
+          .then(getSuggestionsByIdFromHttpResponse)
+          .then(suggestionsById => {
             if (onSuccess) {
-              onSuccess(mapping);
+              onSuccess(suggestionsById);
             }
-            return mapping;
+            return suggestionsById;
           });
       },
       getReviewableQuestionSuggestions: function(onSuccess) {
@@ -91,12 +84,12 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         // tests.
         return $http.get(
           getReviewableSuggestionsHandlerUrl('skill', 'add_question'))
-          .then(getSuggestionsByIdFromResponse)
-          .then(mapping => {
+          .then(getSuggestionsByIdFromHttpResponse)
+          .then(suggestionsById => {
             if (onSuccess) {
-              onSuccess(mapping);
+              onSuccess(suggestionsById);
             }
-            return mapping;
+            return suggestionsById;
           });
       },
       getUserCreatedTranslationSuggestions: function(onSuccess) {
@@ -105,12 +98,12 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         return $http.get(
           getSubmittedSuggestionListHandlerUrl(
             'exploration', 'translate_content'))
-          .then(getSuggestionsByIdFromResponse)
-          .then(mapping => {
+          .then(getSuggestionsByIdFromHttpResponse)
+          .then(suggestionsById => {
             if (onSuccess) {
-              onSuccess(mapping);
+              onSuccess(suggestionsById);
             }
-            return mapping;
+            return suggestionsById;
           });
       },
       getReviewableTranslationSuggestions: function(onSuccess) {
@@ -119,12 +112,12 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         return $http.get(
           getReviewableSuggestionsHandlerUrl(
             'exploration', 'translate_content'))
-          .then(getSuggestionsByIdFromResponse)
-          .then(mapping => {
+          .then(getSuggestionsByIdFromHttpResponse)
+          .then(suggestionsById => {
             if (onSuccess) {
-              onSuccess(mapping);
+              onSuccess(suggestionsById);
             }
-            return mapping;
+            return suggestionsById;
           });
       },
       resolveSuggestiontoExploration: function(
