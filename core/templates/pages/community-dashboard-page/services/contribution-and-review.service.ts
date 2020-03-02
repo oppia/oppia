@@ -28,7 +28,6 @@ require(
 angular.module('oppia').factory('ContributionAndReviewService', [
   '$http', 'UrlInterpolationService', 'ACTION_ACCEPT_SUGGESTION',
   function($http, UrlInterpolationService, ACTION_ACCEPT_SUGGESTION) {
-    // TODO(#8016): Move this function to a backend-api.service with unit tests.
     let getSubmittedSuggestionListHandlerUrl = (targetType, suggestionType) => {
       return UrlInterpolationService.interpolateUrl(
         '/getsubmittedsuggestions/<target_type>/<suggestion_type>', {
@@ -37,7 +36,6 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         });
     };
 
-    // TODO(#8016): Move this function to a backend-api.service with unit tests.
     let getReviewableSuggestionsHandlerUrl = (targetType, suggestionType) => {
       return UrlInterpolationService.interpolateUrl(
         '/getreviewablesuggestions/<target_type>/<suggestion_type>', {
@@ -46,14 +44,12 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         });
     };
 
-    // TODO(#8016): Move this function to a backend-api.service with unit tests.
     let getSuggestionToExplorationActionHandlerUrl = (expId, suggestionId) => {
       return UrlInterpolationService.interpolateUrl(
         '/suggestionactionhandler/exploration/<exploration_id>/<suggestion_id>',
         { exploration_id: expId, suggestion_id: suggestionId });
     };
 
-    // TODO(#8016): Move this function to a backend-api.service with unit tests.
     let getSuggestionToSkillActionHandlerUrl = (skillId, suggestionId) => {
       return UrlInterpolationService.interpolateUrl(
         '/suggestionactionhandler/skill/<skill_id>/<suggestion_id>', {
@@ -62,49 +58,80 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         });
     };
 
-    // TODO(#8016): Move this function to a backend-api.service with unit tests.
-    let fetchSuggestions = function(url, onSuccess) {
-      return $http.get(url).then(res => {
-        let targetIdToDetails = res.data.target_id_to_opportunity_dict;
-        let suggestionIdToSuggestions = {};
-        res.data.suggestions.forEach(suggestion => {
-          let suggestionId = suggestion.suggestion_id;
-          let targetId = suggestion.target_id;
-          suggestionIdToSuggestions[suggestionId] = {
-            suggestion: suggestion,
-            details: targetIdToDetails[targetId]
-          };
-        });
-        return onSuccess(suggestionIdToSuggestions);
+    let getSuggestionsByIdFromResponse = (httpResponse) => {
+      let targetIdToDetails = httpResponse.data.target_id_to_opportunity_dict;
+      let suggestionsById = {};
+      httpResponse.data.suggestions.forEach(suggestion => {
+        let suggestionId = suggestion.suggestion_id;
+        let targetId = suggestion.target_id;
+        suggestionsById[suggestionId] = {
+          suggestion: suggestion,
+          details: targetIdToDetails[targetId]
+        };
       });
+      return suggestionsById;
     };
 
     return {
       getUserCreatedQuestionSuggestions: function(onSuccess) {
-        return fetchSuggestions(
-          getSubmittedSuggestionListHandlerUrl('skill', 'add_question'),
-          onSuccess);
+        // TODO(#8016): Move this function to a backend-api.service with unit
+        // tests.
+        return $http.get(
+          getSubmittedSuggestionListHandlerUrl('skill', 'add_question'))
+          .then(getSuggestionsByIdFromResponse)
+          .then(mapping => {
+            if (onSuccess) {
+              onSuccess(mapping);
+            }
+            return mapping;
+          });
       },
       getReviewableQuestionSuggestions: function(onSuccess) {
-        return fetchSuggestions(
-          getReviewableSuggestionsHandlerUrl('skill', 'add_question'),
-          onSuccess);
+        // TODO(#8016): Move this function to a backend-api.service with unit
+        // tests.
+        return $http.get(
+          getReviewableSuggestionsHandlerUrl('skill', 'add_question'))
+          .then(getSuggestionsByIdFromResponse)
+          .then(mapping => {
+            if (onSuccess) {
+              onSuccess(mapping);
+            }
+            return mapping;
+          });
       },
       getUserCreatedTranslationSuggestions: function(onSuccess) {
-        return fetchSuggestions(
+        // TODO(#8016): Move this function to a backend-api.service with unit
+        // tests.
+        return $http.get(
           getSubmittedSuggestionListHandlerUrl(
-            'exploration', 'translate_content'),
-          onSuccess);
+            'exploration', 'translate_content'))
+          .then(getSuggestionsByIdFromResponse)
+          .then(mapping => {
+            if (onSuccess) {
+              onSuccess(mapping);
+            }
+            return mapping;
+          });
       },
       getReviewableTranslationSuggestions: function(onSuccess) {
-        return fetchSuggestions(
+        // TODO(#8016): Move this function to a backend-api.service with unit
+        // tests.
+        return $http.get(
           getReviewableSuggestionsHandlerUrl(
-            'exploration', 'translate_content'),
-          onSuccess);
+            'exploration', 'translate_content'))
+          .then(getSuggestionsByIdFromResponse)
+          .then(mapping => {
+            if (onSuccess) {
+              onSuccess(mapping);
+            }
+            return mapping;
+          });
       },
       resolveSuggestiontoExploration: function(
           targetId, suggestionId, action, reviewMessage, commitMessage,
           onSuccess) {
+        // TODO(#8016): Move this function to a backend-api.service with unit
+        // tests.
         return $http.put(
           getSuggestionToExplorationActionHandlerUrl(targetId, suggestionId), {
             action: action,
@@ -116,6 +143,8 @@ angular.module('oppia').factory('ContributionAndReviewService', [
       resolveSuggestiontoSkill: function(
           targetId, suggestionId, action, reviewMessage, commitMessage,
           onSuccess) {
+        // TODO(#8016): Move this function to a backend-api.service with unit
+        // tests.
         return $http.put(
           getSuggestionToSkillActionHandlerUrl(targetId, suggestionId), {
             action: action,
