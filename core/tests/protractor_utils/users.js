@@ -39,15 +39,9 @@ var login = function(email, isSuperAdmin = false) {
 };
 
 var logout = function() {
-  var profileDropdown = element(by.css('.protractor-test-profile-dropdown'));
-  waitFor.elementToBeClickable(
-    profileDropdown, 'Could not click profile dropdown');
-  profileDropdown.click();
-  var logoutLink = element(by.css('.protractor-test-logout-link'));
-  waitFor.elementToBeClickable(
-    logoutLink, 'Could not click on the logout link');
-  logoutLink.click();
-  waitFor.pageToFullyLoad();
+  var driver = browser.driver;
+  driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
+  driver.findElement(protractor.By.id('submit-logout')).click();
 };
 
 // The user needs to log in immediately before this method is called. Note

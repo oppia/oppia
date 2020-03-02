@@ -120,7 +120,9 @@ _PARSER.add_argument(
 
 _PARSER.add_argument(
     '--debug_mode',
-    help='Runs the protractor test in debugging mode.',
+    help='Runs the protractor test in debugging mode. Follow the instruction '
+         'provided in following URL to run e2e tests in debugging mode: '
+         'https://www.protractortest.org/#/debugging#disabled-control-flow',
     action='store_true')
 
 # This list contains the sub process triggered by this script. This includes
@@ -258,19 +260,22 @@ def build_js_files(dev_mode_setting):
     update_dev_mode_in_constants_js(CONSTANT_FILE_PATH, dev_mode_setting)
     if not dev_mode_setting:
         python_utils.PRINT('  Generating files for production mode...')
+        build.main(args=['--prod_env'])
     else:
         # The 'hashes.json' file is used by the `url-interpolation` service.
         if not os.path.isfile(HASHES_FILE_PATH):
             with python_utils.open_file(HASHES_FILE_PATH, 'w') as hash_file:
                 hash_file.write('{}')
+        python_utils.PRINT('Generating files for dev mode...')
+        build.main(args=[])
         try:
-            common.run_cmd(
-                [common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
-                 'webpack.dev.config.ts'])
-        except subprocess.CalledProcessError as error:
+            python_utils.PRINT('Compiling webpack...')
+            subprocess.check_call([
+                common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
+                'webpack.dev.config.ts'])
+        except OSError as error:
             python_utils.PRINT(error.output)
             sys.exit(error.returncode)
-    build.main(args=(['--prod_env'] if not dev_mode_setting else []))
 
 
 @contextlib.contextmanager
