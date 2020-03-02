@@ -186,6 +186,9 @@ angular.module('oppia').directive('contributionsAndReview', [
               let topicName = change.topic_name;
               let html = change.question_dict.question_state_data.content.html;
               let skillDescription = contribution.details.skill_description;
+              let actionButtonTitle = (
+                ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION ?
+                  'Review' : 'View');
 
               return {
                 id: suggestionId,
@@ -193,9 +196,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                 subheading: [topicName, skillDescription].join(' / '),
                 labelText: SUGGESTION_LABELS[status].text,
                 labelColor: SUGGESTION_LABELS[status].color,
-                actionButtonTitle: (
-                  ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION ?
-                    'Review' : 'View')
+                actionButtonTitle: actionButtonTitle
               };
             }));
 
@@ -211,6 +212,9 @@ angular.module('oppia').directive('contributionsAndReview', [
               let suggestionId = contribution.suggestion.suggestion_id;
               let translationHtml =
                 contribution.suggestion.change.translation_html;
+              let actionButtonTitle = (
+                ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_TRANSLATE ?
+                  'Review' : 'View');
 
               return {
                 id: suggestionId,
@@ -218,9 +222,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                 subheading: [topicName, storyTitle, chapterTitle].join(' / '),
                 labelText: SUGGESTION_LABELS[status].text,
                 labelColor: SUGGESTION_LABELS[status].color,
-                actionButtonTitle: (
-                  ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_TRANSLATE ?
-                    'Review' : 'View')
+                actionButtonTitle: actionButtonTitle
               };
             }));
 
@@ -271,37 +273,32 @@ angular.module('oppia').directive('contributionsAndReview', [
                     $scope.canEditQuestion = false;
                     $scope.misconceptionsBySkill = [];
 
-                    $scope.questionChanged = () => {
-                      $scope.validationError = null;
-                    };
-                    $scope.accept = () => {
-                      return SuggestionModalService.acceptSuggestion(
+                    $scope.questionChanged = (
+                      () => $scope.validationError = null);
+                    $scope.accept = (
+                      () => SuggestionModalService.acceptSuggestion(
                         $uibModalInstance, {
                           action: (
                             SuggestionModalService.ACTION_ACCEPT_SUGGESTION),
                           commitMessage: $scope.commitMessage,
                           reviewMessage: $scope.reviewMessage
-                        });
-                    };
-                    $scope.reject = () => {
-                      return SuggestionModalService.rejectSuggestion(
+                        }));
+                    $scope.reject = (
+                      () => SuggestionModalService.rejectSuggestion(
                         $uibModalInstance, {
                           action: (
                             SuggestionModalService.ACTION_REJECT_SUGGESTION),
                           reviewMessage: $scope.reviewMessage
-                        });
-                    };
-                    $scope.cancel = () => {
-                      return SuggestionModalService.cancelSuggestion(
-                        $uibModalInstance);
-                    };
+                        }));
+                    $scope.cancel = (
+                      () => SuggestionModalService.cancelSuggestion(
+                        $uibModalInstance));
                   }
                 ]
-              }).result.then(result => {
-                return ContributionAndReviewService.resolveSuggestiontoSkill(
+              }).result.then(
+                result => ContributionAndReviewService.resolveSuggestiontoSkill(
                   targetId, suggestionId, result.action, result.reviewMessage,
-                  result.commitMessage, removeContributionToReview);
-              });
+                  result.commitMessage, removeContributionToReview));
             });
 
           let showTranslationSuggestionModal = (
@@ -329,43 +326,35 @@ angular.module('oppia').directive('contributionsAndReview', [
                   $scope.reviewable = reviewable;
                   $scope.commitMessage = '';
                   $scope.reviewMessage = '';
-                  $scope.accept = () => {
-                    return SuggestionModalService.acceptSuggestion(
-                      $uibModalInstance, {
-                        action: (
-                          SuggestionModalService.ACTION_ACCEPT_SUGGESTION),
-                        commitMessage: $scope.commitMessage,
-                        reviewMessage: $scope.reviewMessage
-                      });
-                  };
-                  $scope.reject = () => {
-                    return SuggestionModalService.rejectSuggestion(
-                      $uibModalInstance, {
-                        action: (
-                          SuggestionModalService.ACTION_REJECT_SUGGESTION),
-                        reviewMessage: $scope.reviewMessage
-                      });
-                  };
-                  $scope.cancel = () => {
-                    return SuggestionModalService.cancelSuggestion(
-                      $uibModalInstance);
-                  };
+                  $scope.accept = () => SuggestionModalService.acceptSuggestion(
+                    $uibModalInstance, {
+                      action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
+                      commitMessage: $scope.commitMessage,
+                      reviewMessage: $scope.reviewMessage
+                    });
+                  $scope.reject = () => SuggestionModalService.rejectSuggestion(
+                    $uibModalInstance, {
+                      action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
+                      reviewMessage: $scope.reviewMessage
+                    });
+                  $scope.cancel = () => SuggestionModalService.cancelSuggestion(
+                    $uibModalInstance);
                 }
               ]
-            }).result.then(result => {
-              ContributionAndReviewService.resolveSuggestiontoExploration(
-                targetId, suggestionId, result.action, result.reviewMessage,
-                result.commitMessage, removeContributionToReview);
-            });
+            }).result.then(
+              result => (
+                ContributionAndReviewService.resolveSuggestiontoExploration(
+                  targetId, suggestionId, result.action, result.reviewMessage,
+                  result.commitMessage, removeContributionToReview)));
           };
 
           ctrl.onClickViewSuggestion = suggestionId => {
             let suggestionType =
               ctrl.contributions[suggestionId].suggestion.suggestion_type;
-            let viewSuggestion =
-              ctrl.suggestionActionsByType[suggestionType].viewSuggestion;
-            if (viewSuggestion) {
-              viewSuggestion();
+            let suggestionActions =
+              ctrl.suggestionActionsByType[suggestionType];
+            if (suggestionActions) {
+              suggestionActions.viewSuggestion(suggestionId);
             }
           };
 
@@ -374,10 +363,10 @@ angular.module('oppia').directive('contributionsAndReview', [
             ctrl.contributionsDataLoading = true;
             ctrl.contributionSummaries = [];
 
-            let switchToContributionsTab = ctrl.suggestionActionsByType[
-              suggestionType].switchToContributionsTab;
-            if (switchToContributionsTab) {
-              switchToContributionsTab();
+            let suggestionActions =
+              ctrl.suggestionActionsByType[suggestionType];
+            if (suggestionActions) {
+              suggestionActions.switchToContributionsTab();
             }
           };
 
@@ -386,10 +375,10 @@ angular.module('oppia').directive('contributionsAndReview', [
             ctrl.contributionsDataLoading = true;
             ctrl.contributionSummaries = [];
 
-            let switchToReviewTab = ctrl.suggestionActionsByType[
-              suggestionType].switchToReviewTab;
-            if (switchToReviewTab) {
-              switchToReviewTab();
+            let suggestionActions =
+              ctrl.suggestionActionsByType[suggestionType];
+            if (suggestionActions) {
+              suggestionActions.switchToReviewTab();
             }
           };
         }
