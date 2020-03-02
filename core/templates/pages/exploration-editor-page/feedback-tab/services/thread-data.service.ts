@@ -37,45 +37,33 @@ angular.module('oppia').factory('ThreadDataService', [
       FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
       SuggestionsService, ThreadMessageObjectFactory, UrlInterpolationService,
       ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED, STATUS_OPEN) {
-    let getFeedbackStatsHandlerUrl = function() {
-      return UrlInterpolationService.interpolateUrl(
+    let getFeedbackStatsHandlerUrl = (
+      () => UrlInterpolationService.interpolateUrl(
         '/feedbackstatshandler/<exploration_id>', {
           exploration_id: ContextService.getExplorationId()
-        });
-    };
-
-    let getThreadListHandlerUrl = function() {
-      return UrlInterpolationService.interpolateUrl(
+        }));
+    let getThreadListHandlerUrl = (
+      () => UrlInterpolationService.interpolateUrl(
         '/threadlisthandler/<exploration_id>', {
           exploration_id: ContextService.getExplorationId()
-        });
-    };
-
-    let getSuggestionListHandlerUrl = function() {
-      return '/suggestionlisthandler';
-    };
-
-    let getSuggestionActionHandlerUrl = function(threadId) {
-      return UrlInterpolationService.interpolateUrl(
+        }));
+    let getSuggestionActionHandlerUrl = (
+      threadId => UrlInterpolationService.interpolateUrl(
         '/suggestionactionhandler/exploration/<exploration_id>/<thread_id>', {
           exploration_id: ContextService.getExplorationId(),
           thread_id: threadId
-        });
-    };
-
-    let getThreadHandlerUrl = function(threadId) {
-      return UrlInterpolationService.interpolateUrl(
+        }));
+    let getThreadHandlerUrl = (
+      threadId => UrlInterpolationService.interpolateUrl(
         '/threadhandler/<thread_id>', {
           thread_id: threadId
-        });
-    };
-
-    let getFeedbackThreadViewEventUrl = function(threadId) {
-      return UrlInterpolationService.interpolateUrl(
+        }));
+    let getFeedbackThreadViewEventUrl = (
+      threadId => UrlInterpolationService.interpolateUrl(
         '/feedbackhandler/thread_view_event/<thread_id>', {
           thread_id: threadId
-        });
-    };
+        }));
+    let getSuggestionListHandlerUrl = () => '/suggestionlisthandler';
 
     // Holds all the threads for this exploration. This is an object whose
     // values are objects, each representing threads, keyed by their IDs.
@@ -83,25 +71,28 @@ angular.module('oppia').factory('ThreadDataService', [
     // The messages of the thread objects are updated lazily.
     let threadsById = {};
 
+    let getThreadById = (threadId) => threadsById[threadId] || null;
+
     // Cached number of open threads requiring action.
     let openThreadsCount = 0;
 
-    let getThreadById = function(threadId) {
-      return threadsById[threadId] || null;
-    };
-
-    let setFeedbackThreadFromBackendDict = function(threadBackendDict) {
-      let threadId = threadBackendDict.thread_id;
-      return threadsById[threadId] =
+    let setFeedbackThreadFromBackendDict = threadBackendDict => {
+      if (!threadBackendDict) {
+        throw Error('Missing input backend dict');
+      }
+      let thread =
         FeedbackThreadObjectFactory.createFromBackendDict(threadBackendDict);
+      return threadsById[thread.threadId] = thread;
     };
 
-    let setSuggestionThreadFromBackendDicts = function(
-        threadBackendDict, suggestionBackendDict) {
-      let threadId = threadBackendDict.thread_id;
-      return threadsById[threadId] =
-        SuggestionThreadObjectFactory.createFromBackendDicts(
-          threadBackendDict, suggestionBackendDict);
+    let setSuggestionThreadFromBackendDicts = (
+        threadBackendDict, suggestionBackendDict) => {
+      if (!threadBackendDict || !suggestionBackendDict) {
+        throw Error('Missing input backend dicts');
+      }
+      let thread = SuggestionThreadObjectFactory.createFromBackendDicts(
+        threadBackendDict, suggestionBackendDict);
+      return threadsById[thread.threadId] = thread;
     };
 
     return {
@@ -146,16 +137,14 @@ angular.module('oppia').factory('ThreadDataService', [
         }
         let threadId = thread.threadId;
 
-        return $http.get(getThreadHandlerUrl(threadId)).then(response => {
-          thread.setMessages(response.data.messages.map(
-            ThreadMessageObjectFactory.createFromBackendDict));
-        });
+        return $http.get(getThreadHandlerUrl(threadId))
+          .then(response => thread.setMessages(response.data.messages.map(
+            ThreadMessageObjectFactory.createFromBackendDict)));
       },
 
       fetchFeedbackStats: function() {
-        return $http.get(getFeedbackStatsHandlerUrl()).then(response => {
-          openThreadsCount = response.data.num_open_threads;
-        });
+        return $http.get(getFeedbackStatsHandlerUrl())
+          .then(response => openThreadsCount = response.data.num_open_threads);
       },
 
       getOpenThreadsCount: function() {
@@ -167,14 +156,13 @@ angular.module('oppia').factory('ThreadDataService', [
           state_name: null,
           subject: newSubject,
           text: newText
-        }).then(
-          () => {
-            openThreadsCount += 1;
-            return this.fetchThreads();
-          },
-          err => {
-            AlertsService.addWarning('Error creating new thread: ' + err + '.');
-          });
+        }).then(() => {
+          openThreadsCount += 1;
+          return this.fetchThreads();
+        },
+        err => {
+          AlertsService.addWarning('Error creating new thread: ' + err + '.');
+        });
       },
 
       markThreadAsSeen: function(thread) {
@@ -227,7 +215,7 @@ angular.module('oppia').factory('ThreadDataService', [
           openThreadsCount -= 1;
           // TODO(#8678): Update the cache with the message
           // instead of fetching the messages everytime from the backend
-          return this.fetchMessages(threadId);
+          return this.fetchMessages(thread);
         });
       }
     };
