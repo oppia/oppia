@@ -166,7 +166,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
       showSuggestionModal: function(
           suggestionType, extraParams, threadUibModalInstance = null) {
         if (!extraParams.activeThread) {
-          throw Error("Trying to show suggestion of a non-existent thread.");
+          throw Error('Trying to show suggestion of a non-existent thread.');
         }
         if (suggestionType === 'edit_exploration_state_content') {
           showEditStateContentSuggestionModal(
