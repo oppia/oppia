@@ -15,13 +15,15 @@
 /**
  * @fileoverview Service to change the rights of collections in the backend.
  */
+
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
 import cloneDeep from 'lodash/cloneDeep';
 
 import { CollectionEditorPageConstants } from
   'pages/collection-editor-page/collection-editor-page.constants';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 

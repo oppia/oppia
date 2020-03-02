@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for CollectionRightsBackendApiService.
  */
 
-import { CollectionRightsBackendApiService } from
-  './collection-rights-backend-api.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { CollectionRightsBackendApiService } from
+  './collection-rights-backend-api.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
 
 describe('Collection rights backend API service', function() {
