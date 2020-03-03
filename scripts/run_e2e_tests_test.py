@@ -61,6 +61,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_run_cmd(unused_commands):
             pass
         # pylint: disable=unused-argument
+
+        def mock_check_call(unused_commands):
+            pass
+        # pylint: disable=unused-argument
+
         def mock_build_main(args):
             pass
 
@@ -81,6 +86,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             self.swap_with_checks, common, 'inplace_replace_file',
             mock_inplace_replace)
         self.mock_run_cmd = mock_run_cmd
+        self.mock_check_call = mock_check_call
         self.mock_build_main = mock_build_main
         self.mock_remove = mock_remove
         self.print_swap = functools.partial(
@@ -268,9 +274,47 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         exit_swap = self.swap_with_checks(sys, 'exit', mock_exit)
         with is_port_open_swap, sleep_swap, exit_swap:
             run_e2e_tests.wait_for_port_to_be_open(1)
-        self.assertEqual(
-            mock_sleep.sleep_time,
-            run_e2e_tests.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
+        self.assertEqual(mock_sleep.sleep_time, run_e2e_tests.MAX_WAIT_TIME)
+
+    def test_wait_for_webpack_compilation_to_complete_success(self):
+        def mock_isdir(unused_dirname):
+            mock_isdir.wait_time += 1
+            if mock_isdir.wait_time > 10:
+                return True
+            return False
+        mock_isdir.wait_time = 0
+
+        def mock_sleep(unused_time):
+            mock_sleep.called_times += 1
+            return
+        mock_sleep.called_times = 0
+
+        isdir_swap = self.swap_with_checks(os.path, 'isdir', mock_isdir)
+        sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
+
+        with isdir_swap, sleep_swap:
+            run_e2e_tests.wait_for_webpack_compilation_to_complete()
+        self.assertEqual(mock_isdir.wait_time, 11)
+        self.assertEqual(mock_sleep.called_times, 10)
+
+    def test_wait_for_webpack_compilation_to_complete_failed(self):
+        def mock_isdir(unused_port):
+            return False
+
+        def mock_sleep(unused_time):
+            mock_sleep.sleep_time += 1
+
+        def mock_exit(unused_exit_code):
+            return
+
+        mock_sleep.sleep_time = 0
+
+        isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
+        sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
+        exit_swap = self.swap_with_checks(sys, 'exit', mock_exit)
+        with isdir_swap, sleep_swap, exit_swap:
+            run_e2e_tests.wait_for_webpack_compilation_to_complete()
+        self.assertEqual(mock_sleep.sleep_time, run_e2e_tests.MAX_WAIT_TIME)
 
     def test_update_dev_mode_in_constants_js_in_dev_mode_without_change_file(
             self):
@@ -435,15 +479,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'update_dev_mode_in_constants_js',
             mock_update_dev_mode_in_constants_js,
             expected_args=[(self.mock_constant_file_path, True)])
-        run_cmd_swap = self.swap_with_checks(
-            common, 'run_cmd', self.mock_run_cmd,
+        check_call_swap = self.swap_with_checks(
+            subprocess, 'check_call', self.mock_check_call,
             expected_args=[(expected_commands,)])
         build_main_swap = self.swap_with_checks(
             build, 'main', self.mock_build_main, expected_kwargs=[{'args': []}])
         print_swap = self.print_swap(called=False)
         with print_swap, self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
-                with update_dev_mode_in_constants_js_swap, run_cmd_swap:
+                with update_dev_mode_in_constants_js_swap, check_call_swap:
                     with is_file_swap, build_main_swap:
                         run_e2e_tests.build_js_files(True)
 
@@ -463,15 +507,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'update_dev_mode_in_constants_js',
             mock_update_dev_mode_in_constants_js,
             expected_args=[(self.mock_constant_file_path, True)])
-        run_cmd_swap = self.swap_with_checks(
-            common, 'run_cmd', self.mock_run_cmd,
+        check_call_swap = self.swap_with_checks(
+            subprocess, 'check_call', self.mock_check_call,
             expected_args=[(expected_commands,)])
         build_main_swap = self.swap_with_checks(
             build, 'main', self.mock_build_main, expected_kwargs=[{'args': []}])
         print_swap = self.print_swap(called=False)
         with print_swap, self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
-                with update_dev_mode_in_constants_js_swap, run_cmd_swap:
+                with update_dev_mode_in_constants_js_swap, check_call_swap:
                     with hash_file_path_swap, build_main_swap:
                         run_e2e_tests.build_js_files(True)
         with python_utils.open_file(mock_hash_file_path, 'r') as f:
@@ -488,7 +532,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_is_file(unused_path):
             return True
 
-        def mock_run_cmd(commands):
+        def mock_check_call(commands):
             raise subprocess.CalledProcessError(
                 returncode=2, cmd=commands, output='ERROR')
 
@@ -507,12 +551,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'update_dev_mode_in_constants_js',
             mock_update_dev_mode_in_constants_js,
             expected_args=[(self.mock_constant_file_path, True)])
-        run_cmd_swap = self.swap_with_checks(
-            common, 'run_cmd', mock_run_cmd,
+        check_call_swap = self.swap_with_checks(
+            subprocess, 'check_call', mock_check_call,
             expected_args=[(expected_commands,)])
-        # The mock exit will not actually exit the program, so the
-        # build_js_files function will continue and build.main will still be
-        # executed. But in actual case, this function will not be executed.
         build_main_swap = self.swap_with_checks(
             build, 'main', self.mock_build_main, expected_kwargs=[{'args': []}])
         exit_swap = self.swap_with_checks(
@@ -520,7 +561,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         print_swap = self.print_swap(expected_args=[('ERROR',)])
         with print_swap, self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
-                with update_dev_mode_in_constants_js_swap, run_cmd_swap:
+                with update_dev_mode_in_constants_js_swap, check_call_swap:
                     with is_file_swap, exit_swap, build_main_swap:
                         run_e2e_tests.build_js_files(True)
 
