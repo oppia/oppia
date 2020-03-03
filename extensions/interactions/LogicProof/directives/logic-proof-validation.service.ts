@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, BaseInteractionValidationService } from
+import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -31,8 +31,8 @@ import { Outcome } from
 })
 export class LogicProofValidationService {
   constructor(
-      private BaseInteractionValidationServiceInstance:
-        BaseInteractionValidationService) {}
+      private baseInteractionValidationServiceInstance:
+        baseInteractionValidationService) {}
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'customizationArgs' is a dict with possible underscore_cased
@@ -49,7 +49,7 @@ export class LogicProofValidationService {
     // We do not require a default rule for this interaction, since the
     // feedback is mostly provided from within the interaction itself.
     return this.getCustomizationArgsWarnings(customizationArgs).concat(
-      this.BaseInteractionValidationServiceInstance.getAnswerGroupWarnings(
+      this.baseInteractionValidationServiceInstance.getAnswerGroupWarnings(
         answerGroups, stateName));
   }
 }
