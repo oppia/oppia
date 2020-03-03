@@ -459,6 +459,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 run_e2e_tests.FECONF_FILE_PATH, False)
 
     def test_build_js_files_in_dev_mode_with_hash_file_exists(self):
+        def mock_wait_for_webpack_compilation_to_complete():
+            pass
 
         def mock_update_dev_mode_in_constants_js(
                 unused_filename, unused_dev_mode):
@@ -479,6 +481,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'update_dev_mode_in_constants_js',
             mock_update_dev_mode_in_constants_js,
             expected_args=[(self.mock_constant_file_path, True)])
+        wait_for_webpack_compilation_to_complete_swap = self.swap_with_checks(
+            run_e2e_tests, 'wait_for_webpack_compilation_to_complete',
+            mock_wait_for_webpack_compilation_to_complete)
         check_call_swap = self.swap_with_checks(
             subprocess, 'check_call', self.mock_check_call,
             expected_args=[(expected_commands,)])
@@ -488,12 +493,16 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with print_swap, self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
                 with update_dev_mode_in_constants_js_swap, check_call_swap:
-                    with is_file_swap, build_main_swap:
+                    with is_file_swap, build_main_swap, (
+                        wait_for_webpack_compilation_to_complete_swap):
                         run_e2e_tests.build_js_files(True)
 
     def test_build_js_files_in_dev_mode_with_hash_file_not_exist(self):
         def mock_update_dev_mode_in_constants_js(
                 unused_filename, unused_dev_mode):
+            pass
+
+        def mock_wait_for_webpack_compilation_to_complete():
             pass
 
         expected_commands = [
@@ -507,6 +516,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'update_dev_mode_in_constants_js',
             mock_update_dev_mode_in_constants_js,
             expected_args=[(self.mock_constant_file_path, True)])
+        wait_for_webpack_compilation_to_complete_swap = self.swap_with_checks(
+            run_e2e_tests, 'wait_for_webpack_compilation_to_complete',
+            mock_wait_for_webpack_compilation_to_complete)
         check_call_swap = self.swap_with_checks(
             subprocess, 'check_call', self.mock_check_call,
             expected_args=[(expected_commands,)])
@@ -516,7 +528,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with print_swap, self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
                 with update_dev_mode_in_constants_js_swap, check_call_swap:
-                    with hash_file_path_swap, build_main_swap:
+                    with hash_file_path_swap, build_main_swap, (
+                        wait_for_webpack_compilation_to_complete_swap):
                         run_e2e_tests.build_js_files(True)
         with python_utils.open_file(mock_hash_file_path, 'r') as f:
             content = f.readlines()
