@@ -97,7 +97,7 @@ class EditableStoryDataHandler(base.BaseHandler):
         ]
         try:
             story_services.update_story(
-                self.userId, story_id, change_list, commit_message)
+                self.user_id, story_id, change_list, commit_message)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
@@ -112,7 +112,7 @@ class EditableStoryDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_story
     def delete(self, story_id):
         """Handles Delete requests."""
-        story_services.delete_story(self.userid, story_id)
+        story_services.delete_story(self.user_id, story_id)
         self.render_json(self.values)
 
 
@@ -133,8 +133,8 @@ class StoryPublishHandler(base.BaseHandler):
             raise self.InvalidInputException
 
         if new_story_status_is_public:
-            topic_services.publish_story(topic_id, story_id, self.userId)
+            topic_services.publish_story(topic_id, story_id, self.user_id)
         else:
-            topic_services.unpublish_story(topic_id, story_id, self.userId)
+            topic_services.unpublish_story(topic_id, story_id, self.user_id)
 
         self.render_json(self.values)
