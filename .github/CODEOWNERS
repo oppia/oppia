@@ -101,6 +101,7 @@
 /.travis.yml @kevinlee12
 /.yarnrc @kevinlee12
 /codecov.yml @kevinlee12
+/core/domain/case_change_service.py @kevinlee12 @nishantwrp
 /core/templates/css/.stylelintrc @kevinlee12
 /tox.ini @kevinlee12
 /scripts/__init__.py @kevinlee12

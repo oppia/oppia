@@ -32,7 +32,7 @@ describe('Classroom backend API service', function() {
   let topicSummaryObjectFactory:
     TopicSummaryObjectFactory = null;
   let responseDictionaries = {
-    topic_summary_dicts: [{
+    topicSummaryDicts: [{
       id: 'sample_topic_id_1',
       name: 'Topic Name 1',
       subtopicCount: 5,
@@ -68,13 +68,12 @@ describe('Classroom backend API service', function() {
     httpTestingController = TestBed.get(HttpTestingController);
     topicSummaryObjectFactory = TestBed.get(TopicSummaryObjectFactory);
 
-    // Sample topic object returnable from the backend
     sampleDataResultsObjects = {
-      topic_summary_objects: [
+      topicSummaryObjects: [
         topicSummaryObjectFactory.createFromBackendDict(
-          responseDictionaries.topic_summary_dicts[0]),
+          responseDictionaries.topicSummaryDicts[0]),
         topicSummaryObjectFactory.createFromBackendDict(
-          responseDictionaries.topic_summary_dicts[1])
+          responseDictionaries.topicSummaryDicts[1])
       ]
     };
   });
@@ -99,7 +98,7 @@ describe('Classroom backend API service', function() {
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
-        sampleDataResultsObjects.topic_summary_objects);
+        sampleDataResultsObjects.topicSummaryObjects);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
