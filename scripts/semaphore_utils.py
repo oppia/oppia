@@ -51,7 +51,7 @@ def log(message, show_time=False):
 class TaskThread(threading.Thread):
     """Runs a task in its own thread."""
 
-    def __init__(self, func, verbose, semaphore=SEMAPHORE, name=None):
+    def __init__(self, func, verbose, semaphore, name):
         super(TaskThread, self).__init__()
         self.func = func
         self.output = None
@@ -133,3 +133,20 @@ def execute_tasks(tasks, semaphore=SEMAPHORE):
         task.join()
 
     _check_all_tasks(currently_running_tasks)
+
+
+def create_task(func, verbose, semaphore=SEMAPHORE, name=None):
+    """Create a Task in its Thread.
+
+    Args:
+        func: Function. The function that is going to run.
+        verbose: bool. True if verbose mode is enabled.
+        semaphore: threading.Semaphore. The object that controls how many tasks
+            can run at any time.
+        name: str. Name of the task that is going to be created.
+
+    Returns:
+        task: TaskThread object. Created task.
+    """
+    task = TaskThread(func, verbose, semaphore, name)
+    return task

@@ -129,7 +129,7 @@
 /scripts/linter_utils_test.py @kevinlee12
 /scripts/pre_commit_hook.py @kevinlee12
 /scripts/pre_commit_hook_test.py @kevinlee12
-/scripts/pre_commit_linter.py @kevinlee12
+/scripts/pre_commit_linter.py @kevinlee12 @Hudda
 /scripts/pre_push_hook.py @kevinlee12
 /scripts/pre_push_hook_test.py @kevinlee12
 /scripts/pylint_extensions.py @kevinlee12
@@ -144,7 +144,7 @@
 /scripts/run_presubmit_checks.py @kevinlee12
 /scripts/run_tests.py @kevinlee12
 /scripts/script_import_test.py @kevinlee12
-/scripts/semaphore_utils.py @kevinlee12
+/scripts/semaphore_utils.py @kevinlee12 @Hudda
 /scripts/setup.py @kevinlee12
 /scripts/setup_gae.py @kevinlee12
 /scripts/setup_gae_test.py @kevinlee12

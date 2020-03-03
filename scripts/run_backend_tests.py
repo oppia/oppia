@@ -306,7 +306,7 @@ def main(args=None):
     for test_target in all_test_targets:
         test = TestingTaskSpec(
             test_target, parsed_args.generate_coverage_report)
-        task = semaphore_utils.TaskThread(
+        task = semaphore_utils.create_task(
             test.run, parsed_args.verbose, name=test_target)
         task_to_taskspec[task] = test
         tasks.append(task)
