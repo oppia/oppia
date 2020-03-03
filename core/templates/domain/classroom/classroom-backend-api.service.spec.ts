@@ -33,19 +33,29 @@ describe('Classroom backend API service', function() {
     TopicSummaryObjectFactory = null;
   let responseDictionaries = {
     topic_summary_dicts: [{
-      name: 'Topic name',
-      description: 'Topic description',
-      canonical_story_count: 4,
-      subtopic_count: 5,
-      total_skill_count: 20,
-      uncategorized_skill_count: 5
+      id: 'sample_topic_id_1',
+      name: 'Topic Name 1',
+      subtopicCount: 5,
+      canonicalStoryCount: 4,
+      totalSkillCount: 10,
+      uncategorizedSkillCount: 3,
+      additionalStoryCount: 1,
+      topicModelCreatedOn: 100001515,
+      topicModelLastUpdated: 5454542545,
+      version: 1,
+      languageCode: 'en'
     }, {
-      name: 'Topic name 2',
-      description: 'Topic description 2',
-      canonical_story_count: 3,
-      subtopic_count: 2,
-      total_skill_count: 10,
-      uncategorized_skill_count: 3
+      id: 'sample_topic_id_2',
+      name: 'Topic Name 2',
+      subtopicCount: 1,
+      canonicalStoryCount: 2,
+      totalSkillCount: 3,
+      uncategorizedSkillCount: 3,
+      additionalStoryCount: 1,
+      topicModelCreatedOn: 151554845,
+      topicModelLastUpdated: 4542545,
+      version: 1,
+      languageCode: 'en'
     }]
   };
   let sampleDataResultsObjects = null;

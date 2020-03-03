@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-class TopicSummary {
+export class TopicSummary {
   _id: string;
   _name: string;
   _canonicalStoryCount: number;
@@ -64,22 +64,33 @@ class TopicSummary {
   }
 }
 
+export interface TopicSummaryBackendDict {
+  additionalStoryCount: number,
+  canonicalStoryCount: number,
+  id: string,
+  languageCode: string,
+  name: string,
+  subtopicCount: number,
+  totalSkillCount: number,
+  uncategorizedSkillCount: number,
+  version: number,
+  topicModelLastUpdated: number,
+  topicModelCreatedOn: number
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class TopicSummaryObjectFactory {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'topicSummaryBackendDict' is a dict with  underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(topicSummaryBackendDict: any): TopicSummary {
+  createFromBackendDict(
+      topicSummaryBackendDict: TopicSummaryBackendDict): TopicSummary {
     return new TopicSummary(
       topicSummaryBackendDict.id,
       topicSummaryBackendDict.name,
-      topicSummaryBackendDict.canonical_story_count,
-      topicSummaryBackendDict.subtopic_count,
-      topicSummaryBackendDict.total_skill_count,
-      topicSummaryBackendDict.uncategorized_skill_count
+      topicSummaryBackendDict.canonicalStoryCount,
+      topicSummaryBackendDict.subtopicCount,
+      topicSummaryBackendDict.totalSkillCount,
+      topicSummaryBackendDict.uncategorizedSkillCount
     );
   }
 }

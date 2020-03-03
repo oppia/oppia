@@ -22,20 +22,21 @@ import { Injectable } from '@angular/core';
 
 import { ClassroomDomainConstants } from
   'domain/classroom/classroom-domain.constants';
-import { TopicSummaryObjectFactory } from
+import { TopicSummaryObjectFactory, TopicSummary,
+  TopicSummaryBackendDict } from
   'domain/topic/TopicSummaryObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+
+export interface TopicSummaryBackendData {
+  topicSummaryDicts: TopicSummaryBackendDict[]
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClassroomBackendApiService {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'subtopicDataBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  topicSummaryObjects: any = null;
+  topicSummaryObjects: TopicSummary[] = null;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
@@ -50,21 +51,22 @@ export class ClassroomBackendApiService {
         classroom_name: classroomName
       });
 
-    this.http.get(classroomDataUrl).toPromise().then((data: any) => {
-      this.topicSummaryObjects = data.topic_summary_dicts.map(
-        (summaryDict) => {
-          return this.topicSummaryObjectFactory.createFromBackendDict(
-            summaryDict);
+    this.http.get(classroomDataUrl).toPromise().then(
+      (data: TopicSummaryBackendData) => {
+        this.topicSummaryObjects = data.topicSummaryDicts.map(
+          (summaryDict) => {
+            return this.topicSummaryObjectFactory.createFromBackendDict(
+              summaryDict);
+          }
+        );
+        if (successCallback) {
+          successCallback(this.topicSummaryObjects);
         }
-      );
-      if (successCallback) {
-        successCallback(this.topicSummaryObjects);
-      }
-    }, (error: any) => {
-      if (errorCallback) {
-        errorCallback(error);
-      }
-    });
+      }, (error: string) => {
+        if (errorCallback) {
+          errorCallback(error);
+        }
+      });
   }
 
   fetchClassroomData(classroomName: string): Promise<Object> {

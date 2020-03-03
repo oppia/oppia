@@ -29,10 +29,15 @@ describe('Topic summary object factory', () => {
     let sampleTopicSummaryBackendDict = {
       id: 'sample_topic_id',
       name: 'Topic Name',
-      subtopic_count: 5,
-      canonical_story_count: 4,
-      total_skill_count: 10,
-      uncategorized_skill_count: 3
+      subtopicCount: 5,
+      canonicalStoryCount: 4,
+      totalSkillCount: 10,
+      uncategorizedSkillCount: 3,
+      additionalStoryCount: 1,
+      topicModelCreatedOn: 100001515,
+      topicModelLastUpdated: 5454542545,
+      version: 1,
+      languageCode: 'en'
     };
     _sampleTopicSummary = topicSummaryObjectFactory.createFromBackendDict(
       sampleTopicSummaryBackendDict);
