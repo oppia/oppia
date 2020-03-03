@@ -101,12 +101,16 @@ angular.module('oppia').factory('ThreadDataService', [
       },
 
       fetchThreads: function() {
+        // TODO(#8016): Move this $http call to a backend-api.service with unit
+        // tests.
         let suggestionPromise = $http.get(getSuggestionListHandlerUrl(), {
           params: {
             target_type: 'exploration',
             target_id: ContextService.getExplorationId(),
           }
         });
+        // TODO(#8016): Move this $http call to a backend-api.service with unit
+        // tests.
         let threadPromise = $http.get(getThreadListHandlerUrl());
 
         return $q.all([suggestionPromise, threadPromise]).then(response => {
@@ -137,12 +141,16 @@ angular.module('oppia').factory('ThreadDataService', [
         }
         let threadId = thread.threadId;
 
+        // TODO(#8016): Move this $http call to a backend-api.service with unit
+        // tests.
         return $http.get(getThreadHandlerUrl(threadId))
           .then(response => thread.setMessages(response.data.messages.map(
             ThreadMessageObjectFactory.createFromBackendDict)));
       },
 
       fetchFeedbackStats: function() {
+        // TODO(#8016): Move this $http call to a backend-api.service with unit
+        // tests.
         return $http.get(getFeedbackStatsHandlerUrl())
           .then(response => openThreadsCount = response.data.num_open_threads);
       },
@@ -152,6 +160,8 @@ angular.module('oppia').factory('ThreadDataService', [
       },
 
       createNewThread: function(newSubject, newText) {
+        // TODO(#8016): Move this $http call to a backend-api.service with unit
+        // tests.
         return $http.post(getThreadListHandlerUrl(), {
           state_name: null,
           subject: newSubject,
@@ -170,6 +180,8 @@ angular.module('oppia').factory('ThreadDataService', [
           throw Error('Trying to update a non-existent thread');
         }
         let threadId = thread.threadId;
+        // TODO(#8016): Move this $http call to a backend-api.service with unit
+        // tests.
         return $http.post(getFeedbackThreadViewEventUrl(threadId), {
           thread_id: threadId
         });
@@ -183,6 +195,8 @@ angular.module('oppia').factory('ThreadDataService', [
         let oldStatus = thread.status;
         let updatedStatus = (oldStatus === newStatus) ? null : newStatus;
 
+        // TODO(#8016): Move this $http call to a backend-api.service with unit
+        // tests.
         return $http.post(getThreadHandlerUrl(threadId), {
           updated_status: updatedStatus,
           updated_subject: null,
@@ -205,6 +219,8 @@ angular.module('oppia').factory('ThreadDataService', [
         }
         let threadId = thread.threadId;
 
+        // TODO(#8016): Move this $http call to a backend-api.service with unit
+        // tests.
         return $http.put(getSuggestionActionHandlerUrl(threadId), {
           action: action,
           review_message: reviewMsg,
