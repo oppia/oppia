@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { IWarning, BaseInteractionValidationService } from
+import { IWarning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
@@ -33,8 +33,8 @@ import { AppConstants } from 'app.constants';
 })
 export class NumericInputValidationService {
   constructor(
-      private BaseInteractionValidationServiceInstance:
-        BaseInteractionValidationService) {}
+      private baseInteractionValidationServiceInstance:
+        baseInteractionValidationService) {}
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'customizationArgs' is a dict with possible underscore_cased
@@ -145,7 +145,7 @@ export class NumericInputValidationService {
     }
 
     warningsList = warningsList.concat(
-      this.BaseInteractionValidationServiceInstance.getAllOutcomeWarnings(
+      this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));
 
     return warningsList;
