@@ -67,6 +67,7 @@ angular.module('oppia').factory('LearnerPlaylistService', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/learner-dashboard-page/modal-templates/' +
           'remove-activity-from-learner-dashboard-modal.template.html'),
+        backdrop: true,
         resolve: {
           activityId: function() {
             return activityId;

@@ -60,6 +60,7 @@ describe('Learner Playlist Modal Controller', function() {
   it('should not remove from learn playlist when cicking on cancel button',
     function() {
       $scope.cancel();
+      $httpBackend.verifyNoOutstandingExpectation();
       expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
     });
 });
