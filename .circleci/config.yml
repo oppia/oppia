@@ -4,8 +4,14 @@ workflows:
     jobs:
       - setup
       - e2e_classroom_page:
+          requires:
+            - setup
       - e2e_file_upload_features:
+          requires:
+            - setup
       - e2e_topic_and_story_editor:
+          requires:
+            - setup
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
