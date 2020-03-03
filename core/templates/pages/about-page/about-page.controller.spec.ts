@@ -40,7 +40,7 @@ describe('About Page', function() {
     // onhashchange and location.hash are reassigned because it shares
     // same memory reference to all test blocks and the controller itself
     // because $provide.value of WindowRef refers to windowRef as well.
-    // Once location.hash or onhashchange is setted in the controller,
+    // Once location.hash or onhashchange is set in the controller,
     // the value will be only available in the test block itself, not affecting
     // others test block.
     windowRef.nativeWindow.onhashchange = null;
