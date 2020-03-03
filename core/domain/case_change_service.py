@@ -21,12 +21,10 @@ import re
 
 SNAKE_CASE_RE = re.compile(r'([^\-_\s])[\-_\s]+([^\-_\s])')
 
-def camelize_string(string):
+def camelize_string(s):
     '''
     Camelizes the string
     '''
-    s = str(string)
-
     return ''.join([
         s[0].lower() if not s[:2].isupper() else s[0],
         SNAKE_CASE_RE.sub(lambda m: m.group(1) + m.group(2).upper(), s[1:]),
