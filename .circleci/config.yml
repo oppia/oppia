@@ -3,27 +3,9 @@ workflows:
   circleci_tests:
     jobs:
       - setup
-      - lint_tests:
-          requires:
-            - setup
-      - typescript_tests:
-          requires:
-            - setup
-      - frontend_tests:
-          requires:
-            - setup
-      - backend_tests:
-          requires:
-            - setup
       - e2e_classroom_page:
-          requires:
-            - typescript_tests
       - e2e_file_upload_features:
-          requires:
-            - typescript_tests
       - e2e_topic_and_story_editor:
-          requires:
-            - typescript_tests
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
