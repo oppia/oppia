@@ -62,7 +62,7 @@ class EditableStoryDataHandler(base.BaseHandler):
     def get(self, story_id):
         """Populates the data on the individual story page."""
         story = story_fetchers.get_story_by_id(story_id, strict=False)
-        topic_id = story.correspondingTopicId
+        topic_id = story.corresponding_topic_id
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         skill_ids = topic.get_all_skill_ids()
         skill_summaries = skill_services.get_multi_skill_summaries(skill_ids)
