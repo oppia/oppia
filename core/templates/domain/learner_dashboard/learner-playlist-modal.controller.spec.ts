@@ -48,19 +48,18 @@ describe('Learner Playlist Modal Controller', function() {
       });
   }));
 
-  it('should remove from learn playlist when cicking on remove button',
-    function() {
-      $httpBackend.expect(
-        'DELETE', '/learnerplaylistactivityhandler/exploration/0').respond(200);
-      $scope.remove();
-      $httpBackend.flush();
-      expect($uibModalInstance.close).toHaveBeenCalled();
-    });
+  it('should call http for deleting from learner playlist when clicking on' +
+    ' remove button', function() {
+    $httpBackend.expect(
+      'DELETE', '/learnerplaylistactivityhandler/exploration/0').respond(200);
+    $scope.remove();
+    $httpBackend.flush();
+    expect($uibModalInstance.close).toHaveBeenCalled();
+  });
 
-  it('should not remove from learn playlist when cicking on cancel button',
-    function() {
-      $scope.cancel();
-      $httpBackend.verifyNoOutstandingExpectation();
-      expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-    });
+  it('should not call http delete when clicking on cancel button', function() {
+    $scope.cancel();
+    $httpBackend.verifyNoOutstandingExpectation();
+    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
+  });
 });
