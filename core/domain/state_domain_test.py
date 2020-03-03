@@ -221,18 +221,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is content</p>'
             }))
         init_state.update_interaction_id('TextInput')
-        default_outcome_dict = {
-            'dest': 'Introduction',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>The default outcome.</p>'},
-            'labelled_as_correct': False,
-            'missing_prerequisite_skill_id': None,
-            'param_changes': [],
-            'refresher_exploration_id': None
-        }
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
 
-        init_state.update_interaction_default_outcome(default_outcome_dict)
+        init_state.update_interaction_default_outcome(default_outcome)
 
         answer_group_dict = {
             'outcome': {
@@ -604,7 +599,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_voiceover_validation(self):
         """Test validation of voiceover."""
-        audio_voiceover = state_domain.Voiceover('a.mp3', 20, True)
+        audio_voiceover = state_domain.Voiceover('a.mp3', 20, True, 24.5)
         audio_voiceover.validate()
 
         with self.assertRaisesRegexp(
@@ -644,6 +639,23 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ):
             with self.swap(audio_voiceover, 'needs_update', 'hello'):
                 audio_voiceover.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected duration_secs to be a float'
+            ):
+            with self.swap(audio_voiceover, 'duration_secs', 'test'):
+                audio_voiceover.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected duration_secs to be a float'
+            ):
+            with self.swap(audio_voiceover, 'duration_secs', 10):
+                audio_voiceover.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected duration_secs to be positive number, '
+            'or zero if not yet specified'
+            ):
+            with self.swap(audio_voiceover, 'duration_secs', -3.45):
+                audio_voiceover.validate()
 
     def test_written_translation_validation(self):
         """Test validation of translation script."""
@@ -676,7 +688,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ]
         init_state.update_interaction_hints(hints_list)
 
-        solution = {
+        solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
@@ -685,7 +697,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
-        init_state.update_interaction_solution(solution)
+        init_state.update_interaction_solution(solution_dict)
         exploration.validate()
 
         hints_list.append(
@@ -868,19 +880,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_duplicate_content_id_with_default_outcome(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        default_outcome_dict = {
-            'dest': 'Introduction',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': ''},
-            'labelled_as_correct': False,
-            'missing_prerequisite_skill_id': None,
-            'param_changes': [],
-            'refresher_exploration_id': None
-        }
-
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml('default_outcome', ''),
+            False, [], None, None
+        )
         exploration.init_state.update_interaction_default_outcome(
-            default_outcome_dict)
+            default_outcome
+        )
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'default_outcome',
@@ -1021,7 +1027,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'filename': 'filename3.mp3',
                         'file_size_bytes': 3000,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 8.1
                     }
                 },
                 'default_outcome': {}
@@ -1107,14 +1114,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'filename': 'filename3.mp3',
                         'file_size_bytes': 3000,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 6.1
                     }
                 },
                 'hint_2': {
                     'en': {
                         'filename': 'filename4.mp3',
                         'file_size_bytes': 3000,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 7.5
                     }
                 },
                 'default_outcome': {}
@@ -1226,14 +1235,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration.init_state.interaction.confirmed_unclassified_answers,
             answer_groups_list)
-
-    def test_cannot_update_non_dict_interaction_default_outcome(self):
-        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-
-        with self.assertRaisesRegexp(
-            Exception, 'Expected default_outcome_dict to be a dict'):
-            exploration.init_state.update_interaction_default_outcome(
-                'invalid_default_outcome')
 
     def test_cannot_update_non_list_interaction_answer_groups(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
@@ -1701,24 +1702,28 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
-                        'needs_update': True
+                        'needs_update': True,
+                        'duration_secs': 1.1
                     },
                     'hi': {
                         'filename': 'abc.mp3',
                         'file_size_bytes': 1234,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.3
                     }
                 },
                 'feedback_1': {
                     'hi': {
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.1
                     },
                     'en': {
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.3
                     }
                 }
             }
@@ -1777,7 +1782,8 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.1
                     }
                 }
             }
@@ -1798,7 +1804,8 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.1
                     }
                 }
             }
@@ -1869,7 +1876,8 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                     123: {
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.1
                     }
                 }
             }
@@ -1889,7 +1897,8 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                     'ed': {
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.1
                     }
                 }
             }
@@ -1908,7 +1917,8 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.1
                     }
                 }
             }
@@ -1929,7 +1939,7 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(VoiceoverDomainTests, self).setUp()
-        self.voiceover = state_domain.Voiceover('filename.mp3', 10, False)
+        self.voiceover = state_domain.Voiceover('filename.mp3', 10, False, 15.0)
 
     def test_validate_non_str_filename(self):
         self.voiceover.validate()
@@ -1973,4 +1983,26 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
         self.voiceover.needs_update = 'needs_update'
         with self.assertRaisesRegexp(
             Exception, 'Expected needs_update to be a bool'):
+            self.voiceover.validate()
+
+    def test_validate_float_duration_secs(self):
+        self.voiceover.validate()
+        self.voiceover.duration_secs = 'duration_secs'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected duration_secs to be a float'):
+            self.voiceover.validate()
+
+    def test_validate_int_duration_secs(self):
+        self.voiceover.validate()
+        self.voiceover.duration_secs = 10
+        with self.assertRaisesRegexp(
+            Exception, 'Expected duration_secs to be a float'):
+            self.voiceover.validate()
+
+    def test_validate_negative_duration_seconds(self):
+        self.voiceover.validate()
+        self.voiceover.duration_secs = -1.45
+        with self.assertRaisesRegexp(
+            Exception, 'Expected duration_secs to be positive number, '
+            'or zero if not yet specified'):
             self.voiceover.validate()
