@@ -21,8 +21,6 @@ describe('Learner Playlist Modal Controller', function() {
   var $httpBackend = null;
   var CsrfService = null;
   var $uibModalInstance;
-  var activityId = '0';
-  var activityType = 'exploration';
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller, $q) {
@@ -53,8 +51,7 @@ describe('Learner Playlist Modal Controller', function() {
   it('should remove from learn playlist when cicking on remove button',
     function() {
       $httpBackend.expect(
-        'DELETE', '/learnerplaylistactivityhandler/' + activityType + '/' +
-        activityId).respond(200);
+        'DELETE', '/learnerplaylistactivityhandler/exploration/0').respond(200);
       $scope.remove();
       $httpBackend.flush();
       expect($uibModalInstance.close).toHaveBeenCalled();

@@ -18,7 +18,7 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
-require('domain/learner_dashboard/learner-playlist.controller.ts');
+require('domain/learner_dashboard/learner-playlist-modal.controller.ts');
 
 angular.module('oppia').factory('LearnerPlaylistService', [
   '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
