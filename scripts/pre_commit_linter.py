@@ -40,8 +40,7 @@ CUSTOMIZATION OPTIONS
 
 5. To lint a specific list of file extensions (*.js/*.py only). Separate file
     extensions by spaces
-        python -m scripts.pre_commit_linter --only-check-file-extensions
-        extension_1 py js
+        python -m scripts.pre_commit_linter --only-check-file-extensions py js
 
 Note that the root folder MUST be named 'oppia'.
  """
