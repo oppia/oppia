@@ -101,12 +101,12 @@
 /.travis.yml @kevinlee12
 /.yarnrc @kevinlee12
 /codecov.yml @kevinlee12
-/core/domain/case_change_service.py @kevinlee12 @nishantwrp
 /core/templates/css/.stylelintrc @kevinlee12
 /tox.ini @kevinlee12
 /scripts/__init__.py @kevinlee12
 /scripts/build.py @kevinlee12
 /scripts/build_test.py @kevinlee12
+/scripts/case_change_service.py @kevinlee12 @nishantwrp
 /scripts/check_e2e_tests_are_captured_in_ci*.py @Showtim3 @kevinlee12
 /scripts/check_frontend_coverage.py @marianazangrossi @kevinlee12
 /scripts/check_frontend_coverage_test.py @marianazangrossi @kevinlee12

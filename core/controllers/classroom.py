@@ -22,8 +22,8 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import topic_services
-from core.domain.case_change_service import camelize
 import feconf
+from scripts import case_change_service
 
 
 class ClassroomPage(base.BaseHandler):
@@ -79,6 +79,7 @@ class ClassroomDataHandler(base.BaseHandler):
         ]
 
         self.values.update({
-            'topicSummaryDicts': camelize(topic_summary_dicts)
+            'topicSummaryDicts': case_change_service.camelize(
+                topic_summary_dicts)
         })
         self.render_json(self.values)

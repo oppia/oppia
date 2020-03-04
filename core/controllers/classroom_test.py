@@ -21,9 +21,9 @@ from constants import constants
 from core.domain import config_domain
 from core.domain import topic_domain
 from core.domain import topic_services
-from core.domain import case_change_service
 from core.tests import test_utils
 import feconf
+from scripts import case_change_service
 
 
 class BaseClassroomControllerTests(test_utils.GenericTestBase):
@@ -98,7 +98,8 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
                 topic_services.get_topic_summary_by_id(topic_id_2).to_dict())
 
             expected_dict = {
-                'topicSummaryDicts': [case_change_service.camelize(topic_summary_dict)]
+                'topicSummaryDicts': [case_change_service.camelize(
+                    topic_summary_dict)]
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 
