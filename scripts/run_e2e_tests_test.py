@@ -274,47 +274,54 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         exit_swap = self.swap_with_checks(sys, 'exit', mock_exit)
         with is_port_open_swap, sleep_swap, exit_swap:
             run_e2e_tests.wait_for_port_to_be_open(1)
-        self.assertEqual(mock_sleep.sleep_time, run_e2e_tests.MAX_WAIT_TIME)
+        self.assertEqual(
+            mock_sleep.sleep_time,
+            run_e2e_tests.MAX_WAIT_TIMEMAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
 
-    def test_wait_for_webpack_compilation_to_complete_success(self):
+    def test_run_webpack_compilation_success(self):
         def mock_isdir(unused_dirname):
-            mock_isdir.wait_time += 1
-            if mock_isdir.wait_time > 10:
+            mock_isdir.run_times += 1
+            if mock_isdir.run_times > 3:
                 return True
             return False
-        mock_isdir.wait_time = 0
+        mock_isdir.run_times = 0
 
-        def mock_sleep(unused_time):
-            mock_sleep.called_times += 1
-            return
-        mock_sleep.called_times = 0
+        expected_commands = [
+            self.mock_node_bin_path, self.mock_webpack_bin_path, '--config',
+            'webpack.dev.config.ts']
 
         isdir_swap = self.swap_with_checks(os.path, 'isdir', mock_isdir)
-        sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
+        # The webpack compilation processes will be called 4 times as mock_isdir
+        # will return true after 4 calls.
+        check_call_swap = self.swap_with_checks(
+            subprocess, 'check_call', self.mock_check_call,
+            expected_args=[(expected_commands,)] * 4)
+        with self.node_bin_path_swap, self.webpack_bin_path_swap, (
+            check_call_swap):
+            with isdir_swap:
+                run_e2e_tests.run_webpack_compilation()
 
-        with isdir_swap, sleep_swap:
-            run_e2e_tests.wait_for_webpack_compilation_to_complete()
-        self.assertEqual(mock_isdir.wait_time, 11)
-        self.assertEqual(mock_sleep.called_times, 10)
-
-    def test_wait_for_webpack_compilation_to_complete_failed(self):
+    def test_run_webpack_compilation_failed(self):
         def mock_isdir(unused_port):
             return False
-
-        def mock_sleep(unused_time):
-            mock_sleep.sleep_time += 1
 
         def mock_exit(unused_exit_code):
             return
 
-        mock_sleep.sleep_time = 0
+        expected_commands = [
+            self.mock_node_bin_path, self.mock_webpack_bin_path, '--config',
+            'webpack.dev.config.ts']
+        # The webpack compilation processes will be called five times.
+        check_call_swap = self.swap_with_checks(
+            subprocess, 'check_call', self.mock_check_call,
+            expected_args=[(expected_commands,)] * 5)
 
         isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
-        sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
-        exit_swap = self.swap_with_checks(sys, 'exit', mock_exit)
-        with isdir_swap, sleep_swap, exit_swap:
-            run_e2e_tests.wait_for_webpack_compilation_to_complete()
-        self.assertEqual(mock_sleep.sleep_time, run_e2e_tests.MAX_WAIT_TIME)
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(1,)])
+        with self.node_bin_path_swap, self.webpack_bin_path_swap:
+            with check_call_swap, isdir_swap, exit_swap:
+                run_e2e_tests.run_webpack_compilation()
 
     def test_update_dev_mode_in_constants_js_in_dev_mode_without_change_file(
             self):
@@ -459,8 +466,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 run_e2e_tests.FECONF_FILE_PATH, False)
 
     def test_build_js_files_in_dev_mode_with_hash_file_exists(self):
-        def mock_wait_for_webpack_compilation_to_complete():
-            pass
+        def mock_isdir(unused_path):
+            return True
 
         def mock_update_dev_mode_in_constants_js(
                 unused_filename, unused_dev_mode):
@@ -481,9 +488,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'update_dev_mode_in_constants_js',
             mock_update_dev_mode_in_constants_js,
             expected_args=[(self.mock_constant_file_path, True)])
-        wait_for_webpack_compilation_to_complete_swap = self.swap_with_checks(
-            run_e2e_tests, 'wait_for_webpack_compilation_to_complete',
-            mock_wait_for_webpack_compilation_to_complete)
+        isdir_swap = self.swap_with_checks(os.path, 'isdir', mock_isdir)
         check_call_swap = self.swap_with_checks(
             subprocess, 'check_call', self.mock_check_call,
             expected_args=[(expected_commands,)])
@@ -493,8 +498,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with print_swap, self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
                 with update_dev_mode_in_constants_js_swap, check_call_swap:
-                    with is_file_swap, build_main_swap, (
-                        wait_for_webpack_compilation_to_complete_swap):
+                    with is_file_swap, build_main_swap, isdir_swap:
                         run_e2e_tests.build_js_files(True)
 
     def test_build_js_files_in_dev_mode_with_hash_file_not_exist(self):
@@ -502,8 +506,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 unused_filename, unused_dev_mode):
             pass
 
-        def mock_wait_for_webpack_compilation_to_complete():
-            pass
+        def mock_isdir(unused_path):
+            return True
 
         expected_commands = [
             self.mock_node_bin_path, self.mock_webpack_bin_path, '--config',
@@ -516,9 +520,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'update_dev_mode_in_constants_js',
             mock_update_dev_mode_in_constants_js,
             expected_args=[(self.mock_constant_file_path, True)])
-        wait_for_webpack_compilation_to_complete_swap = self.swap_with_checks(
-            run_e2e_tests, 'wait_for_webpack_compilation_to_complete',
-            mock_wait_for_webpack_compilation_to_complete)
+        isdir_swap = self.swap_with_checks(os.path, 'isdir', mock_isdir)
         check_call_swap = self.swap_with_checks(
             subprocess, 'check_call', self.mock_check_call,
             expected_args=[(expected_commands,)])
@@ -528,8 +530,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with print_swap, self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
                 with update_dev_mode_in_constants_js_swap, check_call_swap:
-                    with hash_file_path_swap, build_main_swap, (
-                        wait_for_webpack_compilation_to_complete_swap):
+                    with hash_file_path_swap, build_main_swap, isdir_swap:
                         run_e2e_tests.build_js_files(True)
         with python_utils.open_file(mock_hash_file_path, 'r') as f:
             content = f.readlines()
