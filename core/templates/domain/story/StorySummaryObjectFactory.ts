@@ -53,7 +53,7 @@ export class StorySummaryObjectFactory {
     id: string;
     title: string;
     // eslint-disable-next-line camelcase
-    nodecount: number;
+    nodeCount: number;
     // eslint-disable-next-line camelcase
     storyIsPublished: boolean;
   }): StorySummary {
