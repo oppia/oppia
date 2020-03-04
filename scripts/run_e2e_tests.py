@@ -210,6 +210,7 @@ def run_webpack_compilation():
         except subprocess.CalledProcessError as error:
             python_utils.PRINT(error.output)
             sys.exit(error.returncode)
+            return
         if os.path.isdir(webpack_bundles_dir_name):
             break
     if not os.path.isdir(webpack_bundles_dir_name):
