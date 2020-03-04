@@ -60,12 +60,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         def mock_run_cmd(unused_commands):
             pass
-        # pylint: disable=unused-argument
 
         def mock_check_call(unused_commands):
             pass
-        # pylint: disable=unused-argument
 
+        # pylint: disable=unused-argument
         def mock_build_main(args):
             pass
 
@@ -276,7 +275,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests.wait_for_port_to_be_open(1)
         self.assertEqual(
             mock_sleep.sleep_time,
-            run_e2e_tests.MAX_WAIT_TIMEMAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
+            run_e2e_tests.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
 
     def test_run_webpack_compilation_success(self):
         def mock_isdir(unused_dirname):

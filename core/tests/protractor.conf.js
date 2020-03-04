@@ -291,7 +291,7 @@ exports.config = {
         // Directory for screenshots
         dest: '../protractor-screenshots',
         // Function to build filenames of screenshots
-        pathBuilder: function(currentSpec, suites) {
+        pathBuilder: function(currentSpec) {
           return currentSpec.fullName;
         },
         captureOnlyFailedSpecs: true

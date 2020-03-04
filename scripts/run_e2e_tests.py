@@ -44,7 +44,7 @@ PROTRACTOR_BIN_PATH = os.path.join(
 
 CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
 FECONF_FILE_PATH = os.path.join('feconf.py')
-MAX_WAIT_TIMEMAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
+MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
 WEBDRIVER_HOME_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'webdriver-manager')
 WEBDRIVER_MANAGER_BIN_PATH = os.path.join(
@@ -187,11 +187,11 @@ def wait_for_port_to_be_open(port_number):
     """
     waited_seconds = 0
     while (not common.is_port_open(port_number) and
-           waited_seconds < MAX_WAIT_TIMEMAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
+           waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
         time.sleep(1)
         waited_seconds += 1
     if (waited_seconds ==
-            MAX_WAIT_TIMEMAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS and
+            MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS and
             not common.is_port_open(port_number)):
         python_utils.PRINT(
             'Failed to start server on port %s, exiting ...' % port_number)
