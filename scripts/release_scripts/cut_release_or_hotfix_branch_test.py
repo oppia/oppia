@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/cut_release_or_hotfix_branch.py."""
+"""Unit tests for scripts/release_scripts/cut_release_or_hotfix_branch.py."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -262,10 +262,11 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
     def test_exception_is_raised_for_invalid_new_hotfix_number(self):
         def mock_check_output(unused_cmd_tokens):
             return (
-                'branch1\nupstream/branch2\nupstream/release-1.2.3-hotfix-2\n'
-                'upstream/release-1.2.3-hotfix-1\n'
-                'upstream/release-1.2.2-hotfix-3\n'
-                'upstream/release-1.2.3\n')
+                'branch1\nremotes/upstream/branch2\n'
+                'remotes/upstream/release-1.2.3-hotfix-2\n'
+                'remotes/upstream/release-1.2.3-hotfix-1\n'
+                'remotes/upstream/release-1.2.2-hotfix-3\n'
+                'remotes/upstream/release-1.2.3\n')
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
@@ -278,9 +279,10 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
     def test_exception_is_raised_for_missing_release_branch(self):
         def mock_check_output(unused_cmd_tokens):
             return (
-                'branch1\nupstream/branch2\nupstream/release-1.2.3-hotfix-2\n'
-                'upstream/release-1.2.3-hotfix-1\n'
-                'upstream/release-1.2.3-hotfix-3\n')
+                'branch1\nremotes/upstream/branch2\n'
+                'remotes/upstream/release-1.2.3-hotfix-2\n'
+                'remotes/upstream/release-1.2.3-hotfix-1\n'
+                'remotes/upstream/release-1.2.3-hotfix-3\n')
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
@@ -293,10 +295,11 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
     def test_no_exception_is_raised_for_valid_new_hotfix_number(self):
         def mock_check_output(unused_cmd_tokens):
             return (
-                'branch1\nupstream/branch2\nupstream/release-1.2.3-hotfix-2\n'
-                'upstream/release-1.2.3-hotfix-1\n'
-                'upstream/release-1.2.2-hotfix-3\n'
-                'upstream/release-1.2.3\n')
+                'branch1\nremotes/upstream/branch2\n'
+                'remotes/upstream/release-1.2.3-hotfix-2\n'
+                'remotes/upstream/release-1.2.3-hotfix-1\n'
+                'remotes/upstream/release-1.2.2-hotfix-3\n'
+                'remotes/upstream/release-1.2.3\n')
 
         with self.swap(subprocess, 'check_output', mock_check_output):
             (
@@ -304,37 +307,41 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
                 .verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
                     'upstream', '1.2.3', 3))
 
-    def test_exception_is_raised_for_invalid_new_version(self):
+    def test_exception_is_raised_for_invalid_release_version(self):
         with self.assertRaisesRegexp(
             argparse.ArgumentTypeError,
-            'The format of "new_version" should be: x.x.x'):
-            cut_release_or_hotfix_branch.new_version_type('invalid')
+            'The format of "release_version" should be: x.x.x'):
+            (
+                cut_release_or_hotfix_branch
+                .require_release_version_to_have_correct_format('invalid'))
 
-    def test_no_exception_is_raised_for_valid_new_version(self):
-        cut_release_or_hotfix_branch.new_version_type('1.2.3')
+    def test_no_exception_is_raised_for_valid_release_version(self):
+        (
+            cut_release_or_hotfix_branch
+            .require_release_version_to_have_correct_format('1.2.3'))
 
-    def test_missing_new_version(self):
+    def test_missing_release_version(self):
         args_swap = self.swap(
             sys, 'argv', ['cut_release_or_hotfix_branch.py'])
         with args_swap, self.assertRaisesRegexp(
-            Exception, 'ERROR: A "new_version" arg must be specified.'):
-            cut_release_or_hotfix_branch.execute_branch_cut()
+            Exception, 'ERROR: A "release_version" arg must be specified.'):
+            cut_release_or_hotfix_branch.main()
 
     def test_exception_is_raised_if_travis_is_failing(self):
         def mock_input():
             return 'n'
 
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        args_swap = self.swap(
-            sys, 'argv',
-            ['cut_release_or_hotfix_branch.py', '--new_version=1.2.3'])
         with self.verify_local_repo_swap, self.verify_branch_name_swap:
             with self.verify_target_branch_swap:
                 with self.verify_target_version_swap, self.open_tab_swap:
                     with self.get_remote_alias_swap, self.check_call_swap:
-                        with input_swap, args_swap, self.assertRaises(
-                            SystemExit):
-                            cut_release_or_hotfix_branch.execute_branch_cut()
+                        with input_swap, self.assertRaisesRegexp(
+                            Exception,
+                            'Tests should pass on develop before this '
+                            'script is run.'):
+                            cut_release_or_hotfix_branch.execute_branch_cut(
+                                '1.2.3', 0)
 
         self.expected_check_function_calls[
             'verify_hotfix_number_is_one_ahead_of_previous_'
@@ -348,15 +355,13 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             self.check_function_calls, self.expected_check_function_calls)
 
     def test_function_calls_for_release_branch(self):
-        args_swap = self.swap(
-            sys, 'argv',
-            ['cut_release_or_hotfix_branch.py', '--new_version=1.2.3'])
         with self.verify_local_repo_swap, self.verify_branch_name_swap:
             with self.get_remote_alias_swap, self.check_call_swap:
                 with self.verify_target_branch_swap:
                     with self.verify_target_version_swap, self.open_tab_swap:
-                        with self.input_swap, self.ask_user_swap, args_swap:
-                            cut_release_or_hotfix_branch.execute_branch_cut()
+                        with self.input_swap, self.ask_user_swap:
+                            cut_release_or_hotfix_branch.execute_branch_cut(
+                                '1.2.3', 0)
         self.expected_check_function_calls[
             'verify_hotfix_number_is_one_ahead_of_previous_'
             'hotfix_number_is_called'] = False
@@ -365,19 +370,14 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
 
     def test_function_calls_for_hotfix_branch_with_hotfix_number_more_than_one(
             self):
-        args_swap = self.swap(
-            sys, 'argv',
-            [
-                'cut_release_or_hotfix_branch.py', '--new_version=1.2.3',
-                '--hotfix_number=3'])
         with self.verify_local_repo_swap, self.verify_branch_name_swap:
             with self.get_remote_alias_swap, self.check_call_swap:
-                with self.verify_target_branch_swap, args_swap:
+                with self.verify_target_branch_swap:
                     with self.verify_target_version_swap, self.open_tab_swap:
                         with self.verify_hotfix_number_swap, self.input_swap:
                             with self.ask_user_swap:
                                 cut_release_or_hotfix_branch.execute_branch_cut(
-                                    )
+                                    '1.2.3', 3)
         self.expected_check_function_calls[
             'verify_target_version_compatible_with_'
             'latest_released_version_is_called'] = False
@@ -386,19 +386,14 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
 
     def test_function_calls_for_hotfix_branch_with_hotfix_number_equal_to_one(
             self):
-        args_swap = self.swap(
-            sys, 'argv',
-            [
-                'cut_release_or_hotfix_branch.py', '--new_version=1.2.3',
-                '--hotfix_number=1'])
         with self.verify_local_repo_swap, self.verify_branch_name_swap:
             with self.get_remote_alias_swap, self.check_call_swap:
-                with self.verify_target_branch_swap, args_swap:
+                with self.verify_target_branch_swap:
                     with self.verify_target_version_swap, self.open_tab_swap:
                         with self.verify_hotfix_number_swap, self.input_swap:
                             with self.ask_user_swap:
                                 cut_release_or_hotfix_branch.execute_branch_cut(
-                                    )
+                                    '1.2.3', 1)
         self.expected_check_function_calls[
             'verify_target_version_compatible_with_'
             'latest_released_version_is_called'] = False

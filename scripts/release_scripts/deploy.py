@@ -29,7 +29,7 @@ IMPORTANT NOTES:
 
 2.  This script should be run from the oppia root folder:
 
-        python -m scripts.deploy --app_name=[app_name]
+        python -m scripts.release_scripts.deploy --app_name=[app_name]
 
     where [app_name] is the name of your app. Note that the root folder MUST be
     named 'oppia'.
@@ -224,7 +224,7 @@ def build_scripts():
     # Do a build, while outputting to the terminal.
     python_utils.PRINT('Building and minifying scripts...')
     build_process = subprocess.Popen(
-        ['python', '-m', 'scripts.build', '--prod_env'],
+        ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'],
         stdout=subprocess.PIPE)
     while True:
         line = build_process.stdout.readline().strip()
@@ -335,15 +335,17 @@ def check_breakage(app_name, current_release_version):
 
 
 def check_travis_and_circleci_tests(current_branch_name):
-    """Checks if all travis and circleci tests are passing on release branch.
+    """Checks if all travis and circleci tests are passing on release/test
+    branch.
 
     Args:
         current_branch_name: str. The name of current branch.
 
     Raises:
-        Exception: The latest commit on release branch locally does not match
-            the latest commit on local fork or upstream.
-        Exception: The travis or circleci tests are failing.
+        Exception: The latest commit on release/test branch locally does not
+            match the latest commit on local fork or upstream.
+        Exception: The travis or circleci tests are failing on release/test
+            branch.
     """
     local_sha = subprocess.check_output([
         'git', 'rev-parse', current_branch_name])
@@ -420,7 +422,10 @@ def execute_deployment():
         Exception: App name is invalid.
         Exception: Custom version is used with production app.
         Exception: App name is not specified.
-        Exception: The deployment script is not run from a release branch.
+        Exception: The deployment script is not run from a release or test
+            branch.
+        Exception: The deployment script is run for prod server from a test
+            branch.
         Exception: Current release version has '.' character.
         Exception: Last commit message is invalid.
         Exception: The mailgun API key is not added before deployment.
@@ -455,9 +460,13 @@ def execute_deployment():
 
     install_third_party_libs.main()
 
-    if not common.is_current_branch_a_release_branch():
+    if not (common.is_current_branch_a_release_branch() or (
+            common.is_current_branch_a_test_branch())):
         raise Exception(
-            'The deployment script must be run from a release branch.')
+            'The deployment script must be run from a release or test branch.')
+    if common.is_current_branch_a_test_branch() and (
+            app_name in [APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER]):
+        raise Exception('Test branch can only be deployed to backup server.')
     if custom_version is not None:
         current_release_version = custom_version.replace(
             DOT_CHAR, HYPHEN_CHAR)
