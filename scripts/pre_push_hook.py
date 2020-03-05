@@ -60,7 +60,7 @@ OPPIA_PARENT_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir, os.pardir)
 NPM_CMD = os.path.join(
     OPPIA_PARENT_DIR, 'oppia_tools', 'node-10.18.0', 'bin', 'npm')
 YARN_CMD = os.path.join(
-    OPPIA_PARENT_DIR, 'oppia_tools', 'yarn-v1.17.3', 'bin', 'yarn')
+    OPPIA_PARENT_DIR, 'oppia_tools', 'yarn-v1.22.0', 'bin', 'yarn')
 FRONTEND_TEST_SCRIPT = 'run_frontend_tests'
 TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT = 'check_e2e_tests_are_captured_in_ci'
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
