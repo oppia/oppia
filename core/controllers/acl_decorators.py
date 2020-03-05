@@ -1563,6 +1563,11 @@ def can_edit_topic(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
+        try:
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
@@ -1772,6 +1777,11 @@ def can_add_new_story_to_topic(handler):
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
+
+        try:
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
@@ -2046,6 +2056,11 @@ def can_delete_topic(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
+        try:
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
         if role_services.ACTION_DELETE_TOPIC in user_actions_info.actions:
@@ -2265,6 +2280,11 @@ def can_change_topic_publication_status(handler):
         """
         if not self.user_id:
             raise self.NotLoggedInException
+
+        try:
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
