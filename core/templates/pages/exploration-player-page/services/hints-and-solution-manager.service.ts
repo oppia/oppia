@@ -180,8 +180,8 @@ angular.module('oppia').factory('HintsAndSolutionManagerService', [
 
         wrongAnswersSinceLastHintConsumed++;
         if (!areAllHintsExhausted()) {
-          if (numHintsReleased === 0 &&
-            wrongAnswersSinceLastHintConsumed >= 2) {
+          if (
+            numHintsReleased === 0 && wrongAnswersSinceLastHintConsumed >= 2) {
             accelerateHintRelease();
           } else if (
             numHintsReleased > 0 && wrongAnswersSinceLastHintConsumed >= 1) {
