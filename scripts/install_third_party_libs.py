@@ -211,7 +211,7 @@ def main():
         tweak_yarn_executable()
 
     # Install third-party node modules needed for the build process.
-    subprocess.check_call([get_yarn_command()])
+    subprocess.check_call([get_yarn_command(), 'install', '--pure-lockfile'])
 
     # Install pre-commit script.
     python_utils.PRINT('Installing pre-commit hook for git')

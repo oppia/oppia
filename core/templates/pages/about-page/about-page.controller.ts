@@ -34,10 +34,11 @@ angular.module('oppia').directive('aboutPage', [
       controller: [
         'UrlInterpolationService', 'WindowRef',
         function(UrlInterpolationService, WindowRef) {
-          var ctrl = this;
-          var activeTabClass = 'oppia-about-tabs-active';
-          var visibleContent = 'oppia-about-visible-content';
-          var listOfNamesToThank = [
+          const ctrl = this;
+          const activeTabClass = 'oppia-about-tabs-active';
+          const hash = window.location.hash.slice(1);
+          const visibleContent = 'oppia-about-visible-content';
+          const listOfNamesToThank = [
             'Alex Kauffmann', 'Allison Barros',
             'Amy Latten', 'Brett Barros',
             'Crystal Kwok', 'Daniel Hernandez',
@@ -53,7 +54,7 @@ angular.module('oppia').directive('aboutPage', [
             'Vikrant Nanda', 'Vinamrata Singal',
             'Yarin Feigenbaum'];
 
-          var activateTab = function(tabName) {
+          const activateTab = function(tabName: string) {
             $("a[id='" + tabName + "']").parent().addClass(
               activeTabClass
             ).siblings().removeClass(activeTabClass);
@@ -62,12 +63,12 @@ angular.module('oppia').directive('aboutPage', [
             );
           };
 
-          ctrl.onTabClick = function(tabName) {
+          ctrl.onTabClick = function(tabName: string) {
             // Update hash
             WindowRef.nativeWindow.location.hash = '#' + tabName;
             activateTab(tabName);
           };
-          ctrl.getStaticImageUrl = function(imagePath) {
+          ctrl.getStaticImageUrl = function(imagePath: string) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
           ctrl.$onInit = function() {
@@ -95,7 +96,7 @@ angular.module('oppia').directive('aboutPage', [
               .getStaticImageUrl('/general/about_page_mascot.png');
 
             WindowRef.nativeWindow.onhashchange = function() {
-              var hashChange = WindowRef.nativeWindow.location.hash.slice(1);
+              const hashChange = window.location.hash.slice(1);
               if (hashChange === ctrl.TAB_ID_FOUNDATION || (
                 hashChange === 'license')) {
                 activateTab(ctrl.TAB_ID_FOUNDATION);

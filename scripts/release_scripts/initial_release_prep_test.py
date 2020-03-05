@@ -14,17 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/initial_release_prep.py."""
+"""Unit tests for scripts/release_scripts/initial_release_prep.py."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
-
-import subprocess
 
 import constants
 from core.tests import test_utils
 import python_utils
 from scripts import common
+from scripts.release_scripts import cut_release_or_hotfix_branch
 from scripts.release_scripts import initial_release_prep
 
 
@@ -135,56 +134,60 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
     def test_cut_release_branch_with_correct_version(self):
         check_function_calls = {
             'open_new_tab_in_browser_if_possible_is_called': False,
-            'check_call_is_called': False
+            'execute_branch_cut_is_called': False
         }
         expected_check_function_calls = {
             'open_new_tab_in_browser_if_possible_is_called': True,
-            'check_call_is_called': True
+            'execute_branch_cut_is_called': True
         }
         def mock_open_tab(unused_url):
             check_function_calls[
                 'open_new_tab_in_browser_if_possible_is_called'] = True
-        def mock_check_call(unused_cmd_tokens):
-            check_function_calls['check_call_is_called'] = True
+        def mock_execute_branch_cut(
+                unused_target_version, unused_hotfix_number):
+            check_function_calls['execute_branch_cut_is_called'] = True
         def mock_input():
             return '1.2.3'
 
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible',
             mock_open_tab)
-        check_call_swap = self.swap(
-            subprocess, 'check_call', mock_check_call)
+        branch_cut_swap = self.swap(
+            cut_release_or_hotfix_branch, 'execute_branch_cut',
+            mock_execute_branch_cut)
         input_swap = self.swap(
             python_utils, 'INPUT', mock_input)
-        with open_tab_swap, check_call_swap, input_swap:
+        with open_tab_swap, branch_cut_swap, input_swap:
             initial_release_prep.cut_release_branch()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_cut_release_branch_with_incorrect_version(self):
         check_function_calls = {
             'open_new_tab_in_browser_if_possible_is_called': False,
-            'check_call_is_called': False
+            'execute_branch_cut_is_called': False
         }
         expected_check_function_calls = {
             'open_new_tab_in_browser_if_possible_is_called': True,
-            'check_call_is_called': False
+            'execute_branch_cut_is_called': False
         }
         def mock_open_tab(unused_url):
             check_function_calls[
                 'open_new_tab_in_browser_if_possible_is_called'] = True
-        def mock_check_call(unused_cmd_tokens):
-            check_function_calls['check_call_is_called'] = True
+        def mock_execute_branch_cut(
+                unused_target_version, unused_hotfix_number):
+            check_function_calls['execute_branch_cut_is_called'] = True
         def mock_input():
             return 'invalid'
 
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible',
             mock_open_tab)
-        check_call_swap = self.swap(
-            subprocess, 'check_call', mock_check_call)
+        branch_cut_swap = self.swap(
+            cut_release_or_hotfix_branch, 'execute_branch_cut',
+            mock_execute_branch_cut)
         input_swap = self.swap(
             python_utils, 'INPUT', mock_input)
-        with open_tab_swap, check_call_swap, input_swap:
+        with open_tab_swap, branch_cut_swap, input_swap:
             with self.assertRaises(AssertionError):
                 initial_release_prep.cut_release_branch()
         self.assertEqual(check_function_calls, expected_check_function_calls)

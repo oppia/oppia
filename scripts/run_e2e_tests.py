@@ -118,6 +118,13 @@ _PARSER.add_argument(
          'core/tests/protractor/accessibility.js use --suite=accessibility.'
          'For performing a full test, no argument is required.')
 
+_PARSER.add_argument(
+    '--debug_mode',
+    help='Runs the protractor test in debugging mode. Follow the instruction '
+         'provided in following URL to run e2e tests in debugging mode: '
+         'https://www.protractortest.org/#/debugging#disabled-control-flow',
+    action='store_true')
+
 # This list contains the sub process triggered by this script. This includes
 # the oppia web server.
 SUBPROCESSES = []
@@ -191,6 +198,27 @@ def wait_for_port_to_be_open(port_number):
         sys.exit(1)
 
 
+def run_webpack_compilation():
+    """Runs webpack compilation."""
+    max_tries = 5
+    webpack_bundles_dir_name = 'webpack_bundles'
+    for _ in python_utils.RANGE(max_tries):
+        try:
+            subprocess.check_call([
+                common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
+                'webpack.dev.config.ts'])
+        except subprocess.CalledProcessError as error:
+            python_utils.PRINT(error.output)
+            sys.exit(error.returncode)
+            return
+        if os.path.isdir(webpack_bundles_dir_name):
+            break
+    if not os.path.isdir(webpack_bundles_dir_name):
+        python_utils.PRINT(
+            'Failed to complete webpack compilation, exiting ...')
+        sys.exit(1)
+
+
 def update_dev_mode_in_constants_js(constant_file, dev_mode_setting):
     """Change constant file based on the running mode. Only the `DEV_MODE` line
     should be changed.
@@ -253,19 +281,14 @@ def build_js_files(dev_mode_setting):
     update_dev_mode_in_constants_js(CONSTANT_FILE_PATH, dev_mode_setting)
     if not dev_mode_setting:
         python_utils.PRINT('  Generating files for production mode...')
+        build.main(args=['--prod_env'])
     else:
         # The 'hashes.json' file is used by the `url-interpolation` service.
         if not os.path.isfile(HASHES_FILE_PATH):
             with python_utils.open_file(HASHES_FILE_PATH, 'w') as hash_file:
                 hash_file.write('{}')
-        try:
-            common.run_cmd(
-                [common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
-                 'webpack.dev.config.ts'])
-        except subprocess.CalledProcessError as error:
-            python_utils.PRINT(error.output)
-            sys.exit(error.returncode)
-    build.main(args=(['--prod_env'] if not dev_mode_setting else []))
+        build.main(args=[])
+        run_webpack_compilation()
 
 
 @contextlib.contextmanager
@@ -431,7 +454,10 @@ def main(args=None):
     wait_for_port_to_be_open(WEB_DRIVER_PORT)
     wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
     ensure_screenshots_dir_is_removed()
-    commands = [common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH]
+    commands = [common.NODE_BIN_PATH]
+    if parsed_args.debug_mode:
+        commands.append('--inspect-brk')
+    commands.append(PROTRACTOR_BIN_PATH)
     commands.extend(get_e2e_test_parameters(
         parsed_args.sharding_instances, parsed_args.suite, dev_mode))
 

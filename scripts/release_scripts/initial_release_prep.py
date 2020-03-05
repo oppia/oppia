@@ -20,11 +20,11 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
-import subprocess
 
 import python_utils
 import release_constants
 from scripts import common
+from scripts.release_scripts import cut_release_or_hotfix_branch
 
 
 def get_extra_jobs_due_to_schema_changes(
@@ -116,10 +116,8 @@ def cut_release_branch():
         '(e.g. 2.5.3 -> 2.5.4)\n')
     release_version = python_utils.INPUT()
     assert re.match(r'\d+\.\d+\.\d+$', release_version)
-    subprocess.check_call([
-        'python', '-m',
-        'scripts.release_scripts.cut_release_or_hotfix_branch',
-        '--release_version=%s' % release_version])
+    cut_release_or_hotfix_branch.main(
+        args=['--release_version=%s' % release_version])
 
 
 def main():
