@@ -19,6 +19,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.tests import test_utils
 
+import python_utils
+
 from . import case_change_service 
 
 class CheckCaseChangeServiceTests(test_utils.GenericTestBase):
@@ -33,7 +35,7 @@ class CheckCaseChangeServiceTests(test_utils.GenericTestBase):
             'testString'
             ]
         
-        for i in range(len(test_strings)):
+        for i in python_utils.RANGE(len(test_strings)):
             string = test_strings[i]
             expected_result = expected_results[i]
             result = case_change_service.camelize_string(string)
