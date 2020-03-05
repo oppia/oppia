@@ -2386,7 +2386,9 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_change_topic_publication_status
         def get(self, topic_id):
-            self.render_json({})
+            self.render_json({
+                topic_id: topic_id
+            })
 
     def setUp(self):
         super(ChangeTopicPublicationStatusTests, self).setUp()
