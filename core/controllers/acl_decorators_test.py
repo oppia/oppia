@@ -1859,6 +1859,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
             [webapp2.Route('/mock_edit_topic/<topic_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
+        self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.viewer_id, name='Name',
             abbreviated_name='abbrev', thumbnail_filename=None,

@@ -2292,7 +2292,7 @@ def can_change_topic_publication_status(handler):
         if (
                 role_services.ACTION_CHANGE_TOPIC_STATUS in
                 user_actions_info.actions):
-            return handler(self, **kwargs)
+            return handler(self, topic_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 '%s does not have enough rights to publish or unpublish the '
