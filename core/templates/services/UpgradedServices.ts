@@ -72,6 +72,8 @@ import { DragAndDropSortInputRulesService } from
 import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
+import { EndExplorationValidationService } from
+  'interactions/EndExploration/directives/end-exploration-validation.service';
 import { EntityContextObjectFactory } from
   'domain/utilities/EntityContextObjectFactory';
 import { ExplorationDiffService } from
@@ -284,6 +286,9 @@ export class UpgradedServices {
     upgradedServices['DragAndDropSortInputRulesService'] =
       new DragAndDropSortInputRulesService();
     upgradedServices['EditabilityService'] = new EditabilityService();
+    upgradedServices['EndExplorationValidationService'] =
+      new EndExplorationValidationService(
+        upgradedServices['baseInteractionValidationService']);
     upgradedServices['EntityContextObjectFactory'] =
       new EntityContextObjectFactory();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();

@@ -573,7 +573,7 @@ describe('Responses Service', function() {
       interactionData.answerGroups, interactionData.defaultOutcome);
   });
 
-  it('should change interaction id when default outcome is not setted',
+  it('should change interaction id when default outcome is not set',
     function() {
       var cacheSpy = spyOn(AnswerGroupsCacheService, 'set').and.callThrough();
       StateEditorService.setActiveStateName('State');
@@ -590,7 +590,8 @@ describe('Responses Service', function() {
         [], expectedDefaultOutcomeCreated);
     });
 
-  it('should change interaction id by a is terminal id not cached', function() {
+  it('should change interaction id when interaction is terminal and it\'s' +
+    ' not cached', function() {
     var cacheSpy = spyOn(AnswerGroupsCacheService, 'set').and.callThrough();
     ResponsesService.init(interactionData);
     StateEditorService.setInteraction(interactionData);
