@@ -168,10 +168,13 @@ def generate_app_yaml(deploy_mode=False):
     # is being run from the deploy script.
     if deploy_mode:
         content = content.replace('version: default', '')
-        dev_section_start = content.find('# DEVELOPMENT STATIC START\n')
-        dev_section_end = content.find('# DEVELOPMENT STATIC END\n') + len(
-            '# DEVELOPMENT STATIC END\n')
-        content = content[:dev_section_start] + content[dev_section_end:]
+        non_deploy_section_start = content.find(
+            '# NON DEPLOYMENT STATIC START\n')
+        non_deploy_section_end = content.find(
+            '# NON DEPLOYMENT STATIC END\n') + len(
+                '# NON DEPLOYMENT STATIC END\n')
+        content = content[
+            :non_deploy_section_start] + content[non_deploy_section_end:]
 
     if os.path.isfile(APP_YAML_FILEPATH):
         os.remove(APP_YAML_FILEPATH)

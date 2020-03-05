@@ -26,10 +26,10 @@ from core.tests import test_utils
 import python_utils
 
 APP_YAML_PATH = os.path.join(os.getcwd(), 'app_dev.yaml')
-DEV_STATIC_START = '# DEVELOPMENT STATIC START\n'
-DEV_STATIC_END = '# DEVELOPMENT STATIC END\n'
-PROD_STATIC_START = '# PRODUCTION STATIC START\n'
-PROD_STATIC_END = '# PRODUCTION STATIC END\n'
+DEPLOYMENT_STATIC_START = '# DEPLOYMENT STATIC START\n'
+DEPLOYMENT_STATIC_END = '# DEPLOYMENT STATIC END\n'
+NON_DEPLOYMENT_STATIC_START = '# NON DEPLOYMENT STATIC START\n'
+NON_DEPLOYMENT_STATIC_END = '# NON DEPLOYMENT STATIC END\n'
 
 
 class AppYamlTests(test_utils.GenericTestBase):
@@ -42,36 +42,36 @@ class AppYamlTests(test_utils.GenericTestBase):
 
     def test_exactly_one_dev_section_is_present(self):
         """Test that only one instance of dev section is present."""
-        dev_start_count = self.lines.count(DEV_STATIC_START)
-        dev_end_count = self.lines.count(DEV_STATIC_END)
+        dev_start_count = self.lines.count(DEPLOYMENT_STATIC_START)
+        dev_end_count = self.lines.count(DEPLOYMENT_STATIC_END)
         self.assertEqual(dev_start_count, 1)
         self.assertEqual(dev_end_count, 1)
 
     def test_dev_start_is_present_before_dev_end(self):
         """Test that dev start is present before dev end."""
-        dev_start_index = self.lines.index(DEV_STATIC_START)
-        dev_end_index = self.lines.index(DEV_STATIC_END)
+        dev_start_index = self.lines.index(DEPLOYMENT_STATIC_START)
+        dev_end_index = self.lines.index(DEPLOYMENT_STATIC_END)
         self.assertTrue(dev_start_index < dev_end_index)
 
     def test_exactly_one_prod_section_is_present(self):
         """Test that only one instance of prod section is present."""
-        prod_start_count = self.lines.count(PROD_STATIC_START)
-        prod_end_count = self.lines.count(PROD_STATIC_END)
+        prod_start_count = self.lines.count(NON_DEPLOYMENT_STATIC_START)
+        prod_end_count = self.lines.count(NON_DEPLOYMENT_STATIC_END)
         self.assertEqual(prod_start_count, 1)
         self.assertEqual(prod_end_count, 1)
 
     def test_prod_start_is_present_before_prod_end(self):
         """Test that dev start is present before dev end."""
-        prod_start_index = self.lines.index(PROD_STATIC_START)
-        prod_end_index = self.lines.index(PROD_STATIC_END)
+        prod_start_index = self.lines.index(NON_DEPLOYMENT_STATIC_START)
+        prod_end_index = self.lines.index(NON_DEPLOYMENT_STATIC_END)
         self.assertTrue(prod_start_index < prod_end_index)
 
     def test_dev_and_prod_sections_are_non_interleaving(self):
         """Test that dev & prod section do not interleave."""
-        dev_start_index = self.lines.index(DEV_STATIC_START)
-        dev_end_index = self.lines.index(DEV_STATIC_END)
-        prod_start_index = self.lines.index(PROD_STATIC_START)
-        prod_end_index = self.lines.index(PROD_STATIC_END)
+        dev_start_index = self.lines.index(DEPLOYMENT_STATIC_START)
+        dev_end_index = self.lines.index(DEPLOYMENT_STATIC_END)
+        prod_start_index = self.lines.index(NON_DEPLOYMENT_STATIC_START)
+        prod_end_index = self.lines.index(NON_DEPLOYMENT_STATIC_END)
 
         self.assertTrue(
             (dev_end_index < prod_start_index) or (
