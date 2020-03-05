@@ -23,7 +23,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
 
-fdescribe('Read only exploration backend API service', () => {
+describe('Read only exploration backend API service', () => {
   let readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService = null;
   let sampleDataResults = null;
@@ -103,8 +103,8 @@ fdescribe('Read only exploration backend API service', () => {
       let failHandler = jasmine.createSpy('fail');
 
       // Loading a exploration the first time should fetch it from the backend.
-      readOnlyExplorationBackendApiService.loadExploration(
-        '0', null).then(successHandler, failHandler);
+      readOnlyExplorationBackendApiService.loadLatestExploration(
+        '0').then(successHandler, failHandler);
       var req = httpTestingController.expectOne(
         '/explorehandler/init/0');
       expect(req.request.method).toEqual('GET');
@@ -116,8 +116,8 @@ fdescribe('Read only exploration backend API service', () => {
       expect(failHandler).not.toHaveBeenCalled();
 
       // Loading a exploration the second time should not fetch it.
-      readOnlyExplorationBackendApiService.loadExploration(
-        '0', null).then(successHandler, failHandler);
+      readOnlyExplorationBackendApiService.loadLatestExploration(
+        '0').then(successHandler, failHandler);
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
@@ -146,7 +146,7 @@ fdescribe('Read only exploration backend API service', () => {
     })
   );
 
-  fit('should report caching and support clearing the cache', fakeAsync(() => {
+  it('should report caching and support clearing the cache', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 

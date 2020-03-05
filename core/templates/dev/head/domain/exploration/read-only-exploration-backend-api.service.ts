@@ -109,7 +109,7 @@ export class ReadOnlyExplorationBackendApiService {
         }
       } else {
         this._fetchExploration(
-          explorationId, null, function(exploration) {
+          explorationId, null, (exploration) => {
             // Save the fetched exploration to avoid future fetches.
             this._explorationCache[explorationId] = exploration;
             if (resolve) {
@@ -130,7 +130,7 @@ export class ReadOnlyExplorationBackendApiService {
   loadExploration(explorationId: string, version: string): Promise<object> {
     return new Promise((resolve, reject) => {
       this._fetchExploration(
-        explorationId, version, function(exploration) {
+        explorationId, version, (exploration) => {
           if (resolve) {
             resolve(cloneDeep(exploration));
           }

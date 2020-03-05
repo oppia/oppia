@@ -17,6 +17,8 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient, HttpXhrBackend } from '@angular/common/http';
+import { BrowserXhr } from '@angular/http';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
@@ -61,6 +63,8 @@ import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
+import { EditableExplorationBackendApiService } from
+  'domain/exploration/editable-exploration-backend-api.service';
 import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
@@ -137,6 +141,8 @@ import { PlaythroughObjectFactory } from
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { ReadOnlyStoryNodeObjectFactory } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -282,6 +288,8 @@ export class UpgradedServices {
     upgradedServices['IdGenerationService'] = new IdGenerationService();
     upgradedServices['ImprovementActionButtonObjectFactory'] =
       new ImprovementActionButtonObjectFactory();
+    upgradedServices['HttpClient'] = new HttpClient(
+      new HttpXhrBackend(new BrowserXhr));
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
     upgradedServices['LearnerAnswerDetailsObjectFactory'] =
@@ -484,6 +492,10 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
+    upgradedServices['ReadOnlyExplorationBackendApiService'] =
+      new ReadOnlyExplorationBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['StateCardObjectFactory'] =
         new StateCardObjectFactory(
           upgradedServices['AudioTranslationLanguageService']);
@@ -493,6 +505,11 @@ export class UpgradedServices {
       upgradedServices['SkillSummaryObjectFactory']);
 
     // Group 5: Services depending on groups 1-4.
+    upgradedServices['EditableExplorationBackendApiService'] =
+      new EditableExplorationBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['ReadOnlyExplorationBackendApiService'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['SolutionObjectFactory'] =
       new SolutionObjectFactory(
         upgradedServices['SubtitledHtmlObjectFactory'],
