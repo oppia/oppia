@@ -28,10 +28,6 @@ var login = function(email, isSuperAdmin = false) {
   // Use of element is not possible because the login page is non-angular.
   // The full url is also necessary.
   var driver = browser.driver;
-  // Protractor waits for the angular variable to be present when loading
-  // a new page. Since the login page is non-angular, this check can be
-  // disabled.
-  browser.waitForAngularEnabled(false);
   driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
 
   driver.findElement(protractor.By.name('email')).clear();
@@ -40,8 +36,6 @@ var login = function(email, isSuperAdmin = false) {
     driver.findElement(protractor.By.name('admin')).click();
   }
   driver.findElement(protractor.By.id('submit-login')).click();
-  // Enable the wait for angular check after logging in.
-  browser.waitForAngularEnabled(true);
 };
 
 var logout = function() {

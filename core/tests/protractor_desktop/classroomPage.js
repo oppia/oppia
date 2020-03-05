@@ -22,28 +22,16 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var ClassroomPage = require('../protractor_utils/ClassroomPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var TopicsAndSkillsDashboardPage = require(
-  '../protractor_utils/TopicsAndSkillsDashboardPage.js');
-var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 
 describe('Classroom page functionality', function() {
-  var adminPage = null;
   var classroomPage = null;
   var libraryPage = null;
-  var topicsAndSkillsDashboardPage = null;
-  var topicEditorPage = null;
 
   beforeAll(function() {
-    adminPage = new AdminPage.AdminPage();
     classroomPage = new ClassroomPage.ClassroomPage();
     libraryPage = new LibraryPage.LibraryPage();
-    topicsAndSkillsDashboardPage =
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
-    topicEditorPage =
-      new TopicEditorPage.TopicEditorPage();
 
     users.createAndLoginAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
