@@ -2385,7 +2385,7 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
         @acl_decorators.can_change_topic_publication_status
-        def get(self):
+        def get(self, topic_id):
             self.render_json({})
 
     def setUp(self):
