@@ -16,14 +16,14 @@ inbound_services:
 - mail
 
 default_expiration: "10m"
+handlers:
 # Note: The handlers in this file contain two separate sections:
-# DEV_SECTION: Required for a local build.
-# PROD_SECTION: Required for a prod build.
+# DEPLOYMENT SECTION: Required for deployment.
+# NON DEPLOYMENT SECTION: Required for a local setup (both in dev & prod).
 # The comments representing the start & end of these sections should
 # not be modified since they are required for generation of app.yaml.
 # The backend tests to verify this structure: scripts/app_yaml_test.py
-handlers:
-# PRODUCTION STATIC START
+# DEPLOYMENT STATIC START
 - url: /third_party/static
   static_dir: third_party/static
   secure: always
@@ -54,9 +54,9 @@ handlers:
 # Serve js scripts and css files under core/templates/dev/head.
 # This regex allows us to recursively serve js scripts.
 # "\1" inserts text captured by the capture group in the URL pattern.
-- url: /templates/dev/head/(.*\.(css))$
-  static_files: core/templates/dev/head/\1
-  upload: core/templates/dev/head/(.*\.(css))$
+- url: /templates/(.*\.(css))$
+  static_files: core/templates/\1
+  upload: core/templates/(.*\.(css))$
   secure: always
   expiration: "0"
 # Serve js scripts for interactions, rich_text_components, custom ckeditor plugins
@@ -73,9 +73,9 @@ handlers:
   upload: extensions/ckeditor_plugins/(.*\.(js))$
   secure: always
   expiration: "0"
-# PRODUCTION STATIC END
+# DEPLOYMENT STATIC END
 
-# DEVELOPMENT STATIC START
+# NON DEPLOYMENT STATIC START
 - url: /webpack_bundles
   static_dir: webpack_bundles
   secure: always
@@ -86,17 +86,29 @@ handlers:
   secure: always
   application_readable: true
   expiration: "0"
-- url: /templates/dev/head/(.*\.(js))$
-  static_files: local_compiled_js/core/templates/dev/head/\1
-  upload: local_compiled_js/core/templates/dev/head/(.*\.(js))$
+# Serve js scripts and css files under core/templates.
+# This regex allows us to recursively serve js scripts.
+# "\1" inserts text captured by the capture group in the URL pattern.
+- url: /templates/(.*\.(css))$
+  static_files: core/templates/\1
+  upload: core/templates/(.*\.(css))$
   secure: always
   expiration: "0"
-- url: /templates/dev/head/(.*\.(html))$
-  static_files: core/templates/dev/head/\1
-  upload: core/templates/dev/head/(.*\.(html))$
+- url: /templates/(.*\.(js))$
+  static_files: local_compiled_js/core/templates/\1
+  upload: local_compiled_js/core/templates/(.*\.(js))$
+  secure: always
+  expiration: "0"
+- url: /templates/(.*\.(html))$
+  static_files: core/templates/\1
+  upload: core/templates/(.*\.(html))$
   secure: always
   expiration: "0"
   application_readable: true
+- url: /third_party/generated
+  static_dir: third_party/generated
+  secure: always
+  expiration: "0"
 - url: /extensions/interactions/(.*)/static/(.*\.(css|png))
   static_files: extensions/interactions/\1/static/\2
   upload: extensions/interactions/(.*)/static/(.*\.(css|png))
@@ -112,30 +124,8 @@ handlers:
   upload: extensions/(interactions|rich_text_components)/(.*)/directives/(.*\.(html))
   secure: always
   expiration: "0"
-- url: /extensions/visualizations/(.*\.html)
-  static_files: extensions/visualizations/\1
-  upload: extensions/visualizations/(.*\.html)
-  secure: always
-  expiration: "0"
-- url: /extensions/objects/templates/(.*\.html)
-  static_files: extensions/objects/templates/\1
-  upload: extensions/objects/templates/(.*\.html)
-  secure: always
-  expiration: "0"
-- url: /third_party/generated
-  static_dir: third_party/generated
-  secure: always
-  expiration: "0"
-# Serve js scripts and css files under core/templates/dev/head.
-# This regex allows us to recursively serve js scripts.
-# "\1" inserts text captured by the capture group in the URL pattern.
-- url: /templates/dev/head/(.*\.(css))$
-  static_files: core/templates/dev/head/\1
-  upload: core/templates/dev/head/(.*\.(css))$
-  secure: always
-  expiration: "0"
-# Serve js scripts for interactions, rich_text_components, custom ckeditor plugins
-# and objects under extensions. This regex allows us to recursively serve js
+# Serve js scripts for gadgets, interactions, rich_text_components, custom ckeditor plugins
+# and objects under extensions in dev mode. This regex allows us to recursively serve js
 # scripts under the three specified directories. "\1" and "\2" insert capture
 # groups from the url pattern.
 - url: /extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(png))$
@@ -148,7 +138,17 @@ handlers:
   upload: extensions/ckeditor_plugins/(.*\.(js))$
   secure: always
   expiration: "0"
-# DEVELOPMENT STATIC END
+- url: /extensions/visualizations/(.*\.html)
+  static_files: extensions/visualizations/\1
+  upload: extensions/visualizations/(.*\.html)
+  secure: always
+  expiration: "0"
+- url: /extensions/objects/templates/(.*\.html)
+  static_files: extensions/objects/templates/\1
+  upload: extensions/objects/templates/(.*\.html)
+  secure: always
+  expiration: "0"
+# NON DEPLOYMENT STATIC END
 
 # DYNAMIC
 - url: /mapreduce(/.*)?
@@ -299,7 +299,6 @@ skip_files:
 - ^(.*/)Spec.js$
 # Typescript files
 - ^core/(.*/)?.*\.ts$
-- ^extensions/(.*/)?.*\.ts$
 # Typescript output log file
 - ^(.*/)tsc_output_log.txt$
 # Other folders to ignore
@@ -323,7 +322,7 @@ skip_files:
 - third_party/static/bower-angular-translate-loader-partial-2.18.1/
 - third_party/static/bower-angular-translate-loader-static-files-2.18.1/
 - third_party/static/bower-angular-cookies-1.7.9/
-- third_party/static/bower-angular-translate-storage-cookie-2.18.1,/
+- third_party/static/bower-angular-translate-storage-cookie-2.18.1/
 - third_party/static/bower-material-1.1.19/
 # CKEditor-4.12.1 plugins in the download from the CKEditor website include
 # only a11yhelp, about, clipboard, colordialog, copyformatting, dialog, div,
