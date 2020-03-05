@@ -29,6 +29,7 @@ var ExplorationEditorImprovementsTab = function() {
   var allThreadMessages =
     $$('.protractor-test-improvements-thread-message-body');
 
+  var taskCount = $('.protractor-test-improvements-tab-task-count');
   var onlyOpenInput = $('.protractor-test-improvements-only-open-input');
   var confirmModalButton = $('.protractor-test-confirm-button');
   var closeModalButton = $('.protractor-test-improvements-close-modal-button');
@@ -152,6 +153,14 @@ var ExplorationEditorImprovementsTab = function() {
 
   this.getTaskActionButtons = (task) => {
     return task.all(actionButtonLocator);
+  };
+
+  this.verifyOutstandingTaskCount = (expectedTaskCount) => {
+    expect(taskCount.getText()).toMatch(String(expectedTaskCount));
+  };
+
+  this.verifyNoOutstandingTasks = () => {
+    expect(taskCount.isDisplayed()).toBe(false);
   };
 
   this.verifyAnswerDetails = (expectedDetails, expectedInfoCount) => {
