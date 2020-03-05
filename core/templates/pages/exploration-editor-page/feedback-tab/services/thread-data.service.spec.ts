@@ -185,7 +185,7 @@ describe('retrieving threads service', function() {
     $httpBackend.flush();
   });
 
-  it('should use reject handler whenever fetching feedbackt threads or' +
+  it('should use reject handler whenever fetching feedback threads or' +
     ' suggestion threads fails', function(done) {
     var loggerErrorSpy = spyOn(LoggerService, 'error').and.callThrough();
     $httpBackend.whenGET('/threadlisthandler/' + expId).respond(
@@ -362,7 +362,7 @@ describe('retrieving threads service', function() {
       $httpBackend.flush();
     });
 
-  it('should use reject handler when adding a new message in an inexistent' +
+  it('should use reject handler when adding a new message to a nonexistent' +
     ' thread', function(done) {
     var invalidThreadId = '0';
     var successCallback = jasmine.createSpy('success');
@@ -500,7 +500,7 @@ describe('retrieving threads service', function() {
     expect(failureCallback).not.toHaveBeenCalled();
   });
 
-  it('should use reject handler when resolving a suggestion in an inexistent' +
+  it('should use reject handler when resolving a suggestion to a nonexistent' +
     ' thread', function(done) {
     var invalidThreadId = '0';
     var successCallback = jasmine.createSpy('success');

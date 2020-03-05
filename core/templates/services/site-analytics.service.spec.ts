@@ -231,7 +231,7 @@ describe('Site Analytics Service', () => {
       'send', 'event', 'FirstOpenContentBox', 'open', explorationId);
   });
 
-  it('should register first save content event event', () => {
+  it('should register first save content event', () => {
     const explorationId = 'abc1';
     sas.registerFirstSaveContentEvent(explorationId);
 
@@ -320,7 +320,7 @@ describe('Site Analytics Service', () => {
   });
 
   it('should register new card when card number is greather than 10 and' +
-    ' it\'s multiple of 10', () => {
+    ' it\'s a multiple of 10', () => {
     const cardNumber = 20;
     sas.registerNewCard(cardNumber);
 
