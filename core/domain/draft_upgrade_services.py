@@ -101,8 +101,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
-        return draft_change_list    
-
+        return draft_change_list
 
     @classmethod
     def _convert_states_v31_dict_to_v32_dict(cls, draft_change_list):

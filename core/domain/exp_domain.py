@@ -2387,6 +2387,7 @@ class Exploration(python_utils.OBJECT):
 
         return states_dict
 
+    @classmethod
     def _convert_states_v32_dict_to_v33_dict(cls, states_dict):
         """Converts from version 32 to 33. Version 33 adds a new
         customization arg to MultipleChoiceInput which allows
