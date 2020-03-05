@@ -1,4 +1,6 @@
 // Code - https://pencilcode.net/lib/pencilcodeembed.js
+// As only one class is exported in the library, so type definitions
+// for that class are defined only.
 
 interface SetupCode {
   code: String,
