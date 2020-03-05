@@ -76,7 +76,7 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
         def mock_exists(unused_path):
             return False
         exists_swap = self.swap(os.path, 'exists', mock_exists)
-        with self.check_call_swap, exists_swap:
+        with self.Popen_swap, self.check_call_swap, exists_swap:
             from scripts import install_third_party_libs # pylint: disable=unused-variable
         self.assertEqual(
             self.commands, [
