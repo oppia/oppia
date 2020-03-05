@@ -186,7 +186,7 @@ describe('HistoryTab controller', function() {
       }
     );
 
-    it('testing Revert function',
+    it('testing download function',
       function() {
         spyOn( window, 'open' ).and.callFake( function() {
           return true;
