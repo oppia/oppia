@@ -22,7 +22,7 @@ describe('Playthrough Issues Service', function() {
   var PlaythroughIssuesService = null;
   var PlaythroughIssueObjectFactory = null;
   var PlaythroughObjectFactory = null;
-  var playthroughIssuesBackendApiService = null;
+  var PlaythroughIssuesBackendApiService = null;
   var ImprovementModalService = null;
   var $q = null;
   var $rootScope = null;
@@ -68,28 +68,6 @@ describe('Playthrough Issues Service', function() {
     }]
   };
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('PlaythroughIssuesBackendApiService', {
-      fetchIssues: function() {
-        var deferred = $q.defer();
-        deferred.resolve(backendIssues.map(
-          PlaythroughIssueObjectFactory.createFromBackendDict));
-        return deferred.promise;
-      },
-      fetchPlaythrough: function() {
-        var deferred = $q.defer();
-        deferred.resolve(PlaythroughObjectFactory.createFromBackendDict(
-          backendPlaythrough));
-        return deferred.promise;
-      },
-      resolveIssue: function() {
-        var deferred = $q.defer();
-        deferred.resolve();
-        return deferred.promise;
-      }
-    });
-  }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -101,7 +79,7 @@ describe('Playthrough Issues Service', function() {
     PlaythroughIssueObjectFactory = $injector.get(
       'PlaythroughIssueObjectFactory');
     PlaythroughObjectFactory = $injector.get('PlaythroughObjectFactory');
-    playthroughIssuesBackendApiService = $injector.get(
+    PlaythroughIssuesBackendApiService = $injector.get(
       'PlaythroughIssuesBackendApiService');
     ImprovementModalService = $injector.get(
       'ImprovementModalService');
@@ -113,7 +91,9 @@ describe('Playthrough Issues Service', function() {
 
   it('should get issues from backend', function() {
     var backendCallSpy = spyOn(
-      playthroughIssuesBackendApiService, 'fetchIssues').and.callThrough();
+      PlaythroughIssuesBackendApiService, 'fetchIssues').and.returnValue(
+      $q.resolve(backendIssues.map(
+        PlaythroughIssueObjectFactory.createFromBackendDict)));
 
     PlaythroughIssuesService.getIssues().then(function(issues) {
       expect(backendCallSpy).toHaveBeenCalled();
@@ -125,8 +105,9 @@ describe('Playthrough Issues Service', function() {
 
   it('should get playthrough from backend', function() {
     var backendCallSpy = spyOn(
-      playthroughIssuesBackendApiService, 'fetchPlaythrough').and
-      .callThrough();
+      PlaythroughIssuesBackendApiService, 'fetchPlaythrough').and
+      .returnValue($q.resolve(PlaythroughObjectFactory.createFromBackendDict(
+        backendPlaythrough)));
     var playthroughId = 'exp_id1';
 
     PlaythroughIssuesService.getPlaythrough(playthroughId)
@@ -137,17 +118,19 @@ describe('Playthrough Issues Service', function() {
       });
   });
 
-  it('should render issue statement when its type is' +
-  ' MultipleIncorrectSubmissions', function() {
-    var copiedBackendIssue = angular.copy(backendIssues[0]);
-    var issue = PlaythroughIssueObjectFactory.createFromBackendDict(
-      copiedBackendIssue);
-    var stateName = issue.issueCustomizationArgs.state_name.value;
+  it(
+    'should render issue statement when its type is' +
+    ' MultipleIncorrectSubmissions', function() {
+      var copiedBackendIssue = angular.copy(backendIssues[0]);
+      var issue = PlaythroughIssueObjectFactory.createFromBackendDict(
+        copiedBackendIssue);
+      var stateName = issue.issueCustomizationArgs.state_name.value;
 
-    expect(PlaythroughIssuesService.renderIssueStatement(issue))
-      .toBe('Several learners submitted answers to card "' + stateName +
-      '" several times, then gave up and quit.');
-  });
+      expect(PlaythroughIssuesService.renderIssueStatement(issue))
+        .toBe(
+          'Several learners submitted answers to card "' + stateName +
+          '" several times, then gave up and quit.');
+    });
 
   it('should render issue statement when its type is EarlyQuit', function() {
     var copiedBackendIssue = angular.copy(backendIssues[0]);
@@ -215,7 +198,8 @@ describe('Playthrough Issues Service', function() {
 
   it('should resolve issue', function() {
     var backendCallSpy = spyOn(
-      playthroughIssuesBackendApiService, 'resolveIssue').and.callThrough();
+      PlaythroughIssuesBackendApiService, 'resolveIssue').and.returnValue(
+      $q.resolve());
     var issue = PlaythroughIssueObjectFactory.createFromBackendDict(
       angular.copy(backendIssues[0]));
 
@@ -226,6 +210,9 @@ describe('Playthrough Issues Service', function() {
   });
 
   it('should open playthrough modal', function() {
+    spyOn(PlaythroughIssuesBackendApiService, 'fetchPlaythrough').and
+      .returnValue($q.resolve(PlaythroughObjectFactory.createFromBackendDict(
+        backendPlaythrough)));
     var openModalSpy = spyOn(ImprovementModalService, 'openPlaythroughModal')
       .and.callThrough();
     var playthroughId = 'exp_id1';
