@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for checking content of app_dev.yaml."""
+"""Unit tests for checking content of app_deployment.yaml."""
 
 # Note for developers: This test should not be changed in any circumstance
 # since it depends on the format of app_dev.yaml file which is fixed as well.
@@ -40,39 +40,42 @@ class AppYamlTests(test_utils.GenericTestBase):
         with python_utils.open_file(APP_YAML_PATH, 'r') as f:
             self.lines = f.readlines()
 
-    def test_exactly_one_dev_section_is_present(self):
-        """Test that only one instance of dev section is present."""
-        dev_start_count = self.lines.count(DEPLOYMENT_STATIC_START)
-        dev_end_count = self.lines.count(DEPLOYMENT_STATIC_END)
-        self.assertEqual(dev_start_count, 1)
-        self.assertEqual(dev_end_count, 1)
+    def test_exactly_one_deployment_section_is_present(self):
+        """Test that only one instance of deployment section is present."""
+        deployment_start_count = self.lines.count(DEPLOYMENT_STATIC_START)
+        deployment_end_count = self.lines.count(DEPLOYMENT_STATIC_END)
+        self.assertEqual(deployment_start_count, 1)
+        self.assertEqual(deployment_end_count, 1)
 
-    def test_dev_start_is_present_before_dev_end(self):
-        """Test that dev start is present before dev end."""
-        dev_start_index = self.lines.index(DEPLOYMENT_STATIC_START)
-        dev_end_index = self.lines.index(DEPLOYMENT_STATIC_END)
-        self.assertTrue(dev_start_index < dev_end_index)
+    def test_deployment_start_is_present_before_deployment_end(self):
+        """Test that deployment start is present before deployment end."""
+        deployment_start_index = self.lines.index(DEPLOYMENT_STATIC_START)
+        deployment_end_index = self.lines.index(DEPLOYMENT_STATIC_END)
+        self.assertTrue(deployment_start_index < deployment_end_index)
 
-    def test_exactly_one_prod_section_is_present(self):
-        """Test that only one instance of prod section is present."""
-        prod_start_count = self.lines.count(NON_DEPLOYMENT_STATIC_START)
-        prod_end_count = self.lines.count(NON_DEPLOYMENT_STATIC_END)
-        self.assertEqual(prod_start_count, 1)
-        self.assertEqual(prod_end_count, 1)
+    def test_exactly_one_non_deployment_section_is_present(self):
+        """Test that only one instance of non deployment section is present."""
+        non_deployment_start_count = self.lines.count(
+            NON_DEPLOYMENT_STATIC_START)
+        non_deployment_end_count = self.lines.count(NON_DEPLOYMENT_STATIC_END)
+        self.assertEqual(non_deployment_start_count, 1)
+        self.assertEqual(non_deployment_end_count, 1)
 
-    def test_prod_start_is_present_before_prod_end(self):
-        """Test that dev start is present before dev end."""
-        prod_start_index = self.lines.index(NON_DEPLOYMENT_STATIC_START)
-        prod_end_index = self.lines.index(NON_DEPLOYMENT_STATIC_END)
-        self.assertTrue(prod_start_index < prod_end_index)
+    def test_non_deployment_start_is_present_before_non_deployment_end(self):
+        """Test that deployment start is present before deployment end."""
+        non_deployment_start_index = self.lines.index(
+            NON_DEPLOYMENT_STATIC_START)
+        non_deployment_end_index = self.lines.index(NON_DEPLOYMENT_STATIC_END)
+        self.assertTrue(non_deployment_start_index < non_deployment_end_index)
 
-    def test_dev_and_prod_sections_are_non_interleaving(self):
-        """Test that dev & prod section do not interleave."""
-        dev_start_index = self.lines.index(DEPLOYMENT_STATIC_START)
-        dev_end_index = self.lines.index(DEPLOYMENT_STATIC_END)
-        prod_start_index = self.lines.index(NON_DEPLOYMENT_STATIC_START)
-        prod_end_index = self.lines.index(NON_DEPLOYMENT_STATIC_END)
+    def test_deployment_and_non_deployment_sections_are_non_interleaving(self):
+        """Test that deployment & non. deployment section do not interleave."""
+        deployment_start_index = self.lines.index(DEPLOYMENT_STATIC_START)
+        deployment_end_index = self.lines.index(DEPLOYMENT_STATIC_END)
+        non_deployment_start_index = self.lines.index(
+            NON_DEPLOYMENT_STATIC_START)
+        non_deployment_end_index = self.lines.index(NON_DEPLOYMENT_STATIC_END)
 
         self.assertTrue(
-            (dev_end_index < prod_start_index) or (
-                prod_end_index < dev_start_index))
+            (deployment_end_index < non_deployment_start_index) or (
+                non_deployment_end_index < deployment_start_index))
