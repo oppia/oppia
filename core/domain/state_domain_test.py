@@ -178,19 +178,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
-        hints_list = []
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>hint one</p>'
-            },
-        })
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
         init_state.update_interaction_hints(hints_list)
 
         self.assertEqual(
             init_state.get_content_html('hint_1'), '<p>hint one</p>')
 
-        hints_list[0]['hint_content']['html'] = '<p>Changed hint one</p>'
+        hints_list[0].hint_content.html = '<p>Changed hint one</p>'
         init_state.update_interaction_hints(hints_list)
 
         self.assertEqual(
@@ -200,13 +198,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
-        hints_list = []
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>hint one</p>'
-            },
-        })
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
         init_state.update_interaction_hints(hints_list)
 
         self.assertEqual(
@@ -257,13 +253,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         init_state.update_interaction_answer_groups(
             [answer_group_dict])
-        hints_list = []
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>hint one</p>'
-            },
-        })
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
         init_state.update_interaction_hints(hints_list)
 
         solution_dict = {
@@ -687,13 +681,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_id('TextInput')
         exploration.validate()
 
-        hints_list = []
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>hint one</p>'
-            },
-        })
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
         init_state.update_interaction_hints(hints_list)
 
         solution_dict = {
@@ -708,24 +700,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_solution(solution_dict)
         exploration.validate()
 
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_2',
-                'html': '<p>new hint</p>'
-            }
-        })
+        hints_list.append(
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_2', '<p>new hint</p>')
+            )
+        )
         init_state.update_interaction_hints(hints_list)
 
         self.assertEqual(
             init_state.interaction.hints[1].hint_content.html,
             '<p>new hint</p>')
 
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_3',
-                'html': '<p>hint three</p>'
-            }
-        })
+        hints_list.append(
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_3', '<p>hint three</p>')
+            )
+        )
         init_state.update_interaction_hints(hints_list)
 
         del hints_list[1]
@@ -745,13 +735,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # Solution should be set to None as default.
         self.assertEqual(init_state.interaction.solution, None)
 
-        hints_list = []
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': ''
-            },
-        })
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '')
+            )
+        ]
         init_state.update_interaction_hints(hints_list)
         solution = {
             'answer_is_exclusive': False,
@@ -814,7 +802,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # Solution should be set to None as default.
         self.assertEqual(exploration.init_state.interaction.solution, None)
 
-        hints_list = []
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': 'hello_world!',
@@ -823,12 +810,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>'
             }
         }
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': ''
-            },
-        })
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '')
+            )
+        ]
+
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(solution)
         exploration.validate()
@@ -912,12 +899,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_duplicate_content_id_with_hints(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>some html</p>'
-            }
-        }]
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>some html</p>')
+            )
+        ]
 
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_content(
@@ -980,18 +966,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_hints_with_content_id_not_in_written_translations(
             self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        old_hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
-        new_hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_2',
-                'html': '<p>Hello, this is html2 for state2</p>'
-            }
-        }]
+        old_hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+            )
+        ]
+        new_hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+            )
+        ]
 
         exploration.init_state.update_interaction_hints(old_hints_list)
 
@@ -1020,18 +1006,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_hints_with_content_id_not_in_recorded_voiceovers(
             self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        old_hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
-        new_hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_2',
-                'html': '<p>Hello, this is html2 for state2</p>'
-            }
-        }]
+        old_hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+            )
+        ]
+        new_hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+            )
+        ]
 
         exploration.init_state.update_interaction_hints(old_hints_list)
 
@@ -1061,18 +1047,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_hints_with_new_content_id_in_written_translations(
             self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        old_hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
-        new_hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_2',
-                'html': '<p>Hello, this is html2 for state2</p>'
-            }
-        }]
+        old_hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+            )
+        ]
+        new_hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+            )
+        ]
 
         exploration.init_state.update_interaction_hints(old_hints_list)
 
@@ -1107,18 +1093,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_hints_with_new_content_id_in_recorded_voiceovers(
             self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        old_hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
-        new_hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_2',
-                'html': '<p>Hello, this is html2 for state2</p>'
-            }
-        }]
+        old_hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+            )
+        ]
+        new_hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+            )
+        ]
 
         exploration.init_state.update_interaction_hints(old_hints_list)
 
@@ -1155,12 +1141,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_update_interaction_solution_with_non_dict_solution(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+            )
+        ]
         solution = {
             'answer_is_exclusive': True,
             'correct_answer': u'hello_world!',
@@ -1182,12 +1168,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_interaction_solution_with_no_solution(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state2</p>'
+                )
+            )
+        ]
 
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(None)

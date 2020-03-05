@@ -295,8 +295,8 @@ class AdminHandler(base.BaseHandler):
                     'solution', '<p>This is a solution.</p>')).to_dict())
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_1', '<p>This is a hint.</p>')).to_dict()
+                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
+            )
         ]
 
         state.update_interaction_solution(solution_dict)
