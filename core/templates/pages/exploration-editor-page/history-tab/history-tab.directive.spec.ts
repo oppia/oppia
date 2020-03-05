@@ -97,11 +97,12 @@ describe('HistoryTab controller', function() {
   }));
 
   describe('HistoryTab', function() {
-    var $componentController, historyTabCtrl;
+    var $componentController, historyTabCtrl, window;
 
-    beforeEach(angular.mock.inject(function(_$componentController_) {
+    beforeEach(angular.mock.inject(function(_$componentController_, $window) {
       $componentController = _$componentController_;
       historyTabCtrl = $componentController('historyTab', null, {});
+      window = $window;
       // Refer: https://www.codelord.net/2017/01/09/
       // unit-testing-angular-components-with-%24componentcontroller/
       // Angular and $componentController does not take care of
@@ -153,6 +154,45 @@ describe('HistoryTab controller', function() {
         historyTabCtrl.displayedCurrentPageNumber = 2;
         historyTabCtrl.computeVersionsToDisplay();
         expect(historyTabCtrl.versionNumbersToDisplay).toEqual([2, 1]);
+      }
+    );
+
+    it('Check the box has disabled properly',
+      function() {
+        historyTabCtrl.displayedCurrentPageNumber = 1;
+        historyTabCtrl.selectedVersionsArray = [1];
+        expect(historyTabCtrl.isCheckboxDisabled(31)).toBe(false);
+      }
+    );
+
+    it('testing changeSelectedVersions function',
+      function() {
+        historyTabCtrl.selectedVersionsArray = [];
+        var event = {
+          target: {checked: true}
+        };
+        historyTabCtrl.hideHistoryGraph;
+        historyTabCtrl.compareVersionsButtonIsHidden;
+        expect(historyTabCtrl.isCheckboxDisabled(1)).toBe(false);
+        historyTabCtrl.changeSelectedVersions(event, 1);
+        expect(historyTabCtrl.selectedVersionsArray.length).toBe(1);
+        expect(historyTabCtrl.versionCountPrompt).toBe(
+          'Please select one more.');
+        expect(historyTabCtrl.isCheckboxDisabled(2)).toBe(false);
+        historyTabCtrl.changeSelectedVersions(event, 2);
+        expect(historyTabCtrl.selectedVersionsArray.length).toBe(2);
+        expect(historyTabCtrl.versionCountPrompt).toBe('');
+        expect(historyTabCtrl.isCheckboxDisabled(3)).toBe(true);
+      }
+    );
+
+    it('testing Revert function',
+      function() {
+        spyOn( window, 'open' ).and.callFake( function() {
+          return true;
+        });
+        historyTabCtrl.downloadExplorationWithVersion(1);
+        expect( window.open ).toHaveBeenCalled();
       }
     );
   });
