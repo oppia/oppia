@@ -2268,6 +2268,7 @@ def can_change_topic_publication_status(handler):
         """Checks whether the user can can publish or unpublish a topic.
 
         Args:
+            topic_id: str. The topic id.
             **kwargs: *. Keyword arguments.
 
         Returns:

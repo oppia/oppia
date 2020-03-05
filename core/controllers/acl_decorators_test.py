@@ -2052,7 +2052,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
             self):
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json(
+            self.get_json(
                 '/mock_add_story_to_topic/invalid_topic_id',
                 expected_status_int=404)
         self.logout()
@@ -2422,7 +2422,8 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
             self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_change_publication_status/invalid_topic_id',
+            self.get_json(
+                '/mock_change_publication_status/invalid_topic_id',
                 expected_status_int=404)
         self.logout()
 
@@ -2865,8 +2866,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         topic_id = 'invalid_topic_id'
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock_edit_entity/%s/%s' % (
-                feconf.ENTITY_TYPE_TOPIC, topic_id),
+            self.get_json(
+                '/mock_edit_entity/%s/%s' % (
+                    feconf.ENTITY_TYPE_TOPIC, topic_id),
                 expected_status_int=404)
         self.logout()
 
