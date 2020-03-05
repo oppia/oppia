@@ -22,25 +22,39 @@ import os
 import subprocess
 import sys
 
-# These libraries need to be installed before running or importing any script.
+
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
 
-PREREQUISITES = [
-    ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
-    ('future', '0.17.1', os.path.join('third_party', 'future-0.17.1')),
-]
+def install_prerequisites():
+    """These libraries need to be installed before running
+    or importing any script.
+    """
+    # pylint: disable=global-statement
+    # pylint: disable=unused-variable
+    global TOOLS_DIR
+    prerequisites = [
+        ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
+        ('future', '0.17.1', os.path.join('third_party', 'future-0.17.1')),
+    ]
 
-for PACKAGE, VERSION, PATH in PREREQUISITES:
-    if not os.path.exists(PATH):
-        COMMAND = [
-            sys.executable, '-m', 'pip', 'install', '%s==%s'
-            % (PACKAGE, VERSION), '--target', PATH]
-        UEXTENTION = ['--user', '--prefix=', '--system']
-        try:
-            subprocess.check_call(COMMAND)
-        except Exception:
-            subprocess.check_call(COMMAND + UEXTENTION)
+    for package, version, path in prerequisites:
+        if not os.path.exists(path):
+            command = [
+                sys.executable, '-m', 'pip', 'install', '%s==%s'
+                % (package, version), '--target', path]
+            uextention = ['--user', '--prefix=', '--system']
+            process = subprocess.Popen(
+                command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = process.communicate()
+            if 'can\'t combine user with prefix' in stderr:
+                subprocess.check_call(command + uextention)
+
+    # pylint: enable=global-statement
+    # pylint: disable=unused-variable
+
+
+install_prerequisites()
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
