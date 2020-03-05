@@ -2264,7 +2264,7 @@ def can_change_topic_publication_status(handler):
             if the user can publish or unpublish a topic.
     """
 
-    def test_can_change_topic_publication_status(self, **kwargs):
+    def test_can_change_topic_publication_status(self, topic_id, **kwargs):
         """Checks whether the user can can publish or unpublish a topic.
 
         Args:
