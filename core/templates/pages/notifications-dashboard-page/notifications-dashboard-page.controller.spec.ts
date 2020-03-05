@@ -46,7 +46,7 @@ describe('Notifications Dashboard Page', function() {
       '/create/0');
   });
 
-  it('should natigate to profile', function() {
+  it('should navigate to profile', function() {
     var $event = jasmine.createSpyObj('$event', ['stopPropagation']);
     ctrl.navigateToProfile($event, 'user1');
     expect($event.stopPropagation).toHaveBeenCalled();
