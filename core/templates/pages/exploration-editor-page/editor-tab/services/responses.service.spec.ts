@@ -18,7 +18,7 @@
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
-describe('Responses Service', function() {
+fdescribe('Responses Service', function() {
   var ResponsesService = null;
   var InteractionObjectFactory = null;
   var OutcomeObjectFactory = null;
@@ -578,7 +578,7 @@ describe('Responses Service', function() {
       var cacheSpy = spyOn(AnswerGroupsCacheService, 'set').and.callThrough();
       StateEditorService.setActiveStateName('State');
 
-      var newInteractionId = 'TextInput';
+      var newInteractionId = 'Continue';
       var callbackSpy = jasmine.createSpy('callback');
       ResponsesService.onInteractionIdChanged(newInteractionId, callbackSpy);
 
