@@ -1203,13 +1203,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         init_state.update_interaction_answer_groups([answer_group_dict])
 
-        hints_list = []
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>hint one</p>'
-            },
-        })
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
         init_state.update_interaction_hints(hints_list)
 
         solution = {
@@ -1229,20 +1227,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
-        hints_list = []
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>hint one</p>'
-            },
-        })
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
         init_state.update_interaction_hints(hints_list)
 
         self.assertEqual(
             exploration.get_content_html(exploration.init_state_name, 'hint_1'),
             '<p>hint one</p>')
 
-        hints_list[0]['hint_content']['html'] = '<p>Changed hint one</p>'
+        hints_list[0].hint_content.html = '<p>Changed hint one</p>'
         init_state.update_interaction_hints(hints_list)
 
         self.assertEqual(
@@ -1254,13 +1250,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
-        hints_list = []
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>hint one</p>'
-            },
-        })
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
         init_state.update_interaction_hints(hints_list)
 
         self.assertEqual(
@@ -8319,17 +8313,18 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         )
         state1.update_interaction_default_outcome(default_outcome)
 
-        hint_list2 = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }, {
-            'hint_content': {
-                'content_id': 'hint_2',
-                'html': '<p>Hello, this is html2 for state2</p>'
-            }
-        }]
+        hint_list2 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state2</p>'
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2', '<p>Hello, this is html2 for state2</p>'
+                )
+            ),
+        ]
         state2.update_interaction_hints(hint_list2)
 
         solution_dict1 = {
