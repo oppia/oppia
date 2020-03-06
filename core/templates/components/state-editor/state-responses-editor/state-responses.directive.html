@@ -1,10 +1,20 @@
 <div>
   <div class="oppia-editor-header">
-    <strong>Learner's Answers and Oppia's Responses</strong>
-    <span style="margin-left: 150px;" ng-if="!isCurrentInteractionTrivial()" ng-hide="!enableSolicitAnswerDetailsFeature">
-      <input type="checkbox" class="protractor-test-solicit-answer-details-checkbox" ng-change="onChangeSolicitAnswerDetails()" ng-model="stateSolicitAnswerDetailsService.displayed">
-      Solicit Answer Details
-    </span>
+    <table class="container-fluid">
+      <tr class="row">
+        <td class="col-md-7">
+          <strong>
+            Learner's Answers and Oppia's Responses
+          </strong>
+        </td>
+        <td class="col-md-5">
+          <span ng-if="!isCurrentInteractionTrivial()" ng-hide="!enableSolicitAnswerDetailsFeature" class="solicit-answer-details-span">
+            <input type="checkbox" class="protractor-test-solicit-answer-details-checkbox" ng-change="onChangeSolicitAnswerDetails()" ng-model="stateSolicitAnswerDetailsService.displayed">
+            Solicit Answer Details
+          </span>
+        </td>
+      </tr>
+    </table>
   </div>
 
   <md-card class="oppia-editor-card-with-avatar">
