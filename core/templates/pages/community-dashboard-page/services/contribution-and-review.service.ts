@@ -70,55 +70,50 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         // TODO(#8016): Move this function to a backend-api.service with unit
         // tests.
         return $http.get(
-          getSubmittedSuggestionListHandlerUrl('skill', 'add_question'))
-          .then(getSuggestionsByIdFromHttpResponse)
-          .then(suggestionsById => {
-            if (onSuccess) {
-              onSuccess(suggestionsById);
-            }
-            return suggestionsById;
-          });
+          getSubmittedSuggestionListHandlerUrl('skill', 'add_question')
+        ).then(getSuggestionsByIdFromHttpResponse).then(suggestionsById => {
+          if (onSuccess) {
+            onSuccess(suggestionsById);
+          }
+          return suggestionsById;
+        });
       },
       getReviewableQuestionSuggestions: function(onSuccess) {
         // TODO(#8016): Move this function to a backend-api.service with unit
         // tests.
         return $http.get(
-          getReviewableSuggestionsHandlerUrl('skill', 'add_question'))
-          .then(getSuggestionsByIdFromHttpResponse)
-          .then(suggestionsById => {
-            if (onSuccess) {
-              onSuccess(suggestionsById);
-            }
-            return suggestionsById;
-          });
+          getReviewableSuggestionsHandlerUrl('skill', 'add_question')
+        ).then(getSuggestionsByIdFromHttpResponse).then(suggestionsById => {
+          if (onSuccess) {
+            onSuccess(suggestionsById);
+          }
+          return suggestionsById;
+        });
       },
       getUserCreatedTranslationSuggestions: function(onSuccess) {
         // TODO(#8016): Move this function to a backend-api.service with unit
         // tests.
         return $http.get(
           getSubmittedSuggestionListHandlerUrl(
-            'exploration', 'translate_content'))
-          .then(getSuggestionsByIdFromHttpResponse)
-          .then(suggestionsById => {
-            if (onSuccess) {
-              onSuccess(suggestionsById);
-            }
-            return suggestionsById;
-          });
+            'exploration', 'translate_content')
+        ).then(getSuggestionsByIdFromHttpResponse).then(suggestionsById => {
+          if (onSuccess) {
+            onSuccess(suggestionsById);
+          }
+          return suggestionsById;
+        });
       },
       getReviewableTranslationSuggestions: function(onSuccess) {
         // TODO(#8016): Move this function to a backend-api.service with unit
         // tests.
         return $http.get(
-          getReviewableSuggestionsHandlerUrl(
-            'exploration', 'translate_content'))
-          .then(getSuggestionsByIdFromHttpResponse)
-          .then(suggestionsById => {
-            if (onSuccess) {
-              onSuccess(suggestionsById);
-            }
-            return suggestionsById;
-          });
+          getReviewableSuggestionsHandlerUrl('exploration', 'translate_content')
+        ).then(getSuggestionsByIdFromHttpResponse).then(suggestionsById => {
+          if (onSuccess) {
+            onSuccess(suggestionsById);
+          }
+          return suggestionsById;
+        });
       },
       resolveSuggestiontoExploration: function(
           targetId, suggestionId, action, reviewMessage, commitMessage,
