@@ -27,7 +27,7 @@ require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 
 describe('retrieving threads service', function() {
-  var expId = '12345';
+  var expId = 'exp1';
   var ThreadDataService = null;
   var LoggerService = null;
   var AlertsService = null;
@@ -40,36 +40,27 @@ describe('retrieving threads service', function() {
   var mockSuggestions = null;
   var mockSuggestionThreads = null;
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-    angular.mock.module(function($provide) {
-      $provide.value('ExplorationDataService', {
-        explorationId: expId
-      });
-    });
-  });
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
+
+    $provide.value('ContextService', {getExplorationId: () => expId});
   }));
 
-  beforeEach(angular.mock.inject(function($injector, _$q_, _$rootScope_) {
-    ThreadDataService = $injector.get('ThreadDataService');
-    AlertsService = $injector.get('AlertsService');
-    LoggerService = $injector.get('LoggerService');
-    FeedbackThreadObjectFactory = $injector.get('FeedbackThreadObjectFactory');
+  beforeEach(angular.mock.inject(function($injector) {
     $httpBackend = $injector.get('$httpBackend');
-    $rootScope = _$rootScope_;
-    $q = _$q_;
-
+    $q = $injector.get('$q');
+    $rootScope = $injector.get('$rootScope');
+    AlertsService = $injector.get('AlertsService');
     CsrfService = $injector.get('CsrfTokenService');
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
-    });
+    FeedbackThreadObjectFactory = $injector.get('FeedbackThreadObjectFactory');
+    LoggerService = $injector.get('LoggerService');
+    ThreadDataService = $injector.get('ThreadDataService');
+
+    spyOn(CsrfService, 'getTokenAsync')
+      .and.returnValue($q.resolve('sample-csrf-token'));
 
     mockFeedbackThreads = [
       {
@@ -134,7 +125,7 @@ describe('retrieving threads service', function() {
         status: 'open',
         subject: 'Suggestion from a learner',
         summary: null,
-        thread_id: 'exp_1.1234'
+        thread_id: 'exploration.exp1.ghi3'
       }
     ];
   }));
@@ -145,7 +136,7 @@ describe('retrieving threads service', function() {
       suggestion_thread_dicts: mockSuggestionThreads
     });
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=' + expId
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1'
     ).respond({ suggestions: mockSuggestions });
 
     ThreadDataService.fetchThreads().then(threadData => {
@@ -164,7 +155,7 @@ describe('retrieving threads service', function() {
       suggestion_thread_dicts: mockSuggestionThreads
     });
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=' + expId
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1'
     ).respond({ suggestions: [] });
 
     ThreadDataService.fetchThreads().then(function(threadData) {
@@ -188,7 +179,7 @@ describe('retrieving threads service', function() {
     $httpBackend.whenGET('/threadlisthandler/' + expId).respond(
       500, 'Error on retriving feedback threads.');
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=' + expId
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1'
     ).respond({ suggestions: mockSuggestions });
 
     ThreadDataService.fetchThreads().then(done, function() {
@@ -215,7 +206,7 @@ describe('retrieving threads service', function() {
       suggestion_thread_dicts: []
     });
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=' + expId)
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1')
       .respond({ suggestions: [] });
     ThreadDataService.fetchThreads().then(done, done.fail);
     $httpBackend.flush();
@@ -224,7 +215,7 @@ describe('retrieving threads service', function() {
     $httpBackend.expect('GET', '/threadhandler/' + thread.threadId).respond({
       data: { messages }
     });
-    ThreadDataService.fetchMessages(thread.threadId).then(function() {
+    ThreadDataService.fetchMessages(thread).then(function() {
       expect(setMessagesSpy).toHaveBeenCalled();
     }, done.fail);
     $httpBackend.flush();
@@ -243,7 +234,7 @@ describe('retrieving threads service', function() {
 
       $httpBackend.expect('GET', '/threadhandler/' + thread.threadId).respond(
         500, 'Error on fetching messages from a thread.');
-      ThreadDataService.fetchMessages(thread.threadId).then(
+      ThreadDataService.fetchMessages(thread).then(
         done, function() {
           expect(setMessagesSpy).not.toHaveBeenCalled();
           expect(loggerErrorSpy).toHaveBeenCalledWith(
@@ -299,7 +290,7 @@ describe('retrieving threads service', function() {
     expect(ThreadDataService.getOpenThreadsCount()).toBe(0);
 
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=' + expId
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1'
     ).respond({ suggestions: mockSuggestions });
     $httpBackend.expectPOST('/threadlisthandler/' + expId).respond(200);
     $httpBackend.whenGET('/threadlisthandler/' + expId).respond({
@@ -333,19 +324,22 @@ describe('retrieving threads service', function() {
   });
 
   it('should successfully mark thread as seen', function(done) {
-    var threadId = 'abc1';
-    $httpBackend.expectPOST('/feedbackhandler/thread_view_event/' + threadId)
-      .respond(200);
-    ThreadDataService.markThreadAsSeen(threadId).then(done, done.fail);
+    var mockThread = mockFeedbackThreads[0];
+    var thread = FeedbackThreadObjectFactory.createFromBackendDict(mockThread);
+    $httpBackend.expectPOST(
+      '/feedbackhandler/thread_view_event/' + thread.threadId).respond(200);
+    ThreadDataService.markThreadAsSeen(thread).then(done, done.fail);
     $httpBackend.flush();
   });
 
   it('should use reject handler when marking thread as seen fails',
     function(done) {
-      var threadId = 'abc1';
+      var mockThread = mockFeedbackThreads[0];
+      var thread =
+        FeedbackThreadObjectFactory.createFromBackendDict(mockThread);
       $httpBackend.expectPOST(
-        '/feedbackhandler/thread_view_event/' + threadId).respond(500);
-      ThreadDataService.markThreadAsSeen(threadId).then(done, function(error) {
+        '/feedbackhandler/thread_view_event/' + thread.threadId).respond(500);
+      ThreadDataService.markThreadAsSeen(thread).then(done, function(error) {
         expect(error.status).toBe(500);
         done();
       });
@@ -359,7 +353,7 @@ describe('retrieving threads service', function() {
     var failureCallback = jasmine.createSpy('failure');
     ThreadDataService.addNewMessage(
       invalidThreadId, 'Message', 'open', successCallback, failureCallback)
-      .then(done,
+      .then(done.fail,
         function(error) {
           expect(error).toBe(
             'Can not add message to nonexistent thread.');
@@ -372,7 +366,7 @@ describe('retrieving threads service', function() {
 
   it('should successfully add a new message in a thread when its status' +
     ' is different than old status and its status is close', function(done) {
-    var threadId = 'abc1';
+    var threadId = 'exploration.exp1.jkl3';
     var successCallback = jasmine.createSpy('successCallback');
     var failureCallback = jasmine.createSpy('failureCallback');
 
@@ -382,7 +376,7 @@ describe('retrieving threads service', function() {
       suggestion_thread_dicts: mockSuggestionThreads
     });
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=' + expId
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1'
     ).respond({ suggestions: mockSuggestions });
     ThreadDataService.fetchThreads().then(done, done.fail);
     $httpBackend.flush();
@@ -396,12 +390,14 @@ describe('retrieving threads service', function() {
     expect(ThreadDataService.getOpenThreadsCount()).toBe(1);
 
     // Post message
-    $httpBackend.expectPOST('/threadhandler/' + 'abc1').respond(200, {});
+    $httpBackend.expectPOST('/threadhandler/exploration.exp1.jkl3')
+      .respond(200, {});
     // Fetch message
-    $httpBackend.expect('GET', '/threadhandler/' + threadId).respond({});
+    $httpBackend.expect('GET', '/threadhandler/exploration.exp1.jkl3')
+      .respond({});
     ThreadDataService.addNewMessage(
-      threadId, 'Message', 'close', successCallback, failureCallback).then(
-      done);
+      threadId, 'Message', 'close', successCallback, failureCallback)
+      .then(done, done.fail);
     $httpBackend.flush(2);
 
     expect(ThreadDataService.getOpenThreadsCount()).toBe(0);
@@ -411,7 +407,7 @@ describe('retrieving threads service', function() {
 
   it('should successfully add a new message in a thread when its status' +
     ' is different of old status and its status is open', function(done) {
-    var threadId = 'abc1';
+    var threadId = 'exploration.exp1.jkl3';
     var successCallback = jasmine.createSpy('successCallback');
     var failureCallback = jasmine.createSpy('failureCallback');
 
@@ -424,7 +420,7 @@ describe('retrieving threads service', function() {
         suggestion_thread_dicts: mockSuggestionThreads
       });
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=' + expId
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1'
     ).respond({ suggestions: mockSuggestions });
     ThreadDataService.fetchThreads().then(done, done.fail);
     $httpBackend.flush();
@@ -438,7 +434,8 @@ describe('retrieving threads service', function() {
     expect(ThreadDataService.getOpenThreadsCount()).toBe(1);
 
     // Post message
-    $httpBackend.expectPOST('/threadhandler/' + 'abc1').respond(200, {});
+    $httpBackend.expectPOST('/threadhandler/exploration.exp1.jkl3')
+      .respond(200, {});
     // Fetch message
     $httpBackend.expect('GET', '/threadhandler/' + threadId).respond({});
     ThreadDataService.addNewMessage(
@@ -453,7 +450,7 @@ describe('retrieving threads service', function() {
 
   it('should successfully add a new message in a thread when its status' +
     ' is equal old status', function(done) {
-    var threadId = 'abc1';
+    var threadId = 'exploration.exp1.jkl3';
     var successCallback = jasmine.createSpy('successCallback');
     var failureCallback = jasmine.createSpy('failureCallback');
 
@@ -463,7 +460,7 @@ describe('retrieving threads service', function() {
       suggestion_thread_dicts: mockSuggestionThreads
     });
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=' + expId
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1'
     ).respond({ suggestions: mockSuggestions });
     ThreadDataService.fetchThreads().then(done, done.fail);
     $httpBackend.flush();
@@ -477,7 +474,8 @@ describe('retrieving threads service', function() {
     expect(ThreadDataService.getOpenThreadsCount()).toBe(1);
 
     // Post message
-    $httpBackend.expectPOST('/threadhandler/' + 'abc1').respond(200, {});
+    $httpBackend.expectPOST('/threadhandler/exploration.exp1.jkl3')
+      .respond(200, {});
     // Fetch message
     $httpBackend.expect('GET', '/threadhandler/' + threadId).respond({});
     ThreadDataService.addNewMessage(
@@ -518,7 +516,7 @@ describe('retrieving threads service', function() {
       suggestion_thread_dicts: mockSuggestionThreads
     });
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=' + expId
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1'
     ).respond({ suggestions: mockSuggestions });
     ThreadDataService.fetchThreads().then(done, done.fail);
     $httpBackend.flush();
@@ -531,11 +529,11 @@ describe('retrieving threads service', function() {
     expect(ThreadDataService.getOpenThreadsCount()).toBe(1);
 
     $httpBackend.expectPUT(
-      '/suggestionactionhandler/exploration/' + expId + '/' + 'abc1')
-      .respond(200, {});
+      '/suggestionactionhandler/exploration/' + expId + '/exploration.exp1.jkl3'
+    ).respond(200, {});
     ThreadDataService.resolveSuggestion(
-      'abc1', 'Message', 'status', 'a', true, successCallback, failureCallback)
-      .then(successCallback, failureCallback);
+      'exploration.exp1.jkl3', 'Message', 'status', 'a', true, successCallback,
+      failureCallback).then(successCallback, failureCallback);
     $httpBackend.flush();
 
     expect(ThreadDataService.getOpenThreadsCount()).toBe(0);
