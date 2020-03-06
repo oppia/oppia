@@ -284,28 +284,6 @@ angular.module('oppia').directive('contributionsAndReview', [
             ctrl.contributionsDataLoading = true;
             ctrl.SUGGESTION_TYPE_QUESTION = 'add_question';
             ctrl.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
-            ctrl.activeReviewTab = '';
-            ctrl.activeContributionTab = '';
-            ctrl.reviewTabs = [
-              {
-                suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
-                text: 'Review Questions'
-              },
-              {
-                suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
-                text: 'Review Translations'
-              }
-            ];
-            ctrl.contributionTabs = [
-              {
-                suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
-                text: 'Questions'
-              },
-              {
-                suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
-                text: 'Translations'
-              }
-            ];
             ctrl.suggestionActionsByType = {
               [ctrl.SUGGESTION_TYPE_QUESTION]: {
                 viewSuggestion: (suggestionId) => {
@@ -375,7 +353,28 @@ angular.module('oppia').directive('contributionsAndReview', [
                 }
               }
             };
-
+            ctrl.activeReviewTab = '';
+            ctrl.reviewTabs = [
+              {
+                suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
+                text: 'Review Questions'
+              },
+              {
+                suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
+                text: 'Review Translations'
+              }
+            ];
+            ctrl.activeContributionTab = '';
+            ctrl.contributionTabs = [
+              {
+                suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
+                text: 'Questions'
+              },
+              {
+                suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
+                text: 'Translations'
+              }
+            ];
             UserService.getUserInfoAsync().then(userInfo => {
               ctrl.isAdmin = userInfo.isAdmin();
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
