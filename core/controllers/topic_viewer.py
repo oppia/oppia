@@ -23,6 +23,7 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import question_services
 from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
@@ -106,6 +107,13 @@ class TopicPageDataHandler(base.BaseHandler):
             for skill_id in assigned_skill_ids:
                 degrees_of_mastery[skill_id] = None
 
+        show_train_tab = False
+        if len(assigned_skill_ids) > 0:
+            questions = question_services.get_questions_by_skill_ids(
+                5, assigned_skill_ids, False)
+            if len(questions) == 5:
+                show_train_tab = True
+
         self.values.update({
             'topic_id': topic.id,
             'topic_name': topic.name,
@@ -114,6 +122,7 @@ class TopicPageDataHandler(base.BaseHandler):
             'uncategorized_skill_ids': uncategorized_skill_ids,
             'subtopics': subtopics,
             'degrees_of_mastery': degrees_of_mastery,
-            'skill_descriptions': skill_descriptions
+            'skill_descriptions': skill_descriptions,
+            'show_train_tab': show_train_tab
         })
         self.render_json(self.values)

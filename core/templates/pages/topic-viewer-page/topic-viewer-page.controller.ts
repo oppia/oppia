@@ -73,6 +73,7 @@ angular.module('oppia').directive('topicViewerPage', [
                 ctrl.subtopics = topicDataDict.subtopics;
                 $rootScope.loadingMessage = '';
                 ctrl.topicId = topicDataDict.id;
+                ctrl.showTrainTab = topicDataDict.show_train_tab;
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
                 $rootScope.$apply();
