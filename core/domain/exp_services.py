@@ -374,7 +374,12 @@ def apply_change_list(exploration_id, change_list):
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
-                    state.update_interaction_hints(change.new_value)
+                    if not isinstance(change.new_value, list):
+                        raise Exception('Expected hints_list to be a list,'
+                                        ' received %s' % change.new_value)
+                    new_hints_list = [state_domain.Hint.from_dict(hint_dict)
+                                      for hint_dict in change.new_value]
+                    state.update_interaction_hints(new_hints_list)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
@@ -399,6 +404,22 @@ def apply_change_list(exploration_id, change_list):
                         raise Exception(
                             'Expected recorded_voiceovers to be a dict, '
                             'received %s' % change.new_value)
+                    # Explicitly convert the duration_secs value from
+                    # int to float. Reason for this is the data from
+                    # the frontend will be able to match the backend
+                    # state model for Voiceover properly. Also js
+                    # treats any number that can be float and int as
+                    # int (no explicit types). For example,
+                    # 10.000 is not 10.000 it is 10.
+                    new_voiceovers_mapping = (
+                        change.new_value['voiceovers_mapping'])
+                    language_codes_to_audio_metadata = (
+                        new_voiceovers_mapping.values())
+                    for language_codes in language_codes_to_audio_metadata:
+                        for audio_metadata in language_codes.values():
+                            audio_metadata['duration_secs'] = (
+                                float(audio_metadata['duration_secs'])
+                            )
                     recorded_voiceovers = (
                         state_domain.RecordedVoiceovers.from_dict(
                             change.new_value))

@@ -1484,23 +1484,24 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         )
         state1.update_interaction_default_outcome(default_outcome1)
 
-        hint_list2 = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': (
-                    '<p>Hello, this is html1 for state2</p>'
-                    '<oppia-noninteractive-image filepath-with-value="'
-                    '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+        hint_list2 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1',
+                    (
+                        '<p>Hello, this is html1 for state2</p>'
+                        '<oppia-noninteractive-image filepath-with-value="'
+                        '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
+                        '"&amp;quot;&amp;quot;" alt-with-value='
+                        '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     )
-            }
-        }, {
-            'hint_content': {
-                'content_id': 'hint_2',
-                'html': '<p>Hello, this is html2 for state2</p>'
-            }
-        }]
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+            ),
+        ]
         state2.update_interaction_hints(hint_list2)
 
         answer_group_list2 = [{
@@ -4008,6 +4009,38 @@ title: Old Title
         self.assertEqual(
             exploration.init_state.interaction.hints[0].hint_content.content_id,
             'hint_1')
+
+    def test_update_interaction_hints_invalid_parameter_type(self):
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(
+            exploration.init_state.interaction.hints, [])
+
+        # The passed hints should be a list.
+        hint_dict = {
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': (
+                    '<p>Hello, this is html1 for state2'
+                    '<oppia-noninteractive-image filepath-with-value="'
+                    '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
+                    '"&amp;quot;&amp;quot;" alt-with-value='
+                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '</p>')
+            }
+        }
+
+        with self.assertRaisesRegexp(Exception,
+                                     'Expected hints_list to be a list.*'):
+            hints_update = exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                'state_name': exploration.init_state_name,
+                'new_value': hint_dict
+            })
+            exp_services.update_exploration(
+                self.albert_id, self.NEW_EXP_ID, [hints_update],
+                'Changed hints.'
+            )
 
     def test_update_interaction_solutions(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
