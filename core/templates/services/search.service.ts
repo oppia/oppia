@@ -25,6 +25,8 @@ angular.module('oppia').factory('SearchService', [
     var _lastSelectedCategories = {};
     var _lastSelectedLanguageCodes = {};
     var _searchCursor = null;
+    var _isCurrentlyFetchingResults = false;
+    var numSearchesInProgress = 0;
 
     // Appends a suffix to the query describing allowed category and language
     // codes to filter on.
@@ -91,9 +93,6 @@ angular.module('oppia').factory('SearchService', [
       }
     };
 
-    var _isCurrentlyFetchingResults = false;
-    var numSearchesInProgress = 0;
-
     var getQueryUrl = function(searchUrlQueryString) {
       return SEARCH_DATA_URL + '?q=' + searchUrlQueryString;
     };
@@ -127,7 +126,7 @@ angular.module('oppia').factory('SearchService', [
           _isCurrentlyFetchingResults = false;
           var checkMismatch = function(searchQuery) {
             var isMismatch = true;
-            $('.oppia-search-bar-input').each(function(index) {
+            $('.oppia-search-bar-input').each(function() {
               if ((<string>$(this).val()).trim() === searchQuery) {
                 isMismatch = false;
               }
@@ -140,7 +139,7 @@ angular.module('oppia').factory('SearchService', [
             $log.error('Input: ' + (
               <string><any>$('.oppia-search-bar-input').val()).trim());
           }
-        }, function() {
+        })['catch'](function() {
           numSearchesInProgress--;
         });
 
