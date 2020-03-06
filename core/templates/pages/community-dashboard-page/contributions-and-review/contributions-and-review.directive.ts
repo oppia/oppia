@@ -52,7 +52,7 @@ angular.module('oppia').directive('contributionsAndReview', [
         function(
             $filter, $uibModal, ContributionAndReviewService,
             QuestionObjectFactory, UserService) {
-          const ctrl = this;
+          let ctrl = this;
           let SUGGESTION_LABELS = {
             review: { text: 'Awaiting review', color: '#eeeeee' },
             accepted: { text: 'Accepted', color: '#8ed274' },
