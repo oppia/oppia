@@ -27,8 +27,8 @@ TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
 
 def install_prerequisites():
-    """These libraries need to be installed before running
-    or importing any script.
+    """Install libraries that are required before running or
+    importing any script.
     """
     # pylint: disable=global-statement
     # pylint: disable=unused-variable
@@ -51,7 +51,7 @@ def install_prerequisites():
                 subprocess.check_call(command + uextention)
 
     # pylint: enable=global-statement
-    # pylint: disable=unused-variable
+    # pylint: enable=unused-variable
 
 
 install_prerequisites()
