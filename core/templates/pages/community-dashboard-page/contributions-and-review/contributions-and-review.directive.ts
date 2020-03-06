@@ -84,7 +84,6 @@ angular.module('oppia').directive('contributionsAndReview', [
                 let actionButtonTitle = (
                   ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION ?
                     'Review' : 'View');
-
                 return {
                   id: suggestionId,
                   heading: $filter('formatRtePreview')(html),
@@ -112,7 +111,6 @@ angular.module('oppia').directive('contributionsAndReview', [
                 let actionButtonTitle = (
                   ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_TRANSLATE ?
                     'Review' : 'View');
-
                 return {
                   id: suggestionId,
                   heading: $filter('formatRtePreview')(translationHtml),
