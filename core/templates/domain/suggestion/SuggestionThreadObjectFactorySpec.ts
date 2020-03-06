@@ -83,9 +83,10 @@ describe('SuggestionThreadObjectFactory', () => {
       .toEqual('tenth message');
 
     let suggestion = suggestionThread.getSuggestion();
+    expect(suggestion).not.toBeNull();
     expect(suggestion.suggestionId).toEqual('exploration.exp1.thread1');
-    expect(suggestion.suggestionType).toEqual(
-      'edit_exploration_state_content');
+    expect(suggestion.suggestionType)
+      .toEqual('edit_exploration_state_content');
     expect(suggestion.targetType).toEqual('exploration');
     expect(suggestion.targetId).toEqual('exp1');
     expect(suggestion.status).toEqual('accepted');
@@ -94,15 +95,15 @@ describe('SuggestionThreadObjectFactory', () => {
     expect(suggestion.oldValue.html).toEqual('old suggestion content');
     expect(suggestion.lastUpdated).toEqual(1000);
     expect(suggestion.getThreadId()).toEqual('exploration.exp1.thread1');
-    expect(suggestionThread.isSuggestionThread()).toEqual(true);
-    expect(suggestionThread.isSuggestionHandled()).toEqual(true);
+    expect(suggestionThread.isSuggestionThread()).toBeTrue();
+    expect(suggestionThread.isSuggestionHandled()).toBeTrue();
 
     suggestionThread.setSuggestionStatus('review');
-    expect(suggestionThread.isSuggestionHandled()).toEqual(false);
+    expect(suggestionThread.isSuggestionHandled()).toBeFalse();
     expect(suggestionThread.getSuggestionStatus()).toEqual('review');
     expect(suggestionThread.getSuggestionStateName()).toEqual('state_1');
-    expect(suggestionThread.getReplacementHtmlFromSuggestion()).toEqual(
-      'new suggestion content');
+    expect(suggestionThread.getReplacementHtmlFromSuggestion())
+      .toEqual('new suggestion content');
   });
 
   it('should create a new suggestion thread.', () => {
@@ -117,15 +118,14 @@ describe('SuggestionThreadObjectFactory', () => {
     expect(suggestionThread.summary).toEqual('sample summary');
     expect(suggestionThread.messageCount).toEqual(10);
     expect(suggestionThread.threadId).toEqual('exploration.exp1.thread1');
+    expect(suggestionThread.getSuggestion()).toBeNull();
 
-    let suggestion = suggestionThread.getSuggestion();
-    expect(suggestion).toBeUndefined();
     suggestionThread.setSuggestionStatus(null);
-    expect(suggestionThread.isSuggestionHandled()).toEqual(null);
-    expect(suggestionThread.getSuggestionStatus()).toEqual(null);
-    expect(suggestionThread.getSuggestionStateName()).toEqual(null);
-    expect(suggestionThread.getReplacementHtmlFromSuggestion()).toEqual(
-      null);
+
+    expect(suggestionThread.isSuggestionHandled()).toBeNull();
+    expect(suggestionThread.getSuggestionStatus()).toBeNull();
+    expect(suggestionThread.getSuggestionStateName()).toBeNull();
+    expect(suggestionThread.getReplacementHtmlFromSuggestion()).toBeNull();
   });
 
   describe('.setMessages', () => {
