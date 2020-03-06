@@ -59,15 +59,15 @@ require(
 
 angular.module('oppia').controller('TrainingModalController', [
   '$injector', '$scope', '$uibModalInstance', 'AngularNameService',
-  'AnswerClassificationService', 'AnswerGroupObjectFactory', 'ContextService',
+  'AnswerClassificationService', 'AnswerGroupObjectFactory',
   'ExplorationStatesService', 'ExplorationWarningsService', 'GraphDataService',
   'ResponsesService', 'StateEditorService', 'StateInteractionIdService',
-  'TrainingDataService', 'unhandledAnswer', 'finishTrainingCallback',
+  'TrainingDataService', 'finishTrainingCallback', 'unhandledAnswer',
   function($injector, $scope, $uibModalInstance, AngularNameService,
-    AnswerClassificationService, AnswerGroupObjectFactory, ContextService,
-    ExplorationStatesService, ExplorationWarningsService, GraphDataService,
-    ResponsesService, StateEditorService, StateInteractionIdService,
-    TrainingDataService, unhandledAnswer, finishTrainingCallback) {
+      AnswerClassificationService, AnswerGroupObjectFactory,
+      ExplorationStatesService, ExplorationWarningsService, GraphDataService,
+      ResponsesService, StateEditorService, StateInteractionIdService,
+      TrainingDataService, finishTrainingCallback, unhandledAnswer) {
     $scope.trainingDataAnswer = '';
 
     // See the training panel directive in ExplorationEditorTab for an

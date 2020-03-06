@@ -58,7 +58,7 @@ describe('Training Modal Controller', function() {
   describe('when anwer group index is equal response answer groups count',
     function() {
       beforeEach(angular.mock.inject(function($injector, $controller) {
-        callbackSpy = jasmine.createSpy('callback')
+        callbackSpy = jasmine.createSpy('callback');
         $uibModalInstance = jasmine.createSpyObj(['close', 'dismiss']);
         ExplorationStatesService.init({
           Init: {
@@ -135,21 +135,21 @@ describe('Training Modal Controller', function() {
 
         $scope = $rootScope.$new();
         $controller('TrainingModalController', {
-            $scope: $scope,
-            $injector: $injector,
-            $uibModalInstance: $uibModalInstance,
-            unhandledAnswer: 'This is the answer',
-            finishTrainingCallback: callbackSpy
-          });
+          $scope: $scope,
+          $injector: $injector,
+          $uibModalInstance: $uibModalInstance,
+          unhandledAnswer: 'This is the answer',
+          finishTrainingCallback: callbackSpy
+        });
       }));
-    
+
       it('should click on confirm button', function() {
         var answerGroups = (
           ExplorationStatesService.getInteractionAnswerGroupsMemento('Init'));
         var defaultOutcome = (
           ExplorationStatesService.getInteractionDefaultOutcomeMemento(
-          'Init'));
-        
+            'Init'));
+
         expect(answerGroups[0].outcome.dest).toBe('');
         expect(answerGroups[0].trainingData).toEqual(
           ['Not the answer']);
@@ -166,13 +166,13 @@ describe('Training Modal Controller', function() {
           ExplorationStatesService.getInteractionAnswerGroupsMemento('Init'));
         var updatedDefaultOutcome = (
           ExplorationStatesService.getInteractionDefaultOutcomeMemento(
-          'Init'));
-        
+            'Init'));
+
         expect(updatedAnswerGroups[0].outcome.dest).toBe('Init');
         expect(updatedAnswerGroups[0].trainingData).toEqual([]);
         expect(updatedDefaultOutcome.dest).toBe('Init');
       });
-    
+
       it('should exit training modal', function() {
         $scope.exitTrainer();
         expect($uibModalInstance.dismiss).toHaveBeenCalled();
@@ -291,12 +291,12 @@ describe('Training Modal Controller', function() {
       }));
       $scope = $rootScope.$new();
       $controller('TrainingModalController', {
-          $scope: $scope,
-          $injector: $injector,
-          $uibModalInstance: $uibModalInstance,
-          unhandledAnswer: 'This is the answer',
-          finishTrainingCallback: callbackSpy
-        });
+        $scope: $scope,
+        $injector: $injector,
+        $uibModalInstance: $uibModalInstance,
+        unhandledAnswer: 'This is the answer',
+        finishTrainingCallback: callbackSpy
+      });
     }));
 
     it('should click on confirm button', function() {
@@ -416,12 +416,12 @@ describe('Training Modal Controller', function() {
         }));
         $scope = $rootScope.$new();
         $controller('TrainingModalController', {
-            $scope: $scope,
-            $injector: $injector,
-            $uibModalInstance: $uibModalInstance,
-            unhandledAnswer: 'This is the answer',
-            finishTrainingCallback: callbackSpy
-          });
+          $scope: $scope,
+          $injector: $injector,
+          $uibModalInstance: $uibModalInstance,
+          unhandledAnswer: 'This is the answer',
+          finishTrainingCallback: callbackSpy
+        });
       }));
 
       it('should click on confirm button', function() {
