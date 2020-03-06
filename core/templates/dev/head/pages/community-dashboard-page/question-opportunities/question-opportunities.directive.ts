@@ -54,7 +54,9 @@ angular.module('oppia').directive('questionOpportunities', [
   function(UrlInterpolationService, MAX_QUESTIONS_PER_SKILL) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        filterText: '@',
+      },
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/community-dashboard-page/question-opportunities/' +
@@ -62,13 +64,13 @@ angular.module('oppia').directive('questionOpportunities', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$uibModal', 'QuestionSuggestionService', 'AlertsService',
-        'ContributionOpportunitiesService', 'MisconceptionObjectFactory',
-        'QuestionObjectFactory', 'QuestionUndoRedoService',
-        'SkillObjectFactory', 'SkillBackendApiService',
+        'ContributionOpportunitiesService', 'SkillBackendApiService',
+        'MisconceptionObjectFactory', 'QuestionObjectFactory',
+        'QuestionUndoRedoService', 'SkillObjectFactory',
         function(
             $scope, $uibModal, QuestionSuggestionService, AlertsService,
             ContributionOpportunitiesService,MisconceptionObjectFactory,
-            QuestionObjectFactory,QuestionUndoRedoService,
+            QuestionObjectFactory, QuestionUndoRedoService,
             SkillBackendApiService, SkillObjectFactory) {
           const ctrl = this;
           const getOpportunity = function(skillId) {
@@ -122,7 +124,8 @@ angular.module('oppia').directive('questionOpportunities', [
                 '$scope', '$uibModalInstance', 'DEFAULT_SKILL_DIFFICULTY',
                 'MODE_SELECT_DIFFICULTY', 'SkillDifficultyObjectFactory',
                 function($scope, $uibModalInstance, DEFAULT_SKILL_DIFFICULTY,
-                    MODE_SELECT_DIFFICULTY, SkillDifficultyObjectFactory) {
+                  MODE_SELECT_DIFFICULTY, SkillDifficultyObjectFactory) {
+
                   const init = function() {
                     $scope.instructionMessage = (
                       'Select the skill(s) to link the question to:');
