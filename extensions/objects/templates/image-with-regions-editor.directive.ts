@@ -382,11 +382,14 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
             }
             ctrl.movedOutOfRegion = false;
           };
-          ctrl.onMouseMoveRegion = function() {
+          ctrl.onMouseMoveRegion = function(index) {
             if (
               ctrl.userIsCurrentlyDragging ||
               ctrl.userIsCurrentlyResizing) {
               return;
+            }
+            if (ctrl.hoveredRegion === null) {
+              ctrl.hoveredRegion = index;
             }
             var region = cornerAndDimensionsFromRegionArea(
               ctrl.value.labeledRegions[

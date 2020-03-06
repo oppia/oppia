@@ -1784,8 +1784,7 @@ class State(python_utils.OBJECT):
         """Update the list of hints.
 
         Args:
-            hints_list: list(dict). A list of dict; each dict represents a Hint
-                object.
+            hints_list: list(Hint). A list of Hint objects.
 
         Raises:
             Exception: 'hints_list' is not a list.
@@ -1796,9 +1795,7 @@ class State(python_utils.OBJECT):
                 % hints_list)
         old_content_id_list = [
             hint.hint_content.content_id for hint in self.interaction.hints]
-        self.interaction.hints = [
-            Hint.from_dict(hint_dict)
-            for hint_dict in hints_list]
+        self.interaction.hints = copy.deepcopy(hints_list)
 
         new_content_id_list = [
             hint.hint_content.content_id for hint in self.interaction.hints]

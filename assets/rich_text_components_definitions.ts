@@ -194,7 +194,7 @@ export = {
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "video_id",
-      "description": "The YouTube id for this video. This is the 11-character string after \"v=\" in the video URL.",
+      "description": "The Youtube URL or the YouTube id for this video. (The Youtube id is the 11-character string after \"v=\" in the video URL.)",
       "schema": {
         "type": "unicode"
       },
