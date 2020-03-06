@@ -18,7 +18,7 @@
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
-fdescribe('Responses Service', function() {
+describe('Responses Service', function() {
   var ResponsesService = null;
   var InteractionObjectFactory = null;
   var OutcomeObjectFactory = null;

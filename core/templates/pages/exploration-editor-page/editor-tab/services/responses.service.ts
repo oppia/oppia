@@ -154,9 +154,7 @@ angular.module('oppia').factory('ResponsesService', [
         _saveAnswerGroups(_answerGroups);
         callback(_answerGroupsMemento);
       } else {
-        if (_activeAnswerGroupIndex !== -1) {
-          _activeAnswerGroupIndex = -1;
-        }
+        _activeAnswerGroupIndex = -1;
 
         LoggerService.error(
           'The index provided does not exist in _answerGroups array.');
@@ -273,7 +271,9 @@ angular.module('oppia').factory('ResponsesService', [
       },
       changeActiveAnswerGroupIndex: function(newIndex) {
         // If the current group is being clicked on again, close it.
-        if (newIndex !== _activeAnswerGroupIndex) {
+        if (newIndex === _activeAnswerGroupIndex) {
+          _activeAnswerGroupIndex = -1;
+        } else {
           _activeAnswerGroupIndex = newIndex;
         }
 
