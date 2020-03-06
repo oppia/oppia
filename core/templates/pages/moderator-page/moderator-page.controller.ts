@@ -47,7 +47,8 @@ angular.module('oppia').directive('moderatorPage', [
           };
 
           ctrl.getActivityCreateUrl = function(reference) {
-            var path = (reference.type === 'exploration' ?
+            var path = (
+              reference.type === 'exploration' ?
               '/create' :
               '/create_collection');
             return path + '/' + reference.id;
