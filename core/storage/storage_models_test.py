@@ -199,7 +199,6 @@ class StorageModelsTest(test_utils.GenericTestBase):
             topic_models.TopicRightsSnapshotMetadataModel,
             topic_models.TopicSnapshotContentModel,
             topic_models.TopicSnapshotMetadataModel,
-            user_models.UserContributionScoringModel,
             story_models.StorySnapshotContentModel,
             story_models.StorySnapshotMetadataModel,
             question_models.QuestionSnapshotContentModel,
@@ -208,7 +207,6 @@ class StorageModelsTest(test_utils.GenericTestBase):
             exploration_models.ExplorationRightsSnapshotMetadataModel,
             exploration_models.ExplorationSnapshotContentModel,
             exploration_models.ExplorationSnapshotMetadataModel,
-            suggestion_models.GeneralVoiceoverApplicationModel,
             config_models.ConfigPropertySnapshotContentModel,
             config_models.ConfigPropertySnapshotMetadataModel
         }

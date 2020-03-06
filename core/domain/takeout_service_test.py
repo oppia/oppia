@@ -103,6 +103,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     MESSAGE_TEXT = 'Export test text.'
     MESSAGE_RECEIEVED_VIA_EMAIL = False
     CHANGE_CMD = {}
+    SCORE_CATEGORY_1 = 'category_1'
+    SCORE_CATEGORY_2 = 'category_2'
     SCORE_CATEGORY = (
         suggestion_models.SCORE_TYPE_TRANSLATION +
         suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
@@ -319,6 +321,45 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             email_models.GeneralFeedbackEmailReplyToIdModel.create(
                 self.USER_ID_1, self.THREAD_ID_2).put()
 
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_1_id',
+            target_type='exploration',
+            target_id='exp_id',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id=self.USER_ID_1,
+            final_reviewer_id='reviewer_id',
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None).put()
+
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_2_id',
+            target_type='exploration',
+            target_id='exp_id',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id=self.USER_ID_1,
+            final_reviewer_id=None,
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None).put()
+
+        user_models.UserContributionScoringModel(
+            id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_ID_1),
+            user_id=self.USER_ID_1,
+            score_category=self.SCORE_CATEGORY_1,
+            score=1.5,
+            has_email_been_sent=False
+        ).put()
+        user_models.UserContributionScoringModel(
+            id='%s.%s' % (self.SCORE_CATEGORY_2, self.USER_ID_1),
+            user_id=self.USER_ID_1,
+            score_category=self.SCORE_CATEGORY_2,
+            score=2,
+            has_email_been_sent=False
+        ).put()
+
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         super(TakeoutServiceUnitTests, self).setUp()
@@ -398,6 +439,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         topic_rights_data = {
             'managed_topic_ids': []
         }
+
+        expected_voiceover_application_data = {}
+        expected_contrib_score_data = {}
+
         expected_export = {
             'user_stats_data': stats_data,
             'user_settings_data': settings_data,
@@ -419,7 +464,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'collection_rights_data': collection_rights_data,
             'general_suggestion_data': general_suggestion_data,
             'exploration_rights_data': exploration_rights_data,
-            'general_feedback_email_reply_to_id_data': reply_to_data
+            'general_feedback_email_reply_to_id_data': reply_to_data,
+            'general_voiceover_application_data':
+                expected_voiceover_application_data,
+            'user_contribution_scoring_data': expected_contrib_score_data
         }
 
         # Perform export and compare.
@@ -624,6 +672,38 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'managed_topic_ids': [self.TOPIC_ID_1, self.TOPIC_ID_2]
         }
 
+        expected_voiceover_application_data = {
+            'application_1_id': {
+                'target_type': 'exploration',
+                'target_id': 'exp_id',
+                'status': 'review',
+                'language_code': 'en',
+                'filename': 'application_audio.mp3',
+                'content': '<p>Some content</p>',
+                'rejection_message': None
+            },
+            'application_2_id': {
+                'target_type': 'exploration',
+                'target_id': 'exp_id',
+                'status': 'review',
+                'language_code': 'en',
+                'filename': 'application_audio.mp3',
+                'content': '<p>Some content</p>',
+                'rejection_message': None
+            }
+        }
+
+        expected_contrib_score_data = {
+            self.SCORE_CATEGORY_1: {
+                'has_email_been_sent': False,
+                'score': 1.5
+            },
+            self.SCORE_CATEGORY_2: {
+                'has_email_been_sent': False,
+                'score': 2
+            }
+        }
+
         expected_export = {
             'user_stats_data': expected_stats_data,
             'user_settings_data': expected_settings_data,
@@ -648,7 +728,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 expected_collection_rights_data,
             'general_suggestion_data': expected_general_suggestion_data,
             'exploration_rights_data': expected_exploration_rights_data,
-            'general_feedback_email_reply_to_id_data': expected_reply_to_data
+            'general_feedback_email_reply_to_id_data': expected_reply_to_data,
+            'general_voiceover_application_data':
+                expected_voiceover_application_data,
+            'user_contribution_scoring_data': expected_contrib_score_data
         }
 
         exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
