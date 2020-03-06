@@ -68,8 +68,8 @@ export class ThreadMessage {
 @Injectable({providedIn: 'root'})
 export class ThreadMessageObjectFactory {
   constructor(
-    private threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory
-  ) {}
+    private threadMessageSummaryObjectFactory:
+      ThreadMessageSummaryObjectFactory) {}
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'threadMessageBackendDict' is a dict with underscore_cased

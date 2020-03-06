@@ -107,8 +107,8 @@ class SuggestionThread {
 export class SuggestionThreadObjectFactory {
   constructor(
     private suggestionObjectFactory: SuggestionObjectFactory,
-    private threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory
-  ) {}
+    private threadMessageSummaryObjectFactory:
+      ThreadMessageSummaryObjectFactory) {}
 
   private createEditExplorationStateContentSuggestionFromBackendDict(
       suggestionBackendDict: any): Suggestion {
