@@ -17,6 +17,7 @@
  * feedback tab of the exploration editor.
  */
 
+require('domain/feedback_message/ThreadMessageObjectFactory.ts');
 require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
