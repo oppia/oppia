@@ -54,9 +54,18 @@ angular.module('oppia').directive('contributionsAndReview', [
             QuestionObjectFactory, UserService) {
           let ctrl = this;
           let SUGGESTION_LABELS = {
-            review: { text: 'Awaiting review', color: '#eeeeee' },
-            accepted: { text: 'Accepted', color: '#8ed274' },
-            rejected: { text: 'Rejected', color: '#e76c8c' }
+            review: {
+              text: 'Awaiting review',
+              color: '#eeeeee'
+            },
+            accepted: {
+              text: 'Accepted',
+              color: '#8ed274'
+            },
+            rejected: {
+              text: 'Rejected',
+              color: '#e76c8c'
+            }
           };
 
           let getQuestionContributionsSummary = (
