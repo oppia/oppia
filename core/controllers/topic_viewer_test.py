@@ -229,12 +229,12 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
         self.save_new_skill(
             self.skill_id_1, self.admin_id, description='Skill Description 1')
         for index in python_utils.RANGE(number_of_questions):
-            self.question_id = question_services.get_new_question_id()
-            self.question = self.save_new_question(
-                self.question_id, self.admin_id,
+            question_id = question_services.get_new_question_id()
+            self.save_new_question(
+                question_id, self.admin_id,
                 self._create_valid_question_data(index), [self.skill_id_1])
             question_services.create_new_question_skill_link(
-                self.admin_id, self.question_id, self.skill_id_1, 0.5)
+                self.admin_id, question_id, self.skill_id_1, 0.5)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
                 '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'new_topic'))
