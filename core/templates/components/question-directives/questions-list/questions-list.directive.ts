@@ -627,8 +627,8 @@ angular.module('oppia').directive('questionsList', [
                       });
                     }, function() {
                       // Note to developers:
-                      // This callback is triggered when the Cancel button is clicked.
-                      // No further action is needed.
+                      // This callback is triggered when the Cancel button is
+                      // clicked. No further action is needed.
                     });
                   };
 
