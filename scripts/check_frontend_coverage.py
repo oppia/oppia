@@ -190,6 +190,8 @@ FULLY_COVERED_FILENAMES = [
     'learner-dashboard-page.constants.ajs.ts',
     'learner-dashboard-page.constants.ts',
     'learner-params.service.ts',
+    'learner-playlist-modal.controller.ts',
+    'learner-playlist.service.ts',
     'LearnerActionObjectFactory.ts',
     'LearnerAnswerDetailsObjectFactory.ts',
     'LearnerAnswerInfoObjectFactory.ts',
