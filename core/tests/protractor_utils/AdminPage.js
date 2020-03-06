@@ -138,6 +138,7 @@ var AdminPage = function() {
       propertyName, objectType, editingInstructions) {
     this.get();
     configTab.click();
+    waitFor.elementToBeClickable(saveAllConfigs);
     configProperties.map(function(x) {
       return saveConfigProperty(
         x, propertyName, objectType, editingInstructions);
