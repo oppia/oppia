@@ -129,8 +129,11 @@ angular.module('oppia').run([
                     }
                   });
                 },
-                function() {},
-                function() {});
+                function() {
+                  var newWidgetSelector = (
+                    '[data-cke-widget-id="' + that.id + '"]');
+                  editor.editable().findOne(newWidgetSelector).remove();
+                });
             },
             /**
              * This is how the widget will be represented in the outputs source,
