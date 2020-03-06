@@ -59,122 +59,6 @@ angular.module('oppia').directive('contributionsAndReview', [
             $filter, $uibModal, ContributionAndReviewService,
             QuestionObjectFactory, UserService) {
           const ctrl = this;
-
-          ctrl.$onInit = () => {
-            ctrl.isAdmin = false;
-            ctrl.userDetailsLoading = true;
-            ctrl.userIsLoggedIn = false;
-            ctrl.contributions = {};
-            ctrl.contributionSummaries = [];
-            ctrl.contributionsDataLoading = true;
-            ctrl.SUGGESTION_TYPE_QUESTION = 'add_question';
-            ctrl.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
-            ctrl.reviewTabs = [
-              {
-                suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
-                text: 'Review Questions'
-              },
-              {
-                suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
-                text: 'Review Translations'
-              }
-            ];
-            ctrl.contributionTabs = [
-              {
-                suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
-                text: 'Questions'
-              },
-              {
-                suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
-                text: 'Translations'
-              }
-            ];
-            ctrl.suggestionActionsByType = {
-              [ctrl.SUGGESTION_TYPE_QUESTION]: {
-                viewSuggestion: (suggestionId) => {
-                  let suggestion = ctrl.contributions[suggestionId].suggestion;
-                  let contributionDetails =
-                    ctrl.contributions[suggestionId].details;
-                  let isReviewable =
-                    ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION;
-                  showQuestionSuggestionModal(
-                    suggestion, contributionDetails, isReviewable);
-                },
-                switchToContributionsTab: () => {
-                  ContributionAndReviewService
-                    .getUserCreatedQuestionSuggestions(
-                      suggestionIdToSuggestions => {
-                        ctrl.contributions = suggestionIdToSuggestions;
-                        ctrl.contributionSummaries =
-                          getQuestionContributionsSummary();
-                        ctrl.activeContributionTab =
-                          ctrl.SUGGESTION_TYPE_QUESTION;
-                        ctrl.contributionsDataLoading = false;
-                      });
-                },
-                switchToReviewTab: () => {
-                  ContributionAndReviewService.getReviewableQuestionSuggestions(
-                    suggestionIdToSuggestions => {
-                      ctrl.contributions = suggestionIdToSuggestions;
-                      ctrl.contributionSummaries =
-                        getQuestionContributionsSummary();
-                      ctrl.activeReviewTab = ctrl.SUGGESTION_TYPE_QUESTION;
-                      ctrl.contributionsDataLoading = false;
-                    });
-                }
-              },
-
-              [ctrl.SUGGESTION_TYPE_TRANSLATE]: {
-                viewSuggestion: (suggestionId) => {
-                  let suggestion = ctrl.contributions[suggestionId].suggestion;
-                  let isReviewable =
-                    ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_TRANSLATE;
-                  showTranslationSuggestionModal(
-                    suggestion.target_id, suggestion.suggestion_id,
-                    suggestion.change.content_html,
-                    suggestion.change.translation_html, isReviewable);
-                },
-                switchToContributionsTab: () => {
-                  ContributionAndReviewService
-                    .getUserCreatedTranslationSuggestions(
-                      suggestionIdToSuggestions => {
-                        ctrl.contributions = suggestionIdToSuggestions;
-                        ctrl.contributionSummaries =
-                          getTranslationContributionsSummary();
-                        ctrl.activeContributionTab =
-                          ctrl.SUGGESTION_TYPE_TRANSLATE;
-                        ctrl.contributionsDataLoading = false;
-                      });
-                },
-                switchToReviewTab: () => {
-                  ContributionAndReviewService
-                    .getReviewableTranslationSuggestions(
-                      suggestionIdToSuggestions => {
-                        ctrl.contributions = suggestionIdToSuggestions;
-                        ctrl.contributionSummaries =
-                          getTranslationContributionsSummary();
-                        ctrl.activeReviewTab = ctrl.SUGGESTION_TYPE_TRANSLATE;
-                        ctrl.contributionsDataLoading = false;
-                      });
-                }
-              }
-            };
-
-            ctrl.activeReviewTab = '';
-            ctrl.activeContributionTab = '';
-
-            UserService.getUserInfoAsync().then(userInfo => {
-              ctrl.isAdmin = userInfo.isAdmin();
-              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-              ctrl.userDetailsLoading = false;
-              if (ctrl.isAdmin) {
-                ctrl.switchToReviewTab(ctrl.SUGGESTION_TYPE_QUESTION);
-              } else if (ctrl.userIsLoggedIn) {
-                ctrl.switchToContributionsTab(ctrl.SUGGESTION_TYPE_QUESTION);
-              }
-            });
-          };
-
           let getQuestionContributionsSummary = (
             // TODO(#7176): Replace 'any' with the exact type. This has been
             // kept as 'any' because without it typescript will fail to compile
@@ -380,6 +264,121 @@ angular.module('oppia').directive('contributionsAndReview', [
             if (suggestionActions) {
               suggestionActions.switchToReviewTab();
             }
+          };
+
+          ctrl.$onInit = () => {
+            ctrl.isAdmin = false;
+            ctrl.userDetailsLoading = true;
+            ctrl.userIsLoggedIn = false;
+            ctrl.contributions = {};
+            ctrl.contributionSummaries = [];
+            ctrl.contributionsDataLoading = true;
+            ctrl.SUGGESTION_TYPE_QUESTION = 'add_question';
+            ctrl.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
+            ctrl.reviewTabs = [
+              {
+                suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
+                text: 'Review Questions'
+              },
+              {
+                suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
+                text: 'Review Translations'
+              }
+            ];
+            ctrl.contributionTabs = [
+              {
+                suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
+                text: 'Questions'
+              },
+              {
+                suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
+                text: 'Translations'
+              }
+            ];
+            ctrl.suggestionActionsByType = {
+              [ctrl.SUGGESTION_TYPE_QUESTION]: {
+                viewSuggestion: (suggestionId) => {
+                  let suggestion = ctrl.contributions[suggestionId].suggestion;
+                  let contributionDetails =
+                    ctrl.contributions[suggestionId].details;
+                  let isReviewable =
+                    ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION;
+                  showQuestionSuggestionModal(
+                    suggestion, contributionDetails, isReviewable);
+                },
+                switchToContributionsTab: () => {
+                  ContributionAndReviewService
+                    .getUserCreatedQuestionSuggestions(
+                      suggestionIdToSuggestions => {
+                        ctrl.contributions = suggestionIdToSuggestions;
+                        ctrl.contributionSummaries =
+                          getQuestionContributionsSummary();
+                        ctrl.activeContributionTab =
+                          ctrl.SUGGESTION_TYPE_QUESTION;
+                        ctrl.contributionsDataLoading = false;
+                      });
+                },
+                switchToReviewTab: () => {
+                  ContributionAndReviewService.getReviewableQuestionSuggestions(
+                    suggestionIdToSuggestions => {
+                      ctrl.contributions = suggestionIdToSuggestions;
+                      ctrl.contributionSummaries =
+                        getQuestionContributionsSummary();
+                      ctrl.activeReviewTab = ctrl.SUGGESTION_TYPE_QUESTION;
+                      ctrl.contributionsDataLoading = false;
+                    });
+                }
+              },
+
+              [ctrl.SUGGESTION_TYPE_TRANSLATE]: {
+                viewSuggestion: (suggestionId) => {
+                  let suggestion = ctrl.contributions[suggestionId].suggestion;
+                  let isReviewable =
+                    ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_TRANSLATE;
+                  showTranslationSuggestionModal(
+                    suggestion.target_id, suggestion.suggestion_id,
+                    suggestion.change.content_html,
+                    suggestion.change.translation_html, isReviewable);
+                },
+                switchToContributionsTab: () => {
+                  ContributionAndReviewService
+                    .getUserCreatedTranslationSuggestions(
+                      suggestionIdToSuggestions => {
+                        ctrl.contributions = suggestionIdToSuggestions;
+                        ctrl.contributionSummaries =
+                          getTranslationContributionsSummary();
+                        ctrl.activeContributionTab =
+                          ctrl.SUGGESTION_TYPE_TRANSLATE;
+                        ctrl.contributionsDataLoading = false;
+                      });
+                },
+                switchToReviewTab: () => {
+                  ContributionAndReviewService
+                    .getReviewableTranslationSuggestions(
+                      suggestionIdToSuggestions => {
+                        ctrl.contributions = suggestionIdToSuggestions;
+                        ctrl.contributionSummaries =
+                          getTranslationContributionsSummary();
+                        ctrl.activeReviewTab = ctrl.SUGGESTION_TYPE_TRANSLATE;
+                        ctrl.contributionsDataLoading = false;
+                      });
+                }
+              }
+            };
+
+            ctrl.activeReviewTab = '';
+            ctrl.activeContributionTab = '';
+
+            UserService.getUserInfoAsync().then(userInfo => {
+              ctrl.isAdmin = userInfo.isAdmin();
+              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+              ctrl.userDetailsLoading = false;
+              if (ctrl.isAdmin) {
+                ctrl.switchToReviewTab(ctrl.SUGGESTION_TYPE_QUESTION);
+              } else if (ctrl.userIsLoggedIn) {
+                ctrl.switchToContributionsTab(ctrl.SUGGESTION_TYPE_QUESTION);
+              }
+            });
           };
         }
       ]
