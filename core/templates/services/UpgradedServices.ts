@@ -101,6 +101,8 @@ import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerAnswerInfoObjectFactory } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
+import { LearnerDashboardActivityIdsObjectFactory } from
+  'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
 import { LocalStorageService } from 'services/local-storage.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
@@ -289,6 +291,8 @@ export class UpgradedServices {
       new LearnerAnswerDetailsObjectFactory();
     upgradedServices['LearnerAnswerInfoObjectFactory'] =
       new LearnerAnswerInfoObjectFactory();
+    upgradedServices['LearnerDashboardActivityIdsObjectFactory'] =
+      new LearnerDashboardActivityIdsObjectFactory();
     upgradedServices['LoggerService'] = new LoggerService();
     upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'] =
       new NormalizeWhitespacePunctuationAndCasePipe();
