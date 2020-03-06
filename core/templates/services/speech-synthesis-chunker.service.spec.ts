@@ -191,7 +191,7 @@ describe('Speech Synthesis Chunker Service', () => {
       expect(speakSpy).not.toHaveBeenCalled();
     });
 
-    it('should speak speech twice', fakeAsync(() => {
+    it('should speak two phrases at a time', fakeAsync(() => {
       const speakSpy = spyOn(window.speechSynthesis, 'speak').and
         .callFake(function() {
           mockSpeechSynthesisUtteran.onend();
