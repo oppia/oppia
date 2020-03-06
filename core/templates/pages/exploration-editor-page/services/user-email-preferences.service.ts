@@ -58,7 +58,7 @@ angular.module('oppia').factory('UserEmailPreferencesService', [
       },
       /**
        * Set the message type to suggestion and mute to true or false.
-       * @param {boolean} mute - Whether the suggestion notification is muted. 
+       * @param {boolean} mute - Whether the suggestion notification is muted.
        */
       setSuggestionNotificationPreferences: function(mute) {
         this.saveChangeToBackend({
