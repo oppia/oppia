@@ -179,8 +179,6 @@ export class UpgradedServices {
     upgradedServices['ExplorationFeaturesService'] =
       new ExplorationFeaturesService();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
-    upgradedServices['FeedbackThreadObjectFactory'] =
-      new FeedbackThreadObjectFactory();
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GenerateContentIdService'] =
       new GenerateContentIdService();
@@ -246,6 +244,9 @@ export class UpgradedServices {
       new DeviceInfoService(upgradedServices['WindowRef']);
     upgradedServices['DocumentAttributeCustomizationService'] =
       new DocumentAttributeCustomizationService(upgradedServices['WindowRef']);
+    upgradedServices['FeedbackThreadObjectFactory'] =
+      new FeedbackThreadObjectFactory(
+        upgradedServices['ThreadMessageSummaryObjectFactory']);
     upgradedServices['HintObjectFactory'] =
       new HintObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['HtmlEscaperService'] =
