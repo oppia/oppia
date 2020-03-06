@@ -111,13 +111,16 @@
 /scripts/check_frontend_coverage_test.py @marianazangrossi @kevinlee12
 /scripts/clean.py @kevinlee12
 /scripts/clean_test.py @kevinlee12
+/scripts/codeowner_linter.py @Hudda @kevinlee12
 /scripts/common.py @kevinlee12
 /scripts/common_test.py @kevinlee12
 /scripts/create_expression_parser.py @kevinlee12
 /scripts/create_topological_sort_of_all_services.py @bansalnitish @kevinlee12
 /scripts/create_topological_sort_of_all_services_test.py @bansalnitish @kevinlee12
+/scripts/css_linter.py @Hudda @kevinlee12
 /scripts/docstrings_checker.py @kevinlee12
 /scripts/docstrings_checker_test.py @kevinlee12
+/scripts/html_linter.py @Hudda @kevinlee12
 /scripts/install_chrome_on_travis.py @kevinlee12
 /scripts/install_chrome_on_travis_test.py @kevinlee12
 /scripts/install_prerequisites.sh @kevinlee12
@@ -125,8 +128,11 @@
 /scripts/install_third_party_libs.py @kevinlee12
 /scripts/install_third_party_libs_test.py @kevinlee12
 /scripts/install_third_party_test.py @kevinlee12
+/scripts/js_ts_linter.py @Hudda @kevinlee12
+/scripts/linter_manager.py @Hudda @kevinlee12
 /scripts/linter_utils.py @kevinlee12
 /scripts/linter_utils_test.py @kevinlee12
+/scripts/other_linter.py @Hudda @kevinlee12
 /scripts/pre_commit_hook.py @kevinlee12
 /scripts/pre_commit_hook_test.py @kevinlee12
 /scripts/pre_commit_linter.py @kevinlee12 @Hudda
@@ -134,6 +140,7 @@
 /scripts/pre_push_hook_test.py @kevinlee12
 /scripts/pylint_extensions.py @kevinlee12
 /scripts/pylint_extensions_test.py @kevinlee12
+/scripts/python_linter.py @Hudda @kevinlee12
 /scripts/release_scripts/deploy.py @ankita240796 @kevinlee12
 /scripts/release_scripts/deploy_test.py @ankita24079 @kevinlee12
 /scripts/run_backend_tests.py @kevinlee12
