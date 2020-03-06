@@ -28,13 +28,11 @@ import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
-import { AppConstants } from 'app.constants';
+import { AppConstants, WARNING_TYPES_CONSTANT } from 'app.constants';
 
 describe('NumericInputValidationService', () => {
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
-  // preferably in the constants file itself.
-  let validatorService: NumericInputValidationService, WARNING_TYPES: any;
+  let validatorService: NumericInputValidationService;
+  let WARNING_TYPES: WARNING_TYPES_CONSTANT;
 
   let currentState: string;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
