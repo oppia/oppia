@@ -212,23 +212,25 @@ describe('Speech Synthesis Chunker Service', () => {
       expect(speakSpy).toHaveBeenCalledTimes(2);
     }));
 
-    it('should speak speech once when cancel is requested', fakeAsync(() => {
-      const speakSpy = spyOn(window.speechSynthesis, 'speak').and
-        .callFake(() => mockSpeechSynthesisUtteran.onend());
-      const speechSynthesisUtterance = (
-        new MockSpeechSynthesisUtteranceConstructor(
-          'Value inside utterance for testing purposes.' +
-          ' This is the next chunk'));
-      const callbackSpy = jasmine.createSpy('callback');
-      speechSynthesisChunkerService.speak(
-        speechSynthesisUtterance, callbackSpy);
-      speechSynthesisChunkerService.cancel();
+    it('should speak only one phrase when cancel is requested',
+      fakeAsync(() => {
+        const speakSpy = spyOn(window.speechSynthesis, 'speak').and
+          .callFake(() => mockSpeechSynthesisUtteran.onend());
+        const speechSynthesisUtterance = (
+          new MockSpeechSynthesisUtteranceConstructor(
 
-      // wait for 1 setTimeout call to finished.
-      flush(1);
+            'Value inside utterance for testing purposes.' +
+            ' This is the next chunk'));
+        const callbackSpy = jasmine.createSpy('callback');
+        speechSynthesisChunkerService.speak(
+          speechSynthesisUtterance, callbackSpy);
+        speechSynthesisChunkerService.cancel();
 
-      expect(callbackSpy).not.toHaveBeenCalled();
-      expect(speakSpy).toHaveBeenCalledTimes(1);
-    }));
+        // wait for 1 setTimeout call to finished.
+        flush(1);
+
+        expect(callbackSpy).not.toHaveBeenCalled();
+        expect(speakSpy).toHaveBeenCalledTimes(1);
+      }));
   });
 });
