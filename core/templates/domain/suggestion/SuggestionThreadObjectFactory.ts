@@ -136,7 +136,7 @@ export class SuggestionThreadObjectFactory {
       suggestionThreadBackendDict.message_count,
       suggestionThreadBackendDict.thread_id,
       this.threadMessageSummaryObjectFactory.createFromBackendDict(
-        suggestionThreadBackendDict),
+        lastNonemptyMessageSummaryBackendDict),
       this.createEditExplorationStateContentSuggestionFromBackendDict(
         suggestionBackendDict));
   }
