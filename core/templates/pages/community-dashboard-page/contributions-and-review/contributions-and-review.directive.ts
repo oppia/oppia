@@ -128,73 +128,73 @@ angular.module('oppia').directive('contributionsAndReview', [
           };
 
           let showQuestionSuggestionModal = (
-            (suggestion, contributionDetails, reviewable) => {
-              let authorName = suggestion.author_name;
-              let suggestionId = suggestion.suggestion_id;
-              let targetId = suggestion.target_id;
-              let questionDict = suggestion.change.question_dict;
-              let topicName = suggestion.change.topic_name;
-              let skillDescription = contributionDetails.skill_description;
-              let question = QuestionObjectFactory.createFromBackendDict(
-                questionDict);
-              let contentHtml = question.getStateData().content.getHtml();
-              let questionHeader = [topicName, skillDescription].join(' / ');
+              suggestion, contributionDetails, reviewable) => {
+            let authorName = suggestion.author_name;
+            let suggestionId = suggestion.suggestion_id;
+            let targetId = suggestion.target_id;
+            let questionDict = suggestion.change.question_dict;
+            let topicName = suggestion.change.topic_name;
+            let skillDescription = contributionDetails.skill_description;
+            let question = QuestionObjectFactory.createFromBackendDict(
+              questionDict);
+            let contentHtml = question.getStateData().content.getHtml();
+            let questionHeader = [topicName, skillDescription].join(' / ');
 
-              return $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/community-dashboard-page/modal-templates/' +
-                  'question-suggestion-review.directive.html'),
-                backdrop: true,
-                size: 'lg',
-                resolve: {
-                  question: () => question,
-                  reviewable: () => reviewable
-                },
-                controller: [
-                  '$scope', '$uibModalInstance', 'SuggestionModalService',
-                  'question', 'reviewable',
-                  function(
-                      $scope, $uibModalInstance, SuggestionModalService,
-                      question, reviewable) {
-                    $scope.authorName = authorName;
-                    $scope.contentHtml = contentHtml;
-                    $scope.reviewable = reviewable;
-                    $scope.commitMessage = '';
-                    $scope.reviewMessage = '';
-                    $scope.question = question;
-                    $scope.questionHeader = questionHeader;
-                    $scope.questionStateData = question.getStateData();
-                    $scope.questionId = question.getId();
-                    $scope.canEditQuestion = false;
-                    $scope.misconceptionsBySkill = [];
+            return $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/community-dashboard-page/modal-templates/' +
+                'question-suggestion-review.directive.html'),
+              backdrop: true,
+              size: 'lg',
+              resolve: {
+                question: () => question,
+                reviewable: () => reviewable
+              },
+              controller: [
+                '$scope', '$uibModalInstance', 'SuggestionModalService',
+                'question', 'reviewable',
+                function(
+                    $scope, $uibModalInstance, SuggestionModalService,
+                    question, reviewable) {
+                  $scope.authorName = authorName;
+                  $scope.contentHtml = contentHtml;
+                  $scope.reviewable = reviewable;
+                  $scope.commitMessage = '';
+                  $scope.reviewMessage = '';
+                  $scope.question = question;
+                  $scope.questionHeader = questionHeader;
+                  $scope.questionStateData = question.getStateData();
+                  $scope.questionId = question.getId();
+                  $scope.canEditQuestion = false;
+                  $scope.misconceptionsBySkill = [];
 
-                    $scope.questionChanged = (
-                      () => $scope.validationError = null);
-                    $scope.accept = (
-                      () => SuggestionModalService.acceptSuggestion(
-                        $uibModalInstance, {
-                          action: (
-                            SuggestionModalService.ACTION_ACCEPT_SUGGESTION),
-                          commitMessage: $scope.commitMessage,
-                          reviewMessage: $scope.reviewMessage
-                        }));
-                    $scope.reject = (
-                      () => SuggestionModalService.rejectSuggestion(
-                        $uibModalInstance, {
-                          action: (
-                            SuggestionModalService.ACTION_REJECT_SUGGESTION),
-                          reviewMessage: $scope.reviewMessage
-                        }));
-                    $scope.cancel = (
-                      () => SuggestionModalService.cancelSuggestion(
-                        $uibModalInstance));
-                  }
-                ]
-              }).result.then(
-                result => ContributionAndReviewService.resolveSuggestiontoSkill(
-                  targetId, suggestionId, result.action, result.reviewMessage,
-                  result.commitMessage, removeContributionToReview));
-            });
+                  $scope.questionChanged = (
+                    () => $scope.validationError = null);
+                  $scope.accept = (
+                    () => SuggestionModalService.acceptSuggestion(
+                      $uibModalInstance, {
+                        action: (
+                          SuggestionModalService.ACTION_ACCEPT_SUGGESTION),
+                        commitMessage: $scope.commitMessage,
+                        reviewMessage: $scope.reviewMessage
+                      }));
+                  $scope.reject = (
+                    () => SuggestionModalService.rejectSuggestion(
+                      $uibModalInstance, {
+                        action: (
+                          SuggestionModalService.ACTION_REJECT_SUGGESTION),
+                        reviewMessage: $scope.reviewMessage
+                      }));
+                  $scope.cancel = (
+                    () => SuggestionModalService.cancelSuggestion(
+                      $uibModalInstance));
+                }
+              ]
+            }).result.then(
+              result => ContributionAndReviewService.resolveSuggestiontoSkill(
+                targetId, suggestionId, result.action, result.reviewMessage,
+                result.commitMessage, removeContributionToReview));
+          });
 
           let showTranslationSuggestionModal = (
               targetId, suggestionId, contentHtml, translationHtml,
