@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for SpeechSynthesisChunkerService.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, flush } from '@angular/core/testing';
 
 import { SpeechSynthesisChunkerService } from
   'services/speech-synthesis-chunker.service';
@@ -191,13 +191,7 @@ describe('Speech Synthesis Chunker Service', () => {
       expect(speakSpy).not.toHaveBeenCalled();
     });
 
-    it('should speak speech twice', () => {
-      // For some reason, just call install doesn't work, we need to uninstall
-      // first so then actually install.
-      // Ref: https://github.com/gruntjs/grunt-contrib-jasmine/issues/213
-      jasmine.clock().uninstall();
-      jasmine.clock().install();
-
+    it('should speak speech twice', fakeAsync(() => {
       const speakSpy = spyOn(window.speechSynthesis, 'speak').and
         .callFake(function() {
           mockSpeechSynthesisUtteran.onend();
@@ -210,21 +204,15 @@ describe('Speech Synthesis Chunker Service', () => {
       speechSynthesisChunkerService.speak(
         speechSynthesisUtterance, callbackSpy);
 
-      jasmine.clock().tick(5000);
+      // wait for 2 setTimeout calls to finished because there are
+      // two chuncks in speechSynthesisUtterance.
+      flush(2);
 
       expect(callbackSpy).toHaveBeenCalled();
       expect(speakSpy).toHaveBeenCalledTimes(2);
+    }));
 
-      jasmine.clock().uninstall();
-    });
-
-    it('should speak speech once when cancel is requested', () => {
-      // For some reason, just call install doesn't work, we need to uninstall
-      // first so then actually install.
-      // Ref: https://github.com/gruntjs/grunt-contrib-jasmine/issues/213
-      jasmine.clock().uninstall();
-      jasmine.clock().install();
-
+    it('should speak speech once when cancel is requested', fakeAsync(() => {
       const speakSpy = spyOn(window.speechSynthesis, 'speak').and
         .callFake(() => mockSpeechSynthesisUtteran.onend());
       const speechSynthesisUtterance = (
@@ -236,12 +224,11 @@ describe('Speech Synthesis Chunker Service', () => {
         speechSynthesisUtterance, callbackSpy);
       speechSynthesisChunkerService.cancel();
 
-      jasmine.clock().tick(5000);
+      // wait for 1 setTimeout call to finished.
+      flush(1);
 
       expect(callbackSpy).not.toHaveBeenCalled();
       expect(speakSpy).toHaveBeenCalledTimes(1);
-
-      jasmine.clock().uninstall();
-    });
+    }));
   });
 });
