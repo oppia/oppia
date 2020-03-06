@@ -179,8 +179,6 @@ export class UpgradedServices {
     upgradedServices['ExplorationFeaturesService'] =
       new ExplorationFeaturesService();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
-    upgradedServices['FeedbackThreadObjectFactory'] =
-      new FeedbackThreadObjectFactory();
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GenerateContentIdService'] =
       new GenerateContentIdService();
@@ -218,8 +216,6 @@ export class UpgradedServices {
       new SubtitledHtmlObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
     upgradedServices['SuggestionsService'] = new SuggestionsService();
-    upgradedServices['ThreadMessageObjectFactory'] =
-      new ThreadMessageObjectFactory();
     upgradedServices['ThreadMessageSummaryObjectFactory'] =
       new ThreadMessageSummaryObjectFactory();
     upgradedServices['ThreadStatusDisplayService'] =
@@ -248,6 +244,9 @@ export class UpgradedServices {
       new DeviceInfoService(upgradedServices['WindowRef']);
     upgradedServices['DocumentAttributeCustomizationService'] =
       new DocumentAttributeCustomizationService(upgradedServices['WindowRef']);
+    upgradedServices['FeedbackThreadObjectFactory'] =
+      new FeedbackThreadObjectFactory(
+        upgradedServices['ThreadMessageSummaryObjectFactory']);
     upgradedServices['HintObjectFactory'] =
       new HintObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['HtmlEscaperService'] =
@@ -308,6 +307,9 @@ export class UpgradedServices {
     upgradedServices['TextInputValidationService'] =
       new TextInputValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['ThreadMessageObjectFactory'] =
+      new ThreadMessageObjectFactory(
+        upgradedServices['ThreadMessageSummaryObjectFactory']);
     upgradedServices['TopicSummaryObjectFactory'] =
       new TopicSummaryObjectFactory();
     upgradedServices['UrlService'] =
@@ -401,7 +403,8 @@ export class UpgradedServices {
       new SubtopicObjectFactory(upgradedServices['SkillSummaryObjectFactory']);
     upgradedServices['SuggestionThreadObjectFactory'] =
       new SuggestionThreadObjectFactory(
-        upgradedServices['SuggestionObjectFactory']);
+        upgradedServices['SuggestionObjectFactory'],
+        upgradedServices['ThreadMessageSummaryObjectFactory']);
     upgradedServices['TextInputRulesService'] =
       new TextInputRulesService(upgradedServices['NormalizeWhitespacePipe']);
     upgradedServices['UrlInterpolationService'] =

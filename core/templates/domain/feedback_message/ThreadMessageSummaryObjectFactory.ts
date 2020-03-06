@@ -17,8 +17,8 @@
  * summary domain objects.
  */
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
 export class ThreadMessageSummary {
   authorUsername: string;
@@ -34,19 +34,16 @@ export class ThreadMessageSummary {
   }
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({providedIn: 'root'})
 export class ThreadMessageSummaryObjectFactory {
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as 'any'
   // because 'threadMessageSummaryBackendDict' is a dict with underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
-  createFromBackendDict(
-      threadMessageSummaryBackendDict: any): ThreadMessageSummary {
+  createFromBackendDict(threadMessageBackendDict: any): ThreadMessageSummary {
     return new ThreadMessageSummary(
-      threadMessageSummaryBackendDict.author_username,
-      threadMessageSummaryBackendDict.text);
+      threadMessageBackendDict.author_username,
+      threadMessageBackendDict.text);
   }
 }
 angular.module('oppia').factory(

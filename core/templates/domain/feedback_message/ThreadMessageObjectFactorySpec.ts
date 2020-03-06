@@ -16,19 +16,19 @@
  * @fileoverview Unit tests for ThreadMessageObjectFactory.
  */
 
+import { TestBed } from '@angular/core/testing';
+
 import { ThreadMessageObjectFactory } from
   'domain/feedback_message/ThreadMessageObjectFactory';
 
-describe('Thread message object factory', () => {
-  let factory: ThreadMessageObjectFactory;
-
+describe('ThreadMessageObjectFactory', () => {
   beforeEach(() => {
-    factory = new ThreadMessageObjectFactory();
+    this.factory = TestBed.get(ThreadMessageObjectFactory);
   });
 
   describe('.createFromBackendDict', () => {
     it('should create a new thread message from a backend dict.', () => {
-      let threadMessage = factory.createFromBackendDict({
+      let threadMessage = this.factory.createFromBackendDict({
         author_username: 'author',
         created_on: 1000,
         entity_type: 'exploration',
@@ -47,34 +47,16 @@ describe('Thread message object factory', () => {
       expect(threadMessage.messageId).toEqual(1);
       expect(threadMessage.receivedViaEmail).toBe(false);
       expect(threadMessage.text).toEqual('message content');
+      expect(threadMessage.summary.authorUsername).toEqual('author');
+      expect(threadMessage.summary.text).toEqual('message content');
       expect(threadMessage.updatedStatus).toBe(null);
       expect(threadMessage.updatedSubject).toBe(null);
     });
   });
 
-  describe('.getSummary', () => {
-    it('should return the same author and text as message.', () => {
-      let threadMessage = factory.createFromBackendDict({
-        author_username: 'author',
-        text: 'message content',
-        created_on: 1000,
-        entity_type: 'exploration',
-        entity_id: 'exploration.exp1.thread1',
-        message_id: 1,
-        received_via_email: false,
-        updated_status: null,
-        updated_subject: null
-      });
-
-      let summary = threadMessage.getSummary();
-      expect(summary.authorUsername).toEqual('author');
-      expect(summary.text).toEqual('message content');
-    });
-  });
-
   describe('.hasSubjectUpdate', () => {
     it('is true when updatedSubject is non-null', () => {
-      let threadMessage = factory.createFromBackendDict({
+      let threadMessage = this.factory.createFromBackendDict({
         updated_subject: 'a new descriptive subject!',
         author_username: 'author',
         created_on: 1000,
@@ -90,7 +72,7 @@ describe('Thread message object factory', () => {
     });
 
     it('is false when updatedSubject is null', () => {
-      let threadMessage = factory.createFromBackendDict({
+      let threadMessage = this.factory.createFromBackendDict({
         updated_subject: null,
         author_username: 'author',
         created_on: 1000,
@@ -108,7 +90,7 @@ describe('Thread message object factory', () => {
 
   describe('.hasStatusUpdate', () => {
     it('is true when updatedStatus is non-null', () => {
-      let threadMessage = factory.createFromBackendDict({
+      let threadMessage = this.factory.createFromBackendDict({
         updated_status: 'open',
         author_username: 'author',
         created_on: 1000,
@@ -124,7 +106,7 @@ describe('Thread message object factory', () => {
     });
 
     it('is false when updatedStatus is null', () => {
-      let threadMessage = factory.createFromBackendDict({
+      let threadMessage = this.factory.createFromBackendDict({
         updated_status: null,
         author_username: 'author',
         created_on: 1000,
@@ -142,7 +124,7 @@ describe('Thread message object factory', () => {
 
   describe('.isNonempty', () => {
     it('is true when text is nonempty string', () => {
-      let threadMessage = factory.createFromBackendDict({
+      let threadMessage = this.factory.createFromBackendDict({
         text: 'nonempty!',
         author_username: 'author',
         created_on: 1000,
@@ -158,7 +140,7 @@ describe('Thread message object factory', () => {
     });
 
     it('is false when text is empty string', () => {
-      let threadMessage = factory.createFromBackendDict({
+      let threadMessage = this.factory.createFromBackendDict({
         text: '',
         author_username: 'author',
         created_on: 1000,

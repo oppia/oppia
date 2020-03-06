@@ -16,20 +16,22 @@
  * @fileoverview Unit tests for ThreadMessageSummaryObjectFactory.
  */
 
+import { TestBed } from '@angular/core/testing';
+
 import { ThreadMessageSummaryObjectFactory } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 
 describe('Thread message summary object factory', () => {
-  let factory: ThreadMessageSummaryObjectFactory;
-
   beforeEach(() => {
-    factory = new ThreadMessageSummaryObjectFactory();
+    this.factory = TestBed.get(ThreadMessageSummaryObjectFactory);
   });
 
   describe('.createFromBackendDict', () => {
     it('should create new thread message summary from a backend dict.', () => {
-      let threadMessageSummary = factory.createFromBackendDict(
-        { author_username: 'author', text: 'message content' });
+      let threadMessageSummary = this.factory.createFromBackendDict({
+        author_username: 'author',
+        text: 'message content'
+      });
 
       expect(threadMessageSummary.authorUsername).toEqual('author');
       expect(threadMessageSummary.text).toEqual('message content');
@@ -38,18 +40,21 @@ describe('Thread message summary object factory', () => {
 
   describe('.isNonempty', () => {
     it('is true when text is nonempty string', () => {
-      let threadMessageSummary = factory.createFromBackendDict(
-        { text: 'nonempty!', author_username: 'author' });
+      let threadMessageSummary = this.factory.createFromBackendDict({
+        text: 'nonempty!',
+        author_username: 'author'
+      });
 
       expect(threadMessageSummary.isNonempty()).toBe(true);
     });
 
     it('is false when text is empty string', () => {
-      let threadMessageSummary = factory.createFromBackendDict(
-        { text: '', author_username: 'author' });
+      let threadMessageSummary = this.factory.createFromBackendDict({
+        text: '',
+        author_username: 'author'
+      });
 
       expect(threadMessageSummary.isNonempty()).toBe(false);
     });
   });
 });
-

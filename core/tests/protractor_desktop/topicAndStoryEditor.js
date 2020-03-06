@@ -35,7 +35,7 @@ describe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
-  var topicId = null;
+  var topicName = 'Topic 1';
   var skillEditorPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
@@ -52,18 +52,13 @@ describe('Topic editor functionality', function() {
       'creator@topicEditor.com', 'creatorTopicEditor');
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
-    browser.getCurrentUrl().then(function(url) {
-      topicId = url.split('/')[4];
-    }, function() {
-      // Note to developers:
-      // Promise is returned by getCurrentUrl which is handled here.
-      // No further action is needed.
-    });
+    users.logout();
   });
 
   beforeEach(function() {
     users.login('creator@topicEditor.com');
-    topicEditorPage.get(topicId);
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.editTopic(topicName);
   });
 
   it('should add and delete subtopics correctly', function() {
@@ -72,8 +67,8 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectNumberOfSubtopicsToBe(1);
     topicEditorPage.saveTopic('Added subtopic.');
 
-    topicEditorPage.get(topicId);
-    topicEditorPage.moveToSubtopicsTab();
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.editTopic(topicName);
     topicEditorPage.expectNumberOfSubtopicsToBe(1);
     topicEditorPage.deleteSubtopicWithIndex(0);
     topicEditorPage.expectNumberOfSubtopicsToBe(0);

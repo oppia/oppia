@@ -23,14 +23,15 @@ import { SuggestionThreadObjectFactory } from
 import { ThreadMessageObjectFactory } from
   'domain/feedback_message/ThreadMessageObjectFactory';
 
-describe('Suggestion thread object factory', () => {
-  let suggestionThreadObjectFactory: SuggestionThreadObjectFactory = null;
-  let threadMessageObjectFactory: ThreadMessageObjectFactory = null;
-  let suggestionThreadBackendDict;
-  let suggestionBackendDict;
+describe('SuggestionThreadObjectFactory', () => {
+  beforeEach(() => {
+    this.suggestionThreadObjectFactory =
+      TestBed.get(SuggestionThreadObjectFactory);
+    this.threadMessageObjectFactory = TestBed.get(ThreadMessageObjectFactory);
+  });
 
   beforeEach(() => {
-    suggestionThreadBackendDict = {
+    this.suggestionThreadBackendDict = {
       last_updated: 1000,
       original_author_username: 'author',
       status: 'accepted',
@@ -42,7 +43,7 @@ describe('Suggestion thread object factory', () => {
       last_nonempty_message_author: 'author',
       last_nonempty_message_text: 'tenth message',
     };
-    suggestionBackendDict = {
+    this.suggestionBackendDict = {
       suggestion_id: 'exploration.exp1.thread1',
       suggestion_type: '',
       target_type: 'exploration',
@@ -59,17 +60,15 @@ describe('Suggestion thread object factory', () => {
       },
       last_updated: 1000
     };
-
-    suggestionThreadObjectFactory = TestBed.get(SuggestionThreadObjectFactory);
-    threadMessageObjectFactory = TestBed.get(ThreadMessageObjectFactory);
   });
 
   it('should create a new suggestion thread from a backend dict.', () => {
-    suggestionBackendDict.suggestion_type = 'edit_exploration_state_content';
+    this.suggestionBackendDict.suggestion_type =
+      'edit_exploration_state_content';
 
-    let suggestionThread = (
-      suggestionThreadObjectFactory.createFromBackendDicts(
-        suggestionThreadBackendDict, suggestionBackendDict));
+    let suggestionThread =
+      this.suggestionThreadObjectFactory.createFromBackendDicts(
+        this.suggestionThreadBackendDict, this.suggestionBackendDict);
 
     expect(suggestionThread.lastUpdated).toEqual(1000);
     expect(suggestionThread.originalAuthorName).toEqual('author');
@@ -84,9 +83,10 @@ describe('Suggestion thread object factory', () => {
       .toEqual('tenth message');
 
     let suggestion = suggestionThread.getSuggestion();
+    expect(suggestion).not.toBeNull();
     expect(suggestion.suggestionId).toEqual('exploration.exp1.thread1');
-    expect(suggestion.suggestionType).toEqual(
-      'edit_exploration_state_content');
+    expect(suggestion.suggestionType)
+      .toEqual('edit_exploration_state_content');
     expect(suggestion.targetType).toEqual('exploration');
     expect(suggestion.targetId).toEqual('exp1');
     expect(suggestion.status).toEqual('accepted');
@@ -95,20 +95,21 @@ describe('Suggestion thread object factory', () => {
     expect(suggestion.oldValue.html).toEqual('old suggestion content');
     expect(suggestion.lastUpdated).toEqual(1000);
     expect(suggestion.getThreadId()).toEqual('exploration.exp1.thread1');
-    expect(suggestionThread.isSuggestionThread()).toEqual(true);
-    expect(suggestionThread.isSuggestionHandled()).toEqual(true);
+    expect(suggestionThread.isSuggestionThread()).toBeTrue();
+    expect(suggestionThread.isSuggestionHandled()).toBeTrue();
 
     suggestionThread.setSuggestionStatus('review');
-    expect(suggestionThread.isSuggestionHandled()).toEqual(false);
+    expect(suggestionThread.isSuggestionHandled()).toBeFalse();
     expect(suggestionThread.getSuggestionStatus()).toEqual('review');
     expect(suggestionThread.getSuggestionStateName()).toEqual('state_1');
-    expect(suggestionThread.getReplacementHtmlFromSuggestion()).toEqual(
-      'new suggestion content');
+    expect(suggestionThread.getReplacementHtmlFromSuggestion())
+      .toEqual('new suggestion content');
   });
 
   it('should create a new suggestion thread.', () => {
-    let suggestionThread = suggestionThreadObjectFactory.createFromBackendDicts(
-      suggestionThreadBackendDict, suggestionBackendDict);
+    let suggestionThread =
+      this.suggestionThreadObjectFactory.createFromBackendDicts(
+        this.suggestionThreadBackendDict, this.suggestionBackendDict);
 
     expect(suggestionThread.lastUpdated).toEqual(1000);
     expect(suggestionThread.originalAuthorName).toEqual('author');
@@ -117,30 +118,33 @@ describe('Suggestion thread object factory', () => {
     expect(suggestionThread.summary).toEqual('sample summary');
     expect(suggestionThread.messageCount).toEqual(10);
     expect(suggestionThread.threadId).toEqual('exploration.exp1.thread1');
+    expect(suggestionThread.getSuggestion()).toBeNull();
 
-    let suggestion = suggestionThread.getSuggestion();
-    expect(suggestion).toBeUndefined();
     suggestionThread.setSuggestionStatus(null);
-    expect(suggestionThread.isSuggestionHandled()).toEqual(null);
-    expect(suggestionThread.getSuggestionStatus()).toEqual(null);
-    expect(suggestionThread.getSuggestionStateName()).toEqual(null);
-    expect(suggestionThread.getReplacementHtmlFromSuggestion()).toEqual(
-      null);
+
+    expect(suggestionThread.isSuggestionHandled()).toBeNull();
+    expect(suggestionThread.getSuggestionStatus()).toBeNull();
+    expect(suggestionThread.getSuggestionStateName()).toBeNull();
+    expect(suggestionThread.getReplacementHtmlFromSuggestion()).toBeNull();
   });
 
   describe('.setMessages', () => {
     it('should handle message getter and setter.', () => {
       let suggestionThread =
-        suggestionThreadObjectFactory.createFromBackendDicts(
-          suggestionThreadBackendDict, suggestionBackendDict);
+        this.suggestionThreadObjectFactory.createFromBackendDicts(
+          this.suggestionThreadBackendDict, this.suggestionBackendDict);
 
       expect(suggestionThread.getMessages()).toEqual([]);
 
       let messages = [
-        threadMessageObjectFactory.createFromBackendDict(
-          { author_username: 'author1', text: 'message1' }),
-        threadMessageObjectFactory.createFromBackendDict(
-          { author_username: 'author2', text: 'message2' })
+        this.threadMessageObjectFactory.createFromBackendDict({
+          author_username: 'author1',
+          text: 'message1'
+        }),
+        this.threadMessageObjectFactory.createFromBackendDict({
+          author_username: 'author2',
+          text: 'message2'
+        })
       ];
 
       suggestionThread.setMessages(messages);
