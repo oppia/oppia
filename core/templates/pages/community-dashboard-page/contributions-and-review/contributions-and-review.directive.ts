@@ -38,12 +38,6 @@ require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').directive('contributionsAndReview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
-    let SUGGESTION_LABELS = {
-      review: { text: 'Awaiting review', color: '#eeeeee' },
-      accepted: { text: 'Accepted', color: '#8ed274' },
-      rejected: { text: 'Rejected', color: '#e76c8c' }
-    };
-
     return {
       restrict: 'E',
       scope: {},
@@ -59,6 +53,12 @@ angular.module('oppia').directive('contributionsAndReview', [
             $filter, $uibModal, ContributionAndReviewService,
             QuestionObjectFactory, UserService) {
           const ctrl = this;
+          let SUGGESTION_LABELS = {
+            review: { text: 'Awaiting review', color: '#eeeeee' },
+            accepted: { text: 'Accepted', color: '#8ed274' },
+            rejected: { text: 'Rejected', color: '#e76c8c' }
+          };
+
           let getQuestionContributionsSummary = (
             // TODO(#7176): Replace 'any' with the exact type. This has been
             // kept as 'any' because without it typescript will fail to compile
