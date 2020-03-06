@@ -17,8 +17,8 @@
    domain objects.
  */
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
 import { SuggestionsService } from 'services/suggestions.service';
 
@@ -60,9 +60,7 @@ export class Suggestion {
   }
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({providedIn: 'root'})
 export class SuggestionObjectFactory {
   constructor(private suggestionsService: SuggestionsService) {}
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
@@ -70,7 +68,7 @@ export class SuggestionObjectFactory {
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
   createFromBackendDict(suggestionBackendDict: any): Suggestion {
-    var threadId = this.suggestionsService.getThreadIdFromSuggestionBackendDict(
+    let threadId = this.suggestionsService.getThreadIdFromSuggestionBackendDict(
       suggestionBackendDict);
     return new Suggestion(
       suggestionBackendDict.suggestion_type,

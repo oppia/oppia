@@ -20,12 +20,12 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ThreadMessage } from
-  'domain/feedback_message/ThreadMessageObjectFactory';
-import { ThreadMessageSummary } from
-  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 import { Suggestion, SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
+import { ThreadMessage } from
+  'domain/feedback_message/ThreadMessageObjectFactory';
+import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
+  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 
 class SuggestionThread {
   status: string;
@@ -35,15 +35,15 @@ class SuggestionThread {
   lastUpdated: number;
   messageCount: number;
   threadId: string;
-  lastNonemptyMessageSummary: ThreadMessageSummary;
   suggestion: Suggestion;
+  lastNonemptyMessageSummary: ThreadMessageSummary;
   messages: ThreadMessage[];
 
   constructor(
       status: string, subject: string, summary: string,
       originalAuthorName: string, lastUpdated: number, messageCount: number,
-      threadId: string, lastNonemptyMessageAuthor: string,
-      lastNonemptyMessageText: string, suggestion: Suggestion) {
+      threadId: string, lastNonemptyMessageSummary: ThreadMessageSummary,
+      suggestion: Suggestion) {
     this.status = status;
     this.subject = subject;
     this.summary = summary;
@@ -51,8 +51,7 @@ class SuggestionThread {
     this.lastUpdated = lastUpdated;
     this.messageCount = messageCount;
     this.threadId = threadId;
-    this.lastNonemptyMessageSummary = new ThreadMessageSummary(
-      lastNonemptyMessageAuthor, lastNonemptyMessageText);
+    this.lastNonemptyMessageSummary = lastNonemptyMessageSummary;
     this.suggestion = suggestion;
     this.messages = [];
   }
@@ -65,7 +64,7 @@ class SuggestionThread {
     let nonemptyMessages = messages.filter(m => m.isNonempty());
     if (nonemptyMessages.length > 0) {
       let i = nonemptyMessages.length - 1;
-      this.lastNonemptyMessageSummary = nonemptyMessages[i].getSummary();
+      this.lastNonemptyMessageSummary = nonemptyMessages[i].summary;
     }
   }
 
@@ -104,21 +103,31 @@ class SuggestionThread {
   }
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({providedIn: 'root'})
 export class SuggestionThreadObjectFactory {
-  constructor(private suggestionObjectFactory: SuggestionObjectFactory) {}
+  constructor(
+    private suggestionObjectFactory: SuggestionObjectFactory,
+    private threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory
+  ) {}
+
+  private createEditExplorationStateContentSuggestionFromBackendDict(
+      suggestionBackendDict: any): Suggestion {
+    if (suggestionBackendDict.suggestion_type !==
+        'edit_exploration_state_content') {
+      return null;
+    }
+    return this.suggestionObjectFactory.createFromBackendDict(
+      suggestionBackendDict);
+  }
+
   // TODO(#7165): Replace 'any' with the exact type.
   createFromBackendDicts(
       suggestionThreadBackendDict: any,
       suggestionBackendDict: any): SuggestionThread {
-    let suggestion;
-    if (suggestionBackendDict.suggestion_type ===
-        'edit_exploration_state_content') {
-      suggestion = this.suggestionObjectFactory.createFromBackendDict(
-        suggestionBackendDict);
-    }
+    let lastNonemptyMessageSummaryBackendDict = {
+      text: suggestionThreadBackendDict.last_nonempty_message_text,
+      author_username: suggestionThreadBackendDict.last_nonempty_message_author
+    };
     return new SuggestionThread(
       suggestionThreadBackendDict.status, suggestionThreadBackendDict.subject,
       suggestionThreadBackendDict.summary,
@@ -126,8 +135,10 @@ export class SuggestionThreadObjectFactory {
       suggestionThreadBackendDict.last_updated,
       suggestionThreadBackendDict.message_count,
       suggestionThreadBackendDict.thread_id,
-      suggestionThreadBackendDict.last_nonempty_message_author,
-      suggestionThreadBackendDict.last_nonempty_message_text, suggestion);
+      this.threadMessageSummaryObjectFactory.createFromBackendDict(
+        suggestionThreadBackendDict),
+      this.createEditExplorationStateContentSuggestionFromBackendDict(
+        suggestionBackendDict));
   }
 }
 

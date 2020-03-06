@@ -17,10 +17,10 @@
  * domain objects.
  */
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-import { ThreadMessageSummary } from
+import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 
 export class ThreadMessage {
@@ -33,11 +33,13 @@ export class ThreadMessage {
   text: string = '';
   updatedStatus: string = null;
   updatedSubject: string = null;
+  summary: ThreadMessageSummary;
 
   constructor(
       authorUsername: string, createdOn: number, entityType: string,
       entityId: string, messageId: number, receivedViaEmail: boolean,
-      text: string, updatedStatus: string, updatedSubject: string) {
+      text: string, updatedStatus: string, updatedSubject: string,
+      summary: ThreadMessageSummary) {
     this.authorUsername = authorUsername;
     this.createdOn = createdOn;
     this.entityType = entityType;
@@ -47,10 +49,7 @@ export class ThreadMessage {
     this.text = text;
     this.updatedStatus = updatedStatus;
     this.updatedSubject = updatedSubject;
-  }
-
-  getSummary(): ThreadMessageSummary {
-    return new ThreadMessageSummary(this.authorUsername, this.text);
+    this.summary = summary;
   }
 
   isNonempty(): boolean {
@@ -66,24 +65,29 @@ export class ThreadMessage {
   }
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({providedIn: 'root'})
 export class ThreadMessageObjectFactory {
+  constructor(
+    private threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory
+  ) {}
+
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'threadMessageBackendDict' is a dict with underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
   createFromBackendDict(threadMessageBackendDict: any): ThreadMessage {
+    let summary = this.threadMessageSummaryObjectFactory.createFromBackendDict(
+      threadMessageBackendDict);
     return new ThreadMessage(
       threadMessageBackendDict.author_username,
       threadMessageBackendDict.created_on, threadMessageBackendDict.entity_type,
       threadMessageBackendDict.entity_id, threadMessageBackendDict.message_id,
       threadMessageBackendDict.received_via_email,
       threadMessageBackendDict.text, threadMessageBackendDict.updated_status,
-      threadMessageBackendDict.updated_subject);
+      threadMessageBackendDict.updated_subject, summary);
   }
 }
+
 angular.module('oppia').factory(
   'ThreadMessageObjectFactory',
   downgradeInjectable(ThreadMessageObjectFactory));

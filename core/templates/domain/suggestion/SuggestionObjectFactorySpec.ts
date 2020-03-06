@@ -17,21 +17,17 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
 
-describe('Suggestion object factory', () => {
-  let suggestionObjectFactory: SuggestionObjectFactory;
-
+describe('SuggestionObjectFactory', () => {
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [SuggestionObjectFactory]
-    });
-    suggestionObjectFactory = TestBed.get(SuggestionObjectFactory);
+    this.factory = TestBed.get(SuggestionObjectFactory);
   });
 
   it('should create a new suggestion from a backend dict.', () => {
-    var suggestionBackendDict = {
+    let suggestionBackendDict = {
       suggestion_id: 'exploration.exp1.thread1',
       suggestion_type: 'edit_exploration_state_content',
       target_type: 'exploration',
@@ -48,8 +44,7 @@ describe('Suggestion object factory', () => {
       },
       last_updated: 1000
     };
-    var suggestion = suggestionObjectFactory.createFromBackendDict(
-      suggestionBackendDict);
+    let suggestion = this.factory.createFromBackendDict(suggestionBackendDict);
     expect(suggestion.suggestionType).toEqual('edit_exploration_state_content');
     expect(suggestion.targetType).toEqual('exploration');
     expect(suggestion.targetId).toEqual('exp1');
