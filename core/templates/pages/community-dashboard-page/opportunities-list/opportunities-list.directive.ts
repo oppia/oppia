@@ -32,8 +32,7 @@ angular.module('oppia').directive('opportunitiesList', [
         isLabelRequired: '&labelRequired',
         isProgressBarRequired: '&progressBarRequired',
         onLoadMoreOpportunities: '&',
-        onClickActionButton: '=',
-        filterText: '@'
+        onClickActionButton: '='
       },
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -44,10 +43,6 @@ angular.module('oppia').directive('opportunitiesList', [
         var ctrl = this;
         ctrl.$onInit = function() {
           ctrl.showMoreOpportunities = $scope.onLoadMoreOpportunities;
-        };
-        ctrl.filterFunction = function(opportunity) {
-          return opportunity.heading.includes($scope.filterText) ||
-            opportunity.subheading.includes($scope.filterText);
         };
       }]
     };

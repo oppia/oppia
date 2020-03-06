@@ -34,10 +34,6 @@
       <div class="oppia-opportunities-tabs-explanation" data-tab-name="<[$ctrl.tabsDetails[$ctrl.activeTabName].tabName]>">
         <[$ctrl.tabsDetails[$ctrl.activeTabName].description]>
       </div>
-      <div ng-if="$ctrl.activeTabName === 'submitQuestionTab' && $ctrl.showSearchBar" class="oppia-opportunities-search-container">
-        <i class="fas fa-search oppia-opportunities-search-icon"></i>
-        <input type="text" class="form-control oppia-opportunities-search protractor-test-skill-name-input" placeholder="Search skills" ng-model="$ctrl.filterText">
-      </div>
       <div class="oppia-dashboard-language-container" ng-if="$ctrl.showLanguageSelector()">
         <span class="oppia-dashboard-language-container-label"><[$ctrl.tabsDetails[$ctrl.activeTabName].tabName]> in:</span>
         <select class="oppia-opportunity-language-selector protractor-test-language-selector"
@@ -52,7 +48,7 @@
     <contributions-and-review></contributions-and-review>
   </div>
   <div ng-if="$ctrl.activeTabName === 'submitQuestionTab'">
-    <question-opportunities filter-text="<[$ctrl.filterText]>"></question-opportunities>
+    <question-opportunities></question-opportunities>
   </div>
   <div ng-if="$ctrl.activeTabName === 'translateTextTab'">
     <translation-opportunities></translation-opportunities>
@@ -77,37 +73,6 @@
     background: white;
     border: 1px solid #e8e7e3;
     height: 35px;
-  }
-  .oppia-opportunities-search {
-    background: #f1f3f4;
-    border: 1px solid transparent;
-    border-radius: 8px;
-    font-size: 16px;
-    height: 3.5em;
-    padding-left: 45px;
-    transition: background 100ms ease-in,width 100ms ease-out;
-  }
-  .oppia-opportunities-search:focus {
-    background: rgba(255,255,255,1);
-    border: 1px solid transparent;
-    -webkit-box-shadow: 0 1px 1px 0 rgba(65,69,73,0.3), 0 1px 3px 1px rgba(65,69,73,0.15);
-    box-shadow: 0 1px 1px 0 rgba(65,69,73,0.3), 0 1px 3px 1px rgba(65,69,73,0.15);
-  }
-  .oppia-opportunities-search-icon {
-    color: #4a4a4a;
-    float: left;
-    font-size: 20px;
-    left: 65px;
-    margin-top: -10px;
-    position: absolute;
-    top: 50%;
-    z-index: 2;
-  }
-  .oppia-opportunities-search-container {
-    padding-left: 50px;
-    padding-right: 10px;
-    position: relative;
-    width: 50%;
   }
   .oppia-opportunities-tabs-explanation {
     padding-top: 25px;
