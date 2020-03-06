@@ -68,56 +68,61 @@ angular.module('oppia').directive('contributionsAndReview', [
             }
           };
 
-          let getQuestionContributionsSummary = (
+          let getQuestionContributionsSummary = () => {
             // TODO(#7176): Replace 'any' with the exact type. This has been
             // kept as 'any' because without it typescript will fail to compile
             // due to "trying to access property of an unknown type" error.
-            () => Object.values(ctrl.contributions).map((contribution: any) => {
-              let change = contribution.suggestion.change;
-              let status = contribution.suggestion.status;
-              let suggestionId = contribution.suggestion.suggestion_id;
-              let topicName = change.topic_name;
-              let html = change.question_dict.question_state_data.content.html;
-              let skillDescription = contribution.details.skill_description;
-              let actionButtonTitle = (
-                ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION ?
-                  'Review' : 'View');
+            return Object.values(ctrl.contributions)
+              .map((contribution: any) => {
+                let change = contribution.suggestion.change;
+                let status = contribution.suggestion.status;
+                let suggestionId = contribution.suggestion.suggestion_id;
+                let topicName = change.topic_name;
+                let html =
+                  change.question_dict.question_state_data.content.html;
+                let skillDescription = contribution.details.skill_description;
+                let actionButtonTitle = (
+                  ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION ?
+                    'Review' : 'View');
 
-              return {
-                id: suggestionId,
-                heading: $filter('formatRtePreview')(html),
-                subheading: [topicName, skillDescription].join(' / '),
-                labelText: SUGGESTION_LABELS[status].text,
-                labelColor: SUGGESTION_LABELS[status].color,
-                actionButtonTitle: actionButtonTitle
-              };
-            }));
+                return {
+                  id: suggestionId,
+                  heading: $filter('formatRtePreview')(html),
+                  subheading: [topicName, skillDescription].join(' / '),
+                  labelText: SUGGESTION_LABELS[status].text,
+                  labelColor: SUGGESTION_LABELS[status].color,
+                  actionButtonTitle: actionButtonTitle
+                };
+              });
+          };
 
-          let getTranslationContributionsSummary = (
+          let getTranslationContributionsSummary = () => {
             // TODO(#7176): Replace 'any' with the exact type. This has been
             // kept as 'any' because without it typescript will fail to compile
             // due to "trying to access property of an unknown type" error.
-            () => Object.values(ctrl.contributions).map((contribution: any) => {
-              let chapterTitle = contribution.details.chapter_title;
-              let storyTitle = contribution.details.story_title;
-              let topicName = contribution.details.topic_name;
-              let status = contribution.suggestion.status;
-              let suggestionId = contribution.suggestion.suggestion_id;
-              let translationHtml =
-                contribution.suggestion.change.translation_html;
-              let actionButtonTitle = (
-                ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_TRANSLATE ?
-                  'Review' : 'View');
+            return Object.values(ctrl.contributions)
+              .map((contribution: any) => {
+                let chapterTitle = contribution.details.chapter_title;
+                let storyTitle = contribution.details.story_title;
+                let topicName = contribution.details.topic_name;
+                let status = contribution.suggestion.status;
+                let suggestionId = contribution.suggestion.suggestion_id;
+                let translationHtml =
+                  contribution.suggestion.change.translation_html;
+                let actionButtonTitle = (
+                  ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_TRANSLATE ?
+                    'Review' : 'View');
 
-              return {
-                id: suggestionId,
-                heading: $filter('formatRtePreview')(translationHtml),
-                subheading: [topicName, storyTitle, chapterTitle].join(' / '),
-                labelText: SUGGESTION_LABELS[status].text,
-                labelColor: SUGGESTION_LABELS[status].color,
-                actionButtonTitle: actionButtonTitle
-              };
-            }));
+                return {
+                  id: suggestionId,
+                  heading: $filter('formatRtePreview')(translationHtml),
+                  subheading: [topicName, storyTitle, chapterTitle].join(' / '),
+                  labelText: SUGGESTION_LABELS[status].text,
+                  labelColor: SUGGESTION_LABELS[status].color,
+                  actionButtonTitle: actionButtonTitle
+                };
+              });
+          };
 
           let removeContributionToReview = suggestionId => {
             ctrl.contributionSummaries = ctrl.contributionSummaries.filter(
