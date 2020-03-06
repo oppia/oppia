@@ -19,9 +19,11 @@
 import { TestBed } from '@angular/core/testing';
 
 import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from './window-ref.service';
 
 describe('Url Service', () => {
-  let urlService: UrlService;
+  let urlService: UrlService = null;
+  let windowRef: WindowRef = null;
   let sampleHash = 'sampleHash';
   let pathname = '/embed';
   let mockLocation = null;
@@ -37,7 +39,9 @@ describe('Url Service', () => {
     };
 
     urlService = TestBed.get(UrlService);
-    spyOn(urlService, 'getCurrentLocation').and.returnValue(mockLocation);
+    windowRef = TestBed.get(WindowRef);
+    spyOnProperty(windowRef, 'nativeWindow').and.callFake(() => ({
+      location: mockLocation}));
   });
 
   it('should return correct query value list for each query field', () => {
