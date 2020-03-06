@@ -135,7 +135,6 @@ angular.module('oppia').directive('contributionsAndReview', [
               let questionDict = suggestion.change.question_dict;
               let topicName = suggestion.change.topic_name;
               let skillDescription = contributionDetails.skill_description;
-
               let question = QuestionObjectFactory.createFromBackendDict(
                 questionDict);
               let contentHtml = question.getStateData().content.getHtml();
@@ -237,11 +236,11 @@ angular.module('oppia').directive('contributionsAndReview', [
                     $uibModalInstance);
                 }
               ]
-            }).result.then(
-              result => (
-                ContributionAndReviewService.resolveSuggestiontoExploration(
-                  targetId, suggestionId, result.action, result.reviewMessage,
-                  result.commitMessage, removeContributionToReview)));
+            }).result.then(result => {
+              ContributionAndReviewService.resolveSuggestiontoExploration(
+                targetId, suggestionId, result.action, result.reviewMessage,
+                result.commitMessage, removeContributionToReview);
+            });
           };
 
           ctrl.onClickViewSuggestion = suggestionId => {
@@ -258,7 +257,6 @@ angular.module('oppia').directive('contributionsAndReview', [
             ctrl.activeReviewTab = '';
             ctrl.contributionsDataLoading = true;
             ctrl.contributionSummaries = [];
-
             let suggestionActions =
               ctrl.suggestionActionsByType[suggestionType];
             if (suggestionActions) {
@@ -270,7 +268,6 @@ angular.module('oppia').directive('contributionsAndReview', [
             ctrl.activeContributionTab = '';
             ctrl.contributionsDataLoading = true;
             ctrl.contributionSummaries = [];
-
             let suggestionActions =
               ctrl.suggestionActionsByType[suggestionType];
             if (suggestionActions) {
@@ -287,6 +284,8 @@ angular.module('oppia').directive('contributionsAndReview', [
             ctrl.contributionsDataLoading = true;
             ctrl.SUGGESTION_TYPE_QUESTION = 'add_question';
             ctrl.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
+            ctrl.activeReviewTab = '';
+            ctrl.activeContributionTab = '';
             ctrl.reviewTabs = [
               {
                 suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
@@ -341,7 +340,6 @@ angular.module('oppia').directive('contributionsAndReview', [
                     });
                 }
               },
-
               [ctrl.SUGGESTION_TYPE_TRANSLATE]: {
                 viewSuggestion: (suggestionId) => {
                   let suggestion = ctrl.contributions[suggestionId].suggestion;
@@ -377,9 +375,6 @@ angular.module('oppia').directive('contributionsAndReview', [
                 }
               }
             };
-
-            ctrl.activeReviewTab = '';
-            ctrl.activeContributionTab = '';
 
             UserService.getUserInfoAsync().then(userInfo => {
               ctrl.isAdmin = userInfo.isAdmin();
