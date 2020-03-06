@@ -57,9 +57,9 @@ describe('FeedbackThreadObjectFactory', () => {
       expect(feedbackThread.threadId).toEqual('exp1.thread1');
       expect(feedbackThread.isSuggestionThread()).toEqual(false);
       expect(feedbackThread.lastNonemptyMessageSummary.authorUsername)
-      .toEqual('author');
+        .toEqual('author');
       expect(feedbackThread.lastNonemptyMessageSummary.text)
-      .toEqual('tenth message');
+        .toEqual('tenth message');
     });
   });
 
