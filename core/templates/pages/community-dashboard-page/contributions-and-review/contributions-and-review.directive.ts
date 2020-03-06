@@ -168,33 +168,30 @@ angular.module('oppia').directive('contributionsAndReview', [
                   $scope.canEditQuestion = false;
                   $scope.misconceptionsBySkill = [];
 
-                  $scope.questionChanged = (
-                    () => $scope.validationError = null);
-                  $scope.accept = (
-                    () => SuggestionModalService.acceptSuggestion(
-                      $uibModalInstance, {
-                        action: (
-                          SuggestionModalService.ACTION_ACCEPT_SUGGESTION),
-                        commitMessage: $scope.commitMessage,
-                        reviewMessage: $scope.reviewMessage
-                      }));
-                  $scope.reject = (
-                    () => SuggestionModalService.rejectSuggestion(
-                      $uibModalInstance, {
-                        action: (
-                          SuggestionModalService.ACTION_REJECT_SUGGESTION),
-                        reviewMessage: $scope.reviewMessage
-                      }));
-                  $scope.cancel = (
-                    () => SuggestionModalService.cancelSuggestion(
-                      $uibModalInstance));
+                  $scope.questionChanged = () => {
+                    $scope.validationError = null;
+                  };
+                  $scope.accept = () => SuggestionModalService.acceptSuggestion(
+                    $uibModalInstance, {
+                      action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
+                      commitMessage: $scope.commitMessage,
+                      reviewMessage: $scope.reviewMessage
+                    });
+                  $scope.reject = () => SuggestionModalService.rejectSuggestion(
+                    $uibModalInstance, {
+                      action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
+                      reviewMessage: $scope.reviewMessage
+                    });
+                  $scope.cancel = () => SuggestionModalService.cancelSuggestion(
+                    $uibModalInstance);
                 }
               ]
-            }).result.then(
-              result => ContributionAndReviewService.resolveSuggestiontoSkill(
+            }).result.then(result => {
+              ContributionAndReviewService.resolveSuggestiontoSkill(
                 targetId, suggestionId, result.action, result.reviewMessage,
-                result.commitMessage, removeContributionToReview));
-          });
+                result.commitMessage, removeContributionToReview);
+            });
+          };
 
           let showTranslationSuggestionModal = (
               targetId, suggestionId, contentHtml, translationHtml,
