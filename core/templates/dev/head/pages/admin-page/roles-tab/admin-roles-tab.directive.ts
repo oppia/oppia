@@ -29,12 +29,14 @@ angular.module('oppia').directive('adminRolesTab', [
   '$http', '$rootScope', 'AdminDataService', 'AdminTaskManagerService',
   'LanguageUtilService', 'UrlInterpolationService', 'ADMIN_ROLE_HANDLER_URL',
   'REVIEWABLE_ITEM_QUESTION', 'REVIEWABLE_ITEM_TRANSLATION',
-  'REVIEWABLE_ITEM_VOICEOVER',
+  'REVIEWABLE_ITEM_VOICEOVER', 'REVIEW_REMOVE_TYPE_ALL',
+  'REVIEW_REMOVE_TYPE_SPECIFIC', 'VIEW_METHOD_ROLE', 'VIEW_METHOD_USERNAME',
   function(
       $http, $rootScope, AdminDataService, AdminTaskManagerService,
       LanguageUtilService, UrlInterpolationService, ADMIN_ROLE_HANDLER_URL,
       REVIEWABLE_ITEM_QUESTION, REVIEWABLE_ITEM_TRANSLATION,
-      REVIEWABLE_ITEM_VOICEOVER) {
+      REVIEWABLE_ITEM_VOICEOVER, REVIEW_REMOVE_TYPE_ALL,
+      REVIEW_REMOVE_TYPE_SPECIFIC, VIEW_METHOD_ROLE, VIEW_METHOD_USERNAME) {
     return {
       restrict: 'E',
       scope: {},
@@ -185,42 +187,106 @@ angular.module('oppia').directive('adminRolesTab', [
         var refreshFormData = function() {
           ctrl.formData = {
             viewUserRoles: {
-              method: 'role',
+              method: VIEW_METHOD_ROLE,
               role: null,
-              username: ''
+              username: '',
+              isValid: function() {
+                if (this.method === VIEW_METHOD_ROLE) {
+                  return Boolean(this.role);
+                }
+                if (this.method === VIEW_METHOD_USERNAME) {
+                  return Boolean(this.username);
+                }
+                return false;
+              }
             },
             updateRole: {
               newRole: null,
               username: '',
-              topicId: null
+              topicId: null,
+              isValid: function() {
+                if (this.newRole === 'TOPIC_MANAGER') {
+                  return Boolean(this.topicId);
+                } else if (this.newRole) {
+                  return Boolean(this.username);
+                }
+                return false;
+              }
             },
             viewCommunityReviewers: {
-              method: 'role',
+              method: VIEW_METHOD_ROLE,
               username: '',
-              type: '',
-              languageCode: null
+              type: null,
+              languageCode: null,
+              isValid: function() {
+                if (this.method === VIEW_METHOD_ROLE) {
+                  if (this.type === null) {
+                    return false;
+                  }
+                  if (
+                    this.type === REVIEWABLE_ITEM_TRANSLATION ||
+                    this.type === REVIEWABLE_ITEM_VOICEOVER) {
+                    return Boolean(this.languageCode);
+                  }
+                  return true;
+                }
+
+                if (this.method === VIEW_METHOD_USERNAME) {
+                  return Boolean(this.username);
+                }
+              }
             },
             addCommunityReviewer: {
               username: '',
               type: null,
-              languageCode: null
+              languageCode: null,
+              isValid: function() {
+                if (this.username === '') {
+                  return false;
+                }
+                if (this.type === null) {
+                  return false;
+                }
+                if (
+                  this.type === REVIEWABLE_ITEM_TRANSLATION ||
+                  this.type === REVIEWABLE_ITEM_VOICEOVER) {
+                  return Boolean(this.languageCode);
+                }
+                return true;
+              }
             },
             removeCommunityReviewer: {
               username: '',
-              method: 'all',
+              method: REVIEW_REMOVE_TYPE_ALL,
               type: null,
-              languageCode: null
+              languageCode: null,
+              isValid: function() {
+                if (this.username === '') {
+                  return false;
+                }
+                if (this.method === REVIEW_REMOVE_TYPE_ALL) {
+                  return Boolean(this.username);
+                } else {
+                  if (this.type === null) {
+                    return false;
+                  }
+                  if (
+                    this.type === REVIEWABLE_ITEM_TRANSLATION ||
+                    this.type === REVIEWABLE_ITEM_VOICEOVER) {
+                    return Boolean(this.languageCode);
+                  }
+                  return true;
+                }
+              }
             }
           };
         };
 
         ctrl.$onInit = function() {
-          refreshFormData();
-          ctrl.resultRolesVisible = false;
-          ctrl.communityReviewersDataFetched = false;
-          ctrl.result = {};
-          ctrl.setStatusMessage('');
-
+          ctrl.REVIEW_REMOVE_TYPE_ALL = REVIEW_REMOVE_TYPE_ALL;
+          ctrl.REVIEW_REMOVE_TYPE_SPECIFIC = REVIEW_REMOVE_TYPE_SPECIFIC;
+          ctrl.VIEW_METHOD_USERNAME = VIEW_METHOD_USERNAME;
+          ctrl.VIEW_METHOD_ROLE = VIEW_METHOD_ROLE;
           ctrl.UPDATABLE_ROLES = {};
           ctrl.VIEWABLE_ROLES = {};
           ctrl.REVIEWABLE_ITEMS = {
@@ -228,6 +294,12 @@ angular.module('oppia').directive('adminRolesTab', [
             VOICEOVER: REVIEWABLE_ITEM_VOICEOVER,
             QUESTION: REVIEWABLE_ITEM_QUESTION
           };
+          refreshFormData();
+          ctrl.resultRolesVisible = false;
+          ctrl.communityReviewersDataFetched = false;
+          ctrl.result = {};
+          ctrl.setStatusMessage('');
+
           ctrl.languageCodesAndDescriptions = (
             LanguageUtilService.getAllVoiceoverLanguageCodes().map(
               function(languageCode) {

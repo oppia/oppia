@@ -42,12 +42,12 @@
             </label>
             <div class="col-md-8 ml-auto">
               <select ng-model="$ctrl.formData.viewUserRoles.method" class="form-control protractor-test-role-method">
-                <option value="role">By Role</option>
-                <option value="username">By Username</option>
+                <option value="<[$ctrl.VIEW_METHOD_ROLE]>">By Role</option>
+                <option value="<[$ctrl.VIEW_METHOD_USERNAME]>">By Username</option>
               </select>
             </div>
           </div>
-          <div class="d-xl-inline-flex form-group" ng-if="$ctrl.formData.viewUserRoles.method==='role'">
+          <div class="d-xl-inline-flex form-group" ng-if="$ctrl.formData.viewUserRoles.method===$ctrl.VIEW_METHOD_ROLE">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
               <select ng-options="roleName as roleString for (roleName, roleString) in $ctrl.VIEWABLE_ROLES" ng-model="$ctrl.formData.viewUserRoles.role" class="form-control protractor-test-role-value">
@@ -55,7 +55,7 @@
             </div>
           </div>
 
-          <div class="d-xl-inline-flex form-group" ng-if="$ctrl.formData.viewUserRoles.method==='username'">
+          <div class="d-xl-inline-flex form-group" ng-if="$ctrl.formData.viewUserRoles.method===$ctrl.VIEW_METHOD_USERNAME">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
               <input type="text" name="username" placeholder="Enter username" ng-model="$ctrl.formData.viewUserRoles.username" class="form-control protractor-test-username-value">
@@ -63,7 +63,7 @@
           </div>
 
           <button type="submit" class="btn btn-success protractor-test-role-success"
-                  ng-disabled="($ctrl.formData.viewUserRoles.method==='role' && !$ctrl.formData.viewUserRoles.role) || ($ctrl.formData.viewUserRoles.method==='username' && !$ctrl.formData.viewUserRoles.username)"
+                  ng-disabled="!$ctrl.formData.viewUserRoles.isValid()"
                   value="view role">
             View Role
           </button>
@@ -112,7 +112,7 @@
               </select>
             </div>
           </div>
-          <button type="submit" class="btn btn-success protractor-update-form-submit" ng-disabled="!$ctrl.formData.updateRole.newRole || !$ctrl.formData.updateRole.username || ($ctrl.formData.updateRole.newRole==='TOPIC_MANAGER' && !$ctrl.formData.updateRole.topicId)" value="update role">Update Role</button>
+          <button type="submit" class="btn btn-success protractor-update-form-submit" ng-disabled="!$ctrl.formData.updateRole.isValid()" value="update role">Update Role</button>
         </form>
       </md-card>
 
@@ -124,16 +124,17 @@
               Select Method
             </label>
             <div class="col-md-8 ml-auto">
-              <select ng-model="$ctrl.formData.viewCommunityReviewers.method" class="form-control protractor-test-role-method">
-                <option value="role">By Role</option>
-                <option value="username">By Username</option>
+              <select ng-model="$ctrl.formData.viewCommunityReviewers.method" class="form-control">
+                <option value="<[$ctrl.VIEW_METHOD_ROLE]>">By Role</option>
+                <option value="<[$ctrl.VIEW_METHOD_USERNAME]>">By Username</option>
               </select>
             </div>
           </div>
-          <div class="d-xl-inline-flex form-group" ng-if="$ctrl.formData.viewCommunityReviewers.method==='role'">
+          <div class="d-xl-inline-flex form-group"
+               ng-if="$ctrl.formData.viewCommunityReviewers.method===$ctrl.VIEW_METHOD_ROLE">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select ng-options="roleString as roleName for (roleName, roleString) in $ctrl.REVIEWABLE_ITEMS" ng-model="$ctrl.formData.viewCommunityReviewers.type" class="form-control protractor-test-role-value">
+              <select ng-options="roleString as roleName for (roleName, roleString) in $ctrl.REVIEWABLE_ITEMS" ng-model="$ctrl.formData.viewCommunityReviewers.type" class="form-control">
               </select>
             </div>
           </div>
@@ -143,28 +144,29 @@
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
               <select ng-model="$ctrl.formData.viewCommunityReviewers.languageCode"
-                      class="form-control protractor-update-form-role-select"
+                      class="form-control"
                       ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
               </select>
             </div>
           </div>
 
-          <div class="d-xl-inline-flex form-group" ng-if="$ctrl.formData.viewCommunityReviewers.method==='username'">
+          <div class="d-xl-inline-flex form-group"
+               ng-if="$ctrl.formData.viewCommunityReviewers.method===$ctrl.VIEW_METHOD_USERNAME">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <input type="text" name="username" placeholder="Enter username" ng-model="$ctrl.formData.viewCommunityReviewers.username" class="form-control protractor-test-username-value">
+              <input type="text" name="username" placeholder="Enter username" ng-model="$ctrl.formData.viewCommunityReviewers.username" class="form-control">
             </div>
           </div>
 
-          <button type="submit" class="btn btn-success protractor-test-role-success"
-                  ng-disabled="($ctrl.formData.viewCommunityReviewers.method==='role' && !$ctrl.formData.viewCommunityReviewers.type) || ($ctrl.formData.viewCommunityReviewers.method==='username' && !$ctrl.formData.viewCommunityReviewers.username)"
+          <button type="submit" class="btn btn-success"
+                  ng-disabled="!$ctrl.formData.viewCommunityReviewers.isValid()"
                   value="view role">
             View Role
           </button>
         </form>
 
         <div ng-show="$ctrl.communityReviewersDataFetched">
-          <div ng-if="$ctrl.formData.viewCommunityReviewers.method==='username'">
+          <div ng-if="$ctrl.formData.viewCommunityReviewers.method===$ctrl.VIEW_METHOD_USERNAME">
             <table class="table text-center view-results-table">
               <thead>
                 <tr>
@@ -182,7 +184,7 @@
               </tbody>
             </table>
           </div>
-          <div ng-if="$ctrl.formData.viewCommunityReviewers.method==='role'">
+          <div ng-if="$ctrl.formData.viewCommunityReviewers.method===$ctrl.VIEW_METHOD_ROLE">
             <strong>Usernames:</strong> <[$ctrl.result.usernames]>
           </div>
         </div>
@@ -194,14 +196,14 @@
           <div class="d-xl-inline-flex form-group">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <input type="text" placeholder="Enter username" ng-model="$ctrl.formData.addCommunityReviewer.username" class="form-control protractor-update-form-name">
+              <input type="text" placeholder="Enter username" ng-model="$ctrl.formData.addCommunityReviewer.username" class="form-control">
             </div>
           </div>
 
           <div class="d-xl-inline-flex form-group">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Allow reviewing</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select ng-options="value as key for (key, value) in $ctrl.REVIEWABLE_ITEMS" ng-model="$ctrl.formData.addCommunityReviewer.type" class="form-control protractor-update-form-role-select">
+              <select ng-options="value as key for (key, value) in $ctrl.REVIEWABLE_ITEMS" ng-model="$ctrl.formData.addCommunityReviewer.type" class="form-control">
               </select>
             </div>
           </div>
@@ -211,14 +213,14 @@
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
               <select ng-model="$ctrl.formData.addCommunityReviewer.languageCode"
-                      class="form-control protractor-update-form-role-select"
+                      class="form-control"
                       ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
               </select>
             </div>
           </div>
           <button type="submit"
-                  class="btn btn-success protractor-update-form-submit"
-
+                  class="btn btn-success"
+                  ng-disabled="!$ctrl.formData.addCommunityReviewer.isValid()"
                   value="update role">Add Reviewer
           </button>
         </form>
@@ -230,20 +232,21 @@
           <div class="d-xl-inline-flex form-group">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-4 col-lg-4 col-sm-4 ml-auto">
-              <input type="text" placeholder="Enter username" ng-model="$ctrl.formData.removeCommunityReviewer.username" class="form-control protractor-update-form-name">
+              <input type="text" placeholder="Enter username" ng-model="$ctrl.formData.removeCommunityReviewer.username" class="form-control">
             </div>
             <div class="col-md-4 ml-auto">
-              <select ng-model="$ctrl.formData.removeCommunityReviewer.method" class="form-control protractor-test-role-method">
-                <option value="all">Remove all review rights</option>
-                <option value="specific">Remove specific review rights</option>
+              <select ng-model="$ctrl.formData.removeCommunityReviewer.method" class="form-control">
+                <option value="<[$ctrl.REVIEW_REMOVE_TYPE_ALL]>">Remove all review rights</option>
+                <option value="<[$ctrl.REVIEW_REMOVE_TYPE_SPECIFIC]>">Remove specific review rights</option>
               </select>
             </div>
           </div>
 
-          <div class="d-xl-inline-flex form-group" ng-if="$ctrl.formData.removeCommunityReviewer.method==='specific'">
+          <div class="d-xl-inline-flex form-group"
+               ng-if="$ctrl.formData.removeCommunityReviewer.method===$ctrl.REVIEW_REMOVE_TYPE_SPECIFIC">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Remove type</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
-              <select ng-options="value as key for (key, value) in $ctrl.REVIEWABLE_ITEMS" ng-model="$ctrl.formData.removeCommunityReviewer.type" class="form-control protractor-update-form-role-select">
+              <select ng-options="value as key for (key, value) in $ctrl.REVIEWABLE_ITEMS" ng-model="$ctrl.formData.removeCommunityReviewer.type" class="form-control">
               </select>
             </div>
           </div>
@@ -253,14 +256,14 @@
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
               <select ng-model="$ctrl.formData.removeCommunityReviewer.languageCode"
-                      class="form-control protractor-update-form-role-select"
+                      class="form-control"
                       ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
               </select>
             </div>
           </div>
           <button type="submit"
-                  class="btn btn-success protractor-update-form-submit"
-                  ng-disabled="$ctrl.formData.removeCommunityReviewer.username === '' || !($ctrl.formData.removeCommunityReviewer.method === 'all' || $ctrl.formData.removeCommunityReviewer.type && $ctrl.formData.removeCommunityReviewer.languageCode)" value="update role">Remove Reviewer
+                  class="btn btn-success"
+                  ng-disabled="!$ctrl.formData.removeCommunityReviewer.isValid()" value="update role">Remove Reviewer
           </button>
         </form>
       </md-card>

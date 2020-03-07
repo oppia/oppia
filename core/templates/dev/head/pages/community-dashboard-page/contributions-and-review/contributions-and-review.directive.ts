@@ -68,7 +68,7 @@ angular.module('oppia').directive('contributionsAndReview', [
               color: '#e76c8c'
             }
           };
-          var userCanReviewTranslationSuggestionsInLanguages = [];
+
           var getQuestionContributionsSummary = function() {
             var questionContributionsSummaryList = [];
             Object.keys(ctrl.contributions).forEach(function(key) {
@@ -327,10 +327,6 @@ angular.module('oppia').directive('contributionsAndReview', [
             }
           };
 
-          ctrl.canReviewSuggestion = function() {
-            return userCanReviewTranslationSuggestionsInLanguages.length > 0;
-          };
-
           ctrl.switchToReviewTab = function(suggestionType) {
             ctrl.activeContributionTab = '';
             ctrl.contributionsDataLoading = true;
@@ -369,16 +365,7 @@ angular.module('oppia').directive('contributionsAndReview', [
             ctrl.SUGGESTION_TYPE_QUESTION = 'add_question';
             ctrl.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
             ctrl.activeReviewTab = '';
-            ctrl.reviewTabs = [
-              {
-                suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
-                text: 'Review Questions'
-              },
-              {
-                suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
-                text: 'Review Translations'
-              }
-            ];
+            ctrl.reviewTabs = [];
             ctrl.activeContributionTab = '';
             ctrl.contributionTabs = [
               {
@@ -396,19 +383,34 @@ angular.module('oppia').directive('contributionsAndReview', [
               if (ctrl.userIsLoggedIn) {
                 UserService.getUserCommunityRightsData().then(
                   function(UserCommunityRights) {
-                    userCanReviewTranslationSuggestionsInLanguages = (
+                    var userCanReviewTranslationSuggestionsInLanguages = (
                       UserCommunityRights
                         .can_review_translation_for_language_codes);
+                    var userCanReviewQuestionSuggestions = (
+                      UserCommunityRights.can_review_questions);
+                    if (userCanReviewQuestionSuggestions) {
+                      ctrl.reviewTabs.push({
+                        suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
+                        text: 'Review Questions'
+                      });
+                    }
                     if (
                       userCanReviewTranslationSuggestionsInLanguages
                         .length > 0) {
+                      ctrl.reviewTabs.push({
+                        suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
+                        text: 'Review Translations'
+                      });
+                    }
+                    if (ctrl.reviewTabs.length > 0) {
                       ctrl.canReviewTranslation = true;
                       ctrl.reviewTabActive = false;
-                      ctrl.switchToReviewTab();
+                      ctrl.switchToReviewTab(ctrl.SUGGESTION_TYPE_QUESTION);
                     } else {
                       ctrl.canReviewTranslation = false;
                       ctrl.reviewTabActive = true;
-                      ctrl.switchToContributionsTab();
+                      ctrl.switchToContributionsTab(
+                        ctrl.SUGGESTION_TYPE_QUESTION);
                     }
                   });
               }

@@ -209,7 +209,7 @@ class TranslatableTextHandler(base.BaseHandler):
 
 
 class UserCommunityRightsDataHandler(base.BaseHandler):
-    """Provides lessons content which can be translated in a given language."""
+    """Provides user's review rights in community."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

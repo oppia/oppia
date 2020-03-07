@@ -69,8 +69,19 @@ angular.module('oppia').directive('communityDashboardPage', [
 
           var prevSelectedLanguageCode = (
             LocalStorageService.getLastSelectedTranslationLanguageCode());
-          var allAudioLanguageCodes = LanguageUtilService
-            .getAllVoiceoverLanguageCodes();
+          var allAudioLanguageCodes = (
+            LanguageUtilService.getAllVoiceoverLanguageCodes());
+
+          var getLanguageDescriptions = function(languageCodes) {
+            var languageDescriptions = [];
+            languageCodes.forEach(function(languageCode) {
+              languageDescriptions.push(
+                LanguageUtilService.getAudioLanguageDescription(
+                  languageCode));
+            });
+            return languageDescriptions;
+          };
+
           ctrl.onChangeLanguage = function() {
             TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
             LocalStorageService.updateLastSelectedTranslationLanguageCode(
@@ -102,34 +113,25 @@ angular.module('oppia').directive('communityDashboardPage', [
                 ctrl.username = userInfo.getUsername();
                 UserService.getUserCommunityRightsData().then(
                   function(userCommunityRights) {
-                    userCommunityRights
-                      .can_review_translation_for_language_codes.forEach(
-                        function(languageCode) {
-                          ctrl.userCanReviewTranslationSuggestionsInLanguages
-                            .push(
-                              LanguageUtilService.getAudioLanguageDescription(
-                                languageCode));
-                        });
+                    ctrl.userCanReviewTranslationSuggestionsInLanguages = (
+                      getLanguageDescriptions(
+                        userCommunityRights
+                          .can_review_translation_for_language_codes));
 
-                    userCommunityRights
-                      .can_review_voiceover_for_language_codes.forEach(function(
-                          languageCode) {
-                        ctrl.userCanReviewVoiceoverSuggestionsInLanguages.push(
-                          LanguageUtilService.getAudioLanguageDescription(
-                            languageCode));
-                      });
+                    ctrl.userCanReviewVoiceoverSuggestionsInLanguages = (
+                      getLanguageDescriptions(
+                        userCommunityRights
+                          .can_review_voiceover_for_language_codes));
 
                     ctrl.userCanReviewQuestions = (
                       userCommunityRights.can_review_questions);
 
-                    if (
+                    ctrl.userIsReviewer = (
                       ctrl.userCanReviewTranslationSuggestionsInLanguages
                         .length > 0 ||
                       ctrl.userCanReviewVoiceoverSuggestionsInLanguages
                         .length > 0 ||
-                      ctrl.userCanReviewQuestions) {
-                      ctrl.userIsReviewer = true;
-                    }
+                      ctrl.userCanReviewQuestions);
                   });
               }
             });

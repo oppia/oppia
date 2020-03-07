@@ -441,14 +441,14 @@ class UserCommunityRightsTests(test_utils.GenericTestBase):
             'Expected can_review_voiceover_for_language_codes to be a list'):
             self.user_community_rights.validate()
 
-    def test_incorrect_langauge_code_for_voiceover_raise_error(self):
+    def test_incorrect_language_code_for_voiceover_raise_error(self):
         self.user_community_rights.can_review_voiceover_for_language_codes = [
             'invalid_lang_code']
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid language_code: invalid_lang_code'):
             self.user_community_rights.validate()
 
-    def test_incorrect_langauge_code_for_translation_raise_error(self):
+    def test_incorrect_language_code_for_translation_raise_error(self):
         self.user_community_rights.can_review_translation_for_language_codes = [
             'invalid_lang_code']
         with self.assertRaisesRegexp(

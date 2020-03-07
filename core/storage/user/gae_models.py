@@ -52,7 +52,7 @@ class UserSettingsModel(base_models.BaseModel):
     # migration (to give role to all users) is run.
     role = ndb.StringProperty(
         required=True, indexed=True, default=feconf.ROLE_ID_EXPLORATION_EDITOR)
-    # Identifiable username to display in the UI. May be None.
+    # IDentifiable username to display in the UI. May be None.
     username = ndb.StringProperty(indexed=True)
     # Normalized username to use for duplicate-username queries. May be None.
     normalized_username = ndb.StringProperty(indexed=True)
@@ -2083,14 +2083,14 @@ class UserCommunityRightsModel(base_models.BaseModel):
 
     @classmethod
     def get_translation_reviewer_user_id(cls, language_code):
-        """Returns the Id of the users who has rights to review translation in
+        """Returns the ID of the users who has rights to review translation in
         the given language code.
 
         Args:
             language_code: str. The code of the language.
 
         Returns:
-            list(str). A list of user's Ids who has rights to review translation
+            list(str). A list of user's IDs who has rights to review translation
             in the given language code.
         """
         reviewer_models = (
@@ -2101,14 +2101,14 @@ class UserCommunityRightsModel(base_models.BaseModel):
 
     @classmethod
     def get_voiceover_reviewer_user_id(cls, language_code):
-        """Returns the Id of the users who has rights to review voiceover in
+        """Returns the ID of the users who has rights to review voiceover in
         the given language code.
 
         Args:
             language_code: str. The code of the language.
 
         Returns:
-            list(str). A list of user's Ids who has rights to review voiceover
+            list(str). A list of user's IDs who has rights to review voiceover
             in the given language code.
         """
         reviewer_models = (
@@ -2119,10 +2119,10 @@ class UserCommunityRightsModel(base_models.BaseModel):
 
     @classmethod
     def get_question_reviewer_user_id(cls):
-        """Returns the Id of the users who has rights to review questions.
+        """Returns the ID of the users who has rights to review questions.
 
         Returns:
-            list(str). A list of user's Ids who has rights to review questions.
+            list(str). A list of user's IDs who has rights to review questions.
         """
         reviewer_models = cls.query(cls.can_review_questions == True).fetch() # pylint: disable=singleton-comparison
         return [reviewer_model.id for reviewer_model in reviewer_models]

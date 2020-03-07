@@ -526,6 +526,11 @@ export = {
   "REVIEWABLE_ITEM_VOICEOVER": "voiceover",
   "REVIEWABLE_ITEM_QUESTION": "question",
 
+  "REVIEW_REMOVE_TYPE_ALL": "all",
+  "REVIEW_REMOVE_TYPE_SPECIFIC": "specific",
+  "VIEW_METHOD_USERNAME": "username",
+  "VIEW_METHOD_ROLE": "role",
+
   // Interaction IDs for which answer details cannot be solicited.
   "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],
 

@@ -1049,246 +1049,6 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
         self.assertEqual(result_collections, [])
 
 
-class CommunityReviewerTest(test_utils.GenericTestBase):
-    """Tests related to add and check reviewers for community
-    suggestion/application.
-    """
-    TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
-    VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
-    QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
-
-    def setUp(self):
-        super(CommunityReviewerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
-        self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
-        self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
-
-        self.translation_reviewer_id = self.get_user_id_from_email(
-            self.TRANSLATION_REVIEWER_EMAIL)
-        self.voiceover_reviewer_id = self.get_user_id_from_email(
-            self.VOICEOVER_REVIEWER_EMAIL)
-        self.question_reviewer_id = self.get_user_id_from_email(
-            self.QUESTION_REVIEWER_EMAIL)
-
-    def test_add_reviewer_with_invalid_username(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
-            '/adminaddreviewerhandler', {
-                'username': 'invalid',
-                'review_item': 'translation',
-                'language_code': 'invalid'
-            }, csrf_token=csrf_token, expected_status_int=400)
-
-        self.assertEqual(
-            response['error'], 'Invalid username: invalid')
-        self.logout()
-
-    def test_add_translation_reviewer(self):
-        self.assertFalse(
-            user_services.can_review_translation_suggestions(
-                self.translation_reviewer_id, language_code='hi'))
-
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            '/adminaddreviewerhandler', {
-                'username': 'translator',
-                'review_item': 'translation',
-                'language_code': 'hi'
-            }, csrf_token=csrf_token)
-
-        self.assertTrue(user_services.can_review_translation_suggestions(
-            self.translation_reviewer_id, language_code='hi'))
-        self.logout()
-
-    def test_add_translation_reviewer_in_invalid_langauge(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
-            '/adminaddreviewerhandler', {
-                'username': 'translator',
-                'review_item': 'translation',
-                'language_code': 'invalid'
-            }, csrf_token=csrf_token, expected_status_int=400)
-
-        self.assertEqual(
-            response['error'], 'Invalid language_code: invalid')
-        self.logout()
-
-    def test_assigning_same_langauge_for_translation_review_rasie_error(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
-            '/adminaddreviewerhandler', {
-                'username': 'translator',
-                'review_item': 'translation',
-                'language_code': 'hi'
-            }, csrf_token=csrf_token)
-
-        response = self.post_json(
-            '/adminaddreviewerhandler', {
-                'username': 'translator',
-                'review_item': 'translation',
-                'language_code': 'hi'
-            }, csrf_token=csrf_token, expected_status_int=400)
-
-        self.assertEqual(
-            response['error'],
-            'User translator already has rights to review translation in '
-            'language code hi')
-        self.logout()
-
-    def test_add_voiceover_reviewer(self):
-        self.assertFalse(
-            user_services.can_review_voiceover_applications(
-                self.voiceover_reviewer_id, language_code='hi'))
-
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            '/adminaddreviewerhandler', {
-                'username': 'voiceartist',
-                'review_item': 'voiceover',
-                'language_code': 'hi'
-            }, csrf_token=csrf_token)
-
-        self.assertTrue(user_services.can_review_voiceover_applications(
-            self.voiceover_reviewer_id, language_code='hi'))
-        self.logout()
-
-    def test_add_voiceover_reviewer_in_invalid_langauge(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
-            '/adminaddreviewerhandler', {
-                'username': 'voiceartist',
-                'review_item': 'voiceover',
-                'language_code': 'invalid'
-            }, csrf_token=csrf_token, expected_status_int=400)
-
-        self.assertEqual(
-            response['error'], 'Invalid language_code: invalid')
-        self.logout()
-
-    def test_assigning_same_langauge_for_voiceover_review_rasie_error(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
-            '/adminaddreviewerhandler', {
-                'username': 'voiceartist',
-                'review_item': 'voiceover',
-                'language_code': 'hi'
-            }, csrf_token=csrf_token)
-
-        response = self.post_json(
-            '/adminaddreviewerhandler', {
-                'username': 'voiceartist',
-                'review_item': 'voiceover',
-                'language_code': 'hi'
-            }, csrf_token=csrf_token, expected_status_int=400)
-
-        self.assertEqual(
-            response['error'],
-            'User voiceartist already has rights to review voiceover in '
-            'language code hi')
-        self.logout()
-
-    def test_add_question_reviewer(self):
-        self.assertFalse(user_services.can_review_question_suggestions(
-            self.voiceover_reviewer_id))
-
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            '/adminaddreviewerhandler', {
-                'username': 'question',
-                'review_item': 'question'
-            }, csrf_token=csrf_token)
-
-        self.assertTrue(user_services.can_review_question_suggestions(
-            self.question_reviewer_id))
-        self.logout()
-
-    def test_assigning_same_user_as_question_reviewer_rasie_error(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
-            '/adminaddreviewerhandler', {
-                'username': 'question',
-                'review_item': 'question'
-            }, csrf_token=csrf_token)
-
-        response = self.post_json(
-            '/adminaddreviewerhandler', {
-                'username': 'question',
-                'review_item': 'question'
-            }, csrf_token=csrf_token, expected_status_int=400)
-
-        self.assertEqual(
-            response['error'],
-            'User question already has rights to review question.')
-        self.logout()
-
-    def test_add_reviewer_for_invalid_target(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
-            '/adminaddreviewerhandler', {
-                'username': 'question',
-                'review_item': 'invalid'
-            }, csrf_token=csrf_token, expected_status_int=400)
-
-        self.assertEqual(
-            response['error'], 'Invalid assignment: invalid')
-        self.logout()
-
-    def test_all_assigned_reviewers(self):
-
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        response_dict = self.get_json('/allcommunityreviewers')
-
-        self.assertEqual(response_dict['reviewers'], [])
-
-        csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            '/adminaddreviewerhandler', {
-                'username': 'translator',
-                'review_item': 'translation',
-                'language_code': 'hi'
-            }, csrf_token=csrf_token)
-
-        csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            '/adminaddreviewerhandler', {
-                'username': 'translator',
-                'review_item': 'voiceover',
-                'language_code': 'hi'
-            }, csrf_token=csrf_token)
-
-        response_dict = self.get_json('/allcommunityreviewers')
-
-        self.assertEqual(
-            response_dict['reviewers'], [{
-                'username': 'translator',
-                'can_review_questions': False,
-                'can_review_translation_for_language_codes': ['hi'],
-                'can_review_voiceover_for_language_codes': ['hi']
-            }])
-
-
 class SendDummyMailTest(test_utils.GenericTestBase):
     """"Tests for sending test mails to admin."""
 
@@ -1312,3 +1072,593 @@ class SendDummyMailTest(test_utils.GenericTestBase):
                 csrf_token=csrf_token, expected_status_int=400)
             self.assertEqual(
                 generated_response['error'], 'This app cannot send emails.')
+
+
+class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
+    """Tests related to add reviewers for contributor's
+    suggestion/application.
+    """
+    TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
+    VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
+    QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
+
+    def setUp(self):
+        super(AddCommunityReviewerHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
+        self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
+        self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
+
+        self.translation_reviewer_id = self.get_user_id_from_email(
+            self.TRANSLATION_REVIEWER_EMAIL)
+        self.voiceover_reviewer_id = self.get_user_id_from_email(
+            self.VOICEOVER_REVIEWER_EMAIL)
+        self.question_reviewer_id = self.get_user_id_from_email(
+            self.QUESTION_REVIEWER_EMAIL)
+
+    def test_add_reviewer_with_invalid_username_raise_error(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/addcommunityreviewerhandler', {
+                'username': 'invalid',
+                'review_item': 'translation',
+                'language_code': 'en'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'Invalid username: invalid')
+
+    def test_add_translation_reviewer(self):
+        self.assertFalse(
+            user_services.can_review_translation_suggestions(
+                self.translation_reviewer_id, language_code='hi'))
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/addcommunityreviewerhandler', {
+                'username': 'translator',
+                'review_item': 'translation',
+                'language_code': 'hi'
+            }, csrf_token=csrf_token)
+
+        self.assertTrue(user_services.can_review_translation_suggestions(
+            self.translation_reviewer_id, language_code='hi'))
+
+    def test_add_translation_reviewer_in_invalid_language_raise_error(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/addcommunityreviewerhandler', {
+                'username': 'translator',
+                'review_item': 'translation',
+                'language_code': 'invalid'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'Invalid language_code: invalid')
+
+    def test_assigning_same_language_for_translation_review_raise_error(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.assertFalse(
+            user_services.can_review_translation_suggestions(
+                self.translation_reviewer_id, language_code='hi'))
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/addcommunityreviewerhandler', {
+                'username': 'translator',
+                'review_item': 'translation',
+                'language_code': 'hi'
+            }, csrf_token=csrf_token)
+        self.assertTrue(
+            user_services.can_review_translation_suggestions(
+                self.translation_reviewer_id, language_code='hi'))
+        response = self.post_json(
+            '/addcommunityreviewerhandler', {
+                'username': 'translator',
+                'review_item': 'translation',
+                'language_code': 'hi'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'User translator already has rights to review translation in '
+            'language code hi')
+
+    def test_add_voiceover_reviewer(self):
+        self.assertFalse(
+            user_services.can_review_voiceover_applications(
+                self.voiceover_reviewer_id, language_code='hi'))
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/addcommunityreviewerhandler', {
+                'username': 'voiceartist',
+                'review_item': 'voiceover',
+                'language_code': 'hi'
+            }, csrf_token=csrf_token)
+
+        self.assertTrue(user_services.can_review_voiceover_applications(
+            self.voiceover_reviewer_id, language_code='hi'))
+
+    def test_add_voiceover_reviewer_in_invalid_language(self):
+        self.assertFalse(
+            user_services.can_review_voiceover_applications(
+                self.voiceover_reviewer_id, language_code='hi'))
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/addcommunityreviewerhandler', {
+                'username': 'voiceartist',
+                'review_item': 'voiceover',
+                'language_code': 'invalid'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'Invalid language_code: invalid')
+        self.assertFalse(
+            user_services.can_review_voiceover_applications(
+                self.voiceover_reviewer_id, language_code='hi'))
+
+    def test_assigning_same_language_for_voiceover_review_raise_error(self):
+        self.assertFalse(
+            user_services.can_review_voiceover_applications(
+                self.voiceover_reviewer_id, language_code='hi'))
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/addcommunityreviewerhandler', {
+                'username': 'voiceartist',
+                'review_item': 'voiceover',
+                'language_code': 'hi'
+            }, csrf_token=csrf_token)
+        self.assertTrue(
+            user_services.can_review_voiceover_applications(
+                self.voiceover_reviewer_id, language_code='hi'))
+
+        response = self.post_json(
+            '/addcommunityreviewerhandler', {
+                'username': 'voiceartist',
+                'review_item': 'voiceover',
+                'language_code': 'hi'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'User voiceartist already has rights to review voiceover in '
+            'language code hi')
+
+    def test_add_question_reviewer(self):
+        self.assertFalse(user_services.can_review_question_suggestions(
+            self.question_reviewer_id))
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/addcommunityreviewerhandler', {
+                'username': 'question',
+                'review_item': 'question'
+            }, csrf_token=csrf_token)
+
+        self.assertTrue(user_services.can_review_question_suggestions(
+            self.question_reviewer_id))
+
+    def test_assigning_same_user_as_question_reviewer_raise_error(self):
+        self.assertFalse(user_services.can_review_question_suggestions(
+            self.question_reviewer_id))
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/addcommunityreviewerhandler', {
+                'username': 'question',
+                'review_item': 'question'
+            }, csrf_token=csrf_token)
+        self.assertTrue(user_services.can_review_question_suggestions(
+            self.question_reviewer_id))
+
+        response = self.post_json(
+            '/addcommunityreviewerhandler', {
+                'username': 'question',
+                'review_item': 'question'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'User question already has rights to review question.')
+
+    def test_add_reviewer_for_invalid_review_item_raise_error(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/addcommunityreviewerhandler', {
+                'username': 'question',
+                'review_item': 'invalid'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'Invalid review_item: invalid')
+
+
+class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
+    """Tests related to remove reviewers from community dashboard page."""
+    TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
+    VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
+    QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
+
+    def setUp(self):
+        super(RemoveCommunityReviewerHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
+        self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
+        self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
+
+        self.translation_reviewer_id = self.get_user_id_from_email(
+            self.TRANSLATION_REVIEWER_EMAIL)
+        self.voiceover_reviewer_id = self.get_user_id_from_email(
+            self.VOICEOVER_REVIEWER_EMAIL)
+        self.question_reviewer_id = self.get_user_id_from_email(
+            self.QUESTION_REVIEWER_EMAIL)
+
+    def test_add_reviewer_with_invalid_username_raise_error(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json(
+            '/removecommunityreviewerhandler', {
+                'username': 'invalid',
+                'removal_type': 'all'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'Invalid username: invalid')
+
+    def test_remove_translation_reviewer(self):
+        self.assertFalse(
+            user_services.can_review_translation_suggestions(
+                self.translation_reviewer_id, language_code='hi'))
+        user_services.allow_user_review_translation_in_language(
+            self.translation_reviewer_id, 'hi')
+        self.assertTrue(
+            user_services.can_review_translation_suggestions(
+                self.translation_reviewer_id, language_code='hi'))
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/removecommunityreviewerhandler', {
+                'username': 'translator',
+                'removal_type': 'specific',
+                'review_type': 'translation',
+                'language_code': 'hi'
+            }, csrf_token=csrf_token)
+
+        self.assertFalse(user_services.can_review_translation_suggestions(
+            self.translation_reviewer_id, language_code='hi'))
+
+    def test_remove_translation_reviewer_in_invalid_language_raise_error(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json(
+            '/removecommunityreviewerhandler', {
+                'username': 'translator',
+                'removal_type': 'specific',
+                'review_type': 'translation',
+                'language_code': 'invalid'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'Invalid language_code: invalid')
+
+    def test_remove_unassigned_translation_reviewer_raise_error(self):
+        self.assertFalse(
+            user_services.can_review_translation_suggestions(
+                self.translation_reviewer_id, language_code='hi'))
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json(
+            '/removecommunityreviewerhandler', {
+                'username': 'translator',
+                'removal_type': 'specific',
+                'review_type': 'translation',
+                'language_code': 'hi'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'translator does not have rights to review translation in language '
+            'hi.')
+
+    def test_remove_voiceover_reviewer(self):
+        self.assertFalse(
+            user_services.can_review_voiceover_applications(
+                self.voiceover_reviewer_id, language_code='hi'))
+        user_services.allow_user_review_voiceover_in_language(
+            self.voiceover_reviewer_id, 'hi')
+        self.assertTrue(
+            user_services.can_review_voiceover_applications(
+                self.voiceover_reviewer_id, language_code='hi'))
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/removecommunityreviewerhandler', {
+                'username': 'voiceartist',
+                'removal_type': 'specific',
+                'review_type': 'voiceover',
+                'language_code': 'hi'
+            }, csrf_token=csrf_token)
+
+        self.assertFalse(user_services.can_review_voiceover_applications(
+            self.translation_reviewer_id, language_code='hi'))
+
+    def test_remove_voiceover_reviewer_in_invalid_language_raise_error(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json(
+            '/removecommunityreviewerhandler', {
+                'username': 'voiceartist',
+                'removal_type': 'specific',
+                'review_type': 'voiceover',
+                'language_code': 'invalid'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'Invalid language_code: invalid')
+
+    def test_remove_unassigned_voiceover_reviewer_raise_error(self):
+        self.assertFalse(
+            user_services.can_review_voiceover_applications(
+                self.translation_reviewer_id, language_code='hi'))
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json(
+            '/removecommunityreviewerhandler', {
+                'username': 'voiceartist',
+                'removal_type': 'specific',
+                'review_type': 'voiceover',
+                'language_code': 'hi'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'voiceartist does not have rights to review voiceover in language '
+            'hi.')
+
+    def test_remove_question_reviewer(self):
+        user_services.allow_user_review_question(self.question_reviewer_id)
+        self.assertTrue(user_services.can_review_question_suggestions(
+            self.question_reviewer_id))
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/removecommunityreviewerhandler', {
+                'username': 'question',
+                'removal_type': 'specific',
+                'review_type': 'question'
+            }, csrf_token=csrf_token)
+
+        self.assertFalse(user_services.can_review_question_suggestions(
+            self.question_reviewer_id))
+
+    def test_removing_unassigned_question_reviewer_raise_error(self):
+        self.assertFalse(user_services.can_review_question_suggestions(
+            self.question_reviewer_id))
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json(
+            '/removecommunityreviewerhandler', {
+                'username': 'question',
+                'removal_type': 'specific',
+                'review_type': 'question'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'question does not have rights to review question.')
+
+    def test_remove_reviewer_for_invalid_review_item_raise_error(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json(
+            '/removecommunityreviewerhandler', {
+                'username': 'question',
+                'removal_type': 'specific',
+                'review_type': 'invalid'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'Invalid type: invalid')
+
+    def test_remove_reviewer_for_invalid_removal_type_raise_error(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json(
+            '/removecommunityreviewerhandler', {
+                'username': 'question',
+                'removal_type': 'invalid'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'Invalid removal_type: invalid')
+
+    def test_remove_reviewer_from_all_reviewable_items(self):
+        user_services.allow_user_review_question(self.translation_reviewer_id)
+        self.assertTrue(user_services.can_review_question_suggestions(
+            self.translation_reviewer_id))
+
+        user_services.allow_user_review_voiceover_in_language(
+            self.translation_reviewer_id, 'hi')
+        self.assertTrue(
+            user_services.can_review_voiceover_applications(
+                self.translation_reviewer_id, language_code='hi'))
+
+        user_services.allow_user_review_translation_in_language(
+            self.translation_reviewer_id, 'hi')
+        self.assertTrue(
+            user_services.can_review_translation_suggestions(
+                self.translation_reviewer_id, language_code='hi'))
+
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/removecommunityreviewerhandler', {
+                'username': 'translator',
+                'removal_type': 'all'
+            }, csrf_token=csrf_token)
+
+        self.assertFalse(user_services.can_review_question_suggestions(
+            self.translation_reviewer_id))
+        self.assertFalse(
+            user_services.can_review_voiceover_applications(
+                self.translation_reviewer_id, language_code='hi'))
+        self.assertFalse(
+            user_services.can_review_translation_suggestions(
+                self.translation_reviewer_id, language_code='hi'))
+
+
+class CommunityReviewersHandlerTest(test_utils.GenericTestBase):
+    """Tests CommunityReviewersHandler."""
+    TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
+    VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
+    QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
+
+    def setUp(self):
+        super(CommunityReviewersHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
+        self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
+        self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
+
+        self.translation_reviewer_id = self.get_user_id_from_email(
+            self.TRANSLATION_REVIEWER_EMAIL)
+        self.voiceover_reviewer_id = self.get_user_id_from_email(
+            self.VOICEOVER_REVIEWER_EMAIL)
+        self.question_reviewer_id = self.get_user_id_from_email(
+            self.QUESTION_REVIEWER_EMAIL)
+
+    def test_check_community_reviewer_rights_by_username(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.get_json(
+            '/getcommunityreviewershandler', params={
+                'method': 'username',
+                'username': 'translator'
+            })
+        self.assertEqual(
+            response['can_review_translation_for_language_codes'], [])
+        self.assertEqual(
+            response['can_review_voiceover_for_language_codes'], [])
+        self.assertEqual(response['can_review_questions'], False)
+
+        user_services.allow_user_review_question(self.translation_reviewer_id)
+        user_services.allow_user_review_voiceover_in_language(
+            self.translation_reviewer_id, 'hi')
+        user_services.allow_user_review_translation_in_language(
+            self.translation_reviewer_id, 'hi')
+
+        response = self.get_json(
+            '/getcommunityreviewershandler', params={
+                'method': 'username',
+                'username': 'translator'
+            })
+        self.assertEqual(
+            response['can_review_translation_for_language_codes'], ['hi'])
+        self.assertEqual(
+            response['can_review_voiceover_for_language_codes'], ['hi'])
+        self.assertEqual(response['can_review_questions'], True)
+
+    def test_check_community_reviewer_rights_invalid_username(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.get_json(
+            '/getcommunityreviewershandler', params={
+                'method': 'username',
+                'username': 'invalid'
+            }, expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Invalid username: invalid')
+        self.logout()
+
+    def test_check_community_reviewer_by_translation_reviewer_role(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        user_services.allow_user_review_translation_in_language(
+            self.translation_reviewer_id, 'hi')
+        user_services.allow_user_review_translation_in_language(
+            self.voiceover_reviewer_id, 'hi')
+        response = self.get_json(
+            '/getcommunityreviewershandler', params={
+                'method': 'role',
+                'type': 'translation',
+                'language_code': 'hi'
+            })
+
+        self.assertEqual(len(response['usernames']), 2)
+        self.assertTrue('translator' in response['usernames'])
+        self.assertTrue('voiceartist' in response['usernames'])
+
+    def test_check_community_reviewer_by_voiceover_reviewer_role(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        user_services.allow_user_review_voiceover_in_language(
+            self.translation_reviewer_id, 'hi')
+        user_services.allow_user_review_voiceover_in_language(
+            self.voiceover_reviewer_id, 'hi')
+        response = self.get_json(
+            '/getcommunityreviewershandler', params={
+                'method': 'role',
+                'type': 'voiceover',
+                'language_code': 'hi'
+            })
+
+        self.assertEqual(len(response['usernames']), 2)
+        self.assertTrue('translator' in response['usernames'])
+        self.assertTrue('voiceartist' in response['usernames'])
+
+    def test_check_community_reviewer_with_invalid_language_code(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.get_json(
+            '/getcommunityreviewershandler', params={
+                'method': 'role',
+                'type': 'voiceover',
+                'language_code': 'invalid'
+            }, expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Invalid language_code: invalid')
+        self.logout()
+
+    def test_check_community_reviewer_by_question_reviewer_role(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        user_services.allow_user_review_question(self.question_reviewer_id)
+        user_services.allow_user_review_question(self.voiceover_reviewer_id)
+        response = self.get_json(
+            '/getcommunityreviewershandler', params={
+                'method': 'role',
+                'type': 'question'
+            })
+
+        self.assertEqual(len(response['usernames']), 2)
+        self.assertTrue('question' in response['usernames'])
+        self.assertTrue('voiceartist' in response['usernames'])
+
+    def test_check_community_reviewer_with_invalid_method_raise_error(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.get_json(
+            '/getcommunityreviewershandler', params={
+                'method': 'invalid'
+            }, expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Invalid method: invalid')

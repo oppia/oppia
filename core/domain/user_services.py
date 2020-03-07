@@ -579,6 +579,20 @@ def _save_user_community_rights(user_community_rights):
         can_review_questions=user_community_rights.can_review_questions).put()
 
 
+def _update_user_community_rights(user_community_rights):
+    """Updates the users rights model if the updated object has review rights in
+    at least one item else delete the existing model.
+
+    Args:
+        user_community_rights: UserCommunityRights. The updated
+            UserCommunityRights object of the user.
+    """
+    if user_community_rights.can_review_atleast_one_item():
+        _save_user_community_rights(user_community_rights)
+    else:
+        remove_user_from_community_reviewer(user_community_rights.id)
+
+
 def get_usernames_by_role(role):
     """Get usernames of all the users with given role ID.
 
@@ -1875,10 +1889,7 @@ def remove_translation_review_rights_in_language(user_id, language_code):
     user_community_rights = get_user_community_rights(user_id)
     user_community_rights.can_review_translation_for_language_codes.remove(
         language_code)
-    if user_community_rights.can_review_atleast_one_item():
-        _save_user_community_rights(user_community_rights)
-    else:
-        remove_user_from_community_reviewer(user_id)
+    _update_user_community_rights(user_community_rights)
 
 
 def allow_user_review_voiceover_in_language(user_id, language_code):
@@ -1909,10 +1920,7 @@ def remove_voiceover_review_rights_in_language(user_id, language_code):
     user_community_rights = get_user_community_rights(user_id)
     user_community_rights.can_review_voiceover_for_language_codes.remove(
         language_code)
-    if user_community_rights.can_review_atleast_one_item():
-        _save_user_community_rights(user_community_rights)
-    else:
-        remove_user_from_community_reviewer(user_id)
+    _update_user_community_rights(user_community_rights)
 
 
 def allow_user_review_question(user_id):
@@ -1934,10 +1942,7 @@ def remove_question_review_rights(user_id):
     """
     user_community_rights = get_user_community_rights(user_id)
     user_community_rights.can_review_questions = False
-    if user_community_rights.can_review_atleast_one_item():
-        _save_user_community_rights(user_community_rights)
-    else:
-        remove_user_from_community_reviewer(user_id)
+    _update_user_community_rights(user_community_rights)
 
 
 def remove_user_from_community_reviewer(user_id):

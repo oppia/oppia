@@ -1460,6 +1460,9 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
     VOICE_ARTIST_EMAIL = 'voiceartist@community.org'
     VOICE_ARTIST_USERNAME = 'voiceartist'
 
+    QUESTION_REVIEWER_EMAIL = 'question@community.org'
+    QUESTION_REVIEWER_USERNAME = 'questionreviewer'
+
     def setUp(self):
         super(UserContributionReviewRightsTests, self).setUp()
         self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
@@ -1468,6 +1471,11 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
+
+        self.signup(
+            self.QUESTION_REVIEWER_EMAIL, self.QUESTION_REVIEWER_USERNAME)
+        self.question_reviewer_id = (
+            self.get_user_id_from_email(self.TRANSLATOR_EMAIL))
 
     def test_assign_user_review_translation_suggestion_in_language(self):
         self.assertFalse(
@@ -1550,3 +1558,86 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
 
         self.assertEqual(all_reviewers[0].id, self.voice_artist_id)
         self.assertEqual(all_reviewers[1].id, self.translator_id)
+
+    def test_remove_translation_review_rights_in_language(self):
+        user_services.allow_user_review_translation_in_language(
+            self.translator_id, 'hi')
+        self.assertTrue(
+            user_services.can_review_translation_suggestions(
+                self.translator_id, language_code='hi'))
+        user_services.remove_translation_review_rights_in_language(
+            self.translator_id, 'hi')
+
+        self.assertFalse(
+            user_services.can_review_translation_suggestions(
+                self.translator_id, language_code='hi'))
+
+    def test_remove_voiceover_review_rights_in_language(self):
+        user_services.allow_user_review_voiceover_in_language(
+            self.voice_artist_id, 'hi')
+        self.assertTrue(
+            user_services.can_review_voiceover_applications(
+                self.voice_artist_id, language_code='hi'))
+        user_services.remove_voiceover_review_rights_in_language(
+            self.voice_artist_id, 'hi')
+
+        self.assertFalse(
+            user_services.can_review_voiceover_applications(
+                self.voice_artist_id, language_code='hi'))
+
+    def test_remove_question_review_rights(self):
+        user_services.allow_user_review_question(self.question_reviewer_id)
+        self.assertTrue(
+            user_services.can_review_question_suggestions(
+                self.question_reviewer_id))
+        user_services.remove_question_review_rights(self.question_reviewer_id)
+
+        self.assertFalse(
+            user_services.can_review_question_suggestions(
+                self.question_reviewer_id))
+
+    def test_remove_user_from_community_reviewer(self):
+        user_services.allow_user_review_translation_in_language(
+            self.translator_id, 'hi')
+        user_services.allow_user_review_voiceover_in_language(
+            self.translator_id, 'hi')
+        user_services.allow_user_review_question(self.translator_id)
+        self.assertTrue(
+            user_services.can_review_translation_suggestions(
+                self.translator_id, language_code='hi'))
+        self.assertTrue(
+            user_services.can_review_voiceover_applications(
+                self.translator_id, language_code='hi'))
+        self.assertTrue(
+            user_services.can_review_question_suggestions(
+                self.translator_id))
+
+        user_services.remove_user_from_community_reviewer(self.translator_id)
+
+        self.assertFalse(
+            user_services.can_review_translation_suggestions(
+                self.translator_id, language_code='hi'))
+        self.assertFalse(
+            user_services.can_review_voiceover_applications(
+                self.translator_id, language_code='hi'))
+        self.assertFalse(
+            user_services.can_review_question_suggestions(
+                self.translator_id))
+
+    def test_removal_of_all_review_rights_delets_model(self):
+        user_services.allow_user_review_translation_in_language(
+            self.translator_id, 'hi')
+        user_services.allow_user_review_question(self.translator_id)
+
+        user_services.remove_question_review_rights(self.translator_id)
+
+        right_model = user_models.UserCommunityRightsModel.get_by_id(
+            self.translator_id)
+        self.assertFalse(right_model is None)
+
+        user_services.remove_translation_review_rights_in_language(
+            self.translator_id, 'hi')
+
+        right_model = user_models.UserCommunityRightsModel.get_by_id(
+            self.translator_id)
+        self.assertTrue(right_model is None)

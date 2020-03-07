@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import logging
 
+from constants import constants
 from core.domain import config_domain
 from core.domain import html_cleaner
 from core.domain import rights_manager
@@ -177,6 +178,8 @@ SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_ONBOARD_REVIEWER: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_REMOVE_REVIEWER: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
@@ -1225,3 +1228,128 @@ def send_account_deleted_email(user_id, user_email):
         feconf.EMAIL_INTENT_ACCOUNT_DELETED, email_subject, email_body,
         feconf.NOREPLY_EMAIL_ADDRESS, bcc_admin=True,
         recipient_email=user_email)
+
+
+def send_assigned_community_reviewer_email(
+        user_id, review_item, language_code=None):
+    """Sends an email to user who is assigned as a reviewer.
+
+    Args:
+        user_id: str. The ID of the user.
+        review_item: str. The item which user can review.
+        language_code: None|str. The language code for a language if the review
+            item is translation or voiceover else None.
+    """
+    email_subject = 'You have been invited to review Oppia %s' % (
+        review_item)
+
+    if review_item in [
+            constants.REVIEWABLE_ITEM_TRANSLATION,
+            constants.REVIEWABLE_ITEM_VOICEOVER]:
+        review_item_type = 'suggestions' if review_item == (
+            constants.REVIEWABLE_ITEM_TRANSLATION) else 'applications'
+        language_description = utils.get_supported_audio_language_description(
+            language_code).capitalize()
+        # Adding 's' at the end of 'translation' to make it 'translations'.
+        review_item_description = (
+            '%s-language %s' % (language_description, review_item + 's'))
+        reviewer_rights_message = (
+            'review %s %s made by contributors in the %s language' % (
+                review_item, review_item_type, language_description))
+    else:
+        review_item_type = 'suggestions'
+        # Adding 's' at the end of 'question' to make it 'questions'.
+        review_item_description = review_item + 's'
+        reviewer_rights_message = (
+            'review %s %s made by contributors' % (
+                review_item, review_item_type))
+
+    email_body_template = (
+        'Hi %s,<br><br>'
+        'This is to let you know that the Oppia team has added you as a '
+        'reviewer for %s. This allows you to %s.<br><br>'
+        'You can check the %s %s waiting for review in the '
+        'Community dashboard.<br><br>'
+        'Thanks, and happy contributing!<br><br>'
+        'Best wishes,<br>'
+        'The Oppia Community')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    recipient_user_settings = user_services.get_user_settings(user_id)
+    can_user_receive_email = user_services.get_email_preferences(
+        user_id).can_receive_email_updates
+
+    # Send email only if recipient wants to receive.
+    if can_user_receive_email:
+        email_body = email_body_template % (
+            recipient_user_settings.username, review_item_description,
+            reviewer_rights_message, review_item, review_item_type)
+        _send_email(
+            user_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_ONBOARD_REVIEWER, email_subject, email_body,
+            feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_removed_community_reviewer_email(
+        user_id, review_item, language_code=None):
+    """Sends an email to user who is removed from the reviewer position.
+
+    Args:
+        user_id: str. The ID of the user.
+        review_item: str. The item which for which review role is removed.
+        language_code: None|str. The language code for a language if the review
+            item is translation or voiceover else None.
+    """
+    email_subject = 'You have been unassigned as a %s reviewer' % (
+        review_item)
+
+    if review_item in [
+            constants.REVIEWABLE_ITEM_TRANSLATION,
+            constants.REVIEWABLE_ITEM_VOICEOVER]:
+        review_item_type = 'suggestions' if review_item == (
+            constants.REVIEWABLE_ITEM_TRANSLATION) else 'applications'
+        language_description = utils.get_supported_audio_language_description(
+            language_code).capitalize()
+        reviewer_role_description = (
+            '%s reviewer role in the %s-language' % (
+                review_item, language_description))
+        reviewer_rights_message = (
+            'review %s %s made by contributors in the %s language' % (
+                review_item, review_item_type, language_description))
+    else:
+        review_item_type = 'suggestions'
+        # Adding 's' at the end of 'question' to make it 'questions'.
+        reviewer_role_description = '%s reviewer role' % review_item
+        reviewer_rights_message = (
+            'review %s %s made by contributors' % (
+                review_item, review_item_type))
+
+    email_body_template = (
+        'Hi %s,<br><br>'
+        'The Oppia team has removed you from the %s. You won\'t be able to %s '
+        'any more, but you can still contribute %s through the '
+        'Community dashboard.<br><br>'
+        'Thanks, and happy contributing!<br><br>'
+        'Best wishes,<br>'
+        'The Oppia Community')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    recipient_user_settings = user_services.get_user_settings(user_id)
+    can_user_receive_email = user_services.get_email_preferences(
+        user_id).can_receive_email_updates
+
+    # Send email only if recipient wants to receive.
+    if can_user_receive_email:
+        email_body = email_body_template % (
+            recipient_user_settings.username, reviewer_role_description,
+            reviewer_rights_message, review_item)
+        _send_email(
+            user_id, feconf.SYSTEM_COMMITTER_ID,
+            feconf.EMAIL_INTENT_REMOVE_REVIEWER, email_subject, email_body,
+            feconf.NOREPLY_EMAIL_ADDRESS)
