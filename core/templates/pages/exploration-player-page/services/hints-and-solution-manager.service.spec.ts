@@ -39,6 +39,8 @@ describe('HintsAndSolutionManager service', function() {
   var hof;
   var sof;
   var EVENT_NEW_CARD_AVAILABLE;
+  var firstHint, secondHint, thirdHint;
+  var solution;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -65,74 +67,76 @@ describe('HintsAndSolutionManager service', function() {
     sof = $injector.get('SolutionObjectFactory');
     EVENT_NEW_CARD_AVAILABLE = $injector.get('EVENT_NEW_CARD_AVAILABLE');
 
-    // Initialize the service with two hints and a solution.
-    hasms.reset([
-      hof.createFromBackendDict({
-        hint_content: {
-          html: 'one',
-          audio_translations: {}
-        }
-      }), hof.createFromBackendDict({
-        hint_content: {
-          html: 'two',
-          audio_translations: {}
-        }
-      })
-    ], sof.createFromBackendDict({
+    firstHint = hof.createFromBackendDict({
+      hint_content: {
+        html: 'one',
+        audio_translations: {}
+      }
+    });
+    secondHint = hof.createFromBackendDict({
+      hint_content: {
+        html: 'two',
+        audio_translations: {}
+      }
+    });
+    thirdHint = hof.createFromBackendDict({
+      hint_content: {
+        html: 'three',
+        audio_translations: {}
+      }
+    });
+    solution = sof.createFromBackendDict({
       answer_is_exclusive: false,
       correct_answer: 'This is a correct answer!',
       explanation: {
         html: 'This is the explanation to the answer',
         audio_translations: {}
       }
-    }));
+    });
+
+    // Initialize the service with two hints and a solution.
+    hasms.reset([firstHint, secondHint], solution);
   }));
 
   it('should display hints at the right times', function() {
+    expect(hasms.isHintTooltipOpen()).toBe(false);
     expect(hasms.isHintViewable(0)).toBe(false);
     expect(hasms.isHintViewable(1)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.isHintConsumed(0)).toBe(false);
+    expect(hasms.isHintConsumed(1)).toBe(false);
 
+    // For releaseHint.
+    $timeout.flush();
+    // For showTooltip (called only in the first call of releaseHint).
     $timeout.flush();
 
-    // The first hint becomes viewable.
+    expect(hasms.isHintTooltipOpen()).toBe(true);
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
-
-    // No additional hints become viewable because the first hint has not been
-    // consumed yet.
-
-    expect(hasms.isHintViewable(0)).toBe(true);
-    expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.isSolutionViewable()).toBe(false);
-
-    // The first hint is consumed, but a delay is needed for the second hint to
-    // be viewable.
     expect(hasms.displayHint(0).getHtml()).toBe('one');
-    expect(hasms.isHintViewable(0)).toBe(true);
-    expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.isHintConsumed(0)).toBe(true);
+    expect(hasms.isHintConsumed(1)).toBe(false);
 
     $timeout.flush();
 
-    // The second hint is now available, but has not been consumed yet.
+    // displayHint hides tooltip.
+    expect(hasms.isHintTooltipOpen()).toBe(false);
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(true);
     expect(hasms.isSolutionViewable()).toBe(false);
-
-    // The second hint is consumed, but a delay is needed for the solution to
-    // be viewable. Previous hints are still viewable, too.
+    expect(hasms.displayHint(0).getHtml()).toBe('one');
     expect(hasms.displayHint(1).getHtml()).toBe('two');
-    expect(hasms.displayHint(0).getHtml()).toBe('one');
-    expect(hasms.isHintViewable(0)).toBe(true);
-    expect(hasms.isHintViewable(1)).toBe(true);
-    expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.displayHint(3)).toBeNull();
+    expect(hasms.isHintConsumed(0)).toBe(true);
+    expect(hasms.isHintConsumed(1)).toBe(true);
 
     $timeout.flush();
 
-    // The solution is now viewable.
     expect(hasms.isSolutionViewable()).toBe(true);
+
+    $timeout.verifyNoPendingTasks();
   });
 
   it('should not continue to display hints after after a correct answer is' +
@@ -140,27 +144,27 @@ describe('HintsAndSolutionManager service', function() {
     expect(hasms.isHintViewable(0)).toBe(false);
     expect(hasms.isHintViewable(1)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.isHintConsumed(0)).toBe(false);
+    expect(hasms.isHintConsumed(1)).toBe(false);
 
     $timeout.flush();
-    // The first hint becomes viewable.
-    expect(hasms.isHintViewable(0)).toBe(true);
-    expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.isSolutionViewable()).toBe(false);
 
-    // The first hint is consumed, but a delay is needed for the second hint
-    // to be viewable.
-    expect(hasms.displayHint(0).getHtml()).toBe('one');
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.displayHint(0).getHtml()).toBe('one');
+    expect(hasms.isHintConsumed(0)).toBe(true);
+    expect(hasms.isHintConsumed(1)).toBe(false);
 
     $rootScope.$broadcast(EVENT_NEW_CARD_AVAILABLE);
     $timeout.flush();
 
-    // Because a correct answer was submitted, the next hint should not be
-    // available.
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(false);
+    expect(hasms.displayHint(0).getHtml()).toBe('one');
+    expect(hasms.displayHint(1)).toBeNull();
+    expect(hasms.isHintConsumed(0)).toBe(true);
+    expect(hasms.isHintConsumed(1)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
 
     $timeout.verifyNoPendingTasks();
@@ -171,9 +175,124 @@ describe('HintsAndSolutionManager service', function() {
   });
 
   it('should correctly retrieve the solution', function() {
+    $timeout.flush();
+
     expect(hasms.isSolutionConsumed()).toBe(false);
     expect(hasms.displaySolution().correctAnswer).toBe(
       'This is a correct answer!');
     expect(hasms.isSolutionConsumed()).toBe(true);
+
+    $timeout.verifyNoPendingTasks();
+  });
+
+  it('should reset the service', function() {
+    hasms.reset([firstHint, secondHint, thirdHint], solution);
+    expect(hasms.getNumHints()).toBe(3);
+
+    expect(hasms.isHintViewable(0)).toBe(false);
+    expect(hasms.isHintViewable(1)).toBe(false);
+    expect(hasms.isHintViewable(2)).toBe(false);
+    expect(hasms.isSolutionViewable()).toBe(false);
+
+    $timeout.flush();
+
+    expect(hasms.isHintViewable(0)).toBe(true);
+    expect(hasms.isHintViewable(1)).toBe(false);
+    expect(hasms.isHintViewable(2)).toBe(false);
+    expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.displayHint(0).getHtml()).toBe('one');
+
+    $timeout.flush();
+
+    expect(hasms.isHintViewable(0)).toBe(true);
+    expect(hasms.isHintViewable(1)).toBe(true);
+    expect(hasms.isHintViewable(2)).toBe(false);
+    expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.displayHint(0).getHtml()).toBe('one');
+    expect(hasms.displayHint(1).getHtml()).toBe('two');
+
+    $timeout.flush();
+
+    expect(hasms.isHintViewable(0)).toBe(true);
+    expect(hasms.isHintViewable(1)).toBe(true);
+    expect(hasms.isHintViewable(2)).toBe(true);
+    expect(hasms.isSolutionViewable()).toBe(false);
+    expect(hasms.displayHint(0).getHtml()).toBe('one');
+    expect(hasms.displayHint(1).getHtml()).toBe('two');
+    expect(hasms.displayHint(2).getHtml()).toBe('three');
+
+    $timeout.flush();
+
+    expect(hasms.isSolutionViewable()).toBe(true);
+  });
+
+  it('should reset the service when timeouts was called before', function() {
+    // Set timeout.
+    $timeout.flush();
+    // Set tooltipTimeout.
+    $timeout.flush();
+
+    // Reset service to 0 solutions so releaseHint timeout won't be called.
+    hasms.reset([], solution);
+
+    // There is no timeout to flush. timeout and tooltipTimeout variables
+    // were cleaned.
+    expect(function() {
+      $timeout.flush();
+    }).toThrow(Error('No deferred tasks to be flushed'));
+    $timeout.verifyNoPendingTasks();
+  });
+
+  it('should not record the wrong answer when a hint is already released',
+    function() {
+      expect(hasms.isHintTooltipOpen()).toBe(false);
+      expect(hasms.isHintViewable(0)).toBe(false);
+      expect(hasms.isHintViewable(1)).toBe(false);
+      expect(hasms.isSolutionViewable()).toBe(false);
+
+      $timeout.flush();
+      $timeout.flush();
+
+      expect(hasms.isHintTooltipOpen()).toBe(true);
+      // It only changes hint visibility.
+      expect(hasms.isHintViewable(0)).toBe(true);
+      expect(hasms.isHintViewable(1)).toBe(false);
+      expect(hasms.isHintViewable(2)).toBe(false);
+      expect(hasms.isSolutionViewable()).toBe(false);
+
+      hasms.recordWrongAnswer();
+      $timeout.verifyNoPendingTasks();
+
+      expect(hasms.isHintTooltipOpen()).toBe(true);
+      expect(hasms.isHintViewable(0)).toBe(true);
+      expect(hasms.isHintViewable(1)).toBe(false);
+      expect(hasms.isSolutionViewable()).toBe(false);
+    });
+
+  it('should record the wrong answer twice', function() {
+    expect(hasms.isHintTooltipOpen()).toBe(false);
+    expect(hasms.isHintViewable(0)).toBe(false);
+    expect(hasms.isHintViewable(1)).toBe(false);
+    expect(hasms.isSolutionViewable()).toBe(false);
+
+    hasms.recordWrongAnswer();
+    hasms.recordWrongAnswer();
+    $timeout.flush(10000);
+    $timeout.flush(60000);
+    expect(hasms.isHintTooltipOpen()).toBe(true);
+
+    hasms.displayHint(0);
+
+    hasms.recordWrongAnswer();
+    $timeout.flush(10000);
+
+    $timeout.flush(60000);
+
+    expect(hasms.isHintTooltipOpen()).toBe(false);
+    expect(hasms.isHintViewable(0)).toBe(true);
+    expect(hasms.isHintViewable(1)).toBe(true);
+    expect(hasms.isSolutionViewable()).toBe(false);
+
+    $timeout.verifyNoPendingTasks();
   });
 });

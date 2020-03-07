@@ -83,6 +83,16 @@ export class NumericInputValidationService {
     };
 
     var ranges = [];
+    var raiseWarningForRuleIsInclusivelyBetween = function(ruleIndex,
+        answerGroupIndex) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: (
+          'In Rule ' + (ruleIndex + 1) + ' from answer group ' +
+          (answerGroupIndex + 1) + ', Please ensure that the second number ' +
+          'is greater than the first number.')
+      });
+    };
     for (var i = 0; i < answerGroups.length; i++) {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
@@ -103,6 +113,9 @@ export class NumericInputValidationService {
           case 'IsInclusivelyBetween':
             var a = rule.inputs.a;
             var b = rule.inputs.b;
+            if (a > b) {
+              raiseWarningForRuleIsInclusivelyBetween(j, i);
+            }
             setLowerAndUpperBounds(range, a, b, true, true);
             break;
           case 'IsGreaterThan':
