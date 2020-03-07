@@ -2104,6 +2104,11 @@ class UserCommunityRightsModelTests(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            user_models.UserCommunityRightsModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.COPY)
+
 
 class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     """Tests for PendingDeletionRequestModel."""

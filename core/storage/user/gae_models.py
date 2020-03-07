@@ -2098,6 +2098,47 @@ class UserCommunityRightsModel(base_models.BaseModel):
         """
         return cls.get_by_id(user_id) is not None
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserCommunityRightsModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of UserCommunityRightsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
+
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Exports the data from UserCommunityRightsModel
+        into dict format.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from UserCommunityRightsModel.
+        """
+        rights_model = cls.get_by_id(user_id)
+        return {
+            'can_review_translation_for_language_codes': (
+                rights_model.can_review_translation_for_language_codes),
+            'can_review_voiceover_for_language_codes': (
+                rights_model.can_review_translation_for_language_codes),
+            'can_review_questions': rights_model.can_review_questions
+        }
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
     @classmethod
     def get_translation_reviewer_user_id(cls, language_code):
         """Returns the ID of the users who has rights to review translation in
