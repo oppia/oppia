@@ -32,6 +32,7 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # NOTE TO REVIEWERS: Please be circumspect about any PRs which delete elements
 # from this list.
 FULLY_COVERED_FILENAMES = [
+    'about-page.controller.ts',
     'admin-config-tab-backend-api.service.ts',
     'admin-data.service.ts',
     'admin-page.constants.ajs.ts',
@@ -113,6 +114,7 @@ FULLY_COVERED_FILENAMES = [
     'editor-domain.constants.ajs.ts',
     'editor-domain.constants.ts',
     'editor-first-time-events.service.ts',
+    'email-dashboard-page.controller.ts',
     'end-exploration-rules.service.ts',
     'end-exploration-validation.service.ts',
     'EndExploration.ts',
@@ -204,6 +206,7 @@ FULLY_COVERED_FILENAMES = [
     'logic-proof-rules.service.ts',
     'logic-proof-validation.service.ts',
     'LogicProof.ts',
+    'mark-all-audio-and-translations-as-needing-update.controller.ts',
     'MathExpressionInput.ts',
     'mathjaxConfig.ts',
     'meta-tag-customization.service.ts',
@@ -217,6 +220,7 @@ FULLY_COVERED_FILENAMES = [
     'nested-directives-recursion-timeout-prevention.service.ts',
     'normalize-whitespace.filter.ts',
     'normalize-whitespace.pipe.ts',
+    'notifications-dashboard-page.controller.ts',
     'number-attempts.service.ts',
     'number-with-units-rules.service.ts',
     'NumberWithUnits.ts',
@@ -295,6 +299,7 @@ FULLY_COVERED_FILENAMES = [
     'solution-validity.service.ts',
     'solution-verification.service.ts',
     'SolutionObjectFactory.ts',
+    'splash-page.controller.ts',
     'state-classifier-mapping.service.ts',
     'state-content.service.ts',
     'state-customization-args.service.ts',
@@ -330,6 +335,7 @@ FULLY_COVERED_FILENAMES = [
     'suggestions.service.ts',
     'SuggestionThreadObjectFactory.ts',
     'summarize-nonnegative-number.filter.ts',
+    'teach-page.controller.ts',
     'test.extras.ts',
     'text-input-prediction.service.ts',
     'text-input-rules.service.ts',
