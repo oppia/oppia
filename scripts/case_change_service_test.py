@@ -42,39 +42,66 @@ class CheckCaseChangeServiceTests(test_utils.GenericTestBase):
             self.assertEqual(result, expected_result)
 
     def test_camelize(self):
-        test_object = [
+        test_objects = [
+            [
+                {
+                    'key_one': 0,
+                    'key_two': {
+                        'key_three': 0,
+                        'key_four': [
+                            {
+                                'key_five': 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    'keySix': 0
+                }
+            ],
             {
-                'key_one': 0,
+                'key_one': 'value_one',
                 'key_two': {
-                    'key_three': 0,
-                    'key_four': [
-                        {
-                            'key_five': 0
-                        }
-                    ]
+                    'key_Three': 'value_two'
                 }
             },
-            {
-                'keySix': 0
-            }
+            [
+                'string_one',
+                'string_two'
+            ]
         ]
 
-        expected_result = [
+        expected_results = [
+            [
+                {
+                    'keyOne': 0,
+                    'keyTwo': {
+                        'keyThree': 0,
+                        'keyFour': [
+                            {
+                                'keyFive': 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    'keySix': 0
+                }
+            ],
             {
-                'keyOne': 0,
+                'keyOne': 'value_one',
                 'keyTwo': {
-                    'keyThree': 0,
-                    'keyFour': [
-                        {
-                            'keyFive': 0
-                        }
-                    ]
+                    'keyThree': 'value_two'
                 }
             },
-            {
-                'keySix': 0
-            }
+            [
+                'string_one',
+                'string_two'
+            ]
         ]
 
-        result = case_change_service.camelize(test_object)
-        self.assertEqual(result, expected_result)
+        for i in python_utils.RANGE(len(test_objects)):
+            test_object = test_objects[i]
+            expected_result = expected_results[i]
+            result = case_change_service.camelize(test_object)
+            self.assertEqual(result, expected_result)
