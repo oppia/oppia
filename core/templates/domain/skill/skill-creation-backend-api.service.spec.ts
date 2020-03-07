@@ -29,9 +29,9 @@ import { SkillCreationBackendApiService, IRubricBackend,
 describe('Topic creation backend api service', () => {
   let csrfService: CsrfTokenService = null;
   let httpTestingController: HttpTestingController = null;
-  let skillCreationBackendApiService:SkillCreationBackendApiService = null;
-  let rubricDict:IRubricBackend = null;
-  let postData:ISkillCreationBackend = null;
+  let skillCreationBackendApiService: SkillCreationBackendApiService = null;
+  let rubricDict: IRubricBackend = null;
+  let postData: ISkillCreationBackend = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -47,6 +47,7 @@ describe('Topic creation backend api service', () => {
         resolve('sample-csrf-token');
       });
     });
+
     rubricDict = {
       explanation: 'test-explanation',
       difficulty: 'test-difficulty'
@@ -95,9 +96,9 @@ describe('Topic creation backend api service', () => {
       let req = httpTestingController.expectOne(
         '/skill_editor_handler/create_new');
       req.error(new ErrorEvent('Error'), errorResponse);
-      flushMicrotasks();
       expect(req.request.method).toEqual('POST');
       expect(req.request.body).toEqual(postData);
+      flushMicrotasks();
       expect(failHandler).toHaveBeenCalled();
       expect(successHandler).not.toHaveBeenCalled();
     }));
