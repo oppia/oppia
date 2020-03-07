@@ -303,8 +303,8 @@ describe('User Service', function() {
       UserService.getUserCommunityRightsData().then(
         function(userCommunityRights) {
           expect(userCommunityRights).toEqual(sampleUserCommunityRightsDict);
-          // Fetch userInfo again.
-          UserService.getUserInfoAsync().then(function(
+          // Fetch userCommunityRightsInfo again.
+          UserService.getUserCommunityRightsData().then(function(
               sameUserCommunityRights) {
             expect(sameUserCommunityRights).toEqual(
               sampleUserCommunityRightsDict);
