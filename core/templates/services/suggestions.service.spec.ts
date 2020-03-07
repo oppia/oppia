@@ -16,14 +16,18 @@
  * @fileoverview Unit tests for SuggestionsService.
  */
 
+import { TestBed } from '@angular/core/testing';
+
 import { SuggestionsService } from 'services/suggestions.service';
 
 describe('SuggestionsService', () => {
-  let service: SuggestionsService = new SuggestionsService();
+  beforeEach(() => {
+    this.service = TestBed.get(SuggestionsService);
+  });
 
   describe('getThreadIdFromSuggestionBackendDict', () => {
     it('returns the suggestion id of the backend dict', () => {
-      expect(service.getThreadIdFromSuggestionBackendDict({
+      expect(this.service.getThreadIdFromSuggestionBackendDict({
         suggestion_id: 'exploration.exp1.abc1'
       })).toEqual('exploration.exp1.abc1');
     });

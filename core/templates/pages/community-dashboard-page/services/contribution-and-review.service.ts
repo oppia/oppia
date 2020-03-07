@@ -16,11 +16,7 @@
  * @fileoverview Service for fetching and resolving suggestions.
  */
 
-require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
-require('domain/suggestion/SuggestionObjectFactory.ts');
-require('domain/suggestion/SuggestionThreadObjectFactory.ts');
-require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('services/alerts.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');

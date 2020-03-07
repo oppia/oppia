@@ -46,6 +46,7 @@ export class ThreadMessageSummaryObjectFactory {
       threadMessageBackendDict.text);
   }
 }
+
 angular.module('oppia').factory(
   'ThreadMessageSummaryObjectFactory',
   downgradeInjectable(ThreadMessageSummaryObjectFactory));

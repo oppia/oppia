@@ -19,22 +19,28 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // thread-data.service.ts is upgraded to Angular 8.
-import { FeedbackThread } from
-  'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 
+require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
+require('domain/suggestion/SuggestionThreadObjectFactory.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
+require('pages/exploration-editor-page/services/exploration-data.service.ts');
+require('services/alerts.service.ts');
+require('services/suggestions.service.ts');
 
 describe('retrieving threads service', () => {
   var $httpBackend = null;
   var $q = null;
   var $rootScope = null;
-  var CsrfService = null;
+  var CsrfTokenService = null;
   var FeedbackThreadObjectFactory = null;
+  var SuggestionThreadObjectFactory = null;
   var ThreadDataService = null;
 
-  beforeEach(angular.mock.module('oppia', $provide => {
+  beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
@@ -44,15 +50,17 @@ describe('retrieving threads service', () => {
     $provide.value('ExplorationDataService', { explorationId: this.expId });
   }));
 
-  beforeEach(angular.mock.inject($injector => {
+  beforeEach(angular.mock.inject(function($injector) {
     $httpBackend = $injector.get('$httpBackend');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    CsrfService = $injector.get('CsrfTokenService');
+    CsrfTokenService = $injector.get('CsrfTokenService')
     FeedbackThreadObjectFactory = $injector.get('FeedbackThreadObjectFactory');
+    SuggestionThreadObjectFactory =
+      $injector.get('SuggestionThreadObjectFactory');
     ThreadDataService = $injector.get('ThreadDataService');
 
-    spyOn(CsrfService, 'getTokenAsync')
+    spyOn(CsrfTokenService, 'getTokenAsync')
       .and.returnValue($q.resolve('sample-csrf-token'));
   }));
 
@@ -114,24 +122,52 @@ describe('retrieving threads service', () => {
         target_version_at_submission: 1,
       }
     ];
+    this.mockMessages = [
+      {
+        author_username: 'author',
+        created_on: 1000,
+        entity_type: 'exploration',
+        entity_id: 'exploration.exp1.abc1',
+        message_id: 0,
+        received_via_email: false,
+        text: '1st message',
+        updated_status: null,
+        updated_subject: null
+      },
+      {
+        author_username: 'author',
+        created_on: 1200,
+        entity_type: 'exploration',
+        entity_id: 'exploration.exp1.abc1',
+        message_id: 1,
+        received_via_email: false,
+        text: '2nd message',
+        updated_status: null,
+        updated_subject: null
+      }
+    ];
   });
 
   it('should retrieve feedback threads and suggestion thread', done => {
-    $httpBackend.whenGET('/threadlisthandler/' + this.expId).respond({
+    $httpBackend.whenGET('/threadlisthandler/exp1').respond({
       feedback_thread_dicts: this.mockFeedbackThreads,
       suggestion_thread_dicts: this.mockSuggestionThreads
     });
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=' + this.expId)
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1')
       .respond({ suggestions: this.mockSuggestions });
 
     ThreadDataService.fetchThreads().then(
       threadData => {
+        expect(threadData.feedbackThreads.length)
+          .toEqual(this.mockFeedbackThreads.length);
         for (var i = 0; i < this.mockFeedbackThreads.length; ++i) {
           let expectedThreadId = this.mockFeedbackThreads[i].thread_id;
           let actualThreadId = threadData.feedbackThreads[i].threadId;
           expect(actualThreadId).toEqual(expectedThreadId);
         }
+        expect(threadData.suggestionThreads.length)
+          .toEqual(this.mockSuggestionThreads.length);
         for (var i = 0; i < this.mockSuggestionThreads.length; ++i) {
           let expectedThreadId = this.mockSuggestionThreads[i].thread_id;
           let actualThreadId = threadData.suggestionThreads[i].threadId;
@@ -143,33 +179,65 @@ describe('retrieving threads service', () => {
     $httpBackend.flush();
   });
 
-  it(
-    'should return zero suggestion threads if no suggestion objects are found',
-    done => {
-      $httpBackend.whenGET('/threadlisthandler/' + this.expId).respond({
-        feedback_thread_dicts: [],
-        suggestion_thread_dicts: this.mockSuggestionThreads
-      });
-      $httpBackend.whenGET(
-        '/suggestionlisthandler?target_type=exploration&target_id=' + this.expId)
-        .respond({ suggestions: [] });
-
-      ThreadDataService.fetchThreads().then(
-        threadData => {
-          expect(threadData.suggestionThreads).toEqual([]);
-          done();
-        },
-        done.fail);
-      $httpBackend.flush();
+  it('should call reject handler if any thread is null', done => {
+    $httpBackend.whenGET('/threadlisthandler/exp1').respond({
+      feedback_thread_dicts: [null],
+      suggestion_thread_dicts: []
     });
+    $httpBackend.whenGET(
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1')
+      .respond({ suggestions: [] });
+
+    ThreadDataService.fetchThreads().then(
+      done.fail,
+      error => {
+        expect(error).toMatch('Missing input backend dicts');
+        done();
+      });
+    $httpBackend.flush(2);
+
+    $httpBackend.whenGET('/threadlisthandler/exp1').respond({
+      feedback_thread_dicts: [],
+      suggestion_thread_dicts: [null]
+    });
+    $httpBackend.whenGET(
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1')
+      .respond({ suggestions: this.mockSuggestions });
+
+    ThreadDataService.fetchThreads().then(
+      done.fail,
+      error => {
+        expect(error).toMatch('Missing input backend dicts');
+        done();
+      });
+    $httpBackend.flush(2);
+  });
+
+  it('should call reject handler if suggestions are missing', done => {
+    $httpBackend.whenGET('/threadlisthandler/exp1').respond({
+      feedback_thread_dicts: [],
+      suggestion_thread_dicts: this.mockSuggestionThreads
+    });
+    $httpBackend.whenGET(
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1')
+      .respond({ suggestions: [] });
+
+    ThreadDataService.fetchThreads().then(
+      done.fail,
+      error => {
+        expect(error).toMatch('Missing input backend dicts');
+        done();
+      });
+    $httpBackend.flush();
+  });
 
   it(
     'should use reject handler whenever fetching feedback threads or ' +
     'suggestion threads fails', done => {
-    $httpBackend.whenGET('/threadlisthandler/' + this.expId)
+    $httpBackend.whenGET('/threadlisthandler/exp1')
       .respond(500, 'Error on retriving feedback threads.');
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=' + this.expId)
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1')
       .respond({ suggestions: this.mockSuggestions });
 
     ThreadDataService.fetchThreads().then(
@@ -185,31 +253,8 @@ describe('retrieving threads service', () => {
     var mockThread = this.mockFeedbackThreads[0];
     var thread = FeedbackThreadObjectFactory.createFromBackendDict(mockThread);
 
-    $httpBackend.expectGET('/threadhandler/' + thread.threadId).respond({
-      messages: [
-        {
-          author_username: 'author',
-          created_on: 1000,
-          entity_type: 'exploration',
-          entity_id: 'exploration.exp1.abc1',
-          message_id: 0,
-          received_via_email: false,
-          text: '1st message',
-          updated_status: null,
-          updated_subject: null
-        },
-        {
-          author_username: 'author',
-          created_on: 1200,
-          entity_type: 'exploration',
-          entity_id: 'exploration.exp1.abc1',
-          message_id: 1,
-          received_via_email: false,
-          text: '2nd message',
-          updated_status: null,
-          updated_subject: null
-        }
-      ]
+    $httpBackend.expectGET('/threadhandler/exploration.exp1.abc1').respond({
+      messages: this.mockMessages
     });
     var setMessagesSpy = spyOn(thread, 'setMessages').and.callThrough();
 
@@ -223,7 +268,7 @@ describe('retrieving threads service', () => {
     $httpBackend.flush();
   });
 
-  it('should throw error if trying to fetch messages of null thread', done => {
+  it('should throw error if trying to fetch messages of null thread', () => {
     expect(() => ThreadDataService.fetchMessages(null))
       .toThrowError('Trying to update a non-existent thread');
   });
@@ -234,12 +279,13 @@ describe('retrieving threads service', () => {
 
     var setMessagesSpy = spyOn(thread, 'setMessages').and.callThrough();
 
-    $httpBackend.expectGET('/threadhandler/' + thread.threadId)
+    $httpBackend.expectGET('/threadhandler/exploration.exp1.abc1')
       .respond(500, 'Error on fetching messages from a thread.');
     ThreadDataService.fetchMessages(thread).then(
       done.fail,
       error => {
-        expect(error).toEqual('Error on fetching messages from a thread.');
+        expect(error.data).toEqual('Error on fetching messages from a thread.');
+        expect(error.status).toEqual(500);
         expect(setMessagesSpy).not.toHaveBeenCalled();
         done();
       });
@@ -247,9 +293,8 @@ describe('retrieving threads service', () => {
   });
 
   it('should successfully fetch feedback stats', done => {
-    $httpBackend.expectGET('/feedbackstatshandler/' + this.expId).respond({
-      num_open_threads: 10
-    });
+    $httpBackend.expectGET('/feedbackstatshandler/exp1')
+      .respond({ num_open_threads: 10 });
     ThreadDataService.fetchFeedbackStats().then(
       () => {
         expect(ThreadDataService.getOpenThreadsCount()).toEqual(10);
@@ -260,7 +305,7 @@ describe('retrieving threads service', () => {
   });
 
   it('should use reject handler when fetching feedback stats fails', done => {
-    $httpBackend.expectGET('/feedbackstatshandler/' + this.expId)
+    $httpBackend.expectGET('/feedbackstatshandler/exp1')
       .respond(500, 'Error on fetch feedback stats');
     ThreadDataService.fetchFeedbackStats().then(
       done.fail,
@@ -283,20 +328,21 @@ describe('retrieving threads service', () => {
       thread_id: 'exploration.exp1.jkl1'
     };
 
-    $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=' + this.expId)
-      .respond({ suggestions: [] });
-    $httpBackend.expectPOST('/threadlisthandler/' + this.expId).respond(200);
-    $httpBackend.whenGET('/threadlisthandler/' + this.expId).respond({
+    $httpBackend.expectPOST('/threadlisthandler/exp1').respond(200);
+    $httpBackend.whenGET('/threadlisthandler/exp1').respond({
       feedback_thread_dicts: [mockCreatedFeedbackThread],
-      suggestion_thread_dicts: this.mockSuggestionThreads
+      suggestion_thread_dicts: []
     });
+    $httpBackend.whenGET(
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1')
+      .respond({ suggestions: [] });
 
     expect(ThreadDataService.getOpenThreadsCount()).toEqual(0);
     ThreadDataService.createNewThread(subject, 'Text').then(
       threadData => {
+        expect(threadData.feedbackThreads.length).toEqual(1);
         expect(threadData.feedbackThreads[0].threadId)
-        .toEqual('exploration.exp1.jkl1');
+          .toEqual('exploration.exp1.jkl1');
         expect(ThreadDataService.getOpenThreadsCount()).toEqual(1);
         done();
       },
@@ -306,11 +352,9 @@ describe('retrieving threads service', () => {
 
   it('should use reject handler when creating a new thread fails', () => {
     expect(ThreadDataService.getOpenThreadsCount()).toEqual(0);
-
-    $httpBackend.expectPOST('/threadlisthandler/' + this.expId).respond(500);
+    $httpBackend.expectPOST('/threadlisthandler/exp1').respond(500);
     ThreadDataService.createNewThread('Subject', 'Text');
     $httpBackend.flush();
-
     expect(ThreadDataService.getOpenThreadsCount()).toEqual(0);
   });
 
@@ -318,7 +362,7 @@ describe('retrieving threads service', () => {
     var mockThread = this.mockFeedbackThreads[0];
     var thread = FeedbackThreadObjectFactory.createFromBackendDict(mockThread);
     $httpBackend.expectPOST(
-      '/feedbackhandler/thread_view_event/' + thread.threadId).respond(200);
+      '/feedbackhandler/thread_view_event/exploration.exp1.abc1').respond(200);
     ThreadDataService.markThreadAsSeen(thread).then(done, done.fail);
     $httpBackend.flush();
   });
@@ -332,7 +376,7 @@ describe('retrieving threads service', () => {
     var mockThread = this.mockFeedbackThreads[0];
     var thread = FeedbackThreadObjectFactory.createFromBackendDict(mockThread);
     $httpBackend.expectPOST(
-      '/feedbackhandler/thread_view_event/' + thread.threadId).respond(500);
+      '/feedbackhandler/thread_view_event/exploration.exp1.abc1').respond(500);
     ThreadDataService.markThreadAsSeen(thread).then(
       done.fail,
       error => {
@@ -354,17 +398,17 @@ describe('retrieving threads service', () => {
     var thread = FeedbackThreadObjectFactory.createFromBackendDict(mockThread);
 
     // Fetch feedback stats
-    $httpBackend.expectGET('/feedbackstatshandler/' + this.expId).respond({
-      num_open_threads: 1
-    });
+    $httpBackend.expectGET('/feedbackstatshandler/exp1')
+      .respond({ num_open_threads: 1 });
     ThreadDataService.fetchFeedbackStats();
     $httpBackend.flush();
     expect(ThreadDataService.getOpenThreadsCount()).toEqual(1);
 
-    $httpBackend.expectPOST('/threadhandler/' + thread.threadId)
-      .respond(200, {});
-    $httpBackend.expectGET('/threadhandler/' + thread.threadId)
-      .respond({});
+    $httpBackend.expectPOST('/threadhandler/exploration.exp1.abc1')
+      .respond(200);
+    $httpBackend.expectGET('/threadhandler/exploration.exp1.abc1')
+      .respond({ messages: [] });
+
     ThreadDataService.addNewMessage(thread, 'Message', 'close').then(
       () => {
         expect(ThreadDataService.getOpenThreadsCount()).toEqual(0);
@@ -378,21 +422,21 @@ describe('retrieving threads service', () => {
     'should successfully add a new message in a thread when its status ' +
     'is different of old status and its status is open', done => {
     var mockThread = this.mockFeedbackThreads[0];
+    mockThread.status = 'close';
     var thread = FeedbackThreadObjectFactory.createFromBackendDict(mockThread);
 
-    mockThread.status = 'close';
-
     // Fetch feedback stats
-    $httpBackend.expectGET('/feedbackstatshandler/' + this.expId).respond({
+    $httpBackend.expectGET('/feedbackstatshandler/exp1').respond({
       num_open_threads: 1
     });
     ThreadDataService.fetchFeedbackStats();
     $httpBackend.flush();
     expect(ThreadDataService.getOpenThreadsCount()).toEqual(1);
 
-    $httpBackend.expectPOST('/threadhandler/' + thread.threadId)
-      .respond(200, {});
-    $httpBackend.expectGET('/threadhandler/' + thread.threadId).respond({});
+    $httpBackend.expectPOST('/threadhandler/exploration.exp1.abc1')
+      .respond(200);
+    $httpBackend.expectGET('/threadhandler/exploration.exp1.abc1')
+      .respond({ messages: [] });
     ThreadDataService.addNewMessage(thread, 'Message', 'open').then(
       () => {
         expect(ThreadDataService.getOpenThreadsCount()).toEqual(2);
@@ -409,16 +453,17 @@ describe('retrieving threads service', () => {
     var thread = FeedbackThreadObjectFactory.createFromBackendDict(mockThread);
 
     // Fetch feedback stats
-    $httpBackend.expectGET('/feedbackstatshandler/' + this.expId).respond({
+    $httpBackend.expectGET('/feedbackstatshandler/exp1').respond({
       num_open_threads: 1
     });
     ThreadDataService.fetchFeedbackStats();
     $httpBackend.flush();
     expect(ThreadDataService.getOpenThreadsCount()).toEqual(1);
 
-    $httpBackend.expectPOST('/threadhandler/' + thread.threadId)
-      .respond(200, {});
-    $httpBackend.expectGET('/threadhandler/' + thread.threadId).respond({});
+    $httpBackend.expectPOST('/threadhandler/exploration.exp1.abc1')
+      .respond(200);
+    $httpBackend.expectGET('/threadhandler/exploration.exp1.abc1')
+      .respond({ messages: [] });
     ThreadDataService.addNewMessage(thread, 'Message', 'open').then(
       () => {
         expect(ThreadDataService.getOpenThreadsCount()).toEqual(1);
@@ -429,29 +474,30 @@ describe('retrieving threads service', () => {
   });
 
   it('should successfully resolve a suggestion', done => {
-    var mockThread = this.mockFeedbackThreads[0];
-    var thread = FeedbackThreadObjectFactory.createFromBackendDict(mockThread);
+    var thread = SuggestionThreadObjectFactory.createFromBackendDicts(
+      this.mockSuggestionThreads[0], this.mockSuggestions[0]);
 
-    $httpBackend.whenGET('/threadlisthandler/' + this.expId).respond({
-      feedback_thread_dicts: this.mockFeedbackThreads,
+    $httpBackend.whenGET('/threadlisthandler/exp1').respond({
+      feedback_thread_dicts: [],
       suggestion_thread_dicts: this.mockSuggestionThreads
     });
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=' + this.expId
-    ).respond({ suggestions: this.mockSuggestions });
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1')
+      .respond({ suggestions: this.mockSuggestions });
     ThreadDataService.fetchThreads();
     $httpBackend.flush();
 
-    $httpBackend.expectGET('/feedbackstatshandler/' + this.expId).respond({
-      num_open_threads: 1
-    });
+    $httpBackend.expectGET('/feedbackstatshandler/exp1')
+      .respond({ num_open_threads: 1 });
     ThreadDataService.fetchFeedbackStats();
     $httpBackend.flush();
     expect(ThreadDataService.getOpenThreadsCount()).toEqual(1);
 
     $httpBackend.expectPUT(
-      '/suggestionactionhandler/exploration/' + this.expId + '/' +
-      thread.threadId).respond(200, {});
+      '/suggestionactionhandler/exploration/exp1/exploration.exp1.ghi3')
+      .respond(200);
+    $httpBackend.expectGET('/threadhandler/exploration.exp1.ghi3')
+      .respond({ messages: [] });
     ThreadDataService.resolveSuggestion(thread, 'Message', 'status', 'a', true)
       .then(
         () => {

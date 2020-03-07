@@ -20,6 +20,7 @@
 require('domain/feedback_message/ThreadMessageObjectFactory.ts');
 require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/alerts.service.ts');
@@ -121,8 +122,6 @@ angular.module('oppia').factory('ThreadDataService', [
             threadsData.feedback_thread_dicts || [];
           let suggestionThreadBackendDicts =
             threadsData.suggestion_thread_dicts || [];
-          console.log(feedbackThreadBackendDicts);
-          console.log(suggestionThreadBackendDicts);
 
           let suggestionBackendDictsByThreadId = {};
           for (let suggestionBackendDict of suggestionBackendDicts) {
@@ -151,21 +150,19 @@ angular.module('oppia').factory('ThreadDataService', [
 
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
-        return $http.get(getThreadHandlerUrl(threadId))
-          .then(response => {
-            let messagesData = response.data.messages || [];
-            return thread.setMessages(messagesData.map(
-              ThreadMessageObjectFactory.createFromBackendDict));
-          });
+        return $http.get(getThreadHandlerUrl(threadId)).then(response => {
+          let messagesData = response.data.messages || [];
+          return thread.setMessages(messagesData.map(
+            ThreadMessageObjectFactory.createFromBackendDict));
+        });
       },
 
       fetchFeedbackStats: function() {
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
-        return $http.get(getFeedbackStatsHandlerUrl())
-          .then(response => {
-            openThreadsCount = response.data.num_open_threads || 0;
-          });
+        return $http.get(getFeedbackStatsHandlerUrl()).then(response => {
+          openThreadsCount = response.data.num_open_threads || 0;
+        });
       },
 
       getOpenThreadsCount: function() {
@@ -183,8 +180,8 @@ angular.module('oppia').factory('ThreadDataService', [
           openThreadsCount += 1;
           return this.fetchThreads();
         },
-        err => {
-          AlertsService.addWarning('Error creating new thread: ' + err + '.');
+        error => {
+          AlertsService.addWarning('Error creating new thread: ' + error + '.');
         });
       },
 
