@@ -64,11 +64,11 @@ angular.module('oppia').directive('questionOpportunities', [
         '$scope', '$uibModal', 'QuestionSuggestionService', 'AlertsService',
         'ContributionOpportunitiesService', 'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'QuestionUndoRedoService',
-        'SkillObjectFactory', 'SkillBackendApiService',
+        'SkillBackendApiService', 'SkillObjectFactory',
         function(
             $scope, $uibModal, QuestionSuggestionService, AlertsService,
-            ContributionOpportunitiesService,MisconceptionObjectFactory,
-            QuestionObjectFactory,QuestionUndoRedoService,
+            ContributionOpportunitiesService, MisconceptionObjectFactory,
+            QuestionObjectFactory, QuestionUndoRedoService,
             SkillBackendApiService, SkillObjectFactory) {
           const ctrl = this;
           const getOpportunity = function(skillId) {

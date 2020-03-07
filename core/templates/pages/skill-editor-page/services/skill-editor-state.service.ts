@@ -19,10 +19,10 @@
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/question-backend-api.service.ts');
-require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/SkillObjectFactory.ts');
-require('domain/skill/skill-rights-backend-api.service.ts');
 require('domain/skill/SkillRightsObjectFactory.ts');
+require('domain/skill/skill-backend-api.service.ts');
+require('domain/skill/skill-rights-backend-api.service.ts');
 require('services/alerts.service.ts');
 require('services/questions-list.service.ts');
 

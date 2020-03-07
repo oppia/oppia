@@ -79,7 +79,7 @@ angular.module('oppia').directive('questionsList', [
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
             $location, AlertsService, QuestionCreationService, UrlService,
             NUM_QUESTIONS_PER_PAGE, EditableQuestionBackendApiService,
-            EkillBackendApiService, MisconceptionObjectFactory,
+            SkillBackendApiService, MisconceptionObjectFactory,
             QuestionObjectFactory, SkillDifficultyObjectFactory,
             SkillSummaryObjectFactory, DEFAULT_SKILL_DIFFICULTY,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, MODE_SELECT_DIFFICULTY,

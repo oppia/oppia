@@ -64,12 +64,12 @@ angular.module('oppia').directive('questionOpportunities', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$uibModal', 'QuestionSuggestionService', 'AlertsService',
-        'ContributionOpportunitiesService', 'SkillBackendApiService',
-        'MisconceptionObjectFactory', 'QuestionObjectFactory',
-        'QuestionUndoRedoService', 'SkillObjectFactory',
+        'ContributionOpportunitiesService', 'MisconceptionObjectFactory',
+        'QuestionObjectFactory', 'QuestionUndoRedoService',
+        'SkillBackendApiService','SkillObjectFactory',
         function(
             $scope, $uibModal, QuestionSuggestionService, AlertsService,
-            ContributionOpportunitiesService,MisconceptionObjectFactory,
+            ContributionOpportunitiesService, MisconceptionObjectFactory,
             QuestionObjectFactory, QuestionUndoRedoService,
             SkillBackendApiService, SkillObjectFactory) {
           const ctrl = this;
@@ -124,8 +124,7 @@ angular.module('oppia').directive('questionOpportunities', [
                 '$scope', '$uibModalInstance', 'DEFAULT_SKILL_DIFFICULTY',
                 'MODE_SELECT_DIFFICULTY', 'SkillDifficultyObjectFactory',
                 function($scope, $uibModalInstance, DEFAULT_SKILL_DIFFICULTY,
-                  MODE_SELECT_DIFFICULTY, SkillDifficultyObjectFactory) {
-
+                    MODE_SELECT_DIFFICULTY, SkillDifficultyObjectFactory) {
                   const init = function() {
                     $scope.instructionMessage = (
                       'Select the skill(s) to link the question to:');
