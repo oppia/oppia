@@ -20,17 +20,18 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { TopicCreationBackendApiService, ITopicCreationBackend } from
   'domain/topic/topic-creation-backend-api.service.ts';
 
 describe('Topic creation backend api service', () => {
-  var csrfService: CsrfTokenService = null;
-  var httpTestingController: HttpTestingController = null;
-  var topicCreationBackendApiService:TopicCreationBackendApiService = null;
-  var postData:ITopicCreationBackend = {
-    name: 'topic-name',
-    abbreviated_name: 'topic-abbr-name'
+  let csrfService: CsrfTokenService = null;
+  let httpTestingController: HttpTestingController = null;
+  let topicCreationBackendApiService: TopicCreationBackendApiService = null;
+  let postData: ITopicCreationBackend = {
+    abbreviated_name: 'topic-abbr-name',
+    name: 'topic-name'
   };
 
   beforeEach(() => {
@@ -61,7 +62,7 @@ describe('Topic creation backend api service', () => {
       topicCreationBackendApiService.createTopic(
         'topic-name', 'topic-abbr-name').then(
         successHandler);
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/topic_editor_handler/create_new');
       expect(req.request.method).toEqual('POST');
       expect(req.request.body).toEqual(postData);
@@ -73,8 +74,8 @@ describe('Topic creation backend api service', () => {
 
   it('should fail to create a new topic and call the fail handler',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
       topicCreationBackendApiService.createTopic(
         'topic-name', 'topic-abbr-name').then(
         successHandler, failHandler);
@@ -83,12 +84,12 @@ describe('Topic creation backend api service', () => {
         status: 404,
         statusText: 'Not Found'
       });
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/topic_editor_handler/create_new');
       req.error(new ErrorEvent('Error'), errorResponse);
-      flushMicrotasks();
       expect(req.request.method).toEqual('POST');
       expect(req.request.body).toEqual(postData);
+      flushMicrotasks();
       expect(failHandler).toHaveBeenCalled();
       expect(successHandler).not.toHaveBeenCalled();
     }));

@@ -36,13 +36,13 @@ export class TopicCreationBackendApiService {
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback:(reason?: any) => void,
       topicName, abbreviatedTopicName): void {
-    let postData:ITopicCreationBackend = {
+    let postData: ITopicCreationBackend = {
       name: topicName,
       abbreviated_name: abbreviatedTopicName
     };
     this.http.post(
       '/topic_editor_handler/create_new', postData).toPromise()
-      .then((response: { topicId:string }) => {
+      .then((response: { topicId: string }) => {
         if (successCallback) {
           successCallback({
             topicId: response.topicId
