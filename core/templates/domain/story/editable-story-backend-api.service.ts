@@ -16,45 +16,53 @@
  * @fileoverview Service to send changes to a story to the backend.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('domain/story/story-domain.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
-angular.module('oppia').factory('EditableStoryBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService',
-  'EDITABLE_STORY_DATA_URL_TEMPLATE', 'STORY_PUBLISH_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService,
-      EDITABLE_STORY_DATA_URL_TEMPLATE, STORY_PUBLISH_URL_TEMPLATE) {
-    var _fetchStory = function(storyId, successCallback, errorCallback) {
-      var storyDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_STORY_DATA_URL_TEMPLATE, {
-          story_id: storyId
-        });
+import { UrlInterpolationService } from 
+  'domain/utilities/url-interpolation.service.ts';
+import { StoryDomainConstants } from 
+  'domain/story/story-domain.constants.ajs.ts';
 
-      $http.get(storyDataUrl).then(function(response) {
-        var story = angular.copy(response.data.story);
-        var topicName = angular.copy(response.data.topic_name);
-        var storyIsPublished = response.data.story_is_published;
-        var skillSummaries = angular.copy(response.data.skill_summaries);
+import cloneDeep from 'lodash/cloneDeep';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class EditableStoryBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private urlInterpolation: UrlInterpolationService) {}
+
+  //is _fetchStoryData needed?
+  private storyDataDict = null;
+  private _fetchStory(
+      storyName: string, successCallback: any, errorCallback: any): any {
+    var editableStoryDataUrl = this.urlInterpolation.interpolateUrl(
+      StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
+        story_name: storyName
+      });
+
+    this.http.get(
+      editableStoryDataUrl, { observe: 'response' }).toPromise().then(
+      (response) => {
+        this.storyDataDict = cloneDeep(response.body);
         if (successCallback) {
-          successCallback({
-            story: story,
-            topicName: topicName,
-            storyIsPublished: storyIsPublished,
-            skillSummaries: skillSummaries
-          });
+          successCallback(this.storyDataDict);
         }
-      }, function(errorResponse) {
+      }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse.data);
+          errorCallback(errorResponse.body);
         }
       });
-    };
+  }
 
-    var _updateStory = function(
+    private _updateStory = function(
         storyId, storyVersion, commitMessage, changeList,
         successCallback, errorCallback) {
-      var editableStoryDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_STORY_DATA_URL_TEMPLATE, {
+      var editableStoryDataUrl = this.urlInterpolation.interpolateUrl(
+        StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
           story_id: storyId
         });
 
@@ -63,65 +71,72 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
         commit_message: commitMessage,
         change_dicts: changeList
       };
-      $http.put(editableStoryDataUrl, putData).then(function(response) {
+
+      this.http.post(
+        editableStoryDataUrl, putData).toPromise().then(
+         (response) => {
         // The returned data is an updated story dict.
-        var story = angular.copy(response.data.story);
+        var story = angular.copy(response.body.story);
 
         if (successCallback) {
           successCallback(story);
         }
       }, function(errorResponse) {
         if (errorCallback) {
-          errorCallback(errorResponse.data);
+          errorCallback(errorResponse.body);
         }
       });
     };
 
-    var _changeStoryPublicationStatus = function(
+    private _changeStoryPublicationStatus = function(
         storyId, newStoryStatusIsPublic, successCallback, errorCallback) {
-      var storyPublishUrl = UrlInterpolationService.interpolateUrl(
-        STORY_PUBLISH_URL_TEMPLATE, {
+      var storyPublishUrl = this.urlInterpolation.interpolateUrl(
+        StoryDomainConstants.STORY_PUBLISH_URL_TEMPLATE, {
           story_id: storyId
         });
 
       var putData = {
         new_story_status_is_public: newStoryStatusIsPublic
       };
-      $http.put(storyPublishUrl, putData).then(function(response) {
+      this.http.post(
+        storyPublishUrl, putData).toPromise().then(
+         (response) => {
         if (successCallback) {
           successCallback();
         }
       }, function(errorResponse) {
         if (errorCallback) {
-          errorCallback(errorResponse.data);
+          errorCallback(errorResponse.body);
         }
       });
     };
 
-    var _deleteStory = function(
+    private _deleteStory = function(
         storyId, successCallback, errorCallback) {
-      var storyDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_STORY_DATA_URL_TEMPLATE, {
+      var storyDataUrl = this.urlInterpolation.interpolateUrl(
+        StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
           story_id: storyId
         });
-      $http['delete'](storyDataUrl).then(function(response) {
+      this.http.delete(
+        storyDataUrl).toPromise().then(
+         (response) => {
         if (successCallback) {
           successCallback(response.status);
         }
       }, function(errorResponse) {
         if (errorCallback) {
-          errorCallback(errorResponse.data);
+          errorCallback(errorResponse.body);
         }
       });
     };
 
-    return {
-      fetchStory: function(storyId) {
-        return $q(function(resolve, reject) {
-          _fetchStory(storyId, resolve, reject);
-        });
-      },
-
+   // return { 
+    fetchStory(storyId: string): Promise<object> {
+      return new Promise((resolve, reject) => {
+        this._fetchStory(storyId, resolve, reject);
+      });
+    }
+  
       /**
        * Updates a story in the backend with the provided story ID.
        * The changes only apply to the story of the given version and the
@@ -132,27 +147,28 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
        * the success callback, if one is provided to the returned promise
        * object. Errors are passed to the error callback, if one is provided.
        */
-      updateStory: function(
-          storyId, storyVersion, commitMessage, changeList) {
-        return $q(function(resolve, reject) {
-          _updateStory(
+      updateStory(storyId: string, storyVersion: string, commitMessage: string, changeList: string): Promise<object> {
+        return new Promise((resolve, reject) => {
+          this._updateStory(
             storyId, storyVersion, commitMessage, changeList,
             resolve, reject);
         });
-      },
+      }
 
-      changeStoryPublicationStatus: function(storyId, newStoryStatusIsPublic) {
-        return $q(function(resolve, reject) {
-          _changeStoryPublicationStatus(
+      changeStoryPublicationStatus(storyId: string, newStoryStatusIsPublic: string): Promise<object> {
+        return new Promise((resolve, reject) => {
+          this._changeStoryPublicationStatus(
             storyId, newStoryStatusIsPublic, resolve, reject);
         });
-      },
+      }
 
-      deleteStory: function(storyId) {
-        return $q(function(resolve, reject) {
-          _deleteStory(storyId, resolve, reject);
+      deleteStory(storyId: string): Promise<object> {
+        return new Promise((resolve, reject) => {
+          this._deleteStory(storyId, resolve, reject);
         });
       }
     };
-  }
-]);
+  
+angular.module('oppia').factory(
+  'EditableStoryBackendApiService', downgradeInjectable(
+    EditableStoryBackendApiService));
