@@ -1863,7 +1863,7 @@ def can_review_question_suggestions(user_id):
 
 def allow_user_review_translation_in_language(user_id, language_code):
     """Allows the user with the given user id to review translation suggestions
-    in the given lanaguge_code.
+    in the given language_code.
 
     Args:
         user_id: str. The unique ID of the user.
@@ -1880,7 +1880,7 @@ def allow_user_review_translation_in_language(user_id, language_code):
 
 def remove_translation_review_rights_in_language(user_id, language_code):
     """Removes the user's review rights to translation suggestions in the given
-    lanaguge_code.
+    language_code.
 
     Args:
         user_id: str. The unique ID of the user.
@@ -1894,7 +1894,7 @@ def remove_translation_review_rights_in_language(user_id, language_code):
 
 def allow_user_review_voiceover_in_language(user_id, language_code):
     """Allows the user with the given user id to review voiceover applications
-    in the given lanaguge_code.
+    in the given language_code.
 
     Args:
         user_id: str. The unique ID of the user.
@@ -1911,7 +1911,7 @@ def allow_user_review_voiceover_in_language(user_id, language_code):
 
 def remove_voiceover_review_rights_in_language(user_id, language_code):
     """Removes the user's review rights to voiceover applications in the given
-    lanaguge_code.
+    language_code.
 
     Args:
         user_id: str. The unique ID of the user.

@@ -19,8 +19,6 @@
 export class AdminPageConstants {
   public static
     ADMIN_ROLE_HANDLER_URL = '/adminrolehandler';
-  public static
-    ADMIN_ADD_REVIEWER_HANDLER_URL = '/adminaddreviewerhandler';
 
   public static ADMIN_HANDLER_URL = '/adminhandler';
   public static
