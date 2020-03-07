@@ -23,10 +23,9 @@ require('domain/skill/SkillObjectFactory.ts');
 require('domain/skill/SkillRightsObjectFactory.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/skill-rights-backend-api.service.ts');
+require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 require('services/alerts.service.ts');
 require('services/questions-list.service.ts');
-
-require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('SkillEditorStateService', [
   '$rootScope', 'AlertsService', 'SkillBackendApiService',
