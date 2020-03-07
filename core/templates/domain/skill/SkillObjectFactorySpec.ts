@@ -16,26 +16,26 @@
  * @fileoverview Unit tests for SkillObjectFactory.
  */
 
+import { TestBed } from '@angular/core/testing';
+
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
-// import predConsts from 'assets/constants';
 import { RubricObjectFactory } from
   'domain/skill/RubricObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory.ts';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { TestBed } from '@angular/core/testing';
 const constants = require('constants.ts');
 
 describe('Skill object factory', () => {
-  let skillObjectFactory:SkillObjectFactory = null;
-  let conceptCardObjectFactory:ConceptCardObjectFactory = null;
-  let rubricObjectFactory:RubricObjectFactory = null;
-  let misconceptionObjectFactory:MisconceptionObjectFactory = null;
+  let skillObjectFactory: SkillObjectFactory = null;
+  let conceptCardObjectFactory: ConceptCardObjectFactory = null;
+  let rubricObjectFactory: RubricObjectFactory = null;
+  let misconceptionObjectFactory: MisconceptionObjectFactory = null;
   let misconceptionDict1 = null;
   let misconceptionDict2 = null;
   let rubricDict = null;

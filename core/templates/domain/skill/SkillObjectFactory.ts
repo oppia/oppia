@@ -30,18 +30,18 @@ export interface ISkillBackendDict {
   'version': number;
 }
 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
 import { ConceptCardObjectFactory, ConceptCard,
   IConceptCardBackendDict } from
   'domain/skill/ConceptCardObjectFactory';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import { MisconceptionObjectFactory, Misconception,
   IMisconceptionBackendDict } from
   'domain/skill/MisconceptionObjectFactory';
 import { RubricObjectFactory, Rubric, IRubricBackendDict } from
   'domain/skill/RubricObjectFactory';
-import { ValidatorsService } from
-  'services/validators.service.ts';
+import { ValidatorsService } from 'services/validators.service.ts';
 const constants = require('constants.ts');
 
 export class Skill {
