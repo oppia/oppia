@@ -27,12 +27,13 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('ThreadDataService', [
-  '$http', '$log', '$q', 'AlertsService', 'ExplorationDataService',
-  'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory',
-  'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED', 'STATUS_IGNORED',
+  '$http', '$q', 'AlertsService', 'ExplorationDataService',
+  'FeedbackThreadObjectFactory', 'LoggerService',
+  'SuggestionThreadObjectFactory', 'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED',
+  'STATUS_IGNORED',
   function(
-      $http, $log, $q, AlertsService, ExplorationDataService,
-      FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
+      $http, $q, AlertsService, ExplorationDataService,
+      FeedbackThreadObjectFactory, LoggerService, SuggestionThreadObjectFactory,
       ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED) {
     var _expId = ExplorationDataService.explorationId;
     var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
@@ -83,8 +84,9 @@ angular.module('oppia').factory('ThreadDataService', [
         _data.suggestionThreads = [];
         if (threadsResponse.suggestion_thread_dicts.length !==
             suggestionsResponse.suggestions.length) {
-          $log.error('Number of suggestion threads doesn\'t match number of' +
-                     'suggestion objects');
+          LoggerService.error(
+            'Number of suggestion threads doesn\'t match number of' +
+            'suggestion objects');
           return _data;
         }
         // TODO(brianrodri@): Move this pairing logic into the backend.
@@ -99,12 +101,16 @@ angular.module('oppia').factory('ThreadDataService', [
           }
         }
         return _data;
+      })['catch'](function(error) {
+        LoggerService.error(error);
       });
     };
 
     var _fetchMessages = function(threadId) {
       return $http.get(_THREAD_HANDLER_PREFIX + threadId).then(function(res) {
         getThreadById(threadId).setMessages(res.data.messages);
+      })['catch'](function(error) {
+        LoggerService.error(error);
       });
     };
 
@@ -131,9 +137,9 @@ angular.module('oppia').factory('ThreadDataService', [
         }).then(function() {
           _openThreadsCount += 1;
           return _fetchThreads();
-        }, function() {
+        })['catch'](function() {
           AlertsService.addWarning('Error creating new thread.');
-        }).then(onSuccess);
+        })['finally'](onSuccess);
       },
       markThreadAsSeen: function(threadId) {
         return $http.post(_FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId, {
@@ -146,7 +152,6 @@ angular.module('oppia').factory('ThreadDataService', [
         if (thread === null) {
           return $q.reject('Can not add message to nonexistent thread.');
         }
-
         var oldStatus = thread.status;
         var updatedStatus = (oldStatus === newStatus) ? null : newStatus;
 
@@ -167,11 +172,11 @@ angular.module('oppia').factory('ThreadDataService', [
         }).then(onSuccess, onFailure);
       },
       resolveSuggestion: function(
-          threadId, action, commitMsg, reviewMsg, audioUpdateRequired,
-          onSuccess, onFailure) {
+          threadId, action, commitMsg, reviewMsg, onSuccess, onFailure) {
         var thread = getThreadById(threadId);
         if (thread === null) {
-          return $q.reject('Can not add message to nonexistent thread.');
+          return $q.reject(
+            'Can not resolve a suggestion to nonexistent thread.');
         }
 
         return $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, {
