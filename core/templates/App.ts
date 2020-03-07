@@ -231,9 +231,16 @@ angular.module('oppia').factory('$exceptionHandler', [
     // [$templateRequest:tpload].
     var TPLOAD_STATUS_CODE_REGEX = (
       new RegExp(/\[\$templateRequest:tpload\].*p1=(.*?)&p2=/));
+    var UNHANDLED_REJECTION_STATUS_CODE_REGEX = (
+      /Possibly unhandled rejection: {.*"status":-1/);
     var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
 
     return function(exception, cause) {
+      // Suppress unhandled rejection errors status code -1
+      // because -1 is the status code for aborted requests.
+      if (UNHANDLED_REJECTION_STATUS_CODE_REGEX.test(exception)) {
+        return;
+      }
       // Exceptions are expected to be of Error type. If an error is thrown
       // with a primitive data type, it must be converted to an Error object
       // so that the error gets logged correctly.
