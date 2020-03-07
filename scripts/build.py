@@ -55,11 +55,11 @@ EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
     'staging_dir': os.path.join('backend_prod_files', 'extensions', ''),
     'out_dir': os.path.join('build', 'extensions', '')
 }
-TEMPLATES_DEV_DIR = os.path.join('templates', 'dev', 'head', '')
+TEMPLATES_DEV_DIR = os.path.join('templates', '')
 TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS = {
-    'dev_dir': os.path.join('core', 'templates', 'dev', 'head', ''),
-    'staging_dir': os.path.join('backend_prod_files', 'templates', 'head', ''),
-    'out_dir': os.path.join('build', 'templates', 'head', '')
+    'dev_dir': os.path.join('core', 'templates', ''),
+    'staging_dir': os.path.join('backend_prod_files', 'templates', ''),
+    'out_dir': os.path.join('build', 'templates', '')
 }
 WEBPACK_DIRNAMES_TO_DIRPATHS = {
     'staging_dir': os.path.join('backend_prod_files', 'webpack_bundles', ''),
@@ -94,7 +94,7 @@ GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc', '.DS_Store')
 
 JS_FILEPATHS_NOT_TO_BUILD = (
     os.path.join(
-        'core', 'templates', 'dev', 'head', 'expressions', 'parser.js'),
+        'core', 'templates', 'expressions', 'parser.js'),
     os.path.join('extensions', 'ckeditor_plugins', 'pre', 'plugin.js')
 )
 
@@ -572,7 +572,7 @@ def build_third_party_libs(third_party_directory_path):
 
 def build_using_webpack():
     """Execute webpack build process. This takes all TypeScript files we have in
-    /templates/dev/head and generates JS bundles according the require() imports
+    /templates and generates JS bundles according the require() imports
     and also compiles HTML pages into the /backend_prod_files/webpack_bundles
     folder. The files are later copied into /build/webpack_bundles.
 
@@ -1082,7 +1082,7 @@ def _verify_filepath_hash(relative_filepath, file_hashes):
         KeyError: The filename's hash cannot be found in the hash dict.
     """
     # Final filepath example:
-    # head/pages/base.240933e7564bd72a4dde42ee23260c5f.html.
+    # pages/base.240933e7564bd72a4dde42ee23260c5f.html.
     if not file_hashes:
         raise ValueError('Hash dict is empty')
 
