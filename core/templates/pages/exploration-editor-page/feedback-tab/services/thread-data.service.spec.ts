@@ -47,7 +47,7 @@ describe('retrieving threads service', () => {
     }
 
     this.expId = 'exp1';
-    $provide.value('ExplorationDataService', { explorationId: this.expId });
+    $provide.value('ContextService', { getExplorationId: () => this.expId });
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

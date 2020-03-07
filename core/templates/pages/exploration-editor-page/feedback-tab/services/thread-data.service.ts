@@ -21,38 +21,37 @@ require('domain/feedback_message/ThreadMessageObjectFactory.ts');
 require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
-require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('services/alerts.service.ts');
-require('services/suggestions.service.ts');
-
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/suggestions.service.ts');
 
 angular.module('oppia').factory('ThreadDataService', [
-  '$http', '$q', 'AlertsService', 'ExplorationDataService',
+  '$http', '$q', 'AlertsService', 'ContextService',
   'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory',
   'SuggestionsService', 'ThreadMessageObjectFactory', 'UrlInterpolationService',
   'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED', 'STATUS_IGNORED', 'STATUS_OPEN',
   function(
-      $http, $q, AlertsService, ExplorationDataService,
+      $http, $q, AlertsService, ContextService,
       FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
       SuggestionsService, ThreadMessageObjectFactory, UrlInterpolationService,
       ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED, STATUS_OPEN) {
     let getFeedbackStatsHandlerUrl = (
       () => UrlInterpolationService.interpolateUrl(
         '/feedbackstatshandler/<exploration_id>', {
-          exploration_id: ExplorationDataService.explorationId
+          exploration_id: ContextService.getExplorationId()
         }));
     let getThreadListHandlerUrl = (
       () => UrlInterpolationService.interpolateUrl(
         '/threadlisthandler/<exploration_id>', {
-          exploration_id: ExplorationDataService.explorationId
+          exploration_id: ContextService.getExplorationId()
         }));
     let getSuggestionActionHandlerUrl = (
       threadId => UrlInterpolationService.interpolateUrl(
         '/suggestionactionhandler/exploration/<exploration_id>/<thread_id>', {
-          exploration_id: ExplorationDataService.explorationId,
+          exploration_id: ContextService.getExplorationId(),
           thread_id: threadId
         }));
     let getThreadHandlerUrl = (
@@ -108,7 +107,7 @@ angular.module('oppia').factory('ThreadDataService', [
         let suggestionsPromise = $http.get(getSuggestionListHandlerUrl(), {
           params: {
             target_type: 'exploration',
-            target_id: ExplorationDataService.explorationId
+            target_id: ContextService.getExplorationId()
           }
         });
         // TODO(#8016): Move this $http call to a backend-api.service with unit
