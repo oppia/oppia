@@ -165,7 +165,7 @@ describe('retrieving threads service', () => {
 
   it(
     'should use reject handler whenever fetching feedback threads or ' +
-    ' suggestion threads fails', done => {
+    'suggestion threads fails', done => {
     $httpBackend.whenGET('/threadlisthandler/' + this.expId)
       .respond(500, 'Error on retriving feedback threads.');
     $httpBackend.whenGET(
