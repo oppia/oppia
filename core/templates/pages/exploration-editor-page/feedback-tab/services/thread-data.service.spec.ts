@@ -30,14 +30,33 @@ describe('retrieving threads service', () => {
   var $httpBackend = null;
   var $q = null;
   var $rootScope = null;
-  var AlertsService = null;
   var CsrfService = null;
   var FeedbackThreadObjectFactory = null;
-  var LoggerService = null;
   var ThreadDataService = null;
 
-  beforeEach(() => {
+  beforeEach(angular.mock.module('oppia', $provide => {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+
     this.expId = 'exp1';
+    $provide.value('ExplorationDataService', { explorationId: this.expId });
+  }));
+
+  beforeEach(angular.mock.inject($injector => {
+    $httpBackend = $injector.get('$httpBackend');
+    $q = $injector.get('$q');
+    $rootScope = $injector.get('$rootScope');
+    CsrfService = $injector.get('CsrfTokenService');
+    FeedbackThreadObjectFactory = $injector.get('FeedbackThreadObjectFactory');
+    ThreadDataService = $injector.get('ThreadDataService');
+
+    spyOn(CsrfService, 'getTokenAsync')
+      .and.returnValue($q.resolve('sample-csrf-token'));
+  }));
+
+  beforeEach(() => {
     this.mockFeedbackThreads = [
       {
         last_updated: 1441870501230.642,
@@ -75,7 +94,10 @@ describe('retrieving threads service', () => {
         assigned_reviewer_id: null,
         author_name: 'author_1',
         change: {
-          new_value: { html: 'new content html', audio_translation: {} },
+          new_value: {
+            html: 'new content html',
+            audio_translation: {}
+          },
           old_value: null,
           cmd: 'edit_state_property',
           state_name: 'state_1',
@@ -93,29 +115,6 @@ describe('retrieving threads service', () => {
       }
     ];
   });
-
-  beforeEach(angular.mock.module('oppia', $provide => {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-
-    $provide.value('ContextService', { getExplorationId: () => this.expId });
-  }));
-
-  beforeEach(angular.mock.inject($injector => {
-    $httpBackend = $injector.get('$httpBackend');
-    $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
-    AlertsService = $injector.get('AlertsService');
-    CsrfService = $injector.get('CsrfTokenService');
-    FeedbackThreadObjectFactory = $injector.get('FeedbackThreadObjectFactory');
-    LoggerService = $injector.get('LoggerService');
-    ThreadDataService = $injector.get('ThreadDataService');
-
-    spyOn(CsrfService, 'getTokenAsync')
-      .and.returnValue($q.resolve('sample-csrf-token'));
-  }));
 
   it('should retrieve feedback threads and suggestion thread', done => {
     $httpBackend.whenGET('/threadlisthandler/' + this.expId).respond({

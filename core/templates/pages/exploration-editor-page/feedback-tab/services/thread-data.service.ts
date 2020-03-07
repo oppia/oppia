@@ -29,29 +29,29 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('ThreadDataService', [
-  '$http', '$q', 'AlertsService', 'ContextService',
+  '$http', '$q', 'AlertsService', 'ExplorationDataService',
   'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory',
   'SuggestionsService', 'ThreadMessageObjectFactory', 'UrlInterpolationService',
   'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED', 'STATUS_IGNORED', 'STATUS_OPEN',
   function(
-      $http, $q, AlertsService, ContextService,
+      $http, $q, AlertsService, ExplorationDataService,
       FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
       SuggestionsService, ThreadMessageObjectFactory, UrlInterpolationService,
       ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED, STATUS_OPEN) {
     let getFeedbackStatsHandlerUrl = (
       () => UrlInterpolationService.interpolateUrl(
         '/feedbackstatshandler/<exploration_id>', {
-          exploration_id: ContextService.getExplorationId()
+          exploration_id: ExplorationDataService.explorationId
         }));
     let getThreadListHandlerUrl = (
       () => UrlInterpolationService.interpolateUrl(
         '/threadlisthandler/<exploration_id>', {
-          exploration_id: ContextService.getExplorationId()
+          exploration_id: ExplorationDataService.explorationId
         }));
     let getSuggestionActionHandlerUrl = (
       threadId => UrlInterpolationService.interpolateUrl(
         '/suggestionactionhandler/exploration/<exploration_id>/<thread_id>', {
-          exploration_id: ContextService.getExplorationId(),
+          exploration_id: ExplorationDataService.explorationId,
           thread_id: threadId
         }));
     let getThreadHandlerUrl = (
@@ -107,7 +107,7 @@ angular.module('oppia').factory('ThreadDataService', [
         let suggestionsPromise = $http.get(getSuggestionListHandlerUrl(), {
           params: {
             target_type: 'exploration',
-            target_id: ContextService.getExplorationId()
+            target_id: ExplorationDataService.explorationId
           }
         });
         // TODO(#8016): Move this $http call to a backend-api.service with unit
