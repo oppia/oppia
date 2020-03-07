@@ -46,7 +46,7 @@ def camelize(obj):
     """Changes the case of the keys of dict from snake_case to camelCase.
 
     Args:
-        obj: dict or list of dicts. If the object is a dict it changes
+        obj: any object. If the object is a dict it changes
         the case of it's dicts else if it is a list it iterates over all
         the items in the list and changes the case of keys to camelCase
         if it finds another dict. However, if the object is neither a dict nor
