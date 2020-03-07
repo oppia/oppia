@@ -191,7 +191,7 @@ describe('retrieving threads service', () => {
     ThreadDataService.fetchThreads().then(
       done.fail,
       error => {
-        expect(error).toMatch('Missing input backend dicts');
+        expect(error).toMatch('Missing input backend dict');
         done();
       });
     $httpBackend.flush(2);
@@ -207,7 +207,7 @@ describe('retrieving threads service', () => {
     ThreadDataService.fetchThreads().then(
       done.fail,
       error => {
-        expect(error).toMatch('Missing input backend dicts');
+        expect(error).toMatch('Missing input backend dict');
         done();
       });
     $httpBackend.flush(2);
@@ -225,7 +225,7 @@ describe('retrieving threads service', () => {
     ThreadDataService.fetchThreads().then(
       done.fail,
       error => {
-        expect(error).toMatch('Missing input backend dicts');
+        expect(error).toMatch('Missing input backend dict');
         done();
       });
     $httpBackend.flush();
