@@ -30,10 +30,10 @@ angular.module('oppia').directive('splashPage', [function() {
     template: require('./splash-page.directive.html'),
     controllerAs: '$ctrl',
     controller: [
-      '$rootScope', '$timeout', '$window', 'SiteAnalyticsService',
-      'UrlInterpolationService', 'UserService',
-      function($rootScope, $timeout, $window, SiteAnalyticsService,
-          UrlInterpolationService, UserService) {
+      '$rootScope', '$timeout', 'SiteAnalyticsService',
+      'UrlInterpolationService', 'UserService', 'WindowRef',
+      function($rootScope, $timeout, SiteAnalyticsService,
+          UrlInterpolationService, UserService, WindowRef) {
         var ctrl = this;
         ctrl.getStaticImageUrl = function(imagePath) {
           return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -47,7 +47,7 @@ angular.module('oppia').directive('splashPage', [function() {
           SiteAnalyticsService.registerStartLoginEvent(
             'splashPageCreateExplorationButton');
           $timeout(function() {
-            $window.location = destinationUrl;
+            WindowRef.nativeWindow.location = destinationUrl;
           }, 150);
           return false;
         };
@@ -55,7 +55,7 @@ angular.module('oppia').directive('splashPage', [function() {
         ctrl.onClickBrowseLibraryButton = function() {
           SiteAnalyticsService.registerClickBrowseLibraryButtonEvent();
           $timeout(function() {
-            $window.location = '/library';
+            WindowRef.nativeWindow.location = '/library';
           }, 150);
           return false;
         };
@@ -63,7 +63,7 @@ angular.module('oppia').directive('splashPage', [function() {
         ctrl.onClickCreateExplorationButton = function() {
           SiteAnalyticsService.registerClickCreateExplorationButtonEvent();
           $timeout(function() {
-            $window.location = '/creator_dashboard?mode=create';
+            WindowRef.nativeWindow.location = '/creator_dashboard?mode=create';
           }, 150);
           return false;
         };

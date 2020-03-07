@@ -18,6 +18,13 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import {
+  HttpClient,
+  HttpXhrBackend,
+  /* eslint-disable camelcase */
+  ɵangular_packages_common_http_http_d
+  /* eslint-enable camelcase */
+} from '@angular/common/http';
 
 import { AlertsService } from 'services/alerts.service';
 import { AngularNameService } from
@@ -64,6 +71,8 @@ import { DocumentAttributeCustomizationService } from
 import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
+import { EmailDashboardDataService } from
+  'pages/email-dashboard-pages/email-dashboard-data.service';
 import { EntityContextObjectFactory } from
   'domain/utilities/EntityContextObjectFactory';
 import { ExplorationDiffService } from
@@ -268,6 +277,10 @@ export class UpgradedServices {
     upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
+    upgradedServices['EmailDashboardDataService'] =
+      new EmailDashboardDataService(
+        new HttpClient(new HttpXhrBackend(
+          new ɵangular_packages_common_http_http_d())));
     upgradedServices['EditabilityService'] = new EditabilityService();
     upgradedServices['EntityContextObjectFactory'] =
       new EntityContextObjectFactory();

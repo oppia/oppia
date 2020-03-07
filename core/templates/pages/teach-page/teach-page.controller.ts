@@ -35,11 +35,11 @@ angular.module('oppia').directive('teachPage', [
         '/pages/teach-page/teach-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$window', '$timeout', 'SiteAnalyticsService',
-        'UrlInterpolationService',
+        '$timeout', 'SiteAnalyticsService',
+        'UrlInterpolationService', 'WindowRef',
         function(
-            $window, $timeout, SiteAnalyticsService,
-            UrlInterpolationService) {
+            $timeout, SiteAnalyticsService,
+            UrlInterpolationService, WindowRef) {
           var ctrl = this;
           var activeTabClass = 'oppia-about-tabs-active';
           var visibleContent = 'oppia-about-visible-content';
@@ -53,7 +53,7 @@ angular.module('oppia').directive('teachPage', [
           };
           ctrl.onTabClick = function(tabName) {
             // Update hash
-            window.location.hash = '#' + tabName;
+            WindowRef.nativeWindow.location.hash = '#' + tabName;
             activateTab(tabName);
           };
 
@@ -64,7 +64,7 @@ angular.module('oppia').directive('teachPage', [
           ctrl.onApplyToTeachWithOppia = function() {
             SiteAnalyticsService.registerApplyToTeachWithOppiaEvent();
             $timeout(function() {
-              $window.location = ctrl.TEACH_FORM_URL;
+              WindowRef.nativeWindow.location = ctrl.TEACH_FORM_URL;
             }, 150);
             return false;
           };
@@ -74,7 +74,7 @@ angular.module('oppia').directive('teachPage', [
             ctrl.TAB_ID_PLAYBOOK = 'playbook';
             ctrl.TEACH_FORM_URL = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
 
-            var hash = window.location.hash.slice(1);
+            var hash = WindowRef.nativeWindow.location.hash.slice(1);
 
             if (hash === ctrl.TAB_ID_TEACH) {
               activateTab(ctrl.TAB_ID_TEACH);
@@ -82,8 +82,8 @@ angular.module('oppia').directive('teachPage', [
               activateTab(ctrl.TAB_ID_PLAYBOOK);
             }
 
-            window.onhashchange = function() {
-              var hashChange = window.location.hash.slice(1);
+            WindowRef.nativeWindow.onhashchange = function() {
+              var hashChange = WindowRef.nativeWindow.location.hash.slice(1);
               if (hashChange === ctrl.TAB_ID_TEACH) {
                 activateTab(ctrl.TAB_ID_TEACH);
               } else if (hashChange === ctrl.TAB_ID_PLAYBOOK) {
