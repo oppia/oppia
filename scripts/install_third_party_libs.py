@@ -30,11 +30,9 @@ def install_prerequisites():
     """Install libraries that are required before running or
     importing any script.
     """
-    # pylint: disable=global-statement
-    # pylint: disable=unused-variable
-    global TOOLS_DIR
+    tools_dir = os.path.join(os.pardir, 'oppia_tools')
     prerequisites = [
-        ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
+        ('pyyaml', '5.1.2', os.path.join(tools_dir, 'pyyaml-5.1.2')),
         ('future', '0.17.1', os.path.join('third_party', 'future-0.17.1')),
     ]
 
@@ -46,12 +44,8 @@ def install_prerequisites():
             uextention = ['--user', '--prefix=', '--system']
             process = subprocess.Popen(
                 command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            stdout, stderr = process.communicate()
-            if 'can\'t combine user with prefix' in stderr:
+            if 'can\'t combine user with prefix' in process.communicate()[1]:
                 subprocess.check_call(command + uextention)
-
-    # pylint: enable=global-statement
-    # pylint: enable=unused-variable
 
 
 install_prerequisites()
