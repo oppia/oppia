@@ -45,7 +45,7 @@ export class SkillRightsBackendApiService {
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  _fetchSkillRights(skillId:string, successCallback, errorCallback):void {
+  _fetchSkillRights(skillId:string, successCallback, errorCallback): void {
     let skillRightsUrl = this.urlInterpolationService.interpolateUrl(
       SkillEditorPageConstants.SKILL_RIGHTS_URL_TEMPLATE, {
         skill_id: skillId
@@ -63,13 +63,13 @@ export class SkillRightsBackendApiService {
       });
   }
 
-  _isCached(skillId: string):boolean {
+  _isCached(skillId: string): boolean {
     return this.skillRightsCache.hasOwnProperty(skillId);
   }
   /**
     * Gets a skill's rights, given its ID.
     */
-  fetchSkillRights(skillId: string):Promise<ISkillRightBackend> {
+  fetchSkillRights(skillId: string): Promise<ISkillRightBackend> {
     return new Promise((resolve, reject) => {
       this._fetchSkillRights(skillId, resolve, reject);
     });
@@ -83,7 +83,7 @@ export class SkillRightsBackendApiService {
     * rights from the backend, it will store it in the cache to avoid
     * requests from the backend in further function calls.
     */
-  loadSkillRights(skillId: string):Promise<ISkillRightBackend> {
+  loadSkillRights(skillId: string): Promise<ISkillRightBackend> {
     return new Promise((resolve, reject) => {
       if (this._isCached(skillId)) {
         if (resolve) {
@@ -101,11 +101,11 @@ export class SkillRightsBackendApiService {
     });
   }
 
-  isCached(skillId: string):boolean {
+  isCached(skillId: string): boolean {
     return this._isCached(skillId);
   }
 
-  cacheSkillRights(skillId: string, skillRights: ISkillRightBackend):void {
+  cacheSkillRights(skillId: string, skillRights: ISkillRightBackend): void {
     this.skillRightsCache[skillId] = cloneDeep(skillRights);
   }
 }

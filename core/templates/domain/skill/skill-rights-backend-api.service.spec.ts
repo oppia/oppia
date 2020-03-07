@@ -44,6 +44,54 @@ describe('Skill rights backend API service', () => {
     httpTestingController.verify();
   });
 
+  it('should successfully fetch a skill dict from backend',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      skillRightsBackendApiService.fetchSkillRights('0').then(
+        successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/skill_editor_handler/rights/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleSkillRights);
+      flushMicrotasks();
+      expect(successHandler).toHaveBeenCalledWith(sampleSkillRights);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should use reject handler when fetching a skill dict from backend' +
+  ' fails', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    skillRightsBackendApiService.fetchSkillRights('0').then(
+      successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/skill_editor_handler/rights/0');
+    req.error(new ErrorEvent('Error'));
+    expect(req.request.method).toEqual('GET');
+    flushMicrotasks();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
+
+  it('should successfully fetch a skill dict from backend if it\'s not' +
+    'cached', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    skillRightsBackendApiService.loadSkillRights('0').then(
+      successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/skill_editor_handler/rights/0');
+    req.flush(sampleSkillRights);
+    expect(req.request.method).toEqual('GET');
+    flushMicrotasks();
+    expect(skillRightsBackendApiService.isCached('0')).toBe(true);
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it('should report a cached skill rights after caching it',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
@@ -63,54 +111,6 @@ describe('Skill rights backend API service', () => {
         successHandler, failHandler);
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleSkillRights);
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
-
-  it('should use reject handler when fetching a skill dict from backend' +
-  ' fails', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-    skillRightsBackendApiService.fetchSkillRights('0').then(
-      successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      '/skill_editor_handler/rights/0');
-    req.error(new ErrorEvent('Error'));
-    flushMicrotasks();
-    expect(req.request.method).toEqual('GET');
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  }));
-
-  it('should successfully fetch a skill dict from backend if it\'s not' +
-    'cached', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-    skillRightsBackendApiService.loadSkillRights('0').then(
-      successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      '/skill_editor_handler/rights/0');
-    req.flush(sampleSkillRights);
-    flushMicrotasks();
-    expect(skillRightsBackendApiService.isCached('0')).toBe(true);
-    expect(req.request.method).toEqual('GET');
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should fetch skills right given its skillId',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-
-      skillRightsBackendApiService.fetchSkillRights('0').then(
-        successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        '/skill_editor_handler/rights/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleSkillRights);
-      flushMicrotasks();
       expect(successHandler).toHaveBeenCalledWith(sampleSkillRights);
       expect(failHandler).not.toHaveBeenCalled();
     })
