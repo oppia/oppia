@@ -122,8 +122,8 @@ cache:
     - third_party/
     - $HOME/.cache/pip
     - $HOME/.cache/TravisChrome/
-    - backend_prod_files/templates/head/
-    - build/templates/head/
+    - backend_prod_files/templates/
+    - build/templates/
     - backend_prod_files/extensions/
     - build/extensions/
 
