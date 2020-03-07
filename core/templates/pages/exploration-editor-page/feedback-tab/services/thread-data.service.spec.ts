@@ -185,35 +185,38 @@ describe('retrieving threads service', () => {
     var mockThread = this.mockFeedbackThreads[0];
     var thread = FeedbackThreadObjectFactory.createFromBackendDict(mockThread);
 
-    $httpBackend.expectGET('/threadhandler/' + thread.threadId).respond([
-      {
-        author_username: 'author',
-        created_on: 1000,
-        entity_type: 'exploration',
-        entity_id: 'exploration.exp1.abc1',
-        message_id: 0,
-        received_via_email: false,
-        text: '1st message',
-        updated_status: null,
-        updated_subject: null
-      },
-      {
-        author_username: 'author',
-        created_on: 1200,
-        entity_type: 'exploration',
-        entity_id: 'exploration.exp1.abc1',
-        message_id: 1,
-        received_via_email: false,
-        text: '2nd message',
-        updated_status: null,
-        updated_subject: null
-      }
-    ]);
+    $httpBackend.expectGET('/threadhandler/' + thread.threadId).respond({
+      messages: [
+        {
+          author_username: 'author',
+          created_on: 1000,
+          entity_type: 'exploration',
+          entity_id: 'exploration.exp1.abc1',
+          message_id: 0,
+          received_via_email: false,
+          text: '1st message',
+          updated_status: null,
+          updated_subject: null
+        },
+        {
+          author_username: 'author',
+          created_on: 1200,
+          entity_type: 'exploration',
+          entity_id: 'exploration.exp1.abc1',
+          message_id: 1,
+          received_via_email: false,
+          text: '2nd message',
+          updated_status: null,
+          updated_subject: null
+        }
+      ]
+    });
     var setMessagesSpy = spyOn(thread, 'setMessages').and.callThrough();
 
     ThreadDataService.fetchMessages(thread).then(
       () => {
         expect(setMessagesSpy).toHaveBeenCalled();
+        expect(thread.lastNonemptyMessageSummary.text).toEqual('2nd message');
         done();
       },
       done.fail);
