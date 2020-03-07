@@ -274,6 +274,15 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             expected_status_int=401)
         self.logout()
 
+        # Check that the editor page can not be accessed with an
+        # an invalid topic id.
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_URL_PREFIX, 'invalid_topic_id'),
+            expected_status_int=404)
+        self.logout()
+
         # Check that admins can access the editor page.
         self.login(self.ADMIN_EMAIL)
         self.get_html_response(
@@ -663,6 +672,14 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
                 topic_services.get_new_topic_id()), expected_status_int=404)
 
+        self.logout()
+
+        # Check that an invalid topic can not be deleted.
+        self.login(self.ADMIN_EMAIL)
+        self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                'invalid_topic_id'), expected_status_int=404)
         self.logout()
 
 

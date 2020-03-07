@@ -2054,7 +2054,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_add_story_to_topic/invalid_topic_id',
+                '/mock_add_story_to_topic/incorrect_id',
                 expected_status_int=404)
         self.logout()
 
@@ -2867,7 +2867,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
 
     def test_cannot_edit_topic_with_invalid_topic_id(self):
         self.login(self.ADMIN_EMAIL)
-        topic_id = 'invalid_topic_id'
+        topic_id = 'incorrect_id'
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_entity/%s/%s' % (
