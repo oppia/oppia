@@ -302,6 +302,6 @@ describe('About Page', function() {
       ' Philip Guo, Piotr Mitros, Rachel Chen, Rahim Nathwani, Robyn Choo,' +
       ' Tricia Ngoon, Vikrant Nanda, Vinamrata Singal & Yarin Feigenbaum');
     expect(ctrl.aboutPageMascotImgUrl).toBe(
-      '/assets/images/general/about_page_mascot.png');
+      '/assets/images/general/about_page_mascot.webp');
   });
 });
