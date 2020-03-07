@@ -25,10 +25,8 @@ import sys
 
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
+# These libraries need to be installed before running or importing any script.
 
-"""Install libraries that are required before running or
-importing any script.
-"""
 PREREQUISITES = [
     ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
     ('future', '0.17.1', os.path.join('third_party', 'future-0.17.1')),
