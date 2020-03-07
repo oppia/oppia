@@ -1464,6 +1464,45 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
                 line=closing_line_index_of_fileoverview + 1)
 
 
+class BlankLineBelowDocstring(checkers.BaseChecker):
+    """Add lint check to ensure that there is one blank newline
+    below each class docstring.
+    """
+
+    __implements__ = interfaces.IRawChecker
+    name = 'space_between_imports_and_file-overview'
+    priority = -1
+    msgs = {
+        'C0026': (
+            'Please provide an empty line below each calss docstring.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that there is a blank line below
+        each class docstring.
+        """
+
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+        have_a_class = False
+        expect_empty_line = False
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+            if expect_empty_line:
+                expect_empty_line = False
+                have_a_class = False
+                if not file_content[empty_line_check_index + 1] == b'\n':
+                    self.add_message(
+                        'no-empty-line-provided-below-class-docstring',
+                        line=line_num+1)
+            elif line.startswith(b'class'):
+                have_a_class = True
+            elif have_a_class and line.endswith(b'"""'):
+                expect_empty_line = True
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -1485,3 +1524,4 @@ def register(linter):
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(DocstringChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
+    linter.register_checker(BlankLineBelowDocstring(linter))
