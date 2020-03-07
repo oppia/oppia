@@ -254,7 +254,7 @@ type Newable<T> = { new (...args: any[]): T; };
 
 @Injectable({providedIn: 'root'})
 export class UpgradedServices {
-  private static globals: any[] = [ document ];
+  private static globals: any[] = [document];
 
   private servicesByName = {};
 
@@ -274,7 +274,7 @@ export class UpgradedServices {
           throw Error(
             'Dependency order error: trying to construct "' + serviceName +
             '" before the services it depends upon: "' +
-            unregisteredArgs.map(a => a.name).join('", "') + '"')
+            unregisteredArgs.map(a => a.name).join('", "') + '"');
         }
         const constructorArgs = args.map(
           arg => UpgradedServices.globals.includes(arg) ? arg :
