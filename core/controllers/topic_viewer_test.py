@@ -138,7 +138,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                     self.skill_id_1: 'Skill Description 1',
                     self.skill_id_2: 'Skill Description 2'
                 },
-                'show_train_tab': False
+                'train_tab_should_be_displayed': False
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 
@@ -184,7 +184,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                         self.skill_id_1: None,
                         self.skill_id_2: 'Skill Description 2'
                     },
-                    'show_train_tab': False
+                    'train_tab_should_be_displayed': False
                 }
                 self.assertDictContainsSubset(expected_dict, json_response)
 
@@ -213,7 +213,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                 'subtopics': [],
                 'degrees_of_mastery': {},
                 'skill_descriptions': {},
-                'show_train_tab': False
+                'train_tab_should_be_displayed': False
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 
@@ -251,7 +251,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                 'skill_descriptions': {
                     self.skill_id_1: 'Skill Description 1'
                 },
-                'show_train_tab': True
+                'train_tab_should_be_displayed': True
             }
             self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()

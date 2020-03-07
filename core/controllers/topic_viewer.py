@@ -107,12 +107,12 @@ class TopicPageDataHandler(base.BaseHandler):
             for skill_id in assigned_skill_ids:
                 degrees_of_mastery[skill_id] = None
 
-        show_train_tab = False
-        if len(assigned_skill_ids) > 0:
+        train_tab_should_be_displayed = False
+        if assigned_skill_ids:
             questions = question_services.get_questions_by_skill_ids(
                 5, assigned_skill_ids, False)
             if len(questions) == 5:
-                show_train_tab = True
+                train_tab_should_be_displayed = True
 
         self.values.update({
             'topic_id': topic.id,
@@ -123,6 +123,6 @@ class TopicPageDataHandler(base.BaseHandler):
             'subtopics': subtopics,
             'degrees_of_mastery': degrees_of_mastery,
             'skill_descriptions': skill_descriptions,
-            'show_train_tab': show_train_tab
+            'train_tab_should_be_displayed': train_tab_should_be_displayed
         })
         self.render_json(self.values)
