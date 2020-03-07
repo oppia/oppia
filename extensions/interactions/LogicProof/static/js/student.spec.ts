@@ -799,7 +799,7 @@ describe('Match expression to expression template', function() {
                 'a was arbitrary hence \u2200x.p',
                 '  from p and q we have p\u2227q',
                 '  b was arbitrary hence \u2200x.q'].join('\n'));
-            }).toThrow(
+            }).toThrowError(
               sharedErrorWrapper(
                 'We originally took a as our arbitrary variable so this, ' +
                 'rather than b, needs to be the one that we quantify out over.',

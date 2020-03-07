@@ -108,7 +108,7 @@ var logicProofShared = (function() {
       return error.messages[
         Math.floor((Math.random() * error.messages.length))];
     } else {
-      throw error;
+      throw new Error(error);
     }
   };
 
@@ -625,7 +625,7 @@ var logicProofShared = (function() {
         err.parameters.operator = untypedExpression.top_operator_name;
         err.parameters.input_category = 'arguments';
         err.parameters.amount_typed = [];
-        throw err;
+        throw new Error(err);
       }
 
       try {
@@ -635,7 +635,7 @@ var logicProofShared = (function() {
         err.parameters.operator = untypedExpression.top_operator_name;
         err.parameters.input_category = 'dummies';
         err.parameters.amount_typed = [];
-        throw err;
+        throw new Error(err);
       }
       var updatedOperators = {};
       for (var key in operators) {
@@ -746,7 +746,7 @@ var logicProofShared = (function() {
         } catch (err) {
           if (bestAttemptSoFar !== undefined &&
               !bestAttemptSoFar.hasOwnProperty('parameters')) {
-            throw bestAttemptSoFar;
+            throw new Error(bestAttemptSoFar);
           }
           if (bestAttemptSoFar === undefined ||
               greaterThanInLex(
@@ -760,7 +760,7 @@ var logicProofShared = (function() {
     if (results.length > 0) {
       return results;
     } else {
-      throw bestAttemptSoFar;
+      throw new Error(bestAttemptSoFar);
     }
   };
 
@@ -818,7 +818,7 @@ var logicProofShared = (function() {
           }
         } catch (err) {
           if (!err.hasOwnProperty('parameters')) {
-            throw err;
+            throw new Error(err);
           }
           var amountTyped = [i].concat(err.parameters.amount_typed);
           if (bestAttemptSoFar === undefined ||
@@ -843,7 +843,7 @@ var logicProofShared = (function() {
       }
       return result;
     } else {
-      throw bestAttemptSoFar;
+      throw new Error(bestAttemptSoFar);
     }
   };
 

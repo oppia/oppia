@@ -1007,7 +1007,7 @@ var logicProofStudent = (function() {
         }
       }
     }
-    throw bestAttemptSoFar;
+    throw new Error(bestAttemptSoFar);
   };
 
   /**
@@ -1179,7 +1179,7 @@ var logicProofStudent = (function() {
         renderedMessages.push(renderedMessage);
       } catch (err) {
         if (err.message !== 'evaluation failed') {
-          throw err;
+          throw new Error(err);
         }
       }
     }
@@ -1230,7 +1230,7 @@ var logicProofStudent = (function() {
             }, questionInstance.control_model, parameters, evaluationCache);
           } catch (err) {
             if (err.message !== 'evaluation failed') {
-              throw err;
+              throw new Error(err);
             }
           }
           if (check) {

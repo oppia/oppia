@@ -367,7 +367,7 @@ describe('Pre-parse lines', function() {
       expect(
         errorWrapper(
           assignTypes, '\u2203x.A(x)<=>x=2', ['prefix_function', 'constant'])
-      ).toThrowError('The operator x could not be identified.');
+      ).toThrowError();
     });
   });
 });
