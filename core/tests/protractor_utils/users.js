@@ -28,10 +28,6 @@ var login = function(email, isSuperAdmin = false) {
   // Use of element is not possible because the login page is non-angular.
   // The full url is also necessary.
   var driver = browser.driver;
-  // Protractor waits for the angular variable to be present when loading
-  // a new page. Since the login page is non-angular, this check can be
-  // disabled.
-  browser.waitForAngularEnabled(false);
   driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
 
   driver.findElement(protractor.By.name('email')).clear();
@@ -40,8 +36,6 @@ var login = function(email, isSuperAdmin = false) {
     driver.findElement(protractor.By.name('admin')).click();
   }
   driver.findElement(protractor.By.id('submit-login')).click();
-  // Enable the wait for angular check after logging in.
-  browser.waitForAngularEnabled(true);
 };
 
 var logout = function() {
@@ -53,7 +47,13 @@ var logout = function() {
 // The user needs to log in immediately before this method is called. Note
 // that this will fail if the user already has a username.
 var _completeSignup = function(username) {
+  // This is required since there is a redirect which can be considered
+  // as a client side navigation and the tests fail since Angular is
+  // not found due to the navigation interfering with protractor's
+  // bootstrapping.
+  browser.waitForAngularEnabled(false);
   browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
+  browser.waitForAngularEnabled(true);
   var usernameInput = element(by.css('.protractor-test-username-input'));
   var agreeToTermsCheckbox = element(
     by.css('.protractor-test-agree-to-terms-checkbox'));
