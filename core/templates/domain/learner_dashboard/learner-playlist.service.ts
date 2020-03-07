@@ -18,6 +18,7 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
+require('domain/learner_dashboard/learner-playlist-modal.controller.ts');
 
 angular.module('oppia').factory('LearnerPlaylistService', [
   '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
@@ -73,31 +74,12 @@ angular.module('oppia').factory('LearnerPlaylistService', [
           },
           activityTitle: function() {
             return activityTitle;
+          },
+          activityType: function() {
+            return activityType;
           }
         },
-        controller: [
-          '$scope', '$uibModalInstance', '$http', 'UrlInterpolationService',
-          function($scope, $uibModalInstance, $http, UrlInterpolationService) {
-            $scope.sectionNameI18nId = (
-              'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION');
-            $scope.activityTitle = activityTitle;
-            var removeFromLearnerPlaylistUrl = (
-              UrlInterpolationService.interpolateUrl(
-                '/learnerplaylistactivityhandler/' +
-                '<activityType>/<activityId>', {
-                  activityType: activityType,
-                  activityId: activityId
-                }));
-            $scope.remove = function() {
-              $http['delete'](removeFromLearnerPlaylistUrl);
-              $uibModalInstance.close();
-            };
-
-            $scope.cancel = function() {
-              $uibModalInstance.dismiss('cancel');
-            };
-          }
-        ]
+        controller: 'LearnerPlaylistModalController'
       }).result.then(function() {
         if (activityType === ACTIVITY_TYPE_EXPLORATION) {
           learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
