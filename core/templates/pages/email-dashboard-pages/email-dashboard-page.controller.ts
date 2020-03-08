@@ -91,13 +91,18 @@ angular.module('oppia').directive('emailDashboardPage', [
           };
 
           ctrl.recheckStatus = function(index) {
-            var queryId = ctrl.currentPageOfQueries[index].id;
-            EmailDashboardDataService.fetchQuery(queryId).then(function(query) {
-              ctrl.currentPageOfQueries[index] = query;
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the directive is migrated to angular
-              $rootScope.$apply();
-            });
+            var query = ctrl.currentPageOfQueries !== undefined ?
+              ctrl.currentPageOfQueries[index] : null;
+            if (query) {
+              var queryId = query.id;
+              EmailDashboardDataService.fetchQuery(queryId).then(
+                function(query) {
+                  ctrl.currentPageOfQueries[index] = query;
+                  // TODO(#8521): Remove the use of $rootScope.$apply()
+                  // once the directive is migrated to angular
+                  $rootScope.$apply();
+                });
+            }
           };
 
           ctrl.showLinkToResultPage = function(submitter, status) {
