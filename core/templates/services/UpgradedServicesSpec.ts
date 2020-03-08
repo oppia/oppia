@@ -22,12 +22,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('UpgradedServices', () => {
   beforeEach(() => {
-    this.upgradedServices = new UpgradedServices();
-    // We need to access the "registerService" method to test its edge cases,
-    // but we want to keep it private to discourage registering services in
-    // places outside of the UpgradedServices class. To compromise, we use this
-    // type-erasing hack to gain access to the method.
-    this.registerService = (this.upgradedServices as any).registerService;
+    this.upgradedServices = TestBed.get(UpgradedServices);
   });
 
   it('should have a well-defined set of initial services', () => {
@@ -37,9 +32,10 @@ describe('UpgradedServices', () => {
   it('should detect service redefinitions', () => {
     class MockService {}
 
-    this.registerService(MockService).withDependencies();
-    expect(() => this.registerService(MockService).withDependencies())
-      .toThrow(/Redefinition Error/);
+    this.upgradedServices.registerService(MockService).withDependencies();
+    expect(() => {
+      this.upgradedServices.registerService(MockService).withDependencies();
+    }).toThrow(/Redefinition Error/);
   });
 
   it('should detect unregistered services', () => {
@@ -48,7 +44,8 @@ describe('UpgradedServices', () => {
       constructor(private mockDependency: MockDependency) {}
     }
 
-    this.registerService(MockService).withDependencies(MockDependency);
+    this.upgradedServices.registerService(MockService)
+      .withDependencies(MockDependency);
     expect(() => this.upgradedServices.getUpgradedServices())
       .toThrow(/Registry Error/);
   });
@@ -61,8 +58,10 @@ describe('UpgradedServices', () => {
       constructor(private mockService1: MockService1) {}
     }
 
-    this.registerService(MockService1).withDependencies(MockService2);
-    this.registerService(MockService2).withDependencies(MockService1);
+    this.upgradedServices.registerService(MockService1)
+      .withDependencies(MockService2);
+    this.upgradedServices.registerService(MockService2)
+      .withDependencies(MockService1);
     expect(() => this.upgradedServices.getUpgradedServices())
       .toThrow(/Circular Dependency Error/);
   });
