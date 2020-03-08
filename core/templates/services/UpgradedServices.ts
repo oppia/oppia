@@ -62,6 +62,8 @@ import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
 import { ContextService } from 'services/context.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
+import { CreatorDashboardBackendApiService } from
+  'domain/creator_dashboard/creator-dashboard-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
@@ -300,6 +302,8 @@ export class UpgradedServices {
     this.registerService(ContextService).withDependencies(
       UrlService, EntityContextObjectFactory);
     this.registerService(CountVectorizerService).withDependencies();
+    this.registerService(CreatorDashboardBackendApiService).withDependencies(
+      HttpClient);
     this.registerService(CsrfTokenService).withDependencies();
     this.registerService(DateTimeFormatService).withDependencies();
     this.registerService(DebouncerService).withDependencies();

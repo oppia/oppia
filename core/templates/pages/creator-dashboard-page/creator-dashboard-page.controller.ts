@@ -53,8 +53,7 @@ require('services/user.service.ts');
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts');
 
 angular.module('oppia').directive('creatorDashboardPage', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
