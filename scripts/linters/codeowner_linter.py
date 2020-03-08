@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import glob
 import os
 import subprocess
+import sys
 
 # pylint: disable=wrong-import-position
 from . import linter_utils  # isort:skip
@@ -170,7 +171,7 @@ def check_codeowner_file(verbose_mode_enabled):
         python_utils.PRINT('Starting CODEOWNERS file check')
         python_utils.PRINT('----------------------------------------')
 
-    with linter_utils.redirect_stdout(stdout):
+    with linter_utils.redirect_stdout(sys.stdout):
         failed = False
         summary_messages = []
         # Checks whether every pattern in the CODEOWNERS file matches at

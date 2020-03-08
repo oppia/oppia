@@ -55,7 +55,7 @@ import time
 import python_utils
 
 from . import common
-from . import semaphore_utils
+from . import concurrent_task_utils
 from . import setup
 from . import setup_gae
 
@@ -145,11 +145,11 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     last_stdout = last_stdout_str.split('\n')
 
     if LOG_LINE_PREFIX in last_stdout_str:
-        semaphore_utils.log('')
+        concurrent_task_utils.log('')
         for line in last_stdout:
             if line.startswith(LOG_LINE_PREFIX):
-                semaphore_utils.log('INFO: %s' % line[len(LOG_LINE_PREFIX):])
-        semaphore_utils.log('')
+                concurrent_task_utils.log('INFO: %s' % line[len(LOG_LINE_PREFIX):])
+        concurrent_task_utils.log('')
 
     result = '%s%s' % (last_stdout_str, last_stderr_str)
 
@@ -306,20 +306,20 @@ def main(args=None):
     for test_target in all_test_targets:
         test = TestingTaskSpec(
             test_target, parsed_args.generate_coverage_report)
-        task = semaphore_utils.create_task(
+        task = concurrent_task_utils.create_task(
             test.run, parsed_args.verbose, name=test_target)
         task_to_taskspec[task] = test
         tasks.append(task)
 
     task_execution_failed = False
     try:
-        semaphore_utils.execute_tasks(tasks)
+        concurrent_task_utils.execute_tasks(tasks)
     except Exception:
         task_execution_failed = True
 
     for task in tasks:
         if task.exception:
-            semaphore_utils.log(
+            concurrent_task_utils.log(
                 python_utils.convert_to_bytes(task.exception.args[0]))
 
     python_utils.PRINT('')

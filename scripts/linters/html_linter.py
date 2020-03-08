@@ -29,8 +29,7 @@ NODE_DIR = os.path.abspath(
 
 # pylint: disable=wrong-import-position
 from . import linter_utils  # isort:skip
-from . import linter_manager  # isort:skip
-from . import semaphore_utils  # isort:skip
+from .. import concurrent_task_utils  # isort:skip
 
 # pylint: disable=wrong-import-position
 import python_utils  # isort:skip
@@ -229,7 +228,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
                 self.indentation_level -= 1
 
 
-class HTMLLintChecksManager(linter_manager.LintChecksManager):
+class HTMLLintChecksManager(python_utils.OBJECT):
     """Manages all the HTML linting functions.
 
     Attributes:
@@ -244,7 +243,6 @@ class HTMLLintChecksManager(linter_manager.LintChecksManager):
             files_to_lint: list(str). A list of filepaths to lint.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
-        super(HTMLLintChecksManager, self).__init__()
         self.files_to_lint = files_to_lint
         self.verbose_mode_enabled = verbose_mode_enabled
 
@@ -314,15 +312,12 @@ class HTMLLintChecksManager(linter_manager.LintChecksManager):
             python_utils.PRINT('There are no HTML files to lint.')
             return []
 
-        common_messages = super(
-            HTMLLintChecksManager, self).perform_all_lint_checks()
         # The html tags and attributes check has an additional
         # debug mode which when enabled prints the tag_stack for each file.
         html_tag_and_attribute_messages = (
             self._check_html_tags_and_attributes())
 
-        all_messages = (
-            common_messages + html_tag_and_attribute_messages)
+        all_messages = html_tag_and_attribute_messages
         return all_messages
 
 
@@ -435,39 +430,3 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
 
         all_messages += html_linter_messages
         return all_messages
-
-
-def perform_all_lint_checks(
-        files_to_lint, file_extension_type, verbose_mode_enabled=False):
-    """Perform all the lint checks and returns the messages returned by all
-    the checks.
-
-    Args:
-        files_to_lint: list(str). A list of filepaths to lint.
-        file_extension_type: list(str). The list of file extensions to be
-            linted.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
-
-    Returns:
-        all_messages: str. All the messages returned by the lint checks.
-    """
-    # Prepare tasks.
-    max_concurrent_runs = 25
-    concurrent_count = min(multiprocessing.cpu_count(), max_concurrent_runs)
-    semaphore = threading.Semaphore(concurrent_count)
-
-    custom_linter = HTMLLintChecksManager(   # pylint: disable=no-value-for-parameter
-        files_to_lint, verbose_mode_enabled)
-
-    third_party_linter = ThirdPartyHTMLLintChecksManager(
-        files_to_lint, verbose_mode_enabled)
-
-    task_custom = semaphore_utils.create_task(
-        custom_linter.perform_all_lint_checks, verbose_mode_enabled,
-        name=file_extension_type)
-
-    task_third_party = semaphore_utils.create_task(
-        third_party_linter.perform_all_lint_checks, verbose_mode_enabled,
-        semaphore=semaphore, name=file_extension_type)
-
-    return task_custom, task_third_party

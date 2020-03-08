@@ -61,12 +61,12 @@ import threading
 # Install third party dependencies before proceeding.
 from . import codeowner_linter
 from . import css_linter
+from . import general_purpose_linter
 from . import html_linter
-from . import install_third_party_libs
+from .. import install_third_party_libs
 from . import js_ts_linter
-from . import other_linter
 from . import python_linter
-from . import semaphore_utils
+from .. import concurrent_task_utils
 install_third_party_libs.main()
 
 # pylint: disable=wrong-import-position
@@ -216,96 +216,87 @@ class FileCache(python_utils.OBJECT):
         return self._CACHE_DATA_DICT[key]
 
 
-class LintingTaskSpec(python_utils.OBJECT):
-    """Executes a set of tests given a test class name."""
+def _lint_all_files(
+        js_filepaths, ts_filepaths, py_filepaths, html_filepaths,
+        css_filepaths, other_filepaths, verbose_mode_enabled,
+        file_extension_type):
+    """Run all lint checks.
 
-    def __init__(
-            self, js_filepaths, ts_filepaths, py_filepaths, html_filepaths,
-            css_filepaths, other_filepaths, verbose_mode_enabled,
-            file_extension_type):
-        """Constructer of LintingTaskSpec object.
+    Args:
+        js_filepaths: list(str). The list of js filepaths to be linted.
+        ts_filepaths: list(str). The list of ts filepaths to be linted.
+        py_filepaths: list(str). The list of python filepaths to be linted.
+        html_filepaths: list(str). The list of HTML filepaths to be linted.
+        css_filepaths: list(str). The list of CSS filepaths to be linted.
+        other_filepaths: list(str). The list of filepaths other than HTML,
+            CSS, Python, Js and Ts.
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
+        file_extension_type: list(str). The list of file extensions to be
+            linted.
 
-        Args:
-            js_filepaths: list(str). The list of js filepaths to be linted.
-            ts_filepaths: list(str). The list of ts filepaths to be linted.
-            py_filepaths: list(str). The list of python filepaths to be linted.
-            html_filepaths: list(str). The list of HTML filepaths to be linted.
-            css_filepaths: list(str). The list of CSS filepaths to be linted.
-            other_filepaths: list(str). The list of filepaths other than HTML,
-                CSS, Python, Js and Ts.
-            verbose_mode_enabled: bool. True if verbose mode is enabled.
-            file_extension_type: list(str). The list of file extensions to be
-                linted.
-        """
-        self.js_filepaths = js_filepaths
-        self.ts_filepaths = ts_filepaths
-        self.py_filepaths = py_filepaths
-        self.html_filepaths = html_filepaths
-        self.css_filepaths = css_filepaths
-        self.other_filepaths = other_filepaths
-        self.verbose_mode_enabled = verbose_mode_enabled
-        self.file_extension_type = file_extension_type
+    Returns:
+        custom_linter: list. Custom lint checks.
+        third_party_linter: list. Third party lint checks.
+    """
+    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+    config_path = os.path.join(parent_dir, 'oppia', '.stylelintrc')
+    config_path = os.path.join(
+        parent_dir, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
+    custom_linters = []
+    third_party_linters = []
 
-    def lint_all_files(self):
-        """Run all lint checks."""
-        tasks_custom = []
-        tasks_third_party = []
+    js_ts_file_extension = 'js' in file_extension_type or (
+        'ts' in file_extension_type)
+    py_file_extension = 'py' in file_extension_type
+    html_file_extension = 'html' in file_extension_type
+    css_file_extension = 'css' in file_extension_type
 
-        js_ts_file_extension = 'js' in self.file_extension_type or (
-            'ts' in self.file_extension_type)
-        py_file_extension = 'py' in self.file_extension_type
-        html_file_extension = 'html' in self.file_extension_type
-        css_file_extension = 'css' in self.file_extension_type
-        other_file_extension = 'other' in self.file_extension_type
+    custom_linter = general_purpose_linter.GeneralPurposeLinter(
+        py_filepaths, verbose_mode_enabled = verbose_mode_enabled)
+    custom_linters.append(custom_linter)
 
-        if js_ts_file_extension:
-            task_custom, task_third_party = (
-                js_ts_linter.perform_all_lint_checks(
-                    self.js_filepaths, self.ts_filepaths,
-                    self.file_extension_type,
-                    verbose_mode_enabled=self.verbose_mode_enabled))
-            tasks_custom.append(task_custom)
-            tasks_third_party.append(task_third_party)
+    if js_ts_file_extension:
+        task_custom, task_third_party = (
+            js_ts_linter.perform_all_lint_checks(
+                js_filepaths, ts_filepaths,
+                file_extension_type,
+                verbose_mode_enabled=verbose_mode_enabled))
+        tasks_custom.append(task_custom)
+        tasks_third_party.append(task_third_party)
 
-        if html_file_extension:
-            task_custom, task_third_party = (
-                html_linter.perform_all_lint_checks(
-                    self.html_filepaths, self.file_extension_type,
-                    verbose_mode_enabled=self.verbose_mode_enabled))
-            tasks_custom.append(task_custom)
-            tasks_third_party.append(task_third_party)
+    if html_file_extension:
+        task_custom, task_third_party = (
+            html_linter.perform_all_lint_checks(
+                html_filepaths, file_extension_type,
+                verbose_mode_enabled=verbose_mode_enabled))
+        tasks_custom.append(task_custom)
+        tasks_third_party.append(task_third_party)
 
-            task_custom = (
-                css_linter.perform_all_lint_checks(
-                    self.html_filepaths,
-                    self.file_extension_type,
-                    verbose_mode_enabled=self.verbose_mode_enabled))
-            tasks_custom.append(task_custom)
+        task_custom = (
+            css_linter.perform_all_lint_checks(
+                html_filepaths,
+                file_extension_type,
+                verbose_mode_enabled=verbose_mode_enabled))
+        tasks_custom.append(task_custom)
 
-        if css_file_extension:
-            task_custom, task_third_party = (
-                css_linter.perform_all_lint_checks(
-                    self.css_filepaths,
-                    self.file_extension_type,
-                    verbose_mode_enabled=self.verbose_mode_enabled))
-            tasks_custom.append(task_custom)
-            tasks_third_party.append(task_third_party)
+    if css_file_extension:
+        task_custom, task_third_party = (
+            css_linter.perform_all_lint_checks(
+                css_filepaths,
+                file_extension_type,
+                verbose_mode_enabled=verbose_mode_enabled))
+        tasks_custom.append(task_custom)
+        tasks_third_party.append(task_third_party)
 
-        if py_file_extension:
-            task_custom, task_third_party = (
-                python_linter.perform_all_lint_checks(
-                    self.py_filepaths, self.file_extension_type,
-                    verbose_mode_enabled=self.verbose_mode_enabled))
-            tasks_custom.append(task_custom)
-            tasks_third_party.append(task_third_party)
+    if py_file_extension:
+        custom_linter = python_linter.PythonLintChecksManager(
+            py_filepaths, verbose_mode_enabled=verbose_mode_enabled)
+        third_party_linter = python_linter.ThirdPartyPythonLintChecksManager(
+            py_filepaths, verbose_mode_enabled=verbose_mode_enabled)
+        custom_linters.append(custom_linter)
+        third_party_linters.append(third_party_linter)
 
-        if other_file_extension:
-            task_custom = other_linter.perform_all_lint_checks(
-                self.other_filepaths, self.file_extension_type,
-                verbose_mode_enabled=self.verbose_mode_enabled)
-            tasks_custom.append(task_custom)
-
-        return tasks_custom, tasks_third_party
+    return custom_linters, third_party_linters
 
 
 def _get_changed_filepaths():
@@ -479,25 +470,41 @@ def main(args=None):
     read_files(all_filepaths)
     categorize_files(all_filepaths)
 
-    max_concurrent_runs = 25
+    max_concurrent_runs = 1
 
     # Prepare tasks.
     concurrent_count = min(multiprocessing.cpu_count(), max_concurrent_runs)
     semaphore = threading.Semaphore(concurrent_count)
 
-    tasks_custom = []
-    tasks_third_party = []
+    custom_linters = []
+    third_party_linters = []
     for file_extension_type in file_extension_types:
-        linter = LintingTaskSpec(
+        custom_linter, third_party_linter = _lint_all_files(
             _FILES['.js'], _FILES['.ts'], _FILES['.py'], _FILES['.html'],
             _FILES['.css'], _FILES['other'], verbose_mode_enabled,
             file_extension_type)
-        task_custom, task_third_party = linter.lint_all_files()
-        tasks_custom += task_custom
-        tasks_third_party += task_third_party
+        custom_linters += custom_linter
+        third_party_linters += third_party_linter
 
-    semaphore_utils.execute_tasks(tasks_custom)
-    semaphore_utils.execute_tasks(tasks_third_party, semaphore=semaphore)
+    tasks_custom = []
+    tasks_third_party = []
+
+    for linter in custom_linters:
+        task_custom = concurrent_task_utils.create_task(
+            linter.perform_all_lint_checks,
+            verbose=verbose_mode_enabled, name='custom')
+        tasks_custom.append(task_custom)
+
+    for linter in third_party_linters:
+        task_third_party = concurrent_task_utils.create_task(
+            linter.perform_all_lint_checks,
+            verbose=verbose_mode_enabled, semaphore=semaphore)
+        tasks_third_party.append(task_third_party)
+
+    python_utils.PRINT(tasks_custom)
+    python_utils.PRINT(tasks_third_party)
+    concurrent_task_utils.execute_tasks(tasks_custom)
+    concurrent_task_utils.execute_tasks(tasks_third_party, semaphore=semaphore)
 
     all_messages = []
 
@@ -507,11 +514,11 @@ def main(args=None):
     for task in tasks_third_party:
         all_messages += task.output
 
-    code_owner_message = codeowner_linter.check_codeowner_file(
-        verbose_mode_enabled)
-    all_messages += code_owner_message
+    # code_owner_message = codeowner_linter.check_codeowner_file(
+    #     verbose_mode_enabled)
+    # all_messages += code_owner_message
 
-    all_messages = []
+    python_utils.PRINT(all_messages)
 
     _print_complete_summary_of_errors()
 

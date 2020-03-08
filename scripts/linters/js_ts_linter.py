@@ -47,13 +47,12 @@ import python_utils  # isort:skip
 
 # pylint: disable=wrong-import-position
 from . import linter_utils  # isort:skip
-from . import linter_manager  # isort:skip
-from . import semaphore_utils  # isort:skip
+from .. import concurrent_task_utils  # isort:skip
 
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
 import esprima  # isort:
-from . import build  # isort:skip
+from .. import build  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
@@ -109,7 +108,7 @@ def _get_expression_from_node_if_one_exists(
     return expression
 
 
-class JsTsLintChecksManager(linter_manager.LintChecksManager):
+class JsTsLintChecksManager(python_utils.OBJECT):
     """Manages all the Js and Ts linting functions.
 
     Attributes:
@@ -130,7 +129,6 @@ class JsTsLintChecksManager(linter_manager.LintChecksManager):
         """
         os.environ['PATH'] = '%s/bin:' % NODE_DIR + os.environ['PATH']
 
-        super(JsTsLintChecksManager, self).__init__()
         self.js_files = js_files
         self.ts_files = ts_files
         self.verbose_mode_enabled = verbose_mode_enabled
@@ -287,8 +285,7 @@ class JsTsLintChecksManager(linter_manager.LintChecksManager):
             summary_messages.append(summary_message)
             python_utils.PRINT(summary_message)
             python_utils.PRINT('')
-        self.process_manager['extra'] = summary_messages
-        # _STDOUT_LIST.append(stdout)
+        return summary_messages
 
     def _check_js_and_ts_component_name_and_count(self):
         """This function ensures that all JS/TS files have exactly
@@ -342,8 +339,7 @@ class JsTsLintChecksManager(linter_manager.LintChecksManager):
                 summary_messages.append(summary_message)
 
             python_utils.PRINT('')
-            self.process_manager['component'] = summary_messages
-            # _STDOUT_LIST.append(stdout)
+        return summary_messages
 
     def _check_directive_scope(self):
         """This function checks that all directives have an explicit
@@ -474,8 +470,7 @@ class JsTsLintChecksManager(linter_manager.LintChecksManager):
                 summary_messages.append(summary_message)
 
             python_utils.PRINT('')
-            self.process_manager['directive'] = summary_messages
-            # _STDOUT_LIST.append(stdout)
+        return summary_messages
 
     def _check_sorted_dependencies(self):
         """This function checks that the dependencies which are
@@ -567,8 +562,7 @@ class JsTsLintChecksManager(linter_manager.LintChecksManager):
         python_utils.PRINT(summary_message)
         if self.verbose_mode_enabled:
             python_utils.PRINT('----------------------------------------')
-        self.process_manager['sorted'] = summary_messages
-        # _STDOUT_LIST.append(stdout)
+        return summary_messages
 
     def _match_line_breaks_in_controller_dependencies(self):
         """This function checks whether the line breaks between the dependencies
@@ -628,8 +622,7 @@ class JsTsLintChecksManager(linter_manager.LintChecksManager):
                 summary_messages.append(summary_message)
 
             python_utils.PRINT('')
-        self.process_manager['line_breaks'] = summary_messages
-        # _STDOUT_LIST.append(stdout)
+        return summary_messages
 
     def _check_constants_declaration(self):
         """Checks the declaration of constants in the TS files to ensure that
@@ -809,57 +802,6 @@ class JsTsLintChecksManager(linter_manager.LintChecksManager):
 
         return summary_messages
 
-    def _check_dependencies(self):
-        """Check the dependencies related issues. This runs
-        _check_sorted_dependencies and
-        _match_line_breaks_in_controller_dependencies
-        in parallel.
-        """
-        methods = [
-            self._check_sorted_dependencies,
-            self._match_line_breaks_in_controller_dependencies
-        ]
-        super(JsTsLintChecksManager, self)._run_multiple_checks(*methods)
-
-    def perform_all_lint_checks(self):
-        """Perform all the lint checks and returns the messages returned by all
-        the checks.
-
-        Returns:
-            all_messages: str. All the messages returned by the lint checks.
-        """
-
-        if not self.all_filepaths:
-            python_utils.PRINT('')
-            python_utils.PRINT(
-                'There are no JavaScript or Typescript files to lint.')
-            return []
-
-        self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
-        self.parsed_expressions_in_files = (
-            self._get_expressions_from_parsed_script())
-
-        common_messages = super(
-            JsTsLintChecksManager, self).perform_all_lint_checks()
-
-        super(JsTsLintChecksManager, self)._run_multiple_checks(
-            self._check_extra_js_files,
-            self._check_js_and_ts_component_name_and_count,
-            self._check_directive_scope
-        )
-        self._check_dependencies()
-        extra_js_files_messages = self.process_manager['extra']
-        js_and_ts_component_messages = self.process_manager['component']
-        directive_scope_messages = self.process_manager['directive']
-        sorted_dependencies_messages = self.process_manager['sorted']
-        controller_dependency_messages = self.process_manager['line_breaks']
-
-        all_messages = (
-            common_messages + extra_js_files_messages +
-            js_and_ts_component_messages + directive_scope_messages +
-            sorted_dependencies_messages + controller_dependency_messages)
-        return all_messages
-
     def _check_html_directive_name(self):
         """This function checks that all HTML directives end
         with _directive.html.
@@ -915,6 +857,39 @@ class JsTsLintChecksManager(linter_manager.LintChecksManager):
                 python_utils.PRINT(summary_message)
 
         return summary_messages
+
+    def perform_all_lint_checks(self):
+        """Perform all the lint checks and returns the messages returned by all
+        the checks.
+
+        Returns:
+            all_messages: str. All the messages returned by the lint checks.
+        """
+
+        if not self.all_filepaths:
+            python_utils.PRINT('')
+            python_utils.PRINT(
+                'There are no JavaScript or Typescript files to lint.')
+            return []
+
+        self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
+        self.parsed_expressions_in_files = (
+            self._get_expressions_from_parsed_script())
+
+        self._check_dependencies()
+        extra_js_files_messages = self._check_extra_js_files()
+        js_and_ts_component_messages = (
+            self._check_js_and_ts_component_name_and_count())
+        directive_scope_messages = self._check_directive_scope()
+        sorted_dependencies_messages = self._check_sorted_dependencies()
+        controller_dependency_messages = (
+            self._match_line_breaks_in_controller_dependencies())
+        html_directive_name_messages = self._check_html_directive_name()
+
+        all_messages = (extra_js_files_messages + html_directive_name_messages +
+            js_and_ts_component_messages + directive_scope_messages +
+            sorted_dependencies_messages + controller_dependency_messages)
+        return all_messages
 
 
 class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
@@ -1023,43 +998,3 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         all_messages += js_and_ts_linter_messages
 
         return all_messages
-
-
-def perform_all_lint_checks(
-        js_filepaths, ts_filepaths, file_extension_type,
-        verbose_mode_enabled=False):
-    """Perform all the lint checks and returns the messages returned by all
-    the checks.
-
-    Args:
-        js_filepaths: list(str). A list of js filepaths to lint.
-        ts_filepaths: list(str). A list of js filepaths to lint.
-        file_extension_type: list(str). The list of file extensions to be
-            linted.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
-
-    Returns:
-        all_messages: str. All the messages returned by the lint checks.
-    """
-    # Prepare tasks.
-    max_concurrent_runs = 25
-    concurrent_count = min(multiprocessing.cpu_count(), max_concurrent_runs)
-    semaphore = threading.Semaphore(concurrent_count)
-
-    files_to_lint = js_filepaths + ts_filepaths
-
-    custom_linter = JsTsLintChecksManager(   # pylint: disable=no-value-for-parameter
-        js_filepaths, ts_filepaths, verbose_mode_enabled)
-
-    third_party_linter = ThirdPartyJsTsLintChecksManager(
-        files_to_lint, verbose_mode_enabled)
-
-    task_custom = semaphore_utils.create_task(
-        custom_linter.perform_all_lint_checks, verbose_mode_enabled,
-        name=file_extension_type)
-
-    task_third_party = semaphore_utils.create_task(
-        third_party_linter.perform_all_lint_checks, verbose_mode_enabled,
-        semaphore=semaphore, name=file_extension_type)
-
-    return task_custom, task_third_party

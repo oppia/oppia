@@ -31,8 +31,7 @@ import python_utils  # isort:skip
 
 # pylint: disable=wrong-import-position
 from . import linter_utils  # isort:skip
-from . import linter_manager  # isort:skip
-from . import semaphore_utils  # isort:skip
+from .. import concurrent_task_utils  # isort:skip
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
@@ -63,7 +62,7 @@ _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
 
 
-class PythonLintChecksManager(linter_manager.LintChecksManager):
+class PythonLintChecksManager(python_utils.OBJECT):
     """Manages all the Python linting functions.
 
     Attributes:
@@ -78,7 +77,6 @@ class PythonLintChecksManager(linter_manager.LintChecksManager):
             files_to_lint: list(str). A list of filepaths to lint.
             verbose_mode_enabled: bool. True if mode is enabled.
         """
-        super(PythonLintChecksManager, self).__init__()
         self.files_to_lint = files_to_lint
         self.verbose_mode_enabled = verbose_mode_enabled
 
@@ -144,12 +142,9 @@ class PythonLintChecksManager(linter_manager.LintChecksManager):
             python_utils.PRINT('There are no Python files to lint.')
             return []
 
-        common_messages = super(
-            PythonLintChecksManager, self).perform_all_lint_checks()
-
         import_order_messages = self._check_import_order()
 
-        all_messages = common_messages + import_order_messages
+        all_messages = import_order_messages
 
         return all_messages
 
@@ -169,7 +164,6 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             files_to_lint: list(str). A list of filepaths to lint.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
-        super(ThirdPartyPythonLintChecksManager, self).__init__()
         self.files_to_lint = files_to_lint
         self.verbose_mode_enabled = verbose_mode_enabled
 
@@ -350,39 +344,3 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         all_messages += py_linter_messages + py3_linter_messages
 
         return all_messages
-
-
-def perform_all_lint_checks(
-        files_to_lint, file_extension_type, verbose_mode_enabled=False):
-    """Perform all the lint checks and returns the messages returned by all
-    the checks.
-
-    Args:
-        files_to_lint: list(str). A list of filepaths to lint.
-        file_extension_type: list(str). The list of file extensions to be
-            linted.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
-
-    Returns:
-        all_messages: str. All the messages returned by the lint checks.
-    """
-    # Prepare tasks.
-    max_concurrent_runs = 25
-    concurrent_count = min(multiprocessing.cpu_count(), max_concurrent_runs)
-    semaphore = threading.Semaphore(concurrent_count)
-
-    custom_linter = PythonLintChecksManager(   # pylint: disable=no-value-for-parameter
-        files_to_lint, verbose_mode_enabled)
-
-    third_party_linter = ThirdPartyPythonLintChecksManager(
-        files_to_lint, verbose_mode_enabled)
-
-    task_custom = semaphore_utils.create_task(
-        custom_linter.perform_all_lint_checks, verbose_mode_enabled,
-        name=file_extension_type)
-
-    task_third_party = semaphore_utils.create_task(
-        third_party_linter.perform_all_lint_checks, verbose_mode_enabled,
-        semaphore=semaphore, name=file_extension_type)
-
-    return task_custom, task_third_party

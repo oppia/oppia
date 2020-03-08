@@ -32,63 +32,13 @@ NODE_DIR = os.path.abspath(
 sys.path.insert(0, os.getcwd())
 
 # pylint: disable=wrong-import-position
-from . import linter_manager  # isort:skip
-from . import semaphore_utils  # isort:skip
+from .. import concurrent_task_utils  # isort:skip
 
 # pylint: disable=wrong-import-position
 import python_utils  # isort:skip
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
-
-
-class CSSLintChecksManager(linter_manager.LintChecksManager):
-    """Manages all the CSS linting functions.
-
-    Attributes:
-        files_to_lint: list(str). A list of filepaths to lint.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
-    """
-    def __init__(
-            self, files_to_lint, verbose_mode_enabled):
-        """Constructs a CSSLintChecksManager object.
-
-        Args:
-            files_to_lint: list(str). A list of filepaths to lint.
-            verbose_mode_enabled: bool. True if verbose mode is enabled.
-        """
-        super(CSSLintChecksManager, self).__init__()
-        self.files_to_lint = files_to_lint
-        self.verbose_mode_enabled = verbose_mode_enabled
-
-    @property
-    def css_filepaths(self):
-        """Return css filepaths."""
-        return self.files_to_lint
-
-    @property
-    def all_filepaths(self):
-        """Return all filepaths."""
-        return self.css_filepaths
-
-    def perform_all_lint_checks(self):
-        """Perform all the lint checks and returns the messages returned by all
-        the checks.
-
-        Returns:
-            all_messages: str. All the messages returned by the lint checks.
-        """
-
-        if not self.all_filepaths:
-            python_utils.PRINT('')
-            python_utils.PRINT('There are no CSS files to lint.')
-            return []
-
-        common_messages = super(
-            CSSLintChecksManager, self).perform_all_lint_checks()
-
-        all_messages = common_messages
-        return all_messages
 
 
 class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
@@ -200,52 +150,3 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         all_messages += css_linter_messages
 
         return all_messages
-
-
-def perform_all_lint_checks(
-        files_to_lint, file_extension_type, verbose_mode_enabled=False):
-    """Perform all the lint checks and returns the messages returned by all
-    the checks.
-
-    Args:
-        files_to_lint: list(str). A list of filepaths to lint.
-        file_extension_type: list(str). The list of file extensions to be
-            linted.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
-
-    Returns:
-        all_messages: str. All the messages returned by the lint checks.
-    """
-    # Prepare tasks.
-    max_concurrent_runs = 25
-    concurrent_count = min(multiprocessing.cpu_count(), max_concurrent_runs)
-    semaphore = threading.Semaphore(concurrent_count)
-
-    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-
-    if file_extension_type == 'html':
-        config_path = os.path.join(
-            parent_dir, 'oppia', '.stylelintrc')
-
-    if file_extension_type == 'css':
-        config_path = os.path.join(
-            parent_dir, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
-
-    custom_linter = CSSLintChecksManager(   # pylint: disable=no-value-for-parameter
-        files_to_lint, verbose_mode_enabled)
-
-    task_custom = semaphore_utils.create_task(
-        custom_linter.perform_all_lint_checks, verbose_mode_enabled,
-        name=file_extension_type)
-
-    if file_extension_type == 'css':
-        third_party_linter = ThirdPartyCSSLintChecksManager(
-            config_path, files_to_lint, verbose_mode_enabled)
-
-        task_third_party = semaphore_utils.create_task(
-            third_party_linter.perform_all_lint_checks, verbose_mode_enabled,
-            semaphore=semaphore, name=file_extension_type)
-
-        return task_custom, task_third_party
-
-    return task_custom

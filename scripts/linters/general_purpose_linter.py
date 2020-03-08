@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
-import abc
 import multiprocessing
 import os
 import re
@@ -537,8 +536,7 @@ def _check_file_type_specific_bad_pattern(filepath, content):
     return failed, total_error_count
 
 
-class LintChecksManager( # pylint: disable=inherit-non-class
-        python_utils.with_metaclass(abc.ABCMeta, python_utils.OBJECT)):
+class GeneralPurposeLinter(python_utils.OBJECT):
     """Manages all the common linting functions. As an abstract base class, this
     is not intended to be used directly.
 
@@ -549,8 +547,8 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
 
-    def __init__(self, verbose_mode_enabled=False): # pylint: disable=super-init-not-called
-        """Constructs a LintChecksManager object.
+    def __init__(self, files_to_lint, verbose_mode_enabled=False): # pylint: disable=super-init-not-called
+        """Constructs a GeneralPurposeLinter object.
 
         Args:
             verbose_mode_enabled: bool. True if verbose mode is enabled.
@@ -561,13 +559,13 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         # compilable.
         os.environ['PATH'] = '%s/bin:' % NODE_DIR + os.environ['PATH']
 
+        self.files_to_lint = files_to_lint
         self.verbose_mode_enabled = verbose_mode_enabled
-        self.process_manager = multiprocessing.Manager().dict()
 
-    @abc.abstractproperty
+    @property
     def all_filepaths(self):
         """Returns all file paths."""
-        pass
+        return self.files_to_lint
 
     def _check_for_mandatory_pattern_in_file(
             self, pattern_list, filepath, failed):
@@ -644,8 +642,6 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         python_utils.PRINT('')
 
         summary_messages.append(summary_message)
-        self.process_manager['mandatory'] = summary_messages
-        # _STDOUT_LIST.append(stdout)
         return summary_messages
 
     def _check_bad_patterns(self):
@@ -714,8 +710,6 @@ class LintChecksManager( # pylint: disable=inherit-non-class
                 python_utils.PRINT('(%s files checked, %s errors found)' % (
                     total_files_checked, total_error_count))
                 python_utils.PRINT(summary_message)
-        self.process_manager['bad_pattern'] = summary_messages
-        # _STDOUT_LIST.append(stdout)
         return summary_messages
 
     def perform_all_lint_checks(self):
