@@ -14,10 +14,10 @@
     </p>
   </div>
   <div class="modal-footer">
+    <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
     <button class="btn btn-success protractor-test-confirm-story-creation-button" type="submit" ng-disabled="isStoryTitleEmpty(storyTitle) || storyTitle.length >= 20">
       <span>Create Story</span>
     </button>
-    <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
   </div>
 </form>
 <style>
