@@ -34,7 +34,7 @@
           ng-attr-style="<[$ctrl.getRegionStyle($index)]>"
           ng-mouseover="$ctrl.onMouseoverRegion($index)"
           ng-mouseout="$ctrl.onMouseoutRegion($index)"
-          ng-mousemove="$ctrl.onMouseMoveRegion()"
+          ng-mousemove="$ctrl.onMouseMoveRegion($index)"
           ng-mousedown="$ctrl.onMousedownRegion($index)">
     </rect>
     <a ng-repeat="labeledRegion in $ctrl.value.labeledRegions" href
