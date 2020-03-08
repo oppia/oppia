@@ -34,6 +34,7 @@ import { AnswerClassificationResultObjectFactory } from
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerGroupsCacheService } from
+  // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AudioLanguageObjectFactory } from
   'domain/utilities/AudioLanguageObjectFactory';
