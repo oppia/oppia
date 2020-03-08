@@ -463,14 +463,14 @@ export class UpgradedServices {
   private registerService<T>(service: Newable<T>) {
     let serviceRegistry = this.serviceRegistry;
     return {
-      withDependencies: function(...args: Newable<any>[]): void => {
+      withDependencies: function(...args: Newable<any>[]): void {
         if (serviceRegistry.hasOwnProperty(service.name)) {
           throw Error(
             'Redefinition Error: Trying to register "' + service.name + '" ' +
             'more than once');
         }
-        serviceRegistry[service.name] = new Register<T>(
-          service, args.map(a => a.name));
+        serviceRegistry[service.name] =
+          new Register<T>(service, args.map(a => a.name));
       }
     };
   }
