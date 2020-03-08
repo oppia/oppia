@@ -134,15 +134,19 @@ export class UrlInterpolationService {
       return null;
     }
 
+    let nonStringParams = Object.entries(interpolationValues).filter(
+      ([key, val]) => !this.utilsService.isString(val));
+    if (nonStringParams.length > 0) {
+      new LoggerService().error(
+        'Parameters passed into interpolateUrl had non-string values: ' +
+        angular.toJson(nonStringParams));
+      this.alertsService.fatalWarning(
+        'Parameters passed into interpolateUrl must be strings.');
+    }
+
     let escapedInterpolationValues = {};
     for (let varName in interpolationValues) {
       let value = interpolationValues[varName];
-      if (!this.utilsService.isString(value)) {
-        this.alertsService.fatalWarning(
-          'Parameters passed into interpolateUrl must be strings.');
-        return null;
-      }
-
       escapedInterpolationValues[varName] = encodeURIComponent(value);
     }
 
