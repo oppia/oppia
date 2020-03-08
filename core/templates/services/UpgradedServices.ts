@@ -33,6 +33,8 @@ import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
+import { AnswerGroupsCacheService } from
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AudioLanguageObjectFactory } from
   'domain/utilities/AudioLanguageObjectFactory';
 import { AudioTranslationLanguageService } from
@@ -47,6 +49,8 @@ import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ChangeObjectFactory } from
+  'domain/editor/undo_redo/ChangeObjectFactory';
 import { ChangesInHumanReadableFormService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/services/changes-in-human-readable-form.service';
@@ -106,6 +110,7 @@ import { ImprovementActionButtonObjectFactory } from
 import { ImprovementsDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/improvements-tab/services/improvements-display.service';
+import { ImprovementsService } from 'services/improvements.service';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
@@ -117,6 +122,8 @@ import { LearnerAnswerInfoObjectFactory } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
 import { LearnerDashboardActivityIdsObjectFactory } from
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
+import { LearnerParamsService } from
+  'pages/exploration-player-page/services/learner-params.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
@@ -133,6 +140,8 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
+import { ParamMetadataObjectFactory } from
+  'domain/exploration/ParamMetadataObjectFactory';
 import { ParamSpecObjectFactory } from
   'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from
@@ -209,6 +218,8 @@ import { StateWrittenTranslationsService } from
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
+import { StoryNodeObjectFactory } from
+  'domain/story/StoryNodeObjectFactory';
 import { StoryPlaythroughObjectFactory } from
   'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { StoryReferenceObjectFactory } from
@@ -238,6 +249,8 @@ import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { TopicRightsObjectFactory } from
+  'domain/topic/TopicRightsObjectFactory';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -247,6 +260,8 @@ import { UrlService } from 'services/contextual/url.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
+import { VersionTreeService } from
+  'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { WindowDimensionsService } from
@@ -279,6 +294,7 @@ export class UpgradedServices {
       .withDependencies();
     this.registerService(AnswerGroupObjectFactory).withDependencies(
       OutcomeObjectFactory, RuleObjectFactory);
+    this.registerService(AnswerGroupsCacheService).withDependencies();
     this.registerService(AudioLanguageObjectFactory).withDependencies();
     this.registerService(AudioTranslationLanguageService).withDependencies(
       BrowserCheckerService, LanguageUtilService);
@@ -287,6 +303,7 @@ export class UpgradedServices {
     this.registerService(BackgroundMaskService).withDependencies();
     this.registerService(BrowserCheckerService).withDependencies(WindowRef);
     this.registerService(CamelCaseToHyphensPipe).withDependencies();
+    this.registerService(ChangeObjectFactory).withDependencies();
     this.registerService(ChangesInHumanReadableFormService).withDependencies(
       UtilsService);
     this.registerService(ClassifierObjectFactory).withDependencies();
@@ -342,6 +359,7 @@ export class UpgradedServices {
     this.registerService(IdGenerationService).withDependencies();
     this.registerService(ImprovementActionButtonObjectFactory)
       .withDependencies();
+    this.registerService(ImprovementsService).withDependencies();
     this.registerService(InteractionObjectFactory).withDependencies(
       AnswerGroupObjectFactory, HintObjectFactory, SolutionObjectFactory,
       OutcomeObjectFactory);
@@ -353,6 +371,7 @@ export class UpgradedServices {
     this.registerService(LearnerAnswerInfoObjectFactory).withDependencies();
     this.registerService(LearnerDashboardActivityIdsObjectFactory)
       .withDependencies();
+    this.registerService(LearnerParamsService).withDependencies();
     this.registerService(LocalStorageService).withDependencies(
       ExplorationDraftObjectFactory);
     this.registerService(LoggerService).withDependencies();
@@ -369,6 +388,7 @@ export class UpgradedServices {
     this.registerService(ParamChangeObjectFactory).withDependencies();
     this.registerService(ParamChangesObjectFactory).withDependencies(
       ParamChangeObjectFactory);
+    this.registerService(ParamMetadataObjectFactory).withDependencies();
     this.registerService(ParamSpecObjectFactory).withDependencies(
       ParamTypeObjectFactory);
     this.registerService(ParamSpecsObjectFactory).withDependencies(
@@ -433,6 +453,7 @@ export class UpgradedServices {
     this.registerService(StatesObjectFactory)
       .withDependencies(StateObjectFactory);
     this.registerService(StopwatchObjectFactory).withDependencies();
+    this.registerService(StoryNodeObjectFactory).withDependencies();
     this.registerService(StoryPlaythroughObjectFactory).withDependencies(
       ReadOnlyStoryNodeObjectFactory);
     this.registerService(StoryReferenceObjectFactory).withDependencies();
@@ -457,6 +478,7 @@ export class UpgradedServices {
     this.registerService(TopicObjectFactory).withDependencies(
       SubtopicObjectFactory, StoryReferenceObjectFactory,
       SkillSummaryObjectFactory);
+    this.registerService(TopicRightsObjectFactory).withDependencies();
     this.registerService(TopicSummaryObjectFactory).withDependencies();
     this.registerService(UnitsObjectFactory).withDependencies();
     this.registerService(UrlInterpolationService).withDependencies(
@@ -466,6 +488,7 @@ export class UpgradedServices {
     this.registerService(UtilsService).withDependencies();
     this.registerService(ValidatorsService).withDependencies(
       AlertsService, NormalizeWhitespacePipe);
+    this.registerService(VersionTreeService).withDependencies();
     this.registerService(VoiceoverObjectFactory).withDependencies();
     this.registerService(WindowDimensionsService).withDependencies(WindowRef);
     this.registerService(WindowRef).withDependencies();

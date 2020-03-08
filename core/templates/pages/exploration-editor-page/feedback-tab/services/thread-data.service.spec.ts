@@ -21,6 +21,8 @@
 // thread-data.service.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -126,6 +128,7 @@ describe('retrieving threads service', () => {
     ];
   });
 
+  beforeEach(angular.mock.module('oppia', TranslatorProviderForTests));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -144,7 +147,7 @@ describe('retrieving threads service', () => {
       $injector.get('SuggestionThreadObjectFactory');
     ThreadDataService = $injector.get('ThreadDataService');
 
-    spyOn(ContextService, 'getExplorationId').and.returnValue(this.expId);
+    spyOn(ContextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(CsrfTokenService, 'getTokenAsync')
       .and.returnValue($q.resolve('sample-csrf-token'));
   }));
