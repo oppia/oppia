@@ -68,7 +68,27 @@ class CheckCaseChangeServiceTests(test_utils.GenericTestBase):
             [
                 'string_one',
                 'string_two'
-            ]
+            ],
+            {
+                'element_one',
+                'element_two'
+            },
+            {
+                'key_one': {
+                    'element_one'
+                },
+                'key_two': [
+                    {
+                        'key_three': 0,
+                        'key_four': {
+                            'element_two'
+                        }
+                    },
+                    {
+                        'element_three'
+                    }
+                ]
+            }
         ]
 
         expected_results = [
@@ -97,7 +117,27 @@ class CheckCaseChangeServiceTests(test_utils.GenericTestBase):
             [
                 'string_one',
                 'string_two'
-            ]
+            ],
+            {
+                'element_one',
+                'element_two'
+            },
+            {
+                'keyOne': {
+                    'element_one'
+                },
+                'keyTwo': [
+                    {
+                        'keyThree': 0,
+                        'keyFour': {
+                            'element_two'
+                        }
+                    },
+                    {
+                        'element_three'
+                    }
+                ]
+            }
         ]
 
         for i in python_utils.RANGE(len(test_objects)):
