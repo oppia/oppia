@@ -141,6 +141,15 @@ describe('Responses Service', function() {
       interactionData.confirmedUnclassifiedAnswers);
   });
 
+  it('should change active answer group index', function() {
+    ResponsesService.changeActiveAnswerGroupIndex(1);
+    expect(ResponsesService.getActiveAnswerGroupIndex()).toBe(1);
+
+    // Click again in the current group.
+    ResponsesService.changeActiveAnswerGroupIndex(1);
+    expect(ResponsesService.getActiveAnswerGroupIndex()).toBe(-1);
+  });
+
   it('should update default outcome', function() {
     var addInfoMessageSpy = spyOn(AlertsService, 'addInfoMessage')
       .and.callThrough();
