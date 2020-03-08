@@ -30,6 +30,8 @@ var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 
 describe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
@@ -270,6 +272,7 @@ describe('Chapter editor functionality', function() {
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     users.createAndLoginAdminUser(
       userEmail, 'creatorChapterTest');
@@ -294,6 +297,21 @@ describe('Chapter editor functionality', function() {
     storyEditorPage.changeNodeOutline(forms.toRichText('First outline'));
     storyEditorPage.saveStory('First save');
   });
+
+  it(
+    'should check presence of skillreview RTE element in exploration ' +
+    'linked to story', function() {
+      browser.get('/create/' + dummyExplorationIds[0]);
+      waitFor.pageToFullyLoad();
+      explorationEditorMainTab.setContent(function(richTextEditor) {
+        richTextEditor.addRteComponent('Skillreview', 'Description');
+      });
+      explorationEditorPage.navigateToPreviewTab();
+      explorationPlayerPage.expectContentToMatch(function(richTextChecker) {
+        richTextChecker.readRteComponent(
+          'Skillreview', 'Description', forms.toRichText('material1'));
+      });
+    });
 
   it('should add one more chapter to the story', function() {
     storyEditorPage.createNewDestinationChapter('Chapter 2');

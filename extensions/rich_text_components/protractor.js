@@ -22,6 +22,7 @@ var RICH_TEXT_COMPONENTS = {
   Image: require('./Image/protractor.js'),
   Link: require('./Link/protractor.js'),
   Math: require('./Math/protractor.js'),
+  Skillreview: require('./Skillreview/protractor.js'),
   Tabs: require('./Tabs/protractor.js'),
   Video: require('./Video/protractor.js')
 };
