@@ -158,9 +158,8 @@ describe('retrieving threads service', () => {
       suggestion_thread_dicts: this.mockSuggestionThreads
     });
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=exp1').respond({
-        suggestions: this.mockSuggestions
-      });
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1')
+      .respond({ suggestions: this.mockSuggestions });
 
     ThreadDataService.fetchThreads().then(
       threadData => {
@@ -184,9 +183,8 @@ describe('retrieving threads service', () => {
       suggestion_thread_dicts: []
     });
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=exp1').respond({
-        suggestions: []
-      });
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1')
+      .respond({ suggestions: [] });
 
     ThreadDataService.fetchThreads().then(
       done.fail,
@@ -201,9 +199,8 @@ describe('retrieving threads service', () => {
       suggestion_thread_dicts: [null]
     });
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=exp1').respond({
-        suggestions: this.mockSuggestions
-      });
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1')
+      .respond({ suggestions: this.mockSuggestions });
 
     ThreadDataService.fetchThreads().then(
       done.fail,
@@ -220,9 +217,8 @@ describe('retrieving threads service', () => {
       suggestion_thread_dicts: this.mockSuggestionThreads
     });
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=exp1').respond({
-        suggestions: []
-      });
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1')
+      .respond({ suggestions: [] });
 
     ThreadDataService.fetchThreads().then(
       done.fail,
@@ -337,9 +333,8 @@ describe('retrieving threads service', () => {
       suggestion_thread_dicts: []
     });
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=exp1').respond({
-        suggestions: []
-      });
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1')
+      .respond({ suggestions: [] });
 
     expect(ThreadDataService.getOpenThreadsCount()).toEqual(0);
     ThreadDataService.createNewThread(subject, 'Text').then(
@@ -493,9 +488,8 @@ describe('retrieving threads service', () => {
       suggestion_thread_dicts: this.mockSuggestionThreads
     });
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=exp1').respond({
-        suggestions: this.mockSuggestions
-      });
+      '/suggestionlisthandler?target_type=exploration&target_id=exp1')
+      .respond({ suggestions: this.mockSuggestions });
     ThreadDataService.fetchThreads();
     $httpBackend.flush();
 
