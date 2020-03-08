@@ -23,7 +23,6 @@ import { Injectable } from '@angular/core';
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UtilsService } from 'services/utils.service';
-import { LoggerService } from 'services/contextual/logger.service';
 
 
 const Constants = require('constants.ts');
@@ -137,11 +136,10 @@ export class UrlInterpolationService {
     let nonStringParams = Object.entries(interpolationValues).filter(
       ([key, val]) => !this.utilsService.isString(val));
     if (nonStringParams.length > 0) {
-      new LoggerService().error(
-        'Parameters passed into interpolateUrl had non-string values: ' +
-        angular.toJson(nonStringParams));
       this.alertsService.fatalWarning(
-        'Parameters passed into interpolateUrl must be strings.');
+        'Every parameter passed into interpolateUrl must have string values, ' +
+        'but received: ' + nonStringParams.map(
+          ([key, val]) => key + ': ' + angular.toJson(val)).join(', '));
     }
 
     let escapedInterpolationValues = {};
