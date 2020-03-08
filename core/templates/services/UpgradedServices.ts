@@ -360,6 +360,7 @@ export class UpgradedServices {
     this.registerService(IdGenerationService).withDependencies();
     this.registerService(ImprovementActionButtonObjectFactory)
       .withDependencies();
+    this.registerService(ImprovementsDisplayService).withDependencies();
     this.registerService(ImprovementsService).withDependencies();
     this.registerService(InteractionObjectFactory).withDependencies(
       AnswerGroupObjectFactory, HintObjectFactory, SolutionObjectFactory,

@@ -152,7 +152,7 @@ angular.module('oppia').factory('ThreadDataService', [
         return $http.get(getThreadHandlerUrl(threadId)).then(response => {
           let threadMessageBackendDicts = response.data.messages || [];
           thread.setMessages(threadMessageBackendDicts.map(
-            ThreadMessageObjectFactory.createFromBackendDict));
+            m => ThreadMessageObjectFactory.createFromBackendDict(m)));
           return thread.getMessages();
         });
       },

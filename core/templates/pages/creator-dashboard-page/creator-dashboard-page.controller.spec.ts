@@ -69,6 +69,12 @@ describe('Creator dashboard controller', function() {
       for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
         $provide.value(key, value);
       }
+
+      $provide.factory('CreatorDashboardBackendApiService', ['$http', $http => {
+        return {
+          fetchDashboardData: () => $http.get('/creatordashboardhandler/data')
+        };
+      }]);
     }));
 
     beforeEach(angular.mock.inject(function($injector) {
