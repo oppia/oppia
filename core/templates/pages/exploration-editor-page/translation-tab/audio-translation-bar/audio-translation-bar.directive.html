@@ -56,7 +56,7 @@
     </button>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-upload-audio protractor-test-accessibility-translation-upload-audio"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-upload-audio-button protractor-test-accessibility-translation-upload-audio"
             uib-tooltip="Upload"
             tooltip-placement="above"
             ng-click="openAddAudioTranslationModal()"
@@ -92,7 +92,7 @@
     </div>
   </div>
   <div class="oppia-content-wrapper" ng-if="voiceoverRecorder.status().isRecording">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-stop-record"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-stop-record-button"
             uib-tooltip="Stop"
             tooltip-placement="above"
             ng-click="stopRecording()"
@@ -157,7 +157,7 @@
     </div>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-upload-audio"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-upload-audio-button"
             uib-tooltip="Upload audio"
             tooltip-placement="above"
             ng-hide="!canVoiceover"

@@ -92,16 +92,15 @@ describe('Voiceover upload features', function() {
     explorationEditorTranslationTab.deleteAudioRecord();
   });
 
-  it('should upload recorded audio', function() {
+  it('should upload recorded audio and play after logging out', function() {
     explorationEditorTranslationTab.addAudioRecord();
     explorationEditorTranslationTab.stopAudioRecord();
     explorationEditorTranslationTab.confirmAudioRecord();
     explorationEditorTranslationTab.playAudioRecord();
     browser.refresh();
     explorationEditorTranslationTab.playAudioRecord();
-  });
 
-  it('should play recorded file after logging out', function() {
+    // Try after logging out
     users.logout();
     users.login(TEST_EMAIL);
     creatorDashboardPage.get();
@@ -113,16 +112,15 @@ describe('Voiceover upload features', function() {
     explorationEditorTranslationTab.deleteAudioRecord();
   });
 
-  it('should upload audio file from path', function() {
+  it('should upload audio file from path and play after logout', function() {
     explorationEditorTranslationTab.uploadAudioRecord(
       '../../../data/explorations/audio_test/assets/audio/test_audio_1_en.mp3');
     explorationEditorTranslationTab.saveAudioRecord();
     explorationEditorTranslationTab.playAudioRecord();
     browser.refresh();
     explorationEditorTranslationTab.playAudioRecord();
-  });
 
-  it('should play recorded file from file after logging out', function() {
+    // Try after logging out
     users.logout();
     users.login(TEST_EMAIL);
     creatorDashboardPage.get();
