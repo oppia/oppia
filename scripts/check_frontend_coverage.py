@@ -294,6 +294,7 @@ FULLY_COVERED_FILENAMES = [
     'state-editor.constants.ajs.ts',
     'state-editor.constants.ts',
     'state-interaction-id.service.ts',
+    'state-name.service.ts',
     'state-recorded-voiceovers.service.ts',
     'state-rules-stats.service.ts',
     'state-solicit-answer-details.service.ts',
