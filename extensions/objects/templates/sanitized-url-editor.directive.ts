@@ -17,8 +17,7 @@
  */
 
 angular.module('oppia').directive('sanitizedUrlEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     // Editable URL directive.
     return {
       restrict: 'E',
@@ -26,8 +25,7 @@ angular.module('oppia').directive('sanitizedUrlEditor', [
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/sanitized-url-editor.directive.html'),
+      template: require('./sanitized-url-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

@@ -145,6 +145,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """General suggestion needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether GeneralSuggestionModel exists for the user.
@@ -512,6 +517,39 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         return cls.query(ndb.AND(
             cls.target_type == target_type, cls.target_id == target_id,
             cls.language_code == language_code)).fetch()
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Exports the data from GeneralVoiceoverApplicationModel
+        into dict format.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from GeneralVoiceoverApplicationModel.
+        """
+        user_data = dict()
+
+        voiceover_models = (
+            cls.query(cls.author_id == user_id).fetch())
+
+        for voiceover_model in voiceover_models:
+            user_data[voiceover_model.id] = {
+                'target_type': voiceover_model.target_type,
+                'target_id': voiceover_model.target_id,
+                'language_code': voiceover_model.language_code,
+                'status': voiceover_model.status,
+                'content': voiceover_model.content,
+                'filename': voiceover_model.filename,
+                'rejection_message': voiceover_model.rejection_message
+            }
+        return user_data
 
     def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for author_id and

@@ -22,18 +22,15 @@
 
 // TODO(czx): Uniquify the labels of image regions
 angular.module('oppia').directive('imageWithRegionsEditor', [
-  'AssetsBackendApiService',
-  'ContextService', 'UrlInterpolationService', 'ENTITY_TYPE',
-  function(AssetsBackendApiService,
-      ContextService, UrlInterpolationService, ENTITY_TYPE) {
+  'AssetsBackendApiService', 'ContextService', 'ENTITY_TYPE',
+  function(AssetsBackendApiService, ContextService, ENTITY_TYPE) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/image-with-regions-editor.directive.html'),
+      template: require('./image-with-regions-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$element', '$uibModal',
@@ -385,11 +382,14 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
             }
             ctrl.movedOutOfRegion = false;
           };
-          ctrl.onMouseMoveRegion = function() {
+          ctrl.onMouseMoveRegion = function(index) {
             if (
               ctrl.userIsCurrentlyDragging ||
               ctrl.userIsCurrentlyResizing) {
               return;
+            }
+            if (ctrl.hoveredRegion === null) {
+              ctrl.hoveredRegion = index;
             }
             var region = cornerAndDimensionsFromRegionArea(
               ctrl.value.labeledRegions[
@@ -477,9 +477,8 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
           };
           ctrl.resetEditor = function() {
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-                '/objects/templates/' +
-                'image-with-regions-reset-confirmation.directive.html'),
+              template: require(
+                './image-with-regions-reset-confirmation.directive.html'),
               backdrop: 'static',
               keyboard: false,
               controller: [
