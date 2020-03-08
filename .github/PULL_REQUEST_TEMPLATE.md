@@ -1,6 +1,6 @@
 ## Overview
 <!--
-Directions: Please answer *both* questions below and check off every point from the essential checklist!.
+READ ME FIRST: Please answer *both* questions below and check off every point from the essential checklist!.
 -->
 
 1. This PR fixes #[fill_in_number_here].
