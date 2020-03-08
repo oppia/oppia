@@ -178,48 +178,6 @@ describe('Interactions', function() {
     users.logout();
   });
 
-  it('testing for codeRepl', function() {
-    users.createAndLoginUser(
-      'CodeRepl@interactions.com', 'CodeRepl');
-    workflow.createExploration();
-    explorationEditorMainTab.setStateName('CodeEditor');
-    explorationEditorMainTab.setContent(forms.toRichText(
-      'Write a python program to print "Hello World".'));
-    explorationEditorMainTab.setInteraction('CodeRepl', 'hello');
-    explorationEditorMainTab.addResponse('CodeRepl',
-      forms.toRichText('Good job!'), 'End',
-      true, 'CodeEquals', 'print("Hello World")');
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setFeedback(forms.toRichText('Use the print() function'));
-    explorationEditorMainTab.moveToState('End');
-    explorationEditorMainTab.setContent(
-      forms.toRichText('Congratulations, you have finished!'));
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle('CodeRepl Test Exploration');
-    explorationEditorSettingsTab.setObjective(
-      'To publish and play this exploration');
-    explorationEditorSettingsTab.setCategory('Programming');
-    explorationEditorPage.saveChanges();
-    workflow.publishExploration();
-    users.logout();
-    users.createAndLoginUser(
-      'codeReplLearner@interactions.com', 'codeReplLearner');
-    libraryPage.get();
-    libraryPage.findExploration('CodeRepl Test Exploration');
-    libraryPage.playExploration('CodeRepl Test Exploration');
-    explorationPlayerPage.expectExplorationNameToBe(
-      'CodeRepl Test Exploration');
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(
-      'Write a python program to print "Hello World".'));
-    explorationPlayerPage.submitAnswer('CodeRepl', 'print("Hello World")');
-    explorationPlayerPage.expectLatestFeedbackToMatch(
-      forms.toRichText('Good job!'));
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.expectExplorationToBeOver();
-    users.logout();
-  });
-
   it('publish and play exploration successfully', function() {
     /*
      * This suite should be expanded as new interaction's e2e utility is added.

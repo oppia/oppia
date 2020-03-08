@@ -24,15 +24,15 @@ var customizeInteraction = function(interactionEditor, initialCode) {
 };
 
 var expectInteractionDetailsToMatch = function(elem) {
-  // expect(
-  //   elem.element(by.css('.CodeMirror')).isPresent()
-  // ).toBe(true);
+  expect(
+    elem.element(by.css('.CodeMirror')).isPresent()
+  ).toBe(true);
 };
 
 var submitAnswer = function(conversationInput, answerCode) {
   browser.executeScript(
-    'var editor = $(".CodeMirror")[0].CodeMirror;editor.setValue("' +
-    answerCode + '");');
+    "var editor = $('.CodeMirror')[1].CodeMirror;editor.setValue('" +
+    answerCode + "');");
   var submitAnswerButton = element(by.css(
     '.protractor-test-submit-answer-button'));
   waitFor.elementToBeClickable(
