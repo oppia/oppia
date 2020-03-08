@@ -424,7 +424,8 @@ describe('retrieving threads service', () => {
     'is different of old status and its status is open', done => {
       var mockThread = this.mockFeedbackThreads[0];
       mockThread.status = 'close';
-      var thread = FeedbackThreadObjectFactory.createFromBackendDict(mockThread);
+      var thread = FeedbackThreadObjectFactory.createFromBackendDict(
+        mockThread);
 
       // Fetch feedback stats
       $httpBackend.expectGET('/feedbackstatshandler/exp1').respond({
@@ -451,7 +452,8 @@ describe('retrieving threads service', () => {
     'should successfully add a new message in a thread when its status ' +
     'is equal old status', done => {
       var mockThread = this.mockFeedbackThreads[0];
-      var thread = FeedbackThreadObjectFactory.createFromBackendDict(mockThread);
+      var thread = FeedbackThreadObjectFactory.createFromBackendDict(
+        mockThread);
 
       // Fetch feedback stats
       $httpBackend.expectGET('/feedbackstatshandler/exp1').respond({
