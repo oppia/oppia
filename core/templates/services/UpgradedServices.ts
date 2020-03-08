@@ -252,15 +252,15 @@ import { WrittenTranslationsObjectFactory } from
 
 type Newable<T> = { new (...args: any[]): T; };
 
-class Registrar<T> {
+class Register<T> {
   constructor(
-      public serviceConstructor: Newable<T>,
+      public service: Newable<T>,
       public dependencies: string[] = []) {}
 }
 
 @Injectable({providedIn: 'root'})
 export class UpgradedServices {
-  private serviceRegistry: {[serviceName: string]: Registrar<any>};
+  private serviceRegistry: {[serviceName: string]: Register<any>};
 
   constructor() {
     this.serviceRegistry = {};
@@ -462,15 +462,16 @@ export class UpgradedServices {
   }
 
   private registerService<T>(service: Newable<T>) {
+    let that = this; // Necessary for unit-testing code.
     return {
       withDependencies: (...args: Newable<any>[]) => {
-        if (this.serviceRegistry.hasOwnProperty(service.name)) {
+        if (that.serviceRegistry.hasOwnProperty(service.name)) {
           throw Error(
             'Redefinition Error: Trying to register "' + service.name + '" ' +
             'more than once');
         }
-        this.serviceRegistry[service.name] =
-          new Registrar<T>(service, args.map(a => a.name));
+        that.serviceRegistry[service.name] =
+          new Register<T>(service, args.map(a => a.name));
       }
     };
   }
@@ -506,11 +507,11 @@ export class UpgradedServices {
           'Circular Dependency Error: the following service(s) have a cyclic ' +
           'dependency: ' + unresolvedServices.join(', '));
       }
-      for (let service of satisfiedServices) {
-        let {serviceConstructor, dependencies} = this.serviceRegistry[service];
-        resolvedServices[service] =
-          new serviceConstructor(...dependencies.map(d => resolvedServices[d]));
-        unresolvedServices.splice(unresolvedServices.indexOf(service), 1);
+      for (let serviceName of satisfiedServices) {
+        let {service, dependencies} = this.serviceRegistry[serviceName];
+        resolvedServices[serviceName] =
+          new service(...dependencies.map(d => resolvedServices[d]));
+        unresolvedServices.splice(unresolvedServices.indexOf(serviceName), 1);
       }
     }
 
