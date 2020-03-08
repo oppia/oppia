@@ -29,15 +29,6 @@ describe('UpgradedServices', () => {
     expect(() => this.upgradedServices.getUpgradedServices()).not.toThrow();
   });
 
-  it('should detect service redefinitions', () => {
-    class MockService {}
-
-    this.upgradedServices.registerService(MockService).withDependencies();
-    expect(() => {
-      this.upgradedServices.registerService(MockService).withDependencies();
-    }).toThrowError(/Redefinition Error/);
-  });
-
   it('should detect unregistered services', () => {
     class MockDependency {}
     class MockService {
