@@ -325,7 +325,8 @@ export class UpgradedServices {
       HtmlEscaperService, CamelCaseToHyphensPipe);
     this.registerService(ExtractImageFilenamesFromStateService)
       .withDependencies(HtmlEscaperService);
-    this.registerService(FeedbackThreadObjectFactory).withDependencies();
+    this.registerService(FeedbackThreadObjectFactory).withDependencies(
+      ThreadMessageSummaryObjectFactory);
     this.registerService(FractionObjectFactory).withDependencies();
     this.registerService(GenerateContentIdService).withDependencies();
     this.registerService(HintObjectFactory).withDependencies(
@@ -437,11 +438,14 @@ export class UpgradedServices {
     this.registerService(SuggestionModalService).withDependencies();
     this.registerService(SuggestionObjectFactory).withDependencies();
     this.registerService(SuggestionThreadObjectFactory).withDependencies(
-      SuggestionObjectFactory);
+      SuggestionObjectFactory, ThreadMessageSummaryObjectFactory);
     this.registerService(TextInputRulesService).withDependencies(
       NormalizeWhitespacePipe);
     this.registerService(TextInputValidationService).withDependencies(
       baseInteractionValidationService);
+    this.registerService(ThreadMessageObjectFactory).withDependencies(
+      ThreadMessageSummaryObjectFactory);
+    this.registerService(ThreadMessageSummaryObjectFactory).withDependencies();
     this.registerService(ThreadStatusDisplayService).withDependencies();
     this.registerService(TopicObjectFactory).withDependencies(
       SubtopicObjectFactory, StoryReferenceObjectFactory,
