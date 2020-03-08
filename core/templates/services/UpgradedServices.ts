@@ -436,7 +436,9 @@ export class UpgradedServices {
     this.registerService(SubtopicObjectFactory).withDependencies(
       SkillSummaryObjectFactory);
     this.registerService(SuggestionModalService).withDependencies();
-    this.registerService(SuggestionObjectFactory).withDependencies();
+    this.registerService(SuggestionObjectFactory).withDependencies(
+      SuggestionsService);
+    this.registerService(SuggestionsService).withDependencies();
     this.registerService(SuggestionThreadObjectFactory).withDependencies(
       SuggestionObjectFactory, ThreadMessageSummaryObjectFactory);
     this.registerService(TextInputRulesService).withDependencies(

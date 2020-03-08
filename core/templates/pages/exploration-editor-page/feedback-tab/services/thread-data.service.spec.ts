@@ -35,36 +35,14 @@ describe('retrieving threads service', () => {
   var $httpBackend = null;
   var $q = null;
   var $rootScope = null;
+  var ContextService = null;
   var CsrfTokenService = null;
   var FeedbackThreadObjectFactory = null;
   var SuggestionThreadObjectFactory = null;
   var ThreadDataService = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-
-    this.expId = 'exp1';
-    $provide.value('ContextService', { getExplorationId: () => this.expId });
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    $httpBackend = $injector.get('$httpBackend');
-    $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
-    CsrfTokenService = $injector.get('CsrfTokenService');
-    FeedbackThreadObjectFactory = $injector.get('FeedbackThreadObjectFactory');
-    SuggestionThreadObjectFactory =
-      $injector.get('SuggestionThreadObjectFactory');
-    ThreadDataService = $injector.get('ThreadDataService');
-
-    spyOn(CsrfTokenService, 'getTokenAsync')
-      .and.returnValue($q.resolve('sample-csrf-token'));
-  }));
-
   beforeEach(() => {
+    this.expId = 'exp1';
     this.mockFeedbackThreads = [
       {
         last_updated: 1441870501230.642,
@@ -147,6 +125,29 @@ describe('retrieving threads service', () => {
       }
     ];
   });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+
+  beforeEach(angular.mock.inject(function($injector) {
+    $httpBackend = $injector.get('$httpBackend');
+    $q = $injector.get('$q');
+    $rootScope = $injector.get('$rootScope');
+    ContextService = $injector.get('ContextService');
+    CsrfTokenService = $injector.get('CsrfTokenService');
+    FeedbackThreadObjectFactory = $injector.get('FeedbackThreadObjectFactory');
+    SuggestionThreadObjectFactory =
+      $injector.get('SuggestionThreadObjectFactory');
+    ThreadDataService = $injector.get('ThreadDataService');
+
+    spyOn(ContextService, 'getExplorationId').and.returnValue(this.expId);
+    spyOn(CsrfTokenService, 'getTokenAsync')
+      .and.returnValue($q.resolve('sample-csrf-token'));
+  }));
 
   it('should retrieve feedback threads and suggestion thread', done => {
     $httpBackend.whenGET('/threadlisthandler/exp1').respond({
