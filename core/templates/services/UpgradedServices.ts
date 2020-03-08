@@ -253,9 +253,7 @@ import { WrittenTranslationsObjectFactory } from
 type Newable<T> = { new (...args: any[]): T; };
 
 class Register<T> {
-  constructor(
-      public service: Newable<T>,
-      public dependencies: string[] = []) {}
+  constructor(public service: Newable<T>, public dependencies: string[]) {}
 }
 
 @Injectable({providedIn: 'root'})
@@ -265,6 +263,7 @@ export class UpgradedServices {
   constructor() {
     this.serviceRegistry = {};
 
+    // Please keep these sorted by name to make maintenance simpler.
     this.registerService(AlertsService).withDependencies(LoggerService);
     this.registerService(AngularNameService).withDependencies();
     this.registerService(AnswerClassificationResultObjectFactory)
@@ -462,21 +461,21 @@ export class UpgradedServices {
   }
 
   private registerService<T>(service: Newable<T>) {
-    let that = this; // Necessary for unit-testing code.
+    let serviceRegistry = this.serviceRegistry;
     return {
-      withDependencies: (...args: Newable<any>[]) => {
-        if (that.serviceRegistry.hasOwnProperty(service.name)) {
+      withDependencies: function(...args: Newable<any>[]): void => {
+        if (serviceRegistry.hasOwnProperty(service.name)) {
           throw Error(
             'Redefinition Error: Trying to register "' + service.name + '" ' +
             'more than once');
         }
-        that.serviceRegistry[service.name] =
-          new Register<T>(service, args.map(a => a.name));
+        serviceRegistry[service.name] = new Register<T>(
+          service, args.map(a => a.name));
       }
     };
   }
 
-  private validateDependencies(): void {
+  private validateServiceDependencies(): void {
     let registeredServices = Object.keys(this.serviceRegistry);
     let referencedServices = [].concat(
       ...Object.values(this.serviceRegistry).map(r => r.dependencies));
@@ -491,7 +490,7 @@ export class UpgradedServices {
   }
 
   getUpgradedServices() {
-    this.validateDependencies();
+    this.validateServiceDependencies();
 
     let unresolvedServices: string[] = Object.keys(this.serviceRegistry);
     let resolvedServices = {};
