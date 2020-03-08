@@ -46,7 +46,7 @@ describe('UpgradedServices', () => {
     class MockDependency {}
     class MockService {
       constructor(private mockDependency: MockDependency) {}
-    };
+    }
 
     this.registerService(MockService).withDependencies(MockDependency);
     expect(() => this.upgradedServices.getUpgradedServices())
@@ -54,8 +54,12 @@ describe('UpgradedServices', () => {
   });
 
   it('should detect cyclic dependencies', () => {
-    class MockService1 { constructor(private mockService2: MockService2) {} }
-    class MockService2 { constructor(private mockService1: MockService1) {} }
+    class MockService1 {
+      constructor(private mockService2: MockService2) {}
+    }
+    class MockService2 {
+      constructor(private mockService1: MockService1) {}
+    }
 
     this.registerService(MockService1).withDependencies(MockService2);
     this.registerService(MockService2).withDependencies(MockService1);
