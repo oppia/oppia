@@ -650,10 +650,10 @@ class AddCommunityReviewerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid username: %s' % new_reviewer_username)
 
-        review_item = self.payload.get('review_item')
+        review_category = self.payload.get('review_category')
         language_code = self.payload.get('language_code', None)
 
-        if review_item == constants.REVIEWABLE_ITEM_TRANSLATION:
+        if review_category == constants.REVIEW_CATEGORY_TRANSLATION:
             if not utils.is_supported_audio_language_code(language_code):
                 raise self.InvalidInputException(
                     'Invalid language_code: %s' % language_code)
@@ -663,9 +663,9 @@ class AddCommunityReviewerHandler(base.BaseHandler):
                     'User %s already has rights to review translation in '
                     'language code %s' % (
                         new_reviewer_username, language_code))
-            user_services.allow_user_review_translation_in_language(
+            user_services.allow_user_to_review_translation_in_language(
                 new_reviewer_user_id, language_code)
-        elif review_item == constants.REVIEWABLE_ITEM_VOICEOVER:
+        elif review_category == constants.REVIEW_CATEGORY_VOICEOVER:
             if not utils.is_supported_audio_language_code(language_code):
                 raise self.InvalidInputException(
                     'Invalid language_code: %s' % language_code)
@@ -675,21 +675,21 @@ class AddCommunityReviewerHandler(base.BaseHandler):
                     'User %s already has rights to review voiceover in '
                     'language code %s' % (
                         new_reviewer_username, language_code))
-            user_services.allow_user_review_voiceover_in_language(
+            user_services.allow_user_to_review_voiceover_in_language(
                 new_reviewer_user_id, language_code)
-        elif review_item == constants.REVIEWABLE_ITEM_QUESTION:
+        elif review_category == constants.REVIEW_CATEGORY_QUESTION:
             if user_services.can_review_question_suggestions(
                     new_reviewer_user_id):
                 raise self.InvalidInputException(
                     'User %s already has rights to review question.' % (
                         new_reviewer_username))
-            user_services.allow_user_review_question(new_reviewer_user_id)
+            user_services.allow_user_to_review_question(new_reviewer_user_id)
         else:
             raise self.InvalidInputException(
-                'Invalid review_item: %s' % review_item)
+                'Invalid review_category: %s' % review_category)
 
-        email_manager.send_assigned_community_reviewer_email(
-            new_reviewer_user_id, review_item, language_code=language_code)
+        email_manager.send_email_to_new_community_reviewer(
+            new_reviewer_user_id, review_category, language_code=language_code)
         self.render_json({})
 
 
@@ -713,11 +713,11 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid language_code: %s' % language_code)
 
-        if removal_type == constants.REVIEW_REMOVE_TYPE_ALL:
-            user_services.remove_user_from_community_reviewer(user_id)
-        elif removal_type == constants.REVIEW_REMOVE_TYPE_SPECIFIC:
+        if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
+            user_services.remove_community_reviewer(user_id)
+        elif removal_type == constants.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS:
             review_type = self.payload.get('review_type')
-            if review_type == constants.REVIEWABLE_ITEM_TRANSLATION:
+            if review_type == constants.REVIEW_CATEGORY_TRANSLATION:
                 if not user_services.can_review_translation_suggestions(
                         user_id, language_code=language_code):
                     raise self.InvalidInputException(
@@ -725,7 +725,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
                         'language %s.' % (username, language_code))
                 user_services.remove_translation_review_rights_in_language(
                     user_id, language_code)
-            elif review_type == constants.REVIEWABLE_ITEM_VOICEOVER:
+            elif review_type == constants.REVIEW_CATEGORY_VOICEOVER:
                 if not user_services.can_review_voiceover_applications(
                         user_id, language_code=language_code):
                     raise self.InvalidInputException(
@@ -733,7 +733,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
                         'language %s.' % (username, language_code))
                 user_services.remove_voiceover_review_rights_in_language(
                     user_id, language_code)
-            elif review_type == constants.REVIEWABLE_ITEM_QUESTION:
+            elif review_type == constants.REVIEW_CATEGORY_QUESTION:
                 if not user_services.can_review_question_suggestions(user_id):
                     raise self.InvalidInputException(
                         '%s does not have rights to review question.' % (
@@ -743,7 +743,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     'Invalid type: %s' % review_type)
 
-            email_manager.send_removed_community_reviewer_email(
+            email_manager.send_email_to_removed_community_reviewer(
                 user_id, review_type, language_code=language_code)
         else:
             raise self.InvalidInputException(
@@ -758,40 +758,43 @@ class CommunityReviewersHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        method = self.request.get('method')
-        if method == constants.VIEW_METHOD_USERNAME:
-            username = self.request.get('username')
-            user_id = user_services.get_user_id_from_username(username)
-            if user_id is None:
-                raise self.InvalidInputException(
-                    'Invalid username: %s' % username)
-            user_rights = (
-                user_services.get_user_community_rights(user_id))
-            self.render_json({
-                'can_review_translation_for_language_codes': (
-                    user_rights.can_review_translation_for_language_codes),
-                'can_review_voiceover_for_language_codes': (
-                    user_rights.can_review_voiceover_for_language_codes),
-                'can_review_questions': user_rights.can_review_questions
-            })
-        elif method == constants.VIEW_METHOD_ROLE:
-            review_type = self.request.get('type')
-            language_code = self.request.get('language_code', None)
-            if language_code is not None and not (
-                    utils.is_supported_audio_language_code(language_code)):
-                raise self.InvalidInputException(
-                    'Invalid language_code: %s' % language_code)
-            if review_type not in [
-                    constants.REVIEWABLE_ITEM_TRANSLATION,
-                    constants.REVIEWABLE_ITEM_VOICEOVER,
-                    constants.REVIEWABLE_ITEM_QUESTION]:
-                raise self.InvalidInputException(
-                    'Invalid type: %s' % review_type)
-            usernames = user_services.get_community_reviewer_usernames(
-                review_type, language_code=language_code)
-            self.render_json({'usernames': usernames})
-        else:
-            raise self.InvalidInputException('Invalid method: %s' % method)
+        review_type = self.request.get('type')
+        language_code = self.request.get('language_code', None)
+        if language_code is not None and not (
+                utils.is_supported_audio_language_code(language_code)):
+            raise self.InvalidInputException(
+                'Invalid language_code: %s' % language_code)
+        if review_type not in [
+                constants.REVIEW_CATEGORY_TRANSLATION,
+                constants.REVIEW_CATEGORY_VOICEOVER,
+                constants.REVIEW_CATEGORY_QUESTION]:
+            raise self.InvalidInputException(
+                'Invalid type: %s' % review_type)
+        usernames = user_services.get_community_reviewer_usernames(
+            review_type, language_code=language_code)
+        self.render_json({'usernames': usernames})
+
+
+class CommunityReviewerRightsDataHandler(base.BaseHandler):
+    """Handler to show the review rights of a user."""
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        username = self.request.get('username')
+        user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
+            raise self.InvalidInputException(
+                'Invalid username: %s' % username)
+        user_rights = (
+            user_services.get_user_community_rights(user_id))
+        self.render_json({
+            'can_review_translation_for_language_codes': (
+                user_rights.can_review_translation_for_language_codes),
+            'can_review_voiceover_for_language_codes': (
+                user_rights.can_review_voiceover_for_language_codes),
+            'can_review_questions': user_rights.can_review_questions
+        })
 
 
 class SendDummyMailToAdminHandler(base.BaseHandler):

@@ -215,14 +215,14 @@
             </div>
             <div class="col-md-4 ml-auto">
               <select ng-model="$ctrl.formData.removeCommunityReviewer.method" class="form-control">
-                <option value="<[$ctrl.REVIEW_REMOVE_TYPE_ALL]>">Remove all review rights</option>
-                <option value="<[$ctrl.REVIEW_REMOVE_TYPE_SPECIFIC]>">Remove specific review rights</option>
+                <option value="<[$ctrl.ACTION_REMOVE_ALL_REVIEW_RIGHTS]>">Remove all review rights</option>
+                <option value="<[$ctrl.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS]>">Remove specific review rights</option>
               </select>
             </div>
           </div>
 
           <div class="d-xl-inline-flex form-group"
-               ng-if="$ctrl.formData.removeCommunityReviewer.method===$ctrl.REVIEW_REMOVE_TYPE_SPECIFIC">
+               ng-if="$ctrl.formData.removeCommunityReviewer.method===$ctrl.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Remove type</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
               <select ng-options="value as key for (key, value) in $ctrl.REVIEWABLE_ITEMS" ng-model="$ctrl.formData.removeCommunityReviewer.type" class="form-control">

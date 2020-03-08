@@ -2088,7 +2088,7 @@ class UserCommunityRightsModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether UserCommunityRightsModel exists for user.
+        """Check whether UserCommunityRightsModel exists for the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -2140,16 +2140,16 @@ class UserCommunityRightsModel(base_models.BaseModel):
         return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @classmethod
-    def get_translation_reviewer_user_id(cls, language_code):
-        """Returns the ID of the users who has rights to review translation in
-        the given language code.
+    def get_translation_reviewer_user_ids(cls, language_code):
+        """Returns the IDs of the users who have rights to review translations
+        in the given language code.
 
         Args:
             language_code: str. The code of the language.
 
         Returns:
-            list(str). A list of user's IDs who has rights to review translation
-            in the given language code.
+            list(str). A list of IDs of users who have rights to review
+            translations in the given language code.
         """
         reviewer_models = (
             cls.query(
@@ -2158,16 +2158,16 @@ class UserCommunityRightsModel(base_models.BaseModel):
         return [reviewer_model.id for reviewer_model in reviewer_models]
 
     @classmethod
-    def get_voiceover_reviewer_user_id(cls, language_code):
-        """Returns the ID of the users who has rights to review voiceover in
+    def get_voiceover_reviewer_user_ids(cls, language_code):
+        """Returns the IDs of the users who have rights to review voiceovers in
         the given language code.
 
         Args:
             language_code: str. The code of the language.
 
         Returns:
-            list(str). A list of user's IDs who has rights to review voiceover
-            in the given language code.
+            list(str). A list of IDs of users who have rights to review
+            voiceovers in the given language code.
         """
         reviewer_models = (
             cls.query(
@@ -2176,11 +2176,12 @@ class UserCommunityRightsModel(base_models.BaseModel):
         return [reviewer_model.id for reviewer_model in reviewer_models]
 
     @classmethod
-    def get_question_reviewer_user_id(cls):
-        """Returns the ID of the users who has rights to review questions.
+    def get_question_reviewer_user_ids(cls):
+        """Returns the IDs of the users who have rights to review questions.
 
         Returns:
-            list(str). A list of user's IDs who has rights to review questions.
+            list(str). A list of IDs of users who have rights to review
+            questions.
         """
         reviewer_models = cls.query(cls.can_review_questions == True).fetch() # pylint: disable=singleton-comparison
         return [reviewer_model.id for reviewer_model in reviewer_models]

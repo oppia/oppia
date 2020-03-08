@@ -406,7 +406,12 @@ class UserCommunityRightsDataHandlerTest(test_utils.GenericTestBase):
     def test_guest_user_check_community_rights(self):
         response = self.get_json('/usercommunityrightsdatahandler')
 
-        self.assertEqual(response, {})
+        self.assertEqual(
+            response, {
+                'can_review_translation_for_language_codes': [],
+                'can_review_voiceover_for_language_codes': [],
+                'can_review_questions': False
+            })
 
     def test_user_check_community_rights(self):
         user_email = 'user@example.com'
@@ -422,7 +427,7 @@ class UserCommunityRightsDataHandlerTest(test_utils.GenericTestBase):
                 'can_review_questions': False
             })
 
-        user_services.allow_user_review_question(user_id)
+        user_services.allow_user_to_review_question(user_id)
 
         response = self.get_json('/usercommunityrightsdatahandler')
         self.assertEqual(

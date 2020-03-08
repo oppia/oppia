@@ -379,7 +379,7 @@ angular.module('oppia').directive('contributionsAndReview', [
             ];
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-              ctrl.userDeatilsLoading = false;
+              ctrl.userDetailsLoading = false;
               if (ctrl.userIsLoggedIn) {
                 UserService.getUserCommunityRightsData().then(
                   function(UserCommunityRights) {
@@ -403,12 +403,8 @@ angular.module('oppia').directive('contributionsAndReview', [
                       });
                     }
                     if (ctrl.reviewTabs.length > 0) {
-                      ctrl.canReviewTranslation = true;
-                      ctrl.reviewTabActive = false;
                       ctrl.switchToReviewTab(ctrl.SUGGESTION_TYPE_QUESTION);
                     } else {
-                      ctrl.canReviewTranslation = false;
-                      ctrl.reviewTabActive = true;
                       ctrl.switchToContributionsTab(
                         ctrl.SUGGESTION_TYPE_QUESTION);
                     }

@@ -73,7 +73,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
-        user_services.allow_user_review_translation_in_language(
+        user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id, 'hi')
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
@@ -786,7 +786,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
-        user_services.allow_user_review_question(self.reviewer_id)
+        user_services.allow_user_to_review_question(self.reviewer_id)
 
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
@@ -1281,8 +1281,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
-        user_services.allow_user_review_question(self.reviewer_id)
-        user_services.allow_user_review_translation_in_language(
+        user_services.allow_user_to_review_question(self.reviewer_id)
+        user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id, 'hi')
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)

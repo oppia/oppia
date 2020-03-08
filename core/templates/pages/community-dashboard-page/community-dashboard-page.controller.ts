@@ -108,31 +108,32 @@ angular.module('oppia').directive('communityDashboardPage', [
               ctrl.profilePictureDataUrl = dataUrl;
             });
 
+            UserService.getUserCommunityRightsData().then(
+              function(userCommunityRights) {
+                ctrl.userCanReviewTranslationSuggestionsInLanguages = (
+                  getLanguageDescriptions(
+                    userCommunityRights
+                      .can_review_translation_for_language_codes));
+
+                ctrl.userCanReviewVoiceoverSuggestionsInLanguages = (
+                  getLanguageDescriptions(
+                    userCommunityRights
+                      .can_review_voiceover_for_language_codes));
+
+                ctrl.userCanReviewQuestions = (
+                  userCommunityRights.can_review_questions);
+
+                ctrl.userIsReviewer = (
+                  ctrl.userCanReviewTranslationSuggestionsInLanguages
+                    .length > 0 ||
+                  ctrl.userCanReviewVoiceoverSuggestionsInLanguages
+                    .length > 0 ||
+                  ctrl.userCanReviewQuestions);
+              });
+
             UserService.getUserInfoAsync().then(function(userInfo) {
               if (userInfo.isLoggedIn()) {
                 ctrl.username = userInfo.getUsername();
-                UserService.getUserCommunityRightsData().then(
-                  function(userCommunityRights) {
-                    ctrl.userCanReviewTranslationSuggestionsInLanguages = (
-                      getLanguageDescriptions(
-                        userCommunityRights
-                          .can_review_translation_for_language_codes));
-
-                    ctrl.userCanReviewVoiceoverSuggestionsInLanguages = (
-                      getLanguageDescriptions(
-                        userCommunityRights
-                          .can_review_voiceover_for_language_codes));
-
-                    ctrl.userCanReviewQuestions = (
-                      userCommunityRights.can_review_questions);
-
-                    ctrl.userIsReviewer = (
-                      ctrl.userCanReviewTranslationSuggestionsInLanguages
-                        .length > 0 ||
-                      ctrl.userCanReviewVoiceoverSuggestionsInLanguages
-                        .length > 0 ||
-                      ctrl.userCanReviewQuestions);
-                  });
               }
             });
 

@@ -13971,9 +13971,9 @@ class UserCommunityRightsModelValidatorTests(test_utils.GenericTestBase):
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
 
-        user_services.allow_user_review_voiceover_in_language(
+        user_services.allow_user_to_review_voiceover_in_language(
             self.translator_id, 'hi')
-        user_services.allow_user_review_voiceover_in_language(
+        user_services.allow_user_to_review_voiceover_in_language(
             self.voice_artist_id, 'hi')
 
         self.translator_model_instance = (

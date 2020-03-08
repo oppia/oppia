@@ -209,26 +209,27 @@ class TranslatableTextHandler(base.BaseHandler):
 
 
 class UserCommunityRightsDataHandler(base.BaseHandler):
-    """Provides user's review rights in community."""
+    """Provides review rights of the logged in user in translation, voiceover
+    and question category on the community dashboard.
+    """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
+        community_rights = None
         if self.username:
             community_rights = user_services.get_user_community_rights(
                 self.user_id)
-            self.render_json({
-                'can_review_translation_for_language_codes': (
-                    community_rights.can_review_translation_for_language_codes
-                    if community_rights else []),
-                'can_review_voiceover_for_language_codes': (
-                    community_rights.can_review_voiceover_for_language_codes
-                    if community_rights else []),
-                'can_review_questions': (
-                    community_rights.can_review_questions
-                    if community_rights else False)
-            })
-        else:
-            self.render_json({})
+        self.render_json({
+            'can_review_translation_for_language_codes': (
+                community_rights.can_review_translation_for_language_codes
+                if community_rights else []),
+            'can_review_voiceover_for_language_codes': (
+                community_rights.can_review_voiceover_for_language_codes
+                if community_rights else []),
+            'can_review_questions': (
+                community_rights.can_review_questions
+                if community_rights else False)
+        })

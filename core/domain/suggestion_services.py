@@ -363,15 +363,14 @@ def get_reviewable_suggestions(user_id, suggestion_type):
             .get_in_review_suggestions_of_suggestion_type(
                 suggestion_type, user_id))
     ])
-    user_reviewable_suggestions = []
-    community_rights = user_services.get_user_community_rights(user_id)
+    user_review_rights = user_services.get_user_community_rights(user_id)
     if suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
         language_codes = (
-            community_rights.can_review_translation_for_language_codes)
-        for suggestion in all_suggestions:
-            if suggestion.change.language_code in language_codes:
-                user_reviewable_suggestions.append(suggestion)
-        return user_reviewable_suggestions
+            user_review_rights.can_review_translation_for_language_codes)
+        return [
+            suggestion for suggestion in all_suggestions if (
+                suggestion.change.language_code in language_codes)
+            ]
     return all_suggestions
 
 

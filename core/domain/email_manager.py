@@ -46,6 +46,58 @@ def log_new_error(*args, **kwargs):
     logging.error(*args, **kwargs)
 
 
+NEW_REVIEWER_EMAIL_DATA = {
+    constants.REVIEW_CATEGORY_TRANSLATION: {
+        'review_category': 'translations',
+        'to_check': 'translation suggestions',
+        'description_template': '%s language translations',
+        'rights_message_template': (
+            'review translation suggestions made by contributors in the %s '
+            'language')
+    },
+    constants.REVIEW_CATEGORY_VOICEOVER: {
+        'review_category': 'voiceovers',
+        'to_check': 'voiceover applications',
+        'description_template': '%s language voiceovers',
+        'rights_message_template': (
+            'review voiceover applications made by contributors in the %s '
+            'language')
+    },
+    constants.REVIEW_CATEGORY_QUESTION: {
+        'review_category': 'questions',
+        'to_check': 'question suggestions',
+        'description': 'questions',
+        'rights_message': 'review question suggestions made by contributors'
+    }
+}
+
+REMOVED_REVIEWER_EMAIL_DATA = {
+    constants.REVIEW_CATEGORY_TRANSLATION: {
+        'review_category': 'translation',
+        'role_description_template': (
+            'translation reviewer role in the %s language'),
+        'rights_message_template': (
+            'review translation suggestions made by contributors in the %s '
+            'language'),
+        'contribution_allowed': 'translations'
+    },
+    constants.REVIEW_CATEGORY_VOICEOVER: {
+        'review_category': 'voiceover',
+        'role_description_template': (
+            'voiceover reviewer role in the %s language'),
+        'rights_message_template': (
+            'review voiceover applications made by contributors in the %s '
+            'language'),
+        'contribution_allowed': 'voiceovers'
+    },
+    constants.REVIEW_CATEGORY_QUESTION: {
+        'review_category': 'question',
+        'role_description': 'question reviewer role',
+        'rights_message': 'review question suggestions made by contributors',
+        'contribution_allowed': 'questions'
+    }
+}
+
 NOTIFICATION_EMAIL_LIST_SCHEMA = {
     'type': 'list',
     'items': {
@@ -1230,46 +1282,47 @@ def send_account_deleted_email(user_id, user_email):
         recipient_email=user_email)
 
 
-def send_assigned_community_reviewer_email(
-        user_id, review_item, language_code=None):
+def send_email_to_new_community_reviewer(
+        user_id, review_category, language_code=None):
     """Sends an email to user who is assigned as a reviewer.
 
     Args:
         user_id: str. The ID of the user.
-        review_item: str. The item which user can review.
+        review_category: str. The category in which user can review.
         language_code: None|str. The language code for a language if the review
             item is translation or voiceover else None.
     """
-    email_subject = 'You have been invited to review Oppia %s' % (
-        review_item)
+    if review_category not in NEW_REVIEWER_EMAIL_DATA:
+        raise Exception('Invalid review_category: %s' % review_category)
 
-    if review_item in [
-            constants.REVIEWABLE_ITEM_TRANSLATION,
-            constants.REVIEWABLE_ITEM_VOICEOVER]:
-        review_item_type = 'suggestions' if review_item == (
-            constants.REVIEWABLE_ITEM_TRANSLATION) else 'applications'
+    review_category_data = NEW_REVIEWER_EMAIL_DATA[review_category]
+    email_subject = 'You have been invited to review Oppia %s' % (
+        review_category_data['review_category'])
+
+    if review_category in [
+            constants.REVIEW_CATEGORY_TRANSLATION,
+            constants.REVIEW_CATEGORY_VOICEOVER]:
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
         # Adding 's' at the end of 'translation' to make it 'translations'.
-        review_item_description = (
-            '%s-language %s' % (language_description, review_item + 's'))
+        review_category_description = (
+            review_category_data['description_template'] % language_description)
         reviewer_rights_message = (
-            'review %s %s made by contributors in the %s language' % (
-                review_item, review_item_type, language_description))
+            review_category_data['rights_message_template'] % (
+                language_description))
     else:
-        review_item_type = 'suggestions'
-        # Adding 's' at the end of 'question' to make it 'questions'.
-        review_item_description = review_item + 's'
-        reviewer_rights_message = (
-            'review %s %s made by contributors' % (
-                review_item, review_item_type))
+        review_category_description = review_category_data['description']
+        reviewer_rights_message = review_category_data['rights_message']
+
+    to_review = review_category_data['to_check']
 
     email_body_template = (
         'Hi %s,<br><br>'
         'This is to let you know that the Oppia team has added you as a '
         'reviewer for %s. This allows you to %s.<br><br>'
-        'You can check the %s %s waiting for review in the '
-        'Community dashboard.<br><br>'
+        'You can check the %s waiting for review in the '
+        '<a href="https://www.oppia.org/community_dashboard">'
+        'Community Dashboard</a>.<br><br>'
         'Thanks, and happy contributing!<br><br>'
         'Best wishes,<br>'
         'The Oppia Community')
@@ -1285,53 +1338,53 @@ def send_assigned_community_reviewer_email(
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
         email_body = email_body_template % (
-            recipient_user_settings.username, review_item_description,
-            reviewer_rights_message, review_item, review_item_type)
+            recipient_user_settings.username, review_category_description,
+            reviewer_rights_message, to_review)
         _send_email(
             user_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_ONBOARD_REVIEWER, email_subject, email_body,
             feconf.NOREPLY_EMAIL_ADDRESS)
 
 
-def send_removed_community_reviewer_email(
-        user_id, review_item, language_code=None):
+def send_email_to_removed_community_reviewer(
+        user_id, review_category, language_code=None):
     """Sends an email to user who is removed from the reviewer position.
 
     Args:
         user_id: str. The ID of the user.
-        review_item: str. The item which for which review role is removed.
+        review_category: str. The category which for which review role is
+            removed.
         language_code: None|str. The language code for a language if the review
             item is translation or voiceover else None.
     """
-    email_subject = 'You have been unassigned as a %s reviewer' % (
-        review_item)
+    if review_category not in REMOVED_REVIEWER_EMAIL_DATA:
+        raise Exception('Invalid review_category: %s' % review_category)
 
-    if review_item in [
-            constants.REVIEWABLE_ITEM_TRANSLATION,
-            constants.REVIEWABLE_ITEM_VOICEOVER]:
-        review_item_type = 'suggestions' if review_item == (
-            constants.REVIEWABLE_ITEM_TRANSLATION) else 'applications'
+    review_category_data = REMOVED_REVIEWER_EMAIL_DATA[review_category]
+    email_subject = 'You have been unassigned as a %s reviewer' % (
+        review_category_data['review_category'])
+
+    if review_category in [
+            constants.REVIEW_CATEGORY_TRANSLATION,
+            constants.REVIEW_CATEGORY_VOICEOVER]:
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
         reviewer_role_description = (
-            '%s reviewer role in the %s-language' % (
-                review_item, language_description))
+            review_category_data['role_description_template'] % (
+                language_description))
         reviewer_rights_message = (
-            'review %s %s made by contributors in the %s language' % (
-                review_item, review_item_type, language_description))
+            review_category_data['rights_message_template'] % (
+                language_description))
     else:
-        review_item_type = 'suggestions'
-        # Adding 's' at the end of 'question' to make it 'questions'.
-        reviewer_role_description = '%s reviewer role' % review_item
-        reviewer_rights_message = (
-            'review %s %s made by contributors' % (
-                review_item, review_item_type))
+        reviewer_role_description = review_category_data['role_description']
+        reviewer_rights_message = review_category_data['rights_message']
 
     email_body_template = (
         'Hi %s,<br><br>'
         'The Oppia team has removed you from the %s. You won\'t be able to %s '
         'any more, but you can still contribute %s through the '
-        'Community dashboard.<br><br>'
+        '<a href="https://www.oppia.org/community_dashboard">'
+        'Community Dashboard</a>.<br><br>'
         'Thanks, and happy contributing!<br><br>'
         'Best wishes,<br>'
         'The Oppia Community')
@@ -1348,7 +1401,8 @@ def send_removed_community_reviewer_email(
     if can_user_receive_email:
         email_body = email_body_template % (
             recipient_user_settings.username, reviewer_role_description,
-            reviewer_rights_message, review_item)
+            reviewer_rights_message,
+            review_category_data['contribution_allowed'])
         _send_email(
             user_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_REMOVE_REVIEWER, email_subject, email_body,

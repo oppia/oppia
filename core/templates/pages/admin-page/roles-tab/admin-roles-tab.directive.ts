@@ -27,16 +27,18 @@ require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminRolesTab', [
   '$http', '$rootScope', 'AdminDataService', 'AdminTaskManagerService',
-  'LanguageUtilService', 'UrlInterpolationService', 'ADMIN_ROLE_HANDLER_URL',
-  'REVIEWABLE_ITEM_QUESTION', 'REVIEWABLE_ITEM_TRANSLATION',
-  'REVIEWABLE_ITEM_VOICEOVER', 'REVIEW_REMOVE_TYPE_ALL',
-  'REVIEW_REMOVE_TYPE_SPECIFIC', 'VIEW_METHOD_ROLE', 'VIEW_METHOD_USERNAME',
+  'LanguageUtilService', 'UrlInterpolationService',
+  'ACTION_REMOVE_ALL_REVIEW_RIGHTS', 'ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS',
+  'ADMIN_ROLE_HANDLER_URL', 'REVIEW_CATEGORY_QUESTION',
+  'REVIEW_CATEGORY_TRANSLATION', 'REVIEW_CATEGORY_VOICEOVER',
+  'VIEW_METHOD_ROLE', 'VIEW_METHOD_USERNAME',
   function(
       $http, $rootScope, AdminDataService, AdminTaskManagerService,
-      LanguageUtilService, UrlInterpolationService, ADMIN_ROLE_HANDLER_URL,
-      REVIEWABLE_ITEM_QUESTION, REVIEWABLE_ITEM_TRANSLATION,
-      REVIEWABLE_ITEM_VOICEOVER, REVIEW_REMOVE_TYPE_ALL,
-      REVIEW_REMOVE_TYPE_SPECIFIC, VIEW_METHOD_ROLE, VIEW_METHOD_USERNAME) {
+      LanguageUtilService, UrlInterpolationService,
+      ACTION_REMOVE_ALL_REVIEW_RIGHTS, ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS,
+      ADMIN_ROLE_HANDLER_URL, REVIEW_CATEGORY_QUESTION,
+      REVIEW_CATEGORY_TRANSLATION, REVIEW_CATEGORY_VOICEOVER,
+      VIEW_METHOD_ROLE, VIEW_METHOD_USERNAME,) {
     return {
       restrict: 'E',
       scope: {},
@@ -49,12 +51,22 @@ angular.module('oppia').directive('adminRolesTab', [
       controller: [function() {
         var ctrl = this;
 
-        var errorHandler = function(errorResponse) {
+        var handleErrorResponse = function(errorResponse) {
           ctrl.setStatusMessage(
             'Server error: ' + errorResponse.data.error);
         };
 
-        ctrl.submitRoleViewForm = function(values) {
+        var getLanguageDescriptions = function(languageCodes) {
+          var languageDescriptions = [];
+          languageCodes.forEach(function(languageCode) {
+            languageDescriptions.push(
+              LanguageUtilService.getAudioLanguageDescription(
+                languageCode));
+          });
+          return languageDescriptions;
+        };
+
+        ctrl.submitRoleViewForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
@@ -65,9 +77,9 @@ angular.module('oppia').directive('adminRolesTab', [
           ctrl.result = {};
           $http.get(ADMIN_ROLE_HANDLER_URL, {
             params: {
-              method: values.method,
-              role: values.role,
-              username: values.username
+              method: formResponse.method,
+              role: formResponse.role,
+              username: formResponse.username
             }
           }).then(function(response) {
             ctrl.result = response.data;
@@ -79,93 +91,92 @@ angular.module('oppia').directive('adminRolesTab', [
               ctrl.setStatusMessage('Success.');
             }
             refreshFormData();
-          }, errorHandler);
+          }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.submitUpdateRoleForm = function(values) {
+        ctrl.submitUpdateRoleForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
           ctrl.setStatusMessage('Updating User Role');
           AdminTaskManagerService.startTask();
           $http.post(ADMIN_ROLE_HANDLER_URL, {
-            role: values.newRole,
-            username: values.username,
-            topic_id: values.topicId
+            role: formResponse.newRole,
+            username: formResponse.username,
+            topic_id: formResponse.topicId
           }).then(function(response) {
             ctrl.setStatusMessage(
-              'Role of ' + values.username + ' successfully updated to ' +
-              values.newRole);
+              'Role of ' + formResponse.username + ' successfully updated to ' +
+              formResponse.newRole);
             refreshFormData();
-          }, errorHandler);
+          }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.submitAddCommunityReviewerForm = function(values) {
+        ctrl.submitAddCommunityReviewerForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
           ctrl.setStatusMessage('Adding new reviewer...');
           AdminTaskManagerService.startTask();
           $http.post('/addcommunityreviewerhandler', {
-            review_item: values.type,
-            username: values.username,
-            language_code: values.languageCode
+            review_category: formResponse.type,
+            username: formResponse.username,
+            language_code: formResponse.languageCode
           }).then(function(response) {
             ctrl.setStatusMessage(
-              'Successfully added "' + values.username + '" as ' +
-              values.type + ' reviewer.');
+              'Successfully added "' + formResponse.username + '" as ' +
+              formResponse.type + ' reviewer.');
             refreshFormData();
-          }, errorHandler);
+          }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.submitViewCommunityReviewersForm = function(values) {
+        ctrl.submitViewCommunityReviewersForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
           ctrl.setStatusMessage('Processing query...');
           AdminTaskManagerService.startTask();
-          $http.get(
-            '/getcommunityreviewershandler', {
-              params: {
-                method: values.method,
-                username: values.username,
-                type: values.type,
-                language_code: values.languageCode
-              }
-            }).then(function(response) {
-            if (values.method === 'role') {
+          if (formResponse.method === VIEW_METHOD_ROLE) {
+            $http.get(
+              '/getcommunityreviewershandler', {
+                params: {
+                  type: formResponse.type,
+                  language_code: formResponse.languageCode
+                }
+              }).then(function(response) {
               ctrl.result.usernames = response.data.usernames;
-            } else {
-              var translationLanguages = [];
-              var voiceoverLanguages = [];
-              response.data.can_review_translation_for_language_codes.forEach(
-                function(languageCode) {
-                  translationLanguages.push(
-                    LanguageUtilService.getAudioLanguageDescription(
-                      languageCode));
-                });
-              response.data.can_review_voiceover_for_language_codes.forEach(
-                function(languageCode) {
-                  voiceoverLanguages.push(
-                    LanguageUtilService.getAudioLanguageDescription(
-                      languageCode));
-                });
+              ctrl.communityReviewersDataFetched = true;
+              ctrl.setStatusMessage('Success.');
+            }, handleErrorResponse);
+          } else {
+            var translationLanguages = [];
+            var voiceoverLanguages = [];
+            $http.get(
+              '/communityreviewerrightsdatahandler', {
+                params: {
+                  username: formResponse.username
+                }
+              }).then(function(response) {
+              translationLanguages = getLanguageDescriptions(
+                response.data.can_review_translation_for_language_codes);
+              voiceoverLanguages = getLanguageDescriptions(
+                response.data.can_review_voiceover_for_language_codes);
               ctrl.result = {
                 translationLanguages: translationLanguages,
                 voiceoverLanguages: voiceoverLanguages,
                 questions: response.data.can_review_questions
               };
-            }
-            ctrl.communityReviewersDataFetched = true;
-            ctrl.setStatusMessage('Success.');
-          }, errorHandler);
+              ctrl.communityReviewersDataFetched = true;
+              ctrl.setStatusMessage('Success.');
+            }, handleErrorResponse);
+          }
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.submitRemoveCommunityReviewerForm = function(values) {
+        ctrl.submitRemoveCommunityReviewerForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
@@ -173,14 +184,14 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminTaskManagerService.startTask();
           $http.put(
             '/removecommunityreviewerhandler', {
-              username: values.username,
-              removal_type: values.method,
-              review_type: values.type,
-              language_code: values.languageCode
+              username: formResponse.username,
+              removal_type: formResponse.method,
+              review_type: formResponse.type,
+              language_code: formResponse.languageCode
             }).then(function(response) {
             ctrl.setStatusMessage('Success.');
             refreshFormData();
-          }, errorHandler);
+          }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
         };
 
@@ -224,8 +235,8 @@ angular.module('oppia').directive('adminRolesTab', [
                     return false;
                   }
                   if (
-                    this.type === REVIEWABLE_ITEM_TRANSLATION ||
-                    this.type === REVIEWABLE_ITEM_VOICEOVER) {
+                    this.type === REVIEW_CATEGORY_TRANSLATION ||
+                    this.type === REVIEW_CATEGORY_VOICEOVER) {
                     return Boolean(this.languageCode);
                   }
                   return true;
@@ -248,8 +259,8 @@ angular.module('oppia').directive('adminRolesTab', [
                   return false;
                 }
                 if (
-                  this.type === REVIEWABLE_ITEM_TRANSLATION ||
-                  this.type === REVIEWABLE_ITEM_VOICEOVER) {
+                  this.type === REVIEW_CATEGORY_TRANSLATION ||
+                  this.type === REVIEW_CATEGORY_VOICEOVER) {
                   return Boolean(this.languageCode);
                 }
                 return true;
@@ -257,22 +268,22 @@ angular.module('oppia').directive('adminRolesTab', [
             },
             removeCommunityReviewer: {
               username: '',
-              method: REVIEW_REMOVE_TYPE_ALL,
+              method: ACTION_REMOVE_ALL_REVIEW_RIGHTS,
               type: null,
               languageCode: null,
               isValid: function() {
                 if (this.username === '') {
                   return false;
                 }
-                if (this.method === REVIEW_REMOVE_TYPE_ALL) {
+                if (this.method === ACTION_REMOVE_ALL_REVIEW_RIGHTS) {
                   return Boolean(this.username);
                 } else {
                   if (this.type === null) {
                     return false;
                   }
                   if (
-                    this.type === REVIEWABLE_ITEM_TRANSLATION ||
-                    this.type === REVIEWABLE_ITEM_VOICEOVER) {
+                    this.type === REVIEW_CATEGORY_TRANSLATION ||
+                    this.type === REVIEW_CATEGORY_VOICEOVER) {
                     return Boolean(this.languageCode);
                   }
                   return true;
@@ -283,16 +294,18 @@ angular.module('oppia').directive('adminRolesTab', [
         };
 
         ctrl.$onInit = function() {
-          ctrl.REVIEW_REMOVE_TYPE_ALL = REVIEW_REMOVE_TYPE_ALL;
-          ctrl.REVIEW_REMOVE_TYPE_SPECIFIC = REVIEW_REMOVE_TYPE_SPECIFIC;
+          ctrl.ACTION_REMOVE_ALL_REVIEW_RIGHTS = (
+            ACTION_REMOVE_ALL_REVIEW_RIGHTS);
+          ctrl.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS = (
+            ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS);
           ctrl.VIEW_METHOD_USERNAME = VIEW_METHOD_USERNAME;
           ctrl.VIEW_METHOD_ROLE = VIEW_METHOD_ROLE;
           ctrl.UPDATABLE_ROLES = {};
           ctrl.VIEWABLE_ROLES = {};
           ctrl.REVIEWABLE_ITEMS = {
-            TRANSLATION: REVIEWABLE_ITEM_TRANSLATION,
-            VOICEOVER: REVIEWABLE_ITEM_VOICEOVER,
-            QUESTION: REVIEWABLE_ITEM_QUESTION
+            TRANSLATION: REVIEW_CATEGORY_TRANSLATION,
+            VOICEOVER: REVIEW_CATEGORY_VOICEOVER,
+            QUESTION: REVIEW_CATEGORY_QUESTION
           };
           refreshFormData();
           ctrl.resultRolesVisible = false;

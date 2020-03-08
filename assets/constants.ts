@@ -522,12 +522,12 @@ export = {
     ]
   }],
 
-  "REVIEWABLE_ITEM_TRANSLATION": "translation",
-  "REVIEWABLE_ITEM_VOICEOVER": "voiceover",
-  "REVIEWABLE_ITEM_QUESTION": "question",
+  "REVIEW_CATEGORY_TRANSLATION": "translation",
+  "REVIEW_CATEGORY_VOICEOVER": "voiceover",
+  "REVIEW_CATEGORY_QUESTION": "question",
 
-  "REVIEW_REMOVE_TYPE_ALL": "all",
-  "REVIEW_REMOVE_TYPE_SPECIFIC": "specific",
+  "ACTION_REMOVE_ALL_REVIEW_RIGHTS": "all",
+  "ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS": "specific",
   "VIEW_METHOD_USERNAME": "username",
   "VIEW_METHOD_ROLE": "role",
 

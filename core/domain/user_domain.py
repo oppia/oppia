@@ -297,10 +297,10 @@ class UserCommunityRights(python_utils.OBJECT):
         self.can_review_questions = can_review_questions
 
     def can_review_atleast_one_item(self):
-        """Checks whether user has rights to review atleast one item.
+        """Checks whether user has rights to review at least one item.
 
         Returns:
-            boolean. Whether user has rights to review atleast one item.
+            boolean. Whether user has rights to review at east one item.
         """
         return (
             self.can_review_translation_for_language_codes or

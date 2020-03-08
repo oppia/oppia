@@ -2540,7 +2540,7 @@ def can_view_reviewable_suggestions(handler):
         """Checks whether the user can view reviewable suggestions.
 
         Args:
-            target_type: str. The targeted entity type of suggestion.
+            target_type: str. The entity type of the target of the suggestion.
             suggestion_type: str. The type of the suggestion.
             **kwargs: *. Keyword arguments.
 
