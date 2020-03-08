@@ -31,17 +31,17 @@ describe('UpgradedServices', () => {
   });
 
   it('catches out-of-order issues', () => {
-    class MockDependency {};
+    class MockDependency {}
     class MockService {
       constructor(private mockDependency: MockDependency) {}
-    };
+    }
 
     expect(() => this.registerService(MockService).withArgs(MockDependency))
       .toThrowError(/Dependency Error/);
   });
 
   it('catches redefinition errors', () => {
-    class MockService {};
+    class MockService {}
 
     this.registerService(MockService).withArgs();
     expect(() => this.registerService(MockService).withArgs())
