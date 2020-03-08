@@ -387,6 +387,7 @@ export class UpgradedServices {
     this.registerService(PredictionResultObjectFactory).withDependencies();
     this.registerService(PythonProgramTokenizer)
       .withDependencies(LoggerService);
+    this.registerService(RatingComputationService).withDependencies();
     this.registerService(ReadOnlyStoryNodeObjectFactory).withDependencies();
     this.registerService(RecordedVoiceoversObjectFactory).withDependencies(
       VoiceoverObjectFactory);
