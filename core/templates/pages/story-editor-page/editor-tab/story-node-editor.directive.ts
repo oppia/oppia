@@ -172,6 +172,10 @@ angular.module('oppia').directive('storyNodeEditor', [
                 AlertsService.addInfoMessage(
                   'Given skill is already a prerequisite skill', 5000);
               }
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -206,6 +210,10 @@ angular.module('oppia').directive('storyNodeEditor', [
                 AlertsService.addInfoMessage(
                   'Given skill is already an acquired skill', 5000);
               }
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 

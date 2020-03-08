@@ -14,7 +14,7 @@
     </div>
   </div>
   <div ng-if="$ctrl.topicSummaries.length > 0 || $ctrl.untriagedSkillSummaries.length > 0">
-    <ul class="dashboard-tabs">
+    <ul class="dashboard-tabs protractor-test-topics-tab">
       <li ng-class="{'dashboard-tabs-active': $ctrl.activeTab === $ctrl.TAB_NAME_TOPICS}">
         <a class="dashboard-tabs-text"
            ng-click="$ctrl.setActiveTab($ctrl.TAB_NAME_TOPICS)">
