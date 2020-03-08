@@ -35,7 +35,7 @@ describe('UpgradedServices', () => {
     this.upgradedServices.registerService(MockService).withDependencies();
     expect(() => {
       this.upgradedServices.registerService(MockService).withDependencies();
-    }).toThrow(/Redefinition Error/);
+    }).toThrowError(/Redefinition Error/);
   });
 
   it('should detect unregistered services', () => {
@@ -47,7 +47,7 @@ describe('UpgradedServices', () => {
     this.upgradedServices.registerService(MockService)
       .withDependencies(MockDependency);
     expect(() => this.upgradedServices.getUpgradedServices())
-      .toThrow(/Registry Error/);
+      .toThrowError(/Registry Error/);
   });
 
   it('should detect cyclic dependencies', () => {
@@ -63,6 +63,6 @@ describe('UpgradedServices', () => {
     this.upgradedServices.registerService(MockService2)
       .withDependencies(MockService1);
     expect(() => this.upgradedServices.getUpgradedServices())
-      .toThrow(/Circular Dependency Error/);
+      .toThrowError(/Circular Dependency Error/);
   });
 });
