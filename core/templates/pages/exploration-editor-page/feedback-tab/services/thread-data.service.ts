@@ -17,15 +17,16 @@
  * feedback tab of the exploration editor.
  */
 
+require('domain/feedback_message/ThreadMessageObjectFactory.ts');
 require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
-require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('services/alerts.service.ts');
-require('services/suggestions.service.ts');
-
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/suggestions.service.ts');
 
 angular.module('oppia').factory('ThreadDataService', [
   '$http', '$q', 'AlertsService', 'ContextService',
@@ -71,7 +72,7 @@ angular.module('oppia').factory('ThreadDataService', [
     // The messages of the thread objects are updated lazily.
     let threadsById = {};
 
-    let getThreadById = (threadId) => threadsById[threadId] || null;
+    let getThreadById = threadId => (threadsById[threadId] || null);
 
     // Cached number of open threads requiring action.
     let openThreadsCount = 0;
@@ -80,8 +81,8 @@ angular.module('oppia').factory('ThreadDataService', [
       if (!threadBackendDict) {
         throw Error('Missing input backend dict');
       }
-      let thread =
-        FeedbackThreadObjectFactory.createFromBackendDict(threadBackendDict);
+      let thread = FeedbackThreadObjectFactory.createFromBackendDict(
+        threadBackendDict);
       return threadsById[thread.threadId] = thread;
     };
 
@@ -103,36 +104,41 @@ angular.module('oppia').factory('ThreadDataService', [
       fetchThreads: function() {
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
-        let suggestionPromise = $http.get(getSuggestionListHandlerUrl(), {
+        let suggestionsPromise = $http.get(getSuggestionListHandlerUrl(), {
           params: {
             target_type: 'exploration',
-            target_id: ContextService.getExplorationId(),
+            target_id: ContextService.getExplorationId()
           }
         });
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
-        let threadPromise = $http.get(getThreadListHandlerUrl());
+        let threadsPromise = $http.get(getThreadListHandlerUrl());
 
-        return $q.all([suggestionPromise, threadPromise]).then(response => {
-          let [suggestionResponse, threadResponse] = response.map(r => r.data);
+        return $q.all([suggestionsPromise, threadsPromise]).then(response => {
+          let [suggestionsData, threadsData] = response.map(r => r.data);
+          let suggestionBackendDicts = suggestionsData.suggestions || [];
+          let feedbackThreadBackendDicts =
+            threadsData.feedback_thread_dicts || [];
+          let suggestionThreadBackendDicts =
+            threadsData.suggestion_thread_dicts || [];
 
           let suggestionBackendDictsByThreadId = {};
-          suggestionResponse.suggestions.forEach(backendDict => {
+          for (let suggestionBackendDict of suggestionBackendDicts) {
             let threadId =
               SuggestionsService.getThreadIdFromSuggestionBackendDict(
-                backendDict);
-            suggestionBackendDictsByThreadId[threadId] = backendDict;
-          });
+                suggestionBackendDict);
+            suggestionBackendDictsByThreadId[threadId] = suggestionBackendDict;
+          }
 
           return {
-            feedbackThreads: threadResponse.feedback_thread_dicts.map(
+            feedbackThreads: feedbackThreadBackendDicts.map(
               setFeedbackThreadFromBackendDict),
-            suggestionThreads: threadResponse.suggestion_thread_dicts.map(
+            suggestionThreads: suggestionThreadBackendDicts.map(
               threadBackendDict => setSuggestionThreadFromBackendDicts(
                 threadBackendDict,
                 suggestionBackendDictsByThreadId[threadBackendDict.thread_id]))
           };
-        });
+        }, () => $q.reject('Error on retriving feedback threads.'));
       },
 
       fetchMessages: function(thread) {
@@ -143,16 +149,19 @@ angular.module('oppia').factory('ThreadDataService', [
 
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
-        return $http.get(getThreadHandlerUrl(threadId))
-          .then(response => thread.setMessages(response.data.messages.map(
-            ThreadMessageObjectFactory.createFromBackendDict)));
+        return $http.get(getThreadHandlerUrl(threadId)).then(response => {
+          let messagesData = response.data.messages || [];
+          return thread.setMessages(messagesData.map(
+            ThreadMessageObjectFactory.createFromBackendDict));
+        });
       },
 
       fetchFeedbackStats: function() {
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
-        return $http.get(getFeedbackStatsHandlerUrl())
-          .then(response => openThreadsCount = response.data.num_open_threads);
+        return $http.get(getFeedbackStatsHandlerUrl()).then(response => {
+          openThreadsCount = response.data.num_open_threads || 0;
+        });
       },
 
       getOpenThreadsCount: function() {
@@ -170,8 +179,8 @@ angular.module('oppia').factory('ThreadDataService', [
           openThreadsCount += 1;
           return this.fetchThreads();
         },
-        err => {
-          AlertsService.addWarning('Error creating new thread: ' + err + '.');
+        error => {
+          AlertsService.addWarning('Error creating new thread: ' + error + '.');
         });
       },
 

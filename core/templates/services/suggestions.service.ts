@@ -16,12 +16,10 @@
  * @fileoverview Service for inspecting and managing suggestion objects.
  */
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({providedIn: 'root'})
 export class SuggestionsService {
   getThreadIdFromSuggestionBackendDict(suggestionBackendDict: any): string {
     return suggestionBackendDict.suggestion_id;
