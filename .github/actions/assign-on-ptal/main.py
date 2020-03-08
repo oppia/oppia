@@ -1,17 +1,41 @@
-import os
-import requests
+"""This is main Python script for this Github Action. This is used by
+Dockerfile to build a Docker image.
+"""
+
+# Copyright 2019 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import json
+import os
 import re
+import python_utils
+import requests
+
 
 def find_assignees(comment):
-    """This function is used to extract the usernames present in the form 
-    `@person1 @person2 ptal!` anywhere in a comment
+    """This function is used to extract the usernames present in the form
+    `@person1 @person2 ptal!` anywhere in a comment.
 
-    Args: 
-        comment: string. Comment to extract usernames from
+    Args:
+        comment: string. Comment to extract usernames from.
 
     Returns:
-        result: list(string). List of github usernames
+        result: list(string). List of github usernames.
     """
 
     result = []
@@ -19,23 +43,23 @@ def find_assignees(comment):
     # regex1 extracts all the strings of the form `@person1 @person2 ptal`
     # from each line of the comment
     # Refer: https://regex101.com/r/8nUKY0/2
-    pattern_regex = r"(@[a-zA-Z0-9\-]+[\s\W]+)+[p|P][t|T][a|A][l|L]\s*"
+    pattern_regex = r'(@[a-zA-Z0-9\-]+[\s\W]+)+[p|P][t|T][a|A][l|L]\s*'
 
-    # regex2 extracts the github usernames from the strings resulted from 
+    # regex2 extracts the github usernames from the strings resulted from
     # above regex
     # Refer: https://regex101.com/r/8nUKY0/4
-    username_regex = r"@([a-zA-Z\d](?:[a-zA-Z\d]|-(?=[a-zA-Z\d])){0,38})"
+    username_regex = r'@([a-zA-Z\d](?:[a-zA-Z\d]|-(?=[a-zA-Z\d])){0,38})'
 
     lines = comment.splitlines()
     for line in lines:
         # In each line of the comment, find the required pattern.
         pattern_matches = re.finditer(pattern_regex, line)
         for _, pattern in enumerate(pattern_matches, start=1):
-            # For each string matching the pattern, find usernames in it
+            # For each string matching the pattern, find usernames in it.
             username_matches = re.finditer(username_regex, pattern.group())
             for _, username in enumerate(username_matches, start=1):
-                # Append all the usernames found in the string
-                print(username.group(1))
+                # Append all the usernames found in the string.
+                python_utils.PRINT(username.group(1))
                 result.append(username.group(1))
 
     return result
@@ -44,11 +68,11 @@ def find_assignees(comment):
 def build_payload(event):
     """This function is used to build payload that is sent to Github API
 
-    Args: 
-        event: dict. Event payload that is sent BY github when an event occurs
+    Args:
+        event: dict. Event payload that is sent BY github when an event occurs.
 
     Returns:
-        payload: dict. Payload that is sent TO Github API
+        payload: dict. Payload that is sent TO Github API.
     """
 
     if not event['repository']:
@@ -62,14 +86,14 @@ def build_payload(event):
 
     if not event['issue']['user']['login']:
         raise Exception('User payload is malformed.')
-    
-    assignee_names = find_assignees(event["comment"]["body"])
+
+    assignee_names = find_assignees(event['comment']['body'])
     payload = {
-        "url": f"/repos/{event['repository']['owner']['login']}/" +
-                f"{event['repository']['name']}/issues/" +
-                f"{event['issue']['number']}/assignees",
-        "body": {
-            "assignees": assignee_names
+        'url': '/repos/' + event['repository']['owner']['login'] + '/' +
+               event['repository']['name'] + '/issues/' +
+               event['issue']['number'] + '/assignees',
+        'body': {
+            'assignees': assignee_names
         }
     }
     return payload
@@ -79,40 +103,37 @@ def main():
     """This is the main driver function."""
 
     try:
-        # Github token used by github actions
+        # Github token used by github actions.
         repo_token = os.environ['INPUT_REPO-TOKEN']
     except Exception:
         raise Exception('Repo-token not provided')
-        return
 
     try:
-        # Path to the file, where the event payload is stored
-        event_path = os.environ['GITHUB_EVENT_PATH'];
+        # Path to the file, where the event payload is stored.
+        event_path = os.environ['GITHUB_EVENT_PATH']
     except Exception:
         raise Exception('Event path is not present.')
-        return
 
     try:
-        with open(event_path, encoding='utf-8') as json_file:
-            # Event payload after parsing from 'json' to 'dict'
+        with python_utils.open_file(event_path, 'r') as json_file:
+            # Event payload after parsing from 'json' to 'dict'.
             event = json.load(json_file)
 
         payload = build_payload(event)
-        
+
         if not payload['body']['assignees']:
             raise Exception('No assignee found')
-            return
 
         headers = {
             'Authorization': 'token ' + repo_token,
             'Accept': 'application/vnd.github.v3+json;'
         }
-        r = requests.post('https://api.github.com'+payload['url'], 
-            headers=headers, data=json.dumps(payload['body']))
+        requests.post('https://api.github.com' + payload['url'],
+                      headers=headers, data=json.dumps(payload['body']))
 
     except Exception as e:
         raise Exception(e)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
