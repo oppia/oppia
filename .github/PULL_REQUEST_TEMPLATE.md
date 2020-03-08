@@ -6,6 +6,7 @@ This PR does the following: [Explain what your PR does and why]
 
 ## Essential Checklist
 
+- [ ] The PR title starts with "Fix #bugnum: ", followed by a short, clear summary of the changes. (If this PR fixes part of an issue, prefix the title with "Fix part of #bugnum: ...".)
 - [ ] The linter/Karma presubmit checks have passed locally on your machine.
 - [ ] "Allow edits from maintainers" is checked. (See [here](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork) for instructions on how to enable it.)
   - This lets reviewers restart your CircleCI tests for you.
