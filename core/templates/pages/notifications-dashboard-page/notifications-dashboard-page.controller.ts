@@ -19,6 +19,7 @@
 require('base-components/base-content.directive.ts');
 
 require('services/date-time-format.service.ts');
+require('services/contextual/window-ref.service.ts');
 
 angular.module('oppia').directive('notificationsDashboardPage', [
   'UrlInterpolationService', function(
@@ -32,8 +33,8 @@ angular.module('oppia').directive('notificationsDashboardPage', [
         'notifications-dashboard-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$rootScope', 'DateTimeFormatService',
-        function($http, $rootScope, DateTimeFormatService) {
+        '$http', '$rootScope', 'DateTimeFormatService', 'WindowRef',
+        function($http, $rootScope, DateTimeFormatService, WindowRef) {
           var ctrl = this;
           ctrl.getItemUrl = function(activityId, notificationType) {
             return (
@@ -43,7 +44,7 @@ angular.module('oppia').directive('notificationsDashboardPage', [
 
           ctrl.navigateToProfile = function($event, username) {
             $event.stopPropagation();
-            window.location.href = '/profile/' + username;
+            WindowRef.nativeWindow.location.href = '/profile/' + username;
           };
 
           ctrl.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
