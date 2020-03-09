@@ -11,11 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+ 
 /**
  * @fileoverview Unit tests for the Compare versions Service.
  */
-
+ 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // compare-versions.service.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
@@ -44,14 +44,31 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
-
+ 
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+ 
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 import { TranslatorProviderForTests } from 'tests/test.extras';
-
+ 
 require(
   'pages/exploration-editor-page/history-tab/services/' +
   'compare-versions.service.ts');
-
+ 
 describe('Compare versions service', function() {
+  let readOnlyExplorationBackendApiService = null;
+  let httpTestingController = null;
+ 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    readOnlyExplorationBackendApiService = TestBed.get(
+      ReadOnlyExplorationBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -59,14 +76,17 @@ describe('Compare versions service', function() {
       $provide.value(key, value);
     }
   }));
-
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+ 
   describe('compare versions service', function() {
     var cvs = null;
     let vts: VersionTreeService = null;
     var treeParents = null;
     var $httpBackend = null;
     var mockExplorationData = null;
-
+ 
     beforeEach(
       angular.mock.module('oppia', TranslatorProviderForTests));
     beforeEach(angular.mock.module('oppia', function($provide) {
@@ -86,6 +106,9 @@ describe('Compare versions service', function() {
       $provide.value(
         'ParamChangesObjectFactory', new ParamChangesObjectFactory(
           new ParamChangeObjectFactory()));
+      $provide.value(
+        'ReadOnlyExplorationBackendApiService',
+        readOnlyExplorationBackendApiService);
       $provide.value(
         'RecordedVoiceoversObjectFactory',
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
@@ -111,18 +134,18 @@ describe('Compare versions service', function() {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
     });
-
+ 
     beforeEach(angular.mock.inject(function($injector) {
       cvs = $injector.get('CompareVersionsService');
       vts = $injector.get('VersionTreeService');
       $httpBackend = $injector.get('$httpBackend');
     }));
-
+ 
     afterEach(function() {
       $httpBackend.verifyNoOutstandingExpectation();
       $httpBackend.verifyNoOutstandingRequest();
     });
-
+ 
     // Helper function to get states data to pass to getDiffGraphData().
     // states is an object whose keys are state names and whose values are
     //  - contentStr: string which is the text content of the state
@@ -188,7 +211,7 @@ describe('Compare versions service', function() {
         }
       };
     };
-
+ 
     var testSnapshots1 = [{
       commit_type: 'create',
       version_number: 1
@@ -305,7 +328,7 @@ describe('Compare versions service', function() {
       }],
       version_number: 13
     }];
-
+ 
     // Information for mock state data for getDiffGraphData() to be passed to
     // _getStatesData
     var testExplorationData1 = [{
@@ -426,47 +449,79 @@ describe('Compare versions service', function() {
         ruleDests: ['C']
       }
     }];
-
+ 
     // Tests for getDiffGraphData on linear commits
-    it('should detect changed, renamed and added states', function() {
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=1')
-        .respond(_getStatesData(testExplorationData1[0]));
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=7')
-        .respond(_getStatesData(testExplorationData1[6]));
+    it('should detect changed, renamed and added states', fakeAsync(() => {
       vts.init(testSnapshots1);
-      var nodeData = null;
       cvs.getDiffGraphData(1, 7).then(function(data) {
-        nodeData = data.nodes;
-      });
-
-      $httpBackend.flush();
-      expect(nodeData).toEqual({
-        1: {
-          newestStateName: 'A',
-          stateProperty: 'changed',
-          originalStateName: 'A'
-        },
-        2: {
-          newestStateName: 'C',
-          stateProperty: 'added',
-          originalStateName: 'B'
-        }
-      });
-    });
-
-    it('should add new state with same name as old name of renamed state',
-      function() {
-        $httpBackend.expect('GET', '/explorehandler/init/0?v=5')
-          .respond(_getStatesData(testExplorationData1[4]));
-        $httpBackend.expect('GET', '/explorehandler/init/0?v=8')
-          .respond(_getStatesData(testExplorationData1[7]));
-        vts.init(testSnapshots1);
-        var nodeData = null;
-        cvs.getDiffGraphData(5, 8).then(function(data) {
-          nodeData = data.nodes;
+        expect(data.nodes).toEqual({
+          1: {
+            newestStateName: 'A',
+            stateProperty: 'changed',
+            originalStateName: 'A'
+          },
+          2: {
+            newestStateName: 'C',
+            stateProperty: 'added',
+            originalStateName: 'B'
+          }
         });
-        $httpBackend.flush();
-        expect(nodeData).toEqual({
+      });
+ 
+      let req1 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=1');
+      expect(req1.request.method).toEqual('GET');
+      req1.flush(_getStatesData(testExplorationData1[0]));
+ 
+      let req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=7');
+      expect(req2.request.method).toEqual('GET');
+      req2.flush(_getStatesData(testExplorationData1[6]));
+ 
+      flushMicrotasks();
+    }));
+ 
+    it('should add new state with same name as old name of renamed state',
+      fakeAsync(() => {
+        vts.init(testSnapshots1);
+        cvs.getDiffGraphData(5, 8).then(function(data) {
+          expect(data.nodes).toEqual({
+            1: {
+              newestStateName: 'A',
+              stateProperty: 'unchanged',
+              originalStateName: 'A'
+            },
+            2: {
+              newestStateName: 'C',
+              stateProperty: 'changed',
+              originalStateName: 'B'
+            },
+            3: {
+              newestStateName: 'B',
+              stateProperty: 'added',
+              originalStateName: 'B'
+            }
+          });
+        });
+ 
+        let req1 = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=5');
+        expect(req1.request.method).toEqual('GET');
+        req1.flush(_getStatesData(testExplorationData1[4]));
+ 
+        let req2 = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=8');
+        expect(req2.request.method).toEqual('GET');
+        req2.flush(_getStatesData(testExplorationData1[7]));
+ 
+        flushMicrotasks();
+      }
+    ));
+ 
+    it('should not include added, then deleted state', fakeAsync(() => {
+      vts.init(testSnapshots1);
+      cvs.getDiffGraphData(7, 9).then(function(data) {
+        expect(data.nodes).toEqual({
           1: {
             newestStateName: 'A',
             stateProperty: 'unchanged',
@@ -474,171 +529,102 @@ describe('Compare versions service', function() {
           },
           2: {
             newestStateName: 'C',
+            stateProperty: 'unchanged',
+            originalStateName: 'C'
+          }
+        });
+      });
+ 
+      let req1 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=7');
+      expect(req1.request.method).toEqual('GET');
+      req1.flush(_getStatesData(testExplorationData1[6]));
+ 
+      let req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=9');
+      expect(req2.request.method).toEqual('GET');
+      req2.flush(_getStatesData(testExplorationData1[8]));
+ 
+      flushMicrotasks();
+    }));
+ 
+    it('should mark deleted then added states as changed', fakeAsync(() => {
+      vts.init(testSnapshots1);
+      cvs.getDiffGraphData(8, 10).then(function(data) {
+        expect(data.nodes).toEqual({
+          1: {
+            newestStateName: 'A',
+            stateProperty: 'unchanged',
+            originalStateName: 'A'
+          },
+          2: {
+            newestStateName: 'B',
             stateProperty: 'changed',
             originalStateName: 'B'
           },
           3: {
-            newestStateName: 'B',
-            stateProperty: 'added',
-            originalStateName: 'B'
+            newestStateName: 'C',
+            stateProperty: 'unchanged',
+            originalStateName: 'C'
           }
         });
-      }
-    );
-
-    it('should not include added, then deleted state', function() {
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=7')
-        .respond(_getStatesData(testExplorationData1[6]));
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=9')
-        .respond(_getStatesData(testExplorationData1[8]));
+      });
+      let req1 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=8');
+      expect(req1.request.method).toEqual('GET');
+      req1.flush(_getStatesData(testExplorationData1[7]));
+ 
+      let req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=10');
+      expect(req2.request.method).toEqual('GET');
+      req2.flush(_getStatesData(testExplorationData1[9]));
+ 
+      flushMicrotasks();
+    }));
+ 
+    it('should mark renamed then deleted states as deleted', fakeAsync(() => {
       vts.init(testSnapshots1);
-      var nodeData = null;
-      cvs.getDiffGraphData(7, 9).then(function(data) {
-        nodeData = data.nodes;
-      });
-      $httpBackend.flush();
-      expect(nodeData).toEqual({
-        1: {
-          newestStateName: 'A',
-          stateProperty: 'unchanged',
-          originalStateName: 'A'
-        },
-        2: {
-          newestStateName: 'C',
-          stateProperty: 'unchanged',
-          originalStateName: 'C'
-        }
-      });
-    });
-
-    it('should mark deleted then added states as changed', function() {
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=8')
-        .respond(_getStatesData(testExplorationData1[7]));
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=10')
-        .respond(_getStatesData(testExplorationData1[9]));
-      vts.init(testSnapshots1);
-      var nodeData = null;
-      cvs.getDiffGraphData(8, 10).then(function(data) {
-        nodeData = data.nodes;
-      });
-      $httpBackend.flush();
-      expect(nodeData).toEqual({
-        1: {
-          newestStateName: 'A',
-          stateProperty: 'unchanged',
-          originalStateName: 'A'
-        },
-        2: {
-          newestStateName: 'B',
-          stateProperty: 'changed',
-          originalStateName: 'B'
-        },
-        3: {
-          newestStateName: 'C',
-          stateProperty: 'unchanged',
-          originalStateName: 'C'
-        }
-      });
-    });
-
-    it('should mark renamed then deleted states as deleted', function() {
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=11')
-        .respond(_getStatesData(testExplorationData1[10]));
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=13')
-        .respond(_getStatesData(testExplorationData1[12]));
-      vts.init(testSnapshots1);
-      var nodeData = null;
       cvs.getDiffGraphData(11, 13).then(function(data) {
-        nodeData = data.nodes;
-      });
-      $httpBackend.flush();
-      expect(nodeData).toEqual({
-        1: {
-          newestStateName: 'D',
-          stateProperty: 'deleted',
-          originalStateName: 'A'
-        },
-        2: {
-          newestStateName: 'B',
-          stateProperty: 'unchanged',
-          originalStateName: 'B'
-        },
-        3: {
-          newestStateName: 'C',
-          stateProperty: 'unchanged',
-          originalStateName: 'C'
-        }
-      });
-    });
-
-    it('should mark changed state as unchanged when name and content is same' +
-       'on both versions', function() {
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=1')
-        .respond(_getStatesData(testExplorationData1[0]));
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=11')
-        .respond(_getStatesData(testExplorationData1[10]));
-      vts.init(testSnapshots1);
-      var nodeData = null;
-      cvs.getDiffGraphData(1, 11).then(function(data) {
-        nodeData = data.nodes;
-      });
-      $httpBackend.flush();
-      expect(nodeData).toEqual({
-        1: {
-          newestStateName: 'A',
-          stateProperty: 'unchanged',
-          originalStateName: 'A'
-        },
-        2: {
-          newestStateName: 'C',
-          stateProperty: 'added',
-          originalStateName: 'B'
-        },
-        3: {
-          newestStateName: 'B',
-          stateProperty: 'added',
-          originalStateName: 'B'
-        }
-      });
-    });
-
-    it('should mark renamed state as not renamed when name is same on both ' +
-       'versions', function() {
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=2')
-        .respond(_getStatesData(testExplorationData1[1]));
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=4')
-        .respond(_getStatesData(testExplorationData1[3]));
-      vts.init(testSnapshots1);
-      var nodeData = null;
-      cvs.getDiffGraphData(2, 4).then(function(data) {
-        nodeData = data.nodes;
-      });
-      $httpBackend.flush();
-      expect(nodeData).toEqual({
-        1: {
-          newestStateName: 'A',
-          stateProperty: 'unchanged',
-          originalStateName: 'A'
-        }
-      });
-    });
-
-    it('should mark states correctly when a series of changes are applied',
-      function() {
-        $httpBackend.expect('GET', '/explorehandler/init/0?v=1')
-          .respond(_getStatesData(testExplorationData1[0]));
-        $httpBackend.expect('GET', '/explorehandler/init/0?v=13')
-          .respond(_getStatesData(testExplorationData1[12]));
-        vts.init(testSnapshots1);
-        var nodeData = null;
-        cvs.getDiffGraphData(1, 13).then(function(data) {
-          nodeData = data.nodes;
-        });
-        $httpBackend.flush();
-        expect(nodeData).toEqual({
+        expect(data.nodes).toEqual({
           1: {
             newestStateName: 'D',
             stateProperty: 'deleted',
+            originalStateName: 'A'
+          },
+          2: {
+            newestStateName: 'B',
+            stateProperty: 'unchanged',
+            originalStateName: 'B'
+          },
+          3: {
+            newestStateName: 'C',
+            stateProperty: 'unchanged',
+            originalStateName: 'C'
+          }
+        });
+      });
+ 
+      let req1 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=11');
+      expect(req1.request.method).toEqual('GET');
+      req1.flush(_getStatesData(testExplorationData1[10]));
+ 
+      let req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=13');
+      expect(req2.request.method).toEqual('GET');
+      req2.flush(_getStatesData(testExplorationData1[12]));
+ 
+      flushMicrotasks();
+    }));
+ 
+    it('should mark changed state as unchanged when name and content is same' +
+       'on both versions', fakeAsync(() => {
+      vts.init(testSnapshots1);
+      cvs.getDiffGraphData(1, 11).then(function(data) {
+        expect(data.nodes).toEqual({
+          1: {
+            newestStateName: 'A',
+            stateProperty: 'unchanged',
             originalStateName: 'A'
           },
           2: {
@@ -652,9 +638,81 @@ describe('Compare versions service', function() {
             originalStateName: 'B'
           }
         });
+      });
+      let req1 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=1');
+      expect(req1.request.method).toEqual('GET');
+      req1.flush(_getStatesData(testExplorationData1[0]));
+ 
+      let req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=11');
+      expect(req2.request.method).toEqual('GET');
+      req2.flush(_getStatesData(testExplorationData1[10]));
+ 
+      flushMicrotasks();
+    }));
+ 
+    it('should mark renamed state as not renamed when name is same on both ' +
+       'versions', fakeAsync(() => {
+      vts.init(testSnapshots1);
+      cvs.getDiffGraphData(2, 4).then(function(data) {
+        expect(data.nodes).toEqual({
+          1: {
+            newestStateName: 'A',
+            stateProperty: 'unchanged',
+            originalStateName: 'A'
+          }
+        });
+      });
+      let req1 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=2');
+      expect(req1.request.method).toEqual('GET');
+      req1.flush(_getStatesData(testExplorationData1[1]));
+ 
+      let req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=4');
+      expect(req2.request.method).toEqual('GET');
+      req2.flush(_getStatesData(testExplorationData1[3]));
+ 
+      flushMicrotasks();
+    }));
+ 
+    it('should mark states correctly when a series of changes are applied',
+      fakeAsync(() => {
+        vts.init(testSnapshots1);
+        cvs.getDiffGraphData(1, 13).then(function(data) {
+          expect(data.nodes).toEqual({
+            1: {
+              newestStateName: 'D',
+              stateProperty: 'deleted',
+              originalStateName: 'A'
+            },
+            2: {
+              newestStateName: 'C',
+              stateProperty: 'added',
+              originalStateName: 'B'
+            },
+            3: {
+              newestStateName: 'B',
+              stateProperty: 'added',
+              originalStateName: 'B'
+            }
+          });
+        });
+        let req1 = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=1');
+        expect(req1.request.method).toEqual('GET');
+        req1.flush(_getStatesData(testExplorationData1[0]));
+ 
+        let req2 = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=13');
+        expect(req2.request.method).toEqual('GET');
+        req2.flush(_getStatesData(testExplorationData1[12]));
+ 
+        flushMicrotasks();
       }
-    );
-
+    ));
+ 
     var testSnapshots2 = [{
       commit_type: 'create',
       version_number: 1
@@ -717,7 +775,7 @@ describe('Compare versions service', function() {
       }],
       version_number: 8
     }];
-
+ 
     // Information for mock state data for getDiffGraphData() to be passed to
     // _getStatesData
     var testExplorationData2 = [{
@@ -793,87 +851,95 @@ describe('Compare versions service', function() {
         ruleDests: ['D']
       }
     }];
-
+ 
     // Tests for getDiffGraphData with reversions
-    it('should mark states correctly when there is 1 reversion', function() {
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=1')
-        .respond(_getStatesData(testExplorationData2[0]));
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=5')
-        .respond(_getStatesData(testExplorationData2[4]));
+    it('should mark states correctly when there is 1 reversion', fakeAsync(() => {
       vts.init(testSnapshots2);
-      var nodeData = null;
       cvs.getDiffGraphData(1, 5).then(function(data) {
-        nodeData = data.nodes;
+        expect(data.nodes).toEqual({
+          1: {
+            newestStateName: 'A',
+            stateProperty: 'unchanged',
+            originalStateName: 'A'
+          }
+        });
       });
-      $httpBackend.flush();
-      expect(nodeData).toEqual({
-        1: {
-          newestStateName: 'A',
-          stateProperty: 'unchanged',
-          originalStateName: 'A'
-        }
-      });
-    });
-
+      let req1 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=1');
+      expect(req1.request.method).toEqual('GET');
+      req1.flush(_getStatesData(testExplorationData2[0]));
+ 
+      let req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=5');
+      expect(req2.request.method).toEqual('GET');
+      req2.flush(_getStatesData(testExplorationData2[4]));
+ 
+      flushMicrotasks();
+    }));
+ 
     it('should mark states correctly when there is 1 reversion to before v1',
-      function() {
-        $httpBackend.expect('GET', '/explorehandler/init/0?v=3')
-          .respond(_getStatesData(testExplorationData2[2]));
-        $httpBackend.expect('GET', '/explorehandler/init/0?v=5')
-          .respond(_getStatesData(testExplorationData2[4]));
+      fakeAsync(() => {
         vts.init(testSnapshots2);
-        var nodeData = null;
         cvs.getDiffGraphData(3, 5).then(function(data) {
-          nodeData = data.nodes;
+          expect(data.nodes).toEqual({
+            1: {
+              newestStateName: 'A',
+              stateProperty: 'unchanged',
+              originalStateName: 'A'
+            },
+            2: {
+              newestStateName: 'B',
+              stateProperty: 'deleted',
+              originalStateName: 'C'
+            }
+          });
         });
-        $httpBackend.flush();
-        expect(nodeData).toEqual({
-          1: {
-            newestStateName: 'A',
-            stateProperty: 'unchanged',
-            originalStateName: 'A'
-          },
-          2: {
-            newestStateName: 'B',
-            stateProperty: 'deleted',
-            originalStateName: 'C'
-          }
-        });
+        let req1 = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=3');
+        expect(req1.request.method).toEqual('GET');
+        req1.flush(_getStatesData(testExplorationData2[2]));
+ 
+        let req2 = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=5');
+        expect(req2.request.method).toEqual('GET');
+        req2.flush(_getStatesData(testExplorationData2[4]));
+ 
+        flushMicrotasks();
       }
-    );
-
+    ));
+ 
     it('should mark states correctly when compared version is a reversion',
-      function() {
-        $httpBackend.expect('GET', '/explorehandler/init/0?v=4')
-          .respond(_getStatesData(testExplorationData2[3]));
-        $httpBackend.expect('GET', '/explorehandler/init/0?v=5')
-          .respond(_getStatesData(testExplorationData2[4]));
+      fakeAsync(() => {
         vts.init(testSnapshots2);
-        var nodeData = null;
         cvs.getDiffGraphData(4, 5).then(function(data) {
-          nodeData = data.nodes;
+          expect(data.nodes).toEqual({
+            1: {
+              newestStateName: 'A',
+              stateProperty: 'unchanged',
+              originalStateName: 'A'
+            },
+            2: {
+              newestStateName: 'B',
+              stateProperty: 'deleted',
+              originalStateName: 'B'
+            }
+          });
         });
-        $httpBackend.flush();
-        expect(nodeData).toEqual({
-          1: {
-            newestStateName: 'A',
-            stateProperty: 'unchanged',
-            originalStateName: 'A'
-          },
-          2: {
-            newestStateName: 'B',
-            stateProperty: 'deleted',
-            originalStateName: 'B'
-          }
-        });
+        let req1 = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=4');
+        expect(req1.request.method).toEqual('GET');
+        req1.flush(_getStatesData(testExplorationData2[3]));
+ 
+        let req2 = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=5');
+        expect(req2.request.method).toEqual('GET');
+        req2.flush(_getStatesData(testExplorationData2[4]));
+ 
+        flushMicrotasks();
       }
-    );
-
-    it('should mark states correctly when there are 2 reversions', function() {
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=5')
-        .respond(_getStatesData(testExplorationData2[4]));
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=8')
-        .respond(_getStatesData(testExplorationData2[7]));
+    ));
+ 
+    it('should mark states correctly when there are 2 reversions', fakeAsync(() => {
       vts.init(testSnapshots2);
       cvs.getDiffGraphData(5, 8).then(function(data) {
         expect(data.nodes).toEqual({
@@ -894,9 +960,19 @@ describe('Compare versions service', function() {
           }
         });
       });
-      $httpBackend.flush();
-    });
-
+      let req1 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=5');
+      expect(req1.request.method).toEqual('GET');
+      req1.flush(_getStatesData(testExplorationData2[4]));
+ 
+      let req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=8');
+      expect(req2.request.method).toEqual('GET');
+      req2.flush(_getStatesData(testExplorationData2[7]));
+ 
+      flushMicrotasks();
+    }));
+ 
     // Represents snapshots and exploration data for tests for links
     // Only includes information accessed by getDiffGraphData()
     var testSnapshots3 = [{
@@ -953,7 +1029,7 @@ describe('Compare versions service', function() {
       }],
       version_number: 8
     }];
-
+ 
     var testExplorationData3 = [{
       A: {
         contentStr: '',
@@ -1075,153 +1151,173 @@ describe('Compare versions service', function() {
         ruleDests: ['END']
       }
     }];
-
-    it('should correctly display added links', function() {
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=1')
-        .respond(_getStatesData(testExplorationData3[0]));
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=2')
-        .respond(_getStatesData(testExplorationData3[1]));
+ 
+    it('should correctly display added links', fakeAsync(() => {
       vts.init(testSnapshots3);
-      var linkData = null;
       cvs.getDiffGraphData(1, 2).then(function(data) {
-        linkData = data.links;
+        expect(data.links).toEqual([{
+          source: 1,
+          target: 3,
+          linkProperty: 'added'
+        }, {
+          source: 3,
+          target: 2,
+          linkProperty: 'added'
+        }]);
       });
-      $httpBackend.flush();
-      expect(linkData).toEqual([{
-        source: 1,
-        target: 3,
-        linkProperty: 'added'
-      }, {
-        source: 3,
-        target: 2,
-        linkProperty: 'added'
-      }]);
-    });
-
-    it('should correctly display deleted links', function() {
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=5')
-        .respond(_getStatesData(testExplorationData3[4]));
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=6')
-        .respond(_getStatesData(testExplorationData3[5]));
+      let req1 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=1');
+      expect(req1.request.method).toEqual('GET');
+      req1.flush(_getStatesData(testExplorationData3[0]));
+ 
+      let req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=2');
+      expect(req2.request.method).toEqual('GET');
+      req2.flush(_getStatesData(testExplorationData3[1]));
+ 
+      flushMicrotasks();
+    }));
+ 
+    it('should correctly display deleted links', fakeAsync(() => {
       vts.init(testSnapshots3);
-      var linkData = null;
       cvs.getDiffGraphData(5, 6).then(function(data) {
-        linkData = data.links;
+        expect(data.links).toEqual([{
+          source: 1,
+          target: 2,
+          linkProperty: 'unchanged'
+        }, {
+          source: 1,
+          target: 3,
+          linkProperty: 'deleted'
+        }, {
+          source: 2,
+          target: 3,
+          linkProperty: 'unchanged'
+        }, {
+          source: 2,
+          target: 4,
+          linkProperty: 'unchanged'
+        }, {
+          source: 3,
+          target: 1,
+          linkProperty: 'unchanged'
+        }]);
       });
-      $httpBackend.flush();
-      expect(linkData).toEqual([{
-        source: 1,
-        target: 2,
-        linkProperty: 'unchanged'
-      }, {
-        source: 1,
-        target: 3,
-        linkProperty: 'deleted'
-      }, {
-        source: 2,
-        target: 3,
-        linkProperty: 'unchanged'
-      }, {
-        source: 2,
-        target: 4,
-        linkProperty: 'unchanged'
-      }, {
-        source: 3,
-        target: 1,
-        linkProperty: 'unchanged'
-      }]);
-    });
-
-    it('should correctly display links on renamed states', function() {
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=3')
-        .respond(_getStatesData(testExplorationData3[2]));
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=5')
-        .respond(_getStatesData(testExplorationData3[4]));
+      let req1 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=5');
+      expect(req1.request.method).toEqual('GET');
+      req1.flush(_getStatesData(testExplorationData3[4]));
+ 
+      let req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=6');
+      expect(req2.request.method).toEqual('GET');
+      req2.flush(_getStatesData(testExplorationData3[5]));
+ 
+      flushMicrotasks();
+    }));
+ 
+    it('should correctly display links on renamed states', fakeAsync(() => {
       vts.init(testSnapshots3);
-      var linkData = null;
       cvs.getDiffGraphData(3, 5).then(function(data) {
-        linkData = data.links;
+        expect(data.links).toEqual([{
+          source: 1,
+          target: 2,
+          linkProperty: 'unchanged'
+        }, {
+          source: 1,
+          target: 3,
+          linkProperty: 'unchanged'
+        }, {
+          source: 2,
+          target: 3,
+          linkProperty: 'added'
+        }, {
+          source: 2,
+          target: 4,
+          linkProperty: 'unchanged'
+        }, {
+          source: 3,
+          target: 1,
+          linkProperty: 'unchanged'
+        }]);
       });
-      $httpBackend.flush();
-      expect(linkData).toEqual([{
-        source: 1,
-        target: 2,
-        linkProperty: 'unchanged'
-      }, {
-        source: 1,
-        target: 3,
-        linkProperty: 'unchanged'
-      }, {
-        source: 2,
-        target: 3,
-        linkProperty: 'added'
-      }, {
-        source: 2,
-        target: 4,
-        linkProperty: 'unchanged'
-      }, {
-        source: 3,
-        target: 1,
-        linkProperty: 'unchanged'
-      }]);
-    });
-
-    it('should correctly display added, then deleted links', function() {
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=2')
-        .respond(_getStatesData(testExplorationData3[1]));
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=7')
-        .respond(_getStatesData(testExplorationData3[6]));
+      let req1 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=3');
+      expect(req1.request.method).toEqual('GET');
+      req1.flush(_getStatesData(testExplorationData3[2]));
+ 
+      let req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=5');
+      expect(req2.request.method).toEqual('GET');
+      req2.flush(_getStatesData(testExplorationData3[4]));
+ 
+      flushMicrotasks();
+    }));
+ 
+    it('should correctly display added, then deleted links', fakeAsync(() => {
       vts.init(testSnapshots3);
-      var linkData = null;
       cvs.getDiffGraphData(2, 7).then(function(data) {
-        linkData = data.links;
+        expect(data.links).toEqual([{
+          source: 1,
+          target: 2,
+          linkProperty: 'unchanged'
+        }, {
+          source: 2,
+          target: 3,
+          linkProperty: 'unchanged'
+        }]);
       });
-      $httpBackend.flush();
-      expect(linkData).toEqual([{
-        source: 1,
-        target: 2,
-        linkProperty: 'unchanged'
-      }, {
-        source: 2,
-        target: 3,
-        linkProperty: 'unchanged'
-      }]);
-    });
-
-    it('should correctly display deleted, then added links', function() {
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=6')
-        .respond(_getStatesData(testExplorationData3[5]));
-      $httpBackend.expect('GET', '/explorehandler/init/0?v=8')
-        .respond(_getStatesData(testExplorationData3[7]));
+      let req1 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=2');
+      expect(req1.request.method).toEqual('GET');
+      req1.flush(_getStatesData(testExplorationData3[1]));
+ 
+      let req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=7');
+      expect(req2.request.method).toEqual('GET');
+      req2.flush(_getStatesData(testExplorationData3[6]));
+ 
+      flushMicrotasks();
+    }));
+ 
+    it('should correctly display deleted, then added links', fakeAsync(() => {
       vts.init(testSnapshots3);
-      var linkData = null;
       cvs.getDiffGraphData(6, 8).then(function(data) {
-        linkData = data.links;
+        expect(data.links).toEqual([{
+          source: 1,
+          target: 2,
+          linkProperty: 'unchanged'
+        }, {
+          source: 2,
+          target: 3,
+          linkProperty: 'unchanged'
+        }, {
+          source: 2,
+          target: 4,
+          linkProperty: 'unchanged'
+        }, {
+          source: 3,
+          target: 1,
+          linkProperty: 'deleted'
+        }, {
+          source: 3,
+          target: 2,
+          linkProperty: 'added'
+        }]);
       });
-      $httpBackend.flush();
-      expect(linkData).toEqual([{
-        source: 1,
-        target: 2,
-        linkProperty: 'unchanged'
-      }, {
-        source: 2,
-        target: 3,
-        linkProperty: 'unchanged'
-      }, {
-        source: 2,
-        target: 4,
-        linkProperty: 'unchanged'
-      }, {
-        source: 3,
-        target: 1,
-        linkProperty: 'deleted'
-      }, {
-        source: 3,
-        target: 2,
-        linkProperty: 'added'
-      }]);
-    });
-
+      let req1 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=6');
+      expect(req1.request.method).toEqual('GET');
+      req1.flush(_getStatesData(testExplorationData3[5]));
+ 
+      let req2 = httpTestingController.expectOne(
+        '/explorehandler/init/0?v=8');
+      expect(req2.request.method).toEqual('GET');
+      req2.flush(_getStatesData(testExplorationData3[7]));
+ 
+      flushMicrotasks();
+    }));
+ 
     it('shouldn\'t compare versions if v1 > v2.', function() {
       expect(function() {
         cvs.getDiffGraphData(8, 5);

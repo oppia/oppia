@@ -21,8 +21,6 @@ import { HttpClient, HttpXhrBackend } from '@angular/common/http';
 import { BrowserXhr } from '@angular/http';
 import { Injectable } from '@angular/core';
 import {
-  HttpClient,
-  HttpXhrBackend,
   /* eslint-disable camelcase */
   ɵangular_packages_common_http_http_d
   /* eslint-enable camelcase */
