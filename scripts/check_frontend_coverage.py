@@ -299,6 +299,7 @@ FULLY_COVERED_FILENAMES = [
     'solution-validity.service.ts',
     'solution-verification.service.ts',
     'SolutionObjectFactory.ts',
+    'speech-synthesis-chunker.service.ts',
     'splash-page.controller.ts',
     'state-classifier-mapping.service.ts',
     'state-content.service.ts',
