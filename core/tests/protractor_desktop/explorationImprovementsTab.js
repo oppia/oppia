@@ -298,7 +298,7 @@ describe('Feedback Improvements', function() {
 });
 
 
-describe('Suggestions Improvements', function() {
+fdescribe('Suggestions Improvements', function() {
   var EXPLORATION_TITLE = 'Exploration with Suggestion';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
@@ -389,8 +389,8 @@ describe('Suggestions Improvements', function() {
     waitFor.pageToFullyLoad();
 
     improvementsTab.setShowOnlyOpenTasks(false);
-    expect(improvementsTab.getTaskByStatus('Fixed').isPresent()).toBeTrue();
-    expect(improvementsTab.getTaskByStatus('Ignored').isPresent()).toBeTrue();
+    expect(improvementsTab.getTaskByStatus('Fixed').isPresent()).toBe(true);
+    expect(improvementsTab.getTaskByStatus('Ignored').isPresent()).toBe(true);
 
     explorationEditorPage.navigateToPreviewTab();
     explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
