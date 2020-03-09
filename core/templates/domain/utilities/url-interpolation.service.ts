@@ -138,8 +138,8 @@ export class UrlInterpolationService {
     if (nonStringParams.length > 0) {
       this.alertsService.fatalWarning(
         'Every parameter passed into interpolateUrl must have string values, ' +
-        'but received: ' + nonStringParams.map(
-          ([key, val]) => key + ': ' + angular.toJson(val)).join(', '));
+        'but received: {' + nonStringParams.map(
+          ([key, val]) => key + ': ' + angular.toJson(val)).join(', ') + '}');
     }
 
     let escapedInterpolationValues = {};

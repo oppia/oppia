@@ -34,25 +34,24 @@ require('objects/objectComponentsRequires.ts');
 require('components/entity-creation-services/exploration-creation.service.ts');
 require('components/ratings/rating-computation/rating-computation.service.ts');
 require('domain/creator_dashboard/creator-dashboard-backend-api.service.ts');
+require('domain/suggestion/SuggestionObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
   'suggestion-modal-for-creator-view.service.ts');
 require(
-  'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
-require(
   'pages/exploration-editor-page/feedback-tab/services/' +
   'thread-status-display.service.ts');
 require('services/alerts.service.ts');
 require('services/date-time-format.service.ts');
-require('services/suggestions.service.ts');
 require('services/user.service.ts');
 
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts');
 
 angular.module('oppia').directive('creatorDashboardPage', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', function(
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -61,12 +60,13 @@ angular.module('oppia').directive('creatorDashboardPage', [
         '/pages/creator-dashboard-page/creator-dashboard-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$log', '$q', '$rootScope', '$window', 'AlertsService',
-        'CreatorDashboardBackendApiService', 'DateTimeFormatService',
+        '$http', '$log', '$q', '$rootScope', '$window',
+        'AlertsService', 'CreatorDashboardBackendApiService',
+        'DateTimeFormatService',
         'ExplorationCreationService', 'RatingComputationService',
-        'SuggestionModalForCreatorDashboardService', 'SuggestionsService',
-        'SuggestionThreadObjectFactory', 'ThreadDataService',
-        'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
+        'SuggestionModalForCreatorDashboardService', 'SuggestionObjectFactory',
+        'SuggestionThreadObjectFactory', 'ThreadStatusDisplayService',
+        'UrlInterpolationService', 'UserService',
         'ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS',
         'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR', 'EXPLORATIONS_SORT_BY_KEYS',
         'EXPLORATION_DROPDOWN_STATS', 'FATAL_ERROR_CODES',
@@ -74,12 +74,13 @@ angular.module('oppia').directive('creatorDashboardPage', [
         'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
         'SUBSCRIPTION_SORT_BY_KEYS',
         function(
-            $http, $log, $q, $rootScope, $window, AlertsService,
-            CreatorDashboardBackendApiService, DateTimeFormatService,
+            $http, $log, $q, $rootScope, $window,
+            AlertsService, CreatorDashboardBackendApiService,
+            DateTimeFormatService,
             ExplorationCreationService, RatingComputationService,
-            SuggestionModalForCreatorDashboardService, SuggestionsService,
-            SuggestionThreadObjectFactory, ThreadDataService,
-            ThreadStatusDisplayService, UrlInterpolationService, UserService,
+            SuggestionModalForCreatorDashboardService, SuggestionObjectFactory,
+            SuggestionThreadObjectFactory, ThreadStatusDisplayService,
+            UrlInterpolationService, UserService,
             ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS,
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR, EXPLORATIONS_SORT_BY_KEYS,
             EXPLORATION_DROPDOWN_STATS, FATAL_ERROR_CODES,
@@ -110,12 +111,14 @@ angular.module('oppia').directive('creatorDashboardPage', [
           ctrl.setMyExplorationsView = function(newViewType) {
             $http.post('/creatordashboardhandler/data', {
               display_preference: newViewType,
-            }).then(() => ctrl.myExplorationsView = newViewType);
+            }).then(function() {
+              ctrl.myExplorationsView = newViewType;
+            });
             userDashboardDisplayPreference = newViewType;
           };
 
           ctrl.checkMobileView = function() {
-            return $window.innerWidth < 500;
+            return ($window.innerWidth < 500);
           };
 
           ctrl.showUsernamePopover = function(subscriberUsername) {
@@ -174,18 +177,41 @@ angular.module('oppia').directive('creatorDashboardPage', [
             return value;
           };
 
+          var _fetchMessages = function(threadId) {
+            $http.get('/threadhandler/' + threadId).then(function(response) {
+              var allThreads = ctrl.mySuggestionsList.concat(
+                ctrl.suggestionsToReviewList);
+              for (var i = 0; i < allThreads.length; i++) {
+                if (allThreads[i].threadId === threadId) {
+                  allThreads[i].setMessages(response.data.messages);
+                  break;
+                }
+              }
+            });
+          };
+
           ctrl.clearActiveThread = function() {
             ctrl.activeThread = null;
           };
 
           ctrl.setActiveThread = function(threadId) {
-            if (!ctrl.threadsById.hasOwnProperty(threadId)) {
-              throw Error('Trying to set a non-existent thread as active.');
+            _fetchMessages(threadId);
+            for (var i = 0; i < ctrl.mySuggestionsList.length; i++) {
+              if (ctrl.mySuggestionsList[i].threadId === threadId) {
+                ctrl.activeThread = ctrl.mySuggestionsList[i];
+                ctrl.canReviewActiveThread = false;
+                break;
+              }
             }
-            ctrl.activeThread = ctrl.threadsById[threadId];
-            ctrl.canReviewActiveThread = ctrl.suggestionsToReviewList.some(
-              thread => thread.threadId === ctrl.activeThread.threadId);
-            ThreadDataService.fetchMessages(ctrl.activeThread);
+            if (!ctrl.activeThread) {
+              for (var i = 0; i < ctrl.suggestionsToReviewList.length; i++) {
+                if (ctrl.suggestionsToReviewList[i].threadId === threadId) {
+                  ctrl.activeThread = ctrl.suggestionsToReviewList[i];
+                  ctrl.canReviewActiveThread = true;
+                  break;
+                }
+              }
+            }
           };
 
           ctrl.showSuggestionModal = function() {
@@ -223,9 +249,6 @@ angular.module('oppia').directive('creatorDashboardPage', [
           ctrl.getCompleteThumbnailIconUrl = function(iconUrl) {
             return UrlInterpolationService.getStaticImageUrl(iconUrl);
           };
-
-          ctrl.threadsById = {};
-
           ctrl.$onInit = function() {
             ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
             ctrl.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
@@ -241,14 +264,14 @@ angular.module('oppia').directive('creatorDashboardPage', [
             ctrl.canCreateCollections = null;
             $rootScope.loadingMessage = 'Loading';
             var userInfoPromise = UserService.getUserInfoAsync();
-            userInfoPromise.then(userInfo => {
+            userInfoPromise.then(function(userInfo) {
               ctrl.canCreateCollections = userInfo.canCreateCollections();
             });
 
             var dashboardDataPromise = (
-              CreatorDashboardBackendApiService.fetchDashboardData()
-            ).then(
-              response => {
+              CreatorDashboardBackendApiService.fetchDashboardData());
+            dashboardDataPromise.then(
+              function(response) {
                 // The following condition is required for Karma testing. The
                 // Angular HttpClient returns an Observable which when converted
                 // to a promise does not have the 'data' key but the AngularJS
@@ -270,42 +293,60 @@ angular.module('oppia').directive('creatorDashboardPage', [
                 ctrl.dashboardStats = responseData.dashboard_stats;
                 ctrl.lastWeekStats = responseData.last_week_stats;
                 ctrl.myExplorationsView = responseData.display_preference;
-
-                let suggestionBackendDictsByThreadId = {};
-                responseData.created_suggestions_list.forEach(backendDict => {
-                  let threadId =
-                    SuggestionsService.getThreadIdFromSuggestionBackendDict(
-                      backendDict);
-                  suggestionBackendDictsByThreadId[threadId] = backendDict;
-                });
-                responseData.suggestions_to_review_list.forEach(backendDict => {
-                  let threadId =
-                    SuggestionsService.getThreadIdFromSuggestionBackendDict(
-                      backendDict);
-                  suggestionBackendDictsByThreadId[threadId] = backendDict;
-                });
-
-                ctrl.mySuggestionsList =
-                  responseData.threads_for_created_suggestions_list.map(
-                    dict => {
-                      let threadId = dict.thread_id;
-                      return ctrl.threadsById[threadId] =
+                var numberOfCreatedSuggestions = (
+                  responseData.threads_for_created_suggestions_list.length);
+                var numberOfSuggestionsToReview = (
+                  responseData.threads_for_suggestions_to_review_list.length);
+                ctrl.mySuggestionsList = [];
+                for (var i = 0; i < numberOfCreatedSuggestions; i++) {
+                  if (responseData.created_suggestions_list.length !==
+                      numberOfCreatedSuggestions) {
+                    $log.error('Number of suggestions does not match number' +
+                              'of suggestion threads');
+                  }
+                  for (var j = 0; j < numberOfCreatedSuggestions; j++) {
+                    var suggestion = SuggestionObjectFactory
+                      .createFromBackendDict(
+                        responseData.created_suggestions_list[j]);
+                    var threadDict = (
+                      responseData.threads_for_created_suggestions_list[i]);
+                    if (threadDict.thread_id === suggestion.getThreadId()) {
+                      var suggestionThread = (
                         SuggestionThreadObjectFactory.createFromBackendDicts(
-                          dict, suggestionBackendDictsByThreadId[threadId]);
-                    });
-                ctrl.suggestionsToReviewList =
-                  responseData.threads_for_suggestions_to_review_list.map(
-                    dict => {
-                      let threadId = dict.thread_id;
-                      return ctrl.threadsById[threadId] =
+                          threadDict,
+                          responseData.created_suggestions_list[j]));
+                      ctrl.mySuggestionsList.push(suggestionThread);
+                    }
+                  }
+                }
+                ctrl.suggestionsToReviewList = [];
+                for (var i = 0; i < numberOfSuggestionsToReview; i++) {
+                  if (responseData.suggestions_to_review_list.length !==
+                      numberOfSuggestionsToReview) {
+                    $log.error('Number of suggestions does not match number' +
+                              'of suggestion threads');
+                  }
+                  for (var j = 0; j < numberOfSuggestionsToReview; j++) {
+                    var suggestion = SuggestionObjectFactory
+                      .createFromBackendDict(
+                        responseData.suggestions_to_review_list[j]);
+                    var threadDict = (
+                      responseData.threads_for_suggestions_to_review_list[i]);
+                    if (threadDict.thread_id === suggestion.getThreadId()) {
+                      var suggestionThread = (
                         SuggestionThreadObjectFactory.createFromBackendDicts(
-                          dict, suggestionBackendDictsByThreadId[threadId]);
-                    });
+                          threadDict,
+                          responseData.suggestions_to_review_list[j]));
+                      ctrl.suggestionsToReviewList.push(suggestionThread);
+                    }
+                  }
+                }
 
                 if (ctrl.dashboardStats && ctrl.lastWeekStats) {
                   ctrl.relativeChangeInTotalPlays = (
-                    ctrl.dashboardStats.total_plays -
-                    ctrl.lastWeekStats.total_plays);
+                    ctrl.dashboardStats.total_plays - (
+                      ctrl.lastWeekStats.total_plays)
+                  );
                 }
 
                 if (ctrl.explorationsList.length === 0 &&
@@ -319,7 +360,7 @@ angular.module('oppia').directive('creatorDashboardPage', [
                   ctrl.activeTab = 'myExplorations';
                 }
               },
-              errorResponse => {
+              function(errorResponse) {
                 if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
                   AlertsService.addWarning('Failed to get dashboard data');
                 }
