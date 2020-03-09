@@ -2526,7 +2526,8 @@ def get_decorator_for_accepting_suggestion(decorator):
 
 
 def can_view_reviewable_suggestions(handler):
-    """Decorator to check whether user can view reviewable suggestions.
+    """Decorator to check whether user can view the list of suggestions that
+    they are allowed to review.
 
     Args:
         handler: function. The function to be decorated.

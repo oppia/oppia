@@ -528,8 +528,8 @@ export = {
 
   "ACTION_REMOVE_ALL_REVIEW_RIGHTS": "all",
   "ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS": "specific",
-  "VIEW_METHOD_USERNAME": "username",
-  "VIEW_METHOD_ROLE": "role",
+  "USER_FILTER_CRITERION_USERNAME": "username",
+  "USER_FILTER_CRITERION_ROLE": "role",
 
   // Interaction IDs for which answer details cannot be solicited.
   "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],

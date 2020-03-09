@@ -569,6 +569,8 @@ def _save_user_community_rights(user_community_rights):
         user_community_rights: UserCommunityRights. The UserCommunityRights
             object of the user.
     """
+    # TODO(#8794): Add limitation on number of reviewers allowed in any
+    # category.
     user_community_rights.validate()
     user_models.UserCommunityRightsModel(
         id=user_community_rights.id,
@@ -1867,14 +1869,17 @@ def allow_user_to_review_translation_in_language(user_id, language_code):
 
     Args:
         user_id: str. The unique ID of the user.
-        language_code: str. The code of the language.
+        language_code: str. The code of the language. Callers should ensure that
+            the user does not have rights to review translations in the given
+            language code.
     """
     user_community_rights = get_user_community_rights(user_id)
-    language_list = (
+    language_set = set(
         user_community_rights.can_review_translation_for_language_codes)
-    language_list.append(language_code)
-    user_community_rights.can_review_translation_for_language_codes = sorted(
-        language_list)
+    language_set.add(language_code)
+    sorted_language_list = sorted(list(language_set))
+    user_community_rights.can_review_translation_for_language_codes = (
+        sorted_language_list)
     _save_user_community_rights(user_community_rights)
 
 
@@ -1884,7 +1889,9 @@ def remove_translation_review_rights_in_language(user_id, language_code):
 
     Args:
         user_id: str. The unique ID of the user.
-        language_code: str. The code of the language.
+        language_code: str. The code of the language. Callers should ensure that
+            the user have rights to review translations in the given
+            language code.
     """
     user_community_rights = get_user_community_rights(user_id)
     user_community_rights.can_review_translation_for_language_codes.remove(
@@ -1898,14 +1905,17 @@ def allow_user_to_review_voiceover_in_language(user_id, language_code):
 
     Args:
         user_id: str. The unique ID of the user.
-        language_code: str. The code of the language.
+        language_code: str. The code of the language. Callers should ensure that
+            the user does not have rights to review voiceovers in the given
+            language code.
     """
     user_community_rights = get_user_community_rights(user_id)
-    language_list = (
+    language_set = set(
         user_community_rights.can_review_voiceover_for_language_codes)
-    language_list.append(language_code)
-    user_community_rights.can_review_voiceover_for_language_codes = sorted(
-        language_list)
+    language_set.add(language_code)
+    sorted_language_list = sorted(list(language_set))
+    user_community_rights.can_review_voiceover_for_language_codes = (
+        sorted_language_list)
     _save_user_community_rights(user_community_rights)
 
 
@@ -1915,7 +1925,9 @@ def remove_voiceover_review_rights_in_language(user_id, language_code):
 
     Args:
         user_id: str. The unique ID of the user.
-        language_code: str. The code of the language.
+        language_code: str. The code of the language. Callers should ensure that
+            the user have rights to review voiceovers in the given
+            language code.
     """
     user_community_rights = get_user_community_rights(user_id)
     user_community_rights.can_review_voiceover_for_language_codes.remove(
@@ -1927,7 +1939,8 @@ def allow_user_to_review_question(user_id):
     """Allows the user with the given user id to review question suggestions.
 
     Args:
-        user_id: str. The unique ID of the user.
+        user_id: str. The unique ID of the user. Callers should ensure that
+            the given user does not have rights to review questions.
     """
     user_community_rights = get_user_community_rights(user_id)
     user_community_rights.can_review_questions = True
@@ -1938,7 +1951,8 @@ def remove_question_review_rights(user_id):
     """Removes the user's review rights to question suggestions.
 
     Args:
-        user_id: str. The unique ID of the user.
+        user_id: str. The unique ID of the user. Callers should ensure that
+            the given user have rights to review questions.
     """
     user_community_rights = get_user_community_rights(user_id)
     user_community_rights.can_review_questions = False

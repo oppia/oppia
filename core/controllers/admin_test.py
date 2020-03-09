@@ -784,7 +784,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         # Check normal user has expected role. Viewing by username.
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            params={'method': 'username', 'username': 'user1'})
+            params={'filter_criterion': 'username', 'username': 'user1'})
         self.assertEqual(
             response_dict, {'user1': feconf.ROLE_ID_EXPLORATION_EDITOR})
 
@@ -800,11 +800,14 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         # Viewing by role.
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            params={'method': 'role', 'role': feconf.ROLE_ID_MODERATOR})
+            params={
+                'filter_criterion': 'role',
+                'role': feconf.ROLE_ID_MODERATOR
+            })
         self.assertEqual(response_dict, {'user1': feconf.ROLE_ID_MODERATOR})
         self.logout()
 
-    def test_invalid_username_in_view_and_update_role(self):
+    def test_invalid_username_in_filter_criterion_and_update_role(self):
         username = 'myinvaliduser'
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -812,7 +815,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         # Trying to view role of non-existent user.
         self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            params={'method': 'username', 'username': username},
+            params={'filter_criterion': 'username', 'username': username},
             expected_status_int=400)
 
         # Trying to update role of non-existent user.
@@ -823,14 +826,15 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
 
-    def test_cannot_view_role_with_invalid_view_method(self):
+    def test_cannot_view_role_with_invalid_view_filter_criterion(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            params={'method': 'invalid_method', 'username': 'user1'},
+            params={'filter_criterion': 'invalid', 'username': 'user1'},
             expected_status_int=400)
 
-        self.assertEqual(response['error'], 'Invalid method to view roles.')
+        self.assertEqual(
+            response['error'], 'Invalid filter criterion to view roles.')
 
     def test_changing_user_role_from_topic_manager_to_moderator(self):
         user_email = 'user1@example.com'
@@ -843,7 +847,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            params={'method': 'username', 'username': username})
+            params={'filter_criterion': 'username', 'username': username})
         self.assertEqual(
             response_dict, {username: feconf.ROLE_ID_TOPIC_MANAGER})
 
@@ -858,7 +862,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            params={'method': 'username', 'username': username})
+            params={'filter_criterion': 'username', 'username': username})
 
         self.assertEqual(response_dict, {username: feconf.ROLE_ID_MODERATOR})
 
@@ -883,7 +887,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            params={'method': 'username', 'username': username})
+            params={'filter_criterion': 'username', 'username': username})
 
         self.assertEqual(
             response_dict, {username: feconf.ROLE_ID_EXPLORATION_EDITOR})
@@ -899,7 +903,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            params={'method': 'username', 'username': username})
+            params={'filter_criterion': 'username', 'username': username})
         self.assertEqual(
             response_dict, {username: feconf.ROLE_ID_TOPIC_MANAGER})
 
@@ -1340,7 +1344,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
             '/removecommunityreviewerhandler', {
                 'username': 'translator',
                 'removal_type': 'specific',
-                'review_type': 'translation',
+                'review_category': 'translation',
                 'language_code': 'hi'
             }, csrf_token=csrf_token)
 
@@ -1355,7 +1359,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
             '/removecommunityreviewerhandler', {
                 'username': 'translator',
                 'removal_type': 'specific',
-                'review_type': 'translation',
+                'review_category': 'translation',
                 'language_code': 'invalid'
             }, csrf_token=csrf_token, expected_status_int=400)
 
@@ -1372,7 +1376,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
             '/removecommunityreviewerhandler', {
                 'username': 'translator',
                 'removal_type': 'specific',
-                'review_type': 'translation',
+                'review_category': 'translation',
                 'language_code': 'hi'
             }, csrf_token=csrf_token, expected_status_int=400)
 
@@ -1398,7 +1402,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
             '/removecommunityreviewerhandler', {
                 'username': 'voiceartist',
                 'removal_type': 'specific',
-                'review_type': 'voiceover',
+                'review_category': 'voiceover',
                 'language_code': 'hi'
             }, csrf_token=csrf_token)
 
@@ -1413,7 +1417,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
             '/removecommunityreviewerhandler', {
                 'username': 'voiceartist',
                 'removal_type': 'specific',
-                'review_type': 'voiceover',
+                'review_category': 'voiceover',
                 'language_code': 'invalid'
             }, csrf_token=csrf_token, expected_status_int=400)
 
@@ -1430,7 +1434,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
             '/removecommunityreviewerhandler', {
                 'username': 'voiceartist',
                 'removal_type': 'specific',
-                'review_type': 'voiceover',
+                'review_category': 'voiceover',
                 'language_code': 'hi'
             }, csrf_token=csrf_token, expected_status_int=400)
 
@@ -1450,7 +1454,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
             '/removecommunityreviewerhandler', {
                 'username': 'question',
                 'removal_type': 'specific',
-                'review_type': 'question'
+                'review_category': 'question'
             }, csrf_token=csrf_token)
 
         self.assertFalse(user_services.can_review_question_suggestions(
@@ -1466,7 +1470,7 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
             '/removecommunityreviewerhandler', {
                 'username': 'question',
                 'removal_type': 'specific',
-                'review_type': 'question'
+                'review_category': 'question'
             }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -1480,11 +1484,11 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
             '/removecommunityreviewerhandler', {
                 'username': 'question',
                 'removal_type': 'specific',
-                'review_type': 'invalid'
+                'review_category': 'invalid'
             }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
-            response['error'], 'Invalid type: invalid')
+            response['error'], 'Invalid review_category: invalid')
 
     def test_remove_reviewer_for_invalid_removal_type_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -1562,7 +1566,7 @@ class CommunityReviewersHandlerTest(test_utils.GenericTestBase):
             self.voiceover_reviewer_id, 'hi')
         response = self.get_json(
             '/getcommunityreviewershandler', params={
-                'type': 'translation',
+                'review_category': 'translation',
                 'language_code': 'hi'
             })
 
@@ -1578,7 +1582,7 @@ class CommunityReviewersHandlerTest(test_utils.GenericTestBase):
             self.voiceover_reviewer_id, 'hi')
         response = self.get_json(
             '/getcommunityreviewershandler', params={
-                'type': 'voiceover',
+                'review_category': 'voiceover',
                 'language_code': 'hi'
             })
 
@@ -1590,7 +1594,7 @@ class CommunityReviewersHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
             '/getcommunityreviewershandler', params={
-                'type': 'voiceover',
+                'typereview_category': 'voiceover',
                 'language_code': 'invalid'
             }, expected_status_int=400)
 
@@ -1603,7 +1607,7 @@ class CommunityReviewersHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.voiceover_reviewer_id)
         response = self.get_json(
             '/getcommunityreviewershandler', params={
-                'type': 'question'
+                'review_category': 'question'
             })
 
         self.assertEqual(len(response['usernames']), 2)
