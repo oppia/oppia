@@ -18,13 +18,6 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import {
-  HttpClient,
-  HttpXhrBackend,
-  /* eslint-disable camelcase */
-  ɵangular_packages_common_http_http_d
-  /* eslint-enable camelcase */
-} from '@angular/common/http';
 
 import { AlertsService } from 'services/alerts.service';
 import { AngularNameService } from
@@ -105,6 +98,8 @@ import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { HttpClient, HttpXhrBackend, ɵangular_packages_common_http_http_d } from
+  '@angular/common/http';
 import { IdGenerationService } from 'services/id-generation.service';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
@@ -275,17 +270,8 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 
-type Newable<T> = { new (...args: any[]): T; };
-
-class Register<T> {
-  constructor(public service: Newable<T>, public dependencies: string[]) {}
-}
-
 @Injectable({providedIn: 'root'})
 export class UpgradedServices {
-  private serviceRegistry: {[serviceName: string]: Register<any>};
-
-
   getUpgradedServices() {
     let upgradedServices = {};
 
@@ -593,8 +579,8 @@ export class UpgradedServices {
       upgradedServices['WrittenTranslationsObjectFactory']);
 
     // Topographical-level 7:
-    upgradedServices['StatesObjectFactory'] =
-      new StatesObjectFactory(upgradedServices['StateObjectFactory']);
+    upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
+      upgradedServices['StateObjectFactory']);
 
     // Topographical-level 8:
     upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
