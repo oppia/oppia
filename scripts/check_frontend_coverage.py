@@ -247,7 +247,6 @@ FULLY_COVERED_FILENAMES = [
     'practice-session-page.constants.ajs.ts',
     'practice-session-page.constants.ts',
     'PredictionResultObjectFactory.ts',
-    'question-backend-api.service.ts',
     'question-domain.constants.ajs.ts',
     'question-domain.constants.ts',
     'question-player-state.service.ts',
