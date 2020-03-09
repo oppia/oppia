@@ -46,6 +46,7 @@ export class ReadOnlyTopic {
   _subtopics: Array<Subtopic>;
   _degreesOfMastery: IDegreesOfMastery;
   _skillDescriptions: ISkillDescriptions;
+  _trainTabShouldBeDisplayed: boolean;
 
   constructor(topicName: string, topicId: string,
       canonicalStorySummaries: Array<StorySummary>,
@@ -53,7 +54,8 @@ export class ReadOnlyTopic {
       uncategorizedSkillSummaries: Array<SkillSummary>,
       subtopics: Array<Subtopic>,
       degreesOfMastery: IDegreesOfMastery,
-      skillDescriptions: ISkillDescriptions) {
+      skillDescriptions: ISkillDescriptions,
+      trainTabShouldBeDisplayed: boolean) {
     this._topicName = topicName;
     this._topicId = topicId;
     this._canonicalStorySummaries = canonicalStorySummaries;
@@ -62,6 +64,7 @@ export class ReadOnlyTopic {
     this._subtopics = subtopics;
     this._degreesOfMastery = degreesOfMastery;
     this._skillDescriptions = skillDescriptions;
+    this._trainTabShouldBeDisplayed = trainTabShouldBeDisplayed;
   }
 
   getTopicName(): string {
@@ -94,6 +97,10 @@ export class ReadOnlyTopic {
 
   getSkillDescriptions(): ISkillDescriptions {
     return this._skillDescriptions;
+  }
+
+  getTrainTabShouldBeDisplayed(): boolean {
+    return this._trainTabShouldBeDisplayed;
   }
 }
 
@@ -143,7 +150,7 @@ export class ReadOnlyTopicObjectFactory {
     return new ReadOnlyTopic(
       topicDataDict.topic_name, topicDataDict.topic_id, canonicalStories,
       additionalStories, uncategorizedSkills, subtopics, degreesOfMastery,
-      skillDescriptions);
+      skillDescriptions, topicDataDict.train_tab_should_be_displayed);
   }
 }
 

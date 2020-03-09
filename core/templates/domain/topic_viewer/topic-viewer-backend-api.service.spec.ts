@@ -92,7 +92,8 @@ describe('Topic viewer backend API service', () => {
       skill_descriptions: {
         skill_id_1: 'Skill Description 1',
         skill_id_2: 'Skill Description 2'
-      }
+      },
+      train_tab_should_be_displayed: false
     };
 
     sampleDataResultsObjects = readOnlyTopicObjectFactory.createFromBackendDict(

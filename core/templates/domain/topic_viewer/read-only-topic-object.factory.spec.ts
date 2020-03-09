@@ -62,7 +62,8 @@ describe('Topic Data Object Factory', () => {
       skill_descriptions: {
         skill_id_1: 'Skill Description 1',
         skill_id_2: 'Skill Description 2'
-      }
+      },
+      train_tab_should_be_displayed: false
     };
 
     _sampleReadOnlyTopic = readOnlyTopicObjectFactory.createFromBackendDict(
@@ -72,6 +73,7 @@ describe('Topic Data Object Factory', () => {
   it('should check the values of topic name and id', () => {
     expect(_sampleReadOnlyTopic.getTopicName()).toEqual('topic_name');
     expect(_sampleReadOnlyTopic.getTopicId()).toEqual('topic_id');
+    expect(_sampleReadOnlyTopic.getTrainTabShouldBeDisplayed()).toEqual(false);
   });
 
   it('should check value of uncategorized skill object', () => {
