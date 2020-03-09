@@ -148,7 +148,7 @@ angular.module('oppia').factory('ThreadDataService', [
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
         return $http.get(getThreadHandlerUrl(threadId)).then(response => {
-          let threadMessageBackendDicts = response.data.messages || [];
+          let threadMessageBackendDicts = response.data.messages;
           thread.setMessages(threadMessageBackendDicts.map(
             m => ThreadMessageObjectFactory.createFromBackendDict(m)));
           return thread.getMessages();
