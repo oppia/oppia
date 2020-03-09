@@ -65,8 +65,8 @@ angular.module('oppia').directive('creatorDashboardPage', [
         'DateTimeFormatService',
         'ExplorationCreationService', 'RatingComputationService',
         'SuggestionModalForCreatorDashboardService', 'SuggestionObjectFactory',
-        'SuggestionThreadObjectFactory', 'ThreadStatusDisplayService',
-        'UrlInterpolationService', 'UserService',
+        'SuggestionThreadObjectFactory', 'ThreadMessageObjectFactory',
+        'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
         'ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS',
         'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR', 'EXPLORATIONS_SORT_BY_KEYS',
         'EXPLORATION_DROPDOWN_STATS', 'FATAL_ERROR_CODES',
@@ -79,8 +79,8 @@ angular.module('oppia').directive('creatorDashboardPage', [
             DateTimeFormatService,
             ExplorationCreationService, RatingComputationService,
             SuggestionModalForCreatorDashboardService, SuggestionObjectFactory,
-            SuggestionThreadObjectFactory, ThreadStatusDisplayService,
-            UrlInterpolationService, UserService,
+            SuggestionThreadObjectFactory, ThreadMessageObjectFactory,
+            ThreadStatusDisplayService, UrlInterpolationService, UserService,
             ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS,
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR, EXPLORATIONS_SORT_BY_KEYS,
             EXPLORATION_DROPDOWN_STATS, FATAL_ERROR_CODES,
@@ -183,7 +183,8 @@ angular.module('oppia').directive('creatorDashboardPage', [
                 ctrl.suggestionsToReviewList);
               for (var i = 0; i < allThreads.length; i++) {
                 if (allThreads[i].threadId === threadId) {
-                  allThreads[i].setMessages(response.data.messages);
+                  allThreads[i].setMessages(response.data.messages.map(
+                    m => ThreadMessageObjectFactory.createFromBackendDict(m));
                   break;
                 }
               }
