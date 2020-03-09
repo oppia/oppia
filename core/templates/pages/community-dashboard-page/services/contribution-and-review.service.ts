@@ -16,126 +16,110 @@
  * @fileoverview Service for fetching and resolving suggestions.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
+require('domain/suggestion/SuggestionObjectFactory.ts');
+require('domain/suggestion/SuggestionThreadObjectFactory.ts');
+require('pages/exploration-editor-page/services/exploration-data.service.ts');
+require('services/alerts.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('ContributionAndReviewService', [
-  '$http', 'UrlInterpolationService', 'ACTION_ACCEPT_SUGGESTION',
-  function($http, UrlInterpolationService, ACTION_ACCEPT_SUGGESTION) {
-    let getSubmittedSuggestionListHandlerUrl = (
-      (targetType, suggestionType) => UrlInterpolationService.interpolateUrl(
-        '/getsubmittedsuggestions/<target_type>/<suggestion_type>', {
-          target_type: targetType,
-          suggestion_type: suggestionType
-        }));
-    let getReviewableSuggestionsHandlerUrl = (
-      (targetType, suggestionType) => UrlInterpolationService.interpolateUrl(
-        '/getreviewablesuggestions/<target_type>/<suggestion_type>', {
-          target_type: targetType,
-          suggestion_type: suggestionType
-        }));
-    let getSuggestionToExplorationActionHandlerUrl = (
-      (expId, suggestionId) => UrlInterpolationService.interpolateUrl(
-        '/suggestionactionhandler/exploration/<exploration_id>/<suggestion_id>',
-        { exploration_id: expId, suggestion_id: suggestionId }));
-    let getSuggestionToSkillActionHandlerUrl = (
-      (skillId, suggestionId) => UrlInterpolationService.interpolateUrl(
-        '/suggestionactionhandler/skill/<skill_id>/<suggestion_id>', {
-          skill_id: skillId,
-          suggestion_id: suggestionId
-        }));
+  '$http', '$q', 'UrlInterpolationService', 'ACTION_ACCEPT_SUGGESTION',
+  function(
+      $http, $q, UrlInterpolationService, ACTION_ACCEPT_SUGGESTION) {
+    var _SUBMITTED_SUGGESTION_LIST_HANDLER_URL = (
+      '/getsubmittedsuggestions/<target_type>/<suggestion_type>');
+    var _REVIEWABLE_SUGGESTIONS_HANDLER_URL = (
+      '/getreviewablesuggestions/<target_type>/<suggestion_type>');
+    var _SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL = (
+      '/suggestionactionhandler/exploration/<exp_id>/<suggestion_id>');
+    var _SUGGESTION_TO_SKILL_ACTION_HANDLER_URL = (
+      '/suggestionactionhandler/skill/<skill_id>/<suggestion_id>');
 
-    let getSuggestionsByIdFromHttpResponse = httpResponse => {
-      let targetIdToDetails = httpResponse.data.target_id_to_opportunity_dict;
-      let suggestionsById = {};
-      httpResponse.data.suggestions.forEach(suggestion => {
-        let suggestionId = suggestion.suggestion_id;
-        let targetId = suggestion.target_id;
-        suggestionsById[suggestionId] = {
-          suggestion: suggestion,
-          details: targetIdToDetails[targetId]
-        };
+    var _fetchSuggestions = function(url, onSuccess) {
+      var suggestionsPromise = $http.get(url);
+
+      return $q.when(suggestionsPromise, function(res) {
+        var suggestionIdToSuggestions = {};
+        var targetIdToDetails = res.data.target_id_to_opportunity_dict;
+        res.data.suggestions.forEach(function(suggestion) {
+          suggestionIdToSuggestions[suggestion.suggestion_id] = {
+            suggestion: suggestion,
+            details: targetIdToDetails[suggestion.target_id]
+          };
+        });
+        onSuccess(suggestionIdToSuggestions);
       });
-      return suggestionsById;
     };
 
     return {
       getUserCreatedQuestionSuggestions: function(onSuccess) {
-        // TODO(#8016): Move this function to a backend-api.service with unit
-        // tests.
-        return $http.get(
-          getSubmittedSuggestionListHandlerUrl('skill', 'add_question')
-        ).then(getSuggestionsByIdFromHttpResponse).then(suggestionsById => {
-          if (onSuccess) {
-            onSuccess(suggestionsById);
-          }
-          return suggestionsById;
-        });
+        var url = UrlInterpolationService.interpolateUrl(
+          _SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
+            target_type: 'skill',
+            suggestion_type: 'add_question'
+          });
+        return _fetchSuggestions(url, onSuccess);
       },
       getReviewableQuestionSuggestions: function(onSuccess) {
-        // TODO(#8016): Move this function to a backend-api.service with unit
-        // tests.
-        return $http.get(
-          getReviewableSuggestionsHandlerUrl('skill', 'add_question')
-        ).then(getSuggestionsByIdFromHttpResponse).then(suggestionsById => {
-          if (onSuccess) {
-            onSuccess(suggestionsById);
-          }
-          return suggestionsById;
-        });
+        var url = UrlInterpolationService.interpolateUrl(
+          _REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
+            target_type: 'skill',
+            suggestion_type: 'add_question'
+          });
+        return _fetchSuggestions(url, onSuccess);
       },
       getUserCreatedTranslationSuggestions: function(onSuccess) {
-        // TODO(#8016): Move this function to a backend-api.service with unit
-        // tests.
-        return $http.get(
-          getSubmittedSuggestionListHandlerUrl(
-            'exploration', 'translate_content')
-        ).then(getSuggestionsByIdFromHttpResponse).then(suggestionsById => {
-          if (onSuccess) {
-            onSuccess(suggestionsById);
-          }
-          return suggestionsById;
-        });
+        var url = UrlInterpolationService.interpolateUrl(
+          _SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
+            target_type: 'exploration',
+            suggestion_type: 'translate_content'
+          });
+        return _fetchSuggestions(url, onSuccess);
       },
       getReviewableTranslationSuggestions: function(onSuccess) {
-        // TODO(#8016): Move this function to a backend-api.service with unit
-        // tests.
-        return $http.get(
-          getReviewableSuggestionsHandlerUrl('exploration', 'translate_content')
-        ).then(getSuggestionsByIdFromHttpResponse).then(suggestionsById => {
-          if (onSuccess) {
-            onSuccess(suggestionsById);
-          }
-          return suggestionsById;
-        });
+        var url = UrlInterpolationService.interpolateUrl(
+          _REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
+            target_type: 'exploration',
+            suggestion_type: 'translate_content'
+          });
+        return _fetchSuggestions(url, onSuccess);
       },
       resolveSuggestiontoExploration: function(
           targetId, suggestionId, action, reviewMessage, commitMessage,
           onSuccess) {
-        // TODO(#8016): Move this function to a backend-api.service with unit
-        // tests.
-        return $http.put(
-          getSuggestionToExplorationActionHandlerUrl(targetId, suggestionId), {
-            action: action,
-            review_message: reviewMessage,
-            commit_message: (
-              action === ACTION_ACCEPT_SUGGESTION ? commitMessage : null)
-          }).then(() => onSuccess(suggestionId));
+        var url = UrlInterpolationService.interpolateUrl(
+          _SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL, {
+            exp_id: targetId,
+            suggestion_id: suggestionId
+          });
+        return $http.put(url, {
+          action: action,
+          review_message: reviewMessage,
+          commit_message: (
+            action === ACTION_ACCEPT_SUGGESTION ? commitMessage : null)
+        }).then(function() {
+          onSuccess(suggestionId);
+        });
       },
       resolveSuggestiontoSkill: function(
           targetId, suggestionId, action, reviewMessage, commitMessage,
           onSuccess) {
-        // TODO(#8016): Move this function to a backend-api.service with unit
-        // tests.
-        return $http.put(
-          getSuggestionToSkillActionHandlerUrl(targetId, suggestionId), {
-            action: action,
-            review_message: reviewMessage,
-            commit_message: (
-              action === ACTION_ACCEPT_SUGGESTION ? commitMessage : null)
-          }).then(() => onSuccess(suggestionId));
+        var url = UrlInterpolationService.interpolateUrl(
+          _SUGGESTION_TO_SKILL_ACTION_HANDLER_URL, {
+            skill_id: targetId,
+            suggestion_id: suggestionId
+          });
+        return $http.put(url, {
+          action: action,
+          review_message: reviewMessage,
+          commit_message: (
+            action === ACTION_ACCEPT_SUGGESTION ? commitMessage : null)
+        }).then(function() {
+          onSuccess(suggestionId);
+        });
       }
     };
   }

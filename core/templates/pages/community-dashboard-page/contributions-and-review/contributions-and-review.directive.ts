@@ -37,7 +37,8 @@ require(
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').directive('contributionsAndReview', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', function(
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -52,8 +53,8 @@ angular.module('oppia').directive('contributionsAndReview', [
         function(
             $filter, $uibModal, ContributionAndReviewService,
             QuestionObjectFactory, UserService) {
-          let ctrl = this;
-          let SUGGESTION_LABELS = {
+          var ctrl = this;
+          var SUGGESTION_LABELS = {
             review: {
               text: 'Awaiting review',
               color: '#eeeeee'
@@ -67,94 +68,105 @@ angular.module('oppia').directive('contributionsAndReview', [
               color: '#e76c8c'
             }
           };
-
-          let getQuestionContributionsSummary = () => {
-            // TODO(#7176): Replace 'any' with the exact type. This has been
-            // kept as 'any' because without it typescript will fail to compile
-            // due to "trying to access property of an unknown type" error.
-            return Object.values(ctrl.contributions)
-              .map((contribution: any) => {
-                let change = contribution.suggestion.change;
-                let status = contribution.suggestion.status;
-                let suggestionId = contribution.suggestion.suggestion_id;
-                let topicName = change.topic_name;
-                let html =
-                  change.question_dict.question_state_data.content.html;
-                let skillDescription = contribution.details.skill_description;
-                let actionButtonTitle = (
+          var getQuestionContributionsSummary = function() {
+            var questionContributionsSummaryList = [];
+            Object.keys(ctrl.contributions).forEach(function(key) {
+              var suggestion = ctrl.contributions[key].suggestion;
+              var details = ctrl.contributions[key].details;
+              var change = suggestion.change;
+              var requiredData = {
+                id: suggestion.suggestion_id,
+                heading: $filter('formatRtePreview')(
+                  change.question_dict.question_state_data.content.html),
+                subheading: (change.topic_name + ' / ' +
+                  details.skill_description),
+                labelText: SUGGESTION_LABELS[suggestion.status].text,
+                labelColor: SUGGESTION_LABELS[suggestion.status].color,
+                actionButtonTitle: (
                   ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION ?
-                    'Review' : 'View');
-                return {
-                  id: suggestionId,
-                  heading: $filter('formatRtePreview')(html),
-                  subheading: [topicName, skillDescription].join(' / '),
-                  labelText: SUGGESTION_LABELS[status].text,
-                  labelColor: SUGGESTION_LABELS[status].color,
-                  actionButtonTitle: actionButtonTitle
-                };
-              });
+                    'Review' :
+                    'View'
+                )
+              };
+              questionContributionsSummaryList.push(requiredData);
+            });
+            return questionContributionsSummaryList;
           };
 
-          let getTranslationContributionsSummary = () => {
-            // TODO(#7176): Replace 'any' with the exact type. This has been
-            // kept as 'any' because without it typescript will fail to compile
-            // due to "trying to access property of an unknown type" error.
-            return Object.values(ctrl.contributions)
-              .map((contribution: any) => {
-                let chapterTitle = contribution.details.chapter_title;
-                let storyTitle = contribution.details.story_title;
-                let topicName = contribution.details.topic_name;
-                let status = contribution.suggestion.status;
-                let suggestionId = contribution.suggestion.suggestion_id;
-                let translationHtml =
-                  contribution.suggestion.change.translation_html;
-                let actionButtonTitle = (
-                  ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_TRANSLATE ?
-                    'Review' : 'View');
-                return {
-                  id: suggestionId,
-                  heading: $filter('formatRtePreview')(translationHtml),
-                  subheading: [topicName, storyTitle, chapterTitle].join(' / '),
-                  labelText: SUGGESTION_LABELS[status].text,
-                  labelColor: SUGGESTION_LABELS[status].color,
-                  actionButtonTitle: actionButtonTitle
-                };
-              });
+          var getTranslationContributionsSummary = function() {
+            var translationContributionsSummaryList = [];
+            Object.keys(ctrl.contributions).forEach(function(key) {
+              var suggestion = ctrl.contributions[key].suggestion;
+              var details = ctrl.contributions[key].details;
+              var change = suggestion.change;
+              var requiredData = {
+                id: suggestion.suggestion_id,
+                heading: $filter('formatRtePreview')(change.translation_html),
+                subheading: (details.topic_name + ' / ' + details.story_title +
+                  ' / ' + details.chapter_title),
+                labelText: SUGGESTION_LABELS[suggestion.status].text,
+                labelColor: SUGGESTION_LABELS[suggestion.status].color,
+                actionButtonTitle: (
+                  ctrl.activeReviewTab ===
+                  ctrl.SUGGESTION_TYPE_TRANSLATE ?
+                    'Review' :
+                    'View'
+                )
+              };
+              translationContributionsSummaryList.push(requiredData);
+            });
+            return translationContributionsSummaryList;
           };
 
-          let removeContributionToReview = suggestionId => {
-            ctrl.contributionSummaries = ctrl.contributionSummaries.filter(
-              suggestion => suggestion.id !== suggestionId);
+          var removeContributionToReview = function(suggestionId) {
+            ctrl.contributionSummaries = (
+              ctrl.contributionSummaries.filter(function(suggestion) {
+                if (suggestion.id === suggestionId) {
+                  return false;
+                }
+                return true;
+              }));
           };
 
-          let showQuestionSuggestionModal = (
-              suggestion, contributionDetails, reviewable) => {
-            let authorName = suggestion.author_name;
-            let suggestionId = suggestion.suggestion_id;
-            let targetId = suggestion.target_id;
-            let questionDict = suggestion.change.question_dict;
-            let topicName = suggestion.change.topic_name;
-            let skillDescription = contributionDetails.skill_description;
-            let question = QuestionObjectFactory.createFromBackendDict(
-              questionDict);
-            let contentHtml = question.getStateData().content.getHtml();
-            let questionHeader = [topicName, skillDescription].join(' / ');
+          var _showQuestionSuggestionModal = function(
+              suggestion, contributionDetails, reviewable) {
+            var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/community-dashboard-page/modal-templates/' +
+              'question-suggestion-review.directive.html');
+            var targetId = suggestion.target_id;
+            var suggestionId = suggestion.suggestion_id;
+            var authorName = suggestion.author_name;
+            var questionHeader = (suggestion.change.topic_name + ' / ' +
+              contributionDetails.skill_description);
+            var question = QuestionObjectFactory.createFromBackendDict(
+              suggestion.change.question_dict);
+            var contentHtml = question.getStateData().content.getHtml();
 
-            return $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/community-dashboard-page/modal-templates/' +
-                'question-suggestion-review.directive.html'),
+            $uibModal.open({
+              templateUrl: _templateUrl,
               backdrop: true,
               size: 'lg',
               resolve: {
-                question: () => question,
-                reviewable: () => reviewable
+                authorName: function() {
+                  return authorName;
+                },
+                contentHtml: function() {
+                  return contentHtml;
+                },
+                question: function() {
+                  return question;
+                },
+                questionHeader: function() {
+                  return questionHeader;
+                },
+                reviewable: function() {
+                  return reviewable;
+                }
               },
               controller: [
                 '$scope', '$uibModalInstance', 'SuggestionModalService',
                 'question', 'reviewable',
-                function(
-                    $scope, $uibModalInstance, SuggestionModalService,
+                function($scope, $uibModalInstance, SuggestionModalService,
                     question, reviewable) {
                   $scope.authorName = authorName;
                   $scope.contentHtml = contentHtml;
@@ -168,111 +180,181 @@ angular.module('oppia').directive('contributionsAndReview', [
                   $scope.canEditQuestion = false;
                   $scope.misconceptionsBySkill = [];
 
-                  $scope.questionChanged = () => {
+                  $scope.questionChanged = function() {
                     $scope.validationError = null;
                   };
-                  $scope.accept = () => SuggestionModalService.acceptSuggestion(
-                    $uibModalInstance, {
-                      action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
-                      commitMessage: $scope.commitMessage,
-                      reviewMessage: $scope.reviewMessage
-                    });
-                  $scope.reject = () => SuggestionModalService.rejectSuggestion(
-                    $uibModalInstance, {
-                      action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
-                      reviewMessage: $scope.reviewMessage
-                    });
-                  $scope.cancel = () => SuggestionModalService.cancelSuggestion(
-                    $uibModalInstance);
+
+                  $scope.accept = function() {
+                    SuggestionModalService.acceptSuggestion(
+                      $uibModalInstance,
+                      {
+                        action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
+                        commitMessage: $scope.commitMessage,
+                        reviewMessage: $scope.reviewMessage
+                      });
+                  };
+
+                  $scope.reject = function() {
+                    SuggestionModalService.rejectSuggestion(
+                      $uibModalInstance,
+                      {
+                        action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
+                        reviewMessage: $scope.reviewMessage
+                      });
+                  };
+
+                  $scope.cancel = function() {
+                    SuggestionModalService.cancelSuggestion($uibModalInstance);
+                  };
                 }
               ]
-            }).result.then(result => {
+            }).result.then(function(result) {
               ContributionAndReviewService.resolveSuggestiontoSkill(
                 targetId, suggestionId, result.action, result.reviewMessage,
                 result.commitMessage, removeContributionToReview);
             });
           };
 
-          let showTranslationSuggestionModal = (
+          var _showTranslationSuggestionModal = function(
               targetId, suggestionId, contentHtml, translationHtml,
-              reviewable) => {
-            return $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/community-dashboard-page/modal-templates/' +
-                'translation-suggestion-review.directive.html'),
+              reviewable) {
+            var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/community-dashboard-page/modal-templates/' +
+              'translation-suggestion-review.directive.html');
+
+            $uibModal.open({
+              templateUrl: _templateUrl,
               backdrop: true,
               size: 'lg',
               resolve: {
-                translationHtml: () => translationHtml,
-                contentHtml: () => contentHtml,
-                reviewable: () => reviewable
+                translationHtml: function() {
+                  return translationHtml;
+                },
+                contentHtml: function() {
+                  return contentHtml;
+                },
+                reviewable: function() {
+                  return reviewable;
+                }
               },
               controller: [
                 '$scope', '$uibModalInstance', 'SuggestionModalService',
                 'reviewable', 'translationHtml', 'contentHtml',
-                function(
-                    $scope, $uibModalInstance, SuggestionModalService,
+                function($scope, $uibModalInstance, SuggestionModalService,
                     reviewable, translationHtml, contentHtml) {
                   $scope.translationHtml = translationHtml;
                   $scope.contentHtml = contentHtml;
                   $scope.reviewable = reviewable;
                   $scope.commitMessage = '';
                   $scope.reviewMessage = '';
-                  $scope.accept = () => SuggestionModalService.acceptSuggestion(
-                    $uibModalInstance, {
-                      action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
-                      commitMessage: $scope.commitMessage,
-                      reviewMessage: $scope.reviewMessage
-                    });
-                  $scope.reject = () => SuggestionModalService.rejectSuggestion(
-                    $uibModalInstance, {
-                      action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
-                      reviewMessage: $scope.reviewMessage
-                    });
-                  $scope.cancel = () => SuggestionModalService.cancelSuggestion(
-                    $uibModalInstance);
+
+                  $scope.accept = function() {
+                    SuggestionModalService.acceptSuggestion(
+                      $uibModalInstance,
+                      {
+                        action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
+                        commitMessage: $scope.commitMessage,
+                        reviewMessage: $scope.reviewMessage
+                      });
+                  };
+
+                  $scope.reject = function() {
+                    SuggestionModalService.rejectSuggestion(
+                      $uibModalInstance,
+                      {
+                        action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
+                        reviewMessage: $scope.reviewMessage
+                      });
+                  };
+                  $scope.cancel = function() {
+                    SuggestionModalService.cancelSuggestion($uibModalInstance);
+                  };
                 }
               ]
-            }).result.then(result => {
+            }).result.then(function(result) {
               ContributionAndReviewService.resolveSuggestiontoExploration(
                 targetId, suggestionId, result.action, result.reviewMessage,
                 result.commitMessage, removeContributionToReview);
             });
           };
 
-          ctrl.onClickViewSuggestion = suggestionId => {
-            let suggestionType =
-              ctrl.contributions[suggestionId].suggestion.suggestion_type;
-            let suggestionActions =
-              ctrl.suggestionActionsByType[suggestionType];
-            if (suggestionActions) {
-              suggestionActions.viewSuggestion(suggestionId);
+          ctrl.onClickViewSuggestion = function(suggestionId) {
+            var suggestion = ctrl.contributions[suggestionId].suggestion;
+            if (suggestion.suggestion_type ===
+                ctrl.SUGGESTION_TYPE_QUESTION) {
+              var reviewable =
+                ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION;
+              var contributionDetails =
+                ctrl.contributions[suggestionId].details;
+              _showQuestionSuggestionModal(
+                suggestion, contributionDetails, reviewable);
+            }
+            if (suggestion.suggestion_type === ctrl.SUGGESTION_TYPE_TRANSLATE) {
+              var reviewable =
+                ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_TRANSLATE;
+              _showTranslationSuggestionModal(
+                suggestion.target_id, suggestion.suggestion_id,
+                suggestion.change.content_html,
+                suggestion.change.translation_html, reviewable);
             }
           };
 
-          ctrl.switchToContributionsTab = suggestionType => {
+          ctrl.switchToContributionsTab = function(suggestionType) {
             ctrl.activeReviewTab = '';
             ctrl.contributionsDataLoading = true;
             ctrl.contributionSummaries = [];
-            let suggestionActions =
-              ctrl.suggestionActionsByType[suggestionType];
-            if (suggestionActions) {
-              suggestionActions.switchToContributionsTab();
+            if (suggestionType === ctrl.SUGGESTION_TYPE_QUESTION) {
+              ContributionAndReviewService.getUserCreatedQuestionSuggestions(
+                function(suggestionIdToSuggestions) {
+                  ctrl.activeContributionTab = ctrl.SUGGESTION_TYPE_QUESTION;
+                  ctrl.contributions = suggestionIdToSuggestions;
+                  ctrl.contributionSummaries = (
+                    getQuestionContributionsSummary());
+                  ctrl.contributionsDataLoading = false;
+                });
+            }
+            if (suggestionType === ctrl.SUGGESTION_TYPE_TRANSLATE) {
+              ContributionAndReviewService
+                .getUserCreatedTranslationSuggestions(
+                  function(suggestionIdToSuggestions) {
+                    ctrl.activeContributionTab = ctrl.SUGGESTION_TYPE_TRANSLATE;
+                    ctrl.contributions = suggestionIdToSuggestions;
+                    ctrl.contributionSummaries = (
+                      getTranslationContributionsSummary());
+                    ctrl.contributionsDataLoading = false;
+                  });
             }
           };
 
-          ctrl.switchToReviewTab = suggestionType => {
+          ctrl.switchToReviewTab = function(suggestionType) {
             ctrl.activeContributionTab = '';
             ctrl.contributionsDataLoading = true;
             ctrl.contributionSummaries = [];
-            let suggestionActions =
-              ctrl.suggestionActionsByType[suggestionType];
-            if (suggestionActions) {
-              suggestionActions.switchToReviewTab();
+
+            if (suggestionType === ctrl.SUGGESTION_TYPE_QUESTION) {
+              ContributionAndReviewService.getReviewableQuestionSuggestions(
+                function(suggestionIdToSuggestions) {
+                  ctrl.activeReviewTab = ctrl.SUGGESTION_TYPE_QUESTION;
+                  ctrl.contributions = suggestionIdToSuggestions;
+                  ctrl.contributionSummaries = (
+                    getQuestionContributionsSummary());
+                  ctrl.contributionsDataLoading = false;
+                });
+            }
+            if (suggestionType === ctrl.SUGGESTION_TYPE_TRANSLATE) {
+              ContributionAndReviewService
+                .getReviewableTranslationSuggestions(
+                  function(suggestionIdToSuggestions) {
+                    ctrl.activeReviewTab = ctrl.SUGGESTION_TYPE_TRANSLATE;
+                    ctrl.contributions = suggestionIdToSuggestions;
+                    ctrl.contributionSummaries = (
+                      getTranslationContributionsSummary());
+                    ctrl.contributionsDataLoading = false;
+                  });
             }
           };
 
-          ctrl.$onInit = () => {
+          ctrl.$onInit = function() {
             ctrl.isAdmin = false;
             ctrl.userDetailsLoading = true;
             ctrl.userIsLoggedIn = false;
@@ -281,75 +363,6 @@ angular.module('oppia').directive('contributionsAndReview', [
             ctrl.contributionsDataLoading = true;
             ctrl.SUGGESTION_TYPE_QUESTION = 'add_question';
             ctrl.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
-            ctrl.suggestionActionsByType = {
-              [ctrl.SUGGESTION_TYPE_QUESTION]: {
-                viewSuggestion: (suggestionId) => {
-                  let suggestion = ctrl.contributions[suggestionId].suggestion;
-                  let contributionDetails =
-                    ctrl.contributions[suggestionId].details;
-                  let isReviewable =
-                    ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION;
-                  showQuestionSuggestionModal(
-                    suggestion, contributionDetails, isReviewable);
-                },
-                switchToContributionsTab: () => {
-                  ContributionAndReviewService
-                    .getUserCreatedQuestionSuggestions(
-                      suggestionIdToSuggestions => {
-                        ctrl.contributions = suggestionIdToSuggestions;
-                        ctrl.contributionSummaries =
-                          getQuestionContributionsSummary();
-                        ctrl.activeContributionTab =
-                          ctrl.SUGGESTION_TYPE_QUESTION;
-                        ctrl.contributionsDataLoading = false;
-                      });
-                },
-                switchToReviewTab: () => {
-                  ContributionAndReviewService.getReviewableQuestionSuggestions(
-                    suggestionIdToSuggestions => {
-                      ctrl.contributions = suggestionIdToSuggestions;
-                      ctrl.contributionSummaries =
-                        getQuestionContributionsSummary();
-                      ctrl.activeReviewTab = ctrl.SUGGESTION_TYPE_QUESTION;
-                      ctrl.contributionsDataLoading = false;
-                    });
-                }
-              },
-              [ctrl.SUGGESTION_TYPE_TRANSLATE]: {
-                viewSuggestion: (suggestionId) => {
-                  let suggestion = ctrl.contributions[suggestionId].suggestion;
-                  let isReviewable =
-                    ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_TRANSLATE;
-                  showTranslationSuggestionModal(
-                    suggestion.target_id, suggestion.suggestion_id,
-                    suggestion.change.content_html,
-                    suggestion.change.translation_html, isReviewable);
-                },
-                switchToContributionsTab: () => {
-                  ContributionAndReviewService
-                    .getUserCreatedTranslationSuggestions(
-                      suggestionIdToSuggestions => {
-                        ctrl.contributions = suggestionIdToSuggestions;
-                        ctrl.contributionSummaries =
-                          getTranslationContributionsSummary();
-                        ctrl.activeContributionTab =
-                          ctrl.SUGGESTION_TYPE_TRANSLATE;
-                        ctrl.contributionsDataLoading = false;
-                      });
-                },
-                switchToReviewTab: () => {
-                  ContributionAndReviewService
-                    .getReviewableTranslationSuggestions(
-                      suggestionIdToSuggestions => {
-                        ctrl.contributions = suggestionIdToSuggestions;
-                        ctrl.contributionSummaries =
-                          getTranslationContributionsSummary();
-                        ctrl.activeReviewTab = ctrl.SUGGESTION_TYPE_TRANSLATE;
-                        ctrl.contributionsDataLoading = false;
-                      });
-                }
-              }
-            };
             ctrl.activeReviewTab = '';
             ctrl.reviewTabs = [
               {
@@ -372,7 +385,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                 text: 'Translations'
               }
             ];
-            UserService.getUserInfoAsync().then(userInfo => {
+            UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.isAdmin = userInfo.isAdmin();
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
               ctrl.userDetailsLoading = false;
@@ -386,5 +399,4 @@ angular.module('oppia').directive('contributionsAndReview', [
         }
       ]
     };
-  }
-]);
+  }]);
