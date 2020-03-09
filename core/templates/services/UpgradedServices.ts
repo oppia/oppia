@@ -13,11 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for managing all of our upgraded services.
+ * @fileoverview Service for storing all upgraded services
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import {
+  HttpClient,
+  HttpXhrBackend,
+  // eslint-disable-next-line camelcase
+  ɵangular_packages_common_http_http_d
+} from '@angular/common/http';
 
 import { AlertsService } from 'services/alerts.service';
 import { AngularNameService } from
@@ -98,12 +104,6 @@ import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import {
-  HttpClient,
-  HttpXhrBackend,
-  // eslint-disable-next-line camelcase
-  ɵangular_packages_common_http_http_d
-} from '@angular/common/http';
 import { IdGenerationService } from 'services/id-generation.service';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
@@ -274,13 +274,15 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 
-@Injectable({providedIn: 'root'})
+@Injectable({
+  providedIn: 'root'
+})
 export class UpgradedServices {
   getUpgradedServices() {
-    let upgradedServices = {};
-
+    var upgradedServices = {};
     /* eslint-disable dot-notation */
-    // Topographical-level 0:
+
+    // Topological level: 0.
     upgradedServices['AngularNameService'] = new AngularNameService();
     upgradedServices['AnswerClassificationResultObjectFactory'] =
       new AnswerClassificationResultObjectFactory();
@@ -382,7 +384,7 @@ export class UpgradedServices {
     upgradedServices['ɵangular_packages_common_http_http_d'] =
       new ɵangular_packages_common_http_http_d();
 
-    // Topographical-level 1:
+    // Topological level: 1.
     upgradedServices['AlertsService'] = new AlertsService(
       upgradedServices['LoggerService']);
     upgradedServices['BrowserCheckerService'] = new BrowserCheckerService(
@@ -459,7 +461,7 @@ export class UpgradedServices {
       new WrittenTranslationsObjectFactory(
         upgradedServices['WrittenTranslationObjectFactory']);
 
-    // Topographical-level 2:
+    // Topological level: 2.
     upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
       upgradedServices['OutcomeObjectFactory'],
       upgradedServices['RuleObjectFactory']);
@@ -543,7 +545,7 @@ export class UpgradedServices {
       upgradedServices['AlertsService'],
       upgradedServices['NormalizeWhitespacePipe']);
 
-    // Topographical-level 3:
+    // Topological level: 3.
     upgradedServices['AudioTranslationLanguageService'] =
       new AudioTranslationLanguageService(
         upgradedServices['BrowserCheckerService'],
@@ -561,21 +563,21 @@ export class UpgradedServices {
       upgradedServices['ContextService'],
       upgradedServices['PlayerTranscriptService']);
 
-    // Topographical-level 4:
+    // Topological level: 4.
     upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['ExplorationHtmlFormatterService']);
     upgradedServices['StateCardObjectFactory'] = new StateCardObjectFactory(
       upgradedServices['AudioTranslationLanguageService']);
 
-    // Topographical-level 5:
+    // Topological level: 5.
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
       upgradedServices['AnswerGroupObjectFactory'],
       upgradedServices['HintObjectFactory'],
       upgradedServices['SolutionObjectFactory'],
       upgradedServices['OutcomeObjectFactory']);
 
-    // Topographical-level 6:
+    // Topological level: 6.
     upgradedServices['StateObjectFactory'] = new StateObjectFactory(
       upgradedServices['InteractionObjectFactory'],
       upgradedServices['ParamChangesObjectFactory'],
@@ -583,11 +585,11 @@ export class UpgradedServices {
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['WrittenTranslationsObjectFactory']);
 
-    // Topographical-level 7:
+    // Topological level: 7.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
       upgradedServices['StateObjectFactory']);
 
-    // Topographical-level 8:
+    // Topological level: 8.
     upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
       upgradedServices['LoggerService'],
       upgradedServices['ParamChangesObjectFactory'],
