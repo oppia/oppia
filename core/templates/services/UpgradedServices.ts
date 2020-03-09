@@ -593,16 +593,16 @@ export class UpgradedServices {
       upgradedServices['WrittenTranslationsObjectFactory']);
 
     // Topographical-level 7:
+    upgradedServices['StatesObjectFactory'] =
+      new StatesObjectFactory(upgradedServices['StateObjectFactory']);
+
+    // Topographical-level 8:
     upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
       upgradedServices['LoggerService'],
       upgradedServices['ParamChangesObjectFactory'],
       upgradedServices['ParamSpecsObjectFactory'],
       upgradedServices['StatesObjectFactory'],
       upgradedServices['UrlInterpolationService']);
-
-    // Topographical-level 8:
-    upgradedServices['StatesObjectFactory'] =
-      new StatesObjectFactory(upgradedServices['StateObjectFactory']);
 
     /* eslint-enable dot-notation */
     return upgradedServices;
