@@ -38,6 +38,11 @@ var logicProofShared = (function() {
     this.code = code;
     this.parameters = parameters || {};
   };
+  //please see this 
+  //https://stackoverflow.com/questions/
+  //783818/how-do-i-create-a-custom-error-in-javascript
+  UserError.prototype = Error.prototype;
+  UserError.prototype.name = 'UserError';
 
   // These errors already have messages which are user-readable.
   var PreRenderedUserError = function(messages, code) {
@@ -45,6 +50,8 @@ var logicProofShared = (function() {
     this.messages = messages;
     this.code = code;
   };
+  PreRenderedUserError.prototype = Error.prototype;
+  PreRenderedUserError.prototype.name = 'PreRenderedUserError';
   // TODO(Jacob): Make these errors prototype from Error()
 
   /** Converts a message template into a string to show to the user.
@@ -936,7 +943,7 @@ var logicProofShared = (function() {
         return seekTypeInExpression(array[i], operator);
       } catch (err) {}
     }
-    throw UserError('unknown_typing_error', {
+    throw new UserError('unknown_typing_error', {
       array: array
     });
   };

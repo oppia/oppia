@@ -30,6 +30,8 @@ describe('Full system', function() {
       category: category
     };
   };
+  sharedErrorWrapper.prototype = new Error();
+  
   var completeCheck = function(assumptionsString, targetString, proofString) {
     var questionInstance = logicProofStudent.buildInstance(
       LOGIC_PROOF_DEFAULT_QUESTION_DATA);
