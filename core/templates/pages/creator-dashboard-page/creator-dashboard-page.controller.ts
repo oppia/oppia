@@ -34,7 +34,6 @@ require('objects/objectComponentsRequires.ts');
 require('components/entity-creation-services/exploration-creation.service.ts');
 require('components/ratings/rating-computation/rating-computation.service.ts');
 require('domain/creator_dashboard/creator-dashboard-backend-api.service.ts');
-require('domain/suggestion/SuggestionObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
@@ -46,6 +45,7 @@ require(
 require('services/alerts.service.ts');
 require('services/date-time-format.service.ts');
 require('services/user.service.ts');
+require('services/suggestions.service.ts');
 
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts');
 
@@ -64,9 +64,10 @@ angular.module('oppia').directive('creatorDashboardPage', [
         'AlertsService', 'CreatorDashboardBackendApiService',
         'DateTimeFormatService',
         'ExplorationCreationService', 'RatingComputationService',
-        'SuggestionModalForCreatorDashboardService', 'SuggestionObjectFactory',
-        'SuggestionThreadObjectFactory', 'ThreadMessageObjectFactory',
-        'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
+        'SuggestionModalForCreatorDashboardService',
+        'SuggestionThreadObjectFactory', 'SuggestionsService',
+        'ThreadMessageObjectFactory', 'ThreadStatusDisplayService',
+        'UrlInterpolationService', 'UserService',
         'ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS',
         'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR', 'EXPLORATIONS_SORT_BY_KEYS',
         'EXPLORATION_DROPDOWN_STATS', 'FATAL_ERROR_CODES',
@@ -78,9 +79,10 @@ angular.module('oppia').directive('creatorDashboardPage', [
             AlertsService, CreatorDashboardBackendApiService,
             DateTimeFormatService,
             ExplorationCreationService, RatingComputationService,
-            SuggestionModalForCreatorDashboardService, SuggestionObjectFactory,
-            SuggestionThreadObjectFactory, ThreadMessageObjectFactory,
-            ThreadStatusDisplayService, UrlInterpolationService, UserService,
+            SuggestionModalForCreatorDashboardService,
+            SuggestionThreadObjectFactory, SuggestionsService,
+            ThreadMessageObjectFactory, ThreadStatusDisplayService,
+            UrlInterpolationService, UserService,
             ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS,
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR, EXPLORATIONS_SORT_BY_KEYS,
             EXPLORATION_DROPDOWN_STATS, FATAL_ERROR_CODES,
@@ -306,12 +308,12 @@ angular.module('oppia').directive('creatorDashboardPage', [
                               'of suggestion threads');
                   }
                   for (var j = 0; j < numberOfCreatedSuggestions; j++) {
-                    var suggestion = SuggestionObjectFactory
-                      .createFromBackendDict(
+                    var suggestionThreadId = SuggestionsService
+                      .getThreadIdFromSuggestionBackendDict(
                         responseData.created_suggestions_list[j]);
                     var threadDict = (
                       responseData.threads_for_created_suggestions_list[i]);
-                    if (threadDict.thread_id === suggestion.getThreadId()) {
+                    if (threadDict.thread_id === suggestionThreadId) {
                       var suggestionThread = (
                         SuggestionThreadObjectFactory.createFromBackendDicts(
                           threadDict,
@@ -328,12 +330,12 @@ angular.module('oppia').directive('creatorDashboardPage', [
                               'of suggestion threads');
                   }
                   for (var j = 0; j < numberOfSuggestionsToReview; j++) {
-                    var suggestion = SuggestionObjectFactory
-                      .createFromBackendDict(
+                    var suggestionThreadId = SuggestionsService
+                      .getThreadIdFromSuggestionBackendDict(
                         responseData.suggestions_to_review_list[j]);
                     var threadDict = (
                       responseData.threads_for_suggestions_to_review_list[i]);
-                    if (threadDict.thread_id === suggestion.getThreadId()) {
+                    if (threadDict.thread_id === suggestionThreadId) {
                       var suggestionThread = (
                         SuggestionThreadObjectFactory.createFromBackendDicts(
                           threadDict,
