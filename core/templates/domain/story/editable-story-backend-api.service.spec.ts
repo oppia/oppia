@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for EditableStoryBackendApiService.
  */
 
-//import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service.ts';
-import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service.ts';
+import { EditableStoryBackendApiService } from 
+  'domain/story/editable-story-backend-api.service.ts';
 import { CsrfTokenService } from 'services/csrf-token.service.ts';
 
 import { HttpClientTestingModule, HttpTestingController } from
-   '@angular/common/http/testing';
+  '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 describe('Editable story backend API service', () => {
@@ -36,15 +36,15 @@ describe('Editable story backend API service', () => {
       imports: [HttpClientTestingModule],
     });
     httpTestingController = TestBed.get(HttpTestingController);
-    editableStoryBackendApiService = TestBed.get(EditableStoryBackendApiService);
+    editableStoryBackendApiService = TestBed.get(
+      EditableStoryBackendApiService);
 
-    //UndoRedoService = $injector.get('UndoRedoService');
-    //CsrfService = $injector.get('CsrfTokenService');
+    CsrfService = CsrfTokenService;
 
     spyOn(CsrfService, 'getTokenAsync').and.callFake(() => {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
+      return new Promise(function(resolve) {
+        resolve('sample-csrf-token');
+      });
     });
 
     // Sample story object returnable from the backend
@@ -91,10 +91,10 @@ describe('Editable story backend API service', () => {
       editableStoryBackendApiService.fetchStory('storyId').then(
         successHandler, failHandler);
       var req = httpTestingController.expectOne(
-                  '/story_editor_handler/data/storyId');
+        '/story_editor_handler/data/storyId');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
-       
+
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith({
@@ -105,7 +105,7 @@ describe('Editable story backend API service', () => {
       });
       expect(failHandler).not.toHaveBeenCalled();
     }
-  ));
+    ));
 
   it('should successfully delete a story from the backend',
     fakeAsync(() => {
@@ -115,7 +115,7 @@ describe('Editable story backend API service', () => {
       editableStoryBackendApiService.deleteStory('storyId').then(
         successHandler, failHandler);
       var req = httpTestingController.expectOne(
-                  '/story_editor_handler/data/storyId');
+        '/story_editor_handler/data/storyId');
       expect(req.request.method).toEqual('DELETE');
       req.flush(200);
 
@@ -124,7 +124,7 @@ describe('Editable story backend API service', () => {
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
     }
-  ));
+    ));
 
   it('should use the rejection handler if the backend request failed',
     fakeAsync(() => {
@@ -134,7 +134,7 @@ describe('Editable story backend API service', () => {
       editableStoryBackendApiService.fetchStory('2').then(
         successHandler, failHandler);
       var req = httpTestingController.expectOne(
-                  '/story_editor_handler/data/2');
+        '/story_editor_handler/data/2');
       expect(req.request.method).toEqual('GET');
       req.flush(500, 'Error loading story 2.');
 
@@ -143,7 +143,7 @@ describe('Editable story backend API service', () => {
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Error loading story 2.');
     }
-  ));
+    ));
 
   it('should update a story after fetching it from the backend',
     fakeAsync(() => {
@@ -153,11 +153,11 @@ describe('Editable story backend API service', () => {
 
       // Loading a story the first time should fetch it from the backend.
       editableStoryBackendApiService.fetchStory('storyId').then(
-        function(data) {
+        (data: any) => {
           story = data.story;
         });
       var req = httpTestingController.expectOne(
-                  '/story_editor_handler/data/storyId');
+        '/story_editor_handler/data/storyId');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
@@ -173,16 +173,16 @@ describe('Editable story backend API service', () => {
         story.id, story.version, 'Title is updated', []
       ).then(successHandler, failHandler);
       var req = httpTestingController.expectOne(
-                  '/story_editor_handler/data/storyId');
+        '/story_editor_handler/data/storyId');
       expect(req.request.method).toEqual('PUT');
       req.flush(storyWrapper);
-      
+
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(story);
       expect(failHandler).not.toHaveBeenCalled();
     }
-  ));
+    ));
 
   it('should use the rejection handler if the story to update doesn\'t exist',
     fakeAsync(() => {
@@ -194,7 +194,7 @@ describe('Editable story backend API service', () => {
         'storyId_1', '1', 'Update an invalid Story.', []
       ).then(successHandler, failHandler);
       var req = httpTestingController.expectOne(
-                  '/story_editor_handler/data/storyId_1');
+        '/story_editor_handler/data/storyId_1');
       expect(req.request.method).toEqual('PUT');
       req.flush(404, 'Story with given id doesn\'t exist.');
 
@@ -205,7 +205,7 @@ describe('Editable story backend API service', () => {
       expect(failHandler).toHaveBeenCalledWith(
         'Story with given id doesn\'t exist.');
     }
-  ));
+    ));
 
   it('should publish a story', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
@@ -215,7 +215,7 @@ describe('Editable story backend API service', () => {
     editableStoryBackendApiService.changeStoryPublicationStatus(
       'storyId', true).then(successHandler, failHandler);
     var req = httpTestingController.expectOne(
-                '/story_publish_handler/storyId');
+      '/story_publish_handler/storyId');
     expect(req.request.method).toEqual('PUT');
     req.flush();
 
@@ -234,15 +234,15 @@ describe('Editable story backend API service', () => {
       editableStoryBackendApiService.changeStoryPublicationStatus(
         'storyId', true).then(successHandler, failHandler);
       var req = httpTestingController.expectOne(
-                  '/story_publish_handler/storyId_1');
+        '/story_publish_handler/storyId_1');
       expect(req.request.method).toEqual('PUT');
       req.flush(404, 'Story with given id doesn\'t exist.');
-      
+
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
         'Story with given id doesn\'t exist.');
     }
-  ));
+    ));
 });

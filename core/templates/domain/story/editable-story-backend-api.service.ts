@@ -20,10 +20,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { UrlInterpolationService } from 
+import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
-import { StoryDomainConstants } from 
-  'domain/story/story-domain.constants.ajs.ts';
+import { StoryDomainConstants } from
+  'domain/story/story-domain.constants.ts';
 
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -35,7 +35,6 @@ export class EditableStoryBackendApiService {
     private http: HttpClient,
     private urlInterpolation: UrlInterpolationService) {}
 
-  //is _fetchStoryData needed?
   private storyDataDict = null;
   private _fetchStory(
       storyName: string, successCallback: any, errorCallback: any): any {
@@ -46,12 +45,12 @@ export class EditableStoryBackendApiService {
 
     this.http.get(
       editableStoryDataUrl, { observe: 'response' }).toPromise().then(
-      (response) => {
+      (response: any) => {
         this.storyDataDict = cloneDeep(response.body);
         if (successCallback) {
           successCallback(this.storyDataDict);
         }
-      }, (errorResponse) => {
+      }, (errorResponse: any) => {
         if (errorCallback) {
           errorCallback(errorResponse.body);
         }
@@ -59,8 +58,8 @@ export class EditableStoryBackendApiService {
   }
 
     private _updateStory = function(
-        storyId, storyVersion, commitMessage, changeList,
-        successCallback, errorCallback) {
+        storyId: string, storyVersion: number, commitMessage: string, changeList: string[],
+        successCallback: any, errorCallback: any) {
       var editableStoryDataUrl = this.urlInterpolation.interpolateUrl(
         StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
           story_id: storyId
@@ -74,22 +73,22 @@ export class EditableStoryBackendApiService {
 
       this.http.post(
         editableStoryDataUrl, putData).toPromise().then(
-         (response) => {
+        (response: any) => {
         // The returned data is an updated story dict.
-        var story = angular.copy(response.body.story);
+          var story = angular.copy(response.body.story);
 
-        if (successCallback) {
-          successCallback(story);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.body);
-        }
-      });
+          if (successCallback) {
+            successCallback(story);
+          }
+        }, function(errorResponse: any) {
+          if (errorCallback) {
+            errorCallback(errorResponse.body);
+          }
+        });
     };
 
     private _changeStoryPublicationStatus = function(
-        storyId, newStoryStatusIsPublic, successCallback, errorCallback) {
+        storyId: string, newStoryStatusIsPublic: boolean, successCallback: any, errorCallback: any) {
       var storyPublishUrl = this.urlInterpolation.interpolateUrl(
         StoryDomainConstants.STORY_PUBLISH_URL_TEMPLATE, {
           story_id: storyId
@@ -100,75 +99,75 @@ export class EditableStoryBackendApiService {
       };
       this.http.post(
         storyPublishUrl, putData).toPromise().then(
-         (response) => {
-        if (successCallback) {
-          successCallback();
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.body);
-        }
-      });
+        (response: any) => {
+          if (successCallback) {
+            successCallback(response.status);
+          }
+        }, function(errorResponse: any) {
+          if (errorCallback) {
+            errorCallback(errorResponse.body);
+          }
+        });
     };
 
     private _deleteStory = function(
-        storyId, successCallback, errorCallback) {
+        storyId: string, successCallback: any, errorCallback: any) {
       var storyDataUrl = this.urlInterpolation.interpolateUrl(
         StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
           story_id: storyId
         });
       this.http.delete(
         storyDataUrl).toPromise().then(
-         (response) => {
-        if (successCallback) {
-          successCallback(response.status);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.body);
-        }
-      });
+        (response: any) => {
+          if (successCallback) {
+            successCallback(response.status);
+          }
+        }, function(errorResponse: any) {
+          if (errorCallback) {
+            errorCallback(errorResponse.body);
+          }
+        });
     };
 
-   // return { 
     fetchStory(storyId: string): Promise<object> {
       return new Promise((resolve, reject) => {
         this._fetchStory(storyId, resolve, reject);
       });
     }
-  
-      /**
-       * Updates a story in the backend with the provided story ID.
-       * The changes only apply to the story of the given version and the
-       * request to update the story will fail if the provided story
-       * version is older than the current version stored in the backend. Both
-       * the changes and the message to associate with those changes are used
-       * to commit a change to the story. The new story is passed to
-       * the success callback, if one is provided to the returned promise
-       * object. Errors are passed to the error callback, if one is provided.
-       */
-      updateStory(storyId: string, storyVersion: string, commitMessage: string, changeList: string): Promise<object> {
-        return new Promise((resolve, reject) => {
-          this._updateStory(
-            storyId, storyVersion, commitMessage, changeList,
-            resolve, reject);
-        });
-      }
 
-      changeStoryPublicationStatus(storyId: string, newStoryStatusIsPublic: string): Promise<object> {
-        return new Promise((resolve, reject) => {
-          this._changeStoryPublicationStatus(
-            storyId, newStoryStatusIsPublic, resolve, reject);
-        });
-      }
+    /**
+     * Updates a story in the backend with the provided story ID.
+     * The changes only apply to the story of the given version and the
+     * request to update the story will fail if the provided story
+     * version is older than the current version stored in the backend. Both
+     * the changes and the message to associate with those changes are used
+     * to commit a change to the story. The new story is passed to
+     * the success callback, if one is provided to the returned promise
+     * object. Errors are passed to the error callback, if one is provided.
+     */
+    updateStory(storyId: string, storyVersion: number, commitMessage: string, changeList: string[]): Promise<object> {
+      return new Promise((resolve, reject) => {
+        this._updateStory(
+          storyId, storyVersion, commitMessage, changeList,
+          resolve, reject);
+      });
+    }
 
-      deleteStory(storyId: string): Promise<object> {
-        return new Promise((resolve, reject) => {
-          this._deleteStory(storyId, resolve, reject);
-        });
-      }
-    };
-  
+    changeStoryPublicationStatus(
+      storyId: string, newStoryStatusIsPublic: boolean): Promise<object> {
+      return new Promise((resolve, reject) => {
+        this._changeStoryPublicationStatus(
+          storyId, newStoryStatusIsPublic, resolve, reject);
+      });
+    }
+
+    deleteStory(storyId: string): Promise<object> {
+      return new Promise((resolve, reject) => {
+        this._deleteStory(storyId, resolve, reject);
+      });
+    }
+}
+
 angular.module('oppia').factory(
   'EditableStoryBackendApiService', downgradeInjectable(
     EditableStoryBackendApiService));
