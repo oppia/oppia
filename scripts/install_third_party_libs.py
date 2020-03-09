@@ -32,16 +32,18 @@ PREREQUISITES = [
     ('future', '0.17.1', os.path.join('third_party', 'future-0.17.1')),
 ]
 
-for PACKAGE, VERSION, PATH in PREREQUISITES:
-    if not os.path.exists(PATH):
-        COMMAND = [
+# pylint: disable=redefined-outer-name
+for package, version, path in PREREQUISITES:
+    if not os.path.exists(path):
+        command = [
             sys.executable, '-m', 'pip', 'install', '%s==%s'
-            % (PACKAGE, VERSION), '--target', PATH]
-        UEXTENTION = ['--user', '--prefix=', '--system']
+            % (package, version), '--target', path]
+        uextention = ['--user', '--prefix=', '--system']
         PROCESS = subprocess.Popen(
-            COMMAND, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if 'can\'t combine user with prefix' in PROCESS.communicate()[1]:
-            subprocess.check_call(COMMAND + UEXTENTION)
+            subprocess.check_call(command + uextention)
+# pylint: enable=redefined-outer-name
 
 
 # pylint: disable=wrong-import-position
@@ -87,6 +89,7 @@ def get_yarn_command():
     return 'yarn'
 
 
+# pylint: disable=redefined-outer-name
 def pip_install(package, version, install_path):
     """Installs third party libraries with pip.
 
@@ -141,8 +144,10 @@ def pip_install(package, version, install_path):
         python_utils.PRINT(
             'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
         raise Exception('Error installing package')
+# pylint: enable=redefined-outer-name
 
 
+# pylint: disable=redefined-outer-name
 def ensure_pip_library_is_installed(package, version, path):
     """Installs the pip library after ensuring its not already installed.
 
@@ -158,6 +163,7 @@ def ensure_pip_library_is_installed(package, version, path):
     if not os.path.exists(exact_lib_path):
         python_utils.PRINT('Installing %s' % package)
         pip_install(package, version, exact_lib_path)
+# pylint: enable=redefined-outer-name
 
 
 def main():
@@ -179,8 +185,10 @@ def main():
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
     ]
 
+    # pylint: disable=redefined-outer-name
     for package, version, path in pip_dependencies:
         ensure_pip_library_is_installed(package, version, path)
+    # pylint: enable=redefined-outer-name
 
     # Do a little surgery on configparser in pylint-1.9.4 to remove dependency
     # on ConverterMapping, which is not implemented in some Python
