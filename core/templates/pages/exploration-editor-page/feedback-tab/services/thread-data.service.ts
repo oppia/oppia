@@ -28,6 +28,13 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/suggestions.service.ts');
 
+import { FeedbackThread } from
+  'domain/feedback_thread/FeedbackThreadObjectFactory';
+import { SuggestionThread } from
+  'domain/suggestion/SuggestionThreadObjectFactory';
+import { ThreadMessage } from
+  'domain/feedback_message/ThreadMessageObjectFactory';
+
 angular.module('oppia').factory('ThreadDataService', [
   '$http', '$q', 'AlertsService', 'ContextService',
   'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory',
@@ -38,68 +45,83 @@ angular.module('oppia').factory('ThreadDataService', [
       FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
       SuggestionsService, ThreadMessageObjectFactory, UrlInterpolationService,
       ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED, STATUS_OPEN) {
-    let getFeedbackStatsHandlerUrl = (
-      () => UrlInterpolationService.interpolateUrl(
+    // Container for all of the threads related to this exploration.
+    let threadsById = new Map<string, FeedbackThread | SuggestionThread>();
+
+    // Cached number of open threads requiring action.
+    let openThreadsCount: number = 0;
+
+    let getFeedbackStatsHandlerUrl = function(): string {
+      return UrlInterpolationService.interpolateUrl(
         '/feedbackstatshandler/<exploration_id>', {
           exploration_id: ContextService.getExplorationId()
-        }));
-    let getThreadListHandlerUrl = (
-      () => UrlInterpolationService.interpolateUrl(
-        '/threadlisthandler/<exploration_id>', {
-          exploration_id: ContextService.getExplorationId()
-        }));
-    let getSuggestionActionHandlerUrl = (
-      threadId => UrlInterpolationService.interpolateUrl(
+        });
+    };
+
+    let getFeedbackThreadViewEventUrl = function(threadId: string): string {
+      return UrlInterpolationService.interpolateUrl(
+        '/feedbackhandler/thread_view_event/<thread_id>', {
+          thread_id: threadId
+        });
+    };
+
+    let getSuggestionActionHandlerUrl = function(threadId: string): string {
+      return UrlInterpolationService.interpolateUrl(
         '/suggestionactionhandler/exploration/<exploration_id>/<thread_id>', {
           exploration_id: ContextService.getExplorationId(),
           thread_id: threadId
-        }));
-    let getThreadHandlerUrl = (
-      threadId => UrlInterpolationService.interpolateUrl(
+        });
+    };
+
+    let getSuggestionListHandlerUrl = function(): string {
+      return '/suggestionlisthandler';
+    };
+
+    let getThreadHandlerUrl = function(threadId: string): string {
+      return UrlInterpolationService.interpolateUrl(
         '/threadhandler/<thread_id>', {
           thread_id: threadId
-        }));
-    let getFeedbackThreadViewEventUrl = (
-      threadId => UrlInterpolationService.interpolateUrl(
-        '/feedbackhandler/thread_view_event/<thread_id>', {
-          thread_id: threadId
-        }));
-    let getSuggestionListHandlerUrl = () => '/suggestionlisthandler';
+        });
+    };
 
-    // Holds all the threads for this exploration. This is an object whose
-    // values are objects, each representing threads, keyed by their IDs.
-    //
-    // The messages of the thread objects are updated lazily.
-    let threadsById = {};
+    let getThreadListHandlerUrl = function(): string {
+      return UrlInterpolationService.interpolateUrl(
+        '/threadlisthandler/<exploration_id>', {
+          exploration_id: ContextService.getExplorationId()
+        });
+    };
 
-    // Cached number of open threads requiring action.
-    let openThreadsCount = 0;
-
-    let setFeedbackThreadFromBackendDict = threadBackendDict => {
+    // TODO(#7165): Replace 'any' with the exact type.
+    let setFeedbackThreadFromBackendDict = function(
+        threadBackendDict: any): FeedbackThread {
       if (!threadBackendDict) {
         throw Error('Missing input backend dict');
       }
       let thread = FeedbackThreadObjectFactory.createFromBackendDict(
         threadBackendDict);
-      return threadsById[thread.threadId] = thread;
+      threadsById.set(thread.threadId, thread);
+      return thread;
     };
 
-    let setSuggestionThreadFromBackendDicts = (
-        threadBackendDict, suggestionBackendDict) => {
+    // TODO(#7165): Replace 'any' with the exact type.
+    let setSuggestionThreadFromBackendDicts = function(
+        threadBackendDict: any, suggestionBackendDict: any): SuggestionThread {
       if (!threadBackendDict || !suggestionBackendDict) {
         throw Error('Missing input backend dicts');
       }
       let thread = SuggestionThreadObjectFactory.createFromBackendDicts(
         threadBackendDict, suggestionBackendDict);
-      return threadsById[thread.threadId] = thread;
+      threadsById.set(thread.threadId, thread);
+      return thread;
     };
 
     return {
-      getThread: function(threadId) {
-        return threadsById[threadId] || null;
+      getThread: function(threadId: string) {
+        return threadsById.get(threadId) || null;
       },
 
-      fetchThreads: function() {
+      // TODO(#7165): Replace 'any' with the exact type.
+      fetchThreads: function(): any {
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
         let suggestionsPromise = $http.get(getSuggestionListHandlerUrl(), {
@@ -118,31 +140,29 @@ angular.module('oppia').factory('ThreadDataService', [
           let feedbackThreadBackendDicts = threadData.feedback_thread_dicts;
           let suggestionThreadBackendDicts = threadData.suggestion_thread_dicts;
 
-          let suggestionBackendDictsByThreadId = {};
-          for (let suggestionBackendDict of suggestionBackendDicts) {
-            let threadId =
-              SuggestionsService.getThreadIdFromSuggestionBackendDict(
-                suggestionBackendDict);
-            suggestionBackendDictsByThreadId[threadId] = suggestionBackendDict;
-          }
+          let suggestionBackendDictsByThreadId = new Map(
+            suggestionBackendDicts.map(dict => [
+              SuggestionsService.getThreadIdFromSuggestionBackendDict(dict),
+              dict
+            ]));
 
           return {
             feedbackThreads: feedbackThreadBackendDicts.map(
-              setFeedbackThreadFromBackendDict),
+              dict => setFeedbackThreadFromBackendDict(dict)),
             suggestionThreads: suggestionThreadBackendDicts.map(
-              threadBackendDict => setSuggestionThreadFromBackendDicts(
-                threadBackendDict,
-                suggestionBackendDictsByThreadId[threadBackendDict.thread_id]))
+              dict => setSuggestionThreadFromBackendDicts(
+                dict, suggestionBackendDictsByThreadId.get(dict.thread_id)))
           };
-        }, () => $q.reject('Error on retriving feedback threads.'));
+        },
+        () => $q.reject('Error on retriving feedback threads.'));
       },
 
-      fetchMessages: function(thread) {
+      fetchMessages: function(
+          thread: FeedbackThread | SuggestionThread): Promise<ThreadMessage[]> {
         if (!thread) {
           throw Error('Trying to update a non-existent thread');
         }
         let threadId = thread.threadId;
-
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
         return $http.get(getThreadHandlerUrl(threadId)).then(response => {
@@ -153,19 +173,19 @@ angular.module('oppia').factory('ThreadDataService', [
         });
       },
 
-      fetchFeedbackStats: function() {
+      fetchFeedbackStats: function(): Promise<number> {
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
         return $http.get(getFeedbackStatsHandlerUrl()).then(response => {
-          openThreadsCount = response.data.num_open_threads || 0;
+          return openThreadsCount = response.data.num_open_threads;
         });
       },
 
-      getOpenThreadsCount: function() {
+      getOpenThreadsCount: function(): number {
         return openThreadsCount;
       },
 
-      createNewThread: function(newSubject, newText) {
+      createNewThread: function(newSubject: string, newText: string): void {
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
         return $http.post(getThreadListHandlerUrl(), {
@@ -181,7 +201,8 @@ angular.module('oppia').factory('ThreadDataService', [
         });
       },
 
-      markThreadAsSeen: function(thread) {
+      markThreadAsSeen: function(
+          thread: FeedbackThread | SuggestionThread): void {
         if (!thread) {
           throw Error('Trying to update a non-existent thread');
         }
@@ -193,14 +214,15 @@ angular.module('oppia').factory('ThreadDataService', [
         });
       },
 
-      addNewMessage: function(thread, newMessage, newStatus) {
+      addNewMessage: function(
+          thread: FeedbackThread | SuggestionThread, newMessage: string,
+          newStatus: string): Promise<ThreadMessage[]> {
         if (!thread) {
           throw Error('Trying to update a non-existent thread');
         }
         let threadId = thread.threadId;
         let oldStatus = thread.status;
         let updatedStatus = (oldStatus === newStatus) ? null : newStatus;
-
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
         return $http.post(getThreadHandlerUrl(threadId), {
@@ -208,10 +230,8 @@ angular.module('oppia').factory('ThreadDataService', [
           updated_subject: null,
           text: newMessage
         }).then(() => {
-          if (updatedStatus && oldStatus === STATUS_OPEN) {
-            openThreadsCount -= 1;
-          } else if (updatedStatus && newStatus === STATUS_OPEN) {
-            openThreadsCount += 1;
+          if (updatedStatus) {
+            openThreadsCount += (newStatus === STATUS_OPEN) ? 1 : -1;
           }
           thread.status = newStatus;
           return this.fetchMessages(thread);
@@ -219,12 +239,13 @@ angular.module('oppia').factory('ThreadDataService', [
       },
 
       resolveSuggestion: function(
-          thread, action, commitMsg, reviewMsg, audioUpdateRequired) {
+          thread: FeedbackThread | SuggestionThread, action: string,
+          commitMsg: string, reviewMsg: string,
+          audioUpdateRequired: boolean): Promise<ThreadMessage[]> {
         if (!thread) {
           throw Error('Trying to update a non-existent thread');
         }
         let threadId = thread.threadId;
-
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
         return $http.put(getSuggestionActionHandlerUrl(threadId), {
