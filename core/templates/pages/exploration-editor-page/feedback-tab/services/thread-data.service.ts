@@ -115,12 +115,10 @@ angular.module('oppia').factory('ThreadDataService', [
         let threadsPromise = $http.get(getThreadListHandlerUrl());
 
         return $q.all([suggestionsPromise, threadsPromise]).then(response => {
-          let [suggestionsData, threadsData] = response.map(r => r.data);
-          let suggestionBackendDicts = suggestionsData.suggestions || [];
-          let feedbackThreadBackendDicts =
-            threadsData.feedback_thread_dicts || [];
-          let suggestionThreadBackendDicts =
-            threadsData.suggestion_thread_dicts || [];
+          let [suggestionData, threadData] = response.map(r => r.data);
+          let suggestionBackendDicts = suggestionData.suggestions;
+          let feedbackThreadBackendDicts = threadData.feedback_thread_dicts;
+          let suggestionThreadBackendDicts = threadData.suggestion_thread_dicts;
 
           let suggestionBackendDictsByThreadId = {};
           for (let suggestionBackendDict of suggestionBackendDicts) {
