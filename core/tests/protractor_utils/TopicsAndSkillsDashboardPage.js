@@ -75,6 +75,9 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-topic-name-in-topic-select-modal'));
   var abbreviatedTopicNameField = element(
     by.css('.protractor-test-new-abbreviated-topic-name-field'));
+  var topicsTabButton = element(
+    by.css('.protractor-test-topics-tab')
+  );
 
   // Returns a promise of all topics with the given name.
   var _getTopicElements = function(topicName) {
@@ -231,6 +234,8 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.editTopic = function(topicName) {
+    waitFor.elementToBeClickable(
+      topicsTabButton, 'Unable to click on topics tab.');
     _getTopicElements(topicName).then(function(topicElements) {
       if (topicElements.length === 0) {
         throw 'Could not find topic tile with name ' + topicName;
