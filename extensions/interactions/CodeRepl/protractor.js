@@ -31,8 +31,8 @@ var expectInteractionDetailsToMatch = function(elem) {
 
 var submitAnswer = function(conversationInput, answerCode) {
   browser.executeScript(
-    "var editor = $('.CodeMirror')[1].CodeMirror;editor.setValue('" +
-    answerCode + "');");
+    "var editor = $('.protractor-preview-tab .CodeMirror')[0].CodeMirror;" +
+    "editor.setValue('" + answerCode + "');");
   var submitAnswerButton = element(by.css(
     '.protractor-test-submit-answer-button'));
   waitFor.elementToBeClickable(
