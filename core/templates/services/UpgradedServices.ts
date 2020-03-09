@@ -98,8 +98,12 @@ import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { HttpClient, HttpXhrBackend, ɵangular_packages_common_http_http_d } from
-  '@angular/common/http';
+import {
+  HttpClient,
+  HttpXhrBackend,
+  // eslint-disable-next-line camelcase
+  ɵangular_packages_common_http_http_d
+} from '@angular/common/http';
 import { IdGenerationService } from 'services/id-generation.service';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
