@@ -1464,17 +1464,20 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
                 line=closing_line_index_of_fileoverview + 1)
 
 
-class BlankLineBelowDocstring(checkers.BaseChecker):
+class BlankLineBelowDocstringChecker(checkers.BaseChecker):
     """Add lint check to ensure that there is one blank newline
     below each class docstring.
     """
 
     __implements__ = interfaces.IRawChecker
-    name = 'space_between_imports_and_file-overview'
+    name = 'one_line_below_docstring'
     priority = -1
     msgs = {
         'C0026': (
-            'Please provide an empty line below each calss docstring.'
+            'Please provide an empty line below each class docstring.'
+        ),
+        'C0027': (
+            'Please provide only one empty line below each class docstring.'
         )
     }
 
@@ -1488,15 +1491,19 @@ class BlankLineBelowDocstring(checkers.BaseChecker):
         file_length = len(file_content)
         have_a_class = False
         expect_empty_line = False
-        for line_num in python_utils.RANGE(file_length):
+        for line_num in python_utils.RANGE(file_length-1):
             line = file_content[line_num].strip()
             if expect_empty_line:
                 expect_empty_line = False
                 have_a_class = False
-                if not file_content[empty_line_check_index + 1] == b'\n':
+                if not file_content[line_num] == b'\n':
                     self.add_message(
                         'no-empty-line-provided-below-class-docstring',
-                        line=line_num+1)
+                        line=line_num)
+                elif file_content[line_num] == file_content[line_num+1]:
+                    self.add_message(
+                        'more-than-one-empty-line-below-class-docstring',
+                        line=line_num)
             elif line.startswith(b'class'):
                 have_a_class = True
             elif have_a_class and line.endswith(b'"""'):

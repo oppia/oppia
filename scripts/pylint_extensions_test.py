@@ -2143,3 +2143,41 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
+
+
+class BlankLineBelowDocstringTests(unittest.TestCase):
+
+    def setUp(self):
+        super(BlankLineBelowDocstringTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.BlankLineBelowFileOverviewChecker)
+        self.checker_test_object.setup_method()
+
+    def test_no_empty_line_below_docstring(self):
+        node_no_empty_line_below_docstring = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class hehehe(hehehe):
+                        \"\"\" this file does something \"\"\"
+                        I am not a blank line
+                """)
+        node_no_empty_line_below_docstring.file = filename
+        node_no_empty_line_below_docstring.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_no_empty_line_below_docstring)
+
+        message = testutils.Message(
+            msg_id='no-empty-line-provided-below-class-docstring',
+            line=3)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
