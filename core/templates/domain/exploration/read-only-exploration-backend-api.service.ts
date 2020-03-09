@@ -25,7 +25,7 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { AppConstants } from 'app.constants';
 import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service'
+  'domain/utilities/url-interpolation.service';
 
 @Injectable({
   providedIn: 'root'

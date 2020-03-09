@@ -157,7 +157,7 @@ describe('Read only exploration backend API service', () => {
     readOnlyExplorationBackendApiService.loadLatestExploration('0').then(
       successHandler, failHandler);
     var req = httpTestingController.expectOne(
-        '/explorehandler/init/0');
+      '/explorehandler/init/0');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleDataResults);
 
@@ -182,7 +182,7 @@ describe('Read only exploration backend API service', () => {
     readOnlyExplorationBackendApiService.loadLatestExploration('0').then(
       successHandler, failHandler);
     var req = httpTestingController.expectOne(
-        '/explorehandler/init/0');
+      '/explorehandler/init/0');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleDataResults);
 

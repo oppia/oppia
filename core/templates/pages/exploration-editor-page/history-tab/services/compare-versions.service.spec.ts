@@ -11,11 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
- 
+
 /**
  * @fileoverview Unit tests for the Compare versions Service.
  */
- 
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // compare-versions.service.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
@@ -44,23 +44,23 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
- 
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
- 
+
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
 import { TranslatorProviderForTests } from 'tests/test.extras';
- 
+
 require(
   'pages/exploration-editor-page/history-tab/services/' +
   'compare-versions.service.ts');
- 
+
 describe('Compare versions service', function() {
   let readOnlyExplorationBackendApiService = null;
   let httpTestingController = null;
- 
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
@@ -79,14 +79,14 @@ describe('Compare versions service', function() {
   afterEach(() => {
     httpTestingController.verify();
   });
- 
+
   describe('compare versions service', function() {
     var cvs = null;
     let vts: VersionTreeService = null;
     var treeParents = null;
     var $httpBackend = null;
     var mockExplorationData = null;
- 
+
     beforeEach(
       angular.mock.module('oppia', TranslatorProviderForTests));
     beforeEach(angular.mock.module('oppia', function($provide) {
@@ -134,18 +134,18 @@ describe('Compare versions service', function() {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
     });
- 
+
     beforeEach(angular.mock.inject(function($injector) {
       cvs = $injector.get('CompareVersionsService');
       vts = $injector.get('VersionTreeService');
       $httpBackend = $injector.get('$httpBackend');
     }));
- 
+
     afterEach(function() {
       $httpBackend.verifyNoOutstandingExpectation();
       $httpBackend.verifyNoOutstandingRequest();
     });
- 
+
     // Helper function to get states data to pass to getDiffGraphData().
     // states is an object whose keys are state names and whose values are
     //  - contentStr: string which is the text content of the state
@@ -211,7 +211,7 @@ describe('Compare versions service', function() {
         }
       };
     };
- 
+
     var testSnapshots1 = [{
       commit_type: 'create',
       version_number: 1
@@ -328,7 +328,7 @@ describe('Compare versions service', function() {
       }],
       version_number: 13
     }];
- 
+
     // Information for mock state data for getDiffGraphData() to be passed to
     // _getStatesData
     var testExplorationData1 = [{
@@ -449,7 +449,7 @@ describe('Compare versions service', function() {
         ruleDests: ['C']
       }
     }];
- 
+
     // Tests for getDiffGraphData on linear commits
     it('should detect changed, renamed and added states', fakeAsync(() => {
       vts.init(testSnapshots1);
@@ -467,20 +467,20 @@ describe('Compare versions service', function() {
           }
         });
       });
- 
+
       let req1 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=1');
       expect(req1.request.method).toEqual('GET');
       req1.flush(_getStatesData(testExplorationData1[0]));
- 
+
       let req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=7');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData1[6]));
- 
+
       flushMicrotasks();
     }));
- 
+
     it('should add new state with same name as old name of renamed state',
       fakeAsync(() => {
         vts.init(testSnapshots1);
@@ -503,21 +503,21 @@ describe('Compare versions service', function() {
             }
           });
         });
- 
+
         let req1 = httpTestingController.expectOne(
           '/explorehandler/init/0?v=5');
         expect(req1.request.method).toEqual('GET');
         req1.flush(_getStatesData(testExplorationData1[4]));
- 
+
         let req2 = httpTestingController.expectOne(
           '/explorehandler/init/0?v=8');
         expect(req2.request.method).toEqual('GET');
         req2.flush(_getStatesData(testExplorationData1[7]));
- 
+
         flushMicrotasks();
-      }
-    ));
- 
+      })
+    );
+
     it('should not include added, then deleted state', fakeAsync(() => {
       vts.init(testSnapshots1);
       cvs.getDiffGraphData(7, 9).then(function(data) {
@@ -534,20 +534,20 @@ describe('Compare versions service', function() {
           }
         });
       });
- 
+
       let req1 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=7');
       expect(req1.request.method).toEqual('GET');
       req1.flush(_getStatesData(testExplorationData1[6]));
- 
+
       let req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=9');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData1[8]));
- 
+
       flushMicrotasks();
     }));
- 
+
     it('should mark deleted then added states as changed', fakeAsync(() => {
       vts.init(testSnapshots1);
       cvs.getDiffGraphData(8, 10).then(function(data) {
@@ -573,15 +573,15 @@ describe('Compare versions service', function() {
         '/explorehandler/init/0?v=8');
       expect(req1.request.method).toEqual('GET');
       req1.flush(_getStatesData(testExplorationData1[7]));
- 
+
       let req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=10');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData1[9]));
- 
+
       flushMicrotasks();
     }));
- 
+
     it('should mark renamed then deleted states as deleted', fakeAsync(() => {
       vts.init(testSnapshots1);
       cvs.getDiffGraphData(11, 13).then(function(data) {
@@ -603,20 +603,20 @@ describe('Compare versions service', function() {
           }
         });
       });
- 
+
       let req1 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=11');
       expect(req1.request.method).toEqual('GET');
       req1.flush(_getStatesData(testExplorationData1[10]));
- 
+
       let req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=13');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData1[12]));
- 
+
       flushMicrotasks();
     }));
- 
+
     it('should mark changed state as unchanged when name and content is same' +
        'on both versions', fakeAsync(() => {
       vts.init(testSnapshots1);
@@ -643,15 +643,15 @@ describe('Compare versions service', function() {
         '/explorehandler/init/0?v=1');
       expect(req1.request.method).toEqual('GET');
       req1.flush(_getStatesData(testExplorationData1[0]));
- 
+
       let req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=11');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData1[10]));
- 
+
       flushMicrotasks();
     }));
- 
+
     it('should mark renamed state as not renamed when name is same on both ' +
        'versions', fakeAsync(() => {
       vts.init(testSnapshots1);
@@ -668,15 +668,15 @@ describe('Compare versions service', function() {
         '/explorehandler/init/0?v=2');
       expect(req1.request.method).toEqual('GET');
       req1.flush(_getStatesData(testExplorationData1[1]));
- 
+
       let req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=4');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData1[3]));
- 
+
       flushMicrotasks();
     }));
- 
+
     it('should mark states correctly when a series of changes are applied',
       fakeAsync(() => {
         vts.init(testSnapshots1);
@@ -703,16 +703,16 @@ describe('Compare versions service', function() {
           '/explorehandler/init/0?v=1');
         expect(req1.request.method).toEqual('GET');
         req1.flush(_getStatesData(testExplorationData1[0]));
- 
+
         let req2 = httpTestingController.expectOne(
           '/explorehandler/init/0?v=13');
         expect(req2.request.method).toEqual('GET');
         req2.flush(_getStatesData(testExplorationData1[12]));
- 
+
         flushMicrotasks();
-      }
-    ));
- 
+      })
+    );
+
     var testSnapshots2 = [{
       commit_type: 'create',
       version_number: 1
@@ -775,7 +775,7 @@ describe('Compare versions service', function() {
       }],
       version_number: 8
     }];
- 
+
     // Information for mock state data for getDiffGraphData() to be passed to
     // _getStatesData
     var testExplorationData2 = [{
@@ -851,32 +851,34 @@ describe('Compare versions service', function() {
         ruleDests: ['D']
       }
     }];
- 
+
     // Tests for getDiffGraphData with reversions
-    it('should mark states correctly when there is 1 reversion', fakeAsync(() => {
-      vts.init(testSnapshots2);
-      cvs.getDiffGraphData(1, 5).then(function(data) {
-        expect(data.nodes).toEqual({
-          1: {
-            newestStateName: 'A',
-            stateProperty: 'unchanged',
-            originalStateName: 'A'
-          }
+    it('should mark states correctly when there is 1 reversion',
+      fakeAsync(() => {
+        vts.init(testSnapshots2);
+        cvs.getDiffGraphData(1, 5).then(function(data) {
+          expect(data.nodes).toEqual({
+            1: {
+              newestStateName: 'A',
+              stateProperty: 'unchanged',
+              originalStateName: 'A'
+            }
+          });
         });
-      });
-      let req1 = httpTestingController.expectOne(
-        '/explorehandler/init/0?v=1');
-      expect(req1.request.method).toEqual('GET');
-      req1.flush(_getStatesData(testExplorationData2[0]));
- 
-      let req2 = httpTestingController.expectOne(
-        '/explorehandler/init/0?v=5');
-      expect(req2.request.method).toEqual('GET');
-      req2.flush(_getStatesData(testExplorationData2[4]));
- 
-      flushMicrotasks();
-    }));
- 
+        let req1 = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=1');
+        expect(req1.request.method).toEqual('GET');
+        req1.flush(_getStatesData(testExplorationData2[0]));
+
+        let req2 = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=5');
+        expect(req2.request.method).toEqual('GET');
+        req2.flush(_getStatesData(testExplorationData2[4]));
+
+        flushMicrotasks();
+      })
+    );
+
     it('should mark states correctly when there is 1 reversion to before v1',
       fakeAsync(() => {
         vts.init(testSnapshots2);
@@ -898,16 +900,16 @@ describe('Compare versions service', function() {
           '/explorehandler/init/0?v=3');
         expect(req1.request.method).toEqual('GET');
         req1.flush(_getStatesData(testExplorationData2[2]));
- 
+
         let req2 = httpTestingController.expectOne(
           '/explorehandler/init/0?v=5');
         expect(req2.request.method).toEqual('GET');
         req2.flush(_getStatesData(testExplorationData2[4]));
- 
+
         flushMicrotasks();
-      }
-    ));
- 
+      })
+    );
+
     it('should mark states correctly when compared version is a reversion',
       fakeAsync(() => {
         vts.init(testSnapshots2);
@@ -929,50 +931,52 @@ describe('Compare versions service', function() {
           '/explorehandler/init/0?v=4');
         expect(req1.request.method).toEqual('GET');
         req1.flush(_getStatesData(testExplorationData2[3]));
- 
+
         let req2 = httpTestingController.expectOne(
           '/explorehandler/init/0?v=5');
         expect(req2.request.method).toEqual('GET');
         req2.flush(_getStatesData(testExplorationData2[4]));
- 
+
         flushMicrotasks();
-      }
-    ));
- 
-    it('should mark states correctly when there are 2 reversions', fakeAsync(() => {
-      vts.init(testSnapshots2);
-      cvs.getDiffGraphData(5, 8).then(function(data) {
-        expect(data.nodes).toEqual({
-          1: {
-            newestStateName: 'A',
-            stateProperty: 'unchanged',
-            originalStateName: 'A'
-          },
-          2: {
-            newestStateName: 'C',
-            stateProperty: 'added',
-            originalStateName: 'B'
-          },
-          3: {
-            newestStateName: 'D',
-            stateProperty: 'added',
-            originalStateName: 'D'
-          }
+      })
+    );
+
+    it('should mark states correctly when there are 2 reversions',
+      fakeAsync(() => {
+        vts.init(testSnapshots2);
+        cvs.getDiffGraphData(5, 8).then(function(data) {
+          expect(data.nodes).toEqual({
+            1: {
+              newestStateName: 'A',
+              stateProperty: 'unchanged',
+              originalStateName: 'A'
+            },
+            2: {
+              newestStateName: 'C',
+              stateProperty: 'added',
+              originalStateName: 'B'
+            },
+            3: {
+              newestStateName: 'D',
+              stateProperty: 'added',
+              originalStateName: 'D'
+            }
+          });
         });
-      });
-      let req1 = httpTestingController.expectOne(
-        '/explorehandler/init/0?v=5');
-      expect(req1.request.method).toEqual('GET');
-      req1.flush(_getStatesData(testExplorationData2[4]));
- 
-      let req2 = httpTestingController.expectOne(
-        '/explorehandler/init/0?v=8');
-      expect(req2.request.method).toEqual('GET');
-      req2.flush(_getStatesData(testExplorationData2[7]));
- 
-      flushMicrotasks();
-    }));
- 
+        let req1 = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=5');
+        expect(req1.request.method).toEqual('GET');
+        req1.flush(_getStatesData(testExplorationData2[4]));
+
+        let req2 = httpTestingController.expectOne(
+          '/explorehandler/init/0?v=8');
+        expect(req2.request.method).toEqual('GET');
+        req2.flush(_getStatesData(testExplorationData2[7]));
+
+        flushMicrotasks();
+      })
+    );
+
     // Represents snapshots and exploration data for tests for links
     // Only includes information accessed by getDiffGraphData()
     var testSnapshots3 = [{
@@ -1029,7 +1033,7 @@ describe('Compare versions service', function() {
       }],
       version_number: 8
     }];
- 
+
     var testExplorationData3 = [{
       A: {
         contentStr: '',
@@ -1151,7 +1155,7 @@ describe('Compare versions service', function() {
         ruleDests: ['END']
       }
     }];
- 
+
     it('should correctly display added links', fakeAsync(() => {
       vts.init(testSnapshots3);
       cvs.getDiffGraphData(1, 2).then(function(data) {
@@ -1169,15 +1173,15 @@ describe('Compare versions service', function() {
         '/explorehandler/init/0?v=1');
       expect(req1.request.method).toEqual('GET');
       req1.flush(_getStatesData(testExplorationData3[0]));
- 
+
       let req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=2');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData3[1]));
- 
+
       flushMicrotasks();
     }));
- 
+
     it('should correctly display deleted links', fakeAsync(() => {
       vts.init(testSnapshots3);
       cvs.getDiffGraphData(5, 6).then(function(data) {
@@ -1207,15 +1211,15 @@ describe('Compare versions service', function() {
         '/explorehandler/init/0?v=5');
       expect(req1.request.method).toEqual('GET');
       req1.flush(_getStatesData(testExplorationData3[4]));
- 
+
       let req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=6');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData3[5]));
- 
+
       flushMicrotasks();
     }));
- 
+
     it('should correctly display links on renamed states', fakeAsync(() => {
       vts.init(testSnapshots3);
       cvs.getDiffGraphData(3, 5).then(function(data) {
@@ -1245,15 +1249,15 @@ describe('Compare versions service', function() {
         '/explorehandler/init/0?v=3');
       expect(req1.request.method).toEqual('GET');
       req1.flush(_getStatesData(testExplorationData3[2]));
- 
+
       let req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=5');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData3[4]));
- 
+
       flushMicrotasks();
     }));
- 
+
     it('should correctly display added, then deleted links', fakeAsync(() => {
       vts.init(testSnapshots3);
       cvs.getDiffGraphData(2, 7).then(function(data) {
@@ -1271,15 +1275,15 @@ describe('Compare versions service', function() {
         '/explorehandler/init/0?v=2');
       expect(req1.request.method).toEqual('GET');
       req1.flush(_getStatesData(testExplorationData3[1]));
- 
+
       let req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=7');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData3[6]));
- 
+
       flushMicrotasks();
     }));
- 
+
     it('should correctly display deleted, then added links', fakeAsync(() => {
       vts.init(testSnapshots3);
       cvs.getDiffGraphData(6, 8).then(function(data) {
@@ -1309,15 +1313,15 @@ describe('Compare versions service', function() {
         '/explorehandler/init/0?v=6');
       expect(req1.request.method).toEqual('GET');
       req1.flush(_getStatesData(testExplorationData3[5]));
- 
+
       let req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=8');
       expect(req2.request.method).toEqual('GET');
       req2.flush(_getStatesData(testExplorationData3[7]));
- 
+
       flushMicrotasks();
     }));
- 
+
     it('shouldn\'t compare versions if v1 > v2.', function() {
       expect(function() {
         cvs.getDiffGraphData(8, 5);

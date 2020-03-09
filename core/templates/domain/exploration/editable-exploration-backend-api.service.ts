@@ -33,7 +33,8 @@ import { UrlInterpolationService } from
 export class EditableExplorationBackendApiService {
   constructor(
     private http: HttpClient,
-    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
+    private readOnlyExplorationBackendApiService:
+      ReadOnlyExplorationBackendApiService,
     private urlInterpolationService: UrlInterpolationService) {}
 
   private _fetchExploration(
@@ -52,7 +53,7 @@ export class EditableExplorationBackendApiService {
         if (errorCallback) {
           errorCallback(errorResponse.error);
         }
-    });
+      });
   }
 
   private _updateExploration(
@@ -93,8 +94,9 @@ export class EditableExplorationBackendApiService {
       explorationId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
-    var editableExplorationDataUrl = this._getExplorationUrl(explorationId, null);
-
+    var editableExplorationDataUrl = this._getExplorationUrl(
+      explorationId, null);
+    // eslint-disable-next-line
     this.http.delete(editableExplorationDataUrl).toPromise().then(() => {
       // Delete item from the ReadOnlyExplorationBackendApiService's cache
       this.readOnlyExplorationBackendApiService.deleteExplorationFromCache(
