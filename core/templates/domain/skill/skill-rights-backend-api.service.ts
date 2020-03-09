@@ -20,11 +20,11 @@ export interface ISkillRightCache {
   [propName: string]: ISkillRightBackend
 }
 
-import { cloneDeep } from 'lodash';
-
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+
+import { cloneDeep } from 'lodash';
 
 import { ISkillRightBackend } from
   'domain/skill/SkillRightsObjectFactory.ts';
@@ -36,7 +36,6 @@ import { UrlInterpolationService } from
 @Injectable({
   providedIn: 'root'
 })
-
 export class SkillRightsBackendApiService {
   skillRightsCache: ISkillRightCache = {};
   skillRightBackendDict: ISkillRightBackend = null;
