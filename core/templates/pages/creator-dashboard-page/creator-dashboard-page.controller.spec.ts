@@ -27,8 +27,11 @@ require('pages/creator-dashboard-page/creator-dashboard-page.controller.ts');
 
 describe('Creator dashboard controller', function() {
   describe('CreatorDashboard', function() {
-    var ctrl, $httpBackend, $componentController;
+    var ctrl;
+    var $httpBackend;
+    var $componentController;
     var CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data';
+
     var dashboardData = {
       explorations_list: [{
         category: 'Featured category',

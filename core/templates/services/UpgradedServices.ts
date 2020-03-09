@@ -13,18 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for storing all upgraded services
+ * @fileoverview Service for managing all of our upgraded services.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import {
-  HttpClient,
-  HttpXhrBackend,
-  /* eslint-disable camelcase */
-  ɵangular_packages_common_http_http_d
-  /* eslint-enable camelcase */
-} from '@angular/common/http';
 
 import { AlertsService } from 'services/alerts.service';
 import { AngularNameService } from
@@ -33,6 +26,9 @@ import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
+import { AnswerGroupsCacheService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AudioLanguageObjectFactory } from
   'domain/utilities/AudioLanguageObjectFactory';
 import { AudioTranslationLanguageService } from
@@ -47,6 +43,8 @@ import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ChangeObjectFactory } from
+  'domain/editor/undo_redo/ChangeObjectFactory';
 import { ChangesInHumanReadableFormService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/services/changes-in-human-readable-form.service';
@@ -62,6 +60,8 @@ import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
 import { ContextService } from 'services/context.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
+import { CreatorDashboardBackendApiService } from
+  'domain/creator_dashboard/creator-dashboard-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
@@ -98,12 +98,19 @@ import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import {
+  HttpClient,
+  HttpXhrBackend,
+  // eslint-disable-next-line camelcase
+  ɵangular_packages_common_http_http_d
+} from '@angular/common/http';
 import { IdGenerationService } from 'services/id-generation.service';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
 import { ImprovementsDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/improvements-tab/services/improvements-display.service';
+import { ImprovementsService } from 'services/improvements.service';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
@@ -115,6 +122,8 @@ import { LearnerAnswerInfoObjectFactory } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
 import { LearnerDashboardActivityIdsObjectFactory } from
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
+import { LearnerParamsService } from
+  'pages/exploration-player-page/services/learner-params.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
@@ -131,6 +140,8 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
+import { ParamMetadataObjectFactory } from
+  'domain/exploration/ParamMetadataObjectFactory';
 import { ParamSpecObjectFactory } from
   'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from
@@ -147,6 +158,8 @@ import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
+import { PredictionResultObjectFactory } from
+  'domain/classifier/PredictionResultObjectFactory';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
@@ -205,6 +218,8 @@ import { StateWrittenTranslationsService } from
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
+import { StoryNodeObjectFactory } from
+  'domain/story/StoryNodeObjectFactory';
 import { StoryPlaythroughObjectFactory } from
   'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { StoryReferenceObjectFactory } from
@@ -234,6 +249,8 @@ import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { TopicRightsObjectFactory } from
+  'domain/topic/TopicRightsObjectFactory';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -243,6 +260,8 @@ import { UrlService } from 'services/contextual/url.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
+import { VersionTreeService } from
+  'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { WindowDimensionsService } from
@@ -255,24 +274,25 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({providedIn: 'root'})
 export class UpgradedServices {
   getUpgradedServices() {
-    var upgradedServices = {};
-    /* eslint-disable dot-notation */
+    let upgradedServices = {};
 
-    // Group 1: Services without dependencies.
+    /* eslint-disable dot-notation */
+    // Topographical-level 0:
     upgradedServices['AngularNameService'] = new AngularNameService();
     upgradedServices['AnswerClassificationResultObjectFactory'] =
       new AnswerClassificationResultObjectFactory();
+    upgradedServices['AnswerGroupsCacheService'] =
+      new AnswerGroupsCacheService();
     upgradedServices['AudioLanguageObjectFactory'] =
       new AudioLanguageObjectFactory();
     upgradedServices['AutogeneratedAudioLanguageObjectFactory'] =
       new AutogeneratedAudioLanguageObjectFactory();
     upgradedServices['BackgroundMaskService'] = new BackgroundMaskService();
     upgradedServices['CamelCaseToHyphensPipe'] = new CamelCaseToHyphensPipe();
+    upgradedServices['ChangeObjectFactory'] = new ChangeObjectFactory();
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
@@ -280,10 +300,6 @@ export class UpgradedServices {
     upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
-    upgradedServices['EmailDashboardDataService'] =
-      new EmailDashboardDataService(
-        new HttpClient(new HttpXhrBackend(
-          new ɵangular_packages_common_http_http_d())));
     upgradedServices['EditabilityService'] = new EditabilityService();
     upgradedServices['EntityContextObjectFactory'] =
       new EntityContextObjectFactory();
@@ -301,6 +317,7 @@ export class UpgradedServices {
       new ImprovementActionButtonObjectFactory();
     upgradedServices['ImprovementsDisplayService'] =
       new ImprovementsDisplayService();
+    upgradedServices['ImprovementsService'] = new ImprovementsService();
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
     upgradedServices['LearnerAnswerDetailsObjectFactory'] =
@@ -309,23 +326,33 @@ export class UpgradedServices {
       new LearnerAnswerInfoObjectFactory();
     upgradedServices['LearnerDashboardActivityIdsObjectFactory'] =
       new LearnerDashboardActivityIdsObjectFactory();
+    upgradedServices['LearnerParamsService'] = new LearnerParamsService();
     upgradedServices['LoggerService'] = new LoggerService();
     upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'] =
       new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
+    upgradedServices['ParamMetadataObjectFactory'] =
+      new ParamMetadataObjectFactory();
     upgradedServices['ParamTypeObjectFactory'] = new ParamTypeObjectFactory();
     upgradedServices['PlaythroughIssueObjectFactory'] =
       new PlaythroughIssueObjectFactory();
+    upgradedServices['PredictionResultObjectFactory'] =
+      new PredictionResultObjectFactory();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
     upgradedServices['ReadOnlyStoryNodeObjectFactory'] =
       new ReadOnlyStoryNodeObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
+    upgradedServices['SkillSummaryObjectFactory'] =
+      new SkillSummaryObjectFactory();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
     upgradedServices['StateImprovementSuggestionService'] =
       new StateImprovementSuggestionService();
     upgradedServices['StopwatchObjectFactory'] = new StopwatchObjectFactory();
+    upgradedServices['StoryNodeObjectFactory'] = new StoryNodeObjectFactory();
+    upgradedServices['StoryReferenceObjectFactory'] =
+      new StoryReferenceObjectFactory();
     upgradedServices['StorySummaryObjectFactory'] =
       new StorySummaryObjectFactory();
     upgradedServices['SubtitledHtmlObjectFactory'] =
@@ -336,9 +363,14 @@ export class UpgradedServices {
       new ThreadMessageSummaryObjectFactory();
     upgradedServices['ThreadStatusDisplayService'] =
       new ThreadStatusDisplayService();
+    upgradedServices['TopicRightsObjectFactory'] =
+      new TopicRightsObjectFactory();
+    upgradedServices['TopicSummaryObjectFactory'] =
+      new TopicSummaryObjectFactory();
     upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();
     upgradedServices['UserInfoObjectFactory'] = new UserInfoObjectFactory();
     upgradedServices['UtilsService'] = new UtilsService();
+    upgradedServices['VersionTreeService'] = new VersionTreeService();
     upgradedServices['VoiceoverObjectFactory'] = new VoiceoverObjectFactory();
     upgradedServices['WindowRef'] = new WindowRef();
     upgradedServices['WinnowingPreprocessingService'] =
@@ -347,126 +379,104 @@ export class UpgradedServices {
       new WrittenTranslationObjectFactory();
     upgradedServices['baseInteractionValidationService'] =
       new baseInteractionValidationService();
+    upgradedServices['ɵangular_packages_common_http_http_d'] =
+      new ɵangular_packages_common_http_http_d();
 
-    // Group 2: Services depending only on group 1.
-    upgradedServices['AlertsService'] =
-      new AlertsService(upgradedServices['LoggerService']);
-    upgradedServices['BrowserCheckerService'] =
-      new BrowserCheckerService(upgradedServices['WindowRef']);
+    // Topographical-level 1:
+    upgradedServices['AlertsService'] = new AlertsService(
+      upgradedServices['LoggerService']);
+    upgradedServices['BrowserCheckerService'] = new BrowserCheckerService(
+      upgradedServices['WindowRef']);
     upgradedServices['ChangesInHumanReadableFormService'] =
-      new ChangesInHumanReadableFormService(
-        upgradedServices['UtilsService'], document);
-    upgradedServices['DeviceInfoService'] =
-      new DeviceInfoService(upgradedServices['WindowRef']);
+      new ChangesInHumanReadableFormService(upgradedServices['UtilsService']);
+    upgradedServices['DeviceInfoService'] = new DeviceInfoService(
+      upgradedServices['WindowRef']);
     upgradedServices['DocumentAttributeCustomizationService'] =
       new DocumentAttributeCustomizationService(upgradedServices['WindowRef']);
     upgradedServices['FeedbackThreadObjectFactory'] =
       new FeedbackThreadObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);
-    upgradedServices['HintObjectFactory'] =
-      new HintObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
-    upgradedServices['HtmlEscaperService'] =
-      new HtmlEscaperService(upgradedServices['LoggerService']);
-    upgradedServices['LanguageUtilService'] =
-      new LanguageUtilService(
-        upgradedServices['AudioLanguageObjectFactory'],
-        upgradedServices['AutogeneratedAudioLanguageObjectFactory'],
-        upgradedServices['BrowserCheckerService']);
-    upgradedServices['LocalStorageService'] =
-      new LocalStorageService(
-        upgradedServices['ExplorationDraftObjectFactory']);
+    upgradedServices['HintObjectFactory'] = new HintObjectFactory(
+      upgradedServices['SubtitledHtmlObjectFactory']);
+    upgradedServices['HtmlEscaperService'] = new HtmlEscaperService(
+      upgradedServices['LoggerService']);
+    upgradedServices['HttpXhrBackend'] = new HttpXhrBackend(
+      upgradedServices['ɵangular_packages_common_http_http_d']);
+    upgradedServices['LocalStorageService'] = new LocalStorageService(
+      upgradedServices['ExplorationDraftObjectFactory']);
     upgradedServices['MetaTagCustomizationService'] =
       new MetaTagCustomizationService(upgradedServices['WindowRef']);
-    upgradedServices['NormalizeWhitespacePipe'] =
-      new NormalizeWhitespacePipe(upgradedServices['UtilsService']);
+    upgradedServices['NormalizeWhitespacePipe'] = new NormalizeWhitespacePipe(
+      upgradedServices['UtilsService']);
     upgradedServices['NumberWithUnitsObjectFactory'] =
       new NumberWithUnitsObjectFactory(
         upgradedServices['UnitsObjectFactory'],
         upgradedServices['FractionObjectFactory']);
-    upgradedServices['OutcomeObjectFactory'] =
-      new OutcomeObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
+    upgradedServices['OutcomeObjectFactory'] = new OutcomeObjectFactory(
+      upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['ParamChangesObjectFactory'] =
       new ParamChangesObjectFactory(
         upgradedServices['ParamChangeObjectFactory']);
-    upgradedServices['ParamSpecObjectFactory'] =
-      new ParamSpecObjectFactory(upgradedServices['ParamTypeObjectFactory']);
-    upgradedServices['PlayerTranscriptService'] =
-      new PlayerTranscriptService(upgradedServices['LoggerService']);
-    upgradedServices['PlaythroughObjectFactory'] =
-      new PlaythroughObjectFactory(
-        upgradedServices['LearnerActionObjectFactory']);
-    upgradedServices['PythonProgramTokenizer'] =
-      new PythonProgramTokenizer(upgradedServices['LoggerService']);
+    upgradedServices['ParamSpecObjectFactory'] = new ParamSpecObjectFactory(
+      upgradedServices['ParamTypeObjectFactory']);
+    upgradedServices['PlayerTranscriptService'] = new PlayerTranscriptService(
+      upgradedServices['LoggerService']);
+    upgradedServices['PlaythroughObjectFactory'] = new PlaythroughObjectFactory(
+      upgradedServices['LearnerActionObjectFactory']);
+    upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
+      upgradedServices['LoggerService']);
     upgradedServices['RecordedVoiceoversObjectFactory'] =
       new RecordedVoiceoversObjectFactory(
         upgradedServices['VoiceoverObjectFactory']);
-    upgradedServices['SidebarStatusService'] =
-      new SidebarStatusService(upgradedServices['WindowDimensionsService']);
-    upgradedServices['SiteAnalyticsService'] =
-      new SiteAnalyticsService(upgradedServices['WindowRef']);
-    upgradedServices['SkillSummaryObjectFactory'] =
-      new SkillSummaryObjectFactory();
+    upgradedServices['SVMPredictionService'] = new SVMPredictionService(
+      upgradedServices['PredictionResultObjectFactory']);
+    upgradedServices['SiteAnalyticsService'] = new SiteAnalyticsService(
+      upgradedServices['WindowRef']);
     upgradedServices['StateClassifierMappingService'] =
       new StateClassifierMappingService(
         upgradedServices['ClassifierObjectFactory']);
-    upgradedServices['StateEditorService'] =
-      new StateEditorService(upgradedServices['SolutionValidityService']);
-    upgradedServices['StateEditorService'] =
-      new StateEditorService(upgradedServices['SolutionValidityService']);
+    upgradedServices['StateEditorService'] = new StateEditorService(
+      upgradedServices['SolutionValidityService']);
     upgradedServices['StoryPlaythroughObjectFactory'] =
       new StoryPlaythroughObjectFactory(
         upgradedServices['ReadOnlyStoryNodeObjectFactory']);
-    upgradedServices['StoryReferenceObjectFactory'] =
-      new StoryReferenceObjectFactory();
-    upgradedServices['SuggestionObjectFactory'] =
-      new SuggestionObjectFactory(upgradedServices['SuggestionsService']);
+    upgradedServices['SubtopicObjectFactory'] = new SubtopicObjectFactory(
+      upgradedServices['SkillSummaryObjectFactory']);
+    upgradedServices['SuggestionObjectFactory'] = new SuggestionObjectFactory(
+      upgradedServices['SuggestionsService']);
     upgradedServices['TextInputValidationService'] =
       new TextInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['ThreadMessageObjectFactory'] =
       new ThreadMessageObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);
-    upgradedServices['TopicSummaryObjectFactory'] =
-      new TopicSummaryObjectFactory();
-    upgradedServices['UrlService'] =
-      new UrlService(upgradedServices['WindowRef']);
-    upgradedServices['ValidatorsService'] =
-      new ValidatorsService(
-        upgradedServices['AlertsService'],
-        upgradedServices['NormalizeWhitespacePipe']);
-    upgradedServices['WindowDimensionsService'] =
-      new WindowDimensionsService(upgradedServices['WindowRef']);
+    upgradedServices['UrlService'] = new UrlService(
+      upgradedServices['WindowRef']);
+    upgradedServices['WindowDimensionsService'] = new WindowDimensionsService(
+      upgradedServices['WindowRef']);
     upgradedServices['WrittenTranslationsObjectFactory'] =
       new WrittenTranslationsObjectFactory(
         upgradedServices['WrittenTranslationObjectFactory']);
 
-    // Group 3: Services depending only on groups 1-2.
-    upgradedServices['AnswerGroupObjectFactory'] =
-      new AnswerGroupObjectFactory(
-        upgradedServices['OutcomeObjectFactory'],
-        upgradedServices['RuleObjectFactory']);
-    upgradedServices['AudioTranslationLanguageService'] =
-      new AudioTranslationLanguageService(
-        upgradedServices['BrowserCheckerService'],
-        upgradedServices['LanguageUtilService']);
+    // Topographical-level 2:
+    upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
+      upgradedServices['OutcomeObjectFactory'],
+      upgradedServices['RuleObjectFactory']);
     upgradedServices['CodeReplPredictionService'] =
       new CodeReplPredictionService(
         upgradedServices['CountVectorizerService'],
         upgradedServices['PythonProgramTokenizer'],
         upgradedServices['SVMPredictionService'],
         upgradedServices['WinnowingPreprocessingService']);
-    upgradedServices['CodeReplRulesService'] =
-      new CodeReplRulesService(
-        upgradedServices['NormalizeWhitespacePipe'],
-        upgradedServices['CodeNormalizerService']);
-    upgradedServices['ConceptCardObjectFactory'] =
-      new ConceptCardObjectFactory(
-        upgradedServices['SubtitledHtmlObjectFactory'],
-        upgradedServices['RecordedVoiceoversObjectFactory']);
-    upgradedServices['ContextService'] =
-      new ContextService(
-        upgradedServices['UrlService'],
-        upgradedServices['EntityContextObjectFactory']);
+    upgradedServices['CodeReplRulesService'] = new CodeReplRulesService(
+      upgradedServices['NormalizeWhitespacePipe'],
+      upgradedServices['CodeNormalizerService']);
+    upgradedServices['ConceptCardObjectFactory'] = new ConceptCardObjectFactory(
+      upgradedServices['SubtitledHtmlObjectFactory'],
+      upgradedServices['RecordedVoiceoversObjectFactory']);
+    upgradedServices['ContextService'] = new ContextService(
+      upgradedServices['UrlService'],
+      upgradedServices['EntityContextObjectFactory']);
     upgradedServices['EditorFirstTimeEventsService'] =
       new EditorFirstTimeEventsService(
         upgradedServices['SiteAnalyticsService']);
@@ -477,108 +487,112 @@ export class UpgradedServices {
     upgradedServices['ExtractImageFilenamesFromStateService'] =
       new ExtractImageFilenamesFromStateService(
         upgradedServices['HtmlEscaperService']);
-    upgradedServices['ParamSpecsObjectFactory'] =
-      new ParamSpecsObjectFactory(upgradedServices['ParamSpecObjectFactory']);
+    upgradedServices['HttpClient'] = new HttpClient(
+      upgradedServices['HttpXhrBackend']);
+    upgradedServices['LanguageUtilService'] = new LanguageUtilService(
+      upgradedServices['AudioLanguageObjectFactory'],
+      upgradedServices['AutogeneratedAudioLanguageObjectFactory'],
+      upgradedServices['BrowserCheckerService']);
+    upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory(
+      upgradedServices['ParamSpecObjectFactory']);
     upgradedServices['PencilCodeEditorRulesService'] =
       new PencilCodeEditorRulesService(
         upgradedServices['NormalizeWhitespacePipe'],
         upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'],
         upgradedServices['CodeNormalizerService']);
-    upgradedServices['PlayerPositionService'] =
-      new PlayerPositionService(
-        upgradedServices['ContextService'],
-        upgradedServices['PlayerTranscriptService']);
-    upgradedServices['StateContentService'] =
-      new StateContentService(
-        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['SidebarStatusService'] = new SidebarStatusService(
+      upgradedServices['WindowDimensionsService']);
+    upgradedServices['StateContentService'] = new StateContentService(
+      upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateCustomizationArgsService'] =
       new StateCustomizationArgsService(
         upgradedServices['AlertsService'], upgradedServices['UtilsService']);
-    upgradedServices['StateHintsService'] =
-      new StateHintsService(
-        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StateHintsService'] = new StateHintsService(
+      upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateInteractionIdService'] =
       new StateInteractionIdService(
         upgradedServices['AlertsService'], upgradedServices['UtilsService']);
-    upgradedServices['StatePropertyService'] =
-      new StatePropertyService(
-        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StatePropertyService'] = new StatePropertyService(
+      upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateRecordedVoiceoversService'] =
       new StateRecordedVoiceoversService(
         upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateSolicitAnswerDetailsService'] =
       new StateSolicitAnswerDetailsService(
         upgradedServices['AlertsService'], upgradedServices['UtilsService']);
-    upgradedServices['StateSolutionService'] =
-      new StateSolutionService(
-        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StateSolutionService'] = new StateSolutionService(
+      upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateWrittenTranslationsService'] =
       new StateWrittenTranslationsService(
         upgradedServices['AlertsService'], upgradedServices['UtilsService']);
-    upgradedServices['SubtopicObjectFactory'] =
-      new SubtopicObjectFactory(upgradedServices['SkillSummaryObjectFactory']);
     upgradedServices['SuggestionThreadObjectFactory'] =
       new SuggestionThreadObjectFactory(
         upgradedServices['SuggestionObjectFactory'],
         upgradedServices['ThreadMessageSummaryObjectFactory']);
-    upgradedServices['TextInputRulesService'] =
-      new TextInputRulesService(upgradedServices['NormalizeWhitespacePipe']);
-    upgradedServices['UrlInterpolationService'] =
-      new UrlInterpolationService(
-        upgradedServices['AlertsService'],
-        upgradedServices['UrlService'],
-        upgradedServices['UtilsService']);
+    upgradedServices['TextInputRulesService'] = new TextInputRulesService(
+      upgradedServices['NormalizeWhitespacePipe']);
+    upgradedServices['TopicObjectFactory'] = new TopicObjectFactory(
+      upgradedServices['SubtopicObjectFactory'],
+      upgradedServices['StoryReferenceObjectFactory'],
+      upgradedServices['SkillSummaryObjectFactory']);
+    upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(
+      upgradedServices['AlertsService'], upgradedServices['UrlService'],
+      upgradedServices['UtilsService']);
+    upgradedServices['ValidatorsService'] = new ValidatorsService(
+      upgradedServices['AlertsService'],
+      upgradedServices['NormalizeWhitespacePipe']);
 
-    // Group 4: Services depending on groups 1,2 and 3.
+    // Topographical-level 3:
+    upgradedServices['AudioTranslationLanguageService'] =
+      new AudioTranslationLanguageService(
+        upgradedServices['BrowserCheckerService'],
+        upgradedServices['LanguageUtilService']);
+    upgradedServices['CreatorDashboardBackendApiService'] =
+      new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
+    upgradedServices['EmailDashboardDataService'] =
+      new EmailDashboardDataService(upgradedServices['HttpClient']);
     upgradedServices['ExplorationHtmlFormatterService'] =
       new ExplorationHtmlFormatterService(
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
-    upgradedServices['StateCardObjectFactory'] =
-      new StateCardObjectFactory(
-        upgradedServices['AudioTranslationLanguageService']);
-    upgradedServices['TopicObjectFactory'] =
-      new TopicObjectFactory(
-        upgradedServices['SubtopicObjectFactory'],
-        upgradedServices['StoryReferenceObjectFactory'],
-        upgradedServices['SkillSummaryObjectFactory']);
+    upgradedServices['PlayerPositionService'] = new PlayerPositionService(
+      upgradedServices['ContextService'],
+      upgradedServices['PlayerTranscriptService']);
 
-    // Group 5: Services depending on groups 1-4.
-    upgradedServices['SolutionObjectFactory'] =
-      new SolutionObjectFactory(
-        upgradedServices['SubtitledHtmlObjectFactory'],
-        upgradedServices['ExplorationHtmlFormatterService']);
+    // Topographical-level 4:
+    upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(
+      upgradedServices['SubtitledHtmlObjectFactory'],
+      upgradedServices['ExplorationHtmlFormatterService']);
+    upgradedServices['StateCardObjectFactory'] = new StateCardObjectFactory(
+      upgradedServices['AudioTranslationLanguageService']);
 
-    // Group 6: Services depending on groups 1-5.
-    upgradedServices['InteractionObjectFactory'] =
-      new InteractionObjectFactory(
-        upgradedServices['AnswerGroupObjectFactory'],
-        upgradedServices['HintObjectFactory'],
-        upgradedServices['SolutionObjectFactory'],
-        upgradedServices['OutcomeObjectFactory']);
+    // Topographical-level 5:
+    upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
+      upgradedServices['AnswerGroupObjectFactory'],
+      upgradedServices['HintObjectFactory'],
+      upgradedServices['SolutionObjectFactory'],
+      upgradedServices['OutcomeObjectFactory']);
 
-    // Group 7: Services depending on groups 1-6.
-    upgradedServices['StateObjectFactory'] =
-      new StateObjectFactory(
-        upgradedServices['InteractionObjectFactory'],
-        upgradedServices['ParamChangesObjectFactory'],
-        upgradedServices['RecordedVoiceoversObjectFactory'],
-        upgradedServices['SubtitledHtmlObjectFactory'],
-        upgradedServices['WrittenTranslationsObjectFactory']);
+    // Topographical-level 6:
+    upgradedServices['StateObjectFactory'] = new StateObjectFactory(
+      upgradedServices['InteractionObjectFactory'],
+      upgradedServices['ParamChangesObjectFactory'],
+      upgradedServices['RecordedVoiceoversObjectFactory'],
+      upgradedServices['SubtitledHtmlObjectFactory'],
+      upgradedServices['WrittenTranslationsObjectFactory']);
 
-    // Group 8: Services depending on groups 1-7.
-    upgradedServices['StatesObjectFactory'] =
-      new StatesObjectFactory(upgradedServices['StateObjectFactory']);
+    // Topographical-level 7:
+    upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
+      upgradedServices['StateObjectFactory']);
 
-    // Group 9: Services depending on groups 1-8.
-    upgradedServices['ExplorationObjectFactory'] =
-      new ExplorationObjectFactory(
-        upgradedServices['LoggerService'],
-        upgradedServices['ParamChangesObjectFactory'],
-        upgradedServices['ParamSpecsObjectFactory'],
-        upgradedServices['StatesObjectFactory'],
-        upgradedServices['UrlInterpolationService']);
+    // Topographical-level 8:
+    upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
+      upgradedServices['LoggerService'],
+      upgradedServices['ParamChangesObjectFactory'],
+      upgradedServices['ParamSpecsObjectFactory'],
+      upgradedServices['StatesObjectFactory'],
+      upgradedServices['UrlInterpolationService']);
 
     /* eslint-enable dot-notation */
     return upgradedServices;

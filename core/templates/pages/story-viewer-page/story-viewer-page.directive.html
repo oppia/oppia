@@ -47,7 +47,8 @@
           <img ng-src="<[$ctrl.getStaticImageUrl('/general/collection_mascot.svg')]>" class="story-mascot">
           <a ng-repeat="node in $ctrl.storyPlaythroughObject.getStoryNodes()"
              ng-href="<[$ctrl.getExplorationUrl(node)]>"
-             ng-style="{position: 'absolute', left: '<[$ctrl.pathIconParameters[$index].left]>', top: '<[$ctrl.pathIconParameters[$index].top]>'}">
+             ng-style="{position: 'absolute', left: '<[$ctrl.pathIconParameters[$index].left]>', top: '<[$ctrl.pathIconParameters[$index].top]>'}"
+             ng-class="{'oppia-story-node-default-cursor': !$ctrl.isSummaryTileVisible(node)}">
             <div ng-style="{width: '160px',position: 'absolute',left: '<[$ctrl.getExplorationTitlePosition($index)]>',color: '#006553','font-family': 'Capriola, Roboto, Arial,sans-serif','font-size': '18px',bottom: '65%'}">
               <span ng-if="node.isCompleted()" aria-live="assertive" translate="I18N_STORY_VIEWER_COMPLETED_CHAPTER" translate-values="{title: node.getTitle()}">
               </span>
@@ -91,7 +92,8 @@
                  ng-mouseover="$ctrl.updateExplorationPreview(node);
                                $ctrl.setIconHighlight(node, $index);"
                  ng-mouseleave="$ctrl.togglePreviewCard(node);
-                                $ctrl.unsetIconHighlight();">
+                                $ctrl.unsetIconHighlight();"
+                 ng-class="{'oppia-story-node-default-cursor': !$ctrl.isSummaryTileVisible(node)}">
                 <circle ng-show="$ctrl.node.getExplorationId() === $ctrl.nextExplorationId &&
                   $index !== $ctrl.activeHighlightedIconIndex"
                         cx="50"
@@ -272,5 +274,8 @@
     text-align: center;
     top: -30px;
     width: 220px;
+  }
+  .oppia-story-node-default-cursor {
+    cursor: default;
   }
 </style>

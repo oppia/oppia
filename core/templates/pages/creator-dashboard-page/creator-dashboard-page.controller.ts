@@ -34,7 +34,6 @@ require('objects/objectComponentsRequires.ts');
 require('components/entity-creation-services/exploration-creation.service.ts');
 require('components/ratings/rating-computation/rating-computation.service.ts');
 require('domain/creator_dashboard/creator-dashboard-backend-api.service.ts');
-require('domain/suggestion/SuggestionObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
@@ -53,8 +52,7 @@ require('services/user.service.ts');
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts');
 
 angular.module('oppia').directive('creatorDashboardPage', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -66,10 +64,9 @@ angular.module('oppia').directive('creatorDashboardPage', [
         '$http', '$log', '$q', '$rootScope', '$window', 'AlertsService',
         'CreatorDashboardBackendApiService', 'DateTimeFormatService',
         'ExplorationCreationService', 'RatingComputationService',
-        'SuggestionModalForCreatorDashboardService', 'SuggestionObjectFactory',
-        'SuggestionsService', 'SuggestionThreadObjectFactory',
-        'ThreadDataService', 'ThreadStatusDisplayService',
-        'UrlInterpolationService', 'UserService',
+        'SuggestionModalForCreatorDashboardService', 'SuggestionsService',
+        'SuggestionThreadObjectFactory', 'ThreadDataService',
+        'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
         'ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS',
         'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR', 'EXPLORATIONS_SORT_BY_KEYS',
         'EXPLORATION_DROPDOWN_STATS', 'FATAL_ERROR_CODES',
@@ -80,10 +77,9 @@ angular.module('oppia').directive('creatorDashboardPage', [
             $http, $log, $q, $rootScope, $window, AlertsService,
             CreatorDashboardBackendApiService, DateTimeFormatService,
             ExplorationCreationService, RatingComputationService,
-            SuggestionModalForCreatorDashboardService, SuggestionObjectFactory,
-            SuggestionsService, SuggestionThreadObjectFactory,
-            ThreadDataService, ThreadStatusDisplayService,
-            UrlInterpolationService, UserService,
+            SuggestionModalForCreatorDashboardService, SuggestionsService,
+            SuggestionThreadObjectFactory, ThreadDataService,
+            ThreadStatusDisplayService, UrlInterpolationService, UserService,
             ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS,
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR, EXPLORATIONS_SORT_BY_KEYS,
             EXPLORATION_DROPDOWN_STATS, FATAL_ERROR_CODES,
