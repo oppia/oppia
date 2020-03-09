@@ -186,7 +186,7 @@ angular.module('oppia').directive('creatorDashboardPage', [
               for (var i = 0; i < allThreads.length; i++) {
                 if (allThreads[i].threadId === threadId) {
                   allThreads[i].setMessages(response.data.messages.map(
-                    m => ThreadMessageObjectFactory.createFromBackendDict(m));
+                    m => ThreadMessageObjectFactory.createFromBackendDict(m)));
                   break;
                 }
               }
