@@ -18,6 +18,13 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import {
+  HttpClient,
+  HttpXhrBackend,
+  /* eslint-disable camelcase */
+  ɵangular_packages_common_http_http_d
+  /* eslint-enable camelcase */
+} from '@angular/common/http';
 
 import { AlertsService } from 'services/alerts.service';
 import { AngularNameService } from
@@ -64,6 +71,8 @@ import { DocumentAttributeCustomizationService } from
 import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
+import { EmailDashboardDataService } from
+  'pages/email-dashboard-pages/email-dashboard-data.service';
 import { EntityContextObjectFactory } from
   'domain/utilities/EntityContextObjectFactory';
 import { ExplorationDiffService } from
@@ -101,6 +110,8 @@ import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerAnswerInfoObjectFactory } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
+import { LearnerDashboardActivityIdsObjectFactory } from
+  'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
 import { LocalStorageService } from 'services/local-storage.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
@@ -266,6 +277,10 @@ export class UpgradedServices {
     upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
+    upgradedServices['EmailDashboardDataService'] =
+      new EmailDashboardDataService(
+        new HttpClient(new HttpXhrBackend(
+          new ɵangular_packages_common_http_http_d())));
     upgradedServices['EditabilityService'] = new EditabilityService();
     upgradedServices['EntityContextObjectFactory'] =
       new EntityContextObjectFactory();
@@ -289,6 +304,8 @@ export class UpgradedServices {
       new LearnerAnswerDetailsObjectFactory();
     upgradedServices['LearnerAnswerInfoObjectFactory'] =
       new LearnerAnswerInfoObjectFactory();
+    upgradedServices['LearnerDashboardActivityIdsObjectFactory'] =
+      new LearnerDashboardActivityIdsObjectFactory();
     upgradedServices['LoggerService'] = new LoggerService();
     upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'] =
       new NormalizeWhitespacePunctuationAndCasePipe();
