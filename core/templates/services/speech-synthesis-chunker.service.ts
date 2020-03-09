@@ -171,10 +171,14 @@ export class SpeechSynthesisChunkerService {
     // Convert links into speakable text by extracting the readable value.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Link)
       .replaceWith(function() {
-        if ((<HTMLElement><any> this).attributes[
-          'text-with-value'] !== undefined) {
-          return (<HTMLElement><any> this).attributes[
+        var element = <HTMLElement><any> this;
+        if (element.attributes['text-with-value'] !== undefined) {
+          const newTextContent = element.attributes[
             'text-with-value'].textContent.replace(/&quot;/g, '');
+          // newTextContent ends with a " character, so this is being ignored
+          // in the condition below.
+          return newTextContent && newTextContent !== '"' ?
+            newTextContent + ' ' : '';
         }
       });
 
@@ -182,12 +186,11 @@ export class SpeechSynthesisChunkerService {
     // Convert LaTeX to speakable text.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Math)
       .replaceWith(function() {
-        if (
-          (<HTMLElement><any> this).attributes[
-            'raw_latex-with-value'] !== undefined) {
-          return _this._formatLatexToSpeakableText(
-            (<HTMLElement><any> this).attributes[
-              'raw_latex-with-value'].textContent);
+        var element = <HTMLElement><any> this;
+        if (element.attributes['raw_latex-with-value'] !== undefined) {
+          const latexSpeakableText = _this._formatLatexToSpeakableText(
+            element.attributes['raw_latex-with-value'].textContent);
+          return latexSpeakableText.length > 0 ? latexSpeakableText + ' ' : '';
         }
       });
 
