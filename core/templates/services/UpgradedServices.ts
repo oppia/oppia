@@ -287,8 +287,9 @@ export class UpgradedServices {
 
 
   getUpgradedServices() {
-    let upgradedServices = [];
+    let upgradedServices = {};
 
+    /* eslint-disable dot-notation */
     // Topographical-level 0:
     upgradedServices['AngularNameService'] = new AngularNameService();
     upgradedServices['AnswerClassificationResultObjectFactory'] =
@@ -601,6 +602,9 @@ export class UpgradedServices {
     // Topographical-level 8:
     upgradedServices['StatesObjectFactory'] =
       new StatesObjectFactory(upgradedServices['StateObjectFactory']);
+
+    /* eslint-enable dot-notation */
+    return upgradedServices;
   }
 }
 
