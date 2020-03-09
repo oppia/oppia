@@ -179,7 +179,8 @@ var ExplorationEditorImprovementsTab = function() {
     expect(answerInfoCount.getText()).toMatch(String(expectedInfoCount));
   };
 
-  this.verifyReadOnlyAnswerDetails = function(expectedDetails, expectedInfoCount) {
+  this.verifyReadOnlyAnswerDetails = function(
+      expectedDetails, expectedInfoCount) {
     this.verifyAnswerDetails(expectedDetails, expectedInfoCount);
     expect($$('.protractor-test-delete-items').count()).toEqual(0);
     expect($$('.protractor-test-select-answer-detail').count()).toEqual(0);
