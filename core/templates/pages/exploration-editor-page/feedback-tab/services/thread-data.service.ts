@@ -72,8 +72,6 @@ angular.module('oppia').factory('ThreadDataService', [
     // The messages of the thread objects are updated lazily.
     let threadsById = {};
 
-    let getThreadById = threadId => (threadsById[threadId] || null);
-
     // Cached number of open threads requiring action.
     let openThreadsCount = 0;
 
@@ -98,7 +96,7 @@ angular.module('oppia').factory('ThreadDataService', [
 
     return {
       getThread: function(threadId) {
-        return getThreadById(threadId);
+        return threadsById[threadId] || null;
       },
 
       fetchThreads: function() {
