@@ -19,17 +19,18 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import multiprocessing
 import os
 import subprocess
-import threading
+import sys
 
-NODE_DIR = os.path.abspath(
-    os.path.join(os.getcwd(), os.pardir, 'oppia_tools', 'node-10.18.0'))
+NODE_VERSION = '10.18.0'
+CURR_DIR = os.path.abspath(os.getcwd())
+OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
+
+NODE_DIR = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 
 # pylint: disable=wrong-import-position
 from . import linter_utils  # isort:skip
-from .. import concurrent_task_utils  # isort:skip
 
 # pylint: disable=wrong-import-position
 import python_utils  # isort:skip
@@ -264,7 +265,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('----------------------------------------')
 
         html_files_to_lint = self.html_filepaths
-        stdout = python_utils.string_io()
+        stdout = sys.stdout
 
         failed = False
         summary_messages = []
@@ -359,7 +360,7 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         error_summary = []
         total_error_count = 0
         summary_messages = []
-        stdout = python_utils.string_io()
+        stdout = sys.stdout
         htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
         html_files_to_lint = self.html_filepaths
         if self.verbose_mode_enabled:

@@ -166,12 +166,13 @@ def check_codeowner_file(verbose_mode_enabled):
     This function also ensures that the most important rules are at the
     bottom of the CODEOWNERS file.
     """
-    stdout = python_utils.string_io()
+    stdout = sys.stdout
     if verbose_mode_enabled:
         python_utils.PRINT('Starting CODEOWNERS file check')
         python_utils.PRINT('----------------------------------------')
 
-    with linter_utils.redirect_stdout(sys.stdout):
+
+    with linter_utils.redirect_stdout(stdout):
         failed = False
         summary_messages = []
         # Checks whether every pattern in the CODEOWNERS file matches at

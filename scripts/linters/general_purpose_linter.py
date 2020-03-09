@@ -21,9 +21,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
-import multiprocessing
 import os
 import re
+import sys
 from . import linter_utils
 
 # pylint: disable=wrong-import-position
@@ -33,8 +33,11 @@ _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
 
 # NOTE TO DEVELOPERS: This should match the version of Node used in common.py.
-NODE_DIR = os.path.abspath(
-    os.path.join(os.getcwd(), os.pardir, 'oppia_tools', 'node-10.18.0'))
+NODE_VERSION = '10.18.0'
+CURR_DIR = os.path.abspath(os.getcwd())
+OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
+
+NODE_DIR = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
@@ -551,6 +554,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         """Constructs a GeneralPurposeLinter object.
 
         Args:
+            files_to_lint: list(str). A list of filepaths to lint.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
         # Set path for node.
@@ -620,7 +624,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
 
         summary_messages = []
         failed = False
-        stdout = python_utils.string_io()
+        stdout = sys.stdout
         with linter_utils.redirect_stdout(stdout):
             sets_of_patterns_to_match = [
                 MANDATORY_PATTERNS_REGEXP, MANDATORY_PATTERNS_JS_REGEXP]
@@ -655,9 +659,9 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         all_filepaths = [
             filepath for filepath in self.all_filepaths if not (
                 filepath.endswith('pre_commit_linter.py') or (
-                    filepath.endswith('linter_manager.py')))]
+                    filepath.endswith('general_purpose_linter.py')))]
         failed = False
-        stdout = python_utils.string_io()
+        stdout = sys.stdout
         with linter_utils.redirect_stdout(stdout):
             for filepath in all_filepaths:
                 file_content = FILE_CACHE.read(filepath)

@@ -19,11 +19,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import multiprocessing
 import os
 import re
 import sys
-import threading
 import time
 
 # pylint: disable=wrong-import-position
@@ -31,10 +29,15 @@ import python_utils  # isort:skip
 
 # pylint: disable=wrong-import-position
 from . import linter_utils  # isort:skip
-from .. import concurrent_task_utils  # isort:skip
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
+PYLINT_VERSION = '1.9.4'
+PYCODESTYLE_VERSION = '2.5.0'
+PYLINT_QUOTES_VERSION = '0.1.8'
+
+CURR_DIR = os.path.abspath(os.getcwd())
+OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
+
+_PYLINT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylint-%s' % PYLINT_VERSION)
 if not os.path.exists(_PYLINT_PATH):
     python_utils.PRINT('')
     python_utils.PRINT(
@@ -44,11 +47,11 @@ if not os.path.exists(_PYLINT_PATH):
 
 _PATHS_TO_INSERT = [
     _PYLINT_PATH,
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.5.0'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.8')
+    os.path.join(OPPIA_TOOLS_DIR, 'pycodestyle-%s' % PYCODESTYLE_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % PYLINT_QUOTES_VERSION)
 ]
 for path in _PATHS_TO_INSERT:
-    sys.path.insert(0, path)
+    sys.path.insert(1, path)
 
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
@@ -100,7 +103,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
         summary_messages = []
         files_to_check = self.py_filepaths
         failed = False
-        stdout = python_utils.string_io()
+        stdout = sys.stdout
         with linter_utils.redirect_stdout(stdout):
             for filepath in files_to_check:
                 # This line prints the error message along with file path
@@ -126,7 +129,6 @@ class PythonLintChecksManager(python_utils.OBJECT):
                     '%s   Import order checks passed' % _MESSAGE_TYPE_SUCCESS)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
-        # _STDOUT_LIST.append(stdout)
         return summary_messages
 
     def perform_all_lint_checks(self):

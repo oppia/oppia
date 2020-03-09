@@ -40,7 +40,7 @@ CUSTOMIZATION OPTIONS
 
 5. To lint a specific list of file extensions (*.js/*.py only). Separate file
     extensions by spaces
-        python -m scripts.pre_commit_linter --only-check-file-extensions py js
+        python -m scripts.pre_commit_linter --only-check-file-extensions .py .js
 
 Note that the root folder MUST be named 'oppia'.
  """
@@ -63,10 +63,11 @@ from . import codeowner_linter
 from . import css_linter
 from . import general_purpose_linter
 from . import html_linter
-from .. import install_third_party_libs
 from . import js_ts_linter
 from . import python_linter
 from .. import concurrent_task_utils
+from .. import install_third_party_libs
+
 install_third_party_libs.main()
 
 # pylint: disable=wrong-import-position
@@ -218,8 +219,7 @@ class FileCache(python_utils.OBJECT):
 
 def _lint_all_files(
         js_filepaths, ts_filepaths, py_filepaths, html_filepaths,
-        css_filepaths, other_filepaths, verbose_mode_enabled,
-        file_extension_type):
+        css_filepaths, file_extension_type, verbose_mode_enabled=False):
     """Run all lint checks.
 
     Args:
@@ -228,8 +228,6 @@ def _lint_all_files(
         py_filepaths: list(str). The list of python filepaths to be linted.
         html_filepaths: list(str). The list of HTML filepaths to be linted.
         css_filepaths: list(str). The list of CSS filepaths to be linted.
-        other_filepaths: list(str). The list of filepaths other than HTML,
-            CSS, Python, Js and Ts.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
         file_extension_type: list(str). The list of file extensions to be
             linted.
@@ -239,54 +237,52 @@ def _lint_all_files(
         third_party_linter: list. Third party lint checks.
     """
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-    config_path = os.path.join(parent_dir, 'oppia', '.stylelintrc')
-    config_path = os.path.join(
+    config_path_for_css_in_html = os.path.join(
+        parent_dir, 'oppia', '.stylelintrc')
+    config_path_for_oppia_css = os.path.join(
         parent_dir, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
     custom_linters = []
     third_party_linters = []
 
-    js_ts_file_extension = 'js' in file_extension_type or (
-        'ts' in file_extension_type)
-    py_file_extension = 'py' in file_extension_type
-    html_file_extension = 'html' in file_extension_type
-    css_file_extension = 'css' in file_extension_type
+    js_ts_file_extension = '.js' in file_extension_type or (
+        '.ts' in file_extension_type)
+    py_file_extension = '.py' in file_extension_type
+    html_file_extension = '.html' in file_extension_type
+    css_file_extension = '.css' in file_extension_type
+
+    js_ts_file_paths = js_filepaths + ts_filepaths
 
     custom_linter = general_purpose_linter.GeneralPurposeLinter(
-        py_filepaths, verbose_mode_enabled = verbose_mode_enabled)
+        _FILES[file_extension_type], verbose_mode_enabled=verbose_mode_enabled)
     custom_linters.append(custom_linter)
 
     if js_ts_file_extension:
-        task_custom, task_third_party = (
-            js_ts_linter.perform_all_lint_checks(
-                js_filepaths, ts_filepaths,
-                file_extension_type,
-                verbose_mode_enabled=verbose_mode_enabled))
-        tasks_custom.append(task_custom)
-        tasks_third_party.append(task_third_party)
+        custom_linter = js_ts_linter.JsTsLintChecksManager(
+            js_filepaths, ts_filepaths,
+            verbose_mode_enabled=verbose_mode_enabled)
+        third_party_linter = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+            js_ts_file_paths, verbose_mode_enabled=verbose_mode_enabled)
+        custom_linters.append(custom_linter)
+        third_party_linters.append(third_party_linter)
 
     if html_file_extension:
-        task_custom, task_third_party = (
-            html_linter.perform_all_lint_checks(
-                html_filepaths, file_extension_type,
-                verbose_mode_enabled=verbose_mode_enabled))
-        tasks_custom.append(task_custom)
-        tasks_third_party.append(task_third_party)
+        custom_linter = html_linter.HTMLLintChecksManager(
+            html_filepaths, verbose_mode_enabled=verbose_mode_enabled)
+        third_party_linter = html_linter.ThirdPartyHTMLLintChecksManager(
+            html_filepaths, verbose_mode_enabled=verbose_mode_enabled)
+        custom_linters.append(custom_linter)
+        third_party_linters.append(third_party_linter)
 
-        task_custom = (
-            css_linter.perform_all_lint_checks(
-                html_filepaths,
-                file_extension_type,
-                verbose_mode_enabled=verbose_mode_enabled))
-        tasks_custom.append(task_custom)
+        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
+            config_path_for_css_in_html, html_filepaths,
+            verbose_mode_enabled=verbose_mode_enabled)
+        third_party_linters.append(third_party_linter)
 
     if css_file_extension:
-        task_custom, task_third_party = (
-            css_linter.perform_all_lint_checks(
-                css_filepaths,
-                file_extension_type,
-                verbose_mode_enabled=verbose_mode_enabled))
-        tasks_custom.append(task_custom)
-        tasks_third_party.append(task_third_party)
+        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
+            config_path_for_oppia_css, css_filepaths,
+            verbose_mode_enabled=verbose_mode_enabled)
+        third_party_linters.append(third_party_linter)
 
     if py_file_extension:
         custom_linter = python_linter.PythonLintChecksManager(
@@ -350,7 +346,7 @@ def _get_file_extensions(file_extension_type):
         all_file_extensions_type: list(str). The list of all file extensions
         to be linted and checked.
     """
-    all_file_extensions_type = ['js', 'py', 'html', 'css', 'other']
+    all_file_extensions_type = ['.js', '.py', '.html', '.css']
 
     if file_extension_type:
         return file_extension_type
@@ -405,17 +401,6 @@ def _get_all_filepaths(input_path, input_filenames):
         filename for filename in all_filepaths if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
     return all_filepaths
-
-
-def _print_complete_summary_of_errors():
-    """Print complete summary of errors."""
-    error_messages = _TARGET_STDOUT.getvalue()
-    piped_messages = ''.join([x.getvalue() for x in _STDOUT_LIST])
-    error_messages += piped_messages
-    if error_messages != '':
-        python_utils.PRINT('Summary of Errors:')
-        python_utils.PRINT('----------------------------------------')
-        python_utils.PRINT(error_messages)
 
 
 def read_files(file_paths):
@@ -481,8 +466,8 @@ def main(args=None):
     for file_extension_type in file_extension_types:
         custom_linter, third_party_linter = _lint_all_files(
             _FILES['.js'], _FILES['.ts'], _FILES['.py'], _FILES['.html'],
-            _FILES['.css'], _FILES['other'], verbose_mode_enabled,
-            file_extension_type)
+            _FILES['.css'], file_extension_type,
+            verbose_mode_enabled=verbose_mode_enabled)
         custom_linters += custom_linter
         third_party_linters += third_party_linter
 
@@ -498,11 +483,10 @@ def main(args=None):
     for linter in third_party_linters:
         task_third_party = concurrent_task_utils.create_task(
             linter.perform_all_lint_checks,
-            verbose=verbose_mode_enabled, semaphore=semaphore)
+            verbose=verbose_mode_enabled, semaphore=semaphore,
+            name='third_party')
         tasks_third_party.append(task_third_party)
 
-    python_utils.PRINT(tasks_custom)
-    python_utils.PRINT(tasks_third_party)
     concurrent_task_utils.execute_tasks(tasks_custom)
     concurrent_task_utils.execute_tasks(tasks_third_party, semaphore=semaphore)
 
@@ -514,14 +498,9 @@ def main(args=None):
     for task in tasks_third_party:
         all_messages += task.output
 
-    # code_owner_message = codeowner_linter.check_codeowner_file(
-    #     verbose_mode_enabled)
-    # all_messages += code_owner_message
-
-    python_utils.PRINT(all_messages)
-
-    _print_complete_summary_of_errors()
-
+    code_owner_message = codeowner_linter.check_codeowner_file(
+        verbose_mode_enabled)
+    all_messages += code_owner_message
 
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):

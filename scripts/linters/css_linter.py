@@ -19,20 +19,16 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import multiprocessing
 import os
 import subprocess
 import sys
-import threading
 import time
 
-NODE_DIR = os.path.abspath(
-    os.path.join(os.getcwd(), os.pardir, 'oppia_tools', 'node-10.18.0'))
+NODE_VERSION = '10.18.0'
+CURR_DIR = os.path.abspath(os.getcwd())
+OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 
-sys.path.insert(0, os.getcwd())
-
-# pylint: disable=wrong-import-position
-from .. import concurrent_task_utils  # isort:skip
+NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 
 # pylint: disable=wrong-import-position
 import python_utils  # isort:skip
@@ -75,7 +71,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         Returns:
             summary_messages: list(str). Return summary of lint checks.
         """
-        node_path = os.path.join(NODE_DIR, 'bin', 'node')
+        node_path = os.path.join(NODE_PATH, 'bin', 'node')
         stylelint_path = os.path.join(
             'node_modules', 'stylelint', 'bin', 'stylelint.js')
         if not os.path.exists(stylelint_path):

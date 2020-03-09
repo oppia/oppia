@@ -20,38 +20,34 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
-import multiprocessing
 import os
 import re
 import shutil
 import subprocess
 import sys
 import tempfile
-import threading
 import time
 
-NODE_DIR = os.path.abspath(
-    os.path.join(os.getcwd(), os.pardir, 'oppia_tools', 'node-10.18.0'))
+ESPRIMA_VERSION = '4.0.1'
+NODE_VERSION = '10.18.0'
+CURR_DIR = os.path.abspath(os.getcwd())
+OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+NODE_DIR = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 
-_PATHS_TO_INSERT = [
-    os.getcwd(),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'esprima-4.0.1')
-]
-for path in _PATHS_TO_INSERT:
-    sys.path.insert(0, path)
+ESPRIMA_PATH = os.path.join(OPPIA_TOOLS_DIR, 'esprima-%s' % ESPRIMA_VERSION)
+
+sys.path.insert(1, ESPRIMA_PATH)
 
 # pylint: disable=wrong-import-position
 import python_utils  # isort:skip
 
 # pylint: disable=wrong-import-position
 from . import linter_utils  # isort:skip
-from .. import concurrent_task_utils  # isort:skip
 
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
-import esprima  # isort:
+import esprima  # isort:skip
 from .. import build  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
@@ -255,7 +251,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         summary_messages = []
         failed = False
-        stdout = python_utils.string_io()
+        stdout = sys.stdout
         with linter_utils.redirect_stdout(stdout):
             js_files_to_check = self.js_filepaths
 
@@ -302,7 +298,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         failed = False
         summary_messages = []
         components_to_check = ['controller', 'directive', 'factory', 'filter']
-        stdout = python_utils.string_io()
+        stdout = sys.stdout
         for filepath in files_to_check:
             component_num = 0
             parsed_expressions = self.parsed_expressions_in_files[filepath]
@@ -354,7 +350,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         summary_messages = []
         components_to_check = ['directive']
 
-        stdout = python_utils.string_io()
+        stdout = sys.stdout
         for filepath in files_to_check:
             parsed_expressions = self.parsed_expressions_in_files[filepath]
             with linter_utils.redirect_stdout(stdout):
@@ -368,7 +364,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         # The first argument of the expression is the
                         # name of the directive.
                         if arguments[0].type == 'Literal':
-                            directive_name = str(arguments[0].value)
+                            directive_name = python_utils.UNICODE(
+                                arguments[0].value)
                         arguments = arguments[1:]
                         for argument in arguments:
                             # Check the type of an argument.
@@ -486,7 +483,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         failed = False
         summary_messages = []
 
-        stdout = python_utils.string_io()
+        stdout = sys.stdout
         for filepath in files_to_check:
             parsed_expressions = self.parsed_expressions_in_files[filepath]
             with linter_utils.redirect_stdout(stdout):
@@ -497,7 +494,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         # Separate the arguments of the expression.
                         arguments = expression.arguments
                         if arguments[0].type == 'Literal':
-                            property_value = str(arguments[0].value)
+                            property_value = python_utils.UNICODE(
+                                arguments[0].value)
                         arguments = arguments[1:]
                         for argument in arguments:
                             if argument.type != 'ArrayExpression':
@@ -510,11 +508,14 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             elements = argument.elements
                             for element in elements:
                                 if element.type == 'Literal':
-                                    literal_args.append(str(element.value))
+                                    literal_args.append(
+                                        python_utils.UNICODE(
+                                            element.value))
                                 elif element.type == 'FunctionExpression':
                                     func_args = element.params
                                     for func_arg in func_args:
-                                        function_args.append(str(func_arg.name))
+                                        function_args.append(
+                                            python_utils.UNICODE(func_arg.name))
                             for arg in function_args:
                                 if arg.startswith('$'):
                                     dollar_imports.append(arg)
@@ -581,7 +582,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         pattern_to_match = (
             r'controller.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
             r'function\((?P<function_parameters>[\S\s]*?)\)')
-        stdout = python_utils.string_io()
+        stdout = sys.stdout
         with linter_utils.redirect_stdout(stdout):
             for filepath in files_to_check:
                 file_content = FILE_CACHE.read(filepath)
@@ -638,7 +639,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         summary_messages = []
         failed = False
-        stdout = python_utils.string_io()
+        stdout = sys.stdout
 
         with linter_utils.redirect_stdout(stdout):
             ts_files_to_check = self.ts_filepaths
@@ -809,7 +810,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         if self.verbose_mode_enabled:
             python_utils.PRINT('Starting HTML directive name check')
             python_utils.PRINT('----------------------------------------')
-        stdout = python_utils.string_io()
+        stdout = sys.stdout
         total_files_checked = 0
         total_error_count = 0
         files_to_check = self.all_filepaths
@@ -876,7 +877,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         self.parsed_expressions_in_files = (
             self._get_expressions_from_parsed_script())
 
-        self._check_dependencies()
         extra_js_files_messages = self._check_extra_js_files()
         js_and_ts_component_messages = (
             self._check_js_and_ts_component_name_and_count())
@@ -886,7 +886,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             self._match_line_breaks_in_controller_dependencies())
         html_directive_name_messages = self._check_html_directive_name()
 
-        all_messages = (extra_js_files_messages + html_directive_name_messages +
+        all_messages = (
+            extra_js_files_messages + html_directive_name_messages +
             js_and_ts_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages)
         return all_messages
