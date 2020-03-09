@@ -388,7 +388,8 @@ export class UpgradedServices {
     upgradedServices['BrowserCheckerService'] = new BrowserCheckerService(
       upgradedServices['WindowRef']);
     upgradedServices['ChangesInHumanReadableFormService'] =
-      new ChangesInHumanReadableFormService(upgradedServices['UtilsService']);
+      new ChangesInHumanReadableFormService(
+        upgradedServices['UtilsService'], document);
     upgradedServices['DeviceInfoService'] = new DeviceInfoService(
       upgradedServices['WindowRef']);
     upgradedServices['DocumentAttributeCustomizationService'] =

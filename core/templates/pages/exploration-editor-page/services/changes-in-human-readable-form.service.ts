@@ -34,7 +34,7 @@ export class ChangesInHumanReadableFormService {
   CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
 
   constructor(private utilsService: UtilsService,
-              @Inject(DOCUMENT) private document: any = document) {}
+              @Inject(DOCUMENT) private document: any) {}
   // TODO(#7176): Replace 'any' with the exact type.
   makeRulesListHumanReadable(answerGroupValue: any): Array<HTMLElement> {
     let rulesList = [];
