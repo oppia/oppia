@@ -148,7 +148,8 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
         concurrent_task_utils.log('')
         for line in last_stdout:
             if line.startswith(LOG_LINE_PREFIX):
-                concurrent_task_utils.log('INFO: %s' % line[len(LOG_LINE_PREFIX):])
+                concurrent_task_utils.log(
+                    'INFO: %s' % line[len(LOG_LINE_PREFIX):])
         concurrent_task_utils.log('')
 
     result = '%s%s' % (last_stdout_str, last_stderr_str)
