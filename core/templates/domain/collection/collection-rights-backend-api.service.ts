@@ -65,8 +65,8 @@ export class CollectionRightsBackendApiService {
   private _setCollectionStatus(collectionId: string,
       collectionVersion: number,
       isPublic: boolean,
-      successCallback: Function,
-      errorCallback: Function): void {
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
     let collectionPublishUrl = this.urlInterpolationService
       .interpolateUrl('/collection_editor_handler/publish/<collection_id>', {
         collection_id: collectionId
