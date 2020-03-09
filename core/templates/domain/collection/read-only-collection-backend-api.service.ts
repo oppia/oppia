@@ -17,129 +17,143 @@
  * about collections from the backend.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
+import cloneDeep from 'lodash/cloneDeep';
+
+import { AppConstants } from 'app.constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 // TODO(bhenning): For preview mode, this service should be replaced by a
 // separate CollectionDataService implementation which returns a local copy of
 // the collection instead. This file should not be included on the page in that
 // scenario.
-angular.module('oppia').factory('ReadOnlyCollectionBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService',
-  'COLLECTION_DATA_URL_TEMPLATE',
-  function(
-      $http, $q, UrlInterpolationService,
-      COLLECTION_DATA_URL_TEMPLATE) {
-    // Maps previously loaded collections to their IDs.
-    var _collectionCache = [];
-    var _collectionDetailsCache = [];
+@Injectable({
+  providedIn: 'root'
+})
+export class ReadOnlyCollectionBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService) {}
+  private _collectionCache = [];
+  private _collectionDetailsCache = [];
 
-    var _fetchCollection = function(
-        collectionId, successCallback, errorCallback) {
-      var collectionDataUrl = UrlInterpolationService.interpolateUrl(
-        COLLECTION_DATA_URL_TEMPLATE, {
-          collection_id: collectionId
-        });
+  private _fetchCollection(
+      collectionId: string,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
+    var collectionDataUrl = this.urlInterpolationService.interpolateUrl(
+      AppConstants.COLLECTION_DATA_URL_TEMPLATE, {
+        collection_id: collectionId
+      });
 
-      $http.get(collectionDataUrl).then(function(response) {
-        var collection = angular.copy(response.data.collection);
-        _cacheCollectionDetails(response.data);
+    this.http.get(collectionDataUrl).toPromise()
+      .then((response: any) => {
+        var collection = cloneDeep(response.collection);
+        this._cacheCollectionDetails(response);
         if (successCallback) {
           successCallback(collection);
         }
-      }, function(errorResponse) {
+      }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse.data);
+          errorCallback(errorResponse.error);
         }
       });
-    };
+  }
 
-    var _cacheCollectionDetails = function(details) {
-      _collectionDetailsCache[details.collection.id] = {
-        canEdit: details.can_edit,
-        title: details.collection.title,
-      };
-    };
-
-    var _isCached = function(collectionId) {
-      return _collectionCache.hasOwnProperty(collectionId);
-    };
-
-    return {
-      /**
-       * Retrieves a collection from the backend given a collection ID. This
-       * returns a promise object that allows a success and rejection callbacks
-       * to be registered. If the collection is successfully loaded and a
-       * success callback function is provided to the promise object, the
-       * success callback is called with the collection passed in as a
-       * parameter. If something goes wrong while trying to fetch the
-       * collection, the rejection callback is called instead, if present. The
-       * rejection callback function is passed the error that occurred and the
-       * collection ID.
-       */
-      fetchCollection: function(collectionId) {
-        return $q(function(resolve, reject) {
-          _fetchCollection(collectionId, resolve, reject);
-        });
-      },
-
-      /**
-       * Behaves in the exact same way as fetchCollection (including callback
-       * behavior and returning a promise object), except this function will
-       * attempt to see whether the given collection has already been loaded. If
-       * it has not yet been loaded, it will fetch the collection from the
-       * backend. If it successfully retrieves the collection from the backend,
-       * it will store it in the cache to avoid requests from the backend in
-       * further function calls.
-       */
-      loadCollection: function(collectionId) {
-        return $q(function(resolve, reject) {
-          if (_isCached(collectionId)) {
-            if (resolve) {
-              resolve(angular.copy(_collectionCache[collectionId]));
-            }
-          } else {
-            _fetchCollection(collectionId, function(collection) {
-              // Save the fetched collection to avoid future fetches.
-              _collectionCache[collectionId] = collection;
-              if (resolve) {
-                resolve(angular.copy(collection));
-              }
-            }, reject);
-          }
-        });
-      },
-
-      getCollectionDetails: function(collectionId) {
-        if (_collectionDetailsCache[collectionId]) {
-          return _collectionDetailsCache[collectionId];
-        } else {
-          throw Error('collection has not been fetched');
-        }
-      },
-
-      /**
-       * Returns whether the given collection is stored within the local data
-       * cache or if it needs to be retrieved from the backend upon a laod.
-       */
-      isCached: function(collectionId) {
-        return _isCached(collectionId);
-      },
-
-      /**
-       * Replaces the current collection in the cache given by the specified
-       * collection ID with a new collection object.
-       */
-      cacheCollection: function(collectionId, collection) {
-        _collectionCache[collectionId] = angular.copy(collection);
-      },
-
-      /**
-       * Clears the local collection data cache, forcing all future loads to
-       * re-request the previously loaded collections from the backend.
-       */
-      clearCollectionCache: function() {
-        _collectionCache = [];
-      }
+  // TODO(#7165): Replace 'any' with the exact type.
+  private _cacheCollectionDetails(details: any) {
+    this._collectionDetailsCache[details.collection.id] = {
+      canEdit: details.can_edit,
+      title: details.collection.title,
     };
   }
-]);
+
+  private _isCached(collectionId: string) {
+    return this._collectionCache.hasOwnProperty(collectionId);
+  }
+
+  /**
+   * Retrieves a collection from the backend given a collection ID. This
+   * returns a promise object that allows a success and rejection callbacks
+   * to be registered. If the collection is successfully loaded and a
+   * success callback function is provided to the promise object, the
+   * success callback is called with the collection passed in as a
+   * parameter. If something goes wrong while trying to fetch the
+   * collection, the rejection callback is called instead, if present. The
+   * rejection callback function is passed the error that occurred and the
+   * collection ID.
+   */
+  fetchCollection(collectionId: string) {
+    return new Promise((resolve, reject) => {
+      this._fetchCollection(collectionId, resolve, reject);
+    });
+  }
+
+  /**
+   * Behaves in the exact same way as fetchCollection (including callback
+   * behavior and returning a promise object), except this function will
+   * attempt to see whether the given collection has already been loaded. If
+   * it has not yet been loaded, it will fetch the collection from the
+   * backend. If it successfully retrieves the collection from the backend,
+   * it will store it in the cache to avoid requests from the backend in
+   * further function calls.
+   */
+  loadCollection(collectionId: string) {
+    return new Promise((resolve, reject) => {
+      if (this._isCached(collectionId)) {
+        if (resolve) {
+          resolve(cloneDeep(this._collectionCache[collectionId]));
+        }
+      } else {
+        this._fetchCollection(collectionId, (collection) => {
+          // Save the fetched collection to avoid future fetches.
+          this._collectionCache[collectionId] = collection;
+          if (resolve) {
+            resolve(cloneDeep(collection));
+          }
+        }, reject);
+      }
+    });
+  }
+
+  getCollectionDetails(collectionId: string) {
+    if (this._collectionDetailsCache[collectionId]) {
+      return this._collectionDetailsCache[collectionId];
+    } else {
+      throw Error('collection has not been fetched');
+    }
+  }
+
+  /**
+   * Returns whether the given collection is stored within the local data
+   * cache or if it needs to be retrieved from the backend upon a laod.
+   */
+  isCached(collectionId: string) {
+    return this._isCached(collectionId);
+  }
+
+  /**
+   * Replaces the current collection in the cache given by the specified
+   * collection ID with a new collection object.
+   */
+  // TODO(#7165): Replace 'any' with the exact type.
+  cacheCollection(collectionId: string, collection: any) {
+    this._collectionCache[collectionId] = cloneDeep(collection);
+  }
+
+  /**
+   * Clears the local collection data cache, forcing all future loads to
+   * re-request the previously loaded collections from the backend.
+   */
+  clearCollectionCache() {
+    this._collectionCache = [];
+  }
+}
+
+angular.module('oppia').factory(
+  'ReadOnlyCollectionBackendApiService',
+  downgradeInjectable(ReadOnlyCollectionBackendApiService));

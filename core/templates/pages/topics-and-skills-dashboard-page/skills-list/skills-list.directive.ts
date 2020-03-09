@@ -197,6 +197,10 @@ angular.module('oppia').directive('skillsList', [
                   $rootScope.$broadcast(
                     EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
                 }, 100);
+              }, function() {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
             }, function() {
               // Note to developers:
