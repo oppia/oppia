@@ -455,7 +455,8 @@ export class UpgradedServices {
     upgradedServices['SuggestionObjectFactory'] = new SuggestionObjectFactory(
       upgradedServices['SuggestionsService']);
     upgradedServices['TextInputValidationService'] =
-      new TextInputValidationService(baseInteractionValidationService);
+      new TextInputValidationService(
+        upgradedServices['baseInteractionValidationService']);
     upgradedServices['ThreadMessageObjectFactory'] =
       new ThreadMessageObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);
