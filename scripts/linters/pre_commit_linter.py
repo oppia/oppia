@@ -27,20 +27,22 @@ This script ignores all filepaths contained within .eslintignore.
 CUSTOMIZATION OPTIONS
 =====================
 1.  To lint only files that have been touched in this commit
-        python -m scripts.pre_commit_linter
+        python -m scripts.linters.pre_commit_linter
 
 2.  To lint all files in the folder or to lint just a specific file
-        python -m scripts.pre_commit_linter --path filepath
+        python -m scripts.linters.pre_commit_linter --path filepath
 
 3.  To lint a specific list of files (*.js/*.py only). Separate files by spaces
-        python -m scripts.pre_commit_linter --files file_1 file_2 ... file_n
+        python -m scripts.linters.pre_commit_linter
+            --files file_1 file_2 ... file_n
 
 4.  To lint files in verbose mode
-        python -m scripts.pre_commit_linter --verbose
+        python -m scripts.linters.pre_commit_linter --verbose
 
 5. To lint a specific list of file extensions (*.js/*.py only). Separate file
     extensions by spaces
-        python -m scripts.pre_commit_linter --only-check-file-extensions .py .js
+        python -m scripts.linters.pre_commit_linter
+            --only-check-file-extensions .py .js
 
 Note that the root folder MUST be named 'oppia'.
  """

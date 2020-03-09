@@ -127,8 +127,8 @@ def check_for_important_patterns_at_bottom_of_codeowners(important_patterns):
         failed = True
     if len(codeowner_important_paths_set) != len(CODEOWNER_IMPORTANT_PATHS):
         python_utils.PRINT(
-            'scripts/pre_commit_linter.py --> Duplicate pattern(s) found '
-            'in CODEOWNER_IMPORTANT_PATHS list.')
+            'scripts/linters/pre_commit_linter.py --> Duplicate pattern(s) '
+            'found in CODEOWNER_IMPORTANT_PATHS list.')
         failed = True
 
     # Check missing rules by set difference operation.
@@ -140,7 +140,7 @@ def check_for_important_patterns_at_bottom_of_codeowners(important_patterns):
         python_utils.PRINT(
             '%s --> Rule %s is not present in the '
             'CODEOWNER_IMPORTANT_PATHS list in '
-            'scripts/pre_commit_linter.py. Please add this rule in the '
+            'scripts/linters/pre_commit_linter.py. Please add this rule in the '
             'mentioned list or remove this rule from the \'Critical files'
             '\' section.' % (CODEOWNER_FILEPATH, rule))
         failed = True
@@ -150,7 +150,7 @@ def check_for_important_patterns_at_bottom_of_codeowners(important_patterns):
             'section. Please place it under the \'Critical files\' '
             'section since it is an important rule. Alternatively please '
             'remove it from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
-            'scripts/pre_commit_linter.py if it is no longer an '
+            'scripts/linters/pre_commit_linter.py if it is no longer an '
             'important rule.' % (CODEOWNER_FILEPATH, rule))
         failed = True
 
