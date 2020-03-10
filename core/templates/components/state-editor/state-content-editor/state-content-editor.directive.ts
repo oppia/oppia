@@ -40,6 +40,7 @@ angular.module('oppia').directive('stateContentEditor', [
         };
       },
       scope: {
+        getStateContentHtmlSchema: '&stateContentHtmlSchema',
         getStateContentPlaceholder: '&stateContentPlaceholder',
         onSaveStateContent: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
@@ -97,7 +98,7 @@ angular.module('oppia').directive('stateContentEditor', [
             $scope.contentEditorIsOpen = false;
           };
           ctrl.$onInit = function() {
-            $scope.HTML_SCHEMA = {
+            $scope.HTML_SCHEMA = $scope.getStateContentHtmlSchema() || {
               type: 'html'
             };
             $scope.contentId = null;

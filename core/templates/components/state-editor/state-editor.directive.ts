@@ -54,6 +54,7 @@ angular.module('oppia').directive('stateEditor', [
       restrict: 'E',
       scope: {
         addState: '=',
+        getStateContentHtmlSchema: '&stateContentHtmlSchema',
         getStateContentPlaceholder: '&stateContentPlaceholder',
         isInteractionShown: '&interactionIsShown',
         navigateToState: '=',
