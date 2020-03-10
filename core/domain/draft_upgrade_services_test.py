@@ -117,7 +117,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
             exp_id, strict=True, version=None)
         for i in python_utils.RANGE(31):
             exploration_model.commit(
-                self.USER_ID, 'Changed title.', [])
+                self.USER_ID, 'Changed title %s.' % i, [])
         exploration_model.commit(
             self.USER_ID, 'Migrate from v32 to v33', [{
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
