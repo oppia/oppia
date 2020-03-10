@@ -19,20 +19,29 @@
 
 var waitFor = require('../../../core/tests/protractor_utils/waitFor.js');
 
-var customizeInteraction = function(interactionEditor, initialCode) {
-  // There are no customizations.
+var customizeInteraction = function(interactionEditor, placeHolderText) {
+  browser.executeScript(
+    "var editor = $('schema-based-editor .CodeMirror')[0].CodeMirror;" +
+    "editor.setValue('" + placeHolderText + "');");
 };
 
-var expectInteractionDetailsToMatch = function(elem) {
+var expectInteractionDetailsToMatch = function(elem, placeHolderText) {
   expect(
     elem.element(by.css('.CodeMirror')).isPresent()
   ).toBe(true);
+  // The /n must be included in the check because the editor inserts a newline.
+  /* eslint-disable quotes */
+  var testValue = browser.executeScript(
+    "var elem = $('.protractor-test-preview-tab .CodeMirror')[0].CodeMirror;" +
+    "return elem.getValue()");
+  /* eslint-enable quotes */
+  expect(testValue).toEqual(placeHolderText + '\n');
 };
 
 var submitAnswer = function(conversationInput, answerCode) {
   browser.executeScript(
-    "var editor = $('.protractor-preview-tab .CodeMirror')[0].CodeMirror;" +
-    "editor.setValue('" + answerCode + "');");
+    "var elem = $('.protractor-test-preview-tab .CodeMirror')[0].CodeMirror;" +
+    "elem.setValue('" + answerCode + "');");
   var submitAnswerButton = element(by.css(
     '.protractor-test-submit-answer-button'));
   waitFor.elementToBeClickable(
