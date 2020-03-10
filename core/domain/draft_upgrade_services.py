@@ -84,7 +84,7 @@ def try_upgrading_draft_to_exp_version(
             logging.warning('%s is not implemented' % conversion_fn_name)
             return
         conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
-        if commit.commit_cmds[0]['from_version'] == 31:
+        if commit.commit_cmds[0]['from_version'] == 32:
             conversion_fn = functools.partial(conversion_fn, exp_id)
         draft_change_list = conversion_fn(draft_change_list)
         upgrade_times += 1
@@ -95,9 +95,9 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
-    def _convert_states_v31_dict_to_v32_dict(cls, exp_id, draft_change_list):
-        """Converts draft change list from state version 30 to 31. State
-        version 31 adds image dimensions to images inside collapsible
+    def _convert_states_v32_dict_to_v33_dict(cls, exp_id, draft_change_list):
+        """Converts draft change list from state version 32 to 33. State
+        version 33 adds image dimensions to images inside collapsible
         blocks and tabs, for which there should be no changes to drafts.
 
         Args:
@@ -208,6 +208,22 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         }
                     }
                 })
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v31_dict_to_v32_dict(cls, draft_change_list):
+        """Converts draft change list from state version 31 to 32. State
+        version 32 adds a customization arg for the "Add" button text
+        in SetInput interaction, for which there should be no changes
+        to drafts.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
         return draft_change_list
 
     @classmethod

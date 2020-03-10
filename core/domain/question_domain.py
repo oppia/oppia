@@ -246,9 +246,34 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v31_dict_to_v32_dict(
+    def _convert_state_v31_dict_to_v32_dict(cls, question_state_dict):
+        """Converts from version 31 to 32. Version 32 adds a new
+        customization arg to SetInput interaction which allows
+        creators to add custom text to the "Add" button.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'SetInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'buttonText': {
+                    'value': 'Add item'
+                }
+            })
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v32_dict_to_v33_dict(
             cls, question_id, question_state_dict):
-        """Converts from version 31 to 32. Version 32 adds
+        """Converts from version 32 to 33. Version 33 adds
         dimensions to images in the oppia-noninteractive-image tags
         located inside tabs and collapsible blocks.
 
