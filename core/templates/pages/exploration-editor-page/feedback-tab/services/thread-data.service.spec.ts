@@ -17,7 +17,7 @@
  * data for the feedback tab of the exploration editor.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // thread-data.service.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 
@@ -128,7 +128,6 @@ describe('retrieving threads service', () => {
     ];
   });
 
-  // beforeEach(angular.mock.module('oppia', TranslatorProviderForTests));
   beforeEach(angular.mock.module('oppia', $provide => {
     let ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -233,7 +232,7 @@ describe('retrieving threads service', () => {
     'should use reject handler whenever fetching feedback threads or ' +
     'suggestion threads fails', done => {
       $httpBackend.whenGET('/threadlisthandler/exp1')
-        .respond(500, 'Error on retriving feedback threads.');
+        .respond(500, 'Error on retrieving feedback threads.');
       $httpBackend.whenGET(
         '/suggestionlisthandler?target_type=exploration&target_id=exp1')
         .respond({ suggestions: this.mockSuggestions });
@@ -241,7 +240,7 @@ describe('retrieving threads service', () => {
       ThreadDataService.fetchThreads().then(
         done.fail,
         error => {
-          expect(error).toEqual('Error on retriving feedback threads.');
+          expect(error).toEqual('Error on retrieving feedback threads.');
           done();
         });
       $httpBackend.flush();
