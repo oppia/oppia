@@ -148,7 +148,7 @@ def create_group_for_next_release():
     common.open_new_tab_in_browser_if_possible(
         release_constants.RELEASE_ROTA_URL)
     common.ask_user_to_confirm(
-        'Please do the following two things:\n\n'
+        'Please do the following three things:\n\n'
         '1. Create a new chat group for the next release, '
         'and add the release coordinator, QA lead, Ankita '
         'and Nithesh to that group. You can find the release schedule '
@@ -159,7 +159,12 @@ def create_group_for_next_release():
         'the release co-ordinator & QA Lead for next release. '
         'Please follow the release process doc: '
         '[Add link to release process doc] to ensure the release '
-        'follows the schedule. Thanks!\n' % (
+        'follows the schedule. Thanks!\n\n'
+        '3. Send the following message to oppia-dev:\n\n'
+        'Hi all, We have completed the release for current month. '
+        'This is a reminder to fill in the job requests here: '
+        'https://goo.gl/forms/XIj00RJ2h5L55XzU2 if you are planning '
+        'to run your job in the next release. Thanks!\n' % (
             release_constants.RELEASE_ROTA_URL))
 
 
