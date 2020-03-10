@@ -31,6 +31,7 @@ import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
+
 class DraftUpgradeUnitTests(test_utils.GenericTestBase):
     """Test the draft upgrade services module."""
     EXP_ID = 'exp_id'
