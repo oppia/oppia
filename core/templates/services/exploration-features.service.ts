@@ -17,6 +17,9 @@
  *               the exploration editor.
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
 export interface IExplorationDataDict {
   'param_changes': string[];
   'states': {
@@ -29,9 +32,6 @@ export interface IFeatureDataDict {
   'is_exploration_whitelisted': boolean;
   'is_improvements_tab_enabled': boolean;
 }
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -89,6 +89,5 @@ export class ExplorationFeaturesService {
   }
 }
 
-angular.module('oppia').factory(
-  'ExplorationFeaturesService',
+angular.module('oppia').factory('ExplorationFeaturesService',
   downgradeInjectable(ExplorationFeaturesService));

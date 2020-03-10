@@ -19,8 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { ExplorationFeaturesService, IExplorationDataDict,
-  IFeatureDataDict} from
-  'services/exploration-features.service';
+  IFeatureDataDict } from 'services/exploration-features.service';
 
 describe('ExplorationFeatureService', () => {
   let explorationFeatureService: ExplorationFeaturesService = null;
