@@ -66,14 +66,37 @@ require('google-analytics.initializer.ts');
 // loaded after app.constants.ts
 require('I18nFooter.ts');
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
 angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
-  '$interpolateProvider', '$locationProvider',
+  '$interpolateProvider', '$locationProvider', '$provide',
   function(
       $compileProvider, $cookiesProvider, $httpProvider,
-      $interpolateProvider, $locationProvider) {
+      $interpolateProvider, $locationProvider, $provide) {
+    var ugs = new UpgradedServices();
+    // We need to provide these services separately since they are
+    // used in the directives imported in this file and cannot be
+    // injected before bootstrapping of oppia module.
+    var servicesToProvide = [
+      'AlertsService', 'BackgroundMaskService', 'BrowserCheckerService',
+      'ContextService', 'CsrfTokenService', 'DateTimeFormatService',
+      'DebouncerService', 'DeviceInfoService',
+      'DocumentAttributeCustomizationService', 'HtmlEscaperService',
+      'IdGenerationService', 'MetaTagCustomizationService',
+      'SidebarStatusService', 'SiteAnalyticsService', 'UrlInterpolationService',
+      'UrlService', 'UserInfoObjectFactory', 'UtilsService',
+      'WindowDimensionsService', 'WindowRef'];
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      if (servicesToProvide.includes(key)) {
+        $provide.value(key, value);
+      }
+    }
     // Refer: https://docs.angularjs.org/guide/migration
     // #migrate1.5to1.6-ng-services-$location
     // The default hash-prefix used for URLs has changed from

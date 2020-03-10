@@ -15,7 +15,6 @@
 /**
  * @fileoverview Unit tests for the about page.
  */
-import { UpgradedServices } from 'services/UpgradedServices';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('About Page', function() {
@@ -26,12 +25,6 @@ describe('About Page', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('WindowRef', windowRef);
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
   }));
   beforeEach(angular.mock.inject(function($injector) {
     var $rootScope = $injector.get('$rootScope');

@@ -397,6 +397,7 @@ def main(args=None):
             if frontend_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
+                sys.exit(1)
             if does_diff_include_travis_yml_or_js_files(files_to_lint):
                 travis_ci_check_status = start_python_script(
                     TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT)
