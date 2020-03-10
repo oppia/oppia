@@ -27,7 +27,7 @@ import { ThreadMessage } from
 import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 
-class SuggestionThread {
+export class SuggestionThread {
   status: string;
   subject: string;
   summary: string;
