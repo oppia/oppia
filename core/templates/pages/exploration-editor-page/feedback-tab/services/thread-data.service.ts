@@ -116,12 +116,12 @@ angular.module('oppia').factory('ThreadDataService', [
     };
 
     return {
-      getThread: function(threadId: string) {
+      getThread: function(threadId: string): FeedbackThread | SuggestionThread {
         return threadsById.get(threadId) || null;
       },
 
       // TODO(#7165): Replace 'any' with the exact type.
-      fetchThreads: function(): any {
+      fetchThreads: function(): Promise<any> {
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
         let suggestionsPromise = $http.get(getSuggestionListHandlerUrl(), {
@@ -185,7 +185,8 @@ angular.module('oppia').factory('ThreadDataService', [
         return openThreadsCount;
       },
 
-      createNewThread: function(newSubject: string, newText: string): void {
+      createNewThread: function(
+          newSubject: string, newText: string): Promise<void> {
         // TODO(#8016): Move this $http call to a backend-api.service with unit
         // tests.
         return $http.post(getThreadListHandlerUrl(), {
@@ -202,7 +203,7 @@ angular.module('oppia').factory('ThreadDataService', [
       },
 
       markThreadAsSeen: function(
-          thread: FeedbackThread | SuggestionThread): void {
+          thread: FeedbackThread | SuggestionThread): Promise<void> {
         if (!thread) {
           throw Error('Trying to update a non-existent thread');
         }
