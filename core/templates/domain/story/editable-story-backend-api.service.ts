@@ -58,8 +58,8 @@ export class EditableStoryBackendApiService {
   }
 
     private _updateStory = function(
-        storyId: string, storyVersion: number, commitMessage: string, changeList: string[],
-        successCallback: any, errorCallback: any) {
+        storyId: string, storyVersion: string, commitMessage: string,
+        changeList: string[], successCallback: any, errorCallback: any) {
       var editableStoryDataUrl = this.urlInterpolation.interpolateUrl(
         StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
           story_id: storyId
@@ -88,7 +88,8 @@ export class EditableStoryBackendApiService {
     };
 
     private _changeStoryPublicationStatus = function(
-        storyId: string, newStoryStatusIsPublic: boolean, successCallback: any, errorCallback: any) {
+        storyId: string, newStoryStatusIsPublic: boolean,
+        successCallback: any, errorCallback: any) {
       var storyPublishUrl = this.urlInterpolation.interpolateUrl(
         StoryDomainConstants.STORY_PUBLISH_URL_TEMPLATE, {
           story_id: storyId
@@ -116,7 +117,7 @@ export class EditableStoryBackendApiService {
         StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
           story_id: storyId
         });
-      this.http.delete(
+      this.http.request('delete',
         storyDataUrl).toPromise().then(
         (response: any) => {
           if (successCallback) {
@@ -145,7 +146,8 @@ export class EditableStoryBackendApiService {
      * the success callback, if one is provided to the returned promise
      * object. Errors are passed to the error callback, if one is provided.
      */
-    updateStory(storyId: string, storyVersion: number, commitMessage: string, changeList: string[]): Promise<object> {
+    updateStory(storyId: string, storyVersion: string,
+        commitMessage: string, changeList: string[]): Promise<object> {
       return new Promise((resolve, reject) => {
         this._updateStory(
           storyId, storyVersion, commitMessage, changeList,
@@ -154,7 +156,7 @@ export class EditableStoryBackendApiService {
     }
 
     changeStoryPublicationStatus(
-      storyId: string, newStoryStatusIsPublic: boolean): Promise<object> {
+        storyId: string, newStoryStatusIsPublic: boolean): Promise<object> {
       return new Promise((resolve, reject) => {
         this._changeStoryPublicationStatus(
           storyId, newStoryStatusIsPublic, resolve, reject);

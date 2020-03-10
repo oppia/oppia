@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for EditableStoryBackendApiService.
  */
 
-import { EditableStoryBackendApiService } from 
+import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service.ts';
 import { CsrfTokenService } from 'services/csrf-token.service.ts';
 
@@ -136,7 +136,7 @@ describe('Editable story backend API service', () => {
       var req = httpTestingController.expectOne(
         '/story_editor_handler/data/2');
       expect(req.request.method).toEqual('GET');
-      req.flush(500, 'Error loading story 2.');
+      req.flush({status: 500, statusText:'Error loading story 2.'});
 
       flushMicrotasks();
 
@@ -196,7 +196,8 @@ describe('Editable story backend API service', () => {
       var req = httpTestingController.expectOne(
         '/story_editor_handler/data/storyId_1');
       expect(req.request.method).toEqual('PUT');
-      req.flush(404, 'Story with given id doesn\'t exist.');
+      req.flush({status: 404,
+        statusText: 'Story with given id doesn\'t exist.'});
 
       flushMicrotasks();
 
@@ -217,7 +218,6 @@ describe('Editable story backend API service', () => {
     var req = httpTestingController.expectOne(
       '/story_publish_handler/storyId');
     expect(req.request.method).toEqual('PUT');
-    req.flush();
 
     flushMicrotasks();
 
@@ -236,7 +236,8 @@ describe('Editable story backend API service', () => {
       var req = httpTestingController.expectOne(
         '/story_publish_handler/storyId_1');
       expect(req.request.method).toEqual('PUT');
-      req.flush(404, 'Story with given id doesn\'t exist.');
+      req.flush({status: 404,
+        statusText: 'Story with given id doesn\'t exist.'});
 
       flushMicrotasks();
 
