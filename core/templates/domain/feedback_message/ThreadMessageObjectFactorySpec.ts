@@ -41,7 +41,7 @@ describe('ThreadMessageObjectFactory', () => {
       });
 
       expect(threadMessage.authorUsername).toEqual('author');
-      expect(threadMessage.createdOn).toEqual(1000);
+      expect(threadMessage.createdOnMsecs).toEqual(1000);
       expect(threadMessage.entityType).toEqual('exploration');
       expect(threadMessage.entityId).toEqual('exploration.exp1.thread1');
       expect(threadMessage.messageId).toEqual(1);

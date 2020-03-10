@@ -25,27 +25,24 @@ import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
 
 export class ThreadMessage {
   authorUsername: string;
-  createdOn: number;
+  createdOnMsecs: number;
   entityType: string;
   entityId: string;
   messageId: number;
-  receivedViaEmail: boolean;
   text: string = '';
   updatedStatus: string = null;
   updatedSubject: string = null;
   summary: ThreadMessageSummary;
 
   constructor(
-      authorUsername: string, createdOn: number, entityType: string,
-      entityId: string, messageId: number, receivedViaEmail: boolean,
-      text: string, updatedStatus: string, updatedSubject: string,
-      summary: ThreadMessageSummary) {
+      authorUsername: string, createdOnMsecs: number, entityType: string,
+      entityId: string, messageId: number, text: string, updatedStatus: string,
+      updatedSubject: string, summary: ThreadMessageSummary) {
     this.authorUsername = authorUsername;
-    this.createdOn = createdOn;
+    this.createdOnMsecs = createdOnMsecs;
     this.entityType = entityType;
     this.entityId = entityId;
     this.messageId = messageId;
-    this.receivedViaEmail = receivedViaEmail;
     this.text = text;
     this.updatedStatus = updatedStatus;
     this.updatedSubject = updatedSubject;

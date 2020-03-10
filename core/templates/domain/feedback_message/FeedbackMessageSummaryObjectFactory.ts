@@ -29,12 +29,12 @@ export class FeedbackMessageSummary {
   description: string;
   authorUsername: string;
   authorPictureDataUrl: string;
-  createdOn: Date;
+  createdOnMsecs: number;
 
   constructor(
       messageId: number, text: string, updatedStatus: string,
       suggestionHtml: string, currentContentHtml: string, description: string,
-      authorUsername: string, authorPictureDataUrl: string, createdOn: Date) {
+      authorUsername: string, authorPictureDataUrl: string, createdOnMsecs: Date) {
     this.messageId = messageId;
     this.text = text;
     this.updatedStatus = updatedStatus;
@@ -43,7 +43,7 @@ export class FeedbackMessageSummary {
     this.description = description;
     this.authorUsername = authorUsername;
     this.authorPictureDataUrl = authorPictureDataUrl;
-    this.createdOn = createdOn;
+    this.createdOnMsecs = createdOnMsecs;
   }
 }
 
