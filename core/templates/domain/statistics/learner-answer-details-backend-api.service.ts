@@ -16,52 +16,54 @@
  * @fileoverview Service to record learner answer info.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+import { Injectable } from "@angular/core";
+import { HttpClient } from '@angular/common/http';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { StatisticsDomainConstants } from 'domain/statistics/statistics-domain.constants';
 
-require('domain/statistics/statistics-domain.constants.ajs.ts');
+@Injectable({
+    providedIn: 'root'
+})
+export class LearnerAnswerDetailsBackendApiService {
+    constructor(
+        private http: HttpClient,
+        private urlInterpolationService: UrlInterpolationService
+    ) { }
 
-angular.module('oppia').factory('LearnerAnswerDetailsBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService', 'SUBMIT_LEARNER_ANSWER_DETAILS_URL',
-  function(
-      $http, $q, UrlInterpolationService, SUBMIT_LEARNER_ANSWER_DETAILS_URL) {
-    var _recordLearnerAnswerDetails = function(
-        expId, stateName, interactionId, answer, answerDetails,
-        successCallback, errorCallback) {
-      var recordLearnerAnswerDetailsUrl = (
-        UrlInterpolationService.interpolateUrl(
-          SUBMIT_LEARNER_ANSWER_DETAILS_URL, {
+    private _recordLearnerAnswerDetails(expId: string, stateName: string, interactionId: string, answer: string, answerDetails: string,
+        successCallback: any, errorCallback: any) {
+
+        var recordLearnerAnswerDetailsUrl = this.urlInterpolationService.interpolateUrl(
+            StatisticsDomainConstants.SUBMIT_LEARNER_ANSWER_DETAILS_URL, {
             entity_type: 'exploration',
             entity_id: expId
-          }));
-
-      var payload = {
-        state_name: stateName,
-        interaction_id: interactionId,
-        answer: answer,
-        answer_details: answerDetails
-      };
-
-      $http.put(recordLearnerAnswerDetailsUrl, payload).then(function(
-          response) {
-        if (successCallback) {
-          successCallback();
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    return {
-      recordLearnerAnswerDetails: function(expId, stateName, interactionId,
-          answer, answerDetails) {
-        return $q(function(resolve, reject) {
-          _recordLearnerAnswerDetails(
-            expId, stateName, interactionId, answer, answerDetails,
-            resolve, reject);
         });
-      }
-    };
-  }
-]);
+
+        var payload = {
+            state_name: stateName,
+            interaction_id: interactionId,
+            answer: answer,
+            answer_details: answerDetails
+        };
+
+        this.http.put(recordLearnerAnswerDetailsUrl, payload)
+            .toPromise().then(
+                response => {
+                    successCallback && successCallback();
+                },
+                errorResponse => {
+                    errorCallback && errorCallback(errorResponse.body);
+                }
+            );
+    }
+
+    recordLearnerAnswerDetails(expId: string, stateName: string, interactionId: string, answer: string, answerDetails: string): Promise<object> {
+        return new Promise((resolve, reject) => {
+            this._recordLearnerAnswerDetails(expId, stateName, interactionId,
+                answer, answerDetails, resolve, reject)
+        })
+    }
+}
+
+angular.module('oppia').factory('LearnerAnswerDetailsBackendApiService', downgradeInjectable(LearnerAnswerDetailsBackendApiService));
