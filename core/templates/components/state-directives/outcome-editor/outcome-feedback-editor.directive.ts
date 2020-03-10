@@ -40,7 +40,7 @@ angular.module('oppia').directive('outcomeFeedbackEditor', [
             type: 'html',
             ui_config: {
               hide_complex_extensions: (
-                ContextService.getPageContext() == 'topic_editor')
+                ContextService.getPageContext() === 'topic_editor')
             }
           };
         };
