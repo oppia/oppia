@@ -37,6 +37,7 @@ describe('Learner answer info service', function() {
   var mockInteractionRulesService = null;
   var ladbas = null;
   var LearnerAnswerInfoService = null;
+  var AnswerClassificationService = null;
   var DEFAULT_OUTCOME_CLASSIFICATION;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -142,6 +143,7 @@ describe('Learner answer info service', function() {
     oof = $injector.get('OutcomeObjectFactory');
     acrof = $injector.get('AnswerClassificationResultObjectFactory');
     LearnerAnswerInfoService = $injector.get('LearnerAnswerInfoService');
+    AnswerClassificationService = $injector.get('AnswerClassificationService');
     ladbas = $injector.get(
       'LearnerAnswerDetailsBackendApiService');
     DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
@@ -149,11 +151,10 @@ describe('Learner answer info service', function() {
     firstState = sof.createFromBackendDict('new state', stateDict);
     secondState = sof.createFromBackendDict('fake state', stateDict);
     thirdState = sof.createFromBackendDict('demo state', stateDict);
-    spyOn(
-      mockAnswerClassificationService,
-      'getMatchingClassificationResult').and.returnValue(acrof.createNew(
-      oof.createNew('default', 'default_outcome', '', []), 2, 0,
-      DEFAULT_OUTCOME_CLASSIFICATION));
+    spyOn(AnswerClassificationService, 'getMatchingClassificationResult')
+      .and.returnValue(acrof.createNew(
+        oof.createNew('default', 'default_outcome', '', []), 2, 0,
+        DEFAULT_OUTCOME_CLASSIFICATION));
     mockAnswer = 'This is my answer';
     mockInteractionRulesService = {
       Equals: function(answer, inputs) {
