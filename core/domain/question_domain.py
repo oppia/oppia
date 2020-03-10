@@ -326,7 +326,7 @@ class Question(python_utils.OBJECT):
             getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
                 current_state_schema_version, next_state_schema_version)))
 
-        if current_state_schema_version == 31:
+        if current_state_schema_version == 32:
             versioned_question_state['state'] = conversion_fn(
                 question_id, versioned_question_state['state'])
         else:
