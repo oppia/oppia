@@ -2696,18 +2696,25 @@ class CommunityReviewerEmailTest(test_utils.GenericTestBase):
             email_manager.send_email_to_new_community_reviewer(
                 self.translation_reviewer_id, 'invalid_category')
 
-    def test_all_category_keys_present_in_new_reviewer_email_data_constant(
-            self):
-        self.assertEqual(len(email_manager.NEW_REVIEWER_EMAIL_DATA), 3)
-        self.assertTrue(
-            constants.REVIEW_CATEGORY_TRANSLATION in (
-                email_manager.NEW_REVIEWER_EMAIL_DATA))
-        self.assertTrue(
-            constants.REVIEW_CATEGORY_VOICEOVER in (
-                email_manager.NEW_REVIEWER_EMAIL_DATA))
-        self.assertTrue(
-            constants.REVIEW_CATEGORY_QUESTION in (
-                email_manager.NEW_REVIEWER_EMAIL_DATA))
+    def test_schema_of_new_reviewer_email_data_constant(self):
+        self.assertEqual(sorted(email_manager.NEW_REVIEWER_EMAIL_DATA.keys()), [
+            constants.REVIEW_CATEGORY_QUESTION,
+            constants.REVIEW_CATEGORY_TRANSLATION,
+            constants.REVIEW_CATEGORY_VOICEOVER])
+
+        self.assertEqual(sorted(email_manager.NEW_REVIEWER_EMAIL_DATA[
+            constants.REVIEW_CATEGORY_QUESTION].keys()), [
+                'description', 'review_category', 'rights_message', 'to_check'])
+
+        self.assertEqual(sorted(email_manager.NEW_REVIEWER_EMAIL_DATA[
+            constants.REVIEW_CATEGORY_TRANSLATION].keys()), [
+                'description_template', 'review_category',
+                'rights_message_template', 'to_check'])
+
+        self.assertEqual(sorted(email_manager.NEW_REVIEWER_EMAIL_DATA[
+            constants.REVIEW_CATEGORY_VOICEOVER].keys()), [
+                'description_template', 'review_category',
+                'rights_message_template', 'to_check'])
 
     def test_send_assigned_translation_reviewer_email(self):
         expected_email_subject = (
@@ -2861,18 +2868,27 @@ class CommunityReviewerEmailTest(test_utils.GenericTestBase):
             email_manager.send_email_to_removed_community_reviewer(
                 self.translation_reviewer_id, 'invalid_category')
 
-    def test_all_category_keys_present_in_removed_reviewer_email_data_constant(
-            self):
-        self.assertEqual(len(email_manager.REMOVED_REVIEWER_EMAIL_DATA), 3)
-        self.assertTrue(
-            constants.REVIEW_CATEGORY_TRANSLATION in (
-                email_manager.REMOVED_REVIEWER_EMAIL_DATA))
-        self.assertTrue(
-            constants.REVIEW_CATEGORY_VOICEOVER in (
-                email_manager.REMOVED_REVIEWER_EMAIL_DATA))
-        self.assertTrue(
-            constants.REVIEW_CATEGORY_QUESTION in (
-                email_manager.REMOVED_REVIEWER_EMAIL_DATA))
+    def test_schema_of_removed_reviewer_email_data_constant(self):
+        self.assertEqual(
+            sorted(email_manager.REMOVED_REVIEWER_EMAIL_DATA.keys()), [
+                constants.REVIEW_CATEGORY_QUESTION,
+                constants.REVIEW_CATEGORY_TRANSLATION,
+                constants.REVIEW_CATEGORY_VOICEOVER])
+
+        self.assertEqual(sorted(email_manager.REMOVED_REVIEWER_EMAIL_DATA[
+            constants.REVIEW_CATEGORY_QUESTION].keys()), [
+                'contribution_allowed', 'review_category', 'rights_message',
+                'role_description'])
+
+        self.assertEqual(sorted(email_manager.REMOVED_REVIEWER_EMAIL_DATA[
+            constants.REVIEW_CATEGORY_VOICEOVER].keys()), [
+                'contribution_allowed', 'review_category',
+                'rights_message_template', 'role_description_template'])
+
+        self.assertEqual(sorted(email_manager.REMOVED_REVIEWER_EMAIL_DATA[
+            constants.REVIEW_CATEGORY_TRANSLATION].keys()), [
+                'contribution_allowed', 'review_category',
+                'rights_message_template', 'role_description_template'])
 
     def test_send_removed_translation_reviewer_email(self):
         expected_email_subject = (

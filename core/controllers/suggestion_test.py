@@ -915,16 +915,13 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
     def test_suggestion_to_skill_handler_with_invalid_action(self):
         self.login(self.ADMIN_EMAIL)
-
         csrf_token = self.get_new_csrf_token()
-
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id))['suggestions'][0]
 
         csrf_token = self.get_new_csrf_token()
-
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             response = self.put_json(
                 '%s/skill/%s/%s' % (
@@ -936,14 +933,11 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'], 'Invalid action.')
-
         self.logout()
 
     def test_reject_suggestion_to_skill(self):
         self.login(self.ADMIN_EMAIL)
-
         csrf_token = self.get_new_csrf_token()
-
         suggestion_to_reject = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
@@ -951,12 +945,10 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_reject['suggestion_id'])
-
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
 
         csrf_token = self.get_new_csrf_token()
-
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/skill/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
@@ -968,17 +960,13 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_reject['suggestion_id'])
-
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_REJECTED)
-
         self.logout()
 
     def test_accept_suggestion_to_skill(self):
         self.login(self.ADMIN_EMAIL)
-
         csrf_token = self.get_new_csrf_token()
-
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
@@ -986,12 +974,10 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_accept['suggestion_id'])
-
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
 
         csrf_token = self.get_new_csrf_token()
-
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/skill/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
@@ -1005,7 +991,6 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_accept['suggestion_id'])
-
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_ACCEPTED)
 
@@ -1013,9 +998,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
     def test_reviewer_accept_suggestion_to_skill(self):
         self.login(self.REVIEWER_EMAIL)
-
         csrf_token = self.get_new_csrf_token()
-
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
@@ -1023,12 +1006,10 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_accept['suggestion_id'])
-
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
 
         csrf_token = self.get_new_csrf_token()
-
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/skill/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
@@ -1042,10 +1023,8 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_accept['suggestion_id'])
-
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_ACCEPTED)
-
         self.logout()
 
 

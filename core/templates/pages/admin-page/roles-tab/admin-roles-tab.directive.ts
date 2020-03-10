@@ -66,6 +66,12 @@ angular.module('oppia').directive('adminRolesTab', [
           return languageDescriptions;
         };
 
+        ctrl.isLanguageSpecificReviewCategory = function(reviewCategory) {
+          return (
+            reviewCategory === REVIEW_CATEGORY_TRANSLATION ||
+            reviewCategory === REVIEW_CATEGORY_VOICEOVER);
+        };
+
         ctrl.submitRoleViewForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
@@ -234,9 +240,7 @@ angular.module('oppia').directive('adminRolesTab', [
                   if (this.category === null) {
                     return false;
                   }
-                  if (
-                    this.category === REVIEW_CATEGORY_TRANSLATION ||
-                    this.category === REVIEW_CATEGORY_VOICEOVER) {
+                  if (ctrl.isLanguageSpecificReviewCategory(this.category)) {
                     return Boolean(this.languageCode);
                   }
                   return true;
@@ -258,9 +262,7 @@ angular.module('oppia').directive('adminRolesTab', [
                 if (this.category === null) {
                   return false;
                 }
-                if (
-                  this.category === REVIEW_CATEGORY_TRANSLATION ||
-                  this.category === REVIEW_CATEGORY_VOICEOVER) {
+                if (ctrl.isLanguageSpecificReviewCategory(this.category)) {
                   return Boolean(this.languageCode);
                 }
                 return true;
@@ -281,9 +283,7 @@ angular.module('oppia').directive('adminRolesTab', [
                   if (this.category === null) {
                     return false;
                   }
-                  if (
-                    this.category === REVIEW_CATEGORY_TRANSLATION ||
-                    this.category === REVIEW_CATEGORY_VOICEOVER) {
+                  if (ctrl.isLanguageSpecificReviewCategory(this.category)) {
                     return Boolean(this.languageCode);
                   }
                   return true;

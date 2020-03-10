@@ -2126,15 +2126,17 @@ class UserCommunityRightsModel(base_models.BaseModel):
             dict. Dictionary of the data from UserCommunityRightsModel.
         """
         rights_model = cls.get_by_id(user_id)
-        if rights_model is not None:
-            return {
-                'can_review_translation_for_language_codes': (
-                    rights_model.can_review_translation_for_language_codes),
-                'can_review_voiceover_for_language_codes': (
-                    rights_model.can_review_voiceover_for_language_codes),
-                'can_review_questions': rights_model.can_review_questions
-            }
-        return {}
+
+        if rights_model is None:
+            return {}
+
+        return {
+            'can_review_translation_for_language_codes': (
+                rights_model.can_review_translation_for_language_codes),
+            'can_review_voiceover_for_language_codes': (
+                rights_model.can_review_voiceover_for_language_codes),
+            'can_review_questions': rights_model.can_review_questions
+        }
 
     @staticmethod
     def get_export_policy():

@@ -296,7 +296,7 @@ class UserCommunityRights(python_utils.OBJECT):
             can_review_voiceover_for_language_codes)
         self.can_review_questions = can_review_questions
 
-    def can_review_atleast_one_item(self):
+    def can_review_at_least_one_item(self):
         """Checks whether user has rights to review at least one item.
 
         Returns:

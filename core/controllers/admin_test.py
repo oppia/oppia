@@ -1590,17 +1590,6 @@ class CommunityReviewersHandlerTest(test_utils.GenericTestBase):
         self.assertTrue('translator' in response['usernames'])
         self.assertTrue('voiceartist' in response['usernames'])
 
-    def test_check_community_reviewer_with_invalid_language_code(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_json(
-            '/getcommunityreviewershandler', params={
-                'typereview_category': 'voiceover',
-                'language_code': 'invalid'
-            }, expected_status_int=400)
-
-        self.assertEqual(response['error'], 'Invalid language_code: invalid')
-        self.logout()
-
     def test_check_community_reviewer_by_question_reviewer_role(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         user_services.allow_user_to_review_question(self.question_reviewer_id)
@@ -1613,6 +1602,30 @@ class CommunityReviewersHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['usernames']), 2)
         self.assertTrue('question' in response['usernames'])
         self.assertTrue('voiceartist' in response['usernames'])
+
+    def test_check_community_reviewer_with_invalid_language_code_raise_error(
+            self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.get_json(
+            '/getcommunityreviewershandler', params={
+                'review_category': 'voiceover',
+                'language_code': 'invalid'
+            }, expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Invalid language_code: invalid')
+        self.logout()
+
+    def test_check_community_reviewer_with_invalid_review_category_raise_error(
+            self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.get_json(
+            '/getcommunityreviewershandler', params={
+                'review_category': 'invalid',
+                'language_code': 'hi'
+            }, expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Invalid review_category: invalid')
+        self.logout()
 
 
 class CommunityReviewerRightsDataHandlerTest(test_utils.GenericTestBase):

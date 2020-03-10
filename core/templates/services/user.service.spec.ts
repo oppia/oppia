@@ -90,10 +90,8 @@ describe('User Service', function() {
       username: 'tester',
       user_is_logged_in: true
     };
-
     $httpBackend.expect('GET', '/userinfohandler').respond(
       200, sampleUserInfoBackendObject);
-
     var sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
       sampleUserInfoBackendObject);
 
@@ -134,7 +132,6 @@ describe('User Service', function() {
       username: 'tester',
       user_is_logged_in: true
     };
-
     $httpBackend.expect('GET', '/userinfohandler').respond(
       200, sampleUserInfoBackendObject);
     var sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
@@ -161,7 +158,6 @@ describe('User Service', function() {
       username: 'tester',
       user_is_logged_in: false
     };
-
     $httpBackend.expect('GET', '/userinfohandler').respond(
       200, sampleUserInfoBackendObject);
     var sampleUserInfo = userInfoObjectFactory.createDefault();
@@ -169,7 +165,6 @@ describe('User Service', function() {
     UserService.getUserInfoAsync().then(function(userInfo) {
       expect(userInfo).toEqual(sampleUserInfo);
     });
-
     $httpBackend.flush();
   });
 
@@ -188,7 +183,6 @@ describe('User Service', function() {
     };
     $httpBackend.expect('GET', '/userinfohandler').respond(
       200, sampleUserInfoBackendObject);
-
     $httpBackend.expect('GET', requestUrl).respond(
       200, {profile_picture_data_url: 'image data'});
 
@@ -220,9 +214,9 @@ describe('User Service', function() {
         username: 'tester',
         user_is_logged_in: false
       };
-
       $httpBackend.expect('GET', '/userinfohandler').respond(
         200, sampleUserInfoBackendObject);
+
       UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
         expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
           '/avatar/user_blue_72px.png'));
@@ -233,9 +227,9 @@ describe('User Service', function() {
   it('should return the login url', function() {
     var loginUrl = '/login';
     var currentUrl = 'home';
-
     $httpBackend.expect('GET', '/url_handler?current_url=' + currentUrl)
       .respond({login_url: loginUrl});
+
     UserService.getLoginUrlAsync().then(function(dataUrl) {
       expect(dataUrl).toBe(loginUrl);
     });
@@ -277,7 +271,6 @@ describe('User Service', function() {
       voiceover: [],
       question: true
     };
-
     $httpBackend.expect('GET', '/usercommunityrightsdatahandler').respond(
       200, sampleUserCommunityRightsDict);
 
@@ -285,7 +278,6 @@ describe('User Service', function() {
         userCommunityRights) {
       expect(userCommunityRights).toEqual(sampleUserCommunityRightsDict);
     });
-
     $httpBackend.flush();
   });
 
@@ -296,7 +288,6 @@ describe('User Service', function() {
         voiceover: [],
         question: true
       };
-
       $httpBackend.expect('GET', '/usercommunityrightsdatahandler').respond(
         200, sampleUserCommunityRightsDict);
 

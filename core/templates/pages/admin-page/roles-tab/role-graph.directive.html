@@ -119,7 +119,7 @@
           </div>
 
           <div class="d-xl-inline-flex form-group"
-               ng-if="$ctrl.formData.viewCommunityReviewers.category === $ctrl.REVIEW_CATEGORIES.TRANSLATION || $ctrl.formData.viewCommunityReviewers.category === $ctrl.REVIEW_CATEGORIES.VOICEOVER">
+               ng-if="$ctrl.isLanguageSpecificReviewCategory($ctrl.formData.viewCommunityReviewers.category)">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
               <select ng-model="$ctrl.formData.viewCommunityReviewers.languageCode"
@@ -188,7 +188,7 @@
           </div>
 
           <div class="d-xl-inline-flex form-group"
-               ng-if="$ctrl.formData.addCommunityReviewer.category === $ctrl.REVIEW_CATEGORIES.TRANSLATION || $ctrl.formData.addCommunityReviewer.category === $ctrl.REVIEW_CATEGORIES.VOICEOVER">
+               ng-if="$ctrl.isLanguageSpecificReviewCategory($ctrl.formData.addCommunityReviewer.category)">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
               <select ng-model="$ctrl.formData.addCommunityReviewer.languageCode"
@@ -231,7 +231,7 @@
           </div>
 
           <div class="d-xl-inline-flex form-group"
-               ng-if="$ctrl.formData.removeCommunityReviewer.category === $ctrl.REVIEW_CATEGORIES.TRANSLATION || $ctrl.formData.removeCommunityReviewer.category === $ctrl.REVIEW_CATEGORIES.VOICEOVER">
+               ng-if="$ctrl.isLanguageSpecificReviewCategory($ctrl.formData.removeCommunityReviewer.category)">
             <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
               <select ng-model="$ctrl.formData.removeCommunityReviewer.languageCode"
