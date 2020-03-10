@@ -22,7 +22,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 
 from core.domain import exp_domain
+from core.domain import fs_domain
+from core.domain import fs_services
+from core.domain import html_validation_service
 from core.platform import models
+import feconf
 import python_utils
 import utils
 
@@ -80,6 +84,8 @@ def try_upgrading_draft_to_exp_version(
             logging.warning('%s is not implemented' % conversion_fn_name)
             return
         conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
+        if commit.commit_cmds[0]['from_version'] == 31:
+            conversion_fn = functools.partial(conversion_fn, exp_id)
         draft_change_list = conversion_fn(draft_change_list)
         upgrade_times += 1
     return draft_change_list
@@ -89,18 +95,119 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
-    def _convert_states_v31_dict_to_v32_dict(cls, draft_change_list):
+    def _convert_states_v31_dict_to_v32_dict(cls, exp_id, draft_change_list):
         """Converts draft change list from state version 30 to 31. State
         version 31 adds image dimensions to images inside collapsible
         blocks and tabs, for which there should be no changes to drafts.
 
         Args:
+            exp_id: str. Exploration id.
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
 
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
+        file_system_class = fs_services.get_entity_file_system_class()
+        file_system = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        for i, change in enumerate(draft_change_list):
+            # Changes for html in state content.
+            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                    change.property_name == exp_domain.STATE_PROPERTY_CONTENT):
+                html_string = change.new_value['html']
+                converted_html_string = (
+                    html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks( # pylint: disable=line-too-long
+                        file_system, html_string))
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': change.state_name,
+                    'new_value': {
+                        'content_id': change.new_value['content_id'],
+                        'html': converted_html_string
+                    }
+                })
+
+            # Changes for html in interaction answer groups.
+            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                    change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS): # pylint: disable=line-too-long
+                updated_answer_groups = []
+                for answer_group_index, answer_group in enumerate(
+                        change.new_value):
+                    outcome = (
+                        change.new_value[answer_group_index]['outcome'])
+                    html_string = outcome['feedback']['html']
+                    converted_html_string = (
+                        html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks( # pylint: disable=line-too-long
+                            file_system, html_string))
+                    outcome['feedback']['html'] = converted_html_string
+                    updated_answer_groups.append({
+                        'rule_specs': (
+                            change.new_value[answer_group_index]['rule_specs']),
+                        'outcome': outcome,
+                        'training_data': (
+                            change.new_value[answer_group_index]['training_data']),
+                        'tagged_skill_misconception_id': (
+                            change.new_value[answer_group_index]['tagged_skill_misconception_id']) # pylint: disable=line-too-long
+                    })
+
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                    'state_name': change.state_name,
+                    'new_value': updated_answer_groups
+                })
+
+            # Changes for html in hints.
+            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                    change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_HINTS): # pylint: disable=line-too-long
+                updated_hints = []
+                for hint_index, hint in enumerate(change.new_value):
+                    hint_content = change.new_value[hint_index]['hint_content']
+                    html_string = hint_content['html']
+                    converted_html_string = (
+                        html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks( # pylint: disable=line-too-long
+                            file_system, html_string))
+                    updated_hints.append({
+                        'hint_content': {
+                            'content_id': hint_content['content_id'],
+                            'html': converted_html_string
+                        }
+                    })
+
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_HINTS),
+                    'state_name': change.state_name,
+                    'new_value': updated_hints
+                })
+
+            # Changes for html in solution.
+            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                    change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION): # pylint: disable=line-too-long
+                html_string = change.new_value['explanation']['html']
+                converted_html_string = (
+                    html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks( # pylint: disable=line-too-long
+                        file_system, html_string))
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION),
+                    'state_name': change.state_name,
+                    'new_value': {
+                        'answer_is_exclusive': (
+                            change.new_value['answer_is_exclusive']),
+                        'correct_answer': change.new_value['correct_answer'],
+                        'explanation': {
+                            'content_id': (
+                                change.new_value['explanation']['content_id']),
+                            'html': converted_html_string 
+                        }
+                    }
+                })
         return draft_change_list
 
     @classmethod

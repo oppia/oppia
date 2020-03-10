@@ -32,6 +32,8 @@ import string
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
@@ -2158,10 +2160,13 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
+        file_system_class = fs_services.get_entity_file_system_class()
+        file_system = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id))
         for key, state_dict in states_dict.items():
             add_dimensions_to_image_tags = functools.partial(
-                html_validation_service.add_dimensions_to_image_tags, # pylint: disable=line-too-long
-                False, exp_id)
+                html_validation_service.add_dimensions_to_image_tags,
+                file_system)
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 add_dimensions_to_image_tags)
@@ -2171,7 +2176,7 @@ class Exploration(python_utils.OBJECT):
                 state_dict['interaction']['customization_args'][
                     'imageAndRegions']['value']['imagePath'] = (
                         html_validation_service.get_filename_with_dimensions(
-                            False, filename, exp_id))
+                            file_system, filename))
 
         return states_dict
 
@@ -2376,10 +2381,13 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
+        file_system_class = fs_services.get_entity_file_system_class()
+        file_system = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id))
         for key, state_dict in states_dict.items():
             add_dimensions_to_image_tags = functools.partial(
                 html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks, # pylint: disable=line-too-long
-                False, exp_id)
+                file_system)
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 add_dimensions_to_image_tags)

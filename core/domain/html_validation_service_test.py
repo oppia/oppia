@@ -1359,7 +1359,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         for test_case in test_cases:
             self.assertEqual(
                 html_validation_service.add_dimensions_to_image_tags(
-                    False, exp_id, test_case['html_content']),
+                    fs, test_case['html_content']),
                 test_case['expected_output'])
 
     # pylint: disable=anomalous-backslash-in-string
@@ -1550,7 +1550,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         for test_case in test_cases:
             self.assertEqual(
                 html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks( # pylint: disable=line-too-long
-                    False, exp_id, test_case['html_content']),
+                    fs, test_case['html_content']),
                 test_case['expected_output'])
 
     # pylint: disable=anomalous-backslash-in-string
@@ -1573,7 +1573,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
             'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
             'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
-            'quot;abc2_height_120_width_120.png&amp;amp;amp;quot;\&amp;quot;'
+            'quot;abc2_height_32_width_32.png&amp;amp;amp;quot;\&amp;quot;'
             '&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;'
             'p&amp;gt;You have opened the collapsible block.&amp;lt;/p'
             '&amp;gt;&amp;quot;" heading-with-value="&amp;quot;Sample '
@@ -1587,11 +1587,11 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+                feconf.ENTITY_TYPE_QUESTION, exp_id))
         fs.commit('image/abc2.png', raw_image, mimetype='image/png')
         self.assertEqual(
             html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks( # pylint: disable=line-too-long
-                True, exp_id, html_content), expected_output)
+                fs, html_content), expected_output)
 
     def test_add_dimensions_to_image_tags_with_invalid_filepath_with_value(
             self):
@@ -1624,12 +1624,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         with assert_raises_context_manager, logging_swap:
             html_validation_service.add_dimensions_to_image_tags(
-                False, exp_id, html_content)
+                fs, html_content)
 
         self.assertEqual(len(observed_log_messages), 1)
         self.assertEqual(
             observed_log_messages[0],
-            'Exploration exp_id failed to load image: abc1.png')
+            'exploration exp_id failed to load image: abc1.png')
 
     def test_add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks_with_invalid_filepath_with_value( # pylint: disable=line-too-long
             self):
@@ -1667,12 +1667,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         with assert_raises_context_manager, logging_swap:
             html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks( # pylint: disable=line-too-long
-                False, exp_id, html_content)
+                fs, html_content)
 
         self.assertEqual(len(observed_log_messages), 1)
         self.assertEqual(
             observed_log_messages[0],
-            'Exploration exp_id failed to load image: new.png')
+            'exploration exp_id failed to load image: new.png')
 
     def test_add_dimensions_to_image_tags_when_no_filepath_specified(self):
         test_cases = [{
@@ -1759,7 +1759,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         for test_case in test_cases:
             self.assertEqual(
                 html_validation_service.add_dimensions_to_image_tags(
-                    False, exp_id, test_case['html_content']),
+                    fs, test_case['html_content']),
                 test_case['expected_output'])
 
     def test_regenerate_image_filename_using_dimensions(self):

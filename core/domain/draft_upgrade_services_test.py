@@ -26,6 +26,7 @@ from core.domain import exp_services
 from core.tests import test_utils
 import feconf
 import utils
+import python_utils
 
 
 class DraftUpgradeUnitTests(test_utils.GenericTestBase):
@@ -125,13 +126,59 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
-                'property_name': 'content',
-                'new_value': 'new value'
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'new_value': {
+                    'html': 'html_content',
+                    'content_id': 'content_id'
+                }
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                'new_value': [{
+                    'rule_specs': [],
+                    'outcome': {
+                        'feedback': {
+                            'html': '<p>hi</p>',
+                            'content_id': 'cid'
+                        }
+                    },
+                    'training_data': [],
+                    'tagged_skill_misconception_id': None
+                }]
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                'new_value': [{
+                    'hint_content': {
+                        'html': 'html_content',
+                        'content_id': 'content_id'
+                    }
+                }]
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION),
+                'new_value': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': '',
+                    'explanation': {
+                        'content_id': 'cid',
+                        'html': '<p>hello</p>' 
+                    }
+                }
             })]
-        self.assertEqual(
-            draft_upgrade_services.DraftUpgradeUtil._convert_states_v31_dict_to_v32_dict(  # pylint: disable=protected-access,line-too-long
-                draft_change_list)[0].to_dict(),
-            draft_change_list[0].to_dict())
+        for i in python_utils.RANGE(len(draft_change_list)):
+            self.assertEqual(
+                draft_upgrade_services.DraftUpgradeUtil._convert_states_v31_dict_to_v32_dict(  # pylint: disable=protected-access,line-too-long
+                    'exp_id', draft_change_list)[i].to_dict(),
+                    draft_change_list[i].to_dict())
 
     def test_convert_states_v30_dict_to_v31_dict(self):
         draft_change_list = [

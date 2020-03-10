@@ -24,6 +24,8 @@ import functools
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import interaction_registry
@@ -259,9 +261,12 @@ class Question(python_utils.OBJECT):
         Returns:
             dict. The converted question_state_dict.
         """
+        file_system_class = fs_services.get_entity_file_system_class()
+        file_system = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_QUESTION, question_id))
         add_dimensions_to_image_tags = functools.partial(
             html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks, # pylint: disable=line-too-long
-            True, question_id)
+            file_system)
         question_state_dict = state_domain.State.convert_html_fields_in_state( # pylint: disable=line-too-long
             question_state_dict,
             add_dimensions_to_image_tags)
