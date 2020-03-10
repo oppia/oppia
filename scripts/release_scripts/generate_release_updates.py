@@ -163,9 +163,10 @@ def create_group_for_next_release():
         '3. Send the following message to oppia-dev:\n\n'
         'Hi all, We have completed the release for current month. '
         'This is a reminder to fill in the job requests here: '
-        'https://goo.gl/forms/XIj00RJ2h5L55XzU2 if you are planning '
+        '%s if you are planning '
         'to run your job in the next release. Thanks!\n' % (
-            release_constants.RELEASE_ROTA_URL))
+            release_constants.RELEASE_ROTA_URL,
+            release_constants.JOBS_FORM_URL))
 
 
 def main():
