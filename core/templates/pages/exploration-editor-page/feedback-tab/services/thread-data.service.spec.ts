@@ -109,7 +109,6 @@ describe('retrieving threads service', () => {
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.abc1',
         message_id: 0,
-        received_via_email: false,
         text: '1st message',
         updated_status: null,
         updated_subject: null
@@ -120,7 +119,6 @@ describe('retrieving threads service', () => {
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.abc1',
         message_id: 1,
-        received_via_email: false,
         text: '2nd message',
         updated_status: null,
         updated_subject: null

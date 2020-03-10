@@ -34,7 +34,6 @@ describe('ThreadMessageObjectFactory', () => {
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
-        received_via_email: false,
         text: 'message content',
         updated_status: null,
         updated_subject: null
@@ -45,7 +44,6 @@ describe('ThreadMessageObjectFactory', () => {
       expect(threadMessage.entityType).toEqual('exploration');
       expect(threadMessage.entityId).toEqual('exploration.exp1.thread1');
       expect(threadMessage.messageId).toEqual(1);
-      expect(threadMessage.receivedViaEmail).toBe(false);
       expect(threadMessage.text).toEqual('message content');
       expect(threadMessage.summary.authorUsername).toEqual('author');
       expect(threadMessage.summary.text).toEqual('message content');
@@ -63,7 +61,6 @@ describe('ThreadMessageObjectFactory', () => {
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
-        received_via_email: false,
         text: '',
         updated_status: null
       });
@@ -79,7 +76,6 @@ describe('ThreadMessageObjectFactory', () => {
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
-        received_via_email: false,
         text: '',
         updated_status: null
       });
@@ -97,7 +93,6 @@ describe('ThreadMessageObjectFactory', () => {
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
-        received_via_email: false,
         text: null,
         updated_subject: null
       });
@@ -113,7 +108,6 @@ describe('ThreadMessageObjectFactory', () => {
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
-        received_via_email: false,
         text: '',
         updated_subject: null
       });
@@ -131,7 +125,6 @@ describe('ThreadMessageObjectFactory', () => {
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
-        received_via_email: false,
         updated_status: null,
         updated_subject: null
       });
@@ -147,7 +140,6 @@ describe('ThreadMessageObjectFactory', () => {
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
-        received_via_email: false,
         updated_status: null,
         updated_subject: null
       });

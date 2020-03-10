@@ -91,7 +91,6 @@ describe('FeedbackThreadObjectFactory', () => {
             entity_type: 'exploration',
             entity_id: 'exploration.exp1.thread1',
             message_id: 1,
-            received_via_email: false,
             updated_status: null
           }),
           this.threadMessageObjectFactory.createFromBackendDict({
@@ -102,7 +101,6 @@ describe('FeedbackThreadObjectFactory', () => {
             entity_type: 'exploration',
             entity_id: 'exploration.exp1.thread1',
             message_id: 1,
-            received_via_email: false,
             updated_status: null
           })
         ];

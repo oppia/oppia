@@ -81,7 +81,6 @@ export class ThreadMessageObjectFactory {
       threadMessageBackendDict.author_username,
       threadMessageBackendDict.created_on, threadMessageBackendDict.entity_type,
       threadMessageBackendDict.entity_id, threadMessageBackendDict.message_id,
-      threadMessageBackendDict.received_via_email,
       threadMessageBackendDict.text, threadMessageBackendDict.updated_status,
       threadMessageBackendDict.updated_subject,
       this.threadMessageSummaryObjectFactory.createFromBackendDict(
