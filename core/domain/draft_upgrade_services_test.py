@@ -23,11 +23,13 @@ from core.domain import draft_upgrade_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
 import utils
 
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 class DraftUpgradeUnitTests(test_utils.GenericTestBase):
     """Test the draft upgrade services module."""
@@ -105,6 +107,26 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID),
+            self.DRAFT_CHANGELIST)
+
+    def test_try_upgrade_from_v32_to_v33(self):
+        exp_id = 'exp1'
+        self.save_new_exp_with_states_schema_v0(
+            exp_id, self.USER_ID, 'Old Title')
+        exploration_model = exp_models.ExplorationModel.get(
+            exp_id, strict=True, version=None)
+        for i in python_utils.RANGE(31):
+            exploration_model.commit(
+                self.USER_ID, 'Changed title.', [])
+        exploration_model.commit(
+            self.USER_ID, 'Migrate from v32 to v33', [{
+                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+                'from_version': 32,
+                'to_version': 33
+                }])
+        self.assertEqual(
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                self.DRAFT_CHANGELIST, 32, 33, exp_id),
             self.DRAFT_CHANGELIST)
 
 
