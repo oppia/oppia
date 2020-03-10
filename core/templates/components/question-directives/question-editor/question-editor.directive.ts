@@ -77,15 +77,6 @@ angular.module('oppia').directive('questionEditor', [
               'You can speak to the learner here, then ask them a question.');
           };
 
-          ctrl.getStateContentHtmlSchema = function() {
-            return {
-              type: 'html',
-              ui_config: {
-                hide_complex_extensions: true
-              }
-            };
-          };
-
           ctrl.navigateToState = function() {
             return;
           };

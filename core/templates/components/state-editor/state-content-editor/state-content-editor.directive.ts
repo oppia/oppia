@@ -26,6 +26,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
+require('services/context.service.ts');
 require('services/editability.service.ts');
 
 angular.module('oppia').directive('stateContentEditor', [
@@ -40,7 +41,6 @@ angular.module('oppia').directive('stateContentEditor', [
         };
       },
       scope: {
-        getStateContentHtmlSchema: '&stateContentHtmlSchema',
         getStateContentPlaceholder: '&stateContentPlaceholder',
         onSaveStateContent: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
@@ -49,11 +49,13 @@ angular.module('oppia').directive('stateContentEditor', [
         '/components/state-editor/state-content-editor/' +
         'state-content-editor.directive.html'),
       controller: [
-        '$scope', 'EditabilityService', 'EditorFirstTimeEventsService',
-        'StateContentService', 'StateEditorService',
+        '$scope', 'ContextService', 'EditabilityService',
+        'EditorFirstTimeEventsService', 'StateContentService',
+        'StateEditorService',
         function(
-            $scope, EditabilityService, EditorFirstTimeEventsService,
-            StateContentService, StateEditorService) {
+            $scope, ContextService, EditabilityService,
+            EditorFirstTimeEventsService, StateContentService,
+            StateEditorService) {
           var ctrl = this;
           $scope.isCardHeightLimitReached = function() {
             var shadowPreviewCard = $(
@@ -98,8 +100,12 @@ angular.module('oppia').directive('stateContentEditor', [
             $scope.contentEditorIsOpen = false;
           };
           ctrl.$onInit = function() {
-            $scope.HTML_SCHEMA = $scope.getStateContentHtmlSchema() || {
-              type: 'html'
+            $scope.HTML_SCHEMA = {
+              type: 'html',
+              ui_config: {
+                hide_complex_extensions: (
+                  ContextService.getPageContext() == 'topic_editor')
+              }
             };
             $scope.contentId = null;
             $scope.StateContentService = StateContentService;
