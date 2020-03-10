@@ -154,7 +154,7 @@ angular.module('oppia').factory('ThreadDataService', [
                 dict, suggestionBackendDictsByThreadId.get(dict.thread_id)))
           };
         },
-        () => $q.reject('Error on retriving feedback threads.'));
+        () => $q.reject('Error on retrieving feedback threads.'));
       },
 
       fetchMessages: function(
@@ -258,7 +258,7 @@ angular.module('oppia').factory('ThreadDataService', [
             action === ACTION_ACCEPT_SUGGESTION ? STATUS_FIXED : STATUS_IGNORED;
           openThreadsCount -= 1;
           // TODO(#8678): Update the cache with the message
-          // instead of fetching the messages everytime from the backend
+          // instead of fetching the messages every time from the backend
           return this.fetchMessages(thread);
         });
       }
