@@ -25,6 +25,7 @@ import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 describe('Text Input Prediction Service', () => {
@@ -32,7 +33,12 @@ describe('Text Input Prediction Service', () => {
   let $scope = null;
 
   beforeEach(angular.mock.module('oppia'));
-
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
   describe('Test text prediction service', () => {
     let predictionService: TextInputPredictionService;
     beforeEach(() => {

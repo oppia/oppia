@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for the splash page.
  */
+import { UpgradedServices } from 'services/UpgradedServices';
 
 const constants = require('constants.ts');
 
@@ -31,6 +32,12 @@ describe('Splash Page', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('WindowRef', windowRefMock);
   }));
