@@ -34,7 +34,8 @@ export class FeedbackMessageSummary {
   constructor(
       messageId: number, text: string, updatedStatus: string,
       suggestionHtml: string, currentContentHtml: string, description: string,
-      authorUsername: string, authorPictureDataUrl: string, createdOnMsecs: Date) {
+      authorUsername: string, authorPictureDataUrl: string,
+      createdOnMsecs: number) {
     this.messageId = messageId;
     this.text = text;
     this.updatedStatus = updatedStatus;
