@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import functools
 import logging
 
 from core.domain import exp_domain
@@ -133,8 +134,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS): # pylint: disable=line-too-long
                 updated_answer_groups = []
-                for answer_group_index, answer_group in enumerate(
-                        change.new_value):
+                for answer_group_index in python_utils.RANGE(
+                        len(change.new_value)):
                     outcome = (
                         change.new_value[answer_group_index]['outcome'])
                     html_string = outcome['feedback']['html']
@@ -147,7 +148,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                             change.new_value[answer_group_index]['rule_specs']),
                         'outcome': outcome,
                         'training_data': (
-                            change.new_value[answer_group_index]['training_data']),
+                            change.new_value[answer_group_index]['training_data']), # pylint: disable=line-too-long
                         'tagged_skill_misconception_id': (
                             change.new_value[answer_group_index]['tagged_skill_misconception_id']) # pylint: disable=line-too-long
                     })
@@ -164,7 +165,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_HINTS): # pylint: disable=line-too-long
                 updated_hints = []
-                for hint_index, hint in enumerate(change.new_value):
+                for hint_index in python_utils.RANGE(len(change.new_value)):
                     hint_content = change.new_value[hint_index]['hint_content']
                     html_string = hint_content['html']
                     converted_html_string = (
@@ -204,7 +205,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         'explanation': {
                             'content_id': (
                                 change.new_value['explanation']['content_id']),
-                            'html': converted_html_string 
+                            'html': converted_html_string
                         }
                     }
                 })

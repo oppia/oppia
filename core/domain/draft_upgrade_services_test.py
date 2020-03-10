@@ -25,8 +25,8 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.tests import test_utils
 import feconf
-import utils
 import python_utils
+import utils
 
 
 class DraftUpgradeUnitTests(test_utils.GenericTestBase):
@@ -170,7 +170,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     'correct_answer': '',
                     'explanation': {
                         'content_id': 'cid',
-                        'html': '<p>hello</p>' 
+                        'html': '<p>hello</p>'
                     }
                 }
             })]
@@ -178,7 +178,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 draft_upgrade_services.DraftUpgradeUtil._convert_states_v32_dict_to_v33_dict(  # pylint: disable=protected-access,line-too-long
                     'exp_id', draft_change_list)[i].to_dict(),
-                    draft_change_list[i].to_dict())
+                draft_change_list[i].to_dict())
 
     def test_convert_states_v31_dict_to_v32_dict(self):
         draft_change_list = [
