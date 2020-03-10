@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for DebouncerService.
  */
-import { TestBed, fakeAsync, tick, flush } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { DebouncerService } from 'services/debouncer.service';
 import { LoggerService } from 'services/contextual/logger.service';
 
@@ -31,21 +31,25 @@ describe('Debouncer service', () => {
     loggerServiceSpy = spyOn(ls, 'log').and.callThrough();
   });
 
-  it('should call function after 5 seconds', fakeAsync(() => {
+  it('should call function after 5 seconds', () => {
+    // ref: https://github.com/gruntjs/grunt-contrib-jasmine/issues/213
+    jasmine.clock().uninstall();
+    jasmine.clock().install();
     const fnToBeCalled = () => ls.log('function was called');
     ds.debounce(fnToBeCalled, 5)();
-    // Flush 500 times. The number 500 was choosen because after 500
-    // times all the possible setTimeout calls will be already executated.
-    flush(500);
-
+    // Ticks for 10 seconds so all the setTimeout calls will be executed.
+    jasmine.clock().tick(10000);
+    jasmine.clock().uninstall();
     expect(loggerServiceSpy).toHaveBeenCalled();
-  }));
+  });
 
-  it('should call function instantly', fakeAsync(() => {
+  it('should call function instantly', () => {
+    jasmine.clock().uninstall();
+    jasmine.clock().install();
     const fnToBeCalled = () => ls.log('function was called');
     ds.debounce(fnToBeCalled, 0)();
-    flush(1);
-
+    jasmine.clock().tick(0);
+    jasmine.clock().uninstall();
     expect(loggerServiceSpy).toHaveBeenCalled();
-  }));
+  });
 });
