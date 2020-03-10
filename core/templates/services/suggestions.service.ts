@@ -21,6 +21,7 @@ import { Injectable } from '@angular/core';
 
 @Injectable({providedIn: 'root'})
 export class SuggestionsService {
+  // TODO(#7165): Replace 'any' with the exact type.
   getThreadIdFromSuggestionBackendDict(suggestionBackendDict: any): string {
     return suggestionBackendDict.suggestion_id;
   }

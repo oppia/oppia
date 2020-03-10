@@ -123,10 +123,6 @@ export class SuggestionThreadObjectFactory {
   createFromBackendDicts(
       suggestionThreadBackendDict: any,
       suggestionBackendDict: any): SuggestionThread {
-    let lastNonemptyMessageSummaryBackendDict = {
-      text: suggestionThreadBackendDict.last_nonempty_message_text,
-      author_username: suggestionThreadBackendDict.last_nonempty_message_author
-    };
     return new SuggestionThread(
       suggestionThreadBackendDict.status, suggestionThreadBackendDict.subject,
       suggestionThreadBackendDict.summary,
@@ -134,8 +130,9 @@ export class SuggestionThreadObjectFactory {
       suggestionThreadBackendDict.last_updated,
       suggestionThreadBackendDict.message_count,
       suggestionThreadBackendDict.thread_id,
-      this.threadMessageSummaryObjectFactory.createFromBackendDict(
-        lastNonemptyMessageSummaryBackendDict),
+      this.threadMessageSummaryObjectFactory.createNew(
+        suggestionThreadBackendDict.last_nonempty_message_author,
+        suggestionThreadBackendDict.last_nonempty_message_text),
       this.createEditExplorationStateContentSuggestionFromBackendDict(
         suggestionBackendDict));
   }

@@ -41,9 +41,13 @@ export class ThreadMessageSummaryObjectFactory {
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
   createFromBackendDict(threadMessageBackendDict: any): ThreadMessageSummary {
-    return new ThreadMessageSummary(
+    return this.createNew(
       threadMessageBackendDict.author_username,
       threadMessageBackendDict.text);
+  }
+
+  createNew(authorUsername: string, text: string): ThreadMessageSummary {
+    return new ThreadMessageSummary(authorUsername, text);
   }
 }
 

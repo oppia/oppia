@@ -26,6 +26,16 @@ describe('Thread message summary object factory', () => {
     this.factory = TestBed.get(ThreadMessageSummaryObjectFactory);
   });
 
+  describe('.createNew', () => {
+    it('should create new thread message summary from arguments.', () => {
+      let threadMessageSummary =
+        this.factory.createNew('author', 'message content');
+
+      expect(threadMessageSummary.authorUsername).toEqual('author');
+      expect(threadMessageSummary.text).toEqual('message content');
+    });
+  });
+
   describe('.createFromBackendDict', () => {
     it('should create new thread message summary from a backend dict.', () => {
       let threadMessageSummary = this.factory.createFromBackendDict({

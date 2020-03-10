@@ -26,13 +26,6 @@ require(
 require('domain/state/StateObjectFactory.ts');
 
 describe('Learner answer info service', function() {
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
   var sof = null;
   var oof = null;
   var acrof = null;
@@ -40,20 +33,21 @@ describe('Learner answer info service', function() {
   var firstState = null;
   var secondState = null;
   var thirdState = null;
-  var mockAnswerClassificationService = null;
   var mockAnswer = null;
   var mockInteractionRulesService = null;
   var ladbas = null;
   var LearnerAnswerInfoService = null;
   var DEFAULT_OUTCOME_CLASSIFICATION;
 
-  beforeEach(angular.mock.module(function($provide) {
-    mockAnswerClassificationService = {
-      getMatchingClassificationResult: function() {},
-    };
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
 
-    $provide.value(
-      'AnswerClassificationService', mockAnswerClassificationService);
+    $provide.value('AnswerClassificationService', {
+      getMatchingClassificationResult: function() {},
+    });
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

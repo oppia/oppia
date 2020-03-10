@@ -85,10 +85,6 @@ export class FeedbackThreadObjectFactory {
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
   createFromBackendDict(feedbackThreadBackendDict: any): FeedbackThread {
-    let lastNonemptyMessageSummaryBackendDict = {
-      text: feedbackThreadBackendDict.last_nonempty_message_text,
-      author_username: feedbackThreadBackendDict.last_nonempty_message_author
-    };
     return new FeedbackThread(
       feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
       feedbackThreadBackendDict.summary,
@@ -97,8 +93,9 @@ export class FeedbackThreadObjectFactory {
       feedbackThreadBackendDict.message_count,
       feedbackThreadBackendDict.state_name,
       feedbackThreadBackendDict.thread_id,
-      this.threadMessageSummaryObjectFactory.createFromBackendDict(
-        lastNonemptyMessageSummaryBackendDict));
+      this.threadMessageSummaryObjectFactory.createNew(
+        feedbackThreadBackendDict.last_nonempty_message_author,
+        feedbackThreadBackendDict.last_nonempty_message_text));
   }
 }
 
