@@ -103,8 +103,7 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
             'message_id': self.MESSAGE_ID,
             'text': 'a message text',
             'updated_status': 'open',
-            'updated_subject': 'an updated subject',
-            'received_via_email': False
+            'updated_subject': 'an updated subject'
         }
         observed_message = feedback_domain.FeedbackMessage(
             self.FULL_MESSAGE_ID, self.THREAD_ID, self.MESSAGE_ID,

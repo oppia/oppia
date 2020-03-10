@@ -194,8 +194,7 @@ class FeedbackMessage(python_utils.OBJECT):
             'message_id': self.message_id,
             'text': self.text,
             'updated_status': self.updated_status,
-            'updated_subject': self.updated_subject,
-            'received_via_email': self.received_via_email
+            'updated_subject': self.updated_subject
         }
 
 
