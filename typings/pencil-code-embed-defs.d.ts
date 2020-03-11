@@ -1,6 +1,6 @@
 // Code - https://pencilcode.net/lib/pencilcodeembed.js
-// Type definitions are only added for PencilCodeEmbed class
-// since it is the only class used in our codebase.
+// Type definitions are only added for PencilCodeEmbed class since it is the
+// only class used in our codebase.
 
 interface SetupCode {
   code: String,
@@ -13,10 +13,10 @@ class PencilCodeEmbed {
   callbacks: Object;
   requests: Object;
 
-  // Hook up noop event handlers
+  // Hook up noop event handlers.
   on: (tag: String, callback: Function) => void;
 
-  // Send messages to the remote iframe
+  // Send messages to the remote iframe.
   invokeRemote: (
     method: String, args: Array<Object>, callback: Function) => PencilCodeEmbed;
 
@@ -31,55 +31,55 @@ class PencilCodeEmbed {
   // pce.setupScript([{code: 'write "welcome"', type: 'text/coffeescript'}])
   setupScript: (setup: SetupCode[]) => PencilCodeEmbed;
 
-  // Sets code into the editor
+  // Sets code into the editor.
   setCode: (code: String) => PencilCodeEmbed;
 
-  // Gets code from the editor
+  // Gets code from the editor.
   getCode: () => String;
 
-  // Starts running
+  // Starts running.
   beginRun: () => PencilCodeEmbed;
 
-  // Interrupts a run in progress
+  // Interrupts a run in progress.
   stopRun: () => PencilCodeEmbed;
 
-  // Brings up save UI
+  // Brings up save UI.
   save: () => PencilCodeEmbed;
 
-  // Makes editor editable
+  // Makes editor editable.
   setEditable: () => PencilCodeEmbed;
 
-  // Makes editor read only
+  // Makes editor read only.
   setReadOnly: () => PencilCodeEmbed;
 
-  // Hides editor
+  // Hides editor.
   hideEditor: () => PencilCodeEmbed;
 
-  // Shows editor
+  // Shows editor.
   showEditor: () => PencilCodeEmbed;
 
-  // Hides middle button
+  // Hides middle button.
   hideMiddleButton: () => PencilCodeEmbed;
 
-  // Shows middle button
+  // Shows middle button.
   showMiddleButton: () => PencilCodeEmbed;
 
-  // Hides toggle button
+  // Hides toggle button.
   hideToggleButton: () => PencilCodeEmbed;
 
-  // Shows toggle button
+  // Shows toggle button.
   showToggleButton: () => PencilCodeEmbed;
 
-  // Show butter bar notification
+  // Show butter bar notification.
   showNotification: (message: String) => PencilCodeEmbed;
 
-  // Hides butter bar notification
+  // Hides butter bar notification.
   hideNotification: () => PencilCodeEmbed;
 
-  // Shows block mode
+  // Shows block mode.
   setBlockMode: (showBlocks: Object) => PencilCodeEmbed;
 
-  // Shows block mode
+  // Shows block mode.
   setBlockOptions: (palette: Object, options: Object) => PencilCodeEmbed;
 
   eval: (code: String, callback: Function, raw: Object) => PencilCodeEmbed;
