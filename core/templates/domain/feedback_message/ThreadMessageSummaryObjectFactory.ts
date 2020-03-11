@@ -29,7 +29,7 @@ export class ThreadMessageSummary {
     this.text = text;
   }
 
-  isNonempty(): boolean {
+  isTextNonempty(): boolean {
     return this.text.length > 0;
   }
 }

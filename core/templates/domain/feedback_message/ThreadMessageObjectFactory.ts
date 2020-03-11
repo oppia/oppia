@@ -49,7 +49,7 @@ export class ThreadMessage {
     this.summary = summary;
   }
 
-  isNonempty(): boolean {
+  isTextNonempty(): boolean {
     return this.text.length > 0;
   }
 
