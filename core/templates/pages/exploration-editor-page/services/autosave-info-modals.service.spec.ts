@@ -62,18 +62,18 @@ describe('AutosaveInfoModalsService', function() {
       AutosaveInfoModalsService.isModalOpen(false);
     });
 
-  it('should handler reject when closing non strict validation fail modal' +
-    ' throw error', function() {
-    AutosaveInfoModalsService.isModalOpen(false);
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
-    AutosaveInfoModalsService.showNonStrictValidationFailModal();
-    AutosaveInfoModalsService.isModalOpen(true);
-    $rootScope.$apply();
+  it('should handle rejects when closing non strict validation fail modal',
+    function() {
+      AutosaveInfoModalsService.isModalOpen(false);
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject()
+      });
+      AutosaveInfoModalsService.showNonStrictValidationFailModal();
+      AutosaveInfoModalsService.isModalOpen(true);
+      $rootScope.$apply();
 
-    AutosaveInfoModalsService.isModalOpen(false);
-  });
+      AutosaveInfoModalsService.isModalOpen(false);
+    });
 
   it('should call $uibModal open when opening version mismatch' +
     ' modal', function() {
@@ -94,18 +94,18 @@ describe('AutosaveInfoModalsService', function() {
     AutosaveInfoModalsService.isModalOpen(false);
   });
 
-  it('should handler reject when closing version mismatch modal throw error',
-    function() {
-      AutosaveInfoModalsService.isModalOpen(false);
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
-      });
-      AutosaveInfoModalsService.showVersionMismatchModal(lostChanges);
-      AutosaveInfoModalsService.isModalOpen(true);
-      $rootScope.$apply();
-
-      AutosaveInfoModalsService.isModalOpen(false);
+  it('should handle rejects when closing version mismatch modal and throw' +
+    ' error', function() {
+    AutosaveInfoModalsService.isModalOpen(false);
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
     });
+    AutosaveInfoModalsService.showVersionMismatchModal(lostChanges);
+    AutosaveInfoModalsService.isModalOpen(true);
+    $rootScope.$apply();
+
+    AutosaveInfoModalsService.isModalOpen(false);
+  });
 
   it('should call $uibModal open when opening show lost changes modal',
     function() {
