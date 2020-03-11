@@ -55,6 +55,8 @@ var testSuite = [{
   interactionArguments: ['# You can enter the Code below'],
   ruleArguments: ['CodeEquals', 'print("Hello World")'],
   expectedInteractionDetails: ['# You can enter the Code below'],
+  // For testing purposes it is required that the order of
+  // the quotes is double-quotes within single-quotes
   wrongAnswers: ['print("Hello")'],
   correctAnswers: ['print("Hello World")']
 }];
