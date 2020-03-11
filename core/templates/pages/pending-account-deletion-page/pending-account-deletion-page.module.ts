@@ -63,7 +63,7 @@ const bootstrapFn = (extraProviders: StaticProvider[]) => {
 };
 const downgradedModule = downgradeModule(bootstrapFn);
 
-declare var angular: any;
+declare var angular: ng.IAngularStatic;
 
 angular.module('oppia', [
   require('angular-cookies'), 'pascalprecht.translate', 'toastr',
