@@ -308,6 +308,7 @@ FULLY_COVERED_FILENAMES = [
     'state-customization-args.service.ts',
     'state-editor.constants.ajs.ts',
     'state-editor.constants.ts',
+    'state-hints.service.ts',
     'state-interaction-id.service.ts',
     'state-recorded-voiceovers.service.ts',
     'state-rules-stats.service.ts',
