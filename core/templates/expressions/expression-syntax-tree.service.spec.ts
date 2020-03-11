@@ -42,7 +42,8 @@ describe('Expression syntax tree service', () => {
     }));
 
     it('should throw if environment is not found', () => {
-      expect(() => ExpressionSyntaxTreeService.lookupEnvs('', [])).toThrow();
+      expect(() => ExpressionSyntaxTreeService.lookupEnvs('', []))
+      .toThrowError();
     });
 
     it('should return the correct environment if exists', () => {

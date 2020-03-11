@@ -239,7 +239,7 @@ describe('HintsAndSolutionManager service', function() {
     // were cleaned.
     expect(function() {
       $timeout.flush();
-    }).toThrow(Error('No deferred tasks to be flushed'));
+    }).toThrowError('No deferred tasks to be flushed');
     $timeout.verifyNoPendingTasks();
   });
 

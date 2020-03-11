@@ -724,8 +724,7 @@ describe('Match expression to expression template', function() {
           category: category
         };
       };
-      sharedErrorWrapper.prototype = Error.prototype;
-
+      
       it('should accept and build examples correctly', function() {
         expect(
           buildThenDisplay(

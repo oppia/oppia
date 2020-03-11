@@ -38,11 +38,6 @@ var logicProofShared = (function() {
     this.code = code;
     this.parameters = parameters || {};
   };
-  //please see this 
-  //https://stackoverflow.com/questions/
-  //783818/how-do-i-create-a-custom-error-in-javascript
-  UserError.prototype = Error.prototype;
-  UserError.prototype.name = 'UserError';
 
   // These errors already have messages which are user-readable.
   var PreRenderedUserError = function(messages, code) {
@@ -50,8 +45,6 @@ var logicProofShared = (function() {
     this.messages = messages;
     this.code = code;
   };
-  PreRenderedUserError.prototype = Error.prototype;
-  PreRenderedUserError.prototype.name = 'PreRenderedUserError';
   // TODO(Jacob): Make these errors prototype from Error()
 
   /** Converts a message template into a string to show to the user.
@@ -82,7 +75,7 @@ var logicProofShared = (function() {
             message += displayExpression(parameter, language.operators);
             break;
           default:
-            throw new Error(
+            throw Error(
               'Unknown format ' + parameterFormat +
               ' sent to renderGeneralMessage().');
         }
@@ -115,7 +108,7 @@ var logicProofShared = (function() {
       return error.messages[
         Math.floor((Math.random() * error.messages.length))];
     } else {
-      throw new Error(error);
+      throw error;
     }
   };
 
@@ -200,7 +193,7 @@ var logicProofShared = (function() {
       expression.top_kind_name === 'variable') {
       return symbol;
     } else {
-      throw new Error(
+      throw Error(
         'Unknown kind ' + expression.top_kind_name +
         ' sent to displayExpression()');
     }
@@ -632,7 +625,7 @@ var logicProofShared = (function() {
         err.parameters.operator = untypedExpression.top_operator_name;
         err.parameters.input_category = 'arguments';
         err.parameters.amount_typed = [];
-        throw new Error(err);
+        throw err;
       }
 
       try {
@@ -642,7 +635,7 @@ var logicProofShared = (function() {
         err.parameters.operator = untypedExpression.top_operator_name;
         err.parameters.input_category = 'dummies';
         err.parameters.amount_typed = [];
-        throw new Error(err);
+        throw err;
       }
       var updatedOperators = {};
       for (var key in operators) {
@@ -753,7 +746,7 @@ var logicProofShared = (function() {
         } catch (err) {
           if (bestAttemptSoFar !== undefined &&
               !bestAttemptSoFar.hasOwnProperty('parameters')) {
-            throw new Error(bestAttemptSoFar);
+            throw bestAttemptSoFar;
           }
           if (bestAttemptSoFar === undefined ||
               greaterThanInLex(
@@ -767,7 +760,7 @@ var logicProofShared = (function() {
     if (results.length > 0) {
       return results;
     } else {
-      throw new Error(bestAttemptSoFar);
+      throw bestAttemptSoFar;
     }
   };
 
@@ -825,7 +818,7 @@ var logicProofShared = (function() {
           }
         } catch (err) {
           if (!err.hasOwnProperty('parameters')) {
-            throw new Error(err);
+            throw err;
           }
           var amountTyped = [i].concat(err.parameters.amount_typed);
           if (bestAttemptSoFar === undefined ||
@@ -850,7 +843,7 @@ var logicProofShared = (function() {
       }
       return result;
     } else {
-      throw new Error(bestAttemptSoFar);
+      throw bestAttemptSoFar;
     }
   };
 
@@ -943,7 +936,7 @@ var logicProofShared = (function() {
         return seekTypeInExpression(array[i], operator);
       } catch (err) {}
     }
-    throw new UserError('unknown_typing_error', {
+    throw UserError('unknown_typing_error', {
       array: array
     });
   };
