@@ -66,6 +66,11 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         Returns:
             optional((str, (str, str)).
         """
+        if model_class.get_by_id(new_user_id) is not None:
+            # Some models can be already migrated and there is no need to
+            # migrate them again.
+            return ('ALREADY MIGRATED', (old_user_id, new_user_id))
+
         old_model = model_class.get_by_id(old_user_id)
         if not old_model:
             # Some models are defined only for some users (for example
@@ -159,11 +164,10 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(user_model):
         """Implements the map function for this job."""
-        if user_model.id != user_model.gae_id:
-            yield ('ALREADY DONE', (user_model.gae_id, ''))
-            return
-        old_user_id = user_model.id
+        old_user_id = user_model.gae_id
         new_user_id = user_models.UserSettingsModel.get_new_id('')
+        if user_model.id != user_model.gae_id:
+            new_user_id = user_model.id
         for model_class in models.Registry.get_all_storage_model_classes():
             if (model_class.get_user_id_migration_policy() ==
                     base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE):

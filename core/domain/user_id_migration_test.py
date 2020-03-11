@@ -60,9 +60,11 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         """Get successfully migrated model IDs."""
         for item in job_output:
             if item[0] == 'SUCCESS':
-                migrated_model_ids = sorted(item[1], key=lambda item: item[0])
-                migrated_model_ids = [item[1] for item in migrated_model_ids]
-        return migrated_model_ids
+                migrated_model_ids = (
+                    sorted(list(set(item[1])), key=lambda id_set: id_set[0]))
+                print(migrated_model_ids)
+                migrated_model_ids = [model[1] for model in migrated_model_ids]
+                return migrated_model_ids
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
@@ -93,9 +95,10 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
 
     def test_repeated_migration(self):
-        self._run_one_off_job()
         output = self._run_one_off_job()
-        self.assertIn(['ALREADY DONE', [(self.user_a_id, '')]], output)
+        id_set = output[0][1][1]
+        output = self._run_one_off_job()
+        self.assertIn(['ALREADY MIGRATED', [id_set, id_set]], output)
 
     def test_one_user_user_settings_model(self):
         original_model = user_models.UserSettingsModel(
@@ -171,6 +174,7 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         original_models[-1].put()
         original_models.sort(key=lambda model: model.id)
 
+        print(original_models)
         migrated_model_ids = self._get_migrated_model_ids(
             self._run_one_off_job())
         for i, model_id in enumerate(migrated_model_ids):
