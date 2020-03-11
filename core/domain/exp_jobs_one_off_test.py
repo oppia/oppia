@@ -1529,24 +1529,26 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
 
-        hint_list1 = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state1</p>'
-            }
-        }, {
-            'hint_content': {
-                'content_id': 'hint2',
-                'html': '<p>Hello, this is html2 for state1</p>'
-            }
-        }]
+        hint_list1 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state1</p>'
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint2', '<p>Hello, this is html2 for state1</p>'
+                )
+            ),
+        ]
 
-        hint_list2 = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
+        hint_list2 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state2</p>'
+                )
+            )
+        ]
 
         state1.update_interaction_hints(hint_list1)
         state2.update_interaction_hints(hint_list2)
@@ -1577,24 +1579,23 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         state1 = exploration1.states['State1']
         state2 = exploration1.states['State2']
 
-        hint_list1 = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state1</p>'
-            }
-        }, {
-            'hint_content': {
-                'content_id': 'hint2',
-                'html': '<p>Hello, this is html2 for state1</p>'
-            }
-        }]
-
-        hint_list2 = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
+        hint_list1 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state1</p>')
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint2', '<p>Hello, this is html2 for state1</p>')
+            ),
+        ]
+        hint_list2 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state2</p>'
+                )
+            )
+        ]
 
         state1.update_interaction_hints(hint_list1)
 
@@ -1609,12 +1610,13 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
 
         state1 = exploration2.states['State1']
 
-        hint_list1 = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state1</p>'
-            }
-        }]
+        hint_list1 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state1</p>'
+                )
+            ),
+        ]
 
         state1.update_interaction_hints(hint_list1)
 
@@ -1649,17 +1651,18 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
 
         state1 = exploration.states['State1']
 
-        hint_list = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state1</p>'
-            }
-        }, {
-            'hint_content': {
-                'content_id': 'hint2',
-                'html': '<p>Hello, this is html2 for state1</p>'
-            }
-        }]
+        hint_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state1</p>'
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint2', '<p>Hello, this is html2 for state1</p>'
+                )
+            )
+        ]
 
         state1.update_interaction_hints(hint_list)
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -2039,143 +2042,3 @@ class InteractionCustomizationArgsValidationJobTests(
             '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
 
         self.assertEqual(actual_output, expected_output)
-
-
-class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
-    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
-        exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob]
-
-    EXP_ID = 'exp_id'
-
-    USERNAME_A = 'usernamea'
-    USERNAME_B = 'usernameb'
-    EMAIL_A = 'emaila@example.com'
-    EMAIL_B = 'emailb@example.com'
-
-    def setUp(self):
-        super(TranslatorToVoiceArtistOneOffJobTests, self).setUp()
-        self.signup(self.EMAIL_A, self.USERNAME_A)
-        self.signup(self.EMAIL_B, self.USERNAME_B)
-
-        self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
-        self.user_b_id = self.get_user_id_from_email(self.EMAIL_B)
-
-    def test_action_is_performed_when_translator_ids_exists(self):
-        """Test translator_ids are migrated to voice_artist_ids successfully."""
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.user_a_id, title='Exploration Title 1')
-
-        rights_manager.create_new_exploration_rights(
-            exploration.id, self.user_a_id)
-        exp_rights_model = exp_models.ExplorationRightsModel.get(
-            exploration.id)
-        exp_rights_model.translator_ids = [self.user_a_id, self.user_b_id]
-        commit_message = 'Assign a translator for test'
-        commit_cmds = [{
-            'cmd': 'change_role',
-            'assignee_id': self.user_a_id,
-            'new_role': 'translator'
-            }, {
-                'cmd': 'change_role',
-                'assignee_id': self.user_b_id,
-                'new_role': 'translator'
-            }]
-        exp_rights_model.commit(self.user_a_id, commit_message, commit_cmds)
-
-        exp_summary_model = exp_models.ExpSummaryModel(
-            id=exploration.id,
-            title='title',
-            category='category',
-            objective='Old objective',
-            language_code='en',
-            community_owned=exp_rights_model.community_owned,
-            translator_ids=[self.user_a_id, self.user_b_id]
-        )
-        exp_summary_model.put()
-
-        job_id = (
-            exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.create_new())
-        exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.get_output(
-                job_id)
-            )
-        expected_output = ['[u\'SUCCESS\', 1]']
-        self.assertEqual(actual_output, expected_output)
-
-        exp_rights_model_2 = exp_models.ExplorationRightsModel.get(
-            exploration.id)
-        self.assertEqual([], exp_rights_model_2.translator_ids)
-        self.assertEqual(
-            [self.user_a_id, self.user_b_id],
-            exp_rights_model_2.voice_artist_ids
-        )
-
-        exp_summary_model_2 = exp_models.ExpSummaryModel.get(exploration.id)
-        self.assertEqual([], exp_summary_model_2.translator_ids)
-        self.assertEqual(
-            [self.user_a_id, self.user_b_id],
-            exp_summary_model_2.voice_artist_ids
-        )
-
-    def test_partial_job_is_performed_for_deleted_exploration_summary(self):
-        """Tests that when ExplorationRightsModel exists but ExpSummaryModel
-        does not exist or is deleted, action is only performed for rights model,
-        and returns the id of corresponding exploration.
-        """
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.user_a_id, title='Exploration Title 1')
-
-        rights_manager.create_new_exploration_rights(
-            exploration.id, self.user_a_id)
-        exp_rights_model = exp_models.ExplorationRightsModel.get(
-            exploration.id)
-        exp_rights_model.translator_ids = [self.user_b_id]
-        commit_message = 'Assign a translator for test'
-        commit_cmds = [{
-            'cmd': 'change_role',
-            'assignee_ids': self.user_b_id,
-            'new_role': 'translator'
-        }]
-        exp_rights_model.commit(self.user_a_id, commit_message, commit_cmds)
-
-        exp_summary_model = exp_models.ExpSummaryModel(
-            id=exploration.id,
-            title='title',
-            category='category',
-            objective='Old objective',
-            language_code='en',
-            community_owned=exp_rights_model.community_owned,
-            translator_ids=[self.user_b_id]
-        )
-        exp_summary_model.put()
-        exp_services.delete_exploration_summaries([exploration.id])
-
-        job_id = (
-            exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.create_new())
-        exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.get_output(
-                job_id)
-            )
-        expected_output = ['[u\'Summary model does not exist or is '
-                           'deleted\', [u\'exp_id\']]']
-        self.assertEqual(actual_output, expected_output)
-
-        exp_rights_model_2 = exp_models.ExplorationRightsModel.get(
-            exploration.id)
-        self.assertEqual([], exp_rights_model_2.translator_ids)
-        self.assertEqual([self.user_b_id], exp_rights_model_2.voice_artist_ids)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Tests that no action is performed when an exploration is deleted."""
-        exp_id = '100'
-        self.save_new_valid_exploration(exp_id, self.user_a_id)
-        exp_services.delete_exploration(self.user_a_id, exp_id)
-
-        run_job_for_deleted_exp(
-            self, exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob)

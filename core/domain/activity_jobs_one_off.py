@@ -24,16 +24,9 @@ from core.domain import search_services
 from core.platform import models
 import feconf
 
-(
-    collection_models, config_models,
-    exp_models, question_models,
-    skill_models, story_models,
-    topic_models) = (
-        models.Registry.import_models([
-            models.NAMES.collection, models.NAMES.config,
-            models.NAMES.exploration, models.NAMES.question,
-            models.NAMES.skill, models.NAMES.story,
-            models.NAMES.topic]))
+(collection_models, exp_models, topic_models) = (
+    models.Registry.import_models([
+        models.NAMES.collection, models.NAMES.exploration, models.NAMES.topic]))
 
 
 class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
