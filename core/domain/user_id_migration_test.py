@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 
 from constants import constants
+from core.domain import rights_manager
 from core.domain import user_id_migration
 from core.platform import models
 from core.tests import test_utils
@@ -52,6 +53,8 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
     USER_C_USERNAME = 'c'
     USER_D_EMAIL = 'd@example.com'
     USER_D_USERNAME = 'd'
+    USER_D_ID = 'user_id'
+    USER_D_GAE_ID = 'gae_id'
 
     def _get_migrated_model_ids(self, job_output):
         """Get successfully migrated model IDs."""
@@ -93,6 +96,30 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         self._run_one_off_job()
         output = self._run_one_off_job()
         self.assertIn(['ALREADY DONE', [(self.user_a_id, '')]], output)
+
+    def test_one_user_user_settings_model(self):
+        original_model = user_models.UserSettingsModel(
+            id=self.USER_D_ID,
+            gae_id=self.USER_D_ID,
+            gae_user_id=self.USER_D_GAE_ID,
+            email=self.USER_D_EMAIL,
+        )
+        original_model.put()
+
+        migrated_model_ids = self._get_migrated_model_ids(
+            self._run_one_off_job())
+        migrated_model = user_models.UserSettingsModel.get_by_id(
+            migrated_model_ids[-1])
+
+        self.assertNotEqual(original_model.id, migrated_model.id)
+        self.assertEqual(original_model.gae_user_id, migrated_model.gae_user_id)
+        self.assertEqual(original_model.email, migrated_model.email)
+        self.assertEqual(original_model.created_on, migrated_model.created_on)
+        self.assertEqual(
+            original_model.last_updated, migrated_model.last_updated)
+
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.USER_D_ID))
 
     def test_one_user_one_model_full_id(self):
         original_model = user_models.CompletedActivitiesModel(
@@ -1141,3 +1168,521 @@ class ModelsUserIdsHaveUserSettingsExplorationsVerificationJobTests(
             output)
         self.assertIn(
             ['SUCCESS - ExplorationSnapshotMetadataModel', 3], output)
+
+
+class AddAllUserIdsVerificationJobTests(test_utils.GenericTestBase):
+
+    COL_1_ID = 'col_1_id'
+    COL_2_ID = 'col_2_id'
+    EXP_1_ID = 'exp_1_id'
+    EXP_2_ID = 'exp_2_id'
+    TOP_1_ID = 'top_1_id'
+    TOP_2_ID = 'top_2_id'
+    USER_1_ID = 'user_1_id'
+    USER_2_ID = 'user_2_id'
+    USER_3_ID = 'user_3_id'
+    USER_4_ID = 'user_4_id'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = user_id_migration.AddAllUserIdsVerificationJob.create_new()
+        user_id_migration.AddAllUserIdsVerificationJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            user_id_migration.AddAllUserIdsVerificationJob.get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        output = []
+        for key, values in eval_output:
+            if key.startswith('SUCCESS-NOT_SUBSET'):
+                eval_values = [ast.literal_eval(value) for value in values]
+                eval_values = [
+                    (model_id, sorted(user_ids))
+                    for model_id, user_ids in eval_values]
+                output.append(
+                    [key, eval_values])
+            else:
+                output.append([key, values])
+        return output
+
+    def test_one_collection_rights_subset(self):
+        collection_models.CollectionRightsAllUsersModel(
+            id=self.COL_1_ID,
+            all_user_ids=[self.USER_1_ID, self.USER_2_ID, self.USER_3_ID]
+        ).put()
+        collection_models.CollectionRightsModel.put_multi([
+            collection_models.CollectionRightsModel(
+                id=self.COL_1_ID,
+                owner_ids=[self.USER_1_ID, self.USER_2_ID],
+                editor_ids=[self.USER_2_ID],
+                voice_artist_ids=[self.USER_3_ID],
+                viewer_ids=[],
+                community_owned=False,
+                status=constants.ACTIVITY_STATUS_PUBLIC,
+                viewable_if_private=False,
+                first_published_msec=0.0)])
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS-SUBSET-CollectionRightsModel', 1]])
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID],
+            collection_models.CollectionRightsAllUsersModel
+            .get_by_id(self.COL_1_ID).all_user_ids)
+
+    def test_one_exploration_rights_subset(self):
+        exp_models.ExplorationRightsAllUsersModel(
+            id=self.EXP_1_ID,
+            all_user_ids=[self.USER_1_ID, self.USER_2_ID, self.USER_4_ID]
+        ).put()
+        exp_models.ExplorationRightsModel.put_multi([
+            exp_models.ExplorationRightsModel(
+                id=self.EXP_1_ID,
+                owner_ids=[self.USER_1_ID, self.USER_2_ID],
+                editor_ids=[self.USER_2_ID],
+                voice_artist_ids=[],
+                viewer_ids=[self.USER_4_ID],
+                community_owned=False,
+                status=constants.ACTIVITY_STATUS_PUBLIC,
+                viewable_if_private=False,
+                first_published_msec=0.0)])
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS-SUBSET-ExplorationRightsModel', 1]])
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_2_ID, self.USER_4_ID],
+            exp_models.ExplorationRightsAllUsersModel.get_by_id(self.EXP_1_ID)
+            .all_user_ids)
+
+    def test_one_topic_rights_subset(self):
+        topic_models.TopicRightsAllUsersModel(
+            id=self.TOP_1_ID,
+            all_user_ids=[self.USER_1_ID, self.USER_2_ID]
+        ).put()
+        topic_models.TopicRightsModel.put_multi([
+            topic_models.TopicRightsModel(
+                id=self.TOP_1_ID,
+                manager_ids=[self.USER_1_ID, self.USER_2_ID])])
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS-SUBSET-TopicRightsModel', 1]])
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_2_ID],
+            topic_models.TopicRightsAllUsersModel.get_by_id(self.TOP_1_ID)
+            .all_user_ids)
+
+    def test_one_collection_rights_not_subset(self):
+        collection_models.CollectionRightsAllUsersModel(
+            id=self.COL_1_ID,
+            all_user_ids=[self.USER_1_ID, self.USER_2_ID, self.USER_4_ID]
+        ).put()
+        collection_models.CollectionRightsModel.put_multi([
+            collection_models.CollectionRightsModel(
+                id=self.COL_1_ID,
+                owner_ids=[self.USER_1_ID, self.USER_2_ID],
+                editor_ids=[self.USER_2_ID],
+                voice_artist_ids=[self.USER_3_ID],
+                viewer_ids=[],
+                community_owned=False,
+                status=constants.ACTIVITY_STATUS_PUBLIC,
+                viewable_if_private=False,
+                first_published_msec=0.0)])
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [['SUCCESS-NOT_SUBSET-CollectionRightsModel',
+              [(self.COL_1_ID, [self.USER_4_ID])]]])
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID, self.USER_4_ID],
+            collection_models.CollectionRightsAllUsersModel
+            .get_by_id(self.COL_1_ID).all_user_ids)
+
+    def test_one_exploration_rights_not_subset(self):
+        exp_models.ExplorationRightsAllUsersModel(
+            id=self.EXP_1_ID,
+            all_user_ids=[self.USER_1_ID, self.USER_2_ID, self.USER_3_ID]
+        ).put()
+        exp_models.ExplorationRightsModel.put_multi([
+            exp_models.ExplorationRightsModel(
+                id=self.EXP_1_ID,
+                owner_ids=[self.USER_1_ID, self.USER_2_ID],
+                editor_ids=[self.USER_2_ID],
+                voice_artist_ids=[],
+                viewer_ids=[self.USER_4_ID],
+                community_owned=False,
+                status=constants.ACTIVITY_STATUS_PUBLIC,
+                viewable_if_private=False,
+                first_published_msec=0.0)])
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [['SUCCESS-NOT_SUBSET-ExplorationRightsModel',
+              [(self.EXP_1_ID, [self.USER_3_ID])]]])
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID, self.USER_4_ID],
+            exp_models.ExplorationRightsAllUsersModel.get_by_id(self.EXP_1_ID)
+            .all_user_ids)
+
+    def test_one_topic_rights_not_subset(self):
+        topic_models.TopicRightsAllUsersModel(
+            id=self.TOP_1_ID,
+            all_user_ids=[self.USER_1_ID, self.USER_2_ID, self.USER_3_ID]
+        ).put()
+        topic_models.TopicRightsModel.put_multi([
+            topic_models.TopicRightsModel(
+                id=self.TOP_1_ID,
+                manager_ids=[self.USER_1_ID, self.USER_2_ID])])
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [['SUCCESS-NOT_SUBSET-TopicRightsModel',
+              [(self.TOP_1_ID, [self.USER_3_ID])]]])
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID],
+            topic_models.TopicRightsAllUsersModel.get_by_id(self.TOP_1_ID)
+            .all_user_ids)
+
+    def test_one_collection_rights_failure(self):
+        collection_models.CollectionRightsModel.put_multi([
+            collection_models.CollectionRightsModel(
+                id=self.COL_1_ID,
+                owner_ids=[self.USER_1_ID, self.USER_2_ID],
+                editor_ids=[self.USER_2_ID],
+                voice_artist_ids=[self.USER_3_ID],
+                viewer_ids=[],
+                community_owned=False,
+                status=constants.ACTIVITY_STATUS_PUBLIC,
+                viewable_if_private=False,
+                first_published_msec=0.0)])
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['FAILURE-CollectionRightsModel', [self.COL_1_ID]]])
+
+    def test_one_exploration_rights_failure(self):
+        exp_models.ExplorationRightsModel.put_multi([
+            exp_models.ExplorationRightsModel(
+                id=self.EXP_1_ID,
+                owner_ids=[self.USER_1_ID, self.USER_2_ID],
+                editor_ids=[self.USER_2_ID],
+                voice_artist_ids=[],
+                viewer_ids=[self.USER_4_ID],
+                community_owned=False,
+                status=constants.ACTIVITY_STATUS_PUBLIC,
+                viewable_if_private=False,
+                first_published_msec=0.0)])
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['FAILURE-ExplorationRightsModel', [self.EXP_1_ID]]])
+
+    def test_one_topic_rights_failure(self):
+        topic_models.TopicRightsModel.put_multi([
+            topic_models.TopicRightsModel(
+                id=self.TOP_1_ID,
+                manager_ids=[self.USER_1_ID, self.USER_2_ID])])
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['FAILURE-TopicRightsModel', [self.TOP_1_ID]]])
+
+    def test_multiple_rights(self):
+        collection_models.CollectionRightsAllUsersModel(
+            id=self.COL_1_ID,
+            all_user_ids=[self.USER_1_ID]
+        ).put()
+        collection_models.CollectionRightsAllUsersModel(
+            id=self.COL_2_ID,
+            all_user_ids=[self.USER_1_ID, self.USER_2_ID, self.USER_3_ID]
+        ).put()
+        collection_models.CollectionRightsModel.put_multi([
+            collection_models.CollectionRightsModel(
+                id=self.COL_1_ID,
+                owner_ids=[self.USER_1_ID],
+                editor_ids=[],
+                voice_artist_ids=[],
+                viewer_ids=[],
+                community_owned=False,
+                status=constants.ACTIVITY_STATUS_PUBLIC,
+                viewable_if_private=False,
+                first_published_msec=0.0),
+            collection_models.CollectionRightsModel(
+                id=self.COL_2_ID,
+                owner_ids=[self.USER_1_ID],
+                editor_ids=[],
+                voice_artist_ids=[],
+                viewer_ids=[],
+                community_owned=False,
+                status=constants.ACTIVITY_STATUS_PUBLIC,
+                viewable_if_private=False,
+                first_published_msec=0.0)])
+        exp_models.ExplorationRightsAllUsersModel(
+            id=self.EXP_1_ID,
+            all_user_ids=[self.USER_1_ID, self.USER_2_ID, self.USER_4_ID]
+        ).put()
+        exp_models.ExplorationRightsAllUsersModel(
+            id=self.EXP_2_ID,
+            all_user_ids=[self.USER_1_ID, self.USER_2_ID, self.USER_4_ID]
+        ).put()
+        exp_models.ExplorationRightsModel.put_multi([
+            exp_models.ExplorationRightsModel(
+                id=self.EXP_1_ID,
+                owner_ids=[self.USER_1_ID],
+                editor_ids=[self.USER_2_ID],
+                voice_artist_ids=[self.USER_3_ID],
+                viewer_ids=[self.USER_4_ID],
+                community_owned=False,
+                status=constants.ACTIVITY_STATUS_PUBLIC,
+                viewable_if_private=False,
+                first_published_msec=0.0),
+            exp_models.ExplorationRightsModel(
+                id=self.EXP_2_ID,
+                owner_ids=[self.USER_1_ID],
+                editor_ids=[],
+                voice_artist_ids=[],
+                viewer_ids=[],
+                community_owned=False,
+                status=constants.ACTIVITY_STATUS_PUBLIC,
+                viewable_if_private=False,
+                first_published_msec=0.0)])
+        topic_models.TopicRightsAllUsersModel(
+            id=self.TOP_1_ID,
+            all_user_ids=[self.USER_3_ID, self.USER_4_ID]
+        ).put()
+        topic_models.TopicRightsAllUsersModel(
+            id=self.TOP_2_ID,
+            all_user_ids=[self.USER_1_ID, self.USER_2_ID]
+        ).put()
+        topic_models.TopicRightsModel.put_multi([
+            topic_models.TopicRightsModel(
+                id=self.TOP_1_ID,
+                manager_ids=[self.USER_3_ID, self.USER_4_ID]),
+            topic_models.TopicRightsModel(
+                id=self.TOP_2_ID,
+                manager_ids=[self.USER_1_ID, self.USER_2_ID])])
+
+        output = self._run_one_off_job()
+        self.assertIn(['SUCCESS-SUBSET-CollectionRightsModel', 1], output)
+        self.assertIn(
+            ['SUCCESS-NOT_SUBSET-CollectionRightsModel',
+             [(self.COL_2_ID, [self.USER_2_ID, self.USER_3_ID])]],
+            output)
+        self.assertIn(['SUCCESS-SUBSET-ExplorationRightsModel', 1], output)
+        self.assertIn(
+            ['SUCCESS-NOT_SUBSET-ExplorationRightsModel',
+             [(self.EXP_2_ID, [self.USER_2_ID, self.USER_4_ID])]],
+            output)
+        self.assertIn(['SUCCESS-SUBSET-TopicRightsModel', 2], output)
+
+        self.assertItemsEqual(
+            [self.USER_1_ID],
+            collection_models.CollectionRightsAllUsersModel
+            .get_by_id(self.COL_1_ID).all_user_ids)
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID],
+            collection_models.CollectionRightsAllUsersModel
+            .get_by_id(self.COL_2_ID).all_user_ids)
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID, self.USER_4_ID],
+            exp_models.ExplorationRightsAllUsersModel.get_by_id(self.EXP_1_ID)
+            .all_user_ids)
+        self.assertItemsEqual(
+            [self.USER_3_ID, self.USER_4_ID],
+            topic_models.TopicRightsAllUsersModel.get_by_id(self.TOP_1_ID)
+            .all_user_ids)
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_2_ID],
+            topic_models.TopicRightsAllUsersModel.get_by_id(self.TOP_2_ID)
+            .all_user_ids)
+
+
+class AddAllUserIdsSnapshotsVerificationJobTests(test_utils.GenericTestBase):
+
+    COL_1_ID = 'col_1_id'
+    EXP_1_ID = 'exp_1_id'
+    TOP_1_ID = 'top_1_id'
+    TOP_2_ID = 'top_2_id'
+    USER_1_ID = 'user_1_id'
+    USER_2_ID = 'user_2_id'
+    USER_3_ID = 'user_3_id'
+    USER_4_ID = 'user_4_id'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_id_migration.AddAllUserIdsSnapshotsVerificationJob
+            .create_new())
+        user_id_migration.AddAllUserIdsSnapshotsVerificationJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            user_id_migration.AddAllUserIdsSnapshotsVerificationJob.get_output(
+                job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return [
+            [key, sorted(values) if isinstance(values, list) else values]
+            for key, values in eval_output]
+
+    def test_one_collection_rights(self):
+        collection_model = collection_models.CollectionRightsModel(
+            id=self.COL_1_ID,
+            owner_ids=[self.USER_1_ID],
+            editor_ids=[self.USER_2_ID],
+            voice_artist_ids=[],
+            viewer_ids=[],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        )
+        collection_model.save(
+            'cid', 'Created new collection rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        collection_model.owner_ids = [self.USER_3_ID]
+        collection_model.save(
+            'cid', 'Change owner',
+            [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['SUCCESS-CollectionRightsSnapshotContentModel', 2]])
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID],
+            collection_models.CollectionRightsAllUsersModel
+            .get_by_id(self.COL_1_ID).all_user_ids)
+
+    def test_one_exploration_rights(self):
+        exp_model = exp_models.ExplorationRightsModel(
+            id=self.EXP_1_ID,
+            owner_ids=[self.USER_1_ID, self.USER_2_ID],
+            editor_ids=[self.USER_2_ID],
+            voice_artist_ids=[],
+            viewer_ids=[self.USER_4_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        exp_model.save(
+            'cid', 'Created new exploration rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        exp_model.owner_ids = [self.USER_1_ID, self.USER_3_ID]
+        exp_model.save(
+            'cid', 'Change owner',
+            [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['SUCCESS-ExplorationRightsSnapshotContentModel', 2]])
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID, self.USER_4_ID],
+            exp_models.ExplorationRightsAllUsersModel.get_by_id(self.EXP_1_ID)
+            .all_user_ids)
+
+    def test_one_topic_rights(self):
+        topic_model = topic_models.TopicRightsModel(
+            id=self.TOP_1_ID,
+            manager_ids=[self.USER_1_ID, self.USER_2_ID])
+        topic_model.commit(
+            'cid', 'Created new topic rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        topic_model.manager_ids = [self.USER_2_ID, self.USER_3_ID]
+        topic_model.commit(
+            'cid', 'Change manager',
+            [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['SUCCESS-TopicRightsSnapshotContentModel', 2]])
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID],
+            topic_models.TopicRightsAllUsersModel.get_by_id(self.TOP_1_ID)
+            .all_user_ids)
+
+    def test_multiple_rights(self):
+        collection_model = collection_models.CollectionRightsModel(
+            id=self.COL_1_ID,
+            owner_ids=[self.USER_1_ID],
+            editor_ids=[],
+            voice_artist_ids=[],
+            viewer_ids=[],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        )
+        collection_model.save(
+            'cid', 'Created new collection rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        collection_model.editor_ids = [self.USER_1_ID, self.USER_4_ID]
+        collection_model.save(
+            'cid', 'Add editors',
+            [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
+        exp_model = exp_models.ExplorationRightsModel(
+            id=self.EXP_1_ID,
+            owner_ids=[self.USER_1_ID, self.USER_2_ID],
+            editor_ids=[self.USER_2_ID],
+            voice_artist_ids=[],
+            viewer_ids=[self.USER_4_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        exp_model.save(
+            'cid', 'Created new exploration rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        exp_model.owner_ids = [self.USER_1_ID, self.USER_3_ID]
+        exp_model.save(
+            'cid', 'Change owner',
+            [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
+        topic_model_1 = topic_models.TopicRightsModel(
+            id=self.TOP_1_ID,
+            manager_ids=[self.USER_1_ID, self.USER_2_ID])
+        topic_model_1.commit(
+            'cid', 'Created new topic rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        topic_model_1.manager_ids = [self.USER_2_ID, self.USER_3_ID]
+        topic_model_1.commit(
+            'cid', 'Change manager',
+            [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
+        topic_model_2 = topic_models.TopicRightsModel(
+            id=self.TOP_2_ID,
+            manager_ids=[self.USER_1_ID])
+        topic_model_2.commit(
+            'cid', 'Created new topic rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        topic_model_2.manager_ids = [self.USER_4_ID]
+        topic_model_2.commit(
+            'cid', 'Change manager',
+            [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
+
+        output = self._run_one_off_job()
+        self.assertIn(
+            ['SUCCESS-CollectionRightsSnapshotContentModel', 2], output)
+        self.assertIn(
+            ['SUCCESS-ExplorationRightsSnapshotContentModel', 2], output)
+        self.assertIn(['SUCCESS-TopicRightsSnapshotContentModel', 4], output)
+
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_4_ID],
+            collection_models.CollectionRightsAllUsersModel
+            .get_by_id(self.COL_1_ID).all_user_ids)
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID, self.USER_4_ID],
+            exp_models.ExplorationRightsAllUsersModel.get_by_id(self.EXP_1_ID)
+            .all_user_ids)
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID],
+            topic_models.TopicRightsAllUsersModel.get_by_id(self.TOP_1_ID)
+            .all_user_ids)
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_4_ID],
+            topic_models.TopicRightsAllUsersModel.get_by_id(self.TOP_2_ID)
+            .all_user_ids)

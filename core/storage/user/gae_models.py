@@ -108,6 +108,9 @@ class UserSettingsModel(base_models.BaseModel):
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
 
+    # DEPRECATED in 2.8.7. Do not use.
+    gae_user_id = ndb.StringProperty(required=False, indexed=False)
+
     @staticmethod
     def get_deletion_policy():
         """UserSettingsModel can be deleted since it only contains information

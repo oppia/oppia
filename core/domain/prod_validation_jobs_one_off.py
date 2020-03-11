@@ -975,6 +975,8 @@ class CollectionModelValidator(BaseModelValidator):
             'snapshot_content_ids': (
                 collection_models.CollectionSnapshotContentModel,
                 snapshot_model_ids),
+            'all_users_model_ids': (
+                collection_models.CollectionRightsAllUsersModel, [item.id])
         }
 
 
@@ -1095,6 +1097,19 @@ class CollectionRightsSnapshotContentModelValidator(
             'collection_rights_ids': (
                 collection_models.CollectionRightsModel,
                 [item.id[:item.id.find('-')]]),
+        }
+
+
+class CollectionRightsAllUsersModelValidator(BaseModelValidator):
+    """Class for validating CollectionRightsAllUsersModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'collection_rights_ids': (
+                collection_models.CollectionRightsModel, [item.id]),
+            'all_user_ids': (
+                user_models.UserSettingsModel, item.all_user_ids)
         }
 
 
@@ -1757,6 +1772,8 @@ class ExplorationModelValidator(BaseModelValidator):
             'snapshot_content_ids': (
                 exp_models.ExplorationSnapshotContentModel,
                 snapshot_model_ids),
+            'all_users_model_ids': (
+                exp_models.ExplorationRightsAllUsersModel, [item.id])
         }
 
 
@@ -1881,6 +1898,19 @@ class ExplorationRightsSnapshotContentModelValidator(
             'exploration_rights_ids': (
                 exp_models.ExplorationRightsModel,
                 [item.id[:item.id.find('-')]]),
+        }
+
+
+class ExplorationRightsAllUsersModelValidator(BaseModelValidator):
+    """Class for validating ExplorationRightsAllUsersModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'exploration_rights_ids': (
+                exp_models.ExplorationRightsModel, [item.id]),
+            'all_user_ids': (
+                user_models.UserSettingsModel, item.all_user_ids)
         }
 
 
@@ -3203,7 +3233,9 @@ class TopicModelValidator(BaseModelValidator):
             'subtopic_page_ids': (
                 topic_models.SubtopicPageModel,
                 ['%s-%s' % (
-                    item.id, subtopic['id']) for subtopic in item.subtopics])
+                    item.id, subtopic['id']) for subtopic in item.subtopics]),
+            'all_users_model_ids': (
+                topic_models.TopicRightsAllUsersModel, [item.id])
         }
 
     @classmethod
@@ -3365,6 +3397,19 @@ class TopicRightsSnapshotContentModelValidator(
             'topic_rights_ids': (
                 topic_models.TopicRightsModel,
                 [item.id[:item.id.find('-')]]),
+        }
+
+
+class TopicRightsAllUsersModelValidator(BaseModelValidator):
+    """Class for validating TopicRightsAllUsersModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'topic_rights_ids': (
+                topic_models.TopicRightsModel, [item.id]),
+            'all_user_ids': (
+                user_models.UserSettingsModel, item.all_user_ids)
         }
 
 
@@ -4879,6 +4924,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
         CollectionRightsSnapshotContentModelValidator),
     collection_models.CollectionCommitLogEntryModel: (
         CollectionCommitLogEntryModelValidator),
+    collection_models.CollectionRightsAllUsersModel: (
+        CollectionRightsAllUsersModelValidator),
     collection_models.CollectionSummaryModel: CollectionSummaryModelValidator,
     config_models.ConfigPropertyModel: ConfigPropertyModelValidator,
     config_models.ConfigPropertySnapshotMetadataModel: (
@@ -4899,6 +4946,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
         ExplorationRightsSnapshotMetadataModelValidator),
     exp_models.ExplorationRightsSnapshotContentModel: (
         ExplorationRightsSnapshotContentModelValidator),
+    exp_models.ExplorationRightsAllUsersModel: (
+        ExplorationRightsAllUsersModelValidator),
     exp_models.ExplorationCommitLogEntryModel: (
         ExplorationCommitLogEntryModelValidator),
     exp_models.ExpSummaryModel: ExpSummaryModelValidator,
@@ -4958,6 +5007,7 @@ MODEL_TO_VALIDATOR_MAPPING = {
         TopicRightsSnapshotMetadataModelValidator),
     topic_models.TopicRightsSnapshotContentModel: (
         TopicRightsSnapshotContentModelValidator),
+    topic_models.TopicRightsAllUsersModel: TopicRightsAllUsersModelValidator,
     topic_models.TopicCommitLogEntryModel: (
         TopicCommitLogEntryModelValidator),
     topic_models.TopicSummaryModel: TopicSummaryModelValidator,
@@ -5111,6 +5161,14 @@ class CollectionRightsSnapshotContentModelAuditOneOffJob(
         return [collection_models.CollectionRightsSnapshotContentModel]
 
 
+class CollectionRightsAllUsersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates CollectionRightsAllUsersModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [collection_models.CollectionRightsAllUsersModel]
+
+
 class CollectionCommitLogEntryModelAuditOneOffJob(
         ProdValidationAuditOneOffJob):
     """Job that audits and validates CollectionCommitLogEntryModel."""
@@ -5246,6 +5304,15 @@ class ExplorationRightsSnapshotContentModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationRightsSnapshotContentModel]
+
+
+class ExplorationRightsAllUsersModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationRightsAllUsersModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationRightsAllUsersModel]
 
 
 class ExplorationCommitLogEntryModelAuditOneOffJob(
@@ -5543,6 +5610,14 @@ class TopicRightsSnapshotContentModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [topic_models.TopicRightsSnapshotContentModel]
+
+
+class TopicRightsAllUsersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates TopicRightsAllUsersModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [topic_models.TopicRightsAllUsersModel]
 
 
 class TopicCommitLogEntryModelAuditOneOffJob(

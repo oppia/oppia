@@ -315,7 +315,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
         return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @staticmethod
-    def transform_dict_to_valid(model_dict):
+    def convert_to_valid_dict(model_dict):
         """Replace invalid fields and values in the ExplorationRightsModel dict.
 
         Some old ExplorationRightsSnapshotContentModels can contain fields
@@ -513,6 +513,77 @@ class ExplorationRightsModel(base_models.VersionedModel):
             'voiced_exploration_ids': voiced_exploration_ids,
             'viewable_exploration_ids': viewable_exploration_ids
         }
+
+
+class ExplorationRightsAllUsersModel(base_models.BaseModel):
+    """Temporary storage model for all user ids ever mentioned in the
+    exploration rights.
+
+    TODO (#8529): This model should be deleted after the user ID migration is
+    completed.
+
+    The id of each instance is the id of the corresponding exploration.
+    """
+    # The user_ids of users who are (or were in history) members of owner_ids,
+    # editor_ids, voice_artist_ids or viewer_ids in corresponding rights model.
+    all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """ExplorationRightsAllUsersModel are temporary model that will be
+        deleted after user migration.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether ExplorationRightsAllUsersModel references the given
+        user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.all_user_ids == user_id).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_export_policy():
+        """This model is only used for migration purposes. All the data
+        contained in this model are already exported through
+        ExplorationRightsModel.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationRightsAllUsersModel has multiple fields with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, unused_old_user_id, unused_new_user_id):
+        """This model is used to verify that the user ID migration of
+        ExplorationRightsSnapshotContentModel was successful. The content is
+        filled by the AddAllUserIdsVerificationJob and
+        AddAllUserIdsSnapshotsVerificationJob before the
+        GaeIdNotInModelsVerificationJob is run, thus it shouldn't be migrated by
+        this method.
+
+        Args:
+            unused_old_user_id: str. The old user ID.
+            unused_new_user_id: str. The new user ID.
+        """
+        pass
+
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for all the ids in all_user_ids."""
+        user_ids = [user_id for user_id in self.all_user_ids
+                    if user_id not in feconf.SYSTEM_USERS]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)
 
 
 class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
