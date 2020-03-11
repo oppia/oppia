@@ -1007,7 +1007,7 @@ var logicProofStudent = (function() {
         }
       }
     }
-    throw new Error(bestAttemptSoFar);
+    throw bestAttemptSoFar;
   };
 
   /**
@@ -1127,7 +1127,7 @@ var logicProofStudent = (function() {
         var answer = evaluationRule.evaluateExpression(
           argumentsList, types, evaluationRuleParameters);
       } else {
-        throw new Error('Unknown evaluation rule format (' +
+        throw Error('Unknown evaluation rule format (' +
           evaluationRule.format + ') sent to evaluate().');
       }
     }
@@ -1179,7 +1179,7 @@ var logicProofStudent = (function() {
         renderedMessages.push(renderedMessage);
       } catch (err) {
         if (err.message !== 'evaluation failed') {
-          throw new Error(err);
+          throw err;
         }
       }
     }
@@ -1230,7 +1230,7 @@ var logicProofStudent = (function() {
             }, questionInstance.control_model, parameters, evaluationCache);
           } catch (err) {
             if (err.message !== 'evaluation failed') {
-              throw new Error(err);
+              throw err;
             }
           }
           if (check) {

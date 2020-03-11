@@ -206,7 +206,17 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'regexp': re.compile(r'toThrow\('),
         'message': 'Please use \'toThrowError\' instead of '
                    '\'toThrow\'',
-        'excluded_files': (),
+        'excluded_files': (
+            # The toThrow error is standardised toThrowError and currently
+            # the toThrowError unable to handle to the object as thrown
+            # message we made custom Error in these files and there isn't
+            # to way to capture those using reglar expression alone.
+            # We decided that we are going to look into deprecating it,
+            # since it is not space-efficient and we are running into
+            # maintenance issues such as the one you are describing here
+            # For more detail you can check the PR #8522.
+            'extensions/interactions/LogicProof/static/js/student.spec.ts',
+            'extensions/interactions/LogicProof/static/js/complete.spec.ts'),
         'excluded_dirs': ()
     },
     {
@@ -226,7 +236,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'message': 'Please use '
                    '\'throw new Error\' instead of \'throw\'',
         'excluded_files': (),
-        'excluded_dirs': ()
+        'excluded_dirs': ('extensions/interactions/LogicProof/static')
     },
     {
         'regexp': re.compile(r'\b(beforeEach\(inject\(function)\('),
