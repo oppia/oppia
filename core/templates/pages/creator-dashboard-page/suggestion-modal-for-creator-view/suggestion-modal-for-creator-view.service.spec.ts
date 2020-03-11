@@ -108,7 +108,7 @@ describe('Suggestion Modal for Creator View Service', function() {
       expect(extraParams.suggestionsToReviewList.length).toBe(0);
     });
 
-  it('should handler reject when resolving suggestion with resubmit' +
+  it('should handle rejects when resolving suggestion with resubmit' +
     ' action fails', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve({
@@ -150,7 +150,7 @@ describe('Suggestion Modal for Creator View Service', function() {
       expect(extraParams.suggestionsToReviewList.length).toBe(0);
     });
 
-  it('should handler reject when resolving suggestion with no resubmit' +
+  it('should handle rejects when resolving suggestion with no resubmit' +
     ' action fails', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve({

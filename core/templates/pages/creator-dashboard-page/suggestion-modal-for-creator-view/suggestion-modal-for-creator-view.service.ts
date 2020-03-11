@@ -20,9 +20,8 @@ require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/suggestion-modal.service.ts');
-// eslint-disable-next-line max-len
-require('pages/creator-dashboard-page/suggestion-modal-for-creator-view/suggestion-modal-for-creator-view.controller');
-// eslint-enable-next-line max-len
+require('pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
+  'suggestion-modal-for-creator-view.controller');
 
 angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
   '$http', '$log',
