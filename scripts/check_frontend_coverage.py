@@ -271,6 +271,8 @@ FULLY_COVERED_FILENAMES = [
     'review-test-page.constants.ts',
     'rich_text_components_definitions.ts',
     'richTextComponentsRequires.ts',
+    'rte-helper-modal.controller.ts',
+    'rte-helper.service.ts',
     'RubricObjectFactory.ts',
     'RuleObjectFactory.ts',
     'schema-default-value.service.ts',
