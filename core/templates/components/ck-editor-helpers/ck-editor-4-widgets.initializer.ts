@@ -79,7 +79,7 @@ angular.module('oppia').run([
                                                spec.default_value;
               });
 
-              RteHelperService._openCustomizationModal(
+              RteHelperService.openCustomizationModal(
                 customizationArgSpecs,
                 customizationArgs,
                 function(customizationArgsDict) {
