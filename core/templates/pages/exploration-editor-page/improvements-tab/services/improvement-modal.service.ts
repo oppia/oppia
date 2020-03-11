@@ -295,7 +295,7 @@ angular.module('oppia').factory('ImprovementModalService', [
             '/pages/exploration-editor-page/improvements-tab/templates/' +
             'feedback-thread-modal.template.html'),
           resolve: {
-            messages: ThreadDataService.fetchMessages(thread),
+            messages: ThreadDataService.getMessagesAsync(thread),
             isUserLoggedIn:
               UserService.getUserInfoAsync().then(u => u.isLoggedIn())
           },
@@ -324,7 +324,7 @@ angular.module('oppia').factory('ImprovementModalService', [
 
               // TODO(Allan): Implement ability to edit suggestions before
               // applying.
-              $scope.addNewMessage = function(threadId, tmpText, tmpStatus) {
+              $scope.addNewMessageAsync = function(threadId, tmpText, tmpStatus) {
                 if (threadId === null) {
                   AlertsService.addWarning(
                     'Cannot add message to thread with ID: null.');
@@ -336,7 +336,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                   return;
                 }
                 $scope.messageSendingInProgress = true;
-                ThreadDataService.addNewMessage(thread, tmpText, tmpStatus)
+                ThreadDataService.addNewMessageAsync(thread, tmpText, tmpStatus)
                   .then(() => {
                     $scope.tmpMessage.status = $scope.activeThread.status;
                     $scope.messageSendingInProgress = false;
@@ -361,7 +361,7 @@ angular.module('oppia').factory('ImprovementModalService', [
             '/pages/exploration-editor-page/improvements-tab/templates/' +
             'suggestion-thread-modal.template.html'),
           resolve: {
-            messages: ThreadDataService.fetchMessages(thread),
+            messages: ThreadDataService.getMessagesAsync(thread),
             isUserLoggedIn:
               UserService.getUserInfoAsync().then(u => u.isLoggedIn())
           },
@@ -391,7 +391,7 @@ angular.module('oppia').factory('ImprovementModalService', [
 
               // TODO(Allan): Implement ability to edit suggestions before
               // applying.
-              $scope.addNewMessage = function(threadId, tmpText, tmpStatus) {
+              $scope.addNewMessageAsync = function(threadId, tmpText, tmpStatus) {
                 if (threadId === null) {
                   AlertsService.addWarning(
                     'Cannot add message to thread with ID: null.');
@@ -403,7 +403,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                   return;
                 }
                 $scope.messageSendingInProgress = true;
-                ThreadDataService.addNewMessage(thread, tmpText, tmpStatus)
+                ThreadDataService.addNewMessageAsync(thread, tmpText, tmpStatus)
                   .then(() => {
                     $scope.tmpMessage.status = $scope.activeThread.status;
                     $scope.messageSendingInProgress = false;

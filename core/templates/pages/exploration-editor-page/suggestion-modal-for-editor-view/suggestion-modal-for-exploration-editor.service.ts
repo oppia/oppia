@@ -126,7 +126,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
           }
         ]
       }).result.then(result => {
-        return ThreadDataService.resolveSuggestion(
+        return ThreadDataService.resolveSuggestionAsync(
           activeThread, result.action, result.commitMessage,
           result.reviewMessage, result.audioUpdateRequired).then(
           () => {

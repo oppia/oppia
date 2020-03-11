@@ -158,7 +158,7 @@ describe('retrieving threads service', () => {
       '/suggestionlisthandler?target_type=exploration&target_id=exp1')
       .respond({ suggestions: this.mockSuggestions });
 
-    ThreadDataService.fetchThreads().then(
+    ThreadDataService.getThreadsAsync().then(
       threadData => {
         for (let mockFeedbackThread of this.mockFeedbackThreads) {
           expect(ThreadDataService.getThread(mockFeedbackThread.thread_id))
@@ -183,7 +183,7 @@ describe('retrieving threads service', () => {
       '/suggestionlisthandler?target_type=exploration&target_id=exp1')
       .respond({ suggestions: [] });
 
-    ThreadDataService.fetchThreads().then(
+    ThreadDataService.getThreadsAsync().then(
       done.fail,
       error => {
         expect(error).toMatch('Missing input backend dict');
@@ -199,7 +199,7 @@ describe('retrieving threads service', () => {
       '/suggestionlisthandler?target_type=exploration&target_id=exp1')
       .respond({ suggestions: this.mockSuggestions });
 
-    ThreadDataService.fetchThreads().then(
+    ThreadDataService.getThreadsAsync().then(
       done.fail,
       error => {
         expect(error).toMatch('Missing input backend dict');
@@ -217,7 +217,7 @@ describe('retrieving threads service', () => {
       '/suggestionlisthandler?target_type=exploration&target_id=exp1')
       .respond({ suggestions: [] });
 
-    ThreadDataService.fetchThreads().then(
+    ThreadDataService.getThreadsAsync().then(
       done.fail,
       error => {
         expect(error).toMatch('Missing input backend dict');
@@ -235,7 +235,7 @@ describe('retrieving threads service', () => {
         '/suggestionlisthandler?target_type=exploration&target_id=exp1')
         .respond({ suggestions: this.mockSuggestions });
 
-      ThreadDataService.fetchThreads().then(
+      ThreadDataService.getThreadsAsync().then(
         done.fail,
         error => {
           expect(error).toEqual('Error on retrieving feedback threads.');
@@ -253,7 +253,7 @@ describe('retrieving threads service', () => {
     });
     let setMessagesSpy = spyOn(thread, 'setMessages').and.callThrough();
 
-    ThreadDataService.fetchMessages(thread).then(
+    ThreadDataService.getMessagesAsync(thread).then(
       () => {
         expect(setMessagesSpy).toHaveBeenCalled();
         expect(thread.lastNonemptyMessageSummary.text).toEqual('2nd message');
@@ -264,7 +264,7 @@ describe('retrieving threads service', () => {
   });
 
   it('should throw error if trying to fetch messages of null thread', () => {
-    expect(() => ThreadDataService.fetchMessages(null))
+    expect(() => ThreadDataService.getMessagesAsync(null))
       .toThrowError('Trying to update a non-existent thread');
   });
 
@@ -276,7 +276,7 @@ describe('retrieving threads service', () => {
 
     $httpBackend.expectGET('/threadhandler/exploration.exp1.abc1')
       .respond(500, 'Error on fetching messages from a thread.');
-    ThreadDataService.fetchMessages(thread).then(
+    ThreadDataService.getMessagesAsync(thread).then(
       done.fail,
       error => {
         expect(error.data).toEqual('Error on fetching messages from a thread.');
@@ -291,7 +291,7 @@ describe('retrieving threads service', () => {
     $httpBackend.expectGET('/feedbackstatshandler/exp1').respond({
       num_open_threads: 10
     });
-    ThreadDataService.fetchFeedbackStats().then(
+    ThreadDataService.getOpenThreadsCountAsync().then(
       () => {
         expect(ThreadDataService.getOpenThreadsCount()).toEqual(10);
         done();
@@ -303,7 +303,7 @@ describe('retrieving threads service', () => {
   it('should use reject handler when fetching feedback stats fails', done => {
     $httpBackend.expectGET('/feedbackstatshandler/exp1')
       .respond(500, 'Error on fetch feedback stats');
-    ThreadDataService.fetchFeedbackStats().then(
+    ThreadDataService.getOpenThreadsCountAsync().then(
       done.fail,
       () => {
         expect(ThreadDataService.getOpenThreadsCount()).toEqual(0);
@@ -334,7 +334,7 @@ describe('retrieving threads service', () => {
       .respond({ suggestions: [] });
 
     expect(ThreadDataService.getOpenThreadsCount()).toEqual(0);
-    ThreadDataService.createNewThread(subject, 'Text').then(
+    ThreadDataService.createNewThreadAsync(subject, 'Text').then(
       threadData => {
         expect(threadData.feedbackThreads.length).toEqual(1);
         expect(threadData.feedbackThreads[0].threadId)
@@ -349,7 +349,7 @@ describe('retrieving threads service', () => {
   it('should use reject handler when creating a new thread fails', () => {
     expect(ThreadDataService.getOpenThreadsCount()).toEqual(0);
     $httpBackend.expectPOST('/threadlisthandler/exp1').respond(500);
-    ThreadDataService.createNewThread('Subject', 'Text');
+    ThreadDataService.createNewThreadAsync('Subject', 'Text');
     $httpBackend.flush();
     expect(ThreadDataService.getOpenThreadsCount()).toEqual(0);
   });
@@ -359,12 +359,12 @@ describe('retrieving threads service', () => {
     let thread = FeedbackThreadObjectFactory.createFromBackendDict(mockThread);
     $httpBackend.expectPOST(
       '/feedbackhandler/thread_view_event/exploration.exp1.abc1').respond(200);
-    ThreadDataService.markThreadAsSeen(thread).then(done, done.fail);
+    ThreadDataService.markThreadAsSeenAsync(thread).then(done, done.fail);
     $httpBackend.flush();
   });
 
   it('should throw error if trying to mark null thread as seen', () => {
-    expect(() => ThreadDataService.markThreadAsSeen(null))
+    expect(() => ThreadDataService.markThreadAsSeenAsync(null))
       .toThrowError('Trying to update a non-existent thread');
   });
 
@@ -373,7 +373,7 @@ describe('retrieving threads service', () => {
     let thread = FeedbackThreadObjectFactory.createFromBackendDict(mockThread);
     $httpBackend.expectPOST(
       '/feedbackhandler/thread_view_event/exploration.exp1.abc1').respond(500);
-    ThreadDataService.markThreadAsSeen(thread).then(
+    ThreadDataService.markThreadAsSeenAsync(thread).then(
       done.fail,
       error => {
         expect(error.status).toEqual(500);
@@ -383,7 +383,7 @@ describe('retrieving threads service', () => {
   });
 
   it('should use reject handler when passing a null thread', () => {
-    expect(() => ThreadDataService.addNewMessage(null, 'Message', 'open'))
+    expect(() => ThreadDataService.addNewMessageAsync(null, 'Message', 'open'))
       .toThrowError('Trying to update a non-existent thread');
   });
 
@@ -398,7 +398,7 @@ describe('retrieving threads service', () => {
       $httpBackend.expectGET('/feedbackstatshandler/exp1').respond({
         num_open_threads: 1
       });
-      ThreadDataService.fetchFeedbackStats();
+      ThreadDataService.getOpenThreadsCountAsync();
       $httpBackend.flush();
       expect(ThreadDataService.getOpenThreadsCount()).toEqual(1);
 
@@ -408,7 +408,7 @@ describe('retrieving threads service', () => {
         messages: []
       });
 
-      ThreadDataService.addNewMessage(thread, 'Message', 'close').then(
+      ThreadDataService.addNewMessageAsync(thread, 'Message', 'close').then(
         () => {
           expect(ThreadDataService.getOpenThreadsCount()).toEqual(0);
           done();
@@ -429,7 +429,7 @@ describe('retrieving threads service', () => {
       $httpBackend.expectGET('/feedbackstatshandler/exp1').respond({
         num_open_threads: 1
       });
-      ThreadDataService.fetchFeedbackStats();
+      ThreadDataService.getOpenThreadsCountAsync();
       $httpBackend.flush();
       expect(ThreadDataService.getOpenThreadsCount()).toEqual(1);
 
@@ -438,7 +438,7 @@ describe('retrieving threads service', () => {
       $httpBackend.expectGET('/threadhandler/exploration.exp1.abc1').respond({
         messages: []
       });
-      ThreadDataService.addNewMessage(thread, 'Message', 'open').then(
+      ThreadDataService.addNewMessageAsync(thread, 'Message', 'open').then(
         () => {
           expect(ThreadDataService.getOpenThreadsCount()).toEqual(2);
           done();
@@ -458,7 +458,7 @@ describe('retrieving threads service', () => {
       $httpBackend.expectGET('/feedbackstatshandler/exp1').respond({
         num_open_threads: 1
       });
-      ThreadDataService.fetchFeedbackStats();
+      ThreadDataService.getOpenThreadsCountAsync();
       $httpBackend.flush();
       expect(ThreadDataService.getOpenThreadsCount()).toEqual(1);
 
@@ -467,7 +467,7 @@ describe('retrieving threads service', () => {
       $httpBackend.expectGET('/threadhandler/exploration.exp1.abc1').respond({
         messages: []
       });
-      ThreadDataService.addNewMessage(thread, 'Message', 'open').then(
+      ThreadDataService.addNewMessageAsync(thread, 'Message', 'open').then(
         () => {
           expect(ThreadDataService.getOpenThreadsCount()).toEqual(1);
           done();
@@ -487,13 +487,13 @@ describe('retrieving threads service', () => {
     $httpBackend.whenGET(
       '/suggestionlisthandler?target_type=exploration&target_id=exp1')
       .respond({ suggestions: this.mockSuggestions });
-    ThreadDataService.fetchThreads();
+    ThreadDataService.getThreadsAsync();
     $httpBackend.flush();
 
     $httpBackend.expectGET('/feedbackstatshandler/exp1').respond({
       num_open_threads: 1
     });
-    ThreadDataService.fetchFeedbackStats();
+    ThreadDataService.getOpenThreadsCountAsync();
     $httpBackend.flush();
     expect(ThreadDataService.getOpenThreadsCount()).toEqual(1);
 
@@ -503,7 +503,7 @@ describe('retrieving threads service', () => {
     $httpBackend.expectGET('/threadhandler/exploration.exp1.ghi3').respond({
       messages: []
     });
-    ThreadDataService.resolveSuggestion(thread, 'Message', 'status', 'a', true)
+    ThreadDataService.resolveSuggestionAsync(thread, 'Message', 'status', 'a', true)
       .then(
         () => {
           expect(ThreadDataService.getOpenThreadsCount()).toEqual(0);
@@ -514,7 +514,7 @@ describe('retrieving threads service', () => {
   });
 
   it('should throw an error if trying to resolve a null thread', () => {
-    expect(() => ThreadDataService.resolveSuggestion(null))
+    expect(() => ThreadDataService.resolveSuggestionAsync(null))
       .toThrowError('Trying to update a non-existent thread');
   });
 });

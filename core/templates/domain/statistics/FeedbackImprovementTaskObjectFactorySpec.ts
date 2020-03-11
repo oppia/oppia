@@ -63,7 +63,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
 
   describe('.fetchTasks', function() {
     it('fetches threads from the backend', function(done) {
-      spyOn(ThreadDataService, 'fetchThreads').and.returnValue($q.resolve({
+      spyOn(ThreadDataService, 'getThreadsAsync').and.returnValue($q.resolve({
         feedbackThreads: [{ threadId: 'abc1' }, { threadId: 'def2' }]
       }));
 

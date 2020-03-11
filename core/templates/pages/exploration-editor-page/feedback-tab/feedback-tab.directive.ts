@@ -74,7 +74,7 @@ angular.module('oppia').directive('feedbackTab', [
           ctrl.fetchUpdatedThreads = function() {
             let activeThreadId =
               ctrl.activeThread && ctrl.activeThread.threadId;
-            return ThreadDataService.fetchThreads().then(data => {
+            return ThreadDataService.getThreadsAsync().then(data => {
               ctrl.threadData = data;
               ctrl.threadIsStale = false;
               if (activeThreadId !== null) {
@@ -124,7 +124,7 @@ angular.module('oppia').directive('feedbackTab', [
                   $scope.cancel = () => $uibModalInstance.dismiss('cancel');
                 }
               ]
-            }).result.then(result => ThreadDataService.createNewThread(
+            }).result.then(result => ThreadDataService.createNewThreadAsync(
               result.newThreadSubject, result.newThreadText)
             ).then(() => {
               ctrl.clearActiveThread();
@@ -178,7 +178,7 @@ angular.module('oppia').directive('feedbackTab', [
             );
           };
 
-          ctrl.addNewMessage = function(threadId, tmpText, tmpStatus) {
+          ctrl.addNewMessageAsync = function(threadId, tmpText, tmpStatus) {
             if (threadId === null) {
               AlertsService.addWarning(
                 'Cannot add message to thread with ID: null.');
@@ -194,7 +194,7 @@ angular.module('oppia').directive('feedbackTab', [
             if (thread === null) {
               throw Error('Trying to add message to a non-existent thread.');
             }
-            ThreadDataService.addNewMessage(thread, tmpText, tmpStatus)
+            ThreadDataService.addNewMessageAsync(thread, tmpText, tmpStatus)
               .then(() => {
                 _resetTmpMessageFields();
                 ctrl.messageSendingInProgress = false;
@@ -209,9 +209,9 @@ angular.module('oppia').directive('feedbackTab', [
             if (thread === null) {
               throw Error('Trying to display a non-existent thread');
             }
-            ThreadDataService.fetchMessages(thread).then(() => {
+            ThreadDataService.getMessagesAsync(thread).then(() => {
               ctrl.activeThread = thread;
-              ThreadDataService.markThreadAsSeen(ctrl.activeThread);
+              ThreadDataService.markThreadAsSeenAsync(ctrl.activeThread);
               ctrl.tmpMessage.status = ctrl.activeThread.status;
             });
           };
@@ -246,7 +246,7 @@ angular.module('oppia').directive('feedbackTab', [
               text: ''
             };
             ctrl.clearActiveThread();
-            ThreadDataService.fetchFeedbackStats();
+            ThreadDataService.getOpenThreadsCountAsync();
 
             return $q.all([
               UserService.getUserInfoAsync().then(

@@ -69,7 +69,7 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
         suggestionThreads: [{ threadId: 'abc1' }, { threadId: 'def2' }]
       };
 
-      spyOn(ThreadDataService, 'fetchThreads').and
+      spyOn(ThreadDataService, 'getThreadsAsync').and
         .returnValue($q.resolve(threads));
 
       SuggestionImprovementTaskObjectFactory.fetchTasks().then(tasks => {
