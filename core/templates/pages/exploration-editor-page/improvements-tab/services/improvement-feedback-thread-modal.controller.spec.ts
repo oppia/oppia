@@ -33,125 +33,178 @@ describe('Improvement Feedback Thread Modal Controller', function() {
       explorationId: expId
     });
   }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    AlertsService = $injector.get('AlertsService');
-    ThreadDataService = $injector.get('ThreadDataService');
-    CsrfService = $injector.get('CsrfTokenService');
-    $httpBackend = $injector.get('$httpBackend');
-    $q = $injector.get('$q');
-
-    spyOn(CsrfService, 'getTokenAsync').and.returnValue(
-      $q.resolve('sample-csrf-token'));
-
-    var mockFeedbackThreads = [{
-      last_updated: 1000,
-      original_author_username: 'author',
-      status: 'accepted',
-      subject: 'sample subject',
-      summary: 'sample summary',
-      message_count: 10,
-      state_name: 'state 1',
-      thread_id: 'exp1.thread1'
-    }];
-
-    $httpBackend.whenGET('/threadlisthandler/' + expId)
-      .respond({
-        feedback_thread_dicts: mockFeedbackThreads,
-        suggestion_thread_dicts: []
-      });
-    $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=' + expId
-    ).respond({ suggestions: [] });
-    ThreadDataService.fetchThreads().then(function(threads) {
-      thread = threads.feedbackThreads[0];
-    });
-    $httpBackend.flush();
-
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
-
-    var $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $controller(
-      'ImprovementFeedbackThreadModalController', {
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance,
-        isUserLoggedIn: true,
-        thread: thread
-      });
-  }));
 
   afterEach(function() {
     $httpBackend.verifyNoOutstandingRequest();
     $httpBackend.verifyNoOutstandingExpectation();
   });
 
-  it('should evalute scope variables value correctly', function() {
-    expect($scope.isUserLoggedIn).toBe(true);
-    expect($scope.activeThread).toEqual(thread);
-    expect($scope.STATUS_CHOICES).toEqual([{
-      id: 'open',
-      text: 'Open'
-    }, {
-      id: 'fixed',
-      text: 'Fixed'
-    }, {
-      id: 'ignored',
-      text: 'Ignored'
-    }, {
-      id: 'compliment',
-      text: 'Compliment'
-    }, {
-      id: 'not_actionable',
-      text: 'Not Actionable'
-    }]);
-    expect($scope.tmpMessage).toEqual({
-      status: 'accepted',
-      text: ''
+  describe('when thread id is provided', function() {
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      AlertsService = $injector.get('AlertsService');
+      ThreadDataService = $injector.get('ThreadDataService');
+      CsrfService = $injector.get('CsrfTokenService');
+      $httpBackend = $injector.get('$httpBackend');
+      $q = $injector.get('$q');
+
+      spyOn(CsrfService, 'getTokenAsync').and.returnValue(
+        $q.resolve('sample-csrf-token'));
+
+      var mockFeedbackThreads = [{
+        last_updated: 1000,
+        original_author_username: 'author',
+        status: 'accepted',
+        subject: 'sample subject',
+        summary: 'sample summary',
+        message_count: 10,
+        state_name: 'state 1',
+        thread_id: 'exp1.thread1'
+      }];
+
+      $httpBackend.whenGET('/threadlisthandler/' + expId)
+        .respond({
+          feedback_thread_dicts: mockFeedbackThreads,
+          suggestion_thread_dicts: []
+        });
+      $httpBackend.whenGET(
+        '/suggestionlisthandler?target_type=exploration&target_id=' + expId
+      ).respond({ suggestions: [] });
+      ThreadDataService.fetchThreads().then(function(threads) {
+        thread = threads.feedbackThreads[0];
+      });
+      $httpBackend.flush();
+
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
+
+      var $rootScope = $injector.get('$rootScope');
+      $scope = $rootScope.$new();
+      $controller(
+        'ImprovementFeedbackThreadModalController', {
+          $scope: $scope,
+          $uibModalInstance: $uibModalInstance,
+          isUserLoggedIn: true,
+          thread: thread
+        });
+    }));
+
+    it('should evalute scope variables value correctly', function() {
+      expect($scope.isUserLoggedIn).toBe(true);
+      expect($scope.activeThread).toEqual(thread);
+      expect($scope.STATUS_CHOICES).toEqual([{
+        id: 'open',
+        text: 'Open'
+      }, {
+        id: 'fixed',
+        text: 'Fixed'
+      }, {
+        id: 'ignored',
+        text: 'Ignored'
+      }, {
+        id: 'compliment',
+        text: 'Compliment'
+      }, {
+        id: 'not_actionable',
+        text: 'Not Actionable'
+      }]);
+      expect($scope.tmpMessage).toEqual({
+        status: 'accepted',
+        text: ''
+      });
+      expect($scope.getTitle()).toBe('sample subject');
     });
-    expect($scope.getTitle()).toBe('sample subject');
+
+    it('should not add new message when message status is false', function() {
+      var addWarningSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
+      $scope.addNewMessage('temporary text', null);
+      expect(addWarningSpy).toHaveBeenCalledWith(
+        'Invalid message status: null');
+    });
+
+    it('should add new message', function() {
+      $httpBackend.expectPOST('/threadhandler/exp1.thread1').respond(200);
+      $scope.addNewMessage('temporary text', 'newStatus');
+
+      expect($scope.messageSendingInProgress).toBe(true);
+      $httpBackend.flush();
+
+      expect($scope.messageSendingInProgress).toBe(false);
+      expect($scope.tmpMessage.status).toBe('newStatus');
+      expect($uibModalInstance.close).toHaveBeenCalled();
+    });
+
+    it('should use reject handler when adding new message fails', function() {
+      $httpBackend.expectPOST('/threadhandler/exp1.thread1').respond(500);
+      $scope.addNewMessage('temporary text', 'status message');
+
+      expect($scope.messageSendingInProgress).toBe(true);
+      $httpBackend.flush();
+
+      expect($scope.messageSendingInProgress).toBe(false);
+      expect($scope.tmpMessage.status).toBe('accepted');
+      expect($uibModalInstance.close).toHaveBeenCalled();
+    });
+
+    it('should close modal', function() {
+      $scope.close();
+      expect($uibModalInstance.close).toHaveBeenCalled();
+    });
   });
 
-  it('should not add new message when thread id is not valid', function() {
-    var addWarningSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
-    $scope.addNewMessage(null, 'temporary text', 'status message');
-    expect(addWarningSpy).toHaveBeenCalledWith(
-      'Cannot add message to thread with ID: null.');
-  });
+  describe('when thread id is not provided', function() {
+    beforeEach(angular.mock.inject(function($injector, $controller) {
+      AlertsService = $injector.get('AlertsService');
+      ThreadDataService = $injector.get('ThreadDataService');
+      CsrfService = $injector.get('CsrfTokenService');
+      $httpBackend = $injector.get('$httpBackend');
+      $q = $injector.get('$q');
 
-  it('should not add new message when message status is false', function() {
-    var addWarningSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
-    $scope.addNewMessage('exp1.thread1', 'temporary text', null);
-    expect(addWarningSpy).toHaveBeenCalledWith(
-      'Invalid message status: null');
-  });
+      spyOn(CsrfService, 'getTokenAsync').and.returnValue(
+        $q.resolve('sample-csrf-token'));
 
-  it('should add new message', function() {
-    $httpBackend.expectPOST('/threadhandler/exp1.thread1').respond(200);
-    $scope.addNewMessage('exp1.thread1', 'temporary text', 'newStatus');
+      var mockFeedbackThreads = [{
+        last_updated: 1000,
+        original_author_username: 'author',
+        status: 'accepted',
+        subject: 'sample subject',
+        summary: 'sample summary',
+        message_count: 10,
+        state_name: 'state 1',
+        thread_id: null
+      }];
 
-    expect($scope.messageSendingInProgress).toBe(true);
-    $httpBackend.flush();
+      $httpBackend.whenGET('/threadlisthandler/' + expId)
+        .respond({
+          feedback_thread_dicts: mockFeedbackThreads,
+          suggestion_thread_dicts: []
+        });
+      $httpBackend.whenGET(
+        '/suggestionlisthandler?target_type=exploration&target_id=' + expId
+      ).respond({ suggestions: [] });
+      ThreadDataService.fetchThreads().then(function(threads) {
+        thread = threads.feedbackThreads[0];
+      });
+      $httpBackend.flush();
 
-    expect($scope.messageSendingInProgress).toBe(false);
-    expect($scope.tmpMessage.status).toBe('newStatus');
-    expect($uibModalInstance.close).toHaveBeenCalled();
-  });
+      $uibModalInstance = jasmine.createSpyObj(
+        '$uibModalInstance', ['close', 'dismiss']);
 
-  it('should use reject handler when adding new message fails', function() {
-    $httpBackend.expectPOST('/threadhandler/exp1.thread1').respond(500);
-    $scope.addNewMessage('exp1.thread1', 'temporary text', 'status message');
+      var $rootScope = $injector.get('$rootScope');
+      $scope = $rootScope.$new();
+      $controller(
+        'ImprovementFeedbackThreadModalController', {
+          $scope: $scope,
+          $uibModalInstance: $uibModalInstance,
+          isUserLoggedIn: true,
+          thread: thread
+        });
+    }));
 
-    expect($scope.messageSendingInProgress).toBe(true);
-    $httpBackend.flush();
-
-    expect($scope.messageSendingInProgress).toBe(false);
-    expect($scope.tmpMessage.status).toBe('accepted');
-    expect($uibModalInstance.close).toHaveBeenCalled();
-  });
-
-  it('should close modal', function() {
-    $scope.close();
-    expect($uibModalInstance.close).toHaveBeenCalled();
+    it('should not add new message when thread id is not valid', function() {
+      var addWarningSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
+      $scope.addNewMessage('text', 'status message');
+      expect(addWarningSpy).toHaveBeenCalledWith(
+        'Cannot add message to thread with ID: null.');
+    });
   });
 });
