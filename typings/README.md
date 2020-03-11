@@ -19,7 +19,7 @@ For writing custom definitions, existing type definitions in [DefinitelyTyped](h
  
 - ### Testing the definitions
 
-The type checks run with the typescript tests. So you can run the following command. to see if the definitions you wrote are correct:
+The type checks run with the typescript tests. So you can run the following command to see if the definitions you wrote are correct:
 
 ```bash
 

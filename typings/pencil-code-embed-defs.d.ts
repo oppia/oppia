@@ -1,6 +1,6 @@
 // Code - https://pencilcode.net/lib/pencilcodeembed.js
 // Type definitions are only added for PencilCodeEmbed class since it is the
-// only class used in our codebase.
+// only class exported by the library.
 
 interface SetupCode {
   code: String,
