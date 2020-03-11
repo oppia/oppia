@@ -73,18 +73,15 @@ export class ThreadMessageObjectFactory {
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
   createFromBackendDict(threadMessageBackendDict: any): ThreadMessage {
-    let threadMessageSummaryBackendDict = {
-      text: threadMessageBackendDict.text,
-      author_username: threadMessageBackendDict.author_username
-    };
     return new ThreadMessage(
       threadMessageBackendDict.author_username,
       threadMessageBackendDict.created_on, threadMessageBackendDict.entity_type,
       threadMessageBackendDict.entity_id, threadMessageBackendDict.message_id,
       threadMessageBackendDict.text, threadMessageBackendDict.updated_status,
       threadMessageBackendDict.updated_subject,
-      this.threadMessageSummaryObjectFactory.createFromBackendDict(
-        threadMessageSummaryBackendDict));
+      this.threadMessageSummaryObjectFactory.createNew(
+        threadMessageBackendDict.author_username,
+        threadMessageBackendDict.text));
   }
 }
 

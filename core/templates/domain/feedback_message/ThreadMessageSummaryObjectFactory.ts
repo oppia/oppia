@@ -36,16 +36,6 @@ export class ThreadMessageSummary {
 
 @Injectable({providedIn: 'root'})
 export class ThreadMessageSummaryObjectFactory {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as 'any'
-  // because 'threadMessageSummaryBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(threadMessageBackendDict: any): ThreadMessageSummary {
-    return this.createNew(
-      threadMessageBackendDict.author_username,
-      threadMessageBackendDict.text);
-  }
-
   createNew(authorUsername: string, text: string): ThreadMessageSummary {
     return new ThreadMessageSummary(authorUsername, text);
   }
