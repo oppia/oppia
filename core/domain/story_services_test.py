@@ -541,6 +541,42 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
+    def test_cannot_update_story_with_exps_with_invalid_rte_content(self):
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1',
+            end_state_name='End')
+        self.publish_exploration(self.user_id_a, 'exp_id_1')
+        exp_services.update_exploration(
+            self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'Introduction',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': (
+                        '<p><oppia-noninteractive-collapsible>'
+                        '</oppia-noninteractive-collapsible></p>')
+                }
+            })],
+            'Updated State Content.')
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': 'exp_id_1'
+            })
+        ]
+
+        with self.assertRaisesRegexp(
+            Exception, 'RTE content in state Introduction of exploration with '
+            'ID exp_id_1 is not supported on mobile.'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
     def test_cannot_update_story_with_exps_with_parameter_values(self):
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1',

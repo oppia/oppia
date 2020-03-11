@@ -217,17 +217,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
         hints_list = []
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': (
-                    '<p><oppia-noninteractive-collapsible>'
-                    '</oppia-noninteractive-collapsible></p>')
-            },
-        })
+        hints_list.append(
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p><oppia-noninteractive-collapsible>'
+                    '</oppia-noninteractive-collapsible></p>'
+                )
+            )
+        )
         init_state.update_interaction_hints(hints_list)
         self.assertFalse(init_state.is_rte_content_supported_on_android())
-        hints_list[0]['hint_content']['html'] = ''
+        hints_list[0].hint_content.html = ''
         init_state.update_interaction_hints(hints_list)
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
@@ -251,8 +251,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': (
-                        '<p><oppia-noninteractive-tabs>'
-                        '</oppia-noninteractive-tabs></p>')
+                        '<p><oppia-noninteractive-tabs tab_contents-with-value='
+                        '"{"title": "Hint introduction", "content": "This set '
+                        'of tabs shows some hints. Click on the other tabs to '
+                        'display the relevant hints."}">'
+                        '</oppia-noninteractive-tabs> Other Text </p>')
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],

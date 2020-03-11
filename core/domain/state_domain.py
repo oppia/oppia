@@ -25,7 +25,7 @@ import logging
 import re
 
 from constants import constants
-from core.domain import android_validation_domain
+from core.domain import android_validation_constants
 from core.domain import customization_args_util
 from core.domain import html_cleaner
 from core.domain import interaction_registry
@@ -389,7 +389,7 @@ class InteractionInstance(python_utils.OBJECT):
         if self.id:
             return (
                 self.id in
-                android_validation_domain.StoryConstants.VALID_INTERACTION_IDS)
+                android_validation_constants.VALID_INTERACTION_IDS)
 
         return True
 
@@ -408,7 +408,7 @@ class InteractionInstance(python_utils.OBJECT):
                 return False
 
         if (
-                self.default_outcome.feedback and
+                self.default_outcome and self.default_outcome.feedback and
                 regex.search(self.default_outcome.feedback.html)):
             return False
 
@@ -1542,15 +1542,15 @@ class State(python_utils.OBJECT):
         return content_id_to_html[content_id]
 
     def is_rte_content_supported_on_android(self):
-        """Checks whether the RTE components used in the state is supported by
+        """Checks whether the RTE components used in the state are supported by
         Android.
 
         Returns:
             bool. Whether the RTE components in the state is valid.
         """
         regex_string = r'oppia-noninteractive-'
-        for rte_id in android_validation_domain.StoryConstants.INVALID_RTE_COMPONENTS: # pylint: disable=line-too-long
-            regex_string += rte_id + '|'
+        regex_string += (
+            '|'.join(android_validation_constants.INVALID_RTE_COMPONENTS))
         regex_string = regex_string[:-1]
         regex = re.compile(regex_string)
         if self.content and regex.search(self.content.html):

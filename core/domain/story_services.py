@@ -25,7 +25,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
-from core.domain import android_validation_domain
+from core.domain import android_validation_constants
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import story_domain
@@ -231,7 +231,7 @@ def _save_story(committer_id, story, commit_message, change_list):
                     ' different categories.' % (sample_exp_id, exp_id))
             if (
                     exp.language_code not in
-                    android_validation_domain.StoryConstants.SUPPORTED_LANGUAGES): # pylint: disable=line-too-long
+                    android_validation_constants.SUPPORTED_LANGUAGES):
                 raise utils.ValidationError(
                     'Invalid language %s found for exploration with ID %s.'
                     % (exp.language_code, exp_id))
@@ -241,12 +241,15 @@ def _save_story(committer_id, story, commit_message, change_list):
                     ' it. Invalid exploration: %s' % exp.id)
             for state_name in exp.states:
                 state = exp.states[state_name]
-                state.is_rte_content_supported_on_android()
-
                 if not state.interaction.is_supported_on_android_app():
                     raise utils.ValidationError(
                         'Invalid interaction %s in exploration with ID: %s.' %
                         (state.interaction.id, exp.id))
+
+                if not state.is_rte_content_supported_on_android():
+                    raise utils.ValidationError(
+                        'RTE content in state %s of exploration with ID %s is '
+                        'not supported on mobile.' % (state_name, exp.id))
 
 
     # Story model cannot be None as story is passed as parameter here and that

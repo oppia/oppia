@@ -22,7 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 
 from constants import constants
-from core.domain import android_validation_domain as android_checks
+from core.domain import android_validation_constants
 from core.domain import change_domain
 from core.domain import user_services
 from core.platform import models
@@ -494,7 +494,7 @@ class Topic(python_utils.OBJECT):
 
         if (
                 len(name) >
-                android_checks.TopicConstants.MAX_CHARS_IN_TOPIC_NAME):
+                android_validation_constants.MAX_CHARS_IN_TOPIC_NAME):
             raise utils.ValidationError(
                 'Topic name should be at most 35 characters.')
 
@@ -514,7 +514,7 @@ class Topic(python_utils.OBJECT):
 
         if (
                 len(name) >
-                android_checks.TopicConstants.MAX_CHARS_IN_ABBREVIATED_TOPIC_NAME):  # pylint: disable=line-too-long
+                android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME):
             raise utils.ValidationError(
                 'Abbreviated name field should not exceed 12 characters.')
 
@@ -708,7 +708,7 @@ class Topic(python_utils.OBJECT):
 
         if (
                 len(self.description) >
-                android_checks.TopicConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION):
+                android_validation_constants.MAX_CHARS_IN_TOPIC_DESCRIPTION):
             raise utils.ValidationError(
                 'Topic description should be at most 240 characters.')
 
