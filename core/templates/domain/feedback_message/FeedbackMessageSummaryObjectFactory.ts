@@ -55,9 +55,11 @@ export class FeedbackMessageSummaryObjectFactory {
   createNewMessage(
       newMessageId: number, newMessageText: string, authorUsername: string,
       authorPictureDataUrl: string): FeedbackMessageSummary {
+    // Date.now() returns number of milliseconds since 1970-01-01 UTC.
+    let createdOn: number = Date.getTime();
     return new FeedbackMessageSummary(
       newMessageId, newMessageText, null, null, null, null, authorUsername,
-      authorPictureDataUrl, Date().getTime());
+      authorPictureDataUrl, createdOn);
   }
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'feedbackMessageSummaryBackendDict' is a dict with
