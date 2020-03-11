@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for the about page.
  */
+
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('About Page', function() {

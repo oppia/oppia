@@ -15,7 +15,6 @@
 /**
  * @fileoverview Unit tests for SkillEditorRoutingService.
  */
-import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/skill-editor-page/services/skill-editor-routing.service');
 
@@ -25,12 +24,6 @@ describe('Skill Editor Routing Service', function() {
   var $location = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
   beforeEach(angular.mock.inject(function($injector) {
     sers = $injector.get('SkillEditorRoutingService');
     $rootScope = $injector.get('$rootScope');

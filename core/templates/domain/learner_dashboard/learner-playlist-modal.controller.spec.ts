@@ -15,7 +15,6 @@
 /**
  * @fileoverview Unit tests for for learnerPlaylistModal.
  */
-import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Learner Playlist Modal Controller', function() {
   var $scope = null;
@@ -24,12 +23,6 @@ describe('Learner Playlist Modal Controller', function() {
   var $uibModalInstance;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
   beforeEach(angular.mock.inject(function($injector, $controller, $q) {
     var $rootScope = $injector.get('$rootScope');
     $httpBackend = $injector.get('$httpBackend');
