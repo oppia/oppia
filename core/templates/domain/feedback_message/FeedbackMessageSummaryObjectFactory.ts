@@ -57,7 +57,7 @@ export class FeedbackMessageSummaryObjectFactory {
       authorPictureDataUrl: string): FeedbackMessageSummary {
     return new FeedbackMessageSummary(
       newMessageId, newMessageText, null, null, null, null, authorUsername,
-      authorPictureDataUrl, new Date().getTime());
+      authorPictureDataUrl, Date().getTime());
   }
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'feedbackMessageSummaryBackendDict' is a dict with
