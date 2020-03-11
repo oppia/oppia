@@ -214,8 +214,8 @@ class BaseHandler(webapp2.RequestHandler):
             return
 
         if (self.REDIRECT_DELETED_USERS and
-                self.request.referrer and
                 self.user_id and
+                self.request.referrer and
                 self.request.referrer.endswith(
                     feconf.PENDING_ACCOUNT_DELETION_URL)):
             self.redirect('/logout?redirect_url=%s' % self.request.uri)

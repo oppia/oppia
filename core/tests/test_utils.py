@@ -594,7 +594,7 @@ tags: []
         return None
 
     def _get_response(
-            self, url, expected_content_type, params=None,
+            self, url, expected_content_type, params=None, headers=None,
             expected_status_int=200):
         """Get a response, transformed to a Python object.
 
@@ -602,6 +602,7 @@ tags: []
             url: str. The URL to fetch the response.
             expected_content_type: str. The content type to expect.
             params: dict. A dictionary that will be encoded into a query string.
+            headers: dict. A dictionary of headers to send with the request.
             expected_status_int: int. The integer status code to expect. Will
                 be 200 if not specified.
 
@@ -622,7 +623,7 @@ tags: []
         with self.swap(
             jinja2.environment.Environment, 'get_template', mock_get_template):
             response = self.testapp.get(
-                url, params, expect_errors=expect_errors,
+                url, params, headers=headers, expect_errors=expect_errors,
                 status=expected_status_int)
 
         # Testapp takes in a status parameter which is the expected status of
@@ -643,12 +644,13 @@ tags: []
 
         return response
 
-    def get_html_response(self, url, params=None, expected_status_int=200):
+    def get_html_response(self, url, params=None, headers=None, expected_status_int=200):
         """Get a HTML response, transformed to a Python object.
 
         Args:
             url: str. The URL to fetch the response.
             params: dict. A dictionary that will be encoded into a query string.
+            headers: dict. A dictionary of headers to send with the request.
             expected_status_int: int. The integer status code to expect. Will
                 be 200 if not specified.
 
@@ -656,13 +658,13 @@ tags: []
             webtest.TestResponse. The test response.
         """
         response = self._get_response(
-            url, 'text/html', params=params,
+            url, 'text/html', params=params, headers=headers,
             expected_status_int=expected_status_int)
 
         return response
 
     def get_custom_response(
-            self, url, expected_content_type, params=None,
+            self, url, expected_content_type, params=None, headers=None,
             expected_status_int=200):
         """Get a response other than HTML or JSON, transformed to a Python
         object.
@@ -671,6 +673,7 @@ tags: []
             url: str. The URL to fetch the response.
             expected_content_type: str. The content type to expect.
             params: dict. A dictionary that will be encoded into a query string.
+            headers: dict. A dictionary of headers to send with the request.
             expected_status_int: int. The integer status code to expect. Will
                 be 200 if not specified.
 

@@ -904,7 +904,7 @@ class SiteLanguageHandlerTests(test_utils.GenericTestBase):
 
 class UserInfoHandlerTests(test_utils.GenericTestBase):
 
-    def test_user_info_handler(self):
+    def test_user_info_handler_logged_in(self):
         """Test the language is saved in the preferences when handler is
         called.
         """
@@ -921,12 +921,29 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
             'username': self.EDITOR_USERNAME,
             'email': self.EDITOR_EMAIL,
             'user_is_logged_in': True}, json_response)
-        self.logout()
 
+    def test_user_info_handler_logged_out(self):
         json_response = self.get_json('/userinfohandler')
         self.assertDictEqual({
             'user_is_logged_in': False
         }, json_response)
+
+    def test_user_info_handler_logged_in_deleted(self):
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        user_services.mark_user_for_deletion(
+            self.get_user_id_from_email(self.EDITOR_EMAIL), [], [])
+        json_response = self.get_json('/userinfohandler')
+        self.assertDictEqual({
+            'is_moderator': False,
+            'is_admin': False,
+            'is_topic_manager': False,
+            'is_super_admin': False,
+            'can_create_collections': False,
+            'preferred_site_language_code': None,
+            'username': self.EDITOR_USERNAME,
+            'email': None,
+            'user_is_logged_in': True}, json_response)
 
 
 class UrlHandlerTests(test_utils.GenericTestBase):

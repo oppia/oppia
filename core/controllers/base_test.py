@@ -284,6 +284,17 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.assertIn('dashboard', response.headers['location'])
         self.logout()
 
+    def test_automatic_logout_when_redirecting_from_deletetion_page(self):
+        user_services.mark_user_for_deletion(
+            self.get_user_id_from_email(self.TEST_CREATOR_EMAIL), [], [])
+        self.login(self.TEST_CREATOR_EMAIL)
+
+        response = self.get_html_response(
+            '/',
+            headers={'Referer': str(feconf.PENDING_ACCOUNT_DELETION_URL)},
+            expected_status_int=302)
+        self.assertIn('/logout?redirect_url=', response.location)
+
     def test_get_with_invalid_return_type_logs_correct_warning(self):
         # Modify the testapp to use the mock handler.
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
