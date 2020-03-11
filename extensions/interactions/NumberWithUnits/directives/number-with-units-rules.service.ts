@@ -19,8 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { create, addDependencies } from 'mathjs'
-const { add } = create({addDependencies}, {});
+import { unit } from 'mathjs';
 
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';

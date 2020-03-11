@@ -17,7 +17,6 @@
  */
 
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
@@ -653,7 +652,6 @@ module.exports = {
         },
       },
     }),
-    new BundleAnalyzerPlugin(),
   ],
   module: {
     rules: [{
@@ -699,6 +697,5 @@ module.exports = {
     splitChunks: {
       chunks: 'all'
     },
-    usedExports: true,
   }
 };

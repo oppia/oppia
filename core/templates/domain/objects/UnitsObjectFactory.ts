@@ -26,8 +26,7 @@ export interface IUnitsDict {
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { create, addDependencies } from 'mathjs'
-const { add } = create({addDependencies}, {});
+import { createUnit, unit } from 'mathjs';
 
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';

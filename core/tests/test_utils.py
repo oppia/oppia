@@ -644,7 +644,8 @@ tags: []
 
         return response
 
-    def get_html_response(self, url, params=None, headers=None, expected_status_int=200):
+    def get_html_response(
+            self, url, params=None, headers=None, expected_status_int=200):
         """Get a HTML response, transformed to a Python object.
 
         Args:
@@ -684,7 +685,7 @@ tags: []
             expected_content_type, ['text/html', 'application/json'])
 
         response = self._get_response(
-            url, expected_content_type, params=params,
+            url, expected_content_type, params=params, headers=headers,
             expected_status_int=expected_status_int)
 
         return response
