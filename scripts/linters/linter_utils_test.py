@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
+import tempfile
 
 from core.tests import test_utils
 import python_utils
@@ -170,3 +171,20 @@ class MemoizeTest(test_utils.GenericTestBase):
         count_calls(5, 6, d=3, c=2)
         self.assertEqual(call_counter[(5, 6, 3, 2)], 0)
         self.assertEqual(call_counter[(5, 6, 2, 3)], 1)
+
+
+class RedirectStoutTest(test_utils.GenericTestBase):
+    """Tests for the redirect_stdout function."""
+
+    def test_redirect_stdout(self):
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'r+') as tmp:
+            with linter_utils.redirect_stdout(tmp):
+                python_utils.PRINT('This is a test')
+            tmp.seek(0)
+            data = tmp.read()
+        temp_file.close()
+
+        self.assertEqual(data, 'This is a test\n')

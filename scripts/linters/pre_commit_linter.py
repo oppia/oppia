@@ -433,6 +433,16 @@ def categorize_files(file_paths):
     _FILES.update(all_filepaths_dict)
 
 
+def _print_complete_summary_of_errors(all_messages):
+    """Print complete summary of errors."""
+    error_messages = all_messages
+    if error_messages != '':
+        python_utils.PRINT('Summary of Errors:')
+        python_utils.PRINT('----------------------------------------')
+        for message in error_messages:
+            python_utils.PRINT(message)
+
+
 def main(args=None):
     """Main method for pre commit linter script that lints Python, JavaScript,
     HTML, and CSS files.
@@ -503,6 +513,8 @@ def main(args=None):
     code_owner_message = codeowner_linter.check_codeowner_file(
         verbose_mode_enabled)
     all_messages += code_owner_message
+
+    _print_complete_summary_of_errors(all_messages)
 
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
