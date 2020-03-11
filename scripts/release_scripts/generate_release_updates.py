@@ -164,7 +164,9 @@ def create_group_for_next_release():
         'Hi all, We have completed the release for current month. '
         'This is a reminder to fill in the job requests here: '
         '%s if you are planning '
-        'to run your job in the next release. Thanks!\n' % (
+        'to run your job in the next release. '
+        'Please fill in the requests by [Add a deadline which is 7 '
+        'days before the next release cut]. Thanks!\n' % (
             release_constants.RELEASE_ROTA_URL,
             release_constants.JOBS_FORM_URL))
 
