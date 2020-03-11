@@ -28,7 +28,8 @@ import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
-import { AppConstants, WARNING_TYPES_CONSTANT } from 'app.constants';
+import { AppConstants } from 'app.constants';
+import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
 describe('NumericInputValidationService', () => {
   let validatorService: NumericInputValidationService;

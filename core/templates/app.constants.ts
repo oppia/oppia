@@ -16,10 +16,7 @@
  * @fileoverview Shared constants for the Oppia module.
  */
 
-export interface WARNING_TYPES_CONSTANT {
-  CRITICAL: string,
-  ERROR: string
-}
+import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
 
 export class AppConstants {
   public static DEFAULT_TRANSLATIONS = {
