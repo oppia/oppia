@@ -55,7 +55,7 @@ export class FeedbackMessageSummaryObjectFactory {
   createNewMessage(
       newMessageId: number, newMessageText: string, authorUsername: string,
       authorPictureDataUrl: string): FeedbackMessageSummary {
-    let createdOnMsecs: number = new Date().getTime(); // Msecs since 1970-01-01 UTC
+    let createdOnMsecs = new Date().getTime(); // Msecs since 1970-01-01 UTC.
     return new FeedbackMessageSummary(
       newMessageId, newMessageText, null, null, null, null, authorUsername,
       authorPictureDataUrl, createdOnMsecs);
