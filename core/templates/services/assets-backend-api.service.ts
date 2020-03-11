@@ -16,6 +16,8 @@
  * @fileoverview Service to serve as the interface for fetching and uploading
  * assets from Google Cloud Storage.
  */
+// Jquery import is needed here in order to spy ajax method on unit tests.
+import $ from 'jquery';
 
 require('domain/utilities/AudioFileObjectFactory.ts');
 require('domain/utilities/FileDownloadRequestObjectFactory.ts');
@@ -128,11 +130,17 @@ angular.module('oppia').factory('AssetsBackendApiService', [
           successCallback(
             ImageFileObjectFactory.createNew(filename, assetBlob));
         }
-      }, function() {
+      })['catch'](function() {
         errorCallback(filename);
       })['finally'](function() {
         _removeFromFilesCurrentlyBeingRequested(filename, assetType);
       });
+    };
+
+    var removeXSSIPrefix = function(data) {
+      var transformedData = data.substring(5);
+      var parsedResponse = JSON.parse(transformedData);
+      return parsedResponse;
     };
 
     var _abortAllCurrentDownloads = function(assetType) {
@@ -188,19 +196,14 @@ angular.module('oppia').factory('AssetsBackendApiService', [
           contentType: false,
           type: 'POST',
           dataType: 'text',
-          dataFilter: function(data) {
-            // Remove the XSSI prefix.
-            var transformedData = data.substring(5);
-            return JSON.parse(transformedData);
-          },
+          dataFilter: removeXSSIPrefix,
         }).done(function(response) {
           if (successCallback) {
             successCallback(response);
           }
         }).fail(function(data) {
           // Remove the XSSI prefix.
-          var transformedData = data.responseText.substring(5);
-          var parsedResponse = angular.fromJson(transformedData);
+          var parsedResponse = removeXSSIPrefix(data.responseText);
           if (errorCallback) {
             errorCallback(parsedResponse);
           }
