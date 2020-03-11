@@ -55,7 +55,7 @@ describe('Training Modal Controller', function() {
     InteractionObjectFactory = $injector.get('InteractionObjectFactory');
   }));
 
-  describe('when anwer group index is equal response answer groups count',
+  describe('when answer group index is equal to response answer groups count',
     function() {
       beforeEach(angular.mock.inject(function($injector, $controller) {
         callbackSpy = jasmine.createSpy('callback');

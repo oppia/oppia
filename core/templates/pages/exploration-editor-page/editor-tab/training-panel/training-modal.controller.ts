@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for learnerPlaylistModal.
+ * @fileoverview Controller for TrainingModal.
  */
 require(
   'pages/exploration-editor-page/editor-tab/training-panel/' +
