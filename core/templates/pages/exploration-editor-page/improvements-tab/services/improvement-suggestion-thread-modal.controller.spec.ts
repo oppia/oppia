@@ -33,20 +33,9 @@ describe('Improvement Suggestion Thread Modal Controller', function() {
     $provide.value('ExplorationDataService', {
       explorationId: expId
     });
-    $provide.value('UserService', {
-      getUserInfoAsync: function() {
-        return $q.resolve({
-          isLoggedIn: function() {
-            return true;
-          }
-        });
-      }
-    });
     $provide.value('ExplorationStatesService', {
-      hasState: function() {
-        return true;
-      },
-      getState: function(stateName) {}
+      hasState: () => true,
+      getState: stateName => {}
     });
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -58,11 +47,8 @@ describe('Improvement Suggestion Thread Modal Controller', function() {
     $httpBackend = $injector.get('$httpBackend');
     $q = $injector.get('$q');
 
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
-    });
+    spyOn(CsrfService, 'getTokenAsync').and.returnValue(
+      $q.resolve('sample-csrf-token'));
 
     var mockSuggestionThreads = [{
       description: 'Suggestion',
@@ -120,15 +106,17 @@ describe('Improvement Suggestion Thread Modal Controller', function() {
       'ImprovementSuggestionThreadModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
+        isUserLoggedIn: true,
         thread: thread
       });
   }));
 
-  it('should evalute scope variables value correctly', function() {
-    // $apply is called in order to resolve $q from
-    // UserService.getUserInfoAsync.
-    $scope.$apply();
+  afterEach(function() {
+    $httpBackend.verifyNoOutstandingRequest();
+    $httpBackend.verifyNoOutstandingExpectation();
+  });
 
+  it('should evalute scope variables value correctly', function() {
     expect($scope.isUserLoggedIn).toBe(true);
     expect($scope.activeThread).toEqual(thread);
     expect($scope.STATUS_CHOICES).toEqual([{

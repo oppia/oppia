@@ -41,9 +41,11 @@ require('pages/exploration-editor-page/improvements-tab/services/improvement-con
 /* eslint-enable max-len */
 
 angular.module('oppia').factory('ImprovementModalService', [
-  '$uibModal', 'UrlInterpolationService',
+  '$uibModal', 'UrlInterpolationService', 'UserExplorationPermissionsService',
+  'UserService',
   function(
-      $uibModal, UrlInterpolationService) {
+      $uibModal, UrlInterpolationService, UserExplorationPermissionsService,
+      UserService) {
     return {
       /**
        * Opens the modal for displaying playthrough actions.
@@ -57,12 +59,8 @@ angular.module('oppia').factory('ImprovementModalService', [
             'playthrough-modal.template.html'),
           backdrop: true,
           resolve: {
-            playthrough: function() {
-              return playthrough;
-            },
-            playthroughIndex: function() {
-              return playthroughIndex;
-            }
+            playthrough: () => playthrough,
+            playthroughIndex: () => playthroughIndex
           },
           controller: 'ImprovementPlaythoughModalController'
         });
@@ -73,9 +71,10 @@ angular.module('oppia').factory('ImprovementModalService', [
             '/pages/exploration-editor-page/improvements-tab/templates/' +
             'answer-details-modal.template.html'),
           resolve: {
-            learnerAnswerDetails: function() {
-              return learnerAnswerDetails;
-            }
+            isEditable: () => (
+              UserExplorationPermissionsService.getPermissionsAsync()
+                .then(permissions => permissions.can_edit)),
+            learnerAnswerDetails: () => learnerAnswerDetails
           },
           controller: 'ImprovementLearnerAnswerDetailsModalController'
         });
@@ -88,9 +87,10 @@ angular.module('oppia').factory('ImprovementModalService', [
           backdrop: 'static',
           size: 'lg',
           resolve: {
-            thread: function() {
-              return thread;
-            }
+            isUserLoggedIn: () => (
+              UserService.getUserInfoAsync()
+                .then(userInfo => userInfo.isLoggedIn())),
+            thread: () => thread
           },
           controller: 'ImprovementFeedbackThreadModalController',
         });
@@ -104,9 +104,10 @@ angular.module('oppia').factory('ImprovementModalService', [
           backdrop: 'static',
           size: 'lg',
           resolve: {
-            thread: function() {
-              return thread;
-            }
+            isUserLoggedIn: () => (
+              UserService.getUserInfoAsync()
+                .then(userInfo => userInfo.isLoggedIn())),
+            thread: () => thread
           },
           controller: 'ImprovementSuggestionThreadModalController',
         });
@@ -122,15 +123,9 @@ angular.module('oppia').factory('ImprovementModalService', [
             'confirmation-modal.template.html'),
           backdrop: true,
           resolve: {
-            message: function() {
-              return message;
-            },
-            buttonText: function() {
-              return buttonText;
-            },
-            buttonClass: function() {
-              return buttonClass;
-            }
+            message: () => message,
+            buttonText: () => buttonText,
+            buttonClass: () => buttonClass
           },
           controller: 'ImprovementConfirmationModalController'
         });

@@ -26,11 +26,7 @@ describe('Improvement Playthough Modal Controller', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(function($provide) {
     $provide.value('ExplorationStatesService', {
-      getState: function() {
-        return {
-          interaction: null
-        };
-      }
+      getState: () => ({ interaction: null })
     });
   }));
 
@@ -95,21 +91,9 @@ describe('Improvement Playthough Modal Controller', function() {
     });
 
     it('should render issue table', function() {
-      expect($scope.renderIssueTable()).toBe(
-        '<multiple-incorrect-submissions-issue' +
-        ' final-block="[{&amp;quot;actionType&amp;quot;:&' +
-        'amp;quot;ExplorationStart&amp;quot;,&' +
-        'amp;quot;actionCustomizationArgs&amp;quot;:{&amp;quot;state_name&' +
-        'amp;quot;:{&amp;quot;value&amp;quot;:&amp;quot;state_name1&' +
-        'amp;quot;}},&amp;quot;schemaVersion&amp;quot;:&amp;quot;&' +
-        'amp;quot;},{&amp;quot;actionType&amp;quot;:&' +
-        'amp;quot;ExplorationStart&amp;quot;,&' +
-        'amp;quot;actionCustomizationArgs&amp;quot;:{&amp;quot;state_name&' +
-        'amp;quot;:{&amp;quot;value&amp;quot;:&amp;quot;state_name2&' +
-        'amp;quot;}},&amp;quot;schemaVersion&amp;quot;:&amp;quot;&' +
-        'amp;quot;}]"' +
-        ' action-start-index="1"' +
-        '></multiple-incorrect-submissions-issue>');
+      expect($scope.renderIssueTable()).toMatch(
+        /<multiple-incorrect-submissions-issue final-block=".*"/,
+        / action-start-index="1"><\/multiple-incorrect-submissions-issue>/);
     });
 
     it('should get actions to render', function() {
@@ -225,31 +209,9 @@ describe('Improvement Playthough Modal Controller', function() {
     });
 
     it('should render issue table', function() {
-      expect($scope.renderIssueTable()).toBe(
-        '<multiple-incorrect-submissions-issue' +
-        ' final-block="[{&amp;quot;actionType&amp;quot;:&' +
-        'amp;quot;ExplorationStart&amp;quot;,&' +
-        'amp;quot;actionCustomizationArgs&amp;quot;:{&' +
-        'amp;quot;state_name&amp;quot;:{&amp;quot;value&amp;quot;:&' +
-        'amp;quot;state_name3&amp;quot;}},&amp;quot;schemaVersion&' +
-        'amp;quot;:&amp;quot;&amp;quot;},{&amp;quot;actionType&' +
-        'amp;quot;:&amp;quot;ExplorationStart&amp;quot;,&' +
-        'amp;quot;actionCustomizationArgs&amp;quot;:{&' +
-        'amp;quot;state_name&amp;quot;:{&amp;quot;value&amp;quot;:&' +
-        'amp;quot;state_name4&amp;quot;}},&amp;quot;schemaVersion&' +
-        'amp;quot;:&amp;quot;&amp;quot;},{&amp;quot;actionType&' +
-        'amp;quot;:&amp;quot;ExplorationStart&amp;quot;,&' +
-        'amp;quot;actionCustomizationArgs&amp;quot;:{&' +
-        'amp;quot;state_name&amp;quot;:{&amp;quot;value&amp;quot;:&' +
-        'amp;quot;state_name5&amp;quot;}},&amp;quot;schemaVersion&' +
-        'amp;quot;:&amp;quot;&amp;quot;},{&amp;quot;actionType&amp;quot;:&' +
-        'amp;quot;ExplorationStart&amp;quot;,&' +
-        'amp;quot;actionCustomizationArgs&amp;quot;:{&amp;quot;state_name&' +
-        'amp;quot;:{&amp;quot;value&amp;quot;:&amp;quot;state_name6&' +
-        'amp;quot;}},&amp;quot;schemaVersion&amp;quot;:&amp;quot;&' +
-        'amp;quot;}]"' +
-        ' action-start-index="3">' +
-        '</multiple-incorrect-submissions-issue>');
+      expect($scope.renderIssueTable()).toMatch(
+        /<multiple-incorrect-submissions-issue final-block=".*"/,
+        /action-start-index="3"><\/multiple-incorrect-submissions-issue>/);
     });
 
     it('should get actions to render', function() {

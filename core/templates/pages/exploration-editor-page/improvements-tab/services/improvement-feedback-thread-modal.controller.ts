@@ -19,15 +19,13 @@
 angular.module('oppia').controller('ImprovementFeedbackThreadModalController', [
   '$scope', '$uibModalInstance', 'AlertsService', 'DateTimeFormatService',
   'EditabilityService', 'ThreadDataService', 'ThreadStatusDisplayService',
-  'UserService', 'thread',
+  'isUserLoggedIn', 'thread',
   function(
       $scope, $uibModalInstance, AlertsService, DateTimeFormatService,
       EditabilityService, ThreadDataService, ThreadStatusDisplayService,
-      UserService, thread) {
-    UserService.getUserInfoAsync().then(function(userInfo) {
-      $scope.isUserLoggedIn = userInfo.isLoggedIn();
-    });
+      isUserLoggedIn, thread) {
     $scope.activeThread = thread;
+    $scope.isUserLoggedIn = isUserLoggedIn;
     $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
     $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
     $scope.getHumanReadableStatus = (

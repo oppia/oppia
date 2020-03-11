@@ -32,15 +32,6 @@ describe('Improvement Feedback Thread Modal Controller', function() {
     $provide.value('ExplorationDataService', {
       explorationId: expId
     });
-    $provide.value('UserService', {
-      getUserInfoAsync: function() {
-        return $q.resolve({
-          isLoggedIn: function() {
-            return true;
-          }
-        });
-      }
-    });
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     AlertsService = $injector.get('AlertsService');
@@ -49,11 +40,8 @@ describe('Improvement Feedback Thread Modal Controller', function() {
     $httpBackend = $injector.get('$httpBackend');
     $q = $injector.get('$q');
 
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
-    });
+    spyOn(CsrfService, 'getTokenAsync').and.returnValue(
+      $q.resolve('sample-csrf-token'));
 
     var mockFeedbackThreads = [{
       last_updated: 1000,
@@ -88,15 +76,17 @@ describe('Improvement Feedback Thread Modal Controller', function() {
       'ImprovementFeedbackThreadModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
+        isUserLoggedIn: true,
         thread: thread
       });
   }));
 
-  it('should evalute scope variables value correctly', function() {
-    // $apply is called in order to resolve $q from
-    // UserService.getUserInfoAsync.
-    $scope.$apply();
+  afterEach(function() {
+    $httpBackend.verifyNoOutstandingRequest();
+    $httpBackend.verifyNoOutstandingExpectation();
+  });
 
+  it('should evalute scope variables value correctly', function() {
     expect($scope.isUserLoggedIn).toBe(true);
     expect($scope.activeThread).toEqual(thread);
     expect($scope.STATUS_CHOICES).toEqual([{
@@ -129,7 +119,7 @@ describe('Improvement Feedback Thread Modal Controller', function() {
       'Cannot add message to thread with ID: null.');
   });
 
-  it('should not add new message when message status is falsy', function() {
+  it('should not add new message when message status is false', function() {
     var addWarningSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
     $scope.addNewMessage('exp1.thread1', 'temporary text', null);
     expect(addWarningSpy).toHaveBeenCalledWith(

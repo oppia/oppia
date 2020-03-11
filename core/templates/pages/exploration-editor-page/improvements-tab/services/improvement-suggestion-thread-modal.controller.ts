@@ -21,12 +21,12 @@ angular.module('oppia').controller(
     '$scope', '$uibModalInstance', 'AlertsService', 'ChangeListService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationStatesService',
     'SuggestionModalForExplorationEditorService', 'ThreadDataService',
-    'ThreadStatusDisplayService', 'UserService', 'thread',
+    'ThreadStatusDisplayService', 'isUserLoggedIn', 'thread',
     function(
         $scope, $uibModalInstance, AlertsService, ChangeListService,
         DateTimeFormatService, EditabilityService, ExplorationStatesService,
         SuggestionModalForExplorationEditorService, ThreadDataService,
-        ThreadStatusDisplayService, UserService, thread) {
+        ThreadStatusDisplayService, isUserLoggedIn, thread) {
       var openSuggestionReviewModal = function(
           suggestionThread, threadUibModalInstance) {
         return SuggestionModalForExplorationEditorService.showSuggestionModal(
@@ -47,10 +47,8 @@ angular.module('oppia').controller(
         );
       };
 
-      UserService.getUserInfoAsync().then(function(userInfo) {
-        $scope.isUserLoggedIn = userInfo.isLoggedIn();
-      });
       $scope.activeThread = thread;
+      $scope.isUserLoggedIn = isUserLoggedIn;
       $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
       $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
       $scope.getHumanReadableStatus = (

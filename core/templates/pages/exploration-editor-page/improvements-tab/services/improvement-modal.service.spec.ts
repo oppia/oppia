@@ -24,7 +24,9 @@ import { UpgradedServices } from 'services/UpgradedServices';
 describe('Improvement Modal Service', function() {
   var ImprovementModalService = null;
   var $uibModal = null;
-  var uibModalSpy = null;
+  var $q = null;
+  var $rootScope = null;
+  var openModalSpy = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -33,36 +35,56 @@ describe('Improvement Modal Service', function() {
       $provide.value(key, value);
     }
   }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ContextService', {
+      getExplorationId: () => '0'
+    });
+    $provide.value('UserExplorationPermissionsService', {
+      getPermissionsAsync: () => $q.resolve({
+        can_edit: true
+      })
+    });
+    $provide.value('UserService', {
+      getUserInfoAsync: () => $q.resolve({
+        isLoggedIn: () => true
+      })
+    });
+  }));
   beforeEach(angular.mock.inject(function($injector) {
     ImprovementModalService = $injector.get('ImprovementModalService');
     $uibModal = $injector.get('$uibModal');
+    $q = $injector.get('$q');
+    $rootScope = $injector.get('$rootScope');
 
-    uibModalSpy = spyOn($uibModal, 'open').and.callThrough();
+    openModalSpy = spyOn($uibModal, 'open').and.callThrough();
   }));
 
   it('should open playthrough modal', function() {
     ImprovementModalService.openPlaythroughModal({}, 0);
-    expect(uibModalSpy).toHaveBeenCalled();
+    expect(openModalSpy).toHaveBeenCalled();
   });
 
   it('should open learner answer details modal', function() {
     ImprovementModalService.openLearnerAnswerDetails({});
-    expect(uibModalSpy).toHaveBeenCalled();
+    $rootScope.$apply();
+    expect(openModalSpy).toHaveBeenCalled();
   });
 
   it('should open feedback modal', function() {
     ImprovementModalService.openFeedbackThread({});
-    expect(uibModalSpy).toHaveBeenCalled();
+    $rootScope.$apply();
+    expect(openModalSpy).toHaveBeenCalled();
   });
 
   it('should open suggestion modal', function() {
     ImprovementModalService.openSuggestionThread({});
-    expect(uibModalSpy).toHaveBeenCalled();
+    $rootScope.$apply();
+    expect(openModalSpy).toHaveBeenCalled();
   });
 
   it('should open confirmation modal', function() {
     ImprovementModalService.openConfirmationModal(
       'Message', 'ButtonText', 'btn');
-    expect(uibModalSpy).toHaveBeenCalled();
+    expect(openModalSpy).toHaveBeenCalled();
   });
 });

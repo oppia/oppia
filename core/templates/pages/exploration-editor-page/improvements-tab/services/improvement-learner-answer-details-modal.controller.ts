@@ -20,16 +20,13 @@ angular.module('oppia').controller(
   'ImprovementLearnerAnswerDetailsModalController', [
     '$scope', '$uibModalInstance', 'DateTimeFormatService',
     'ExplorationHtmlFormatterService', 'LearnerAnswerDetailsDataService',
-    'UserExplorationPermissionsService', 'learnerAnswerDetails',
+    'isEditable', 'learnerAnswerDetails',
     function(
         $scope, $uibModalInstance, DateTimeFormatService,
         ExplorationHtmlFormatterService, LearnerAnswerDetailsDataService,
-        UserExplorationPermissionsService, learnerAnswerDetails) {
-      UserExplorationPermissionsService.getPermissionsAsync()
-        .then(permissions => {
-          $scope.isEditable = permissions.can_edit;
-        });
+        isEditable, learnerAnswerDetails) {
       $scope.selectedLearnerAnswerInfo = [];
+      $scope.isEditable = isEditable;
       $scope.learnerAnswerDetails = learnerAnswerDetails;
       $scope.currentLearnerAnswerInfo = null;
       $scope.viewAnswerDetails = false;

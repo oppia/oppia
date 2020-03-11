@@ -45,8 +45,8 @@ angular.module('oppia').controller('ImprovementPlaythoughModalController', [
       actionIndexAtStartOfFinalBlock = indexOfFirstDisplayedAction;
 
       $scope.issueIsMultipleIncorrectSubmissions = false;
-      if (playthrough.issueType === (
-        ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS)) {
+      if (playthrough.issueType ===
+          ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
         $scope.issueIsMultipleIncorrectSubmissions = true;
       }
     };
@@ -86,8 +86,8 @@ angular.module('oppia').controller('ImprovementPlaythoughModalController', [
           // of the block has crossed the threshold number of actions
           // per block. If it has, we don't add more learner actions
           // to the block.
-          if (indexOfFirstDisplayedAction - i >= (
-            MAX_UNRELATED_ACTIONS_PER_BLOCK)) {
+          if (indexOfFirstDisplayedAction - i >=
+              MAX_UNRELATED_ACTIONS_PER_BLOCK) {
             indexOfFirstDisplayedAction = i + 1;
             break;
           }

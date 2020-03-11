@@ -27,15 +27,6 @@ describe('Improvement Learner Answer Details Modal Controller', function() {
   var learnerAnswerInfo = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module(function($provide) {
-    $provide.value('UserExplorationPermissionsService', {
-      getPermissionsAsync: function() {
-        return $q.resolve({
-          can_edit: true
-        });
-      }
-    });
-  }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     LearnerAnswerDetailsObjectFactory = $injector.get(
       'LearnerAnswerDetailsObjectFactory');
@@ -69,15 +60,12 @@ describe('Improvement Learner Answer Details Modal Controller', function() {
       'ImprovementLearnerAnswerDetailsModalController', {
         $scope: $scope,
         $uibModalInstance: $uibModalInstance,
+        isEditable: true,
         learnerAnswerDetails: learnerAnswerDetails
       });
   }));
 
   it('should evalute scope variables value correctly', function() {
-    // $apply is called in order to resolve $q from
-    // UserExplorationPermissionsService.getPermissionsAsync.
-    $scope.$apply();
-
     expect($scope.isEditable).toBe(true);
     expect($scope.selectedLearnerAnswerInfo).toEqual([]);
     expect($scope.learnerAnswerDetails).toEqual(learnerAnswerDetails);
@@ -114,7 +102,7 @@ describe('Improvement Learner Answer Details Modal Controller', function() {
     expect($scope.selectedLearnerAnswerInfo).toEqual([]);
   });
 
-  it('should delet selected learner answer info', function() {
+  it('should delete selected learner answer info', function() {
     var deleteLearnerAnswerInfo = spyOn(
       LearnerAnswerDetailsDataService, 'deleteLearnerAnswerInfo').and
       .callThrough();
