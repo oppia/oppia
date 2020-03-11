@@ -62,7 +62,6 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             if item[0] == 'SUCCESS':
                 migrated_model_ids = (
                     sorted(list(set(item[1])), key=lambda id_set: id_set[0]))
-                print(migrated_model_ids)
                 migrated_model_ids = [model[1] for model in migrated_model_ids]
                 return migrated_model_ids
 
@@ -174,13 +173,13 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         original_models[-1].put()
         original_models.sort(key=lambda model: model.id)
 
-        print(original_models)
         migrated_model_ids = self._get_migrated_model_ids(
             self._run_one_off_job())
         for i, model_id in enumerate(migrated_model_ids):
             migrated_model = (
                 user_models.CompletedActivitiesModel.get_by_id(model_id))
             self.assertNotEqual(
+
                 original_models[i].id, migrated_model.id)
             self.assertEqual(
                 original_models[i].exploration_ids,
