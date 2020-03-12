@@ -39,9 +39,9 @@ for package, version, path in PREREQUISITES:
             sys.executable, '-m', 'pip', 'install', '%s==%s'
             % (package, version), '--target', path]
         uextention = ['--user', '--prefix=', '--system']
-        PROCESS = subprocess.Popen(
+        process = subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if 'can\'t combine user with prefix' in PROCESS.communicate()[1]:
+        if 'can\'t combine user with prefix' in process.communicate()[1]:
             subprocess.check_call(command + uextention)
 # pylint: enable=redefined-outer-name
 
