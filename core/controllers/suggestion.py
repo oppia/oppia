@@ -291,8 +291,11 @@ def get_all_related_suggestion_types(suggestion_type):
     Returns:
         list(str). A list of suggestion_types.
     """
-    if suggestion_type in constants.QUESTION_SUGGESTION_TYPES:
-        return constants.QUESTION_SUGGESTION_TYPES
+    # Currently, only question suggestions have multiple realted types.
+    question_suggestion_types = list(
+        constants.QUESTION_SUGGESTION_TYPE_TO_SKILL_DIFFICULTY_FLOAT.keys())
+    if suggestion_type in question_suggestion_types:
+        return question_suggestion_types
     return [suggestion_type]
 
 

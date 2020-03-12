@@ -50,10 +50,12 @@ angular.module('oppia').directive('contributionsAndReview', [
       controllerAs: '$ctrl',
       controller: [
         '$filter', '$uibModal', 'AlertsService', 'ContributionAndReviewService',
-        'QuestionObjectFactory', 'QUESTION_SUGGESTION_TYPES', 'UserService',
+        'QuestionObjectFactory',
+        'QUESTION_SUGGESTION_TYPE_TO_SKILL_DIFFICULTY_FLOAT', 'UserService',
         function(
             $filter, $uibModal, AlertsService, ContributionAndReviewService,
-            QuestionObjectFactory, QUESTION_SUGGESTION_TYPES, UserService) {
+            QuestionObjectFactory,
+            QUESTION_SUGGESTION_TYPE_TO_SKILL_DIFFICULTY_FLOAT, UserService) {
           var ctrl = this;
           var SUGGESTION_LABELS = {
             review: {
@@ -322,7 +324,7 @@ angular.module('oppia').directive('contributionsAndReview', [
           ctrl.onClickViewSuggestion = function(suggestionId) {
             var suggestion = ctrl.contributions[suggestionId].suggestion;
             if (
-              QUESTION_SUGGESTION_TYPES.includes(suggestion.suggestion_type)
+              ctrl.questionSuggestionTypes.includes(suggestion.suggestion_type)
             ) {
               var reviewable =
                 ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION;
@@ -427,6 +429,8 @@ angular.module('oppia').directive('contributionsAndReview', [
                 text: 'Translations'
               }
             ];
+            ctrl.questionSuggestionTypes = Object.keys(
+              QUESTION_SUGGESTION_TYPE_TO_SKILL_DIFFICULTY_FLOAT);
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.isAdmin = userInfo.isAdmin();
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();

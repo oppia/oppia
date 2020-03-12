@@ -81,7 +81,9 @@ def create_suggestion(
             raise Exception(
                 'The given content_html does not match the content of the '
                 'exploration.')
-    elif suggestion_type in constants.QUESTION_SUGGESTION_TYPES:
+    elif (suggestion_type in
+            constants.QUESTION_SUGGESTION_TYPE_TO_SKILL_DIFFICULTY_FLOAT
+                .keys()):
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
