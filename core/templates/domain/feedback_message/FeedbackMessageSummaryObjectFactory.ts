@@ -76,7 +76,7 @@ export class FeedbackMessageSummaryObjectFactory {
       feedbackMessageSummaryBackendDict.description,
       feedbackMessageSummaryBackendDict.author_username,
       feedbackMessageSummaryBackendDict.author_picture_data_url,
-      feedbackMessageSummaryBackendDict.created_on);
+      feedbackMessageSummaryBackendDict.created_on_msecs);
   }
 }
 

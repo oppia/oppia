@@ -105,7 +105,7 @@ describe('retrieving threads service', () => {
     this.mockMessages = [
       {
         author_username: 'author',
-        created_on: 1000,
+        created_on_msecs: 1000,
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.abc1',
         message_id: 0,
@@ -115,7 +115,7 @@ describe('retrieving threads service', () => {
       },
       {
         author_username: 'author',
-        created_on: 1200,
+        created_on_msecs: 1200,
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.abc1',
         message_id: 1,
