@@ -216,7 +216,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             # maintenance issues such as the one you are describing here
             # For more detail you can check the PR #8522.
             'extensions/interactions/LogicProof/static/js/student.spec.ts',
-            'extensions/interactions/LogicProof/static/js/complete.spec.ts'),
+            'extensions/interactions/LogicProof/static/js/complete.spec.ts'
+            'extensions/interactions/LogicProof/static/js/teacher.spec.ts'),
         'excluded_dirs': ()
     },
     {

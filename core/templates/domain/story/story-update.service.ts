@@ -57,7 +57,12 @@ angular.module('oppia').factory('StoryUpdateService', [
         UndoRedoService.applyChange(changeObj, story);
       } catch (err) {
         AlertsService.addWarning(err.message);
-        throw new Error(err);
+        var additionalInfo = (
+          'name: ' + err.name +
+          '\nmessage: ' + err.message +
+          '\nstack: ' + err.stack
+        );
+        throw new Error(additionalInfo);
       }
     };
 

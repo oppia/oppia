@@ -110,7 +110,12 @@ angular.module('oppia').factory('AssetsBackendApiService', [
                 '\nData: ' + data
               );
               e.message += additionalInfo;
-              throw new Error(e);
+              var errorStr = (
+                'name: ' + e.name +
+                '\nmessage: ' + e.message +
+                '\nstack: ' + e.stack
+              );
+              throw new Error(errorStr);
             }
           } else {
             var additionalInfo = (
