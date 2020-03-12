@@ -86,7 +86,7 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
   describe('SuggestionImprovementTask', function() {
     beforeEach(function() {
       var mockSuggestionThreadBackendDict = {
-        last_updated: 1000,
+        last_updated_msecs: 1000,
         original_author_username: 'author',
         status: 'accepted',
         subject: 'sample subject',
@@ -114,7 +114,7 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
             html: 'old suggestion content'
           }
         },
-        last_updated: 1000
+        last_updated_msecs: 1000
       };
 
       this.mockThread = SuggestionThreadObjectFactory.createFromBackendDicts(
@@ -153,7 +153,7 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
     describe('.getLastUpdatedTime', function() {
       it('returns the time when this task was last updated', function() {
         expect(this.task.getLastUpdatedTime())
-          .toBe(this.mockThread.last_updated);
+          .toBe(this.mockThread.lastUpdatedMsecs);
       });
     });
 

@@ -87,7 +87,7 @@ angular.module('oppia').factory('SuggestionImprovementTaskObjectFactory', [
 
     /** @returns {number} - The time that the task was last updated. */
     SuggestionImprovementTask.prototype.getLastUpdatedTime = function() {
-      return this._thread.last_updated;
+      return this._thread.lastUpdatedMsecs;
     };
 
     return {

@@ -30,7 +30,7 @@ export class FeedbackThread {
   subject: string;
   summary: string;
   originalAuthorName: string;
-  lastUpdated: number;
+  lastUpdatedMsecs: number;
   messageCount: number;
   stateName: string;
   threadId: string;
@@ -39,14 +39,14 @@ export class FeedbackThread {
 
   constructor(
       status: string, subject: string, summary: string,
-      originalAuthorName: string, lastUpdated: number, messageCount: number,
-      stateName: string, threadId: string,
+      originalAuthorName: string, lastUpdatedMsecs: number,
+      messageCount: number, stateName: string, threadId: string,
       lastNonemptyMessageSummary: ThreadMessageSummary) {
     this.status = status;
     this.subject = subject;
     this.summary = summary;
     this.originalAuthorName = originalAuthorName;
-    this.lastUpdated = lastUpdated;
+    this.lastUpdatedMsecs = lastUpdatedMsecs;
     this.messageCount = messageCount;
     this.stateName = stateName;
     this.threadId = threadId;

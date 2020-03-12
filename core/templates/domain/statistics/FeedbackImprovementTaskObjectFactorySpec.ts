@@ -81,7 +81,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
   describe('FeedbackImprovementTask', function() {
     beforeEach(function() {
       this.mockThread = {
-        last_updated: 1441870501230.642,
+        last_updated_msecs: 1441870501230.642,
         original_author_username: 'test_learner',
         state_name: null,
         status: 'open',
@@ -123,7 +123,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
     describe('.getLastUpdatedTime', function() {
       it('returns the time when this task was last updated', function() {
         expect(this.task.getLastUpdatedTime())
-          .toBe(this.mockThread.last_updated);
+          .toBe(this.mockThread.lastUpdatedMsecs);
       });
     });
 
