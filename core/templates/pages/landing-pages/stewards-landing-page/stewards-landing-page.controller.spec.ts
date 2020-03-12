@@ -226,7 +226,7 @@ describe('Stewards Landing Page', function() {
       innerWidth: 998
     });
     ctrl.$onInit();
-    windowDimensions.onResize(new Event('resize'));
+    windowDimensions.onResize(new Event(''));
     expect(ctrl.windowIsNarrow).toBe(false);
   });
 
@@ -238,7 +238,7 @@ describe('Stewards Landing Page', function() {
       innerWidth: 768
     });
     ctrl.$onInit();
-    windowDimensions.onResize(new Event('resize'));
+    windowDimensions.onResize(new Event(''));
     expect(ctrl.windowIsNarrow).toBe(true);
   });
 });
