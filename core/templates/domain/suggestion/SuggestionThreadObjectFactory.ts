@@ -60,7 +60,7 @@ export class SuggestionThread {
     // Since messages have been updated, we need to update all of our other
     // message-related fields to maintain consistency between them.
     this.messageCount = messages.length;
-    let nonemptyMessages = messages.filter(m => m.isTextNonempty());
+    let nonemptyMessages = messages.filter(m => m.hasText());
     if (nonemptyMessages.length > 0) {
       let i = nonemptyMessages.length - 1;
       this.lastNonemptyMessageSummary = nonemptyMessages[i].summary;

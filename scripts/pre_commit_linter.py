@@ -2753,7 +2753,7 @@ class JsTsLintChecksManager(LintChecksManager):
         )
         self._check_dependencies()
         # Since missing the message keys is the same as not having any messages,
-        # we use get w/ default here to simplify gathering everything.
+        # we use get with default here to simplify gathering everything.
         extra_js_files_messages = self.process_manager.get('extra', ())
         js_and_ts_component_messages = self.process_manager.get('component', ())
         directive_scope_messages = self.process_manager.get('directive', ())

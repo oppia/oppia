@@ -116,7 +116,7 @@ describe('ThreadMessageObjectFactory', () => {
     });
   });
 
-  describe('.isTextNonempty', () => {
+  describe('.hasText', () => {
     it('is true when text is nonempty string', () => {
       let threadMessage = this.factory.createFromBackendDict({
         text: 'nonempty!',
@@ -129,7 +129,7 @@ describe('ThreadMessageObjectFactory', () => {
         updated_subject: null
       });
 
-      expect(threadMessage.isTextNonempty()).toBe(true);
+      expect(threadMessage.hasText()).toBe(true);
     });
 
     it('is false when text is empty string', () => {
@@ -144,7 +144,7 @@ describe('ThreadMessageObjectFactory', () => {
         updated_subject: null
       });
 
-      expect(threadMessage.isTextNonempty()).toBe(false);
+      expect(threadMessage.hasText()).toBe(false);
     });
   });
 });

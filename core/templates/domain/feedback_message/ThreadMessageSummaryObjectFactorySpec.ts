@@ -36,17 +36,17 @@ describe('Thread message summary object factory', () => {
     });
   });
 
-  describe('.isTextNonempty', () => {
+  describe('.hasText', () => {
     it('is true when text is nonempty string', () => {
       let threadMessageSummary = this.factory.createNew('author', 'nonempty!');
 
-      expect(threadMessageSummary.isTextNonempty()).toBe(true);
+      expect(threadMessageSummary.hasText()).toBe(true);
     });
 
     it('is false when text is empty string', () => {
       let threadMessageSummary = this.factory.createNew('author', '');
 
-      expect(threadMessageSummary.isTextNonempty()).toBe(false);
+      expect(threadMessageSummary.hasText()).toBe(false);
     });
   });
 });

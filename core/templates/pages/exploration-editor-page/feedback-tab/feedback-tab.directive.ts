@@ -246,7 +246,6 @@ angular.module('oppia').directive('feedbackTab', [
               text: ''
             };
             ctrl.clearActiveThread();
-            ThreadDataService.getOpenThreadsCountAsync();
 
             return $q.all([
               UserService.getUserInfoAsync().then(
