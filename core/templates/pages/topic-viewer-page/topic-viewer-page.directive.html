@@ -11,7 +11,7 @@
            translate="I18N_TOPIC_VIEWER_PLAY">
         </a>
       </li>
-      <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}">
+      <li ng-class="{'topic-viewer-tabs-active': $ctrl.activeTab === 'practice'}" ng-show="$ctrl.trainTabShouldBeDisplayed">
         <a class="topic-viewer-tabs-text"
            ng-click="$ctrl.setActiveTab('practice')"
            translate="I18N_TOPIC_VIEWER_TRAIN">
@@ -39,7 +39,7 @@
 <style>
   .oppia-topic-viewer-tabs-container {
     margin: 0 auto;
-    width: 70%;
+    width: 60%;
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs {
@@ -47,7 +47,6 @@
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 0;
-    margin-left: 12.5%;
     padding-left: 0;
     padding-top: 7vh;
     text-align: center;
@@ -58,6 +57,7 @@
     display: flex;
     margin-bottom: 0;
     width: 250px;
+    flex: 1;
   }
 
   .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
