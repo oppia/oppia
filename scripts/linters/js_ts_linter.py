@@ -803,62 +803,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         return summary_messages
 
-    def _check_html_directive_name(self):
-        """This function checks that all HTML directives end
-        with _directive.html.
-        """
-        if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting HTML directive name check')
-            python_utils.PRINT('----------------------------------------')
-        stdout = sys.stdout
-        total_files_checked = 0
-        total_error_count = 0
-        files_to_check = self.all_filepaths
-        failed = False
-        summary_messages = []
-        # For RegExp explanation, please see https://regex101.com/r/gU7oT6/37.
-        pattern_to_match = (
-            r'templateUrl: UrlInterpolationService\.[A-z\(]+' +
-            r'(?P<directive_name>[^\)]+)')
-        with linter_utils.redirect_stdout(stdout):
-            for filepath in files_to_check:
-                file_content = FILE_CACHE.read(filepath)
-                total_files_checked += 1
-                matched_patterns = re.findall(pattern_to_match, file_content)
-                for matched_pattern in matched_patterns:
-                    matched_pattern = matched_pattern.split()
-                    directive_filepath = ''.join(matched_pattern).replace(
-                        '\'', '').replace('+', '')
-                    if not directive_filepath.endswith('_directive.html'):
-                        failed = True
-                        total_error_count += 1
-                        python_utils.PRINT(
-                            '%s --> Please ensure that this file ends'
-                            'with _directive.html.' % directive_filepath)
-                        python_utils.PRINT('')
-
-            if failed:
-                summary_message = (
-                    '%s   HTML directive name check failed, see files above '
-                    'that did not end with _directive.html but '
-                    'should have.' % _MESSAGE_TYPE_FAILED)
-                summary_messages.append(summary_message)
-            else:
-                summary_message = '%s   HTML directive name check passed' % (
-                    _MESSAGE_TYPE_SUCCESS)
-                summary_messages.append(summary_message)
-
-            python_utils.PRINT('')
-            if total_files_checked == 0:
-                if self.verbose_mode_enabled:
-                    python_utils.PRINT('There are no files to be checked.')
-            else:
-                python_utils.PRINT('(%s files checked, %s errors found)' % (
-                    total_files_checked, total_error_count))
-                python_utils.PRINT(summary_message)
-
-        return summary_messages
-
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -884,10 +828,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         sorted_dependencies_messages = self._check_sorted_dependencies()
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
-        html_directive_name_messages = self._check_html_directive_name()
 
         all_messages = (
-            extra_js_files_messages + html_directive_name_messages +
+            extra_js_files_messages +
             js_and_ts_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages)
         return all_messages

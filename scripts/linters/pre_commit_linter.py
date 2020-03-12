@@ -499,7 +499,9 @@ def main(args=None):
             name='third_party')
         tasks_third_party.append(task_third_party)
 
+    # Concurrency limit: 25.
     concurrent_task_utils.execute_tasks(tasks_custom)
+    # Concurrency limit: 1.
     concurrent_task_utils.execute_tasks(tasks_third_party, semaphore=semaphore)
 
     all_messages = []

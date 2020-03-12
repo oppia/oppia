@@ -1485,4 +1485,4 @@ def register(linter):
     linter.register_checker(DivisionOperatorChecker(linter))
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(DocstringChecker(linter))
-    # linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
+    linter.register_checker(BlankLineBelowFileOverviewChecker(linter))

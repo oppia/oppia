@@ -467,7 +467,7 @@ BAD_PATTERNS_MAP = {
 }
 
 
-def _is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
+def is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
     """Checks if file is excluded from the bad patterns check.
 
     Args:
@@ -483,7 +483,7 @@ def _is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
             or filepath in BAD_PATTERNS[pattern]['excluded_files'])
 
 
-def _check_bad_pattern_in_file(filepath, file_content, pattern):
+def check_bad_pattern_in_file(filepath, file_content, pattern):
     """Detects whether the given pattern is present in the file.
 
     Args:
@@ -517,7 +517,7 @@ def _check_bad_pattern_in_file(filepath, file_content, pattern):
     return False
 
 
-def _check_file_type_specific_bad_pattern(filepath, content):
+def check_file_type_specific_bad_pattern(filepath, content):
     """Check the file content based on the file's extension.
 
     Args:
@@ -533,7 +533,7 @@ def _check_file_type_specific_bad_pattern(filepath, content):
     total_error_count = 0
     if pattern:
         for regexp in pattern:
-            if _check_bad_pattern_in_file(filepath, content, regexp):
+            if check_bad_pattern_in_file(filepath, content, regexp):
                 failed = True
                 total_error_count += 1
     return failed, total_error_count
@@ -668,7 +668,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                 total_files_checked += 1
                 for pattern in BAD_PATTERNS:
                     if (pattern in file_content and
-                            not _is_filepath_excluded_for_bad_patterns_check(
+                            not is_filepath_excluded_for_bad_patterns_check(
                                 pattern, filepath)):
                         failed = True
                         python_utils.PRINT('%s --> %s' % (
@@ -677,12 +677,12 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                         total_error_count += 1
 
                 for regexp in BAD_PATTERNS_REGEXP:
-                    if _check_bad_pattern_in_file(
+                    if check_bad_pattern_in_file(
                             filepath, file_content, regexp):
                         failed = True
                         total_error_count += 1
 
-                temp_failed, temp_count = _check_file_type_specific_bad_pattern(
+                temp_failed, temp_count = check_file_type_specific_bad_pattern(
                     filepath, file_content)
                 failed = failed or temp_failed
                 total_error_count += temp_count
