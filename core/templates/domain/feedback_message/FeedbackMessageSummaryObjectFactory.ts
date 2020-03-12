@@ -56,7 +56,7 @@ export class FeedbackMessageSummaryObjectFactory {
       newMessageId: number, newMessageText: string, authorUsername: string,
       authorPictureDataUrl: string): FeedbackMessageSummary {
     // Date.now() returns number of milliseconds since 1970-01-01 UTC.
-    let createdOn: number = new Date.getTime();
+    let createdOn: number = new Date().getTime();
     return new FeedbackMessageSummary(
       newMessageId, newMessageText, null, null, null, null, authorUsername,
       authorPictureDataUrl, createdOn);
