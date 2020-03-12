@@ -93,7 +93,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
         message_count: 10,
         last_nonempty_message_author: 'author',
         last_nonempty_message_text: 'tenth message'
-      }
+      };
       this.mockThread = FeedbackThreadObjectFactory.createFromBackendDict(
         feedbackThreadBackendDict);
       this.task =
