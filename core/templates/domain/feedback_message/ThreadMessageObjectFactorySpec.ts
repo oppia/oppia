@@ -30,7 +30,7 @@ describe('ThreadMessageObjectFactory', () => {
     it('should create a new thread message from a backend dict.', () => {
       let threadMessage = this.factory.createFromBackendDict({
         author_username: 'author',
-        created_on: 1000,
+        created_on_msecs: 1000,
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
@@ -57,7 +57,7 @@ describe('ThreadMessageObjectFactory', () => {
       let threadMessage = this.factory.createFromBackendDict({
         updated_subject: 'a new descriptive subject!',
         author_username: 'author',
-        created_on: 1000,
+        created_on_msecs: 1000,
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
@@ -72,7 +72,7 @@ describe('ThreadMessageObjectFactory', () => {
       let threadMessage = this.factory.createFromBackendDict({
         updated_subject: null,
         author_username: 'author',
-        created_on: 1000,
+        created_on_msecs: 1000,
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
@@ -89,7 +89,7 @@ describe('ThreadMessageObjectFactory', () => {
       let threadMessage = this.factory.createFromBackendDict({
         updated_status: 'open',
         author_username: 'author',
-        created_on: 1000,
+        created_on_msecs: 1000,
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
@@ -104,7 +104,7 @@ describe('ThreadMessageObjectFactory', () => {
       let threadMessage = this.factory.createFromBackendDict({
         updated_status: null,
         author_username: 'author',
-        created_on: 1000,
+        created_on_msecs: 1000,
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
@@ -121,7 +121,7 @@ describe('ThreadMessageObjectFactory', () => {
       let threadMessage = this.factory.createFromBackendDict({
         text: 'nonempty!',
         author_username: 'author',
-        created_on: 1000,
+        created_on_msecs: 1000,
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
@@ -136,7 +136,7 @@ describe('ThreadMessageObjectFactory', () => {
       let threadMessage = this.factory.createFromBackendDict({
         text: '',
         author_username: 'author',
-        created_on: 1000,
+        created_on_msecs: 1000,
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,

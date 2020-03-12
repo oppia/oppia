@@ -70,7 +70,7 @@ describe('SuggestionThreadObjectFactory', () => {
       this.suggestionThreadObjectFactory.createFromBackendDicts(
         this.suggestionThreadBackendDict, this.suggestionBackendDict);
 
-    expect(suggestionThread.lastUpdated).toEqual(1000);
+    expect(suggestionThread.lastUpdatedMsecs).toEqual(1000);
     expect(suggestionThread.originalAuthorName).toEqual('author');
     expect(suggestionThread.status).toEqual('accepted');
     expect(suggestionThread.subject).toEqual('sample subject');
@@ -93,7 +93,7 @@ describe('SuggestionThreadObjectFactory', () => {
     expect(suggestion.authorName).toEqual('author');
     expect(suggestion.newValue.html).toEqual('new suggestion content');
     expect(suggestion.oldValue.html).toEqual('old suggestion content');
-    expect(suggestion.lastUpdated).toEqual(1000);
+    expect(suggestion.lastUpdatedMsecs).toEqual(1000);
     expect(suggestion.getThreadId()).toEqual('exploration.exp1.thread1');
     expect(suggestionThread.isSuggestionThread()).toBeTrue();
     expect(suggestionThread.isSuggestionHandled()).toBeTrue();
@@ -111,7 +111,7 @@ describe('SuggestionThreadObjectFactory', () => {
       this.suggestionThreadObjectFactory.createFromBackendDicts(
         this.suggestionThreadBackendDict, this.suggestionBackendDict);
 
-    expect(suggestionThread.lastUpdated).toEqual(1000);
+    expect(suggestionThread.lastUpdatedMsecs).toEqual(1000);
     expect(suggestionThread.originalAuthorName).toEqual('author');
     expect(suggestionThread.status).toEqual('accepted');
     expect(suggestionThread.subject).toEqual('sample subject');

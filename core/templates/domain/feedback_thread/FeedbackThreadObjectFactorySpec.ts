@@ -51,7 +51,7 @@ describe('FeedbackThreadObjectFactory', () => {
       expect(feedbackThread.subject).toEqual('sample subject');
       expect(feedbackThread.summary).toEqual('sample summary');
       expect(feedbackThread.originalAuthorName).toEqual('author');
-      expect(feedbackThread.lastUpdated).toEqual(1000);
+      expect(feedbackThread.lastUpdatedMsecs).toEqual(1000);
       expect(feedbackThread.messageCount).toEqual(10);
       expect(feedbackThread.stateName).toEqual('state 1');
       expect(feedbackThread.threadId).toEqual('exp1.thread1');
