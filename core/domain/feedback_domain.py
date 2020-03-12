@@ -314,7 +314,8 @@ class FeedbackThreadSummary(python_utils.OBJECT):
         return {
             'status': self.status,
             'original_author_id': self.original_author_id,
-            'last_updated': utils.get_time_in_millisecs(self.last_updated),
+            'last_updated_msecs': (
+                utils.get_time_in_millisecs(self.last_updated)),
             'last_message_text': self.last_message_text,
             'total_message_count': self.total_message_count,
             'last_message_is_read': self.last_message_is_read,
