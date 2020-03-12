@@ -504,7 +504,8 @@ describe('retrieving threads service', () => {
       messages: []
     });
     ThreadDataService.resolveSuggestionAsync(
-      thread, 'Message', 'status', 'a', true).then(
+      thread, 'Message', 'status', 'a', true)
+      .then(
         () => {
           expect(ThreadDataService.getOpenThreadsCount()).toEqual(0);
           done();
