@@ -216,7 +216,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             # maintenance issues such as the one you are describing here
             # For more detail you can check the PR #8522.
             'extensions/interactions/LogicProof/static/js/student.spec.ts',
-            'extensions/interactions/LogicProof/static/js/complete.spec.ts'
+            'extensions/interactions/LogicProof/static/js/complete.spec.ts',
             'extensions/interactions/LogicProof/static/js/teacher.spec.ts'),
         'excluded_dirs': ()
     },
@@ -237,7 +237,11 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'message': 'Please use '
                    '\'throw new Error\' instead of \'throw\'',
         'excluded_files': (),
-        'excluded_dirs': ('extensions/interactions/LogicProof/static')
+        'excluded_dirs': (
+            # The throw error is standardised throw new Error and currently
+            # the throw new Error is unable to handle the custom made error
+            # object.
+            'extensions/interactions/LogicProof/static')
     },
     {
         'regexp': re.compile(r'\b(beforeEach\(inject\(function)\('),
