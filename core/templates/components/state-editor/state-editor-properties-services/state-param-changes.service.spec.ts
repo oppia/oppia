@@ -22,7 +22,7 @@ import { StateParamChangesService } from 'components/state-editor/state-editor-p
 /* eslint-enable max-len */
 
 
-fdescribe('State Param Changes service', () => {
+describe('State Param Changes service', () => {
   let spcs: StateParamChangesService = null;
 
   beforeEach(() => {
