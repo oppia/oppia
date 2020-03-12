@@ -1448,20 +1448,21 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
                 closing_line_index_of_fileoverview = line_num
                 break
 
-        empty_line_check_index = closing_line_index_of_fileoverview
-        if empty_line_check_index < file_length - 1:
-            while file_content[empty_line_check_index + 1] == b'\n':
-                empty_line_counter += 1
-                empty_line_check_index += 1
+        if triple_quote_counter == 2:
+            empty_line_check_index = closing_line_index_of_fileoverview
+            if empty_line_check_index < file_length - 1:
+                while file_content[empty_line_check_index + 1] == b'\n':
+                    empty_line_counter += 1
+                    empty_line_check_index += 1
 
-        if empty_line_counter > 1:
-            self.add_message(
-                'only-a-single-empty-line-should-be-provided',
-                line=closing_line_index_of_fileoverview + 1)
-        elif empty_line_counter == 0:
-            self.add_message(
-                'no-empty-line-provided-below-fileoverview',
-                line=closing_line_index_of_fileoverview + 1)
+            if empty_line_counter > 1:
+                self.add_message(
+                    'only-a-single-empty-line-should-be-provided',
+                    line=closing_line_index_of_fileoverview + 1)
+            elif empty_line_counter == 0:
+                self.add_message(
+                    'no-empty-line-provided-below-fileoverview',
+                    line=closing_line_index_of_fileoverview + 1)
 
 
 def register(linter):
