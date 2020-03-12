@@ -75,9 +75,10 @@ export class ThreadMessageObjectFactory {
   createFromBackendDict(threadMessageBackendDict: any): ThreadMessage {
     return new ThreadMessage(
       threadMessageBackendDict.author_username,
-      threadMessageBackendDict.created_on, threadMessageBackendDict.entity_type,
-      threadMessageBackendDict.entity_id, threadMessageBackendDict.message_id,
-      threadMessageBackendDict.text, threadMessageBackendDict.updated_status,
+      threadMessageBackendDict.created_on_msecs,
+      threadMessageBackendDict.entity_type, threadMessageBackendDict.entity_id,
+      threadMessageBackendDict.message_id, threadMessageBackendDict.text,
+      threadMessageBackendDict.updated_status,
       threadMessageBackendDict.updated_subject,
       this.threadMessageSummaryObjectFactory.createNew(
         threadMessageBackendDict.author_username,

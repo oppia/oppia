@@ -32,7 +32,7 @@ describe('SuggestionThreadObjectFactory', () => {
 
   beforeEach(() => {
     this.suggestionThreadBackendDict = {
-      last_updated: 1000,
+      last_updated_msecs: 1000,
       original_author_username: 'author',
       status: 'accepted',
       subject: 'sample subject',
@@ -58,7 +58,7 @@ describe('SuggestionThreadObjectFactory', () => {
         new_value: { html: 'new suggestion content' },
         old_value: { html: 'old suggestion content' }
       },
-      last_updated: 1000
+      last_updated_msecs: 1000
     };
   });
 

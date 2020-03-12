@@ -35,13 +35,13 @@ export class Suggestion {
   newValue: any;
   // TODO(#7165): Replace 'any' with the exact type.
   oldValue: any;
-  lastUpdated: number;
+  lastUpdatedMsecs: number;
 
   constructor(
       suggestionType: string, suggestionId: string, threadId: string,
       targetType: string, targetId: string, status: string, authorName: string,
       stateName: string, newValue: string, oldValue: string,
-      lastUpdated: number) {
+      lastUpdatedMsecs: number) {
     this.suggestionType = suggestionType;
     this.suggestionId = suggestionId;
     this.threadId = threadId;
@@ -52,7 +52,7 @@ export class Suggestion {
     this.stateName = stateName;
     this.newValue = newValue;
     this.oldValue = oldValue;
-    this.lastUpdated = lastUpdated;
+    this.lastUpdatedMsecs = lastUpdatedMsecs;
   }
 
   getThreadId(): string {
@@ -78,7 +78,7 @@ export class SuggestionObjectFactory {
       suggestionBackendDict.change.state_name,
       suggestionBackendDict.change.new_value,
       suggestionBackendDict.change.old_value,
-      suggestionBackendDict.last_updated);
+      suggestionBackendDict.last_updated_msecs);
   }
 }
 

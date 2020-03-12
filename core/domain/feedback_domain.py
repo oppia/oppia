@@ -81,7 +81,8 @@ class FeedbackThread(python_utils.OBJECT):
             dict. A dict representation of the FeedbackThread object.
         """
         return {
-            'last_updated': utils.get_time_in_millisecs(self.last_updated),
+            'last_updated_msecs': (
+                utils.get_time_in_millisecs(self.last_updated)),
             'original_author_username': (
                 user_services.get_username(self.original_author_id)
                 if self.original_author_id else None),
@@ -188,7 +189,7 @@ class FeedbackMessage(python_utils.OBJECT):
             'author_username': (
                 user_services.get_username(self.author_id)
                 if self.author_id else None),
-            'created_on': utils.get_time_in_millisecs(self.created_on),
+            'created_on_msecs': utils.get_time_in_millisecs(self.created_on),
             'entity_type': self.entity_type,
             'entity_id': self.entity_id,
             'message_id': self.message_id,

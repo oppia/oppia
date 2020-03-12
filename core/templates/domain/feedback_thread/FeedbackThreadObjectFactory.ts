@@ -89,7 +89,7 @@ export class FeedbackThreadObjectFactory {
       feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
       feedbackThreadBackendDict.summary,
       feedbackThreadBackendDict.original_author_username,
-      feedbackThreadBackendDict.last_updated,
+      feedbackThreadBackendDict.last_updated_msecs,
       feedbackThreadBackendDict.message_count,
       feedbackThreadBackendDict.state_name,
       feedbackThreadBackendDict.thread_id,

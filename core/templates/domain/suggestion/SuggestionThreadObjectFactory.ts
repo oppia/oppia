@@ -127,7 +127,7 @@ export class SuggestionThreadObjectFactory {
       suggestionThreadBackendDict.status, suggestionThreadBackendDict.subject,
       suggestionThreadBackendDict.summary,
       suggestionThreadBackendDict.original_author_username,
-      suggestionThreadBackendDict.last_updated,
+      suggestionThreadBackendDict.last_updated_msecs,
       suggestionThreadBackendDict.message_count,
       suggestionThreadBackendDict.thread_id,
       this.threadMessageSummaryObjectFactory.createNew(

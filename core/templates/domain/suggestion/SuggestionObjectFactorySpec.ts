@@ -42,7 +42,7 @@ describe('SuggestionObjectFactory', () => {
         new_value: 'new suggestion content',
         old_value: 'old suggestion content'
       },
-      last_updated: 1000
+      last_updated_msecs: 1000
     };
     let suggestion = this.factory.createFromBackendDict(suggestionBackendDict);
     expect(suggestion.suggestionType).toEqual('edit_exploration_state_content');
@@ -54,7 +54,7 @@ describe('SuggestionObjectFactory', () => {
     expect(suggestion.stateName).toEqual('state_1');
     expect(suggestion.newValue).toEqual('new suggestion content');
     expect(suggestion.oldValue).toEqual('old suggestion content');
-    expect(suggestion.lastUpdated).toEqual(1000);
+    expect(suggestion.lastUpdatedMsecs).toEqual(1000);
     expect(suggestion.getThreadId()).toEqual('exploration.exp1.thread1');
   });
 });

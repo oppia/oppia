@@ -32,7 +32,7 @@ describe('FeedbackThreadObjectFactory', () => {
   describe('.createFromBackendDict', () => {
     it('should create a new feedback thread from a backend dict.', () => {
       let feedbackThreadBackendDict = {
-        last_updated: 1000,
+        last_updated_msecs: 1000,
         original_author_username: 'author',
         status: 'accepted',
         subject: 'sample subject',
@@ -68,7 +68,7 @@ describe('FeedbackThreadObjectFactory', () => {
       it('updates message-related fields', () => {
         let feedbackThread =
           this.feedbackThreadObjectFactory.createFromBackendDict({
-            last_updated: 1000,
+            last_updated_msecs: 1000,
             original_author_username: 'author',
             status: 'accepted',
             subject: 'sample subject',
@@ -87,7 +87,7 @@ describe('FeedbackThreadObjectFactory', () => {
             author_username: 'author1',
             text: 'message1',
             updated_subject: null,
-            created_on: 1000,
+            created_on_msecs: 1000,
             entity_type: 'exploration',
             entity_id: 'exploration.exp1.thread1',
             message_id: 1,
@@ -97,7 +97,7 @@ describe('FeedbackThreadObjectFactory', () => {
             author_username: 'author2',
             text: 'message2',
             updated_subject: null,
-            created_on: 1000,
+            created_on_msecs: 1000,
             entity_type: 'exploration',
             entity_id: 'exploration.exp1.thread1',
             message_id: 1,
