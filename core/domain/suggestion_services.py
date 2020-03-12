@@ -64,7 +64,8 @@ def create_suggestion(
         DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, has_suggestion=True)
 
     status = suggestion_models.STATUS_IN_REVIEW
-
+    question_suggestion_types = (
+        constants.QUESTION_SUGGESTION_TYPE_TO_SKILL_DIFFICULTY_FLOAT.keys())
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
         exploration = exp_fetchers.get_exploration_by_id(target_id)
     if suggestion_type == suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
@@ -81,9 +82,7 @@ def create_suggestion(
             raise Exception(
                 'The given content_html does not match the content of the '
                 'exploration.')
-    elif (suggestion_type in
-            constants.QUESTION_SUGGESTION_TYPE_TO_SKILL_DIFFICULTY_FLOAT
-                .keys()):
+    elif suggestion_type in question_suggestion_types:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
