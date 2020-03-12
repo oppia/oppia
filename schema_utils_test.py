@@ -449,6 +449,15 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertTrue(is_nonempty('    '))
         self.assertFalse(is_nonempty(''))
 
+    def test_is_valid_url_validator(self):
+        """Tests if static method is_valid_url returns true iff obj
+        is not a valid url.
+        """
+        is_valid_url = schema_utils.get_validator('is_valid_url')
+        self.assertTrue(is_valid_url('https://www.example.com'))
+        self.assertFalse(is_valid_url('mailto:abc@xyz.com'))
+        self.assertFalse(is_valid_url('mailto:abc@xyz.com,asd@qwerty.com'))
+
     def test_is_at_most_validator(self):
         """Tests if static method is_at_most returns true iff obj
         is at most a value.

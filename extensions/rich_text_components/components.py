@@ -122,6 +122,15 @@ class Image(BaseRteComponent):
 class Link(BaseRteComponent):
     """Class for Link component."""
 
+    @classmethod
+    def validate(cls, value_dict):
+        """Validates Link component."""
+        super(Link, cls).validate(value_dict)
+        regex_pattern = r'.*mailto:.*'
+        url_with_value = value_dict['url-with-value']
+        if re.match(regex_pattern, url_with_value):
+            raise Exception('Invalid URL')
+
 
 class Math(BaseRteComponent):
     """Class for Math component."""

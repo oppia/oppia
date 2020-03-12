@@ -34,6 +34,8 @@ angular.module('oppia').directive('sanitizedUrlEditor', [
             type: 'unicode',
             validators: [{
               id: 'is_nonempty'
+            }, {
+              id: 'is_valid_url'
             }],
             ui_config: {
               placeholder: 'https://www.example.com'

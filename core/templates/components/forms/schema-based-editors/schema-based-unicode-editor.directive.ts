@@ -20,7 +20,8 @@ require('interactions/codemirrorRequires.ts');
 
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
-
+require('components/forms/validators/is-nonempty.filter.ts');
+require('components/forms/validators/is-valid-url.filter.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('services/contextual/device-info.service.ts');
 

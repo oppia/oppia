@@ -339,6 +339,18 @@ class _Validators(python_utils.OBJECT):
         return bool(obj)
 
     @staticmethod
+    def is_valid_url(obj):
+        """Ensures that `obj` (a string) is a valid URL.
+
+        Args:
+            obj: str. A string.
+
+        Returns:
+            bool. Whether the given object is a valif URL.
+        """
+        return bool(re.search(r'^((?!(mailto:)).)*$', obj))
+
+    @staticmethod
     def is_uniquified(obj):
         """Returns True iff the given object (a list) has no duplicates.
 

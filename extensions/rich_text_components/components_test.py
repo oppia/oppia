@@ -110,6 +110,9 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         }, {
             'url-with-value': 'http://link.com',
             'text-with-value': 1234
+        }, {
+            'url-with-value': 'https://mailto:abc@link.com',
+            'text-with-value': 'abc@link.com'
         }]
 
         self.check_validation(
