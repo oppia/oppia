@@ -39,12 +39,10 @@ var ExplorationEditorMainTab = function() {
     return element(
       by.cssContainingText('.protractor-test-html-select-option', optionNum));
   };
-  ////// BIG RANDOM CODE CHUNK
   var itemSelectionAnswerOptions = function(optionNum) {
     return element(
       by.cssContainingText('.protractor-test-html-select-option', optionNum));
-  };
-  //////
+  }
   var neutralElement = element.all(by.css('.protractor-test-neutral-element'))
     .first();
   var defaultResponseTab = element(
@@ -897,7 +895,10 @@ var ExplorationEditorMainTab = function() {
         multipleChoiceAnswerOptions(parameterValues[i])
           .click();
       } else if (interactionId === 'ItemSelectionInput') {
-        itemSelectionAnswerOptions(parameterValues[i]).click();
+        var answerArray = Array.from(parameterValues[i]);
+          for (var i = 0; i < answerArray.length; i++) {
+            itemSelectionAnswerOptions(answerArray[i]).click();
+        }
       } else {
         parameterEditor.setValue(parameterValues[i]);
       }

@@ -19,23 +19,23 @@
 
 var forms = require('../../../core/tests/protractor_utils/forms.js');
 var objects = require('../../objects/protractor.js');
+var waitFor = require('../../../core/tests/protractor_utils/waitFor.js');
 
 // The members of richTextInstructionsArray are functions, one for each option,
 // which will each be passed a 'handler' that they can use to edit the
 // rich-text area of the option, for example by
 //   handler.appendUnderlineText('emphasised');
 var customizeInteraction = function(elem, richTextInstructionsArray, maxSelectionAllowed) {
-  // need to set # of max selections
+  objects.IntEditor(
+    elem.all(by.tagName('schema-based-int-editor')).last()
+  ).setValue(maxSelectionAllowed);
+
   forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
   for (var i = 0; i < richTextInstructionsArray.length; i++) {
     var richTextEditor = forms.ListEditor(elem).editItem(i, 'RichText');
     richTextEditor.clear();
     richTextInstructionsArray[i](richTextEditor);
   }
-
-  objects.IntEditor(
-    elem.all(by.tagName('schema-based-int-editor')).last()
-  ).setValue(maxSelectionAllowed);
 };
 
 // These members of richTextInstructionsArray each describe how to check one of
@@ -58,12 +58,25 @@ var expectInteractionDetailsToMatch = function(
 // answer = an array of strings, iterate over each of the items in the array and click on each item
 var submitAnswer = function(elem, answer) {
   var answerArray = Array.from(answer);
-  for (var i = 0; i < answer.length; i++) {
-    // tagName = name of tag, e.g. <a>, <p> etc. 
-    // file named oppia-interactive-item-selection-input is defining that tag (kinda like creating a class)
-    elem.element(by.tagName('oppia-interactive-item-selection-input')).
-      element(by.buttonText(answer)).click();
+  console.log(answer);
+  console.log(answerArray.length);
+
+  for (var i = 0; i < 1; i++) {
+    //waitFor protractor-test-item-selection-input-item
+    elem.all(by.css('.protractor-test-item-selection-input-item')).filter(function(elem) {
+      return elem.element(by.css('.protractor-test-item-selection-option'))
+        .element(by.tagName('p')).getText().then(function(answerChoice) {
+          console.log(i);
+          return (answerChoice === answerArray[i]);
+        });
+    }).first().element(by.css('.protractor-test-item-selection-input-checkbox')).click();
   }
+
+  // need to wait until all elements have been selected, also need to explicitly click submit button bc it has one! 
+  var submitAnswerButton = element(by.css('.protractor-test-submit-answer-button'));
+  waitFor.elementToBeClickable(submitAnswerButton, 'Submit Answer button is not clickable');
+  submitAnswerButton.click();
+  console.log("submit button clicked");
 };
 
 var answerObjectType = 'SetOfHtmlString'; // type of object returned by interaction
@@ -76,7 +89,8 @@ var testSuite = [{
   }, function(editor) {
     editor.appendItalicText('answer3');
   }], 3],
-  ruleArguments: ['Equals', ['<p>answer1</p>', '<p>answer2</p>']],
+  //ruleArguments: ['Equals', ['answer1', 'answer2']],
+  ruleArguments: ['Equals', ['answer1']],
   expectedInteractionDetails: [[function(checker) {
     checker.readBoldText('answer1');
   }, function(checker) {
@@ -84,8 +98,28 @@ var testSuite = [{
   }, function(checker) {
     checker.readItalicText('answer3');
   }]],
-  wrongAnswers: [['<p>answer1</p>'], ['<p>answer2</p>'], ['<p>answer1</p>', '<p>answer3</p>']],
-  correctAnswers: [['<p>answer1</p>', '<p>answer2</p>']]
+  //wrongAnswers: [['answer1', 'answer3']],
+  wrongAnswers: [['answer3']],
+  //correctAnswers: [['answer1', 'answer2']]
+  correctAnswers: [['answer1']]
+}/*, { 
+  interactionArguments: [[function(editor) {
+    editor.appendBoldText('answer1');
+  }, function(editor) {
+    editor.appendItalicText('answer2');
+  }, function(editor) {
+    editor.appendItalicText('answer3');
+  }], 3],
+  ruleArguments: ['ContainsAtLeastOneOf', ['answer1', 'answer2']],
+  expectedInteractionDetails: [[function(checker) {
+    checker.readBoldText('answer1');
+  }, function(checker) {
+    checker.readItalicText('answer2');
+  }, function(checker) {
+    checker.readItalicText('answer3');
+  }]],
+  wrongAnswers: [['answer3']],
+  correctAnswers: [['answer1']]
 }, { 
   interactionArguments: [[function(editor) {
     editor.appendBoldText('answer1');
@@ -94,7 +128,7 @@ var testSuite = [{
   }, function(editor) {
     editor.appendItalicText('answer3');
   }], 3],
-  ruleArguments: ['ContainsAtLeastOneOf', ['<p>answer1</p>', '<p>answer2</p>']],
+  ruleArguments: ['IsProperSubsetOf', ['answer1', 'answer2']],
   expectedInteractionDetails: [[function(checker) {
     checker.readBoldText('answer1');
   }, function(checker) {
@@ -102,8 +136,8 @@ var testSuite = [{
   }, function(checker) {
     checker.readItalicText('answer3');
   }]],
-  wrongAnswers: [['<p>answer3</p>']],
-  correctAnswers: [['<p>answer1</p>'], ['<p>answer2</p>'], ['<p>answer1</p>', '<p>answer2</p>']]
+  wrongAnswers: [['answer1', 'answer2']],
+  correctAnswers: [['answer1']]
 }, { 
   interactionArguments: [[function(editor) {
     editor.appendBoldText('answer1');
@@ -112,7 +146,7 @@ var testSuite = [{
   }, function(editor) {
     editor.appendItalicText('answer3');
   }], 3],
-  ruleArguments: ['IsProperSubsetOf', ['<p>answer1</p>', '<p>answer2</p>']],
+  ruleArguments: ['DoesNotContainAtLeastOneOf', ['answer1', 'answer2']],
   expectedInteractionDetails: [[function(checker) {
     checker.readBoldText('answer1');
   }, function(checker) {
@@ -120,27 +154,9 @@ var testSuite = [{
   }, function(checker) {
     checker.readItalicText('answer3');
   }]],
-  wrongAnswers: [['<p>answer3</p>'], ['<p>answer1</p>', '<p>answer2</p>']],
-  correctAnswers: [['<p>answer1</p>'], ['<p>answer2</p>']]
-}, { 
-  interactionArguments: [[function(editor) {
-    editor.appendBoldText('answer1');
-  }, function(editor) {
-    editor.appendItalicText('answer2');
-  }, function(editor) {
-    editor.appendItalicText('answer3');
-  }], 3],
-  ruleArguments: ['DoesNotContainAtLeastOneOf', ['<p>answer1</p>', '<p>answer2</p>']],
-  expectedInteractionDetails: [[function(checker) {
-    checker.readBoldText('answer1');
-  }, function(checker) {
-    checker.readItalicText('answer2');
-  }, function(checker) {
-    checker.readItalicText('answer3');
-  }]],
-  wrongAnswers: [['<p>answer1</p>', '<p>answer2</p>']],
-  correctAnswers: [['<p>answer1</p>'], ['<p>answer2</p>'], ['<p>answer3</p>']]
-}];
+  wrongAnswers: [['answer1', 'answer2']],
+  correctAnswers: [['answer3']]
+}*/];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;

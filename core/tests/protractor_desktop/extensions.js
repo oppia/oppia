@@ -21,6 +21,7 @@ var general = require('../protractor_utils/general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
@@ -128,6 +129,7 @@ describe('Interactions', function() {
 
     for (var interactionId in interactions.INTERACTIONS) {
       var interaction = interactions.INTERACTIONS[interactionId];
+
       for (var i = 0; i < interaction.testSuite.length; i++) {
         var test = interaction.testSuite[i];
 
@@ -154,7 +156,7 @@ describe('Interactions', function() {
           explorationPlayerPage.submitAnswer(
             interactionId, test.wrongAnswers[j]);
           explorationPlayerPage.expectLatestFeedbackToMatch(
-            forms.toRichText('no'));
+                forms.toRichText('no'));
         }
         // Dismiss conversation help card.
         var clearHelpcardButton = element(by.css(
