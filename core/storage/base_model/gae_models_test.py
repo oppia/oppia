@@ -244,15 +244,16 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
         self.assertEqual(user_data, expected_data)
 
     def test_export_data_nontrivial(self):
-        model1 = base_models.BaseSnapshotMetadataModel(
-            id='model_id-1', committer_id='committer_id', commit_type='create')
+        version_model = TestVersionedModel(id='version_model')
+        model1 = version_model.SNAPSHOT_METADATA_CLASS.create(
+            'model_id-1', 'committer_id', 'create', None, None)
         model1.put()
-        model2 = base_models.BaseSnapshotMetadataModel(
-            id='model_id-2', committer_id='committer_id', commit_type='create',
-            commit_message='Hi this is a commit.')
+        model2 = version_model.SNAPSHOT_METADATA_CLASS.create(
+            'model_id-2', 'committer_id', 'create', 'Hi this is a commit.',
+            None)
         model2.put()
-        user_data = (base_models
-                     .BaseSnapshotMetadataModel
+        user_data = (version_model
+                     .SNAPSHOT_METADATA_CLASS
                      .export_data('committer_id'))
         expected_data = {
             'model_id-1': {
