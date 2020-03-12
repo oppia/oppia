@@ -52,10 +52,6 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
     FEEDBACK_IMPROVEMENT_TASK_TYPE = _FEEDBACK_IMPROVEMENT_TASK_TYPE_;
   }));
 
-  beforeEach(function() {
-    this.mockThread = ;
-  });
-
   describe('.createNew', function() {
     it('retrieves data from passed thread', function() {
       var mockThread = {threadId: 1};
