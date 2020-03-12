@@ -26,6 +26,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
   var $q = null;
   var $rootScope = null;
   var FeedbackImprovementTaskObjectFactory = null;
+  var FeedbackThreadObjectFactory = null;
   var ImprovementModalService = null;
   var ThreadDataService = null;
   var FEEDBACK_IMPROVEMENT_TASK_TYPE = null;
@@ -39,16 +40,21 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
 
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _FeedbackImprovementTaskObjectFactory_,
-      _ImprovementModalService_, _ThreadDataService_,
-      _FEEDBACK_IMPROVEMENT_TASK_TYPE_) {
+      _FeedbackThreadObjectFactory_, _ImprovementModalService_,
+      _ThreadDataService_, _FEEDBACK_IMPROVEMENT_TASK_TYPE_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     FeedbackImprovementTaskObjectFactory =
       _FeedbackImprovementTaskObjectFactory_;
+    FeedbackThreadObjectFactory = _FeedbackThreadObjectFactory_;
     ImprovementModalService = _ImprovementModalService_;
     ThreadDataService = _ThreadDataService_;
     FEEDBACK_IMPROVEMENT_TASK_TYPE = _FEEDBACK_IMPROVEMENT_TASK_TYPE_;
   }));
+
+  beforeEach(function() {
+    this.mockThread = ;
+  });
 
   describe('.createNew', function() {
     it('retrieves data from passed thread', function() {
@@ -80,15 +86,20 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
 
   describe('FeedbackImprovementTask', function() {
     beforeEach(function() {
-      this.mockThread = {
-        last_updated_msecs: 1441870501230.642,
+      let feedbackThreadBackendDict = {
+        last_updated_msecs: 1000,
         original_author_username: 'test_learner',
         state_name: null,
         status: 'open',
         subject: 'Feedback from a learner',
         summary: null,
-        thread_id: 'abc1',
-      };
+        thread_id: 'exp1.thread1',
+        message_count: 10,
+        last_nonempty_message_author: 'author',
+        last_nonempty_message_text: 'tenth message'
+      }
+      this.mockThread = FeedbackThreadObjectFactory.createFromBackendDict(
+        feedbackThreadBackendDict);
       this.task =
         FeedbackImprovementTaskObjectFactory.createNew(this.mockThread);
     });
