@@ -37,6 +37,8 @@ export class ServiceBootstrapComponent {}
 import { AppConstants } from 'app.constants';
 import { CollectionDomainConstants } from
   'domain/collection/collection-domain.constants';
+import { CollectionEditorPageConstants } from
+  'pages/collection-editor-page/collection-editor-page.constants';
 import { EditorDomainConstants } from
   'domain/editor/editor-domain.constants';
 import { InteractionsExtensionsConstants } from
@@ -44,8 +46,6 @@ import { InteractionsExtensionsConstants } from
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { ServicesConstants } from 'services/services.constants';
-import { CollectionEditorPageConstants } from
-  'pages/collection-editor-page/collection-editor-page.constants';
 
 @NgModule({
   imports: [
