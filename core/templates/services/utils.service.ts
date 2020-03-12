@@ -24,7 +24,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class UtilsService {
-  isEmpty(obj: any): boolean {
+  isEmpty(obj: Object): boolean {
     for (var property in obj) {
       if (obj.hasOwnProperty(property)) {
         return false;
@@ -33,11 +33,12 @@ export class UtilsService {
     return true;
   }
 
-  isString(input: any): boolean {
+  isString(input: Object): boolean {
     return (typeof input === 'string' || input instanceof String);
   }
 
-  isEquivalent(a: any, b: any): boolean {
+
+  isEquivalent(a: Object, b: Object): boolean {
     if (a === null || b === null) {
       return a === b;
     }

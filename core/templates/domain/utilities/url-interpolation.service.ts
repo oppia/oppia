@@ -29,6 +29,10 @@ import { LoggerService } from 'services/contextual/logger.service';
 const Constants = require('constants.ts');
 const hashes = require('hashes.json');
 
+interface InterpolationValues {
+  [param: string]: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -103,7 +107,8 @@ export class UrlInterpolationService {
    * If a URL requires a value which is not keyed within the
    * interpolationValues object, this will return null.
    */
-  interpolateUrl(urlTemplate: string, interpolationValues: any): string {
+  interpolateUrl(urlTemplate: string,
+      interpolationValues: InterpolationValues): string {
     if (!urlTemplate) {
       this.alertsService.fatalWarning(
         'Invalid or empty URL template passed in: \'' + urlTemplate + '\'');

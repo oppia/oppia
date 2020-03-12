@@ -23,17 +23,17 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class DebugInfoTrackerService {
-  _sequenceOfActions: Array<any> = [];
+  _sequenceOfActions: Array<Object> = [];
 
   reset(): void {
     this._sequenceOfActions = [];
   }
 
-  addAction(action: any): void {
+  addAction(action: Object): void {
     this._sequenceOfActions.push(action);
   }
 
-  getSequenceOfActions(): Array<any> {
+  getSequenceOfActions(): Array<Object> {
     return this._sequenceOfActions;
   }
 }
