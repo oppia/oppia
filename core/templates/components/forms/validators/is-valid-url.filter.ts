@@ -17,9 +17,8 @@
  */
 
 angular.module('oppia').filter('isValidUrl', [function() {
-    var IS_VALID_URL_REGEXP = /^((?!(mailto:)).)*$/;
-    return function(input) {
-      return IS_VALID_URL_REGEXP.test(input);
-    };
-  }]);
-  
+  var IS_VALID_URL_REGEXP = /^((?!(mailto:)).)*$/;
+  return function(input) {
+    return IS_VALID_URL_REGEXP.test(input);
+  };
+}]);
