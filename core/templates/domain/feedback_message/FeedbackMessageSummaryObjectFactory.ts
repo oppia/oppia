@@ -29,13 +29,13 @@ export class FeedbackMessageSummary {
   description: string;
   authorUsername: string;
   authorPictureDataUrl: string;
-  createdOnMsecsMsecs: number;
+  createdOnMsecs: number;
 
   constructor(
       messageId: number, text: string, updatedStatus: string,
       suggestionHtml: string, currentContentHtml: string, description: string,
       authorUsername: string, authorPictureDataUrl: string,
-      createdOnMsecsMsecs: number) {
+      createdOnMsecs: number) {
     this.messageId = messageId;
     this.text = text;
     this.updatedStatus = updatedStatus;
@@ -44,7 +44,7 @@ export class FeedbackMessageSummary {
     this.description = description;
     this.authorUsername = authorUsername;
     this.authorPictureDataUrl = authorPictureDataUrl;
-    this.createdOnMsecsMsecs = createdOnMsecsMsecs;
+    this.createdOnMsecs = createdOnMsecs;
   }
 }
 
