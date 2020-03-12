@@ -85,13 +85,17 @@ angular.module('oppia').config([
     // injected before bootstrapping of oppia module.
     var servicesToProvide = [
       'AlertsService', 'BackgroundMaskService', 'BrowserCheckerService',
-      'ContextService', 'CsrfTokenService', 'DateTimeFormatService',
-      'DebouncerService', 'DeviceInfoService',
-      'DocumentAttributeCustomizationService', 'HtmlEscaperService',
-      'IdGenerationService', 'MetaTagCustomizationService',
-      'SidebarStatusService', 'SiteAnalyticsService', 'UrlInterpolationService',
-      'UrlService', 'UserInfoObjectFactory', 'UtilsService',
-      'WindowDimensionsService', 'WindowRef'];
+      'CamelCaseToHyphensPipe', 'ContextService', 'CsrfTokenService',
+      'DateTimeFormatService', 'DebouncerService', 'DeviceInfoService',
+      'DocumentAttributeCustomizationService',
+      'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
+      'ExpressionParserService',
+      'HtmlEscaperService', 'IdGenerationService', 'LoggerService',
+      'MetaTagCustomizationService', 'SidebarStatusService',
+      'SiteAnalyticsService', 'StateObjectFactory', 'StatesObjectFactory',
+      'UrlInterpolationService', 'UrlService', 'UserInfoObjectFactory',
+      'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
+      'WindowRef'];
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       if (servicesToProvide.includes(key)) {
         $provide.value(key, value);
