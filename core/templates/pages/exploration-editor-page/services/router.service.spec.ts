@@ -154,6 +154,7 @@ describe('Router Service', function() {
 
       expect(RouterService.getActiveTabName()).toBe('main');
       RouterService.navigateToMainTab('newState');
+      $timeout.flush();
       // To $watch the first $location.path call.
       $rootScope.$apply();
 
@@ -193,6 +194,7 @@ describe('Router Service', function() {
 
     expect(RouterService.getActiveTabName()).toBe('main');
     RouterService.navigateToMainTab('newState');
+    $timeout.flush();
     // To $watch the first $location.path call.
     $rootScope.$apply();
 
@@ -216,6 +218,7 @@ describe('Router Service', function() {
         expect(applyAsyncSpy).toHaveBeenCalled();
 
         RouterService.navigateToMainTab('newState');
+        $timeout.flush();
         $rootScope.$apply();
 
         expect(RouterService.getActiveTabName()).toBe('main');
@@ -230,6 +233,7 @@ describe('Router Service', function() {
 
       // Go to stats tab.
       RouterService.navigateToStatsTab();
+      $timeout.flush();
       $rootScope.$apply();
 
       expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
@@ -241,6 +245,7 @@ describe('Router Service', function() {
 
       // Now go to main tab.
       RouterService.navigateToMainTab('newState');
+      $timeout.flush();
       $rootScope.$apply();
       $rootScope.$apply();
 
@@ -259,6 +264,7 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToTranslationTab();
+    $timeout.flush();
     $rootScope.$apply();
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
@@ -276,6 +282,7 @@ describe('Router Service', function() {
 
     expect(RouterService.getActiveTabName()).toBe('main');
     RouterService.navigateToPreviewTab();
+    $timeout.flush();
     $timeout.flush(200);
     $rootScope.$apply();
 
@@ -298,6 +305,7 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToStatsTab();
+    $timeout.flush();
     $rootScope.$apply();
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
@@ -314,6 +322,7 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToImprovementsTab();
+    $timeout.flush();
     $rootScope.$apply();
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
@@ -333,6 +342,7 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToSettingsTab();
+    $timeout.flush();
     $rootScope.$apply();
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
@@ -347,6 +357,7 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToHistoryTab();
+    $timeout.flush();
     $rootScope.$apply();
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
@@ -365,6 +376,7 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToFeedbackTab();
+    $timeout.flush();
     $rootScope.$apply();
 
     // $watch is called
@@ -388,6 +400,7 @@ describe('Router Service', function() {
     locationPathSpy.and.returnValue('/invalid');
 
     RouterService.navigateToMainTab(null);
+    $timeout.flush();
     $rootScope.$apply();
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
 
@@ -407,6 +420,7 @@ describe('Router Service', function() {
   it('should save pending changes', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
     RouterService.savePendingChanges();
+    $timeout.flush();
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
   });
 });
