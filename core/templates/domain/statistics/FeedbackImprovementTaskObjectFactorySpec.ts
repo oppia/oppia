@@ -121,9 +121,13 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
     });
 
     describe('.getLastUpdatedTime', function() {
-      it('returns the time when this task was last updated', function() {
+      it('is a number', function() {
+        expect(this.task.getLastUpdatedTime()).toEqual(jasmine.any(Number));
+      });
+
+      it('returns the time when the thread was last updated', function() {
         expect(this.task.getLastUpdatedTime())
-          .toBe(this.mockThread.lastUpdatedMsecs);
+          .toEqual(this.mockThread.lastUpdatedMsecs);
       });
     });
 

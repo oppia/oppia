@@ -169,8 +169,13 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
     });
 
     describe('.getLastUpdatedTime', function() {
+      it('is a number', function() {
+        expect(this.task.getLastUpdatedTime()).toEqual(jasmine.any(Number));
+      });
+
       it('returns the time when this task was last updated', function() {
-        expect(this.task.getLastUpdatedTime()).toBe(this.testLastUpdatedTime);
+        expect(this.task.getLastUpdatedTime())
+          .toEqual(this.testLastUpdatedTime);
       });
     });
 

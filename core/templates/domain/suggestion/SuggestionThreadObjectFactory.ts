@@ -32,7 +32,7 @@ export class SuggestionThread {
   subject: string;
   summary: string;
   originalAuthorName: string;
-  lastUpdated: number;
+  lastUpdatedMsecs: number;
   messageCount: number;
   threadId: string;
   suggestion: Suggestion;
@@ -41,14 +41,15 @@ export class SuggestionThread {
 
   constructor(
       status: string, subject: string, summary: string,
-      originalAuthorName: string, lastUpdated: number, messageCount: number,
-      threadId: string, lastNonemptyMessageSummary: ThreadMessageSummary,
+      originalAuthorName: string, lastUpdatedMsecs: number,
+      messageCount: number, threadId: string,
+      lastNonemptyMessageSummary: ThreadMessageSummary,
       suggestion: Suggestion) {
     this.status = status;
     this.subject = subject;
     this.summary = summary;
     this.originalAuthorName = originalAuthorName;
-    this.lastUpdated = lastUpdated;
+    this.lastUpdatedMsecs = lastUpdatedMsecs;
     this.messageCount = messageCount;
     this.threadId = threadId;
     this.lastNonemptyMessageSummary = lastNonemptyMessageSummary;
