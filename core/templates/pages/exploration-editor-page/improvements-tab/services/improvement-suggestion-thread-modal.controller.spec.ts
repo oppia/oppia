@@ -84,11 +84,10 @@ describe('Improvement Suggestion Thread Modal Controller', function() {
       target_version_at_submission: 1,
     }];
 
-    $httpBackend.whenGET('/threadlisthandler/' + expId)
-      .respond({
-        feedback_thread_dicts: [],
-        suggestion_thread_dicts: mockSuggestionThreads
-      });
+    $httpBackend.whenGET('/threadlisthandler/' + expId).respond({
+      feedback_thread_dicts: [],
+      suggestion_thread_dicts: mockSuggestionThreads
+    });
     $httpBackend.whenGET(
       '/suggestionlisthandler?target_type=exploration&target_id=' + expId
     ).respond({suggestions: mockSuggestions});
@@ -102,13 +101,12 @@ describe('Improvement Suggestion Thread Modal Controller', function() {
 
     var $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    $controller(
-      'ImprovementSuggestionThreadModalController', {
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance,
-        isUserLoggedIn: true,
-        thread: thread
-      });
+    $controller('ImprovementSuggestionThreadModalController', {
+      $scope: $scope,
+      $uibModalInstance: $uibModalInstance,
+      isUserLoggedIn: true,
+      thread: thread
+    });
   }));
 
   afterEach(function() {

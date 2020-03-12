@@ -56,13 +56,12 @@ describe('Improvement Learner Answer Details Modal Controller', function() {
 
     var $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    $controller(
-      'ImprovementLearnerAnswerDetailsModalController', {
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance,
-        isEditable: true,
-        learnerAnswerDetails: learnerAnswerDetails
-      });
+    $controller('ImprovementLearnerAnswerDetailsModalController', {
+      $scope: $scope,
+      $uibModalInstance: $uibModalInstance,
+      isEditable: true,
+      learnerAnswerDetails: learnerAnswerDetails
+    });
   }));
 
   it('should evalute scope variables value correctly', function() {

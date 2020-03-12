@@ -28,14 +28,13 @@ describe('Improvement Confirmation Modal', function() {
       '$uibModalInstance', ['close', 'dismiss']);
 
     $scope = $rootScope.$new();
-    $controller(
-      'ImprovementConfirmationModalController', {
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance,
-        buttonClass: 'btn',
-        buttonText: 'Button Text',
-        message: 'Message Text'
-      });
+    $controller('ImprovementConfirmationModalController', {
+      $scope: $scope,
+      $uibModalInstance: $uibModalInstance,
+      buttonClass: 'btn',
+      buttonText: 'Button Text',
+      message: 'Message Text'
+    });
   }));
 
   it('should evalute scope variables values correctly', function() {

@@ -61,11 +61,10 @@ describe('Improvement Feedback Thread Modal Controller', function() {
         thread_id: 'exp1.thread1'
       }];
 
-      $httpBackend.whenGET('/threadlisthandler/' + expId)
-        .respond({
-          feedback_thread_dicts: mockFeedbackThreads,
-          suggestion_thread_dicts: []
-        });
+      $httpBackend.whenGET('/threadlisthandler/' + expId).respond({
+        feedback_thread_dicts: mockFeedbackThreads,
+        suggestion_thread_dicts: []
+      });
       $httpBackend.whenGET(
         '/suggestionlisthandler?target_type=exploration&target_id=' + expId
       ).respond({ suggestions: [] });
@@ -79,13 +78,12 @@ describe('Improvement Feedback Thread Modal Controller', function() {
 
       var $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
-      $controller(
-        'ImprovementFeedbackThreadModalController', {
-          $scope: $scope,
-          $uibModalInstance: $uibModalInstance,
-          isUserLoggedIn: true,
-          thread: thread
-        });
+      $controller('ImprovementFeedbackThreadModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+        isUserLoggedIn: true,
+        thread: thread
+      });
     }));
 
     it('should evalute scope variables value correctly', function() {

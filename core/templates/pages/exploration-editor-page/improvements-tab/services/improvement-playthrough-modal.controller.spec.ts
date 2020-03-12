@@ -70,13 +70,12 @@ describe('Improvement Playthough Modal Controller', function() {
 
       var $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
-      $controller(
-        'ImprovementPlaythoughModalController', {
-          $scope: $scope,
-          $uibModalInstance: $uibModalInstance,
-          playthrough: playthrough,
-          playthroughIndex: 0
-        });
+      $controller('ImprovementPlaythoughModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+        playthrough: playthrough,
+        playthroughIndex: 0
+      });
     }));
 
     it('should call init when controller is initialized', function() {
