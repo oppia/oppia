@@ -324,7 +324,8 @@ angular.module('oppia').factory('ImprovementModalService', [
 
               // TODO(Allan): Implement ability to edit suggestions before
               // applying.
-              $scope.addNewMessageAsync = function(threadId, tmpText, tmpStatus) {
+              $scope.addNewMessageAsync = function(
+                  threadId, tmpText, tmpStatus) {
                 if (threadId === null) {
                   AlertsService.addWarning(
                     'Cannot add message to thread with ID: null.');
@@ -391,7 +392,8 @@ angular.module('oppia').factory('ImprovementModalService', [
 
               // TODO(Allan): Implement ability to edit suggestions before
               // applying.
-              $scope.addNewMessageAsync = function(threadId, tmpText, tmpStatus) {
+              $scope.addNewMessageAsync = function(
+                  threadId, tmpText, tmpStatus) {
                 if (threadId === null) {
                   AlertsService.addWarning(
                     'Cannot add message to thread with ID: null.');

@@ -503,8 +503,8 @@ describe('retrieving threads service', () => {
     $httpBackend.expectGET('/threadhandler/exploration.exp1.ghi3').respond({
       messages: []
     });
-    ThreadDataService.resolveSuggestionAsync(thread, 'Message', 'status', 'a', true)
-      .then(
+    ThreadDataService.resolveSuggestionAsync(
+      thread, 'Message', 'status', 'a', true).then(
         () => {
           expect(ThreadDataService.getOpenThreadsCount()).toEqual(0);
           done();
