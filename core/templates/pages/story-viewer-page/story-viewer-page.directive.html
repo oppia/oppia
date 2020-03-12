@@ -49,7 +49,7 @@
              ng-href="<[$ctrl.getExplorationUrl(node)]>"
              ng-style="{position: 'absolute', left: '<[$ctrl.pathIconParameters[$index].left]>', top: '<[$ctrl.pathIconParameters[$index].top]>'}"
              ng-class="{'oppia-story-node-default-cursor': !$ctrl.isSummaryTileVisible(node)}">
-            <div ng-style="{width: '160px',position: 'absolute',left: '<[$ctrl.getExplorationTitlePosition($index)]>',color: '#006553','font-family': 'Capriola, Roboto, Arial,sans-serif','font-size': '18px',bottom: '65%'}">
+            <div ng-style="{width: '120px',position: 'absolute',left: '<[$ctrl.getExplorationTitlePosition($index)]>',color: '#006553','font-family': 'Capriola, Roboto, Arial,sans-serif','font-size': '18px',bottom: '82%'}">
               <span ng-if="node.isCompleted()" aria-live="assertive" translate="I18N_STORY_VIEWER_COMPLETED_CHAPTER" translate-values="{title: node.getTitle()}">
               </span>
               <span ng-if="!node.isCompleted()" aria-live="assertive">
@@ -62,7 +62,7 @@
                  xmlns="http://www.w3.org/2000/svg"
                  xmlns:xlink="http://www.w3.org/1999/xlink"
                  version="1.1"
-                 style="position:relative;top:20px">
+                 style="position:relative">
               <defs>
                 <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
                   <circle cx="50"
@@ -261,7 +261,7 @@
     left: 50%;
     position: absolute;
     text-align: center;
-    transform: translate(-50%, 195px);
+    transform: translate(-50%, 170px);
     z-index: 1;
   }
   .oppia-story-node-small-screen::before {
