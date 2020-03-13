@@ -160,6 +160,12 @@ class UserSettingsModel(base_models.BaseModel):
         """
         pass
 
+    def verify_model_user_ids_exist(self):
+        """We don't need to check the existence of UserSettingsModel for a
+        UserSettingsModel.
+        """
+        pass
+
     @staticmethod
     def export_data(user_id):
         """Exports the data from UserSettingsModel into dict format for Takeout.

@@ -97,7 +97,7 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         output = self._run_one_off_job()
         id_set = output[0][1][1]
         output = self._run_one_off_job()
-        self.assertIn(['ALREADY MIGRATED', [id_set, id_set]], output)
+        self.assertIn(['ALREADY MIGRATED', [id_set]], output)
 
     def test_one_user_user_settings_model(self):
         original_model = user_models.UserSettingsModel(
@@ -1048,7 +1048,6 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
         self.assertIn(
             ['FAILURE - TopicRightsModel', ['topic_1_id']], output)
         self.assertIn(['SUCCESS - TopicRightsModel', 1], output)
-        self.assertIn(['SUCCESS - UserSettingsModel', 3], output)
 
 
 class ModelsUserIdsHaveUserSettingsExplorationsVerificationJobTests(
