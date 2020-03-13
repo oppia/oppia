@@ -88,6 +88,184 @@ def run_job_for_deleted_exp(
         self.assertEqual(job_class.get_output(job_id), [])
 
 
+class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(MathExpressionInputInteractionOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
+        """Checks (exp, state) pairs are produced only for
+        desired interactions.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1', 'State2', 'State3'])
+
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+
+        state1.update_interaction_id('MathExpressionInput')
+        state2.update_interaction_id('MathExpressionInput')
+        state3.update_interaction_id('MathExpressionInput')
+
+        # This exploration is valid (has no equation/inequalities) therefore
+        # it shouldn't be detected by this audit job.
+        answer_group_list1 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': u'[\'x+y-z\']'}
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state1.update_interaction_answer_groups(answer_group_list1)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start MathExpressionInteractionOneOff job on sample exploration.
+        job_id = (
+            exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.create_new(
+            ))
+        exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.get_output(
+                job_id))
+        self.assertEqual(actual_output, [])
+
+        # This exploration is invalid (has an equation) therefore
+        # it should be detected by this audit job.
+        answer_group_list2 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': u'[\'y=mx+c\']'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state2</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state2.update_interaction_answer_groups(answer_group_list2)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # This exploration is invalid (has inequalities) therefore
+        # it should be detected by this audit job.
+        answer_group_list3 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': u'[\'x<y>z\']'}
+            }],
+            'outcome': {
+                'dest': 'State2',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state3</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state3.update_interaction_answer_groups(answer_group_list3)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start MathExpressionInteractionOneOff job on sample exploration.
+        job_id = (
+            exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.create_new(
+            ))
+        exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.get_output(
+                job_id))
+        expected_output = [(
+            u'[u\'exp_id0\', [u"State2: [\'y=mx+c\']", u"State3: [\'x<y>z\']"]]'
+        )]
+        self.assertEqual(actual_output, expected_output)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        state1 = exploration.states['State1']
+
+        state1.update_interaction_id('MathExpressionInput')
+
+        answer_group_list = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': u'[\'y=mx+c\']'}
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state1.update_interaction_answer_groups(answer_group_list)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.MathExpressionInputInteractionOneOffJob)
+
+
 class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
     """Tests for ExpSummary aggregations."""
 
