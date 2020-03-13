@@ -292,7 +292,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         response = self.get_html_response(
             '/',
             headers={
-                'Referer': python_utils.UNICODE(
+                'Referer': python_utils.convert_to_bytes(
                     feconf.PENDING_ACCOUNT_DELETION_URL)},
             expected_status_int=302)
         self.assertIn('/logout?redirect_url=', response.location)
