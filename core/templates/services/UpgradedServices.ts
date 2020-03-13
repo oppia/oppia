@@ -18,6 +18,13 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import {
+  HttpClient,
+  HttpXhrBackend,
+  /* eslint-disable camelcase */
+  ɵangular_packages_common_http_http_d
+  /* eslint-enable camelcase */
+} from '@angular/common/http';
 
 import { AlertsService } from 'services/alerts.service';
 import { AngularNameService } from
@@ -58,12 +65,15 @@ import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
+import { DebugInfoTrackerService } from 'services/debug-info-tracker.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
 import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
+import { EmailDashboardDataService } from
+  'pages/email-dashboard-pages/email-dashboard-data.service';
 import { EntityContextObjectFactory } from
   'domain/utilities/EntityContextObjectFactory';
 import { ExplorationDiffService } from
@@ -101,6 +111,8 @@ import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerAnswerInfoObjectFactory } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
+import { LearnerDashboardActivityIdsObjectFactory } from
+  'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
 import { LocalStorageService } from 'services/local-storage.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
@@ -118,6 +130,8 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
+import { ParamMetadataObjectFactory } from
+  'domain/exploration/ParamMetadataObjectFactory';
 import { ParamSpecObjectFactory } from
   'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from
@@ -236,6 +250,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { from } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -266,7 +281,13 @@ export class UpgradedServices {
     upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
+    upgradedServices['DebugInfoTrackerService'] =
+      new DebugInfoTrackerService();
     upgradedServices['EditabilityService'] = new EditabilityService();
+    upgradedServices['EmailDashboardDataService'] =
+      new EmailDashboardDataService(
+        new HttpClient(new HttpXhrBackend(
+          new ɵangular_packages_common_http_http_d())));
     upgradedServices['EntityContextObjectFactory'] =
       new EntityContextObjectFactory();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
@@ -289,11 +310,15 @@ export class UpgradedServices {
       new LearnerAnswerDetailsObjectFactory();
     upgradedServices['LearnerAnswerInfoObjectFactory'] =
       new LearnerAnswerInfoObjectFactory();
+    upgradedServices['LearnerDashboardActivityIdsObjectFactory'] =
+      new LearnerDashboardActivityIdsObjectFactory();
     upgradedServices['LoggerService'] = new LoggerService();
     upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'] =
       new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
+    upgradedServices['ParamMetadataObjectFactory'] =
+      new ParamMetadataObjectFactory();
     upgradedServices['ParamTypeObjectFactory'] =
       new ParamTypeObjectFactory();
     upgradedServices['PlaythroughIssueObjectFactory'] =
