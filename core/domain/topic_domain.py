@@ -1163,6 +1163,11 @@ class TopicSummary(python_utils.OBJECT):
         if self.name == '':
             raise utils.ValidationError('Name field should not be empty')
 
+        if not isinstance(self.description, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected description to be a string, received %s'
+                % self.description)
+
         if not isinstance(self.canonical_name, python_utils.BASESTRING):
             raise utils.ValidationError('Canonical name should be a string.')
         if self.canonical_name == '':

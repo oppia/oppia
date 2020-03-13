@@ -781,6 +781,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         self.topic_summary_dict = {
             'id': 'topic_id',
             'name': 'name',
+            'description': 'topic description',
             'language_code': 'en',
             'version': 1,
             'canonical_story_count': 1,
@@ -793,7 +794,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         }
 
         self.topic_summary = topic_domain.TopicSummary(
-            'topic_id', 'name', 'name', 'en', 1, 1, 1, 1, 1, 1,
+            'topic_id', 'name', 'name', 'en', 'topic description', 1, 1, 1, 1, 1, 1,
             current_time, current_time)
 
     def test_topic_summary_gets_created(self):
