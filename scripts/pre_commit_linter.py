@@ -534,8 +534,6 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/package.json',
     '/yarn.lock',
     '/scripts/install_third_party_libs.py',
-    './templateCacheToWebpackImport.js'
-    './Untitled'
     '/.github/']
 
 # NOTE TO DEVELOPERS: This should match the version of Node used in common.py.
