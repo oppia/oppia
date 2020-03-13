@@ -24,14 +24,9 @@ import subprocess
 import sys
 import time
 
-NODE_VERSION = '10.18.0'
-CURR_DIR = os.path.abspath(os.getcwd())
-OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
+import python_utils
 
-NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
-
-# pylint: disable=wrong-import-position
-import python_utils  # isort:skip
+from .. import common
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
@@ -71,7 +66,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         Returns:
             summary_messages: list(str). Return summary of lint checks.
         """
-        node_path = os.path.join(NODE_PATH, 'bin', 'node')
+        node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         stylelint_path = os.path.join(
             'node_modules', 'stylelint', 'bin', 'stylelint.js')
         if not os.path.exists(stylelint_path):
@@ -134,15 +129,10 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
         Returns:
             all_messages: str. All the messages returned by the lint checks.
         """
-        all_messages = []
         if not self.all_filepaths:
             python_utils.PRINT('')
             python_utils.PRINT(
                 'There are no HTML or CSS files to lint.')
-            return all_messages
+            return []
 
-        css_linter_messages = self._lint_css_files()
-
-        all_messages += css_linter_messages
-
-        return all_messages
+        return self._lint_css_files()

@@ -50,8 +50,6 @@ Note that the root folder MUST be named 'oppia'.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-# Pylint has issues with the import order of argparse.
-# pylint: disable=wrong-import-order
 import argparse
 import fnmatch
 import multiprocessing
@@ -59,6 +57,8 @@ import os
 import subprocess
 import sys
 import threading
+
+import python_utils
 
 # Install third party dependencies before proceeding.
 from . import codeowner_linter
@@ -71,9 +71,6 @@ from .. import concurrent_task_utils
 from .. import install_third_party_libs
 
 install_third_party_libs.main()
-
-# pylint: disable=wrong-import-position
-import python_utils  # isort:skip
 
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
@@ -95,16 +92,6 @@ _EXCLUSIVE_GROUP.add_argument(
     nargs='+',
     help='specific file extensions to be linted. Space separated list',
     action='store')
-
-EXCLUDED_PATHS = (
-    'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
-    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
-    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
-    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
-    'webpack_bundles/*', 'core/tests/services_sources/*',
-    'core/tests/release_sources/tmp_unzip.zip',
-    'core/tests/release_sources/tmp_unzip.tar.gz')
 
 # NOTE TO DEVELOPERS: This should match the version of Node used in common.py.
 NODE_DIR = os.path.abspath(
@@ -401,7 +388,8 @@ def _get_all_filepaths(input_path, input_filenames):
         all_filepaths = _get_changed_filepaths()
     all_filepaths = [
         filename for filename in all_filepaths if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+        any(fnmatch.fnmatch(filename, pattern) for pattern in(
+            general_purpose_linter.EXCLUDED_PATHS))]
     return all_filepaths
 
 
@@ -467,10 +455,11 @@ def main(args=None):
     read_files(all_filepaths)
     categorize_files(all_filepaths)
 
-    max_concurrent_runs = 1
+    third_party_max_concurrent_runs = 1
 
     # Prepare tasks.
-    concurrent_count = min(multiprocessing.cpu_count(), max_concurrent_runs)
+    concurrent_count = min(
+        multiprocessing.cpu_count(), third_party_max_concurrent_runs)
     semaphore = threading.Semaphore(concurrent_count)
 
     custom_linters = []
@@ -512,9 +501,8 @@ def main(args=None):
     for task in tasks_third_party:
         all_messages += task.output
 
-    code_owner_message = codeowner_linter.check_codeowner_file(
+    all_messages += codeowner_linter.check_codeowner_file(
         verbose_mode_enabled)
-    all_messages += code_owner_message
 
     _print_complete_summary_of_errors(all_messages)
 

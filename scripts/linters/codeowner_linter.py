@@ -24,11 +24,9 @@ import os
 import subprocess
 import sys
 
-# pylint: disable=wrong-import-position
-from . import linter_utils  # isort:skip
+import python_utils
 
-# pylint: disable=wrong-import-position
-import python_utils  # isort:skip
+from . import linter_utils
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
@@ -97,10 +95,8 @@ def _is_path_ignored(path_to_check):
 
     # The "git check-ignore <path>" command returns 0 when the path is ignored
     # otherwise it returns 1. subprocess.call then returns this returncode.
-    if subprocess.call(command):
-        return False
-    else:
-        return True
+
+    return subprocess.call(command) == 0
 
 
 def check_for_important_patterns_at_bottom_of_codeowners(important_patterns):

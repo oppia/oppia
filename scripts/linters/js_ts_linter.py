@@ -28,22 +28,18 @@ import sys
 import tempfile
 import time
 
+import python_utils
+
+from . import linter_utils
+from .. import common
+
 ESPRIMA_VERSION = '4.0.1'
-NODE_VERSION = '10.18.0'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
-
-NODE_DIR = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 
 ESPRIMA_PATH = os.path.join(OPPIA_TOOLS_DIR, 'esprima-%s' % ESPRIMA_VERSION)
 
 sys.path.insert(1, ESPRIMA_PATH)
-
-# pylint: disable=wrong-import-position
-import python_utils  # isort:skip
-
-# pylint: disable=wrong-import-position
-from . import linter_utils  # isort:skip
 
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
@@ -123,7 +119,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             ts_files: list(str). The list of ts filepaths to be linted.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
-        os.environ['PATH'] = '%s/bin:' % NODE_DIR + os.environ['PATH']
+        os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
 
         self.js_files = js_files
         self.ts_files = ts_files
@@ -223,18 +219,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         """Compiles a typescript file and returns the path for compiled
         js file.
         """
-        allow_js = 'true'
-        lib = 'es2017,dom'
-        no_implicit_use_strict = 'true'
-        skip_lib_check = 'true'
-        target = 'es5'
-        type_roots = './node_modules/@types'
         cmd = (
             './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
             '-lib %s -noImplicitUseStrict %s -skipLibCheck '
             '%s -target %s -typeRoots %s %s typings/*') % (
-                dir_path, allow_js, lib, no_implicit_use_strict,
-                skip_lib_check, target, type_roots, filepath)
+                dir_path, 'true', 'es2017,dom', 'true',
+                'true', 'es5', './node_modules/@types', filepath)
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         compiled_js_filepath = os.path.join(
             dir_path, os.path.basename(filepath).replace('.ts', '.js'))
@@ -866,7 +856,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         Returns:
             summary_messages: list(str). Summary of lint check.
         """
-        node_path = os.path.join(NODE_DIR, 'bin', 'node')
+        node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         eslint_path = os.path.join(
             'node_modules', 'eslint', 'bin', 'eslint.js')
         if not os.path.exists(eslint_path):
@@ -931,14 +921,10 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         Returns:
             all_messages: str. All the messages returned by the lint checks.
         """
-        all_messages = []
         if not self.all_filepaths:
             python_utils.PRINT('')
             python_utils.PRINT(
                 'There are no JavaScript or Typescript files to lint.')
-            return all_messages
+            return []
 
-        js_and_ts_linter_messages = self._lint_js_and_ts_files()
-        all_messages += js_and_ts_linter_messages
-
-        return all_messages
+        return self._lint_js_and_ts_files()

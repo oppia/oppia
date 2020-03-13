@@ -24,11 +24,9 @@ import re
 import sys
 import time
 
-# pylint: disable=wrong-import-position
-import python_utils  # isort:skip
+import python_utils
 
-# pylint: disable=wrong-import-position
-from . import linter_utils  # isort:skip
+from . import linter_utils
 
 PYLINT_VERSION = '1.9.4'
 PYCODESTYLE_VERSION = '2.5.0'
@@ -338,11 +336,13 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         if not self.all_filepaths:
             python_utils.PRINT('')
             python_utils.PRINT('There are no Python files to lint.')
-            return all_messages
+            return []
 
         py_linter_messages = self._lint_py_files(
             config_pylint, config_pycodestyle)
+        all_messages.extend(py_linter_messages)
+
         py3_linter_messages = self._lint_py_files_for_python3_compatibility()
-        all_messages += py_linter_messages + py3_linter_messages
+        all_messages.extend(py3_linter_messages)
 
         return all_messages

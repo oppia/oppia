@@ -19,25 +19,17 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-# Pylint has issues with the import order of argparse.
-# pylint: disable=wrong-import-order
 import os
 import re
 import sys
-from . import linter_utils
 
-# pylint: disable=wrong-import-position
-import python_utils  # isort:skip
+import python_utils
+
+from . import linter_utils
+from .. import common
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
-
-# NOTE TO DEVELOPERS: This should match the version of Node used in common.py.
-NODE_VERSION = '10.18.0'
-CURR_DIR = os.path.abspath(os.getcwd())
-OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
-
-NODE_DIR = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
@@ -523,6 +515,7 @@ def check_file_type_specific_bad_pattern(filepath, content):
     Args:
         filepath: str. Path of the file.
         content: str. Contents of the file.
+
      Returns:
         failed: bool. True if there is bad pattern else false.
         total_error_count: int. The number of errors.
@@ -561,7 +554,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         # The path for node is set explicitly, since otherwise the lint
         # tests fail on CircleCI due to the TypeScript files not being
         # compilable.
-        os.environ['PATH'] = '%s/bin:' % NODE_DIR + os.environ['PATH']
+        os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
 
         self.files_to_lint = files_to_lint
         self.verbose_mode_enabled = verbose_mode_enabled

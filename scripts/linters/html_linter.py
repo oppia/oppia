@@ -23,18 +23,14 @@ import os
 import subprocess
 import sys
 
-NODE_VERSION = '10.18.0'
-CURR_DIR = os.path.abspath(os.getcwd())
-OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
+import python_utils
 
-NODE_DIR = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
-
-# pylint: disable=wrong-import-position
-from . import linter_utils  # isort:skip
+from . import linter_utils
+from .. import common
 
 # pylint: disable=wrong-import-position
-import python_utils  # isort:skip
-import html.parser  # isort:skip
+import html.parser # isort:skip
+# pylint: enable=wrong-import-position
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
@@ -315,11 +311,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
 
         # The html tags and attributes check has an additional
         # debug mode which when enabled prints the tag_stack for each file.
-        html_tag_and_attribute_messages = (
-            self._check_html_tags_and_attributes())
-
-        all_messages = html_tag_and_attribute_messages
-        return all_messages
+        return self._check_html_tags_and_attributes()
 
 
 class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
@@ -353,7 +345,7 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
 
     def _lint_html_files(self):
         """This function is used to check HTML files for linting errors."""
-        node_path = os.path.join(NODE_DIR, 'bin', 'node')
+        node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         htmllint_path = os.path.join(
             'node_modules', 'htmllint-cli', 'bin', 'cli.js')
 
@@ -420,14 +412,11 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         Returns:
             all_messages: str. All the messages returned by the lint checks.
         """
-        all_messages = []
         if not self.all_filepaths:
             python_utils.PRINT('')
             python_utils.PRINT(
                 'There are no HTML files to lint.')
-            return all_messages
+            return []
 
-        html_linter_messages = self._lint_html_files()
 
-        all_messages += html_linter_messages
-        return all_messages
+        return self._lint_html_files()
