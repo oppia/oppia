@@ -45,7 +45,10 @@ angular.module('oppia').directive('schemaBasedListEditor', [
         // UI configuration. May be undefined.
         uiConfig: '&',
         validators: '&',
-        labelForFocusTarget: '&'
+        labelForFocusTarget: '&',
+        // Variable to keep track of the changes in the list-editor on
+        // addition and deletion of elements.
+        oldToNewListMapping: '='
       },
       template: require('./schema-based-list-editor.directive.html'),
       restrict: 'E',
@@ -81,25 +84,21 @@ angular.module('oppia').directive('schemaBasedListEditor', [
           return false;
         };
 
-        var oldTonewListMapping = {
-          newToOldListPosition: [],
-          deletedIndexes: []
-        };
-
         var intializeOldTonewListMapping = function() {
           for (var i = 0; i < $scope.localValue.length; i++) {
-            oldTonewListMapping.newToOldListPosition.push(i);
+            $scope.oldToNewListMapping.newToOldListPosition.push(i);
           }
         };
         var updateOldTonewListMappingOnDelete = function(index) {
-          var deletedIndex = oldTonewListMapping.newToOldListPosition[index];
+          var deletedIndex = $scope.oldToNewListMapping.
+            newToOldListPosition[index];
           if (deletedIndex !== -1) {
-            oldTonewListMapping.deletedIndexes.push(deletedIndex);
+            $scope.oldToNewListMapping.deletedIndexes.push(deletedIndex);
           }
-          oldTonewListMapping.newToOldListPosition.splice(index, 1);
+          $scope.oldToNewListMapping.newToOldListPosition.splice(index, 1);
         };
         var updateOldTonewListMappingOnAddElement = function() {
-          oldTonewListMapping.newToOldListPosition.push(-1);
+          $scope.oldToNewListMapping.newToOldListPosition.push(-1);
         };
 
         var validate = function() {
@@ -235,10 +234,6 @@ angular.module('oppia').directive('schemaBasedListEditor', [
             $scope.$on(
               'submittedSchemaBasedUnicodeForm', $scope._onChildFormSubmit);
             intializeOldTonewListMapping();
-            $scope.$on('updateAnswerGroupForMultiChoiceInput',
-              function(event, callback) {
-                callback(oldTonewListMapping);
-              });
 
             $scope.deleteElement = function(index) {
               updateOldTonewListMappingOnDelete(index);

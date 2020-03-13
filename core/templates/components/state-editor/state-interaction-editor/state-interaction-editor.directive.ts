@@ -246,7 +246,12 @@ angular.module('oppia').directive('stateInteractionEditor', [
                         UrlInterpolationService.getInteractionThumbnailImageUrl(
                           interactionId));
                     };
-
+                    $scope.oldToNewListMappingObject = {
+                      oldToNewListMapping: {
+                        newToOldListPosition: [],
+                        deletedIndexes: []
+                      }
+                    };
                     $scope.INTERACTION_SPECS = INTERACTION_SPECS;
 
                     if (StateEditorService.isInQuestionMode()) {
@@ -390,11 +395,9 @@ angular.module('oppia').directive('stateInteractionEditor', [
                       // the new answer choices.
                       if (StateInteractionIdService.savedMemento ===
                              'MultipleChoiceInput') {
-                        $scope.$broadcast('updateAnswerGroupForMultiChoiceInput'
-                          , function(data) {
-                            updateMultiChoiceInputAnswerGroupsOnDelete(
-                              data.deletedIndexes);
-                          });
+                        updateMultiChoiceInputAnswerGroupsOnDelete(
+                          $scope.oldToNewListMappingObject.
+                            oldToNewListMapping.deletedIndexes);
                       }
                       EditorFirstTimeEventsService
                         .registerFirstSaveInteractionEvent();
