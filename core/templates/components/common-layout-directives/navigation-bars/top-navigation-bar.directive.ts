@@ -86,6 +86,7 @@ angular.module('oppia').directive('topNavigationBar', [
            * @param {String} menuName - name of menu, on which
            * open/close action to be performed (aboutMenu,profileMenu).
            */
+        
           ctrl.openSubmenu = function(evt, menuName) {
             // Focus on the current target before opening its submenu.
             NavigationService.openSubmenu(evt, menuName);

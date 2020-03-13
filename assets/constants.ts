@@ -651,7 +651,7 @@ export = {
   "ENABLE_ACCOUNT_DELETION": false,
 
   // Used to hide the callout to classroom until it is ready.
-  "SHOW_CLASSROOM_CALLOUT": false,
+  "SHOW_CLASSROOM_CALLOUT": true,
 
   "DEV_MODE": true
 };
