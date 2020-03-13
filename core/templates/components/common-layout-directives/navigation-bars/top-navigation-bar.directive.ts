@@ -55,7 +55,7 @@ angular.module('oppia').directive('topNavigationBar', [
           // The order of the elements in this array specifies the order in
           // which they will be hidden. Earlier elements will be hidden first.
           var NAV_ELEMENTS_ORDER = [
-            'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_ABOUT',
+            'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_CLASSROOM', 'I18N_TOPNAV_ABOUT',
             'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
           var truncateNavbarDebounced =
             DebouncerService.debounce(truncateNavbar, 500);
