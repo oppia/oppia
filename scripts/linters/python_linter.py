@@ -142,11 +142,7 @@ class PythonLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('There are no Python files to lint.')
             return []
 
-        import_order_messages = self._check_import_order()
-
-        all_messages = import_order_messages
-
-        return all_messages
+        return self._check_import_order()
 
 
 class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
@@ -338,11 +334,9 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('There are no Python files to lint.')
             return []
 
-        py_linter_messages = self._lint_py_files(
-            config_pylint, config_pycodestyle)
-        all_messages.extend(py_linter_messages)
+        all_messages.extend(
+            self._lint_py_files(config_pylint, config_pycodestyle))
 
-        py3_linter_messages = self._lint_py_files_for_python3_compatibility()
-        all_messages.extend(py3_linter_messages)
+        all_messages.extend(self._lint_py_files_for_python3_compatibility())
 
         return all_messages
