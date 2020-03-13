@@ -129,7 +129,7 @@ jobs:
       - run:
           name: Run e2e classroom page test
           command: |
-            python -m scripts.run_e2e_tests --suite="classroomPageFileUploadFeatures"
+            python -m scripts.run_e2e_tests --skip_install --suite="classroomPageFileUploadFeatures"
 
   e2e_file_upload_features:
     <<: *job_defaults
@@ -142,7 +142,7 @@ jobs:
       - run:
           name: Run e2e file upload features test
           command: |
-            python -m scripts.run_e2e_tests --suite="fileUploadFeatures"
+            python -m scripts.run_e2e_tests --skip_install --suite="fileUploadFeatures"
 
   e2e_navigation:
     <<: *job_defaults
@@ -155,7 +155,7 @@ jobs:
       - run:
           name: Run e2e file upload features test
           command: |
-            python -m scripts.run_e2e_tests --suite="navigation"
+            python -m scripts.run_e2e_tests --skip_install --suite="navigation"
 
   e2e_topic_and_story_editor:
     <<: *job_defaults
@@ -168,7 +168,7 @@ jobs:
       - run:
           name: Run e2e topic and story editor test
           command: |
-            python -m scripts.run_e2e_tests --suite="topicAndStoryEditorFileUploadFeatures"
+            python -m scripts.run_e2e_tests --skip_install --suite="topicAndStoryEditorFileUploadFeatures"
 notify:
   webhooks:
     # A list of hook hashes, containing the url field
