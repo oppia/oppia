@@ -84,12 +84,12 @@ angular.module('oppia').directive('schemaBasedListEditor', [
           return false;
         };
 
-        var intializeOldTonewListMapping = function() {
+        var intializeOldToNewListMapping = function() {
           for (var i = 0; i < $scope.localValue.length; i++) {
             $scope.oldToNewListMapping.newToOldListPosition.push(i);
           }
         };
-        var updateOldTonewListMappingOnDelete = function(index) {
+        var updateOldToNewListMappingOnDelete = function(index) {
           var deletedIndex = $scope.oldToNewListMapping.
             newToOldListPosition[index];
           if (deletedIndex !== -1) {
@@ -97,7 +97,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
           }
           $scope.oldToNewListMapping.newToOldListPosition.splice(index, 1);
         };
-        var updateOldTonewListMappingOnAddElement = function() {
+        var updateOldToNewListMappingOnAddElement = function() {
           $scope.oldToNewListMapping.newToOldListPosition.push(-1);
         };
 
@@ -162,7 +162,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
                 SchemaDefaultValueService.getDefaultValue($scope.itemSchema()));
               FocusManagerService.setFocus(
                 $scope.getFocusLabel($scope.localValue.length - 1));
-              updateOldTonewListMappingOnAddElement();
+              updateOldToNewListMappingOnAddElement();
             };
 
             var _deleteLastElementIfUndefined = function() {
@@ -233,10 +233,10 @@ angular.module('oppia').directive('schemaBasedListEditor', [
               'submittedSchemaBasedFloatForm', $scope._onChildFormSubmit);
             $scope.$on(
               'submittedSchemaBasedUnicodeForm', $scope._onChildFormSubmit);
-            intializeOldTonewListMapping();
+            intializeOldToNewListMapping();
 
             $scope.deleteElement = function(index) {
-              updateOldTonewListMappingOnDelete(index);
+              updateOldToNewListMappingOnDelete(index);
               // Need to let the RTE know that HtmlContent has been changed.
               $scope.$broadcast('externalHtmlContentChange');
               $scope.localValue.splice(index, 1);
