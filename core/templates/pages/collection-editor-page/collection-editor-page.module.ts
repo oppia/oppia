@@ -23,6 +23,8 @@ import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { RequestInterceptor } from 'services/request-interceptor.service';
 
 // This component is needed to force-bootstrap Angular at the beginning of the
 // app.
@@ -35,6 +37,8 @@ export class ServiceBootstrapComponent {}
 import { AppConstants } from 'app.constants';
 import { CollectionDomainConstants } from
   'domain/collection/collection-domain.constants';
+import { CollectionEditorPageConstants } from
+  'pages/collection-editor-page/collection-editor-page.constants';
 import { EditorDomainConstants } from
   'domain/editor/editor-domain.constants';
 import { InteractionsExtensionsConstants } from
@@ -42,8 +46,6 @@ import { InteractionsExtensionsConstants } from
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { ServicesConstants } from 'services/services.constants';
-import { CollectionEditorPageConstants } from
-  'pages/collection-editor-page/collection-editor-page.constants';
 
 @NgModule({
   imports: [
@@ -63,7 +65,12 @@ import { CollectionEditorPageConstants } from
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,
     ServicesConstants,
-    CollectionEditorPageConstants
+    CollectionEditorPageConstants,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RequestInterceptor,
+      multi: true
+    }
   ]
 })
 class CollectionEditorPageModule {
@@ -80,7 +87,7 @@ const bootstrapFn = (extraProviders: StaticProvider[]) => {
 };
 const downgradedModule = downgradeModule(bootstrapFn);
 
-declare var angular: any;
+declare var angular: ng.IAngularStatic;
 
 angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
