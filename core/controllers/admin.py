@@ -295,8 +295,8 @@ class AdminHandler(base.BaseHandler):
                     'solution', '<p>This is a solution.</p>')).to_dict())
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_1', '<p>This is a hint.</p>')).to_dict()
+                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
+            )
         ]
 
         state.update_interaction_solution(solution_dict)
@@ -338,8 +338,7 @@ class AdminHandler(base.BaseHandler):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skill = skill_domain.Skill.create_default_skill(
             skill_id, skill_description, rubrics)
-        skill.update_explanation(
-            state_domain.SubtitledHtml('1', explanation).to_dict())
+        skill.update_explanation(state_domain.SubtitledHtml('1', explanation))
         return skill
 
     def _load_dummy_new_structures_data(self):
