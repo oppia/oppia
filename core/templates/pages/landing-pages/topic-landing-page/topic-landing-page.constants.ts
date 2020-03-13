@@ -79,7 +79,7 @@ export class TopicLandingPageConstants {
           },
           image_2: {
             file_name_webp: 'ratios_question.webp',
-            file_name_png: 'ratios_question.webp',
+            file_name_png: 'ratios_question.png',
             alt: 'A smoothie shop and a card having question "What does a' +
               ' ratio tell us?" with options.'
           },
