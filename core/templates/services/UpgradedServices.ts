@@ -18,6 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import {
   HttpClient,
   HttpXhrBackend,
@@ -137,6 +138,7 @@ import { NormalizeWhitespacePunctuationAndCasePipe } from
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { PageTitleService } from 'services/page-title.service';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
@@ -387,6 +389,7 @@ export class UpgradedServices {
       new baseInteractionValidationService();
     upgradedServices['ɵangular_packages_common_http_http_d'] =
       new ɵangular_packages_common_http_http_d();
+    upgradedServices['Title'] = new Title({});
 
     // Topological level: 1.
     upgradedServices['AlertsService'] = new AlertsService(
@@ -419,8 +422,10 @@ export class UpgradedServices {
       new NumberWithUnitsObjectFactory(
         upgradedServices['UnitsObjectFactory'],
         upgradedServices['FractionObjectFactory']);
-    upgradedServices['OutcomeObjectFactory'] = new OutcomeObjectFactory(
-      upgradedServices['SubtitledHtmlObjectFactory']);
+    upgradedServices['OutcomeObjectFactory'] =
+      new OutcomeObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
+    upgradedServices['PageTitleService'] = new PageTitleService(
+      upgradedServices['Title']);
     upgradedServices['ParamChangesObjectFactory'] =
       new ParamChangesObjectFactory(
         upgradedServices['ParamChangeObjectFactory']);
