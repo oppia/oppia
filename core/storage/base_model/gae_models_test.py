@@ -264,7 +264,10 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
             'model_id-2': {
                 'commit_type': 'create',
                 'commit_message': 'Hi this is a commit.',
-                'commit_cmds': [{'cmd': 'some_command'}, {'cmd2': 'another_command'}]
+                'commit_cmds': [
+                    {'cmd': 'some_command'},
+                    {'cmd2': 'another_command'}
+                ]
             }
         }
         self.assertEqual(user_data, expected_data)
