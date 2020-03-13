@@ -25,28 +25,28 @@ require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 
 angular.module('oppia').factory('FeedbackImprovementTaskObjectFactory', [
-  '$q', 'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
+  'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
   'ThreadDataService', 'FEEDBACK_IMPROVEMENT_TASK_TYPE',
   function(
-      $q, ImprovementActionButtonObjectFactory, ImprovementModalService,
+      ImprovementActionButtonObjectFactory, ImprovementModalService,
       ThreadDataService, FEEDBACK_IMPROVEMENT_TASK_TYPE) {
     var FeedbackImprovementTask = function(feedbackThread) {
-      this._feedbackThread = feedbackThread;
+      this._thread = feedbackThread;
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
           'Review Thread', 'btn-primary',
-          () => ImprovementModalService.openFeedbackThread(feedbackThread)),
+          () => ImprovementModalService.openFeedbackThread(this._thread)),
       ];
     };
 
     /** @returns {string} - The actionable status of this task. */
     FeedbackImprovementTask.prototype.getStatus = function() {
-      return this._feedbackThread.status;
+      return this._thread.status;
     };
 
     /** @returns {string} - A simple summary of the feedback thread. */
     FeedbackImprovementTask.prototype.getTitle = function() {
-      return this._feedbackThread.subject;
+      return this._thread.subject;
     };
 
     /**
@@ -70,7 +70,7 @@ angular.module('oppia').factory('FeedbackImprovementTaskObjectFactory', [
      *    rendering.
      */
     FeedbackImprovementTask.prototype.getDirectiveData = function() {
-      return this._feedbackThread;
+      return this._thread;
     };
 
     /**
@@ -83,7 +83,7 @@ angular.module('oppia').factory('FeedbackImprovementTaskObjectFactory', [
 
     /** @returns {number} - The time that the task was last updated. */
     FeedbackImprovementTask.prototype.getLastUpdatedTime = function() {
-      return this._feedbackThread.last_updated;
+      return this._thread.lastUpdatedMsecs;
     };
 
     return {
@@ -101,12 +101,8 @@ angular.module('oppia').factory('FeedbackImprovementTaskObjectFactory', [
        */
       fetchTasks: function() {
         var createNew = this.createNew;
-        return ThreadDataService.fetchThreads().then(threadData => {
-          return $q.all(
-            threadData.feedbackThreads.map(
-              thread => ThreadDataService.fetchMessages(thread.threadId))
-          ).then(() => threadData);
-        }).then(threadData => threadData.feedbackThreads.map(createNew));
+        return ThreadDataService.getThreadsAsync()
+          .then(threadData => threadData.feedbackThreads.map(createNew));
       },
     };
   }
