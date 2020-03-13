@@ -250,7 +250,7 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
         model1.put()
         model2 = version_model.SNAPSHOT_METADATA_CLASS.create(
             'model_id-2', 'committer_id', 'create', 'Hi this is a commit.',
-            None)
+            [{'cmd': 'some_command'}, {'cmd2': 'another_command'}])
         model2.put()
         user_data = (version_model
                      .SNAPSHOT_METADATA_CLASS
@@ -264,7 +264,7 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
             'model_id-2': {
                 'commit_type': 'create',
                 'commit_message': 'Hi this is a commit.',
-                'commit_cmds': None
+                'commit_cmds': [{'cmd': 'some_command'}, {'cmd2': 'another_command'}]
             }
         }
         self.assertEqual(user_data, expected_data)
