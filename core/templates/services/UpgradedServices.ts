@@ -65,6 +65,7 @@ import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
+import { DebugInfoTrackerService } from 'services/debug-info-tracker.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
@@ -129,6 +130,8 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
+import { ParamMetadataObjectFactory } from
+  'domain/exploration/ParamMetadataObjectFactory';
 import { ParamSpecObjectFactory } from
   'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from
@@ -247,6 +250,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { from } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -277,11 +281,13 @@ export class UpgradedServices {
     upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
+    upgradedServices['DebugInfoTrackerService'] =
+      new DebugInfoTrackerService();
+    upgradedServices['EditabilityService'] = new EditabilityService();
     upgradedServices['EmailDashboardDataService'] =
       new EmailDashboardDataService(
         new HttpClient(new HttpXhrBackend(
           new ɵangular_packages_common_http_http_d())));
-    upgradedServices['EditabilityService'] = new EditabilityService();
     upgradedServices['EntityContextObjectFactory'] =
       new EntityContextObjectFactory();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
@@ -311,6 +317,8 @@ export class UpgradedServices {
       new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
+    upgradedServices['ParamMetadataObjectFactory'] =
+      new ParamMetadataObjectFactory();
     upgradedServices['ParamTypeObjectFactory'] =
       new ParamTypeObjectFactory();
     upgradedServices['PlaythroughIssueObjectFactory'] =

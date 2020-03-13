@@ -95,15 +95,11 @@ angular.module('oppia').factory('ParameterMetadataService', [
 
       // Finally, the rule feedback strings are evaluated.
       state.interaction.answerGroups.forEach(function(group) {
-        for (var k = 0; k < group.outcome.feedback.length; k++) {
-          ExpressionInterpolationService.getParamsFromString(
-            group.outcome.feedback[k]).forEach(
-            function(paramName) {
-              result.push(ParamMetadataObjectFactory.createWithGetAction(
-                paramName, PARAM_SOURCE_FEEDBACK, k));
-            }
-          );
-        }
+        ExpressionInterpolationService.getParamsFromString(
+          group.outcome.feedback.getHtml()).forEach(function(paramName, index) {
+          result.push(ParamMetadataObjectFactory.createWithGetAction(
+            paramName, PARAM_SOURCE_FEEDBACK, index));
+        });
       });
 
       return result;
@@ -138,11 +134,11 @@ angular.module('oppia').factory('ParameterMetadataService', [
 
         // Determine all parameter names that are used within this exploration.
         var allParamNames = [];
-        var expParamMetadata = getMetadataFromParamChanges(
+        var expParamChangesMetadata = getMetadataFromParamChanges(
           ExplorationParamChangesService.savedMemento);
         var stateParamMetadatas = {};
 
-        expParamMetadata.forEach(function(expParamMetadataItem) {
+        expParamChangesMetadata.forEach(function(expParamMetadataItem) {
           if (allParamNames.indexOf(expParamMetadataItem.paramName) === -1) {
             allParamNames.push(expParamMetadataItem.paramName);
           }
@@ -168,7 +164,8 @@ angular.module('oppia').factory('ParameterMetadataService', [
           var paramName = allParamNames[paramInd];
           var tmpUnsetParameter = null;
 
-          var paramStatusAtOutset = getParamStatus(expParamMetadata, paramName);
+          var paramStatusAtOutset = getParamStatus(
+            expParamChangesMetadata, paramName);
           if (paramStatusAtOutset === PARAM_ACTION_GET) {
             unsetParametersInfo.push({
               paramName: paramName,

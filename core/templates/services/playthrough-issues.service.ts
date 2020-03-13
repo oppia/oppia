@@ -52,11 +52,10 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
         stateName + '" many times.';
     };
 
-    var renderEarlyQuitIssueSuggestions = function(issue) {
+    var renderEarlyQuitIssueSuggestions = function(stateName) {
       var suggestions = [
-        ('Review the cards up to and including "' +
-          issue.issueCustomizationArgs.state_name.value + '" for errors, ' +
-          'ambiguities, or insufficient motivation.'),
+        ('Review the cards up to and including "' + stateName +
+          '" for errors, ' + 'ambiguities, or insufficient motivation.'),
       ];
       return suggestions;
     };
@@ -71,8 +70,7 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
       return suggestions;
     };
 
-    var renderCyclicTransitionsIssueSuggestions = function(issue) {
-      var stateNames = issue.issueCustomizationArgs.state_names.value;
+    var renderCyclicTransitionsIssueSuggestions = function(stateNames) {
       var finalIndex = stateNames.length - 1;
       var suggestions = [
         ('Check that the concept presented in "' + stateNames[0] + '" has ' +
@@ -118,12 +116,14 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
       renderIssueSuggestions: function(issue) {
         var issueType = issue.issueType;
         if (issueType === ISSUE_TYPE_EARLY_QUIT) {
-          return renderEarlyQuitIssueSuggestions(issue);
+          return renderEarlyQuitIssueSuggestions(
+            issue.issueCustomizationArgs.state_name.value);
         } else if (issueType === ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
           return renderMultipleIncorrectIssueSuggestions(
             issue.issueCustomizationArgs.state_name.value);
         } else if (issueType === ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS) {
-          return renderCyclicTransitionsIssueSuggestions(issue);
+          return renderCyclicTransitionsIssueSuggestions(
+            issue.issueCustomizationArgs.state_names.value);
         }
       },
       resolveIssue: function(issue) {
