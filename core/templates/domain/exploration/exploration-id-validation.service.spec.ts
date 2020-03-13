@@ -41,9 +41,20 @@ describe('Exploration id validation service', function() {
       'ExplorationIdValidationService');
     $httpBackend = $injector.get('$httpBackend');
 
-    invalidExpResults = {
+    invalidExpResults = [{
       summaries: []
-    };
+    },
+    {
+      summaries: [
+        null
+      ]
+    },
+    {
+      summaries: [
+        'exp_1',
+        'exp_2'
+      ]
+    }];
 
     validExpResults = {
       summaries: [{
@@ -78,15 +89,17 @@ describe('Exploration id validation service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should correctly validate the invalid exploration id',
+  it('should correctly validate the invalid exploration ids',
     function() {
-      $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond(
-        invalidExpResults);
-      ExplorationIdValidationService.isExpPublished('0').then(
-        function(response) {
-          expect(response).toEqual(false);
-        });
-      $httpBackend.flush();
+      for (var i = 0; i < invalidExpResults.length; i++) {
+        $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond(
+          invalidExpResults[i]);
+        ExplorationIdValidationService.isExpPublished('0').then(
+          function(response) {
+            expect(response).toEqual(false);
+          });
+        $httpBackend.flush();
+      }
     }
   );
 

@@ -26,13 +26,7 @@ angular.module('oppia').factory('ExplorationIdValidationService', [
         return ExplorationSummaryBackendApiService.
           loadPublicExplorationSummaries([explorationId]).then(
             function(summaries) {
-              if (summaries.length === 1) {
-                if (summaries[0]) {
-                  return true;
-                }
-                return false;
-              }
-              return false;
+              return (summaries.length === 1 && summaries[0] !== null);
             });
       }
     };
