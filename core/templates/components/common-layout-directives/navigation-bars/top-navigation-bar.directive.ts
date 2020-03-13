@@ -304,4 +304,3 @@ angular.module('oppia').directive('topNavigationBar', [
       ]
     };
   }]);
-  
