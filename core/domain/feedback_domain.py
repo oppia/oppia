@@ -81,8 +81,7 @@ class FeedbackThread(python_utils.OBJECT):
             dict. A dict representation of the FeedbackThread object.
         """
         return {
-            'last_updated_msecs': (
-                utils.get_time_in_millisecs(self.last_updated)),
+            'last_updated': utils.get_time_in_millisecs(self.last_updated),
             'original_author_username': (
                 user_services.get_username(self.original_author_id)
                 if self.original_author_id else None),
@@ -189,13 +188,14 @@ class FeedbackMessage(python_utils.OBJECT):
             'author_username': (
                 user_services.get_username(self.author_id)
                 if self.author_id else None),
-            'created_on_msecs': utils.get_time_in_millisecs(self.created_on),
+            'created_on': utils.get_time_in_millisecs(self.created_on),
             'entity_type': self.entity_type,
             'entity_id': self.entity_id,
             'message_id': self.message_id,
             'text': self.text,
             'updated_status': self.updated_status,
-            'updated_subject': self.updated_subject
+            'updated_subject': self.updated_subject,
+            'received_via_email': self.received_via_email
         }
 
 
@@ -314,8 +314,7 @@ class FeedbackThreadSummary(python_utils.OBJECT):
         return {
             'status': self.status,
             'original_author_id': self.original_author_id,
-            'last_updated_msecs': (
-                utils.get_time_in_millisecs(self.last_updated)),
+            'last_updated': utils.get_time_in_millisecs(self.last_updated),
             'last_message_text': self.last_message_text,
             'total_message_count': self.total_message_count,
             'last_message_is_read': self.last_message_is_read,

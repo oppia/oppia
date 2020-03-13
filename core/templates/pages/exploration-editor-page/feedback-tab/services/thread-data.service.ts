@@ -17,250 +17,180 @@
  * feedback tab of the exploration editor.
  */
 
-require('domain/feedback_message/ThreadMessageObjectFactory.ts');
 require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require('pages/exploration-editor-page/services/exploration-data.service.ts');
+require('services/alerts.service.ts');
+
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
-require('services/alerts.service.ts');
-require('services/context.service.ts');
-require('services/suggestions.service.ts');
-
-import { FeedbackThread } from
-  'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { SuggestionThread } from
-  'domain/suggestion/SuggestionThreadObjectFactory';
-import { ThreadMessage } from
-  'domain/feedback_message/ThreadMessageObjectFactory';
 
 angular.module('oppia').factory('ThreadDataService', [
-  '$http', '$q', 'AlertsService', 'ContextService',
-  'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory',
-  'SuggestionsService', 'ThreadMessageObjectFactory', 'UrlInterpolationService',
-  'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED', 'STATUS_IGNORED', 'STATUS_OPEN',
+  '$http', '$q', 'AlertsService', 'ExplorationDataService',
+  'FeedbackThreadObjectFactory', 'LoggerService',
+  'SuggestionThreadObjectFactory', 'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED',
+  'STATUS_IGNORED',
   function(
-      $http, $q, AlertsService, ContextService,
-      FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
-      SuggestionsService, ThreadMessageObjectFactory, UrlInterpolationService,
-      ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED, STATUS_OPEN) {
-    // Container for all of the threads related to this exploration.
-    let threadsById = new Map<string, FeedbackThread | SuggestionThread>();
+      $http, $q, AlertsService, ExplorationDataService,
+      FeedbackThreadObjectFactory, LoggerService, SuggestionThreadObjectFactory,
+      ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED) {
+    var _expId = ExplorationDataService.explorationId;
+    var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
+    var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
+    var _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler';
+    var _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' +
+        'exploration/' + _expId + '/';
+    var _THREAD_HANDLER_PREFIX = '/threadhandler/';
+    var _FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event';
+    var _THREAD_STATUS_OPEN = 'open';
 
-    // Cached number of open threads requiring action.
-    let openThreadsCount: number = 0;
-
-    let getFeedbackStatsHandlerUrl = function(): string {
-      return UrlInterpolationService.interpolateUrl(
-        '/feedbackstatshandler/<exploration_id>', {
-          exploration_id: ContextService.getExplorationId()
-        });
+    // All the threads for this exploration. This is a list whose entries are
+    // objects, each representing threads. The 'messages' key of this object
+    // is updated lazily.
+    var _data = {
+      feedbackThreads: [],
+      suggestionThreads: []
     };
 
-    let getFeedbackThreadViewEventUrl = function(threadId: string): string {
-      return UrlInterpolationService.interpolateUrl(
-        '/feedbackhandler/thread_view_event/<thread_id>', {
-          thread_id: threadId
-        });
-    };
-
-    let getSuggestionActionHandlerUrl = function(threadId: string): string {
-      return UrlInterpolationService.interpolateUrl(
-        '/suggestionactionhandler/exploration/<exploration_id>/<thread_id>', {
-          exploration_id: ContextService.getExplorationId(),
-          thread_id: threadId
-        });
-    };
-
-    let getSuggestionListHandlerUrl = function(): string {
-      return '/suggestionlisthandler';
-    };
-
-    let getThreadHandlerUrl = function(threadId: string): string {
-      return UrlInterpolationService.interpolateUrl(
-        '/threadhandler/<thread_id>', {
-          thread_id: threadId
-        });
-    };
-
-    let getThreadListHandlerUrl = function(): string {
-      return UrlInterpolationService.interpolateUrl(
-        '/threadlisthandler/<exploration_id>', {
-          exploration_id: ContextService.getExplorationId()
-        });
-    };
-
-    // TODO(#7165): Replace 'any' with the exact type.
-    let setFeedbackThreadFromBackendDict = function(
-        threadBackendDict: any): FeedbackThread {
-      if (!threadBackendDict) {
-        throw Error('Missing input backend dict');
+    // TODO(brianrodri@): Use a helper-object to give this function O(1)
+    // complexity instead of O(N).
+    var getThreadById = function(threadId) {
+      var thread = null;
+      var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
+      for (var i = 0; i < allThreads.length; i++) {
+        if (allThreads[i].threadId === threadId) {
+          thread = allThreads[i];
+          break;
+        }
       }
-      let thread = FeedbackThreadObjectFactory.createFromBackendDict(
-        threadBackendDict);
-      threadsById.set(thread.threadId, thread);
       return thread;
     };
 
-    // TODO(#7165): Replace 'any' with the exact type.
-    let setSuggestionThreadFromBackendDicts = function(
-        threadBackendDict: any, suggestionBackendDict: any): SuggestionThread {
-      if (!threadBackendDict || !suggestionBackendDict) {
-        throw Error('Missing input backend dicts');
-      }
-      let thread = SuggestionThreadObjectFactory.createFromBackendDicts(
-        threadBackendDict, suggestionBackendDict);
-      threadsById.set(thread.threadId, thread);
-      return thread;
+    // Number of open threads that need action
+    var _openThreadsCount = 0;
+
+    var _fetchThreads = function() {
+      var threadsPromise = $http.get(_THREAD_LIST_HANDLER_URL);
+      var suggestionsPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
+        params: {target_type: 'exploration', target_id: _expId}
+      });
+
+      return $q.all([threadsPromise, suggestionsPromise]).then(function(res) {
+        let [threadsResponse, suggestionsResponse] = res.map(r => r.data);
+        _data.feedbackThreads = threadsResponse.feedback_thread_dicts.map(
+          FeedbackThreadObjectFactory.createFromBackendDict);
+
+        _data.suggestionThreads = [];
+        if (threadsResponse.suggestion_thread_dicts.length !==
+            suggestionsResponse.suggestions.length) {
+          LoggerService.error(
+            'Number of suggestion threads doesn\'t match number of' +
+            'suggestion objects');
+          return _data;
+        }
+        // TODO(brianrodri@): Move this pairing logic into the backend.
+        for (let threadDict of threadsResponse.suggestion_thread_dicts) {
+          for (let suggestionDict of suggestionsResponse.suggestions) {
+            if (threadDict.thread_id === suggestionDict.suggestion_id) {
+              _data.suggestionThreads.push(
+                SuggestionThreadObjectFactory.createFromBackendDicts(
+                  threadDict, suggestionDict));
+              break;
+            }
+          }
+        }
+        return _data;
+      })['catch'](function(error) {
+        LoggerService.error(error);
+      });
+    };
+
+    var _fetchMessages = function(threadId) {
+      return $http.get(_THREAD_HANDLER_PREFIX + threadId).then(function(res) {
+        getThreadById(threadId).setMessages(res.data.messages);
+      })['catch'](function(error) {
+        LoggerService.error(error);
+      });
     };
 
     return {
-      getThread: function(threadId: string): FeedbackThread | SuggestionThread {
-        return threadsById.get(threadId) || null;
+      fetchThreads: function() {
+        return _fetchThreads();
       },
-
-      // TODO(#7165): Replace 'any' with the exact type.
-      getThreadsAsync: function(): Promise<any> {
-        // TODO(#8016): Move this $http call to a backend-api.service with unit
-        // tests.
-        let suggestionsPromise = $http.get(getSuggestionListHandlerUrl(), {
-          params: {
-            target_type: 'exploration',
-            target_id: ContextService.getExplorationId()
-          }
-        });
-        // TODO(#8016): Move this $http call to a backend-api.service with unit
-        // tests.
-        let threadsPromise = $http.get(getThreadListHandlerUrl());
-
-        return $q.all([suggestionsPromise, threadsPromise]).then(response => {
-          let [suggestionData, threadData] = response.map(r => r.data);
-          let suggestionBackendDicts = suggestionData.suggestions;
-          let feedbackThreadBackendDicts = threadData.feedback_thread_dicts;
-          let suggestionThreadBackendDicts = threadData.suggestion_thread_dicts;
-
-          let suggestionBackendDictsByThreadId = new Map(
-            suggestionBackendDicts.map(dict => [
-              SuggestionsService.getThreadIdFromSuggestionBackendDict(dict),
-              dict
-            ]));
-
-          return {
-            feedbackThreads: feedbackThreadBackendDicts.map(
-              dict => setFeedbackThreadFromBackendDict(dict)),
-            suggestionThreads: suggestionThreadBackendDicts.map(
-              dict => setSuggestionThreadFromBackendDicts(
-                dict, suggestionBackendDictsByThreadId.get(dict.thread_id)))
-          };
-        },
-        () => $q.reject('Error on retrieving feedback threads.'));
+      fetchMessages: function(threadId) {
+        return _fetchMessages(threadId);
       },
-
-      getMessagesAsync: function(
-          thread: FeedbackThread | SuggestionThread): Promise<ThreadMessage[]> {
-        if (!thread) {
-          throw Error('Trying to update a non-existent thread');
-        }
-        let threadId = thread.threadId;
-        // TODO(#8016): Move this $http call to a backend-api.service with unit
-        // tests.
-        return $http.get(getThreadHandlerUrl(threadId)).then(response => {
-          let threadMessageBackendDicts = response.data.messages;
-          thread.setMessages(threadMessageBackendDicts.map(
-            m => ThreadMessageObjectFactory.createFromBackendDict(m)));
-          return thread.getMessages();
+      fetchFeedbackStats: function() {
+        return $http.get(_FEEDBACK_STATS_HANDLER_URL).then(function(response) {
+          _openThreadsCount = response.data.num_open_threads;
         });
       },
-
-      getOpenThreadsCountAsync: function(): Promise<number> {
-        // TODO(#8016): Move this $http call to a backend-api.service with unit
-        // tests.
-        return $http.get(getFeedbackStatsHandlerUrl()).then(response => {
-          return openThreadsCount = response.data.num_open_threads;
-        });
+      getOpenThreadsCount: function() {
+        return _openThreadsCount;
       },
-
-      getOpenThreadsCount: function(): number {
-        return openThreadsCount;
-      },
-
-      createNewThreadAsync: function(
-          newSubject: string, newText: string): Promise<void> {
-        // TODO(#8016): Move this $http call to a backend-api.service with unit
-        // tests.
-        return $http.post(getThreadListHandlerUrl(), {
+      createNewThread: function(newSubject, newText, onSuccess) {
+        return $http.post(_THREAD_LIST_HANDLER_URL, {
           state_name: null,
           subject: newSubject,
           text: newText
-        }).then(() => {
-          openThreadsCount += 1;
-          return this.getThreadsAsync();
-        },
-        error => {
-          AlertsService.addWarning('Error creating new thread: ' + error + '.');
-        });
+        }).then(function() {
+          _openThreadsCount += 1;
+          return _fetchThreads();
+        })['catch'](function() {
+          AlertsService.addWarning('Error creating new thread.');
+        })['finally'](onSuccess);
       },
-
-      markThreadAsSeenAsync: function(
-          thread: FeedbackThread | SuggestionThread): Promise<void> {
-        if (!thread) {
-          throw Error('Trying to update a non-existent thread');
-        }
-        let threadId = thread.threadId;
-        // TODO(#8016): Move this $http call to a backend-api.service with unit
-        // tests.
-        return $http.post(getFeedbackThreadViewEventUrl(threadId), {
+      markThreadAsSeen: function(threadId) {
+        return $http.post(_FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId, {
           thread_id: threadId
         });
       },
-
-      addNewMessageAsync: function(
-          thread: FeedbackThread | SuggestionThread, newMessage: string,
-          newStatus: string): Promise<ThreadMessage[]> {
-        if (!thread) {
-          throw Error('Trying to update a non-existent thread');
+      addNewMessage: function(
+          threadId, newMessage, newStatus, onSuccess, onFailure) {
+        var thread = getThreadById(threadId);
+        if (thread === null) {
+          return $q.reject('Can not add message to nonexistent thread.');
         }
-        let threadId = thread.threadId;
-        let oldStatus = thread.status;
-        let updatedStatus = (oldStatus === newStatus) ? null : newStatus;
-        // TODO(#8016): Move this $http call to a backend-api.service with unit
-        // tests.
-        return $http.post(getThreadHandlerUrl(threadId), {
+        var oldStatus = thread.status;
+        var updatedStatus = (oldStatus === newStatus) ? null : newStatus;
+
+        return $http.post(_THREAD_HANDLER_PREFIX + threadId, {
           updated_status: updatedStatus,
           updated_subject: null,
           text: newMessage
-        }).then(() => {
-          if (updatedStatus) {
-            openThreadsCount += (newStatus === STATUS_OPEN) ? 1 : -1;
-          }
+        }).then(function() {
           thread.status = newStatus;
-          return this.getMessagesAsync(thread);
-        });
+          if (updatedStatus) {
+            if (oldStatus === _THREAD_STATUS_OPEN) {
+              _openThreadsCount -= 1;
+            } else if (newStatus === _THREAD_STATUS_OPEN) {
+              _openThreadsCount += 1;
+            }
+          }
+          return _fetchMessages(threadId);
+        }).then(onSuccess, onFailure);
       },
-
-      resolveSuggestionAsync: function(
-          thread: FeedbackThread | SuggestionThread, action: string,
-          commitMsg: string, reviewMsg: string,
-          audioUpdateRequired: boolean): Promise<ThreadMessage[]> {
-        if (!thread) {
-          throw Error('Trying to update a non-existent thread');
+      resolveSuggestion: function(
+          threadId, action, commitMsg, reviewMsg, onSuccess, onFailure) {
+        var thread = getThreadById(threadId);
+        if (thread === null) {
+          return $q.reject(
+            'Can not resolve a suggestion to nonexistent thread.');
         }
-        let threadId = thread.threadId;
-        // TODO(#8016): Move this $http call to a backend-api.service with unit
-        // tests.
-        return $http.put(getSuggestionActionHandlerUrl(threadId), {
+
+        return $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, {
           action: action,
           review_message: reviewMsg,
           commit_message: action === ACTION_ACCEPT_SUGGESTION ? commitMsg : null
-        }).then(() => {
+        }).then(function() {
           thread.status =
             action === ACTION_ACCEPT_SUGGESTION ? STATUS_FIXED : STATUS_IGNORED;
-          openThreadsCount -= 1;
+          _openThreadsCount -= 1;
           // TODO(#8678): Update the cache with the message
-          // instead of fetching the messages every time from the backend
-          return this.getMessagesAsync(thread);
-        });
+          // instead of fetching the messages everytime from the backend
+          return _fetchMessages(threadId);
+        }).then(onSuccess, onFailure);
       }
     };
   }

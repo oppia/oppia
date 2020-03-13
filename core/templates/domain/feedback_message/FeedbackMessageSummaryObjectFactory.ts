@@ -29,13 +29,12 @@ export class FeedbackMessageSummary {
   description: string;
   authorUsername: string;
   authorPictureDataUrl: string;
-  createdOnMsecs: number;
+  createdOn: Date;
 
   constructor(
       messageId: number, text: string, updatedStatus: string,
       suggestionHtml: string, currentContentHtml: string, description: string,
-      authorUsername: string, authorPictureDataUrl: string,
-      createdOnMsecs: number) {
+      authorUsername: string, authorPictureDataUrl: string, createdOn: Date) {
     this.messageId = messageId;
     this.text = text;
     this.updatedStatus = updatedStatus;
@@ -44,7 +43,7 @@ export class FeedbackMessageSummary {
     this.description = description;
     this.authorUsername = authorUsername;
     this.authorPictureDataUrl = authorPictureDataUrl;
-    this.createdOnMsecs = createdOnMsecs;
+    this.createdOn = createdOn;
   }
 }
 
@@ -55,11 +54,9 @@ export class FeedbackMessageSummaryObjectFactory {
   createNewMessage(
       newMessageId: number, newMessageText: string, authorUsername: string,
       authorPictureDataUrl: string): FeedbackMessageSummary {
-    // Date.now() returns number of milliseconds since 1970-01-01 UTC.
-    let createdOnMsecs: number = new Date().getTime();
     return new FeedbackMessageSummary(
       newMessageId, newMessageText, null, null, null, null, authorUsername,
-      authorPictureDataUrl, createdOnMsecs);
+      authorPictureDataUrl, new Date());
   }
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'feedbackMessageSummaryBackendDict' is a dict with
@@ -76,7 +73,7 @@ export class FeedbackMessageSummaryObjectFactory {
       feedbackMessageSummaryBackendDict.description,
       feedbackMessageSummaryBackendDict.author_username,
       feedbackMessageSummaryBackendDict.author_picture_data_url,
-      feedbackMessageSummaryBackendDict.created_on_msecs);
+      feedbackMessageSummaryBackendDict.created_on);
   }
 }
 

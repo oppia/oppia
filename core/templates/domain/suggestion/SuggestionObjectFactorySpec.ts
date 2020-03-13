@@ -16,18 +16,18 @@
  * @fileoverview Unit tests for SuggestionObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
 
-describe('SuggestionObjectFactory', () => {
+describe('Suggestion object factory', () => {
+  let suggestionObjectFactory: SuggestionObjectFactory;
+
   beforeEach(() => {
-    this.factory = TestBed.get(SuggestionObjectFactory);
+    suggestionObjectFactory = new SuggestionObjectFactory();
   });
 
   it('should create a new suggestion from a backend dict.', () => {
-    let suggestionBackendDict = {
+    var suggestionBackendDict = {
       suggestion_id: 'exploration.exp1.thread1',
       suggestion_type: 'edit_exploration_state_content',
       target_type: 'exploration',
@@ -42,9 +42,10 @@ describe('SuggestionObjectFactory', () => {
         new_value: 'new suggestion content',
         old_value: 'old suggestion content'
       },
-      last_updated_msecs: 1000
+      last_updated: 1000
     };
-    let suggestion = this.factory.createFromBackendDict(suggestionBackendDict);
+    var suggestion = suggestionObjectFactory.createFromBackendDict(
+      suggestionBackendDict);
     expect(suggestion.suggestionType).toEqual('edit_exploration_state_content');
     expect(suggestion.targetType).toEqual('exploration');
     expect(suggestion.targetId).toEqual('exp1');
@@ -54,7 +55,7 @@ describe('SuggestionObjectFactory', () => {
     expect(suggestion.stateName).toEqual('state_1');
     expect(suggestion.newValue).toEqual('new suggestion content');
     expect(suggestion.oldValue).toEqual('old suggestion content');
-    expect(suggestion.lastUpdatedMsecs).toEqual(1000);
+    expect(suggestion.lastUpdated).toEqual(1000);
     expect(suggestion.getThreadId()).toEqual('exploration.exp1.thread1');
   });
 });

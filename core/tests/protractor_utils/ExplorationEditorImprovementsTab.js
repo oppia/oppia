@@ -62,38 +62,31 @@ var ExplorationEditorImprovementsTab = function() {
   var stateNameLocator =
     by.css('.protractor-test-improvements-task-state-name');
 
-  var newTaskStateNameMatcher = function(expectedStateName) {
-    return function(task) {
+  var newTaskStateNameMatcher = (expectedStateName) => {
+    return (task) => {
       return task.element(stateNameLocator).getText()
         .then(stateName => stateName === expectedStateName);
     };
   };
 
-  var newTaskTypeMatcher = function(expectedTaskType) {
-    return function(task) {
+  var newTaskTypeMatcher = (expectedTaskType) => {
+    return (task) => {
       return task.getAttribute('class')
         .then(cssClass => cssClass.includes(expectedTaskType));
     };
   };
 
-  var newTaskContentMatcher = function(expectedContent) {
-    return function(task) {
+  var newTaskContentMatcher = (expectedContent) => {
+    return (task) => {
       return task.element(taskBodyLocator).getText()
         .then(taskBody => taskBody.includes(expectedContent));
     };
   };
 
-  var newTaskTitleMatcher = function(expectedTitle) {
-    return function(task) {
+  var newTaskTitleMatcher = (expectedTitle) => {
+    return (task) => {
       return task.element(taskTitleLocator).getText()
         .then(taskTitle => taskTitle.includes(expectedTitle));
-    };
-  };
-
-  var newTaskStatusMatcher = function(expectedStatus) {
-    return function(task) {
-      return task.element(taskStatusLocator).getText()
-        .then(taskStatus => taskStatus === expectedStatus);
     };
   };
 
@@ -104,18 +97,14 @@ var ExplorationEditorImprovementsTab = function() {
    * @param {Iterable.<(ElementFinder) => Promise.<boolean>>} matchers
    * @returns {(ElementFinder) => Promise.<boolean>}
    */
-  var reduceTaskMatchers = function(matchers) {
-    return function(task) {
+  var reduceTaskMatchers = (matchers) => {
+    return (task) => {
       return Promise.all(matchers.map(isMatch => isMatch(task)))
         .then(matchResults => matchResults.every(m => m));
     };
   };
 
-  this.getTaskByStatus = function(expectedStatus) {
-    return allTasks.filter(newTaskStatusMatcher(expectedStatus)).first();
-  };
-
-  this.getAnswerDetailsTask = function(stateName) {
+  this.getAnswerDetailsTask = (stateName) => {
     var answerDetailsTaskMatcher = reduceTaskMatchers([
       newTaskTypeMatcher('answer-details'),
       newTaskStateNameMatcher(stateName),
@@ -123,7 +112,7 @@ var ExplorationEditorImprovementsTab = function() {
     return allTasks.filter(answerDetailsTaskMatcher).first();
   };
 
-  this.getFeedbackTask = function(latestMessage) {
+  this.getFeedbackTask = (latestMessage) => {
     var feedbackTaskMatcher = reduceTaskMatchers([
       newTaskTypeMatcher('feedback'),
       newTaskContentMatcher(latestMessage),
@@ -131,7 +120,7 @@ var ExplorationEditorImprovementsTab = function() {
     return allTasks.filter(feedbackTaskMatcher).first();
   };
 
-  this.getSuggestionTask = function(description) {
+  this.getSuggestionTask = (description) => {
     var suggestionTaskMatcher = reduceTaskMatchers([
       newTaskTypeMatcher('suggestion'),
       newTaskContentMatcher(description),
@@ -139,7 +128,7 @@ var ExplorationEditorImprovementsTab = function() {
     return allTasks.filter(suggestionTaskMatcher).first();
   };
 
-  this.getPlaythroughTask = function(taskTitle) {
+  this.getPlaythroughTask = (taskTitle) => {
     var playthroughTaskMatcher = reduceTaskMatchers([
       newTaskTypeMatcher('playthrough'),
       newTaskTitleMatcher(taskTitle),
@@ -147,50 +136,49 @@ var ExplorationEditorImprovementsTab = function() {
     return allTasks.filter(playthroughTaskMatcher).first();
   };
 
-  this.getTasks = function() {
+  this.getTasks = () => {
     return allTasks;
   };
 
-  this.getTaskStatus = function(task) {
+  this.getTaskStatus = (task) => {
     return task.element(taskStatusLocator).getText();
   };
 
-  this.clickTaskActionButton = function(task, buttonText) {
+  this.clickTaskActionButton = (task, buttonText) => {
     var buttonElement = task.element(by.buttonText(buttonText));
     waitFor.elementToBeClickable(
       buttonElement, 'Action button takes too long to become clickable');
     buttonElement.click();
   };
 
-  this.getTaskActionButtons = function(task) {
+  this.getTaskActionButtons = (task) => {
     return task.all(actionButtonLocator);
   };
 
-  this.verifyOutstandingTaskCount = function(expectedTaskCount) {
+  this.verifyOutstandingTaskCount = (expectedTaskCount) => {
     expect(taskCount.getText()).toMatch(String(expectedTaskCount));
   };
 
-  this.verifyNoOutstandingTasks = function() {
+  this.verifyNoOutstandingTasks = () => {
     expect(taskCount.isDisplayed()).toBe(false);
   };
 
-  this.verifyAnswerDetails = function(expectedDetails, expectedInfoCount) {
+  this.verifyAnswerDetails = (expectedDetails, expectedInfoCount) => {
     expect(answerDetails.getText()).toMatch(expectedDetails);
     expect(answerInfoCount.getText()).toMatch(String(expectedInfoCount));
   };
 
-  this.verifyReadOnlyAnswerDetails = function(
-      expectedDetails, expectedInfoCount) {
+  this.verifyReadOnlyAnswerDetails = (expectedDetails, expectedInfoCount) => {
     this.verifyAnswerDetails(expectedDetails, expectedInfoCount);
     expect($$('.protractor-test-delete-items').count()).toEqual(0);
     expect($$('.protractor-test-select-answer-detail').count()).toEqual(0);
   };
 
-  this.getThreadMessages = function() {
+  this.getThreadMessages = () => {
     return allThreadMessages.map(message => message.getText());
   };
 
-  this.sendResponseAndCloseModal = function(feedbackResponse, feedbackStatus) {
+  this.sendResponseAndCloseModal = (feedbackResponse, feedbackStatus) => {
     responseTextarea.sendKeys(feedbackResponse);
     if (feedbackStatus) {
       responseStatusSelect.click();
@@ -199,45 +187,45 @@ var ExplorationEditorImprovementsTab = function() {
     responseSendButton.click();
   };
 
-  this.acceptSuggestion = function(commitMessage = 'Commit message') {
+  this.acceptSuggestion = () => {
     waitFor.elementToBeClickable(
       reviewSuggestionButton,
       'View Suggestion button takes too long to become clickable');
     reviewSuggestionButton.click();
 
-    suggestionCommitMessageInput.sendKeys(commitMessage);
+    suggestionCommitMessageInput.sendKeys('Commit message');
     waitFor.elementToBeClickable(
       acceptSuggestionButton,
       'Accept Suggestion button takes too long to become clickable');
     acceptSuggestionButton.click();
   };
 
-  this.rejectSuggestion = function(rejectReason = 'Commit message') {
+  this.rejectSuggestion = () => {
     waitFor.elementToBeClickable(
       reviewSuggestionButton,
       'View Suggestion button takes too long to become clickable');
     reviewSuggestionButton.click();
 
-    suggestionReviewMessageInput.sendKeys(rejectReason);
+    suggestionReviewMessageInput.sendKeys('Commit message');
     waitFor.elementToBeClickable(
       rejectSuggestionButton,
       'Accept Suggestion button takes too long to become clickable');
     rejectSuggestionButton.click();
   };
 
-  this.setShowOnlyOpenTasks = function(choice = true) {
+  this.setShowOnlyOpenTasks = (choice = true) => {
     if (choice !== onlyOpenInput.isSelected()) {
       onlyOpenInput.click();
     }
   };
 
-  this.confirmAction = function() {
+  this.confirmAction = () => {
     waitFor.elementToBeClickable(
       confirmModalButton, 'Confirm button takes too long to become clickable');
     confirmModalButton.click();
   };
 
-  this.closeModal = function() {
+  this.closeModal = () => {
     waitFor.elementToBeClickable(
       closeModalButton, 'Close button takes too long to become clickable');
     closeModalButton.click();

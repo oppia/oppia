@@ -35,10 +35,7 @@ angular.module('oppia').directive('moderatorPage', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$rootScope', 'AlertsService', 'DateTimeFormatService',
-        'ThreadMessageObjectFactory',
-        function(
-            $http, $rootScope, AlertsService, DateTimeFormatService,
-            ThreadMessageObjectFactory) {
+        function($http, $rootScope, AlertsService, DateTimeFormatService) {
           var ctrl = this;
           ctrl.getDatetimeAsString = function(millisSinceEpoch) {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
@@ -125,8 +122,7 @@ angular.module('oppia').directive('moderatorPage', [
             });
 
             $http.get('/recent_feedback_messages').then(function(response) {
-              ctrl.allFeedbackMessages = response.data.results.map(
-                r => ThreadMessageObjectFactory.createFromBackendDict(r));
+              ctrl.allFeedbackMessages = response.data.results;
             });
 
             $http.get('/moderatorhandler/featured').then(function(response) {

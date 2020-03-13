@@ -244,23 +244,19 @@ describe('URL Interpolation Service', () => {
     expect(uis.interpolateUrl.bind(uis, '/test_url/<page>', {
       page: 0
     })).toThrow(new Error(
-      'Every parameter passed into interpolateUrl must have string values, ' +
-      'but received: {page: 0}'));
+      'Parameters passed into interpolateUrl must be strings.'));
     expect(uis.interpolateUrl.bind(uis, '/test_url/<page>', {
       page: {}
     })).toThrow(new Error(
-      'Every parameter passed into interpolateUrl must have string values, ' +
-      'but received: {page: {}}'));
+      'Parameters passed into interpolateUrl must be strings.'));
     expect(uis.interpolateUrl.bind(uis, '/test_url/<page>', {
       page: []
     })).toThrow(new Error(
-      'Every parameter passed into interpolateUrl must have string values, ' +
-      'but received: {page: []}'));
+      'Parameters passed into interpolateUrl must be strings.'));
     expect(uis.interpolateUrl.bind(uis, '/test_url/<page>', {
       page: /abc/
     })).toThrow(new Error(
-      'Every parameter passed into interpolateUrl must have string values, ' +
-      'but received: {page: {}}'));
+      'Parameters passed into interpolateUrl must be strings.'));
   });
 
   it('should interpolate correct path', () => {

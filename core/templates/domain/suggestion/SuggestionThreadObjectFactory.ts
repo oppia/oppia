@@ -22,53 +22,38 @@ import { Injectable } from '@angular/core';
 
 import { Suggestion, SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
-import { ThreadMessage } from
-  'domain/feedback_message/ThreadMessageObjectFactory';
-import { ThreadMessageSummary, ThreadMessageSummaryObjectFactory } from
-  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 
-export class SuggestionThread {
+class SuggestionThread {
   status: string;
   subject: string;
   summary: string;
   originalAuthorName: string;
-  lastUpdatedMsecs: number;
+  lastUpdated: number;
   messageCount: number;
   threadId: string;
   suggestion: Suggestion;
-  lastNonemptyMessageSummary: ThreadMessageSummary;
-  messages: ThreadMessage[] = [];
-
+  // TODO(#7165): Replace any with exact type.
+  messages: Array<any>;
   constructor(
       status: string, subject: string, summary: string,
-      originalAuthorName: string, lastUpdatedMsecs: number,
-      messageCount: number, threadId: string,
-      lastNonemptyMessageSummary: ThreadMessageSummary,
-      suggestion: Suggestion) {
+      originalAuthorName: string, lastUpdated: number, messageCount: number,
+      threadId: string, suggestion: Suggestion) {
     this.status = status;
     this.subject = subject;
     this.summary = summary;
     this.originalAuthorName = originalAuthorName;
-    this.lastUpdatedMsecs = lastUpdatedMsecs;
+    this.lastUpdated = lastUpdated;
     this.messageCount = messageCount;
     this.threadId = threadId;
-    this.lastNonemptyMessageSummary = lastNonemptyMessageSummary;
     this.suggestion = suggestion;
+    this.messages = [];
   }
-
-  setMessages(messages: ThreadMessage[]): void {
+  // TODO(#7165): Replace any with exact type.
+  setMessages(messages: Array<any>): void {
     this.messages = messages;
-    // Since messages have been updated, we need to update all of our other
-    // message-related fields to maintain consistency between them.
-    this.messageCount = messages.length;
-    let nonemptyMessages = messages.filter(m => m.hasText());
-    if (nonemptyMessages.length > 0) {
-      let i = nonemptyMessages.length - 1;
-      this.lastNonemptyMessageSummary = nonemptyMessages[i].summary;
-    }
   }
-
-  getMessages(): ThreadMessage[] {
+  // TODO(#7165): Replace any with exact type.
+  getMessages(): Array<any> {
     return this.messages;
   }
 
@@ -103,39 +88,28 @@ export class SuggestionThread {
   }
 }
 
-@Injectable({providedIn: 'root'})
+@Injectable({
+  providedIn: 'root'
+})
 export class SuggestionThreadObjectFactory {
-  constructor(
-    private suggestionObjectFactory: SuggestionObjectFactory,
-    private threadMessageSummaryObjectFactory:
-      ThreadMessageSummaryObjectFactory) {}
-
-  private createEditExplorationStateContentSuggestionFromBackendDict(
-      suggestionBackendDict: any): Suggestion {
-    if (suggestionBackendDict.suggestion_type !==
-        'edit_exploration_state_content') {
-      return null;
-    }
-    return this.suggestionObjectFactory.createFromBackendDict(
-      suggestionBackendDict);
-  }
-
+  constructor(private suggestionObjectFactory: SuggestionObjectFactory) {}
   // TODO(#7165): Replace 'any' with the exact type.
   createFromBackendDicts(
       suggestionThreadBackendDict: any,
       suggestionBackendDict: any): SuggestionThread {
+    let suggestion;
+    if (suggestionBackendDict.suggestion_type ===
+        'edit_exploration_state_content') {
+      suggestion = this.suggestionObjectFactory.createFromBackendDict(
+        suggestionBackendDict);
+    }
     return new SuggestionThread(
       suggestionThreadBackendDict.status, suggestionThreadBackendDict.subject,
       suggestionThreadBackendDict.summary,
       suggestionThreadBackendDict.original_author_username,
-      suggestionThreadBackendDict.last_updated_msecs,
+      suggestionThreadBackendDict.last_updated,
       suggestionThreadBackendDict.message_count,
-      suggestionThreadBackendDict.thread_id,
-      this.threadMessageSummaryObjectFactory.createNew(
-        suggestionThreadBackendDict.last_nonempty_message_author,
-        suggestionThreadBackendDict.last_nonempty_message_text),
-      this.createEditExplorationStateContentSuggestionFromBackendDict(
-        suggestionBackendDict));
+      suggestionThreadBackendDict.thread_id, suggestion);
   }
 }
 
