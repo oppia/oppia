@@ -133,6 +133,8 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
+import { ParamMetadataObjectFactory } from
+  'domain/exploration/ParamMetadataObjectFactory';
 import { ParamSpecObjectFactory } from
   'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from
@@ -251,6 +253,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { from } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -285,11 +288,11 @@ export class UpgradedServices {
     upgradedServices['DebouncerService'] = new DebouncerService();
     upgradedServices['DebugInfoTrackerService'] =
       new DebugInfoTrackerService();
+    upgradedServices['EditabilityService'] = new EditabilityService();
     upgradedServices['EmailDashboardDataService'] =
       new EmailDashboardDataService(
         new HttpClient(new HttpXhrBackend(
           new ɵangular_packages_common_http_http_d())));
-    upgradedServices['EditabilityService'] = new EditabilityService();
     upgradedServices['EntityContextObjectFactory'] =
       new EntityContextObjectFactory();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
@@ -319,6 +322,8 @@ export class UpgradedServices {
       new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
+    upgradedServices['ParamMetadataObjectFactory'] =
+      new ParamMetadataObjectFactory();
     upgradedServices['ParamTypeObjectFactory'] =
       new ParamTypeObjectFactory();
     upgradedServices['PlaythroughIssueObjectFactory'] =
