@@ -17,13 +17,16 @@ workflows:
             - setup
       - e2e_classroom_page:
           requires:
-            - typescript_tests
+            - e2e_navigation
       - e2e_file_upload_features:
+          requires:
+            - e2e_navigation
+      - e2e_navigation:
           requires:
             - typescript_tests
       - e2e_topic_and_story_editor:
           requires:
-            - typescript_tests
+            - e2e_navigation
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
