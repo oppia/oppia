@@ -33,12 +33,12 @@ describe('State name service', () => {
     sns = TestBed.get(StateNameService);
   });
 
-  it('check the defines', () =>{
+  it('tests the initialization', () =>{
     expect((sns as any).savedMemento).toBeNull();
     expect((sns as any).stateNameEditorIsShown).toBeFalse();
   });
 
-  it('test the set function are called after init', () => {
+  it('tests that the set function is called after init', () => {
     spyOn(sns, 'setStateNameSavedMemento');
     spyOn(sns, 'setStateNameEditorVisibility');
     sns.init();
@@ -48,13 +48,13 @@ describe('State name service', () => {
     expect((sns as any).stateNameEditorIsShown).toBe(false);
   });
 
-  it('test the get function', () => {
+  it('tests the get function', () => {
     expect(sns.getStateNameSavedMemento()).toBeNull();
     (sns as any).savedMemento = 'SomeValue';
     expect(sns.getStateNameSavedMemento()).toBe('SomeValue');
   });
 
-  it('test the set function', () => {
+  it('tests the set function', () => {
     sns.setStateNameSavedMemento('SomeValue');
     expect((sns as any).savedMemento).toBe('SomeValue');
     sns.setStateNameEditorVisibility(true);
