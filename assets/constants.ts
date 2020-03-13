@@ -117,19 +117,19 @@ export = {
     "description": "বাংলা (Bangla)"
   }, {
     "code": "ca",
-    "description": "Català (Catalan)"
+    "description": "català (Catalan)"
   }, {
     "code": "zh",
     "description": "中文 (Chinese)"
   }, {
     "code": "hr",
-    "description": "Hrvatski (Croatian)"
+    "description": "hrvatski (Croatian)"
   }, {
     "code": "cs",
-    "description": "Čeština (Czech)"
+    "description": "čeština (Czech)"
   }, {
     "code": "da",
-    "description": "Dansk (Danish)"
+    "description": "dansk (Danish)"
   }, {
     "code": "nl",
     "description": "Nederlands (Dutch)"
@@ -141,13 +141,13 @@ export = {
     "description": "Suomi (Finnish)"
   }, {
     "code": "fr",
-    "description": "Français (French)"
+    "description": "français (French)"
   }, {
     "code": "de",
     "description": "Deutsch (German)"
   }, {
     "code": "el",
-    "description": "Eλληνικά (Greek)"
+    "description": "ελληνικά (Greek)"
   }, {
     "code": "he",
     "description": "עברית (Hebrew)"
@@ -162,7 +162,7 @@ export = {
     "description": "Bahasa Indonesia (Indonesian)"
   }, {
     "code": "it",
-    "description": "Italiano (Italian)"
+    "description": "italiano (Italian)"
   }, {
     "code": "ja",
     "description": "日本語 (Japanese)"
@@ -174,10 +174,10 @@ export = {
     "description": "한국어 (Korean)"
   }, {
     "code": "lv",
-    "description": "Latviešu (Latvian)"
+    "description": "latviešu (Latvian)"
   }, {
     "code": "lt",
-    "description": "Lietuvių (Lithuanian)"
+    "description": "lietuvių (Lithuanian)"
   }, {
     "code": "no",
     "description": "Norsk (Norwegian)"
@@ -189,28 +189,28 @@ export = {
     "description": "Polski (Polish)"
   }, {
     "code": "pt",
-    "description": "Português (Portuguese)"
+    "description": "português (Portuguese)"
   }, {
     "code": "ro",
-    "description": "Română (Romanian)"
+    "description": "română (Romanian)"
   }, {
     "code": "ru",
-    "description": "Pусский (Russian)"
+    "description": "pусский (Russian)"
   }, {
     "code": "sr",
-    "description": "Cрпски (Serbian)"
+    "description": "cрпски (Serbian)"
   }, {
     "code": "sk",
-    "description": "Slovenčina (Slovak)"
+    "description": "slovenčina (Slovak)"
   }, {
     "code": "sl",
-    "description": "Slovenščina (Slovenian)"
+    "description": "slovenščina (Slovenian)"
   }, {
     "code": "es",
-    "description": "Español (Spanish)"
+    "description": "español (Spanish)"
   }, {
     "code": "sv",
-    "description": "Svenska (Swedish)"
+    "description": "svenska (Swedish)"
   }, {
     "code": "th",
     "description": "ภาษาไทย (Thai)"
@@ -219,7 +219,7 @@ export = {
     "description": "Türkçe (Turkish)"
   }, {
     "code": "uk",
-    "description": "Yкраїнська (Ukrainian)"
+    "description": "yкраїнська (Ukrainian)"
   }, {
     "code": "vi",
     "description": "Tiếng Việt (Vietnamese)"
