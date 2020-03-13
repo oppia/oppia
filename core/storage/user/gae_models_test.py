@@ -127,7 +127,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
             user_models.UserSettingsModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY)
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
 
     def test_get_by_role(self):
         user = user_models.UserSettingsModel.get_by_role(

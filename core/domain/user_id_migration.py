@@ -165,9 +165,12 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     def map(user_model):
         """Implements the map function for this job."""
         old_user_id = user_model.gae_id
-        new_user_id = user_models.UserSettingsModel.get_new_id('')
         if user_model.id != user_model.gae_id:
             new_user_id = user_model.id
+        else:
+            new_user_id = user_models.UserSettingsModel.get_new_id('')
+            UserIdMigrationJob._copy_model_with_new_id(
+                user_models.UserSettingsModel, old_user_id, new_user_id)
         for model_class in models.Registry.get_all_storage_model_classes():
             if (model_class.get_user_id_migration_policy() ==
                     base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE):

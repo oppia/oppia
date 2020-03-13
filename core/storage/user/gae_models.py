@@ -147,9 +147,18 @@ class UserSettingsModel(base_models.BaseModel):
     @staticmethod
     def get_user_id_migration_policy():
         """UserSettingsModel has ID that contains user ID and needs to be
-        replaced.
+        replaced. The replacement is handled directly in the
+        user_id_migration.py, because it needs to be migrated before the other
+        models.
         """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """UserSettingsModel is migrated in the user_id_migration.py, because it
+        needs to be migrated before the other models.
+        """
+        pass
 
     @staticmethod
     def export_data(user_id):
