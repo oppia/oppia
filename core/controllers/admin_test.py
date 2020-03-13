@@ -105,7 +105,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': True,
+            'value': False,
         }, response_config_properties[
             config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name])
 
