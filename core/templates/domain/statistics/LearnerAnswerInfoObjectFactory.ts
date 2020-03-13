@@ -33,15 +33,15 @@ export class LearnerAnswerInfo {
   _id: string;
   _answer: string;
   _answerDetails: string;
-  _createdOnMsecs: number;
+  _createdOn: number;
 
   constructor(
       learnerAnswerInfoId: string, answer: string, answerDetails: string,
-      createdOnMsecs: number) {
+      createdOn: number) {
     this._id = learnerAnswerInfoId;
     this._answer = answer;
     this._answerDetails = answerDetails;
-    this._createdOnMsecs = createdOnMsecs;
+    this._createdOn = createdOn;
   }
 
   getId(): string {
@@ -57,7 +57,7 @@ export class LearnerAnswerInfo {
   }
 
   getCreatedOn(): number {
-    return this._createdOnMsecs;
+    return this._createdOn;
   }
 }
 
