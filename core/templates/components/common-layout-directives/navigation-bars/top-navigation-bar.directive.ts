@@ -40,8 +40,8 @@ angular.module('oppia').directive('topNavigationBar', [
         '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
         'SiteAnalyticsService', 'NavigationService', 'WindowDimensionsService',
-        'DebouncerService', 'DeviceInfoService', 'LOGOUT_URL', 
-        'SHOW_CLASSROOM_CALLOUT', 
+        'DebouncerService', 'DeviceInfoService', 'LOGOUT_URL',
+        'SHOW_CLASSROOM_CALLOUT',
         function(
             $scope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
