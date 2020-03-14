@@ -82,6 +82,7 @@ install:
 - python -m scripts.install_third_party_libs
 - python -m scripts.build --prod_env
 
+
 script:
 # Run the e2e tests in the production environment (using --prod_env).
 - if [ "$RUN_E2E_TESTS_ACCESSIBILITY" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="accessibility" --prod_env --skip-install --skip-build; fi
