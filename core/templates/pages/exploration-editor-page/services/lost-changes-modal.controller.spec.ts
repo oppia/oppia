@@ -37,18 +37,11 @@ describe('Lost Changes Modal Controller', function() {
       'ChangesInHumanReadableFormService');
 
     logSpy = spyOn($log, 'error').and.callThrough();
-    // Remove spyOn when #8729 be merged, because
-    // ChangesInHumanReadableFormService was refactored in this PR.
-    // Ref: https://github.com/oppia/oppia/pull/8729
-    spyOn(ChangesInHumanReadableFormService, 'makeHumanReadable').and
-      .returnValue({
-        outerHTML: 'mocking'
-      });
-    var $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
 
+    var $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $controller(
       'LostChangesModalController', {
@@ -61,13 +54,10 @@ describe('Lost Changes Modal Controller', function() {
 
   it('should evaluates lostChangesHtml when controller is initialized',
     function() {
-      // Remove expect when #8729 be merged.
-      expect($scope.lostChangesHtml).toBe('mocking');
-      // Uncomment this piece of code below when #8729 be merged.
-      // expect($scope.lostChangesHtml).toBe(
-      //   '<ul>' +
-      //   '<li>Added state: ' + lostChanges[0].state_name + '</li>' +
-      //   '</ul>');
+      expect($scope.lostChangesHtml).toBe(
+        '<ul>' +
+        '<li>Added state: ' + lostChanges[0].state_name + '</li>' +
+        '</ul>');
       expect(logSpy).toHaveBeenCalledWith(
         'Lost changes: ' + JSON.stringify(lostChanges));
     });
