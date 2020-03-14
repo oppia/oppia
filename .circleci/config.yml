@@ -140,8 +140,9 @@ jobs:
       - persist_to_workspace:
           root: /home/circleci/
           paths:
-            - oppia/build/
             - oppia/app.yaml
+            - oppia/assets/hashes.json
+            - oppia/build/
 
   e2e_topic_and_story_editor:
     <<: *job_defaults
