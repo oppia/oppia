@@ -37,19 +37,16 @@ export class ChangesInHumanReadableFormService {
               @Inject(DOCUMENT) private document: any) {}
   // TODO(#7176): Replace 'any' with the exact type.
   makeRulesListHumanReadable(answerGroupValue: any): Array<HTMLElement> {
-    const rulesList = [];
+    let rulesList = [];
     answerGroupValue.rules.forEach((rule) => {
-      const ruleElm = this.document.createElement('li');
-      const paragraphElement = this.document.createElement('p');
-      paragraphElement.textContent = 'Type: ' + rule.type;
-      ruleElm.append(paragraphElement);
-
-      const valueElement = this.document.createElement('p');
-      valueElement.textContent = 'Value: ' + (
-        Object.keys(rule.inputs).map((input) => rule.inputs[input]))
-        .toString();
-      ruleElm.append(valueElement);
-
+      let ruleElm = this.document.createElement('<li></li>');
+      ruleElm.html('<p>Type: ' + rule.type + '</p>');
+      ruleElm.append(
+        '<p>Value: ' + (
+          Object.keys(rule.inputs).map(function(input) {
+            return rule.inputs[input];
+          })
+        ).toString() + '</p>');
       rulesList.push(ruleElm);
     });
     return rulesList;
@@ -62,185 +59,6 @@ export class ChangesInHumanReadableFormService {
   getStatePropertyValue(statePropertyValue: Array<string> | Object): any {
     return Array.isArray(statePropertyValue) ?
         statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
-  }
-
-  _getElementsByLostChangePropertyName(lostChange: any): Array<HTMLElement> {
-    const stateWiseEditsMapping = [];
-    const newValue = this.getStatePropertyValue(lostChange.new_value);
-    const oldValue = this.getStatePropertyValue(lostChange.old_value);
-
-    switch (lostChange.property_name) {
-      case 'content':
-        if (newValue !== null) {
-          const contentElement = this.document.createElement('div');
-          contentElement.classList.add('state-edit-desc');
-          contentElement.innerHTML = '<strong>Edited content: ' +
-            '<div class="content">' + newValue.html + '</div></strong>';
-
-          // TODO(sll): Also add display of audio translations here.
-          stateWiseEditsMapping.push(contentElement);
-        }
-        break;
-
-      case 'widget_id': {
-        let lostChangeValue = '';
-        if (oldValue === null) {
-          if (newValue !== 'EndExploration') {
-            lostChangeValue = ('<strong>Added Interaction: </strong>' +
-                newValue);
-          } else {
-            lostChangeValue = 'Ended Exploration';
-          }
-        } else {
-          lostChangeValue = ('<strong>Deleted Interaction: </strong>' +
-              oldValue);
-        }
-        let contentElement = this.document.createElement('div');
-        contentElement.classList.add('state-edit-desc');
-        contentElement.innerHTML += lostChangeValue;
-
-        stateWiseEditsMapping.push(contentElement);
-      }
-        break;
-
-      case 'widget_customization_args': {
-        let lostChangeValue = '';
-        if (this.utilsService.isEmpty(oldValue)) {
-          lostChangeValue = 'Added Interaction Customizations';
-        } else if (this.utilsService.isEmpty(newValue)) {
-          lostChangeValue = 'Removed Interaction Customizations';
-        } else {
-          lostChangeValue = 'Edited Interaction Customizations';
-        }
-        let contentElement = this.document.createElement('div');
-        contentElement.classList.add('state-edit-desc');
-        contentElement.textContent = lostChangeValue;
-
-        stateWiseEditsMapping.push(contentElement);
-      }
-        break;
-
-      case 'answer_groups': {
-        let answerGroupChanges = this.getRelativeChangeToGroups(
-          lostChange);
-        let answerGroupHtml = '';
-        if (answerGroupChanges === 'added') {
-          answerGroupHtml += (
-            '<p class="sub-edit"><i>Destination: </i>' +
-              newValue.outcome.dest + '</p>');
-          answerGroupHtml += (
-            '<div class="sub-edit"><i>Feedback: </i>' +
-              '<div class="feedback">' +
-              newValue.outcome.feedback.getHtml() + '</div></div>');
-          let rulesList = this.makeRulesListHumanReadable(newValue);
-          if (rulesList.length > 0) {
-            answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';
-            const rulesListHtml = this.document.createElement('ol');
-            rulesListHtml.classList.add('rules-list');
-            for (let rule in rulesList) {
-              rulesListHtml.innerHTML += rulesList[rule].outerHTML;
-            }
-            answerGroupHtml += rulesListHtml.outerHTML;
-          }
-          const contentElement = this.document.createElement('div');
-          contentElement.classList.add('state-edit-desc', 'answer-group');
-          contentElement.innerHTML += '<strong>Added answer group: </strong>';
-          contentElement.innerHTML += answerGroupHtml;
-
-          stateWiseEditsMapping.push(contentElement);
-        } else if (answerGroupChanges === 'edited') {
-          if (newValue.outcome.dest !== oldValue.outcome.dest) {
-            answerGroupHtml += (
-              '<p class="sub-edit"><i>Destination: </i>' +
-                newValue.outcome.dest + '</p>');
-          }
-          if (isEqual(
-            newValue.outcome.feedback.getHtml(),
-            oldValue.outcome.feedback.getHtml())) {
-            answerGroupHtml += (
-              '<div class="sub-edit"><i>Feedback: </i>' +
-                '<div class="feedback">' +
-                newValue.outcome.feedback.getHtml() +
-                '</div></div>');
-          }
-          if (isEqual(newValue.rules, oldValue.rules)) {
-            let rulesList = this.makeRulesListHumanReadable(newValue);
-            if (rulesList.length > 0) {
-              answerGroupHtml += (
-                '<p class="sub-edit"><i>Rules: </i></p>');
-              const rulesListHtml = this.document.createElement('ol');
-              rulesListHtml.classList.add('rules-list');
-              for (let rule in rulesList) {
-                rulesListHtml.innerHTML += rulesList[rule].outerHTML;
-              }
-              answerGroupHtml += rulesListHtml.outerHTML;
-            }
-          }
-          const contentElement = this.document.createElement('div');
-          contentElement.classList.add('state-edit-desc', 'answer-group');
-          contentElement.innerHTML += '<strong>Edited answer group: </strong>';
-          contentElement.innerHTML += answerGroupHtml;
-
-          stateWiseEditsMapping.push(contentElement);
-        } else if (answerGroupChanges === 'deleted') {
-          const contentElement = this.document.createElement('div');
-          contentElement.classList.add('state-edit-desc');
-          contentElement.textContent = 'Deleted answer group';
-          stateWiseEditsMapping.push(contentElement);
-        }
-      }
-        break;
-
-      case 'default_outcome': {
-        let defaultOutcomeChanges = this.getRelativeChangeToGroups(
-          lostChange);
-        let defaultOutcomeHtml = '';
-        if (defaultOutcomeChanges === 'added') {
-          defaultOutcomeHtml += (
-            '<p class="sub-edit"><i>Destination: </i>' +
-              newValue.dest + '</p>');
-          defaultOutcomeHtml += (
-            '<div class="sub-edit"><i>Feedback: </i>' +
-              '<div class="feedback">' + newValue.feedback.getHtml() +
-              '</div></div>');
-
-          const contentElement = this.document.createElement('div');
-          contentElement.classList.add('state-edit-desc', 'default-outcome');
-          contentElement.innerHTML += 'Added default outcome: ';
-          contentElement.innerHTML += defaultOutcomeHtml;
-
-          stateWiseEditsMapping.push(contentElement);
-        } else if (defaultOutcomeChanges === 'edited') {
-          if (newValue.dest !== oldValue.dest) {
-            defaultOutcomeHtml += (
-              '<p class="sub-edit"><i>Destination: </i>' +
-                newValue.dest +
-                '</p>');
-          }
-          if (isEqual(newValue.feedback.getHtml(),
-            oldValue.feedback.getHtml())) {
-            defaultOutcomeHtml += (
-              '<div class="sub-edit"><i>Feedback: </i>' +
-                '<div class="feedback">' + newValue.feedback.getHtml() +
-                '</div></div>');
-          }
-          const contentElement = this.document.createElement('div');
-          contentElement.classList.add('state-edit-desc', 'default-outcome');
-          contentElement.innerHTML += 'Edited default outcome: ';
-          contentElement.innerHTML += defaultOutcomeHtml;
-
-          stateWiseEditsMapping.push(contentElement);
-        } else if (defaultOutcomeChanges === 'deleted') {
-          const contentElement = this.document.createElement('div');
-          contentElement.classList.add('state-edit-desc');
-          contentElement.textContent = 'Deleted default outcome';
-
-          stateWiseEditsMapping.push(contentElement);
-        }
-      }
-    }
-
-    return stateWiseEditsMapping;
   }
 
   // Detects whether an object of the type 'answer_group' or
@@ -271,7 +89,7 @@ export class ChangesInHumanReadableFormService {
   }
   // TODO(#7176): Replace 'any' with the exact type.
   _makeHumanReadable(lostChanges: Array<any>): HTMLElement {
-    let outerHtml = this.document.createElement('ul');
+    let outerHtml = this.document.createElement('<ul></ul>');
     let stateWiseEditsMapping = {};
     // The letiable stateWiseEditsMapping stores the edits grouped by state.
     // For instance, you made the following edits:
@@ -288,40 +106,196 @@ export class ChangesInHumanReadableFormService {
     // TODO(#7176): Replace 'any' with the exact type.
     lostChanges.forEach((lostChange: any) => {
       switch (lostChange.cmd) {
-        case this.CMD_ADD_STATE: {
-          const liElement = this.document.createElement('li');
-          liElement.textContent = 'Added state: ' + lostChange.state_name;
-          outerHtml.append(liElement);
-        }
+        case this.CMD_ADD_STATE:
+          outerHtml.append(
+            this.document.createElement('<li></li>').html(
+              'Added state: ' + lostChange.state_name));
           break;
-        case this.CMD_RENAME_STATE: {
-          const liElement = this.document.createElement('li');
-          liElement.textContent = 'Renamed state: ' +
-            lostChange.old_state_name + ' to ' + lostChange.new_state_name;
-          outerHtml.append(liElement);
-        }
+        case this.CMD_RENAME_STATE:
+          outerHtml.append(
+            this.document.createElement('<li></li>').html(
+              'Renamed state: ' + lostChange.old_state_name + ' to ' +
+                  lostChange.new_state_name));
           break;
-        case this.CMD_DELETE_STATE: {
-          const liElement = this.document.createElement('li');
-          liElement.textContent = 'Deleted state: ' + lostChange.state_name;
-          outerHtml.append(liElement);
-        }
+        case this.CMD_DELETE_STATE:
+          outerHtml.append(
+            this.document.createElement('<li></li>').html(
+              'Deleted state: ' + lostChange.state_name));
           break;
         case this.CMD_EDIT_STATE_PROPERTY: {
+          let newValue = this.getStatePropertyValue(lostChange.new_value);
+          let oldValue = this.getStatePropertyValue(lostChange.old_value);
           let stateName = lostChange.state_name;
           if (!stateWiseEditsMapping[stateName]) {
             stateWiseEditsMapping[stateName] = [];
           }
 
-          stateWiseEditsMapping[stateName].push(
-            ...this._getElementsByLostChangePropertyName(lostChange));
+          switch (lostChange.property_name) {
+            case 'content':
+              if (newValue !== null) {
+                // TODO(sll): Also add display of audio translations here.
+                stateWiseEditsMapping[stateName].push(
+                  this.document.createElement('<div></div>').html(
+                    '<strong>Edited content: </strong><div class="content">' +
+                        newValue.html + '</div>')
+                    .addClass('state-edit-desc'));
+              }
+              break;
+
+            case 'widget_id': {
+              let lostChangeValue = '';
+              if (oldValue === null) {
+                if (newValue !== 'EndExploration') {
+                  lostChangeValue = ('<strong>Added Interaction: </strong>' +
+                      newValue);
+                } else {
+                  lostChangeValue = 'Ended Exploration';
+                }
+              } else {
+                lostChangeValue = ('<strong>Deleted Interaction: </strong>' +
+                    oldValue);
+              }
+              stateWiseEditsMapping[stateName].push(
+                this.document.createElement('<div></div>').html(lostChangeValue)
+                  .addClass('state-edit-desc'));
+              break;}
+
+            case 'widget_customization_args': {
+              let lostChangeValue = '';
+              if (this.utilsService.isEmpty(oldValue)) {
+                lostChangeValue = 'Added Interaction Customizations';
+              } else if (this.utilsService.isEmpty(newValue)) {
+                lostChangeValue = 'Removed Interaction Customizations';
+              } else {
+                lostChangeValue = 'Edited Interaction Customizations';
+              }
+              stateWiseEditsMapping[stateName].push(
+                this.document.createElement('<div></div>').html(lostChangeValue)
+                  .addClass('state-edit-desc'));
+              break;
+            }
+
+            case 'answer_groups': {
+              let answerGroupChanges = this.getRelativeChangeToGroups(
+                lostChange);
+              let answerGroupHtml = '';
+              if (answerGroupChanges === 'added') {
+                answerGroupHtml += (
+                  '<p class="sub-edit"><i>Destination: </i>' +
+                    newValue.outcome.dest + '</p>');
+                answerGroupHtml += (
+                  '<div class="sub-edit"><i>Feedback: </i>' +
+                    '<div class="feedback">' +
+                    newValue.outcome.feedback.getHtml() + '</div></div>');
+                let rulesList = this.makeRulesListHumanReadable(newValue);
+                if (rulesList.length > 0) {
+                  answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';
+                  let rulesListHtml = (
+                    this.document.createElement(
+                      '<ol></ol>').addClass('rules-list'));
+                  for (let rule in rulesList) {
+                    rulesListHtml.html(rulesList[rule][0].outerHTML);
+                  }
+                  answerGroupHtml += rulesListHtml[0].outerHTML;
+                }
+                stateWiseEditsMapping[stateName].push(
+                  this.document.createElement(
+                    '<div><strong>Added answer group: ' + '</strong></div>')
+                    .append(answerGroupHtml)
+                    .addClass('state-edit-desc answer-group'));
+              } else if (answerGroupChanges === 'edited') {
+                if (newValue.outcome.dest !== oldValue.outcome.dest) {
+                  answerGroupHtml += (
+                    '<p class="sub-edit"><i>Destination: </i>' +
+                      newValue.outcome.dest + '</p>');
+                }
+                if (isEqual(
+                  newValue.outcome.feedback.getHtml(),
+                  oldValue.outcome.feedback.getHtml())) {
+                  answerGroupHtml += (
+                    '<div class="sub-edit"><i>Feedback: </i>' +
+                      '<div class="feedback">' +
+                      newValue.outcome.feedback.getHtml() +
+                      '</div></div>');
+                }
+                if (isEqual(newValue.rules, oldValue.rules)) {
+                  let rulesList = this.makeRulesListHumanReadable(newValue);
+                  if (rulesList.length > 0) {
+                    answerGroupHtml += (
+                      '<p class="sub-edit"><i>Rules: </i></p>');
+                    let rulesListHtml = (this.document.createElement(
+                      '<ol></ol>').addClass('rules-list'));
+                    for (let rule in rulesList) {
+                      rulesListHtml.html(rulesList[rule][0].outerHTML);
+                    }
+                    answerGroupChanges = rulesListHtml[0].outerHTML;
+                  }
+                }
+                stateWiseEditsMapping[stateName].push(
+                  this.document.createElement(
+                    '<div><strong>Edited answer group: <strong>' +
+                        '</div>')
+                    .append(answerGroupHtml)
+                    .addClass('state-edit-desc answer-group'));
+              } else if (answerGroupChanges === 'deleted') {
+                stateWiseEditsMapping[stateName].push(
+                  this.document.createElement('<div>Deleted answer group</div>')
+                    .addClass('state-edit-desc'));
+              }
+              break;
+            }
+
+            case 'default_outcome': {
+              let defaultOutcomeChanges = this.getRelativeChangeToGroups(
+                lostChange);
+              let defaultOutcomeHtml = '';
+              if (defaultOutcomeChanges === 'added') {
+                defaultOutcomeHtml += (
+                  '<p class="sub-edit"><i>Destination: </i>' +
+                    newValue.dest + '</p>');
+                defaultOutcomeHtml += (
+                  '<div class="sub-edit"><i>Feedback: </i>' +
+                    '<div class="feedback">' + newValue.feedback.getHtml() +
+                    '</div></div>');
+                stateWiseEditsMapping[stateName].push(
+                  this.document.createElement(
+                    '<div>Added default outcome: </div>')
+                    .append(defaultOutcomeHtml)
+                    .addClass('state-edit-desc default-outcome'));
+              } else if (defaultOutcomeChanges === 'edited') {
+                if (newValue.dest !== oldValue.dest) {
+                  defaultOutcomeHtml += (
+                    '<p class="sub-edit"><i>Destination: </i>' +
+                      newValue.dest +
+                      '</p>');
+                }
+                if (isEqual(newValue.feedback.getHtml(),
+                  oldValue.feedback.getHtml())) {
+                  defaultOutcomeHtml += (
+                    '<div class="sub-edit"><i>Feedback: </i>' +
+                      '<div class="feedback">' + newValue.feedback +
+                      '</div></div>');
+                }
+                stateWiseEditsMapping[stateName].push(
+                  this.document.createElement(
+                    '<div>Edited default outcome: </div>')
+                    .append(defaultOutcomeHtml)
+                    .addClass('state-edit-desc default-outcome'));
+              } else if (defaultOutcomeChanges === 'deleted') {
+                stateWiseEditsMapping[stateName].push(
+                  this.document.createElement(
+                    '<div>Deleted default outcome</div>')
+                    .addClass('state-edit-desc'));
+              }
+            }
+          }
         }
       }
     });
 
     for (let stateName in stateWiseEditsMapping) {
-      const stateChangesEl = this.document.createElement('li');
-      stateChangesEl.textContent = 'Edits to state: ' + stateName;
+      let stateChangesEl = this.document.createElement(
+        '<li>Edits to state: ' + stateName + '</li>');
       for (let stateEdit in stateWiseEditsMapping[stateName]) {
         stateChangesEl.append(stateWiseEditsMapping[stateName][stateEdit]);
       }
@@ -336,9 +310,8 @@ export class ChangesInHumanReadableFormService {
     try {
       return this._makeHumanReadable(lostChanges);
     } catch (e) {
-      const errorElement = this.document.createElement('div');
-      errorElement.textContent = 'Error: Could not recover lost changes.';
-      return errorElement;
+      return this.document.createElement(
+        '<div>Error: Could not recover lost changes.</div>');
     }
   }
 }
