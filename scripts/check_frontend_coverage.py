@@ -370,6 +370,8 @@ FULLY_COVERED_FILENAMES = [
     'topics-and-skills-dashboard-page.constants.ajs.ts',
     'topics-and-skills-dashboard-page.constants.ts',
     'TopicSummaryObjectFactory.ts',
+    'training-modal.controller.ts',
+    'training-modal.service.ts',
     'translation-language.service.ts',
     'translation-status.service.ts',
     'translation-tab-active-content-id.service.ts',
