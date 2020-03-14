@@ -26,6 +26,7 @@ require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 require('services/contextual/device-info.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('constants.ts');
 
 angular.module('oppia').directive('topNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -39,12 +40,12 @@ angular.module('oppia').directive('topNavigationBar', [
         '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
         'SiteAnalyticsService', 'NavigationService', 'WindowDimensionsService',
-        'DebouncerService', 'DeviceInfoService', 'LOGOUT_URL',
+        'DebouncerService', 'DeviceInfoService', 'LOGOUT_URL','SHOW_CLASSROOM_CALLOUT',
         function(
             $scope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
             SiteAnalyticsService, NavigationService, WindowDimensionsService,
-            DebouncerService, DeviceInfoService, LOGOUT_URL) {
+            DebouncerService, DeviceInfoService, LOGOUT_URL, SHOW_CLASSROOM_CALLOUT) {
           var ctrl = this;
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
@@ -195,6 +196,7 @@ angular.module('oppia').directive('topNavigationBar', [
           };
 
           ctrl.$onInit = function() {
+            $scope.SHOW_CLASSROOM_CALLOUT = (SHOW_CLASSROOM_CALLOUT);
             ctrl.isModerator = null;
             ctrl.isAdmin = null;
             ctrl.isTopicManager = null;
