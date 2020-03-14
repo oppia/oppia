@@ -154,7 +154,7 @@ jobs:
       - run:
           name: Run e2e topic and story editor test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures" --prod_env
+            python -m scripts.run_e2e_tests --skip-install --suite="topicAndStoryEditorFileUploadFeatures" --prod_env
 notify:
   webhooks:
     # A list of hook hashes, containing the url field
