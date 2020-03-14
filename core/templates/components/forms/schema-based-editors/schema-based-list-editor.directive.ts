@@ -85,20 +85,26 @@ angular.module('oppia').directive('schemaBasedListEditor', [
         };
 
         var intializeOldToNewListMapping = function() {
-          for (var i = 0; i < $scope.localValue.length; i++) {
-            $scope.oldToNewListMapping.newToOldListPosition.push(i);
+          if ($scope.oldToNewListMapping !== undefined) {
+            for (var i = 0; i < $scope.localValue.length; i++) {
+              $scope.oldToNewListMapping.newToOldListPosition.push(i);
+            }
           }
         };
         var updateOldToNewListMappingOnDelete = function(index) {
-          var deletedIndex = $scope.oldToNewListMapping.
-            newToOldListPosition[index];
-          if (deletedIndex !== -1) {
-            $scope.oldToNewListMapping.deletedIndexes.push(deletedIndex);
+          if ($scope.oldToNewListMapping !== undefined) {
+            var deletedIndex = $scope.oldToNewListMapping.
+              newToOldListPosition[index];
+            if (deletedIndex !== -1) {
+              $scope.oldToNewListMapping.deletedIndexes.push(deletedIndex);
+            }
+            $scope.oldToNewListMapping.newToOldListPosition.splice(index, 1);
           }
-          $scope.oldToNewListMapping.newToOldListPosition.splice(index, 1);
         };
         var updateOldToNewListMappingOnAddElement = function() {
-          $scope.oldToNewListMapping.newToOldListPosition.push(-1);
+          if ($scope.oldToNewListMapping !== undefined) {
+            $scope.oldToNewListMapping.newToOldListPosition.push(-1);
+          }
         };
 
         var validate = function() {
