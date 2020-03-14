@@ -418,5 +418,4 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
                 'There are no HTML files to lint.')
             return []
 
-
         return self._lint_html_files()

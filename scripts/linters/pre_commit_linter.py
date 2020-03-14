@@ -93,23 +93,12 @@ _EXCLUSIVE_GROUP.add_argument(
     help='specific file extensions to be linted. Space separated list',
     action='store')
 
-# NOTE TO DEVELOPERS: This should match the version of Node used in common.py.
-NODE_DIR = os.path.abspath(
-    os.path.join(os.getcwd(), os.pardir, 'oppia_tools', 'node-10.18.0'))
-
 if not os.getcwd().endswith('oppia'):
     python_utils.PRINT('')
     python_utils.PRINT(
         'ERROR    Please run this script from the oppia root directory.')
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
-if not os.path.exists(_PYLINT_PATH):
-    python_utils.PRINT('')
-    python_utils.PRINT(
-        'ERROR  Please run install_third_party_libs.py first to install pylint')
-    python_utils.PRINT('         and its dependencies.')
-    sys.exit(1)
 
 _PATHS_TO_INSERT = [
     os.getcwd(),

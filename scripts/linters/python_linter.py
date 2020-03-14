@@ -27,26 +27,12 @@ import time
 import python_utils
 
 from . import linter_utils
-
-PYLINT_VERSION = '1.9.4'
-PYCODESTYLE_VERSION = '2.5.0'
-PYLINT_QUOTES_VERSION = '0.1.8'
-
-CURR_DIR = os.path.abspath(os.getcwd())
-OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
-
-_PYLINT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylint-%s' % PYLINT_VERSION)
-if not os.path.exists(_PYLINT_PATH):
-    python_utils.PRINT('')
-    python_utils.PRINT(
-        'ERROR  Please run install_third_party_libs.py first to install pylint')
-    python_utils.PRINT('         and its dependencies.')
-    sys.exit(1)
+from .. import common
 
 _PATHS_TO_INSERT = [
-    _PYLINT_PATH,
-    os.path.join(OPPIA_TOOLS_DIR, 'pycodestyle-%s' % PYCODESTYLE_VERSION),
-    os.path.join(OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % PYLINT_QUOTES_VERSION)
+    common.PYLINT_PATH,
+    common.PYCODESTYLE_PATH,
+    common.PYLINT_QUOTES_PATH
 ]
 for path in _PATHS_TO_INSERT:
     sys.path.insert(1, path)

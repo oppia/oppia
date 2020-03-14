@@ -800,7 +800,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         Returns:
             all_messages: str. All the messages returned by the lint checks.
         """
-        all_messages = []
 
         if not self.all_filepaths:
             python_utils.PRINT('')
@@ -812,17 +811,18 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         self.parsed_expressions_in_files = (
             self._get_expressions_from_parsed_script())
 
-        all_messages.extend(self._check_extra_js_files())
-
-        all_messages.extend(self._check_js_and_ts_component_name_and_count())
-
-        all_messages.extend(self._check_directive_scope())
-
-        all_messages.extend(self._check_sorted_dependencies())
-
-        all_messages.extend(
+        extra_js_files_messages = self._check_extra_js_files()
+        js_and_ts_component_messages = (
+            self._check_js_and_ts_component_name_and_count())
+        directive_scope_messages = self._check_directive_scope()
+        sorted_dependencies_messages = self._check_sorted_dependencies()
+        controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
 
+        all_messages = (
+            extra_js_files_messages +
+            js_and_ts_component_messages + directive_scope_messages +
+            sorted_dependencies_messages + controller_dependency_messages)
         return all_messages
 
 
