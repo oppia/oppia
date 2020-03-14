@@ -338,6 +338,8 @@ FULLY_COVERED_FILENAMES = [
     'subtopic-viewer-backend-api.service.ts',
     'subtopic-viewer-domain.constants.ts',
     'SubtopicPageContentsObjectFactory.ts',
+    'suggestion-modal-for-creator-view.controller.ts',
+    'suggestion-modal-for-creator-view.service.ts',
     'suggestion-modal.service.ts',
     'SuggestionImprovementTaskObjectFactory.ts',
     'SuggestionObjectFactory.ts',
