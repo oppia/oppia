@@ -556,6 +556,7 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         else:
             yield (key, values)
 
+
 class LinkComponentValidationAuditJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Audit job to validate the Link RTE component."""
