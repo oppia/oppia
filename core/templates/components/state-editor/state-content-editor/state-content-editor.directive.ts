@@ -104,7 +104,7 @@ angular.module('oppia').directive('stateContentEditor', [
               type: 'html',
               ui_config: {
                 hide_complex_extensions: (
-                  ContextService.getPageContext() === 'topic_editor')
+                  ContextService.getEntityType() === 'question')
               }
             };
             $scope.contentId = null;

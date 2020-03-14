@@ -90,7 +90,7 @@ angular.module('oppia').directive('hintEditor', [
               type: 'html',
               ui_config: {
                 hide_complex_extensions: (
-                  ContextService.getPageContext() === 'topic_editor')
+                  ContextService.getEntityType() === 'question')
               }
             };
 
