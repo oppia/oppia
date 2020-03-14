@@ -41,21 +41,6 @@ describe('Exploration id validation service', function() {
       'ExplorationIdValidationService');
     $httpBackend = $injector.get('$httpBackend');
 
-    invalidExpResults = [{
-      summaries: []
-    },
-    {
-      summaries: [
-        null
-      ]
-    },
-    {
-      summaries: [
-        'exp_1',
-        'exp_2'
-      ]
-    }];
-
     validExpResults = {
       summaries: [{
         id: '0',
@@ -91,15 +76,41 @@ describe('Exploration id validation service', function() {
 
   it('should correctly validate the invalid exploration ids',
     function() {
-      for (var i = 0; i < invalidExpResults.length; i++) {
-        $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond(
-          invalidExpResults[i]);
-        ExplorationIdValidationService.isExpPublished('0').then(
-          function(response) {
-            expect(response).toEqual(false);
-          });
-        $httpBackend.flush();
-      }
+      // The service should respond false when the summaries array
+      // is empty
+      $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond({
+        summaries: []
+      });
+      ExplorationIdValidationService.isExpPublished('0').then(
+        function(response) {
+          expect(response).toEqual(false);
+        });
+      $httpBackend.flush();
+
+      // The service should respond false when the summaries array
+      // contains null
+      $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond({
+        summaries: [null]
+      });
+      ExplorationIdValidationService.isExpPublished('0').then(
+        function(response) {
+          expect(response).toEqual(false);
+        });
+      $httpBackend.flush();
+
+      // The service should respond false when the summaries array
+      // contains more than one element
+      $httpBackend.expectGET(/.*?explorationsummarieshandler?.*/g).respond({
+        summaries: [
+          'exp_1',
+          'exp_2'
+        ]
+      });
+      ExplorationIdValidationService.isExpPublished('0').then(
+        function(response) {
+          expect(response).toEqual(false);
+        });
+      $httpBackend.flush();
     }
   );
 
