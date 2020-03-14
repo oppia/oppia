@@ -52,7 +52,8 @@ var INTERACTIONS = {
   MultipleChoiceInput: require('./MultipleChoiceInput/protractor.js'),
   NumericInput: require('./NumericInput/protractor.js'),
   NumberWithUnits: require('./NumberWithUnits/protractor.js'),
-  TextInput: require('./TextInput/protractor.js')
+  TextInput: require('./TextInput/protractor.js'),
+  CodeRepl: require('./CodeRepl/protractor.js')
 };
 
 var getInteraction = function(interactionName) {
