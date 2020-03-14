@@ -3,7 +3,7 @@
 READ ME FIRST: Please answer *both* questions below and check off every point from the essential checklist!
 -->
 
-1. This PR fixes #[fill_in_number_here].
+1. This PR fixes or fixes part of #[fill_in_number_here].
 2. This PR does the following: [Explain here what your PR does and why]
 
 ## Essential Checklist
