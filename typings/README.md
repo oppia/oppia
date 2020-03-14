@@ -7,17 +7,17 @@ For adding type definitions for a js library, the first step is to find the sour
 
 Try to find the file that imports the js script of the library. For example **PencilCodeEmbed** is imported by the [pencilcode.html](https://github.com/oppia/oppia/blob/develop/extensions/interactions/pencilcode.html) file.
 
-- ### Create a file for the type definitions
+### Create a file for the type definitions
 
 Create a file which will contain the type definitions in the typings directory with name `library-name-defs.d.ts`.
 
 
-- ### Write the type definitions
+### Write the type definitions
 
 For writing custom definitions, existing type definitions in [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped) and [this guide](http://blog.wolksoftware.com/contributing-to-definitelytyped) can be used as a reference.
 
  
-- ### Testing the definitions
+### Testing the definitions
 
 The type checks run with the typescript tests. So you can run the following command to see if the definitions you wrote are correct:
 
