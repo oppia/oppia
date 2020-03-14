@@ -67,6 +67,8 @@ import { ComputeGraphService } from 'services/compute-graph.service';
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
 import { ContextService } from 'services/context.service';
+import { ContinueValidationService } from
+  'interactions/Continue/directives/continue-validation.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
@@ -75,9 +77,14 @@ import { DebugInfoTrackerService } from 'services/debug-info-tracker.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
+import { DragAndDropSortInputRulesService } from
+// eslint-disable-next-line max-len
+  'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
+import { EndExplorationValidationService } from
+  'interactions/EndExploration/directives/end-exploration-validation.service';
 import { EmailDashboardDataService } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
 import { EntityContextObjectFactory } from
@@ -290,17 +297,25 @@ export class UpgradedServices {
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
+    // eslint-disable-next-line max-len
+    upgradedServices['ContinueValidationService'] = new ContinueValidationService(
+      upgradedServices['baseInteractionValidationService']);
     upgradedServices['CountVectorizerService'] = new CountVectorizerService();
     upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
     upgradedServices['DebugInfoTrackerService'] =
       new DebugInfoTrackerService();
+    upgradedServices['DragAndDropSortInputRulesService'] =
+      new DragAndDropSortInputRulesService();
     upgradedServices['EditabilityService'] = new EditabilityService();
     upgradedServices['EmailDashboardDataService'] =
       new EmailDashboardDataService(
         new HttpClient(new HttpXhrBackend(
           new ɵangular_packages_common_http_http_d())));
+    upgradedServices['EndExplorationValidationService'] =
+      new EndExplorationValidationService(
+        upgradedServices['baseInteractionValidationService']);
     upgradedServices['EntityContextObjectFactory'] =
       new EntityContextObjectFactory();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
