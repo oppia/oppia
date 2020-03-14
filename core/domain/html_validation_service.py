@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import logging
+import re
 
 import bs4
 from core.domain import fs_domain
@@ -710,6 +711,32 @@ def add_caption_attr_to_image(html_string):
             image['caption-with-value'] = escape_html(json.dumps(''))
 
     return python_utils.UNICODE(soup)
+
+
+def validate_url_with_value_for_links(html_list):
+    """Validates url-with-value field in link component in a list of
+    html string.
+
+    Args:
+        html_list: list(str). List of html strings to be validated.
+
+    Returns:
+        list(str): List of all the html strings where the link component is
+            invalid.
+    """
+    err_list = []
+
+    for html_string in html_list:
+        soup = bs4.BeautifulSoup(
+            html_string.encode(encoding='utf-8'), 'html.parser')
+
+        for link in soup.findAll(name='oppia-noninteractive-link'):
+            if (not link.has_attr('url-with-value') or
+                    link['url-with-value'] == '' or
+                    link['url-with-value'] == '&quot;&quot;' or
+                    re.match(r'.*mailto:.*', link['url-with-value'])):
+                err_list.append(python_utils.UNICODE(link))
+    return err_list
 
 
 def validate_customization_args(html_list):

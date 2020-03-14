@@ -555,3 +555,36 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
+
+class LinkComponentValidationAuditJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Audit job to validate the Link RTE component."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        try:
+            exploration = exp_fetchers.get_exploration_from_model(item)
+        except Exception as e:
+            yield (
+                'Error %s when loading exploration'
+                % python_utils.convert_to_bytes(e), [item.id])
+            return
+
+        html_list = exploration.get_all_html_content_strings()
+
+        err_list = html_validation_service.validate_url_with_value_for_links(
+            html_list)
+
+        for html in err_list:
+            yield (item.id, html)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)

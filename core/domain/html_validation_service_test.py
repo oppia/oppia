@@ -327,6 +327,42 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 html_validation_service.convert_to_textangular(
                     test_case['html_content']))
 
+    def test_validate_url_with_value_for_links(self):
+        test_case = {
+            'html_content': [(
+                '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
+                'This is a tag with Italic&amp;quot;"'
+                ' url-with-value="&amp;quot;mailto:somelink&amp;quot;">'
+                '</oppia-noninteractive-link></i></p>'
+            ), (
+                '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
+                'This is a tag with Italic&amp;quot;"'
+                ' url-with-value="&amp;quot;&amp;quot;">'
+                '</oppia-noninteractive-link></i></p>'
+            ), (
+                '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
+                'This is a tag with Italic&amp;quot;"'
+                ' url-with-value="&amp;quot;https://www.abc.com&amp;quot;">'
+                '</oppia-noninteractive-link></i></p>'
+            )],
+            'expected_output': [(
+                '<oppia-noninteractive-link text-with-value="&amp;quot;'
+                'This is a tag with Italic&amp;quot;"'
+                ' url-with-value="&amp;quot;mailto:somelink&amp;quot;">'
+                '</oppia-noninteractive-link>'
+            ), (
+                '<oppia-noninteractive-link text-with-value="&amp;quot;'
+                'This is a tag with Italic&amp;quot;"'
+                ' url-with-value="&amp;quot;&amp;quot;">'
+                '</oppia-noninteractive-link>'
+            )]
+        }
+
+        self.assertEqual(
+            set(test_case['expected_output']),
+            set(html_validation_service.validate_url_with_value_for_links(
+                test_case['html_content'])))
+
     def test_validate_rte_format(self):
         test_cases_for_textangular = [
             (

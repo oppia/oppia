@@ -2360,3 +2360,138 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self, exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob)
+
+
+class LinkComponentValidationAuditJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(LinkComponentValidationAuditJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_link_component_validation_audit_job(self):
+        """Validates the link RTE component."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exploration.add_states(['State1', 'State2', 'State3'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+        content1_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-tabs tab_contents-with-value="'
+                '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
+                'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;'
+                'title&amp;quot;: &amp;quot;hello&amp;quot;}, {&amp;'
+                'quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
+                'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;'
+                'quot;title&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]">'
+                '</oppia-noninteractive-tabs>'
+                '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
+                'This is a tag with Italic&amp;quot;"'
+                ' url-with-value="&amp;quot;https://www.link.com&amp;quot;">'
+                '</oppia-noninteractive-link></i></p>'
+            )
+        }
+        default_outcome2 = state_domain.Outcome(
+            'State1',
+            state_domain.SubtitledHtml(
+                'default_outcome',
+                (
+                    '<p><oppia-noninteractive-link text-with-value="'
+                    '&amp;quot;What is a link?&amp;quot;" url-with-'
+                    'value="&amp;quot;https://mailto:link@link.com&amp'
+                    ';quot;"></oppia-noninteractive-link></p>'
+                )
+            ), False, [], None, None
+        )
+        content3_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+                'circle divided into equal fifths.&amp;quot;" '
+                'caption-with-value="&amp;quot;Hello&amp;quot;" '
+                'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
+                '</oppia-noninteractive-image>'
+                '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
+                'This is a tag with Italic&amp;quot;"'
+                ' url-with-value="&amp;quot;https://www.link.com&amp;quot;">'
+                '</oppia-noninteractive-link></i></p>'
+                '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
+                'This is a tag with Italic&amp;quot;"'
+                ' url-with-value="&amp;quot;&amp;quot;">'
+                '</oppia-noninteractive-link></i></p>'
+            )
+        }
+
+        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content1_dict))
+            state2.update_interaction_default_outcome(default_outcome2)
+            state3.update_content(
+                state_domain.SubtitledHtml.from_dict(content3_dict))
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+            # Start LinkComponentValidationAuditJob job on sample exploration.
+            job_id = (
+                exp_jobs_one_off.LinkComponentValidationAuditJob.create_new())
+            exp_jobs_one_off.LinkComponentValidationAuditJob.enqueue(
+                job_id)
+            self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .LinkComponentValidationAuditJob.get_output(job_id))
+
+        expected_output = [
+            u'[u\'exp_id0\', [u\'<oppia-noninteractive-link '
+            'text-with-value="&amp;quot;What is a link?&amp;quot;" '
+            'url-with-value="&amp;quot;https://mailto:link@link.com&amp;quot;"'
+            '></oppia-noninteractive-link>\', '
+            'u\'<oppia-noninteractive-link text-with-value="&amp;quot;'
+            'This is a tag with Italic&amp;quot;" url-with-value="&amp;quot;'
+            '&amp;quot;"></oppia-noninteractive-link>\']]']
+
+        self.assertEqual(actual_output, expected_output)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        content_dict = {
+            'html': (
+                '<p><oppia-noninteractive-link text-with-value="'
+                '&amp;quot;What is a link?&amp;quot;" url-with-'
+                'value="&amp;quot;https://mailto:link@link.com&amp'
+                ';quot;"></oppia-noninteractive-link></p>'
+            ),
+            'content_id': 'content'
+        }
+
+        state1 = exploration.states['State1']
+
+        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+            state1.update_content(
+                state_domain.SubtitledHtml.from_dict(content_dict))
+            exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.LinkComponentValidationAuditJob)
