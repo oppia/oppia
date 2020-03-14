@@ -448,9 +448,9 @@ def main(args=None):
     atexit.register(cleanup)
 
     dev_mode = not parsed_args.prod_env
-    update_community_dashboard_status_in_feconf_file(
-        FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
     if not parsed_args.skip_build:
+        update_community_dashboard_status_in_feconf_file(
+            FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
         build_js_files(dev_mode)
     start_webdriver_manager()
 
