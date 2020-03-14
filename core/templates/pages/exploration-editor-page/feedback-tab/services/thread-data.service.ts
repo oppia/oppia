@@ -35,6 +35,8 @@ import { SuggestionThread } from
 import { ThreadMessage } from
   'domain/feedback_message/ThreadMessageObjectFactory';
 
+type AnyThread = FeedbackThread | SuggestionThread;
+
 angular.module('oppia').factory('ThreadDataService', [
   '$http', '$q', 'AlertsService', 'ContextService',
   'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory',
@@ -46,7 +48,7 @@ angular.module('oppia').factory('ThreadDataService', [
       SuggestionsService, ThreadMessageObjectFactory, UrlInterpolationService,
       ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED, STATUS_OPEN) {
     // Container for all of the threads related to this exploration.
-    let threadsById = new Map<string, FeedbackThread | SuggestionThread>();
+    let threadsById = new Map<string, AnyThread>();
 
     // Cached number of open threads requiring action.
     let openThreadsCount: number = 0;
@@ -116,7 +118,7 @@ angular.module('oppia').factory('ThreadDataService', [
     };
 
     return {
-      getThread: function(threadId: string): FeedbackThread | SuggestionThread {
+      getThread: function(threadId: string): AnyThread {
         return threadsById.get(threadId) || null;
       },
 
@@ -157,8 +159,7 @@ angular.module('oppia').factory('ThreadDataService', [
         () => $q.reject('Error on retrieving feedback threads.'));
       },
 
-      getMessagesAsync: function(
-          thread: FeedbackThread | SuggestionThread): Promise<ThreadMessage[]> {
+      getMessagesAsync: function(thread: AnyThread): Promise<ThreadMessage[]> {
         if (!thread) {
           throw Error('Trying to update a non-existent thread');
         }
@@ -202,8 +203,7 @@ angular.module('oppia').factory('ThreadDataService', [
         });
       },
 
-      markThreadAsSeenAsync: function(
-          thread: FeedbackThread | SuggestionThread): Promise<void> {
+      markThreadAsSeenAsync: function(thread: AnyThread): Promise<void> {
         if (!thread) {
           throw Error('Trying to update a non-existent thread');
         }
@@ -216,7 +216,7 @@ angular.module('oppia').factory('ThreadDataService', [
       },
 
       addNewMessageAsync: function(
-          thread: FeedbackThread | SuggestionThread, newMessage: string,
+          thread: AnyThread, newMessage: string,
           newStatus: string): Promise<ThreadMessage[]> {
         if (!thread) {
           throw Error('Trying to update a non-existent thread');
@@ -240,9 +240,8 @@ angular.module('oppia').factory('ThreadDataService', [
       },
 
       resolveSuggestionAsync: function(
-          thread: FeedbackThread | SuggestionThread, action: string,
-          commitMsg: string, reviewMsg: string,
-          audioUpdateRequired: boolean): Promise<ThreadMessage[]> {
+          thread: AnyThread, action: string, commitMsg: string,
+          reviewMsg: string): Promise<ThreadMessage[]> {
         if (!thread) {
           throw Error('Trying to update a non-existent thread');
         }
