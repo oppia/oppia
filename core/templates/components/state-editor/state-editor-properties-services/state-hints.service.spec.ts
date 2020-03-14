@@ -38,11 +38,11 @@ describe('State hints service', () => {
   });
 
 
-  it('constructor should have been called', () =>{
+  it('tests that the constructor should have been called', () =>{
     expect(shs.setterMethodKey).toBe('saveHints');
   });
 
-  it('setActiveHintIndex should be called after init', () =>{
+  it('tests that the setActiveHintIndex should be called after init', () =>{
     spyOn(shs, 'setActiveHintIndex');
     var StateName = 'Introduction';
     var value = {0: {
@@ -54,7 +54,7 @@ describe('State hints service', () => {
     expect(shs.setActiveHintIndex).toHaveBeenCalled();
   });
 
-  it('tested set and get ActiveHintIndex function', () =>{
+  it('tests set and get ActiveHintIndex function', () =>{
     shs.setActiveHintIndex(1);
     expect(shs.getActiveHintIndex()).toBe(1);
     shs.setActiveHintIndex(2);
