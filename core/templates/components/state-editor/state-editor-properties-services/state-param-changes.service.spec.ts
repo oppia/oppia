@@ -34,7 +34,7 @@ describe('State Param Changes service', () => {
   });
 
 
-  it('constructor should have been called', () =>{
+  it('tests that the constructor should have been called', () =>{
     expect(spcs.setterMethodKey).toBe('saveStateParamChanges');
   });
 });
