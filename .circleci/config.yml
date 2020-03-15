@@ -141,6 +141,7 @@ jobs:
           root: /home/circleci/
           paths:
             - oppia/app.yaml
+            - oppia/assets/constants.ts
             - oppia/assets/hashes.json
             - oppia/backend_prod_files/
             - oppia/build/
