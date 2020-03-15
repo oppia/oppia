@@ -53,7 +53,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
   }));
 
   describe('.createNew', function() {
-    it('retrieves data from passed thread', function() {
+    it('should retrieve data from passed thread', function() {
       var mockThread = {threadId: 1};
       var task = FeedbackImprovementTaskObjectFactory.createNew(mockThread);
 
@@ -64,7 +64,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
   });
 
   describe('.fetchTasks', function() {
-    it('fetches threads from the backend', function(done) {
+    it('should fetch threads from the backend', function(done) {
       spyOn(ThreadDataService, 'getThreadsAsync').and.returnValue($q.resolve({
         feedbackThreads: [{ threadId: 'abc1' }, { threadId: 'def2' }]
       }));
@@ -101,45 +101,45 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
     });
 
     describe('.getStatus', function() {
-      it('returns the same status as the thread', function() {
+      it('should return the same status as the thread', function() {
         this.mockThread.status = 'a unique status';
         expect(this.task.getStatus()).toEqual('a unique status');
       });
     });
 
     describe('.getTitle', function() {
-      it('returns the subject of the thread', function() {
+      it('should return the subject of the thread', function() {
         this.mockThread.subject = 'Feedback from a learner';
         expect(this.task.getTitle()).toEqual('Feedback from a learner');
       });
     });
 
     describe('.getDirectiveType', function() {
-      it('returns feedback as directive type', function() {
+      it('should return feedback as directive type', function() {
         expect(this.task.getDirectiveType())
           .toEqual(FEEDBACK_IMPROVEMENT_TASK_TYPE);
       });
     });
 
     describe('.getDirectiveData', function() {
-      it('returns the thread', function() {
+      it('should return the thread', function() {
         expect(this.task.getDirectiveData()).toBe(this.mockThread);
       });
     });
 
     describe('.getLastUpdatedTime', function() {
-      it('is a number', function() {
+      it('should return a number', function() {
         expect(this.task.getLastUpdatedTime()).toEqual(jasmine.any(Number));
       });
 
-      it('returns the time when the thread was last updated', function() {
+      it('should return the time when the thread was last updated', function() {
         expect(this.task.getLastUpdatedTime())
           .toEqual(this.mockThread.lastUpdatedMsecs);
       });
     });
 
     describe('.getActionButtons', function() {
-      it('contains one button', function() {
+      it('should return one button', function() {
         expect(this.task.getActionButtons().length).toEqual(1);
       });
 
@@ -148,7 +148,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
           this.button = this.task.getActionButtons()[0];
         });
 
-        it('opens a thread modal', function() {
+        it('should open a thread modal', function() {
           var spy = spyOn(ImprovementModalService, 'openFeedbackThread');
 
           this.button.execute();

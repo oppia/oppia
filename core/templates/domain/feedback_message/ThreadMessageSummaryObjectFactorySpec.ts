@@ -37,13 +37,13 @@ describe('Thread message summary object factory', () => {
   });
 
   describe('.hasText', () => {
-    it('is true when text is nonempty string', () => {
+    it('should be true when text is nonempty string', () => {
       let threadMessageSummary = this.factory.createNew('author', 'nonempty!');
 
       expect(threadMessageSummary.hasText()).toBe(true);
     });
 
-    it('is false when text is empty string', () => {
+    it('should be false when text is empty string', () => {
       let threadMessageSummary = this.factory.createNew('author', '');
 
       expect(threadMessageSummary.hasText()).toBe(false);

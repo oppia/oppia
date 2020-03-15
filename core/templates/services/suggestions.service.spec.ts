@@ -26,7 +26,7 @@ describe('SuggestionsService', () => {
   });
 
   describe('getThreadIdFromSuggestionBackendDict', () => {
-    it('returns the suggestion id of the backend dict', () => {
+    it('should return the suggestion id of the backend dict', () => {
       expect(this.service.getThreadIdFromSuggestionBackendDict({
         suggestion_id: 'exploration.exp1.abc1'
       })).toEqual('exploration.exp1.abc1');

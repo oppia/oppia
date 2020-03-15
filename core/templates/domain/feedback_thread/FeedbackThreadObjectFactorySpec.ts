@@ -65,7 +65,7 @@ describe('FeedbackThreadObjectFactory', () => {
 
   describe('FeedbackThread', () => {
     describe('.setMessages', () => {
-      it('updates message-related fields', () => {
+      it('should update message-related fields', () => {
         let feedbackThread =
           this.feedbackThreadObjectFactory.createFromBackendDict({
             last_updated_msecs: 1000,

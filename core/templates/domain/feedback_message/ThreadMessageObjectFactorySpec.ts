@@ -53,7 +53,7 @@ describe('ThreadMessageObjectFactory', () => {
   });
 
   describe('.hasSubjectUpdate', () => {
-    it('is true when updatedSubject is non-null', () => {
+    it('should be true when updatedSubject is non-null', () => {
       let threadMessage = this.factory.createFromBackendDict({
         updated_subject: 'a new descriptive subject!',
         author_username: 'author',
@@ -68,7 +68,7 @@ describe('ThreadMessageObjectFactory', () => {
       expect(threadMessage.hasSubjectUpdate()).toBe(true);
     });
 
-    it('is false when updatedSubject is null', () => {
+    it('should be false when updatedSubject is null', () => {
       let threadMessage = this.factory.createFromBackendDict({
         updated_subject: null,
         author_username: 'author',
@@ -85,7 +85,7 @@ describe('ThreadMessageObjectFactory', () => {
   });
 
   describe('.hasStatusUpdate', () => {
-    it('is true when updatedStatus is non-null', () => {
+    it('should be true when updatedStatus is non-null', () => {
       let threadMessage = this.factory.createFromBackendDict({
         updated_status: 'open',
         author_username: 'author',
@@ -100,7 +100,7 @@ describe('ThreadMessageObjectFactory', () => {
       expect(threadMessage.hasStatusUpdate()).toBe(true);
     });
 
-    it('is false when updatedStatus is null', () => {
+    it('should be false when updatedStatus is null', () => {
       let threadMessage = this.factory.createFromBackendDict({
         updated_status: null,
         author_username: 'author',
@@ -117,7 +117,7 @@ describe('ThreadMessageObjectFactory', () => {
   });
 
   describe('.hasText', () => {
-    it('is true when text is nonempty string', () => {
+    it('should be true when text is nonempty string', () => {
       let threadMessage = this.factory.createFromBackendDict({
         text: 'nonempty!',
         author_username: 'author',
@@ -132,7 +132,7 @@ describe('ThreadMessageObjectFactory', () => {
       expect(threadMessage.hasText()).toBe(true);
     });
 
-    it('is false when text is empty string', () => {
+    it('should be false when text is empty string', () => {
       let threadMessage = this.factory.createFromBackendDict({
         text: '',
         author_username: 'author',
