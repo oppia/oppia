@@ -186,7 +186,7 @@ export = {
     "description": "فارسی (Persian)"
   }, {
     "code": "pl",
-    "description": "polski (Polish)"
+    "description": "polszczyzna (Polish)"
   }, {
     "code": "pt",
     "description": "português (Portuguese)"
