@@ -30,7 +30,7 @@ import utils
 # are being run by CircleCI.
 TEST_SUITES_NOT_RUN_ON_TRAVIS = [
     'full', 'adminPage', 'accessibility', 'classroomPageFileUploadFeatures',
-    'embedding', 'extensions', 'fileUploadFeatures', 'library', 'navigation',
+    'embedding', 'fileUploadFeatures', 'library', 'navigation',
     'topicAndStoryEditorFileUploadFeatures']
 
 TRAVIS_CI_FILE_PATH = os.path.join(os.getcwd(), '.travis.yml')

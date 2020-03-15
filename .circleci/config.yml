@@ -27,9 +27,6 @@ workflows:
       - e2e_embedding:
           requires:
             - e2e_navigation
-      - e2e_extensions:
-          requires:
-            - e2e_navigation
       - e2e_file_upload_features:
           requires:
             - typescript_tests
@@ -160,20 +157,9 @@ jobs:
       - attach_workspace:
           at: /home/circleci/
       - run:
-          name: Run e2e extensions test
+          name: Run e2e embedding test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env
-
-  e2e_extensions:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run e2e extensions test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="extensions" --prod_env
 
   e2e_file_upload_features:
     <<: *job_defaults
@@ -210,7 +196,7 @@ jobs:
       - attach_workspace:
           at: /home/circleci/
       - run:
-          name: Run e2e file upload features test
+          name: Run e2e navigation test
           command: |
             python -m scripts.run_e2e_tests --prod_env --skip-install --suite="navigation"
       - persist_to_workspace:
