@@ -138,7 +138,7 @@ export = {
     "description": "Filipino (Filipino)"
   }, {
     "code": "fi",
-    "description": "Suomi (Finnish)"
+    "description": "suomi (Finnish)"
   }, {
     "code": "fr",
     "description": "français (French)"
@@ -156,7 +156,7 @@ export = {
     "description": "हिन्दी (Hindi)"
   }, {
     "code": "hu",
-    "description": "Magyar (Hungarian)"
+    "description": "magyar (Hungarian)"
   }, {
     "code": "id",
     "description": "Bahasa Indonesia (Indonesian)"
@@ -186,7 +186,7 @@ export = {
     "description": "فارسی (Persian)"
   }, {
     "code": "pl",
-    "description": "Polski (Polish)"
+    "description": "polski (Polish)"
   }, {
     "code": "pt",
     "description": "português (Portuguese)"
