@@ -184,7 +184,6 @@ angular.module('oppia').directive('stateInteractionEditor', [
             $scope.recomputeGraph();
             _updateInteractionPreviewAndAnswerChoices();
           };
-
           var updateMultiChoiceInputAnswerGroupsOnDelete =
             function(deletedIndexes) {
               var answerGroups = ResponsesService.getAnswerGroups();

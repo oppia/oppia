@@ -69,12 +69,6 @@ angular.module('oppia').factory('ResponsesService', [
     var _defaultOutcome = null;
     var _confirmedUnclassifiedAnswers = null;
     var _answerChoices = null;
-
-    // A boolean flag to check whether we need to update and save the
-    // answer groups when the answer choices are modified in the case of
-    // MultipleChoiceInput interaction.
-    var _multiChoiceInputAnswerGroupRequiresUpdation = false;
-
     var _verifySolution = function() {
       // This checks if the solution is valid once a rule has been changed or
       // added.
@@ -127,15 +121,11 @@ angular.module('oppia').factory('ResponsesService', [
 
     var _reduceRuleIndexByOne = function(answerGroupIndex, ruleIndex) {
       _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x--;
-      _saveAnswerGroups(_answerGroups);
-      _multiChoiceInputAnswerGroupRequiresUpdation = true;
     };
 
     var _makeRuleInvalid = function(answerGroupIndex, ruleIndex) {
-      _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x =
-      Number.MAX_SAFE_INTEGER;
-      _saveAnswerGroups(_answerGroups);
-      _multiChoiceInputAnswerGroupRequiresUpdation = true;
+      _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x = (
+        Number.MAX_SAFE_INTEGER);
     };
 
     var _updateAnswerGroup = function(index, updates, callback) {
@@ -331,10 +321,18 @@ angular.module('oppia').factory('ResponsesService', [
         // If the interaction is MultipleChoiceInput, update the answer groups
         // to refer to the new answer options.
         if (StateInteractionIdService.savedMemento === 'MultipleChoiceInput') {
-          if (_answerGroupsMemento &&
-             _multiChoiceInputAnswerGroupRequiresUpdation) {
-            callback(_answerGroupsMemento);
-          }
+          // Save and update the answer groups for MultipleChoiceInput which
+          // are modified by the functions reduceRuleIndexByOne() and
+          // makeRuleInvalid() when the answer choices are added or deleted.
+          // The functions reduceRuleIndexByOne() and makeRuleInvalid() are
+          // invoked from state interaction editor during saving of the updated
+          // answer choices.
+          _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
+            var newRules = angular.copy(answerGroup.rules);
+            _updateAnswerGroup(answerGroupIndex, {
+              rules: newRules
+            }, callback);
+          });
         }
 
         // If the interaction is ItemSelectionInput, update the answer groups
