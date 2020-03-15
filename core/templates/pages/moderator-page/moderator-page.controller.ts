@@ -47,11 +47,13 @@ angular.module('oppia').directive('moderatorPage', [
           };
 
           ctrl.getActivityCreateUrl = function(reference) {
-            return (
-              (reference.type === (
-                'exploration' ? '/create' : '/create_collection')) +
-              '/' + reference.id);
+            var path = (
+              reference.type === 'exploration' ?
+              '/create' :
+              '/create_collection');
+            return path + '/' + reference.id;
           };
+
           ctrl.isSaveFeaturedActivitiesButtonDisabled = function() {
             return angular.equals(
               ctrl.displayedFeaturedActivityReferences,
@@ -71,6 +73,7 @@ angular.module('oppia').directive('moderatorPage', [
               AlertsService.addSuccessMessage('Featured activities saved.');
             });
           };
+
           ctrl.$onInit = function() {
             $rootScope.loadingMessage = 'Loading';
             ctrl.allCommits = [];
