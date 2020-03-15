@@ -21,9 +21,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service.ts';
+  'domain/utilities/url-interpolation.service';
 import { StoryDomainConstants } from
-  'domain/story/story-domain.constants.ts';
+  'domain/story/story-domain.constants';
 
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -37,10 +37,10 @@ export class EditableStoryBackendApiService {
 
   private storyDataDict = null;
   private _fetchStory(
-      storyName: string, successCallback: any, errorCallback: any): any {
+      storyId: string, successCallback: any, errorCallback: any): any {
     var editableStoryDataUrl = this.urlInterpolation.interpolateUrl(
       StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
-        story_name: storyName
+        story_id: storyId
       });
 
     this.http.get(
@@ -52,7 +52,7 @@ export class EditableStoryBackendApiService {
         }
       }, (errorResponse: any) => {
         if (errorCallback) {
-          errorCallback(errorResponse.body);
+          errorCallback(errorResponse.error);
         }
       });
   }
@@ -71,18 +71,18 @@ export class EditableStoryBackendApiService {
         change_dicts: changeList
       };
 
-      this.http.post(
+      this.http.put(
         editableStoryDataUrl, putData).toPromise().then(
         (response: any) => {
         // The returned data is an updated story dict.
-          var story = angular.copy(response.body.story);
+          var story = cloneDeep(response.story);
 
           if (successCallback) {
             successCallback(story);
           }
         }, function(errorResponse: any) {
           if (errorCallback) {
-            errorCallback(errorResponse.body);
+            errorCallback(errorResponse.error);
           }
         });
     };
@@ -98,7 +98,7 @@ export class EditableStoryBackendApiService {
       var putData = {
         new_story_status_is_public: newStoryStatusIsPublic
       };
-      this.http.post(
+      this.http.put(
         storyPublishUrl, putData).toPromise().then(
         (response: any) => {
           if (successCallback) {
@@ -106,7 +106,7 @@ export class EditableStoryBackendApiService {
           }
         }, function(errorResponse: any) {
           if (errorCallback) {
-            errorCallback(errorResponse.body);
+            errorCallback(errorResponse.error);
           }
         });
     };
@@ -125,7 +125,7 @@ export class EditableStoryBackendApiService {
           }
         }, function(errorResponse: any) {
           if (errorCallback) {
-            errorCallback(errorResponse.body);
+            errorCallback(errorResponse.error);
           }
         });
     };
@@ -169,7 +169,3 @@ export class EditableStoryBackendApiService {
       });
     }
 }
-
-angular.module('oppia').factory(
-  'EditableStoryBackendApiService', downgradeInjectable(
-    EditableStoryBackendApiService));

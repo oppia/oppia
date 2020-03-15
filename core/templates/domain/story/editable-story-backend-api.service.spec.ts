@@ -17,8 +17,8 @@
  */
 
 import { EditableStoryBackendApiService } from
-  'domain/story/editable-story-backend-api.service.ts';
-import { CsrfTokenService } from 'services/csrf-token.service.ts';
+  'domain/story/editable-story-backend-api.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
@@ -29,22 +29,21 @@ describe('Editable story backend API service', () => {
     EditableStoryBackendApiService = null;
   let sampleDataResults = null;
   let httpTestingController: HttpTestingController;
-  let CsrfService = null;
+  let csrfService: CsrfTokenService = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [EditableStoryBackendApiService]
     });
     httpTestingController = TestBed.get(HttpTestingController);
     editableStoryBackendApiService = TestBed.get(
       EditableStoryBackendApiService);
 
-    CsrfService = CsrfTokenService;
+    csrfService = TestBed.get(CsrfTokenService);
 
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(() => {
-      return new Promise(function(resolve) {
-        resolve('sample-csrf-token');
-      });
+    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+      return Promise.resolve('sample-csrf-token')
     });
 
     // Sample story object returnable from the backend
@@ -136,7 +135,10 @@ describe('Editable story backend API service', () => {
       var req = httpTestingController.expectOne(
         '/story_editor_handler/data/2');
       expect(req.request.method).toEqual('GET');
-      req.flush({status: 500, statusText:'Error loading story 2.'});
+      req.flush('Error loading story 2.', {
+        status: 500,
+        statusText: 'Error loading story 2.'
+      });
 
       flushMicrotasks();
 
@@ -196,8 +198,10 @@ describe('Editable story backend API service', () => {
       var req = httpTestingController.expectOne(
         '/story_editor_handler/data/storyId_1');
       expect(req.request.method).toEqual('PUT');
-      req.flush({status: 404,
-        statusText: 'Story with given id doesn\'t exist.'});
+      req.flush('Story with given id doesn\'t exist.', {
+        status: 404,
+        statusText: 'Story with given id doesn\'t exist.'
+      });
 
       flushMicrotasks();
 
@@ -218,6 +222,7 @@ describe('Editable story backend API service', () => {
     var req = httpTestingController.expectOne(
       '/story_publish_handler/storyId');
     expect(req.request.method).toEqual('PUT');
+    req.flush(200);
 
     flushMicrotasks();
 
@@ -236,8 +241,10 @@ describe('Editable story backend API service', () => {
       var req = httpTestingController.expectOne(
         '/story_publish_handler/storyId_1');
       expect(req.request.method).toEqual('PUT');
-      req.flush({status: 404,
-        statusText: 'Story with given id doesn\'t exist.'});
+      req.flush('Story with given id doesn\'t exist.', {
+        status: 404,
+        statusText: 'Story with given id doesn\'t exist.'
+      });
 
       flushMicrotasks();
 
