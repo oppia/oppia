@@ -141,9 +141,10 @@ jobs:
           root: /home/circleci/
           paths:
             - oppia/app.yaml
-            - oppia/third_party/generated/
             - oppia/assets/hashes.json
+            - oppia/backend_prod_files/
             - oppia/build/
+            - oppia/third_party/generated/
 
   e2e_topic_and_story_editor:
     <<: *job_defaults
