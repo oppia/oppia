@@ -11,6 +11,9 @@
 # - The dev workflow team will review the code quality to see if the e2e tests
 #   can be optimized further.
 
+# Android team
+/core/domain/android_validation_constants.py @BenHenning
+
 # Angular Migration team
 /core/templates/services/contextual/logger.service.ts @bansalnitish
 /core/templates/services/contextual/logger.service.spec.ts @bansalnitish

@@ -22,8 +22,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import copy
 import logging
+import re
 
 from constants import constants
+from core.domain import android_validation_constants
 from core.domain import customization_args_util
 from core.domain import html_cleaner
 from core.domain import interaction_registry
@@ -376,6 +378,50 @@ class InteractionInstance(python_utils.OBJECT):
         """
         return self.id and interaction_registry.Registry.get_interaction_by_id(
             self.id).is_terminal
+
+    def is_supported_on_android_app(self):
+        """Determines whether the interaction is a valid interaction that is
+        supported by the Android app.
+
+        Returns:
+            bool. Whether the interaction is supported by the Android app.
+        """
+        if self.id:
+            return (
+                self.id in
+                android_validation_constants.VALID_INTERACTION_IDS)
+
+        return True
+
+    def is_rte_content_supported_on_android(self, regex):
+        """Determines whether the RTE content in interaction answer groups,
+        hints and solution is supported by Android app.
+
+        Args:
+            regex: SRE_Pattern. The invalid regex pattern.
+
+        Returns:
+            bool. Whether the RTE content is valid.
+        """
+        for answer_group in self.answer_groups:
+            if regex.search(answer_group.outcome.feedback.html):
+                return False
+
+        if (
+                self.default_outcome and self.default_outcome.feedback and
+                regex.search(self.default_outcome.feedback.html)):
+            return False
+
+        for hint in self.hints:
+            if regex.search(hint.hint_content.html):
+                return False
+
+        if (
+                self.solution and self.solution.explanation and
+                regex.search(self.solution.explanation.html)):
+            return False
+
+        return True
 
     def get_all_outcomes(self):
         """Returns a list of all outcomes of this interaction, taking into
@@ -1494,6 +1540,23 @@ class State(python_utils.OBJECT):
             raise ValueError('Content ID %s does not exist' % content_id)
 
         return content_id_to_html[content_id]
+
+    def is_rte_content_supported_on_android(self):
+        """Checks whether the RTE components used in the state are supported by
+        Android.
+
+        Returns:
+            bool. Whether the RTE components in the state is valid.
+        """
+        regex_string = r'oppia-noninteractive-'
+        regex_string += (
+            '|'.join(android_validation_constants.INVALID_RTE_COMPONENTS))
+        regex_string = regex_string[:-1]
+        regex = re.compile(regex_string)
+        if self.content and regex.search(self.content.html):
+            return False
+
+        return self.interaction.is_rte_content_supported_on_android(regex)
 
     def get_training_data(self):
         """Retrieves training data from the State domain object."""

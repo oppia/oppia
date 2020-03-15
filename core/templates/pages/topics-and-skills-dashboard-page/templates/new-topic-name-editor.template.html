@@ -8,9 +8,9 @@
     <div class="form-group row" ng-class="{'has-error': !isTopicNameValid()}">
       <label class="col-sm-6 col-form-label">Enter a name for the topic: &nbsp;</label>
       <div class="col-sm-6">
-        <input class="form-control protractor-test-new-topic-name-field" ng-model="topicName" maxlength="20" autofocus>
-        <p style="color: red;" ng-if="topicName.length === 20">
-          Topic name should be less than 20 characters. Please add a short topic name.
+        <input class="form-control protractor-test-new-topic-name-field" ng-model="topicName" maxlength="35" autofocus>
+        <p style="color: red;" ng-if="topicName.length === 35">
+          Topic name should be less than 35 characters. Please add a short topic name.
         </p>
       </div>
     </div>

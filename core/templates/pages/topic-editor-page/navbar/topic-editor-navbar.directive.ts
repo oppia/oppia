@@ -20,6 +20,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 
+require('domain/classroom/classroom-domain.constants.ajs.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-rights-backend-api.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
@@ -38,13 +39,13 @@ angular.module('oppia').directive('topicEditorNavbar', [
         'UndoRedoService', 'TopicEditorStateService', 'UrlService',
         'TopicRightsBackendApiService', 'TopicEditorRoutingService',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
-        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
+        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED', 'TOPIC_VIEWER_URL_TEMPLATE',
         function(
             $scope, $rootScope, $uibModal, $window, AlertsService,
             UndoRedoService, TopicEditorStateService, UrlService,
             TopicRightsBackendApiService, TopicEditorRoutingService,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
-            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, TOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
           $scope.isSaveInProgress = function() {
             return TopicEditorStateService.isSavingTopic();
@@ -60,6 +61,20 @@ angular.module('oppia').directive('topicEditorNavbar', [
           };
           $scope.selectQuestionsTab = function() {
             TopicEditorRoutingService.navigateToQuestionsTab();
+          };
+          $scope.openTopicViewer = function() {
+            if ($scope.getChangeListLength() > 0) {
+              AlertsService.addInfoMessage(
+                'Please save all pending changes to preview the topic ' +
+                'with the changes', 2000);
+              return;
+            }
+            $window.open(
+              UrlInterpolationService.interpolateUrl(
+                TOPIC_VIEWER_URL_TEMPLATE, {
+                  topic_name: $scope.topic.getName()
+                }
+              ), 'blank');
           };
 
           var _validateTopic = function() {
