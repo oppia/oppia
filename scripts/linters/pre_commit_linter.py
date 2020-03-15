@@ -444,7 +444,7 @@ def main(args=None):
     read_files(all_filepaths)
     categorize_files(all_filepaths)
 
-    third_party_max_concurrent_runs = 1
+    third_party_max_concurrent_runs = 2
 
     # Prepare tasks.
     concurrent_count = min(
@@ -479,7 +479,7 @@ def main(args=None):
 
     # Concurrency limit: 25.
     concurrent_task_utils.execute_tasks(tasks_custom)
-    # Concurrency limit: 1.
+    # Concurrency limit: 2.
     concurrent_task_utils.execute_tasks(tasks_third_party, semaphore=semaphore)
 
     all_messages = []
