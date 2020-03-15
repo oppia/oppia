@@ -38,9 +38,9 @@ angular.module('oppia').directive('baseContent', [
       template: require('./base-content.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$rootScope', '$window', 'BackgroundMaskService',
-        'SidebarStatusService', 'UrlService', 'SITE_FEEDBACK_FORM_URL',
+        'SidebarStatusService', 'UrlService',
         function($rootScope, $window, BackgroundMaskService,
-            SidebarStatusService, UrlService, SITE_FEEDBACK_FORM_URL) {
+            SidebarStatusService, UrlService) {
           // Mimic redirection behaviour in the backend (see issue #7867 for
           // details).
           if ($window.location.hostname === 'oppiaserver.appspot.com') {
@@ -69,7 +69,6 @@ angular.module('oppia').directive('baseContent', [
           };
           ctrl.$onInit = function() {
             ctrl.iframed = UrlService.isIframed();
-            ctrl.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
             ctrl.DEV_MODE = $rootScope.DEV_MODE;
           };
         }
