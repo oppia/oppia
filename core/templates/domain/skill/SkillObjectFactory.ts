@@ -156,17 +156,12 @@ export class Skill {
   }
 
   findMisconceptionById(id: string) {
-    var resMis;
-    this._misconceptions.forEach((mis: Misconception) => {
-      if (mis.getId() === id) {
-        resMis = mis;
+    for (var idx in this._misconceptions) {
+      if (this._misconceptions[idx].getId() === id) {
+        return this._misconceptions[idx];
       }
-    });
-    if (resMis) {
-      return resMis;
-    } else {
-      throw new Error('Cannot find Misconception by Id : ' + id);
     }
+    throw new Error('Could not find misconception with ID: ' + id);
   }
 
   deleteMisconception(id: string) {
