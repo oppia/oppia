@@ -33,12 +33,10 @@ export interface ISkillBackendDict {
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ConceptCardObjectFactory, ConceptCard,
-  IConceptCardBackendDict } from
+import { ConceptCardObjectFactory, ConceptCard, IConceptCardBackendDict } from
   'domain/skill/ConceptCardObjectFactory';
-import { MisconceptionObjectFactory, Misconception,
-  IMisconceptionBackendDict } from
-  'domain/skill/MisconceptionObjectFactory';
+import { MisconceptionObjectFactory, Misconception, IMisconceptionBackendDict }
+  from 'domain/skill/MisconceptionObjectFactory';
 import { RubricObjectFactory, Rubric, IRubricBackendDict } from
   'domain/skill/RubricObjectFactory';
 import { ValidatorsService } from 'services/validators.service.ts';
@@ -56,12 +54,12 @@ export class Skill {
   _supersedingSkillId: string | null;
   _allQuestionsMerged: boolean;
   _prerequisiteSkillIds: string[];
-  SKILL_DIFFICULTIES : string[] = constants.SKILL_DIFFICULTIES;
+  SKILL_DIFFICULTIES: string[] = constants.SKILL_DIFFICULTIES;
 
   constructor(id: string, description: string, misconceptions: Misconception[],
-      rubrics: Rubric[], conceptCard: ConceptCard, languageCode: string,
-      version: number, nextMisconceptionId: number, supersedingSkillId: string,
-      allQuestionsMerged: boolean, prerequisiteSkillIds: string[]) {
+    rubrics: Rubric[], conceptCard: ConceptCard, languageCode: string,
+    version: number, nextMisconceptionId: number, supersedingSkillId: string,
+    allQuestionsMerged: boolean, prerequisiteSkillIds: string[]) {
     this._id = id;
     this._allQuestionsMerged = allQuestionsMerged;
     this._conceptCard = conceptCard;
@@ -197,18 +195,17 @@ export class Skill {
   }
 
   updateRubricForDifficulty(difficulty: string, explanation: string) {
-    if (this.SKILL_DIFFICULTIES.includes(difficulty)) {
-      for (var idx in this._rubrics) {
-        if (this._rubrics[idx].getDifficulty() === difficulty) {
-          this._rubrics[idx].setExplanation(explanation);
-          return;
-        }
-      }
-      const rubricObjectFactory = new RubricObjectFactory();
-      this._rubrics.push(rubricObjectFactory.create(difficulty, explanation));
-    } else {
+    if (this.SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
       throw new Error('Invalid difficulty value passed');
     }
+    for (var idx in this._rubrics) {
+      if (this._rubrics[idx].getDifficulty() === difficulty) {
+        this._rubrics[idx].setExplanation(explanation);
+        return;
+      }
+    }
+    const rubricObjectFactory = new RubricObjectFactory();
+    this._rubrics.push(rubricObjectFactory.create(difficulty, explanation));
   }
 
   toBackendDict(): ISkillBackendDict {
@@ -286,7 +283,7 @@ export class SkillObjectFactory {
   }
 
   generateMisconceptionsFromBackendDict(
-      misconceptionsBackendDicts : IMisconceptionBackendDict[]) {
+    misconceptionsBackendDicts: IMisconceptionBackendDict[]) {
     return misconceptionsBackendDicts.map(misconceptionsBackendDict => {
       return this.misconceptionObjectFactory.createFromBackendDict(
         misconceptionsBackendDict);
@@ -294,7 +291,7 @@ export class SkillObjectFactory {
   }
 
   generateRubricsFromBackendDict(
-      rubricBackendDicts : IRubricBackendDict[]) {
+    rubricBackendDicts: IRubricBackendDict[]) {
     return rubricBackendDicts.map((rubricBackendDict) => {
       return this.rubricObjectFactory.createFromBackendDict(rubricBackendDict);
     });
