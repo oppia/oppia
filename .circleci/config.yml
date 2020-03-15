@@ -15,21 +15,18 @@ workflows:
       - backend_tests:
           requires:
             - setup
-      - e2e_build_non_prod_env:
-          requires:
-            - typescript_tests
       - e2e_classroom_page:
           requires:
-            - e2e_build_non_prod_env
+            - e2e_file_upload_features
       - e2e_file_upload_features:
           requires:
-            - e2e_build_non_prod_env
+            - typescript_tests
       - e2e_navigation:
           requires:
             - typescript_tests
       - e2e_topic_and_story_editor:
           requires:
-            - e2e_build_non_prod_env
+            - e2e_file_upload_features
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
@@ -108,22 +105,6 @@ jobs:
           command: |
             python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
 
-  e2e_build_non_prod_env:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Build files for non prod tests
-          command: python -m scripts.build
-      - persist_to_workspace:
-          root: /home/circleci/
-          paths:
-            - oppia/assets/hashes.json
-            - oppia/third_party/generated/
-            - oppia/webpack_bundles/
-
   e2e_classroom_page:
     <<: *job_defaults
     steps:
@@ -144,7 +125,13 @@ jobs:
       - run:
           name: Run e2e file upload features test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --skip-build --suite="fileUploadFeatures"
+            python -m scripts.run_e2e_tests --skip-install --suite="fileUploadFeatures"
+      - persist_to_workspace:
+          root: /home/circleci/
+          paths:
+            - oppia/assets/hashes.json
+            - oppia/third_party/generated/
+            - oppia/webpack_bundles
 
   e2e_navigation:
     <<: *job_defaults
