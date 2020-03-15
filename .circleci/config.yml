@@ -15,6 +15,9 @@ workflows:
       - backend_tests:
           requires:
             - setup
+      - e2e_accessibility:
+          requires:
+            - e2e_navigation
       - e2e_classroom_page:
           requires:
             - e2e_file_upload_features
@@ -104,6 +107,17 @@ jobs:
           name: Run backend tests
           command: |
             python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
+
+  e2e_accessibility:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run e2e accessibility test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
 
   e2e_classroom_page:
     <<: *job_defaults
