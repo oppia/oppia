@@ -20,6 +20,7 @@ require(
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-update.service.ts');
+require('domain/exploration/exploration-id-validation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/alerts.service.ts');
 
@@ -42,12 +43,14 @@ angular.module('oppia').directive('storyNodeEditor', [
         '/pages/story-editor-page/editor-tab/story-node-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StoryEditorStateService',
-        'StoryUpdateService', 'UndoRedoService', 'EVENT_STORY_INITIALIZED',
+        'ExplorationIdValidationService', 'StoryUpdateService',
+        'UndoRedoService', 'EVENT_STORY_INITIALIZED',
         'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_STORY_NODE_EDITOR',
         'AlertsService',
         function(
             $scope, $rootScope, $uibModal, StoryEditorStateService,
-            StoryUpdateService, UndoRedoService, EVENT_STORY_INITIALIZED,
+            ExplorationIdValidationService, StoryUpdateService,
+            UndoRedoService, EVENT_STORY_INITIALIZED,
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
             AlertsService) {
           var ctrl = this;
@@ -76,6 +79,7 @@ angular.module('oppia').directive('storyNodeEditor', [
               }
             }
           };
+
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyNodeIds = $scope.story.getStoryContents().getNodeIds();
@@ -95,6 +99,8 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.editableOutline = $scope.getOutline();
             $scope.explorationId = $scope.getExplorationId();
             $scope.currentExplorationId = $scope.explorationId;
+            $scope.expIdIsValid = true;
+            $scope.invalidExpErrorIsShown = false;
             $scope.nodeTitleEditorIsShown = false;
             $scope.OUTLINE_SCHEMA = {
               type: 'html',
@@ -111,6 +117,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           $scope.checkCanSaveExpId = function() {
             $scope.canSaveExpId = $scope.explorationIdPattern.test(
               $scope.explorationId);
+            $scope.invalidExpErrorIsShown = false;
           };
           $scope.updateTitle = function(newTitle) {
             if (newTitle === $scope.currentTitle) {
@@ -131,9 +138,17 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.updateExplorationId = function(explorationId) {
-            StoryUpdateService.setStoryNodeExplorationId(
-              $scope.story, $scope.getId(), explorationId);
-            $scope.currentExplorationId = explorationId;
+            ExplorationIdValidationService.isExpPublished(
+              explorationId).then(function(expIdIsValid) {
+              $scope.expIdIsValid = expIdIsValid;
+              if ($scope.expIdIsValid) {
+                StoryUpdateService.setStoryNodeExplorationId(
+                  $scope.story, $scope.getId(), explorationId);
+                $scope.currentExplorationId = explorationId;
+              } else {
+                $scope.invalidExpErrorIsShown = true;
+              }
+            });
           };
 
           $scope.removePrerequisiteSkillId = function(skillId) {
@@ -342,7 +357,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             // EXPLORATION_AND_SKILL_ID_PATTERN
             // is not being used here, as the chapter of the story can be saved
             // with empty exploration id.
-            $scope.explorationIdPattern = /^[a-zA-Z0-9_-]*$/;
+            $scope.explorationIdPattern = /^[a-zA-Z0-9_-]+$/;
             $scope.canSaveExpId = true;
             $scope.$on(EVENT_STORY_INITIALIZED, _init);
             $scope.$on(EVENT_STORY_REINITIALIZED, _init);
