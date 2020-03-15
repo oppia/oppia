@@ -29,8 +29,9 @@ import utils
 # One is extra (ie. (full: [*.js])) and three other test suites are
 # are being run by CircleCI.
 TEST_SUITES_NOT_RUN_ON_TRAVIS = [
-    'full', 'classroomPageFileUploadFeatures', 'fileUploadFeatures',
-    'navigation', 'topicAndStoryEditorFileUploadFeatures']
+    'full', 'adminPage', 'accessibility', 'classroomPageFileUploadFeatures',
+    'embedding', 'extensions', 'fileUploadFeatures', 'library', 'navigation',
+    'topicAndStoryEditorFileUploadFeatures']
 
 TRAVIS_CI_FILE_PATH = os.path.join(os.getcwd(), '.travis.yml')
 PROTRACTOR_CONF_FILE_PATH = os.path.join(
