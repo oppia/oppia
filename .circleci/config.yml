@@ -122,6 +122,7 @@ jobs:
           paths:
             - oppia/assets/hashes.json
             - oppia/third_party/generated/
+            - oppia/webpack_bundles/
 
   e2e_classroom_page:
     <<: *job_defaults
