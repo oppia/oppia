@@ -65,7 +65,7 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
   }));
 
   describe('.createNew', function() {
-    it('retrieves data from passed thread', function() {
+    it('should retrieve data from passed thread', function() {
       var mockLearnerAnswerDetails = {learnerAnswerInfoData: 'sample'};
       var task = AnswerDetailsImprovementTaskObjectFactory.createNew(
         mockLearnerAnswerDetails);
@@ -77,7 +77,7 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
   });
 
   describe('.fetchTasks', function() {
-    it('fetches threads from the backend', function(done) {
+    it('should fetch threads from the backend', function(done) {
       spyOn(
         LearnerAnswerDetailsDataService,
         'fetchLearnerAnswerInfoData').and.callFake($q.resolve);
@@ -120,60 +120,60 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
     });
 
     describe('.getStatus', function() {
-      it('returns open as status', function() {
+      it('should return open as status', function() {
         expect(this.task.getStatus()).toEqual(STATUS_OPEN);
       });
 
-      it('returns not actionable as status', function() {
+      it('should return not actionable as status', function() {
         this.testLearnerAnswerDetails.learnerAnswerInfoData = [];
         expect(this.task.getStatus()).toEqual(STATUS_NOT_ACTIONABLE);
       });
     });
 
     describe('.getTitle', function() {
-      it('returns answer details as title', function() {
+      it('should return answer details as title', function() {
         expect(this.task.getTitle()).toEqual(
           'Answer details for the card "fakeStateName"');
       });
     });
 
     describe('.isObsolete', function() {
-      it('returns is obsolete as false', function() {
+      it('should return is obsolete as false', function() {
         expect(this.task.isObsolete()).toEqual(false);
       });
 
-      it('returns is obsolete as true', function() {
+      it('should return is obsolete as true', function() {
         this.testLearnerAnswerDetails.learnerAnswerInfoData = [];
         expect(this.task.isObsolete()).toEqual(true);
       });
     });
 
     describe('.getDirectiveType', function() {
-      it('returns answer details as directive type', function() {
+      it('should return answer details as directive type', function() {
         expect(this.task.getDirectiveType())
           .toEqual(ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE);
       });
     });
 
     describe('.getDirectiveData', function() {
-      it('returns the learner answer details', function() {
+      it('should return the learner answer details', function() {
         expect(this.task.getDirectiveData()).toBe(
           this.testLearnerAnswerDetails);
       });
     });
 
     describe('.getActionButtons', function() {
-      it('contains one button', function() {
+      it('should return one button', function() {
         expect(this.task.getActionButtons().length).toEqual(1);
       });
     });
 
     describe('.getLastUpdatedTime', function() {
-      it('is a number', function() {
+      it('should return a number', function() {
         expect(this.task.getLastUpdatedTime()).toEqual(jasmine.any(Number));
       });
 
-      it('returns the time when this task was last updated', function() {
+      it('should return the time when this task was last updated', function() {
         expect(this.task.getLastUpdatedTime())
           .toEqual(this.testLastUpdatedTime);
       });
@@ -184,7 +184,7 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
         this.button = this.task.getActionButtons()[0];
       });
 
-      it('opens a learner answer details modal', function() {
+      it('should open a learner answer details modal', function() {
         var spy = spyOn(ImprovementModalService, 'openLearnerAnswerDetails');
 
         this.button.execute();
