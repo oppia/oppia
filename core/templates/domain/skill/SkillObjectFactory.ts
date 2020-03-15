@@ -57,9 +57,9 @@ export class Skill {
   SKILL_DIFFICULTIES: string[] = constants.SKILL_DIFFICULTIES;
 
   constructor(id: string, description: string, misconceptions: Misconception[],
-    rubrics: Rubric[], conceptCard: ConceptCard, languageCode: string,
-    version: number, nextMisconceptionId: number, supersedingSkillId: string,
-    allQuestionsMerged: boolean, prerequisiteSkillIds: string[]) {
+      rubrics: Rubric[], conceptCard: ConceptCard, languageCode: string,
+      version: number, nextMisconceptionId: number, supersedingSkillId: string,
+      allQuestionsMerged: boolean, prerequisiteSkillIds: string[]) {
     this._id = id;
     this._allQuestionsMerged = allQuestionsMerged;
     this._conceptCard = conceptCard;
@@ -278,7 +278,7 @@ export class SkillObjectFactory {
   }
 
   generateMisconceptionsFromBackendDict(
-    misconceptionsBackendDicts: IMisconceptionBackendDict[]) {
+      misconceptionsBackendDicts: IMisconceptionBackendDict[]) {
     return misconceptionsBackendDicts.map(misconceptionsBackendDict => {
       return this.misconceptionObjectFactory.createFromBackendDict(
         misconceptionsBackendDict);
@@ -286,7 +286,7 @@ export class SkillObjectFactory {
   }
 
   generateRubricsFromBackendDict(
-    rubricBackendDicts: IRubricBackendDict[]) {
+      rubricBackendDicts: IRubricBackendDict[]) {
     return rubricBackendDicts.map((rubricBackendDict) => {
       return this.rubricObjectFactory.createFromBackendDict(rubricBackendDict);
     });
