@@ -85,14 +85,18 @@ angular.module('oppia').config([
     // injected before bootstrapping of oppia module.
     var servicesToProvide = [
       'AlertsService', 'BackgroundMaskService', 'BrowserCheckerService',
-      'CamelCaseToHyphensPipe', 'ContextService', 'CsrfTokenService',
+      'CodeReplRulesService', 'ContextService', 'CsrfTokenService',
       'DateTimeFormatService', 'DebouncerService', 'DeviceInfoService',
       'DocumentAttributeCustomizationService',
       'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
-      'ExpressionParserService',
-      'HtmlEscaperService', 'IdGenerationService', 'LoggerService',
-      'MetaTagCustomizationService', 'SidebarStatusService',
-      'SiteAnalyticsService', 'StateObjectFactory', 'StatesObjectFactory',
+      'ExpressionParserService', 'ExtensionTagAssemblerService',
+      'ExtractImageFilenamesFromStateService',
+      'HtmlEscaperService', 'IdGenerationService', 'InteractionObjectFactory',
+      'LoggerService', 'MetaTagCustomizationService',
+      'PencilCodeEditorRulesService', 'SidebarStatusService',
+      'SiteAnalyticsService', 'SolutionObjectFactory', 'StateCardObjectFactory',
+      'StateImprovementSuggestionService', 'StateObjectFactory',
+      'StatesObjectFactory', 'TextInputRulesService',
       'UrlInterpolationService', 'UrlService', 'UserInfoObjectFactory',
       'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
       'WindowRef'];
