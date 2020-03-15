@@ -324,7 +324,7 @@ angular.module('oppia').factory('ImprovementModalService', [
 
               // TODO(Allan): Implement ability to edit suggestions before
               // applying.
-              $scope.addNewMessageAsync = function(
+              $scope.addNewMessage = function(
                   threadId, tmpText, tmpStatus) {
                 if (threadId === null) {
                   AlertsService.addWarning(
@@ -392,7 +392,7 @@ angular.module('oppia').factory('ImprovementModalService', [
 
               // TODO(Allan): Implement ability to edit suggestions before
               // applying.
-              $scope.addNewMessageAsync = function(
+              $scope.addNewMessage = function(
                   threadId, tmpText, tmpStatus) {
                 if (threadId === null) {
                   AlertsService.addWarning(
