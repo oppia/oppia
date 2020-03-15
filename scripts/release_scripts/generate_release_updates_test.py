@@ -181,13 +181,13 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
             'create_new_file_with_release_message_template_gets_called': False,
             'validate_release_message_gets_called': False,
             'prompt_user_to_send_announcement_email_gets_called': False,
-            'prepare_for_next_release': False,
+            'prepare_for_next_release_gets_called': False,
         }
         expected_check_function_calls = {
             'create_new_file_with_release_message_template_gets_called': True,
             'validate_release_message_gets_called': True,
             'prompt_user_to_send_announcement_email_gets_called': True,
-            'prepare_for_next_release': True,
+            'prepare_for_next_release_gets_called': True,
         }
         def mock_create_new_file_with_release_message_template():
             check_function_calls[
@@ -199,7 +199,7 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
             check_function_calls[
                 'prompt_user_to_send_announcement_email_gets_called'] = True
         def mock_prepare_for_next_release():
-            check_function_calls['prepare_for_next_release'] = True
+            check_function_calls['prepare_for_next_release_gets_called'] = True
         def mock_exists(unused_filepath):
             return True
         def mock_remove(unused_filepath):
