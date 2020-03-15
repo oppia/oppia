@@ -31,8 +31,8 @@ angular.module('oppia').directive('emailDashboardResultPage', [
         '/pages/email_dashboard/email_dashboard_result_directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$timeout', '$window', 'UrlInterpolationService',
-        function($http, $timeout, $window, UrlInterpolationService) {
+        '$http', '$timeout', 'UrlInterpolationService', 'WindowRef',
+        function($http, $timeout, UrlInterpolationService, WindowRef) {
           var ctrl = this;
           var RESULT_HANDLER_URL = '/emaildashboardresult/<query_id>';
           var CANCEL_EMAIL_HANDLER_URL =
@@ -42,7 +42,8 @@ angular.module('oppia').directive('emailDashboardResultPage', [
             '/emaildashboardtestbulkemailhandler/<query_id>';
 
           var getQueryId = function() {
-            return $window.location.pathname.split('/').slice(-1)[0];
+            return (WindowRef.nativeWindow.location.pathname
+              .split('/').slice(-1)[0]);
           };
 
           var validateEmailSubjectAndBody = function() {
@@ -86,9 +87,9 @@ angular.module('oppia').directive('emailDashboardResultPage', [
               }).then(function() {
                 ctrl.emailSubmitted = true;
                 $timeout(function() {
-                  $window.location.href = EMAIL_DASHBOARD_PAGE;
+                  WindowRef.nativeWindow.location.href = EMAIL_DASHBOARD_PAGE;
                 }, 4000);
-              }, function() {
+              })['catch'](function() {
                 ctrl.errorHasOccurred = true;
                 ctrl.submitIsInProgress = false;
               });
@@ -114,7 +115,7 @@ angular.module('oppia').directive('emailDashboardResultPage', [
             $http.post(cancelUrlHandler).then(function() {
               ctrl.emailCancelled = true;
               $timeout(function() {
-                $window.location.href = EMAIL_DASHBOARD_PAGE;
+                WindowRef.nativeWindow.location.href = EMAIL_DASHBOARD_PAGE;
               }, 4000);
             }, function() {
               ctrl.errorHasOccurred = true;
@@ -141,6 +142,7 @@ angular.module('oppia').directive('emailDashboardResultPage', [
               ctrl.invalid.maxRecipients = false;
             }
           };
+
           ctrl.$onInit = function() {
             ctrl.emailOption = 'all';
             ctrl.emailSubject = '';
