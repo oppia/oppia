@@ -304,12 +304,13 @@ describe('Chapter editor functionality', function() {
       browser.get('/create/' + dummyExplorationIds[0]);
       waitFor.pageToFullyLoad();
       explorationEditorMainTab.setContent(function(richTextEditor) {
-        richTextEditor.addRteComponent('Skillreview', 'Description');
+        richTextEditor.addRteComponent(
+          'Skillreview', 'Description', 'skillFromChapterEditor0');
       });
       explorationEditorPage.navigateToPreviewTab();
       explorationPlayerPage.expectContentToMatch(function(richTextChecker) {
         richTextChecker.readRteComponent(
-          'Skillreview', 'Description', forms.toRichText('material1'));
+          'Skillreview', 'Description', forms.toRichText('material0'));
       });
     });
 

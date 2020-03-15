@@ -21,13 +21,13 @@ var objects = require('../../objects/protractor.js');
 var forms = require(
   '../../../core/tests/protractor_utils/forms.js');
 
-var customizeComponent = function(modal, text) {
+var customizeComponent = function(modal, text, skillDescription) {
   objects.UnicodeStringEditor(
     modal.element(by.tagName('schema-based-unicode-editor'))
   ).setValue(text);
   objects.SkillSelector(
     modal.element(by.tagName('skill-selector-editor'))
-  ).setValue();
+  ).setValue(skillDescription);
 };
 
 var expectComponentDetailsToMatch = function(elem, text, reviewMaterial) {

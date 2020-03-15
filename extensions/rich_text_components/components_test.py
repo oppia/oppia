@@ -21,9 +21,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 import os
+import re
 
 from core.tests import test_utils
 from extensions.rich_text_components import components
+import python_utils
 
 
 class ComponentValidationUnitTests(test_utils.GenericTestBase):
@@ -230,3 +232,35 @@ class ComponentDefinitionTests(test_utils.GenericTestBase):
                 defined_components.append(name)
         defined_components.remove('BaseRteComponent')
         self.assertEqual(set(defined_components), set(actual_components))
+
+
+class ComponentE2eTests(test_utils.GenericTestBase):
+    """Tests that all components have their e2e test files defined."""
+
+    def test_component_e2e_tests(self):
+        """Tests that an e2e test is defined for all rich text components."""
+        test_file = os.path.join(
+            'extensions', 'rich_text_components', 'protractor.js')
+        actual_components = [name for name in os.listdir(
+            './extensions/rich_text_components') if os.path.isdir(os.path.join(
+                './extensions/rich_text_components', name))]
+        with python_utils.open_file(test_file, 'r') as f:
+            text = f.read()
+            # Replace all spaces and new lines with empty space.
+            text = re.sub(r' ', r'', text)
+            text = re.sub(r'\n', r'', text)
+
+            # Isolate the text inside the RICH_TEXT_COMPONENTS constant.
+            first_bracket_index = text.find('={')
+            last_bracket_index = text.find('};')
+            text_inside_constant = text[
+                first_bracket_index + 2:last_bracket_index] + ','
+
+            rte_components_with_test = []
+            while text_inside_constant.find(',') != -1:
+                rte_components_with_test.append(
+                    text_inside_constant[0:text_inside_constant.find(':')])
+                text_inside_constant = text_inside_constant[
+                    text_inside_constant.find(',') + 1:]
+
+        self.assertEqual(set(actual_components), set(rte_components_with_test))

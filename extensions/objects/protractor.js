@@ -179,7 +179,9 @@ var SanitizedUrlEditor = function(elem) {
 
 var SkillSelector = function(elem) {
   return {
-    setValue: function() {
+    setValue: function(skillDescription) {
+      elem.element(
+        by.css('.protractor-test-skill-name-input')).sendKeys(skillDescription);
       elem.element(by.css('.protractor-test-rte-skill-selector-item')).click();
     }
   };
