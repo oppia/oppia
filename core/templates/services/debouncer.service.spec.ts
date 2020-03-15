@@ -31,25 +31,27 @@ describe('Debouncer service', () => {
     loggerServiceSpy = spyOn(ls, 'log').and.callThrough();
   });
 
-  it('should call fnToBeCalled function const after 5 seconds', () => {
-    // Ref: https://github.com/gruntjs/grunt-contrib-jasmine/issues/213.
-    jasmine.clock().uninstall();
-    jasmine.clock().install();
-    const fnToBeCalled = () => ls.log('function was called');
-    ds.debounce(fnToBeCalled, 5)();
-    // Ticks for 10 seconds so all the setTimeout calls will be executed.
-    jasmine.clock().tick(10000);
-    jasmine.clock().uninstall();
-    expect(loggerServiceSpy).toHaveBeenCalled();
-  });
+  it('should call a debounced function after a non-zero given wait time',
+    () => {
+      // Ref: https://github.com/gruntjs/grunt-contrib-jasmine/issues/213.
+      jasmine.clock().uninstall();
+      jasmine.clock().install();
+      const fnToBeCalled = () => ls.log('function was called');
+      ds.debounce(fnToBeCalled, 5)();
+      // Ticks for 10 seconds so all the setTimeout calls will be executed.
+      jasmine.clock().tick(10000);
+      jasmine.clock().uninstall();
+      expect(loggerServiceSpy).toHaveBeenCalled();
+    });
 
-  it('should call fnToBeCalled function const instantly', () => {
-    jasmine.clock().uninstall();
-    jasmine.clock().install();
-    const fnToBeCalled = () => ls.log('function was called');
-    ds.debounce(fnToBeCalled, 0)();
-    jasmine.clock().tick(0);
-    jasmine.clock().uninstall();
-    expect(loggerServiceSpy).toHaveBeenCalled();
-  });
+  it('should instantly call a debounced function with wait time as zero',
+    () => {
+      jasmine.clock().uninstall();
+      jasmine.clock().install();
+      const fnToBeCalled = () => ls.log('function was called');
+      ds.debounce(fnToBeCalled, 0)();
+      jasmine.clock().tick(0);
+      jasmine.clock().uninstall();
+      expect(loggerServiceSpy).toHaveBeenCalled();
+    });
 });
