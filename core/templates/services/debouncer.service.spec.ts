@@ -31,8 +31,8 @@ describe('Debouncer service', () => {
     loggerServiceSpy = spyOn(ls, 'log').and.callThrough();
   });
 
-  it('should call function after 5 seconds', () => {
-    // ref: https://github.com/gruntjs/grunt-contrib-jasmine/issues/213
+  it('should call fnToBeCalled function const after 5 seconds', () => {
+    // Ref: https://github.com/gruntjs/grunt-contrib-jasmine/issues/213.
     jasmine.clock().uninstall();
     jasmine.clock().install();
     const fnToBeCalled = () => ls.log('function was called');
@@ -43,7 +43,7 @@ describe('Debouncer service', () => {
     expect(loggerServiceSpy).toHaveBeenCalled();
   });
 
-  it('should call function instantly', () => {
+  it('should call fnToBeCalled function const instantly', () => {
     jasmine.clock().uninstall();
     jasmine.clock().install();
     const fnToBeCalled = () => ls.log('function was called');
