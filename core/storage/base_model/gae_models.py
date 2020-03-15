@@ -1160,6 +1160,20 @@ class BaseSnapshotMetadataModel(BaseModel):
         """
         return self.id[self.id.rfind(_VERSION_DELIMITER) + 1:]
 
+    @classmethod
+    def export_data(cls, user_id):
+        metadata_models = (
+            cls.query(cls.committer_id == user_id).fetch())
+
+        user_data = {}
+        for metadata_model in metadata_models:
+            user_data[metadata_model.id] = {
+                'commit_type': metadata_model.commit_type,
+                'commit_message': metadata_model.commit_message,
+                'commit_cmds': metadata_model.commit_cmds
+            }
+        return user_data
+
 
 class BaseSnapshotContentModel(BaseModel):
     """Base class for snapshot content classes.
