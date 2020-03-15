@@ -178,7 +178,7 @@ angular.module('oppia').directive('feedbackTab', [
             );
           };
 
-          ctrl.addNewMessageAsync = function(threadId, tmpText, tmpStatus) {
+          ctrl.addNewMessage = function(threadId, tmpText, tmpStatus) {
             if (threadId === null) {
               AlertsService.addWarning(
                 'Cannot add message to thread with ID: null.');
