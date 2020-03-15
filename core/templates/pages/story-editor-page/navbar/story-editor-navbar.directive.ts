@@ -101,6 +101,13 @@ angular.module('oppia').directive('storyEditorNavbar', [
                     );
                     break;
                   }
+                  if (summaries[idx].language_code !== 'en') {
+                    $scope.validationIssues.push(
+                      'The explorations with ID ' + summaries[idx].id +
+                      ' is not in English.'
+                    );
+                    break;
+                  }
                 }
               }
             });
