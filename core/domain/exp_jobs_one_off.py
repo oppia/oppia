@@ -43,7 +43,7 @@ from mutagen import mp3
     models.NAMES.exploration])
 gae_image_services = models.Registry.import_gae_image_services()
 
-
+SEPARATORS = ['<', '>', '=']
 ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
 _COMMIT_TYPE_REVERT = 'revert'
 ALL_IMAGES_VERIFIED = 'Images verified'
@@ -78,6 +78,37 @@ SUCCESSFUL_EXPLORATION_MIGRATION = 'Successfully migrated exploration'
 AUDIO_FILE_PREFIX = 'audio'
 AUDIO_ENTITY_TYPE = 'exploration'
 AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION = 31
+
+
+class MathExpressionInputInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):  # pylint: disable=line-too-long
+    """Job that produces a list of (exploration, state) pairs that use the Math
+    Expression Interaction and that have rules that contain [<, >, =] to
+    identify and prevent usage of equation/inequalities.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if not item.deleted:
+            exploration = exp_fetchers.get_exploration_from_model(item)
+            for state_name, state in exploration.states.items():
+                if state.interaction.id == 'MathExpressionInput':
+                    for group in state.interaction.answer_groups:
+                        for rule_spec in group.rule_specs:
+                            rule = rule_spec.inputs['x']
+                            if any(sep in rule for sep in SEPARATORS):
+                                yield (
+                                    item.id,
+                                    '%s: %s' % (
+                                        state_name.encode('utf-8'),
+                                        rule.encode('utf-8')))
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
 
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):

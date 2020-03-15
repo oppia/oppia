@@ -75,6 +75,20 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-topic-name-in-topic-select-modal'));
   var abbreviatedTopicNameField = element(
     by.css('.protractor-test-new-abbreviated-topic-name-field'));
+  var topicsTabButton = element(
+    by.css('.protractor-test-topics-tab')
+  );
+
+  // Returns a promise of all topics with the given name.
+  var _getTopicElements = function(topicName) {
+    return topicsListItems.filter(function(name) {
+      return name.element(by.css('.protractor-test-topic-name')).getText().then(
+        function(elementTopicName) {
+          return (topicName === elementTopicName);
+        });
+    });
+  };
+
   this.get = function() {
     browser.get(DASHBOARD_URL);
     waitFor.pageToFullyLoad();
@@ -219,6 +233,19 @@ var TopicsAndSkillsDashboardPage = function() {
     });
   };
 
+  this.editTopic = function(topicName) {
+    waitFor.elementToBeClickable(
+      topicsTabButton, 'Unable to click on topics tab.');
+    _getTopicElements(topicName).then(function(topicElements) {
+      if (topicElements.length === 0) {
+        throw 'Could not find topic tile with name ' + topicName;
+      }
+      waitFor.elementToBeClickable(
+        topicElements[0], 'Unable to click on topic: ' + topicName);
+      topicElements[0].click();
+      waitFor.pageToFullyLoad();
+    });
+  };
 
   this.expectSkillDescriptionToBe = function(description, index) {
     skillDescriptions.then(function(elems) {
