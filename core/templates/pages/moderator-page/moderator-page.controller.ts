@@ -126,7 +126,7 @@ angular.module('oppia').directive('moderatorPage', [
 
             $http.get('/recent_feedback_messages').then(function(response) {
               ctrl.allFeedbackMessages = response.data.results.map(
-                r => ThreadMessageObjectFactory.createFromBackendDict(r));
+                d => ThreadMessageObjectFactory.createFromBackendDict(d));
             });
 
             $http.get('/moderatorhandler/featured').then(function(response) {
