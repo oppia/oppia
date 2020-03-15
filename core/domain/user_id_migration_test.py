@@ -93,12 +93,6 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
 
-    def test_repeated_migration(self):
-        output = self._run_one_off_job()
-        id_set = output[0][1][1]
-        output = self._run_one_off_job()
-        self.assertIn(['ALREADY MIGRATED', [id_set]], output)
-
     def test_one_user_user_settings_model(self):
         original_model = user_models.UserSettingsModel(
             id=self.USER_D_ID,
@@ -466,6 +460,282 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
                 original_models[i].created_on, migrated_model.created_on)
             self.assertEqual(
                 original_models[i].last_updated, migrated_model.last_updated)
+
+    def test_idempotent_copy_model_with_new_id_not_migrated(self):
+        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+
+        user_models.IncompleteActivitiesModel(
+            id=self.user_a_id,
+            exploration_ids=['1', '2'],
+            collection_ids=['1', '2']
+        ).put()
+        user_models.CompletedActivitiesModel(
+            id=self.user_a_id,
+            exploration_ids=['1', '2'],
+            collection_ids=['1', '2']
+        ).put()
+        output = self._run_one_off_job()
+        id_set = (self.user_a_id, new_user_id)
+        self.assertIn(['SUCCESS', [id_set]], output)
+
+        self.assertIsNone(
+            user_models.CompletedActivitiesModel.get_by_id(self.user_a_id))
+        self.assertIsNone(
+            user_models.IncompleteActivitiesModel.get_by_id(self.user_a_id))
+        self.assertIsNotNone(
+            user_models.CompletedActivitiesModel.get_by_id(new_user_id))
+        self.assertIsNotNone(
+            user_models.IncompleteActivitiesModel.get_by_id(new_user_id))
+
+    def test_idempotent_copy_model_with_new_id_half_migrated(self):
+        user_models.IncompleteActivitiesModel(
+            id=self.user_a_id,
+            exploration_ids=['1', '2'],
+            collection_ids=['1', '2']
+        ).put()
+        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+
+        user_models.CompletedActivitiesModel(
+            id=self.user_a_id,
+            exploration_ids=['1', '2'],
+            collection_ids=['1', '2']
+        ).put()
+        output = self._run_one_off_job()
+        id_set = (self.user_a_id, new_user_id)
+        self.assertIn(['SUCCESS', [id_set]], output)
+        self.assertIn(['ALREADY MIGRATED', [id_set] * 2], output)
+
+        self.assertIsNone(
+            user_models.CompletedActivitiesModel.get_by_id(self.user_a_id))
+        self.assertIsNone(
+            user_models.IncompleteActivitiesModel.get_by_id(self.user_a_id))
+        self.assertIsNotNone(
+            user_models.CompletedActivitiesModel.get_by_id(new_user_id))
+        self.assertIsNotNone(
+            user_models.IncompleteActivitiesModel.get_by_id(new_user_id))
+
+    def test_idempotent_copy_model_with_new_id_all_migrated(self):
+        user_models.IncompleteActivitiesModel(
+            id=self.user_a_id,
+            exploration_ids=['1', '2'],
+            collection_ids=['1', '2']
+        ).put()
+        user_models.CompletedActivitiesModel(
+            id=self.user_a_id,
+            exploration_ids=['1', '2'],
+            collection_ids=['1', '2']
+        ).put()
+        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+
+        output = self._run_one_off_job()
+        id_set = (self.user_a_id, new_user_id)
+        self.assertIn(['SUCCESS', [id_set]], output)
+        self.assertIn(['ALREADY MIGRATED', [id_set] * 3], output)
+
+        self.assertIsNone(
+            user_models.CompletedActivitiesModel.get_by_id(self.user_a_id))
+        self.assertIsNone(
+            user_models.IncompleteActivitiesModel.get_by_id(self.user_a_id))
+        self.assertIsNotNone(
+            user_models.CompletedActivitiesModel.get_by_id(new_user_id))
+        self.assertIsNotNone(
+            user_models.IncompleteActivitiesModel.get_by_id(new_user_id))
+
+    def test_idempotent_copy_model_with_new_id_and_user_id_not_migrated(self):
+        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+
+        exp_play_model_id_1 = '%s.%s' % (self.user_a_id, 'exp_1_id')
+        user_models.ExpUserLastPlaythroughModel(
+            id=exp_play_model_id_1,
+            user_id=self.user_a_id,
+            exploration_id='exp_id',
+            last_played_exp_version=2,
+            last_played_state_name='start'
+        ).put()
+        exp_play_model_id_2 = '%s.%s' % (self.user_a_id, 'exp_2_id')
+        user_models.ExpUserLastPlaythroughModel(
+            id=exp_play_model_id_2,
+            user_id=self.user_a_id,
+            exploration_id='exp_id',
+            last_played_exp_version=2,
+            last_played_state_name='start'
+        ).put()
+        output = self._run_one_off_job()
+        id_set = (self.user_a_id, new_user_id)
+        self.assertIn(['SUCCESS', [id_set]], output)
+
+        self.assertIsNone(
+            user_models.ExpUserLastPlaythroughModel.get_by_id(
+                exp_play_model_id_1))
+        self.assertIsNone(
+            user_models.ExpUserLastPlaythroughModel.get_by_id(
+                exp_play_model_id_2))
+        self.assertIsNotNone(
+            user_models.ExpUserLastPlaythroughModel.get_by_id(
+                exp_play_model_id_1.replace(self.user_a_id, new_user_id)))
+        self.assertIsNotNone(
+            user_models.ExpUserLastPlaythroughModel.get_by_id(
+                exp_play_model_id_2.replace(self.user_a_id, new_user_id)))
+
+    def test_idempotent_copy_model_with_new_id_and_user_id_half_migrated(self):
+        exp_play_model_id_1 = '%s.%s' % (self.user_a_id, 'exp_1_id')
+        user_models.ExpUserLastPlaythroughModel(
+            id=exp_play_model_id_1,
+            user_id=self.user_a_id,
+            exploration_id='exp_id',
+            last_played_exp_version=2,
+            last_played_state_name='start'
+        ).put()
+        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+
+        exp_play_model_id_2 = '%s.%s' % (self.user_a_id, 'exp_2_id')
+        user_models.ExpUserLastPlaythroughModel(
+            id=exp_play_model_id_2,
+            user_id=self.user_a_id,
+            exploration_id='exp_id',
+            last_played_exp_version=2,
+            last_played_state_name='start'
+        ).put()
+        output = self._run_one_off_job()
+        id_set = (self.user_a_id, new_user_id)
+        self.assertIn(['SUCCESS', [id_set]], output)
+        self.assertIn(['ALREADY MIGRATED', [id_set]], output)
+
+        self.assertIsNone(
+            user_models.ExpUserLastPlaythroughModel.get_by_id(
+                exp_play_model_id_1))
+        self.assertIsNone(
+            user_models.ExpUserLastPlaythroughModel.get_by_id(
+                exp_play_model_id_2))
+        self.assertIsNotNone(
+            user_models.ExpUserLastPlaythroughModel.get_by_id(
+                exp_play_model_id_1.replace(self.user_a_id, new_user_id)))
+        self.assertIsNotNone(
+            user_models.ExpUserLastPlaythroughModel.get_by_id(
+                exp_play_model_id_2.replace(self.user_a_id, new_user_id)))
+
+    def test_idempotent_copy_model_with_new_id_and_user_id_all_migrated(self):
+        exp_play_model_id_1 = '%s.%s' % (self.user_a_id, 'exp_1_id')
+        user_models.ExpUserLastPlaythroughModel(
+            id=exp_play_model_id_1,
+            user_id=self.user_a_id,
+            exploration_id='exp_id',
+            last_played_exp_version=2,
+            last_played_state_name='start'
+        ).put()
+        exp_play_model_id_2 = '%s.%s' % (self.user_a_id, 'exp_2_id')
+        user_models.ExpUserLastPlaythroughModel(
+            id=exp_play_model_id_2,
+            user_id=self.user_a_id,
+            exploration_id='exp_id',
+            last_played_exp_version=2,
+            last_played_state_name='start'
+        ).put()
+        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+
+        output = self._run_one_off_job()
+        id_set = (self.user_a_id, new_user_id)
+        self.assertIn(['SUCCESS', [id_set]], output)
+        self.assertIn(['ALREADY MIGRATED', [id_set]], output)
+
+        self.assertIsNone(
+            user_models.ExpUserLastPlaythroughModel.get_by_id(
+                exp_play_model_id_1))
+        self.assertIsNone(
+            user_models.ExpUserLastPlaythroughModel.get_by_id(
+                exp_play_model_id_2))
+        self.assertIsNotNone(
+            user_models.ExpUserLastPlaythroughModel.get_by_id(
+                exp_play_model_id_1.replace(self.user_a_id, new_user_id)))
+        self.assertIsNotNone(
+            user_models.ExpUserLastPlaythroughModel.get_by_id(
+                exp_play_model_id_2.replace(self.user_a_id, new_user_id)))
+
+    def test_idempotent_change_model_with_one_user_id_field_not_migrated(self):
+        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+
+        exp_models.ExplorationSnapshotMetadataModel(
+            id='instance_1_id',
+            committer_id=self.user_a_id,
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}]
+        ).put()
+        exp_models.ExplorationSnapshotMetadataModel(
+            id='instance_2_id',
+            committer_id=self.user_a_id,
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}]
+        ).put()
+        output = self._run_one_off_job()
+        id_set = (self.user_a_id, new_user_id)
+        self.assertIn(['SUCCESS', [id_set]], output)
+
+        self.assertEqual(
+            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
+                'instance_1_id').committer_id, new_user_id)
+        self.assertEqual(
+            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
+                'instance_2_id').committer_id, new_user_id)
+
+    def test_idempotent_change_model_with_one_user_id_field_half_migrated(self):
+        exp_models.ExplorationSnapshotMetadataModel(
+            id='instance_1_id',
+            committer_id=self.user_a_id,
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}]
+        ).put()
+        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+
+        exp_models.ExplorationSnapshotMetadataModel(
+            id='instance_2_id',
+            committer_id=self.user_a_id,
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}]
+        ).put()
+        output = self._run_one_off_job()
+        id_set = (self.user_a_id, new_user_id)
+        self.assertIn(['SUCCESS', [id_set]], output)
+        self.assertIn(['ALREADY MIGRATED', [id_set]], output)
+
+        self.assertEqual(
+            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
+                'instance_1_id').committer_id, new_user_id)
+        self.assertEqual(
+            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
+                'instance_2_id').committer_id, new_user_id)
+
+    def test_idempotent_change_model_with_one_user_id_field_all_migrated(self):
+        exp_models.ExplorationSnapshotMetadataModel(
+            id='instance_1_id',
+            committer_id=self.user_a_id,
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}]
+        ).put()
+        exp_models.ExplorationSnapshotMetadataModel(
+            id='instance_2_id',
+            committer_id=self.user_a_id,
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}]
+        ).put()
+        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+
+        output = self._run_one_off_job()
+        id_set = (self.user_a_id, new_user_id)
+        self.assertIn(['SUCCESS', [id_set]], output)
+        self.assertIn(['ALREADY MIGRATED', [id_set]], output)
+
+        self.assertEqual(
+            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
+                'instance_1_id').committer_id, new_user_id)
+        self.assertEqual(
+            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
+                'instance_2_id').committer_id, new_user_id)
 
 
 class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
