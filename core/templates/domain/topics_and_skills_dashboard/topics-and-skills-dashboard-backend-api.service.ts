@@ -17,27 +17,33 @@
   from the backend and to merge skills from the dashboard.
  */
 
-require(
-  'domain/topics_and_skills_dashboard/' +
-  'topics-and-skills-dashboard-domain.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { TopicsAndSkillsDashboardDomainConstants } from 
+  // eslint-disable-next-line max-len
+  '../topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
 
-angular.module('oppia').factory('TopicsAndSkillsDashboardBackendApiService', [
-  '$http', 'MERGE_SKILLS_URL', function($http, MERGE_SKILLS_URL) {
-    var _fetchDashboardData = function() {
-      return $http.get('/topics_and_skills_dashboard/data');
-    };
 
-    var _mergeSkills = function(oldSkillId, newSkillId) {
-      var mergeSkillsData = {
-        old_skill_id: oldSkillId,
-        new_skill_id: newSkillId
-      };
-      return $http.post(MERGE_SKILLS_URL, mergeSkillsData);
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class TopicsAndSkillsDashboardBackendApiService {
+  constructor(private http: HttpClient) {}
 
-    return {
-      fetchDashboardData: _fetchDashboardData,
-      mergeSkills: _mergeSkills
-    };
+  fetchDasboardData():Promise<any> {
+    return this.http.get('/topics_and_skills_dashboard/data').toPromise();
   }
-]);
+
+  mergeSkills(oldSkillId, newSkillId):Promise<void> {
+    var mergeSkillsData = {
+      old_skill_id: oldSkillId,
+      new_skill_id: newSkillId
+    };
+    // eslint-disable-next-line max-len
+    return this.http.post<void>(TopicsAndSkillsDashboardDomainConstants.MERGE_SKILLS_URL, mergeSkillsData).toPromise();
+  }
+}
+angular.module('oppia').factory(
+  'TopicsAndSkillsDashboardBackendApiService', downgradeInjectable(
+    TopicsAndSkillsDashboardBackendApiService));
