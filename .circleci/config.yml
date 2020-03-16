@@ -1,6 +1,16 @@
 workflows:
   version: 2
   circleci_tests:
+    # The following jobs runs in the following stages:
+    # - Setup runs first.
+    # - After setup passes, lint and frontend test run.
+    #     - If frontend tests fail, stop and do not run the next step, but lint continues.
+    # - After frontend tests passes, backend and typescript tests run.
+    #     - If typescript tests fail, stop and do not run the next step, but backend continues.
+    # - After typescript tests passes, the flagship e2e tests (navigation and file upload) run.
+    # - After file upload e2e test passes, all other non-prod e2e tests run in parallel.
+    # - After navigation e2e test passes, all other prod e2e tests run in parallel.
+
     jobs:
       - setup
       - lint_tests:
