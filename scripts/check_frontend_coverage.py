@@ -102,6 +102,7 @@ FULLY_COVERED_FILENAMES = [
     'creator-dashboard-page.constants.ts',
     'data.ts',
     'date-time-format.service.ts',
+    'debouncer.service.ts',
     'debug-info-tracker.service.ts',
     'device-info.service.ts',
     'document-attribute-customization.service.ts',
@@ -126,6 +127,7 @@ FULLY_COVERED_FILENAMES = [
     'exploration-editor-page.constants.ts',
     'exploration-features-backend-api.service.ts',
     'exploration-html-formatter.service.ts',
+    'exploration-id-validation.service.ts',
     'exploration-init-state-name.service.ts',
     'exploration-param-changes.service.ts',
     'exploration-player-page.constants.ajs.ts',
@@ -372,6 +374,9 @@ FULLY_COVERED_FILENAMES = [
     'topics-and-skills-dashboard-page.constants.ajs.ts',
     'topics-and-skills-dashboard-page.constants.ts',
     'TopicSummaryObjectFactory.ts',
+    'training-data-editor-panel-modal.controller.ts',
+    'training-data-editor-panel.service.ts',
+    'training-data.service.ts',
     'training-modal.controller.ts',
     'training-modal.service.ts',
     'translation-language.service.ts',
@@ -411,8 +416,10 @@ class LcovStanzaRelevantLines(python_utils.OBJECT):
     def __init__(self, stanza):
         """Initialize the object which provides relevant data of a lcov
         stanza in order to calculate any decrease in frontend test coverage.
+
         Args:
             stanza: list(str). Contains all the lines from a lcov stanza.
+
         Raises:
             Exception: file_path is empty.
             Exception: Total lines number is not found.
@@ -456,6 +463,7 @@ def get_stanzas_from_lcov_file():
     BRF: total branches
     BRH: branches covered
     end_of_record
+
     Returns:
         list(LcovStanzaRelevantLines). A list with all stanzas.
     """
@@ -484,6 +492,7 @@ def check_coverage_changes():
     - New file insertion
     - File renaming
     - File deletion
+
     Raises:
         Exception: LCOV_FILE_PATH doesn't exist.
     """
