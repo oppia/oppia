@@ -198,7 +198,7 @@ angular.module('oppia').directive('topNavigationBar', [
           };
 
           ctrl.$onInit = function() {
-            $scope.SHOW_CLASSROOM_CALLOUT = (SHOW_CLASSROOM_CALLOUT);
+            $scope.SHOW_CLASSROOM_CALLOUT = SHOW_CLASSROOM_CALLOUT;
             ctrl.isModerator = null;
             ctrl.isAdmin = null;
             ctrl.isTopicManager = null;
