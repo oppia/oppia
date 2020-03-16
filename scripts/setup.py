@@ -214,6 +214,12 @@ def main(args=None):
     elif os.path.isfile('/usr/bin/chromium-browser'):
         # Unix.
         chrome_bin = '/usr/bin/chromium-browser'
+    elif os.path.isfile('/usr/bin/google-chrome-beta'):
+        # Unix.
+        chrome_bin = '/usr/bin/google-chrome-beta'
+    elif os.path.isfile('/usr/bin/chromium'):
+        # Unix.
+        chrome_bin = '/usr/bin/chromium'
     elif os.path.isfile(
             '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'):
         # Windows.
