@@ -17,18 +17,18 @@
  * topic_id.
  */
 
-export interface ITopicCreationBackend {
-  'abbreviated_name': string,
-  'name': string
-}
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+export interface ITopicCreationBackend {
+  'abbreviated_name': string;
+  name: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
-
 export class TopicCreationBackendApiService {
   constructor(private http: HttpClient) { }
 

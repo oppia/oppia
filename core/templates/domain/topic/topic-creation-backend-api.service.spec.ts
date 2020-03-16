@@ -44,7 +44,7 @@ describe('Topic creation backend api service', () => {
     httpTestingController = TestBed.get(HttpTestingController);
     topicCreationBackendApiService = TestBed.get(
       TopicCreationBackendApiService);
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfService, 'getTokenAsync').and.returnValue(() => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');
       });
