@@ -16,26 +16,25 @@
  * @fileoverview Backend service for creating a new skills
  */
 
-export interface IRubricBackend {
-  'difficulty':string,
-  'explanation': string
-}
-
-export interface ISkillCreationBackend {
-  'description': string,
-  'explanation_dict': string,
-  'linked_topic_ids': string[],
-  'rubrics': IRubricBackend
-}
-
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+export interface IRubricBackend {
+  difficulty: string,
+  explanation: string
+}
+
+export interface ISkillCreationBackend {
+  description: string,
+  'explanation_dict': string,
+  'linked_topic_ids': string[],
+  rubrics: IRubricBackend
+}
+
 @Injectable({
   providedIn: 'root'
 })
-
 export class SkillCreationBackendApiService {
   constructor(private http: HttpClient) {}
 
