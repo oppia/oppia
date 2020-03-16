@@ -6,39 +6,39 @@ workflows:
       - lint_tests:
           requires:
             - setup
-      - typescript_tests:
-          requires:
-            - setup
       - frontend_tests:
           requires:
             - setup
+      - typescript_tests:
+          requires:
+            - frontend_tests
       - backend_tests:
           requires:
-            - setup
-      - e2e_admin:
-          requires:
-            - e2e_navigation
-      - e2e_accessibility:
-          requires:
-            - e2e_navigation
-      - e2e_classroom_page:
-          requires:
-            - e2e_file_upload_features
-      - e2e_embedding:
-          requires:
-            - e2e_navigation
+            - frontend_tests
       - e2e_file_upload_features:
           requires:
             - typescript_tests
-      - e2e_library:
-          requires:
-            - e2e_navigation
       - e2e_navigation:
           requires:
             - typescript_tests
+      - e2e_classroom_page:
+          requires:
+            - e2e_file_upload_features
       - e2e_topic_and_story_editor:
           requires:
             - e2e_file_upload_features
+      - e2e_accessibility:
+          requires:
+            - e2e_navigation
+      - e2e_admin:
+          requires:
+            - e2e_navigation
+      - e2e_embedding:
+          requires:
+            - e2e_navigation
+      - e2e_library:
+          requires:
+            - e2e_navigation
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
