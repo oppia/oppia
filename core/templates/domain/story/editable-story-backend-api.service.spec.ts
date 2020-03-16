@@ -43,7 +43,7 @@ describe('Editable story backend API service', () => {
     csrfService = TestBed.get(CsrfTokenService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
-      return Promise.resolve('sample-csrf-token')
+      return Promise.resolve('sample-csrf-token');
     });
 
     // Sample story object returnable from the backend
@@ -98,9 +98,9 @@ describe('Editable story backend API service', () => {
 
       expect(successHandler).toHaveBeenCalledWith({
         story: sampleDataResults.story,
-        topicName: sampleDataResults.topic_name,
-        storyIsPublished: true,
-        skillSummaries: sampleDataResults.skill_summaries
+        topic_name: sampleDataResults.topic_name,
+        story_is_published: true,
+        skill_summaries: sampleDataResults.skill_summaries
       });
       expect(failHandler).not.toHaveBeenCalled();
     }
@@ -239,7 +239,7 @@ describe('Editable story backend API service', () => {
       editableStoryBackendApiService.changeStoryPublicationStatus(
         'storyId', true).then(successHandler, failHandler);
       var req = httpTestingController.expectOne(
-        '/story_publish_handler/storyId_1');
+        '/story_publish_handler/storyId');
       expect(req.request.method).toEqual('PUT');
       req.flush('Story with given id doesn\'t exist.', {
         status: 404,
