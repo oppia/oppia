@@ -68,3 +68,6 @@ RELEASE_NOTES_TEMPLATE_URL = (
 RELEASE_NOTES_EXAMPLE_URL = (
     'https://docs.google.com/document/d/'
     '1OUwgMPNORABJAz7DS0iuDUr5A2FxcXg4Y5-qUEdgo-M/edit#heading=h.l3dbee3s55ti')
+JOBS_FORM_URL = 'https://goo.gl/forms/XIj00RJ2h5L55XzU2'
+
+OPPIA_DEV_GROUP_URL = 'https://groups.google.com/forum/#!forum/oppia-dev'
