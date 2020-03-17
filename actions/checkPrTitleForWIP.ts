@@ -19,7 +19,7 @@ async function run() {
       var body = "comment hoja plz";
       octokit.issues.createComment({
         owner,
-        repoName,
+        repo: repoName,
         issue_number: issueNumber,
         body
       }).then(({ data, headers, status }) => {}).catch(err => {
