@@ -50,12 +50,10 @@ angular.module('oppia').directive('contributionsAndReview', [
       controllerAs: '$ctrl',
       controller: [
         '$filter', '$uibModal', 'AlertsService', 'ContributionAndReviewService',
-        'QuestionObjectFactory',
-        'QUESTION_SUGGESTION_TYPE_TO_SKILL_DIFFICULTY_FLOAT', 'UserService',
+        'QuestionObjectFactory', 'UserService',
         function(
             $filter, $uibModal, AlertsService, ContributionAndReviewService,
-            QuestionObjectFactory,
-            QUESTION_SUGGESTION_TYPE_TO_SKILL_DIFFICULTY_FLOAT, UserService) {
+            QuestionObjectFactory, UserService) {
           var ctrl = this;
           var SUGGESTION_LABELS = {
             review: {
@@ -146,7 +144,7 @@ angular.module('oppia').directive('contributionsAndReview', [
               suggestion.change.question_dict);
             var contentHtml = question.getStateData().content.getHtml();
             var skillRubrics = contributionDetails.skill_rubrics;
-            var skillDifficulty = suggestion.skill_difficulty;
+            var skillDifficulty = suggestion.change.skill_difficulty;
 
             $uibModal.open({
               templateUrl: _templateUrl,

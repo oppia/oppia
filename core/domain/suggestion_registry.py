@@ -549,7 +549,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected change to contain skill_difficulty')
 
-        if self.change.skill_difficulty not in feconf.SKILL_DIFFICULTIES:
+        if self._get_skill_difficulty() not in feconf.SKILL_DIFFICULTIES:
             raise utils.ValidationError(
                 'Expected change skill_difficulty to be one of %s '
                 % feconf.SKILL_DIFFICULTIES)
@@ -618,7 +618,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'The skill with the given id doesn\'t exist.')
         question_services.create_new_question_skill_link(
             self.author_id, question_dict['id'], self.change.skill_id,
-            self.change.skill_difficulty)
+            self._get_skill_difficulty())
 
     def populate_old_value_of_change(self):
         """Populates old value of the change."""
@@ -647,6 +647,10 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'The new change question_dict must not be equal to the old '
                 'question_dict')
+
+    def _get_skill_difficulty(self):
+        """Returns the suggestion's skill difficulty."""
+        return float(self.change.skill_difficulty)
 
 
 class BaseVoiceoverApplication(python_utils.OBJECT):

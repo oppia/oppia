@@ -1071,7 +1071,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                     'linked_skill_ids': ['skill_1']
                 },
                 'skill_id': 'skill_1',
-                'skill_difficulty': 0.3
+                'skill_difficulty': 0.3,
+                'topic_name': 'topic_1'
             },
             'score_category': 'question.topic_1',
             'last_updated': utils.get_time_in_millisecs(self.fake_date)
