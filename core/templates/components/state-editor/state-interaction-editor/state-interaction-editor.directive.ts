@@ -121,7 +121,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
           };
 
           var _updateInteractionPreviewAndAnswerChoices = function(
-              oldToNewListMapping) {
+              oldToNewListMapping = {}) {
             $scope.interactionId = StateInteractionIdService.savedMemento;
 
             var currentCustomizationArgs =

@@ -84,7 +84,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
           return false;
         };
 
-        var intializeOldToNewListMapping = function() {
+        var initializeOldToNewListMapping = function() {
           if ($scope.oldToNewListMapping !== undefined) {
             for (var i = 0; i < $scope.localValue.length; i++) {
               $scope.oldToNewListMapping.newToOldListPosition.push(i);
@@ -239,7 +239,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
               'submittedSchemaBasedFloatForm', $scope._onChildFormSubmit);
             $scope.$on(
               'submittedSchemaBasedUnicodeForm', $scope._onChildFormSubmit);
-            intializeOldToNewListMapping();
+            initializeOldToNewListMapping();
 
             $scope.deleteElement = function(index) {
               updateOldToNewListMappingOnDeleteElement(index);
