@@ -313,9 +313,6 @@ export class UpgradedServices {
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
-    // eslint-disable-next-line max-len
-    upgradedServices['ContinueValidationService'] = new ContinueValidationService(
-      upgradedServices['baseInteractionValidationService']);
     upgradedServices['CountVectorizerService'] = new CountVectorizerService();
     upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
@@ -329,9 +326,6 @@ export class UpgradedServices {
       new EmailDashboardDataService(
         new HttpClient(new HttpXhrBackend(
           new ɵangular_packages_common_http_http_d())));
-    upgradedServices['EndExplorationValidationService'] =
-      new EndExplorationValidationService(
-        upgradedServices['baseInteractionValidationService']);
     upgradedServices['EntityContextObjectFactory'] =
       new EntityContextObjectFactory();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
@@ -422,10 +416,16 @@ export class UpgradedServices {
     upgradedServices['ChangesInHumanReadableFormService'] =
       new ChangesInHumanReadableFormService(
         upgradedServices['UtilsService'], document);
+    // eslint-disable-next-line max-len
+    upgradedServices['ContinueValidationService'] = new ContinueValidationService(
+      upgradedServices['baseInteractionValidationService']);
     upgradedServices['DeviceInfoService'] = new DeviceInfoService(
       upgradedServices['WindowRef']);
     upgradedServices['DocumentAttributeCustomizationService'] =
       new DocumentAttributeCustomizationService(upgradedServices['WindowRef']);
+    upgradedServices['EndExplorationValidationService'] =
+      new EndExplorationValidationService(
+        upgradedServices['baseInteractionValidationService']);
     upgradedServices['FeedbackThreadObjectFactory'] =
       new FeedbackThreadObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);
