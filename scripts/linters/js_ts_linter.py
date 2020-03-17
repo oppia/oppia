@@ -379,14 +379,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     # statement.
                                     body_element_type_is_not_return = (
                                         body_element.type != 'ReturnStatement')
+                                    arg_type = (
+                                        body_element.argument and
+                                        body_element.argument.type)
                                     body_element_arg_type_is_not_object = (
-                                        body_element.argument.type != (
-                                            'ObjectExpression'))
-                                    if (
-                                            body_element_arg_type_is_not_object
-                                            or (
-                                                body_element_type_is_not_return
-                                                )):
+                                        arg_type != 'ObjectExpression')
+                                    if (body_element_arg_type_is_not_object or
+                                            body_element_type_is_not_return):
                                         continue
                                     # Separate the properties of the return
                                     # node.
