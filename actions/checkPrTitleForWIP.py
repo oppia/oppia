@@ -1,11 +1,9 @@
 import github, os, json
+from github import Github
 
 def main():
-    gh = github.Github(os.getenv('GITHUB_TOKEN'))
-    print(str(os.getenv('GITHUB_TOKEN'))[0:-1],str(os.getenv('GITHUB_TOKEN')[-1]))
-    print(gh.get_user())
+    gh = Github(os.getenv('GITHUB_TOKEN'))
     event = json.load(open(os.getenv('GITHUB_EVENT_PATH')))
-    #print(event)
     if 'WIP' in event['pull_request']['title']:
         repo = gh.get_repo(event['repository']['full_name'])
         issue = repo.get_issue(event['pull_request']['number'])
