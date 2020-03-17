@@ -107,7 +107,8 @@ class QuestionSuggestionChange(change_domain.BaseChange):
         {
             'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'required_attribute_names': [
-                'question_dict', 'skill_id', 'skill_difficulty']
+                'question_dict', 'skill_id', 'skill_difficulty'],
+            'optional_attribute_names': []
         }
     ]
 

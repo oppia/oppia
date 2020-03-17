@@ -516,6 +516,8 @@ COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 
+SKILL_DIFFICULTIES = list(constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.values())
+
 # User id and username for suggestion bot. This bot will be used to accept
 # suggestions automatically after a threshold time.
 SUGGESTION_BOT_USER_ID = 'OppiaSuggestionBot'
