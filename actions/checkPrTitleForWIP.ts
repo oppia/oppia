@@ -4,6 +4,7 @@ const github = require('@actions/github');
 async function run() {
   try {
     //console.log(github.context);
+    var context = github.context;
     var pullRequest = context.payload.pull_request;
     var pullRequestNumber = pullRequest.number;
 
