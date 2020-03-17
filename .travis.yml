@@ -16,16 +16,13 @@ env:
   jobs:
     # TODO(sll): Reinstate this when the load tests are more reliable.
     # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true EXCLUDE_LOAD_TESTS=false
-    - RUN_E2E_TESTS_ACCESSIBILITY=true
     - RUN_E2E_TESTS_ADDITIONAL_EDITOR_FEATURES=true
     - RUN_E2E_TESTS_ADDITIONAL_PLAYER_FEATURES=true
-    - RUN_E2E_TESTS_ADMIN_PAGE=true
     - RUN_E2E_TESTS_CLASSROOM_PAGE=true
     - RUN_E2E_TESTS_COLLECTIONS=true
     - RUN_E2E_TESTS_COMMUNITY_DASHBOARD=true
     - RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES=true
     - RUN_E2E_TESTS_CREATOR_DASHBOARD=true
-    - RUN_E2E_TESTS_EMBEDDING=true
     - RUN_E2E_TESTS_EXPLORATION_FEEDBACK_TAB=true
     - RUN_E2E_TESTS_EXPLORATION_HISTORY_TAB=true
     - RUN_E2E_TESTS_EXPLORATION_IMPROVEMENTS_TAB=true
@@ -34,8 +31,6 @@ env:
     - RUN_E2E_TESTS_EXTENSIONS=true
     - RUN_E2E_TESTS_LEARNER_DASHBOARD=true
     - RUN_E2E_TESTS_LEARNER=true
-    - RUN_E2E_TESTS_LIBRARY=true
-    - RUN_E2E_TESTS_NAVIGATION=true
     - RUN_E2E_TESTS_PREFERENCES=true
     - RUN_E2E_TESTS_PROFILE_FEATURES=true
     - RUN_E2E_TESTS_PROFILE_MENU=true
@@ -83,16 +78,13 @@ install:
 
 script:
 # Run the e2e tests in the production environment (using --prod_env).
-- if [ "$RUN_E2E_TESTS_ACCESSIBILITY" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="accessibility" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_ADDITIONAL_EDITOR_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_ADDITIONAL_PLAYER_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="additionalPlayerFeatures" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_ADMIN_PAGE" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="adminPage" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_CLASSROOM_PAGE" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="classroomPage" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_COLLECTIONS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="collections" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_COMMUNITY_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="communityDashboard" --community_dashboard_enabled --prod_env; fi
 - if [ "$RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="coreEditorAndPlayerFeatures" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_CREATOR_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="creatorDashboard" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_EMBEDDING" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="embedding" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_EXPLORATION_FEEDBACK_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="explorationFeedbackTab" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_EXPLORATION_HISTORY_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="explorationHistoryTab" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_EXPLORATION_IMPROVEMENTS_TAB" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="explorationImprovementsTab" --prod_env; fi
@@ -101,8 +93,6 @@ script:
 - if [ "$RUN_E2E_TESTS_EXTENSIONS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="extensions" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_LEARNER_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="learnerDashboard" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_LEARNER" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="learner" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_LIBRARY" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="library" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_NAVIGATION" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="navigation" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_PREFERENCES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="preferences" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_PROFILE_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="profileFeatures" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_PROFILE_MENU" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="profileMenu" --prod_env; fi
