@@ -114,14 +114,14 @@ describe('Improvement Feedback Thread Modal Controller', function() {
 
     it('should not add new message when message status is false', function() {
       var addWarningSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
-      $scope.addNewMessage('exp1.thread1', 'temporary text', null);
+      $scope.addNewMessage('temporary text', null);
       expect(addWarningSpy).toHaveBeenCalledWith(
         'Invalid message status: null');
     });
 
     it('should add new message', function() {
       $httpBackend.expectPOST('/threadhandler/exp1.thread1').respond(200);
-      $scope.addNewMessage('exp1.thread1', 'temporary text', 'newStatus');
+      $scope.addNewMessage('temporary text', 'newStatus');
 
       expect($scope.messageSendingInProgress).toBe(true);
       $httpBackend.flush();
@@ -133,7 +133,7 @@ describe('Improvement Feedback Thread Modal Controller', function() {
 
     it('should use reject handler when adding new message fails', function() {
       $httpBackend.expectPOST('/threadhandler/exp1.thread1').respond(500);
-      $scope.addNewMessage('exp1.thread1', 'temporary text', 'status message');
+      $scope.addNewMessage('temporary text', 'status message');
 
       expect($scope.messageSendingInProgress).toBe(true);
       $httpBackend.flush();
@@ -200,7 +200,7 @@ describe('Improvement Feedback Thread Modal Controller', function() {
 
     it('should not add new message when thread id is not valid', function() {
       var addWarningSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
-      $scope.addNewMessage(null, 'text', 'status message');
+      $scope.addNewMessage('text', 'status message');
       expect(addWarningSpy).toHaveBeenCalledWith(
         'Cannot add message to thread with ID: null.');
     });

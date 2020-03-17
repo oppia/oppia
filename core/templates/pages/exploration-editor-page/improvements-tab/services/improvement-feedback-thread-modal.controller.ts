@@ -46,8 +46,8 @@ angular.module('oppia').controller('ImprovementFeedbackThreadModalController', [
 
     // TODO(Allan): Implement ability to edit suggestions before
     // applying.
-    $scope.addNewMessage = function(threadId, tmpText, tmpStatus) {
-      if (threadId === null) {
+    $scope.addNewMessage = function(tmpText, tmpStatus) {
+      if (thread.threadId === null) {
         AlertsService.addWarning(
           'Cannot add message to thread with ID: null.');
         return;
@@ -59,7 +59,7 @@ angular.module('oppia').controller('ImprovementFeedbackThreadModalController', [
       }
       $scope.messageSendingInProgress = true;
       ThreadDataService.addNewMessage(
-        threadId, tmpText, tmpStatus, function() {
+        thread.threadId, tmpText, tmpStatus, function() {
           $scope.tmpMessage.status = $scope.activeThread.status;
           $scope.messageSendingInProgress = false;
         }, function() {
