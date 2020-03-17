@@ -60,9 +60,9 @@ export class LearnerAction {
   // camelCasing.
   toBackendDict(): any {
     return {
-      action_type: this.actionType,
-      action_customization_args: this.actionCustomizationArgs,
-      schema_version: this.schemaVersion,
+      actionType: this.actionType,
+      actionCustomizationArgs: this.actionCustomizationArgs,
+      schemaVersion: this.schemaVersion,
     };
   }
 }
@@ -107,9 +107,9 @@ export class LearnerActionObjectFactory {
   // camelCasing.
   createFromBackendDict(learnerActionBackendDict: any): LearnerAction {
     return new LearnerAction(
-      learnerActionBackendDict.action_type,
-      learnerActionBackendDict.action_customization_args,
-      learnerActionBackendDict.schema_version);
+      learnerActionBackendDict.actionType,
+      learnerActionBackendDict.actionCustomizationArgs,
+      learnerActionBackendDict.schemaVersion);
   }
 }
 

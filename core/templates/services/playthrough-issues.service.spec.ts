@@ -58,13 +58,13 @@ describe('Playthrough Issues Service', function() {
       }
     },
     actions: [{
-      action_type: 'ExplorationStart',
-      action_customization_args: {
+      actionType: 'ExplorationStart',
+      actionCustomizationArgs: {
         state_name: {
           value: 'state_name1'
         }
       },
-      schema_version: 1
+      schemaVersion: 1
     }]
   };
 

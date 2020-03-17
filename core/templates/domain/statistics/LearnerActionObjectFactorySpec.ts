@@ -65,9 +65,9 @@ describe('Learner Action Object Factory', () => {
   it('should create a new learner action from a backend dict', () => {
     var learnerActionObject =
         this.LearnerActionObjectFactory.createFromBackendDict({
-          action_type: 'AnswerSubmit',
-          action_customization_args: {},
-          schema_version: 1
+          actionType: 'AnswerSubmit',
+          actionCustomizationArgs: {},
+          schemaVersion: 1
         });
 
     expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
@@ -81,9 +81,9 @@ describe('Learner Action Object Factory', () => {
 
     var learnerActionDict = learnerActionObject.toBackendDict();
     expect(learnerActionDict).toEqual({
-      action_type: 'AnswerSubmit',
-      action_customization_args: {},
-      schema_version: 1
+      actionType: 'AnswerSubmit',
+      actionCustomizationArgs: {},
+      schemaVersion: 1
     });
   });
 });
