@@ -16,14 +16,13 @@ async function run() {
         'https://github.com/oppia/oppia/wiki/Setup-your-own-CircleCI-instance');
       var linkB = linkText.link(
         'https://github.com/oppia/oppia/wiki/Setup-your-own-Travis-instance');
-      body=('Hi @' + userName + ' ' +
+      console.log('Hi @' + userName + ' ' +
             'We typically do not want WIP PRs since each ' +
             'push will make the Travis queue unnecessarily ' +
             'long. If you need to run automated tests, ' +
             'please see our guides:' +
             'Please follow this ' + linkA + ' and ' + linkB + ' ' +
             'on how to set that up. Thanks!');
-      console.log(body)
   } catch (error) {
     core.setFailed(error.message);
   }
