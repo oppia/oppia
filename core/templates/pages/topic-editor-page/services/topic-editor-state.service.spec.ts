@@ -255,10 +255,7 @@ describe('Topic editor state service', function() {
     $provide.value(
       'TopicRightsBackendApiService',
       [fakeTopicRightsBackendApiService][0]);
-  }));
-  beforeEach(
-    angular.mock.module('oppia', TranslatorProviderForTests));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+
     fakeEditableStoryBackendApiService = (
       FakeEditableStoryBackendApiService());
     $provide.value(
