@@ -55,9 +55,9 @@ describe('Playthrough Object Factory', () => {
         issue_type: 'EarlyQuit',
         issue_customization_args: {},
         actions: [{
-          action_type: 'AnswerSubmit',
-          action_customization_args: {},
-          schema_version: 1
+          actionType: 'AnswerSubmit',
+          actionCustomizationArgs: {},
+          schemaVersion: 1
         }]
       }
     );
@@ -84,9 +84,9 @@ describe('Playthrough Object Factory', () => {
       issue_type: 'EarlyQuit',
       issue_customization_args: {},
       actions: [{
-        action_type: 'AnswerSubmit',
-        action_customization_args: {},
-        schema_version: 1
+        actionType: 'AnswerSubmit',
+        actionCustomizationArgs: {},
+        schemaVersion: 1
       }]
     });
   });
