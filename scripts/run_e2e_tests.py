@@ -96,6 +96,10 @@ _PARSER.add_argument(
     help='If true, skips installing dependencies. The default value is false.',
     action='store_true')
 _PARSER.add_argument(
+    '--skip-build',
+    help='If true, skips building files. The default value is false.',
+    action='store_true')
+_PARSER.add_argument(
     '--sharding-instances', type=int, default=3,
     help='Sets the number of parallel browsers to open while sharding.'
          'Sharding must be disabled (either by passing in false to --sharding'
@@ -446,7 +450,8 @@ def main(args=None):
     dev_mode = not parsed_args.prod_env
     update_community_dashboard_status_in_feconf_file(
         FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
-    build_js_files(dev_mode)
+    if not parsed_args.skip_build:
+        build_js_files(dev_mode)
     start_webdriver_manager()
 
     start_google_app_engine_server(dev_mode)
