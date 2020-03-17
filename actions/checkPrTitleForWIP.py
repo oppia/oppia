@@ -7,7 +7,7 @@ def main():
     if 'WIP' in event['pull_request']['title']:
         repo = gh.get_repo(event['repository']['full_name'])
         issue = repo.get_issue(event['pull_request']['number'])
-        comment = ('Hi @' + str(a['pull_request']['user']['login']) + ' '
+        comment = ('Hi @' + str(event['pull_request']['user']['login']) + ' '
                    'We typically do not want WIP PRs since each push will '
                    'make the Travis queue unnecessarily long. If you need '
                    'to run automated tests, please see our guides:'
