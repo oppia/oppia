@@ -368,8 +368,8 @@ def get_reviewable_suggestions(user_id, suggestion_type):
         language_codes = (
             user_review_rights.can_review_translation_for_language_codes)
         return [
-            suggestion for suggestion in all_suggestions if
-            suggestion.change.language_code in language_codes]
+            suggestion for suggestion in all_suggestions
+            if suggestion.change.language_code in language_codes]
 
     return all_suggestions
 
