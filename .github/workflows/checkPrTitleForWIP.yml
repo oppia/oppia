@@ -21,4 +21,5 @@ jobs:
 
     - name: check for WIP in PR HEADING
       run: |
+        npm i @actions/core@^1.0.0 @actions/github@^1.0.0
         node ./actions/checkPrTitleForWIP.ts
