@@ -457,6 +457,18 @@ def main(args=None):
     read_files(all_filepaths)
     categorize_files(all_filepaths)
 
+    # Prepare custom tasks.
+    custom_max_concurrent_runs = 25
+    custom_concurrent_count = min(
+        multiprocessing.cpu_count(), custom_max_concurrent_runs)
+    custom_semaphore = threading.Semaphore(custom_concurrent_count)
+
+    # Prepare third_party tasks.
+    third_party_max_concurrent_runs = 2
+    third_party_concurrent_count = min(
+        multiprocessing.cpu_count(), third_party_max_concurrent_runs)
+    third_party_semaphore = threading.Semaphore(third_party_concurrent_count)
+
     custom_linters = []
     third_party_linters = []
     for file_extension_type in file_extension_types:
@@ -471,23 +483,22 @@ def main(args=None):
     tasks_third_party = []
 
     for linter in custom_linters:
-        # Concurrency limit: 25.
         task_custom = concurrent_task_utils.create_task(
-            linter.perform_all_lint_checks, 25,
-            verbose=verbose_mode_enabled, name='custom')
+            linter.perform_all_lint_checks, verbose_mode_enabled,
+            custom_semaphore, name='custom')
         tasks_custom.append(task_custom)
 
     for linter in third_party_linters:
-        # Concurrency limit: 2.
         task_third_party = concurrent_task_utils.create_task(
-            linter.perform_all_lint_checks, 2,
-            verbose=verbose_mode_enabled, name='third_party')
+            linter.perform_all_lint_checks, verbose_mode_enabled,
+            third_party_semaphore, name='third_party')
         tasks_third_party.append(task_third_party)
 
     # Concurrency limit: 25.
-    concurrent_task_utils.execute_tasks(tasks_custom, 25)
+    concurrent_task_utils.execute_tasks(tasks_custom, custom_semaphore)
     # Concurrency limit: 2.
-    concurrent_task_utils.execute_tasks(tasks_third_party, 2)
+    concurrent_task_utils.execute_tasks(
+        tasks_third_party, third_party_semaphore)
 
     all_messages = []
 

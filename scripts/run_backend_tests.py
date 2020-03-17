@@ -46,10 +46,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import importlib
 import inspect
+import multiprocessing
 import os
 import re
 import subprocess
 import sys
+import threading
 import time
 
 import python_utils
@@ -300,23 +302,24 @@ def main(args=None):
             test_path=parsed_args.test_path,
             include_load_tests=include_load_tests)
 
-
+    # Prepare tasks.
+    max_concurrent_runs = 25
+    concurrent_count = min(multiprocessing.cpu_count(), max_concurrent_runs)
+    semaphore = threading.Semaphore(concurrent_count)
 
     task_to_taskspec = {}
     tasks = []
     for test_target in all_test_targets:
         test = TestingTaskSpec(
             test_target, parsed_args.generate_coverage_report)
-        # Concurrency limit: 25.
         task = concurrent_task_utils.create_task(
-            test.run, 25, verbose=parsed_args.verbose, name=test_target)
+            test.run, parsed_args.verbose, semaphore, name=test_target)
         task_to_taskspec[task] = test
         tasks.append(task)
 
     task_execution_failed = False
     try:
-        # Concurrency limit: 25.
-        concurrent_task_utils.execute_tasks(tasks, 25)
+        concurrent_task_utils.execute_tasks(tasks, semaphore)
     except Exception:
         task_execution_failed = True
 
