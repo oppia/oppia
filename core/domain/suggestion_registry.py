@@ -80,7 +80,7 @@ class BaseSuggestion(python_utils.OBJECT):
             'final_reviewer_id': self.final_reviewer_id,
             'change': self.change.to_dict(),
             'score_category': self.score_category,
-            'last_updated': utils.get_time_in_millisecs(self.last_updated)
+            'last_updated_msecs': utils.get_time_in_millisecs(self.last_updated)
         }
 
     def get_score_type(self):

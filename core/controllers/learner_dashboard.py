@@ -176,7 +176,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
                 'author_username': authors_settings[0].username,
                 'author_picture_data_url': (
                     authors_settings[0].profile_picture_data_url),
-                'created_on': utils.get_time_in_millisecs(
+                'created_on_msecs': utils.get_time_in_millisecs(
                     messages[0].created_on)
             }
             message_summary_list.append(suggestion_summary)
@@ -199,7 +199,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
                 'updated_status': m.updated_status,
                 'author_username': author_username,
                 'author_picture_data_url': author_picture_data_url,
-                'created_on': utils.get_time_in_millisecs(m.created_on)
+                'created_on_msecs': utils.get_time_in_millisecs(m.created_on)
             }
             message_summary_list.append(message_summary)
 

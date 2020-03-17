@@ -641,7 +641,7 @@
                 <span ng-if="!thread.lastMessageText && thread.totalMessageCount === 1"><i translate="I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT"></i></span>
               </td>
               <td class="col-lg-2 col-md-2 col-sm-2">
-                <span><[$ctrl.getLocaleAbbreviatedDatetimeString(thread.lastUpdated)]></span>
+                <span><[$ctrl.getLocaleAbbreviatedDatetimeString(thread.lastUpdatedMsecs)]></span>
               </td>
             </tr>
           </table>
@@ -692,7 +692,7 @@
                     </span>
                   </div>
                   <div class="col-lg-3 col-md-3 col-sm-3">
-                    <span><[$ctrl.getLocaleAbbreviatedDatetimeString(message.createdOn)]></span>
+                    <span><[$ctrl.getLocaleAbbreviatedDatetimeString(message.createdOnMsecs)]></span>
                   </div>
                 </div>
 

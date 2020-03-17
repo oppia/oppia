@@ -17,12 +17,15 @@
    domain objects.
  */
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import { SuggestionsService } from 'services/suggestions.service';
 
 export class Suggestion {
   suggestionType: string;
   suggestionId: string;
+  threadId: string;
   targetType: string;
   targetId: string;
   status: string;
@@ -32,15 +35,16 @@ export class Suggestion {
   newValue: any;
   // TODO(#7165): Replace 'any' with the exact type.
   oldValue: any;
-  lastUpdated: number;
+  lastUpdatedMsecs: number;
 
   constructor(
-      suggestionType: string, suggestionId: string, targetType: string,
-      targetId: string, status: string, authorName: string,
+      suggestionType: string, suggestionId: string, threadId: string,
+      targetType: string, targetId: string, status: string, authorName: string,
       stateName: string, newValue: string, oldValue: string,
-      lastUpdated: number) {
+      lastUpdatedMsecs: number) {
     this.suggestionType = suggestionType;
     this.suggestionId = suggestionId;
+    this.threadId = threadId;
     this.targetType = targetType;
     this.targetId = targetId;
     this.status = status;
@@ -48,32 +52,33 @@ export class Suggestion {
     this.stateName = stateName;
     this.newValue = newValue;
     this.oldValue = oldValue;
-    this.lastUpdated = lastUpdated;
+    this.lastUpdatedMsecs = lastUpdatedMsecs;
   }
 
   getThreadId(): string {
-    return this.suggestionId;
+    return this.threadId;
   }
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({providedIn: 'root'})
 export class SuggestionObjectFactory {
+  constructor(private suggestionsService: SuggestionsService) {}
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'suggestionBackendDict' is a dict with underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
   createFromBackendDict(suggestionBackendDict: any): Suggestion {
+    let threadId = this.suggestionsService.getThreadIdFromSuggestionBackendDict(
+      suggestionBackendDict);
     return new Suggestion(
       suggestionBackendDict.suggestion_type,
-      suggestionBackendDict.suggestion_id, suggestionBackendDict.target_type,
-      suggestionBackendDict.target_id, suggestionBackendDict.status,
-      suggestionBackendDict.author_name,
+      suggestionBackendDict.suggestion_id, threadId,
+      suggestionBackendDict.target_type, suggestionBackendDict.target_id,
+      suggestionBackendDict.status, suggestionBackendDict.author_name,
       suggestionBackendDict.change.state_name,
       suggestionBackendDict.change.new_value,
       suggestionBackendDict.change.old_value,
-      suggestionBackendDict.last_updated);
+      suggestionBackendDict.last_updated_msecs);
   }
 }
 

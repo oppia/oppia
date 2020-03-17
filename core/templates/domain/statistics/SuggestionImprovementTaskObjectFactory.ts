@@ -28,23 +28,23 @@ require(
   'suggestion-modal-for-exploration-editor.service.ts');
 
 angular.module('oppia').factory('SuggestionImprovementTaskObjectFactory', [
-  '$q', 'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
+  'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
   'ThreadDataService', 'SUGGESTION_IMPROVEMENT_TASK_TYPE',
   function(
-      $q, ImprovementActionButtonObjectFactory, ImprovementModalService,
+      ImprovementActionButtonObjectFactory, ImprovementModalService,
       ThreadDataService, SUGGESTION_IMPROVEMENT_TASK_TYPE) {
     var SuggestionImprovementTask = function(suggestionThread) {
+      this._thread = suggestionThread;
       this._actionButtons = [
         ImprovementActionButtonObjectFactory.createNew(
           'Review Thread', 'btn-primary',
-          () => ImprovementModalService.openSuggestionThread(suggestionThread)),
+          () => ImprovementModalService.openSuggestionThread(this._thread)),
       ];
-      this._suggestionThread = suggestionThread;
     };
 
     /** @returns {string} - The actionable status of this task. */
     SuggestionImprovementTask.prototype.getStatus = function() {
-      return this._suggestionThread.status;
+      return this._thread.status;
     };
 
     /**
@@ -57,8 +57,8 @@ angular.module('oppia').factory('SuggestionImprovementTaskObjectFactory', [
 
     /** @returns {string} - A simple summary of the suggestion thread. */
     SuggestionImprovementTask.prototype.getTitle = function() {
-      return 'Suggestion for the card "' +
-        this._suggestionThread.suggestion.stateName + '"';
+      return 'Suggestion for the card "' + this._thread.suggestion.stateName +
+        '"';
     };
 
     /**
@@ -66,7 +66,7 @@ angular.module('oppia').factory('SuggestionImprovementTaskObjectFactory', [
      *    this task's data.
      */
     SuggestionImprovementTask.prototype.getDirectiveData = function() {
-      return this._suggestionThread;
+      return this._thread;
     };
 
     /**
@@ -87,7 +87,7 @@ angular.module('oppia').factory('SuggestionImprovementTaskObjectFactory', [
 
     /** @returns {number} - The time that the task was last updated. */
     SuggestionImprovementTask.prototype.getLastUpdatedTime = function() {
-      return this._suggestionThread.last_updated;
+      return this._thread.lastUpdatedMsecs;
     };
 
     return {
@@ -105,12 +105,8 @@ angular.module('oppia').factory('SuggestionImprovementTaskObjectFactory', [
        */
       fetchTasks: function() {
         var createNew = this.createNew;
-        return ThreadDataService.fetchThreads().then(threadData => {
-          return $q.all(
-            threadData.suggestionThreads.map(
-              thread => ThreadDataService.fetchMessages(thread.threadId))
-          ).then(() => threadData);
-        }).then(threadData => threadData.suggestionThreads.map(createNew));
+        return ThreadDataService.getThreadsAsync()
+          .then(threadData => threadData.suggestionThreads.map(createNew));
       },
     };
   }

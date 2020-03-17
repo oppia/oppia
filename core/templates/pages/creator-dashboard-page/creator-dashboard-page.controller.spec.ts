@@ -19,25 +19,20 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // creator-dashboard-page.controller.ts is upgraded to Angular 8.
-import { RatingComputationService } from
-  'components/ratings/rating-computation/rating-computation.service';
-import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
-/* eslint-disable max-len */
-import { ThreadStatusDisplayService } from
-  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-/* eslint-enable max-len */
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
 
 require('pages/creator-dashboard-page/creator-dashboard-page.controller.ts');
 
-describe('Creator dashboard controller', function() {
-  describe('CreatorDashboard', function() {
-    var ctrl, $httpBackend, componentController;
+describe('Creator dashboard controller', () => {
+  describe('CreatorDashboard', () => {
+    var ctrl;
+    var $httpBackend;
+    var $componentController;
+    var AlertsService;
+    var CreatorDashboardBackendApiService;
+
     var CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data';
     var dashboardData = {
       explorations_list: [{
@@ -70,60 +65,39 @@ describe('Creator dashboard controller', function() {
       }
     };
 
-    beforeEach(
-      angular.mock.module('oppia', TranslatorProviderForTests));
-
-    beforeEach(function() {
-      angular.mock.module('oppia');
-    });
-    beforeEach(angular.mock.module('oppia', function($provide) {
+    beforeEach(angular.mock.module('oppia', TranslatorProviderForTests));
+    beforeEach(angular.mock.module('oppia', $provide => {
       var ugs = new UpgradedServices();
       for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
         $provide.value(key, value);
       }
+
+      $provide.factory('CreatorDashboardBackendApiService', ['$http', $http => {
+        return {
+          fetchDashboardData: () => $http.get('/creatordashboardhandler/data')
+        };
+      }]);
     }));
 
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.factory(
-        'CreatorDashboardBackendApiService', ['$http', function($http) {
-          return {
-            fetchDashboardData: function() {
-              return $http.get('/creatordashboardhandler/data');
-            }
-          };
-        }]);
-      $provide.value(
-        'RatingComputationService', new RatingComputationService());
-      $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
-      $provide.value(
-        'ThreadStatusDisplayService', new ThreadStatusDisplayService());
-      $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
-    }));
-
-    beforeEach(inject(['$componentController', function(
-        $componentController) {
-      componentController = $componentController;
-    }]));
-
-    beforeEach(angular.mock.inject(function($injector) {
+    beforeEach(angular.mock.inject($injector => {
+      $componentController = $injector.get('$componentController');
       $httpBackend = $injector.get('$httpBackend');
-    }));
+      AlertsService = $injector.get('AlertsService');
+      CreatorDashboardBackendApiService =
+        $injector.get('CreatorDashboardBackendApiService');
 
-    beforeEach(angular.mock.inject(
-      function(CreatorDashboardBackendApiService) {
-        $httpBackend.expect('GET', CREATOR_DASHBOARD_DATA_URL).respond(
-          dashboardData);
-        ctrl = componentController('creatorDashboardPage', null, {
-          AlertsService: null,
-          CreatorDashboardBackendApiService: CreatorDashboardBackendApiService
-        });
-        // Refer: https://www.codelord.net/2017/01/09/
-        // unit-testing-angular-components-with-%24componentcontroller/
-        // Angular and $componentController does not take care of
-        // $onInit lifecycle hook, so we need to call it explicitly.
-        ctrl.$onInit();
-      }
-    ));
+      $httpBackend.expect('GET', CREATOR_DASHBOARD_DATA_URL)
+        .respond(dashboardData);
+      ctrl = $componentController('creatorDashboardPage', null, {
+        AlertsService: AlertsService,
+        CreatorDashboardBackendApiService: CreatorDashboardBackendApiService
+      });
+      // Refer: https://www.codelord.net/2017/01/09/
+      // unit-testing-angular-components-with-%24componentcontroller/
+      // Angular and $componentController does not take care of
+      // $onInit lifecycle hook, so we need to call it explicitly.
+      ctrl.$onInit();
+    }));
 
     it('should have the correct data for creator dashboard', function() {
       $httpBackend.flush();

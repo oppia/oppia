@@ -32,35 +32,14 @@ angular.module('oppia').directive('suggestionImprovementTask', [
       controller: [
         '$scope', 'DateTimeFormatService', 'ThreadStatusDisplayService',
         function($scope, DateTimeFormatService, ThreadStatusDisplayService) {
-          $scope.getLatestMessage = function() {
-            var numMessages = $scope.getData().messages.length;
-            if (numMessages > 1) {
-              var latestMessage = $scope.getData().messages[numMessages - 1];
-              return {
-                text: latestMessage.text,
-                author: latestMessage.author_username,
-                updatedOn: latestMessage.created_on,
-                updatedStatus: latestMessage.updated_status,
-              };
-            } else {
-              return {
-                text: $scope.getData().subject,
-                author: $scope.getData().originalAuthorName,
-                updatedOn: $scope.getData().lastUpdated,
-                updatedStatus: null,
-              };
-            }
+          $scope.getLastNonemptyMessageAuthorUsername = function() {
+            return $scope.getData().lastNonemptyMessageSummary.authorUsername ||
+              $scope.getData().originalAuthorName;
           };
 
-          $scope.getHumanReadableUpdatedStatus = function() {
-            var updatedStatus = $scope.getLatestMessage().updatedStatus;
-            return updatedStatus === null ? null :
-              ThreadStatusDisplayService.getHumanReadableStatus(updatedStatus);
-          };
-
-          $scope.getLocaleAbbreviatedDatetimeString = function() {
-            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-              $scope.getLatestMessage().updatedOn);
+          $scope.getLastNonemptyMessageText = function() {
+            return $scope.getData().lastNonemptyMessageSummary.text ||
+              $scope.getData().subject;
           };
         }
       ]

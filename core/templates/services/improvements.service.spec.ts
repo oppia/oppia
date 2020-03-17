@@ -25,7 +25,7 @@ describe('ImprovementsService', () => {
   });
 
   describe('.isStateForcedToResolveOutstandingUnaddressedAnswers', () => {
-    it('returns true for states with TextInput interactions', () => {
+    it('should return true for states with TextInput interactions', () => {
       var mockState = {interaction: {id: 'TextInput'}};
 
       expect(
@@ -34,7 +34,7 @@ describe('ImprovementsService', () => {
       ).toBe(true);
     });
 
-    it('returns false for states with FractionInput interactions', () => {
+    it('should return false for states with FractionInput interactions', () => {
       var mockState = {interaction: {id: 'FractionInput'}};
 
       expect(

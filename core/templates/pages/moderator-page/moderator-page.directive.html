@@ -45,13 +45,13 @@
               <th>Username</th>
             </tr>
             <tr ng-repeat="message in $ctrl.allFeedbackMessages track by $index">
-              <td><[$ctrl.getDatetimeAsString(message.created_on)]></td>
+              <td><[$ctrl.getDatetimeAsString(message.createdOnMsecs)]></td>
               <td>
-                <a ng-href="<[$ctrl.getExplorationCreateUrl(message.exploration_id)]>">
-                  <[message.exploration_id]>
+                <a ng-href="<[$ctrl.getExplorationCreateUrl(message.explorationId)]>">
+                  <[message.explorationId]>
                 </a>
               </td>
-              <td><[message.author_username]></td>
+              <td><[message.authorUsername]></td>
             </tr>
           </table>
         </div>
