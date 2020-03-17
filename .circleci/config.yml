@@ -1,44 +1,59 @@
 workflows:
   version: 2
   circleci_tests:
+    # The following jobs run in the following stages:
+    # - Setup runs first.
+    # - After setup passes, lint and frontend tests run.
+    #     - If frontend tests fail, stop and do not run the next step, but lint continues.
+    # - After frontend tests passes, backend and typescript tests run.
+    #     - If typescript tests fail, stop and do not run the next step, but backend continues.
+    # - After typescript tests passes, the flagship e2e tests (navigation and file upload) run. We run
+    #   these tests as sanity checks before running the entire test suite. Note that the navigation e2e
+    #   test also compiles all the prod files needed for other prod e2e tests.
+    #     - If either flagship e2e tests fail, then the rest of the e2e tests in the the corresponding
+    #       suite will not run.
+    # - After file upload e2e test passes, all other non-prod e2e tests run in parallel.
+    # - After navigation e2e test passes, all other prod e2e tests run in parallel.
+    # For an illustration of the stages, see https://github.com/oppia/oppia/wiki/images/circleCIWorkflow.png.
+
     jobs:
       - setup
       - lint_tests:
           requires:
             - setup
-      - typescript_tests:
-          requires:
-            - setup
       - frontend_tests:
           requires:
             - setup
+      - typescript_tests:
+          requires:
+            - frontend_tests
       - backend_tests:
           requires:
-            - setup
-      - e2e_admin:
-          requires:
-            - e2e_navigation
-      - e2e_accessibility:
-          requires:
-            - e2e_navigation
-      - e2e_classroom_page:
-          requires:
-            - e2e_file_upload_features
-      - e2e_embedding:
-          requires:
-            - e2e_navigation
+            - frontend_tests
       - e2e_file_upload_features:
           requires:
             - typescript_tests
-      - e2e_library:
-          requires:
-            - e2e_navigation
       - e2e_navigation:
           requires:
             - typescript_tests
+      - e2e_classroom_page:
+          requires:
+            - e2e_file_upload_features
       - e2e_topic_and_story_editor:
           requires:
             - e2e_file_upload_features
+      - e2e_accessibility:
+          requires:
+            - e2e_navigation
+      - e2e_admin:
+          requires:
+            - e2e_navigation
+      - e2e_embedding:
+          requires:
+            - e2e_navigation
+      - e2e_library:
+          requires:
+            - e2e_navigation
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
@@ -117,6 +132,29 @@ jobs:
           command: |
             python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
 
+  # Production environment e2e tests
+  # The following e2e tests are run in the production environment. Tests that require uploading files
+  # should be run in the non-prod environment.
+  e2e_navigation:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run e2e navigation test
+          command: |
+            python -m scripts.run_e2e_tests --prod_env --skip-install --suite="navigation"
+      - persist_to_workspace:
+          root: /home/circleci/
+          paths:
+            - oppia/app.yaml
+            - oppia/assets/constants.ts
+            - oppia/assets/hashes.json
+            - oppia/backend_prod_files/
+            - oppia/build/
+            - oppia/third_party/generated/
+
   e2e_admin:
     <<: *job_defaults
     steps:
@@ -139,17 +177,6 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
 
-  e2e_classroom_page:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run e2e classroom page test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures"
-
   e2e_embedding:
     <<: *job_defaults
     steps:
@@ -161,6 +188,20 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env
 
+  e2e_library:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run e2e library test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
+
+  # Non-prod e2e Tests
+  # The following tests must be run in a non-production environment because they are uploading files.
+  # All other e2e tests should be run in prod mode.
   e2e_file_upload_features:
     <<: *job_defaults
     steps:
@@ -178,36 +219,16 @@ jobs:
             - oppia/third_party/generated/
             - oppia/webpack_bundles
 
-  e2e_library:
+  e2e_classroom_page:
     <<: *job_defaults
     steps:
       - checkout
       - attach_workspace:
           at: /home/circleci/
       - run:
-          name: Run e2e library test
+          name: Run e2e classroom page test
           command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
-
-  e2e_navigation:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run e2e navigation test
-          command: |
-            python -m scripts.run_e2e_tests --prod_env --skip-install --suite="navigation"
-      - persist_to_workspace:
-          root: /home/circleci/
-          paths:
-            - oppia/app.yaml
-            - oppia/assets/constants.ts
-            - oppia/assets/hashes.json
-            - oppia/backend_prod_files/
-            - oppia/build/
-            - oppia/third_party/generated/
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures"
 
   e2e_topic_and_story_editor:
     <<: *job_defaults
@@ -219,6 +240,7 @@ jobs:
           name: Run e2e topic and story editor test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures"
+
 notify:
   webhooks:
     # A list of hook hashes, containing the url field
