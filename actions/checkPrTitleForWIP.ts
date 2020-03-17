@@ -4,6 +4,7 @@ const github = require('@actions/github');
 async function run() {
   try {
     //console.log(github.context);
+    console.log(github);
     var context = github.context;
     var pullRequest = context.payload.pull_request;
     var pullRequestNumber = pullRequest.number;
@@ -15,7 +16,7 @@ async function run() {
         'https://github.com/oppia/oppia/wiki/Setup-your-own-CircleCI-instance');
       var linkB = linkText.link(
         'https://github.com/oppia/oppia/wiki/Setup-your-own-Travis-instance');
-      var params = context.repo({
+      var params = github.repo({
         number: pullRequestNumber,
         body: 'Hi @' + userName + ' ' +
             'We typically do not want WIP PRs since each ' +
