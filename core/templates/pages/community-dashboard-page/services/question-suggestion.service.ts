@@ -18,7 +18,6 @@
 
 angular.module('oppia').factory('QuestionSuggestionService', [
   '$http', function($http) {
-
     return {
       submitSuggestion: function(
           question, associatedSkill, skillDifficulty, topicName, onSuccess) {
