@@ -42,7 +42,7 @@ describe('Skill object factory', () => {
   let skillContentsDict = null;
   let skillDict = null;
   let skillDifficulties = null;
-  let subtitledHtmlObjectFactory:SubtitledHtmlObjectFactory = null;
+  let subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

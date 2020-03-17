@@ -16,10 +16,12 @@
  * @fileoverview Factory for creating new frontend instances of SubtitledHtml
  * domain objects.
  */
+
 export interface ISubtitledHtmlBackendDict {
   'content_id': string;
-  'html': string;
+  html: string;
 }
+
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 

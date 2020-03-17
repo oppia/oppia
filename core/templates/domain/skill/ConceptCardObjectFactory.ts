@@ -18,7 +18,7 @@
  */
 
 export interface IConceptCardBackendDict {
-  'explanation': ISubtitledHtmlBackendDict,
+  explanation: ISubtitledHtmlBackendDict,
   'worked_examples': Array<ISubtitledHtmlBackendDict>,
   'recorded_voiceovers': IRecordedVoiceOverBackendDict
 }

@@ -18,16 +18,16 @@
 
 export interface ISkillBackendDict {
   'all_questions_merged': boolean;
-  'description': string;
-  'id': string;
+  description: string;
+  id: string;
   'language_code': string;
-  'misconceptions': IMisconceptionBackendDict[];
+  misconceptions: IMisconceptionBackendDict[];
   'next_misconception_id': number;
   'prerequisite_skill_ids': string[];
-  'rubrics': IRubricBackendDict[];
+  rubrics: IRubricBackendDict[];
   'skill_contents': IConceptCardBackendDict;
   'superseding_skill_id': string;
-  'version': number;
+  version: number;
 }
 
 import { downgradeInjectable } from '@angular/upgrade/static';

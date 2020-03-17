@@ -18,8 +18,8 @@
  */
 
 export interface IRubricBackendDict {
-  'difficulty': string,
-  'explanation': string
+  difficulty: string,
+  explanation: string
 }
 
 import { downgradeInjectable } from '@angular/upgrade/static';

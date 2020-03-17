@@ -24,15 +24,16 @@ export interface IRecordedVoiceOverBackendDict {
   }
 }
 export interface IVoice {
-  'filename': string,
-  'fileSizeBytes': number,
-  'needsUpdate': boolean
+  filename: string;
+  fileSizeBytes: number;
+  needsUpdate: boolean;
 }
 export interface IVoiceoverMapping {
   [propName: string]: {
     [propName: string]: Voiceover
   }
 }
+
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
