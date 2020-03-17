@@ -69,6 +69,7 @@ angular.module('oppia').factory('ResponsesService', [
     var _defaultOutcome = null;
     var _confirmedUnclassifiedAnswers = null;
     var _answerChoices = null;
+
     var _verifySolution = function() {
       // This checks if the solution is valid once a rule has been changed or
       // added.
