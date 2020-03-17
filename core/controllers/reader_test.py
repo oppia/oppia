@@ -1482,7 +1482,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             [{
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'state_name1'
                     }
                 },
@@ -1519,7 +1519,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'actions': [{
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'state_name1'
                     }
                 },
@@ -1581,7 +1581,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             [{
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'state_name1'
                     }
                 },
@@ -1614,7 +1614,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'actions': [{
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'state_name1'
                     }
                 },
@@ -1650,7 +1650,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             [{
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'state_name1'
                     }
                 },
@@ -1683,7 +1683,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'actions': [{
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'state_name1'
                     }
                 },
@@ -1873,7 +1873,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             [{
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'state_name1'
                     }
                 },

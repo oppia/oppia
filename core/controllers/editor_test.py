@@ -1872,7 +1872,7 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
             [{
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'state_name1'
                     }
                 },
@@ -1985,7 +1985,7 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
             response['actions'], [{
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'state_name1'
                     }
                 },
@@ -2026,7 +2026,7 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
             [{
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'state_name1'
                     }
                 },

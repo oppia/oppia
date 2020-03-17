@@ -474,7 +474,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
             }, [stats_domain.LearnerAction.from_dict({
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'state_name1'
                     }
                 },
@@ -495,7 +495,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
             }, [stats_domain.LearnerAction.from_dict({
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'state_name1'
                     }
                 },
@@ -521,7 +521,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
                 {
                     'actionType': 'ExplorationStart',
                     'actionCustomizationArgs': {
-                        'stateName': {
+                        'state_name': {
                             'value': 'state_name1'
                         }
                     },
@@ -545,7 +545,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
             'actions': [{
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'state_name1'
                     }
                 },
@@ -572,7 +572,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
             {
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'state_name1'
                     }
                 },
@@ -611,7 +611,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
                 'actionType': 'InvalidActionType',
                 'schemaVersion': 1,
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'state_name1'
                     }
                 },
@@ -1012,13 +1012,13 @@ class LearnerActionTests(test_utils.GenericTestBase):
         self.learner_action.validate()
 
     def test_validate_with_int_action_type(self):
-        self.learner_action.actionType = 5
+        self.learner_action.action_type = 5
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected actionType to be a string, received %s' % (type(5)))):
             self.learner_action.validate()
 
     def test_validate_with_string_schema_version(self):
-        self.learner_action.schemaVersion = '1'
+        self.learner_action.schema_version = '1'
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected schemaVersion to be an int, received %s' % (type('1')))):
             self.learner_action.validate()

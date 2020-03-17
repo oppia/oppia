@@ -212,7 +212,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             }, [{
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'New state'
                     }
                 },
@@ -632,7 +632,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             }, [{
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'Home'
                     }
                 },
@@ -649,7 +649,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             }, [{
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'End'
                     }
                 },
@@ -715,7 +715,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 'value'], 'Renamed state')
         self.assertEqual(
             playthrough1_instance.actions[0]['actionCustomizationArgs'][
-                'stateName']['value'],
+                'state_name']['value'],
             'Renamed state')
         playthrough2_instance = stats_models.PlaythroughModel.get(
             playthrough_id2)
@@ -724,7 +724,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 'value'], 'End')
         self.assertEqual(
             playthrough2_instance.actions[0]['actionCustomizationArgs'][
-                'stateName']['value'],
+                'state_name']['value'],
             'End')
 
         # Test deletion of states.
@@ -757,7 +757,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 'value'], 'Renamed state')
         self.assertEqual(
             playthrough1_instance.actions[0]['actionCustomizationArgs'][
-                'stateName']['value'],
+                'state_name']['value'],
             'Renamed state')
         playthrough2_instance = stats_models.PlaythroughModel.get(
             playthrough_id2)
@@ -766,7 +766,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 'value'], 'End')
         self.assertEqual(
             playthrough2_instance.actions[0]['actionCustomizationArgs'][
-                'stateName']['value'],
+                'state_name']['value'],
             'End')
 
     def test_get_playthroughs_multi(self):
@@ -1029,7 +1029,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             [{
                 'actionType': 'ExplorationStart',
                 'actionCustomizationArgs': {
-                    'stateName': {
+                    'state_name': {
                         'value': 'Home'
                     }
                 },
@@ -1063,7 +1063,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 'value'], ['Home', 'End', 'Home'])
         self.assertEqual(
             playthrough_instance.actions[0]['actionCustomizationArgs'][
-                'stateName']['value'], 'Home')
+                'state_name']['value'], 'Home')
 
         # Test renaming of states.
         exploration.rename_state('Home', 'Renamed state')
@@ -1092,7 +1092,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 'value'], ['Renamed state', 'End', 'Renamed state'])
         self.assertEqual(
             playthrough_instance.actions[0]['actionCustomizationArgs'][
-                'stateName']['value'],
+                'state_name']['value'],
             'Renamed state')
 
     def test_get_multiple_exploration_stats_by_version_with_invalid_exp_id(
