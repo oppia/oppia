@@ -16,124 +16,164 @@
  * @fileoverview Service to send changes to a skill to the backend.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('domain/skill/skill-domain.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('EditableSkillBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService',
-  'EDITABLE_SKILL_DATA_URL_TEMPLATE', 'SKILL_DATA_URL_TEMPLATE',
-  function(
-      $http, $q, UrlInterpolationService,
-      EDITABLE_SKILL_DATA_URL_TEMPLATE, SKILL_DATA_URL_TEMPLATE) {
-    var _fetchSkill = function(skillId, successCallback, errorCallback) {
-      var skillDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_SKILL_DATA_URL_TEMPLATE, {
-          skill_id: skillId
-        });
+import { SkillDomainConstants } from
+  'domain/skill/skill-domain.constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service.ts';
 
-      $http.get(skillDataUrl).then(function(response) {
-        var skill = angular.copy(response.data.skill);
-        var groupedSkillSummaryDicts = angular.copy(
-          response.data.grouped_skill_summaries);
-        if (successCallback) {
-          successCallback({
-            skill: skill,
-            groupedSkillSummaries: groupedSkillSummaryDicts
-          });
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    var _fetchMultiSkills = function(skillIds, successCallback, errorCallback) {
-      var skillDataUrl = UrlInterpolationService.interpolateUrl(
-        SKILL_DATA_URL_TEMPLATE, {
-          comma_separated_skill_ids: skillIds.join(',')
-        });
-
-      $http.get(skillDataUrl).then(function(response) {
-        var skills = angular.copy(response.data.skills);
-        if (successCallback) {
-          successCallback(skills);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    var _updateSkill = function(
-        skillId, skillVersion, commitMessage, changeList,
-        successCallback, errorCallback) {
-      var editableSkillDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_SKILL_DATA_URL_TEMPLATE, {
-          skill_id: skillId
-        });
-
-      var putData = {
-        version: skillVersion,
-        commit_message: commitMessage,
-        change_dicts: changeList
-      };
-
-      $http.put(editableSkillDataUrl, putData).then(function(response) {
-        // The returned data is an updated skill dict.
-        var skill = angular.copy(response.data.skill);
-        if (successCallback) {
-          successCallback(skill);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    var _deleteSkill = function(skillId, successCallback, errorCallback) {
-      var skillDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_SKILL_DATA_URL_TEMPLATE, {
-          skill_id: skillId
-        });
-
-      $http['delete'](skillDataUrl).then(function(response) {
-        if (successCallback) {
-          successCallback(response.status);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    return {
-      fetchSkill: function(skillId) {
-        return $q(function(resolve, reject) {
-          _fetchSkill(skillId, resolve, reject);
-        });
-      },
-      fetchMultiSkills: function(skillIds) {
-        return $q(function(resolve, reject) {
-          _fetchMultiSkills(skillIds, resolve, reject);
-        });
-      },
-      updateSkill: function(
-          skillId, skillVersion, commitMessage, changeList) {
-        return $q(function(resolve, reject) {
-          _updateSkill(
-            skillId, skillVersion, commitMessage, changeList,
-            resolve, reject);
-        });
-      },
-      deleteSkill: function(skillId) {
-        return $q(function(resolve, reject) {
-          _deleteSkill(skillId, resolve, reject);
-        });
-      }
-    };
+// TODO(#7165): Replace any with exact type.
+interface editableSkillResponseConfig{
+    skill?: any;
+    skills?: any;
+    // eslint-disable-next-line camelcase
+    grouped_skill_summaries?: any;
   }
-]);
+@Injectable({
+  providedIn: 'root'
+})
+export class EditableSkillBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
+
+  // TODO(#7165): Replace any with exact type.
+  _fetchSkill(
+      skillId: string,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void
+  ): void {
+    const skillDataUrl = this.urlInterpolationService.interpolateUrl(
+      SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
+        skill_id: skillId
+      }
+    );
+    this.http.get<editableSkillResponseConfig>(skillDataUrl).toPromise().then(
+      (data: editableSkillResponseConfig) => successCallback({
+        skill: data.skill,
+        groupedSkillSummaries: data.grouped_skill_summaries
+      }),
+      err => {
+        if (errorCallback) {
+          errorCallback(err);
+        }
+      }
+    );
+  }
+
+  // TODO(#7165): Replace any with exact type.
+  _fetchMultiSkills(
+      skillIds: [string],
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void
+  ): void {
+    const skillDataUrl = this.urlInterpolationService.interpolateUrl(
+      SkillDomainConstants.SKILL_DATA_URL_TEMPLATE, {
+        comma_separated_skill_ids: skillIds.join(',')
+      }
+    );
+    this.http.get<editableSkillResponseConfig>(skillDataUrl).toPromise().then(
+      (data: editableSkillResponseConfig) => successCallback(data.skills),
+      err => {
+        if (errorCallback) {
+          errorCallback(err);
+        }
+      }
+    );
+  }
+  // TODO(#7165): Replace any with exact type.
+  _updateSkill(
+      skillId: string,
+      skillVersion: any,
+      commitMessage: string,
+      changeList: [any],
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void
+  ): void {
+    const editableSkillDataUrl = this.urlInterpolationService.interpolateUrl(
+      SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
+        skill_id: skillId
+      }
+    );
+
+    const putData = {
+      version: skillVersion,
+      commit_message: commitMessage,
+      change_dicts: changeList
+    };
+
+    this.http.put<editableSkillResponseConfig>(
+      editableSkillDataUrl, putData
+    ).toPromise().then(
+      (data: editableSkillResponseConfig) => successCallback(data.skill),
+      err => {
+        if (errorCallback) {
+          errorCallback(err);
+        }
+      }
+    );
+  }
+
+  // TODO(#7165): Replace any with exact type.
+  _deleteSkill(
+      skillId: string,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void
+  ): void {
+    const skillDataUrl = this.urlInterpolationService.interpolateUrl(
+      SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
+        skill_id: skillId
+      });
+    this.http['delete'](skillDataUrl, { observe: 'response' }).toPromise().then(
+      (res) => successCallback(res.status),
+      (err) => {
+        if (errorCallback) {
+          errorCallback(err.data);
+        }
+      }
+    );
+  }
+
+  // TODO(#7165): Replace any with exact type.
+  fetchSkill(skillId: string): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._fetchSkill(skillId, resolve, reject);
+    });
+  }
+
+  // TODO(#7165): Replace any with exact type.
+  fetchMultiSkills(skillIds: [string]): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._fetchMultiSkills(skillIds, resolve, reject);
+    });
+  }
+
+  // TODO(#7165): Replace any with exact type.
+  updateSkill(
+      skillId: string,
+      skillVersion: any,
+      commitMessage: string,
+      changeList: [any]
+  ): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._updateSkill(
+        skillId, skillVersion, commitMessage, changeList, resolve, reject
+      );
+    });
+  }
+
+  // TODO(#7165): Replace any with exact type.
+  deleteSkill(skillId: string): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._deleteSkill(skillId, resolve, reject);
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'EditableSkillBackendApiService',
+  downgradeInjectable(EditableSkillBackendApiService));
