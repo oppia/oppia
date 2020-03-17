@@ -438,7 +438,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
                 'data:image/png;'))
         self.assertEqual(
             utils.get_time_in_millisecs(first_suggestion.created_on),
-            messages_summary['created_on'])
+            messages_summary['created_on_msecs'])
         self.assertEqual(
             messages_summary['suggestion_html'], '<p>new content html</p>')
         self.assertEqual(

@@ -110,7 +110,7 @@ angular.module('oppia').directive('historyTab', [
                * ctrl.compareVersionMetadata is an object with keys
                * 'earlierVersion' and 'laterVersion' whose values are the
                * metadata of the compared versions, containing 'committerId',
-               * 'createdOn', 'commitMessage', and 'versionNumber'.
+               * 'createdOnMsecs', 'commitMessage', and 'versionNumber'.
                */
               ctrl.compareVersions = {};
               ctrl.compareVersionMetadata = {};
@@ -144,7 +144,7 @@ angular.module('oppia').directive('historyTab', [
                     var versionNumber = explorationSnapshots[i].version_number;
                     ctrl.explorationVersionMetadata[versionNumber] = {
                       committerId: explorationSnapshots[i].committer_id,
-                      createdOnStr: (
+                      createdOnMsecsStr: (
                         DateTimeFormatService
                           .getLocaleAbbreviatedDatetimeString(
                             explorationSnapshots[i].created_on_ms)),
@@ -166,7 +166,7 @@ angular.module('oppia').directive('historyTab', [
             return (
               'Revision #' + versionMetadata.versionNumber +
               ' by ' + versionMetadata.committerId +
-              ' (' + versionMetadata.createdOnStr +
+              ' (' + versionMetadata.createdOnMsecsStr +
               ')' + (
                 versionMetadata.commitMessage ?
                   ': ' + versionMetadata.commitMessage : ''));
@@ -307,8 +307,8 @@ angular.module('oppia').directive('historyTab', [
             * explorationVersionMetadata is an object whose keys are version
             * numbers and whose values are objects containing data of that
             * revision (that is to be displayed) with the keys 'committerId',
-            * 'createdOn', 'commitMessage', and 'versionNumber'. It contains a
-            * maximum of 30 versions.
+            * 'createdOnMsecs', 'commitMessage', and 'versionNumber'. It
+            * contains a maximum of 30 versions.
             *
             * versionCheckboxArray is an array of the version numbers of the
             * revisions to be displayed on the page, in the order they are
