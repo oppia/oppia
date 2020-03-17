@@ -2,8 +2,8 @@ import github
 
 def main():
     print("WORKS!!")
-    print(github)
-    gh = Github(os.getenv('GITHUB_TOKEN'))
+    gh = github.Github(os.getenv('GITHUB_TOKEN'))
+    print(github.context)
 
 if __name__ == '__main__':
     main()
