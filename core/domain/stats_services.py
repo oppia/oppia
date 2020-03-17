@@ -83,7 +83,7 @@ def _migrate_to_latest_action_schema(learner_action_dict):
     Raises:
         Exception. The action_schema_version is invalid.
     """
-    action_schema_version = learner_action_dict['schema_version']
+    action_schema_version = learner_action_dict['schemaVersion']
     if action_schema_version is None or action_schema_version < 1:
         action_schema_version = 0
 
