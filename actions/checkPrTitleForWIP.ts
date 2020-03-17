@@ -8,10 +8,10 @@ async function run() {
     var pullRequest = github.context.payload.pull_request;
     var pullRequestNumber = pullRequest.number;
 
-    //if (pullRequest.title.includes('WIP')) {
+    if (pullRequest.title.includes('WIP')) {
     //  //var userName = pullRequest.user.login;
-    //  console.log(github.context);
-    //}
+      console.log(pullRequest.title);
+    }
   } catch (error) {
     core.setFailed(error.message);
   }
