@@ -10,25 +10,14 @@ jobs:
     runs-on: ubuntu-18.04
     strategy:
       matrix:
-        node_version: [10, 12]
+        python-version: [3.7]
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Use Node.js ${{ matrix.node_version }}
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-node@v1
       with:
-        version: ${{ matrix.node_version }}
-
-    - name: check for WIP in PR HEADING
-      uses: peter-evans/commit-comment@v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        body: |
-          This is a multi-line test comment
-          - With GitHub **Markdown**
-          - Created by [commit-comment][1]
-
-          [1]: https://github.com/peter-evans/commit-comment
-        #run: | 
-            #npm i @actions/core@^1.0.0 @actions/github@^1.0.0
-            #node ./actions/checkPrTitleForWIP.ts
+        python-version: ${{ matrix.python-version }}
+    - name: check if it works
+      run: |
+        python ./actions/checkPrTitleForWIP.py
