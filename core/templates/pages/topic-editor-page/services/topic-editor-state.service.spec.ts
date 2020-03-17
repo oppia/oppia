@@ -58,6 +58,7 @@ describe('Topic editor state service', function() {
   var TopicUpdateService = null;
   var fakeEditableTopicBackendApiService = null;
   var fakeTopicRightsBackendApiService = null;
+  var fakeEditableStoryBackendApiService = null;
   var secondSubtopicPageObject = null;
   var secondBackendTopicObject = null;
   var secondTopicRightsObject = null;
@@ -143,6 +144,61 @@ describe('Topic editor state service', function() {
     return self;
   };
 
+  var FakeEditableStoryBackendApiService = function() {
+    var self = {
+      newBackendStoryObject: null,
+      failure: null,
+      fetchStory: null,
+      updateStory: null,
+      changeStoryPublicationStatus: null
+    };
+
+    var _fetchStory = function() {
+      return $q(function(resolve, reject) {
+        if (!self.failure) {
+          resolve({
+            story: self.newBackendStoryObject,
+            topicName: 'Topic Name',
+            storyIsPublished: false,
+            skillSummaries: [{
+              id: 'Skill 1',
+              description: 'Skill Description'
+            }]
+          });
+        } else {
+          reject();
+        }
+      });
+    };
+
+    var _updateStory = function() {
+      return $q(function(resolve, reject) {
+        if (!self.failure) {
+          resolve(self.newBackendStoryObject);
+        } else {
+          reject();
+        }
+      });
+    };
+
+    var _changeStoryPublicationStatus = function() {
+      return $q(function(resolve, reject) {
+        if (!self.failure) {
+          resolve();
+        } else {
+          reject();
+        }
+      });
+    };
+
+    self.newBackendStoryObject = {};
+    self.failure = null;
+    self.fetchStory = _fetchStory;
+    self.updateStory = _updateStory;
+    self.changeStoryPublicationStatus = _changeStoryPublicationStatus;
+    return self;
+  };
+
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -199,6 +255,15 @@ describe('Topic editor state service', function() {
     $provide.value(
       'TopicRightsBackendApiService',
       [fakeTopicRightsBackendApiService][0]);
+  }));
+  beforeEach(
+    angular.mock.module('oppia', TranslatorProviderForTests));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    fakeEditableStoryBackendApiService = (
+      FakeEditableStoryBackendApiService());
+    $provide.value(
+      'EditableStoryBackendApiService',
+      [fakeEditableStoryBackendApiService][0]);
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
