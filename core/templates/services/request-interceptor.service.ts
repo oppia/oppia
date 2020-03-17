@@ -80,6 +80,8 @@ export class RequestInterceptor implements HttpInterceptor {
         .pipe(
           switchMap(token => {
             if (request.method === 'POST' || request.method === 'PUT') {
+              // eslint-disable-next-line no-console
+              console.log('Here too 3');
               var body = new HttpParams()
                 // @ts-ignore
                 .set('csrf_token', token)

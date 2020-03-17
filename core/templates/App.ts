@@ -126,6 +126,10 @@ angular.module('oppia').config([
             if (config.data) {
               return $q(function(resolve, reject) {
                 // Get CSRF token before sending the request.
+                // eslint-disable-next-line no-debugger
+                debugger;
+                // eslint-disable-next-line no-console
+                console.log('Here too');
                 CsrfTokenService.getTokenAsync().then(function(token) {
                   config.data = $.param({
                     csrf_token: token,
@@ -272,6 +276,8 @@ angular.module('oppia').factory('$exceptionHandler', [
             try {
               // We use jQuery here instead of Angular's $http, since the latter
               // creates a circular dependency.
+              // eslint-disable-next-line no-console
+              console.log('Here too2');
               CsrfTokenService.getTokenAsync().then(function(token) {
                 $.ajax({
                   type: 'POST',
