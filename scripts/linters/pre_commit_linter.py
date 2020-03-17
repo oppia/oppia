@@ -328,18 +328,18 @@ def _get_file_extensions(file_extension_type):
     """
     all_file_extensions_type = ['*.js', '*.py', '*.html', '*.css']
 
-    # Check if '*.js' and '*.ts' both are present in file_extension_type.
-    js_and_ts_is_present = '*.js' in file_extension_type and (
-        '*.ts' in file_extension_type)
-
-    if js_and_ts_is_present:
-        python_utils.PRINT(
-            'Please either use "*.js" or "*.ts" both are not '
-            'allowed together....')
-        python_utils.PRINT('Exiting...')
-        sys.exit(1)
-
     if file_extension_type:
+        # Check if '*.js' and '*.ts' both are present in file_extension_type.
+        js_and_ts_is_present = '*.js' in file_extension_type and (
+            '*.ts' in file_extension_type)
+
+        if js_and_ts_is_present:
+            python_utils.PRINT(
+                'Please either use "*.js" or "*.ts" both are not '
+                'allowed together....')
+            python_utils.PRINT('Exiting...')
+            sys.exit(1)
+
         return set(file_extension_type)
 
     return all_file_extensions_type
