@@ -13,6 +13,18 @@ async function run() {
 
     if (pullRequest.title.includes('WIP')) {
       var userName = pullRequest.user.login;
+      var owner = github.context.payload.sender.login;
+      var repoName = context.payload.repository.name;
+      var issueNumber = context.payload.pull_request.number;
+      var body = "comment hoja plz";
+      octokit.issues.createComment({
+        owner,
+        repo: repoNumber,
+        issue_number: issueNumber,
+        body
+      }).then(({ data, headers, status }) => {}).catch(err => {
+        console.log(err);
+      });
       console.log(userName);
     }
   } catch (error) {
