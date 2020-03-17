@@ -10,7 +10,7 @@ async function run() {
 
     if (pullRequest.title.includes('WIP')) {
     //  //var userName = pullRequest.user.login;
-      console.log(pullRequest.title);
+      console.log(pullRequest.user);
     }
   } catch (error) {
     core.setFailed(error.message);
