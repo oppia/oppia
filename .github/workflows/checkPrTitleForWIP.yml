@@ -20,6 +20,15 @@ jobs:
         version: ${{ matrix.node_version }}
 
     - name: check for WIP in PR HEADING
-      run: |
-        npm i @actions/core@^1.0.0 @actions/github@^1.0.0
-        node ./actions/checkPrTitleForWIP.ts
+      uses: peter-evans/commit-comment@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        body: |
+          This is a multi-line test comment
+          - With GitHub **Markdown**
+          - Created by [commit-comment][1]
+
+          [1]: https://github.com/peter-evans/commit-comment
+        #run: | 
+            #npm i @actions/core@^1.0.0 @actions/github@^1.0.0
+            #node ./actions/checkPrTitleForWIP.ts
