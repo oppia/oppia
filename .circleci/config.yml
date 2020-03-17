@@ -1,15 +1,20 @@
 workflows:
   version: 2
   circleci_tests:
-    # The following jobs runs in the following stages:
+    # The following jobs run in the following stages:
     # - Setup runs first.
-    # - After setup passes, lint and frontend test run.
+    # - After setup passes, lint and frontend tests run.
     #     - If frontend tests fail, stop and do not run the next step, but lint continues.
     # - After frontend tests passes, backend and typescript tests run.
     #     - If typescript tests fail, stop and do not run the next step, but backend continues.
-    # - After typescript tests passes, the flagship e2e tests (navigation and file upload) run.
+    # - After typescript tests passes, the flagship e2e tests (navigation and file upload) run. We run
+    #   these tests as sanity checks before running the entire test suite. Note that the navigation e2e
+    #   test also compiles all the prod files needed for other prod e2e tests.
+    #     - If either flagship e2e tests fail, then the rest of the e2e tests in the the corresponding
+    #       suite will not run.
     # - After file upload e2e test passes, all other non-prod e2e tests run in parallel.
     # - After navigation e2e test passes, all other prod e2e tests run in parallel.
+    # For an illustration of the stages, see https://github.com/oppia/oppia/wiki/images/circleCIWorkflow.png.
 
     jobs:
       - setup
