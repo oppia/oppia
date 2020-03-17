@@ -8,19 +8,12 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-18.04
-    strategy:
-      matrix:
-        python-version: [3.7]
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-        python -m pip install --upgrade pip
-        pip install PyGithub
-    - name: check if it works
+    - name: Check if python works
       run: |
-        python ./actions/checkPrTitleForWIP.py
+          python ./actions/checkPrTitleForWIP.py
