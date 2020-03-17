@@ -48,6 +48,7 @@ angular.module('oppia').directive('topNavigationBar', [
             SiteAnalyticsService, NavigationService, WindowDimensionsService,
             DebouncerService, DeviceInfoService, LOGOUT_URL,
             SHOW_CLASSROOM_CALLOUT) {
+            $scope.SHOW_CLASSROOM_CALLOUT = SHOW_CLASSROOM_CALLOUT;
           var ctrl = this;
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
@@ -198,7 +199,6 @@ angular.module('oppia').directive('topNavigationBar', [
           };
 
           ctrl.$onInit = function() {
-            $scope.SHOW_CLASSROOM_CALLOUT = SHOW_CLASSROOM_CALLOUT;
             ctrl.isModerator = null;
             ctrl.isAdmin = null;
             ctrl.isTopicManager = null;
