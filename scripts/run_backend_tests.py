@@ -307,14 +307,16 @@ def main(args=None):
     for test_target in all_test_targets:
         test = TestingTaskSpec(
             test_target, parsed_args.generate_coverage_report)
+        # Concurrency limit: 25.
         task = concurrent_task_utils.create_task(
-            test.run, parsed_args.verbose, name=test_target)
+            test.run, 25, verbose=parsed_args.verbose, name=test_target)
         task_to_taskspec[task] = test
         tasks.append(task)
 
     task_execution_failed = False
     try:
-        concurrent_task_utils.execute_tasks(tasks)
+        # Concurrency limit: 25.
+        concurrent_task_utils.execute_tasks(tasks, 25)
     except Exception:
         task_execution_failed = True
 

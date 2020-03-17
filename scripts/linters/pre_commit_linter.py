@@ -32,17 +32,17 @@ CUSTOMIZATION OPTIONS
 2.  To lint all files in the folder or to lint just a specific file
         python -m scripts.linters.pre_commit_linter --path filepath
 
-3.  To lint a specific list of files (*.js/*.py only). Separate files by spaces
+3.  To lint a specific list of files. Separate files by spaces
         python -m scripts.linters.pre_commit_linter
             --files file_1 file_2 ... file_n
 
 4.  To lint files in verbose mode
         python -m scripts.linters.pre_commit_linter --verbose
 
-5. To lint a specific list of file extensions (*.js/*.py only). Separate file
+5. To lint a specific list of file extensions. Separate file
     extensions by spaces
         python -m scripts.linters.pre_commit_linter
-            --only-check-file-extensions .py .js
+            --only-check-file-extensions "*.py" "*.js"
 
 Note that the root folder MUST be named 'oppia'.
  """
@@ -90,6 +90,7 @@ _PARSER.add_argument(
 _EXCLUSIVE_GROUP.add_argument(
     '--only-check-file-extensions',
     nargs='+',
+    choices=['*.html', '*.css', '*.js', '*.ts', '*.py'],
     help='specific file extensions to be linted. Space separated list',
     action='store')
 
@@ -222,16 +223,17 @@ def _lint_all_files(
     custom_linters = []
     third_party_linters = []
 
-    js_ts_file_extension = '.js' in file_extension_type or (
-        '.ts' in file_extension_type)
-    py_file_extension = '.py' in file_extension_type
-    html_file_extension = '.html' in file_extension_type
-    css_file_extension = '.css' in file_extension_type
+    js_ts_file_extension = '*.js' in file_extension_type or (
+        '*.ts' in file_extension_type)
+    py_file_extension = '*.py' in file_extension_type
+    html_file_extension = '*.html' in file_extension_type
+    css_file_extension = '*.css' in file_extension_type
 
     js_ts_file_paths = js_filepaths + ts_filepaths
 
     custom_linter = general_purpose_linter.GeneralPurposeLinter(
-        _FILES[file_extension_type], verbose_mode_enabled=verbose_mode_enabled)
+        _FILES[file_extension_type[1:]],
+        verbose_mode_enabled=verbose_mode_enabled)
     custom_linters.append(custom_linter)
 
     if js_ts_file_extension:
@@ -324,10 +326,21 @@ def _get_file_extensions(file_extension_type):
         all_file_extensions_type: list(str). The list of all file extensions
         to be linted and checked.
     """
-    all_file_extensions_type = ['.js', '.py', '.html', '.css']
+    all_file_extensions_type = ['*.js', '*.py', '*.html', '*.css']
+
+    # Check if '*.js' and '*.ts' both are present in file_extension_type.
+    js_and_ts_is_present = '*.js' in file_extension_type and (
+        '*.ts' in file_extension_type)
+
+    if js_and_ts_is_present:
+        python_utils.PRINT(
+            'Please either use "*.js" or "*.ts" both are not '
+            'allowed together....')
+        python_utils.PRINT('Exiting...')
+        sys.exit(1)
 
     if file_extension_type:
-        return file_extension_type
+        return set(file_extension_type)
 
     return all_file_extensions_type
 
@@ -444,13 +457,6 @@ def main(args=None):
     read_files(all_filepaths)
     categorize_files(all_filepaths)
 
-    third_party_max_concurrent_runs = 2
-
-    # Prepare tasks.
-    concurrent_count = min(
-        multiprocessing.cpu_count(), third_party_max_concurrent_runs)
-    semaphore = threading.Semaphore(concurrent_count)
-
     custom_linters = []
     third_party_linters = []
     for file_extension_type in file_extension_types:
@@ -465,22 +471,23 @@ def main(args=None):
     tasks_third_party = []
 
     for linter in custom_linters:
+        # Concurrency limit: 25.
         task_custom = concurrent_task_utils.create_task(
-            linter.perform_all_lint_checks,
+            linter.perform_all_lint_checks, 25,
             verbose=verbose_mode_enabled, name='custom')
         tasks_custom.append(task_custom)
 
     for linter in third_party_linters:
+        # Concurrency limit: 2.
         task_third_party = concurrent_task_utils.create_task(
-            linter.perform_all_lint_checks,
-            verbose=verbose_mode_enabled, semaphore=semaphore,
-            name='third_party')
+            linter.perform_all_lint_checks, 2,
+            verbose=verbose_mode_enabled, name='third_party')
         tasks_third_party.append(task_third_party)
 
     # Concurrency limit: 25.
-    concurrent_task_utils.execute_tasks(tasks_custom)
+    concurrent_task_utils.execute_tasks(tasks_custom, 25)
     # Concurrency limit: 2.
-    concurrent_task_utils.execute_tasks(tasks_third_party, semaphore=semaphore)
+    concurrent_task_utils.execute_tasks(tasks_third_party, 2)
 
     all_messages = []
 

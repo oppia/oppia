@@ -178,13 +178,12 @@ class RedirectStoutTest(test_utils.GenericTestBase):
 
     def test_redirect_stdout(self):
         temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
 
-        with python_utils.open_file(filename, 'r+') as tmp:
-            with linter_utils.redirect_stdout(tmp):
+        with python_utils.open_file(temp_file.name, 'r+') as temp_file_contents:
+            with linter_utils.redirect_stdout(temp_file_contents):
                 python_utils.PRINT('This is a test')
-            tmp.seek(0)
-            data = tmp.read()
+            temp_file_contents.seek(0)
+            data = temp_file_contents.read()
         temp_file.close()
 
         self.assertEqual(data, 'This is a test\n')

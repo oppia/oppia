@@ -28,12 +28,6 @@ import python_utils
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
 
-MAX_CONCURRENT_RUNS = 25
-
-# Prepare tasks.
-CONCURRENT_COUNT = min(multiprocessing.cpu_count(), MAX_CONCURRENT_RUNS)
-SEMAPHORE = threading.Semaphore(CONCURRENT_COUNT)
-
 
 def log(message, show_time=False):
     """Logs a message to the terminal.
@@ -82,6 +76,12 @@ class TaskThread(threading.Thread):
             self.finished = True
 
 
+def _concurrency_limit(max_concurrent_runs):
+    """Returns the object that controls how many tasks run at a time."""
+    concurrent_count = min(multiprocessing.cpu_count(), max_concurrent_runs)
+    return threading.Semaphore(concurrent_count)
+
+
 def _check_all_tasks(tasks):
     """Checks the results of all tasks."""
     running_tasks_data = []
@@ -103,17 +103,17 @@ def _check_all_tasks(tasks):
             log(task_details)
 
 
-def execute_tasks(tasks, semaphore=SEMAPHORE):
+def execute_tasks(tasks, max_concurrent_runs):
     """Starts all tasks and checks the results.
     Runs no more than the allowable limit defined in the semaphore.
 
     Args:
         tasks: list(TestingTaskSpec). The tasks to run.
-        semaphore: threading.Semaphore. The object that controls how many tasks
-            can run at any time.
+        max_concurrent_runs: int. Number of tasks that run at a time.
     """
     remaining_tasks = [] + tasks
     currently_running_tasks = []
+    semaphore = _concurrency_limit(max_concurrent_runs)
 
     while remaining_tasks:
         task = remaining_tasks.pop()
@@ -135,18 +135,18 @@ def execute_tasks(tasks, semaphore=SEMAPHORE):
     _check_all_tasks(currently_running_tasks)
 
 
-def create_task(func, verbose, semaphore=SEMAPHORE, name=None):
+def create_task(func, max_concurrent_runs, verbose=False, name=None):
     """Create a Task in its Thread.
 
     Args:
         func: Function. The function that is going to run.
         verbose: bool. True if verbose mode is enabled.
-        semaphore: threading.Semaphore. The object that controls how many tasks
-            can run at any time.
+        max_concurrent_runs: int. Number of tasks that run at a time.
         name: str. Name of the task that is going to be created.
 
     Returns:
         task: TaskThread object. Created task.
     """
+    semaphore = _concurrency_limit(max_concurrent_runs)
     task = TaskThread(func, verbose, semaphore, name)
     return task
