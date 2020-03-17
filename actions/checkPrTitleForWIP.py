@@ -1,4 +1,4 @@
-#import github
+import github
 
 def main():
     print("WORKS!!\n")
