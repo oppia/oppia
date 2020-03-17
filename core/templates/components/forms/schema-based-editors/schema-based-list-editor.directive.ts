@@ -91,7 +91,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
             }
           }
         };
-        var updateOldToNewListMappingOnDelete = function(index) {
+        var updateOldToNewListMappingOnDeleteElement = function(index) {
           if ($scope.oldToNewListMapping !== undefined) {
             var deletedIndex = $scope.oldToNewListMapping.
               newToOldListPosition[index];
@@ -242,7 +242,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
             intializeOldToNewListMapping();
 
             $scope.deleteElement = function(index) {
-              updateOldToNewListMappingOnDelete(index);
+              updateOldToNewListMappingOnDeleteElement(index);
               // Need to let the RTE know that HtmlContent has been changed.
               $scope.$broadcast('externalHtmlContentChange');
               $scope.localValue.splice(index, 1);

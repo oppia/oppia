@@ -568,7 +568,6 @@ angular.module('oppia').directive('stateResponses', [
             var activeStateName = $scope.stateName;
             return outcome && (outcome.dest === activeStateName);
           };
-
           ctrl.$onInit = function() {
             $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
               SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
@@ -636,10 +635,11 @@ angular.module('oppia').directive('stateResponses', [
                 ResponsesService.getActiveAnswerGroupIndex());
             });
 
-            $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
-              var interactionId = $scope.getCurrentInteractionId();
+            $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices,
+                oldToNewListMapping) {
               ResponsesService.updateAnswerChoices(
-                newAnswerChoices, function(newAnswerGroups) {
+                newAnswerChoices, oldToNewListMapping, function(
+                    newAnswerGroups) {
                   $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
                   $scope.refreshWarnings()();
                 });

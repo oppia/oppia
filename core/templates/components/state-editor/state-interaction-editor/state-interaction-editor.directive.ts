@@ -77,7 +77,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
         'StateCustomizationArgsService', 'EditabilityService',
         'InteractionDetailsCacheService', 'UrlInterpolationService',
         'ExplorationHtmlFormatterService', 'SubtitledHtmlObjectFactory',
-        'StateSolutionService', 'StateHintsService', 'ResponsesService',
+        'StateSolutionService', 'StateHintsService',
         'StateContentService', function(
             $scope, $http, $rootScope, $uibModal, $injector, $filter,
             AlertsService, HtmlEscaperService, StateEditorService,
@@ -85,7 +85,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
             StateCustomizationArgsService, EditabilityService,
             InteractionDetailsCacheService, UrlInterpolationService,
             ExplorationHtmlFormatterService, SubtitledHtmlObjectFactory,
-            StateSolutionService, StateHintsService, ResponsesService,
+            StateSolutionService, StateHintsService,
             StateContentService) {
           var ctrl = this;
           var DEFAULT_TERMINAL_STATE_CONTENT =
@@ -120,7 +120,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
               interactionCustomizationArgs, false);
           };
 
-          var _updateInteractionPreviewAndAnswerChoices = function() {
+          var _updateInteractionPreviewAndAnswerChoices = function(
+              oldToNewListMapping) {
             $scope.interactionId = StateInteractionIdService.savedMemento;
 
             var currentCustomizationArgs =
@@ -131,7 +132,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
             $rootScope.$broadcast(
               'updateAnswerChoices',
               StateEditorService.getAnswerChoices(
-                $scope.interactionId, currentCustomizationArgs));
+                $scope.interactionId, currentCustomizationArgs),
+              oldToNewListMapping);
           };
 
           // If a terminal interaction is selected for a state with no content,
@@ -151,7 +153,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
             $scope.onSaveStateContent(StateContentService.displayed);
           };
 
-          $scope.onCustomizationModalSavePostHook = function() {
+          $scope.onCustomizationModalSavePostHook = function(
+              oldToNewListMapping) {
             var hasInteractionIdChanged = (
               StateInteractionIdService.displayed !==
               StateInteractionIdService.savedMemento);
@@ -182,24 +185,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
             }
 
             $scope.recomputeGraph();
-            _updateInteractionPreviewAndAnswerChoices();
+            _updateInteractionPreviewAndAnswerChoices(oldToNewListMapping);
           };
-          var updateMultiChoiceInputAnswerGroupsOnDelete =
-            function(deletedIndexes) {
-              var answerGroups = ResponsesService.getAnswerGroups();
-              deletedIndexes.forEach( function(deletedIndex) {
-                for (var i = 0; i < answerGroups.length; i++) {
-                  var rules = answerGroups[i].rules;
-                  for (var j = 0; j < rules.length; j++) {
-                    if (deletedIndex < rules[j].inputs.x) {
-                      ResponsesService.reduceRuleIndexByOne(i, j);
-                    } else if (deletedIndex === rules[j].inputs.x) {
-                      ResponsesService.makeRuleInvalid(i, j);
-                    }
-                  }
-                }
-              });
-            };
 
           $scope.openInteractionCustomizerModal = function() {
             if (EditabilityService.isEditable()) {
@@ -388,19 +375,10 @@ angular.module('oppia').directive('stateInteractionEditor', [
                     };
 
                     $scope.save = function() {
-                      // If the interaction type is MultipleChoiceInput, we
-                      // need to handle the deletion of answer choices and
-                      // update the answer groups accordingly in order to match
-                      // the new answer choices.
-                      if (StateInteractionIdService.savedMemento ===
-                             'MultipleChoiceInput') {
-                        updateMultiChoiceInputAnswerGroupsOnDelete(
-                          $scope.oldToNewListMappingObject.
-                            oldToNewListMapping.deletedIndexes);
-                      }
                       EditorFirstTimeEventsService
                         .registerFirstSaveInteractionEvent();
-                      $uibModalInstance.close();
+                      $uibModalInstance.close($scope.oldToNewListMappingObject.
+                        oldToNewListMapping);
                     };
 
                     $scope.okay = function() {

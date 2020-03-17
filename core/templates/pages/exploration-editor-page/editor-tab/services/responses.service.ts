@@ -119,15 +119,6 @@ angular.module('oppia').factory('ResponsesService', [
       }
     };
 
-    var _reduceRuleIndexByOne = function(answerGroupIndex, ruleIndex) {
-      _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x--;
-    };
-
-    var _makeRuleInvalid = function(answerGroupIndex, ruleIndex) {
-      _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x = (
-        Number.MAX_SAFE_INTEGER);
-    };
-
     var _updateAnswerGroup = function(index, updates, callback) {
       var answerGroup = _answerGroups[index];
       if (updates.hasOwnProperty('rules')) {
@@ -301,12 +292,6 @@ angular.module('oppia').factory('ResponsesService', [
         _saveDefaultOutcome(outcome);
         callback(_defaultOutcomeMemento);
       },
-      reduceRuleIndexByOne: function(answerGroupIndex, ruleIndex) {
-        return _reduceRuleIndexByOne(answerGroupIndex, ruleIndex);
-      },
-      makeRuleInvalid: function(answerGroupIndex, ruleIndex) {
-        return _makeRuleInvalid(answerGroupIndex, ruleIndex);
-      },
       updateConfirmedUnclassifiedAnswers: function(
           confirmedUnclassifiedAnswers) {
         _saveConfirmedUnclassifiedAnswers(confirmedUnclassifiedAnswers);
@@ -314,19 +299,48 @@ angular.module('oppia').factory('ResponsesService', [
       // Updates answer choices when the interaction requires it -- for
       // example, the rules for multiple choice need to refer to the multiple
       // choice interaction's customization arguments.
-      updateAnswerChoices: function(newAnswerChoices, callback) {
+      updateAnswerChoices: function(newAnswerChoices, oldToNewListMapping,
+          callback) {
         var oldAnswerChoices = angular.copy(_answerChoices);
         _answerChoices = newAnswerChoices;
 
         // If the interaction is MultipleChoiceInput, update the answer groups
         // to refer to the new answer options.
         if (StateInteractionIdService.savedMemento === 'MultipleChoiceInput') {
-          // Save and update the answer groups for MultipleChoiceInput which
-          // are modified by the functions reduceRuleIndexByOne() and
-          // makeRuleInvalid() when the answer choices are added or deleted.
-          // The functions reduceRuleIndexByOne() and makeRuleInvalid() are
-          // invoked from state interaction editor during saving of the updated
-          // answer choices.
+          // Save and update the answer groups for MultipleChoiceInput
+          // based on the information about the modification of answer choices
+          // from the schema-based-list editor.
+          // The information regarding the modifications of answer choices is
+          // present in oldToNewListMapping.
+
+          if (oldToNewListMapping !== undefined) {
+            var deletedIndexes = oldToNewListMapping.deletedIndexes;
+            var answerGroups = angular.copy(_answerGroups);
+            deletedIndexes.forEach( function(deletedIndex) {
+              for (var i = 0; i < answerGroups.length; i++) {
+                var rules = answerGroups[i].rules;
+                for (var j = 0; j < rules.length; j++) {
+                  if (deletedIndex < rules[j].inputs.x) {
+                    // If the deletedIndex is lesser than a rule index
+                    // we need to reduce the rule index by one because
+                    // length the of answer choices reduce by one after the
+                    // after the choice corresponding to deletedIndex is
+                    // deleted.
+                    _answerGroups[i].rules[j].inputs.x--;
+                  } else if (deletedIndex === rules[j].inputs.x) {
+                    // if deletedindex corresponds to a rule index we make the
+                    // corresponding rule invalid. For an answer group to be
+                    // invalid a rule index in that answer group should be
+                    // greater than the number of choices.
+                    // We make the rule invalid by assigning the rule a value
+                    // which is much higher than length of the answer choices.
+                    _answerGroups[i].rules[j].inputs.x = (
+                      Number.MAX_SAFE_INTEGER);
+                  }
+                }
+              }
+            });
+          }
           _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
             var newRules = angular.copy(answerGroup.rules);
             _updateAnswerGroup(answerGroupIndex, {
