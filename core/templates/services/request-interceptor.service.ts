@@ -66,6 +66,8 @@ export class RequestInterceptor implements HttpInterceptor {
   intercept(
       request: HttpRequest<any>, next: HttpHandler
   ): Observable<HttpEvent<any>> {
+    // eslint-disable-next-line no-debugger
+    debugger;
     var csrf = this.csrf;
     try {
       csrf.initializeToken();

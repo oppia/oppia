@@ -571,12 +571,12 @@ export class UpgradedServices {
       new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['EmailDashboardDataService'] =
       new EmailDashboardDataService(upgradedServices['HttpClient']);
-    upgradedServices['EditableSkillBackendApiService'] =
-      new EditableSkillBackendApiService(
-        new HttpClient(new HttpXhrBackend(
-          new ɵangular_packages_common_http_http_d())),
-        upgradedServices['UrlInterpolationService']
-      );
+    // upgradedServices['EditableSkillBackendApiService'] =
+    //   new EditableSkillBackendApiService(
+    //     new HttpClient(new HttpXhrBackend(
+    //       new ɵangular_packages_common_http_http_d())),
+    //     upgradedServices['UrlInterpolationService']
+    //   );
     upgradedServices['ExplorationHtmlFormatterService'] =
       new ExplorationHtmlFormatterService(
         upgradedServices['CamelCaseToHyphensPipe'],
