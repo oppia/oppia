@@ -527,7 +527,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                     suggestion_models.SCORE_TYPE_QUESTION,
                     self.get_score_type()))
         if not isinstance(
-            self.change, question_domain.QuestionSuggestionChange):
+                self.change, question_domain.QuestionSuggestionChange):
             raise utils.ValidationError(
                 'Expected change to be an instance of QuestionSuggestionChange')
 
