@@ -16,7 +16,7 @@ async function run() {
       const repo = repository.split('/');
       //var repoName = github.context.payload.repository.name;
       var issueNumber = github.context.payload.pull_request.number;
-      var body = "comment hoja plz";
+      var body = "comment";
       octokit.issues.createComment({
         owner: repo[0],
         repo: repo[1],
