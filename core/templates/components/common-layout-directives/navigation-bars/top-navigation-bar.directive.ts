@@ -44,7 +44,7 @@ angular.module('oppia').directive('topNavigationBar', [
             $scope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
             SiteAnalyticsService, NavigationService, WindowDimensionsService,
-            DebouncerService, DeviceInfoService, LOGOUT_URL,) {
+            DebouncerService, DeviceInfoService, LOGOUT_URL) {
           var ctrl = this;
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
