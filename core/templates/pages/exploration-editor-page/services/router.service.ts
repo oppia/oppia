@@ -67,9 +67,6 @@ angular.module('oppia').factory('RouterService', [
 
     var activeTabName = TABS.MAIN.name;
 
-    var isImprovementsTabEnabled =
-      ExplorationFeaturesService.isImprovementsTabEnabled;
-
     // When the URL path changes, reroute to the appropriate tab in the
     // exploration editor page.
     $rootScope.$watch(function() {
@@ -169,29 +166,23 @@ angular.module('oppia').factory('RouterService', [
     };
 
     var _savePendingChanges = function() {
-      try {
+      // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
+      // null" error. To get around this we must use $timeout().
+      $timeout(function() {
         $rootScope.$broadcast('externalSave');
-      } catch (e) {
-        // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
-        // null" error. To get around this we must use $apply().
-        $rootScope.$apply(function() {
-          $rootScope.$broadcast('externalSave');
-        });
-      }
+      });
     };
 
     var _getCurrentStateFromLocationPath = function() {
-      if ($location.path().indexOf('/gui/') !== -1) {
-        return $location.path().substring('/gui/'.length);
+      var location = $location.path();
+      if (location.indexOf('/gui/') !== -1) {
+        return location.substring('/gui/'.length);
       } else {
         return null;
       }
     };
 
     var _actuallyNavigate = function(pathType, newStateName) {
-      if (pathType !== SLUG_GUI && pathType !== SLUG_PREVIEW) {
-        return;
-      }
       if (newStateName) {
         StateEditorService.setActiveStateName(newStateName);
       }
