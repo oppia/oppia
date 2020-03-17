@@ -2,7 +2,7 @@ import github, os, json
 
 def main():
     gh = github.Github(os.getenv('GITHUB_TOKEN'))
-    print(os.getenv('GITHUB_TOKEN'))
+    print(str(os.getenv('GITHUB_TOKEN'))[0])
     print(gh.get_user())
     event = json.load(open(os.getenv('GITHUB_EVENT_PATH')))
     #print(event)
