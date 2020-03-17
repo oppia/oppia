@@ -15,6 +15,13 @@
     "url": "https://github.com/oppia/oppia/issues"
   },
   "homepage": "https://github.com/oppia/oppia#readme",
+  "dependencies": {
+    "@actions/core": "^1.0.0",
+    "@actions/io": "^1.0.0",
+    "@actions/exec": "^1.0.0",
+    "@actions/github": "^1.0.0",
+    "@actions/tool-cache": "^1.0.0"
+  },
   "devDependencies": {
     "@angular/common": "^8.0.0",
     "@angular/compiler": "^8.0.0",
