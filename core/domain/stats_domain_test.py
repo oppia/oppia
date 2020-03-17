@@ -920,9 +920,9 @@ class LearnerActionTests(test_utils.GenericTestBase):
                 playthrough_model)
 
         self.assertEqual(
-            playthrough.actions[0].actionType, 'ExplorationStart1')
+            playthrough.actions[0].action_type, 'ExplorationStart1')
         self.assertEqual(
-            playthrough.actions[0].actionCustomizationArgs['new_key'], 5)
+            playthrough.actions[0].action_customization_args['new_key'], 5)
 
         # For other action types, no changes happen during migration.
         learner_action1 = stats_domain.LearnerAction('ExplorationQuit', {}, 1)
@@ -953,7 +953,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
                 playthrough_model_1)
 
         self.assertEqual(
-            playthrough1.actions[0].actionType, 'ExplorationQuit')
+            playthrough1.actions[0].action_type, 'ExplorationQuit')
 
     def test_cannot_update_learner_action_from_invalid_schema_version_model(
             self):

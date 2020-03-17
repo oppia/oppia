@@ -406,10 +406,10 @@ def update_exp_issues_for_new_exp_version(
                 playthrough.issue_customization_args['state_name']['value'] = (
                     new_state_name)
             for a_idx, action in enumerate(playthrough.actions):
-                if action.actionCustomizationArgs['stateName']['value'] == (
+                if action.action_customization_args['stateName']['value'] == (
                         old_state_name):
                     playthroughs[p_idx].actions[
-                        a_idx].actionCustomizationArgs['stateName'][
+                        a_idx].action_customization_args['stateName'][
                             'value'] = new_state_name
 
         all_playthrough_ids.extend(playthrough_ids)
