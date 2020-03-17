@@ -7,7 +7,7 @@ def main():
     event = json.load(open(os.getenv('GITHUB_EVENT_PATH')))
     print(event)
     if 'WIP' in event['pull_request']['title']:
-        repo = g.get_repo(event['repository']['full_name'])
+        repo = gh.get_repo(event['repository']['full_name'])
         issue = repo.get_issue(event['pull_request']['number'])
         issue.create_comment('I have arrived!!')
 
