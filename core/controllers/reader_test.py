@@ -1480,13 +1480,13 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 }
             },
             [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'state_name1'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             }])
         stats_models.ExplorationIssuesModel.create(
             self.exp_id, 1, [{
@@ -1517,13 +1517,13 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 }
             },
             'actions': [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'state_name1'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             }]
         }
 
@@ -1579,13 +1579,13 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 },
             },
             [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'state_name1'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             }])
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1612,13 +1612,13 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 },
             },
             'actions': [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'state_name1'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             }],
         }
 
@@ -1648,13 +1648,13 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 },
             },
             [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'state_name1'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             }])
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1681,13 +1681,13 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 },
             },
             'actions': [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'state_name1'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             }]
         }
 
@@ -1871,13 +1871,13 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 }
             },
             [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'state_name1'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             }])
 
         stats_models.ExplorationIssuesModel.create(

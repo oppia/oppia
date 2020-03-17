@@ -780,13 +780,13 @@ class LearnerAction(python_utils.OBJECT):
             dict. A dict mapping of all fields of LearnerAction object.
         """
         return {
-            'action_type': self.action_type,
-            'action_customization_args': (
+            'actionType': self.action_type,
+            'actionCustomizationArgs': (
                 customization_args_util.get_full_customization_args(
                     self.action_customization_args,
                     action_registry.Registry.get_action_by_type(
                         self.action_type).customization_arg_specs)),
-            'schema_version': self.schema_version
+            'schemaVersion': self.schema_version
         }
 
     @classmethod
@@ -801,9 +801,9 @@ class LearnerAction(python_utils.OBJECT):
             LearnerAction. The corresponding LearnerAction domain object.
         """
         return cls(
-            action_dict['action_type'],
-            action_dict['action_customization_args'],
-            action_dict['schema_version'])
+            action_dict['actionType'],
+            action_dict['actionCustomizationArgs'],
+            action_dict['schemaVersion'])
 
     @classmethod
     def update_learner_action_from_model(cls, action_dict):
@@ -814,8 +814,8 @@ class LearnerAction(python_utils.OBJECT):
         Args:
             action_dict: dict. Dict representing the LearnerAction object.
         """
-        current_action_schema_version = action_dict['schema_version']
-        action_dict['schema_version'] += 1
+        current_action_schema_version = action_dict['schemaVersion']
+        action_dict['schemaVersion'] += 1
 
         conversion_fn = getattr(cls, '_convert_action_v%s_dict_to_v%s_dict' % (
             current_action_schema_version, current_action_schema_version + 1))

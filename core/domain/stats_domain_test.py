@@ -472,13 +472,13 @@ class PlaythroughTests(test_utils.GenericTestBase):
                     'value': 200
                 }
             }, [stats_domain.LearnerAction.from_dict({
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'state_name1'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             })])
         playthrough.validate()
         return playthrough
@@ -493,13 +493,13 @@ class PlaythroughTests(test_utils.GenericTestBase):
                     'value': 200
                 }
             }, [stats_domain.LearnerAction.from_dict({
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'state_name1'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             })])
 
         playthrough_dict = playthrough.to_dict()
@@ -519,13 +519,13 @@ class PlaythroughTests(test_utils.GenericTestBase):
         self.assertEqual(
             playthrough_dict['actions'], [
                 {
-                    'action_type': 'ExplorationStart',
-                    'action_customization_args': {
-                        'state_name': {
+                    'actionType': 'ExplorationStart',
+                    'actionCustomizationArgs': {
+                        'stateName': {
                             'value': 'state_name1'
                         }
                     },
-                    'schema_version': 1
+                    'schemaVersion': 1
                 }])
 
     def test_from_dict(self):
@@ -543,13 +543,13 @@ class PlaythroughTests(test_utils.GenericTestBase):
                 }
             },
             'actions': [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'state_name1'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             }],
         }
 
@@ -570,13 +570,13 @@ class PlaythroughTests(test_utils.GenericTestBase):
         self.assertEqual(
             playthrough.actions[0].to_dict(),
             {
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'state_name1'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             })
 
     def test_from_dict_raises_exception_when_miss_exp_id(self):
@@ -608,10 +608,10 @@ class PlaythroughTests(test_utils.GenericTestBase):
     def test_validate_with_invalid_action_type(self):
         self.playthrough.actions = [
             stats_domain.LearnerAction.from_dict({
-                'action_type': 'InvalidActionType',
-                'schema_version': 1,
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'InvalidActionType',
+                'schemaVersion': 1,
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'state_name1'
                     }
                 },
@@ -869,10 +869,10 @@ class LearnerActionTests(test_utils.GenericTestBase):
 
     def _dummy_convert_action_v1_dict_to_v2_dict(self, action_dict):
         """A test implementation of schema conversion function."""
-        action_dict['schema_version'] = 2
-        if action_dict['action_type'] == 'ExplorationStart':
-            action_dict['action_type'] = 'ExplorationStart1'
-            action_dict['action_customization_args']['new_key'] = 5
+        action_dict['schemaVersion'] = 2
+        if action_dict['actionType'] == 'ExplorationStart':
+            action_dict['actionType'] = 'ExplorationStart1'
+            action_dict['actionCustomizationArgs']['new_key'] = 5
 
         return action_dict
 
@@ -886,9 +886,9 @@ class LearnerActionTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             learner_action_dict, {
-                'action_type': 'ExplorationStart',
-                'action_customization_args': expected_customization_args,
-                'schema_version': 1
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': expected_customization_args,
+                'schemaVersion': 1
             })
 
     def test_update_learner_action_from_model(self):
@@ -920,9 +920,9 @@ class LearnerActionTests(test_utils.GenericTestBase):
                 playthrough_model)
 
         self.assertEqual(
-            playthrough.actions[0].action_type, 'ExplorationStart1')
+            playthrough.actions[0].actionType, 'ExplorationStart1')
         self.assertEqual(
-            playthrough.actions[0].action_customization_args['new_key'], 5)
+            playthrough.actions[0].actionCustomizationArgs['new_key'], 5)
 
         # For other action types, no changes happen during migration.
         learner_action1 = stats_domain.LearnerAction('ExplorationQuit', {}, 1)
@@ -953,7 +953,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
                 playthrough_model_1)
 
         self.assertEqual(
-            playthrough1.actions[0].action_type, 'ExplorationQuit')
+            playthrough1.actions[0].actionType, 'ExplorationQuit')
 
     def test_cannot_update_learner_action_from_invalid_schema_version_model(
             self):
@@ -1012,15 +1012,15 @@ class LearnerActionTests(test_utils.GenericTestBase):
         self.learner_action.validate()
 
     def test_validate_with_int_action_type(self):
-        self.learner_action.action_type = 5
+        self.learner_action.actionType = 5
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected action_type to be a string, received %s' % (type(5)))):
+            'Expected actionType to be a string, received %s' % (type(5)))):
             self.learner_action.validate()
 
     def test_validate_with_string_schema_version(self):
-        self.learner_action.schema_version = '1'
+        self.learner_action.schemaVersion = '1'
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected schema_version to be an int, received %s' % (type('1')))):
+            'Expected schemaVersion to be an int, received %s' % (type('1')))):
             self.learner_action.validate()
 
 

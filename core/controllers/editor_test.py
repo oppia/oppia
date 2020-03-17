@@ -1870,13 +1870,13 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
                 }
             },
             [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'state_name1'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             }])
         self.playthrough_id2 = stats_models.PlaythroughModel.create(
             self.EXP_ID, 1, 'MultipleIncorrectSubmissions',
@@ -1889,13 +1889,13 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
                 }
             },
             [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
                     'state_name': {
                         'value': 'state_name1'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             }])
         stats_models.ExplorationIssuesModel.create(
             self.EXP_ID, 1,
@@ -1983,13 +1983,13 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
             })
         self.assertEqual(
             response['actions'], [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'state_name1'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             }])
 
 
@@ -2024,13 +2024,13 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
                 }
             },
             [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'state_name1'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             }])
         self.playthrough_id2 = stats_models.PlaythroughModel.create(
             self.EXP_ID, 1, 'EarlyQuit',
@@ -2043,13 +2043,13 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
                 }
             },
             [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
                     'state_name': {
                         'value': 'state_name2'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             }])
 
         stats_models.ExplorationIssuesModel.create(

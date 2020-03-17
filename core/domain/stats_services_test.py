@@ -210,13 +210,13 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                     'value': 200
                 }
             }, [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'New state'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             }])
         exp_issue1 = stats_domain.ExplorationIssue.from_dict({
             'issue_type': 'EarlyQuit',
@@ -630,13 +630,13 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                     'value': 200
                 }
             }, [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'Home'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             }])
         playthrough_id2 = stats_models.PlaythroughModel.create(
             exploration.id, exploration.version, 'EarlyQuit', {
@@ -647,13 +647,13 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                     'value': 200
                 }
             }, [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'End'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             }])
         exp_issue1 = stats_domain.ExplorationIssue.from_dict({
             'issue_type': 'EarlyQuit',
@@ -714,8 +714,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             playthrough1_instance.issue_customization_args['state_name'][
                 'value'], 'Renamed state')
         self.assertEqual(
-            playthrough1_instance.actions[0]['action_customization_args'][
-                'state_name']['value'],
+            playthrough1_instance.actions[0]['actionCustomizationArgs'][
+                'stateName']['value'],
             'Renamed state')
         playthrough2_instance = stats_models.PlaythroughModel.get(
             playthrough_id2)
@@ -723,8 +723,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             playthrough2_instance.issue_customization_args['state_name'][
                 'value'], 'End')
         self.assertEqual(
-            playthrough2_instance.actions[0]['action_customization_args'][
-                'state_name']['value'],
+            playthrough2_instance.actions[0]['actionCustomizationArgs'][
+                'stateName']['value'],
             'End')
 
         # Test deletion of states.
@@ -756,8 +756,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             playthrough1_instance.issue_customization_args['state_name'][
                 'value'], 'Renamed state')
         self.assertEqual(
-            playthrough1_instance.actions[0]['action_customization_args'][
-                'state_name']['value'],
+            playthrough1_instance.actions[0]['actionCustomizationArgs'][
+                'stateName']['value'],
             'Renamed state')
         playthrough2_instance = stats_models.PlaythroughModel.get(
             playthrough_id2)
@@ -765,8 +765,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             playthrough2_instance.issue_customization_args['state_name'][
                 'value'], 'End')
         self.assertEqual(
-            playthrough2_instance.actions[0]['action_customization_args'][
-                'state_name']['value'],
+            playthrough2_instance.actions[0]['actionCustomizationArgs'][
+                'stateName']['value'],
             'End')
 
     def test_get_playthroughs_multi(self):
@@ -1027,13 +1027,13 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 },
             },
             [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
+                'actionType': 'ExplorationStart',
+                'actionCustomizationArgs': {
+                    'stateName': {
                         'value': 'Home'
                     }
                 },
-                'schema_version': 1
+                'schemaVersion': 1
             }])
 
         exp_issue = stats_domain.ExplorationIssue.from_dict({
@@ -1062,8 +1062,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             playthrough_instance.issue_customization_args['state_names'][
                 'value'], ['Home', 'End', 'Home'])
         self.assertEqual(
-            playthrough_instance.actions[0]['action_customization_args'][
-                'state_name']['value'], 'Home')
+            playthrough_instance.actions[0]['actionCustomizationArgs'][
+                'stateName']['value'], 'Home')
 
         # Test renaming of states.
         exploration.rename_state('Home', 'Renamed state')
@@ -1091,8 +1091,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             playthrough_instance.issue_customization_args['state_names'][
                 'value'], ['Renamed state', 'End', 'Renamed state'])
         self.assertEqual(
-            playthrough_instance.actions[0]['action_customization_args'][
-                'state_name']['value'],
+            playthrough_instance.actions[0]['actionCustomizationArgs'][
+                'stateName']['value'],
             'Renamed state')
 
     def test_get_multiple_exploration_stats_by_version_with_invalid_exp_id(
