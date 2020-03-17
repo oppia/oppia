@@ -35,7 +35,10 @@ angular.module('oppia').directive('moderatorPage', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$rootScope', 'AlertsService', 'DateTimeFormatService',
-        function($http, $rootScope, AlertsService, DateTimeFormatService) {
+        'ThreadMessageObjectFactory',
+        function(
+            $http, $rootScope, AlertsService, DateTimeFormatService,
+            ThreadMessageObjectFactory) {
           var ctrl = this;
           ctrl.getDatetimeAsString = function(millisSinceEpoch) {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
@@ -47,11 +50,13 @@ angular.module('oppia').directive('moderatorPage', [
           };
 
           ctrl.getActivityCreateUrl = function(reference) {
-            return (
-              (reference.type === (
-                'exploration' ? '/create' : '/create_collection')) +
-              '/' + reference.id);
+            var path = (
+              reference.type === 'exploration' ?
+              '/create' :
+              '/create_collection');
+            return path + '/' + reference.id;
           };
+
           ctrl.isSaveFeaturedActivitiesButtonDisabled = function() {
             return angular.equals(
               ctrl.displayedFeaturedActivityReferences,
@@ -71,6 +76,7 @@ angular.module('oppia').directive('moderatorPage', [
               AlertsService.addSuccessMessage('Featured activities saved.');
             });
           };
+
           ctrl.$onInit = function() {
             $rootScope.loadingMessage = 'Loading';
             ctrl.allCommits = [];
@@ -119,7 +125,8 @@ angular.module('oppia').directive('moderatorPage', [
             });
 
             $http.get('/recent_feedback_messages').then(function(response) {
-              ctrl.allFeedbackMessages = response.data.results;
+              ctrl.allFeedbackMessages = response.data.results.map(
+                d => ThreadMessageObjectFactory.createFromBackendDict(d));
             });
 
             $http.get('/moderatorhandler/featured').then(function(response) {
