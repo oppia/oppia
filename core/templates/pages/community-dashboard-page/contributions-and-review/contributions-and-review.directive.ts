@@ -323,9 +323,7 @@ angular.module('oppia').directive('contributionsAndReview', [
 
           ctrl.onClickViewSuggestion = function(suggestionId) {
             var suggestion = ctrl.contributions[suggestionId].suggestion;
-            if (
-              ctrl.questionSuggestionTypes.includes(suggestion.suggestion_type)
-            ) {
+            if (suggestion.suggestion_type === ctrl.SUGGESTION_TYPE_QUESTION) {
               var reviewable =
                 ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION;
               var contributionDetails =
@@ -429,8 +427,6 @@ angular.module('oppia').directive('contributionsAndReview', [
                 text: 'Translations'
               }
             ];
-            ctrl.questionSuggestionTypes = Object.keys(
-              QUESTION_SUGGESTION_TYPE_TO_SKILL_DIFFICULTY_FLOAT);
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.isAdmin = userInfo.isAdmin();
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();

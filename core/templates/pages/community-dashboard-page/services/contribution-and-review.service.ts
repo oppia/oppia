@@ -59,7 +59,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         var url = UrlInterpolationService.interpolateUrl(
           _SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
             target_type: 'skill',
-            suggestion_type: 'add_easy_question'
+            suggestion_type: 'add_question'
           });
         return _fetchSuggestions(url, onSuccess);
       },
@@ -67,7 +67,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         var url = UrlInterpolationService.interpolateUrl(
           _REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
             target_type: 'skill',
-            suggestion_type: 'add_easy_question'
+            suggestion_type: 'add_question'
           });
         return _fetchSuggestions(url, onSuccess);
       },

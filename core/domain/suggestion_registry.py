@@ -243,12 +243,15 @@ class SuggestionEditStateContent(BaseSuggestion):
     """
 
     def __init__( # pylint: disable=super-init-not-called
-            self, suggestion_id, suggestion_type, target_id,
-            target_version_at_submission, status, author_id, final_reviewer_id,
+            self, suggestion_id, target_id, target_version_at_submission,
+            status, author_id, final_reviewer_id,
             change, score_category, last_updated):
-        """Initializes an edit state content suggestion object."""
+        """Initializes an object of type SuggestionEditStateContent
+        corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
+        """
         self.suggestion_id = suggestion_id
-        self.suggestion_type = suggestion_type
+        self.suggestion_type = (
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
         self.target_type = suggestion_models.TARGET_TYPE_EXPLORATION
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
@@ -382,12 +385,15 @@ class SuggestionTranslateContent(BaseSuggestion):
     """
 
     def __init__( # pylint: disable=super-init-not-called
-            self, suggestion_id, suggestion_type, target_id,
-            target_version_at_submission, status, author_id, final_reviewer_id,
+            self, suggestion_id, target_id, target_version_at_submission,
+            status, author_id, final_reviewer_id,
             change, score_category, last_updated):
-        """Initializes a translation suggestion object."""
+        """Initializes an object of type SuggestionTranslateContent
+        corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
+        """
         self.suggestion_id = suggestion_id
-        self.suggestion_type = suggestion_type
+        self.suggestion_type = (
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
         self.target_type = suggestion_models.TARGET_TYPE_EXPLORATION
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
@@ -462,11 +468,7 @@ class SuggestionTranslateContent(BaseSuggestion):
 
 
 class SuggestionAddQuestion(BaseSuggestion):
-    """Domain object for question suggestions of any of the following types:
-
-        SUGGESTION_TYPE_ADD_EASY_QUESTION
-        SUGGESTION_TYPE_ADD_MEDIUM_QUESTION
-        SUGGESTION_TYPE_ADD_HARD_QUESTION
+    """Domain object for a suggestion of type SUGGESTION_TYPE_ADD_QUESTION.
 
     Attributes:
         suggestion_id: str. The ID of the suggestion.
@@ -487,12 +489,14 @@ class SuggestionAddQuestion(BaseSuggestion):
     """
 
     def __init__( # pylint: disable=super-init-not-called
-            self, suggestion_id, suggestion_type, target_id,
-            target_version_at_submission, status, author_id, final_reviewer_id,
+            self, suggestion_id, target_id, target_version_at_submission,
+            status, author_id, final_reviewer_id,
             change, score_category, last_updated):
-        """Initializes a question suggestion object."""
+        """Initializes an object of type SuggestionAddQuestion
+        corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
+        """
         self.suggestion_id = suggestion_id
-        self.suggestion_type = suggestion_type
+        self.suggestion_type = suggestion_models.SUGGESTION_TYPE_ADD_QUESTION
         self.target_type = suggestion_models.TARGET_TYPE_SKILL
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
@@ -506,17 +510,6 @@ class SuggestionAddQuestion(BaseSuggestion):
             feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.score_category = score_category
         self.last_updated = last_updated
-
-    def to_dict(self):
-        """Returns a dict representation of a question suggestion object with
-            skill difficulty information.
-
-        Returns:
-            dict. A dict representation of a suggestion object.
-        """
-        base_dict = super(SuggestionAddQuestion, self).to_dict()
-        base_dict['skill_difficulty'] = self.get_skill_difficulty()
-        return base_dict
 
     def validate(self):
         """Validates a suggestion object of type SuggestionAddQuestion.
@@ -615,7 +608,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'The skill with the given id doesn\'t exist.')
         question_services.create_new_question_skill_link(
             self.author_id, question_dict['id'], self.change.skill_id,
-            self.get_skill_difficulty())
+            constants.DEFAULT_SKILL_DIFFICULTY)
 
     def populate_old_value_of_change(self):
         """Populates old value of the change."""
@@ -644,12 +637,6 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'The new change question_dict must not be equal to the old '
                 'question_dict')
-
-    def get_skill_difficulty(self):
-        """Returns the skill difficulty of the suggestion."""
-        return constants.QUESTION_SUGGESTION_TYPE_TO_SKILL_DIFFICULTY_FLOAT[
-            self.suggestion_type
-        ]
 
 
 class BaseVoiceoverApplication(python_utils.OBJECT):
@@ -861,8 +848,5 @@ SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
         SuggestionEditStateContent),
     suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
         SuggestionTranslateContent),
-    suggestion_models.SUGGESTION_TYPE_ADD_EASY_QUESTION: SuggestionAddQuestion,
-    suggestion_models.SUGGESTION_TYPE_ADD_MEDIUM_QUESTION: (
-        SuggestionAddQuestion),
-    suggestion_models.SUGGESTION_TYPE_ADD_HARD_QUESTION: SuggestionAddQuestion
+    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: SuggestionAddQuestion
 }

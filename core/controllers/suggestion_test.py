@@ -27,7 +27,6 @@ from core.domain import feedback_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
-from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
@@ -253,7 +252,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.save_new_default_exploration(exp_id, self.editor_id)
 
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_EASY_QUESTION,
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             suggestion_models.TARGET_TYPE_TOPIC, exp_id, 1,
             self.author_id, {
                 'cmd': (
@@ -634,7 +633,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_ADD_EASY_QUESTION),
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
                 'target_type': suggestion_models.TARGET_TYPE_SKILL,
                 'target_id': self.SKILL_ID,
                 'target_version_at_submission': 1,
@@ -653,13 +652,13 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         suggestions = self.get_json(
             '%s?suggestion_type=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
-                suggestion_models.SUGGESTION_TYPE_ADD_EASY_QUESTION)
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
             )['suggestions']
         self.assertEqual(len(suggestions), 1)
         suggestion = suggestions[0]
         self.assertEqual(
             suggestion['suggestion_type'],
-            suggestion_models.SUGGESTION_TYPE_ADD_EASY_QUESTION)
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
         self.assertEqual(suggestion['target_id'], self.SKILL_ID)
         self.assertEqual(
             suggestion['target_type'], suggestion_models.TARGET_TYPE_SKILL)
@@ -671,7 +670,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         suggestion_to_accept = self.get_json(
             '%s?suggestion_type=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
-                suggestion_models.SUGGESTION_TYPE_ADD_EASY_QUESTION)
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
             )['suggestions'][0]
 
         self.login(self.ADMIN_EMAIL)
@@ -690,7 +689,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         suggestion_post_accept = self.get_json(
             '%s?suggestion_type=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
-                suggestion_models.SUGGESTION_TYPE_ADD_EASY_QUESTION)
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
             )['suggestions'][0]
         self.assertEqual(
             suggestion_post_accept['status'],
@@ -747,7 +746,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_ADD_EASY_QUESTION),
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
                 'target_type': suggestion_models.TARGET_TYPE_SKILL,
                 'target_id': self.skill_id,
                 'target_version_at_submission': 1,
@@ -940,8 +939,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
                     'action': u'accept',
                     'commit_message': u'commit message',
                     'review_message': u'Accepted!',
-                    'skill_id': self.skill_id,
-                    'skill_difficulty': 0.6
+                    'skill_id': self.skill_id
                 }, csrf_token=csrf_token)
 
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -970,7 +968,6 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.EXP_ID = 'exp1'
         # Needs to be 12 characters long.
         self.SKILL_ID = 'skill1234567'
-        self.SKILL_ID2 = 'skill1234568'
         self.SKILL_DESCRIPTION = 'skill to link question to'
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, title='Exploration title')
@@ -1000,20 +997,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'new_value': self.EXP_ID
             })], 'Changes.')
 
-        self.rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        self.rubric_dicts = [rubric.to_dict() for rubric in self.rubrics]
         self.save_new_skill(
-            self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION,
-            rubrics=self.rubrics)
-        self.save_new_skill(
-            self.SKILL_ID2, self.owner_id, description=self.SKILL_DESCRIPTION,
-            rubrics=self.rubrics)
+            self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1077,7 +1062,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_ADD_EASY_QUESTION),
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
                 'target_type': suggestion_models.TARGET_TYPE_SKILL,
                 'target_id': self.SKILL_ID,
                 'target_version_at_submission': 1,
@@ -1108,43 +1093,11 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.login(self.AUTHOR_EMAIL)
 
         response = self.get_json(
-            '/getsubmittedsuggestions/skill/add_easy_question')
+            '/getsubmittedsuggestions/skill/add_question')
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
-        self.assertEqual(
-            response['target_id_to_opportunity_dict'][self.SKILL_ID][
-                'skill_rubrics'],
-            self.rubric_dicts)
         response = self.get_json(
-            '/getsubmittedsuggestions/topic/add_easy_question')
-        self.assertEqual(response, {})
-
-    def test_skill_handler_multiple_suggestions_returns_data(self):
-        self.login(self.AUTHOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
-                'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_ADD_MEDIUM_QUESTION),
-                'target_type': suggestion_models.TARGET_TYPE_SKILL,
-                'target_id': self.SKILL_ID2,
-                'target_version_at_submission': 1,
-                'change': {
-                    'cmd': (
-                        question_domain
-                        .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-                    'question_dict': self.question_dict,
-                    'skill_id': None
-                },
-                'description': 'Add new question to skill'
-            }, csrf_token=csrf_token)
-
-        response = self.get_json(
-            '/getsubmittedsuggestions/skill/add_easy_question')
-        self.assertEqual(len(response['suggestions']), 2)
-        self.assertEqual(len(response['target_id_to_opportunity_dict']), 2)
-        response = self.get_json(
-            '/getsubmittedsuggestions/topic/add_easy_question')
+            '/getsubmittedsuggestions/topic/add_question')
         self.assertEqual(response, {})
 
     def test_handler_with_invalid_suggestion_type_raise_error(self):
@@ -1187,7 +1140,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.EXP_ID = 'exp1'
         # Needs to be 12 characters long.
         self.SKILL_ID = 'skill1234567'
-        self.SKILL_ID2 = 'skill1234568'
         self.SKILL_DESCRIPTION = 'skill to link question to'
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, title='Exploration title')
@@ -1219,8 +1171,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.save_new_skill(
             self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION)
-        self.save_new_skill(
-            self.SKILL_ID2, self.owner_id, description=self.SKILL_DESCRIPTION)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1284,7 +1234,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.post_json(
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_ADD_EASY_QUESTION),
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION),
                 'target_type': suggestion_models.TARGET_TYPE_SKILL,
                 'target_id': self.SKILL_ID,
                 'target_version_at_submission': 1,
@@ -1315,41 +1265,11 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(
-            '/getreviewablesuggestions/skill/add_easy_question')
+            '/getreviewablesuggestions/skill/add_question')
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
         response = self.get_json(
-            '/getreviewablesuggestions/topic/add_easy_question')
-        self.assertEqual(response, {})
-
-    def test_skill_handler_multiple_suggestions_returns_data(self):
-        self.login(self.AUTHOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        self.post_json(
-            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
-                'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_ADD_MEDIUM_QUESTION),
-                'target_type': suggestion_models.TARGET_TYPE_SKILL,
-                'target_id': self.SKILL_ID2,
-                'target_version_at_submission': 1,
-                'change': {
-                    'cmd': (
-                        question_domain
-                        .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-                    'question_dict': self.question_dict,
-                    'skill_id': None
-                },
-                'description': 'Add new question to skill'
-            }, csrf_token=csrf_token)
-        self.logout()
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        response = self.get_json(
-            '/getreviewablesuggestions/skill/add_easy_question')
-        self.assertEqual(len(response['suggestions']), 2)
-        self.assertEqual(len(response['target_id_to_opportunity_dict']), 2)
-        response = self.get_json(
-            '/getreviewablesuggestions/topic/add_easy_question')
+            '/getreviewablesuggestions/topic/add_question')
         self.assertEqual(response, {})
 
     def test_handler_with_invalid_suggestion_type_raise_error(self):

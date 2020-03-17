@@ -19,7 +19,6 @@ suggestions.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -64,8 +63,7 @@ def create_suggestion(
         DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, has_suggestion=True)
 
     status = suggestion_models.STATUS_IN_REVIEW
-    question_suggestion_types = (
-        constants.QUESTION_SUGGESTION_TYPE_TO_SKILL_DIFFICULTY_FLOAT.keys())
+
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
         exploration = exp_fetchers.get_exploration_by_id(target_id)
     if suggestion_type == suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
@@ -82,7 +80,7 @@ def create_suggestion(
             raise Exception(
                 'The given content_html does not match the content of the '
                 'exploration.')
-    elif suggestion_type in question_suggestion_types:
+    elif suggestion_type == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
@@ -108,8 +106,7 @@ def get_suggestion_from_model(suggestion_model):
         suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
             suggestion_model.suggestion_type])
     return suggestion_domain_class(
-        suggestion_model.id, suggestion_model.suggestion_type,
-        suggestion_model.target_id,
+        suggestion_model.id, suggestion_model.target_id,
         suggestion_model.target_version_at_submission,
         suggestion_model.status, suggestion_model.author_id,
         suggestion_model.final_reviewer_id, suggestion_model.change_cmd,
