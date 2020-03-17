@@ -17,7 +17,9 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install PyGithub
+        pi install PyGithub
     - name: Check if python works
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
           python ./actions/checkPrTitleForWIP.py
