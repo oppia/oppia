@@ -97,7 +97,7 @@ export class ContributionOpportunitiesBackendApiService {
 
   // TODO(#7165): Replace any with exact type.
   fetchSkillOpportunities(
-      cursor: any ): Promise<Object> {
+      cursor: any): Promise<Object> {
     const params: ContributionOpportunityParams = {
       cursor: cursor
     };
@@ -109,7 +109,7 @@ export class ContributionOpportunitiesBackendApiService {
 
   // TODO(#7165): Replace any with exact type.
   fetchTranslationOpportunities(
-      languageCode: string, cursor: any ): Promise<Object> {
+      languageCode: string, cursor: any): Promise<Object> {
     const params: ContributionOpportunityParams = {
       language_code: languageCode,
       cursor: cursor
@@ -123,7 +123,7 @@ export class ContributionOpportunitiesBackendApiService {
 
   // TODO(#7165): Replace any with exact type.
   fetchVoiceoverOpportunities(
-      languageCode: string, cursor: any ): Promise<Object> {
+      languageCode: string, cursor: any): Promise<Object> {
     const params: ContributionOpportunityParams = {
       language_code: languageCode,
       cursor: cursor
