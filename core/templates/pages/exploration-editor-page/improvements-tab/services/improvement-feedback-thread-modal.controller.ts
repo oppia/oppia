@@ -58,13 +58,13 @@ angular.module('oppia').controller('ImprovementFeedbackThreadModalController', [
         return;
       }
       $scope.messageSendingInProgress = true;
-      ThreadDataService.addNewMessage(
-        thread.threadId, tmpText, tmpStatus, function() {
+      ThreadDataService.addNewMessageAsync(thread, tmpText, tmpStatus)
+        .then(() => {
           $scope.tmpMessage.status = $scope.activeThread.status;
           $scope.messageSendingInProgress = false;
-        }, function() {
+        })['catch']((error) => {
           $scope.messageSendingInProgress = false;
-        }).then($uibModalInstance.close);
+        })['finally']($uibModalInstance.close);
     };
 
     $scope.close = function() {

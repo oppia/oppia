@@ -25,6 +25,7 @@ describe('Improvement Feedback Thread Modal Controller', function() {
   var AlertsService = null;
   var ThreadDataService = null;
   var CsrfService = null;
+  var ContextService = null;
   var thread = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -44,11 +45,13 @@ describe('Improvement Feedback Thread Modal Controller', function() {
       AlertsService = $injector.get('AlertsService');
       ThreadDataService = $injector.get('ThreadDataService');
       CsrfService = $injector.get('CsrfTokenService');
+      ContextService = $injector.get('ContextService');
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
 
       spyOn(CsrfService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
+      spyOn(ContextService, 'getExplorationId').and.returnValue('exp1');
 
       var mockFeedbackThreads = [{
         last_updated: 1000,
@@ -68,7 +71,7 @@ describe('Improvement Feedback Thread Modal Controller', function() {
       $httpBackend.whenGET(
         '/suggestionlisthandler?target_type=exploration&target_id=' + expId
       ).respond({ suggestions: [] });
-      ThreadDataService.fetchThreads().then(function(threads) {
+      ThreadDataService.getThreadsAsync().then(function(threads) {
         thread = threads.feedbackThreads[0];
       });
       $httpBackend.flush();
@@ -120,11 +123,16 @@ describe('Improvement Feedback Thread Modal Controller', function() {
     });
 
     it('should add new message', function() {
-      $httpBackend.expectPOST('/threadhandler/exp1.thread1').respond(200);
+      $httpBackend.expect('POST', '/threadhandler/exp1.thread1').respond(200);
+      $httpBackend.expect('GET', '/threadhandler/exp1.thread1').respond({
+        messages: [{
+          text: 'temporary text'
+        }]
+      });
       $scope.addNewMessage('temporary text', 'newStatus');
 
       expect($scope.messageSendingInProgress).toBe(true);
-      $httpBackend.flush();
+      $httpBackend.flush(2);
 
       expect($scope.messageSendingInProgress).toBe(false);
       expect($scope.tmpMessage.status).toBe('newStatus');
@@ -154,11 +162,13 @@ describe('Improvement Feedback Thread Modal Controller', function() {
       AlertsService = $injector.get('AlertsService');
       ThreadDataService = $injector.get('ThreadDataService');
       CsrfService = $injector.get('CsrfTokenService');
+      ContextService = $injector.get('ContextService');
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
 
       spyOn(CsrfService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
+      spyOn(ContextService, 'getExplorationId').and.returnValue('exp1');
 
       var mockFeedbackThreads = [{
         last_updated: 1000,
@@ -179,7 +189,7 @@ describe('Improvement Feedback Thread Modal Controller', function() {
       $httpBackend.whenGET(
         '/suggestionlisthandler?target_type=exploration&target_id=' + expId
       ).respond({ suggestions: [] });
-      ThreadDataService.fetchThreads().then(function(threads) {
+      ThreadDataService.getThreadsAsync().then(function(threads) {
         thread = threads.feedbackThreads[0];
       });
       $httpBackend.flush();

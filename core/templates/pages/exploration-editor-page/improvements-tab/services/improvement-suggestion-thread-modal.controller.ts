@@ -72,24 +72,19 @@ angular.module('oppia').controller(
       // TODO(Allan): Implement ability to edit suggestions before
       // applying.
       $scope.addNewMessage = function(tmpText, tmpStatus) {
-        if (thread.threadId === null) {
-          AlertsService.addWarning(
-            'Cannot add message to thread with ID: null.');
-          return;
-        }
         if (!tmpStatus) {
           AlertsService.addWarning(
             'Invalid message status: ' + tmpStatus);
           return;
         }
         $scope.messageSendingInProgress = true;
-        ThreadDataService.addNewMessage(
-          thread.threadId, tmpText, tmpStatus, function() {
+        ThreadDataService.addNewMessageAsync(thread, tmpText, tmpStatus)
+          .then(() => {
             $scope.tmpMessage.status = $scope.activeThread.status;
             $scope.messageSendingInProgress = false;
-          }, function() {
+          })['catch'](() => {
             $scope.messageSendingInProgress = false;
-          }).then($uibModalInstance.close);
+          })['finally']($uibModalInstance.close);
       };
 
       $scope.onClickReviewSuggestion = function() {
