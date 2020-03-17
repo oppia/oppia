@@ -12,20 +12,20 @@ async function run() {
     var pullRequestNumber = pullRequest.number;
 
     if (pullRequest.title.includes('WIP')) {
-      var userName = pullRequest.user.login;
-      var owner = github.context.payload.sender.login;
-      var repoName = github.context.payload.repository.name;
-      var issueNumber = github.context.payload.pull_request.number;
-      var body = "comment hoja plz";
-      octokit.issues.createComment({
-        owner,
-        repo: repoName,
-        issue_number: issueNumber,
-        body
-      }).then(({ data, headers, status }) => {}).catch(err => {
-        console.log(err);
-      });
-      console.log(userName);
+      var repository = process.env.GITHUB_REPOSITORY;
+      console.log(repository);
+      //var repoName = github.context.payload.repository.name;
+      //var issueNumber = github.context.payload.pull_request.number;
+      //var body = "comment hoja plz";
+      //octokit.issues.createComment({
+      //  owner,
+      //  repo: repoName,
+      //  issue_number: issueNumber,
+      //  body
+      //}).then(({ data, headers, status }) => {}).catch(err => {
+      //  console.log(err);
+      //});
+      //console.log(userName);
     }
   } catch (error) {
     core.setFailed(error.message);
