@@ -1872,7 +1872,8 @@ class LintChecksManager( # pylint: disable=inherit-non-class
                         regexp_to_check['included_types'])]) and (
                             not any([
                                 filepath.endswith(
-                                    pattern) for pattern in (
+                                    os.path.join(os.getcwd(), pattern))
+                                for pattern in (
                                         regexp_to_check[
                                             'excluded_files'] +
                                         regexp_to_check[
