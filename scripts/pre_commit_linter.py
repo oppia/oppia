@@ -236,7 +236,13 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'regexp': re.compile(r'require\(.*\.\..*\);'),
         'message': 'Please, don\'t use relative imports in require().',
         'excluded_files': (),
-        'excluded_dirs': ('core/tests/')
+        'excluded_dirs': ('core/tests/',)
+    },
+    {
+        'regexp': re.compile(r'innerHTML'),
+        'message': 'Please do not use innerHTML property.',
+        'excluded_files': ('core/templates/Polyfills.ts',),
+        'excluded_dirs': ('core/tests/',)
     }
 ]
 
@@ -1018,9 +1024,10 @@ def _check_bad_pattern_in_file(filepath, file_content, pattern):
         bool. True if there is bad pattern else false.
     """
     regexp = pattern['regexp']
-    if not (any(filepath.startswith(excluded_dir)
+    if not (any(filepath.startswith(os.path.join(os.getcwd(), excluded_dir))
                 for excluded_dir in pattern['excluded_dirs'])
-            or filepath in pattern['excluded_files']):
+            or filepath in [os.path.join(os.getcwd(), excluded_path)
+                            for excluded_path in pattern['excluded_files']]):
         bad_pattern_count = 0
         for line_num, line in enumerate(file_content.split('\n'), 1):
             if line.endswith('disable-bad-pattern-check'):
