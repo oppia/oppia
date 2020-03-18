@@ -317,6 +317,9 @@ angular.module('oppia').factory('ResponsesService', [
           if (oldToNewListMapping !== undefined) {
             var deletedIndexes = oldToNewListMapping.deletedIndexes;
             var answerGroups = angular.copy(_answerGroups);
+            if (deletedIndexes === undefined) {
+               return;
+            }
             deletedIndexes.forEach( function(deletedIndex) {
               for (var i = 0; i < answerGroups.length; i++) {
                 var rules = answerGroups[i].rules;
