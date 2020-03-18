@@ -20,20 +20,19 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+
 require('services/autoplayed-videos.service.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveVideo', [
-  '$sce', '$timeout', 'HtmlEscaperService', 'UrlInterpolationService',
-  function($sce, $timeout, HtmlEscaperService, UrlInterpolationService) {
+  '$sce', '$timeout', 'HtmlEscaperService',
+  function($sce, $timeout, HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/Video/directives/video.directive.html'),
+      template: require('./video.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'ContextService', '$element',
