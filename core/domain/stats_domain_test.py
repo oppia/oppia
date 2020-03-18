@@ -1014,13 +1014,13 @@ class LearnerActionTests(test_utils.GenericTestBase):
     def test_validate_with_int_action_type(self):
         self.learner_action.action_type = 5
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected actionType to be a string, received %s' % (type(5)))):
+            'Expected action_type to be a string, received %s' % (type(5)))):
             self.learner_action.validate()
 
     def test_validate_with_string_schema_version(self):
         self.learner_action.schema_version = '1'
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected schemaVersion to be an int, received %s' % (type('1')))):
+            'Expected schema_version to be an int, received %s' % (type('1')))):
             self.learner_action.validate()
 
 
