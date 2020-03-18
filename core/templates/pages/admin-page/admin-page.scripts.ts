@@ -22,3 +22,5 @@ require('pages/admin-page/admin-page.module.ts');
 require('App.ts');
 
 require('pages/admin-page/admin-page.directive.ts');
+
+require('third-party-libs.ts');

@@ -22,3 +22,5 @@ require('pages/creator-dashboard-page/creator-dashboard-page.module.ts');
 require('App.ts');
 
 require('pages/creator-dashboard-page/creator-dashboard-page.controller.ts');
+
+require('third-party-libs.ts');

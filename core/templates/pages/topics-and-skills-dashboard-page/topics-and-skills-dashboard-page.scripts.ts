@@ -34,3 +34,5 @@ require(
 require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page.controller.ts');
+
+require('third-party-libs.ts');

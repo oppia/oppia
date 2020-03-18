@@ -21,3 +21,5 @@ require('App.ts');
 
 require('pages/community-dashboard-page/' +
   'community-dashboard-page.controller.ts');
+
+require('third-party-libs.ts');

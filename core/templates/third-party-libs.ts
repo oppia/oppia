@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts for the practice session.
+ * @fileoverview This file imports the third party libraries that we use.
  */
 
-// The module needs to be loaded before everything else since it defines the
-// main module the elements are attached to.
-require('pages/practice-session-page/practice-session-page.module.ts');
-require('App.ts');
-
-require('pages/practice-session-page/practice-session-page.controller.ts');
-
-require('third-party-libs.ts');
+// Ckeditor
+window.CKEDITOR_BASEPATH = '/third_party/static/ckeditor-4.12.1/';
+require('../../third_party/static/ckeditor-4.12.1/ckeditor.js');
