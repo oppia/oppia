@@ -97,6 +97,10 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
 
     // This should only be called when 'exploration' is non-null.
     var _loadInitialQuestion = function(successCallback) {
+      if (!questions || questions.length === 0) {
+        AlertsService.addWarning('No questions available.');
+        return;
+      }
       var initialState = questions[0].getStateData();
 
       var questionHtml = makeQuestion(initialState, []);
