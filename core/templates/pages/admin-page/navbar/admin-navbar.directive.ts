@@ -97,7 +97,7 @@ angular.module('oppia').directive('adminNavbar', [
               })
             );
           });
-
+          //  The logoWhiteImgUrl is no longer used in the html page
           ctrl.logoWhiteImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/logo/288x128_logo_white.webp');
 

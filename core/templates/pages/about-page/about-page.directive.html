@@ -546,7 +546,11 @@
     <div class="oppia-about-extra-container">
       <div class="oppia-static-extra-content oppia-about-clearfix">
         <div class="oppia-about-otter-container">
-          <img ng-src="<[$ctrl.aboutPageMascotImgUrl]>" class="oppia-about-otter" alt="Otter">
+          <picture>
+            <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/general/about_page_mascot.webp')]>">
+            <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/about_page_mascot.png')]>">
+            <img ng-src="<[$ctrl.getStaticImageUrl('/general/about_page_mascot.png')]>" class="oppia-about-otter" alt="Otter">
+          </picture>
         </div>
         <div class="oppia-about-otter-speech-card">
           <blockquote class="oppia-about-otter-speech-bubble">

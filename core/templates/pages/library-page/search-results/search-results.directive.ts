@@ -67,7 +67,7 @@ angular.module('oppia').directive('searchResults', [
             $q.all([userInfoPromise, searchResultsPromise]).then(function() {
               $rootScope.loadingMessage = '';
             });
-
+            //  The below variable is not being used now
             ctrl.noExplorationsImgUrl =
              UrlInterpolationService.getStaticImageUrl(
                '/general/no_explorations_found.webp');
