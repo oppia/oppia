@@ -170,13 +170,13 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
                 exploration.states[
                     suggestion.change.state_name].content.html)
             suggestion_summary = {
-                'suggestion_html': suggestion.change.new_value['html'],
-                'current_content_html': current_content_html,
+                'suggestionHtml': suggestion.change.new_value['html'],
+                'currentContentHtml': current_content_html,
                 'description': suggestion_thread.subject,
-                'author_username': authors_settings[0].username,
-                'author_picture_data_url': (
+                'authorUsername': authors_settings[0].username,
+                'authorPictureDataUrl': (
                     authors_settings[0].profile_picture_data_url),
-                'created_on_msecs': utils.get_time_in_millisecs(
+                'createdOnMsecs': utils.get_time_in_millisecs(
                     messages[0].created_on)
             }
             message_summary_list.append(suggestion_summary)
@@ -194,12 +194,12 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
                     author_settings.profile_picture_data_url)
 
             message_summary = {
-                'message_id': m.message_id,
+                'messageId': m.message_id,
                 'text': m.text,
-                'updated_status': m.updated_status,
-                'author_username': author_username,
-                'author_picture_data_url': author_picture_data_url,
-                'created_on_msecs': utils.get_time_in_millisecs(m.created_on)
+                'updatedStatus': m.updated_status,
+                'authorUsername': author_username,
+                'authorPictureDataUrl': author_picture_data_url,
+                'createdOnMsecs': utils.get_time_in_millisecs(m.created_on)
             }
             message_summary_list.append(message_summary)
 

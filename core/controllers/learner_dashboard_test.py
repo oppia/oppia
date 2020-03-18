@@ -331,7 +331,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         self.assertDictContainsSubset({
             'text': 'a sample message',
-            'author_username': 'editor'
+            'authorUsername': 'editor'
         }, first_message)
 
         # Add another message.
@@ -355,7 +355,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         second_message = messages_summary[1]
         self.assertDictContainsSubset({
             'text': 'Message 1',
-            'author_username': 'editor'
+            'authorUsername': 'editor'
         }, second_message)
 
         self.logout()
@@ -381,8 +381,8 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         response_dict = self.get_json(thread_url)
         messages_summary = response_dict['message_summary_list'][0]
 
-        self.assertEqual(messages_summary['author_username'], None)
-        self.assertEqual(messages_summary['author_picture_data_url'], None)
+        self.assertEqual(messages_summary['authorUsername'], None)
+        self.assertEqual(messages_summary['authorPictureDataUrl'], None)
 
     def test_get_suggestions_after_updating_suggestion_summary(self):
         self.login(self.EDITOR_EMAIL)
@@ -398,12 +398,12 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         messages_summary = response_dict['message_summary_list'][0]
 
         self.assertEqual(
-            messages_summary['author_username'], self.EDITOR_USERNAME)
+            messages_summary['authorUsername'], self.EDITOR_USERNAME)
         self.assertTrue(
-            messages_summary['author_picture_data_url'].startswith(
+            messages_summary['authorPictureDataUrl'].startswith(
                 'data:image/png;'))
-        self.assertFalse(messages_summary.get('suggestion_html'))
-        self.assertFalse(messages_summary.get('current_content_html'))
+        self.assertFalse(messages_summary.get('suggestionHtml'))
+        self.assertFalse(messages_summary.get('currentContentHtml'))
         self.assertFalse(messages_summary.get('description'))
 
         new_content = state_domain.SubtitledHtml(
@@ -432,17 +432,17 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         first_suggestion = feedback_services.get_messages(thread_id)[0]
 
         self.assertEqual(
-            messages_summary['author_username'], self.EDITOR_USERNAME)
+            messages_summary['authorUsername'], self.EDITOR_USERNAME)
         self.assertTrue(
-            messages_summary['author_picture_data_url'].startswith(
+            messages_summary['authorPictureDataUrl'].startswith(
                 'data:image/png;'))
         self.assertEqual(
             utils.get_time_in_millisecs(first_suggestion.created_on),
-            messages_summary['created_on_msecs'])
+            messages_summary['createdOnMsecs'])
         self.assertEqual(
-            messages_summary['suggestion_html'], '<p>new content html</p>')
+            messages_summary['suggestionHtml'], '<p>new content html</p>')
         self.assertEqual(
-            messages_summary['current_content_html'], current_content_html)
+            messages_summary['currentContentHtml'], current_content_html)
         self.assertEqual(
             messages_summary['description'], suggestion_thread.subject)
         self.logout()

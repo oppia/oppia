@@ -45,9 +45,9 @@ describe('Feedback message object factory', () => {
       messageId: 0,
       text: 'Sample text',
       updatedStatus: null,
-      author_username: 'User 1',
-      author_picture_data_url: 'sample_picture_url_1',
-      created_on_msecs: 1000
+      authorUsername: 'User 1',
+      authorPictureDataUrl: 'sample_picture_url_1',
+      createdOnMsecs: 1000
     };
 
     var feedbackMessageSummary = (
