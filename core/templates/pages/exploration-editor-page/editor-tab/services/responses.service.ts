@@ -41,7 +41,7 @@ require(
 
 angular.module('oppia').factory('ResponsesService', [
   '$rootScope', 'AlertsService', 'AnswerGroupsCacheService',
-  'OutcomeObjectFactory',
+  'LoggerService', 'OutcomeObjectFactory',
   'SolutionValidityService', 'SolutionVerificationService',
   'StateEditorService', 'StateInteractionIdService',
   'StateSolutionService', 'COMPONENT_NAME_DEFAULT_OUTCOME',
@@ -50,7 +50,7 @@ angular.module('oppia').factory('ResponsesService', [
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INTERACTION_SPECS',
   function(
       $rootScope, AlertsService, AnswerGroupsCacheService,
-      OutcomeObjectFactory,
+      LoggerService, OutcomeObjectFactory,
       SolutionValidityService, SolutionVerificationService,
       StateEditorService, StateInteractionIdService,
       StateSolutionService, COMPONENT_NAME_DEFAULT_OUTCOME,
@@ -92,11 +92,11 @@ angular.module('oppia').factory('ResponsesService', [
           StateSolutionService.savedMemento.correctAnswer
         );
 
-        SolutionValidityService.updateValidity(
-          StateEditorService.getActiveStateName(), solutionIsValid);
         var solutionWasPreviouslyValid = (
           SolutionValidityService.isSolutionValid(
             StateEditorService.getActiveStateName()));
+        SolutionValidityService.updateValidity(
+          StateEditorService.getActiveStateName(), solutionIsValid);
         if (solutionIsValid && !solutionWasPreviouslyValid) {
           AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
         } else if (!solutionIsValid && solutionWasPreviouslyValid) {
@@ -122,35 +122,43 @@ angular.module('oppia').factory('ResponsesService', [
 
     var _updateAnswerGroup = function(index, updates, callback) {
       var answerGroup = _answerGroups[index];
-      if (updates.hasOwnProperty('rules')) {
-        answerGroup.rules = updates.rules;
+
+      if (answerGroup) {
+        if (updates.hasOwnProperty('rules')) {
+          answerGroup.rules = updates.rules;
+        }
+        if (updates.hasOwnProperty('taggedSkillMisconceptionId')) {
+          answerGroup.taggedSkillMisconceptionId =
+            updates.taggedSkillMisconceptionId;
+        }
+        if (updates.hasOwnProperty('feedback')) {
+          answerGroup.outcome.feedback = updates.feedback;
+        }
+        if (updates.hasOwnProperty('dest')) {
+          answerGroup.outcome.dest = updates.dest;
+        }
+        if (updates.hasOwnProperty('refresherExplorationId')) {
+          answerGroup.outcome.refresherExplorationId = (
+            updates.refresherExplorationId);
+        }
+        if (updates.hasOwnProperty('missingPrerequisiteSkillId')) {
+          answerGroup.outcome.missingPrerequisiteSkillId = (
+            updates.missingPrerequisiteSkillId);
+        }
+        if (updates.hasOwnProperty('labelledAsCorrect')) {
+          answerGroup.outcome.labelledAsCorrect = updates.labelledAsCorrect;
+        }
+        if (updates.hasOwnProperty('trainingData')) {
+          answerGroup.trainingData = updates.trainingData;
+        }
+        _saveAnswerGroups(_answerGroups);
+        callback(_answerGroupsMemento);
+      } else {
+        _activeAnswerGroupIndex = -1;
+
+        LoggerService.error(
+          'The index provided does not exist in _answerGroups array.');
       }
-      if (updates.hasOwnProperty('taggedSkillMisconceptionId')) {
-        answerGroup.taggedSkillMisconceptionId =
-          updates.taggedSkillMisconceptionId;
-      }
-      if (updates.hasOwnProperty('feedback')) {
-        answerGroup.outcome.feedback = updates.feedback;
-      }
-      if (updates.hasOwnProperty('dest')) {
-        answerGroup.outcome.dest = updates.dest;
-      }
-      if (updates.hasOwnProperty('refresherExplorationId')) {
-        answerGroup.outcome.refresherExplorationId = (
-          updates.refresherExplorationId);
-      }
-      if (updates.hasOwnProperty('missingPrerequisiteSkillId')) {
-        answerGroup.outcome.missingPrerequisiteSkillId = (
-          updates.missingPrerequisiteSkillId);
-      }
-      if (updates.hasOwnProperty('labelledAsCorrect')) {
-        answerGroup.outcome.labelledAsCorrect = updates.labelledAsCorrect;
-      }
-      if (updates.hasOwnProperty('trainingData')) {
-        answerGroup.trainingData = updates.trainingData;
-      }
-      _saveAnswerGroups(_answerGroups);
-      callback(_answerGroupsMemento);
     };
 
     var _saveDefaultOutcome = function(newDefaultOutcome) {
@@ -197,6 +205,30 @@ angular.module('oppia').factory('ResponsesService', [
         _activeAnswerGroupIndex = -1;
         _activeRuleIndex = 0;
       },
+      getAnswerGroups: function() {
+        return angular.copy(_answerGroups);
+      },
+      getAnswerGroup: function(index) {
+        return angular.copy(_answerGroups[index]);
+      },
+      getAnswerGroupCount: function() {
+        return _answerGroups.length;
+      },
+      getDefaultOutcome: function() {
+        return angular.copy(_defaultOutcome);
+      },
+      getConfirmedUnclassifiedAnswers: function() {
+        return angular.copy(_confirmedUnclassifiedAnswers);
+      },
+      getAnswerChoices: function() {
+        return angular.copy(_answerChoices);
+      },
+      getActiveRuleIndex: function() {
+        return _activeRuleIndex;
+      },
+      getActiveAnswerGroupIndex: function() {
+        return _activeAnswerGroupIndex;
+      },
       onInteractionIdChanged: function(newInteractionId, callback) {
         if (AnswerGroupsCacheService.contains(newInteractionId)) {
           _answerGroups = AnswerGroupsCacheService.get(newInteractionId);
@@ -237,9 +269,6 @@ angular.module('oppia').factory('ResponsesService', [
           callback(_answerGroupsMemento, _defaultOutcomeMemento);
         }
       },
-      getActiveAnswerGroupIndex: function() {
-        return _activeAnswerGroupIndex;
-      },
       changeActiveAnswerGroupIndex: function(newIndex) {
         // If the current group is being clicked on again, close it.
         if (newIndex === _activeAnswerGroupIndex) {
@@ -250,14 +279,8 @@ angular.module('oppia').factory('ResponsesService', [
 
         _activeRuleIndex = -1;
       },
-      getActiveRuleIndex: function() {
-        return _activeRuleIndex;
-      },
       changeActiveRuleIndex: function(newIndex) {
         _activeRuleIndex = newIndex;
-      },
-      getAnswerChoices: function() {
-        return angular.copy(_answerChoices);
       },
       updateAnswerGroup: function(index, updates, callback) {
         _updateAnswerGroup(index, updates, callback);
@@ -433,21 +456,6 @@ angular.module('oppia').factory('ResponsesService', [
             });
           }
         }
-      },
-      getAnswerGroups: function() {
-        return angular.copy(_answerGroups);
-      },
-      getAnswerGroup: function(index) {
-        return angular.copy(_answerGroups[index]);
-      },
-      getAnswerGroupCount: function() {
-        return _answerGroups.length;
-      },
-      getDefaultOutcome: function() {
-        return angular.copy(_defaultOutcome);
-      },
-      getConfirmedUnclassifiedAnswers: function() {
-        return angular.copy(_confirmedUnclassifiedAnswers);
       },
       // This registers the change to the handlers in the list of changes.
       save: function(newAnswerGroups, defaultOutcome, callback) {
