@@ -31,7 +31,7 @@
     <div class="oppia-progress-info protractor-test-progress-info">
       <strong>Exploration <[inVoiceoverMode ? 'voiceover' : 'translation']> progress:</strong>
     </div>
-    <div class="progress oppia-translation-progess-bar">
+    <div class="progress oppia-translation-progress-bar">
       <div class="progress-bar bg-success" role="progressbar" ng-style="getTranslationProgressStyle()"></div>
     </div>
     <span aria-label="<[getTranslationProgressAriaLabel()]>" role="status" class="oppia-numerical-progress-status protractor-test-translation-numerical-status">(<[numberOfRequiredAudio - numberOfAudioNotAvailable]>/<[numberOfRequiredAudio]>)</span>
@@ -50,18 +50,17 @@
     display: -webkit-flex;
     display: flex;
     font-size: 16px;
-    width: 250px;
   }
   .oppia-translation-progress {
     display: -webkit-flex;
     display: flex;
     margin-top: 8px;
   }
-  .oppia-translation-progess-bar {
+  .oppia-translation-progress-bar {
     display: -webkit-flex;
     display: flex;
     height: 10px;
-    margin-top: 5px;
+    margin: 7px 0 7px 15px;
     width: 350px;
   }
   .oppia-translation-language-selector {
@@ -121,10 +120,10 @@
       font-size: 16px;
       width: 300px;
     }
-    .oppia-translation-progess-bar {
+    .oppia-translation-progress-bar {
       display: inline-block;
       height: 10px;
-      margin-top: 5px;
+      margin: 7px 0 7px 15px;
       width: 350px;
     }
   }
