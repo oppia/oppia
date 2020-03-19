@@ -29,7 +29,7 @@ import { SkillOpportunityObjectFactory } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-fdescribe('Oppotunities backend API serice', function() {
+describe('Oppotunities backend API serice', function() {
   let contributionOpportunitiesBackendApiService:
     ContributionOpportunitiesBackendApiService = null;
   let httpTestingController: HttpTestingController;
@@ -98,7 +98,7 @@ fdescribe('Oppotunities backend API serice', function() {
     httpTestingController.verify();
   });
 
-  fit('should successfully fetch the skills data',
+  it('should successfully fetch the skills data',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
@@ -124,7 +124,7 @@ fdescribe('Oppotunities backend API serice', function() {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
-  fit('should successfully fetch the translation data',
+  it('should successfully fetch the translation data',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
@@ -151,7 +151,7 @@ fdescribe('Oppotunities backend API serice', function() {
     })
   );
 
-  fit('should successfully fetch the voiceover data',
+  it('should successfully fetch the voiceover data',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');

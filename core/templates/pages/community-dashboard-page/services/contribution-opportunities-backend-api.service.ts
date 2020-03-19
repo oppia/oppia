@@ -97,9 +97,9 @@ export class ContributionOpportunitiesBackendApiService {
 
   // TODO(#7165): Replace any with exact type.
   fetchSkillOpportunities(
-      cursor: any): Promise<Object> {
+      cursor: number|string): Promise<Object> {
     const params: ContributionOpportunityParams = {
-      cursor: cursor
+      cursor: cursor.toString()
     };
     return new Promise((resolve, reject) => {
       this._fetchOpportunities(
@@ -109,10 +109,10 @@ export class ContributionOpportunitiesBackendApiService {
 
   // TODO(#7165): Replace any with exact type.
   fetchTranslationOpportunities(
-      languageCode: string, cursor: any): Promise<Object> {
+      languageCode: string, cursor: number|string): Promise<Object> {
     const params: ContributionOpportunityParams = {
       language_code: languageCode,
-      cursor: cursor
+      cursor: cursor.toString()
     };
     return new Promise((resolve, reject) => {
       this._fetchOpportunities(
