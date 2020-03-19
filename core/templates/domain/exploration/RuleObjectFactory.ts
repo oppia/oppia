@@ -17,18 +17,18 @@
  * domain objects.
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
 export interface IBackendRuleDict {
   inputs: IRuleInput,
   'rule_type': string
 }
-// The rule inputs are dependent on the type of rule
+// The rule inputs are dependent on the 'type' of rule
 // that's why 'any' is used here
 export interface IRuleInput {
   [propName: string ]: any;
 }
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 export class Rule {
   type: string;
@@ -59,6 +59,5 @@ export class RuleObjectFactory {
   }
 }
 
-angular.module('oppia').factory(
-  'RuleObjectFactory',
+angular.module('oppia').factory('RuleObjectFactory',
   downgradeInjectable(RuleObjectFactory));

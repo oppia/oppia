@@ -18,14 +18,13 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { RuleObjectFactory, IBackendRuleDict, IRuleInput } from
+import { RuleObjectFactory, IBackendRuleDict, IRuleInput, Rule } from
   'domain/exploration/RuleObjectFactory';
 
 describe('RuleObjectFactory', () => {
   let ruleObjectFactory: RuleObjectFactory = null;
   let ruleBackendDict: IBackendRuleDict = null;
   let inputBackend: IRuleInput = null;
-  let rule = null;
 
   beforeEach(() => {
     ruleObjectFactory = TestBed.get(RuleObjectFactory);
@@ -35,11 +34,7 @@ describe('RuleObjectFactory', () => {
     ruleBackendDict = {
       rule_type: 'rule_type_1',
       inputs: inputBackend
-    };
-    rule = {
-      type: 'rule_type_1',
-      inputs: inputBackend
-    };
+    }
   });
 
   it('should convert to a backend dictionary', () => {
@@ -49,6 +44,6 @@ describe('RuleObjectFactory', () => {
 
   it('should creat a new rule from creatNew()', () => {
     let rulesDict = ruleObjectFactory.createNew('rule_type_1', inputBackend);
-    expect(rulesDict).toEqual(rule);
+    expect(rulesDict).toEqual(new Rule('rule_type_1', inputBackend));
   });
 });
