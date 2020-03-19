@@ -514,6 +514,7 @@
 /app_dev.yaml @jameesjohn @vojtechjelinek
 /core/templates/google-analytics.initializer.ts @jameesjohn @vojtechjelinek
 /core/templates/base-components/ @jameesjohn @vojtechjelinek
+/core/templates/ckeditor.import.ts @nishantwrp @vojtechjelinek
 /core/templates/pages/Base.ts @jameesjohn @vojtechjelinek
 /core/templates/pages/oppia_footer_directive.html @jameesjohn @vojtechjelinek
 /core/templates/pages/OppiaFooterDirective.ts @jameesjohn @vojtechjelinek
@@ -521,7 +522,6 @@
 /core/templates/pages/header_css_libs.html @jameesjohn @vojtechjelinek
 /core/templates/pages/header_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/services/csrf-token.service*.ts @jameesjohn @vojtechjelinek
-/core/templates/third-party-libs.ts @nishantwrp @vojtechjelinek
 /jinja_utils*.py @jameesjohn @vojtechjelinek
 /webpack.common.config.ts @jameesjohn @vojtechjelinek
 /webpack.common.macros.ts @jameesjohn @vojtechjelinek
