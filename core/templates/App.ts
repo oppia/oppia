@@ -221,7 +221,8 @@ angular.module('oppia').config(['toastrConfig', function(toastrConfig) {
 // spread over multiple lines. The errored file may be viewed on the
 // browser console where the line number should match.
 angular.module('oppia').factory('$exceptionHandler', [
-  '$log', 'CsrfTokenService', function($log, CsrfTokenService) {
+  '$log', 'CsrfTokenService', 'DEV_MODE',
+  function($log, CsrfTokenService, DEV_MODE) {
     var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
     // Refer: https://docs.angularjs.org/guide/migration#-templaterequest-
     // The tpload error namespace has changed in Angular v1.7.
@@ -255,46 +256,49 @@ angular.module('oppia').factory('$exceptionHandler', [
       if (tploadStatusCode !== null && tploadStatusCode[1] === '-1') {
         return;
       }
-      sourceMappedStackTrace.mapStackTrace(
-        exception.stack, function(mappedStack) {
-          var messageAndSourceAndStackTrace = [
-            '',
-            'Cause: ' + cause,
-            exception.message,
-            mappedStack.join('\n'),
-            '    at URL: ' + window.location.href
-          ].join('\n');
-          // To prevent an overdose of errors, throttle to at most 1 error every
-          // MIN_TIME_BETWEEN_ERRORS_MSEC.
-          if (
-            Date.now() - timeOfLastPostedError > MIN_TIME_BETWEEN_ERRORS_MSEC) {
-            // Catch all errors, to guard against infinite recursive loops.
-            try {
-              // We use jQuery here instead of Angular's $http, since the latter
-              // creates a circular dependency.
-              CsrfTokenService.getTokenAsync().then(function(token) {
-                $.ajax({
-                  type: 'POST',
-                  url: '/frontend_errors',
-                  data: $.param({
-                    csrf_token: token,
-                    payload: JSON.stringify({
-                      error: messageAndSourceAndStackTrace
-                    }),
-                    source: document.URL
-                  }, true),
-                  contentType: 'application/x-www-form-urlencoded',
-                  dataType: 'text',
-                  async: true
-                });
+      if (!DEV_MODE) {
+        sourceMappedStackTrace.mapStackTrace(
+          exception.stack, function(mappedStack) {
+            var messageAndSourceAndStackTrace = [
+              '',
+              'Cause: ' + cause,
+              exception.message,
+              mappedStack.join('\n'),
+              '    at URL: ' + window.location.href
+            ].join('\n');
+            var timeDifference = Date.now() - timeOfLastPostedError;
+            // To prevent an overdose of errors, throttle to at most 1 error
+            // every MIN_TIME_BETWEEN_ERRORS_MSEC.
+            if (timeDifference > MIN_TIME_BETWEEN_ERRORS_MSEC) {
+              // Catch all errors, to guard against infinite recursive loops.
+              try {
+                // We use jQuery here instead of Angular's $http, since the
+                // latter creates a circular dependency.
+                CsrfTokenService.getTokenAsync().then(function(token) {
+                  $.ajax({
+                    type: 'POST',
+                    url: '/frontend_errors',
+                    data: $.param({
+                      csrf_token: token,
+                      payload: JSON.stringify({
+                        error: messageAndSourceAndStackTrace
+                      }),
+                      source: document.URL
+                    }, true),
+                    contentType: 'application/x-www-form-urlencoded',
+                    dataType: 'text',
+                    async: true
+                  });
 
-                timeOfLastPostedError = Date.now();
-              });
-            } catch (loggingError) {
-              $log.warn('Error logging failed.');
+                  timeOfLastPostedError = Date.now();
+                });
+              } catch (loggingError) {
+                $log.warn('Error logging failed.');
+              }
             }
           }
-        });
+        );
+      }
       $log.error.apply($log, arguments);
     };
   }
