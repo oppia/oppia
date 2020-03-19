@@ -61,7 +61,10 @@ export class FeedbackMessageSummaryObjectFactory {
       newMessageId, newMessageText, null, null, null, null, authorUsername,
       authorPictureDataUrl, createdOnMsecs);
   }
-
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'feedbackMessageSummaryBackendDict' is a dict with	
+  // underscore_cased keys which give tslint errors against underscore_casing	
+  // in favor of camelCasing.
   createFromBackendDict(
       feedbackMessageSummaryBackendDict: any): FeedbackMessageSummary {
     return new FeedbackMessageSummary(
