@@ -67,12 +67,12 @@
 /CONTRIBUTORS @seanlip
 /LICENSE @seanlip
 /NOTICE @seanlip
-/core/templates/pages/about-page/*.html @seanlip
-/core/templates/pages/about-page/*.ts @DubeySandeep
-/core/templates/pages/privacy-page/*.html @seanlip
-/core/templates/pages/privacy-page/*.ts @DubeySandeep
-/core/templates/pages/terms-page/*.html @seanlip
-/core/templates/pages/terms-page/*.ts @DubeySandeep
+/core/templates/pages/about-page/ @DubeySandeep
+/core/templates/pages/about-page/about-page.directive.html @seanlip
+/core/templates/pages/privacy-page/ @DubeySandeep
+/core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip
+/core/templates/pages/terms-page/ @DubeySandeep
+/core/templates/pages/terms-page/terms-page.mainpage.html @seanlip
 
 
 # Dashboard pages.
