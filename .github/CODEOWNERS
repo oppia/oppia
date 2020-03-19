@@ -478,6 +478,7 @@
 /core/storage/suggestion/ @nithusha21
 /core/templates/domain/suggestion/ @nithusha21
 /core/templates/services/suggestion-modal.service*.ts @nithusha21
+/core/templates/services/suggestions.service*.ts @nithusha21
 
 
 # Feedback project.
