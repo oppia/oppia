@@ -31,11 +31,11 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { AudioLanguageObjectFactory } from
@@ -68,6 +68,8 @@ import { ComputeGraphService } from 'services/compute-graph.service';
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
 import { ContextService } from 'services/context.service';
+import { ContinueValidationService } from
+  'interactions/Continue/directives/continue-validation.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CreatorDashboardBackendApiService } from
   'domain/creator_dashboard/creator-dashboard-backend-api.service';
@@ -78,9 +80,14 @@ import { DebugInfoTrackerService } from 'services/debug-info-tracker.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
+import { DragAndDropSortInputRulesService } from
+// eslint-disable-next-line max-len
+  'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
+import { EndExplorationValidationService } from
+  'interactions/EndExploration/directives/end-exploration-validation.service';
 import { EmailDashboardDataService } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
 import { EntityContextObjectFactory } from
@@ -312,7 +319,13 @@ export class UpgradedServices {
     upgradedServices['DebouncerService'] = new DebouncerService();
     upgradedServices['DebugInfoTrackerService'] =
       new DebugInfoTrackerService();
+    upgradedServices['DragAndDropSortInputRulesService'] =
+      new DragAndDropSortInputRulesService();
     upgradedServices['EditabilityService'] = new EditabilityService();
+    upgradedServices['EmailDashboardDataService'] =
+      new EmailDashboardDataService(
+        new HttpClient(new HttpXhrBackend(
+          new ɵangular_packages_common_http_http_d())));
     upgradedServices['EntityContextObjectFactory'] =
       new EntityContextObjectFactory();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
@@ -403,10 +416,16 @@ export class UpgradedServices {
     upgradedServices['ChangesInHumanReadableFormService'] =
       new ChangesInHumanReadableFormService(
         upgradedServices['UtilsService'], document);
+    // eslint-disable-next-line max-len
+    upgradedServices['ContinueValidationService'] = new ContinueValidationService(
+      upgradedServices['baseInteractionValidationService']);
     upgradedServices['DeviceInfoService'] = new DeviceInfoService(
       upgradedServices['WindowRef']);
     upgradedServices['DocumentAttributeCustomizationService'] =
       new DocumentAttributeCustomizationService(upgradedServices['WindowRef']);
+    upgradedServices['EndExplorationValidationService'] =
+      new EndExplorationValidationService(
+        upgradedServices['baseInteractionValidationService']);
     upgradedServices['FeedbackThreadObjectFactory'] =
       new FeedbackThreadObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);
