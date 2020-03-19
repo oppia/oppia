@@ -239,8 +239,7 @@ angular.module('oppia').directive('explorationEditorPage', [
           // Called on page load.
           ctrl.initExplorationPage = function(successCallback) {
             $q.all([
-              ExplorationDataService.getData(function(
-                  explorationId, lostChanges) {
+              ExplorationDataService.getData((explorationId, lostChanges) => {
                 if (!AutosaveInfoModalsService.isModalOpen()) {
                   AutosaveInfoModalsService.showLostChangesModal(
                     lostChanges, explorationId);
@@ -248,12 +247,14 @@ angular.module('oppia').directive('explorationEditorPage', [
               }),
               ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
                 ContextService.getExplorationId()),
+              ThreadDataService.getOpenThreadsCountAsync()
             ]).then(function(combinedData) {
-              var explorationData = combinedData[0];
-              var featuresData = combinedData[1];
+              var [explorationData, featuresData, openThreadsCount] =
+                combinedData;
               if (explorationData.exploration_is_linked_to_story) {
                 ContextService.setExplorationIsLinkedToStory();
               }
+
               ExplorationFeaturesService.init(explorationData, featuresData);
 
               ExplorationStatesService.init(explorationData.states);
@@ -333,7 +334,7 @@ angular.module('oppia').directive('explorationEditorPage', [
               if (!RouterService.isLocationSetToNonStateEditorTab() &&
                   !explorationData.states.hasOwnProperty(
                     RouterService.getCurrentStateFromLocationPath('gui'))) {
-                if (ThreadDataService.getOpenThreadsCount() > 0) {
+                if (openThreadsCount > 0) {
                   RouterService.navigateToFeedbackTab();
                 } else {
                   RouterService.navigateToMainTab();
