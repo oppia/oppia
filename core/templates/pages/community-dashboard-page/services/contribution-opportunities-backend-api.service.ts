@@ -34,7 +34,7 @@ type OpportunityType = 'skill' | 'voiceover' | 'translation';
 
 // TODO(#7165): Replace any with exact type.
 type ContributionOpportunityParams = {
-  cursor: any;
+  cursor: string;
   // eslint-disable-next-line camelcase
   language_code?: string;
 };
@@ -123,10 +123,10 @@ export class ContributionOpportunitiesBackendApiService {
 
   // TODO(#7165): Replace any with exact type.
   fetchVoiceoverOpportunities(
-      languageCode: string, cursor: any): Promise<Object> {
+      languageCode: string, cursor: number|string): Promise<Object> {
     const params: ContributionOpportunityParams = {
       language_code: languageCode,
-      cursor: cursor
+      cursor: cursor.toString()
     };
     return new Promise((resolve, reject) => {
       this._fetchOpportunities(

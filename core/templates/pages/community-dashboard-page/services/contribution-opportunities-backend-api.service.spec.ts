@@ -29,7 +29,7 @@ import { SkillOpportunityObjectFactory } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-describe('Oppotunities backend API serice', function() {
+fdescribe('Oppotunities backend API serice', function() {
   let contributionOpportunitiesBackendApiService:
     ContributionOpportunitiesBackendApiService = null;
   let httpTestingController: HttpTestingController;
@@ -39,23 +39,30 @@ describe('Oppotunities backend API serice', function() {
     SkillOpportunityObjectFactory = null;
   let urlInterpolationService:
     UrlInterpolationService = null;
-  const skillResponse = [{
-    id: 'skill_id',
-    skill_description: 'A new skill for question',
-    topic_name: 'A new topic',
-    question_count: 30
-  }];
-  const sampleExplorationSumary = [{
-    id: 'exp_id',
-    topic_name: 'Topic',
-    story_title: 'A new story',
-    chapter_title: 'Introduction',
-    content_count: 100,
-    translation_counts: {
-      hi: 15
-    }
-  }
-  ];
+  const skillResponse = {
+    opportunities: [{
+      id: 'skill_id',
+      skill_description: 'A new skill for question',
+      topic_name: 'A new topic',
+      question_count: 30
+    }],
+    next_cursor: '6',
+    more: ''
+  };
+  const sampleExplorationSumary = {
+    opportunities: [{
+      id: 'exp_id',
+      topic_name: 'Topic',
+      story_title: 'A new story',
+      chapter_title: 'Introduction',
+      content_count: 100,
+      translation_counts: {
+        hi: 15
+      }
+    }],
+    next_cursor: '6',
+    more: ''
+  };
   let sampleSkillOpportunityResponse = null;
   let sampleTranslationOpportunityResponse = null;
   let sampleVoiceoverOpportunityResponse = null;
@@ -72,16 +79,17 @@ describe('Oppotunities backend API serice', function() {
     skillOpportunityObjectFactory = TestBed.get(SkillOpportunityObjectFactory);
     urlInterpolationService = TestBed.get(UrlInterpolationService);
     sampleSkillOpportunityResponse = [
-      skillOpportunityObjectFactory.createFromBackendDict(skillResponse[0])
+      skillOpportunityObjectFactory.createFromBackendDict(
+        skillResponse.opportunities[0])
     ];
     sampleTranslationOpportunityResponse = [
       explorationOpportunitySummaryObjectFactory.createFromBackendDict(
-        sampleExplorationSumary[0]
+        sampleExplorationSumary.opportunities[0]
       )
     ];
     sampleVoiceoverOpportunityResponse = [
       explorationOpportunitySummaryObjectFactory.createFromBackendDict(
-        sampleExplorationSumary[0]
+        sampleExplorationSumary.opportunities[0]
       )
     ];
   });
@@ -90,7 +98,7 @@ describe('Oppotunities backend API serice', function() {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch the skills data',
+  fit('should successfully fetch the skills data',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
@@ -111,13 +119,12 @@ describe('Oppotunities backend API serice', function() {
 
       flushMicrotasks();
 
-      //   expect(successHandler).toHaveBeenCalledWith(
-      //     [sampleSkillOpportunityResponse]);
-      expect(successHandler).toHaveBeenCalledWith([]);
+      expect(successHandler).toHaveBeenCalledWith(
+        sampleSkillOpportunityResponse);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
-  it('should successfully fetch the translation data',
+  fit('should successfully fetch the translation data',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
@@ -134,18 +141,17 @@ describe('Oppotunities backend API serice', function() {
         ) + `?language_code=${'hi'}&cursor=${''}`
       );
       expect(req.request.method).toEqual('GET');
-      req.flush(skillResponse);
+      req.flush(sampleExplorationSumary);
 
       flushMicrotasks();
 
-      //   expect(successHandler).toHaveBeenCalledWith(
-      //     [sampleTranslationOpportunityResponse]);
-      expect(successHandler).toHaveBeenCalledWith([]);
+      expect(successHandler).toHaveBeenCalledWith(
+        sampleTranslationOpportunityResponse);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
 
-  it('should successfully fetch the voiceover data',
+  fit('should successfully fetch the voiceover data',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
@@ -162,15 +168,13 @@ describe('Oppotunities backend API serice', function() {
         ) + `?language_code=${'hi'}&cursor=${''}`
       );
       expect(req.request.method).toEqual('GET');
-      req.flush(skillResponse);
+      req.flush(sampleExplorationSumary);
 
       flushMicrotasks();
 
-      //   expect(successHandler).toHaveBeenCalledWith(
-      // [sampleVoiceoverOpportunityResponse]);
-      expect(successHandler).toHaveBeenCalledWith([]);
+      expect(successHandler).toHaveBeenCalledWith(
+        sampleVoiceoverOpportunityResponse);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
 });
-// TODO(@srijanreddy98): Check for which urls we can get a sample response
