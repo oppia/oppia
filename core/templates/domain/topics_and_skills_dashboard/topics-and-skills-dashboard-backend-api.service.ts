@@ -42,7 +42,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
     };
     return this.http.post<void>(
       TopicsAndSkillsDashboardDomainConstants.MERGE_SKILLS_URL,
-       mergeSkillsData).toPromise();
+      mergeSkillsData).toPromise();
   }
 }
 angular.module('oppia').factory(
