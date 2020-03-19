@@ -58,25 +58,16 @@ var expectInteractionDetailsToMatch = function(
 // answer = an array of strings, iterate over each of the items in the array and click on each item
 var submitAnswer = function(elem, answer) {
   var answerArray = Array.from(answer);
-  console.log(answer);
-  console.log(answerArray.length);
 
-  for (var i = 0; i < 1; i++) {
-    //waitFor protractor-test-item-selection-input-item
-    elem.all(by.css('.protractor-test-item-selection-input-item')).filter(function(elem) {
-      return elem.element(by.css('.protractor-test-item-selection-option'))
-        .element(by.tagName('p')).getText().then(function(answerChoice) {
-          console.log(i);
-          return (answerChoice === answerArray[i]);
-        });
-    }).first().element(by.css('.protractor-test-item-selection-input-checkbox')).click();
+  for (var i = 0; i < answerArray.length; i++) {
+    var desiredAnswer = answerArray[i];
+    elem.element(by.cssContainingText(".protractor-test-item-selection-input-item", desiredAnswer))
+      .element(by.css('.protractor-test-item-selection-input-checkbox')).click();
   }
 
-  // need to wait until all elements have been selected, also need to explicitly click submit button bc it has one! 
   var submitAnswerButton = element(by.css('.protractor-test-submit-answer-button'));
   waitFor.elementToBeClickable(submitAnswerButton, 'Submit Answer button is not clickable');
   submitAnswerButton.click();
-  console.log("submit button clicked");
 };
 
 var answerObjectType = 'SetOfHtmlString'; // type of object returned by interaction
@@ -89,8 +80,7 @@ var testSuite = [{
   }, function(editor) {
     editor.appendItalicText('answer3');
   }], 3],
-  //ruleArguments: ['Equals', ['answer1', 'answer2']],
-  ruleArguments: ['Equals', ['answer1']],
+  ruleArguments: ['Equals', ['answer1', 'answer2']],
   expectedInteractionDetails: [[function(checker) {
     checker.readBoldText('answer1');
   }, function(checker) {
@@ -98,11 +88,9 @@ var testSuite = [{
   }, function(checker) {
     checker.readItalicText('answer3');
   }]],
-  //wrongAnswers: [['answer1', 'answer3']],
-  wrongAnswers: [['answer3']],
-  //correctAnswers: [['answer1', 'answer2']]
-  correctAnswers: [['answer1']]
-}/*, { 
+  wrongAnswers: [['answer1', 'answer3']],
+  correctAnswers: [['answer1', 'answer2']]
+}, { 
   interactionArguments: [[function(editor) {
     editor.appendBoldText('answer1');
   }, function(editor) {
@@ -156,7 +144,7 @@ var testSuite = [{
   }]],
   wrongAnswers: [['answer1', 'answer2']],
   correctAnswers: [['answer3']]
-}*/];
+}];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
