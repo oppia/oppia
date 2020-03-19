@@ -142,7 +142,6 @@ angular.module('oppia').factory('SkillEditorStateService', [
        * Returns whether this service is currently attempting to load the
        * skill maintained by this service.
        */
-
       isLoadingSkill: function() {
         return _skillIsBeingLoaded;
       },
