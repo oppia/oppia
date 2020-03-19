@@ -28,15 +28,17 @@ module.exports = function(config) {
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
-      'core/templates/dev/head/**/*_directive.html',
-      'core/templates/dev/head/**/*.directive.html',
-      'core/templates/dev/head/**/*.template.html',
-      'core/templates/dev/head/AppInit.ts',
+      'core/templates/**/*_directive.html',
+      'core/templates/**/*.directive.html',
+      'core/templates/**/*.template.html',
+      // Any of the *.module.ts files could be used here, we use
+      // about-page.module.ts because it is first alphabetically.
+      'core/templates/pages/about-page/about-page.module.ts',
       // This is a file that is generated on running the run_frontend_tests.py
       // script. This generated file is a combination of all the spec files
       // since Karma is unable to run tests on multiple files due to some
       // unknown reason.
-      'core/templates/dev/head/combined-tests.spec.ts',
+      'core/templates/combined-tests.spec.ts',
       {
         pattern: 'extensions/**/*.png',
         watched: false,
@@ -54,7 +56,7 @@ module.exports = function(config) {
       }
     ],
     exclude: [
-      'local_compiled_js/core/templates/dev/head/**/*-e2e.js',
+      'local_compiled_js/core/templates/**/*-e2e.js',
       'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
     ],
@@ -66,15 +68,15 @@ module.exports = function(config) {
       '/extensions/': '/base/extensions/'
     },
     preprocessors: {
-      'core/templates/dev/head/*.ts': ['webpack'],
-      'core/templates/dev/head/**/*.ts': ['webpack'],
+      'core/templates/*.ts': ['webpack'],
+      'core/templates/**/*.ts': ['webpack'],
       'extensions/**/*.ts': ['webpack'],
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
-      'core/templates/dev/head/**/*_directive.html': ['ng-html2js'],
-      'core/templates/dev/head/**/*.directive.html': ['ng-html2js'],
-      'core/templates/dev/head/**/*.template.html': ['ng-html2js'],
+      'core/templates/**/*_directive.html': ['ng-html2js'],
+      'core/templates/**/*.directive.html': ['ng-html2js'],
+      'core/templates/**/*.template.html': ['ng-html2js'],
       'extensions/interactions/**/*.directive.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
@@ -111,7 +113,8 @@ module.exports = function(config) {
         flags: [
           '--no-sandbox',
           '--disable-gpu',
-          '--js-flags=--max-old-space-size=4096'
+          '--disable-dev-shm-usage',
+          '--js-flags=--max-old-space-size=2048'
         ]
       }
     },
@@ -146,14 +149,14 @@ module.exports = function(config) {
         modules: [
           'core/tests/data',
           'assets',
-          'core/templates/dev/head',
+          'core/templates',
           'extensions',
           'node_modules',
           'third_party',
         ],
         extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
       },
-      devtool: 'inline-source-map',
+      devtool: 'inline-cheap-source-map',
       module: {
         rules: [
           {

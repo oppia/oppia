@@ -88,6 +88,184 @@ def run_job_for_deleted_exp(
         self.assertEqual(job_class.get_output(job_id), [])
 
 
+class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(MathExpressionInputInteractionOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
+        """Checks (exp, state) pairs are produced only for
+        desired interactions.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1', 'State2', 'State3'])
+
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+
+        state1.update_interaction_id('MathExpressionInput')
+        state2.update_interaction_id('MathExpressionInput')
+        state3.update_interaction_id('MathExpressionInput')
+
+        # This exploration is valid (has no equation/inequalities) therefore
+        # it shouldn't be detected by this audit job.
+        answer_group_list1 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': u'[\'x+y-z\']'}
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state1.update_interaction_answer_groups(answer_group_list1)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start MathExpressionInteractionOneOff job on sample exploration.
+        job_id = (
+            exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.create_new(
+            ))
+        exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.get_output(
+                job_id))
+        self.assertEqual(actual_output, [])
+
+        # This exploration is invalid (has an equation) therefore
+        # it should be detected by this audit job.
+        answer_group_list2 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': u'[\'y=mx+c\']'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state2</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state2.update_interaction_answer_groups(answer_group_list2)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # This exploration is invalid (has inequalities) therefore
+        # it should be detected by this audit job.
+        answer_group_list3 = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': u'[\'x<y>z\']'}
+            }],
+            'outcome': {
+                'dest': 'State2',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state3</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state3.update_interaction_answer_groups(answer_group_list3)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start MathExpressionInteractionOneOff job on sample exploration.
+        job_id = (
+            exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.create_new(
+            ))
+        exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.MathExpressionInputInteractionOneOffJob.get_output(
+                job_id))
+        expected_output = [(
+            u'[u\'exp_id0\', [u"State2: [\'y=mx+c\']", u"State3: [\'x<y>z\']"]]'
+        )]
+        self.assertEqual(actual_output, expected_output)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        state1 = exploration.states['State1']
+
+        state1.update_interaction_id('MathExpressionInput')
+
+        answer_group_list = [{
+            'rule_specs': [{
+                'rule_type': 'IsMathematicallyEquivalentTo',
+                'inputs': {'x': u'[\'y=mx+c\']'}
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state1.update_interaction_answer_groups(answer_group_list)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.MathExpressionInputInteractionOneOffJob)
+
+
 class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
     """Tests for ExpSummary aggregations."""
 
@@ -779,19 +957,12 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         intro_state.update_interaction_id('TextInput')
         end_state.update_interaction_id('EndExploration')
 
-        default_outcome_dict = {
-            'dest': 'End',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Introduction</p>'
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-
-        intro_state.update_interaction_default_outcome(default_outcome_dict)
+        default_outcome = state_domain.Outcome(
+            'End', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Introduction</p>'
+            ), False, [], None, None
+        )
+        intro_state.update_interaction_default_outcome(default_outcome)
         end_state.update_interaction_default_outcome(None)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -1536,24 +1707,26 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
 
-        hint_list1 = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state1</p>'
-            }
-        }, {
-            'hint_content': {
-                'content_id': 'hint2',
-                'html': '<p>Hello, this is html2 for state1</p>'
-            }
-        }]
+        hint_list1 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state1</p>'
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint2', '<p>Hello, this is html2 for state1</p>'
+                )
+            ),
+        ]
 
-        hint_list2 = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
+        hint_list2 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state2</p>'
+                )
+            )
+        ]
 
         state1.update_interaction_hints(hint_list1)
         state2.update_interaction_hints(hint_list2)
@@ -1584,24 +1757,23 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         state1 = exploration1.states['State1']
         state2 = exploration1.states['State2']
 
-        hint_list1 = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state1</p>'
-            }
-        }, {
-            'hint_content': {
-                'content_id': 'hint2',
-                'html': '<p>Hello, this is html2 for state1</p>'
-            }
-        }]
-
-        hint_list2 = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
+        hint_list1 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state1</p>')
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint2', '<p>Hello, this is html2 for state1</p>')
+            ),
+        ]
+        hint_list2 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state2</p>'
+                )
+            )
+        ]
 
         state1.update_interaction_hints(hint_list1)
 
@@ -1616,12 +1788,13 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
 
         state1 = exploration2.states['State1']
 
-        hint_list1 = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state1</p>'
-            }
-        }]
+        hint_list1 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state1</p>'
+                )
+            ),
+        ]
 
         state1.update_interaction_hints(hint_list1)
 
@@ -1656,17 +1829,18 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
 
         state1 = exploration.states['State1']
 
-        hint_list = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state1</p>'
-            }
-        }, {
-            'hint_content': {
-                'content_id': 'hint2',
-                'html': '<p>Hello, this is html2 for state1</p>'
-            }
-        }]
+        hint_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state1</p>'
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint2', '<p>Hello, this is html2 for state1</p>'
+                )
+            )
+        ]
 
         state1.update_interaction_hints(hint_list)
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -1757,36 +1931,24 @@ class ExplorationContentValidationJobForCKEditorTests(
             )
         }
 
-        default_outcome_dict1 = {
-            'dest': 'State2',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
-                    '<ol><ol><li>Item1</li></ol><li>Item2</li></ol>'
-                )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        default_outcome_dict2 = {
-            'dest': 'State1',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
+        default_outcome1 = state_domain.Outcome(
+            'State2', state_domain.SubtitledHtml(
+                'default_outcome',
+                '<ol><ol><li>Item1</li></ol><li>Item2</li></ol>'
+            ), False, [], None, None
+        )
+        default_outcome2 = state_domain.Outcome(
+            'State1',
+            state_domain.SubtitledHtml(
+                'default_outcome',
+                (
                     '<pre>Hello this is <b> testing '
                     '<oppia-noninteractive-image filepath-with-value="amp;quot;'
                     'random.png&amp;quot;"></oppia-noninteractive-image> in '
                     '</b>progress</pre>'
-
                 )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
+            ), False, [], None, None,
+        )
 
         mock_validate_context = self.swap(
             state_domain.SubtitledHtml, 'validate', mock_validate)
@@ -1799,8 +1961,8 @@ class ExplorationContentValidationJobForCKEditorTests(
             state3.update_content(
                 state_domain.SubtitledHtml.from_dict(content3_dict))
 
-            state1.update_interaction_default_outcome(default_outcome_dict1)
-            state2.update_interaction_default_outcome(default_outcome_dict2)
+            state1.update_interaction_default_outcome(default_outcome1)
+            state2.update_interaction_default_outcome(default_outcome2)
             exp_services.save_new_exploration(self.albert_id, exploration)
             job_id = (
                 exp_jobs_one_off
@@ -1939,22 +2101,18 @@ class InteractionCustomizationArgsValidationJobTests(
                 '</oppia-noninteractive-tabs>'
             )
         }
-        default_outcome_dict2 = {
-            'dest': 'State1',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
+        default_outcome2 = state_domain.Outcome(
+            'State1',
+            state_domain.SubtitledHtml(
+                'default_outcome',
+                (
                     '<p><oppia-noninteractive-link text-with-value="'
                     '&amp;quot;What is a link?&amp;quot;" url-with-'
                     'value="&amp;quot;htt://link.com&amp'
                     ';quot;"></oppia-noninteractive-link></p>'
                 )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
+            ), False, [], None, None
+        )
         content3_dict = {
             'content_id': 'content',
             'html': (
@@ -1969,7 +2127,7 @@ class InteractionCustomizationArgsValidationJobTests(
         with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
             state1.update_content(
                 state_domain.SubtitledHtml.from_dict(content1_dict))
-            state2.update_interaction_default_outcome(default_outcome_dict2)
+            state2.update_interaction_default_outcome(default_outcome2)
             state3.update_content(
                 state_domain.SubtitledHtml.from_dict(content3_dict))
             exp_services.save_new_exploration(self.albert_id, exploration)

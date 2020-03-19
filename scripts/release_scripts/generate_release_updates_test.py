@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/generate_release_updates.py."""
+"""Unit tests for scripts/release_scripts/generate_release_updates.py."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -152,7 +152,7 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
                     'the release_info.py script and re-run this script.')):
                 generate_release_updates.main()
 
-    def test_create_group_for_next_release(self):
+    def test_prepare_for_next_release(self):
         check_function_calls = {
             'open_new_tab_in_browser_if_possible_gets_called': False,
             'ask_user_to_confirm_gets_called': False
@@ -173,7 +173,7 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
         ask_user_swap = self.swap(
             common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
         with open_tab_swap, ask_user_swap:
-            generate_release_updates.create_group_for_next_release()
+            generate_release_updates.prepare_for_next_release()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_function_calls(self):
@@ -181,13 +181,13 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
             'create_new_file_with_release_message_template_gets_called': False,
             'validate_release_message_gets_called': False,
             'prompt_user_to_send_announcement_email_gets_called': False,
-            'create_group_for_next_release': False,
+            'prepare_for_next_release_gets_called': False,
         }
         expected_check_function_calls = {
             'create_new_file_with_release_message_template_gets_called': True,
             'validate_release_message_gets_called': True,
             'prompt_user_to_send_announcement_email_gets_called': True,
-            'create_group_for_next_release': True,
+            'prepare_for_next_release_gets_called': True,
         }
         def mock_create_new_file_with_release_message_template():
             check_function_calls[
@@ -198,8 +198,8 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
         def mock_prompt_user_to_send_announcement_email():
             check_function_calls[
                 'prompt_user_to_send_announcement_email_gets_called'] = True
-        def mock_create_group_for_next_release():
-            check_function_calls['create_group_for_next_release'] = True
+        def mock_prepare_for_next_release():
+            check_function_calls['prepare_for_next_release_gets_called'] = True
         def mock_exists(unused_filepath):
             return True
         def mock_remove(unused_filepath):
@@ -218,13 +218,13 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
         send_swap = self.swap(
             generate_release_updates, 'prompt_user_to_send_announcement_email',
             mock_prompt_user_to_send_announcement_email)
-        create_group_swap = self.swap(
-            generate_release_updates, 'create_group_for_next_release',
-            mock_create_group_for_next_release)
+        prepare_swap = self.swap(
+            generate_release_updates, 'prepare_for_next_release',
+            mock_prepare_for_next_release)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         remove_swap = self.swap(os, 'remove', mock_remove)
 
-        with self.branch_name_swap, release_summary_swap, create_group_swap:
+        with self.branch_name_swap, release_summary_swap, prepare_swap:
             with write_swap, check_swap, send_swap, exists_swap, remove_swap:
                 generate_release_updates.main()
 

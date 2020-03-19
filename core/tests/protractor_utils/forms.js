@@ -718,9 +718,19 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
   };
 };
 
+var CodeStringEditor = function(elem) {
+  return {
+    setValue: function(code) {
+      elem.element(by.tagName('textarea')).clear();
+      elem.element(by.tagName('textarea')).sendKeys(code);
+    }
+  };
+};
+
 // This is used by the list and dictionary editors to retrieve the editors of
 // their entries dynamically.
 var FORM_EDITORS = {
+  CodeString: CodeStringEditor,
   Dictionary: DictionaryEditor,
   Graph: GraphEditor,
   List: ListEditor,
@@ -740,6 +750,7 @@ var getEditor = function(formName) {
   }
 };
 
+exports.CodeStringEditor = CodeStringEditor;
 exports.DictionaryEditor = DictionaryEditor;
 exports.ListEditor = ListEditor;
 exports.RealEditor = RealEditor;

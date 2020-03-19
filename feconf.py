@@ -174,7 +174,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 30
+CURRENT_STATE_SCHEMA_VERSION = 32
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -500,8 +500,12 @@ MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
 # category.
 MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
 
-# The number of medium question skill difficulty.
+# The difficulty value of an easy question.
+EASY_SKILL_DIFFICULTY = 0.3
+# The difficulty value of a medium question.
 MEDIUM_SKILL_DIFFICULTY = 0.6
+# The difficulty value of a hard question.
+HARD_SKILL_DIFFICULTY = 0.9
 
 # The maximum number of skills to be requested at one time when fetching
 # questions.
@@ -983,7 +987,7 @@ RTE_CONTENT_SPEC = {
 # of topics as the value.
 # Note: This dict needs to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
 # oppia constant defined in
-# core/templates/dev/head/pages/landing-pages/TopicLandingPage.js file.
+# core/templates/pages/landing-pages/TopicLandingPage.js file.
 AVAILABLE_LANDING_PAGES = {
     'maths': ['fractions', 'negative-numbers', 'ratios']
 }

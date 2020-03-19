@@ -28,6 +28,7 @@ from core.controllers import base
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
+from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -178,6 +179,10 @@ class AdminHandler(base.BaseHandler):
                     self.payload.get('action') ==
                     'generate_dummy_new_structures_data'):
                 self._load_dummy_new_structures_data()
+            elif (
+                    self.payload.get('action') ==
+                    'generate_dummy_new_skill_data'):
+                self._generate_dummy_skill_and_questions()
             elif self.payload.get('action') == (
                     'flush_migration_bot_contribution_data'):
                 user_services.flush_migration_bot_contributions_model()
@@ -294,8 +299,8 @@ class AdminHandler(base.BaseHandler):
                     'solution', '<p>This is a solution.</p>')).to_dict())
         hints_list = [
             state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_1', '<p>This is a hint.</p>')).to_dict()
+                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
+            )
         ]
 
         state.update_interaction_solution(solution_dict)
@@ -308,7 +313,8 @@ class AdminHandler(base.BaseHandler):
             state_domain.Outcome(
                 None, state_domain.SubtitledHtml(
                     'feedback_id', '<p>Dummy Feedback</p>'),
-                True, [], None, None).to_dict()
+                True, [], None, None
+            )
         )
         question = question_domain.Question(
             question_id, state,
@@ -336,8 +342,7 @@ class AdminHandler(base.BaseHandler):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skill = skill_domain.Skill.create_default_skill(
             skill_id, skill_description, rubrics)
-        skill.update_explanation(
-            state_domain.SubtitledHtml('1', explanation).to_dict())
+        skill.update_explanation(state_domain.SubtitledHtml('1', explanation))
         return skill
 
     def _load_dummy_new_structures_data(self):
@@ -440,6 +445,39 @@ class AdminHandler(base.BaseHandler):
         else:
             raise Exception('Cannot load new structures data in production.')
 
+    def _generate_dummy_skill_and_questions(self):
+        """Generate and loads the database with a skill and 15 questions
+        linked to the skill.
+
+        Raises:
+            Exception: Cannot load new structures data in production mode.
+            Exception: User does not have enough rights to generate data.
+        """
+        if constants.DEV_MODE:
+            if self.user.role != feconf.ROLE_ID_ADMIN:
+                raise Exception(
+                    'User does not have enough rights to generate data.')
+            skill_id = skill_services.get_new_skill_id()
+            skill_name = 'Dummy Skill %s' % python_utils.UNICODE(
+                random.getrandbits(32))
+            skill = self._create_dummy_skill(
+                skill_id, skill_name, '<p>Dummy Explanation 1</p>')
+            skill_services.save_new_skill(self.user_id, skill)
+            for i in python_utils.RANGE(15):
+                question_id = question_services.get_new_question_id()
+                question_name = 'Question number %s %s' % (
+                    python_utils.UNICODE(i), skill_name)
+                question = self._create_dummy_question(
+                    question_id, question_name, [skill_id])
+                question_services.add_question(self.user_id, question)
+                question_difficulty = [feconf.EASY_SKILL_DIFFICULTY,
+                                       feconf.MEDIUM_SKILL_DIFFICULTY,
+                                       feconf.HARD_SKILL_DIFFICULTY]
+                random_difficulty = random.choice(question_difficulty)
+                question_services.create_new_question_skill_link(
+                    self.user_id, question_id, skill_id, random_difficulty)
+        else:
+            raise Exception('Cannot generate dummy skills in production.')
 
     def _reload_collection(self, collection_id):
         """Reloads the collection in dev_mode corresponding to the given
@@ -631,3 +669,16 @@ class DataExtractionQueryHandler(base.BaseHandler):
             'data': extracted_answers
         }
         self.render_json(response)
+
+
+class SendDummyMailToAdminHandler(base.BaseHandler):
+    """This function handles sending test emails."""
+
+    @acl_decorators.can_access_admin_page
+    def post(self):
+        username = self.username
+        if feconf.CAN_SEND_EMAILS:
+            email_manager.send_dummy_mail_to_admin(username)
+            self.render_json({})
+        else:
+            raise self.InvalidInputException('This app cannot send emails.')
