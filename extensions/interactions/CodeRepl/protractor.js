@@ -41,11 +41,9 @@ var expectInteractionDetailsToMatch = function(elem, placeHolderText) {
 };
 
 var submitAnswer = function(conversationInput, answerCode) {
-  /* eslint-disable quotes */
   browser.executeScript(
     "var elem = $('.protractor-test-preview-tab .CodeMirror')[0].CodeMirror;" +
     "elem.setValue('" + answerCode + "');");
-  /* eslint-enable quotes */
   var submitAnswerButton = element(by.css(
     '.protractor-test-submit-answer-button'));
   waitFor.elementToBeClickable(
