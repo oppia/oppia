@@ -169,6 +169,32 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
         self.logout()
 
+    def test_cannot_generate_dummy_skill_data_in_production_mode(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'Cannot generate dummy skills in production.')
+        with assert_raises_regexp_context_manager, prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_new_skill_data'
+                }, csrf_token=csrf_token)
+        self.logout()
+
+    def test_non_admins_cannot_generate_dummy_skill_data(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        assert_raises_regexp = self.assertRaisesRegexp(
+            Exception, 'User does not have enough rights to generate data.')
+        with assert_raises_regexp:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_new_skill_data'
+                }, csrf_token=csrf_token)
+        self.logout()
+
     def test_cannot_reload_collection_in_production_mode(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -247,6 +273,23 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                     skill_summaries[2].id], '')
         )
         self.assertEqual(len(questions), 3)
+        self.logout()
+
+    def test_generate_dummy_skill_and_questions_data(self):
+        self.set_admins([self.ADMIN_USERNAME])
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_new_skill_data'
+            }, csrf_token=csrf_token)
+        skill_summaries = skill_services.get_all_skill_summaries()
+        self.assertEqual(len(skill_summaries), 1)
+        questions, _, _ = (
+            question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
+                20, [skill_summaries[0].id], '')
+        )
+        self.assertEqual(len(questions), 15)
         self.logout()
 
     def test_flush_migration_bot_contributions_action(self):
