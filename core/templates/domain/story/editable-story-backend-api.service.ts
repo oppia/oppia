@@ -169,3 +169,7 @@ export class EditableStoryBackendApiService {
       });
     }
 }
+
+angular.module('oppia').factory(
+  'EditableStoryBackendApiService', downgradeInjectable(
+    EditableStoryBackendApiService));

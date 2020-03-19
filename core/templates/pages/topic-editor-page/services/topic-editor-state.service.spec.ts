@@ -407,6 +407,22 @@ describe('Topic editor state service', function() {
       },
       language_code: 'en'
     };
+
+    fakeEditableStoryBackendApiService.newBackendStoryObject = {
+      id: 'storyId_0',
+      title: 'Story title',
+      description: 'Story Description',
+      notes: '<p>Notes/p>',
+      story_contents: {
+        initial_node_id: 'node_1',
+        next_node_id: 'node_2',
+        nodes: []
+      },
+      language_code: 'en',
+      story_contents_schema_version: '1',
+      version: '1',
+      corresponding_topic_id: 'topic_id'
+    };
   }));
 
   it('should request to load the topic from the backend', function() {
@@ -415,7 +431,7 @@ describe('Topic editor state service', function() {
 
     TopicEditorStateService.loadTopic(5);
     expect(fakeEditableTopicBackendApiService.fetchTopic).toHaveBeenCalled();
-  });
+});
 
   it('should request to load the subtopic page from the backend', function() {
     spyOn(

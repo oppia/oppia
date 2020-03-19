@@ -113,7 +113,8 @@ module.exports = function(config) {
         flags: [
           '--no-sandbox',
           '--disable-gpu',
-          '--js-flags=--max-old-space-size=4096'
+          '--disable-dev-shm-usage',
+          '--js-flags=--max-old-space-size=2048'
         ]
       }
     },
@@ -155,7 +156,7 @@ module.exports = function(config) {
         ],
         extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
       },
-      devtool: 'inline-source-map',
+      devtool: 'inline-cheap-source-map',
       module: {
         rules: [
           {
