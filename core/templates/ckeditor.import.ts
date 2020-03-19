@@ -13,9 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the third party libraries that we use.
+ * @fileoverview This file imports the ckeditor library.
  */
 
-// Ckeditor
 window.CKEDITOR_BASEPATH = '/third_party/static/ckeditor-4.12.1/';
 require('../../third_party/static/ckeditor-4.12.1/ckeditor.js');

@@ -31,5 +31,3 @@ require(
 require(
   'pages/exploration-player-page/layout-directives/' +
   'learner-view-info.directive.ts');
-
-require('third-party-libs.ts');

@@ -32,5 +32,3 @@ require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
   'exploration-save-and-publish-buttons.directive.ts');
 require('pages/exploration-editor-page/exploration-editor-page.controller.ts');
-
-require('third-party-libs.ts');

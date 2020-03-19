@@ -23,5 +23,3 @@ require('App.ts');
 
 require('base-components/base-content.directive.ts');
 require('pages/review-test-page/review-test-page.directive.ts');
-
-require('third-party-libs.ts');
