@@ -36,8 +36,7 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('feedbackTab', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -50,35 +49,42 @@ angular.module('oppia').directive('feedbackTab', [
         '$q', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
         'DateTimeFormatService', 'EditabilityService',
         'ExplorationStatesService',
-        'SuggestionModalForExplorationEditorService',
-        'ThreadDataService', 'ThreadStatusDisplayService',
-        'UrlInterpolationService', 'UserService',
+        'SuggestionModalForExplorationEditorService', 'ThreadDataService',
+        'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
         function(
             $q, $rootScope, $uibModal, AlertsService, ChangeListService,
             DateTimeFormatService, EditabilityService,
             ExplorationStatesService,
-            SuggestionModalForExplorationEditorService,
-            ThreadDataService, ThreadStatusDisplayService,
-            UrlInterpolationService, UserService) {
+            SuggestionModalForExplorationEditorService, ThreadDataService,
+            ThreadStatusDisplayService, UrlInterpolationService, UserService) {
           var ctrl = this;
+
           var _resetTmpMessageFields = function() {
-            ctrl.tmpMessage.status = ctrl.activeThread ?
-              ctrl.activeThread.status : null;
+            ctrl.tmpMessage.status =
+              ctrl.activeThread && ctrl.activeThread.status;
             ctrl.tmpMessage.text = '';
           };
+
           ctrl.clearActiveThread = function() {
             ctrl.activeThread = null;
             _resetTmpMessageFields();
           };
+
           // Fetches the threads again if any thread is updated.
           ctrl.fetchUpdatedThreads = function() {
-            var threadPromise = ThreadDataService.fetchThreads().then(data => {
+            let activeThreadId =
+              ctrl.activeThread && ctrl.activeThread.threadId;
+            return ThreadDataService.getThreadsAsync().then(data => {
               ctrl.threadData = data;
-              return data;
+              ctrl.threadIsStale = false;
+              if (activeThreadId !== null) {
+                // Fetching threads invalidates old thread domain objects, so we
+                // need to update our reference to the active thread afterwards.
+                ctrl.activeThread = ThreadDataService.getThread(activeThreadId);
+              }
             });
-            ctrl.threadIsStale = false;
-            return threadPromise;
           };
+
           ctrl.onBackButtonClicked = function() {
             ctrl.clearActiveThread();
             if (ctrl.threadIsStale) {
@@ -87,79 +93,84 @@ angular.module('oppia').directive('feedbackTab', [
           };
 
           ctrl.showCreateThreadModal = function() {
-            $uibModal.open({
+            return $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/feedback-tab/templates/' +
                 'create-feedback-thread-modal.template.html'),
               backdrop: true,
               resolve: {},
-              controller: ['$scope', '$uibModalInstance', function(
-                  $scope, $uibModalInstance) {
-                $scope.newThreadSubject = '';
-                $scope.newThreadText = '';
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.newThreadSubject = '';
+                  $scope.newThreadText = '';
 
-                $scope.create = function(newThreadSubject, newThreadText) {
-                  if (!newThreadSubject) {
-                    AlertsService.addWarning(
-                      'Please specify a thread subject.');
-                    return;
-                  }
-                  if (!newThreadText) {
-                    AlertsService.addWarning('Please specify a message.');
-                    return;
-                  }
+                  $scope.create = (newThreadSubject, newThreadText) => {
+                    if (!newThreadSubject) {
+                      AlertsService.addWarning(
+                        'Please specify a thread subject.');
+                      return;
+                    }
+                    if (!newThreadText) {
+                      AlertsService.addWarning('Please specify a message.');
+                      return;
+                    }
+                    $uibModalInstance.close({
+                      newThreadSubject: newThreadSubject,
+                      newThreadText: newThreadText
+                    });
+                  };
 
-                  $uibModalInstance.close({
-                    newThreadSubject: newThreadSubject,
-                    newThreadText: newThreadText
-                  });
-                };
-
-                $scope.cancel = function() {
-                  $uibModalInstance.dismiss('cancel');
-                };
-              }]
-            }).result.then(function(result) {
-              ThreadDataService.createNewThread(
-                result.newThreadSubject, result.newThreadText, function() {
-                  ctrl.clearActiveThread();
-                  AlertsService.addSuccessMessage('Feedback thread created.');
-                });
-            }, function() {
+                  $scope.cancel = () => $uibModalInstance.dismiss('cancel');
+                }
+              ]
+            }).result.then(result => ThreadDataService.createNewThreadAsync(
+              result.newThreadSubject, result.newThreadText)
+            ).then(() => {
+              ctrl.clearActiveThread();
+              AlertsService.addSuccessMessage('Feedback thread created.');
+            },
+            () => {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });
           };
 
-          var _isSuggestionHandled = function() {
-            return ctrl.activeThread.isSuggestionHandled();
+          var _isSuggestionHandled = () => {
+            return (
+              ctrl.activeThread !== null &&
+              ctrl.activeThread.isSuggestionHandled());
           };
 
-          var _isSuggestionValid = function() {
-            return ExplorationStatesService.hasState(
-              ctrl.activeThread.getSuggestionStateName());
+          var _isSuggestionValid = () => {
+            return (
+              ctrl.activeThread !== null &&
+              ExplorationStatesService.hasState(
+                ctrl.activeThread.getSuggestionStateName()));
           };
 
-          var _hasUnsavedChanges = function() {
-            return (ChangeListService.getChangeList().length > 0);
+          var _hasUnsavedChanges = () => {
+            return ChangeListService.getChangeList().length > 0;
           };
 
-          ctrl.getSuggestionButtonType = function() {
-            return (!_isSuggestionHandled() && _isSuggestionValid() &&
-                    !_hasUnsavedChanges() ? 'primary' : 'default');
+          ctrl.getSuggestionButtonType = () => {
+            return (
+              !_isSuggestionHandled() && _isSuggestionValid() &&
+              !_hasUnsavedChanges()) ? 'primary' : 'default';
           };
 
           // TODO(Allan): Implement ability to edit suggestions before applying.
-          ctrl.showSuggestionModal = function() {
+          ctrl.showSuggestionModal = () => {
+            if (ctrl.activeThread === null) {
+              throw Error('Trying to show suggestion of a non-existent thread');
+            }
             SuggestionModalForExplorationEditorService.showSuggestionModal(
-              ctrl.activeThread.suggestion.suggestionType,
-              {
+              ctrl.activeThread.suggestion.suggestionType, {
                 activeThread: ctrl.activeThread,
-                setActiveThread: function(threadId) {
-                  ctrl.fetchUpdatedThreads()
-                    .then(() => ctrl.setActiveThread(threadId));
-                },
+                setActiveThread: (
+                  threadId => ctrl.fetchUpdatedThreads()
+                    .then(() => ctrl.setActiveThread(threadId))),
                 isSuggestionHandled: _isSuggestionHandled,
                 hasUnsavedChanges: _hasUnsavedChanges,
                 isSuggestionValid: _isSuggestionValid
@@ -179,40 +190,45 @@ angular.module('oppia').directive('feedbackTab', [
             }
             ctrl.threadIsStale = true;
             ctrl.messageSendingInProgress = true;
-            ThreadDataService.addNewMessage(
-              threadId, tmpText, tmpStatus, function() {
+            let thread = ThreadDataService.getThread(threadId);
+            if (thread === null) {
+              throw Error('Trying to add message to a non-existent thread.');
+            }
+            ThreadDataService.addNewMessageAsync(thread, tmpText, tmpStatus)
+              .then(() => {
                 _resetTmpMessageFields();
                 ctrl.messageSendingInProgress = false;
-              }, function() {
+              },
+              () => {
                 ctrl.messageSendingInProgress = false;
               });
           };
 
           ctrl.setActiveThread = function(threadId) {
-            ThreadDataService.fetchMessages(threadId);
-            ThreadDataService.markThreadAsSeen(threadId);
-            var allThreads = [].concat(
-              ctrl.threadData.feedbackThreads,
-              ctrl.threadData.suggestionThreads);
-            for (var i = 0; i < allThreads.length; i++) {
-              if (allThreads[i].threadId === threadId) {
-                ctrl.activeThread = allThreads[i];
-                break;
-              }
+            let thread = ThreadDataService.getThread(threadId);
+            if (thread === null) {
+              throw Error('Trying to display a non-existent thread');
             }
-            ctrl.tmpMessage.status = ctrl.activeThread.status;
+            ThreadDataService.getMessagesAsync(thread).then(() => {
+              ctrl.activeThread = thread;
+              ThreadDataService.markThreadAsSeenAsync(ctrl.activeThread);
+              ctrl.tmpMessage.status = ctrl.activeThread.status;
+            });
           };
+
           ctrl.getLabelClass = function(status) {
             return ThreadStatusDisplayService.getLabelClass(status);
           };
+
           ctrl.getHumanReadableStatus = function(status) {
             return ThreadStatusDisplayService.getHumanReadableStatus(status);
           };
-          ctrl.getLocaleAbbreviatedDatetimeString = function(
-              millisSinceEpoch) {
+
+          ctrl.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               millisSinceEpoch);
           };
+
           ctrl.isExplorationEditable = function() {
             return EditabilityService.isEditable();
           };
@@ -223,10 +239,6 @@ angular.module('oppia').directive('feedbackTab', [
             ctrl.userIsLoggedIn = null;
             ctrl.threadIsStale = false;
             $rootScope.loadingMessage = 'Loading';
-            var userInfoPromise = UserService.getUserInfoAsync();
-            userInfoPromise.then(function(userInfo) {
-              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-            });
 
             // Initial load of the thread list on page load.
             ctrl.tmpMessage = {
@@ -234,11 +246,12 @@ angular.module('oppia').directive('feedbackTab', [
               text: ''
             };
             ctrl.clearActiveThread();
-            ThreadDataService.fetchFeedbackStats();
-            var threadPromise = ctrl.fetchUpdatedThreads();
-            $q.all([userInfoPromise, threadPromise]).then(function() {
-              $rootScope.loadingMessage = '';
-            });
+
+            return $q.all([
+              UserService.getUserInfoAsync().then(
+                userInfo => ctrl.userIsLoggedIn = userInfo.isLoggedIn()),
+              ctrl.fetchUpdatedThreads()
+            ]).then(() => $rootScope.loadingMessage = '');
           };
         }
       ]
