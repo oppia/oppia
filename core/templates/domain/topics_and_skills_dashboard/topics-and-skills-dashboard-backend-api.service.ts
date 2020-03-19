@@ -31,19 +31,20 @@ import { TopicsAndSkillsDashboardDomainConstants } from
 export class TopicsAndSkillsDashboardBackendApiService {
   constructor(private http: HttpClient) {}
 
-  fetchDasboardData():Promise<any> {
+  fetchDasboardData(): Promise<any> {
     return this.http.get('/topics_and_skills_dashboard/data').toPromise();
   }
 
-  mergeSkills(oldSkillId, newSkillId):Promise<void> {
+  mergeSkills(oldSkillId, newSkillId): Promise<void> {
     var mergeSkillsData = {
       old_skill_id: oldSkillId,
       new_skill_id: newSkillId
     };
-    // eslint-disable-next-line max-len
-    return this.http.post<void>(TopicsAndSkillsDashboardDomainConstants.MERGE_SKILLS_URL, mergeSkillsData).toPromise();
+    return this.http.post<void>(
+      TopicsAndSkillsDashboardDomainConstants.MERGE_SKILLS_URL,
+       mergeSkillsData).toPromise();
   }
 }
 angular.module('oppia').factory(
-  'TopicsAndSkillsDashboardBackendApiService', downgradeInjectable(
-    TopicsAndSkillsDashboardBackendApiService));
+  'TopicsAndSkillsDashboardBackendApiService', 
+  downgradeInjectable(TopicsAndSkillsDashboardBackendApiService));

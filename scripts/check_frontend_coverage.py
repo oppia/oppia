@@ -367,7 +367,6 @@ FULLY_COVERED_FILENAMES = [
     'topic-viewer-domain.constants.ajs.ts',
     'topic-viewer-domain.constants.ts',
     'TopicRightsObjectFactory.ts',
-    'topics-and-skills-dashboard-domain.constants.ajs.ts',
     'topics-and-skills-dashboard-domain.constants.ts',
     'topics-and-skills-dashboard-page.constants.ajs.ts',
     'topics-and-skills-dashboard-page.constants.ts',

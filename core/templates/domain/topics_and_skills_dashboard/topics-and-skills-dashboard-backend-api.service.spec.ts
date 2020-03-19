@@ -23,24 +23,22 @@ import { TopicsAndSkillsDashboardBackendApiService } from
   // eslint-disable-next-line max-len
   '../topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
-describe('Topics and Skills Dashboard backend API service', ()=> {
-  // eslint-disable-next-line max-len
-  let TopicsAndSkillsDashboardBackendApiService :TopicsAndSkillsDashboardBackendApiService = null;
-  let httpTestingController: HttpTestingController;
+describe('Topics and Skills Dashboard backend API service', () => {
+  let topicsAndSkillsDashboardBackendApiService:
+    TopicsAndSkillsDashboardBackendApiService = null;
+  let httpTestingController: HttpTestingController = null;
 
   var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
-
-
   var TOPICS_AND_SKILLS_DASHBOARD_DATA_URL =
-  '/topics_and_skills_dashboard/data';
+    '/topics_and_skills_dashboard/data';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
     httpTestingController = TestBed.get(HttpTestingController);
-    // eslint-disable-next-line max-len
-    TopicsAndSkillsDashboardBackendApiService = TestBed.get(TopicsAndSkillsDashboardBackendApiService);
+    topicsAndSkillsDashboardBackendApiService = TestBed.get(
+      TopicsAndSkillsDashboardBackendApiService);
     var sampleDataResults = {
       topic_summary_dicts: [{
         id: SAMPLE_TOPIC_ID,
@@ -60,28 +58,28 @@ describe('Topics and Skills Dashboard backend API service', ()=> {
     afterEach(() => {
       httpTestingController.verify();
     });
+
     it('should use rejection handler if dashboard data backend request failed',
-      fakeAsync(()=>{
+      fakeAsync(() => {
         var successHandler = jasmine.createSpy('success');
         var failHandler = jasmine.createSpy('fail');
-        TopicsAndSkillsDashboardBackendApiService.fetchDasboardData().then(
+        topicsAndSkillsDashboardBackendApiService.fetchDasboardData().then(
           successHandler, failHandler);
         var req = httpTestingController.expectOne(
-          //eslint-disable-next-line max-len
-          TOPICS_AND_SKILLS_DASHBOARD_DATA_URL, 'Error Loading dashboard data.');
+          TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
+          'Error Loading dashboard data.');
         expect(req.request.method).toEqual('GET');
         expect(successHandler).not.toHaveBeenCalled();
         expect(failHandler).toHaveBeenCalled();
       })
     );
 
-
     it('should successfully fetch topics and skills dashboard data from the ' +
       'backend',
     fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-      TopicsAndSkillsDashboardBackendApiService.fetchDasboardData().then(
+      topicsAndSkillsDashboardBackendApiService.fetchDasboardData().then(
         successHandler, failHandler);
       var req = httpTestingController.expectOne(
         TOPICS_AND_SKILLS_DASHBOARD_DATA_URL);
