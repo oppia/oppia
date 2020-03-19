@@ -34,7 +34,7 @@ describe('RuleObjectFactory', () => {
     ruleBackendDict = {
       rule_type: 'rule_type_1',
       inputs: inputBackend
-    }
+    };
   });
 
   it('should convert to a backend dictionary', () => {
