@@ -27,7 +27,7 @@ export interface IBackendRuleDict {
 // The rule inputs are dependent on the 'type' of rule
 // that's why 'any' is used here
 export interface IRuleInput {
-  [propName: string ]: any;
+  [propName: string]: any;
 }
 
 export class Rule {
