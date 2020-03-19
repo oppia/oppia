@@ -99,7 +99,7 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             old_user_id: str. The old (GAE) ID of the user being migrated.
             new_user_id: str. The newly generated ID of the user being migrated.
         """
-        max_number_of_models_in_transaction = 20
+        max_number_of_models_in_transaction = 10
         old_models = model_class.query(
             model_class.user_id == old_user_id).fetch()
         new_models = []
