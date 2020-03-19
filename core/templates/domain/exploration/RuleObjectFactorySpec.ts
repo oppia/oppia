@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 /**
  * @fileoverview unit test for RuleObjectFactory.
  */
+
 import { TestBed } from '@angular/core/testing';
 
 import { RuleObjectFactory, IBackendRuleDict, IRuleInput } from
@@ -24,6 +25,8 @@ describe('RuleObjectFactory', () => {
   let ruleObjectFactory: RuleObjectFactory = null;
   let ruleBackendDict: IBackendRuleDict = null;
   let inputBackend: IRuleInput = null;
+  let rule = null;
+
   beforeEach(() => {
     ruleObjectFactory = TestBed.get(RuleObjectFactory);
     inputBackend = {
@@ -33,25 +36,19 @@ describe('RuleObjectFactory', () => {
       rule_type: 'rule_type_1',
       inputs: inputBackend
     };
-  });
-
-  it('should creat new rule', () => {
-    var rules =
-      ruleObjectFactory.createFromBackendDict(ruleBackendDict);
-    expect(rules.getInput()).toEqual(inputBackend);
-    expect(rules.getType()).toEqual('rule_type_1');
+    rule = {
+      type: 'rule_type_1',
+      inputs: inputBackend
+    };
   });
 
   it('should convert to a backend dictionary', () => {
-    var rules =
-      ruleObjectFactory.createFromBackendDict(ruleBackendDict);
-    expect(rules.toBackendDict()).toEqual(ruleBackendDict);
+    let rulesDict = ruleObjectFactory.createFromBackendDict(ruleBackendDict);
+    expect(rulesDict.toBackendDict()).toEqual(ruleBackendDict);
   });
 
   it('should creat a new rule from creatNew()', () => {
-    var rules =
-      ruleObjectFactory.createNew('rule_type_1', inputBackend);
-    expect(rules.getInput()).toEqual(inputBackend);
-    expect(rules.getType()).toEqual('rule_type_1');
+    let rulesDict = ruleObjectFactory.createNew('rule_type_1', inputBackend);
+    expect(rulesDict).toEqual(rule);
   });
 });

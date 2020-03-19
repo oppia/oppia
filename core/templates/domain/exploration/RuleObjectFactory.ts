@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,10 +18,11 @@
  */
 
 export interface IBackendRuleDict {
-  'inputs': IRuleInput,
+  inputs: IRuleInput,
   'rule_type': string
 }
-
+// The rule inputs are dependent on the type of rule
+// that's why 'any' is used here
 export interface IRuleInput {
   [propName: string ]: any;
 }
@@ -32,16 +33,10 @@ import { Injectable } from '@angular/core';
 export class Rule {
   type: string;
   inputs: IRuleInput;
+
   constructor(type: string, inputs: IRuleInput) {
     this.type = type;
     this.inputs = inputs;
-  }
-
-  getInput(): IRuleInput {
-    return this.inputs;
-  }
-  getType(): string {
-    return this.type;
   }
   toBackendDict(): IBackendRuleDict {
     return {
