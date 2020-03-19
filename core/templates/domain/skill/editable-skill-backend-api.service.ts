@@ -59,7 +59,7 @@ export class EditableSkillBackendApiService {
       }),
       err => {
         if (errorCallback) {
-          errorCallback(err);
+          errorCallback(err.error);
         }
       }
     );
@@ -80,7 +80,7 @@ export class EditableSkillBackendApiService {
       (data: editableSkillResponseConfig) => successCallback(data.skills),
       err => {
         if (errorCallback) {
-          errorCallback(err);
+          errorCallback(err.error);
         }
       }
     );
@@ -112,7 +112,7 @@ export class EditableSkillBackendApiService {
       (data: editableSkillResponseConfig) => successCallback(data.skill),
       err => {
         if (errorCallback) {
-          errorCallback(err);
+          errorCallback(err.error);
         }
       }
     );
@@ -132,7 +132,7 @@ export class EditableSkillBackendApiService {
       (res) => successCallback(res.status),
       (err) => {
         if (errorCallback) {
-          errorCallback(err.data);
+          errorCallback(err.error);
         }
       }
     );

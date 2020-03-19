@@ -79,8 +79,6 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
 import { EditabilityService } from 'services/editability.service';
-import { EditableSkillBackendApiService } from
-  'domain/skill/editable-skill-backend-api.service.ts';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { EmailDashboardDataService } from
@@ -571,12 +569,6 @@ export class UpgradedServices {
       new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['EmailDashboardDataService'] =
       new EmailDashboardDataService(upgradedServices['HttpClient']);
-    // upgradedServices['EditableSkillBackendApiService'] =
-    //   new EditableSkillBackendApiService(
-    //     new HttpClient(new HttpXhrBackend(
-    //       new ɵangular_packages_common_http_http_d())),
-    //     upgradedServices['UrlInterpolationService']
-    //   );
     upgradedServices['ExplorationHtmlFormatterService'] =
       new ExplorationHtmlFormatterService(
         upgradedServices['CamelCaseToHyphensPipe'],
