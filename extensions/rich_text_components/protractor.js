@@ -17,10 +17,9 @@
  * protractor tests.
  */
 
-// NOTE to devs: If other functions or constants are added above this constant,
-// make sure to edit components_test.ComponentE2eTests to use the correct regex
-// to return the values inside this constant or alternatively only add functions
-// and other constants below this one.
+// NOTE to devs: If this constant is renamed, make sure to edit
+// components_test.ComponentE2eTests.test_component_e2e_tests to search for the
+// correct constant name.
 var RICH_TEXT_COMPONENTS = {
   Collapsible: require('./Collapsible/protractor.js'),
   Image: require('./Image/protractor.js'),

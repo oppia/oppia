@@ -223,9 +223,11 @@ class ComponentDefinitionTests(test_utils.GenericTestBase):
 
     def test_component_definition(self):
         """Test that all components are defined."""
+        rich_text_components_dir = (
+            os.path.join(os.curdir, 'extensions', 'rich_text_components'))
         actual_components = [name for name in os.listdir(
-            './extensions/rich_text_components') if os.path.isdir(os.path.join(
-                './extensions/rich_text_components', name))]
+            rich_text_components_dir) if os.path.isdir(os.path.join(
+                rich_text_components_dir, name))]
         defined_components = []
         for name, obj in inspect.getmembers(components):
             if inspect.isclass(obj):
@@ -241,9 +243,11 @@ class ComponentE2eTests(test_utils.GenericTestBase):
         """Tests that an e2e test is defined for all rich text components."""
         test_file = os.path.join(
             'extensions', 'rich_text_components', 'protractor.js')
+        rich_text_components_dir = (
+            os.path.join(os.curdir, 'extensions', 'rich_text_components'))
         actual_components = [name for name in os.listdir(
-            './extensions/rich_text_components') if os.path.isdir(os.path.join(
-                './extensions/rich_text_components', name))]
+            rich_text_components_dir) if os.path.isdir(os.path.join(
+                rich_text_components_dir, name))]
         with python_utils.open_file(test_file, 'r') as f:
             text = f.read()
             # Replace all spaces and new lines with empty space.
@@ -251,10 +255,12 @@ class ComponentE2eTests(test_utils.GenericTestBase):
             text = re.sub(r'\n', r'', text)
 
             # Isolate the text inside the RICH_TEXT_COMPONENTS constant.
-            first_bracket_index = text.find('={')
+            beginning_sequence = 'varRICH_TEXT_COMPONENTS={'
+            first_bracket_index = text.find(beginning_sequence)
             last_bracket_index = text.find('};')
             text_inside_constant = text[
-                first_bracket_index + 2:last_bracket_index] + ','
+                first_bracket_index + len(beginning_sequence):
+                last_bracket_index] + ','
 
             rte_components_with_test = []
             while text_inside_constant.find(',') != -1:

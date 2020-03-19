@@ -258,7 +258,7 @@ describe('Chapter editor functionality', function() {
     var skills = [];
     for (var i = 0; i < numSkills; i++) {
       var skillName = 'skillFromChapterEditor' + i.toString();
-      var material = 'material' + i.toString();
+      var material = 'reviewMaterial' + i.toString();
       workflow.createSkillAndAssignTopic(skillName, material, topicName);
       skills.push(skillName);
     }
@@ -310,7 +310,7 @@ describe('Chapter editor functionality', function() {
       explorationEditorPage.navigateToPreviewTab();
       explorationPlayerPage.expectContentToMatch(function(richTextChecker) {
         richTextChecker.readRteComponent(
-          'Skillreview', 'Description', forms.toRichText('material0'));
+          'Skillreview', 'Description', forms.toRichText('reviewMaterial0'));
       });
     });
 
