@@ -301,7 +301,6 @@ class SentEmailModel(base_models.BaseModel):
         return all(model is not None for model in user_settings_models)
 
 
-
 class BulkEmailModel(base_models.BaseModel):
     """Records the content of an email sent from Oppia to multiple users.
 

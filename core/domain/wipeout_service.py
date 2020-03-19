@@ -25,8 +25,8 @@ from core.domain import user_services
 from core.platform import models
 
 current_user_services = models.Registry.import_current_user_services()
-(base_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.user])
+(base_models, story_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.story, models.NAMES.user])
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -76,6 +76,8 @@ def delete_user(pending_deletion_model):
         pending_deletion_model: PendingDeletionRequestModel.
     """
     _delete_user_models(pending_deletion_model.id)
+    _hard_delete_explorations_and_collections(pending_deletion_model)
+    _delete_story_models(pending_deletion_model.id)
     pending_deletion_model.deletion_complete = True
     pending_deletion_model.put()
 
@@ -101,6 +103,19 @@ def verify_user_deleted(pending_deletion_model):
         return False
 
 
+def _hard_delete_explorations_and_collections(pending_deletion_model):
+    """Hard delete the exploration and collection models that are private and
+    solely owned by the user.
+
+    Args:
+        pending_deletion_model: PendingDeletionRequestModel.
+    """
+    exp_services.delete_explorations(
+        pending_deletion_model.id, pending_deletion_model.exploration_ids)
+    collection_services.delete_collections(
+        pending_deletion_model.id, pending_deletion_model.collection_ids)
+
+
 def _delete_user_models(user_id):
     """Delete the user models for the user with user_id.
 
@@ -112,6 +127,35 @@ def _delete_user_models(user_id):
         if (model_class.get_deletion_policy() !=
                 base_models.DELETION_POLICY.KEEP):
             model_class.apply_deletion_policy(user_id)
+
+
+def _delete_story_models(user_id):
+    """Delete the story models for the user with user_id.
+
+    Args:
+        user_id: str. The id of the user to be deleted.
+    """
+    metadata_models = story_models.StorySnapshotMetadataModel.query(
+        story_models.StorySnapshotMetadataModel.committer_id == user_id
+    ).fetch()
+    story_ids = set([
+        model.get_unversioned_instance_id() for model in metadata_models])
+
+    commit_log_models = story_models.StoryCommitLogEntryModel.query(
+        story_models.StoryCommitLogEntryModel.user_id == user_id
+    ).fetch()
+    story_ids = story_ids | set(model.story_id for model in commit_log_models)
+
+    anonymous_user_ids = {
+        story_id: user_models.UserSettingsModel.get_new_id()
+        for story_id in story_ids
+    }
+
+    for model in metadata_models:
+        model.committer_id = (
+            anonymous_user_ids[model.get_unversioned_instance_id()])
+    for model in commit_log_models:
+        metadata_models.user_id = anonymous_user_ids[model.story_id]
 
 
 def _verify_user_models_deleted(user_id):

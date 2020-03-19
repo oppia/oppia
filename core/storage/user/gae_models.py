@@ -205,7 +205,8 @@ class UserSettingsModel(base_models.BaseModel):
             new_id = ''.join(
                 random.choice(string.ascii_lowercase)
                 for _ in python_utils.RANGE(USER_ID_LENGTH))
-            if not cls.get_by_id(new_id):
+            if (not cls.get_by_id(new_id) and
+                    not AnonymizedUserModel.get_by_id(new_id)):
                 return new_id
 
         raise Exception('New id generator is producing too many collisions.')
@@ -2117,4 +2118,23 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         """PendingDeletionRequestModel is going to be used later and only as
         a temporary model, so it doesn't need to be migrated.
         """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
+
+class AnonymizedUserModel(base_models.BaseModel):
+    """Model for storing anonymized user IDs."""
+
+    @staticmethod
+    def get_deletion_policy():
+        """AnonymizedIdsRegistryModel contains only anonymous ids."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_policy():
+        """AnonymizedIdsRegistryModel contains only anonymous ids."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """AnonymizedIdsRegistryModel contains only anonymous ids."""
         return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE

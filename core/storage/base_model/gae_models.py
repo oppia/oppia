@@ -46,7 +46,7 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'NOT_APPLICABLE'
 )
 
-EXPORT_POLICY = utils.create_enum( # pylint: disable=invalid-name
+EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'CONTAINS_USER_DATA',
     'NOT_APPLICABLE',
     'TO_BE_IMPLEMENTED'
