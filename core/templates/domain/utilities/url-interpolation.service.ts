@@ -107,7 +107,8 @@ export class UrlInterpolationService {
    * If a URL requires a value which is not keyed within the
    * interpolationValues object, this will return null.
    */
-  interpolateUrl(urlTemplate: string,
+  interpolateUrl(
+      urlTemplate: string,
       interpolationValues: InterpolationValuesType): string {
     if (!urlTemplate) {
       this.alertsService.fatalWarning(

@@ -24,6 +24,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class UtilsService {
+  // The type of obj is Object because it can be anything.
   isEmpty(obj: Object): boolean {
     for (var property in obj) {
       if (obj.hasOwnProperty(property)) {
@@ -33,11 +34,12 @@ export class UtilsService {
     return true;
   }
 
+  // The type of input is Object because it can be anything.
   isString(input: Object): boolean {
     return (typeof input === 'string' || input instanceof String);
   }
 
-
+  // The type of a and b is Object because they can be anything.
   isEquivalent(a: Object, b: Object): boolean {
     if (a === null || b === null) {
       return a === b;

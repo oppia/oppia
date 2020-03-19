@@ -22,6 +22,8 @@ import { Injectable } from '@angular/core';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 
+// This make the UrlParamsType like a dict whose keys and values both are
+// string.
 interface UrlParamsType {
   [param: string]: string
 }
