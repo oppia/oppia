@@ -161,6 +161,7 @@
 /core/domain/value_generators_domain*.py @vojtechjelinek
 /core/storage/exploration/ @aks681
 /core/templates/dev/head/components/entity-creation-services/exploration-creation.service*.ts @aks681
+/core/templates/dev/head/components/entity-creation-services/exploration-creation.service -backend-api*.ts
 /core/templates/dev/head/components/button-directives/hint-and-solution-buttons.directive*.ts @aks681
 /core/templates/dev/head/components/button-directives/hint-and-solution-buttons.directive.html @aks681
 /core/templates/dev/head/components/state-directives/ @aks681

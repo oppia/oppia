@@ -17,18 +17,17 @@
  * modal.
  */
 
-require('components/entity-creation-services/exploration-creation.service -backend-api.ts');         //change1
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/csrf-token.service.ts');
 require('services/site-analytics.service.ts');
 
 angular.module('oppia').factory('ExplorationCreationService', [
-  'ExplorationCreationBackendService', '$rootScope', '$timeout', '$uibModal', '$window',             //change2
+  '$http', '$rootScope', '$timeout', '$uibModal', '$window',
   'AlertsService', 'CsrfTokenService', 'SiteAnalyticsService',
   'UrlInterpolationService',
   function(
-      ExplorationCreationService, $rootScope, $timeout, $uibModal, $window,                          //change3
+      $http, $rootScope, $timeout, $uibModal, $window,
       AlertsService, CsrfTokenService, SiteAnalyticsService,
       UrlInterpolationService) {
     var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
@@ -45,15 +44,14 @@ angular.module('oppia').factory('ExplorationCreationService', [
         AlertsService.clearWarnings();
         $rootScope.loadingMessage = 'Creating exploration';
 
-        
-        ExplorationCreationBackendService.createExploration().then(                                 //change4
-          function(response){
+        $http.post('/contributehandler/create_new', {
+        }).then(function(response) {
           SiteAnalyticsService.registerCreateNewExplorationEvent(
-            response.explorationId);                                                                //change5
+            response.data.explorationId);
           $timeout(function() {
             $window.location = UrlInterpolationService.interpolateUrl(
               CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                exploration_id: response.explorationId                                              //change6
+                exploration_id: response.data.explorationId
               }
             );
           }, 150);
