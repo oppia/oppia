@@ -643,7 +643,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                         question_domain
                         .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                     'question_dict': self.question_dict,
-                    'skill_id': None,
+                    'skill_id': self.SKILL_ID,
                     'skill_difficulty': 0.3
                 },
                 'description': 'Add new question to skill'
@@ -757,7 +757,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
                         question_domain
                         .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                     'question_dict': self.question_dict,
-                    'skill_id': None,
+                    'skill_id': self.skill_id,
                     'skill_difficulty': 0.3
                 },
                 'description': 'Add new question to skill'
