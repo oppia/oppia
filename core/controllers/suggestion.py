@@ -85,7 +85,7 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
         opportunity_services.get_skill_opportunities_by_ids(list(target_ids)))
     opportunity_skill_ids = [opp.id for opp in opportunities]
     opportunity_id_to_skill = {
-        skill.id:skill
+        skill.id: skill
         for skill in skill_services.get_multi_skills(opportunity_skill_ids)
     }
     id_to_opportunity = {}
