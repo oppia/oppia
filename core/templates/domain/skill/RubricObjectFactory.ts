@@ -17,8 +17,13 @@
  * rubrics.
  */
 
-import { Injectable } from '@angular/core';
+export interface IRubricBackendDict {
+  difficulty: string,
+  explanation: string
+}
+
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
 export class Rubric {
   _difficulty: string;
@@ -29,7 +34,7 @@ export class Rubric {
     this._explanation = explanation;
   }
 
-  toBackendDict(): {difficulty: string; explanation: string;} {
+  toBackendDict(): IRubricBackendDict {
     return {
       difficulty: this._difficulty,
       explanation: this._explanation
@@ -53,9 +58,7 @@ export class Rubric {
   providedIn: 'root'
 })
 export class RubricObjectFactory {
-  createFromBackendDict(rubricBackendDict: {
-      difficulty: string; explanation: string;
-    }): Rubric {
+  createFromBackendDict(rubricBackendDict: IRubricBackendDict): Rubric {
     return new Rubric(
       rubricBackendDict.difficulty,
       rubricBackendDict.explanation);
