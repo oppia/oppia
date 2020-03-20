@@ -17,13 +17,20 @@
  * concept card. In the backend, this is referred to as SkillContents.
  */
 
+export interface IConceptCardBackendDict {
+  explanation: ISubtitledHtmlBackendDict,
+  'worked_examples': Array<ISubtitledHtmlBackendDict>,
+  'recorded_voiceovers': IRecordedVoiceOverBackendDict
+}
+
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-
 import { AppConstants } from 'app.constants';
-import { RecordedVoiceovers, RecordedVoiceoversObjectFactory } from
+import { RecordedVoiceovers, RecordedVoiceoversObjectFactory,
+  IRecordedVoiceOverBackendDict } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SubtitledHtml, SubtitledHtmlObjectFactory } from
+import { SubtitledHtml, SubtitledHtmlObjectFactory,
+  ISubtitledHtmlBackendDict} from
   'domain/exploration/SubtitledHtmlObjectFactory';
 
 export class ConceptCard {
@@ -38,8 +45,8 @@ export class ConceptCard {
     this._workedExamples = workedExamples;
     this._recordedVoiceovers = recordedVoiceovers;
   }
-  // TODO(#7165): Replace 'any' with the exact type.
-  toBackendDict(): any {
+
+  toBackendDict(): IConceptCardBackendDict {
     return {
       explanation: this._explanation.toBackendDict(),
       worked_examples: this._workedExamples.map(
@@ -115,14 +122,13 @@ export class ConceptCardObjectFactory {
       private recordedVoiceoversObjectFactory:
           RecordedVoiceoversObjectFactory) {}
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'workedExampleDicts' is a dict having underscore keys.
   _generateWorkedExamplesFromBackendDict(
-      workedExampleDicts: any): Array<SubtitledHtml> {
-    return workedExampleDicts.map((workedExampleDict: any) => {
-      return this.subtitledHtmlObjectFactory.createFromBackendDict(
-        workedExampleDict);
-    });
+      workedExampleDicts): Array<SubtitledHtml> {
+    return workedExampleDicts.map(
+      (workedExampleDict: ISubtitledHtmlBackendDict) => {
+        return this.subtitledHtmlObjectFactory.createFromBackendDict(
+          workedExampleDict);
+      });
   }
 
   // Create an interstitial concept card that would be displayed in the
@@ -135,15 +141,15 @@ export class ConceptCardObjectFactory {
     };
     return new ConceptCard(
       this.subtitledHtmlObjectFactory.createDefault(
-        'Loading review material', AppConstants.COMPONENT_NAME_EXPLANATION), [],
+        'Loading review material',
+        AppConstants.COMPONENT_NAME_EXPLANATION), [],
       this.recordedVoiceoversObjectFactory.createFromBackendDict(
         recordedVoiceoversDict)
     );
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'conceptCardBackendDict' is a dict having underscore keys.
-  createFromBackendDict(conceptCardBackendDict: any): ConceptCard {
+  createFromBackendDict(
+      conceptCardBackendDict: IConceptCardBackendDict): ConceptCard {
     return new ConceptCard(
       this.subtitledHtmlObjectFactory.createFromBackendDict(
         conceptCardBackendDict.explanation),

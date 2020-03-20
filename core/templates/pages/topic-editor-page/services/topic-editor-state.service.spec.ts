@@ -431,7 +431,7 @@ describe('Topic editor state service', function() {
 
     TopicEditorStateService.loadTopic(5);
     expect(fakeEditableTopicBackendApiService.fetchTopic).toHaveBeenCalled();
-});
+  });
 
   it('should request to load the subtopic page from the backend', function() {
     spyOn(

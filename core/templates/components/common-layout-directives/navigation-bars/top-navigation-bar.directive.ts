@@ -26,6 +26,7 @@ require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 require('services/contextual/device-info.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('constants.ts');
 
 angular.module('oppia').directive('topNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -40,11 +41,14 @@ angular.module('oppia').directive('topNavigationBar', [
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
         'SiteAnalyticsService', 'NavigationService', 'WindowDimensionsService',
         'DebouncerService', 'DeviceInfoService', 'LOGOUT_URL',
+        'SHOW_CLASSROOM_CALLOUT',
         function(
             $scope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
             SiteAnalyticsService, NavigationService, WindowDimensionsService,
-            DebouncerService, DeviceInfoService, LOGOUT_URL) {
+            DebouncerService, DeviceInfoService, LOGOUT_URL,
+            SHOW_CLASSROOM_CALLOUT) {
+          $scope.SHOW_CLASSROOM_CALLOUT = SHOW_CLASSROOM_CALLOUT;
           var ctrl = this;
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
@@ -55,7 +59,7 @@ angular.module('oppia').directive('topNavigationBar', [
           // The order of the elements in this array specifies the order in
           // which they will be hidden. Earlier elements will be hidden first.
           var NAV_ELEMENTS_ORDER = [
-            'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_ABOUT',
+            'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_CLASSROOM', 'I18N_TOPNAV_ABOUT',
             'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
           var truncateNavbarDebounced =
             DebouncerService.debounce(truncateNavbar, 500);
