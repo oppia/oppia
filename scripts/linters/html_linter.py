@@ -233,7 +233,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
     def __init__(
-            self, files_to_lint, verbose_mode_enabled=False):
+            self, files_to_lint, verbose_mode_enabled):
         """Constructs a HTMLLintChecksManager object.
 
         Args:
@@ -322,7 +322,7 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
     def __init__(
-            self, files_to_lint, verbose_mode_enabled=False):
+            self, files_to_lint, verbose_mode_enabled):
         """Constructs a ThirdPartyHTMLLintChecksManager object.
 
         Args:
@@ -419,3 +419,23 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
             return []
 
         return self._lint_html_files()
+
+
+def get_linters(files_to_lint, verbose_mode_enabled=False):
+    """Creates HTMLLintChecksManager and ThirdPartyHTMLLintChecksManager
+        objects and returns them.
+
+    Args:
+        files_to_lint: list(str). A list of filepaths to lint.
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
+
+    Returns:
+        linter: object(linter). Returns linter object.
+    """
+    custom_linter = HTMLLintChecksManager(
+        files_to_lint, verbose_mode_enabled)
+
+    third_party_linter = ThirdPartyHTMLLintChecksManager(
+        files_to_lint, verbose_mode_enabled)
+
+    return custom_linter, third_party_linter

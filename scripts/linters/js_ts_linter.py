@@ -832,8 +832,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
     def __init__(
-            self, files_to_lint,
-            verbose_mode_enabled=False):
+            self, files_to_lint, verbose_mode_enabled):
         """Constructs a ThirdPartyJsTsLintChecksManager object.
 
         Args:
@@ -927,3 +926,26 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
             return []
 
         return self._lint_js_and_ts_files()
+
+
+def get_linters(js_filepaths, ts_filepaths, verbose_mode_enabled=False):
+    """Creates JsTsLintChecksManager and ThirdPartyJsTsLintChecksManager
+        objects and return them.
+
+    Args:
+        js_filepaths: list(str). A list of js filepaths to lint.
+        ts_filepaths: list(str). A list of ts filepaths to lint.
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
+
+    Returns:
+        linter: object(linter). Returns linter object.
+    """
+    js_ts_file_paths = js_filepaths + ts_filepaths
+
+    custom_linter = JsTsLintChecksManager(
+        js_filepaths, ts_filepaths, verbose_mode_enabled)
+
+    third_party_linter = ThirdPartyJsTsLintChecksManager(
+        js_ts_file_paths, verbose_mode_enabled)
+
+    return custom_linter, third_party_linter

@@ -32,9 +32,9 @@ CUSTOMIZATION OPTIONS
 2.  To lint all files in the folder or to lint just a specific file
         python -m scripts.linters.pre_commit_linter --path filepath
 
-3.  To lint a specific list of files. Separate files by spaces
+3.  To lint a specific list of files. Separate filepaths by spaces
         python -m scripts.linters.pre_commit_linter
-            --files file_1 file_2 ... file_n
+            --files filepath_1 filepath_2 ... filepath_n
 
 4.  To lint files in verbose mode
         python -m scripts.linters.pre_commit_linter --verbose
@@ -42,7 +42,7 @@ CUSTOMIZATION OPTIONS
 5. To lint a specific list of file extensions. Separate file
     extensions by spaces
         python -m scripts.linters.pre_commit_linter
-            --only-check-file-extensions "*.py" "*.js"
+            --only-check-file-extensions py js
 
 Note that the root folder MUST be named 'oppia'.
  """
@@ -90,7 +90,7 @@ _PARSER.add_argument(
 _EXCLUSIVE_GROUP.add_argument(
     '--only-check-file-extensions',
     nargs='+',
-    choices=['*.html', '*.css', '*.js', '*.ts', '*.py'],
+    choices=['html', 'css', 'js', 'ts', 'py', 'other'],
     help='specific file extensions to be linted. Space separated list',
     action='store')
 
@@ -198,7 +198,7 @@ class FileCache(python_utils.OBJECT):
 
 def _lint_all_files(
         js_filepaths, ts_filepaths, py_filepaths, html_filepaths,
-        css_filepaths, file_extension_type, verbose_mode_enabled=False):
+        css_filepaths, file_extensions_to_lint, verbose_mode_enabled=False):
     """Run all lint checks.
 
     Args:
@@ -208,7 +208,7 @@ def _lint_all_files(
         html_filepaths: list(str). The list of HTML filepaths to be linted.
         css_filepaths: list(str). The list of CSS filepaths to be linted.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
-        file_extension_type: list(str). The list of file extensions to be
+        file_extensions_to_lint: list(str). The list of file extensions to be
             linted.
 
     Returns:
@@ -223,51 +223,49 @@ def _lint_all_files(
     custom_linters = []
     third_party_linters = []
 
-    js_ts_file_extension = '*.js' in file_extension_type or (
-        '*.ts' in file_extension_type)
-    py_file_extension = '*.py' in file_extension_type
-    html_file_extension = '*.html' in file_extension_type
-    css_file_extension = '*.css' in file_extension_type
+    js_ts_file_extension_type = 'js' in file_extensions_to_lint or (
+        'ts' in file_extensions_to_lint)
+    py_file_extension_type = 'py' in file_extensions_to_lint
+    html_file_extension_type = 'html' in file_extensions_to_lint
+    css_file_extension_type = 'css' in file_extensions_to_lint
+    other_file_extension_type = 'other' in file_extensions_to_lint
 
-    js_ts_file_paths = js_filepaths + ts_filepaths
+    if not other_file_extension_type:
+        general_files_to_lint = '.' + file_extensions_to_lint
+    else:
+        general_files_to_lint = file_extensions_to_lint
 
-    custom_linter = general_purpose_linter.GeneralPurposeLinter(
-        _FILES[file_extension_type[1:]],
+    custom_linter = general_purpose_linter.get_linters(
+        _FILES[general_files_to_lint],
         verbose_mode_enabled=verbose_mode_enabled)
     custom_linters.append(custom_linter)
 
-    if js_ts_file_extension:
-        custom_linter = js_ts_linter.JsTsLintChecksManager(
+    if js_ts_file_extension_type:
+        custom_linter, third_party_linter = js_ts_linter.get_linters(
             js_filepaths, ts_filepaths,
             verbose_mode_enabled=verbose_mode_enabled)
-        third_party_linter = js_ts_linter.ThirdPartyJsTsLintChecksManager(
-            js_ts_file_paths, verbose_mode_enabled=verbose_mode_enabled)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
-    if html_file_extension:
-        custom_linter = html_linter.HTMLLintChecksManager(
-            html_filepaths, verbose_mode_enabled=verbose_mode_enabled)
-        third_party_linter = html_linter.ThirdPartyHTMLLintChecksManager(
+    if html_file_extension_type:
+        custom_linter, third_party_linter = html_linter.get_linters(
             html_filepaths, verbose_mode_enabled=verbose_mode_enabled)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
-        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
+        third_party_linter = css_linter.get_linters(
             config_path_for_css_in_html, html_filepaths,
             verbose_mode_enabled=verbose_mode_enabled)
         third_party_linters.append(third_party_linter)
 
-    if css_file_extension:
-        third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
+    if css_file_extension_type:
+        third_party_linter = css_linter.get_linters(
             config_path_for_oppia_css, css_filepaths,
             verbose_mode_enabled=verbose_mode_enabled)
         third_party_linters.append(third_party_linter)
 
-    if py_file_extension:
-        custom_linter = python_linter.PythonLintChecksManager(
-            py_filepaths, verbose_mode_enabled=verbose_mode_enabled)
-        third_party_linter = python_linter.ThirdPartyPythonLintChecksManager(
+    if py_file_extension_type:
+        custom_linter, third_party_linter = python_linter.get_linters(
             py_filepaths, verbose_mode_enabled=verbose_mode_enabled)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
@@ -314,33 +312,33 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     return files_in_directory
 
 
-def _get_file_extensions(file_extension_type):
+def _get_file_extensions(file_extensions_to_lint):
     """This function is used to return the file extensions which need to be
     linted and checked.
 
     Args:
-        file_extension_type: list(str). The list of file extensions to be
+        file_extensions_to_lint: list(str). The list of file extensions to be
         linted checked.
 
     Returns:
         all_file_extensions_type: list(str). The list of all file extensions
         to be linted and checked.
     """
-    all_file_extensions_type = ['*.js', '*.py', '*.html', '*.css']
+    all_file_extensions_type = ['js', 'py', 'html', 'css', 'other']
 
-    if file_extension_type:
-        # Check if '*.js' and '*.ts' both are present in file_extension_type.
-        js_and_ts_is_present = '*.js' in file_extension_type and (
-            '*.ts' in file_extension_type)
+    if file_extensions_to_lint:
+        # Check if 'js' and 'ts' both are present in file_extensions_to_lint.
+        js_and_ts_is_present = 'js' in file_extensions_to_lint and (
+            'ts' in file_extensions_to_lint)
 
         if js_and_ts_is_present:
             python_utils.PRINT(
-                'Please either use "*.js" or "*.ts" both are not '
+                'Please either use "js" or "ts". Both are not '
                 'allowed together....')
             python_utils.PRINT('Exiting...')
             sys.exit(1)
 
-        return set(file_extension_type)
+        return set(file_extensions_to_lint)
 
     return all_file_extensions_type
 
@@ -479,6 +477,7 @@ def main(args=None):
         custom_linters += custom_linter
         third_party_linters += third_party_linter
 
+    # Create tasks.
     tasks_custom = []
     tasks_third_party = []
 
@@ -494,6 +493,7 @@ def main(args=None):
             third_party_semaphore, name='third_party')
         tasks_third_party.append(task_third_party)
 
+    # Execute tasks.
     # Concurrency limit: 25.
     concurrent_task_utils.execute_tasks(tasks_custom, custom_semaphore)
     # Concurrency limit: 2.

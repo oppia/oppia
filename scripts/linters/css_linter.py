@@ -42,7 +42,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
     """
     def __init__(
             self, config_path, files_to_lint,
-            verbose_mode_enabled=False):
+            verbose_mode_enabled):
         """Constructs a ThirdPartyCSSLintChecksManager object.
 
         Args:
@@ -136,3 +136,20 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             return []
 
         return self._lint_css_files()
+
+
+def get_linters(config_path, files_to_lint, verbose_mode_enabled=False):
+    """Creates ThirdPartyCSSLintChecksManager and returns it.
+
+    Args:
+        config_path: str. Path to the configuration file.
+        files_to_lint: list(str). A list of filepaths to lint.
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
+
+    Returns:
+        tlinter: object(linter). Returns linter object.
+    """
+    third_party_linter = ThirdPartyCSSLintChecksManager(
+        config_path, files_to_lint, verbose_mode_enabled)
+
+    return third_party_linter

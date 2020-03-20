@@ -543,7 +543,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
 
-    def __init__(self, files_to_lint, verbose_mode_enabled=False): # pylint: disable=super-init-not-called
+    def __init__(self, files_to_lint, verbose_mode_enabled):
         """Constructs a GeneralPurposeLinter object.
 
         Args:
@@ -651,8 +651,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         summary_messages = []
         all_filepaths = [
             filepath for filepath in self.all_filepaths if not (
-                filepath.endswith('pre_commit_linter.py') or (
-                    filepath.endswith('general_purpose_linter.py')))]
+                filepath.endswith('general_purpose_linter.py'))]
         failed = False
         stdout = sys.stdout
         with linter_utils.redirect_stdout(stdout):
@@ -719,5 +718,22 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         mandatory_patterns_messages = self._check_mandatory_patterns()
         pattern_messages = self._check_bad_patterns()
 
-        return (
-            mandatory_patterns_messages + pattern_messages)
+        all_messages = mandatory_patterns_messages + pattern_messages
+        return all_messages
+
+
+def get_linters(
+        files_to_lint, verbose_mode_enabled=False):
+    """Creates GeneralPurposeLinter object and returns it.
+
+    Args:
+        files_to_lint: list(str). A list of filepaths to lint.
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
+
+    Returns:
+        linter: object(linter). Returns linter object.
+    """
+    custom_linter = GeneralPurposeLinter(
+        files_to_lint, verbose_mode_enabled)
+
+    return custom_linter
