@@ -363,6 +363,7 @@ FULLY_COVERED_FILENAMES = [
     'thread-status-display.service.ts',
     'ThreadMessageObjectFactory.ts',
     'ThreadMessageSummaryObjectFactory.ts',
+    'topic-creation-backend-api.service.ts',
     'topic-domain.constants.ajs.ts',
     'topic-domain.constants.ts',
     'topic-editor-page.constants.ajs.ts',
