@@ -329,14 +329,6 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.get_supported_audio_language_description(
                 invalid_language_code)
 
-    def test_flatten_list(self):
-        list_of_lists = [['a', 'b'], [0, 1], ['c', 'd'], []]
-
-        result = utils.flatten_list(list_of_lists)
-
-        expected = ['a', 'b', 0, 1, 'c', 'd']
-        self.assertListEqual(result, expected)
-
     def test_snake_case_to_camel_case(self):
         camel_case_str1 = utils.snake_case_to_camel_case('user_id_number')
         camel_case_str2 = utils.snake_case_to_camel_case('hello_world')

@@ -83,10 +83,15 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
     target_ids = set([s.target_id for s in suggestions])
     opportunities = (
         opportunity_services.get_skill_opportunities_by_ids(list(target_ids)))
+    opportunity_skill_ids = [opp.id for opp in opportunities]
+    opportunity_id_to_skill = {
+        skill.id:skill
+        for skill in skill_services.get_multi_skills(opportunity_skill_ids)
+    }
     id_to_opportunity = {}
     for opp in opportunities:
         opp_dict = opp.to_dict()
-        skill = skill_services.get_skill_by_id(opp.id, strict=False)
+        skill = opportunity_id_to_skill.get(opp.id)
         if skill is not None:
             opp_dict['skill_rubrics'] = [
                 rubric.to_dict() for rubric in skill.rubrics]
@@ -186,9 +191,6 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         if action == suggestion_models.ACTION_TYPE_ACCEPT:
-            # The skill_id is passed only at the time of accepting the
-            # suggestion.
-            suggestion.change.skill_id = target_id
             # Question suggestions do not use commit messages.
             suggestion_services.accept_suggestion(
                 suggestion, self.user_id, 'UNUSED_COMMIT_MESSAGE',

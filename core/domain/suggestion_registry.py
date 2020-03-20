@@ -551,8 +551,8 @@ class SuggestionAddQuestion(BaseSuggestion):
 
         if self._get_skill_difficulty() not in feconf.SKILL_DIFFICULTIES:
             raise utils.ValidationError(
-                'Expected change skill_difficulty to be one of %s '
-                % feconf.SKILL_DIFFICULTIES)
+                'Expected change skill_difficulty to be one of %s, found %s '
+                % (feconf.SKILL_DIFFICULTIES, self._get_skill_difficulty()))
 
         question = question_domain.Question(
             None, state_domain.State.from_dict(

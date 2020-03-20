@@ -259,7 +259,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     question_domain
                     .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                 'question_dict': question_dict,
-                'skill_id': None
+                'skill_id': None,
+                'skill_difficulty': 0.3
             }, None, None)
 
         suggestion_id = suggestion_services.query_suggestions(
@@ -642,7 +643,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                         question_domain
                         .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                     'question_dict': self.question_dict,
-                    'skill_id': None
+                    'skill_id': None,
+                    'skill_difficulty': 0.3
                 },
                 'description': 'Add new question to skill'
             }, csrf_token=csrf_token)
@@ -755,7 +757,8 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
                         question_domain
                         .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                     'question_dict': self.question_dict,
-                    'skill_id': None
+                    'skill_id': None,
+                    'skill_difficulty': 0.3
                 },
                 'description': 'Add new question to skill'
             }, csrf_token=csrf_token)
@@ -1071,7 +1074,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                         question_domain
                         .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                     'question_dict': self.question_dict,
-                    'skill_id': None
+                    'skill_id': None,
+                    'skill_difficulty': 0.3
                 },
                 'description': 'Add new question to skill'
             }, csrf_token=csrf_token)
@@ -1243,7 +1247,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                         question_domain
                         .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                     'question_dict': self.question_dict,
-                    'skill_id': None
+                    'skill_id': None,
+                    'skill_difficulty': 0.3
                 },
                 'description': 'Add new question to skill'
             }, csrf_token=csrf_token)
