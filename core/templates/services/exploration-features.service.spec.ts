@@ -38,13 +38,20 @@ describe('ExplorationFeatureService', () => {
       states: {}
     };
     explorationData2 = {
-      param_changes: [],
+      param_changes:[],
       states: {
         state_1: {
-          param_changes: ['param_1', 'param_2']
+          param_changes: ['param_1', 'param_2'],
         }
       }
     };
+  });
+
+  afterEach(()=> {
+    ExplorationFeaturesService.settings.areParametersEnabled = false;
+    ExplorationFeaturesService.serviceIsInitialized = false;
+    ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled = false;
+    ExplorationFeaturesService.settings.isImprovementsTabEnabled = false;
   });
 
   it('should init the exploration from param change', () => {
@@ -64,4 +71,14 @@ describe('ExplorationFeatureService', () => {
     expect(explorationFeatureService.isPlaythroughRecordingEnabled())
       .toEqual(true);
   });
+
+  it('should return if service is initialized', () => {
+    ExplorationFeaturesService.serviceIsInitialized = true;
+    explorationFeatureService.init(explorationData, featureData);
+    expect(explorationFeatureService.isInitialized()).toEqual(true);
+    expect(explorationFeatureService.areParametersEnabled()).toEqual(false);
+    expect(explorationFeatureService.isImprovementsTabEnabled()).toEqual(false);
+    expect(explorationFeatureService.isPlaythroughRecordingEnabled())
+      .toEqual(false);
+  })
 });
