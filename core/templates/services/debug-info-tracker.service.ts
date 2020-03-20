@@ -23,8 +23,6 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class DebugInfoTrackerService {
-  // The type of an action is not fixed. It could be anything so it is defined
-  // as any.
   _sequenceOfActions: Array<any> = [];
 
   reset(): void {
