@@ -103,6 +103,8 @@ import { ExplorationHtmlFormatterService } from
 import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
+import { ExpressionSyntaxTreeService } from
+  'expressions/expression-syntax-tree.service';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { ExtractImageFilenamesFromStateService } from
@@ -343,6 +345,8 @@ export class UpgradedServices {
     upgradedServices['ExplorationFeaturesService'] =
       new ExplorationFeaturesService();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
+    upgradedServices['ExpressionSyntaxTreeService'] =
+      new ExpressionSyntaxTreeService(new ExpressionParserService());
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GenerateContentIdService'] =
       new GenerateContentIdService();
