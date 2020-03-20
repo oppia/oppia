@@ -47,7 +47,7 @@ describe('ExplorationFeatureService', () => {
     };
   });
 
-  afterEach(()=> {
+  afterEach(() => {
     ExplorationFeaturesService.settings.areParametersEnabled = false;
     ExplorationFeaturesService.serviceIsInitialized = false;
     ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled = false;
