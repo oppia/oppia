@@ -11,6 +11,9 @@
 # - The dev workflow team will review the code quality to see if the e2e tests
 #   can be optimized further.
 
+# Android team
+/core/domain/android_validation_constants.py @BenHenning
+
 # Angular Migration team
 /core/templates/services/contextual/logger.service.ts @bansalnitish
 /core/templates/services/contextual/logger.service.spec.ts @bansalnitish
@@ -260,14 +263,14 @@
 
 
 # Interaction project.
-/core/domain/customization_args_util*.py @seanlip
+/core/domain/customization_args_util*.py @brianrodri
 /core/domain/interaction_registry*.py @aks681
 /core/domain/obj_services*.py @aks681
 /core/templates/components/version-diff-visualization/codemirror-mergeview.directive.ts @aks681
 /core/templates/domain/objects/ @aks681
-/core/templates/expressions/ @seanlip
+/core/templates/expressions/ @brianrodri
 /core/templates/services/code-normalizer.service*.ts @aks681
-/extensions/domain*.py @seanlip
+/extensions/domain*.py @brianrodri
 /extensions/interactions/ @aks681 @vojtechjelinek
 /extensions/objects/ @aks681
 /extensions/value_generators/ @vojtechjelinek
@@ -409,6 +412,7 @@
 /core/templates/App*.ts @ankita240796
 /core/templates/app.constants.ts @ankita240796
 /core/templates/app.constants.ajs.ts @ankita240796
+/core/templates/app-type.constants.ts @nishantwrp @ankita240796
 /core/templates/combined-tests.spec.ts @ankita240796
 /core/templates/pages/interaction-specs.constants.ajs.ts @vojtechjelinek @jameesjohn
 /core/templates/pages/interaction-specs.constants.ts @bansalnitish
@@ -460,6 +464,7 @@
 /core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
 /core/templates/services/autoplayed-videos.service*.ts @aks681
 /core/templates/services/rte-helper.service*.ts @aks681
+/core/templates/services/rte-helper-modal.controller*.ts @aks681
 /core/domain/rte_component_registry*.py @vojtechjelinek
 /extensions/ckeditor_plugins/ @vojtechjelinek
 /extensions/rich_text_components/ @vojtechjelinek
@@ -473,6 +478,7 @@
 /core/storage/suggestion/ @nithusha21
 /core/templates/domain/suggestion/ @nithusha21
 /core/templates/services/suggestion-modal.service*.ts @nithusha21
+/core/templates/services/suggestions.service*.ts @nithusha21
 
 
 # Feedback project.
