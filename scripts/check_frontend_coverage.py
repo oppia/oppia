@@ -295,6 +295,7 @@ FULLY_COVERED_FILENAMES = [
     'SetInput.ts',
     'sidebar-status.service.ts',
     'site-analytics.service.ts',
+    'skill-creation-backend-api.service.ts',
     'skill-domain.constants.ajs.ts',
     'skill-domain.constants.ts',
     'skill-editor-page.constants.ajs.ts',
