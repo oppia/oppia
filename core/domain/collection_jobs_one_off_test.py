@@ -15,6 +15,10 @@
 # limitations under the License.
 
 """Tests for Collection-related one-off jobs."""
+
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import ast
 
 from core.domain import collection_domain
@@ -41,8 +45,8 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
         super(CollectionMigrationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test collections.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_migration_job_does_not_convert_up_to_date_collection(self):

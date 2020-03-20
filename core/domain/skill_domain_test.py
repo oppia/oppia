@@ -14,6 +14,9 @@
 
 """Tests for skill domain objects and methods defined on them."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import datetime
 
 from constants import constants
@@ -42,12 +45,20 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'name', '<p>notes</p>',
-            '<p>default_feedback</p>')]
+            '<p>default_feedback</p>', True)]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], '<p>Explanation 1</p>'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], '<p>Explanation 2</p>'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], '<p>Explanation 3</p>')]
         self.skill = skill_domain.Skill(
-            self.SKILL_ID, 'Description', misconceptions,
+            self.SKILL_ID, 'Description', misconceptions, rubrics,
             skill_contents, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0, 1,
-            None, False
+            None, False, ['skill_id_2']
         )
 
     def _assert_validation_error(self, expected_error_substring):
@@ -71,9 +82,93 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected misconception ID to be an integer')
 
+    def test_valid_misconception_name(self):
+        misconception_name = 'This string is smaller than 50'
+        self.skill.update_misconception_name(0, misconception_name)
+        self.skill.validate()
+        misconception_name = ('This string is a larger string'
+                              'and it is greater than 50 chars.')
+        self.skill.update_misconception_name(0, misconception_name)
+        self._assert_validation_error(
+            'The length of misconception_name should '
+            'be between 1 and 50 characters'
+        )
+
+    def test_valid_misconception_must_be_addressed(self):
+        self.skill.validate()
+        must_be_addressed = 'False'
+        with self.assertRaisesRegexp(
+            ValueError, 'must_be_addressed should be a bool value'):
+            self.skill.update_misconception_must_be_addressed(
+                0, must_be_addressed)
+
+        self.skill.misconceptions[0].must_be_addressed = 'False'
+        self._assert_validation_error(
+            'Expected must_be_addressed to be a bool'
+        )
+
+    def test_rubrics_validation(self):
+        self.skill.rubrics = 'rubric'
+        self._assert_validation_error('Expected rubrics to be a list')
+
+        self.skill.rubrics = ['rubric']
+        self._assert_validation_error(
+            'Expected each rubric to be a Rubric object')
+
+        self.skill.rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], '<p>Explanation</p>'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], '<p>Another Explanation</p>')]
+        self._assert_validation_error('Duplicate rubric found')
+
+    def test_valid_rubric_difficulty(self):
+        self.skill.rubrics = [skill_domain.Rubric(
+            'invalid_difficulty', '<p>Explanation</p>')]
+        self._assert_validation_error('Invalid difficulty received for rubric')
+
+    def test_valid_rubric_difficulty_type(self):
+        self.skill.rubrics = [skill_domain.Rubric(10, '<p>Explanation</p>')]
+        self._assert_validation_error('Expected difficulty to be a string')
+
+    def test_valid_rubric_explanation(self):
+        self.skill.rubrics[0].explanation = 0
+        self._assert_validation_error('Expected explanation to be a string')
+
+    def test_rubric_present_for_all_difficulties(self):
+        self.skill.validate()
+        self.skill.rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], '<p>Explanation 1</p>'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], '<p>Explanation 2</p>')
+        ]
+        self._assert_validation_error(
+            'All 3 difficulties should be addressed in rubrics')
+
+    def test_order_of_rubrics(self):
+        self.skill.rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], '<p>Explanation 1</p>'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], '<p>Explanation 2</p>'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], '<p>Explanation 3</p>')
+        ]
+        self._assert_validation_error(
+            'The difficulties should be ordered as follows')
+
     def test_description_validation(self):
         self.skill.description = 0
         self._assert_validation_error('Description should be a string')
+
+    def test_prerequisite_skill_ids_validation(self):
+        self.skill.prerequisite_skill_ids = 0
+        self._assert_validation_error(
+            'Expected prerequisite_skill_ids to be a list')
+        self.skill.prerequisite_skill_ids = [0]
+        self._assert_validation_error(
+            'Expected each skill ID to be a string')
 
     def test_language_code_validation(self):
         self.skill.language_code = 0
@@ -101,6 +196,16 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected misconceptions schema version to be an integer')
 
+        self.skill.misconceptions_schema_version = 2
+        self.skill.rubric_schema_version = 100
+        self._assert_validation_error(
+            'Expected rubric schema version to be %s' %
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION)
+
+        self.skill.rubric_schema_version = 'a'
+        self._assert_validation_error(
+            'Expected rubric schema version to be an integer')
+
     def test_misconception_validation(self):
         self.skill.misconceptions[0].feedback = 0
         self._assert_validation_error(
@@ -121,45 +226,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.misconceptions = ''
         self._assert_validation_error('Expected misconceptions to be a list')
 
-    def test_misconception_validation_with_invalid_html_in_notes(self):
-        self.skill.misconceptions[0].notes = '<a>Test</a>'
-        self._assert_validation_error(
-            'Invalid html: <a>Test</a> for rte with invalid tags and '
-            'strings: {\'invalidTags\': \\[u\'a\'], '
-            '\'strings\': \\[\'<a>Test</a>\']}')
-
-    def test_misconception_validation_with_invalid_customization_args_in_notes(
-            self):
-        self.skill.misconceptions[0].notes = (
-            '<oppia-noninteractive-image></oppia-noninteractive-image>')
-        self._assert_validation_error(
-            'Invalid html: <oppia-noninteractive-image>'
-            '</oppia-noninteractive-image> due to errors in '
-            'customization_args: {"Missing attributes: '
-            '\\[u\'alt-with-value\', u\'caption-with-value\', '
-            'u\'filepath-with-value\'], Extra attributes: \\[]": '
-            '\\[\'<oppia-noninteractive-image>'
-            '</oppia-noninteractive-image>\']}')
-
-    def test_misconception_validation_with_invalid_html_in_feedback(self):
-        self.skill.misconceptions[0].feedback = '<a>Test</a>'
-        self._assert_validation_error(
-            'Invalid html: <a>Test</a> for rte with invalid tags and '
-            'strings: {\'invalidTags\': \\[u\'a\'], '
-            '\'strings\': \\[\'<a>Test</a>\']}')
-
-    def test_misconception_validation_with_invalid_customization_args_in_feedback(self): # pylint: disable=line-too-long
-        self.skill.misconceptions[0].feedback = (
-            '<oppia-noninteractive-image></oppia-noninteractive-image>')
-        self._assert_validation_error(
-            'Invalid html: <oppia-noninteractive-image>'
-            '</oppia-noninteractive-image> due to errors in '
-            'customization_args: {"Missing attributes: '
-            '\\[u\'alt-with-value\', u\'caption-with-value\', '
-            'u\'filepath-with-value\'], Extra attributes: \\[]": '
-            '\\[\'<oppia-noninteractive-image>'
-            '</oppia-noninteractive-image>\']}')
-
     def test_skill_contents_validation(self):
         self.skill.skill_contents.worked_examples = ''
         self._assert_validation_error('Expected worked examples to be a list')
@@ -176,14 +242,19 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected skill_contents to be a SkillContents object')
 
+    def test_validate_duplicate_content_id(self):
+        self.skill.skill_contents.worked_examples = (
+            [self.skill.skill_contents.explanation])
+        self._assert_validation_error('Found a duplicate content id 1')
+
     def test_misconception_id_validation(self):
         self.skill.misconceptions = [
             skill_domain.Misconception(
                 self.MISCONCEPTION_ID, 'name', '<p>notes</p>',
-                '<p>default_feedback</p>'),
+                '<p>default_feedback</p>', True),
             skill_domain.Misconception(
                 self.MISCONCEPTION_ID, 'name 2', '<p>notes 2</p>',
-                '<p>default_feedback</p>')]
+                '<p>default_feedback</p>', True)]
         self._assert_validation_error('Duplicate misconception ID found')
 
     def test_skill_migration_validation(self):
@@ -200,12 +271,23 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
     def test_create_default_skill(self):
         """Test the create_default_skill function."""
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0],
+                '<p>[NOTE: Creator should fill this in]</p>'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1],
+                '<p>[NOTE: Creator should fill this in]</p>'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2],
+                '<p>[NOTE: Creator should fill this in]</p>')]
         skill = skill_domain.Skill.create_default_skill(
-            self.SKILL_ID, 'Description')
+            self.SKILL_ID, 'Description', rubrics)
         expected_skill_dict = {
             'id': self.SKILL_ID,
             'description': 'Description',
             'misconceptions': [],
+            'rubrics': [rubric.to_dict() for rubric in rubrics],
             'skill_contents': {
                 'explanation': {
                     'html': feconf.DEFAULT_SKILL_EXPLANATION,
@@ -226,6 +308,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'misconceptions_schema_version': (
                 feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
             ),
+            'rubric_schema_version': (
+                feconf.CURRENT_RUBRIC_SCHEMA_VERSION
+            ),
             'skill_contents_schema_version': (
                 feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
             ),
@@ -233,7 +318,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'next_misconception_id': 0,
             'version': 0,
             'superseding_skill_id': None,
-            'all_questions_merged': False
+            'all_questions_merged': False,
+            'prerequisite_skill_ids': []
         }
         self.assertEqual(skill.to_dict(), expected_skill_dict)
 
@@ -254,14 +340,21 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         misconceptions = skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'Tag Name', '<p>Description</p>',
-            '<p>Feedback</p>')
+            '<p>Feedback</p>', True)
         misconceptions_dict = misconceptions.to_dict()
         misconceptions_from_dict = skill_domain.Misconception.from_dict(
             misconceptions_dict)
+
+        rubric = skill_domain.Rubric(
+            constants.SKILL_DIFFICULTIES[0], '<p>Explanation</p>')
+        rubric_dict = rubric.to_dict()
+        rubric_from_dict = skill_domain.Rubric.from_dict(rubric_dict)
         self.assertEqual(
             skill_contents_from_dict.to_dict(), skill_contents_dict)
         self.assertEqual(
             misconceptions_from_dict.to_dict(), misconceptions_dict)
+        self.assertEqual(
+            rubric_from_dict.to_dict(), rubric_dict)
 
     def test_skill_mastery_to_dict(self):
         expected_skill_mastery_dict = {
@@ -275,17 +368,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             expected_skill_mastery_dict,
             observed_skill_mastery.to_dict())
 
-    def test_skill_rights_to_dict(self):
-        expected_dict = {
-            'creator_id': 'user',
-            'skill_is_private': True,
-            'skill_id': 'skill_id'
-        }
-        skill_rights = skill_domain.SkillRights('skill_id', True, 'user')
-        self.assertDictEqual(expected_dict, skill_rights.to_dict())
-
     def test_update_worked_examples(self):
-        worked_examples_dict = [{
+        worked_examples_dict_list = [{
             'content_id': 'worked_example_1',
             'html': '<p>Worked example</p>'
         }, {
@@ -293,19 +377,18 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'html': '<p>Another worked example</p>'
         }]
 
-        self.skill.update_worked_examples(worked_examples_dict)
+        worked_examples_object_list = [
+            state_domain.SubtitledHtml.from_dict(worked_example)
+            for worked_example in worked_examples_dict_list]
+
+        self.skill.update_worked_examples(worked_examples_object_list)
         self.skill.validate()
 
         # Delete the last worked_example.
-        worked_examples_dict.pop()
+        worked_examples_object_list.pop()
 
-        self.skill.update_worked_examples(worked_examples_dict)
+        self.skill.update_worked_examples(worked_examples_object_list)
         self.skill.validate()
-
-    def test_skill_rights_is_creator(self):
-        skill_rights = skill_domain.SkillRights(self.SKILL_ID, True, 'user')
-        self.assertTrue(skill_rights.is_creator('user'))
-        self.assertFalse(skill_rights.is_creator('fakeuser'))
 
     def test_require_valid_description_with_empty_description_raise_error(self):
         with self.assertRaisesRegexp(
@@ -406,6 +489,18 @@ class SkillChangeTests(test_utils.GenericTestBase):
                 'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
                 'feedback': '<p>default_feedback</p>'})
 
+    def test_skill_change_object_with_update_rubrics(self):
+        skill_change_object = skill_domain.SkillChange({
+            'cmd': 'update_rubrics',
+            'difficulty': constants.SKILL_DIFFICULTIES[0],
+            'explanation': '<p>Explanation</p>'
+        })
+
+        self.assertEqual(skill_change_object.cmd, 'update_rubrics')
+        self.assertEqual(
+            skill_change_object.difficulty, constants.SKILL_DIFFICULTIES[0])
+        self.assertEqual(skill_change_object.explanation, '<p>Explanation</p>')
+
     def test_skill_change_object_with_delete_skill_misconception(self):
         skill_change_object = skill_domain.SkillChange({
             'cmd': 'delete_skill_misconception',
@@ -497,6 +592,20 @@ class SkillChangeTests(test_utils.GenericTestBase):
         self.assertEqual(skill_change_object.from_version, 'from_version')
         self.assertEqual(skill_change_object.to_version, 'to_version')
 
+    def test_skill_change_object_with_migrate_rubrics_schema_to_latest_version(
+            self):
+        skill_change_object = skill_domain.SkillChange({
+            'cmd': 'migrate_rubrics_schema_to_latest_version',
+            'from_version': 'from_version',
+            'to_version': 'to_version'
+        })
+
+        self.assertEqual(
+            skill_change_object.cmd,
+            'migrate_rubrics_schema_to_latest_version')
+        self.assertEqual(skill_change_object.from_version, 'from_version')
+        self.assertEqual(skill_change_object.to_version, 'to_version')
+
     def test_to_dict(self):
         skill_change_dict = {
             'cmd': 'migrate_misconceptions_schema_to_latest_version',
@@ -505,51 +614,6 @@ class SkillChangeTests(test_utils.GenericTestBase):
         }
         skill_change_object = skill_domain.SkillChange(skill_change_dict)
         self.assertEqual(skill_change_object.to_dict(), skill_change_dict)
-
-
-class SkillRightsChangeTests(test_utils.GenericTestBase):
-
-    def test_skill_rights_change_object_with_missing_cmd(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Missing cmd key in change dict'):
-            skill_domain.SkillRightsChange({'invalid': 'data'})
-
-    def test_skill_change_rights_object_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Command invalid is not allowed'):
-            skill_domain.SkillRightsChange({'cmd': 'invalid'})
-
-    def test_skill_rights_change_object_with_extra_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'The following extra attributes are present: invalid')):
-            skill_domain.SkillRightsChange({
-                'cmd': 'publish_skill',
-                'invalid': 'invalid'
-            })
-
-    def test_skill_rights_change_object_with_create_new(self):
-        skill_rights_change_object = skill_domain.SkillRightsChange({
-            'cmd': 'create_new'
-        })
-
-        self.assertEqual(skill_rights_change_object.cmd, 'create_new')
-
-    def test_skill_rights_change_object_with_publish_skill(self):
-        skill_rights_change_object = skill_domain.SkillRightsChange({
-            'cmd': 'publish_skill'
-        })
-
-        self.assertEqual(skill_rights_change_object.cmd, 'publish_skill')
-
-    def test_to_dict(self):
-        skill_rights_change_dict = {
-            'cmd': 'publish_skill'
-        }
-        skill_rights_change_object = skill_domain.SkillRightsChange(
-            skill_rights_change_dict)
-        self.assertEqual(
-            skill_rights_change_object.to_dict(), skill_rights_change_dict)
 
 
 class SkillSummaryTests(test_utils.GenericTestBase):

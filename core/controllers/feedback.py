@@ -14,6 +14,9 @@
 
 """Controllers for the feedback thread page."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import feedback_services
@@ -87,8 +90,9 @@ class ThreadHandler(base.BaseHandler):
         messages = [m.to_dict() for m in feedback_services.get_messages(
             thread_id)]
         message_ids = [message['message_id'] for message in messages]
-        feedback_services.update_messages_read_by_the_user(
-            self.user_id, thread_id, message_ids)
+        if self.user_id:
+            feedback_services.update_messages_read_by_the_user(
+                self.user_id, thread_id, message_ids)
         self.values.update({
             'messages': messages,
             'suggestion': suggestion.to_dict() if suggestion else None

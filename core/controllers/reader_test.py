@@ -14,6 +14,9 @@
 
 """Tests for the page that allows learners to play through an exploration."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import logging
 
 from constants import constants
@@ -21,6 +24,7 @@ from core.domain import classifier_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import param_domain
@@ -250,14 +254,18 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
-            self.skill_id, 'user', 'Description')
+            self.skill_id, 'user', description='Description')
 
     def test_get_exploration_pretests(self):
         super(ExplorationPretestsUnitTest, self).setUp()
         story_id = story_services.get_new_story_id()
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, 'user', 'Topic', 'A new topic', [], [], [], [], 0)
+            topic_id, 'user', name='Topic',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
         self.save_new_story(
             story_id, 'user', 'Title', 'Description', 'Notes', topic_id
         )
@@ -272,10 +280,10 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         ]
         story_services.update_story('user', story_id, changelist, 'Added node.')
 
-        exp_id = '0'
+        exp_id = '15'
         exp_id_2 = '1'
         exp_services.delete_demo('0')
-        exp_services.load_demo('0')
+        exp_services.load_demo('15')
         exp_services.delete_demo('1')
         exp_services.load_demo('1')
         change_list = [story_domain.StoryChange({
@@ -345,7 +353,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id, 'user', 'Description')
+        self.save_new_skill(self.skill_id, 'user', description='Description')
 
         self.question_id = question_services.get_new_question_id()
         self.save_new_question(
@@ -363,21 +371,21 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
     def test_questions_are_returned_successfully(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id)
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id, 'false')
         json_response_1 = self.get_json(url)
         self.assertEqual(len(json_response_1['question_dicts']), 1)
 
     def test_question_count_more_than_available_returns_all_questions(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '5', self.skill_id)
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '5', self.skill_id, 'true')
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 2)
 
     def test_multiple_skill_id_returns_questions(self):
         skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_2, 'user', 'Description')
+        self.save_new_skill(skill_id_2, 'user', description='Description')
 
         question_id_3 = question_services.get_new_question_id()
         self.save_new_question(
@@ -385,8 +393,8 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
             self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_3, skill_id_2, 0.5)
-        url = '%s?question_count=%s&skill_ids=%s,%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '3', self.skill_id, skill_id_2)
+        url = '%s?question_count=%s&skill_ids=%s,%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '3', self.skill_id, skill_id_2, 'true')
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 3)
         question_ids = [data['id'] for data in json_response['question_dicts']]
@@ -395,15 +403,21 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
     def test_invalid_skill_id_returns_no_questions(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '1', 'invalid_skill_id')
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '1', 'invalid_skill_id', 'true')
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 0)
 
     def test_question_count_zero_raises_invalid_input_exception(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s' % (
-            feconf.QUESTIONS_URL_PREFIX, '0', self.skill_id)
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '0', self.skill_id, 'true')
+        self.get_json(url, expected_status_int=400)
+
+    def test_invalid_fetch_by_difficulty_raises_invalid_input_exception(self):
+        # Call the handler.
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id, [])
         self.get_json(url, expected_status_int=400)
 
 
@@ -589,7 +603,7 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
 
         # Register users.
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
@@ -1385,23 +1399,23 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
         # Remove one exploration.
-        self.delete_json(str(
+        self.delete_json(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
                 constants.ACTIVITY_TYPE_EXPLORATION,
-                self.EXP_ID_0)))
+                self.EXP_ID_0))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_1])
 
         # Remove another exploration.
-        self.delete_json(str(
+        self.delete_json(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
                 constants.ACTIVITY_TYPE_EXPLORATION,
-                self.EXP_ID_1)))
+                self.EXP_ID_1))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [])
@@ -1421,23 +1435,23 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
         # Remove one collection.
-        self.delete_json(str(
+        self.delete_json(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
                 constants.ACTIVITY_TYPE_COLLECTION,
-                self.COL_ID_0)))
+                self.COL_ID_0))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_1])
 
         # Remove another collection.
-        self.delete_json(str(
+        self.delete_json(
             '%s/%s/%s' %
             (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
                 constants.ACTIVITY_TYPE_COLLECTION,
-                self.COL_ID_1)))
+                self.COL_ID_1))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [])
@@ -1454,7 +1468,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
 
         exp_services.load_demo(self.exp_id)
-        self.exploration = exp_services.get_exploration_by_id(self.exp_id)
+        self.exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         playthrough_id = stats_models.PlaythroughModel.create(
             self.exp_id, self.exploration.version, 'EarlyQuit',
             {
@@ -1843,7 +1857,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'issue_schema_version': 1
             }, csrf_token=self.csrf_token, expected_status_int=400)
 
-        self.assertEqual(response['error'], u'\'playthrough_id\'')
+        self.assertEqual(response['error'], 'u\'playthrough_id\'')
 
     def test_move_playthrough_to_correct_issue(self):
         playthrough_id = stats_models.PlaythroughModel.create(
@@ -1923,7 +1937,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         exp_services.load_demo(self.exp_id)
-        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
 
         self.exp_version = exploration.version
         self.state_name = 'Home'
@@ -2606,3 +2620,125 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
         )
 
         self.logout()
+
+
+class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
+    """Tests for learner answer info handler tests."""
+
+    def test_submit_learner_answer_details_for_exploration_states(self):
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        entity_type = feconf.ENTITY_TYPE_EXPLORATION
+
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    entity_type, exp_id),
+                {
+                    'state_name': 'abc',
+                    'interaction_id': 'TextInput',
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token, expected_status_int=404)
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
+            exploration_dict = self.get_json(
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+            state_name = exploration_dict['exploration']['init_state_name']
+            interaction_id = exploration_dict['exploration'][
+                'states'][state_name]['interaction']['id']
+            state_reference = (
+                stats_services.get_state_reference_for_exploration(
+                    exp_id, state_name))
+
+            self.assertEqual(state_name, 'Sentence')
+            self.assertEqual(interaction_id, 'TextInput')
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    entity_type, exp_id),
+                {
+                    'state_name': state_name,
+                    'interaction_id': interaction_id,
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token)
+
+            learner_answer_details = stats_services.get_learner_answer_details(
+                entity_type, state_reference)
+            self.assertEqual(
+                learner_answer_details.state_reference, state_reference)
+            self.assertEqual(
+                learner_answer_details.interaction_id, interaction_id)
+            self.assertEqual(
+                len(learner_answer_details.learner_answer_info_list), 1)
+            self.assertEqual(
+                learner_answer_details.learner_answer_info_list[0].answer,
+                'This is an answer.')
+            self.assertEqual(
+                learner_answer_details.learner_answer_info_list[0]
+                .answer_details,
+                'This is an answer details.')
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    entity_type, exp_id),
+                {
+                    'state_name': state_name,
+                    'interaction_id': 'GraphInput',
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token, expected_status_int=500)
+
+    def test_submit_learner_answer_details_for_question(self):
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        editor_id = self.get_user_id_from_email(
+            self.EDITOR_EMAIL)
+        question_id = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id, editor_id,
+            self._create_valid_question_data('ABC'), ['skill_1'])
+        with self.swap(
+            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True):
+            state_reference = (
+                stats_services.get_state_reference_for_question(question_id))
+            self.assertEqual(state_reference, question_id)
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    feconf.ENTITY_TYPE_QUESTION, question_id),
+                {
+                    'interaction_id': 'TextInput',
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token)
+            learner_answer_details = stats_services.get_learner_answer_details(
+                feconf.ENTITY_TYPE_QUESTION, state_reference)
+            self.assertEqual(
+                learner_answer_details.state_reference, state_reference)
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    feconf.ENTITY_TYPE_QUESTION, question_id),
+                {
+                    'interaction_id': 'TextInput',
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token)
+            self.put_json(
+                '%s/%s/%s' % (
+                    feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL,
+                    feconf.ENTITY_TYPE_QUESTION, question_id),
+                {
+                    'interaction_id': 'GraphInput',
+                    'answer': 'This is an answer.',
+                    'answer_details': 'This is an answer details.',
+                }, csrf_token=csrf_token, expected_status_int=500)

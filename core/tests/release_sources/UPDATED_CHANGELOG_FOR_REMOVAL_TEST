@@ -1,0 +1,33 @@
+This file contains a summary of changes to the Oppia code base.
+
+v1.0.2 (29 Aug 2019)
+------------------------
+Bug fixes
+* Fix #7007: Allows adding proper tags for the exploration by replacing parent with ctrl (#7058)
+* Fix #6864: Fix console error in learner dashboard and empty suggestion modal (#7056)
+* Fix #7031: Add missing $ctrl (#7032)
+
+Statistics
+* Adding a LearnerAnswerDetailsModel (#6815)
+
+Improvements to editors and players
+* Fix part of #5799: Feedback card object factory (#7076)
+* Frontend changes such that creator can enable/disable solicit answer details feature for a state (#6926)
+* Fix #6792: Adding Exploration Titles to Collection Landing Page (#6881)
+
+
+v1.0.1 (29 Mar 2013)
+--------------------
+* Add hits-per-state data to the statistics page.
+* Add responsive CSS support for viewing Oppia in mobile devices.
+* Add a 'Give Feedback' handler. The feedback is stored in the datastore.
+* Improve the display of the main page, the gallery page and the editor pages by tweaking the CSS.
+* After an interaction with the reader on the exploration page, scroll down to show the new content.
+* Remove the AugmentedUser class, replacing it instead with datastore queries.
+* Update sample explorations
+* Security fixes
+
+
+v1.0 (22 Mar 2013)
+------------------
+* Initial release

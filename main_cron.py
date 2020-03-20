@@ -14,15 +14,15 @@
 
 """Main package for URL routing and the index page."""
 
-# pylint: disable=relative-import
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from core.controllers import cron
 from core.platform import models
 import feconf
 import main
 
 import webapp2
-
-# pylint: enable=relative-import
 
 
 transaction_services = models.Registry.import_transaction_services()
@@ -34,6 +34,11 @@ URLS = [
     main.get_redirect_route(
         r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler),
     main.get_redirect_route(
+        r'/cron/users/user_deletion', cron.CronUserDeletionHandler),
+    main.get_redirect_route(
+        r'/cron/users/verify_user_deletion',
+        cron.CronVerifyUserDeletionHandler),
+    main.get_redirect_route(
         r'/cron/explorations/recommendations',
         cron.CronExplorationRecommendationsHandler),
     main.get_redirect_route(
@@ -44,9 +49,6 @@ URLS = [
     main.get_redirect_route(
         r'/cron/suggestions/accept_stale_suggestions',
         cron.CronAcceptStaleSuggestionsHandler),
-    main.get_redirect_route(
-        '/cron/suggestions/notify_reviewers',
-        cron.CronMailReviewersInRotationHandler)
 ]
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name

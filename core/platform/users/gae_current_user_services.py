@@ -16,9 +16,13 @@
 
 """Provides a seam for user-related services."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import logging
 
 import feconf
+import python_utils
 import utils
 
 from google.appengine.api import users
@@ -49,8 +53,8 @@ def is_current_user_super_admin():
     return users.is_current_user_admin()
 
 
-def get_user_id_from_email(email):
-    """Given an email address, returns a user id.
+def get_gae_id_from_email(email):
+    """Given an email address, returns a gae id.
 
     Returns None if the email address does not correspond to a valid user id.
     """
@@ -70,11 +74,13 @@ def get_user_id_from_email(email):
 
     key = _FakeUser(id=email, user=fake_user).put()
     obj = _FakeUser.get_by_id(key.id())
-    user_id = obj.user.user_id()
-    return unicode(user_id) if user_id else None
+    # GAE uses the naming 'user_id' internally, we call the GAE user_id just a
+    # gae_id in our code.
+    gae_id = obj.user.user_id()
+    return python_utils.convert_to_bytes(gae_id) if gae_id else None
 
 
-def get_current_user_id():
+def get_current_gae_id():
     """Gets the user_id of current user.
 
     Returns:

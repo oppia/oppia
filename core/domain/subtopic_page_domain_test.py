@@ -16,7 +16,11 @@
 
 """Tests for subtopic page domain objects."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from constants import constants
+from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.tests import test_utils
 import feconf
@@ -127,7 +131,8 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'filename': 'test.mp3',
                         'file_size_bytes': 100,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.5
                     }
                 }
             }
@@ -152,7 +157,9 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
-        self.subtopic_page.update_page_contents_audio(recorded_voiceovers_dict)
+        self.subtopic_page.update_page_contents_audio(
+            state_domain.RecordedVoiceovers.from_dict(
+                recorded_voiceovers_dict))
         self.assertEqual(self.subtopic_page.to_dict(),
                          expected_subtopic_page_dict)
 
@@ -181,10 +188,11 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
-        self.subtopic_page.update_page_contents_html({
-            'html': '<p>hello world</p>',
-            'content_id': 'content'
-        })
+        self.subtopic_page.update_page_contents_html(
+            state_domain.SubtitledHtml.from_dict({
+                'html': '<p>hello world</p>',
+                'content_id': 'content'
+            }))
         self.assertEqual(self.subtopic_page.to_dict(),
                          expected_subtopic_page_dict)
 
@@ -268,12 +276,6 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
             subtopic_page_domain.SubtopicPageContents
             .create_default_subtopic_page_contents())
 
-    def _assert_validation_error(self, expected_error_substring):
-        """Checks that the topic passes strict validation."""
-        with self.assertRaisesRegexp(
-            utils.ValidationError, expected_error_substring):
-            self.subtopic_page_contents.validate()
-
     def test_create_default_subtopic_page(self):
         subtopic_page_contents = (
             subtopic_page_domain.SubtopicPageContents
@@ -309,7 +311,8 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
                         'en': {
                             'filename': 'test.mp3',
                             'file_size_bytes': 100,
-                            'needs_update': False
+                            'needs_update': False,
+                            'duration_secs': 0.34343
                         }
                     }
                 }

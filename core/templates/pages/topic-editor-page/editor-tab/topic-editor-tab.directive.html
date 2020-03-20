@@ -1,0 +1,94 @@
+<div role="form" class="form-horizontal topic-editor">
+  <md-card class="oppia-page-card oppia-long-text">
+    <!-- Move this form into a separate directive -->
+    <thumbnail-uploader disabled="!topicRights.canEditTopic()"
+                        editable-thumbnail-data-url="editableThumbnailDataUrl"
+                        update-filename="updateTopicThumbnailFilename">
+    </thumbnail-uploader>
+
+    <div class="topic-name">
+      <label for="topicName" class="form-heading">Topic Name</label>
+      <input id="topicName" type="text" class="form-control protractor-test-topic-name-field"
+             ng-disabled="!topicRights.canEditTopic()"
+             ng-model="editableName" ng-blur="updateTopicName(editableName)"
+             placeholder="Enter a name for the topic." maxlength="35" ng-trim="false">
+      <span class="form-text" style="font-size: smaller; color: red;" ng-if="editableName.length === 35">
+        <em>Please use at most 35 characters for the topic name.</em>
+      </span>
+    </div>
+
+    <div class="abbreviated-name">
+      <label for="abbreviatedName" class="form-heading">Abbreviated Topic Name</label>
+      <input id="abbreviatedName" type="text" class="form-control protractor-test-abbreviated-topic-name-field"
+             ng-disabled="!topicRights.canEditTopic()"
+             ng-model="editableAbbreviatedName" ng-blur="updateAbbreviatedName(editableAbbreviatedName)"
+             placeholder="Enter an abbreviated topic name." maxlength="12" ng-trim="false">
+      <span class="form-text" style="font-size: smaller; color: red;" ng-if="editableAbbreviatedName.length === 12">
+        <em>Please use at most 12 characters for the abbreviated topic name.</em>
+      </span>
+    </div>
+
+    <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
+      <label for="topicDescription" class="form-heading">Description</label>
+      <textarea type="text" class="form-control protractor-test-topic-description-field"
+                ng-model="editableDescription" maxlength="240"
+                ng-change="updateTopicDescriptionStatus(editableDescription)"
+                ng-blur="updateTopicDescription(editableDescription)"
+                placeholder="Enter the description of the topic">
+      </textarea>
+      <span class="form-text" style="font-size: smaller; color: red;" ng-if="editableDescription.length === 240">
+        <em>Please use at most 240 characters for the topic description.</em>
+      </span>
+      <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="form-text" style="font-size: smaller">
+        What does this topic contain?
+      </span>
+    </div>
+
+    <div class="canonical-stories">
+      <label class="form-heading"> Canonical Stories </label>
+      <button class="btn btn-secondary protractor-test-create-story-button"
+              ng-click="createCanonicalStory()"
+              style="float: right;">
+        Create Story
+      </button>
+      <stories-list ng-if="topic.getCanonicalStoryIds().length > 0"
+                    story-summaries="canonicalStorySummaries"
+                    topic="topic">
+      </stories-list>
+      <h4 ng-if="topic.getCanonicalStoryIds().length === 0" style="color: gray;">
+        Click on Create Story to create a new canonical story for the topic
+      </h4>
+    </div>
+  </md-card>
+</div>
+
+<style>
+  thumbnail-uploader {
+    margin-bottom: 15px;
+  }
+
+  .topic-editor textarea {
+    resize: vertical;
+  }
+  .topic-editor {
+    margin-top: 2%;
+    margin-left: 25%;
+    width: 50%;
+  }
+
+  .topic-editor .form-heading {
+    font-size: 1.2em;
+  }
+
+  .topic-editor .topic-name {
+    margin-bottom: 1.5%;
+  }
+
+  .topic-editor .canonical-stories {
+    margin-top: 2%;
+  }
+
+  .topic-editor .topic-description textarea {
+    height: 7vh;
+  }
+</style>

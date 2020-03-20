@@ -13,6 +13,10 @@
 # limitations under the License.
 
 """Tests for question domain objects."""
+
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import datetime
 
 from core.domain import question_domain
@@ -180,74 +184,6 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         self.assertEqual(10, observed_object.to_version)
 
 
-class QuestionRightsChangeTest(test_utils.GenericTestBase):
-    """Test for QuestionRights Change object."""
-
-    def test_to_dict(self):
-        """Test to verify to_dict method of the QuestionRights
-        Change object.
-        """
-        expected_object_dict = {
-            'cmd': 'create_new'
-        }
-
-        change_dict = {
-            'cmd': 'create_new'
-        }
-        observed_object = question_domain.QuestionRightsChange(
-            change_dict=change_dict,
-        )
-
-        self.assertEqual(expected_object_dict, observed_object.to_dict())
-
-    def test_change_dict_without_cmd(self):
-        """Test to verify __init__ method of the QuestionRights
-        Change object when change_dict is without cmd key.
-        """
-        self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Missing cmd key in change dict',
-            callableObj=question_domain.QuestionRightsChange,
-            change_dict={}
-        )
-
-    def test_change_dict_with_wrong_cmd(self):
-        """Test to verify __init__ method of the QuestionRights
-        Change object when change_dict is with wrong cmd value.
-        """
-        self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Command wrong is not allowed',
-            callableObj=question_domain.QuestionRightsChange,
-            change_dict={'cmd': 'wrong', }
-        )
-
-    def test_change_dict_with_extra_attributes_in_cmd(self):
-        """Test to verify __init__ method of the QuestionRights Change
-        object when change_dict is with extra attributes in cmd.
-        """
-        self.assertRaisesRegexp(
-            utils.ValidationError,
-            'The following extra attributes are present: invalid',
-            callableObj=question_domain.QuestionRightsChange,
-            change_dict={'cmd': 'create_new', 'invalid': 'invalid'}
-        )
-
-    def test_create_new(self):
-        """Test to verify __init__ method of the QuestionRights Change
-        object when cmd is create_new.
-        """
-        change_dict = {
-            'cmd': 'create_new'
-        }
-        observed_object = question_domain.QuestionRightsChange(
-            change_dict=change_dict,
-        )
-
-        self.assertEqual('create_new', observed_object.cmd)
-
-
-
 class QuestionDomainTest(test_utils.GenericTestBase):
     """Tests for Question domain object."""
 
@@ -328,7 +264,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     'rule_type': 'Contains'
                 }],
                 'training_data': [],
-                'tagged_misconception_id': None
+                'tagged_skill_misconception_id': None
             })
         ]
 
@@ -339,10 +275,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """Test to verify validate method of a finalized Question domain object
         with correct input.
         """
-        try:
-            self.question.validate()
-        except utils.ValidationError:
-            self.fail(msg='validate() raised ValidationError unexpectedly!')
+        self.question.validate()
 
     def test_not_strict_validation(self):
         """Test to verify validate method of Question domain object with
@@ -446,7 +379,6 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         self.fake_date_updated = datetime.datetime(
             2018, 11, 17, 20, 3, 14, 0)
         self.observed_object = question_domain.QuestionSummary(
-            creator_id='user_1',
             question_id='question_1',
             question_content='<p>question content</p>',
             question_model_created_on=self.fake_date_created,
@@ -459,7 +391,6 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         """
         expected_object_dict = {
             'id': 'question_1',
-            'creator_id': 'user_1',
             'question_content': '<p>question content</p>',
             'last_updated_msec': utils.get_time_in_millisecs(
                 self.fake_date_updated),
@@ -472,34 +403,31 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
     def test_validation_with_valid_properties(self):
         self.observed_object.validate()
 
-    def test_validation_with_invalid_html_in_question_content(self):
-        """Test validation fails with invalid html in question
-        content.
-        """
-        self.observed_object.question_content = '<a>Test</a>'
+    def test_validation_with_invalid_id(self):
+        self.observed_object.id = 1
         with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Invalid html: <a>Test</a> for rte with invalid tags and '
-                'strings: {\'invalidTags\': \\[u\'a\'], '
-                '\'strings\': \\[\'<a>Test</a>\']}')):
+            utils.ValidationError, 'Expected id to be a string, received 1'):
             self.observed_object.validate()
 
-    def test_validation_with_invalid_customization_args_in_question_content(
-            self):
-        """Test validation fails with invalid customization args in question
-        content.
-        """
-        self.observed_object.question_content = (
-            '<oppia-noninteractive-image></oppia-noninteractive-image>')
+    def test_validation_with_invalid_question_content(self):
+        self.observed_object.question_content = 1
         with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Invalid html: <oppia-noninteractive-image>'
-                '</oppia-noninteractive-image> due to errors in '
-                'customization_args: {"Missing attributes: '
-                '\\[u\'alt-with-value\', u\'caption-with-value\', '
-                'u\'filepath-with-value\'], Extra attributes: \\[]": '
-                '\\[\'<oppia-noninteractive-image>'
-                '</oppia-noninteractive-image>\']}')):
+            utils.ValidationError,
+            'Expected question content to be a string, received 1'):
+            self.observed_object.validate()
+
+    def test_validation_with_invalid_created_on(self):
+        self.observed_object.created_on = 1
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected created on to be a datetime, received 1'):
+            self.observed_object.validate()
+
+    def test_validation_with_invalid_last_updated(self):
+        self.observed_object.last_updated = 1
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected last updated to be a datetime, received 1'):
             self.observed_object.validate()
 
 
@@ -521,38 +449,19 @@ class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
         self.assertEqual(expected_object_dict, observed_object.to_dict())
 
 
-class QuestionRightsDomainTest(test_utils.GenericTestBase):
-    """Test for Question Rights Domain object."""
-
-    def setUp(self):
-        """Before each individual test, create a question and user."""
-        super(QuestionRightsDomainTest, self).setUp()
-        self.question_id = 'question_id'
-        self.signup('user@example.com', 'User')
-        self.skill_ids = ['skill_1']
-        self.question = question_domain.Question.create_default_question(
-            self.question_id, self.skill_ids)
-
-        self.user_id = self.get_user_id_from_email('user@example.com')
+class MergedQuestionSkillLinkDomainTest(test_utils.GenericTestBase):
+    """Test for Merged Question Skill Link Domain object."""
 
     def test_to_dict(self):
-        """Test to verify to_dict method of the Question Rights Domain
-        object.
+        """Test to verify to_dict method of the Merged Question Skill Link
+        Domain object.
         """
-        question_rights = question_domain.QuestionRights(
-            self.question_id, self.user_id)
-        expected_dict = {
-            'question_id': self.question_id,
-            'creator_id': self.user_id
+        expected_object_dict = {
+            'question_id': 'testquestion',
+            'skill_ids': ['testskill'],
+            'skill_descriptions': ['testskilldescription'],
+            'skill_difficulties': [0.5],
         }
-
-        self.assertEqual(expected_dict, question_rights.to_dict())
-
-    def test_is_creator(self):
-        """Test to verify is_creator method of the Question Rights Domain
-        object.
-        """
-        question_rights = question_domain.QuestionRights(
-            self.question_id, self.user_id)
-        self.assertTrue(question_rights.is_creator(self.user_id))
-        self.assertFalse(question_rights.is_creator('fakeuser'))
+        observed_object = question_domain.MergedQuestionSkillLink(
+            'testquestion', ['testskill'], ['testskilldescription'], [0.5])
+        self.assertEqual(expected_object_dict, observed_object.to_dict())

@@ -14,9 +14,12 @@
 
 """Controllers for the learner dashboard."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import learner_progress_services
 from core.domain import subscription_services
@@ -24,6 +27,7 @@ from core.domain import suggestion_services
 from core.domain import summary_services
 from core.domain import user_services
 import feconf
+import python_utils
 import utils
 
 
@@ -33,7 +37,7 @@ class LearnerDashboardPage(base.BaseHandler):
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/learner-dashboard-page.mainpage.html')
+        self.render_template('learner-dashboard-page.mainpage.html')
 
 
 class LearnerDashboardHandler(base.BaseHandler):
@@ -109,7 +113,7 @@ class LearnerDashboardHandler(base.BaseHandler):
                 number_of_nonexistent_activities),
             'completed_to_incomplete_collections': (
                 completed_to_incomplete_collections),
-            'thread_summaries': thread_summaries,
+            'thread_summaries': [s.to_dict() for s in thread_summaries],
             'number_of_unread_threads': number_of_unread_threads,
             'subscription_list': subscription_list
         })
@@ -161,7 +165,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
         if suggestion:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
+            exploration = exp_fetchers.get_exploration_by_id(exploration_id)
             current_content_html = (
                 exploration.states[
                     suggestion.change.state_name].content.html)
@@ -171,13 +175,15 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
                 'description': suggestion_thread.subject,
                 'author_username': authors_settings[0].username,
                 'author_picture_data_url': (
-                    authors_settings[0].profile_picture_data_url)
+                    authors_settings[0].profile_picture_data_url),
+                'created_on_msecs': utils.get_time_in_millisecs(
+                    messages[0].created_on)
             }
             message_summary_list.append(suggestion_summary)
             messages.pop(0)
             authors_settings.pop(0)
 
-        for m, author_settings in zip(messages, authors_settings):
+        for m, author_settings in python_utils.ZIP(messages, authors_settings):
 
             if author_settings is None:
                 author_username = None
@@ -193,7 +199,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
                 'updated_status': m.updated_status,
                 'author_username': author_username,
                 'author_picture_data_url': author_picture_data_url,
-                'created_on': utils.get_time_in_millisecs(m.created_on)
+                'created_on_msecs': utils.get_time_in_millisecs(m.created_on)
             }
             message_summary_list.append(message_summary)
 

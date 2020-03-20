@@ -16,6 +16,9 @@
 and are created.
 """
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -30,9 +33,14 @@ class QuestionCreationHandler(base.BaseHandler):
     """A handler that creates the question model given a question dict."""
 
     @acl_decorators.can_manage_question_skill_status
-    def post(self, comma_separated_skill_ids):
+    def post(self):
         """Handles POST requests."""
-        skill_ids = comma_separated_skill_ids.split(',')
+        skill_ids = self.payload.get('skill_ids')
+
+        if not skill_ids:
+            raise self.InvalidInputException(
+                'skill_ids parameter isn\'t present in the payload')
+
         if len(skill_ids) > constants.MAX_SKILLS_PER_QUESTION:
             raise self.InvalidInputException(
                 'More than %d QuestionSkillLinks for one question '
@@ -40,12 +48,12 @@ class QuestionCreationHandler(base.BaseHandler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception:
-            raise self.InvalidInputException
+        except Exception as e:
+            raise self.InvalidInputException('Skill ID(s) aren\'t valid: ', e)
 
         try:
             skill_services.get_multi_skills(skill_ids)
-        except Exception, e:
+        except Exception as e:
             raise self.PageNotFoundException(e)
 
         question_dict = self.payload.get('question_dict')
@@ -54,24 +62,49 @@ class QuestionCreationHandler(base.BaseHandler):
                 ('question_state_data' not in question_dict) or
                 ('language_code' not in question_dict) or
                 (question_dict['version'] != 1)):
-            raise self.InvalidInputException
+            raise self.InvalidInputException(
+                'Question Data should contain id, state data, language code, ' +
+                'and its version should be set as 1')
 
         question_dict['question_state_data_schema_version'] = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
         question_dict['id'] = question_services.get_new_question_id()
         question_dict['linked_skill_ids'] = skill_ids
+
         try:
             question = question_domain.Question.from_dict(question_dict)
-        except Exception:
-            raise self.InvalidInputException
+        except Exception as e:
+            raise self.InvalidInputException(
+                'Question structure is invalid:', e)
+
+        skill_difficulties = self.payload.get('skill_difficulties')
+
+        if not skill_difficulties:
+            raise self.InvalidInputException(
+                'skill_difficulties not present in the payload')
+        if len(skill_ids) != len(skill_difficulties):
+            raise self.InvalidInputException(
+                'Skill difficulties don\'t match up with skill IDs')
+
+        try:
+            skill_difficulties = [
+                float(difficulty) for difficulty in skill_difficulties]
+        except (ValueError, TypeError):
+            raise self.InvalidInputException(
+                'Skill difficulties must be a float value')
+
+        if any((
+                difficulty < 0 or difficulty > 1)
+               for difficulty in skill_difficulties):
+            raise self.InvalidInputException(
+                'Skill difficulties must be between 0 and 1')
+
         question_services.add_question(self.user_id, question)
-        # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
-        # with a value passed from the frontend.
         question_services.link_multiple_skills_for_question(
             self.user_id,
             question.id,
             skill_ids,
-            [constants.DEFAULT_SKILL_DIFFICULTY] * len(skill_ids))
+            skill_difficulties)
 
         self.values.update({
             'question_id': question.id
@@ -83,26 +116,47 @@ class QuestionSkillLinkHandler(base.BaseHandler):
     """A handler for linking and unlinking questions to or from a skill."""
 
     @acl_decorators.can_manage_question_skill_status
-    def post(self, question_id, skill_id):
-        """Links a question to a skill."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
-        if skill is None:
-            raise self.PageNotFoundException(
-                'The skill with the given id doesn\'t exist.')
+    def put(self, question_id):
+        """Updates the QuestionSkillLink models with respect to the given
+        question.
+        """
+        if self.payload.get('action') == 'update_difficulty':
+            new_difficulty = self.payload.get('new_difficulty')
+            skill_id = self.payload.get('skill_id')
+            if skill_id is None:
+                raise self.InvalidInputException(
+                    'The \'skill_id\' field is missing in payload')
+            if new_difficulty is None:
+                raise self.InvalidInputException(
+                    'The \'new_difficulty\' field is missing in payload')
+            question_services.update_question_skill_link_difficulty(
+                question_id, skill_id, float(new_difficulty))
+        elif self.payload.get('action') == 'edit_links':
+            difficulty = self.payload.get('difficulty')
+            skill_ids_task_list = self.payload.get('skill_ids_task_list')
+            if skill_ids_task_list is None:
+                raise self.InvalidInputException(
+                    'Missing fields \'skill_ids_task_list\'in payload')
 
-        # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
-        # with a value passed from the frontend.
-        question_services.create_new_question_skill_link(
-            self.user_id, question_id, skill_id,
-            constants.DEFAULT_SKILL_DIFFICULTY)
-        self.render_json(self.values)
+            for task_dict in skill_ids_task_list:
+                if not 'id' in task_dict:
+                    raise self.InvalidInputException(
+                        'Missing skill ID for edit_links.')
+                if task_dict['task'] == 'remove':
+                    question_services.delete_question_skill_link(
+                        self.user_id, question_id, task_dict['id'])
+                elif task_dict['task'] == 'add':
+                    if difficulty is None:
+                        raise self.InvalidInputException(
+                            'Missing field \'difficulty\' in payload')
+                    question_services.create_new_question_skill_link(
+                        self.user_id, question_id, task_dict['id'], difficulty)
+                else:
+                    raise self.InvalidInputException(
+                        'Invalid task for edit_links.')
+        else:
+            raise self.InvalidInputException('Invalid action in payload.')
 
-    @acl_decorators.can_manage_question_skill_status
-    def delete(self, question_id, skill_id):
-        """Unlinks a question from a skill."""
-        question_services.delete_question_skill_link(
-            self.user_id, question_id, skill_id)
         self.render_json(self.values)
 
 
@@ -116,10 +170,6 @@ class EditableQuestionDataHandler(base.BaseHandler):
         """Gets the data for the question overview page."""
         question = question_services.get_question_by_id(
             question_id, strict=False)
-
-        if question is None:
-            raise self.PageNotFoundException(
-                'The question with the given id doesn\'t exist.')
 
         associated_skill_dicts = [
             skill.to_dict() for skill in skill_services.get_multi_skills(

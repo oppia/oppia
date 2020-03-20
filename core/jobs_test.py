@@ -16,6 +16,9 @@
 
 """Tests for long running jobs and continuous computations."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import ast
 import logging
 import re
@@ -29,6 +32,7 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 from google.appengine.ext import ndb
 from mapreduce import input_readers
@@ -93,7 +97,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
             NotImplementedError,
             'Subclasses of BaseJobManager should implement _real_enqueue().'):
             jobs.BaseJobManager._real_enqueue(  # pylint: disable=protected-access
-                'job_id', taskqueue_services.QUEUE_NAME_DEFAULT, None)
+                'job_id', taskqueue_services.QUEUE_NAME_DEFAULT, None, None)
 
     def test_failing_jobs(self):
         observed_log_messages = []
@@ -105,7 +109,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
 
         # Mocks GoogleCloudStorageInputReader() to fail a job.
-        _mock_input_reader = lambda _, __: 1 / 0
+        _mock_input_reader = lambda _, __: python_utils.divide(1, 0)
 
         input_reader_swap = self.swap(
             input_readers, 'GoogleCloudStorageInputReader', _mock_input_reader)
@@ -769,7 +773,8 @@ class JobRegistryTests(test_utils.GenericTestBase):
             event_types_listened_to = klass.get_event_types_listened_to()
             self.assertTrue(isinstance(event_types_listened_to, list))
             for event_type in event_types_listened_to:
-                self.assertTrue(isinstance(event_type, basestring))
+                self.assertTrue(
+                    isinstance(event_type, python_utils.BASESTRING))
                 self.assertTrue(issubclass(
                     event_services.Registry.get_event_class_by_type(
                         event_type),
@@ -1149,7 +1154,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 stats_models.ExplorationAnnotationsModel.get(self.EXP_ID)
 
             # Launch the batch computation.
-            StartExplorationEventCounter.start_computation()
+            batch_job_id = StartExplorationEventCounter.start_computation()
             # Data in realtime layer 0 is still there.
             self.assertEqual(MockStartExplorationRealtimeModel.get(
                 '0:%s' % self.EXP_ID).count, 1)
@@ -1160,7 +1165,15 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.assertTrue(
+                MockStartExplorationMRJobManager.is_active(batch_job_id))
+            self.assertFalse(
+                MockStartExplorationMRJobManager.has_finished(batch_job_id))
             self.process_and_flush_pending_tasks()
+            self.assertFalse(
+                MockStartExplorationMRJobManager.is_active(batch_job_id))
+            self.assertTrue(
+                MockStartExplorationMRJobManager.has_finished(batch_job_id))
             self.assertEqual(
                 stats_models.ExplorationAnnotationsModel.get(
                     self.EXP_ID).num_starts, 1)

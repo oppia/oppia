@@ -14,11 +14,16 @@
 
 """Models for storing the question data models."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import math
 
 from constants import constants
 from core.platform import models
 import core.storage.user.gae_models as user_models
+import feconf
+import python_utils
 import utils
 
 from google.appengine.datastore import datastore_query
@@ -31,12 +36,26 @@ from google.appengine.ext import ndb
 
 class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a question snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a question snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class QuestionModel(base_models.VersionedModel):
@@ -60,6 +79,33 @@ class QuestionModel(base_models.VersionedModel):
     linked_skill_ids = ndb.StringProperty(
         indexed=True, repeated=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Question should be kept but the creator should be anonymized."""
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether QuestionModel snapshots references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """QuestionModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def _get_new_id(cls):
         """Generates a unique ID for the question of the form
@@ -73,9 +119,10 @@ class QuestionModel(base_models.VersionedModel):
             producing too many collisions.
         """
 
-        for _ in range(base_models.MAX_RETRIES):
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = utils.convert_to_hash(
-                str(utils.get_random_int(base_models.RAND_RANGE)),
+                python_utils.UNICODE(
+                    utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
             if not cls.get_by_id(new_id):
                 return new_id
@@ -173,6 +220,36 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     # The difficulty of the skill.
     skill_difficulty = ndb.FloatProperty(required=True, indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Question-skill link should be kept since questions are only
+        anonymized and are not deleted whe user is deleted.
+        """
+        return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """Check whether QuestionSkillLinkModel references the given user.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data should
+            be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """QuestionSkillLinkModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_model_id(cls, question_id, skill_id):
         """Returns the model id by combining the questions and skill id.
@@ -261,6 +338,102 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_models, next_cursor_str
 
     @classmethod
+    def get_question_skill_links_based_on_difficulty_equidistributed_by_skill(
+            cls, total_question_count, skill_ids, difficulty_requested):
+        """Fetches the list of constant number of QuestionSkillLinkModels
+        linked to the skills, sorted by the absolute value of the difference
+        between skill difficulty and the requested difficulty.
+
+        Args:
+            total_question_count: int. The number of questions expected.
+            skill_ids: list(str). The ids of skills for which the linked
+                question ids are to be retrieved.
+            difficulty_requested: float. The skill difficulty of the questions
+                requested to be fetched.
+
+        Returns:
+            list(QuestionSkillLinkModel). A list of QuestionSkillLinkModels
+                corresponding to given skill_ids, with
+                total_question_count/len(skill_ids) number of questions for
+                each skill. If not evenly divisible, it will be rounded up.
+                If not enough questions for a skill, just return all questions
+                it links to. The order of questions will follow the order of
+                given skill ids, and the order of questions for the same skill
+                follows the absolute value of the difference between skill
+                difficulty and the requested difficulty.
+        """
+        if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
+            raise Exception('Please keep the number of skill IDs below 20.')
+
+        question_count_per_skill = int(
+            math.ceil(python_utils.divide(
+                float(total_question_count), float(len(skill_ids)))))
+
+        question_skill_link_mapping = {}
+
+        for skill_id in skill_ids:
+            query = cls.query(cls.skill_id == skill_id)
+
+            equal_questions_query = query.filter(
+                cls.skill_difficulty == difficulty_requested)
+            # We fetch more questions here in order to try and ensure that the
+            # eventual number of returned questions is sufficient to meet the
+            # number requested, even after deduplication.
+            new_question_skill_link_models = (
+                equal_questions_query.fetch(question_count_per_skill * 2))
+            for model in new_question_skill_link_models:
+                if model.question_id in question_skill_link_mapping:
+                    new_question_skill_link_models.remove(model)
+
+            if len(new_question_skill_link_models) < question_count_per_skill:
+                # Fetch QuestionSkillLinkModels with difficulty smaller than
+                # requested difficulty and sort them by decreasing difficulty.
+                easier_questions_query = query.filter(
+                    cls.skill_difficulty < difficulty_requested)
+                easier_questions_query = easier_questions_query.order(
+                    -cls.skill_difficulty)
+                easier_question_skill_link_models = (
+                    easier_questions_query.fetch(question_count_per_skill))
+                for model in easier_question_skill_link_models:
+                    if model.question_id in question_skill_link_mapping:
+                        easier_question_skill_link_models.remove(model)
+                new_question_skill_link_models.extend(
+                    easier_question_skill_link_models)
+
+                if (len(new_question_skill_link_models) <
+                        question_count_per_skill):
+                    # Fetch QuestionSkillLinkModels with difficulty larger than
+                    # requested difficulty and sort them by increasing
+                    # difficulty.
+                    harder_questions_query = query.filter(
+                        cls.skill_difficulty > difficulty_requested)
+                    harder_questions_query = harder_questions_query.order(
+                        cls.skill_difficulty)
+                    harder_question_skill_link_models = (
+                        harder_questions_query.fetch(question_count_per_skill))
+                    for model in harder_question_skill_link_models:
+                        if model.question_id in question_skill_link_mapping:
+                            harder_question_skill_link_models.remove(model)
+                    new_question_skill_link_models.extend(
+                        harder_question_skill_link_models)
+
+                # Sort QuestionSkillLinkModels by the difference between their
+                # difficulty and requested difficulty.
+                new_question_skill_link_models = sorted(
+                    new_question_skill_link_models,
+                    key=lambda model: abs(
+                        model.skill_difficulty - difficulty_requested)
+                )
+            new_question_skill_link_models = (
+                new_question_skill_link_models[:question_count_per_skill])
+
+            for model in new_question_skill_link_models:
+                if model.question_id not in question_skill_link_mapping:
+                    question_skill_link_mapping[model.question_id] = model
+
+        return list(question_skill_link_mapping.values())
+
+    @classmethod
     def get_question_skill_links_equidistributed_by_skill(
             cls, total_question_count, skill_ids):
         """Fetches the list of constant number of QuestionSkillLinkModels
@@ -281,15 +454,34 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 given skill ids, but the order of questions for the same skill
                 is random.
         """
+        if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
+            raise Exception('Please keep the number of skill IDs below 20.')
+
         question_count_per_skill = int(
-            math.ceil(float(total_question_count) / float(len(skill_ids))))
+            math.ceil(
+                python_utils.divide(
+                    float(total_question_count), float(len(skill_ids)))))
         question_skill_link_models = []
+        existing_question_ids = []
+
         for skill_id in skill_ids:
+            query = cls.query(cls.skill_id == skill_id)
+            # We fetch more questions here in order to try and ensure that the
+            # eventual number of returned questions is sufficient to meet the
+            # number requested, even after deduplication.
+            new_question_skill_link_models = query.fetch(
+                question_count_per_skill * 2)
+
+            # Deduplicate if the same question is linked to multiple skills.
+            for model in new_question_skill_link_models:
+                if model.question_id in existing_question_ids:
+                    new_question_skill_link_models.remove(model)
+
             question_skill_link_models.extend(
-                cls.query(cls.skill_id == skill_id).fetch(
-                    question_count_per_skill
-                )
-            )
+                new_question_skill_link_models[:question_count_per_skill])
+            existing_question_ids.extend(
+                [model.question_id for model in new_question_skill_link_models])
+
         return question_skill_link_models
 
     @classmethod
@@ -304,7 +496,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             list(str). The list of all question ids corresponding to the given
                 skill id.
         """
-        question_skill_link_models = cls.query(cls.skill_id == skill_id)
+        question_skill_link_models = cls.query().filter(
+            cls.skill_id == skill_id,
+            cls.deleted == False) #pylint: disable=singleton-comparison
         question_ids = [
             model.question_id for model in question_skill_link_models
         ]
@@ -376,6 +570,20 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # The id of the question being edited.
     question_id = ndb.StringProperty(indexed=True, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Question commit log is deleted only if the corresponding collection
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def _get_instance_id(cls, question_id, question_version):
         """Returns ID of the question commit log entry model.
@@ -399,13 +607,11 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     A QuestionSummaryModel instance stores the following information:
 
-    creator_id, question_model_last_updated, question_model_created_on,
+    question_model_last_updated, question_model_created_on,
     question_state_data.
 
     The key of each instance is the question id.
     """
-    # The user ID of the creator of the question.
-    creator_id = ndb.StringProperty(required=True)
     # Time when the question model was last updated (not to be
     # confused with last_updated, which is the time when the
     # question *summary* model was last updated).
@@ -419,40 +625,36 @@ class QuestionSummaryModel(base_models.BaseModel):
     # The html content for the question.
     question_content = ndb.TextProperty(indexed=False, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Question summary should be kept but the creator should be
+        anonymized.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @staticmethod
+    def get_export_policy():
+        """Model data has already been exported as a part of the QuestionModel
+        export_data function, and thus a new export_data function does not
+        need to be defined here.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
-    def get_by_creator_id(cls, creator_id):
-        """Gets QuestionSummaryModel by creator_id.
+    def has_reference_to_user_id(cls, unused_user_id):
+        """Check whether any existing QuestionSummaryModel refers to the given
+        user_id.
 
         Args:
-            creator_id: str. The user ID of the creator of the question.
+            unused_user_id: str. The ID of the user whose data should be
+            checked.
 
         Returns:
-            QuestionSummaryModel. The summary model of the question.
+            bool. Whether any models refer to the given user_id.
         """
-        return QuestionSummaryModel.query().filter(
-            cls.creator_id == creator_id).fetch()
+        return False
 
-
-class QuestionRightsSnapshotMetadataModel(
-        base_models.BaseSnapshotMetadataModel):
-    """Storage model for the metadata for a question rights snapshot."""
-    pass
-
-
-class QuestionRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
-    """Storage model for the content of a question rights snapshot."""
-    pass
-
-
-class QuestionRightsModel(base_models.VersionedModel):
-    """Storage model for rights related to a question.
-
-    The id of each instance is the id of the corresponding question.
-    """
-
-    SNAPSHOT_METADATA_CLASS = QuestionRightsSnapshotMetadataModel
-    SNAPSHOT_CONTENT_CLASS = QuestionRightsSnapshotContentModel
-    ALLOW_REVERT = False
-
-    # The user ID of the creator of the question.
-    creator_id = ndb.StringProperty(indexed=True, required=True)
+    @staticmethod
+    def get_user_id_migration_policy():
+        """QuestionSummaryModel has one field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE

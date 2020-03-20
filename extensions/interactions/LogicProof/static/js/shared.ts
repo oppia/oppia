@@ -16,6 +16,8 @@
  * @fileoverview Components used by both the editor and reader of the
  *  LogicProof interaction.
  */
+import logicProofParser from
+  'interactions/LogicProof/static/js/generatedParser.ts';
 
 var logicProofShared = (function() {
   // Used by parseLineString() to limit the number of possible parsings of a
@@ -43,7 +45,7 @@ var logicProofShared = (function() {
     this.messages = messages;
     this.code = code;
   };
-  // TODO (Jacob) Make these errors prototype from Error()
+  // TODO(Jacob): Make these errors prototype from Error()
 
   /** Converts a message template into a string to show to the user.
    * @param messageTemplate: a GeneralMessageTemplate object that determines how
@@ -988,3 +990,5 @@ var logicProofShared = (function() {
     greaterThanInLex: greaterThanInLex
   };
 })();
+
+export default logicProofShared;

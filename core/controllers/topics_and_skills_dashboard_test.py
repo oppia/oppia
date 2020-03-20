@@ -14,8 +14,14 @@
 
 """Tests for the topics and skills dashboard page."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+from constants import constants
 from core.domain import question_services
 from core.domain import skill_services
+from core.domain import state_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
 import feconf
@@ -40,11 +46,14 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.linked_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
-            self.linked_skill_id, self.admin_id, 'Description 3')
-        skill_services.publish_skill(self.linked_skill_id, self.admin_id)
+            self.linked_skill_id, self.admin_id, description='Description 3')
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description', [], [],
-            [self.linked_skill_id], [], 1)
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.linked_skill_id],
+            subtopics=[], next_subtopic_id=1)
 
 
 class TopicsAndSkillsDashboardPageDataHandlerTests(
@@ -54,10 +63,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         # Check that non-admins or non-topic managers cannot access the
         # topics and skills dashboard data.
         skill_id = skill_services.get_new_skill_id()
-        skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.admin_id, 'Description')
-        skill_services.publish_skill(skill_id, self.admin_id)
-        self.save_new_skill(skill_id_2, self.admin_id, 'Description 2')
+        self.save_new_skill(skill_id, self.admin_id, description='Description')
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
@@ -84,11 +90,6 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(
             json_response['untriaged_skill_summary_dicts'][0]['id'],
             skill_id)
-        self.assertEqual(
-            len(json_response['unpublished_skill_summary_dicts']), 1)
-        self.assertEqual(
-            json_response['unpublished_skill_summary_dicts'][0]['id'],
-            skill_id_2)
         self.assertEqual(
             json_response['can_delete_topic'], True)
         self.assertEqual(
@@ -124,8 +125,6 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
             json_response['untriaged_skill_summary_dicts'][0]['id'],
             skill_id)
         self.assertEqual(
-            len(json_response['unpublished_skill_summary_dicts']), 0)
-        self.assertEqual(
             json_response['can_delete_topic'], False)
         self.assertEqual(
             json_response['can_create_topic'], False)
@@ -133,6 +132,16 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
             json_response['can_delete_skill'], False)
         self.assertEqual(
             json_response['can_create_skill'], False)
+        self.logout()
+
+    def test_topics_and_skills_dashboard_page(self):
+        self.login(self.ADMIN_EMAIL)
+
+        response = self.get_html_response(
+            feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
+        self.assertIn(
+            '{"title": "Topics and Skills Dashboard - Oppia"})', response.body)
+
         self.logout()
 
 
@@ -145,13 +154,16 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def test_topic_creation(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-
+        payload = {
+            'name': 'Topic name',
+            'abbreviated_name': 'name'
+        }
         json_response = self.post_json(
-            self.url, {'name': 'Topic name'}, csrf_token=csrf_token)
+            self.url, payload, csrf_token=csrf_token)
         topic_id = json_response['topicId']
         self.assertEqual(len(topic_id), 12)
         self.assertIsNotNone(
-            topic_services.get_topic_by_id(topic_id, strict=False))
+            topic_fetchers.get_topic_by_id(topic_id, strict=False))
         self.logout()
 
 
@@ -164,9 +176,23 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def test_skill_creation(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-
+        rubrics = [{
+            'difficulty': constants.SKILL_DIFFICULTIES[0],
+            'explanation': 'Explanation 1'
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[1],
+            'explanation': 'Explanation 2'
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[2],
+            'explanation': 'Explanation 3'
+        }]
         json_response = self.post_json(
-            self.url, {'description': 'Skill Description'},
+            self.url, {
+                'description': 'Skill Description',
+                'rubrics': rubrics,
+                'explanation_dict': state_domain.SubtitledHtml(
+                    '1', '<p>Explanation</p>').to_dict()
+            },
             csrf_token=csrf_token)
         skill_id = json_response['skillId']
         self.assertEqual(len(skill_id), 12)
@@ -179,7 +205,52 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         payload = {
             'description': 'Skill Description',
-            'linked_topic_ids': ['topic']
+            'linked_topic_ids': ['topic'],
+            'rubrics': [],
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', '<p>Explanation</p>').to_dict()
+        }
+        json_response = self.post_json(
+            self.url, payload, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(json_response['status_code'], 400)
+        self.logout()
+
+    def test_skill_creation_in_invalid_rubrics(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'description': 'Skill Description',
+            'linked_topic_ids': [self.topic_id],
+            'rubrics': 'invalid'
+        }
+        json_response = self.post_json(
+            self.url, payload, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(json_response['status_code'], 400)
+        self.logout()
+
+    def test_skill_creation_in_invalid_explanation(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'description': 'Skill Description',
+            'linked_topic_ids': [self.topic_id],
+            'rubrics': [],
+            'explanation_dict': 'explanation'
+        }
+        json_response = self.post_json(
+            self.url, payload, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(json_response['status_code'], 400)
+
+        payload = {
+            'description': 'Skill Description',
+            'linked_topic_ids': [self.topic_id],
+            'rubrics': [],
+            'explanation_dict': {
+                'explanation': 'Explanation'
+            }
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -190,9 +261,22 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def test_skill_creation_in_valid_topic(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
+        rubrics = [{
+            'difficulty': constants.SKILL_DIFFICULTIES[0],
+            'explanation': 'Explanation 1'
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[1],
+            'explanation': 'Explanation 2'
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[2],
+            'explanation': 'Explanation 3'
+        }]
         payload = {
             'description': 'Skill Description',
-            'linked_topic_ids': [self.topic_id]
+            'linked_topic_ids': [self.topic_id],
+            'rubrics': rubrics,
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', '<p>Explanation</p>').to_dict()
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token)
@@ -200,7 +284,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(len(skill_id), 12)
         self.assertIsNotNone(
             skill_services.get_skill_by_id(skill_id, strict=False))
-        topic = topic_services.get_topic_by_id(self.topic_id)
+        topic = topic_fetchers.get_topic_by_id(self.topic_id)
         self.assertEqual(
             topic.uncategorized_skill_ids,
             [self.linked_skill_id, skill_id])
@@ -225,7 +309,8 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         old_skill_id = self.linked_skill_id
         new_skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(new_skill_id, self.admin_id, 'Skill Description')
+        self.save_new_skill(
+            new_skill_id, self.admin_id, description='Skill Description')
         old_links = question_services.get_question_skill_links_of_skill(
             old_skill_id, 'Old Description')
         new_links = question_services.get_question_skill_links_of_skill(
@@ -272,7 +357,8 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def test_merge_skill_fails_when_old_skill_id_is_invalid(self):
         self.login(self.ADMIN_EMAIL)
         new_skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(new_skill_id, self.admin_id, 'Skill Description')
+        self.save_new_skill(
+            new_skill_id, self.admin_id, description='Skill Description')
         payload = {
             'old_skill_id': 'invalid_old_skill_id',
             'new_skill_id': new_skill_id

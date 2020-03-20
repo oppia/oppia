@@ -1,0 +1,5 @@
+<a ng-if="$ctrl.isLinkAvailable()" ng-href="<[$ctrl.link()]>">
+  <img ng-src="<[$ctrl.src()]>" alt="" class="rounded-circle">
+</a>
+
+<img ng-if="!$ctrl.isLinkAvailable()" class="rounded-circle" ng-src="<[$ctrl.src()]>">

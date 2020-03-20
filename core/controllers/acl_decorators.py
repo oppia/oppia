@@ -16,22 +16,29 @@
 
 """Decorators to provide authorization across the site."""
 
-import urllib
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import functools
 
 from core.controllers import base
 from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import skill_domain
 from core.domain import skill_services
-from core.domain import story_services
+from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 
 current_user_services = models.Registry.import_current_user_services()
 
@@ -108,26 +115,27 @@ def can_play_exploration(handler):
     return test_can_play
 
 
-def can_view_skill(handler):
-    """Decorator to check whether user can play a given skill.
+def can_view_skills(handler):
+    """Decorator to check whether user can view multiple given skills.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that can also
-            check if the user can play a given skill.
+            check if the user can view multiple given skills.
     """
 
-    def test_can_play(self, skill_id, **kwargs):
-        """Checks if the user can play the skill.
+    def test_can_view(self, comma_separated_skill_ids, **kwargs):
+        """Checks if the user can view the skills.
 
         Args:
-            skill_id: str. The skill id.
+            comma_separated_skill_ids: str. The skill ids
+                separated by commas.
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can play the given skill.
+            bool. Whether the user can view the given skills.
 
         Raises:
             PageNotFoundException: The page is not found.
@@ -135,15 +143,23 @@ def can_view_skill(handler):
         # This is a temporary check, since a decorator is required for every
         # method. Once skill publishing is done, whether given skill is
         # published should be checked here.
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        skill_ids = comma_separated_skill_ids.split(',')
 
-        if skill is not None:
-            return handler(self, skill_id, **kwargs)
-        else:
-            raise self.PageNotFoundException
-    test_can_play.__wrapped__ = True
+        try:
+            for skill_id in skill_ids:
+                skill_domain.Skill.require_valid_skill_id(skill_id)
+        except Exception:
+            raise self.InvalidInputException
 
-    return test_can_play
+        try:
+            skill_services.get_multi_skills(skill_ids)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
+        return handler(self, comma_separated_skill_ids, **kwargs)
+    test_can_view.__wrapped__ = True
+
+    return test_can_view
 
 
 def can_play_collection(handler):
@@ -947,6 +963,7 @@ def can_edit_exploration(handler):
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
+
         if exploration_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1005,6 +1022,54 @@ def can_voiceover_exploration(handler):
     test_can_voiceover.__wrapped__ = True
 
     return test_can_voiceover
+
+
+def can_save_exploration(handler):
+    """Decorator to check whether user can save exploration.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that checks if
+            a user has permission to save a given exploration.
+    """
+
+    def test_can_save(self, exploration_id, **kwargs):
+        """Checks if the user can save the exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+            **kwargs: dict(str: *). Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            PageNotFoundException: The page is not found.
+            UnauthorizedUserException: The user does not have
+                credentials to save changes to this exploration.
+        """
+
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
+        if exploration_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if rights_manager.check_can_save_activity(
+                self.user, exploration_rights):
+            return handler(self, exploration_id, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have permissions to save this exploration.')
+
+    test_can_save.__wrapped__ = True
+
+    return test_can_save
 
 
 def can_delete_exploration(handler):
@@ -1498,7 +1563,7 @@ def can_edit_topic(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -1543,15 +1608,11 @@ def can_edit_question(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        question_rights = question_services.get_question_rights(
+        question = question_services.get_question_by_id(
             question_id, strict=False)
-
-        if question_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
-
-        if (
-                role_services.ACTION_EDIT_ANY_QUESTION in self.user.actions or
-                question_rights.is_creator(self.user_id)):
+        if question is None:
+            raise self.PageNotFoundException
+        if role_services.ACTION_EDIT_ANY_QUESTION in self.user.actions:
             return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -1559,6 +1620,38 @@ def can_edit_question(handler):
     test_can_edit.__wrapped__ = True
 
     return test_can_edit
+
+
+def can_play_question(handler):
+    """Decorator to check whether the user can play given question.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+            whether the user can play a given question.
+    """
+    def test_can_play_question(self, question_id, **kwargs):
+        """Checks whether the user can play the given question.
+
+        Args:
+            question_id: str. The question id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The page is not found.
+        """
+        question = question_services.get_question_by_id(
+            question_id, strict=False)
+        if question is None:
+            raise self.PageNotFoundException
+        return handler(self, question_id, **kwargs)
+    test_can_play_question.__wrapped__ = True
+    return test_can_play_question
 
 
 def can_view_question_editor(handler):
@@ -1591,15 +1684,11 @@ def can_view_question_editor(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        question_rights = question_services.get_question_rights(
+        question = question_services.get_question_by_id(
             question_id, strict=False)
-
-        if question_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
-
-        if (
-                role_services.ACTION_VISIT_ANY_QUESTION_EDITOR in
-                self.user.actions or question_rights.is_creator(self.user_id)):
+        if question is None:
+            raise self.PageNotFoundException
+        if role_services.ACTION_VISIT_ANY_QUESTION_EDITOR in self.user.actions:
             return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -1684,7 +1773,7 @@ def can_add_new_story_to_topic(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -1711,12 +1800,12 @@ def can_edit_story(handler):
             a user has permission to edit a story for a given topic.
     """
 
-    def test_can_edit_story(self, topic_id, **kwargs):
+    def test_can_edit_story(self, story_id, **kwargs):
         """Checks whether the user can edit a story belonging to
         a given topic.
 
         Args:
-            topic_id: str. The topic id.
+            story_id: str. The story id.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -1731,13 +1820,23 @@ def can_edit_story(handler):
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
+        story_domain.Story.require_valid_story_id(story_id)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        if story is None:
+            raise base.UserFacingExceptions.PageNotFoundException
 
+        topic_id = story.corresponding_topic_id
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
-        if topic_rights is None:
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+        if topic_rights is None or topic is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        canonical_story_ids = topic.get_canonical_story_ids()
+        if story_id not in canonical_story_ids:
             raise base.UserFacingExceptions.PageNotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):
-            return handler(self, topic_id, **kwargs)
+            return handler(self, story_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this story.')
@@ -1777,20 +1876,8 @@ def can_edit_skill(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        skill_rights = skill_services.get_skill_rights(
-            skill_id, strict=False)
-        if skill_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
-
-        if role_services.ACTION_EDIT_PUBLIC_SKILLS in self.user.actions:
-            if not skill_rights.is_private():
-                return handler(self, skill_id, **kwargs)
-            elif skill_rights.is_private() and skill_rights.is_creator(
-                    self.user.user_id):
-                return handler(self, skill_id, **kwargs)
-            else:
-                raise self.UnauthorizedUserException(
-                    'You do not have credentials to edit this skill.')
+        if role_services.ACTION_EDIT_SKILLS in self.user.actions:
+            return handler(self, skill_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this skill.')
@@ -1878,55 +1965,6 @@ def can_create_skill(handler):
     return test_can_create_skill
 
 
-def can_publish_skill(handler):
-    """Decorator to check whether the user can publish a skill.
-
-    Args:
-        handler: function. The function to be decorated.
-
-    Returns:
-        function. The newly decorated function that now also
-            checks whether the user has permission to publish
-            a skill.
-    """
-    def test_can_publish_skill(self, skill_id, **kwargs):
-        """Tests whether the user can publish a given skill by checking
-        if the user is logged in and using can_user_publish_skill.
-
-        Args:
-            skill_id: str. The skill ID.
-            **kwargs: *. Keyword arguments.
-
-        Returns:
-            *. The return value of the desired function.
-
-        Raises:
-            NotLoggedInException: The user is not logged in.
-            PageNotFoundException: The given page cannot be found.
-            UnauthorizedUserException: The given user does not have
-                credentials to publish the given skill.
-        """
-        if not self.user_id:
-            raise base.UserFacingExceptions.NotLoggedInException
-
-        skill_rights = skill_services.get_skill_rights(skill_id, strict=False)
-        if skill_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
-
-        if role_services.ACTION_PUBLISH_OWNED_SKILL not in self.user.actions:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to edit this skill.')
-        elif skill_rights.is_creator(self.user.user_id):
-            return handler(self, skill_id, **kwargs)
-        else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to edit this skill.')
-
-    test_can_publish_skill.__wrapped__ = True
-
-    return test_can_publish_skill
-
-
 def can_delete_story(handler):
     """Decorator to check whether the user can delete a story in a given
     topic.
@@ -1940,12 +1978,12 @@ def can_delete_story(handler):
             given topic.
     """
 
-    def test_can_delete_story(self, topic_id, **kwargs):
+    def test_can_delete_story(self, story_id, **kwargs):
         """Checks whether the user can delete a story in
         a given topic.
 
         Args:
-            topic_id: str. The topic id.
+            story_id: str. The story ID.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -1960,13 +1998,17 @@ def can_delete_story(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        if story is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+        topic_id = story.corresponding_topic_id
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):
-            return handler(self, topic_id, **kwargs)
+            return handler(self, story_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to delete this story.')
@@ -2260,8 +2302,8 @@ def can_access_topic_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
-        topic_name = urllib.unquote_plus(topic_name)
-        topic = topic_services.get_topic_by_name(topic_name)
+        topic_name = python_utils.url_unquote_plus(topic_name)
+        topic = topic_fetchers.get_topic_by_name(topic_name)
 
         if topic is None:
             raise self.PageNotFoundException
@@ -2269,8 +2311,12 @@ def can_access_topic_viewer_page(handler):
         topic_id = topic.id
         topic_rights = topic_services.get_topic_rights(
             topic_id, strict=False)
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
 
-        if topic_rights.topic_is_published:
+        if (
+                topic_rights.topic_is_published or
+                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
+                user_actions_info.actions):
             return handler(self, topic_name, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -2290,11 +2336,12 @@ def can_access_story_viewer_page(handler):
             if the user can access the given story viewer page.
     """
 
-    def test_can_access(self, story_id, **kwargs):
+    def test_can_access(self, story_id, *args, **kwargs):
         """Checks if the user can access story viewer page.
 
         Args:
             story_id: str. The unique id of the story.
+            *args: *. Arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -2303,16 +2350,29 @@ def can_access_story_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
-        story = story_services.get_story_by_id(story_id, strict=False)
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
 
         if story is None:
             raise self.PageNotFoundException
 
-        story_rights = story_services.get_story_rights(
-            story_id, strict=False)
+        story_is_published = False
+        topic_is_published = False
+        topic_id = story.corresponding_topic_id
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        if topic_id:
+            topic = topic_fetchers.get_topic_by_id(topic_id)
+            topic_rights = topic_services.get_topic_rights(topic_id)
+            topic_is_published = topic_rights.topic_is_published
+            all_story_references = topic.get_all_story_references()
+            for reference in all_story_references:
+                if reference.story_id == story_id:
+                    story_is_published = reference.story_is_published
 
-        if story_rights.story_is_published:
-            return handler(self, story_id, **kwargs)
+        if (
+                (story_is_published and topic_is_published) or
+                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
+                user_actions_info.actions):
+            return handler(self, story_id, *args, **kwargs)
         else:
             raise self.PageNotFoundException
     test_can_access.__wrapped__ = True
@@ -2331,11 +2391,11 @@ def can_access_subtopic_viewer_page(handler):
             if the user can access the give subtopic viewer page.
     """
 
-    def test_can_access(self, topic_id, subtopic_id, **kwargs):
+    def test_can_access(self, topic_name, subtopic_id, **kwargs):
         """Checks if the user can access subtopic viewer page.
 
         Args:
-            topic_id: str. The id of the topic.
+            topic_name: str. The name of the topic.
             subtopic_id: str. The id of the Subtopic.
             **kwargs: *. Keyword arguments.
 
@@ -2345,12 +2405,31 @@ def can_access_subtopic_viewer_page(handler):
         Raises:
             PageNotFoundException: The given page cannot be found.
         """
+        topic = topic_fetchers.get_topic_by_name(topic_name)
+        if topic is None:
+            raise self.PageNotFoundException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        topic_rights = topic_services.get_topic_rights(topic.id)
+
+        if (
+                (topic_rights is None or not topic_rights.topic_is_published)
+                and role_services.ACTION_VISIT_ANY_TOPIC_EDITOR not in
+                user_actions_info.actions):
+            raise self.PageNotFoundException
+
+        subtopic_is_present = any(
+            subtopic.id == int(subtopic_id) for subtopic in topic.subtopics)
+
+        if not subtopic_is_present:
+            raise self.PageNotFoundException
+
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
-            topic_id, subtopic_id, strict=False)
+            topic.id, int(subtopic_id), strict=False)
         if subtopic_page is None:
             raise self.PageNotFoundException
         else:
-            return handler(self, topic_id, subtopic_id, **kwargs)
+            return handler(self, topic_name, subtopic_id, **kwargs)
     test_can_access.__wrapped__ = True
 
     return test_can_access
@@ -2433,3 +2512,101 @@ def get_decorator_for_accepting_suggestion(decorator):
         return test_can_accept_suggestion
 
     return generate_decorator_for_handler
+
+
+def can_edit_entity(handler):
+    """Decorator to check whether user can edit entity.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+            if the user can edit entity.
+    """
+    def test_can_edit_entity(self, entity_type, entity_id, **kwargs):
+        """Checks if the user can edit entity.
+
+        Args:
+            entity_type: str. The type of entity i.e. exploration, question etc.
+            entity_id: str. The ID of the entity.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The given page cannot be found.
+        """
+        arg_swapped_handler = lambda x, y, z: handler(y, x, z)
+        # This swaps the first two arguments (self and entity_type), so
+        # that functools.partial can then be applied to the leftmost one to
+        # create a modified handler function that has the correct signature
+        # for the corresponding decorators.
+        reduced_handler = functools.partial(
+            arg_swapped_handler, entity_type)
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            return can_edit_exploration(reduced_handler)(
+                self, entity_id, **kwargs)
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            return can_edit_question(reduced_handler)(self, entity_id, **kwargs)
+        elif entity_type == feconf.ENTITY_TYPE_TOPIC:
+            return can_edit_topic(reduced_handler)(self, entity_id, **kwargs)
+        elif entity_type == feconf.ENTITY_TYPE_SKILL:
+            return can_edit_skill(reduced_handler)(self, entity_id, **kwargs)
+        elif entity_type == feconf.ENTITY_TYPE_STORY:
+            return can_edit_story(reduced_handler)(self, entity_id, **kwargs)
+        else:
+            raise self.PageNotFoundException
+
+    test_can_edit_entity.__wrapped__ = True
+
+    return test_can_edit_entity
+
+
+def can_play_entity(handler):
+    """Decorator to check whether user can play entity.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+            if the user can play entity.
+    """
+    def test_can_play_entity(self, entity_type, entity_id, **kwargs):
+        """Checks if the user can play entity.
+
+        Args:
+            entity_type: str. The type of entity i.e. exploration, question etc.
+            entity_id: str. The ID of the entity.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The given page cannot be found.
+        """
+        arg_swapped_handler = lambda x, y, z: handler(y, x, z)
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            # This swaps the first two arguments (self and entity_type), so
+            # that functools.partial can then be applied to the leftmost one to
+            # create a modified handler function that has the correct signature
+            # for can_edit_question().
+            reduced_handler = functools.partial(
+                arg_swapped_handler, feconf.ENTITY_TYPE_EXPLORATION)
+            # This raises an error if the question checks fail.
+            return can_play_exploration(reduced_handler)(
+                self, entity_id, **kwargs)
+        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+            reduced_handler = functools.partial(
+                arg_swapped_handler, feconf.ENTITY_TYPE_QUESTION)
+            return can_play_question(reduced_handler)(
+                self, entity_id, **kwargs)
+        else:
+            raise self.PageNotFoundException
+
+    test_can_play_entity.__wrapped__ = True
+
+    return test_can_play_entity

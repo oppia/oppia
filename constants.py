@@ -18,9 +18,14 @@
 
 """Loads constants for backend use."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import json
 import os
 import re
+
+import python_utils
 
 
 def parse_json_from_js(js_file):
@@ -45,5 +50,5 @@ class Constants(dict):
     __getattr__ = dict.__getitem__
 
 
-with open(os.path.join('assets', 'constants.js'), 'r') as f:
+with python_utils.open_file(os.path.join('assets', 'constants.ts'), 'r') as f:
     constants = Constants(parse_json_from_js(f))

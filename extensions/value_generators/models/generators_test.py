@@ -16,6 +16,9 @@
 
 """Tests for value generators."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from core.tests import test_utils
 from extensions.value_generators.models import generators
 
@@ -28,6 +31,8 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
         self.assertEqual(generator.generate_value({}, **{'value': 'a'}), 'a')
         self.assertEqual(generator.generate_value(
             {}, **{'value': 'a', 'parse_with_jinja': False}), 'a')
+        self.assertEqual(generator.generate_value(
+            None, **{'value': 'a', 'parse_with_jinja': False}), 'a')
         self.assertEqual(generator.generate_value(
             {}, **{'value': '{{a}}', 'parse_with_jinja': False}), '{{a}}')
         self.assertEqual(generator.generate_value(

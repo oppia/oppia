@@ -14,6 +14,9 @@
 
 """Models for storing the story data models."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from constants import constants
 from core.platform import models
 
@@ -25,12 +28,26 @@ from google.appengine.ext import ndb
 
 class StorySnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a story snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class StorySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a story snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class StoryModel(base_models.VersionedModel):
@@ -60,6 +77,28 @@ class StoryModel(base_models.VersionedModel):
         ndb.IntegerProperty(required=True, indexed=True))
     # The topic id to which the story belongs.
     corresponding_topic_id = ndb.StringProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Story should be kept if the corresponding topic is published."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether StoryModel snapshots references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """StoryModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -96,6 +135,11 @@ class StoryModel(base_models.VersionedModel):
         story_commit_log_entry.story_id = self.id
         story_commit_log_entry.put()
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to stories.
@@ -108,6 +152,13 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
     # The id of the story being edited.
     story_id = ndb.StringProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Story commit log is deleted only if the corresponding collection
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @classmethod
     def _get_instance_id(cls, story_id, version):
@@ -122,6 +173,13 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             str. The commit id with the story id and version number.
         """
         return 'story-%s-%s' % (story_id, version)
+
+    @staticmethod
+    def get_export_policy():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class StorySummaryModel(base_models.BaseModel):
@@ -155,29 +213,32 @@ class StorySummaryModel(base_models.BaseModel):
     node_count = ndb.IntegerProperty(required=True, indexed=True)
     version = ndb.IntegerProperty(required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Story summary should be kept if the corresponding topic is
+        published.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
-class StoryRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
-    """Storage model for the metadata for a story rights snapshot."""
-    pass
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """Check whether StorySummaryModel references the given user.
 
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data should
+            be checked.
 
-class StoryRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
-    """Storage model for the content of a story rights snapshot."""
-    pass
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
-class StoryRightsModel(base_models.VersionedModel):
-    """Storage model for rights related to a story.
-
-    The id of each instance is the id of the corresponding story.
-    """
-
-    SNAPSHOT_METADATA_CLASS = StoryRightsSnapshotMetadataModel
-    SNAPSHOT_CONTENT_CLASS = StoryRightsSnapshotContentModel
-    ALLOW_REVERT = False
-
-    # The user_ids of the managers of this story.
-    manager_ids = ndb.StringProperty(indexed=True, repeated=True)
-    # Whether this story is published.
-    story_is_published = ndb.BooleanProperty(
-        indexed=True, required=True, default=False)
+    @staticmethod
+    def get_user_id_migration_policy():
+        """StoryModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE

@@ -141,6 +141,14 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-state-name-submit'));
   var answerCorrectnessToggle = element(
     by.css('.protractor-test-editor-correctness-toggle'));
+  var solicitAnswerDetailsCheckbox = element(
+    by.css('.protractor-test-solicit-answer-details-checkbox'));
+
+  /*
+   * Symbols
+   */
+  var correctAnswerTickMark = element(
+    by.css('.protractor-test-correct-tick-mark'));
 
   /*
    * Actions
@@ -248,10 +256,16 @@ var ExplorationEditorMainTab = function() {
   this.addResponse = function(
       interactionId, feedbackInstructions, destStateName,
       createNewState, ruleName) {
-    expect(addResponseButton.isDisplayed()).toEqual(true);
     // Open the "Add Response" modal if it is not already open.
+    waitFor.elementToBeClickable(
+      addResponseButton, 'Response Editor button is not clickable');
     addResponseButton.click();
+    this.setResponse.apply(null, arguments);
+  };
 
+  this.setResponse = function(
+      interactionId, feedbackInstructions, destStateName,
+      createNewState, ruleName) {
     // Set the rule description.
     var args = [addResponseDetails, interactionId, ruleName];
     for (var i = 5; i < arguments.length; i++) {
@@ -260,7 +274,6 @@ var ExplorationEditorMainTab = function() {
     expect(addResponseDetails.isDisplayed()).toBe(true);
     _selectRule(addResponseDetails, interactionId, ruleName);
     _setRuleParameters.apply(null, args);
-
     // Open the feedback entry form if it is not already open.
     feedbackEditor.isPresent().then(function(isVisible) {
       if (isVisible) {
@@ -289,24 +302,29 @@ var ExplorationEditorMainTab = function() {
   };
 
   // Rules are zero-indexed; 'default' denotes the default outcome.
+  // 'pop' denotes the currently opened one.
   this.getResponseEditor = function(responseNum) {
     var headerElem;
-    if (responseNum === 'default') {
-      headerElem = defaultResponseTab;
-    } else {
-      headerElem = responseTab.get(
-        responseNum);
-    }
-
-    responseBody(responseNum).isPresent().then(function(isVisible) {
-      if (!isVisible) {
-        expect(headerElem.isDisplayed()).toBe(true);
-        waitFor.elementToBeClickable(
-          headerElem, 'Response Editor header is not clickable');
-        headerElem.click();
+    if (responseNum !== 'pop') {
+      if (responseNum === 'default') {
+        headerElem = defaultResponseTab;
+      } else {
+        headerElem = responseTab.get(
+          responseNum);
       }
-    });
 
+      responseBody(responseNum).isPresent().then(function(isVisible) {
+        if (!isVisible) {
+          expect(headerElem.isDisplayed()).toBe(true);
+          waitFor.elementToBeClickable(
+            headerElem, 'Response Editor header is not clickable');
+          headerElem.click();
+        }
+      });
+    } else {
+      headerElem = addResponseHeader;
+      expect(headerElem.isDisplayed()).toBe(true);
+    }
     return {
       /**
        * Check for correct rule parameters.
@@ -432,6 +450,10 @@ var ExplorationEditorMainTab = function() {
 
   this.expectCannotAddResponse = function() {
     expect(addResponseButton.isPresent()).toBeFalsy();
+  };
+
+  this.expectTickMarkIsDisplayed = function() {
+    expect(correctAnswerTickMark.isDisplayed()).toBe(true);
   };
 
   var _setOutcomeDest = function(
@@ -619,6 +641,10 @@ var ExplorationEditorMainTab = function() {
       interaction, 'interaction takes too long to appear');
   };
 
+  this.setInteractionWithoutCloseAddResponse = function(interactionId) {
+    createNewInteraction(interactionId);
+    customizeInteraction.apply(null, arguments);
+  };
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
   var createNewInteraction = function(interactionId) {
@@ -655,8 +681,18 @@ var ExplorationEditorMainTab = function() {
     expect(interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId])
       .isDisplayed()).toBe(true);
     interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]).click();
-    expect(interactionTile(interactionId).isDisplayed()).toBe(true);
-    interactionTile(interactionId).click();
+
+    var targetTile = interactionTile(interactionId);
+    waitFor.visibilityOf(
+      targetTile,
+      'Interaction tile ' + interactionId + ' takes too long to be visible'
+    );
+    waitFor.elementToBeClickable(
+      targetTile,
+      'Interaction tile ' + interactionId + ' takes too long to be clickable'
+    );
+    expect(targetTile.isDisplayed()).toBe(true);
+    targetTile.click();
   };
 
   // This function should not usually be invoked directly; please consider
@@ -986,6 +1022,13 @@ var ExplorationEditorMainTab = function() {
       stateNameContainer, name,
       'Current state name is:' + stateNameContainer.getAttribute(
         'textContent') + 'instead of expected ' + name);
+  };
+
+  this.setSolicitAnswerDetailsFeature = function() {
+    waitFor.elementToBeClickable(
+      solicitAnswerDetailsCheckbox,
+      'Solicit answer details checkbox takes too long to be clickable');
+    solicitAnswerDetailsCheckbox.click();
   };
 
   this.expectCurrentStateToBe = function(name) {

@@ -15,9 +15,14 @@
 # limitations under the License.
 
 """Tests for Story-related one-off jobs."""
+
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import ast
 
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_jobs_one_off
 from core.domain import story_services
 from core.domain import topic_services
@@ -39,6 +44,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         super(StoryMigrationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test stories.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.TOPIC_ID = topic_services.get_new_topic_id()
         self.story_id_1 = 'story_id_1'
@@ -47,11 +53,13 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.skill_id_1 = 'skill_id_1'
         self.skill_id_2 = 'skill_id_2'
         self.save_new_topic(
-            self.TOPIC_ID, self.albert_id, 'Name', 'Description',
-            [self.story_id_1, self.story_id_2], [self.story_id_3],
-            [self.skill_id_1, self.skill_id_2], [], 1
-        )
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+            self.TOPIC_ID, self.albert_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
         self.process_and_flush_pending_tasks()
 
     def test_migration_job_does_not_convert_up_to_date_story(self):
@@ -77,7 +85,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Verify the story is exactly the same after migration.
         updated_story = (
-            story_services.get_story_by_id(self.STORY_ID))
+            story_fetchers.get_story_by_id(self.STORY_ID))
         self.assertEqual(
             updated_story.story_contents_schema_version,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
@@ -103,7 +111,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Ensure the story is deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            story_services.get_story_by_id(self.STORY_ID)
+            story_fetchers.get_story_by_id(self.STORY_ID)
 
         # Start migration job on sample story.
         job_id = (
@@ -116,7 +124,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Ensure the story is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            story_services.get_story_by_id(self.STORY_ID)
+            story_fetchers.get_story_by_id(self.STORY_ID)
 
         output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
         expected = [[u'story_deleted',
@@ -135,7 +143,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, self.STORY_ID)
         story = (
-            story_services.get_story_by_id(self.STORY_ID))
+            story_fetchers.get_story_by_id(self.STORY_ID))
         self.assertEqual(story.story_contents_schema_version, 1)
 
         # Start migration job.
@@ -146,7 +154,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Verify the story migrates correctly.
         updated_story = (
-            story_services.get_story_by_id(self.STORY_ID))
+            story_fetchers.get_story_by_id(self.STORY_ID))
         self.assertEqual(
             updated_story.story_contents_schema_version,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
@@ -168,7 +176,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, story.id)
         get_story_by_id_swap = self.swap(
-            story_services, 'get_story_by_id', _mock_get_story_by_id)
+            story_fetchers, 'get_story_by_id', _mock_get_story_by_id)
 
         with get_story_by_id_swap:
             job_id = (
@@ -182,8 +190,5 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         # If the story had been successfully migrated, this would include a
         # 'successfully migrated' message. Its absence means that the story
         # could not be processed.
-        expected = [[u'validation_error',
-                     [u'Story %s failed validation: \'str\' object has '
-                      'no attribute \'validate\'' % (self.STORY_ID)]]]
-        self.assertEqual(
-            expected, [ast.literal_eval(x) for x in output])
+        for x in output:
+            self.assertRegexpMatches(x, 'object has no attribute \'validate\'')

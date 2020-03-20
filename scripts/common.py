@@ -14,10 +14,94 @@
 
 """Common utility functions and classes used by multiple Python scripts."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import contextlib
+import getpass
 import os
+import platform
+import re
+import shutil
+import socket
 import subprocess
+import sys
+
+import python_utils
+import release_constants
+
+PSUTIL_VERSION = '5.6.7'
+
+CURRENT_PYTHON_BIN = sys.executable
+NODE_VERSION = '10.18.0'
+
+# NB: Please ensure that the version is consistent with the version in .yarnrc.
+YARN_VERSION = '1.22.0'
+
+COVERAGE_VERSION = '4.5.4'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
+CURR_DIR = os.path.abspath(os.getcwd())
+OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
+THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
+GOOGLE_APP_ENGINE_HOME = os.path.join(
+    OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine')
+GOOGLE_CLOUD_SDK_HOME = os.path.join(
+    OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0', 'google-cloud-sdk')
+NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
+NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
+FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
+YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
+OS_NAME = platform.system()
+ARCHITECTURE = platform.machine()
+PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
+RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
+RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
+HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
+TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
+
+
+def is_windows_os():
+    """Check if the running system is Windows."""
+    return OS_NAME == 'Windows'
+
+
+def is_mac_os():
+    """Check if the running system is MacOS."""
+    return OS_NAME == 'Darwin'
+
+
+def is_linux_os():
+    """Check if the running system is Linux."""
+    return OS_NAME == 'Linux'
+
+
+def is_x64_architecture():
+    """Check if the architecture is on X64."""
+    # https://docs.python.org/2/library/platform.html#platform.architecture
+    return sys.maxsize > 2**32
+
+
+NODE_BIN_PATH = os.path.join(
+    NODE_PATH, '' if is_windows_os() else 'bin', 'node')
+
+# Add path for node which is required by the node_modules.
+os.environ['PATH'] = os.pathsep.join([
+    os.path.dirname(NODE_BIN_PATH), os.path.join(YARN_PATH, 'bin'),
+    os.environ['PATH']])
+
+
+def run_cmd(cmd_tokens):
+    """Runs the command and returns the output.
+    Raises subprocess.CalledProcessError upon failure.
+
+    Args:
+        cmd_tokens: list(str). The list of command tokens to execute.
+
+    Returns:
+        str. The output of the command.
+    """
+    return subprocess.check_output(cmd_tokens).strip()
 
 
 def ensure_directory_exists(d):
@@ -37,7 +121,7 @@ def require_cwd_to_be_oppia(allow_deploy_dir=False):
     current_dirname = os.path.basename(os.path.normpath(os.getcwd()))
     is_deploy_dir = (
         current_dirname.startswith('deploy-') and
-        os.path.isdir(os.path.join(os.getcwd(), '..', 'oppia')))
+        os.path.isdir(os.path.join(os.getcwd(), os.pardir, 'oppia')))
 
     if is_oppia_dir or (allow_deploy_dir and is_deploy_dir):
         return
@@ -50,18 +134,22 @@ def open_new_tab_in_browser_if_possible(url):
     browser_cmds = ['chromium-browser', 'google-chrome', 'firefox']
     for cmd in browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
-            subprocess.call([cmd, url])
+            subprocess.check_call([cmd, url])
             return
-    print '******************************************************************'
-    print 'WARNING: Unable to open browser. Please manually open the following '
-    print 'URL in a browser window, then press Enter to confirm.'
-    print ''
-    print '    %s' % url
-    print ''
-    print 'NOTE: To get rid of this message, open scripts/common.py and fix'
-    print 'the function open_new_tab_in_browser_if_possible() to work on your'
-    print 'system.'
-    raw_input()
+    python_utils.PRINT(
+        '******************************************************************')
+    python_utils.PRINT(
+        'WARNING: Unable to open browser. Please manually open the following')
+    python_utils.PRINT('URL in a browser window, then press Enter to confirm.')
+    python_utils.PRINT('')
+    python_utils.PRINT('    %s' % url)
+    python_utils.PRINT('')
+    python_utils.PRINT(
+        'NOTE: To get rid of this message, open scripts/common.py and fix')
+    python_utils.PRINT(
+        'the function open_new_tab_in_browser_if_possible() to work on your')
+    python_utils.PRINT('system.')
+    python_utils.INPUT()
 
 
 def get_remote_alias(remote_url):
@@ -95,13 +183,41 @@ def verify_local_repo_is_clean():
 
 
 def get_current_branch_name():
-    """Get the current branch name."""
+    """Get the current branch name.
+
+    Returns:
+        str. The name of current branch.
+    """
     git_status_output = subprocess.check_output(
         ['git', 'status']).strip().split('\n')
     branch_message_prefix = 'On branch '
     git_status_first_line = git_status_output[0]
     assert git_status_first_line.startswith(branch_message_prefix)
     return git_status_first_line[len(branch_message_prefix):]
+
+
+def get_current_release_version_number(release_branch_name):
+    """Gets the release version given a release branch name.
+
+    Args:
+        release_branch_name: str. The name of release branch.
+
+    Returns:
+        str. The version of release.
+    """
+    release_match = re.match(RELEASE_BRANCH_REGEX, release_branch_name)
+    release_maintenance_match = re.match(
+        RELEASE_MAINTENANCE_BRANCH_REGEX, release_branch_name)
+    hotfix_match = re.match(
+        HOTFIX_BRANCH_REGEX, release_branch_name)
+    if release_match:
+        return release_match.group(1)
+    elif release_maintenance_match:
+        return release_maintenance_match.group(1)
+    elif hotfix_match:
+        return hotfix_match.group(1)
+    else:
+        raise Exception('Invalid branch name: %s.' % release_branch_name)
 
 
 def is_current_branch_a_release_branch():
@@ -111,7 +227,22 @@ def is_current_branch_a_release_branch():
         bool. Whether the current branch is a release branch.
     """
     current_branch_name = get_current_branch_name()
-    return current_branch_name.startswith(RELEASE_BRANCH_NAME_PREFIX)
+    release_match = bool(re.match(RELEASE_BRANCH_REGEX, current_branch_name))
+    release_maintenance_match = bool(
+        re.match(RELEASE_MAINTENANCE_BRANCH_REGEX, current_branch_name))
+    hotfix_match = bool(
+        re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
+    return release_match or release_maintenance_match or hotfix_match
+
+
+def is_current_branch_a_test_branch():
+    """Returns whether the current branch is a test branch for deployment.
+
+    Returns:
+        bool. Whether the current branch is a test branch for deployment.
+    """
+    current_branch_name = get_current_branch_name()
+    return bool(re.match(TEST_BRANCH_REGEX, current_branch_name))
 
 
 def verify_current_branch_name(expected_branch_name):
@@ -143,7 +274,7 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
                     'instructions: '
                     'https://help.github.com/articles/'
                     'error-repository-not-found/#check-your-ssh-access')
-            subprocess.call([
+            subprocess.check_call([
                 'git', 'clone',
                 'git@github.com:oppia/release-scripts.git'])
 
@@ -154,10 +285,257 @@ def ensure_release_scripts_folder_exists_and_is_up_to_date():
         # Update the local repo.
         remote_alias = get_remote_alias(
             'git@github.com:oppia/release-scripts.git')
-        subprocess.call(['git', 'pull', remote_alias])
+        subprocess.check_call(['git', 'pull', remote_alias])
 
 
-class CD(object):
+def is_port_open(port):
+    """Checks if a process is listening to the port.
+
+    Args:
+        port: int. The port number.
+
+    Return:
+        bool. True if port is open else False.
+    """
+    with contextlib.closing(
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        return bool(not s.connect_ex(('localhost', port)))
+
+
+def recursive_chown(path, uid, gid):
+    """Changes the owner and group id of all files in a path to the numeric
+    uid and gid.
+
+    Args:
+        path: str. The path for which owner id and group id need to be setup.
+        uid: int. Owner ID to be set.
+        gid: int. Group ID to be set.
+    """
+    os.chown(path, uid, gid)
+    for root, directories, filenames in os.walk(path):
+        for directory in directories:
+            os.chown(os.path.join(root, directory), uid, gid)
+        for filename in filenames:
+            os.chown(os.path.join(root, filename), uid, gid)
+
+
+def recursive_chmod(path, mode):
+    """Changes the mode of path to the passed numeric mode.
+
+    Args:
+        path: str. The path for which mode would be set.
+        mode: int. The mode to be set.
+    """
+    os.chmod(path, mode)
+    for root, directories, filenames in os.walk(path):
+        for directory in directories:
+            os.chmod(os.path.join(root, directory), mode)
+        for filename in filenames:
+            os.chmod(os.path.join(root, filename), mode)
+
+
+def print_each_string_after_two_new_lines(strings):
+    """Prints the given strings, separating adjacent strings with two newlines.
+
+    Args:
+        strings: list(str). The strings to print.
+    """
+    for string in strings:
+        python_utils.PRINT('%s\n' % string)
+
+
+def install_npm_library(library_name, version, path):
+    """Installs the npm library after ensuring its not already installed.
+
+    Args:
+        library_name: str. The library name.
+        version: str. The library version.
+        path: str. The installation path for the library.
+    """
+    python_utils.PRINT(
+        'Checking whether %s is installed in %s' % (library_name, path))
+    if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
+        python_utils.PRINT('Installing %s' % library_name)
+        subprocess.check_call([
+            'yarn', 'add', '%s@%s' % (library_name, version)])
+
+
+def ask_user_to_confirm(message):
+    """Asks user to perform a task and confirm once they are done.
+
+    Args:
+        message: str. The message which specifies the task user has
+            to do.
+    """
+    while True:
+        python_utils.PRINT(
+            '******************************************************')
+        python_utils.PRINT(message)
+        python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
+        answer = python_utils.INPUT().lower()
+        if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
+            return
+
+
+def get_personal_access_token():
+    """"Returns the personal access token for the GitHub id of user.
+
+    Returns:
+        str. The personal access token for the GitHub id of user.
+
+    Raises:
+        Exception: Personal access token is None.
+    """
+    personal_access_token = getpass.getpass(
+        prompt=(
+            'Please provide personal access token for your github ID. '
+            'You can create one at https://github.com/settings/tokens: '))
+
+    if personal_access_token is None:
+        raise Exception(
+            'No personal access token provided, please set up a personal '
+            'access token at https://github.com/settings/tokens and re-run '
+            'the script')
+    return personal_access_token
+
+
+def check_blocking_bug_issue_count(repo):
+    """Checks the number of unresolved blocking bugs.
+
+    Args:
+        repo: github.Repository.Repository. The PyGithub object for the repo.
+
+    Raises:
+        Exception: Number of unresolved blocking bugs is not zero.
+        Exception: The blocking bug milestone is closed.
+    """
+    blocking_bugs_milestone = repo.get_milestone(
+        number=release_constants.BLOCKING_BUG_MILESTONE_NUMBER)
+    if blocking_bugs_milestone.state == 'closed':
+        raise Exception('The blocking bug milestone is closed.')
+    if blocking_bugs_milestone.open_issues:
+        open_new_tab_in_browser_if_possible(
+            'https://github.com/oppia/oppia/issues?q=is%3Aopen+'
+            'is%3Aissue+milestone%3A%22Blocking+bugs%22')
+        raise Exception(
+            'There are %s unresolved blocking bugs. Please ensure '
+            'that they are resolved before release summary generation.' % (
+                blocking_bugs_milestone.open_issues))
+
+
+def check_prs_for_current_release_are_released(repo):
+    """Checks that all pull requests for current release have a
+    'PR: released' label.
+
+    Args:
+        repo: github.Repository.Repository. The PyGithub object for the repo.
+
+    Raises:
+        Exception: Some pull requests for current release do not have a
+            PR: released label.
+    """
+    current_release_label = repo.get_label(
+        release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
+    current_release_prs = repo.get_issues(
+        state='all', labels=[current_release_label])
+    for pr in current_release_prs:
+        label_names = [label.name for label in pr.labels]
+        if release_constants.LABEL_FOR_RELEASED_PRS not in label_names:
+            open_new_tab_in_browser_if_possible(
+                'https://github.com/oppia/oppia/pulls?utf8=%E2%9C%93&q=is%3Apr'
+                '+label%3A%22PR%3A+for+current+release%22+')
+            raise Exception(
+                'There are PRs for current release which do not have '
+                'a \'PR: released\' label. Please ensure that they are '
+                'released before release summary generation.')
+
+
+def kill_processes_based_on_regex(pattern):
+    """Kill any processes whose command line matches the provided regex.
+
+    Args:
+        pattern: str. Pattern for searching processes.
+    """
+    regex = re.compile(pattern)
+    if PSUTIL_DIR not in sys.path:
+        sys.path.insert(1, PSUTIL_DIR)
+    import psutil
+    for process in psutil.process_iter():
+        try:
+            cmdline = ' '.join(process.cmdline())
+            if regex.match(cmdline) and process.is_running():
+                python_utils.PRINT('Killing %s ...' % cmdline)
+                process.kill()
+        # Possible exception raised by psutil includes: AccessDenied,
+        # NoSuchProcess, ZombieProcess, TimeoutExpired. We can safely ignore
+        # those ones and continue.
+        # https://psutil.readthedocs.io/en/latest/#exceptions
+        except psutil.Error:
+            continue
+
+
+def convert_to_posixpath(file_path):
+    """Converts a Windows style filepath to posixpath format. If the operating
+    system is not Windows, this function does nothing.
+
+    Args:
+        file_path: str. The path to be converted.
+
+    Returns:
+        str. Returns a posixpath version of the file path.
+    """
+    if not is_windows_os():
+        return file_path
+    return file_path.replace('\\', '/')
+
+
+def create_readme(dir_path, readme_content):
+    """Creates a readme in a given dir path with the specified
+    readme content.
+
+    Args:
+        dir_path: str. The path of the dir where the README is to
+            be created.
+        readme_content: str. The content to be written in the README.
+    """
+    with python_utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
+        f.write(readme_content)
+
+
+def inplace_replace_file(filename, regex_pattern, replacement_string):
+    """Replace the file content in-place with regex pattern. The pattern is used
+    to replace the file's content line by line.
+
+    Note:
+        This function should only be used with files that are processed line by
+            line.
+
+    Args:
+        filename: str. The name of the file to be changed.
+        regex_pattern: str. The pattern to check.
+        replacement_string: str. The content to be replaced.
+    """
+    backup_filename = '%s.bak' % filename
+    shutil.copyfile(filename, backup_filename)
+    new_contents = []
+    try:
+        regex = re.compile(regex_pattern)
+        with python_utils.open_file(backup_filename, 'r') as f:
+            for line in f:
+                new_contents.append(regex.sub(replacement_string, line))
+
+        with python_utils.open_file(filename, 'w') as f:
+            for line in new_contents:
+                f.write(line)
+        os.remove(backup_filename)
+    except Exception:
+        # Restore the content if there was en error.
+        os.remove(filename)
+        shutil.move(backup_filename, filename)
+        raise
+
+
+class CD(python_utils.OBJECT):
     """Context manager for changing the current working directory."""
 
     def __init__(self, new_path):

@@ -14,11 +14,14 @@
 
 """Jobs for statistics views."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import ast
 
 from core import jobs
 from core.domain import calculation_registry
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import interaction_registry
 from core.platform import models
 import feconf
@@ -118,8 +121,16 @@ class InteractionAnswerSummariesMRJobManager(
                 - Ignoring answers submitted to version:
                     Occurs when version mismatches and the new
                     version has a different interaction ID.
+                - Expected valid exploration id, version, and state name triple:
+                    Occurs when the key to reduce cannot be split into
+                    components.
         """
-        exploration_id, exploration_version, state_name = key.split(':')
+        try:
+            exploration_id, exploration_version, state_name = key.split(':')
+        except Exception as e:
+            yield (key, 'ERROR: Expected valid exploration id, version, and '
+                        'state name triple, actual: %r' % e)
+            return
 
         value_dicts = [
             ast.literal_eval(stringified_value)
@@ -135,12 +146,9 @@ class InteractionAnswerSummariesMRJobManager(
         # For answers mapped to specific versions, the versions list should only
         # contain the version they correspond to. Otherwise, if they map to
         # VERSION_ALL, then multiple versions may be included.
-        if exploration_version != VERSION_ALL and (
-                len(versions) != 1 or versions[0] != int(exploration_version)):
-            yield (
-                'ERROR: Expected a single version when aggregating answers '
-                'for exploration %s (v=%s), but found: %s' % (
-                    exploration_id, exploration_version, versions))
+        assert (exploration_version == VERSION_ALL or len(versions) == 1)
+        assert (exploration_version == VERSION_ALL or versions[0] == int(
+            exploration_version))
 
         # Map interaction IDs and StateAnswersModel IDs to exploration versions.
         versioned_interaction_ids = {version: set() for version in versions}
@@ -154,22 +162,16 @@ class InteractionAnswerSummariesMRJobManager(
         # Convert the interaction IDs to a list so they may be easily indexed.
         versioned_interaction_ids = {
             v: list(interaction_ids)
-            for v, interaction_ids in versioned_interaction_ids.iteritems()
+            for v, interaction_ids in versioned_interaction_ids.items()
         }
 
         # Verify all interaction ID and item ID containers are well-structured.
-        for version, interaction_ids in versioned_interaction_ids.iteritems():
+        for version, interaction_ids in versioned_interaction_ids.items():
             if len(interaction_ids) != 1:
                 yield (
                     'ERROR: Expected exactly one interaction ID for '
                     'exploration %s and version %s, found: %s' % (
                         exploration_id, version, len(interaction_ids)))
-        for version, item_ids in versioned_item_ids.iteritems():
-            if not item_ids:
-                yield (
-                    'ERROR: Expected at least one item ID for exploration %s '
-                    'and version %s, found: %s' % (
-                        exploration_id, version, len(item_ids)))
 
         # Filter out any item IDs which happen at and before a version with a
         # changed interaction ID. Start with the most recent version since it
@@ -178,7 +180,7 @@ class InteractionAnswerSummariesMRJobManager(
         latest_interaction_id = versioned_interaction_ids[latest_version][0]
 
         # Ensure the exploration corresponding to these answers exists.
-        exp = exp_services.get_exploration_by_id(
+        exp = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False)
         if exp is None:
             return

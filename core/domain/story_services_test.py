@@ -14,10 +14,16 @@
 
 """Tests the methods defined in story services."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import logging
 
+from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import param_domain
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import topic_services
 from core.domain import user_services
@@ -44,8 +50,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.TOPIC_ID, self.USER_ID, 'Topic', 'A new topic', [], [], [], [],
-            0)
+            self.TOPIC_ID, self.USER_ID, name='Topic',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
         self.save_new_story(
             self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
             self.TOPIC_ID)
@@ -61,7 +70,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist,
             'Added node.')
-        self.story = story_services.get_story_by_id(self.STORY_ID)
+        self.story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
@@ -90,27 +99,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(new_story_id), 12)
         self.assertEqual(story_models.StoryModel.get_by_id(new_story_id), None)
 
-    def test_get_story_from_model(self):
-        story_model = story_models.StoryModel.get(self.STORY_ID)
-        story = story_services.get_story_from_model(story_model)
-
-        self.assertEqual(story.to_dict(), self.story.to_dict())
-
-    def test_get_story_summary_from_model(self):
-        story_summary_model = story_models.StorySummaryModel.get(self.STORY_ID)
-        story_summary = story_services.get_story_summary_from_model(
-            story_summary_model)
-
-        self.assertEqual(story_summary.id, self.STORY_ID)
-        self.assertEqual(story_summary.title, 'Title')
-        self.assertEqual(story_summary.description, 'Description')
-        self.assertEqual(story_summary.node_count, 1)
-
-    def test_get_story_by_id(self):
-        expected_story = self.story.to_dict()
-        story = story_services.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story.to_dict(), expected_story)
-
     def test_commit_log_entry(self):
         story_commit_log_entry = (
             story_models.StoryCommitLogEntryModel.get_commit(self.STORY_ID, 1)
@@ -118,14 +106,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_commit_log_entry.commit_type, 'create')
         self.assertEqual(story_commit_log_entry.story_id, self.STORY_ID)
         self.assertEqual(story_commit_log_entry.user_id, self.USER_ID)
-
-    def test_get_story_summary_by_id(self):
-        story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
-
-        self.assertEqual(story_summary.id, self.STORY_ID)
-        self.assertEqual(story_summary.title, 'Title')
-        self.assertEqual(story_summary.description, 'Description')
-        self.assertEqual(story_summary.node_count, 1)
 
     def test_update_story_properties(self):
         changelist = [
@@ -145,12 +125,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist,
             'Updated Title and Description.')
-        story = story_services.get_story_by_id(self.STORY_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.title, 'New Title')
         self.assertEqual(story.description, 'New Description')
         self.assertEqual(story.version, 3)
 
-        story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
+        story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.title, 'New Title')
         self.assertEqual(story_summary.node_count, 1)
 
@@ -185,7 +165,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist, 'Added story node.')
-        story = story_services.get_story_by_id(self.STORY_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(
             story.story_contents.nodes[1].destination_node_ids,
             [self.NODE_ID_1])
@@ -196,7 +176,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.story_contents.next_node_id, 'node_3')
         self.assertEqual(story.version, 3)
 
-        story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
+        story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.node_count, 2)
 
         changelist = [
@@ -222,8 +202,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist,
             'Removed a story node.')
-        story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
-        story = story_services.get_story_by_id(self.STORY_ID)
+        story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story_summary.node_count, 1)
         self.assertEqual(
             story.story_contents.nodes[0].title, 'Modified title 2')
@@ -253,10 +233,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_story_which_not_corresponding_topic_id(self):
         topic_id = topic_services.get_new_topic_id()
-        self.save_new_topic(
-            topic_id, self.USER_ID, 'A New Topic', 'A new topic description.',
-            [], [], [], [], 0)
         story_id = story_services.get_new_story_id()
+        self.save_new_topic(
+            topic_id, self.USER_ID, name='A New Topic',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='A new topic description.', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
         self.save_new_story(
             story_id, self.USER_ID, 'Title', 'Description', 'Notes', topic_id)
 
@@ -277,206 +260,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
     def test_delete_story(self):
         story_services.delete_story(self.USER_ID, self.STORY_ID)
-        self.assertEqual(story_services.get_story_by_id(
+        self.assertEqual(story_fetchers.get_story_by_id(
             self.STORY_ID, strict=False), None)
         self.assertEqual(
-            story_services.get_story_summary_by_id(
+            story_fetchers.get_story_summary_by_id(
                 self.STORY_ID, strict=False), None)
-
-    def test_admin_can_manage_story(self):
-        story_rights = story_services.get_story_rights(self.STORY_ID)
-
-        self.assertTrue(story_services.check_can_edit_story(
-            self.user_admin, story_rights))
-
-    def test_publish_story_with_no_exploration_id(self):
-        story_rights = story_services.get_story_rights(self.STORY_ID)
-        self.assertFalse(story_rights.story_is_published)
-        with self.assertRaisesRegexp(
-            Exception,
-            'Story node with id node_1 does not contain an exploration id.'):
-            story_services.publish_story(self.STORY_ID, self.user_id_admin)
-
-    def test_publish_story_with_private_exploration(self):
-        self.save_new_story(
-            'private_story', self.USER_ID, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID
-        )
-        topic_services.add_canonical_story(
-            self.USER_ID, self.TOPIC_ID, 'private_story')
-        changelist = [
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': self.NODE_ID_1,
-                'title': 'Title 1'
-            })
-        ]
-        story_services.update_story(
-            self.USER_ID, 'private_story', changelist,
-            'Added node.')
-        self.save_new_default_exploration(
-            'exp_id', self.user_id_a, title='title')
-        change_list = [story_domain.StoryChange({
-            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-            'property_name': (
-                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'node_id': self.NODE_ID_1,
-            'old_value': None,
-            'new_value': 'exp_id'
-        })]
-        story_services.update_story(
-            self.USER_ID, 'private_story', change_list, 'Updated story node.')
-        story_rights = story_services.get_story_rights('private_story')
-        self.assertFalse(story_rights.story_is_published)
-        with self.assertRaisesRegexp(
-            Exception,
-            'Exploration with id exp_id isn\'t published.'):
-            story_services.publish_story('private_story', self.user_id_admin)
-
-    def test_publish_and_unpublish_story(self):
-        self.save_new_story(
-            'public_story', self.USER_ID, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID
-        )
-        topic_services.add_canonical_story(
-            self.USER_ID, self.TOPIC_ID, 'public_story')
-        changelist = [
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': self.NODE_ID_1,
-                'title': 'Title 1'
-            })
-        ]
-        story_services.update_story(
-            self.USER_ID, 'public_story', changelist,
-            'Added node.')
-        self.save_new_default_exploration(
-            'exp_id', self.user_id_a, title='title')
-        self.publish_exploration(self.user_id_a, 'exp_id')
-        change_list = [story_domain.StoryChange({
-            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-            'property_name': (
-                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'node_id': 'node_1',
-            'old_value': None,
-            'new_value': 'exp_id'
-        })]
-        story_services.update_story(
-            self.USER_ID, 'public_story', change_list, 'Updated story node.')
-        story_rights = story_services.get_story_rights('public_story')
-        self.assertFalse(story_rights.story_is_published)
-        story_services.publish_story('public_story', self.user_id_admin)
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'The user does not have enough rights to unpublish the story.'):
-            story_services.unpublish_story('public_story', self.user_id_a)
-
-    def test_create_new_story_rights(self):
-        story_services.assign_role(
-            self.user_admin, self.user_a,
-            story_domain.ROLE_MANAGER, self.STORY_ID)
-
-        story_rights = story_services.get_story_rights(self.STORY_ID)
-
-        self.assertTrue(story_services.check_can_edit_story(
-            self.user_a, story_rights))
-        self.assertFalse(story_services.check_can_edit_story(
-            self.user_b, story_rights))
-
-    def test_non_admin_cannot_assign_roles(self):
-        with self.assertRaisesRegexp(
-            Exception,
-            'UnauthorizedUserException: Could not assign new role.'):
-            story_services.assign_role(
-                self.user_b, self.user_a,
-                story_domain.ROLE_MANAGER, self.STORY_ID)
-
-        story_rights = story_services.get_story_rights(self.STORY_ID)
-        self.assertFalse(story_services.check_can_edit_story(
-            self.user_a, story_rights))
-        self.assertFalse(story_services.check_can_edit_story(
-            self.user_b, story_rights))
-
-    def test_role_cannot_be_assigned_to_non_story_manager(self):
-        with self.assertRaisesRegexp(
-            Exception,
-            'The assignee doesn\'t have enough rights to become a manager.'):
-            story_services.assign_role(
-                self.user_admin, self.user_b,
-                story_domain.ROLE_MANAGER, self.STORY_ID)
-
-    def test_manager_cannot_assign_roles(self):
-        story_services.assign_role(
-            self.user_admin, self.user_a,
-            story_domain.ROLE_MANAGER, self.STORY_ID)
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'UnauthorizedUserException: Could not assign new role.'):
-            story_services.assign_role(
-                self.user_a, self.user_b,
-                story_domain.ROLE_MANAGER, self.STORY_ID)
-
-        story_rights = story_services.get_story_rights(self.STORY_ID)
-        self.assertTrue(story_services.check_can_edit_story(
-            self.user_a, story_rights))
-        self.assertFalse(story_services.check_can_edit_story(
-            self.user_b, story_rights))
-
-    def test_reassigning_manager_role_to_same_user(self):
-        story_services.assign_role(
-            self.user_admin, self.user_a,
-            story_domain.ROLE_MANAGER, self.STORY_ID)
-        with self.assertRaisesRegexp(
-            Exception, 'This user already is a manager for this story'):
-            story_services.assign_role(
-                self.user_admin, self.user_a,
-                story_domain.ROLE_MANAGER, self.STORY_ID)
-
-        story_rights = story_services.get_story_rights(self.STORY_ID)
-        self.assertTrue(story_services.check_can_edit_story(
-            self.user_a, story_rights))
-        self.assertFalse(story_services.check_can_edit_story(
-            self.user_b, story_rights))
-
-    def test_deassigning_manager_role(self):
-        story_services.assign_role(
-            self.user_admin, self.user_a,
-            story_domain.ROLE_MANAGER, self.STORY_ID)
-
-        story_rights = story_services.get_story_rights(self.STORY_ID)
-
-        self.assertTrue(story_services.check_can_edit_story(
-            self.user_a, story_rights))
-        self.assertFalse(story_services.check_can_edit_story(
-            self.user_b, story_rights))
-
-        story_services.assign_role(
-            self.user_admin, self.user_a,
-            story_domain.ROLE_NONE, self.STORY_ID)
-
-        self.assertFalse(story_services.check_can_edit_story(
-            self.user_a, story_rights))
-        self.assertFalse(story_services.check_can_edit_story(
-            self.user_b, story_rights))
-
-    def test_invalid_dict(self):
-        with self.assertRaisesRegexp(
-            Exception, 'Invalid role: invalid_role'):
-            story_services.assign_role(
-                self.user_admin, self.user_a,
-                'invalid_role', self.STORY_ID)
-
-    def test_reassigning_none_role_to_same_user(self):
-        with self.assertRaisesRegexp(
-            Exception, 'This user already has no role for this story'):
-            story_services.assign_role(
-                self.user_admin, self.user_a,
-                story_domain.ROLE_NONE, self.STORY_ID)
-        story_rights = story_services.get_story_rights(self.STORY_ID)
-        self.assertFalse(story_services.check_can_edit_story(
-            self.user_a, story_rights))
 
     def test_cannot_get_story_from_model_with_invalid_schema_version(self):
         story_model = story_models.StoryModel.get(self.STORY_ID)
@@ -487,10 +275,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'Sorry, we can only process v1-v%d story schemas at '
             'present.' % feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
-            story_services.get_story_from_model(story_model)
+            story_fetchers.get_story_from_model(story_model)
 
     def test_get_story_summaries_by_ids(self):
-        story_summaries = story_services.get_story_summaries_by_ids(
+        story_summaries = story_fetchers.get_story_summaries_by_ids(
             [self.STORY_ID])
 
         self.assertEqual(len(story_summaries), 1)
@@ -525,7 +313,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_update_story_node_outline(self):
-        story = story_services.get_story_by_id(self.STORY_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.story_contents.nodes[0].outline, '')
 
         change_list = [story_domain.StoryChange({
@@ -540,7 +328,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_services.update_story(
             self.USER_ID, self.STORY_ID, change_list, 'Updated story outline.')
 
-        story = story_services.get_story_by_id(self.STORY_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
 
         self.assertEqual(story.story_contents.nodes[0].outline, 'new_outline')
 
@@ -562,7 +350,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'Updated story outline.')
 
     def test_update_story_acquired_skill_ids(self):
-        story = story_services.get_story_by_id(self.STORY_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.story_contents.nodes[0].acquired_skill_ids, [])
 
         change_list = [story_domain.StoryChange({
@@ -578,7 +366,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.USER_ID, self.STORY_ID, change_list,
             'Updated story acquired_skill_ids.')
 
-        story = story_services.get_story_by_id(self.STORY_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
 
         self.assertEqual(
             story.story_contents.nodes[0].acquired_skill_ids, ['skill_id'])
@@ -601,7 +389,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'Updated story acquired_skill_ids.')
 
     def test_update_story_notes(self):
-        story = story_services.get_story_by_id(self.STORY_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.notes, 'Notes')
 
         change_list = [story_domain.StoryChange({
@@ -614,12 +402,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_services.update_story(
             self.USER_ID, self.STORY_ID, change_list, 'Updated story notes.')
 
-        story = story_services.get_story_by_id(self.STORY_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
 
         self.assertEqual(story.notes, 'New notes')
 
     def test_update_story_language_code(self):
-        story = story_services.get_story_by_id(self.STORY_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.language_code, 'en')
 
         change_list = [story_domain.StoryChange({
@@ -633,7 +421,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.USER_ID, self.STORY_ID, change_list,
             'Updated story language_code.')
 
-        story = story_services.get_story_by_id(self.STORY_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
 
         self.assertEqual(story.language_code, 'bn')
 
@@ -644,162 +432,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'save story'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, [], 'Commit message')
-
-    def test_cannot_update_story_with_no_commit_message(self):
-        change_list = [story_domain.StoryChange({
-            'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
-            'property_name': story_domain.STORY_PROPERTY_LANGUAGE_CODE,
-            'old_value': 'en',
-            'new_value': 'bn'
-        })]
-
-        with self.assertRaisesRegexp(
-            Exception, 'Expected a commit message but received none.'):
-            story_services.update_story(
-                self.USER_ID, self.STORY_ID, change_list, '')
-
-    def test_check_cannot_edit_story_with_no_story_rights(self):
-        self.assertFalse(story_services.check_can_edit_story(self.user_a, None))
-
-    def test_cannot_get_story_rights_with_invalid_story_id(self):
-        self.assertIsNone(
-            story_services.get_story_rights('invalid_story_id', strict=False))
-
-    def test_cannot_unpublish_story_with_invalid_story_id(self):
-        with self.assertRaisesRegexp(
-            Exception, 'The given story does not exist'):
-            story_services.unpublish_story(
-                'invalid_story_id', self.user_id_admin)
-
-    def test_cannot_unpublish_an_unpublished_story(self):
-        with self.assertRaisesRegexp(
-            Exception, 'The story is already unpublished.'):
-            story_services.unpublish_story(self.STORY_ID, self.user_id_admin)
-
-    def test_unpublish_story(self):
-        self.save_new_default_exploration(
-            'exp_id', self.user_id_a, title='title')
-        self.publish_exploration(self.user_id_a, 'exp_id')
-
-        change_list = [story_domain.StoryChange({
-            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-            'property_name': (
-                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'node_id': self.NODE_ID_1,
-            'old_value': None,
-            'new_value': 'exp_id'
-        })]
-        story_services.update_story(
-            self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
-
-        story_services.publish_story(self.STORY_ID, self.user_id_admin)
-        story_rights = story_services.get_story_rights(self.STORY_ID)
-
-        self.assertTrue(story_rights.story_is_published)
-
-        story_services.unpublish_story(self.STORY_ID, self.user_id_admin)
-        story_rights = story_services.get_story_rights(self.STORY_ID)
-
-        self.assertFalse(story_rights.story_is_published)
-
-    def test_cannot_publish_story_with_invalid_story_id(self):
-        self.save_new_default_exploration(
-            'exp_id', self.user_id_a, title='title')
-        self.publish_exploration(self.user_id_a, 'exp_id')
-
-        change_list = [story_domain.StoryChange({
-            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-            'property_name': (
-                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'node_id': self.NODE_ID_1,
-            'old_value': None,
-            'new_value': 'exp_id'
-        })]
-        story_services.update_story(
-            self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
-
-        with self.assertRaisesRegexp(
-            Exception, 'The given story does not exist'):
-            story_services.publish_story('invalid_story_id', self.user_id_admin)
-
-    def test_cannot_publish_a_published_story(self):
-        self.save_new_default_exploration(
-            'exp_id', self.user_id_a, title='title')
-        self.publish_exploration(self.user_id_a, 'exp_id')
-
-        change_list = [story_domain.StoryChange({
-            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-            'property_name': (
-                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'node_id': self.NODE_ID_1,
-            'old_value': None,
-            'new_value': 'exp_id'
-        })]
-        story_services.update_story(
-            self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
-
-        story_services.publish_story(self.STORY_ID, self.user_id_admin)
-        story_rights = story_services.get_story_rights(self.STORY_ID)
-
-        self.assertTrue(story_rights.story_is_published)
-
-        with self.assertRaisesRegexp(
-            Exception, 'The story is already published.'):
-            story_services.publish_story(self.STORY_ID, self.user_id_admin)
-
-    def test_normal_user_cannot_publish_story(self):
-        self.save_new_default_exploration(
-            'exp_id', self.user_id_a, title='title')
-        self.publish_exploration(self.user_id_a, 'exp_id')
-
-        change_list = [story_domain.StoryChange({
-            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-            'property_name': (
-                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'node_id': self.NODE_ID_1,
-            'old_value': None,
-            'new_value': 'exp_id'
-        })]
-        story_services.update_story(
-            self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
-
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'The user does not have enough rights to publish the story.'):
-            story_services.publish_story(self.STORY_ID, self.user_id_a)
-
-    def test_cannot_publish_story_with_invalid_exploration_id(self):
-
-        def _mock_get_multiple_explorations_by_id(
-                unused_exp_ids, **unused_strict):
-            """Mocks get_multiple_explorations_by_id()."""
-            return [None]
-
-        self.save_new_default_exploration(
-            'exp_id', self.user_id_a, title='title')
-        self.publish_exploration(self.user_id_a, 'exp_id')
-
-        change_list = [story_domain.StoryChange({
-            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-            'property_name': (
-                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'node_id': self.NODE_ID_1,
-            'old_value': None,
-            'new_value': 'exp_id'
-        })]
-        story_services.update_story(
-            self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
-
-        get_exp_rights_swap = self.swap(
-            exp_services, 'get_multiple_explorations_by_id',
-            _mock_get_multiple_explorations_by_id)
-
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception, 'Exploration id exp_id doesn\'t exist.')
-
-        with assert_raises_regexp_context_manager, get_exp_rights_swap:
-            story_services.publish_story(self.STORY_ID, self.user_id_admin)
 
     def test_cannot_update_story_with_invalid_exploration_id(self):
         change_list = [story_domain.StoryChange({
@@ -813,6 +445,206 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception, 'Expected story to only reference valid explorations'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
+    def test_cannot_update_story_with_exps_with_different_categories(self):
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1')
+        self.publish_exploration(self.user_id_a, 'exp_id_1')
+
+        self.save_new_valid_exploration(
+            'exp_id_2', self.user_id_a, title='title', category='Category 2')
+        self.publish_exploration(self.user_id_a, 'exp_id_2')
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_2,
+                'title': 'Title 2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': 'exp_id_1'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+                'node_id': 'node_1',
+                'old_value': [],
+                'new_value': ['node_2']
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_2,
+                'old_value': None,
+                'new_value': 'exp_id_2'
+            })
+        ]
+
+        with self.assertRaisesRegexp(
+            Exception, 'All explorations in a story should be of the '
+            'same category'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
+    def test_cannot_update_story_with_exps_with_other_languages(self):
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1',
+            language_code='es')
+        self.publish_exploration(self.user_id_a, 'exp_id_1')
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': 'exp_id_1'
+            })
+        ]
+
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid language es found for exploration with '
+            'ID exp_id_1'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
+    def test_cannot_update_story_with_exps_with_invalid_interactions(self):
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1',
+            interaction_id='LogicProof')
+        self.publish_exploration(self.user_id_a, 'exp_id_1')
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': 'exp_id_1'
+            })
+        ]
+
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid interaction LogicProof in exploration with '
+            'ID: exp_id_1'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
+    def test_cannot_update_story_with_exps_with_invalid_rte_content(self):
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1',
+            end_state_name='End')
+        self.publish_exploration(self.user_id_a, 'exp_id_1')
+        exp_services.update_exploration(
+            self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'Introduction',
+                'new_value': {
+                    'content_id': 'content',
+                    'html': (
+                        '<p><oppia-noninteractive-collapsible>'
+                        '</oppia-noninteractive-collapsible></p>')
+                }
+            })],
+            'Updated State Content.')
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': 'exp_id_1'
+            })
+        ]
+
+        with self.assertRaisesRegexp(
+            Exception, 'RTE content in state Introduction of exploration with '
+            'ID exp_id_1 is not supported on mobile.'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
+    def test_cannot_update_story_with_exps_with_parameter_values(self):
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1',
+            interaction_id='LogicProof')
+        exp_services.update_exploration(
+            self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'param_specs',
+                'new_value': {
+                    'theParameter':
+                        param_domain.ParamSpec('UnicodeString').to_dict()
+                }
+            })],
+            '')
+        self.publish_exploration(self.user_id_a, 'exp_id_1')
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': 'exp_id_1'
+            })
+        ]
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected no exploration to have parameter values in'
+            ' it. Invalid exploration: exp_id_1'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
+        self.save_new_valid_exploration(
+            'exp_id_2', self.user_id_a, title='title 2', category='Category 1',
+            interaction_id='LogicProof')
+        exp_services.update_exploration(
+            self.user_id_a, 'exp_id_2', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'param_specs',
+                'new_value': {
+                    'param1':
+                        param_domain.ParamSpec('UnicodeString').to_dict()
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_PARAM_CHANGES,
+                'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                'new_value': [
+                    param_domain.ParamChange('param1', 'Copier', {}).to_dict()]
+            })],
+            '')
+        self.publish_exploration(self.user_id_a, 'exp_id_2')
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': 'exp_id_1',
+                'new_value': 'exp_id_2'
+            })
+        ]
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected no exploration to have parameter values in'
+            ' it. Invalid exploration: exp_id_2'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
@@ -856,8 +688,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         self.save_new_topic(
-            topic_id, self.USER_ID, 'A different topic', 'A new topic', [], [],
-            [], [], 0)
+            topic_id, self.USER_ID, name='A different topic',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
         self.save_new_story(
             story_id, self.USER_ID, 'new title', 'Description', 'Notes',
             topic_id)
@@ -874,8 +709,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.USER_ID, story_id, change_list,
             'Updated story language_code.')
 
-        story_v1 = story_services.get_story_by_id(story_id, version=1)
-        story_v2 = story_services.get_story_by_id(story_id, version=2)
+        story_v1 = story_fetchers.get_story_by_id(story_id, version=1)
+        story_v2 = story_fetchers.get_story_by_id(story_id, version=2)
 
         self.assertEqual(story_v1.language_code, 'en')
         self.assertEqual(story_v2.language_code, 'bn')
@@ -1080,7 +915,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Delete node.')
 
     def test_delete_initial_node(self):
-        story = story_services.get_story_by_id(self.STORY_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
 
         self.assertEqual(
             story.story_contents.initial_node_id, self.NODE_ID_1)
@@ -1092,7 +927,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_services.update_story(
             self.USER_ID, self.STORY_ID, change_list, 'Delete node.')
 
-        story = story_services.get_story_by_id(self.STORY_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
 
         self.assertIsNone(story.story_contents.initial_node_id)
 
@@ -1126,8 +961,11 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.owner_id = 'owner'
         self.TOPIC_ID = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.TOPIC_ID, self.USER_ID, 'New Topic', 'A new topic', [], [], [],
-            [], 0)
+            self.TOPIC_ID, self.USER_ID, name='New Topic',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
         story = story_domain.Story.create_default_story(
             self.STORY_1_ID, 'Title', self.TOPIC_ID)
         story.description = ('Description')
@@ -1187,46 +1025,46 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
     def test_get_completed_node_ids(self):
         # There should be no exception if the user or story do not exist;
         # it should also return an empty list in both of these situations.
-        self.assertEqual(story_services.get_completed_node_ids(
+        self.assertEqual(story_fetchers.get_completed_node_ids(
             'Fake', self.STORY_1_ID), [])
-        self.assertEqual(story_services.get_completed_node_ids(
+        self.assertEqual(story_fetchers.get_completed_node_ids(
             self.owner_id, 'Fake'), [])
 
         # If no model exists, there should be no completed node IDs.
         self.assertIsNone(
             self._get_progress_model(self.owner_id, self.STORY_1_ID))
-        self.assertEqual(story_services.get_completed_node_ids(
+        self.assertEqual(story_fetchers.get_completed_node_ids(
             self.owner_id, self.STORY_1_ID), [])
 
         # If the first node is completed, it should be reported.
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
-        self.assertEqual(story_services.get_completed_node_ids(
+        self.assertEqual(story_fetchers.get_completed_node_ids(
             self.owner_id, self.STORY_1_ID), [self.NODE_ID_1])
 
         # If all nodes are completed, all of them should be reported.
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
         self.assertEqual(
-            story_services.get_completed_node_ids(
+            story_fetchers.get_completed_node_ids(
                 self.owner_id, self.STORY_1_ID),
             [self.NODE_ID_1, self.NODE_ID_2, self.NODE_ID_3])
 
     def test_get_latest_completed_node_ids(self):
         self.assertIsNone(
             self._get_progress_model(self.owner_id, self.STORY_1_ID))
-        self.assertEqual(story_services.get_latest_completed_node_ids(
+        self.assertEqual(story_fetchers.get_latest_completed_node_ids(
             self.owner_id, self.STORY_1_ID), [])
 
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
         self.assertEqual(
-            story_services.get_latest_completed_node_ids(
+            story_fetchers.get_latest_completed_node_ids(
                 self.owner_id, self.STORY_1_ID),
             [self.NODE_ID_1])
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)
         self.assertEqual(
-            story_services.get_latest_completed_node_ids(
+            story_fetchers.get_latest_completed_node_ids(
                 self.owner_id, self.STORY_1_ID),
             [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4])
 
@@ -1237,7 +1075,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
 
         self.assertEqual(
-            story_services.get_latest_completed_node_ids(
+            story_fetchers.get_latest_completed_node_ids(
                 self.owner_id, self.STORY_1_ID),
             [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4])
 
@@ -1249,7 +1087,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)
 
         self.assertEqual(
-            story_services.get_latest_completed_node_ids(
+            story_fetchers.get_latest_completed_node_ids(
                 self.owner_id, self.STORY_1_ID),
             [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4])
 
@@ -1258,7 +1096,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
 
         for ind, completed_node in enumerate(
-                story_services.get_completed_nodes_in_story(
+                story_fetchers.get_completed_nodes_in_story(
                     self.owner_id, self.STORY_1_ID)):
             self.assertEqual(
                 completed_node.to_dict(), self.nodes[ind].to_dict())
@@ -1269,28 +1107,10 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         # The starting index is 1 because the first story node is completed,
         # and the pending nodes will start from the second node.
         for index, pending_node in enumerate(
-                story_services.get_pending_nodes_in_story(
+                story_fetchers.get_pending_nodes_in_story(
                     self.owner_id, self.STORY_1_ID), start=1):
             self.assertEqual(
                 pending_node.to_dict(), self.nodes[index].to_dict())
-
-    def test_get_node_index_by_story_id_and_node_id(self):
-        # Tests correct node index should be returned when story and node exist.
-        node_index = story_services.get_node_index_by_story_id_and_node_id(
-            self.STORY_1_ID, self.NODE_ID_1)
-        self.assertEqual(node_index, 0)
-
-        # Tests error should be raised if story or node doesn't exist.
-        with self.assertRaisesRegexp(
-            Exception,
-            'Story node with id node_5 does not exist in this story.'):
-            story_services.get_node_index_by_story_id_and_node_id(
-                self.STORY_1_ID, 'node_5')
-
-        with self.assertRaisesRegexp(
-            Exception, 'Story with id story_id_2 does not exist.'):
-            story_services.get_node_index_by_story_id_and_node_id(
-                'story_id_2', self.NODE_ID_1)
 
     def test_record_completed_node_in_story_context(self):
         # Ensure that node completed within the context of a story are
@@ -1355,8 +1175,9 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
                 self.NODE_ID_1, self.NODE_ID_2, self.NODE_ID_3])
 
 
-# TODO: Remove this mock class and the StoryContentsMigrationTests class
-# once the actual functions for story_contents migrations are implemented.
+# TODO(aks681): Remove this mock class and the StoryContentsMigrationTests
+# class once the actual functions for story_contents migrations are
+# implemented.
 class MockStoryObject(story_domain.Story):
     """Mocks Story domain object."""
 
@@ -1373,8 +1194,11 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         user_id = 'user_id'
         self.save_new_topic(
-            topic_id, user_id, 'Topic', 'A new topic', [], [], [], [],
-            0)
+            topic_id, user_id, name='Topic',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
         self.save_new_story(
             story_id, user_id, 'Title', 'Description', 'Notes',
             topic_id)
@@ -1387,6 +1211,6 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
             feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 2)
 
         with swap_story_object, current_schema_version_swap:
-            story = story_services.get_story_from_model(story_model)
+            story = story_fetchers.get_story_from_model(story_model)
 
         self.assertEqual(story.story_contents_schema_version, 2)

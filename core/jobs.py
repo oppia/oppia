@@ -16,6 +16,9 @@
 
 """Common classes and methods for managing long running jobs."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import collections
 import copy
 import datetime
@@ -24,6 +27,7 @@ import logging
 import traceback
 
 from core.platform import models
+import python_utils
 import utils
 
 from google.appengine.api import app_identity
@@ -72,7 +76,7 @@ DEFAULT_RECENCY_MSEC = 14 * 24 * 60 * 60 * 1000
 NUM_JOBS_IN_DASHBOARD_LIMIT = 100
 
 
-class BaseJobManager(object):
+class BaseJobManager(python_utils.OBJECT):
     """Base class for managing long-running jobs.
 
     These jobs are not transaction-safe, and multiple jobs of the same kind
@@ -136,7 +140,9 @@ class BaseJobManager(object):
         return transaction_services.run_in_transaction(_create_new_job)
 
     @classmethod
-    def enqueue(cls, job_id, queue_name, additional_job_params=None):
+    def enqueue(
+            cls, job_id, queue_name,
+            additional_job_params=None, shard_count=None):
         """Marks a job as queued and adds it to a queue for processing.
 
         Args:
@@ -146,6 +152,7 @@ class BaseJobManager(object):
                 values.
             additional_job_params: dict(str : *) or None. Additional parameters
                 for the job.
+            shard_count: int. Number of shards used for the job.
         """
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
@@ -155,7 +162,8 @@ class BaseJobManager(object):
 
         # Enqueue the job.
         cls._pre_enqueue_hook(job_id)
-        cls._real_enqueue(job_id, queue_name, additional_job_params)
+        cls._real_enqueue(
+            job_id, queue_name, additional_job_params, shard_count)
 
         model.status_code = STATUS_CODE_QUEUED
         model.time_queued_msec = utils.get_current_time_in_millisecs()
@@ -212,7 +220,8 @@ class BaseJobManager(object):
             cls, output_list, test_only_max_output_len_chars=None):
         """Returns compressed list of strings within a max length of chars.
 
-        Ensures that the payload (i.e., [str(output) for output in output_list])
+        Ensures that the payload (i.e.,
+        [python_utils.UNICODE(output) for output in output_list])
         makes up at most max_output_chars of the final output data.
 
         Args:
@@ -235,10 +244,11 @@ class BaseJobManager(object):
             pass
 
         # Consolidate the lines of output since repeating them isn't useful.
-        counter = _OrderedCounter(str(output) for output in output_list)
+        counter = _OrderedCounter(
+            python_utils.UNICODE(output) for output in output_list)
         output_str_list = [
             output_str if count == 1 else '(%dx) %s' % (count, output_str)
-            for (output_str, count) in counter.iteritems()
+            for (output_str, count) in counter.items()
         ]
 
         # Truncate outputs to fit within given max length.
@@ -345,7 +355,8 @@ class BaseJobManager(object):
             cls.cancel(model.id, user_id)
 
     @classmethod
-    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
+    def _real_enqueue(
+            cls, job_id, queue_name, additional_job_params, shard_count):
         """Does the actual work of enqueueing a job for deferred execution.
 
         Args:
@@ -355,6 +366,7 @@ class BaseJobManager(object):
                 values.
             additional_job_params: dict(str : *) or None. Additional parameters
                 on jobs.
+            shard_count: int. Number of shards used for the job.
         """
         raise NotImplementedError(
             'Subclasses of BaseJobManager should implement _real_enqueue().')
@@ -611,9 +623,11 @@ class BaseDeferredJobManager(BaseJobManager):
                 'Job %s failed at %s' %
                 (job_id, utils.get_current_time_in_millisecs()))
             cls.register_failure(
-                job_id, '%s\n%s' % (unicode(e), traceback.format_exc()))
+                job_id, '%s\n%s'
+                % (python_utils.UNICODE(e), traceback.format_exc()))
             raise taskqueue_services.PermanentTaskFailure(
-                'Task failed: %s\n%s' % (unicode(e), traceback.format_exc()))
+                'Task failed: %s\n%s'
+                % (python_utils.UNICODE(e), traceback.format_exc()))
 
         # Note that the job may have been canceled after it started and before
         # it reached this stage. This will result in an exception when the
@@ -624,7 +638,8 @@ class BaseDeferredJobManager(BaseJobManager):
             (job_id, utils.get_current_time_in_millisecs()))
 
     @classmethod
-    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
+    def _real_enqueue(
+            cls, job_id, queue_name, additional_job_params, unused_shard_count):
         """Puts the job in the task queue.
 
         Args:
@@ -634,9 +649,11 @@ class BaseDeferredJobManager(BaseJobManager):
                 values.
             additional_job_params: dict(str : *) or None. Additional params to
                 pass into the job's _run() method.
+            unused_shard_count: int. Number of shards used for the job.
         """
         taskqueue_services.defer(
-            cls._run_job, queue_name, job_id, additional_job_params)
+            cls._run_job, queue_name,
+            job_id, additional_job_params)
 
 
 class MapReduceJobPipeline(base_handler.PipelineBase):
@@ -704,7 +721,7 @@ class StoreMapReduceResults(base_handler.PipelineBase):
                 (job_id, utils.get_current_time_in_millisecs()))
             job_class.register_failure(
                 job_id,
-                '%s\n%s' % (unicode(e), traceback.format_exc()))
+                '%s\n%s' % (python_utils.UNICODE(e), traceback.format_exc()))
 
 
 class GoogleCloudStorageConsistentJsonOutputWriter(
@@ -722,7 +739,7 @@ class GoogleCloudStorageConsistentJsonOutputWriter(
             data: *. Data to be serialized in JSON format.
         """
         super(GoogleCloudStorageConsistentJsonOutputWriter, self).write(
-            '%s\n' % json.dumps(data))
+            python_utils.convert_to_bytes('%s\n' % json.dumps(data)))
 
 
 class BaseMapReduceJobManager(BaseJobManager):
@@ -805,7 +822,8 @@ class BaseMapReduceJobManager(BaseJobManager):
             'reduce as a @staticmethod.')
 
     @classmethod
-    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
+    def _real_enqueue(
+            cls, job_id, queue_name, additional_job_params, shard_count):
         """Configures, creates, and queues the pipeline for the given job and
         params.
 
@@ -816,6 +834,7 @@ class BaseMapReduceJobManager(BaseJobManager):
                 values.
             additional_job_params: dict(str : *) or None. Additional params to
                 pass into the job's _run() method.
+            shard_count: int. Number of shards used for the job.
 
         Raises:
             Exception: Passed a value to a parameter in the mapper which has
@@ -840,7 +859,7 @@ class BaseMapReduceJobManager(BaseJobManager):
                 # strings. Also note that the value for this key is determined
                 # just before enqueue time, so it will be roughly equal to the
                 # actual enqueue time.
-                MAPPER_PARAM_KEY_QUEUED_TIME_MSECS: str(
+                MAPPER_PARAM_KEY_QUEUED_TIME_MSECS: python_utils.UNICODE(
                     utils.get_current_time_in_millisecs()),
             },
             'reducer_params': {
@@ -849,7 +868,8 @@ class BaseMapReduceJobManager(BaseJobManager):
                     'content_type': 'text/plain',
                     'naming_format': 'mrdata/$name/$id/output-$num',
                 }
-            }
+            },
+            'shards': shard_count
         }
 
         if additional_job_params is not None:
@@ -906,17 +926,21 @@ class BaseMapReduceOneOffJobManager(BaseMapReduceJobManager):
     """Overriden to force subclass jobs into the one-off jobs queue."""
 
     @classmethod
-    def enqueue(cls, job_id, additional_job_params=None):
+    def enqueue(cls, job_id, additional_job_params=None, shard_count=8):
         """Marks a job as queued and adds it to a queue for processing.
 
         Args:
             job_id: str. The ID of the job to enqueue.
             additional_job_params: dict(str : *) or None. Additional parameters
                 for the job.
+            shard_count: int. Number of shards used for the job.
+                Default count is 8.
         """
         super(BaseMapReduceOneOffJobManager, cls).enqueue(
-            job_id, taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
-            additional_job_params=additional_job_params)
+            job_id,
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+            additional_job_params=additional_job_params,
+            shard_count=shard_count)
 
 
 class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
@@ -1012,7 +1036,8 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
         Returns:
             bool. Whether mapper spec and all mapper patterns are valid.
         """
-        return True  # TODO.
+        # TODO(seanlip): Actually implement the validation.
+        return True
 
 
 class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
@@ -1188,7 +1213,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             realtime_layer. The realtime layer entity.
         """
         if (self.realtime_layer is None or
-                str(self.realtime_layer) != self.id[0]):
+                python_utils.UNICODE(self.realtime_layer) != self.id[0]):
             raise Exception(
                 'Realtime layer %s does not match realtime id %s' %
                 (self.realtime_layer, self.id))
@@ -1197,7 +1222,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             BaseRealtimeDatastoreClassForContinuousComputations, self).put()
 
 
-class BaseContinuousComputationManager(object):
+class BaseContinuousComputationManager(python_utils.OBJECT):
     """This class represents a manager for a continuously-running computation.
 
     Such computations consist of two parts: a batch job to compute summary
@@ -1404,11 +1429,16 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def _kickoff_batch_job(cls):
-        """Create and enqueue a new batch job."""
+        """Create and enqueue a new batch job.
+
+        Returns:
+            str. The unique id of the new batch job.
+        """
         job_manager = cls._get_batch_job_manager_class()
         job_id = job_manager.create_new()
         job_manager.enqueue(
             job_id, taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS)
+        return job_id
 
     @classmethod
     def _register_end_of_batch_job_and_return_status(cls):
@@ -1447,6 +1477,10 @@ class BaseContinuousComputationManager(object):
     def start_computation(cls):
         """(Re)starts the continuous computation corresponding to this class.
 
+        Returns:
+            str. The unique id of the new batch job beginning/continuing the
+                computation.
+
         Raises:
             Exception: The computation wasn't idle before trying to start.
         """
@@ -1476,7 +1510,7 @@ class BaseContinuousComputationManager(object):
 
         cls._clear_inactive_realtime_layer(datetime.datetime.utcnow())
 
-        cls._kickoff_batch_job()
+        return cls._kickoff_batch_job()
 
     @classmethod
     def stop_computation(cls, user_id):
@@ -1570,8 +1604,12 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
-        """Seam that can be overridden by tests."""
-        cls._kickoff_batch_job()
+        """Seam that can be overridden by tests.
+
+        Returns:
+            str. The unique id of the next batch job to be run.
+        """
+        return cls._kickoff_batch_job()
 
     @classmethod
     def on_batch_job_completion(cls):

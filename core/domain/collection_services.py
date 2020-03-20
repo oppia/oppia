@@ -22,6 +22,9 @@ delegate to the Collection model class. This will enable the collection
 storage model to be changed without affecting this module and others above it.
 """
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import collections
 import copy
 import logging
@@ -30,12 +33,15 @@ import os
 from constants import constants
 from core.domain import activity_services
 from core.domain import collection_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (collection_models, user_models) = models.Registry.import_models([
@@ -254,7 +260,7 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
     memcache_keys = [_get_collection_memcache_key(i) for i in collection_ids]
     cache_result = memcache_services.get_multi(memcache_keys)
 
-    for collection_obj in cache_result.itervalues():
+    for collection_obj in cache_result.values():
         result[collection_obj.id] = collection_obj
 
     for _id in collection_ids:
@@ -281,7 +287,7 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
             % '\n'.join(not_found))
 
     cache_update = {
-        cid: db_results_dict[cid] for cid in db_results_dict.iterkeys()
+        cid: db_results_dict[cid] for cid in db_results_dict
         if db_results_dict[cid] is not None
     }
 
@@ -484,7 +490,7 @@ def record_played_exploration_in_collection_context(
         progress_model.put()
 
 
-def _get_collection_summary_dicts_from_models(collection_summary_models):
+def get_collection_summary_dicts_from_models(collection_summary_models):
     """Given an iterable of CollectionSummaryModel instances, create a dict
     containing corresponding collection summary domain objects, keyed by id.
 
@@ -523,6 +529,25 @@ def get_collection_summaries_matching_ids(collection_ids):
             collection_ids)]
 
 
+def get_collection_summaries_subscribed_to(user_id):
+    """Returns a list of CollectionSummary domain objects that the user
+    subscribes to.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(CollectionSummary). List of CollectionSummary domain objects that
+        the user subscribes to.
+    """
+    return [
+        summary for summary in
+        get_collection_summaries_matching_ids(
+            subscription_services.get_collection_ids_subscribed_to(user_id)
+        ) if summary is not None
+    ]
+
+
 # TODO(bhenning): Update this function to support also matching the query to
 # explorations contained within this collection. Introduce tests to verify this
 # behavior.
@@ -548,7 +573,7 @@ def get_collection_ids_matching_query(query_string, cursor=None):
     returned_collection_ids = []
     search_cursor = cursor
 
-    for _ in range(MAX_ITERATIONS):
+    for _ in python_utils.RANGE(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_collection_ids)
 
@@ -681,7 +706,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     # Validate that all explorations referenced by the collection exist.
     exp_ids = collection.exploration_ids
     exp_summaries = (
-        exp_services.get_exploration_summaries_matching_ids(exp_ids))
+        exp_fetchers.get_exploration_summaries_matching_ids(exp_ids))
     exp_summaries_dict = {
         exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
     }
@@ -804,31 +829,48 @@ def delete_collection(committer_id, collection_id, force_deletion=False):
             still retained in the datastore. This last option is the preferred
             one.
     """
-    collection_rights_model = collection_models.CollectionRightsModel.get(
-        collection_id)
-    collection_rights_model.delete(
-        committer_id, '', force_deletion=force_deletion)
+    delete_collections(
+        committer_id, [collection_id], force_deletion=force_deletion)
 
-    collection_model = collection_models.CollectionModel.get(collection_id)
-    collection_model.delete(
-        committer_id, feconf.COMMIT_MESSAGE_COLLECTION_DELETED,
+
+def delete_collections(committer_id, collection_ids, force_deletion=False):
+    """Deletes the collections with the given collection_ids.
+
+    IMPORTANT: Callers of this function should ensure that committer_id has
+    permissions to delete this collection, prior to calling this function.
+
+    Args:
+        committer_id: str. ID of the committer.
+        collection_ids: list(str). IDs of the collections to be deleted.
+        force_deletion: bool. If true, the collections and its histories are
+            fully deleted and are unrecoverable. Otherwise, the collections and
+            all its histories are marked as deleted, but the corresponding
+            models are still retained in the datastore.
+    """
+    collection_models.CollectionRightsModel.delete_multi(
+        collection_ids, committer_id, '', force_deletion=force_deletion)
+    collection_models.CollectionModel.delete_multi(
+        collection_ids, committer_id,
+        feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
         force_deletion=force_deletion)
 
     # This must come after the collection is retrieved. Otherwise the memcache
     # key will be reinstated.
-    collection_memcache_key = _get_collection_memcache_key(collection_id)
-    memcache_services.delete(collection_memcache_key)
+    collection_memcache_keys = [
+        _get_collection_memcache_key(collection_id)
+        for collection_id in collection_ids]
+    memcache_services.delete_multi(collection_memcache_keys)
 
     # Delete the collection from search.
-    search_services.delete_collections_from_search_index([collection_id])
+    search_services.delete_collections_from_search_index(collection_ids)
 
     # Delete the summary of the collection (regardless of whether
     # force_deletion is True or not).
-    delete_collection_summary(collection_id)
+    delete_collection_summaries(collection_ids)
 
     # Remove the collection from the featured activity list, if necessary.
-    activity_services.remove_featured_activity(
-        constants.ACTIVITY_TYPE_COLLECTION, collection_id)
+    activity_services.remove_featured_activities(
+        constants.ACTIVITY_TYPE_COLLECTION, collection_ids)
 
 
 def get_collection_snapshots_metadata(collection_id):
@@ -846,7 +888,7 @@ def get_collection_snapshots_metadata(collection_id):
     """
     collection = get_collection_by_id(collection_id)
     current_version = collection.version
-    version_nums = range(1, current_version + 1)
+    version_nums = list(python_utils.RANGE(1, current_version + 1))
 
     return collection_models.CollectionModel.get_snapshots_metadata(
         collection_id, version_nums)
@@ -1008,18 +1050,13 @@ def compute_collection_contributors_summary(collection_id):
     while True:
         snapshot_metadata = snapshots_metadata[current_version - 1]
         committer_id = snapshot_metadata['committer_id']
-        is_revert = (snapshot_metadata['commit_type'] == 'revert')
-        if not is_revert and committer_id not in constants.SYSTEM_USER_IDS:
+        if committer_id not in constants.SYSTEM_USER_IDS:
             contributors_summary[committer_id] += 1
 
         if current_version == 1:
             break
 
-        if is_revert:
-            current_version = snapshot_metadata['commit_cmds'][0][
-                'version_number']
-        else:
-            current_version -= 1
+        current_version -= 1
     return contributors_summary
 
 
@@ -1056,15 +1093,16 @@ def save_collection_summary(collection_summary):
     collection_summary_model.put()
 
 
-def delete_collection_summary(collection_id):
-    """Delete a collection summary model.
+def delete_collection_summaries(collection_ids):
+    """Delete multiple collection summary models.
 
     Args:
-        collection_id: str. ID of the collection whose collection summary is to
-            be deleted.
+        collection_ids: list(str). IDs of the collections whose collection
+            summaries are to be deleted.
     """
-
-    collection_models.CollectionSummaryModel.get(collection_id).delete()
+    summary_models = (
+        collection_models.CollectionSummaryModel.get_multi(collection_ids))
+    collection_models.CollectionSummaryModel.delete_multi(summary_models)
 
 
 def save_new_collection_from_yaml(committer_id, yaml_content, collection_id):
@@ -1141,7 +1179,7 @@ def load_demo(collection_id):
     for collection_node in collection.nodes:
         exp_id = collection_node.exploration_id
         # Only load the demo exploration if it is not yet loaded.
-        if exp_services.get_exploration_by_id(exp_id, strict=False) is None:
+        if exp_fetchers.get_exploration_by_id(exp_id, strict=False) is None:
             exp_services.load_demo(exp_id)
 
     logging.info('Collection with id %s was loaded.' % collection_id)

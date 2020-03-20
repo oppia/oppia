@@ -61,6 +61,8 @@ var ExplorationEditorSettingsTab = function() {
     by.css('.protractor-test-delete-exploration-button'));
   var confirmDeleteExplorationButton = element(
     by.css('.protractor-test-really-delete-exploration-button'));
+  var enableCorrectnessFeedbackButton = element(
+    by.css('.protractor-test-enable-mark-correctness-feedback'));
 
   /*
    * Workflows
@@ -103,6 +105,13 @@ var ExplorationEditorSettingsTab = function() {
 
   this.enableParameters = function() {
     enableParametersSwitch.click();
+  };
+
+  this.enableCorrectnessFeedback = function() {
+    expect(enableCorrectnessFeedbackButton.isDisplayed()).toBe(true);
+    waitFor.elementToBeClickable(enableCorrectnessFeedbackButton,
+      'Enable correctness feedback button is not clickable.');
+    enableCorrectnessFeedbackButton.click();
   };
 
   this.expectAvailableFirstStatesToBe = function(names) {

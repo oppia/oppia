@@ -16,6 +16,9 @@
 
 """Tests for the HTML validation."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import logging
 import os
 
@@ -24,6 +27,7 @@ from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.tests import test_utils
 import feconf
+import python_utils
 
 
 class ContentMigrationTests(test_utils.GenericTestBase):
@@ -69,7 +73,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             elif index == 2:
                 tag = soup.find(name='b')
             html_validation_service.wrap_with_siblings(tag, soup.new_tag('p'))
-            self.assertEqual(str(soup), test_case['expected_output'])
+            self.assertEqual(
+                python_utils.UNICODE(soup), test_case['expected_output'])
 
     def test_convert_to_textangular(self):
         test_cases = [{
@@ -480,7 +485,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         for index, test_case in enumerate(test_cases_for_textangular):
             actual_output_for_textangular = (
-                html_validation_service._validate_soup_for_rte( # pylint: disable=protected-access
+                html_validation_service.validate_soup_for_rte(
                     bs4.BeautifulSoup(test_case, 'html.parser'),
                     feconf.RTE_FORMAT_TEXTANGULAR, err_dict))
 
@@ -508,7 +513,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         for index, test_case in enumerate(test_cases_for_ckeditor):
             actual_output_for_ckeditor = (
-                html_validation_service._validate_soup_for_rte( # pylint: disable=protected-access
+                html_validation_service.validate_soup_for_rte(
                     bs4.BeautifulSoup(test_case, 'html.parser'),
                     feconf.RTE_FORMAT_CKEDITOR, err_dict))
 
@@ -840,6 +845,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'expected_output': (
                 '<ol><li><p>This is a p in ol</p><p> or ul</p></li></ol>'
             )
+        }, {
+            'html_content': '<ul>\n<li>Item</li>\n</ul>',
+            'expected_output': '<ul><li>Item</li></ul>'
+        }, {
+            'html_content': '<p>Para1</p>\n<p>Para2</p>',
+            'expected_output': '<p>Para1</p><p>Para2</p>'
         }]
 
         for test_case in test_cases:
@@ -1119,7 +1130,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'heading-with-value="&amp;quot;lorem ipsum&amp;quot;">'
                 '</oppia-noninteractive-collapsible>'
             )],
-            'Missing attributes: [u\'text-with-value\'], Extra attributes: []':
+            'Missing attributes: text-with-value, Extra attributes: ':
             [(
                 '<oppia-noninteractive-collapsible content-with-value'
                 '="&amp;quot;&amp;lt;p&amp;gt;&amp;lt;oppia-noninteractive-'
@@ -1144,7 +1155,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '</oppia-noninteractive-video>'
             )],
             (
-                'Invalid URL: Sanitized URL should start with \'http://\' or '
+                u'Invalid URL: Sanitized URL should start with \'http://\' or '
                 '\'https://\'; received htt://link.com'
             ): [(
                 '<p><oppia-noninteractive-link text-with-value="&amp;quot;'
@@ -1152,8 +1163,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'link.com&amp;quot;"></oppia-noninteractive-link></p>'
             )],
             (
-                'Missing attributes: [u\'video_id-with-value\'], '
-                'Extra attributes: []'
+                'Missing attributes: video_id-with-value, '
+                'Extra attributes: '
             ): [(
                 '<oppia-noninteractive-video autoplay-with-value="false" '
                 'end-with-value="0" start-with-value="0">'
@@ -1170,7 +1181,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'url-with-value="&amp;quot;http://google.com&amp;quot;">'
                 '</oppia-noninteractive-link></p>'
             )],
-            'Missing keys: [\'title\'], Extra keys: [u\'url\']': [(
+            'Missing keys: [u\'title\'], Extra keys: [u\'url\']': [(
                 '<oppia-noninteractive-tabs tab_contents-with-value="'
                 '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
                 'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;url'
@@ -1193,7 +1204,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: '
                 '&amp;quot;Savjet 1&amp;quot;}]"></oppia-noninteractive-tabs>'
             )],
-            'Missing attributes: [u\'alt-with-value\'], Extra attributes: []':
+            'Missing attributes: alt-with-value, Extra attributes: ':
             [(
                 '<oppia-noninteractive-image caption-with-value="&amp;quot;abc'
                 '&amp;quot;" filepath-with-value="&amp;quot;random.png&amp;'
@@ -1249,8 +1260,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'Invalid URL: Sanitized URL should start with \'http://\' '
                 'or \'https://\'; received htt://link.com'
             )],
-            ['Missing attributes: [u\'alt-with-value\'], Extra attributes: []'],
-            ['Expected dict, received [1, 2, 3]']
+            ['Missing attributes: alt-with-value, Extra attributes: '],
+            [u'Expected dict, received [1, 2, 3]']
         ]
         for test_case in test_cases:
             html_string = test_case['html_string']
@@ -1258,7 +1269,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             soup = bs4.BeautifulSoup(
                 html_string.encode(encoding='utf-8'), 'html.parser')
             actual_output.append(list(
-                html_validation_service._validate_customization_args_in_tag( # pylint: disable=protected-access
+                html_validation_service.validate_customization_args_in_tag(
                     soup.find(name=tag_name))))
 
         self.assertEqual(actual_output, expected_output)
@@ -1334,16 +1345,17 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }]
 
         exp_id = 'eid'
-        owner_id = 'Admin'
 
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
-        fs.commit(owner_id, 'image/abc1.png', raw_image, mimetype='image/png')
-        fs.commit(owner_id, 'image/abc2.png', raw_image, mimetype='image/png')
-        fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs.commit('image/abc1.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc2.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc3.png', raw_image, mimetype='image/png')
 
         for test_case in test_cases:
             self.assertEqual(
@@ -1370,14 +1382,15 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         )
 
         exp_id = 'exp_id'
-        owner_id = 'Admin'
 
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
-        fs.commit(owner_id, 'image/abc1.png', raw_image, mimetype='image/png')
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs.commit('image/abc1.png', raw_image, mimetype='image/png')
 
         with assert_raises_context_manager, logging_swap:
             html_validation_service.add_dimensions_to_image_tags(
@@ -1435,15 +1448,16 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }]
 
         exp_id = 'eid'
-        owner_id = 'Admin'
 
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
-                fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
-        fs.commit(owner_id, 'image/img.png', raw_image, mimetype='image/png')
-        fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs.commit('image/img.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc3.png', raw_image, mimetype='image/png')
 
         for test_case in test_cases:
             self.assertEqual(

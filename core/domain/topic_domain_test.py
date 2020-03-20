@@ -16,11 +16,12 @@
 
 """Tests for topic domain objects."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import datetime
 
 from constants import constants
-from core.domain import skill_domain
-from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import user_services
 from core.tests import test_utils
@@ -37,7 +38,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name')
+            self.topic_id, 'Name', 'abbrev')
         self.topic.subtopics = [
             topic_domain.Subtopic(1, 'Title', ['skill_id_1'])]
         self.topic.next_subtopic_id = 2
@@ -50,18 +51,23 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_create_default_topic(self):
         """Tests the create_default_topic() function."""
-        topic = topic_domain.Topic.create_default_topic(self.topic_id, 'Name')
+        topic = topic_domain.Topic.create_default_topic(
+            self.topic_id, 'Name', 'abbrev')
         expected_topic_dict = {
             'id': self.topic_id,
             'name': 'Name',
+            'abbreviated_name': 'abbrev',
+            'thumbnail_filename': None,
             'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
-            'canonical_story_ids': [],
-            'additional_story_ids': [],
+            'canonical_story_references': [],
+            'additional_story_references': [],
             'uncategorized_skill_ids': [],
             'subtopics': [],
             'next_subtopic_id': 1,
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'subtopic_schema_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            'story_reference_schema_version': (
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
             'version': 0
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
@@ -88,28 +94,97 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'id': 1,
                 'title': 'Title'}])
 
-    def test_delete_story(self):
-        self.topic.canonical_story_ids = [
-            'story_id', 'story_id_1', 'story_id_2']
-        self.topic.delete_story('story_id_1')
+    def test_delete_canonical_story(self):
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_2')
+        ]
+        self.topic.delete_canonical_story('story_id_1')
+        canonical_story_ids = self.topic.get_canonical_story_ids()
         self.assertEqual(
-            self.topic.canonical_story_ids, ['story_id', 'story_id_2'])
+            canonical_story_ids, ['story_id', 'story_id_2'])
         with self.assertRaisesRegexp(
             Exception, 'The story_id story_id_5 is not present in the canonical'
-            ' story ids list of the topic.'):
-            self.topic.delete_story('story_id_5')
+            ' story references list of the topic.'):
+            self.topic.delete_canonical_story('story_id_5')
+
+    def test_get_all_story_references(self):
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
+        self.topic.additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_2'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_3')
+        ]
+        all_story_references = self.topic.get_all_story_references()
+        self.assertEqual(len(all_story_references), 4)
+        self.assertEqual(all_story_references[0].story_id, 'story_id')
+        self.assertEqual(all_story_references[1].story_id, 'story_id_1')
+        self.assertEqual(all_story_references[2].story_id, 'story_id_2')
+        self.assertEqual(all_story_references[3].story_id, 'story_id_3')
+
 
     def test_add_canonical_story(self):
-        self.topic.canonical_story_ids = [
-            'story_id', 'story_id_1']
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
         self.topic.add_canonical_story('story_id_2')
+        canonical_story_ids = self.topic.get_canonical_story_ids()
         self.assertEqual(
-            self.topic.canonical_story_ids,
+            canonical_story_ids,
             ['story_id', 'story_id_1', 'story_id_2'])
         with self.assertRaisesRegexp(
             Exception, 'The story_id story_id_2 is already present in the '
-            'canonical story ids list of the topic.'):
+            'canonical story references list of the topic.'):
             self.topic.add_canonical_story('story_id_2')
+
+    def test_delete_additional_story(self):
+        self.topic.additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_2')
+        ]
+        self.topic.delete_additional_story('story_id_1')
+        additional_story_ids = self.topic.get_additional_story_ids()
+        self.assertEqual(
+            additional_story_ids, ['story_id', 'story_id_2'])
+        with self.assertRaisesRegexp(
+            Exception,
+            'The story_id story_id_5 is not present in the additional'
+            ' story references list of the topic.'):
+            self.topic.delete_additional_story('story_id_5')
+
+    def test_add_additional_story(self):
+        self.topic.additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
+        self.topic.add_additional_story('story_id_2')
+        additional_story_ids = self.topic.get_additional_story_ids()
+        self.assertEqual(
+            additional_story_ids,
+            ['story_id', 'story_id_1', 'story_id_2'])
+        with self.assertRaisesRegexp(
+            Exception, 'The story_id story_id_2 is already present in the '
+            'additional story references list of the topic.'):
+            self.topic.add_additional_story('story_id_2')
 
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the topic passes strict validation."""
@@ -123,13 +198,47 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             topic_domain.Topic.require_valid_topic_id(topic_id)
 
+    def _assert_valid_abbreviated_name(
+            self, expected_error_substring, name):
+        """Checks that the topic passes strict validation."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            topic_domain.Topic.require_valid_abbreviated_name(name)
+
     def test_valid_topic_id(self):
         self._assert_valid_topic_id('Topic id should be a string', 10)
         self._assert_valid_topic_id('Topic id abc is invalid', 'abc')
 
+    def test_valid_abbreviated_name(self):
+        self._assert_valid_abbreviated_name(
+            'Abbreviated name should be a string.', 10)
+        self._assert_valid_abbreviated_name(
+            'Abbreviated name field should not be empty.', '')
+        self._assert_valid_abbreviated_name(
+            'Abbreviated name field should not exceed 12 characters.',
+            'this is a lengthy name.')
+
+    def test_thumbnail_filename_validation(self):
+        self.topic.thumbnail_filename = 1
+        self._assert_validation_error(
+            'Expected thumbnail filename to be a string, received 1')
+
     def test_subtopic_title_validation(self):
         self.topic.subtopics[0].title = 1
         self._assert_validation_error('Expected subtopic title to be a string')
+
+    def test_story_id_validation(self):
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference(123, True)
+        ]
+        self._assert_validation_error('Expected story id to be a string')
+
+    def test_story_is_published_validation(self):
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference('story_id', 'published')
+        ]
+        self._assert_validation_error(
+            'Expected story_is_published to be a boolean')
 
     def test_subtopic_id_validation(self):
         self.topic.subtopics[0].id = 'invalid_id'
@@ -153,11 +262,19 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Name should be a string')
         self.topic.name = ''
         self._assert_validation_error('Name field should not be empty')
+        self.topic.name = 'Very long and therefore invalid topic name'
+        self._assert_validation_error(
+            'Topic name should be at most 35 characters')
 
     def test_subtopic_schema_version_type_validation(self):
         self.topic.subtopic_schema_version = 'invalid_version'
         self._assert_validation_error(
-            'Expected schema version to be an integer')
+            'Expected subtopic schema version to be an integer')
+
+    def test_story_reference_schema_version_type_validation(self):
+        self.topic.story_reference_schema_version = 'invalid_version'
+        self._assert_validation_error(
+            'Expected story reference schema version to be an integer')
 
     def test_subtopic_schema_version_validation(self):
         self.topic.subtopic_schema_version = 0
@@ -173,6 +290,15 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_description_validation(self):
         self.topic.description = 1
         self._assert_validation_error('Expected description to be a string')
+        self.topic.description = (
+            'Lorem ipsum dolor sit amet, consectetuer '
+            'adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. '
+            'Dum sociis natoque penatibus et magnis dis parturient montes, '
+            'nascetur ridiculus mus. Donec quam felis, ultricies nec, '
+            'pellentesque eu,'
+        )
+        self._assert_validation_error(
+            'Topic description should be at most 240 characters.')
 
     def test_next_subtopic_id_validation(self):
         self.topic.next_subtopic_id = '1'
@@ -189,25 +315,49 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.language_code = 'xz'
         self._assert_validation_error('Invalid language code')
 
-    def test_canonical_story_ids_validation(self):
-        self.topic.canonical_story_ids = ['story_id', 'story_id', 'story_id_1']
+    def test_canonical_story_references_validation(self):
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
         self._assert_validation_error(
             'Expected all canonical story ids to be distinct.')
-        self.topic.canonical_story_ids = 'story_id'
+        self.topic.canonical_story_references = 'story_id'
         self._assert_validation_error(
-            'Expected canonical story ids to be a list')
+            'Expected canonical story references to be a list')
 
-    def test_additional_story_ids_validation(self):
-        self.topic.additional_story_ids = ['story_id', 'story_id', 'story_id_1']
+    def test_additional_story_references_validation(self):
+        self.topic.additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
         self._assert_validation_error(
             'Expected all additional story ids to be distinct.')
-        self.topic.additional_story_ids = 'story_id'
+        self.topic.additional_story_references = 'story_id'
         self._assert_validation_error(
-            'Expected additional story ids to be a list')
+            'Expected additional story references to be a list')
 
     def test_additional_canonical_story_intersection_validation(self):
-        self.topic.additional_story_ids = ['story_id', 'story_id_1']
-        self.topic.canonical_story_ids = ['story_id', 'story_id_2']
+        self.topic.additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1'),
+        ]
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_2')
+        ]
         self._assert_validation_error(
             'Expected additional story ids list and canonical story '
             'ids list to be mutually exclusive.')
@@ -226,23 +376,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self.topic.add_uncategorized_skill_id('skill_id_1')
         self.topic.add_uncategorized_skill_id('skill_id_3')
         self.assertEqual(self.topic.uncategorized_skill_ids, ['skill_id_3'])
-
-    def test_fail_to_add_unpublished_skill_id(self):
-        self.save_new_skill(
-            'skill_a', self.user_id_a, 'Description A', misconceptions=[],
-            skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml(
-                    '1', 'Explanation'), [
-                        state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
-                state_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {'1': {}, '2': {}}})))
-        with self.assertRaisesRegexp(
-            Exception,
-            'Cannot assign unpublished skills to a topic'):
-            self.topic.add_uncategorized_skill_id('skill_a')
-
 
     def test_remove_uncategorized_skill_id(self):
         self.topic.uncategorized_skill_ids = ['skill_id_5']
@@ -315,11 +448,15 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.update_language_code('bn')
         self.assertEqual(self.topic.language_code, 'bn')
 
-    def test_update_additional_story_ids(self):
-        self.assertEqual(self.topic.additional_story_ids, [])
-        self.topic.update_additional_story_ids(['story_id_1', 'story_id_2'])
-        self.assertEqual(
-            self.topic.additional_story_ids, ['story_id_1', 'story_id_2'])
+    def test_update_abbreviated_name(self):
+        self.assertEqual(self.topic.abbreviated_name, 'abbrev')
+        self.topic.update_abbreviated_name('name')
+        self.assertEqual(self.topic.abbreviated_name, 'name')
+
+    def test_update_thumbnail_filename(self):
+        self.assertEqual(self.topic.thumbnail_filename, None)
+        self.topic.update_thumbnail_filename('img.png')
+        self.assertEqual(self.topic.thumbnail_filename, 'img.png')
 
     def test_cannot_add_uncategorized_skill_with_existing_uncategorized_skill(
             self):
@@ -800,3 +937,30 @@ class TopicSummaryTests(test_utils.GenericTestBase):
                 'Expected subtopic_count to be non-negative, '
                 'received \'-1\'')):
             self.topic_summary.validate()
+
+
+class TopicRightsTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(TopicRightsTests, self).setUp()
+        self.signup('a@example.com', 'A')
+        self.signup('b@example.com', 'B')
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
+        self.topic_summary_dict = {
+            'topic_id': 'topic_id',
+            'manager_names': ['A'],
+            'topic_is_published': False,
+        }
+
+        self.topic_summary = topic_domain.TopicRights(
+            'topic_id', [self.user_id_a], False
+        )
+
+    def test_topic_summary_gets_created(self):
+        self.assertEqual(
+            self.topic_summary.to_dict(), self.topic_summary_dict)
+
+    def test_is_manager(self):
+        self.assertTrue(self.topic_summary.is_manager(self.user_id_a))
+        self.assertFalse(self.topic_summary.is_manager(self.user_id_b))

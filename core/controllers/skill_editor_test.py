@@ -14,6 +14,9 @@
 
 """Tests for the skill editor page."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import topic_services
@@ -42,15 +45,20 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
 
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id, self.admin_id, 'Description')
+        self.save_new_skill(
+            self.skill_id, self.admin_id, description='Description')
         self.skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id_2, self.admin_id, 'Description')
+        self.save_new_skill(
+            self.skill_id_2, self.admin_id, description='Description')
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description',
-            [], [], [self.skill_id], [], 1)
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[self.skill_id],
+            subtopics=[], next_subtopic_id=1)
 
-    def _delete_skill_model_and_memcache(self, user_id, skill_id):
+    def delete_skill_model_and_memcache(self, user_id, skill_id):
         """Deletes skill model and memcache corresponding to the given skill
         id.
         """
@@ -64,15 +72,6 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
             unused_commit_message):
         """Mocks skill updates. Always fails by raising a validation error."""
         raise utils.ValidationError()
-
-    def _mock_get_skill_rights(self, unused_skill_id, **unused_kwargs):
-        """Mocks get_skill_rights. Returns None."""
-        return None
-
-    def _mock_publish_skill_raise_exception(
-            self, unused_skill_id, unused_committer_id):
-        """Mocks publishing skills. Always fails by raising an exception."""
-        raise Exception()
 
 
 class SkillEditorTest(BaseSkillEditorControllerTests):
@@ -100,7 +99,7 @@ class SkillEditorTest(BaseSkillEditorControllerTests):
         self.login(self.ADMIN_EMAIL)
 
         # Check GET returns 404 when cannot get skill by id.
-        self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.get_html_response(self.url, expected_status_int=404)
         self.logout()
 
@@ -125,15 +124,6 @@ class SkillRightsHandlerTest(BaseSkillEditorControllerTests):
         with self.swap(role_services, 'get_all_actions', mock_get_all_actions):
             json_response = self.get_json(self.url)
             self.assertEqual(json_response['can_edit_skill_description'], False)
-        self.logout()
-
-    def test_skill_rights_handler_fails(self):
-        self.login(self.ADMIN_EMAIL)
-        # Check GET returns 404 when the returned skill rights is None.
-        skill_services_swap = self.swap(
-            skill_services, 'get_skill_rights', self._mock_get_skill_rights)
-        with skill_services_swap:
-            self.get_json(self.url, expected_status_int=404)
         self.logout()
 
 
@@ -176,12 +166,14 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         # Check that admins can access the editable skill data.
         json_response = self.get_json(self.url)
         self.assertEqual(self.skill_id, json_response['skill']['id'])
+        self.assertEqual(
+            1, len(json_response['grouped_skill_summaries']['Name']))
         self.logout()
 
     def test_editable_skill_handler_get_fails(self):
         self.login(self.ADMIN_EMAIL)
         # Check GET returns 404 when cannot get skill by id.
-        self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.get_json(self.url, expected_status_int=404)
         self.logout()
 
@@ -208,8 +200,16 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             self.put_json(
                 self.url, self.put_payload, csrf_token=csrf_token,
                 expected_status_int=400)
+        self.put_payload['version'] = None
+        self.put_json(
+            self.url, self.put_payload, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.put_payload['version'] = -1
+        self.put_json(
+            self.url, self.put_payload, csrf_token=csrf_token,
+            expected_status_int=400)
         # Check PUT returns 404 when cannot get skill by id.
-        self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.put_json(
             self.url, {}, csrf_token=csrf_token, expected_status_int=404)
         self.logout()
@@ -260,53 +260,32 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
     def test_skill_data_handler_get_fails(self):
         self.login(self.ADMIN_EMAIL)
         # Check GET returns 404 when cannot get skill by id.
-        self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.get_json(self.url, expected_status_int=404)
+        self.url = '%s/1,%s' % (
+            feconf.SKILL_DATA_URL_PREFIX, self.skill_id_2)
         self.get_json(self.url, expected_status_int=404)
         self.logout()
 
 
-class SkillPublishHandlerTest(BaseSkillEditorControllerTests):
-    """Tests for SkillPublishHandler."""
+class FetchSkillsHandlerTest(BaseSkillEditorControllerTests):
+    """Tests for FetchSkillsHandler."""
 
     def setUp(self):
-        super(SkillPublishHandlerTest, self).setUp()
-        self.url = '%s/%s' % (feconf.SKILL_PUBLISH_URL_PREFIX, self.skill_id)
+        super(FetchSkillsHandlerTest, self).setUp()
+        self.url = feconf.FETCH_SKILLS_URL_PREFIX
 
-    def test_skill_publish_handler_succeeds(self):
+    def test_skill_data_handler_get_multiple_skills(self):
         self.login(self.ADMIN_EMAIL)
-        # Check that an admin can publish a skill.
-        csrf_token = self.get_new_csrf_token()
-        self.put_json(self.url, {'version': 1}, csrf_token=csrf_token)
+        # Check that admins can access two skills data at the same time.
+        json_response = self.get_json(self.url)
+        self.assertEqual(self.skill_id, json_response['skills'][0]['id'])
+        self.assertEqual(len(json_response['skills']), 1)
         self.logout()
 
-    def test_skill_publish_handler_fails(self):
-
+    def test_skill_data_handler_get_fails(self):
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        # Check that a skill cannot be published when the payload has no
-        # version.
-        self.put_json(
-            self.url, {}, csrf_token=csrf_token,
-            expected_status_int=400)
-        # Check that a skill cannot be published when the payload's version
-        # is different from the skill's version.
-        self.put_json(
-            self.url, {'version': -1}, csrf_token=csrf_token,
-            expected_status_int=400)
-        # Check that a non-existing skill cannot be published.
-        url = '%s/non-existing-id' % (feconf.SKILL_PUBLISH_URL_PREFIX)
-        self.put_json(
-            url, {'version': 1}, csrf_token=csrf_token, expected_status_int=404)
-
-        # Check that the status is 401 when call to publish_skill raises an
-        # exception.
-        skill_services_swap = self.swap(
-            skill_services, 'publish_skill',
-            self._mock_publish_skill_raise_exception)
-        with skill_services_swap:
-            csrf_token = self.get_new_csrf_token()
-            self.put_json(
-                self.url, {'version': 1}, csrf_token=csrf_token,
-                expected_status_int=401)
-
+        # Check GET returns 404 when cannot get skill by id.
+        self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.get_json(self.url, expected_status_int=404)
         self.logout()

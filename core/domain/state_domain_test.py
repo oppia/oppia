@@ -16,12 +16,16 @@
 
 """Tests for state domain objects and methods defined on them."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import functools
 import logging
 import os
 import re
 
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import html_validation_service
 from core.domain import state_domain
@@ -37,6 +41,42 @@ def mock_get_filename_with_dimensions(filename, unused_exp_id):
 
 class StateDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on states."""
+
+    def test_get_all_html_content_strings(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'owner_id', end_state_name='END',
+            interaction_id='DragAndDropSortInput')
+
+        list_of_sets_of_html_strings = ['<p>list_of_sets_of_html_strings</p>']
+        answer_group_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [list_of_sets_of_html_strings]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        exploration.init_state.interaction.answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_group_dict)]
+
+        html_list = (
+            exploration.init_state.interaction.get_all_html_content_strings())
+        self.assertEqual(
+            html_list,
+            ['<p>Feedback</p>', '<p>list_of_sets_of_html_strings</p>', '', ''])
 
     def test_export_state_to_dict(self):
         """Test exporting a state to a dict."""
@@ -98,7 +138,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
             assets_list)
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         state_with_training_data = exploration.states['Home']
         state_without_training_data = exploration.states['End']
 
@@ -121,7 +161,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
             assets_list)
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         state = exploration.states['text']
 
         expected_training_data = [{
@@ -132,6 +172,251 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         observed_training_data = state.get_training_data()
 
         self.assertEqual(observed_training_data, expected_training_data)
+
+    def test_get_content_html_with_correct_state_name_returns_html(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
+        init_state.update_interaction_hints(hints_list)
+
+        self.assertEqual(
+            init_state.get_content_html('hint_1'), '<p>hint one</p>')
+
+        hints_list[0].hint_content.html = '<p>Changed hint one</p>'
+        init_state.update_interaction_hints(hints_list)
+
+        self.assertEqual(
+            init_state.get_content_html('hint_1'), '<p>Changed hint one</p>')
+
+    def test_android_validation(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': (
+                    '<p><oppia-noninteractive-math>'
+                    '</oppia-noninteractive-math></p>')
+            },
+        }
+
+        init_state.update_interaction_solution(solution_dict)
+        self.assertFalse(init_state.is_rte_content_supported_on_android())
+        solution_dict['explanation']['html'] = ''
+        init_state.update_interaction_solution(solution_dict)
+        self.assertTrue(init_state.is_rte_content_supported_on_android())
+
+        hints_list = []
+        hints_list.append(
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p><oppia-noninteractive-collapsible>'
+                    '</oppia-noninteractive-collapsible></p>'
+                )
+            )
+        )
+        init_state.update_interaction_hints(hints_list)
+        self.assertFalse(init_state.is_rte_content_supported_on_android())
+        hints_list[0].hint_content.html = ''
+        init_state.update_interaction_hints(hints_list)
+        self.assertTrue(init_state.is_rte_content_supported_on_android())
+
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', (
+                    '<p><oppia-noninteractive-math>'
+                    '</oppia-noninteractive-math></p>')),
+            False, [], None, None
+        )
+
+        init_state.update_interaction_default_outcome(default_outcome)
+        self.assertFalse(init_state.is_rte_content_supported_on_android())
+        default_outcome.feedback.html = ''
+        init_state.update_interaction_default_outcome(default_outcome)
+        self.assertTrue(init_state.is_rte_content_supported_on_android())
+
+        answer_group_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': (
+                        '<p><oppia-noninteractive-tabs tab_contents-with-value='
+                        '"{"title": "Hint introduction", "content": "This set '
+                        'of tabs shows some hints. Click on the other tabs to '
+                        'display the relevant hints."}">'
+                        '</oppia-noninteractive-tabs> Other Text </p>')
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        init_state.update_interaction_answer_groups(
+            [answer_group_dict])
+        self.assertFalse(init_state.is_rte_content_supported_on_android())
+        answer_group_dict['outcome']['feedback']['html'] = (
+            '<p><oppia-noninteractive-image>'
+            '</oppia-noninteractive-image></p>')
+        init_state.update_interaction_answer_groups(
+            [answer_group_dict])
+        self.assertTrue(init_state.is_rte_content_supported_on_android())
+
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': (
+                    '<p><oppia-noninteractive-tabs>'
+                    '</oppia-noninteractive-tabs></p>')
+            }))
+        self.assertFalse(init_state.is_rte_content_supported_on_android())
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': (
+                    '<p><oppia-noninteractive-link>'
+                    '</oppia-noninteractive-link></p>')
+            }))
+        self.assertTrue(init_state.is_rte_content_supported_on_android())
+
+    def test_get_content_html_with_invalid_content_id_raise_error(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
+        init_state.update_interaction_hints(hints_list)
+
+        self.assertEqual(
+            init_state.get_content_html('hint_1'), '<p>hint one</p>')
+
+        with self.assertRaisesRegexp(
+            ValueError, 'Content ID Invalid id does not exist'):
+            init_state.get_content_html('Invalid id')
+
+    def test_get_content_id_mapping_needing_translations_with_existing_translations(self): # pylint: disable=line-too-long
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('TextInput')
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+
+        init_state.update_interaction_default_outcome(default_outcome)
+
+        answer_group_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        init_state.update_interaction_answer_groups(
+            [answer_group_dict])
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
+        init_state.update_interaction_hints(hints_list)
+
+        solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>hello_world is a string</p>'
+            },
+        }
+
+        init_state.update_interaction_solution(solution_dict)
+
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'html': '<p>hello!</p>',
+                        'needs_update': False
+                    }
+                },
+                'hint_1': {},
+                'default_outcome': {},
+                'solution': {},
+                'feedback_1': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        init_state.update_written_translations(written_translations)
+
+        self.assertEqual(
+            init_state.get_content_id_mapping_needing_translations('hi'), {
+                'hint_1': '<p>hint one</p>',
+                'solution': '<p>hello_world is a string</p>',
+                'feedback_1': '<p>Feedback</p>',
+                'default_outcome': '<p>The default outcome.</p>'
+            })
+
+    def test_add_translation_works_correctly(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+
+        self.assertEqual(init_state.get_translation_counts(), {})
+
+        init_state.add_translation('content', 'hi', '<p>Translated text</p>')
+
+        self.assertEqual(init_state.get_translation_counts(), {'hi': 1})
 
     def test_state_operations(self):
         """Test adding, updating and checking existence of states."""
@@ -406,40 +691,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(subtitled_html, 'html', 20):
                 subtitled_html.validate()
 
-    def test_subtitled_html_validation_with_invalid_html_for_rte(self):
-        """Test validation of subtitled HTML with invalid html for rte."""
-        subtitled_html = state_domain.SubtitledHtml(
-            'content_id', '<p>some html</p>')
-        subtitled_html.validate()
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Invalid html: <a>Test</a> for rte with invalid tags and '
-                'strings: {\'invalidTags\': \\[u\'a\'], '
-                '\'strings\': \\[\'<a>Test</a>\']}')):
-            with self.swap(subtitled_html, 'html', '<a>Test</a>'):
-                subtitled_html.validate()
-
-    def test_subtitled_html_validation_with_invalid_customization_args(self):
-        """Test validation of subtitled HTML with invalid customization args."""
-        subtitled_html = state_domain.SubtitledHtml(
-            'content_id', '<p>some html</p>')
-        subtitled_html.validate()
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Invalid html: <oppia-noninteractive-image>'
-                '</oppia-noninteractive-image> due to errors in '
-                'customization_args: {"Missing attributes: '
-                '\\[u\'alt-with-value\', u\'caption-with-value\', '
-                'u\'filepath-with-value\'], Extra attributes: \\[]": '
-                '\\[\'<oppia-noninteractive-image>'
-                '</oppia-noninteractive-image>\']}')):
-            with self.swap(
-                subtitled_html, 'html',
-                '<oppia-noninteractive-image></oppia-noninteractive-image>'):
-                subtitled_html.validate()
-
     def test_subtitled_html_validation_with_invalid_content(self):
         """Test validation of subtitled HTML with invalid content."""
         subtitled_html = state_domain.SubtitledHtml(
@@ -453,7 +704,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_voiceover_validation(self):
         """Test validation of voiceover."""
-        audio_voiceover = state_domain.Voiceover('a.mp3', 20, True)
+        audio_voiceover = state_domain.Voiceover('a.mp3', 20, True, 24.5)
         audio_voiceover.validate()
 
         with self.assertRaisesRegexp(
@@ -493,6 +744,23 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ):
             with self.swap(audio_voiceover, 'needs_update', 'hello'):
                 audio_voiceover.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected duration_secs to be a float'
+            ):
+            with self.swap(audio_voiceover, 'duration_secs', 'test'):
+                audio_voiceover.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected duration_secs to be a float'
+            ):
+            with self.swap(audio_voiceover, 'duration_secs', 10):
+                audio_voiceover.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected duration_secs to be positive number, '
+            'or zero if not yet specified'
+            ):
+            with self.swap(audio_voiceover, 'duration_secs', -3.45):
+                audio_voiceover.validate()
 
     def test_written_translation_validation(self):
         """Test validation of translation script."""
@@ -518,16 +786,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_id('TextInput')
         exploration.validate()
 
-        hints_list = []
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>hint one</p>'
-            },
-        })
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
         init_state.update_interaction_hints(hints_list)
 
-        solution = {
+        solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
@@ -536,27 +802,25 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
-        init_state.update_interaction_solution(solution)
+        init_state.update_interaction_solution(solution_dict)
         exploration.validate()
 
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_2',
-                'html': '<p>new hint</p>'
-            }
-        })
+        hints_list.append(
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_2', '<p>new hint</p>')
+            )
+        )
         init_state.update_interaction_hints(hints_list)
 
         self.assertEqual(
             init_state.interaction.hints[1].hint_content.html,
             '<p>new hint</p>')
 
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_3',
-                'html': '<p>hint three</p>'
-            }
-        })
+        hints_list.append(
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_3', '<p>hint three</p>')
+            )
+        )
         init_state.update_interaction_hints(hints_list)
 
         del hints_list[1]
@@ -576,13 +840,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # Solution should be set to None as default.
         self.assertEqual(init_state.interaction.solution, None)
 
-        hints_list = []
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': ''
-            },
-        })
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '')
+            )
+        ]
         init_state.update_interaction_hints(hints_list)
         solution = {
             'answer_is_exclusive': False,
@@ -645,7 +907,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # Solution should be set to None as default.
         self.assertEqual(exploration.init_state.interaction.solution, None)
 
-        hints_list = []
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': 'hello_world!',
@@ -654,12 +915,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>'
             }
         }
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': ''
-            },
-        })
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '')
+            )
+        ]
+
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(solution)
         exploration.validate()
@@ -707,15 +968,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'Contains'
             }],
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }
 
         exploration.init_state.update_interaction_answer_groups(
             [answer_group_dict])
-        exploration.init_state.update_content({
-            'content_id': 'feedback_1',
-            'html': '<p>Feedback</p>'
-        })
+        exploration.init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'feedback_1',
+                'html': '<p>Feedback</p>'
+            }))
 
         with self.assertRaisesRegexp(
             Exception, 'Found a duplicate content id feedback_1'):
@@ -723,23 +985,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_duplicate_content_id_with_default_outcome(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        default_outcome_dict = {
-            'dest': 'Introduction',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': ''},
-            'labelled_as_correct': False,
-            'missing_prerequisite_skill_id': None,
-            'param_changes': [],
-            'refresher_exploration_id': None
-        }
-
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml('default_outcome', ''),
+            False, [], None, None
+        )
         exploration.init_state.update_interaction_default_outcome(
-            default_outcome_dict)
-        exploration.init_state.update_content({
-            'content_id': 'default_outcome',
-            'html': ''
-        })
+            default_outcome
+        )
+        exploration.init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'default_outcome',
+                'html': ''
+            }))
 
         with self.assertRaisesRegexp(
             Exception, 'Found a duplicate content id default_outcome'):
@@ -747,18 +1004,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_duplicate_content_id_with_hints(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>some html</p>'
-            }
-        }]
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>some html</p>')
+            )
+        ]
 
         exploration.init_state.update_interaction_hints(hints_list)
-        exploration.init_state.update_content({
-            'content_id': 'hint_1',
-            'html': ''
-        })
+        exploration.init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'hint_1',
+                'html': ''
+            }))
 
         with self.assertRaisesRegexp(
             Exception, 'Found a duplicate content id hint_1'):
@@ -781,10 +1038,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         exploration.init_state.update_interaction_solution(solution)
-        exploration.init_state.update_content({
-            'content_id': 'solution',
-            'html': ''
-        })
+        exploration.init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'solution',
+                'html': ''
+                }))
 
         with self.assertRaisesRegexp(
             Exception, 'Found a duplicate content id solution'):
@@ -813,18 +1071,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_hints_with_content_id_not_in_written_translations(
             self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        old_hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
-        new_hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_2',
-                'html': '<p>Hello, this is html2 for state2</p>'
-            }
-        }]
+        old_hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+            )
+        ]
+        new_hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+            )
+        ]
 
         exploration.init_state.update_interaction_hints(old_hints_list)
 
@@ -853,18 +1111,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_hints_with_content_id_not_in_recorded_voiceovers(
             self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        old_hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
-        new_hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_2',
-                'html': '<p>Hello, this is html2 for state2</p>'
-            }
-        }]
+        old_hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+            )
+        ]
+        new_hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+            )
+        ]
 
         exploration.init_state.update_interaction_hints(old_hints_list)
 
@@ -874,7 +1132,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'filename': 'filename3.mp3',
                         'file_size_bytes': 3000,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 8.1
                     }
                 },
                 'default_outcome': {}
@@ -893,18 +1152,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_hints_with_new_content_id_in_written_translations(
             self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        old_hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
-        new_hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_2',
-                'html': '<p>Hello, this is html2 for state2</p>'
-            }
-        }]
+        old_hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+            )
+        ]
+        new_hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+            )
+        ]
 
         exploration.init_state.update_interaction_hints(old_hints_list)
 
@@ -939,18 +1198,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_hints_with_new_content_id_in_recorded_voiceovers(
             self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        old_hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
-        new_hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_2',
-                'html': '<p>Hello, this is html2 for state2</p>'
-            }
-        }]
+        old_hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+            )
+        ]
+        new_hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+            )
+        ]
 
         exploration.init_state.update_interaction_hints(old_hints_list)
 
@@ -960,14 +1219,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'filename': 'filename3.mp3',
                         'file_size_bytes': 3000,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 6.1
                     }
                 },
                 'hint_2': {
                     'en': {
                         'filename': 'filename4.mp3',
                         'file_size_bytes': 3000,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 7.5
                     }
                 },
                 'default_outcome': {}
@@ -985,12 +1246,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_update_interaction_solution_with_non_dict_solution(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state2</p>')
+            )
+        ]
         solution = {
             'answer_is_exclusive': True,
             'correct_answer': u'hello_world!',
@@ -1012,12 +1273,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_interaction_solution_with_no_solution(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state2</p>'
+                )
+            )
+        ]
 
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(None)
@@ -1062,7 +1324,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'Contains'
             }],
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         self.assertEqual(
@@ -1078,14 +1340,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration.init_state.interaction.confirmed_unclassified_answers,
             answer_groups_list)
-
-    def test_cannot_update_non_dict_interaction_default_outcome(self):
-        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-
-        with self.assertRaisesRegexp(
-            Exception, 'Expected default_outcome_dict to be a dict'):
-            exploration.init_state.update_interaction_default_outcome(
-                'invalid_default_outcome')
 
     def test_cannot_update_non_list_interaction_answer_groups(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
@@ -1114,7 +1368,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'Contains'
             }],
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         with self.assertRaisesRegexp(
@@ -1138,7 +1392,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': {},
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         with self.assertRaisesRegexp(
@@ -1167,7 +1421,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'Contains'
             }],
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
 
         with self.assertRaisesRegexp(
@@ -1206,7 +1460,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'Contains'
             }],
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }]
         exploration.init_state.update_interaction_answer_groups(answer_groups)
 
@@ -1220,7 +1474,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             observed_log_messages,
             [
                 'RuleSpec \'Contains\' has inputs which are not recognized '
-                'parameter names: set([\'x\'])'
+                'parameter names: set([u\'x\'])'
             ]
         )
 
@@ -1271,6 +1525,45 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             written_translations.get_content_ids_for_text_translation(), [
                 'feedback_2', 'feedback_1'])
+
+    def test_get_translated_content_in_non_existing_language_raise_error(self):
+        written_translations = state_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'html': '<p> In English.</p>',
+                        'needs_update': False
+                    }
+                }
+            }
+        })
+        translated_content = written_translations.get_translated_content(
+            'content', 'en')
+        self.assertEqual(translated_content, '<p> In English.</p>')
+
+        with self.assertRaisesRegexp(
+            Exception, 'Translation for the given content_id content does not '
+            'exist in hi language code'):
+            written_translations.get_translated_content('content', 'hi')
+
+    def test_get_translated_content_for_invalid_content_id_raise_error(self):
+        written_translations = state_domain.WrittenTranslations.from_dict({
+            'translations_mapping': {
+                'content': {
+                    'en': {
+                        'html': '<p> In English.</p>',
+                        'needs_update': False
+                    }
+                }
+            }
+        })
+        translated_content = written_translations.get_translated_content(
+            'content', 'en')
+        self.assertEqual(translated_content, '<p> In English.</p>')
+
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid content_id: invalid_id'):
+            written_translations.get_translated_content('invalid_id', 'hi')
 
     def test_add_content_id_for_translations_adds_content_id(self):
         written_translations = state_domain.WrittenTranslations.from_dict({
@@ -1448,7 +1741,60 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             re.escape(
                 'Expected state written_translations to match the listed '
                 'content ids [\'invalid_content\']')):
-            written_translations.validate(['invalid_content'])
+            written_translations.validate([b'invalid_content'])
+
+    def test_get_content_ids_that_are_correctly_translated(self):
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {},
+                'hint_1': {}
+            }
+        }
+
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        self.assertEqual(
+            written_translations.get_content_ids_that_are_correctly_translated(
+                'hi'), [])
+
+    def test_get_content_ids_that_are_correctly_translated_with_some_existing_translations(self): # pylint: disable=line-too-long
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'html': '<p>hello!</p>',
+                        'needs_update': False
+                    }
+                },
+                'hint_1': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        self.assertEqual(
+            written_translations.get_content_ids_that_are_correctly_translated(
+                'hi'), ['content'])
+
+    def test_get_content_ids_that_are_correctly_translated_with_some_existing_translations_needs_update(self): # pylint: disable=line-too-long
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'html': '<p>hello!</p>',
+                        'needs_update': True
+                    }
+                },
+                'hint_1': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        self.assertEqual(
+            written_translations.get_content_ids_that_are_correctly_translated(
+                'hi'), [])
 
 
 class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
@@ -1461,24 +1807,28 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
-                        'needs_update': True
+                        'needs_update': True,
+                        'duration_secs': 1.1
                     },
                     'hi': {
                         'filename': 'abc.mp3',
                         'file_size_bytes': 1234,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.3
                     }
                 },
                 'feedback_1': {
                     'hi': {
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.1
                     },
                     'en': {
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.3
                     }
                 }
             }
@@ -1537,7 +1887,8 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.1
                     }
                 }
             }
@@ -1558,7 +1909,8 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.1
                     }
                 }
             }
@@ -1629,7 +1981,8 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                     123: {
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.1
                     }
                 }
             }
@@ -1649,7 +2002,8 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                     'ed': {
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.1
                     }
                 }
             }
@@ -1668,7 +2022,8 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 1.1
                     }
                 }
             }
@@ -1682,14 +2037,14 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             re.escape(
                 'Expected state recorded_voiceovers to match the listed '
                 'content ids [\'invalid_content\']')):
-            recorded_voiceovers.validate(['invalid_content'])
+            recorded_voiceovers.validate([b'invalid_content'])
 
 
 class VoiceoverDomainTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(VoiceoverDomainTests, self).setUp()
-        self.voiceover = state_domain.Voiceover('filename.mp3', 10, False)
+        self.voiceover = state_domain.Voiceover('filename.mp3', 10, False, 15.0)
 
     def test_validate_non_str_filename(self):
         self.voiceover.validate()
@@ -1711,7 +2066,8 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
             Exception,
             re.escape(
                 'Invalid audio filename: it should have one of the following '
-                'extensions: %s' % feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())):
+                'extensions: %s'
+                % list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()))):
             self.voiceover.validate()
 
     def test_validate_non_int_file_size_bytes(self):
@@ -1732,4 +2088,26 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
         self.voiceover.needs_update = 'needs_update'
         with self.assertRaisesRegexp(
             Exception, 'Expected needs_update to be a bool'):
+            self.voiceover.validate()
+
+    def test_validate_float_duration_secs(self):
+        self.voiceover.validate()
+        self.voiceover.duration_secs = 'duration_secs'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected duration_secs to be a float'):
+            self.voiceover.validate()
+
+    def test_validate_int_duration_secs(self):
+        self.voiceover.validate()
+        self.voiceover.duration_secs = 10
+        with self.assertRaisesRegexp(
+            Exception, 'Expected duration_secs to be a float'):
+            self.voiceover.validate()
+
+    def test_validate_negative_duration_seconds(self):
+        self.voiceover.validate()
+        self.voiceover.duration_secs = -1.45
+        with self.assertRaisesRegexp(
+            Exception, 'Expected duration_secs to be positive number, '
+            'or zero if not yet specified'):
             self.voiceover.validate()

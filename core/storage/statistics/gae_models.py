@@ -16,6 +16,9 @@
 
 """Models for Oppia statistics."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import datetime
 import json
 import logging
@@ -23,6 +26,7 @@ import sys
 
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 from google.appengine.ext import ndb
@@ -87,6 +91,18 @@ class StateCounterModel(base_models.BaseModel):
     # subsequently resolved by an exploration admin.
     active_answer_count = ndb.IntegerProperty(default=0, indexed=False)
 
+    @staticmethod
+    def get_deletion_policy():
+        """StateCounterModels is aggregated and anonymized, and cannot be tied
+        back to an individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """StateCounterModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_or_create(cls, exploration_id, state_name):
         """Gets or creates an entity by exploration_id and state_name.
@@ -103,6 +119,11 @@ class StateCounterModel(base_models.BaseModel):
         if not counter:
             counter = cls(id=instance_id)
         return counter
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
@@ -121,6 +142,20 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     is_feedback_useful = ndb.BooleanProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """AnswerSubmittedEventLogEntryModels are anonymized, and cannot be tied
+        back to an individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """AnswerSubmittedEventLogEntryModel doesn't have any field with
+        user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -152,6 +187,11 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
         answer_submitted_event_entity.put()
         return entity_id
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student entering an exploration. In this context,
@@ -168,6 +208,20 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     session_id = ndb.StringProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """ExplorationActualStartEventLogEntryModels are anonymized, and cannot
+        be tied back to an individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationActualStartEventLogEntryModel doesn't have any field with
+        user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -195,6 +249,11 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
         actual_start_event_entity.put()
         return entity_id
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class SolutionHitEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student triggering the solution."""
@@ -210,6 +269,18 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
     time_spent_in_state_secs = ndb.FloatProperty()
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """SolutionHitEventLogEntryModels are anonymized, and cannot be tied
+        back to an individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """SolutionHitEventLogEntryModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -239,6 +310,11 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         solution_hit_event_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class StartExplorationEventLogEntryModel(base_models.BaseModel):
@@ -280,6 +356,20 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
                                             feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """StartExplorationEventLogEntryModels are anonymized, and cannot be
+        tied back to an individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """StartExplorationEventLogEntryModel doesn't have any field with
+        user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -338,6 +428,11 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         start_event_entity.put()
         return entity_id
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a reader attempting to leave the
@@ -395,6 +490,20 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """MaybeLeaveExplorationEventLogEntryModels are anonymized, and cannot
+        be tied back to an individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """MaybeLeaveExplorationEventLogEntryModel doesn't have any field with
+        user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates entity ID for a new event based on its
@@ -449,6 +558,11 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         leave_event_entity.put()
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a learner reaching a terminal state of an
@@ -499,6 +613,20 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
                                             feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """CompleteExplorationEventLogEntryModels are anonymized, and cannot be
+        tied back to an individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """CompleteExplorationEventLogEntryModel doesn't have any field with
+        user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -554,6 +682,11 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
         complete_event_entity.put()
         return entity_id
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class RateExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a learner rating the exploration.
@@ -576,6 +709,20 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
     old_rating = ndb.IntegerProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """RateExplorationEventLogEntryModels are anonymized, and cannot be tied
+        back to an individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """RateExplorationEventLogEntryModel doesn't have any field with
+        user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, user_id):
@@ -618,6 +765,11 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
         ).put()
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class StateHitEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student getting to a particular state. The
@@ -657,6 +809,18 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
                                             feconf.PLAY_TYPE_NORMAL])
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """StateHitEventLogEntryModels are anonymized, and cannot be tied back
+        to an individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """StateHitEventLogEntryModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -712,6 +876,11 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         state_event_entity.put()
         return entity_id
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class StateCompleteEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student completing a state."""
@@ -727,6 +896,20 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
     time_spent_in_state_secs = ndb.FloatProperty()
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """StateCompleteEventLogEntryModels are anonymized, and cannot be tied
+        back to an individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """StateCompleteEventLogEntryModel doesn't have any field with
+        user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -757,6 +940,11 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
         state_finish_event_entity.put()
         return entity_id
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student leaving for a refresher exploration."""
@@ -774,6 +962,20 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
     time_spent_in_state_secs = ndb.FloatProperty()
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """LeaveForRefresherExplorationEventLogEntryModels are anonymized, and
+        cannot be tied back to an individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """LeaveForRefresherExplorationEventLogEntryModel doesn't have any field
+        with user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -804,6 +1006,11 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         leave_for_refresher_exp_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class ExplorationStatsModel(base_models.BaseModel):
@@ -843,6 +1050,18 @@ class ExplorationStatsModel(base_models.BaseModel):
     #   'num_completions_v1': ...,
     #   'num_completions_v2': ...}}
     state_stats_mapping = ndb.JsonProperty(indexed=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """ExplorationStatsModels are aggregated and anonymized, and cannot be
+        tied back to an individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationStatsModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
@@ -981,6 +1200,11 @@ class ExplorationStatsModel(base_models.BaseModel):
             exploration_stats_models.append(stats_instance)
         cls.put_multi(exploration_stats_models)
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class ExplorationIssuesModel(base_models.BaseModel):
     """Model for storing the list of playthroughs for an exploration grouped by
@@ -994,6 +1218,18 @@ class ExplorationIssuesModel(base_models.BaseModel):
     # where each dict represents an issue along with the associated
     # playthroughs.
     unresolved_issues = ndb.JsonProperty(repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """ExplorationIssuesModels are aggregated and anonymized, and cannot be
+        tied back to an individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationIssuesModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
@@ -1018,7 +1254,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
             exp_version: int. Version of the exploration.
 
         Returns:
-            ExplorationISsuesModel. Exploration issues model instance in
+            ExplorationIssuesModel. Exploration issues model instance in
                 datastore.
         """
         instance_id = cls.get_entity_id(exp_id, exp_version)
@@ -1047,6 +1283,11 @@ class ExplorationIssuesModel(base_models.BaseModel):
         exp_issues_instance.put()
         return instance_id
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class PlaythroughModel(base_models.BaseModel):
     """Model for storing recorded useful playthrough data in the datastore.
@@ -1068,6 +1309,18 @@ class PlaythroughModel(base_models.BaseModel):
     # ordered by the time of occurence of the action.
     actions = ndb.JsonProperty(repeated=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """PlaythroughModels are anonymized, and cannot be tied back to an
+        individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """PlaythroughModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def _generate_id(cls, exp_id):
         """Generates a unique id for the playthrough of the form
@@ -1084,11 +1337,12 @@ class PlaythroughModel(base_models.BaseModel):
                 many collisions.
         """
 
-        for _ in xrange(base_models.MAX_RETRIES):
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
-                    str(utils.get_random_int(base_models.RAND_RANGE)),
+                    python_utils.UNICODE(
+                        utils.get_random_int(base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
@@ -1137,6 +1391,11 @@ class PlaythroughModel(base_models.BaseModel):
         instances = cls.get_multi(playthrough_ids)
         cls.delete_multi(instances)
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class LearnerAnswerDetailsModel(base_models.BaseModel):
     """Model for storing the answer details that a learner enters when they
@@ -1171,6 +1430,18 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
     # sizes of all answer info dicts stored inside learner_answer_info_list.
     accumulated_answer_info_json_size_bytes = ndb.IntegerProperty(
         indexed=True, required=False, default=0)
+
+    @staticmethod
+    def get_deletion_policy():
+        """LearnerAnswerDetailsModels are aggregated and anonymized, and cannot
+        be tied back to an individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """LearnerAnswerDetailsModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_state_reference_for_exploration(cls, exp_id, state_name):
@@ -1280,6 +1551,11 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             return model_instance
         return None
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
@@ -1300,6 +1576,18 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     #               'total_entry_count': ...,
     #               'no_answer_count': ...}}
     state_hit_counts = ndb.JsonProperty(indexed=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """ExplorationAnnotationsModels are aggregated and anonymized, and
+        cannot be tied back to an individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationAnnotationsModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_entity_id(cls, exploration_id, exploration_version):
@@ -1357,6 +1645,11 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
                 cls.exploration_id == exploration_id
             ).fetch(feconf.DEFAULT_QUERY_LIMIT)]
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class StateAnswersModel(base_models.BaseModel):
     """Store all answers of a state. This model encapsulates a sharded storage
@@ -1412,6 +1705,18 @@ class StateAnswersModel(base_models.BaseModel):
     # CURRENT_SCHEMA_VERSION in this class needs to be incremented.
     schema_version = ndb.IntegerProperty(
         indexed=True, default=feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION)
+
+    @staticmethod
+    def get_deletion_policy():
+        """StateAnswersModels are aggregated and anonymized, and cannot be tied
+        back to an individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """StateAnswersModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _get_model(
@@ -1486,7 +1791,8 @@ class StateAnswersModel(base_models.BaseModel):
                     cls._get_entity_id(
                         exploration_id, exploration_version, state_name,
                         shard_id)
-                    for shard_id in xrange(1, main_shard.shard_count + 1)]
+                    for shard_id in python_utils.RANGE(
+                        1, main_shard.shard_count + 1)]
                 all_models += cls.get_multi(shard_ids)
             return all_models
         else:
@@ -1556,7 +1862,7 @@ class StateAnswersModel(base_models.BaseModel):
             last_shard_updated = False
 
         # Insert any new shards.
-        for i in xrange(1, len(sharded_answer_lists)):
+        for i in python_utils.RANGE(1, len(sharded_answer_lists)):
             shard_id = main_shard.shard_count + i
             entity_id = cls._get_entity_id(
                 exploration_id, exploration_version, state_name, shard_id)
@@ -1632,8 +1938,8 @@ class StateAnswersModel(base_models.BaseModel):
             str. Entity_id for a StateAnswersModel instance.
         """
         return ':'.join([
-            exploration_id, str(exploration_version), state_name,
-            str(shard_id)])
+            exploration_id, python_utils.UNICODE(exploration_version),
+            state_name, python_utils.UNICODE(shard_id)])
 
     @classmethod
     def _shard_answers(
@@ -1697,6 +2003,11 @@ class StateAnswersModel(base_models.BaseModel):
         """
         return sys.getsizeof(json.dumps(answer_dict))
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     """Store output of calculation performed on StateAnswers.
@@ -1716,6 +2027,18 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     calculation_output_type = ndb.StringProperty(indexed=True)
     # Calculation output dict stored as JSON blob.
     calculation_output = ndb.JsonProperty(indexed=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """StateAnswersCalcOutputModels are aggregated and anonymized, and
+        cannot be tied back to an individual user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """StateAnswersCalcOutputModels doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def create_or_update(
@@ -1781,8 +2104,8 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
                 given exploration state.
         """
         entity_id = cls._get_entity_id(
-            exploration_id, str(exploration_version), state_name,
-            calculation_id)
+            exploration_id, python_utils.UNICODE(exploration_version),
+            state_name, calculation_id)
         instance = cls.get(entity_id, strict=False)
         return instance
 
@@ -1802,5 +2125,10 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             str. The entity ID corresponding to the given exploration state.
         """
         return ':'.join([
-            exploration_id, str(exploration_version), state_name,
-            calculation_id])
+            exploration_id, python_utils.UNICODE(exploration_version),
+            state_name, calculation_id])
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE

@@ -16,12 +16,17 @@
 
 """Tests for collection domain objects and methods defined on them."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import datetime
 
+from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 # Dictionary-like data structures within sample YAML must be formatted
@@ -670,7 +675,8 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         """
         current_collection_schema_version = (
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
-        for version_num in range(1, current_collection_schema_version):
+        for version_num in python_utils.RANGE(
+                1, current_collection_schema_version):
             self.assertTrue(hasattr(
                 collection_domain.Collection,
                 '_convert_collection_contents_v%s_dict_to_v%s_dict' % (
@@ -687,7 +693,8 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         current_collection_schema_version = (
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
-        for version_num in range(1, current_collection_schema_version):
+        for version_num in python_utils.RANGE(
+                1, current_collection_schema_version):
             self.assertTrue(hasattr(
                 collection_domain.Collection,
                 '_convert_v%s_dict_to_v%s_dict' % (
@@ -871,7 +878,7 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
         current_time = datetime.datetime.utcnow()
         self.collection_summary_dict = {
             'category': 'category',
-            'status': 'status',
+            'status': constants.ACTIVITY_STATUS_PRIVATE,
             'community_owned': True,
             'viewer_ids': ['viewer_id'],
             'version': 1,
@@ -889,9 +896,10 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
         }
 
         self.collection_summary = collection_domain.CollectionSummary(
-            'col_id', 'title', 'category', 'objective', 'en', [], 'status',
-            True, ['owner_id'], ['editor_id'], ['viewer_id'],
-            ['contributor_id'], {}, 1, 1, current_time, current_time)
+            'col_id', 'title', 'category', 'objective', 'en', [],
+            constants.ACTIVITY_STATUS_PRIVATE, True, ['owner_id'],
+            ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
+            current_time, current_time)
 
     def test_collection_summary_gets_created(self):
         self.assertEqual(
@@ -1072,3 +1080,50 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected each id in contributor_ids to be string, received 2'):
             self.collection_summary.validate()
+
+    def test_is_private(self):
+        self.assertTrue(self.collection_summary.is_private())
+        self.collection_summary = collection_domain.CollectionSummary(
+            'col_id', 'title', 'category', 'objective', 'en', [],
+            constants.ACTIVITY_STATUS_PUBLIC, True, ['owner_id'],
+            ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
+            datetime.datetime.utcnow(), datetime.datetime.utcnow())
+        self.assertFalse(self.collection_summary.is_private())
+
+    def test_is_solely_owned_by_user_one_owner(self):
+        self.assertTrue(
+            self.collection_summary.is_solely_owned_by_user('owner_id'))
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('other_id'))
+        self.collection_summary = collection_domain.CollectionSummary(
+            'col_id', 'title', 'category', 'objective', 'en', [],
+            constants.ACTIVITY_STATUS_PUBLIC, True, ['other_id'],
+            ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
+            datetime.datetime.utcnow(), datetime.datetime.utcnow())
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('owner_id'))
+        self.assertTrue(
+            self.collection_summary.is_solely_owned_by_user('other_id'))
+
+    def test_is_solely_owned_by_user_multiple_owners(self):
+        self.assertTrue(
+            self.collection_summary.is_solely_owned_by_user('owner_id'))
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('other_id'))
+        self.collection_summary = collection_domain.CollectionSummary(
+            'col_id', 'title', 'category', 'objective', 'en', [],
+            constants.ACTIVITY_STATUS_PUBLIC, True, ['owner_id', 'other_id'],
+            ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
+            datetime.datetime.utcnow(), datetime.datetime.utcnow())
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('owner_id'))
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('other_id'))
+
+    def test_is_solely_owned_by_user_other_users(self):
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('editor_id'))
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('viewer_id'))
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('contributor_id'))

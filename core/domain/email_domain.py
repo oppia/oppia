@@ -14,8 +14,13 @@
 
 """Domain objects for models relating to emails."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-class FeedbackThreadReplyInfo(object):
+import python_utils
+
+
+class FeedbackThreadReplyInfo(python_utils.OBJECT):
     """Domain object for email reply-to-id objects.
 
     Attributes:

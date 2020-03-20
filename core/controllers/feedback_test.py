@@ -16,6 +16,9 @@
 
 """Tests for the feedback controllers."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_jobs_continuous
@@ -29,6 +32,7 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.feedback, models.NAMES.suggestion])
@@ -36,10 +40,11 @@ import feconf
 
 EXPECTED_THREAD_KEYS = [
     'status', 'original_author_username', 'state_name', 'summary',
-    'thread_id', 'subject', 'last_updated', 'message_count']
+    'thread_id', 'subject', 'last_updated_msecs', 'message_count',
+    'last_nonempty_message_text', 'last_nonempty_message_author']
 EXPECTED_MESSAGE_KEYS = [
-    'author_username', 'created_on', 'entity_type', 'message_id', 'entity_id',
-    'text', 'updated_status', 'updated_subject', 'received_via_email']
+    'author_username', 'created_on_msecs', 'entity_type', 'message_id',
+    'entity_id', 'text', 'updated_status', 'updated_subject']
 
 
 class MockFeedbackAnalyticsAggregator(
@@ -321,13 +326,13 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
         # Generate 10 users.
         num_users = 10
-        for num in range(num_users):
+        for num in python_utils.RANGE(num_users):
             username = _get_username(num)
             email = _get_email(num)
             self.signup(email, username)
 
         # Each of these users posts a new message to the same thread.
-        for num in range(num_users):
+        for num in python_utils.RANGE(num_users):
             self.login(_get_email(num))
             csrf_token = self.get_new_csrf_token()
             self.post_json(
@@ -349,7 +354,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             self.EDITOR_USERNAME)
         self.assertEqual(response_dict['messages'][0]['message_id'], 0)
         self.assertEqual(response_dict['messages'][0]['text'], 'Message 0')
-        for num in range(num_users):
+        for num in python_utils.RANGE(num_users):
             self.assertEqual(
                 response_dict['messages'][num + 1]['author_username'],
                 _get_username(num))
@@ -625,8 +630,11 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
 
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.owner_id, 'Name', 'Description',
-            [], [], [], [], 1)
+            self.topic_id, self.owner_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
 
     def test_get_feedback_threads_linked_to_topics(self):
         self.login(self.OWNER_EMAIL)

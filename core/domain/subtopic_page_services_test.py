@@ -16,6 +16,10 @@
 
 """Tests for subtopic page domain objects."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
@@ -121,7 +125,8 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'filename': 'test.mp3',
                         'file_size_bytes': 100,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 7.213
                     }
                 }
             }
@@ -137,11 +142,13 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 }
             }
         }
-        self.subtopic_page.update_page_contents_html({
-            'html': '<p>hello world</p>',
-            'content_id': 'content'
-        })
-        self.subtopic_page.update_page_contents_audio(recorded_voiceovers)
+        self.subtopic_page.update_page_contents_html(
+            state_domain.SubtitledHtml.from_dict({
+                'html': '<p>hello world</p>',
+                'content_id': 'content'
+            }))
+        self.subtopic_page.update_page_contents_audio(
+            state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers))
         subtopic_page_services.save_subtopic_page(
             self.user_id, self.subtopic_page, 'Updated page contents',
             [subtopic_page_domain.SubtopicPageChange({

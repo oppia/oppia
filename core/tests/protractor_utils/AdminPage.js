@@ -34,6 +34,18 @@ var AdminPage = function() {
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
   var statusMessage = element(by.css('[ng-if="$ctrl.statusMessage"]'));
 
+  // Viewing roles can be done by two methods: 1. By roles 2. By username
+  var roleDropdown = element(by.css('.protractor-test-role-method'));
+  var roleValueOption = element(by.css('.protractor-test-role-value'));
+  var roleUsernameOption = element(by.css(
+    '.protractor-test-username-value'));
+  var viewRoleButton = element(by.css('.protractor-test-role-success'));
+  var oneOffJobRows = element.all(by.css('.protractor-test-one-off-jobs-rows'));
+  var unfinishedOneOffJobRows = element.all(by.css(
+    '.protractor-test-unfinished-one-off-jobs-rows'));
+  var unfinishedOffJobIDs = element.all(by.css(
+    '.protractor-test-unfinished-one-off-jobs-id'));
+
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause
   // a problem when used to run tests directly on Travis.
@@ -117,10 +129,16 @@ var AdminPage = function() {
     return waitFor.pageToFullyLoad();
   };
 
+  this.getJobsTab = function() {
+    browser.get(ADMIN_URL_SUFFIX + '#/jobs');
+    return waitFor.pageToFullyLoad();
+  };
+
   this.editConfigProperty = function(
       propertyName, objectType, editingInstructions) {
     this.get();
     configTab.click();
+    waitFor.elementToBeClickable(saveAllConfigs);
     configProperties.map(function(x) {
       return saveConfigProperty(
         x, propertyName, objectType, editingInstructions);
@@ -132,6 +150,61 @@ var AdminPage = function() {
       if (!success) {
         throw Error('Could not find config property: ' + propertyName);
       }
+    });
+  };
+
+  this.startOneOffJob = function(jobName) {
+    this._startOneOffJob(jobName, 0);
+  };
+
+  this._startOneOffJob = function(jobName, i) {
+    waitFor.visibilityOf(oneOffJobRows.first(),
+      'Starting one off jobs taking too long to appear.');
+    oneOffJobRows.get(i).getText().then((text) => {
+      if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
+        oneOffJobRows.get(i).element(
+          by.css('.protractor-test-one-off-jobs-start-btn')).click();
+      } else {
+        this._startOneOffJob(jobName, ++i);
+      }
+    });
+  };
+
+  this.stopOneOffJob = function(jobName) {
+    this._stopOneOffJob(jobName, 0);
+  };
+
+  this._stopOneOffJob = function(jobName, i) {
+    unfinishedOneOffJobRows.get(i).getText().then((text) => {
+      if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
+        unfinishedOneOffJobRows.get(i).element(
+          by.css('.protractor-test-one-off-jobs-stop-btn')).click();
+      } else {
+        this._stopOneOffJob(jobName, ++i);
+      }
+    });
+  };
+
+  this.expectNumberOfRunningOneOffJobs = function(count) {
+    element.all(by.css(
+      '.protractor-test-unfinished-one-off-jobs-id')).count().then((len) =>{
+      expect(len).toEqual(count);
+    });
+  };
+
+  this.expectJobToBeRunning = function(jobName) {
+    browser.refresh();
+    waitFor.pageToFullyLoad();
+    waitFor.visibilityOf(element(
+      by.css('.protractor-test-unfinished-jobs-card')),
+    'Unfinished Jobs taking too long to appear');
+    let unfinishedJobs = unfinishedOffJobIDs.filter((element) => {
+      return element.getText().then((job) => {
+        return job.toLowerCase().startsWith(jobName.toLowerCase());
+      });
+    });
+    unfinishedJobs.get(0).getText((job) => {
+      expect(job.toLowerCase().startsWith(jobName.toLowerCase())).toBeTrue();
     });
   };
 
@@ -150,7 +223,48 @@ var AdminPage = function() {
     waitFor.textToBePresentInElement(
       statusMessage, 'successfully updated to',
       'Could not set role successfully');
-    return true;
+  };
+
+  this.getUsersAsssignedToRole = function(role) {
+    waitFor.visibilityOf(roleDropdown,
+      'View role dropdown taking too long to be visible');
+    roleDropdown.sendKeys('By Role');
+
+    roleValueOption.click();
+    roleValueOption.sendKeys(role);
+
+    viewRoleButton.click();
+  };
+
+  this.viewRolesbyUsername = function(username) {
+    waitFor.visibilityOf(roleDropdown,
+      'View role dropdown taking too long to be visible');
+    roleDropdown.sendKeys('By Username');
+
+    roleUsernameOption.click();
+    roleUsernameOption.sendKeys(username);
+
+    viewRoleButton.click();
+  };
+
+  this.expectUsernamesToMatch = function(expectedUsernamesArray) {
+    var foundUsersArray = [];
+    element.all(by.css('.protractor-test-roles-result-rows'))
+      .map(function(elm) {
+        return elm.getText();
+      })
+      .then(function(texts) {
+        texts.forEach(function(name) {
+          foundUsersArray.push(name);
+        });
+        expect(foundUsersArray.length).toEqual(expectedUsernamesArray.length);
+
+        expectedUsernamesArray.sort();
+        foundUsersArray.sort();
+        foundUsersArray.forEach(function(name, ind) {
+          expect(name).toEqual(expectedUsernamesArray[ind]);
+        });
+      });
   };
 };
 

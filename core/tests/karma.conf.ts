@@ -14,38 +14,38 @@ module.exports = function(config) {
     files: [
       'local_compiled_js/core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
-      'local_compiled_js/assets/constants.js',
-      'local_compiled_js/assets/rich_text_components_definitions.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.4.1/jquery.min.js',
       'third_party/static/jqueryui-1.12.1/jquery-ui.min.js',
-      'third_party/static/angularjs-1.5.8/angular.js',
-      'third_party/static/angularjs-1.5.8/angular-mocks.js',
+      'third_party/static/angularjs-1.7.9/angular.js',
+      'third_party/static/angularjs-1.7.9/angular-mocks.js',
       'third_party/static/headroom-js-0.9.4/headroom.min.js',
       'third_party/static/headroom-js-0.9.4/angular.headroom.min.js',
       'third_party/static/math-expressions-1.7.0/math-expressions.js',
-      'third_party/static/ckeditor-4.9.2/ckeditor.js',
+      'third_party/static/ckeditor-4.12.1/ckeditor.js',
       generatedJs,
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
-      'core/templates/dev/head/**/*_directive.html',
-      'core/templates/dev/head/**/*.directive.html',
-      'core/templates/dev/head/**/*.template.html',
-      'local_compiled_js/extensions/**/*.js',
-      // This is a file that is generated on running the run_frontend_tests.sh
+      'core/templates/**/*_directive.html',
+      'core/templates/**/*.directive.html',
+      'core/templates/**/*.template.html',
+      // Any of the *.module.ts files could be used here, we use
+      // about-page.module.ts because it is first alphabetically.
+      'core/templates/pages/about-page/about-page.module.ts',
+      // This is a file that is generated on running the run_frontend_tests.py
       // script. This generated file is a combination of all the spec files
       // since Karma is unable to run tests on multiple files due to some
       // unknown reason.
-      'core/templates/dev/head/combined-tests.spec.ts',
+      'core/templates/combined-tests.spec.ts',
       {
         pattern: 'extensions/**/*.png',
         watched: false,
         served: true,
         included: false
       },
-      'extensions/interactions/**/*_directive.html',
+      'extensions/interactions/**/*.directive.html',
       'extensions/interactions/rule_templates.json',
       'core/tests/data/*.json',
       {
@@ -56,7 +56,7 @@ module.exports = function(config) {
       }
     ],
     exclude: [
-      'local_compiled_js/core/templates/dev/head/**/*-e2e.js',
+      'local_compiled_js/core/templates/**/*-e2e.js',
       'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
     ],
@@ -68,55 +68,59 @@ module.exports = function(config) {
       '/extensions/': '/base/extensions/'
     },
     preprocessors: {
-      'core/templates/dev/head/*.ts': ['webpack'],
-      'core/templates/dev/head/**/*.ts': ['webpack'],
+      'core/templates/*.ts': ['webpack'],
+      'core/templates/**/*.ts': ['webpack'],
       'extensions/**/*.ts': ['webpack'],
-      'core/templates/dev/head/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/!(*.spec).js': ['coverage'],
-      'core/templates/dev/head/**/!(*.spec).js': ['coverage'],
-      'extensions/!(*Spec).js': ['coverage'],
-      'extensions/**/!(*Spec).js': ['coverage'],
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
-      'core/templates/dev/head/**/*_directive.html': ['ng-html2js'],
-      'core/templates/dev/head/**/*.directive.html': ['ng-html2js'],
-      'core/templates/dev/head/**/*.template.html': ['ng-html2js'],
-      'extensions/interactions/**/*_directive.html': ['ng-html2js'],
+      'core/templates/**/*_directive.html': ['ng-html2js'],
+      'core/templates/**/*.directive.html': ['ng-html2js'],
+      'core/templates/**/*.template.html': ['ng-html2js'],
+      'extensions/interactions/**/*.directive.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
     },
-    reporters: ['progress', 'coverage'],
-    coverageReporter: {
-      reporters: [{
-        type: 'html'
-      }, {
-        type: 'json'
-      }],
-      subdir: '.',
-      dir: '../karma_coverage_reports/'
+    reporters: ['progress', 'coverage-istanbul'],
+    coverageIstanbulReporter: {
+      reports: ['html', 'lcovonly'],
+      dir: '../karma_coverage_reports/',
+      fixWebpackSourcePaths: true,
+      'report-config': {
+        html: { outdir: 'html' }
+      }
     },
     autoWatch: true,
-    browsers: ['Chrome_Travis'],
+    browsers: ['CI_Chrome'],
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 60000,
+    browserNoActivityTimeout: 120000,
+    browserDisconnectTimeout: 60000,
+    browserDisconnectTolerance: 3,
     browserConsoleLogOptions: {
       level: 'log',
       format: '%b %T: %m',
       terminal: true
     },
-    browserNoActivityTimeout: 60000,
     // Continue running in the background after running tests.
     singleRun: true,
     customLaunchers: {
-      Chrome_Travis: {
-        base: 'Chrome',
-        flags: ['--no-sandbox']
+      CI_Chrome: {
+        base: 'ChromeHeadless',
+        // Discussion of the necessity of extra flags can be found here:
+        // https://github.com/karma-runner/karma-chrome-launcher/issues/154
+        // https://github.com/karma-runner/karma-chrome-launcher/issues/180
+        flags: [
+          '--no-sandbox',
+          '--disable-gpu',
+          '--disable-dev-shm-usage',
+          '--js-flags=--max-old-space-size=2048'
+        ]
       }
     },
 
     plugins: [
+      'karma-coverage-istanbul-reporter',
       'karma-jasmine',
       'karma-chrome-launcher',
       'karma-ng-html2js-preprocessor',
@@ -143,30 +147,50 @@ module.exports = function(config) {
       mode: 'development',
       resolve: {
         modules: [
-          'core/templates/dev/head',
+          'core/tests/data',
+          'assets',
+          'core/templates',
           'extensions',
           'node_modules',
+          'third_party',
         ],
+        extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
       },
+      devtool: 'inline-cheap-source-map',
       module: {
-        rules: [{
-          test: /\.ts$/,
-          use: [
-            'cache-loader',
-            'thread-loader',
-            {
-              loader: 'ts-loader',
-              options: {
-                // this is needed for thread-loader to work correctly
-                happyPackMode: true
+        rules: [
+          {
+            test: /\.ts$/,
+            use: [
+              'cache-loader',
+              'thread-loader',
+              {
+                loader: 'ts-loader',
+                options: {
+                  // this is needed for thread-loader to work correctly
+                  happyPackMode: true
+                }
               }
+            ]
+          },
+          {
+            test: /\.html$/,
+            loader: 'underscore-template-loader'
+          },
+          {
+            // Exclude all the spec files from the report.
+            test: /^(?!.*(s|S)pec\.ts$).*\.ts$/,
+            enforce: 'post',
+            use: {
+              loader: 'istanbul-instrumenter-loader',
+              options: { esModules: true }
             }
-          ]
-        },
-        {
-          test: /\.html$/,
-          loader: 'underscore-template-loader'
-        }]
+          },
+          {
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader']
+          }
+        ]
       },
       plugins: [
         new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })

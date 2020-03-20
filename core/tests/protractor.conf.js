@@ -1,4 +1,4 @@
-var ScreenShotReporter = require('protractor-screenshot-reporter');
+var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
 var glob = require('glob')
 var path = require('path')
 
@@ -17,16 +17,40 @@ var suites = {
       'protractor/accessibility.js'
     ],
 
-    additionalEditorAndPlayerFeatures: [
-      'protractor_desktop/additionalEditorAndPlayerFeatures.js'
+    additionalEditorFeatures: [
+      'protractor_desktop/additionalEditorFeatures.js'
+    ],
+
+    additionalPlayerFeatures: [
+      'protractor_desktop/additionalPlayerFeatures.js'
+    ],
+
+    adminPage: [
+      'protractor_desktop/adminTabFeatures.js'
+    ],
+
+    classroomPage: [
+      'protractor_desktop/classroomPage.js'
+    ],
+
+    classroomPageFileUploadFeatures: [
+      'protractor_desktop/classroomPageFileUploadFeatures.js'
     ],
 
     collections: [
       'protractor_desktop/collections.js'
     ],
 
+    communityDashboard: [
+      'protractor_desktop/communityDashboard.js'
+    ],
+
     coreEditorAndPlayerFeatures: [
       'protractor_desktop/coreEditorAndPlayerFeatures.js'
+    ],
+
+    creatorDashboard: [
+      'protractor_desktop/creatorDashboard.js'
     ],
 
     embedding: [
@@ -41,6 +65,10 @@ var suites = {
       'protractor_desktop/explorationHistoryTab.js'
     ],
 
+    explorationImprovementsTab: [
+      'protractor_desktop/explorationImprovementsTab.js'
+    ],
+
     explorationStatisticsTab: [
       'protractor_desktop/explorationStatisticsTab.js'
     ],
@@ -51,6 +79,10 @@ var suites = {
 
     extensions: [
       'protractor_desktop/extensions.js'
+    ],
+
+    fileUploadFeatures: [
+      'protractor_desktop/voiceoverUploadFeatures.js'
     ],
 
     learnerDashboard: [
@@ -91,6 +123,10 @@ var suites = {
 
     topicAndStoryEditor: [
       'protractor_desktop/topicAndStoryEditor.js'
+    ],
+
+    topicAndStoryEditorFileUploadFeatures: [
+      'protractor_desktop/topicAndStoryEditorFileUploadFeatures.js'
     ],
 
     topicsAndSkillsDashboard: [
@@ -176,6 +212,10 @@ exports.config = {
   // (Note that the hint tooltip has a 60-second timeout.)
   allScriptsTimeout: 180000,
 
+
+  // How long to wait for a page to load.
+  getPageTimeout: 60000,
+
   // ----- What tests to run -----
   //
   // When run without a command line parameter, all suites will run. If run
@@ -191,7 +231,14 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     chromeOptions: {
-      args: ['--lang=en-EN', '--window-size=1285x1000']
+      args: [
+        '--lang=en-EN',
+        '--window-size=1285x1000',
+        // These arguments let us simulate recording from a microphone
+        '--use-fake-device-for-media-stream',
+        '--use-fake-ui-for-media-stream',
+        '--use-file-for-fake-audio-capture=data/cafe.mp3',
+      ]
     },
     prefs: {
       intl: {
@@ -239,15 +286,15 @@ exports.config = {
 
     if (_ADD_SCREENSHOT_REPORTER) {
       // This takes screenshots of failed tests. For more information see
-      // https://www.npmjs.com/package/protractor-screenshot-reporter
-      jasmine.getEnv().addReporter(new ScreenShotReporter({
+      // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
+      jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
         // Directory for screenshots
-        baseDirectory: '../protractor-screenshots',
+        dest: '../protractor-screenshots',
         // Function to build filenames of screenshots
-        pathBuilder: function(spec, descriptions, results, capabilities) {
-          return descriptions[1] + ' ' + descriptions[0];
+        pathBuilder: function(currentSpec) {
+          return currentSpec.fullName;
         },
-        takeScreenShotsOnlyForFailedSpecs: true
+        captureOnlyFailedSpecs: true
       }));
     }
 

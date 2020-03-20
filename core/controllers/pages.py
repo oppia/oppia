@@ -14,45 +14,13 @@
 
 """Controllers for simple, mostly-static pages (like About, Splash, etc.)."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from core.controllers import acl_decorators
 from core.controllers import base
 import feconf
-
-
-class AboutPage(base.BaseHandler):
-    """Page with information about Oppia."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('dist/about-page.mainpage.html')
-
-
-class ContactPage(base.BaseHandler):
-    """Page with information about how to contact Oppia."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('dist/contact-page.mainpage.html')
-
-
-class DonatePage(base.BaseHandler):
-    """Page with information about how to donate to Oppia."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('dist/donate-page.mainpage.html')
-
-
-class ThanksPage(base.BaseHandler):
-    """Page that thanks people who donate to Oppia."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('dist/thanks-page.mainpage.html')
+import python_utils
 
 
 class ForumRedirectPage(base.BaseHandler):
@@ -60,25 +28,7 @@ class ForumRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect(feconf.GOOGLE_GROUP_URL)
-
-
-class TermsPage(base.BaseHandler):
-    """Page with terms and conditions."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('dist/terms-page.mainpage.html')
-
-
-class PrivacyPage(base.BaseHandler):
-    """Page with privacy policy."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('dist/privacy-page.mainpage.html')
+        self.redirect(python_utils.convert_to_bytes(feconf.GOOGLE_GROUP_URL))
 
 
 class AboutRedirectPage(base.BaseHandler):
@@ -87,7 +37,7 @@ class AboutRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect('/about')
+        self.redirect(python_utils.convert_to_bytes('/about'))
 
 
 class FoundationRedirectPage(base.BaseHandler):
@@ -95,7 +45,7 @@ class FoundationRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect(feconf.FOUNDATION_SITE_URL)
+        self.redirect(python_utils.convert_to_bytes(feconf.FOUNDATION_SITE_URL))
         return
 
 
@@ -105,7 +55,7 @@ class TeachRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect('/teach')
+        self.redirect(python_utils.convert_to_bytes('/teach'))
 
 
 class ConsoleErrorPage(base.BaseHandler):
@@ -114,7 +64,11 @@ class ConsoleErrorPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/console_errors.html')
+        # Note that this line is not meant to be covered by backend tests
+        # because this handler is only meant to be used in e2e tests. In the
+        # backend test environment, the HTML template file is not generated at
+        # all.
+        self.render_template('console_errors.html')  # pragma: no cover
 
 
 class MaintenancePage(base.BaseHandler):
@@ -123,4 +77,4 @@ class MaintenancePage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, *args, **kwargs):
         """Handles GET requests."""
-        self.render_template('dist/maintenance-page.mainpage.html')
+        self.render_template('maintenance-page.mainpage.html')

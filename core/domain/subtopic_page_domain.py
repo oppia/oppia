@@ -16,11 +16,15 @@
 
 """Domain objects for the pages for subtopics, and related models."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
@@ -64,7 +68,7 @@ class SubtopicPageChange(change_domain.BaseChange):
     }]
 
 
-class SubtopicPageContents(object):
+class SubtopicPageContents(python_utils.OBJECT):
     """Domain object for the contents on a subtopic page."""
 
     def __init__(
@@ -141,7 +145,7 @@ class SubtopicPageContents(object):
                 'written_translations']))
 
 
-class SubtopicPage(object):
+class SubtopicPage(python_utils.OBJECT):
     """Domain object for a Subtopic page."""
 
     def __init__(
@@ -247,26 +251,23 @@ class SubtopicPage(object):
         """
         return int(self.id[len(self.topic_id) + 1:])
 
-    def update_page_contents_html(self, new_page_contents_html_dict):
+    def update_page_contents_html(self, new_page_contents_html):
         """The new value for the html data field.
 
         Args:
-            new_page_contents_html_dict: dict. The new html for the subtopic
+            new_page_contents_html: SubtitledHtml. The new html for the subtopic
                 page.
         """
-        self.page_contents.subtitled_html = (
-            state_domain.SubtitledHtml.from_dict(new_page_contents_html_dict))
+        self.page_contents.subtitled_html = new_page_contents_html
 
-    def update_page_contents_audio(self, new_page_contents_audio_dict):
+    def update_page_contents_audio(self, new_page_contents_audio):
         """The new value for the recorded_voiceovers data field.
 
         Args:
-            new_page_contents_audio_dict: dict. The new audio for the subtopic
-                page.
+            new_page_contents_audio: RecordedVoiceovers. The new audio for
+            the subtopic page.
         """
-        self.page_contents.recorded_voiceovers = (
-            state_domain.RecordedVoiceovers.from_dict(
-                new_page_contents_audio_dict))
+        self.page_contents.recorded_voiceovers = new_page_contents_audio
 
     def update_page_contents_written_translations(
             self, new_page_written_translations_dict):
@@ -287,7 +288,7 @@ class SubtopicPage(object):
             ValidationError: One or more attributes of the subtopic page are
                 invalid.
         """
-        if not isinstance(self.topic_id, basestring):
+        if not isinstance(self.topic_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected topic_id to be a string, received %s' %
                 self.topic_id)
@@ -311,11 +312,11 @@ class SubtopicPage(object):
                     self.page_contents_schema_version)
             )
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
         if not any([self.language_code == lc['code']
-                    for lc in constants.ALL_LANGUAGE_CODES]):
+                    for lc in constants.SUPPORTED_CONTENT_LANGUAGES]):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)

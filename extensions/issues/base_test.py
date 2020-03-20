@@ -16,6 +16,9 @@
 
 """Tests for the base issue specification."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from core.domain import playthrough_issue_registry
 from core.platform import models
 from core.tests import test_utils
@@ -33,7 +36,7 @@ class IssueUnitTests(test_utils.GenericTestBase):
             stats_models.ISSUE_TYPE_EARLY_QUIT)
 
         issue_dict = issue.to_dict()
-        self.assertItemsEqual(issue_dict.keys(), [
+        self.assertItemsEqual(list(issue_dict.keys()), [
             'customization_arg_specs'])
         self.assertEqual(
             issue_dict['customization_arg_specs'], [{
@@ -63,7 +66,7 @@ class IssueUnitTests(test_utils.GenericTestBase):
             stats_models.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS)
 
         issue_dict = issue.to_dict()
-        self.assertItemsEqual(issue_dict.keys(), [
+        self.assertItemsEqual(list(issue_dict.keys()), [
             'customization_arg_specs'])
         self.assertEqual(
             issue_dict['customization_arg_specs'], [{
@@ -90,7 +93,7 @@ class IssueUnitTests(test_utils.GenericTestBase):
             stats_models.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS)
 
         issue_dict = issue.to_dict()
-        self.assertItemsEqual(issue_dict.keys(), [
+        self.assertItemsEqual(list(issue_dict.keys()), [
             'customization_arg_specs'])
         self.assertEqual(
             issue_dict['customization_arg_specs'], [{

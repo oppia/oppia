@@ -31,6 +31,8 @@ Each page entry includes:
         cached: see above.
 """
 
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 PAGE_KEY_SPLASH = 'splash'
 PAGE_KEY_LIBRARY = 'library'
 PAGE_KEY_CREATOR_DASHBOARD = 'dashboard'

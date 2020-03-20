@@ -16,6 +16,9 @@
 
 """Jobs for statistics views."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import ast
 import collections
 import copy
@@ -24,12 +27,13 @@ import datetime
 from core import jobs
 from core.domain import config_domain
 from core.domain import exp_domain
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.domain import stats_services
 from core.platform import models
 import feconf
+import python_utils
 
 (exp_models, stats_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics
@@ -37,6 +41,29 @@ import feconf
 
 
 PLAYTHROUGH_PROJECT_RELEASE_DATETIME = datetime.datetime(2018, 9, 1)
+
+
+def require_non_negative(
+        exp_id, exp_version, property_name, value,
+        require_non_negative_messages, state_name=None):
+    """Ensures that all the statistical data is non-negative.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: str. Version of the exploration.
+        property_name: str. The property name whose value is to be checked.
+        value: int. The value of property_name which is to be checked.
+        require_non_negative_messages: list(str). A list in which the
+            error messages are to be appended.
+        state_name: str|None. The name of the state whose statistics should
+            be checked. It is None when exploration-wide stats models are
+            passed in.
+    """
+    state_name = state_name if state_name else ''
+    if value < 0:
+        require_non_negative_messages.append(
+            'Negative count: exp_id:%s version:%s state:%s %s:%s' % (
+                exp_id, exp_version, state_name, property_name, value))
 
 
 class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
@@ -65,15 +92,12 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                     trying to create the model as a domain object, or None if no
                     error occurred.
         """
-        if playthrough_model.deleted:
-            return
-
         try:
             playthrough = (
                 stats_services.get_playthrough_from_model(playthrough_model))
             playthrough.validate()
         except Exception as e:
-            validate_error = str(e)
+            validate_error = python_utils.UNICODE(e)
         else:
             validate_error = None
 
@@ -147,8 +171,9 @@ class PlaythroughAudit(jobs.BaseMapReduceOneOffJobManager):
                     'Details: %s.' % (key, audit_data['reference_error']),)
 
 
-class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job to regenerate missing stats models for explorations with
+class RegenerateMissingV1StatsModelsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job to regenerate missing v1 stats models for explorations with
     correct v1 stats from previous versions.
 
     Note that job RecomputeStatisticsOneOffJob must be run immediately after
@@ -174,9 +199,9 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         ]
 
         # Find the latest version number.
-        exploration = exp_services.get_exploration_by_id(exploration_model.id)
+        exploration = exp_fetchers.get_exploration_by_id(exploration_model.id)
         latest_exp_version = exploration.version
-        versions = range(1, latest_exp_version + 1)
+        versions = list(python_utils.RANGE(1, latest_exp_version + 1))
 
         # Retrieve all exploration instances.
         exploration_instances = exp_models.ExplorationModel.get_multi_versions(
@@ -196,7 +221,7 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 exploration.id, versions))
 
         current_version = exploration_model.version
-        for exp_version in xrange(1, current_version + 1):
+        for exp_version in python_utils.RANGE(1, current_version + 1):
             exp_stats = old_exp_stats_instances[exp_version - 1]
             if not exp_stats:
                 curr_exploration = exploration_instances[exp_version - 1]
@@ -315,7 +340,9 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 {
                     'event_type': feconf.EVENT_TYPE_STATE_COMPLETED,
                     'version': item.exp_version,
-                    'state_name': item.state_name
+                    'state_name': item.state_name,
+                    'id': item.id,
+                    'created_on': python_utils.UNICODE(item.created_on)
                 })
         elif isinstance(
                 item, stats_models.AnswerSubmittedEventLogEntryModel):
@@ -325,6 +352,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'event_type': feconf.EVENT_TYPE_ANSWER_SUBMITTED,
                     'version': item.exp_version,
                     'state_name': item.state_name,
+                    'id': item.id,
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'is_feedback_useful': item.is_feedback_useful
                 })
         elif isinstance(item, stats_models.StateHitEventLogEntryModel):
@@ -334,6 +363,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'event_type': feconf.EVENT_TYPE_STATE_HIT,
                     'version': item.exploration_version,
                     'state_name': item.state_name,
+                    'id': item.id,
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(item, stats_models.SolutionHitEventLogEntryModel):
@@ -343,6 +374,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'event_type': feconf.EVENT_TYPE_SOLUTION_HIT,
                     'version': item.exp_version,
                     'state_name': item.state_name,
+                    'id': item.id,
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(
@@ -354,7 +387,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'version': item.exploration_version,
                     'state_name': item.state_name,
                     'id': item.id,
-                    'created_on': str(item.created_on),
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(
@@ -365,6 +398,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
                     'version': item.exp_version,
                     'state_name': item.state_name,
+                    'id': item.id,
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'session_id': item.session_id
                 })
         elif isinstance(
@@ -375,10 +410,10 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
                     'version': item.exploration_version,
                     'state_name': item.state_name,
+                    'id': item.id,
+                    'created_on': python_utils.UNICODE(item.created_on),
                     'session_id': item.session_id
                 })
-        else:
-            raise Exception('Bad item: %s' % type(item))
         # pylint: enable=too-many-return-statements
 
     @staticmethod
@@ -430,7 +465,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             - The third element is the list of all the errors that occured
                 during the preparation of reduce.
         """
-        values = map(ast.literal_eval, values)
+        values = list(python_utils.MAP(ast.literal_eval, values))
         error_messages = []
 
         for value in values:
@@ -450,11 +485,13 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             filtered_values, key=lambda x: x['version'])
 
         # Find the latest version number.
-        exploration = exp_services.get_exploration_by_id(exp_id, strict=False)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
         if exploration is None:
+            error_messages.append(
+                'Exploration with exploration_id %s not found' % exp_id)
             return [], [], error_messages
         latest_exp_version = exploration.version
-        versions = range(1, latest_exp_version + 1)
+        versions = list(python_utils.RANGE(1, latest_exp_version + 1))
 
         # Get a copy of the corrupted statistics models to copy uncorrupted
         # v1 fields.
@@ -484,8 +521,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 datastore_stats_for_version.num_starts_v2 = 0
                 datastore_stats_for_version.num_completions_v2 = 0
                 datastore_stats_for_version.num_actual_starts_v2 = 0
-                for state_stats in (datastore_stats_for_version.
-                                    state_stats_mapping.values()):
+                for state_stats in (list(datastore_stats_for_version.
+                                         state_stats_mapping.values())):
                     state_stats.total_answers_count_v2 = 0
                     state_stats.useful_feedback_count_v2 = 0
                     state_stats.total_hit_count_v2 = 0
@@ -617,7 +654,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             prev_stats_dict['state_stats_mapping'].pop(state_name)
 
         for old_state_name, new_state_name in (
-                exp_versions_diff.old_to_new_state_names.iteritems()):
+                exp_versions_diff.old_to_new_state_names.items()):
             prev_stats_dict['state_stats_mapping'][new_state_name] = (
                 prev_stats_dict['state_stats_mapping'].pop(old_state_name))
 
@@ -677,52 +714,6 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
     def entity_classes_to_map_over(cls):
         return [stats_models.ExplorationStatsModel]
 
-    @classmethod
-    def require_non_negative(
-            cls, exp_id, exp_version, property_name, value, state_name=None):
-        """Ensures that all the statistical data is non-negative.
-
-        Args:
-            exp_id: str. ID of the exploration.
-            exp_version: str. Version of the exploration.
-            property_name: str. The name used as the property's key in the
-                value dict.
-            value: dict. Its structure is as follows:
-                {
-                    'num_starts_v1': int. # of times exploration was
-                        started.
-                    'num_completions_v1': int. # of times exploration was
-                        completed.
-                    'num_actual_starts_v1': int. # of times exploration was
-                        actually started.
-                    'state_stats_mapping': A dict containing the values of
-                        stats for the states of the exploration. It is
-                        formatted as follows:
-                        {
-                            state_name: {
-                                'total_answers_count_v1',
-                                'useful_feedback_count_v1',
-                                'total_hit_count_v1',
-                                'first_hit_count_v1',
-                                'num_completions_v1'
-                            }
-                        }
-                }
-            state_name: str|None. The name of the state whose statistics should
-                be checked. It is None when exploration-wide stats models are
-                passed in.
-
-        Yield:
-            str. "Negative count: exp_id:? version:? state:? ?:?",
-                where ? is the placeholder for exp_id, exp_version,
-                state_name, property_name and value.
-        """
-        state_name = state_name if state_name else ''
-        if value[property_name] < 0:
-            yield (
-                'Negative count: exp_id:%s version:%s state:%s %s:%s' % (
-                    exp_id, exp_version, property_name, state_name, value))
-
     @staticmethod
     def map(item):
         """Implements the map function. Must be declared @staticmethod.
@@ -781,6 +772,8 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(exp_id, stringified_values):
+        require_non_negative_messages = []
+
         for exp_stats in stringified_values:
             exp_stats = ast.literal_eval(exp_stats)
             exp_version = exp_stats['exp_version']
@@ -789,13 +782,15 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
             num_completions_v1 = exp_stats['num_completions_v1']
             num_actual_starts_v1 = exp_stats['num_actual_starts_v1']
 
-            StatisticsAuditV1.require_non_negative(
-                exp_id, exp_version, 'num_starts_v1', num_starts_v1)
-            StatisticsAuditV1.require_non_negative(
-                exp_id, exp_version, 'num_completions_v1', num_completions_v1)
-            StatisticsAuditV1.require_non_negative(
+            require_non_negative(
+                exp_id, exp_version, 'num_starts_v1', num_starts_v1,
+                require_non_negative_messages)
+            require_non_negative(
+                exp_id, exp_version, 'num_completions_v1', num_completions_v1,
+                require_non_negative_messages)
+            require_non_negative(
                 exp_id, exp_version, 'num_actual_starts_v1',
-                num_actual_starts_v1)
+                num_actual_starts_v1, require_non_negative_messages)
 
             # Number of starts must never be less than the number of
             # completions.
@@ -831,21 +826,26 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
                 first_hit_count_v1 = state_stats['first_hit_count_v1']
                 num_completions_v1 = state_stats['num_completions_v1']
 
-                StatisticsAuditV1.require_non_negative(
+                require_non_negative(
                     exp_id, exp_version, 'total_answers_count_v1',
-                    total_answers_count_v1, state_name=state_name)
-                StatisticsAuditV1.require_non_negative(
+                    total_answers_count_v1, require_non_negative_messages,
+                    state_name=state_name)
+                require_non_negative(
                     exp_id, exp_version, 'useful_feedback_count_v1',
-                    useful_feedback_count_v1, state_name=state_name)
-                StatisticsAuditV1.require_non_negative(
+                    useful_feedback_count_v1, require_non_negative_messages,
+                    state_name=state_name)
+                require_non_negative(
                     exp_id, exp_version, 'total_hit_count_v1',
-                    total_hit_count_v1, state_name=state_name)
-                StatisticsAuditV1.require_non_negative(
+                    total_hit_count_v1, require_non_negative_messages,
+                    state_name=state_name)
+                require_non_negative(
                     exp_id, exp_version, 'first_hit_count_v1',
-                    first_hit_count_v1, state_name=state_name)
-                StatisticsAuditV1.require_non_negative(
+                    first_hit_count_v1, require_non_negative_messages,
+                    state_name=state_name)
+                require_non_negative(
                     exp_id, exp_version, 'num_completions_v1',
-                    num_completions_v1, state_name=state_name)
+                    num_completions_v1, require_non_negative_messages,
+                    state_name=state_name)
 
                 # The total number of answers submitted can never be less than
                 # the number of submitted answers for which useful feedback was
@@ -875,6 +875,9 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
                             exp_id, exp_version, state_name, total_hit_count_v1,
                             num_completions_v1),)
 
+        for error_message in require_non_negative_messages:
+            yield error_message
+
 
 class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
     """A one-off statistics audit for the v2 stats.
@@ -886,53 +889,6 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [stats_models.ExplorationStatsModel]
-
-    @classmethod
-    def _require_non_negative(
-            cls, exp_id, exp_version, property_name, value, state_name=None):
-        """Ensures that all the statistical data is non-negative.
-
-        Args:
-            exp_id: str. ID of the exploration.
-            exp_version: str. Version of the exploration.
-            property_name: str. The name used as the property's key in the
-                value dict.
-            value: dict. Its structure is as follows:
-                {
-                    'num_starts_v2': int. # of times exploration was
-                        started.
-                    'num_completions_v2': int. # of times exploration was
-                        completed.
-                    'num_actual_starts_v2': int. # of times exploration was
-                        actually started.
-                    'state_stats_mapping': A dict containing the values of
-                        stats for the states of the exploration. It is
-                        formatted as follows:
-                        {
-                            state_name: {
-                                'total_answers_count_v2',
-                                'useful_feedback_count_v2',
-                                'total_hit_count_v2',
-                                'first_hit_count_v2',
-                                'num_times_solution_viewed_v2',
-                                'num_completions_v2'
-                            }
-                        }
-                }
-            state_name: str|None. The name of the state whose statistics should
-                be checked. It is None when exploration-wide stats models are
-                passed in.
-
-        Yield:
-            str. "Negative count: exp_id:? version:? state:? ?:?",
-                where ? is the placeholder for exp_id, exp_version,
-                state_name, property_name and value.
-        """
-        state_name = state_name if state_name else ''
-        if value[property_name] < 0:
-            yield (
-                'Negative count: exp_id:%s version:%s state:%s %s:%s' % (
-                    exp_id, exp_version, property_name, state_name, value))
 
     @staticmethod
     def map(item):
@@ -995,6 +951,8 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(exp_id, stringified_values):
+        require_non_negative_messages = []
+
         for exp_stats in stringified_values:
             exp_stats = ast.literal_eval(exp_stats)
             exp_version = exp_stats['exp_version']
@@ -1003,13 +961,15 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
             num_completions_v2 = exp_stats['num_completions_v2']
             num_actual_starts_v2 = exp_stats['num_actual_starts_v2']
 
-            StatisticsAuditV2._require_non_negative(
-                exp_id, exp_version, 'num_starts_v2', num_starts_v2)
-            StatisticsAuditV2._require_non_negative(
-                exp_id, exp_version, 'num_completions_v2', num_completions_v2)
-            StatisticsAuditV2._require_non_negative(
+            require_non_negative(
+                exp_id, exp_version, 'num_starts_v2', num_starts_v2,
+                require_non_negative_messages)
+            require_non_negative(
+                exp_id, exp_version, 'num_completions_v2', num_completions_v2,
+                require_non_negative_messages)
+            require_non_negative(
                 exp_id, exp_version, 'num_actual_starts_v2',
-                num_actual_starts_v2)
+                num_actual_starts_v2, require_non_negative_messages)
 
             # Number of starts must never be less than the number of
             # completions.
@@ -1047,24 +1007,30 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
                 num_times_solution_viewed_v2 = state_stats[
                     'num_times_solution_viewed_v2']
 
-                StatisticsAuditV2._require_non_negative(
+                require_non_negative(
                     exp_id, exp_version, 'total_answers_count_v2',
-                    total_answers_count_v2, state_name=state_name)
-                StatisticsAuditV2._require_non_negative(
+                    total_answers_count_v2, require_non_negative_messages,
+                    state_name=state_name)
+                require_non_negative(
                     exp_id, exp_version, 'useful_feedback_count_v2',
-                    useful_feedback_count_v2, state_name=state_name)
-                StatisticsAuditV2._require_non_negative(
+                    useful_feedback_count_v2, require_non_negative_messages,
+                    state_name=state_name)
+                require_non_negative(
                     exp_id, exp_version, 'total_hit_count_v2',
-                    total_hit_count_v2, state_name=state_name)
-                StatisticsAuditV2._require_non_negative(
+                    total_hit_count_v2, require_non_negative_messages,
+                    state_name=state_name)
+                require_non_negative(
                     exp_id, exp_version, 'first_hit_count_v2',
-                    first_hit_count_v2, state_name=state_name)
-                StatisticsAuditV2._require_non_negative(
+                    first_hit_count_v2, require_non_negative_messages,
+                    state_name=state_name)
+                require_non_negative(
                     exp_id, exp_version, 'num_completions_v2',
-                    num_completions_v2, state_name=state_name)
-                StatisticsAuditV2._require_non_negative(
+                    num_completions_v2, require_non_negative_messages,
+                    state_name=state_name)
+                require_non_negative(
                     exp_id, exp_version, 'num_times_solution_viewed_v2',
-                    num_times_solution_viewed_v2, state_name=state_name)
+                    num_times_solution_viewed_v2, require_non_negative_messages,
+                    state_name=state_name)
 
                 # The total number of answers submitted can never be less than
                 # the number of submitted answers for which useful feedback was
@@ -1103,6 +1069,9 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
                         'exp_id:%s version:%s state:%s %s > %s' % (
                             exp_id, exp_version, state_name, total_hit_count_v2,
                             num_completions_v2),)
+
+        for error_message in require_non_negative_messages:
+            yield error_message
 
 
 class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
@@ -1245,12 +1214,12 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
             if value['version'] == stats_jobs_continuous.VERSION_ALL:
                 all_starts = value['starts']
                 all_completions = value['completions']
-                for (state_name, counts) in value['state_hit'].iteritems():
+                for (state_name, counts) in value['state_hit'].items():
                     all_state_hit[state_name] = counts['first_entry_count']
             else:
                 sum_starts += value['starts']
                 sum_completions += value['completions']
-                for (state_name, counts) in value['state_hit'].iteritems():
+                for (state_name, counts) in value['state_hit'].items():
                     sum_state_hit[state_name] += counts['first_entry_count']
 
         if sum_starts != all_starts:
@@ -1269,9 +1238,138 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                     'state hit count not same exp_id:%s state:%s, '
                     'all:%s sum: null' % (
                         key, state_name, all_state_hit[state_name]),)
-            elif all_state_hit[state_name] != sum_state_hit[state_name]:
-                yield (
-                    'state hit count not same exp_id: %s state: %s '
-                    'all: %s sum:%s' % (
-                        key, state_name, all_state_hit[state_name],
-                        sum_state_hit[state_name]),)
+
+
+class RegenerateMissingV2StatsModelsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job to regenerate v2 stats models which were missing due to
+    incorrect handling of exploration reverts. If a model is missing at version
+    x, we will regenerate all models from version x-1 till the max version of
+    the exploration.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exp):
+        all_models = (
+            stats_models.ExplorationStatsModel.get_multi_stats_models(
+                [exp_domain.ExpVersionReference(exp.id, version)
+                 for version in python_utils.RANGE(1, exp.version + 1)]))
+
+        if exp.deleted:
+            all_existent_models = [m for m in all_models if m is not None]
+            stats_models.ExplorationStatsModel.delete_multi(all_existent_models)
+            yield (
+                'Deleted all stats', {
+                    'exp_id': exp.id,
+                    'number_of_models': len(all_existent_models)
+                })
+            return
+
+        first_missing_version = None
+        for version, model in enumerate(all_models):
+            if model is None:
+                first_missing_version = version + 1
+                break
+
+        # If no stats models are missing, we are good.
+        if first_missing_version is None:
+            yield ('No change', exp.id)
+            return
+
+        # The first model cannot be missing. It should only be missing for
+        # revert commits and the first change cannot be a revert commit.
+        if first_missing_version == 1:
+            yield ('Missing model at version 1', exp.id)
+            return
+
+        new_exp_stats_dicts = []
+
+        # From the version just before the first missing version to the latest
+        # version of the exploration stats were incorrectly calculated. So we
+        # recalculate stats for all these versions.
+        for version in python_utils.RANGE(
+                first_missing_version - 1, exp.version + 1):
+            commit_log = exp_models.ExplorationCommitLogEntryModel.get_commit(
+                exp.id, version)
+            exp_at_version = exp_models.ExplorationModel.get_version(
+                exp.id, version)
+
+            # If commit log models are missing (we noticed this on prod), we
+            # manually calculate a diff between adjacent versions.
+            if commit_log is None:
+                prev_exp = exp_models.ExplorationModel.get_version(
+                    exp.id, version - 1)
+                old_states = prev_exp.states
+                new_states = exp_at_version.states
+                inferred_change_list = []
+
+                # If a state isn't present in the new version, we consider it as
+                # a deletion.
+                for old_state in old_states:
+                    if old_state not in new_states:
+                        inferred_change_list.append(
+                            exp_domain.ExplorationChange({
+                                'cmd': exp_domain.CMD_DELETE_STATE,
+                                'state_name': old_state
+                            }))
+
+                # If a new state is present in the new version, we consider it
+                # as an addition.
+                for new_state in new_states:
+                    if new_state not in old_states:
+                        inferred_change_list.append(
+                            exp_domain.ExplorationChange({
+                                'cmd': exp_domain.CMD_ADD_STATE,
+                                'state_name': new_state
+                            }))
+                exp_versions_diff = exp_domain.ExplorationVersionsDiff(
+                    inferred_change_list)
+
+                # If there are existing stats models for this version, which was
+                # incorrectly calculated before, we delete it.
+                if all_models[version - 1] is not None:
+                    all_models[version - 1].delete()
+
+                new_exp_stats_dicts.append(
+                    stats_services.get_stats_for_new_exp_version(
+                        exp.id, version, exp_at_version.states,
+                        exp_versions_diff, None).to_dict())
+            else:
+                change_list = (
+                    [exp_domain.ExplorationChange(commit_cmd)
+                     for commit_cmd in commit_log.commit_cmds])
+                exp_versions_diff = exp_domain.ExplorationVersionsDiff(
+                    change_list)
+
+                # If there are existing stats models for this version, which was
+                # incorrectly calculated before, we delete it.
+                if all_models[version - 1] is not None:
+                    all_models[version - 1].delete()
+
+                if commit_log.commit_type == 'revert':
+                    revert_to_version = (
+                        commit_log.commit_cmds[0]['version_number'])
+                    new_exp_stats_dicts.append(
+                        stats_services.get_stats_for_new_exp_version(
+                            exp.id, version, exp_at_version.states, None,
+                            revert_to_version).to_dict())
+                else:
+                    new_exp_stats_dicts.append(
+                        stats_services.get_stats_for_new_exp_version(
+                            exp.id, version, exp_at_version.states,
+                            exp_versions_diff, None).to_dict())
+
+        stats_models.ExplorationStatsModel.save_multi(new_exp_stats_dicts)
+
+        yield ('Success', exp.id)
+
+    @staticmethod
+    def reduce(key, items):
+        if key in ('Success', 'No change'):
+            yield (key, len(items))
+        else:
+            yield (key, items)

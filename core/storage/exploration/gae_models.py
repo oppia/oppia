@@ -16,24 +16,42 @@
 
 """Model for an Oppia exploration."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import datetime
 
 from constants import constants
 import core.storage.base_model.gae_models as base_models
 import core.storage.user.gae_models as user_models
 import feconf
+import python_utils
 
 from google.appengine.ext import ndb
 
 
 class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class ExplorationModel(base_models.VersionedModel):
@@ -97,6 +115,34 @@ class ExplorationModel(base_models.VersionedModel):
     # DEPRECATED in v2.5.4. Do not use.
     skin_customizations = ndb.JsonProperty(indexed=False)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration is deleted only if it is not public."""
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether ExplorationModel or its snapshots references the given
+        user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_exploration_count(cls):
         """Returns the total number of explorations."""
@@ -142,17 +188,76 @@ class ExplorationModel(base_models.VersionedModel):
         exploration_commit_log.exploration_id = self.id
         exploration_commit_log.put()
 
+    @classmethod
+    def delete_multi(
+            cls, entity_ids, committer_id, commit_message,
+            force_deletion=False):
+        """Deletes the given cls instances with the given entity_ids.
+
+        Note that this extends the superclass method.
+
+        Args:
+            entity_ids: list(str). Ids of entities to delete.
+            committer_id: str. The user_id of the user who committed the change.
+            commit_message: str. The commit description message.
+            force_deletion: bool. If True these models are deleted completely
+                from storage, otherwise there are only marked as deleted.
+                Default is False.
+        """
+        super(ExplorationModel, cls).delete_multi(
+            entity_ids, committer_id,
+            commit_message, force_deletion=force_deletion)
+
+        if not force_deletion:
+            committer_user_settings_model = (
+                user_models.UserSettingsModel.get_by_id(committer_id))
+            committer_username = (
+                committer_user_settings_model.username
+                if committer_user_settings_model else '')
+
+            commit_log_models = []
+            exp_rights_models = ExplorationRightsModel.get_multi(
+                entity_ids, include_deleted=True)
+            versioned_models = cls.get_multi(entity_ids, include_deleted=True)
+
+            versioned_and_exp_rights_models = python_utils.ZIP(
+                versioned_models, exp_rights_models)
+            for model, rights_model in versioned_and_exp_rights_models:
+                exploration_commit_log = ExplorationCommitLogEntryModel.create(
+                    model.id, model.version, committer_id, committer_username,
+                    cls._COMMIT_TYPE_DELETE,
+                    commit_message, [{'cmd': cls.CMD_DELETE_COMMIT}],
+                    rights_model.status, rights_model.community_owned
+                )
+                exploration_commit_log.exploration_id = model.id
+                commit_log_models.append(exploration_commit_log)
+            ndb.put_multi_async(commit_log_models)
+
 
 class ExplorationRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration rights snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class ExplorationRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration rights snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class ExplorationRightsModel(base_models.VersionedModel):
@@ -196,6 +301,117 @@ class ExplorationRightsModel(base_models.VersionedModel):
     )
     # DEPRECATED in v2.8.3. Do not use.
     translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration rights are deleted only if the corresponding exploration
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
+    @staticmethod
+    def transform_dict_to_valid(model_dict):
+        """Replace invalid fields and values in the ExplorationRightsModel dict.
+
+        Some old ExplorationRightsSnapshotContentModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a ExplorationRightsModel from
+        them. We need to remove or replace these fields and values.
+
+        Args:
+            model_dict: dict. The content of the model. Some fields and field
+                values might no longer exist in the ExplorationRightsModel
+                schema.
+
+        Returns:
+            dict. The content of the model. Only valid fields and values are
+            present.
+        """
+        # The all_viewer_ids field was previously used in some versions of the
+        # model, we need to remove it.
+        if 'all_viewer_ids' in model_dict:
+            del model_dict['all_viewer_ids']
+        # The status field could historically take the value 'publicized', this
+        # value is now equivalent to 'public'.
+        if model_dict['status'] == 'publicized':
+            model_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
+        # The voice_artist_ids field was previously named translator_ids. We
+        # need to move the values from translator_ids field to voice_artist_ids
+        # and delete translator_ids.
+        if 'translator_ids' in model_dict and model_dict['translator_ids']:
+            model_dict['voice_artist_ids'] = model_dict['translator_ids']
+            model_dict['translator_ids'] = []
+        return model_dict
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether ExplorationRightsModel reference user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return (
+            cls.query(ndb.OR(
+                cls.owner_ids == user_id,
+                cls.editor_ids == user_id,
+                cls.voice_artist_ids == user_id,
+                cls.viewer_ids == user_id
+            )).get(keys_only=True) is not None
+            or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationRightsModel has multiple fields with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the owner_ids, editor_ids,
+        voice_artist_ids and viewer_ids.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        migrated_models = []
+        for model in cls.query(ndb.OR(
+                cls.owner_ids == old_user_id, cls.editor_ids == old_user_id,
+                cls.voice_artist_ids == old_user_id,
+                cls.viewer_ids == old_user_id)).fetch():
+            model.owner_ids = [
+                new_user_id if owner_id == old_user_id else owner_id
+                for owner_id in model.owner_ids]
+            model.editor_ids = [
+                new_user_id if editor_id == old_user_id else editor_id
+                for editor_id in model.editor_ids]
+            model.voice_artist_ids = [
+                new_user_id if voice_art_id == old_user_id else voice_art_id
+                for voice_art_id in model.voice_artist_ids]
+            model.viewer_ids = [
+                new_user_id if viewer_id == old_user_id else viewer_id
+                for viewer_id in model.viewer_ids]
+            migrated_models.append(model)
+        cls.put_multi(migrated_models, update_last_updated_time=False)
+
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for all the ids in owner_ids,
+        editor_ids, voice_artist_ids and viewer_ids.
+        """
+        user_ids = (self.owner_ids + self.editor_ids + self.voice_artist_ids +
+                    self.viewer_ids)
+        user_ids = [user_id for user_id in user_ids
+                    if user_id not in feconf.SYSTEM_USERS]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Saves a new version of the exploration, updating the Exploration
@@ -265,6 +481,39 @@ class ExplorationRightsModel(base_models.VersionedModel):
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
 
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Export user-relevant properties of ExplorationRightsModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict or None. The user-relevant properties of ExplorationRightsModel
+            in a python dict format. In this case, we are returning all the
+            ids of explorations that the user is connected to, so they either
+            own, edit, voice, or have permission to view.
+        """
+        owned_explorations = cls.get_all().filter(cls.owner_ids == user_id)
+        editable_explorations = cls.get_all().filter(cls.editor_ids == user_id)
+        voiced_explorations = (
+            cls.get_all().filter(cls.voice_artist_ids == user_id))
+        viewable_explorations = cls.get_all().filter(cls.viewer_ids == user_id)
+
+        owned_exploration_ids = [exp.key.id() for exp in owned_explorations]
+        editable_exploration_ids = (
+            [exp.key.id() for exp in editable_explorations])
+        voiced_exploration_ids = [exp.key.id() for exp in voiced_explorations]
+        viewable_exploration_ids = (
+            [exp.key.id() for exp in viewable_explorations])
+
+        return {
+            'owned_exploration_ids': owned_exploration_ids,
+            'editable_exploration_ids': editable_exploration_ids,
+            'voiced_exploration_ids': voiced_exploration_ids,
+            'viewable_exploration_ids': viewable_exploration_ids
+        }
+
 
 class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to explorations.
@@ -277,6 +526,40 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
     # The id of the exploration being edited.
     exploration_id = ndb.StringProperty(indexed=True, required=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration commit log is deleted only if the corresponding
+        exploration is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def get_multi(cls, exp_id, exp_versions):
+        """Gets the ExplorationCommitLogEntryModels for the given exploration
+        id and exploration versions.
+
+        Args:
+            exp_id: str. The id of the exploration.
+            exp_versions: list(int). The versions of the exploration.
+
+        Returns:
+            list(ExplorationCommitLogEntryModel). The list of
+            ExplorationCommitLogEntryModel instances which matches the given
+            exp_id and exp_versions.
+        """
+        instance_ids = [cls._get_instance_id(exp_id, exp_version)
+                        for exp_version in exp_versions]
+
+        return super(ExplorationCommitLogEntryModel, cls).get_multi(
+            instance_ids)
 
     @classmethod
     def _get_instance_id(cls, exp_id, exp_version):
@@ -408,6 +691,69 @@ class ExpSummaryModel(base_models.BaseModel):
     # DEPRECATED in v2.8.3. Do not use.
     translator_ids = ndb.StringProperty(indexed=True, repeated=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration summary is deleted only if the corresponding exploration
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether ExpSummaryModel references user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(ndb.OR(
+            cls.owner_ids == user_id,
+            cls.editor_ids == user_id,
+            cls.voice_artist_ids == user_id,
+            cls.viewer_ids == user_id,
+            cls.contributor_ids == user_id
+        )).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExpSummaryModel has multiple fields with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the owner_ids, editor_ids,
+        voice_artist_ids, viewer_ids and contributor_ids.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        migrated_models = []
+        for model in cls.query(ndb.OR(
+                cls.owner_ids == old_user_id, cls.editor_ids == old_user_id,
+                cls.voice_artist_ids == old_user_id,
+                cls.viewer_ids == old_user_id,
+                cls.contributor_ids == old_user_id)).fetch():
+            model.owner_ids = [
+                new_user_id if owner_id == old_user_id else owner_id
+                for owner_id in model.owner_ids]
+            model.editor_ids = [
+                new_user_id if editor_id == old_user_id else editor_id
+                for editor_id in model.editor_ids]
+            model.voice_artist_ids = [
+                new_user_id if voice_art_id == old_user_id else voice_art_id
+                for voice_art_id in model.voice_artist_ids]
+            model.viewer_ids = [
+                new_user_id if viewer_id == old_user_id else viewer_id
+                for viewer_id in model.viewer_ids]
+            model.contributor_ids = [
+                new_user_id if contributor_id == old_user_id else contributor_id
+                for contributor_id in model.contributor_ids]
+            migrated_models.append(model)
+        cls.put_multi(migrated_models, update_last_updated_time=False)
+
     @classmethod
     def get_non_private(cls):
         """Returns an iterable with non-private ExpSummary models.
@@ -502,95 +848,22 @@ class ExpSummaryModel(base_models.BaseModel):
             -ExpSummaryModel.first_published_msec
         ).fetch(limit)
 
-
-class StateIdMappingModel(base_models.BaseModel):
-    """DEPRECATED: DO NOT USE.
-    State ID model for Oppia explorations.
-    This model maps each exploration version's state to a unique id.
-    Note: use the state id only for derived data, but not for data that’s
-    regarded as the source of truth, as the rules for assigning state id may
-    change in future.
-    The key of each instance is a combination of exploration id and version.
-    """
-
-    # The exploration id whose states are mapped.
-    exploration_id = ndb.StringProperty(indexed=True, required=True)
-
-    # The version of the exploration.
-    exploration_version = ndb.IntegerProperty(indexed=True, required=True)
-
-    # A dict which maps each state name to a unique id.
-    state_names_to_ids = ndb.JsonProperty(required=True)
-
-    # Latest state id that has been assigned to any of the states in any of
-    # of the versions of given exploration. New state IDs should be assigned
-    # from this value + 1.
-    largest_state_id_used = ndb.IntegerProperty(indexed=True, required=True)
-
-    @classmethod
-    def create(
-            cls, exp_id, exp_version, state_names_to_ids,
-            largest_state_id_used, overwrite=False):
-        """Creates a new instance of state id mapping model.
-        Args:
-            exp_id: str. The exploration id whose states are mapped.
-            exp_version: int. The version of that exploration.
-            state_names_to_ids: dict. A dict storing state name to ids mapping.
-            largest_state_id_used: int. The largest integer so far that has been
-                used as a state ID for this exploration.
-            overwrite: bool. Whether overwriting of an existing model should
-                be allowed.
-        Returns:
-            StateIdMappingModel. Instance of the state id mapping model.
+    @staticmethod
+    def get_export_policy():
+        """Model data has already been exported as a part of the
+        ExplorationModel and thus does not need a separate export_data
+        function.
         """
-        instance_id = cls._generate_instance_id(exp_id, exp_version)
-        if not overwrite and cls.get_by_id(instance_id):
-            raise Exception(
-                'State id mapping model already exists for exploration %s,'
-                ' version %d' % (exp_id, exp_version))
-        model = cls(
-            id=instance_id, exploration_id=exp_id,
-            exploration_version=exp_version,
-            state_names_to_ids=state_names_to_ids,
-            largest_state_id_used=largest_state_id_used)
-        model.put()
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
-        return model
-
-    @classmethod
-    def _generate_instance_id(cls, exp_id, exp_version):
-        """Generates ID of the state id mapping model instance.
-        Args:
-            exp_id: str. The exploration id whose states are mapped.
-            exp_version: int. The version of the exploration.
-        Returns:
-            str. A string containing exploration ID and
-                exploration version.
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for all the ids in owner_ids,
+        editor_ids, voice_artist_ids, viewer_ids and contributor_ids.
         """
-        return '%s.%d' % (exp_id, exp_version)
-
-    @classmethod
-    def get_state_id_mapping_model(cls, exp_id, exp_version):
-        """Retrieve state id mapping model from the datastore.
-        Args:
-            exp_id: str. The exploration id.
-            exp_version: int. The exploration version.
-        Returns:
-            StateIdMappingModel. The model retrieved from the datastore.
-        """
-        instance_id = cls._generate_instance_id(exp_id, exp_version)
-        instance = cls.get(instance_id)
-        return instance
-
-    @classmethod
-    def delete_state_id_mapping_models(cls, exp_id, exp_versions):
-        """Removes state id mapping models present in state_id_mapping_models.
-        Args:
-            exp_id: str. The id of the exploration.
-            exp_versions: list(int). A list of exploration versions for which
-                the state id mapping model is to be deleted.
-        """
-        keys = [
-            ndb.Key(cls, cls._generate_instance_id(exp_id, exp_version))
-            for exp_version in exp_versions]
-        ndb.delete_multi(keys)
+        user_ids = (self.owner_ids + self.editor_ids + self.voice_artist_ids +
+                    self.viewer_ids + self.contributor_ids)
+        user_ids = [user_id for user_id in user_ids
+                    if user_id not in feconf.SYSTEM_USERS]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)

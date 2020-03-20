@@ -16,6 +16,9 @@
 
 """Python configuration for SetInput interaction."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from extensions.interactions import base
 
 
@@ -35,7 +38,14 @@ class SetInput(base.BaseInteraction):
 
     # NB: There used to be a UnicodeString-typed parameter here called
     # 'element_type'. This has since been removed.
-    _customization_arg_specs = []
+    _customization_arg_specs = [{
+        'name': 'buttonText',
+        'description': 'Label for the \'Add Item\' button',
+        'schema': {
+            'type': 'unicode',
+        },
+        'default_value': 'Add item'
+    }]
 
     _answer_visualization_specs = [{
         # Table with answer counts for top N answers.

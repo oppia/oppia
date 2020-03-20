@@ -14,6 +14,9 @@
 
 """Tests for the exploration voice artist work."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import datetime
 
 from core.domain import rights_manager
@@ -51,7 +54,8 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
                 'en': {
                     'filename': 'testFile.mp3',
                     'file_size_bytes': 12200,
-                    'needs_update': False
+                    'needs_update': False,
+                    'duration_secs': 4.5
                 }
             },
             'default_outcome': {}
@@ -76,7 +80,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
         with self.assertRaisesRegexp(
             Exception, 'Invalid POST request: a version must be specified.'):
             self.put_json(
-                '%s/%s' % (feconf.VOICEOVER_DATA_PREFIX, self.EXP_ID), {
+                '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID), {
                     'change_list': [{
                         'cmd': 'edit_state_property',
                         'state_name': feconf.DEFAULT_INIT_STATE_NAME,
@@ -93,7 +97,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
             ' 3, which is too old. Please reload the page and try again.'):
 
             self.put_json(
-                '%s/%s' % (feconf.VOICEOVER_DATA_PREFIX, self.EXP_ID), {
+                '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID), {
                     'change_list': [{
                         'cmd': 'edit_state_property',
                         'state_name': feconf.DEFAULT_INIT_STATE_NAME,
@@ -106,7 +110,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
     def test_voice_artist_can_save_valid_change_list(self):
         response = self.put_json(
-            '/createhandler/voiceover/%s' % self.EXP_ID, {
+            '/createhandler/data/%s' % self.EXP_ID, {
                 'change_list': [{
                     'cmd': 'edit_state_property',
                     'state_name': feconf.DEFAULT_INIT_STATE_NAME,
@@ -125,7 +129,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
     def test_voice_artist_cannot_save_invalid_change_list(self):
         # Trying to change exploration objective.
         response = self.put_json(
-            '/createhandler/voiceover/%s' % self.EXP_ID, {
+            '/createhandler/data/%s' % self.EXP_ID, {
                 'change_list': [{
                     'cmd': 'edit_exploration_property',
                     'property_name': 'objective',
@@ -158,7 +162,8 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
                 'en': {
                     'filename': 'testFile.mp3',
                     'file_size_bytes': 12200,
-                    'needs_update': False
+                    'needs_update': False,
+                    'duration_secs': 4.5
                 }
             },
             'default_outcome': {}
@@ -204,7 +209,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
             'version': 1,
         }
         response = self.put_json(
-            '/createhandler/autosave_voiceover_draft/%s' % self.EXP_ID,
+            '/createhandler/autosave_draft/%s' % self.EXP_ID,
             payload, csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.voice_artist_id, self.EXP_ID))
@@ -216,7 +221,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
 
     def test_draft_not_updated_validation_error(self):
         response = self.put_json(
-            '/createhandler/autosave_voiceover_draft/%s' % self.EXP_ID, {
+            '/createhandler/autosave_draft/%s' % self.EXP_ID, {
                 'change_list': self.INVALID_DRAFT_CHANGELIST,
                 'version': 1,
             }, csrf_token=self.csrf_token, expected_status_int=400)
@@ -238,7 +243,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
             'version': 10,
         }
         response = self.put_json(
-            '/createhandler/autosave_voiceover_draft/%s' % self.EXP_ID,
+            '/createhandler/autosave_draft/%s' % self.EXP_ID,
             payload, csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.voice_artist_id, self.EXP_ID))
@@ -250,7 +255,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
 
     def test_discard_draft(self):
         self.post_json(
-            '/createhandler/autosave_voiceover_draft/%s' % self.EXP_ID, {},
+            '/createhandler/autosave_draft/%s' % self.EXP_ID, {},
             csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.voice_artist_id, self.EXP_ID))

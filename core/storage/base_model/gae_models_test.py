@@ -16,12 +16,16 @@
 
 """Tests for core.storage.base_model.gae_models."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import types
 
 from constants import constants
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -35,6 +39,22 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             entity.delete()
 
         super(BaseModelUnitTests, self).tearDown()
+
+    def test_get_deletion_policy(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.get_deletion_policy()
+
+    def test_has_reference_to_user_id(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.has_reference_to_user_id('user_id')
+
+    def test_get_user_id_migration_policy(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.get_user_id_migration_policy()
+
+    def test_get_user_id_migration_field(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.get_user_id_migration_field()
 
     def test_error_cases_for_get_method(self):
         with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
@@ -51,7 +71,11 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
     def test_export_data(self):
         with self.assertRaises(NotImplementedError):
-            base_models.BaseModel.export_data('model_id')
+            base_models.BaseModel.export_data('user_id')
+
+    def test_get_export_policy(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.get_export_policy()
 
     def test_generic_query_put_get_and_delete_operations(self):
         model = base_models.BaseModel()
@@ -117,7 +141,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_new_id_method_returns_unique_ids(self):
         ids = set([])
-        for _ in range(100):
+        for _ in python_utils.RANGE(100):
             new_id = base_models.BaseModel.get_new_id('')
             self.assertNotIn(new_id, ids)
 
@@ -127,6 +151,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
     def test_get_new_id_method_does_not_fail_with_bad_names(self):
         base_models.BaseModel.get_new_id(None)
         base_models.BaseModel.get_new_id('¡Hola!')
+        base_models.BaseModel.get_new_id(u'¡Hola!')
         base_models.BaseModel.get_new_id(12345)
         base_models.BaseModel.get_new_id({'a': 'b'})
 
@@ -149,6 +174,20 @@ class TestVersionedModel(base_models.VersionedModel):
 
 class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
 
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            base_models.BaseCommitLogEntryModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
+
+    def test_get_user_id_migration_field(self):
+        # We need to compare the field types not the field values, thus using
+        # python_utils.UNICODE.
+        self.assertEqual(
+            python_utils.UNICODE(
+                base_models.BaseCommitLogEntryModel
+                .get_user_id_migration_field()),
+            python_utils.UNICODE(base_models.BaseCommitLogEntryModel.user_id))
+
     def test_base_class_get_instance_id_raises_not_implemented_error(self):
         # Raise NotImplementedError as _get_instance_id is to be overwritten
         # in child classes of BaseCommitLogEntryModel.
@@ -157,6 +196,33 @@ class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
 
 
 class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            base_models.BaseSnapshotMetadataModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
+
+    def test_get_user_id_migration_field(self):
+        # We need to compare the field types not the field values, thus using
+        # python_utils.UNICODE.
+        self.assertEqual(
+            python_utils.UNICODE(
+                base_models.BaseSnapshotMetadataModel
+                .get_user_id_migration_field()),
+            python_utils.UNICODE(
+                base_models.BaseSnapshotMetadataModel.committer_id))
+
+    def test_exists_for_user_id(self):
+        model1 = base_models.BaseSnapshotMetadataModel(
+            id='model_id-1', committer_id='committer_id', commit_type='create')
+        model1.put()
+        self.assertTrue(
+            base_models.BaseSnapshotMetadataModel
+            .exists_for_user_id('committer_id'))
+        self.assertFalse(
+            base_models.BaseSnapshotMetadataModel
+            .exists_for_user_id('x_id'))
 
     def test_get_version_string(self):
         model1 = base_models.BaseSnapshotMetadataModel(
@@ -169,6 +235,42 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
             id='model_id-1', committer_id='committer_id', commit_type='create')
         model1.put()
         self.assertEqual(model1.get_unversioned_instance_id(), 'model_id')
+
+    def test_export_data_trivial(self):
+        user_data = (base_models
+                     .BaseSnapshotMetadataModel
+                     .export_data('trivial_user'))
+        expected_data = {}
+        self.assertEqual(user_data, expected_data)
+
+    def test_export_data_nontrivial(self):
+        version_model = TestVersionedModel(id='version_model')
+        model1 = version_model.SNAPSHOT_METADATA_CLASS.create(
+            'model_id-1', 'committer_id', 'create', None, None)
+        model1.put()
+        model2 = version_model.SNAPSHOT_METADATA_CLASS.create(
+            'model_id-2', 'committer_id', 'create', 'Hi this is a commit.',
+            [{'cmd': 'some_command'}, {'cmd2': 'another_command'}])
+        model2.put()
+        user_data = (version_model
+                     .SNAPSHOT_METADATA_CLASS
+                     .export_data('committer_id'))
+        expected_data = {
+            'model_id-1': {
+                'commit_type': 'create',
+                'commit_message': None,
+                'commit_cmds': None
+            },
+            'model_id-2': {
+                'commit_type': 'create',
+                'commit_message': 'Hi this is a commit.',
+                'commit_cmds': [
+                    {'cmd': 'some_command'},
+                    {'cmd2': 'another_command'}
+                ]
+            }
+        }
+        self.assertEqual(user_data, expected_data)
 
 
 class BaseSnapshotContentModelTests(test_utils.GenericTestBase):

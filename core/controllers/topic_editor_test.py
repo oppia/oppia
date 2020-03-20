@@ -14,7 +14,11 @@
 
 """Tests for the topic editor page."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from core.domain import skill_services
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -46,14 +50,19 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.new_user = user_services.UserActionsInfo(self.new_user_id)
         self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
+        self.save_new_skill(
+            self.skill_id, self.admin_id, description='Skill Description')
         self.skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
-            self.skill_id_2, self.admin_id, 'Skill Description 2')
+            self.skill_id_2, self.admin_id, description='Skill Description 2')
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description', [], [],
-            [self.skill_id, self.skill_id_2], [], 1)
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
@@ -81,9 +90,13 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         self.assertEqual(response['additional_story_summary_dicts'], [])
 
         self.save_new_topic(
-            topic_id, self.admin_id, 'New name', 'New description',
-            [canonical_story_id], [additional_story_id], [self.skill_id],
-            [], 1)
+            topic_id, self.admin_id, name='New name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='New description',
+            canonical_story_ids=[canonical_story_id],
+            additional_story_ids=[additional_story_id],
+            uncategorized_skill_ids=[self.skill_id],
+            subtopics=[], next_subtopic_id=1)
 
         self.save_new_story(
             canonical_story_id, self.admin_id, 'title', 'description',
@@ -92,25 +105,33 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             additional_story_id, self.admin_id, 'another title',
             'another description', 'another note', topic_id)
 
+        topic_services.publish_story(
+            topic_id, canonical_story_id, self.admin_id)
+
         response = self.get_json(
             '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
-        canonical_story_summary_dicts = response[
+        canonical_story_summary_dict = response[
             'canonical_story_summary_dicts'][0]
-        additional_story_summary_dicts = response[
+        additional_story_summary_dict = response[
             'additional_story_summary_dicts'][0]
 
         self.assertEqual(
-            canonical_story_summary_dicts['description'], 'description')
-        self.assertEqual(canonical_story_summary_dicts['title'], 'title')
+            canonical_story_summary_dict['description'], 'description')
+        self.assertEqual(canonical_story_summary_dict['title'], 'title')
         self.assertEqual(
-            canonical_story_summary_dicts['id'], canonical_story_id)
+            canonical_story_summary_dict['id'], canonical_story_id)
         self.assertEqual(
-            additional_story_summary_dicts['description'],
+            canonical_story_summary_dict['story_is_published'], True)
+
+        self.assertEqual(
+            additional_story_summary_dict['description'],
             'another description')
         self.assertEqual(
-            additional_story_summary_dicts['title'], 'another title')
+            additional_story_summary_dict['title'], 'another title')
         self.assertEqual(
-            additional_story_summary_dicts['id'], additional_story_id)
+            additional_story_summary_dict['id'], additional_story_id)
+        self.assertEqual(
+            additional_story_summary_dict['story_is_published'], False)
 
         self.logout()
 
@@ -124,7 +145,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         story_id = json_response['storyId']
         self.assertEqual(len(story_id), 12)
         self.assertIsNotNone(
-            story_services.get_story_by_id(story_id, strict=False))
+            story_fetchers.get_story_by_id(story_id, strict=False))
         self.logout()
 
 
@@ -267,6 +288,7 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
 
 
     def test_editable_topic_handler_get(self):
+        skill_services.delete_skill(self.admin_id, self.skill_id_2)
         # Check that non-admins cannot access the editable topic data.
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
@@ -277,14 +299,29 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
 
         # Check that admins can access the editable topic data.
         self.login(self.ADMIN_EMAIL)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 0)
+            json_response = self.get_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
+            self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+            self.assertEqual(
+                'Skill Description',
+                json_response['skill_id_to_description_dict'][self.skill_id])
 
-        json_response = self.get_json(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
-        self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
-        self.assertEqual(
-            'Skill Description',
-            json_response['skill_id_to_description_dict'][self.skill_id])
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            expected_email_html_body = (
+                'The deleted skills: %s are still'
+                ' present in topic with id %s' % (
+                    self.skill_id_2, self.topic_id))
+            self.assertEqual(len(messages), 1)
+            self.assertIn(
+                expected_email_html_body,
+                messages[0].html.decode())
+
         self.logout()
 
         # Check that editable topic handler is accessed only when a topic id
@@ -371,7 +408,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                             'en': {
                                 'filename': 'test.mp3',
                                 'file_size_bytes': 100,
-                                'needs_update': False
+                                'needs_update': False,
+                                'duration_secs': 0.34342
                             }
                         }
                     }
@@ -381,17 +419,33 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         }
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
+        skill_services.delete_skill(self.admin_id, self.skill_id_2)
 
-        json_response = self.put_json(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-            change_cmd, csrf_token=csrf_token)
-        self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
-        self.assertEqual('A new name', json_response['topic_dict']['name'])
-        self.assertEqual(2, len(json_response['topic_dict']['subtopics']))
-        self.assertEqual(
-            'Skill Description',
-            json_response['skill_id_to_description_dict'][self.skill_id])
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 0)
+            json_response = self.put_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                change_cmd, csrf_token=csrf_token)
+            self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+            self.assertEqual('A new name', json_response['topic_dict']['name'])
+            self.assertEqual(2, len(json_response['topic_dict']['subtopics']))
+            self.assertEqual(
+                'Skill Description',
+                json_response['skill_id_to_description_dict'][self.skill_id])
+
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            expected_email_html_body = (
+                'The deleted skills: %s are still'
+                ' present in topic with id %s' % (
+                    self.skill_id_2, self.topic_id))
+            self.assertEqual(len(messages), 1)
+            self.assertIn(
+                expected_email_html_body,
+                messages[0].html.decode())
 
         # Test if the corresponding subtopic pages were created.
         json_response = self.get_json(
@@ -429,7 +483,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                         'en': {
                             'file_size_bytes': 100,
                             'filename': 'test.mp3',
-                            'needs_update': False
+                            'needs_update': False,
+                            'duration_secs': 0.34342
                         }
                     }
                 }
@@ -476,8 +531,12 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
 
         topic_id_1 = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id_1, self.admin_id, 'Name 1', 'Description 1', [], [],
-            [self.skill_id], [], 1)
+            topic_id_1, self.admin_id, name='Name 1',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description 1', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id],
+            subtopics=[], next_subtopic_id=1)
 
         json_response = self.put_json(
             '%s/%s' % (
@@ -543,7 +602,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                             'en': {
                                 'filename': 'test.mp3',
                                 'file_size_bytes': 100,
-                                'needs_update': False
+                                'needs_update': False,
+                                'duration_secs': 0.34342
                             }
                         }
                     }

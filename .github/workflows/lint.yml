@@ -1,0 +1,21 @@
+name: CI Tests
+on: [push]
+
+jobs:
+  lint:
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '2.x'
+          architecture: 'x64'
+      - name: Install Third Party Dependencies
+        run: python -m scripts.install_third_party_libs
+      - name: Third Party Size Check
+        run: python -m scripts.third_party_size_check
+      - name: Run Lint Checks
+        run: python -m scripts.pre_commit_linter --path=. --verbose

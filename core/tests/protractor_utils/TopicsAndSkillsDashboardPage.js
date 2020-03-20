@@ -19,9 +19,11 @@
 
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
+var SkillEditorPage = require('./SkillEditorPage.js');
 
 var TopicsAndSkillsDashboardPage = function() {
   var DASHBOARD_URL = '/topics_and_skills_dashboard';
+  var skillEditorPage = new SkillEditorPage.SkillEditorPage();
   var topicNames = element.all(by.css('.protractor-test-topic-name'));
   var skillDescriptions = element.all(
     by.css('.protractor-test-skill-description'));
@@ -53,9 +55,6 @@ var TopicsAndSkillsDashboardPage = function() {
   var confirmSkillDeletionButton = element(
     by.css('.protractor-test-confirm-skill-deletion-button')
   );
-  var unpublishedSkillsTabButton = element(
-    by.css('.protractor-test-unpublished-skills-tab')
-  );
   var unusedSkillsTabButton = element(
     by.css('.protractor-test-unused-skills-tab')
   );
@@ -66,7 +65,29 @@ var TopicsAndSkillsDashboardPage = function() {
   var mergeSkillsButtons = element.all(
     by.css('.protractor-test-merge-skills-button'));
   var confirmSkillsMergeButton = element(
-    by.css('.protractor-test-confirm-skills-merge-button'));
+    by.css('.protractor-test-confirm-skill-selection-button'));
+  var searchSkillInput = element(by.css('.protractor-test-search-skill-input'));
+  var editConceptCardExplanationButton = element(
+    by.css('.protractor-test-edit-concept-card'));
+  var saveConceptCardExplanationButton = element(
+    by.css('.protractor-test-save-concept-card'));
+  var topicNamesInTopicSelectModal = element.all(
+    by.css('.protractor-test-topic-name-in-topic-select-modal'));
+  var abbreviatedTopicNameField = element(
+    by.css('.protractor-test-new-abbreviated-topic-name-field'));
+  var topicsTabButton = element(
+    by.css('.protractor-test-topics-tab')
+  );
+
+  // Returns a promise of all topics with the given name.
+  var _getTopicElements = function(topicName) {
+    return topicsListItems.filter(function(name) {
+      return name.element(by.css('.protractor-test-topic-name')).getText().then(
+        function(elementTopicName) {
+          return (topicName === elementTopicName);
+        });
+    });
+  };
 
   this.get = function() {
     browser.get(DASHBOARD_URL);
@@ -100,13 +121,33 @@ var TopicsAndSkillsDashboardPage = function() {
     });
   };
 
-  this.createTopicWithTitle = function(title) {
+  this.assignSkillWithIndexToTopicByTopicName = function(
+      skillIndex, topicName) {
+    assignSkillToTopicButtons.then(function(elems) {
+      elems[skillIndex].click();
+      topicNamesInTopicSelectModal.then(function(topics) {
+        for (var i = 0; i < topics.length; i++) {
+          (function(topic) {
+            topic.getText().then(function(isTarget) {
+              if (isTarget === topicName) {
+                topic.click();
+                confirmMoveButton.click();
+              }
+            });
+          })(topics[i]);
+        }
+      });
+    });
+  };
+
+  this.createTopic = function(title, abbreviatedName) {
     waitFor.elementToBeClickable(
       createTopicButton,
       'Create Topic button takes too long to be clickable');
     createTopicButton.click();
 
     topicNameField.sendKeys(title);
+    abbreviatedTopicNameField.sendKeys(abbreviatedName);
     confirmTopicCreationButton.click();
     waitFor.pageToFullyLoad();
   };
@@ -143,19 +184,37 @@ var TopicsAndSkillsDashboardPage = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.createSkillWithDescription = function(description) {
+  this.createSkillWithDescriptionAndExplanation = function(
+      description, reviewMaterial) {
     waitFor.elementToBeClickable(
       createSkillButton,
       'Create Skill button takes too long to be clickable');
     createSkillButton.click();
 
     skillNameField.sendKeys(description);
+    editConceptCardExplanationButton.click();
+
+    var editor = element(by.css('.protractor-test-concept-card-text'));
+    waitFor.visibilityOf(
+      editor, 'Explanation Editor takes too long to appear');
+
+    browser.switchTo().activeElement().sendKeys(reviewMaterial);
+
+    waitFor.elementToBeClickable(
+      saveConceptCardExplanationButton,
+      'Save Concept Card Explanation button takes too long to be clickable');
+    saveConceptCardExplanationButton.click();
+    waitFor.invisibilityOf(
+      editor, 'Explanation Editor takes too long to close');
+
+    for (var i = 0; i < 3; i++) {
+      skillEditorPage.editRubricExplanationWithIndex(i, 'Explanation ' + i);
+    }
+    waitFor.elementToBeClickable(
+      confirmSkillCreationButton,
+      'Create skill button takes too long to be clickable');
     confirmSkillCreationButton.click();
     waitFor.pageToFullyLoad();
-  };
-
-  this.navigateToUnpublishedSkillsTab = function() {
-    unpublishedSkillsTabButton.click();
   };
 
   this.navigateToUnusedSkillsTab = function() {
@@ -174,6 +233,19 @@ var TopicsAndSkillsDashboardPage = function() {
     });
   };
 
+  this.editTopic = function(topicName) {
+    waitFor.elementToBeClickable(
+      topicsTabButton, 'Unable to click on topics tab.');
+    _getTopicElements(topicName).then(function(topicElements) {
+      if (topicElements.length === 0) {
+        throw 'Could not find topic tile with name ' + topicName;
+      }
+      waitFor.elementToBeClickable(
+        topicElements[0], 'Unable to click on topic: ' + topicName);
+      topicElements[0].click();
+      waitFor.pageToFullyLoad();
+    });
+  };
 
   this.expectSkillDescriptionToBe = function(description, index) {
     skillDescriptions.then(function(elems) {
@@ -185,6 +257,13 @@ var TopicsAndSkillsDashboardPage = function() {
     skillsListItems.then(function(elems) {
       expect(elems.length).toBe(number);
     });
+  };
+
+  this.searchSkillByName = function(name) {
+    waitFor.visibilityOf(
+      searchSkillInput,
+      'searchSkillInput takes too long to be visible.');
+    searchSkillInput.sendKeys(name);
   };
 };
 
