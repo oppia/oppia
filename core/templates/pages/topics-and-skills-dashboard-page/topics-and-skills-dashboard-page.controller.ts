@@ -95,6 +95,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   EVENT_TYPE_SKILL_CREATION_ENABLED, ctrl.userCanCreateSkill);
                 ctrl.userCanDeleteTopic = response.data.can_delete_topic;
                 ctrl.userCanDeleteSkill = response.data.can_delete_skill;
+                $rootScope.$apply()
                 if (ctrl.topicSummaries.length === 0 &&
                     ctrl.untriagedSkillSummaries.length !== 0) {
                   ctrl.activeTab = ctrl.TAB_NAME_UNTRIAGED_SKILLS;
