@@ -20,6 +20,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
+require('services/context.service.ts');
 require('services/editability.service.ts');
 
 angular.module('oppia').directive('solutionExplanationEditor', [
@@ -37,8 +38,11 @@ angular.module('oppia').directive('solutionExplanationEditor', [
         'solution-explanation-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'EditabilityService', 'StateSolutionService',
-        function($scope, EditabilityService, StateSolutionService) {
+        '$scope', 'ContextService', 'EditabilityService',
+        'StateSolutionService',
+        function(
+            $scope, ContextService, EditabilityService,
+            StateSolutionService) {
           var ctrl = this;
           ctrl.openExplanationEditor = function() {
             if (ctrl.isEditable) {
@@ -77,10 +81,12 @@ angular.module('oppia').directive('solutionExplanationEditor', [
             ctrl.explanationEditorIsOpen = false;
 
             ctrl.StateSolutionService = StateSolutionService;
-
             ctrl.EXPLANATION_FORM_SCHEMA = {
               type: 'html',
-              ui_config: {}
+              ui_config: {
+                hide_complex_extensions: (
+                  ContextService.getEntityType() === 'question')
+              }
             };
           };
         }

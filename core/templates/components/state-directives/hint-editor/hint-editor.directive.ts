@@ -24,6 +24,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
+require('services/context.service.ts');
 require('services/editability.service.ts');
 
 angular.module('oppia').directive('hintEditor', [
@@ -41,8 +42,9 @@ angular.module('oppia').directive('hintEditor', [
         '/components/state-directives/hint-editor/hint-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'EditabilityService', 'StateHintsService',
-        function($scope, EditabilityService, StateHintsService) {
+        '$scope', 'ContextService', 'EditabilityService', 'StateHintsService',
+        function(
+            $scope, ContextService, EditabilityService, StateHintsService) {
           var ctrl = this;
           ctrl.openHintEditor = function() {
             if (ctrl.isEditable) {
@@ -86,7 +88,10 @@ angular.module('oppia').directive('hintEditor', [
 
             ctrl.HINT_FORM_SCHEMA = {
               type: 'html',
-              ui_config: {}
+              ui_config: {
+                hide_complex_extensions: (
+                  ContextService.getEntityType() === 'question')
+              }
             };
 
             ctrl.hintMemento = null;
