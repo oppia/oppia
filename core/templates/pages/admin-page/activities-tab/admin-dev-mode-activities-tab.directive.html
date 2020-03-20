@@ -92,6 +92,24 @@
   </div>
 </md-card>
 
+<md-card class="oppia-page-card oppia-long-text" style="max-width: 700px">
+  <div class="container" style="margin-left: 0;">
+    <h3>Generate dummy skill with questions (only admins)</h3>
+    <div class="row">
+      <span class="col-lg-4 col-md-4 col-sm-4">
+        Generate a skill with 15 questions linked to it.
+      </span>
+      <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
+        <button type="button"
+                class="btn btn-secondary float-right"
+                ng-click="$ctrl.generateNewSkillData()">
+          Generate Data
+        </button>
+      </span>
+    </div>
+  </div>
+</md-card>
+
 <style>
   .oppia-admin-page-card .row {
     margin-left: 0;
