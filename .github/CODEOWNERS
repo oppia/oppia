@@ -67,9 +67,12 @@
 /CONTRIBUTORS @seanlip
 /LICENSE @seanlip
 /NOTICE @seanlip
-/core/templates/pages/about-page/ @seanlip
-/core/templates/pages/privacy-page/ @seanlip
-/core/templates/pages/terms-page/ @seanlip
+/core/templates/pages/about-page/ @DubeySandeep
+/core/templates/pages/about-page/about-page.directive.html @seanlip
+/core/templates/pages/privacy-page/ @DubeySandeep
+/core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip
+/core/templates/pages/terms-page/ @DubeySandeep
+/core/templates/pages/terms-page/terms-page.mainpage.html @seanlip
 
 
 # Dashboard pages.
@@ -398,7 +401,7 @@
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
 /main_mail.py @aks681
-/main.py @nithusha21 @seanlip
+/main.py @nithusha21 @DubeySandeep
 /feconf.py @nithusha21 @seanlip
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
@@ -421,7 +424,7 @@
 /core/templates/services/contextual/document-attribute-customization.service*.ts @bansalnitish
 /core/templates/services/contextual/meta-tag-customization.service*.ts @bansalnitish
 /core/templates/services/translation-file-hash-loader.service.ts @nithusha21
-/release_constants.py @ankita240796 @nithusha21 @seanlip
+/release_constants.py @ankita240796 @nithusha21 @DubeySandeep
 
 
 # Miscellaneous.
@@ -429,7 +432,7 @@
 /core/__init__.py @nithusha21
 /core/controllers/__init__.py @nithusha21
 /core/domain/__init__.py @nithusha21
-/core/domain/config*.py @seanlip
+/core/domain/config*.py @DubeySandeep
 /core/domain/change_domain.py @ankita240796
 /core/templates/tests/ @kevinlee12 @nithusha21
 /core/templates/domain/utilities/ @bansalnitish
@@ -439,12 +442,12 @@
 
 
 # Restricted pages.
-/core/controllers/admin*.py @seanlip @nithusha21
+/core/controllers/admin*.py @DubeySandeep @nithusha21
 /core/controllers/moderator*.py @seanlip
 /core/controllers/recent_commits*.py @seanlip
 /core/domain/moderator_services*.py @seanlip
-/core/templates/pages/admin-page/ @seanlip @nithusha21
-/core/templates/pages/moderator-page/ @seanlip @nithusha21
+/core/templates/pages/admin-page/ @DubeySandeep @nithusha21
+/core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
 
 
 # QA team.
@@ -549,7 +552,7 @@
 
 
 # Draft version upgrade.
-/core/domain/draft_upgrade_services*.py @seanlip
+/core/domain/draft_upgrade_services*.py @DubeySandeep
 
 # Critical files.
 #
