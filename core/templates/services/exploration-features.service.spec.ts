@@ -38,7 +38,7 @@ describe('ExplorationFeatureService', () => {
       states: {}
     };
     explorationData2 = {
-      param_changes:[],
+      param_changes: [],
       states: {
         state_1: {
           param_changes: ['param_1', 'param_2'],
@@ -80,5 +80,5 @@ describe('ExplorationFeatureService', () => {
     expect(explorationFeatureService.isImprovementsTabEnabled()).toEqual(false);
     expect(explorationFeatureService.isPlaythroughRecordingEnabled())
       .toEqual(false);
-  })
+  });
 });
