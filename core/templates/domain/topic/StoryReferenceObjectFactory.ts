@@ -50,8 +50,8 @@ export class StoryReferenceObjectFactory {
       // camelCasing.
       storyReferenceBackendDict: any): StoryReference {
     return new StoryReference(
-      storyReferenceBackendDict.story_id,
-      storyReferenceBackendDict.story_is_published);
+      storyReferenceBackendDict.storyId,
+      storyReferenceBackendDict.storyIsPublished);
   }
 
   createFromStoryId(storyId: string): StoryReference {

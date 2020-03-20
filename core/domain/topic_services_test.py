@@ -1304,8 +1304,8 @@ class StoryReferenceMigrationTests(test_utils.GenericTestBase):
             'name': 'name'
         })
         story_reference_dict = {
-            'story_id': 'story_id',
-            'story_is_published': False
+            'storyId': 'story_id',
+            'storyIsPublished': False
         }
         model = topic_models.TopicModel(
             id='topic_id',

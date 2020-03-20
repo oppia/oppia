@@ -61,9 +61,9 @@ describe('Editable topic backend API service', function() {
         name: 'Topic Name',
         description: 'Topic Description',
         version: '1',
-        canonical_story_references: [{
-          story_id: 'story_1',
-          story_is_published: true
+        canonicalStoryReferences: [{
+          storyId: 'story_1',
+          storyIsPublished: true
         }],
         canonical_story_summary_dicts: [{
           id: '0',
@@ -71,11 +71,11 @@ describe('Editable topic backend API service', function() {
           node_count: 1,
           story_is_published: false
         }],
-        additional_story_references: [{
-          story_id: 'story_2',
-          story_is_published: true
+        additionalStoryReferences: [{
+          storyId: 'story_2',
+          storyIsPublished: true
         }],
-        uncategorized_skill_ids: ['skill_id_1'],
+        uncategorizedSkillIds: ['skill_id_1'],
         subtopics: [],
         language_code: 'en'
       },

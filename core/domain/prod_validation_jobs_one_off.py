@@ -3175,10 +3175,10 @@ class TopicModelValidator(BaseModelValidator):
             skill_ids = skill_ids + subtopic['skill_ids']
         skill_ids = list(set(skill_ids))
         canonical_story_ids = [
-            reference['story_id']
+            reference['storyId']
             for reference in item.canonical_story_references]
         additional_story_ids = [
-            reference['story_id']
+            reference['storyId']
             for reference in item.additional_story_references]
         return {
             'topic_commit_log_entry_ids': (
@@ -3439,9 +3439,9 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             if topic_model is None or topic_model.deleted:
                 continue
             pubished_canonical_story_ids = [
-                reference['story_id']
+                reference['storyId']
                 for reference in topic_model.canonical_story_references
-                if reference['story_is_published']]
+                if reference['storyIsPublished']]
             if item.canonical_story_count != len(pubished_canonical_story_ids):
                 cls.errors['canonical story count check'].append((
                     'Entity id %s: Canonical story count: %s does not '
@@ -3469,9 +3469,9 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             if topic_model is None or topic_model.deleted:
                 continue
             published_additional_story_ids = [
-                reference['story_id']
+                reference['storyId']
                 for reference in topic_model.additional_story_references
-                if reference['story_is_published']]
+                if reference['storyIsPublished']]
             if (
                     item.additional_story_count !=
                     len(published_additional_story_ids)):
@@ -4502,8 +4502,8 @@ class StoryProgressModelValidator(BaseUserModelValidator):
                     topic.additional_story_references)
                 story_is_published = False
                 for reference in all_story_references:
-                    if reference['story_id'] == story_model.id:
-                        story_is_published = reference['story_is_published']
+                    if reference['storyId'] == story_model.id:
+                        story_is_published = reference['storyIsPublished']
                 if not story_is_published:
                     cls.errors['public story check'].append(
                         'Entity id %s: Story with id %s corresponding to '

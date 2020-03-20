@@ -56,17 +56,17 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         expected_topic_dict = {
             'id': self.topic_id,
             'name': 'Name',
-            'abbreviated_name': 'abbrev',
-            'thumbnail_filename': None,
+            'abbreviatedName': 'abbrev',
+            'thumbnailFilename': None,
             'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
-            'canonical_story_references': [],
-            'additional_story_references': [],
-            'uncategorized_skill_ids': [],
+            'canonicalStoryReferences': [],
+            'additionalStoryReferences': [],
+            'uncategorizedSkillIds': [],
             'subtopics': [],
-            'next_subtopic_id': 1,
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
-            'subtopic_schema_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            'story_reference_schema_version': (
+            'nextSubtopicId': 1,
+            'languageCode': constants.DEFAULT_LANGUAGE_CODE,
+            'subtopicSchemaVersion': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            'storyReferenceSchemaVersion': (
                 feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
             'version': 0
         }

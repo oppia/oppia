@@ -441,25 +441,25 @@ export class TopicObjectFactory {
         subtopic, skillIdToDescriptionDict);
     });
     let canonicalStoryReferences =
-        topicBackendDict.canonical_story_references.map(
+        topicBackendDict.canonicalStoryReferences.map(
           (reference: StoryReference) => {
             return this.storyReferenceObjectFactory.createFromBackendDict(
               reference);
           });
     let additionalStoryReferences =
-        topicBackendDict.additional_story_references.map(
+        topicBackendDict.additionalStoryReferences.map(
           (reference: StoryReference) => {
             return this.storyReferenceObjectFactory.createFromBackendDict(
               reference);
           });
     return new Topic(
       topicBackendDict.id, topicBackendDict.name,
-      topicBackendDict.abbreviated_name,
-      topicBackendDict.description, topicBackendDict.language_code,
+      topicBackendDict.abbreviatedName,
+      topicBackendDict.description, topicBackendDict.languageCode,
       canonicalStoryReferences, additionalStoryReferences,
-      topicBackendDict.uncategorized_skill_ids,
-      topicBackendDict.next_subtopic_id, topicBackendDict.version,
-      subtopics, topicBackendDict.thumbnail_filename,
+      topicBackendDict.uncategorizedSkillIds,
+      topicBackendDict.nextSubtopicId, topicBackendDict.version,
+      subtopics, topicBackendDict.thumbnailFilename,
       skillIdToDescriptionDict, this.skillSummaryObjectFactory,
       this.subtopicObjectFactory, this.storyReferenceObjectFactory
     );

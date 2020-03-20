@@ -43,12 +43,12 @@ ROLE_NONE = 'none'
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
 TOPIC_PROPERTY_NAME = 'name'
-TOPIC_PROPERTY_ABBREVIATED_NAME = 'abbreviated_name'
-TOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
+TOPIC_PROPERTY_ABBREVIATED_NAME = 'abbreviatedName'
+TOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnailFilename'
 TOPIC_PROPERTY_DESCRIPTION = 'description'
-TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES = 'canonical_story_references'
-TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES = 'additional_story_references'
-TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
+TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES = 'canonicalStoryReferences'
+TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES = 'additionalStoryReferences'
+TOPIC_PROPERTY_LANGUAGE_CODE = 'languageCode'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
 
@@ -236,8 +236,8 @@ class StoryReference(python_utils.OBJECT):
             A dict, mapping all fields of StoryReference instance.
         """
         return {
-            'story_id': self.story_id,
-            'story_is_published': self.story_is_published
+            'storyId': self.story_id,
+            'storyIsPublished': self.story_is_published
         }
 
     @classmethod
@@ -252,8 +252,8 @@ class StoryReference(python_utils.OBJECT):
             StoryReference. The corresponding StoryReference domain object.
         """
         story_reference = cls(
-            story_reference_dict['story_id'],
-            story_reference_dict['story_is_published'])
+            story_reference_dict['storyId'],
+            story_reference_dict['storyIsPublished'])
         return story_reference
 
     @classmethod
@@ -442,26 +442,26 @@ class Topic(python_utils.OBJECT):
         return {
             'id': self.id,
             'name': self.name,
-            'abbreviated_name': self.abbreviated_name,
-            'thumbnail_filename': self.thumbnail_filename,
+            'abbreviatedName': self.abbreviated_name,
+            'thumbnailFilename': self.thumbnail_filename,
             'description': self.description,
-            'canonical_story_references': [
+            'canonicalStoryReferences': [
                 reference.to_dict()
                 for reference in self.canonical_story_references
             ],
-            'additional_story_references': [
+            'additionalStoryReferences': [
                 reference.to_dict()
                 for reference in self.additional_story_references
             ],
-            'uncategorized_skill_ids': self.uncategorized_skill_ids,
+            'uncategorizedSkillIds': self.uncategorized_skill_ids,
             'subtopics': [
                 subtopic.to_dict() for subtopic in self.subtopics
             ],
-            'subtopic_schema_version': self.subtopic_schema_version,
-            'next_subtopic_id': self.next_subtopic_id,
-            'language_code': self.language_code,
+            'subtopicSchemaVersion': self.subtopic_schema_version,
+            'nextSubtopicId': self.next_subtopic_id,
+            'languageCode': self.language_code,
             'version': self.version,
-            'story_reference_schema_version': (
+            'storyReferenceSchemaVersion': (
                 self.story_reference_schema_version)
         }
 

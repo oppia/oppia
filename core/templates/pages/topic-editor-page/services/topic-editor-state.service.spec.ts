@@ -218,19 +218,19 @@ describe('Topic editor state service', function() {
         id: '0',
         name: 'Topic Name',
         description: 'Topic Description',
-        canonical_story_references: [{
-          story_id: 'story_1',
-          story_is_published: true
+        canonicalStoryReferences: [{
+          storyId: 'story_1',
+          storyIsPublished: true
         }],
-        additional_story_references: [{
-          story_id: 'story_2',
-          story_is_published: true
+        additionalStoryReferences: [{
+          storyId: 'story_2',
+          storyIsPublished: true
         }],
-        uncategorized_skill_ids: ['skill_1'],
+        uncategorizedSkillIds: ['skill_1'],
         subtopics: [],
-        language_code: 'en',
-        next_subtopic_id: 1,
-        subtopic_schema_version: '1',
+        languageCode: 'en',
+        nextSubtopicId: 1,
+        subtopicSchemaVersion: '1',
         version: '1'
       },
       groupedSkillSummaries: {},
@@ -256,15 +256,15 @@ describe('Topic editor state service', function() {
         id: '0',
         name: 'Topic Name 2',
         description: 'Topic Description 2',
-        canonical_story_references: [{
-          story_id: 'story_3',
-          story_is_published: true
+        canonicalStoryReferences: [{
+          storyId: 'story_3',
+          storyIsPublished: true
         }],
-        additional_story_references: [{
-          story_id: 'story_4',
-          story_is_published: true
+        additionalStoryReferences: [{
+          storyId: 'story_4',
+          storyIsPublished: true
         }],
-        uncategorized_skill_ids: ['skill_5'],
+        uncategorizedSkillIds: ['skill_5'],
         subtopics: [
           {
             id: 1,
@@ -276,9 +276,9 @@ describe('Topic editor state service', function() {
             skill_ids: ['skill_3']
           }
         ],
-        language_code: 'en',
-        next_subtopic_id: 3,
-        subtopic_schema_version: '1',
+        languageCode: 'en',
+        nextSubtopicId: 3,
+        subtopicSchemaVersion: '1',
         version: '1'
       },
       groupedSkillSummaries: {},

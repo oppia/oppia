@@ -30,32 +30,32 @@ describe('Topic object factory', () => {
     let sampleTopicBackendObject = {
       id: 'sample_topic_id',
       name: 'Topic name',
-      abbreviated_name: 'abbrev',
-      thumbnail_filename: 'img.png',
+      abbreviatedName: 'abbrev',
+      thumbnailFilename: 'img.png',
       description: 'Topic description',
       version: 1,
-      uncategorized_skill_ids: ['skill_1', 'skill_2'],
-      canonical_story_references: [{
-        story_id: 'story_1',
-        story_is_published: true
+      uncategorizedSkillIds: ['skill_1', 'skill_2'],
+      canonicalStoryReferences: [{
+        storyId: 'story_1',
+        storyIsPublished: true
       }, {
-        story_id: 'story_4',
-        story_is_published: false
+        storyId: 'story_4',
+        storyIsPublished: false
       }],
-      additional_story_references: [{
-        story_id: 'story_2',
-        story_is_published: true
+      additionalStoryReferences: [{
+        storyId: 'story_2',
+        storyIsPublished: true
       }, {
-        story_id: 'story_3',
-        story_is_published: false
+        storyId: 'story_3',
+        storyIsPublished: false
       }],
       subtopics: [{
         id: 1,
         title: 'Title',
         skill_ids: ['skill_3']
       }],
-      next_subtopic_id: 1,
-      language_code: 'en'
+      nextSubtopicId: 1,
+      languageCode: 'en'
     };
     let skillIdToDescriptionDict = {
       skill_1: 'Description 1',
@@ -117,18 +117,18 @@ describe('Topic object factory', () => {
       id: 'topic_id_2',
       name: 'Another name',
       description: 'Another description',
-      language_code: 'en',
+      languageCode: 'en',
       version: '15',
-      canonical_story_references: [{
-        story_id: 'story_10',
-        story_is_published: true
+      canonicalStoryReferences: [{
+        storyId: 'story_10',
+        storyIsPublished: true
       }],
-      additional_story_references: [{
-        story_id: 'story_5',
-        story_is_published: true
+      additionalStoryReferences: [{
+        storyId: 'story_5',
+        storyIsPublished: true
       }],
-      uncategorized_skill_ids: ['skill_2', 'skill_3'],
-      next_subtopic_id: 2,
+      uncategorizedSkillIds: ['skill_2', 'skill_3'],
+      nextSubtopicId: 2,
       subtopics: [{
         id: 1,
         title: 'Title',

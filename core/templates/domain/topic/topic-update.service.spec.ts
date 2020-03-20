@@ -118,21 +118,21 @@ describe('Topic update service', function() {
         name: 'Topic name',
         description: 'Topic description',
         version: 1,
-        uncategorized_skill_ids: ['skill_1'],
-        canonical_story_references: [{
-          story_id: 'story_1',
-          story_is_published: true
+        uncategorizedSkillIds: ['skill_1'],
+        canonicalStoryReferences: [{
+          storyId: 'story_1',
+          storyIsPublished: true
         }],
-        additional_story_references: [{
-          story_id: 'story_2',
-          story_is_published: true
+        additionalStoryReferences: [{
+          storyId: 'story_2',
+          storyIsPublished: true
         }],
         subtopics: [{
           id: 1,
           title: 'Title',
           skill_ids: ['skill_2']
         }],
-        next_subtopic_id: 2,
+        nextSubtopicId: 2,
         language_code: 'en'
       },
       skillIdToDescriptionDict: {

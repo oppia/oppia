@@ -33,8 +33,8 @@ describe('Story reference object factory', () => {
     storyReferenceObjectFactory = TestBed.get(StoryReferenceObjectFactory);
 
     var sampleStoryReferenceBackendObject = {
-      story_id: 'story_id',
-      story_is_published: true
+      storyId: 'story_id',
+      storyIsPublished: true
     };
 
     _sampleStoryReference = storyReferenceObjectFactory.createFromBackendDict(
