@@ -1504,7 +1504,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         ]
         state2.update_interaction_hints(hint_list2)
 
-        answer_group2_1 = state_domain.AnswerGroup(
+        answer_group_1_list2 = state_domain.AnswerGroup(
             state_domain.Outcome(
                 'state1',
                 state_domain.SubtitledHtml(
@@ -1525,7 +1525,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             ], [], None
         )
 
-        answer_group2_2 = state_domain.AnswerGroup(
+        answer_group_2_list2 = state_domain.AnswerGroup(
             state_domain.Outcome(
                 'state3',
                 state_domain.SubtitledHtml(
@@ -1537,8 +1537,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             ], [], None
         )
 
-        answer_group_list2 = [answer_group2_1, answer_group2_2]
-        answer_group3_1 = state_domain.AnswerGroup(
+        answer_group_list2 = [answer_group_1_list2, answer_group_2_list2]
+        answer_group_1_list3 = state_domain.AnswerGroup(
             state_domain.Outcome(
                 'state1',
                 state_domain.SubtitledHtml(
@@ -1572,7 +1572,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 )
             ], [], None
         )
-        answer_group_list3 = [answer_group3_1]
+        answer_group_list3 = [answer_group_1_list3]
         state2.update_interaction_answer_groups(answer_group_list2)
         state3.update_interaction_answer_groups(answer_group_list3)
 
