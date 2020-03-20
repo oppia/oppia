@@ -55,7 +55,7 @@ describe('Topic object factory', () => {
         skill_ids: ['skill_3']
       }],
       nextSubtopicId: 1,
-      languageCode: 'en'
+      language_code: 'en'
     };
     let skillIdToDescriptionDict = {
       skill_1: 'Description 1',
@@ -117,7 +117,7 @@ describe('Topic object factory', () => {
       id: 'topic_id_2',
       name: 'Another name',
       description: 'Another description',
-      languageCode: 'en',
+      language_code: 'en',
       version: '15',
       canonicalStoryReferences: [{
         storyId: 'story_10',

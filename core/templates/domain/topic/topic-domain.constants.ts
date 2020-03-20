@@ -50,7 +50,7 @@ export class TopicDomainConstants {
   public static TOPIC_PROPERTY_ABBREVIATED_NAME = 'abbreviatedName';
   public static TOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnailFilename';
   public static TOPIC_PROPERTY_DESCRIPTION = 'description';
-  public static TOPIC_PROPERTY_LANGUAGE_CODE = 'languageCode';
+  public static TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code';
 
   public static SUBTOPIC_PROPERTY_TITLE = 'title';
 

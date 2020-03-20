@@ -228,7 +228,7 @@ describe('Topic editor state service', function() {
         }],
         uncategorizedSkillIds: ['skill_1'],
         subtopics: [],
-        languageCode: 'en',
+        language_code: 'en',
         nextSubtopicId: 1,
         subtopicSchemaVersion: '1',
         version: '1'
@@ -276,7 +276,7 @@ describe('Topic editor state service', function() {
             skill_ids: ['skill_3']
           }
         ],
-        languageCode: 'en',
+        language_code: 'en',
         nextSubtopicId: 3,
         subtopicSchemaVersion: '1',
         version: '1'

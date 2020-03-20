@@ -48,7 +48,7 @@ TOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnailFilename'
 TOPIC_PROPERTY_DESCRIPTION = 'description'
 TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES = 'canonicalStoryReferences'
 TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES = 'additionalStoryReferences'
-TOPIC_PROPERTY_LANGUAGE_CODE = 'languageCode'
+TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
 
@@ -459,7 +459,7 @@ class Topic(python_utils.OBJECT):
             ],
             'subtopicSchemaVersion': self.subtopic_schema_version,
             'nextSubtopicId': self.next_subtopic_id,
-            'languageCode': self.language_code,
+            'language_code': self.language_code,
             'version': self.version,
             'storyReferenceSchemaVersion': (
                 self.story_reference_schema_version)

@@ -455,7 +455,7 @@ export class TopicObjectFactory {
     return new Topic(
       topicBackendDict.id, topicBackendDict.name,
       topicBackendDict.abbreviatedName,
-      topicBackendDict.description, topicBackendDict.languageCode,
+      topicBackendDict.description, topicBackendDict.language_code,
       canonicalStoryReferences, additionalStoryReferences,
       topicBackendDict.uncategorizedSkillIds,
       topicBackendDict.nextSubtopicId, topicBackendDict.version,

@@ -64,7 +64,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'uncategorizedSkillIds': [],
             'subtopics': [],
             'nextSubtopicId': 1,
-            'languageCode': constants.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'subtopicSchemaVersion': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             'storyReferenceSchemaVersion': (
                 feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
