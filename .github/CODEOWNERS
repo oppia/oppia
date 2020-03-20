@@ -263,14 +263,14 @@
 
 
 # Interaction project.
-/core/domain/customization_args_util*.py @seanlip
+/core/domain/customization_args_util*.py @brianrodri
 /core/domain/interaction_registry*.py @aks681
 /core/domain/obj_services*.py @aks681
 /core/templates/components/version-diff-visualization/codemirror-mergeview.directive.ts @aks681
 /core/templates/domain/objects/ @aks681
-/core/templates/expressions/ @seanlip
+/core/templates/expressions/ @brianrodri
 /core/templates/services/code-normalizer.service*.ts @aks681
-/extensions/domain*.py @seanlip
+/extensions/domain*.py @brianrodri
 /extensions/interactions/ @aks681 @vojtechjelinek
 /extensions/objects/ @aks681
 /extensions/value_generators/ @vojtechjelinek
