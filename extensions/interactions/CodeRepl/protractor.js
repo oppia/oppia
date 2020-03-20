@@ -29,7 +29,7 @@ var expectInteractionDetailsToMatch = function(elem, placeHolderText) {
   expect(
     elem.element(by.css('.CodeMirror')).isPresent()
   ).toBe(true);
-  // The /n must be included in the check because the editor inserts a newline.
+  // The \n must be included in the check because the editor inserts a newline.
   // For testing purposes it is required that the order of
   // the quotes is single-quotes within double-quotes
   /* eslint-disable quotes */
