@@ -15,40 +15,30 @@
 /**
  * @fileoverview Unit tests for expression-syntax-tree.service.ts
  */
-
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-
-require('App.ts');
-require('expressions/expression-syntax-tree.service.ts');
+import { ExpressionParserService } from
+  'expressions/expression-parser.service.ts';
+import { ExpressionSyntaxTreeService } from
+  'expressions/expression-syntax-tree.service.ts';
 
 describe('Expression syntax tree service', () => {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
   describe('expression syntax tree service', () => {
-    let ExpressionSyntaxTreeService = null;
+    let expressionSyntaxTreeService: ExpressionSyntaxTreeService;
 
-    beforeEach(angular.mock.inject(($injector) => {
-      ExpressionSyntaxTreeService =
-          $injector.get('ExpressionSyntaxTreeService');
-    }));
+    beforeEach(() => {
+      expressionSyntaxTreeService = new ExpressionSyntaxTreeService(
+        new ExpressionParserService()
+      );
+    });
 
     it('should throw if environment is not found', () => {
-      expect(() => ExpressionSyntaxTreeService.lookupEnvs('', [])).toThrow();
+      expect(() => expressionSyntaxTreeService.lookupEnvs('', [])).toThrow();
     });
 
     it('should return the correct environment if exists', () => {
       const expected = 'bar';
-      const actual =
-          ExpressionSyntaxTreeService.lookupEnvs('foo', [{foo: 'bar'}]);
+      const actual = expressionSyntaxTreeService.lookupEnvs('foo', [
+        {foo: 'bar'}
+      ]);
 
       expect(expected).toBe(actual);
     });
