@@ -74,7 +74,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             FATAL_ERROR_CODES, SKILL_DIFFICULTIES) {
           var ctrl = this;
           var _initDashboard = function() {
-            TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+            TopicsAndSkillsDashboardBackendApiService.getData().then(
               function(response) {
                 ctrl.topicSummaries = response.data.topic_summary_dicts;
                 ctrl.editableTopicSummaries = ctrl.topicSummaries.filter(
