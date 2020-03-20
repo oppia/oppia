@@ -31,7 +31,7 @@ import { TopicsAndSkillsDashboardDomainConstants } from
 export class TopicsAndSkillsDashboardBackendApiService {
   constructor(private http: HttpClient) {}
 
-  getData(): Promise<any> {
+  fetchDasboardData(): Promise<any> {
     return this.http.get('/topics_and_skills_dashboard/data').toPromise();
   }
 
