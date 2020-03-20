@@ -23,7 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class FeedbackThreadSummary {
   status: string;
   originalAuthorId: string;
-  lastUpdated: Date;
+  lastUpdatedMsecs: number;
   lastMessageText: string;
   totalMessageCount: number;
   lastMessageRead: boolean;
@@ -35,14 +35,14 @@ export class FeedbackThreadSummary {
   threadId: string;
 
   constructor(
-      status: string, originalAuthorId: string, lastUpdated: Date,
+      status: string, originalAuthorId: string, lastUpdatedMsecs: number,
       lastMessageText: string, totalMessageCount: number,
       lastMessageRead: boolean, secondLastMessageRead: boolean,
       authorLastMessage: string, authorSecondLastMessage: string,
       explorationTitle: string, explorationId: string, threadId: string) {
     this.status = status;
     this.originalAuthorId = originalAuthorId;
-    this.lastUpdated = lastUpdated;
+    this.lastUpdatedMsecs = lastUpdatedMsecs;
     this.lastMessageText = lastMessageText;
     this.totalMessageCount = totalMessageCount;
     this.lastMessageRead = lastMessageRead;
@@ -63,7 +63,7 @@ export class FeedbackThreadSummary {
 
   appendNewMessage(lastMessageText: string, authorLastMessage: string): void {
     this.lastMessageText = lastMessageText;
-    this.lastUpdated = new Date();
+    this.lastUpdatedMsecs = new Date().getTime();
     this.authorSecondLastMessage = this.authorLastMessage;
     this.authorLastMessage = authorLastMessage;
     this.totalMessageCount += 1;
@@ -77,13 +77,13 @@ export class FeedbackThreadSummary {
 })
 export class FeedbackThreadSummaryObjectFactory {
   create(
-      status: string, originalAuthorId: string, lastUpdated: Date,
+      status: string, originalAuthorId: string, lastUpdatedMsecs: number,
       lastMessageText: string, totalMessageCount: number,
       lastMessageRead: boolean, secondLastMessageRead: boolean,
       authorLastMessage: string, authorSecondLastMessage: string,
       explorationTitle: string, explorationId: string,
       threadId: string): FeedbackThreadSummary {
-    return new FeedbackThreadSummary(status, originalAuthorId, lastUpdated,
+    return new FeedbackThreadSummary(status, originalAuthorId, lastUpdatedMsecs,
       lastMessageText, totalMessageCount, lastMessageRead,
       secondLastMessageRead, authorLastMessage, authorSecondLastMessage,
       explorationTitle, explorationId, threadId);
@@ -94,7 +94,7 @@ export class FeedbackThreadSummaryObjectFactory {
     return new FeedbackThreadSummary(
       feedbackThreadSummaryBackendDict.status,
       feedbackThreadSummaryBackendDict.original_author_id,
-      feedbackThreadSummaryBackendDict.last_updated,
+      feedbackThreadSummaryBackendDict.last_updated_msecs,
       feedbackThreadSummaryBackendDict.last_message_text,
       feedbackThreadSummaryBackendDict.total_message_count,
       feedbackThreadSummaryBackendDict.last_message_is_read,

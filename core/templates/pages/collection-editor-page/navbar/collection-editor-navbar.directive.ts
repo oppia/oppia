@@ -45,7 +45,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
         'collection-editor-navbar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$uibModal', 'AlertsService', 'RouterService',
+        '$scope', '$rootScope', '$uibModal', 'AlertsService', 'RouterService',
         'UndoRedoService', 'CollectionEditorStateService',
         'CollectionValidationService',
         'CollectionRightsBackendApiService',
@@ -53,7 +53,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
         'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
-            $scope, $uibModal, AlertsService, RouterService,
+            $scope, $rootScope, $uibModal, AlertsService, RouterService,
             UndoRedoService, CollectionEditorStateService,
             CollectionValidationService,
             CollectionRightsBackendApiService,
@@ -84,6 +84,10 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                 ctrl.collectionRights.setPublic();
                 CollectionEditorStateService.setCollectionRights(
                   ctrl.collectionRights);
+
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the controller is migrated to angular.
+                $rootScope.$apply();
               });
           };
 
@@ -249,6 +253,10 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                 ctrl.collectionRights.setPrivate();
                 CollectionEditorStateService.setCollectionRights(
                   ctrl.collectionRights);
+
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the controller is migrated to angular.
+                $rootScope.$apply();
               }, function() {
                 AlertsService.addWarning(
                   'There was an error when unpublishing the collection.');
