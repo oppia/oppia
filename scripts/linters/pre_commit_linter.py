@@ -235,7 +235,7 @@ def _lint_all_files(
     else:
         general_files_to_lint = file_extensions_to_lint
 
-    custom_linter = general_purpose_linter.get_linters(
+    custom_linter, third_party_linter = general_purpose_linter.get_linters(
         _FILES[general_files_to_lint],
         verbose_mode_enabled=verbose_mode_enabled)
     custom_linters.append(custom_linter)
@@ -253,13 +253,13 @@ def _lint_all_files(
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
-        third_party_linter = css_linter.get_linters(
+        custom_linter, third_party_linter = css_linter.get_linters(
             config_path_for_css_in_html, html_filepaths,
             verbose_mode_enabled=verbose_mode_enabled)
         third_party_linters.append(third_party_linter)
 
     if css_file_extension_type:
-        third_party_linter = css_linter.get_linters(
+        custom_linter, third_party_linter = css_linter.get_linters(
             config_path_for_oppia_css, css_filepaths,
             verbose_mode_enabled=verbose_mode_enabled)
         third_party_linters.append(third_party_linter)
@@ -333,8 +333,9 @@ def _get_file_extensions(file_extensions_to_lint):
 
         if js_and_ts_is_present:
             python_utils.PRINT(
-                'Please either use "js" or "ts". Both are not '
-                'allowed together....')
+                'Please either use "js" or "ts". As we do not have separate '
+                'linters for Js and Ts files. If both used together then JsTs '
+                'linters is going to run twice.')
             python_utils.PRINT('Exiting...')
             sys.exit(1)
 
@@ -494,6 +495,12 @@ def main(args=None):
         tasks_third_party.append(task_third_party)
 
     # Execute tasks.
+    # Here we set Concurrency limit for custom task to 25 because we need to
+    # parallelize the tasks to work on full capacity of CPU.
+    # Concurrency limit for third party tasks is set to 2 because these
+    # third party libraries have their own ways to lint at their fastest
+    # (ie. might parallelize on their own)
+
     # Concurrency limit: 25.
     concurrent_task_utils.execute_tasks(tasks_custom, custom_semaphore)
     # Concurrency limit: 2.

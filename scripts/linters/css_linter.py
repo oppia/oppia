@@ -147,9 +147,10 @@ def get_linters(config_path, files_to_lint, verbose_mode_enabled=False):
         verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
-        tlinter: object(linter). Returns linter object.
+        linter: tuple(ThirdPartyCSSLintChecksManager). Returns custom and
+            third_party linter objects.
     """
     third_party_linter = ThirdPartyCSSLintChecksManager(
         config_path, files_to_lint, verbose_mode_enabled)
 
-    return third_party_linter
+    return None, third_party_linter

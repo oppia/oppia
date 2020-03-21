@@ -337,7 +337,9 @@ def get_linters(files_to_lint, verbose_mode_enabled=False):
         verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
-        tasks: objects(linter). Return object of linters.
+        linters: tuple(PythonLintChecksManager,
+            ThirdPartyPythonLintChecksManager). Return object of custom and
+            third_party linter objects.
     """
     custom_linter = PythonLintChecksManager(
         files_to_lint, verbose_mode_enabled)

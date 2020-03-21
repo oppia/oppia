@@ -731,9 +731,10 @@ def get_linters(
         verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
-        linter: object(linter). Returns linter object.
+        linter: tuple(GeneralPurposeLinter). Returns custom and third_party
+            linter objects.
     """
     custom_linter = GeneralPurposeLinter(
         files_to_lint, verbose_mode_enabled)
 
-    return custom_linter
+    return custom_linter, None
