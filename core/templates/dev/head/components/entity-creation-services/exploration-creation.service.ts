@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,18 +17,18 @@
  * modal.
  */
 
-require('components/entity-creation-services/exploration-creation.service -backend-api.ts');         //change1
+require('components/entity-creation-services/exploration-creation.service -backend-api.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/csrf-token.service.ts');
 require('services/site-analytics.service.ts');
 
 angular.module('oppia').factory('ExplorationCreationService', [
-  'ExplorationCreationBackendService', '$rootScope', '$timeout', '$uibModal', '$window',             //change2
+  'ExplorationCreationBackendService', '$rootScope', '$timeout', '$uibModal', '$window',
   'AlertsService', 'CsrfTokenService', 'SiteAnalyticsService',
   'UrlInterpolationService',
   function(
-      ExplorationCreationService, $rootScope, $timeout, $uibModal, $window,                          //change3
+      ExplorationCreationService, $rootScope, $timeout, $uibModal, $window,
       AlertsService, CsrfTokenService, SiteAnalyticsService,
       UrlInterpolationService) {
     var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
@@ -46,14 +46,14 @@ angular.module('oppia').factory('ExplorationCreationService', [
         $rootScope.loadingMessage = 'Creating exploration';
 
         
-        ExplorationCreationBackendService.createExploration().then(                                 //change4
+        ExplorationCreationBackendService.createExploration().then(
           function(response){
           SiteAnalyticsService.registerCreateNewExplorationEvent(
-            response.explorationId);                                                                //change5
+            response.explorationId);
           $timeout(function() {
             $window.location = UrlInterpolationService.interpolateUrl(
               CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                exploration_id: response.explorationId                                              //change6
+                exploration_id: response.explorationId
               }
             );
           }, 150);
