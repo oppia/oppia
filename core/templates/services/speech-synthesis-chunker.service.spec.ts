@@ -21,6 +21,7 @@ import { TestBed, fakeAsync, flush } from '@angular/core/testing';
 import { SpeechSynthesisChunkerService } from
   'services/speech-synthesis-chunker.service';
 
+
 describe('Speech Synthesis Chunker Service', () => {
   let speechSynthesisChunkerService: SpeechSynthesisChunkerService = null;
 
@@ -35,14 +36,14 @@ describe('Speech Synthesis Chunker Service', () => {
   describe('formatLatexToSpeakableText', () => {
     it('should properly convert subtraction in LaTeX to speakable text',
       () => {
-        var latex1 = '5 - 3';
-        var latex2 = 'i - j';
+        var latex1 = '&quot;5 - 3&quot;';
+        var latex2 = '&quot;i - j&quot;';
         var speakableLatex1 =
           speechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
         var speakableLatex2 =
           speechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
         expect(speakableLatex1).toEqual('5 minus 3');
-        expect(speakableLatex2).toEqual('i minus j');
+        expect(speakableLatex2).toEqual('\'I\' minus \'J\'');
       }
     );
 
@@ -60,10 +61,13 @@ describe('Speech Synthesis Chunker Service', () => {
           speechSynthesisChunkerService.formatLatexToSpeakableText(latex3);
         var speakableLatex4 =
           speechSynthesisChunkerService.formatLatexToSpeakableText(latex4);
-        expect(speakableLatex1).toEqual('2/3');
-        expect(speakableLatex2).toEqual('a b c over x y z');
-        expect(speakableLatex3).toEqual('3n over 5');
-        expect(speakableLatex4).toEqual('i j k over 5x y');
+        expect(speakableLatex1).toEqual('two third');
+        expect(speakableLatex2).toEqual('the fraction a \'B\' \'C\',' +
+            ' over \'X\' \'Y\' \'Z\'. End fraction.');
+        expect(speakableLatex3).toEqual('the fraction 3 \'N\',' +
+            ' over 5. End fraction.');
+        expect(speakableLatex4).toEqual('the fraction' +
+            ' \'I\' \'J\' \'K\', over 5 \'X\' \'Y\'. End fraction.');
       }
     );
 
@@ -75,8 +79,9 @@ describe('Speech Synthesis Chunker Service', () => {
           speechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
         var speakableLatex2 =
           speechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
-        expect(speakableLatex1).toEqual('the square root of 3');
-        expect(speakableLatex2).toEqual('the square root of x y');
+        expect(speakableLatex1).toEqual('the square root of 3 ,');
+        expect(speakableLatex2).toEqual('the square root of' +
+            ' \'X\' \'Y\'. End square root');
       }
     );
 
@@ -84,8 +89,8 @@ describe('Speech Synthesis Chunker Service', () => {
       () => {
         var latex1 = 'x ^ 2';
         var latex2 = '42 ^ 4';
-        var latex3 = 'x ^ 62';
-        var latex4 = '3n ^ 4x';
+        var latex3 = 'x ^ {62}';
+        var latex4 = '3n ^ {4x}';
         var speakableLatex1 =
           speechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
         var speakableLatex2 =
@@ -94,10 +99,10 @@ describe('Speech Synthesis Chunker Service', () => {
           speechSynthesisChunkerService.formatLatexToSpeakableText(latex3);
         var speakableLatex4 =
           speechSynthesisChunkerService.formatLatexToSpeakableText(latex4);
-        expect(speakableLatex1).toEqual('x^2');
-        expect(speakableLatex2).toEqual('42 to the power of 4');
-        expect(speakableLatex3).toEqual('x to the power of 62');
-        expect(speakableLatex4).toEqual('3n to the power of 4x');
+        expect(speakableLatex1).toEqual('\'X\' squared');
+        expect(speakableLatex2).toEqual('42 to the 4 power;');
+        expect(speakableLatex3).toEqual('\'X\' raised to the 62 power;');
+        expect(speakableLatex4).toEqual('3 \'N\' raised to the 4 \'X\' power;');
       }
     );
 
@@ -112,9 +117,9 @@ describe('Speech Synthesis Chunker Service', () => {
         speechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
       var speakableLatex3 =
         speechSynthesisChunkerService.formatLatexToSpeakableText(latex3);
-      expect(speakableLatex1).toEqual('the sine of 90');
-      expect(speakableLatex2).toEqual('the cosine of 0');
-      expect(speakableLatex3).toEqual('the tangent of u v');
+      expect(speakableLatex1).toEqual('sine 90');
+      expect(speakableLatex2).toEqual('cosine 0');
+      expect(speakableLatex3).toEqual('tan \'U\' \'V\'');
     });
   });
 
