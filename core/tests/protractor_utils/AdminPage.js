@@ -34,6 +34,16 @@ var AdminPage = function() {
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
   var statusMessage = element(by.css('[ng-if="$ctrl.statusMessage"]'));
 
+  var assignReviewerForm = element(by.css('.protractor-assign-reviewer-form'));
+  var viewReviewerForm = element(by.css('.protractor-view-reviewer-form'));
+  var removeReviewerForm = element(by.css('.protractor-remove-reviewer-form'));
+  var languageSelectCss = by.css('.protractor-form-language-select');
+  var reviewerUsernameCss = by.css('.protractor-form-reviewer-username');
+  var reviewCategorySelectCss = by.css(
+    '.protractor-form-review-category-select');
+  var reviewerFormSubmitButtonCss = by.css(
+    '.protractor-reviewer-form-submit-button');
+
   // Viewing roles can be done by two methods: 1. By roles 2. By username
   var roleDropdown = element(by.css('.protractor-test-role-method'));
   var roleValueOption = element(by.css('.protractor-test-role-value'));
@@ -265,6 +275,60 @@ var AdminPage = function() {
           expect(name).toEqual(expectedUsernamesArray[ind]);
         });
       });
+  };
+  var _assignReviewer = function(
+      username, reviewCategory, languageDescription = null) {
+    waitFor.elementToBeClickable(
+      adminRolesTab, 'Admin Roles tab is not clickable');
+    adminRolesTab.click();
+
+    waitFor.visibilityOf(
+      assignReviewerForm, 'Assign reviewer form is not visible');
+
+    var usernameInputField = assignReviewerForm.element(reviewerUsernameCss);
+    waitFor.visibilityOf(
+      usernameInputField,
+      'Username input field is not visible in assign reviewer form');
+    usernameInputField.sendKeys(username);
+
+    var reviewCategorySelectField = assignReviewerForm.element(
+      reviewCategorySelectCss);
+    waitFor.visibilityOf(
+      reviewCategorySelectField,
+      'Review category options are not visible in assign reviewer form');
+    var reviewCategoryOption = reviewCategorySelectField.element(
+      by.cssContainingText('option', reviewCategory));
+    reviewCategoryOption.click();
+
+    if (languageDescription !== null) {
+      var languageSelectField = assignReviewerForm.element(languageSelectCss);
+      waitFor.visibilityOf(
+        languageSelectField,
+        'Language options are not visible in assign reviewer form');
+      var languageOption = languageSelectField.element(
+        by.cssContainingText('option', languageDescription));
+      languageOption.click();
+    }
+
+    var submitButton = assignReviewerForm.element(reviewerFormSubmitButtonCss);
+    waitFor.elementToBeClickable(
+      submitButton, 'Submit assign reviewer button is not clickable');
+    submitButton.click();
+
+    waitFor.textToBePresentInElement(
+      statusMessage, 'Successfully added',
+      'Could not add translation reviewer successfully');
+  };
+  this.assignTranslationReviewer = function(languageDescription, username) {
+    _assignReviewer(username, 'TRANSLATION', languageDescription);
+  };
+
+  this.assignVoiceoverReviewer = function(languageDescription, username) {
+    _assignReviewer(username, 'VOICEOVER', languageDescription);
+  };
+
+  this.assignQuestionReviewer = function(username) {
+    _assignReviewer(username, 'QUESTION');
   };
 };
 
