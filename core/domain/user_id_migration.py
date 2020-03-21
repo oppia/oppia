@@ -88,7 +88,7 @@ class CreateNewUsersMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, old_new_user_id_tuples):
         """Implements the reduce function for this job."""
         if key == 'ALREADY MIGRATED':
-            yield(key, len(old_new_user_id_tuples))
+            yield (key, len(old_new_user_id_tuples))
         else:
             yield (key, old_new_user_id_tuples)
 
