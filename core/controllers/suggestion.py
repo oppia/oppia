@@ -88,15 +88,15 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
         skill.id: skill
         for skill in skill_services.get_multi_skills(opportunity_skill_ids)
     }
-    id_to_opportunity = {}
+    opportunity_id_to_opportunity = {}
     for opp in opportunities:
         opp_dict = opp.to_dict()
         skill = opportunity_id_to_skill.get(opp.id)
         if skill is not None:
             opp_dict['skill_rubrics'] = [
                 rubric.to_dict() for rubric in skill.rubrics]
-        id_to_opportunity[opp.id] = opp_dict
-    return id_to_opportunity
+        opportunity_id_to_opportunity[opp.id] = opp_dict
+    return opportunity_id_to_opportunity
 
 
 class SuggestionHandler(base.BaseHandler):

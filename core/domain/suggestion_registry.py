@@ -80,7 +80,7 @@ class BaseSuggestion(python_utils.OBJECT):
             'final_reviewer_id': self.final_reviewer_id,
             'change': self.change.to_dict(),
             'score_category': self.score_category,
-            'last_updated_msecs': utils.get_time_in_millisecs(self.last_updated)
+            'last_updated': utils.get_time_in_millisecs(self.last_updated)
         }
 
     def get_score_type(self):
@@ -549,10 +549,12 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected change to contain skill_difficulty')
 
-        if self._get_skill_difficulty() not in feconf.SKILL_DIFFICULTIES:
+        skill_difficulties = list(
+            constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.values())
+        if self._get_skill_difficulty() not in skill_difficulties:
             raise utils.ValidationError(
                 'Expected change skill_difficulty to be one of %s, found %s '
-                % (feconf.SKILL_DIFFICULTIES, self._get_skill_difficulty()))
+                % (skill_difficulties, self._get_skill_difficulty()))
 
         question = question_domain.Question(
             None, state_domain.State.from_dict(
