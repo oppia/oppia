@@ -249,8 +249,13 @@ angular.module('oppia').directive('explorationEditorPage', [
               ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
                 ContextService.getExplorationId()),
             ]).then(function(combinedData) {
+
               var explorationData = combinedData[0];
               var featuresData = combinedData[1];
+
+              if (explorationData.exploration_is_linked_to_story) {
+                ContextService.setExplorationIsLinkedToStory();
+              }
 
               ExplorationFeaturesService.init(explorationData, featuresData);
 

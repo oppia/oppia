@@ -35,6 +35,7 @@ export class ContextService {
     private entityContextObjectFactory: EntityContextObjectFactory) {}
 
   pageContext = null;
+  explorationIsLinkedToStory = false;
   explorationId = null;
   questionId = null;
   editorContext = null;
@@ -107,6 +108,22 @@ export class ContextService {
 
       return ServicesConstants.PAGE_CONTEXT.OTHER;
     }
+  }
+
+  canEntityReferToSkills(): boolean {
+    return (
+      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR ||
+      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR ||
+      (
+        this.getPageContext() === (
+          ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR) &&
+        this.explorationIsLinkedToStory
+      )
+    );
+  }
+
+  setExplorationIsLinkedToStory(): void {
+    this.explorationIsLinkedToStory = true;
   }
 
   isInExplorationContext(): boolean {
