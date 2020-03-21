@@ -36,7 +36,6 @@ export interface IFeatureDataDict {
 @Injectable({
   providedIn: 'root'
 })
-
 export class ExplorationFeaturesService {
   static serviceIsInitialized = false;
   static settings = {
