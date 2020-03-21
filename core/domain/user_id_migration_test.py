@@ -41,20 +41,136 @@ taskqueue_services = models.Registry.import_taskqueue_services()
 search_services = models.Registry.import_search_services()
 
 
+class CreateNewUsersMigrationJobTests(test_utils.GenericTestBase):
+    """Tests for UserIdMigrationJobTests."""
+    USER_A_ID = 'user_1_id'
+    USER_A_EMAIL = 'a@example.com'
+    USER_B_ID = 'user_2_id'
+    USER_B_EMAIL = 'b@example.com'
+    USER_C_ID = 'user_3_id'
+    USER_C_EMAIL = 'c@example.com'
+
+    def _get_migrated_model_ids(self, job_output):
+        """Get successfully migrated model IDs."""
+        for item in job_output:
+            if item[0] == 'SUCCESS':
+                migrated_model_ids = (
+                    sorted(list(set(item[1])), key=lambda id_set: id_set[0]))
+                migrated_model_ids = [model[1] for model in migrated_model_ids]
+                return migrated_model_ids
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = user_id_migration.CreateNewUsersMigrationJob.create_new()
+        user_id_migration.CreateNewUsersMigrationJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            user_id_migration.CreateNewUsersMigrationJob.get_output(job_id))
+        eval_output = []
+        for stringified_item in stringified_output:
+            items = ast.literal_eval(stringified_item)
+            if isinstance(items[1], int):
+                eval_output.append([items[0], items[1]])
+            else:
+                user_ids = [ast.literal_eval(item) for item in items[1]]
+                eval_output.append([items[0], user_ids])
+        return eval_output
+
+    def setUp(self):
+        def empty(*_):
+            """Function that takes any number of arguments and does nothing."""
+            pass
+
+        # We don't want to signup the superadmin user.
+        with self.swap(test_utils.TestBase, 'signup_superadmin_user', empty):
+            super(CreateNewUsersMigrationJobTests, self).setUp()
+
+    def test_one_user_user_settings_model(self):
+        original_model = user_models.UserSettingsModel(
+            id=self.USER_A_ID,
+            gae_id=self.USER_A_ID,
+            gae_user_id=self.USER_A_ID,
+            email=self.USER_A_EMAIL,
+        )
+        original_model.put()
+
+        output = self._run_one_off_job()
+        migrated_model_ids = self._get_migrated_model_ids(output)
+        migrated_model = user_models.UserSettingsModel.get_by_id(
+            migrated_model_ids[0])
+
+        self.assertNotEqual(original_model.id, migrated_model.id)
+        self.assertEqual(original_model.gae_user_id, migrated_model.gae_user_id)
+        self.assertEqual(original_model.email, migrated_model.email)
+        self.assertEqual(original_model.created_on, migrated_model.created_on)
+        self.assertEqual(
+            original_model.last_updated, migrated_model.last_updated)
+
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.USER_A_ID))
+
+    def test_multiple_user_user_settings_model(self):
+        original_models = {}
+        original_models[self.USER_A_ID] = user_models.UserSettingsModel(
+            id=self.USER_A_ID,
+            gae_id=self.USER_A_ID,
+            email=self.USER_A_EMAIL,
+        )
+        original_models[self.USER_A_ID].put()
+        original_models[self.USER_B_ID] = user_models.UserSettingsModel(
+            id=self.USER_B_ID,
+            gae_id=self.USER_B_ID,
+            email=self.USER_B_EMAIL,
+        )
+        original_models[self.USER_B_ID].put()
+        original_models[self.USER_C_ID] = user_models.UserSettingsModel(
+            id=self.USER_C_ID,
+            gae_id=self.USER_C_ID,
+            email=self.USER_C_EMAIL,
+        )
+        original_models[self.USER_C_ID].put()
+
+        output = self._run_one_off_job()
+        migrated_model_ids = self._get_migrated_model_ids(output)
+        for user_id in migrated_model_ids:
+            migrated_model = user_models.UserSettingsModel.get_by_id(user_id)
+            original_model = original_models[migrated_model.gae_id]
+
+            self.assertNotEqual(original_model.id, migrated_model.id)
+            self.assertEqual(
+                original_model.gae_user_id, migrated_model.gae_user_id)
+            self.assertEqual(original_model.email, migrated_model.email)
+            self.assertEqual(
+                original_model.created_on, migrated_model.created_on)
+            self.assertEqual(
+                original_model.last_updated, migrated_model.last_updated)
+
+            self.assertIsNone(
+                user_models.UserSettingsModel.get_by_id(migrated_model.gae_id))
+
+
 class UserIdMigrationJobTests(test_utils.GenericTestBase):
     """Tests for UserIdMigrationJobTests."""
-    EXP_ID_1 = 'exp_id_1'
-    EXP_ID_2 = 'exp_id_2'
+
+    USER_A_ID = 'user_0_id'
+    USER_A_GAE_ID = 'gae_0_id'
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
+    USER_B_ID = 'user_1_id'
+    USER_B_GAE_ID = 'gae_1_id'
     USER_B_EMAIL = 'b@example.com'
     USER_B_USERNAME = 'b'
+    USER_C_ID = 'user_2_id'
+    USER_C_GAE_ID = 'gae_2_id'
     USER_C_EMAIL = 'c@example.com'
     USER_C_USERNAME = 'c'
+    USER_D_ID = 'user_3_id'
+    USER_D_GAE_ID = 'gae_3_id'
     USER_D_EMAIL = 'd@example.com'
     USER_D_USERNAME = 'd'
-    USER_D_ID = 'user_id'
-    USER_D_GAE_ID = 'gae_id'
 
     def _get_migrated_model_ids(self, job_output):
         """Get successfully migrated model IDs."""
@@ -90,36 +206,16 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         # We don't want to signup the superadmin user.
         with self.swap(test_utils.TestBase, 'signup_superadmin_user', empty):
             super(UserIdMigrationJobTests, self).setUp()
-        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
 
-    def test_one_user_user_settings_model(self):
-        original_model = user_models.UserSettingsModel(
-            id=self.USER_D_ID,
-            gae_id=self.USER_D_ID,
-            gae_user_id=self.USER_D_GAE_ID,
-            email=self.USER_D_EMAIL,
-        )
-        original_model.put()
-
-        migrated_model_ids = self._get_migrated_model_ids(
-            self._run_one_off_job())
-        migrated_model = user_models.UserSettingsModel.get_by_id(
-            migrated_model_ids[-1])
-
-        self.assertNotEqual(original_model.id, migrated_model.id)
-        self.assertEqual(original_model.gae_user_id, migrated_model.gae_user_id)
-        self.assertEqual(original_model.email, migrated_model.email)
-        self.assertEqual(original_model.created_on, migrated_model.created_on)
-        self.assertEqual(
-            original_model.last_updated, migrated_model.last_updated)
-
-        self.assertIsNone(
-            user_models.UserSettingsModel.get_by_id(self.USER_D_ID))
+        user_models.UserSettingsModel(
+            id=self.USER_A_ID,
+            gae_id=self.USER_A_GAE_ID,
+            email=self.USER_A_EMAIL,
+        ).put()
 
     def test_one_user_one_model_full_id(self):
         original_model = user_models.CompletedActivitiesModel(
-            id=self.user_a_id,
+            id=self.USER_A_GAE_ID,
             exploration_ids=['1', '2'],
             collection_ids=['1', '2'])
         original_model.put()
@@ -141,27 +237,33 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             original_model.last_updated, migrated_model.last_updated)
 
         self.assertIsNone(
-            user_models.CompletedActivitiesModel.get_by_id(self.user_a_id))
+            user_models.CompletedActivitiesModel.get_by_id(self.USER_A_GAE_ID))
 
     def test_multiple_users_one_model_full_id(self):
-        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
-        user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
-        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
-        user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
+        user_models.UserSettingsModel(
+            id=self.USER_B_ID,
+            gae_id=self.USER_B_GAE_ID,
+            email=self.USER_B_EMAIL,
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_C_ID,
+            gae_id=self.USER_C_GAE_ID,
+            email=self.USER_C_EMAIL,
+        ).put()
 
         original_models = []
         original_models.append(user_models.CompletedActivitiesModel(
-            id=self.user_a_id,
+            id=self.USER_A_GAE_ID,
             exploration_ids=['1', '2'],
             collection_ids=['11', '22']))
         original_models[-1].put()
         original_models.append(user_models.CompletedActivitiesModel(
-            id=user_b_id,
+            id=self.USER_B_GAE_ID,
             exploration_ids=['3', '4'],
             collection_ids=['33', '44']))
         original_models[-1].put()
         original_models.append(user_models.CompletedActivitiesModel(
-            id=user_c_id,
+            id=self.USER_C_GAE_ID,
             exploration_ids=['5', '6'],
             collection_ids=['55', '66']))
         original_models[-1].put()
@@ -187,16 +289,16 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
                 original_models[i].last_updated, migrated_model.last_updated)
 
         self.assertIsNone(
-            user_models.CompletedActivitiesModel.get_by_id(self.user_a_id))
+            user_models.CompletedActivitiesModel.get_by_id(self.USER_A_GAE_ID))
         self.assertIsNone(
-            user_models.CompletedActivitiesModel.get_by_id(user_b_id))
+            user_models.CompletedActivitiesModel.get_by_id(self.USER_B_GAE_ID))
         self.assertIsNone(
-            user_models.CompletedActivitiesModel.get_by_id(user_c_id))
+            user_models.CompletedActivitiesModel.get_by_id(self.USER_C_GAE_ID))
 
     def test_one_user_one_model_part_id(self):
         original_model = user_models.ExpUserLastPlaythroughModel(
-            id='%s.%s' % (self.user_a_id, 'exp_id'),
-            user_id=self.user_a_id,
+            id='%s.%s' % (self.USER_A_GAE_ID, 'exp_id'),
+            user_id=self.USER_A_GAE_ID,
             exploration_id='exp_id',
             last_played_exp_version=2,
             last_played_state_name='start')
@@ -226,12 +328,13 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             original_model.last_updated, migrated_model.last_updated)
 
         self.assertIsNone(
-            user_models.CompletedActivitiesModel.get_by_id(self.user_a_id))
+            user_models.ExpUserLastPlaythroughModel.get_by_id(
+                '%s.%s' % (self.USER_A_GAE_ID, 'exp_id')))
 
     def test_one_user_different_one_model_part_id(self):
         original_model = user_models.UserContributionScoringModel(
-            id='%s.%s' % ('category', self.user_a_id),
-            user_id=self.user_a_id,
+            id='%s.%s' % ('category', self.USER_A_GAE_ID),
+            user_id=self.USER_A_GAE_ID,
             score_category='category',
             score=1.5,
             has_email_been_sent=False
@@ -259,32 +362,38 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             original_model.last_updated, migrated_model.last_updated)
 
         self.assertIsNone(user_models.UserContributionScoringModel.get_by_id(
-            '%s.%s' % ('category', self.user_a_id)))
+            '%s.%s' % ('category', self.USER_A_GAE_ID)))
 
     def test_multiple_users_one_model_part_id(self):
-        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
-        user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
-        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
-        user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
+        user_models.UserSettingsModel(
+            id=self.USER_B_ID,
+            gae_id=self.USER_B_GAE_ID,
+            email=self.USER_B_EMAIL,
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_C_ID,
+            gae_id=self.USER_C_GAE_ID,
+            email=self.USER_C_EMAIL,
+        ).put()
 
         original_models = []
         original_models.append(user_models.ExpUserLastPlaythroughModel(
-            id='%s.%s' % (self.user_a_id, 'exp_id'),
-            user_id=self.user_a_id,
+            id='%s.%s' % (self.USER_A_GAE_ID, 'exp_id'),
+            user_id=self.USER_A_GAE_ID,
             exploration_id='exp_id',
             last_played_exp_version=2,
             last_played_state_name='start'))
         original_models[-1].put()
         original_models.append(user_models.ExpUserLastPlaythroughModel(
-            id='%s.%s' % (user_b_id, 'exp_id'),
-            user_id=user_b_id,
+            id='%s.%s' % (self.USER_B_GAE_ID, 'exp_id'),
+            user_id=self.USER_B_GAE_ID,
             exploration_id='exp_id',
             last_played_exp_version=3,
             last_played_state_name='start'))
         original_models[-1].put()
         original_models.append(user_models.ExpUserLastPlaythroughModel(
-            id='%s.%s' % (user_c_id, 'exp_id'),
-            user_id=user_c_id,
+            id='%s.%s' % (self.USER_C_GAE_ID, 'exp_id'),
+            user_id=self.USER_C_GAE_ID,
             exploration_id='exp_id',
             last_played_exp_version=4,
             last_played_state_name='start'))
@@ -317,36 +426,45 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
                 original_models[i].last_updated, migrated_model.last_updated)
 
             self.assertIsNone(
-                user_models.CompletedActivitiesModel.get_by_id(self.user_a_id))
+                user_models.CompletedActivitiesModel.get_by_id(
+                    self.USER_A_GAE_ID))
             self.assertIsNone(
-                user_models.CompletedActivitiesModel.get_by_id(user_b_id))
+                user_models.CompletedActivitiesModel.get_by_id(
+                    self.USER_B_GAE_ID))
             self.assertIsNone(
-                user_models.CompletedActivitiesModel.get_by_id(user_c_id))
+                user_models.CompletedActivitiesModel.get_by_id(
+                    self.USER_C_GAE_ID))
 
     def test_multiple_users_different_one_model_part_id(self):
-        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
-        user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
-        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
-        user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
+        user_models.UserSettingsModel(
+            id=self.USER_B_ID,
+            gae_id=self.USER_B_GAE_ID,
+            email=self.USER_B_EMAIL,
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_C_ID,
+            gae_id=self.USER_C_GAE_ID,
+            email=self.USER_C_EMAIL,
+        ).put()
 
         original_models = []
         original_models.append(user_models.UserContributionScoringModel(
-            id='%s.%s' % ('score_category', self.user_a_id),
-            user_id=self.user_a_id,
+            id='%s.%s' % ('score_category', self.USER_A_GAE_ID),
+            user_id=self.USER_A_GAE_ID,
             score_category='score_category',
             score=2,
             has_email_been_sent=False))
         original_models[-1].put()
         original_models.append(user_models.UserContributionScoringModel(
-            id='%s.%s' % ('score_category', user_b_id),
-            user_id=user_b_id,
+            id='%s.%s' % ('score_category', self.USER_B_GAE_ID),
+            user_id=self.USER_B_GAE_ID,
             score_category='score_category',
             score=2,
             has_email_been_sent=False))
         original_models[-1].put()
         original_models.append(user_models.UserContributionScoringModel(
-            id='%s.%s' % ('score_category', user_c_id),
-            user_id=user_c_id,
+            id='%s.%s' % ('score_category', self.USER_C_GAE_ID),
+            user_id=self.USER_C_GAE_ID,
             score_category='score_category',
             score=2,
             has_email_been_sent=False))
@@ -375,10 +493,17 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             self.assertEqual(
                 original_models[i].last_updated, migrated_model.last_updated)
 
+        self.assertIsNone(user_models.UserContributionScoringModel.get_by_id(
+            '%s.%s' % ('score_category', self.USER_A_GAE_ID)))
+        self.assertIsNone(user_models.UserContributionScoringModel.get_by_id(
+            '%s.%s' % ('score_category', self.USER_B_GAE_ID)))
+        self.assertIsNone(user_models.UserContributionScoringModel.get_by_id(
+            '%s.%s' % ('score_category', self.USER_C_GAE_ID)))
+
     def test_one_user_one_model_user_id_field(self):
         original_model = exp_models.ExplorationSnapshotMetadataModel(
             id='instance_id',
-            committer_id=self.user_a_id,
+            committer_id=self.USER_A_GAE_ID,
             commit_type='create',
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}])
@@ -408,29 +533,35 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             original_model.last_updated, migrated_model.last_updated)
 
     def test_multiple_users_one_model_user_id_field(self):
-        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
-        user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
-        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
-        user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
+        user_models.UserSettingsModel(
+            id=self.USER_B_ID,
+            gae_id=self.USER_B_GAE_ID,
+            email=self.USER_B_EMAIL,
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_C_ID,
+            gae_id=self.USER_C_GAE_ID,
+            email=self.USER_C_EMAIL,
+        ).put()
 
         original_models = []
         original_models.append(exp_models.ExplorationSnapshotMetadataModel(
             id='instance_id1',
-            committer_id=self.user_a_id,
+            committer_id=self.USER_A_GAE_ID,
             commit_type='create',
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}]))
         original_models[-1].put()
         original_models.append(exp_models.ExplorationSnapshotMetadataModel(
             id='instance_id2',
-            committer_id=user_b_id,
+            committer_id=self.USER_B_GAE_ID,
             commit_type='create',
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}]))
         original_models[-1].put()
         original_models.append(exp_models.ExplorationSnapshotMetadataModel(
             id='instance_id3',
-            committer_id=user_c_id,
+            committer_id=self.USER_C_GAE_ID,
             commit_type='create',
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}]))
@@ -465,23 +596,23 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
 
         user_models.IncompleteActivitiesModel(
-            id=self.user_a_id,
+            id=self.USER_A_GAE_ID,
             exploration_ids=['1', '2'],
             collection_ids=['1', '2']
         ).put()
         user_models.CompletedActivitiesModel(
-            id=self.user_a_id,
+            id=self.USER_A_GAE_ID,
             exploration_ids=['1', '2'],
             collection_ids=['1', '2']
         ).put()
         output = self._run_one_off_job()
-        id_set = (self.user_a_id, new_user_id)
+        id_set = (self.USER_A_GAE_ID, new_user_id)
         self.assertIn(['SUCCESS', [id_set]], output)
 
         self.assertIsNone(
-            user_models.CompletedActivitiesModel.get_by_id(self.user_a_id))
+            user_models.CompletedActivitiesModel.get_by_id(self.USER_A_GAE_ID))
         self.assertIsNone(
-            user_models.IncompleteActivitiesModel.get_by_id(self.user_a_id))
+            user_models.IncompleteActivitiesModel.get_by_id(self.USER_A_GAE_ID))
         self.assertIsNotNone(
             user_models.CompletedActivitiesModel.get_by_id(new_user_id))
         self.assertIsNotNone(
@@ -489,26 +620,25 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
 
     def test_idempotent_copy_model_with_new_id_half_migrated(self):
         user_models.IncompleteActivitiesModel(
-            id=self.user_a_id,
+            id=self.USER_A_GAE_ID,
             exploration_ids=['1', '2'],
             collection_ids=['1', '2']
         ).put()
         new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
 
         user_models.CompletedActivitiesModel(
-            id=self.user_a_id,
+            id=self.USER_A_GAE_ID,
             exploration_ids=['1', '2'],
             collection_ids=['1', '2']
         ).put()
         output = self._run_one_off_job()
-        id_set = (self.user_a_id, new_user_id)
+        id_set = (self.USER_A_GAE_ID, new_user_id)
         self.assertIn(['SUCCESS', [id_set]], output)
-        self.assertIn(['ALREADY MIGRATED', [id_set] * 2], output)
 
         self.assertIsNone(
-            user_models.CompletedActivitiesModel.get_by_id(self.user_a_id))
+            user_models.CompletedActivitiesModel.get_by_id(self.USER_A_GAE_ID))
         self.assertIsNone(
-            user_models.IncompleteActivitiesModel.get_by_id(self.user_a_id))
+            user_models.IncompleteActivitiesModel.get_by_id(self.USER_A_GAE_ID))
         self.assertIsNotNone(
             user_models.CompletedActivitiesModel.get_by_id(new_user_id))
         self.assertIsNotNone(
@@ -516,26 +646,25 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
 
     def test_idempotent_copy_model_with_new_id_all_migrated(self):
         user_models.IncompleteActivitiesModel(
-            id=self.user_a_id,
+            id=self.USER_A_GAE_ID,
             exploration_ids=['1', '2'],
             collection_ids=['1', '2']
         ).put()
         user_models.CompletedActivitiesModel(
-            id=self.user_a_id,
+            id=self.USER_A_GAE_ID,
             exploration_ids=['1', '2'],
             collection_ids=['1', '2']
         ).put()
         new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
 
         output = self._run_one_off_job()
-        id_set = (self.user_a_id, new_user_id)
+        id_set = (self.USER_A_GAE_ID, new_user_id)
         self.assertIn(['SUCCESS', [id_set]], output)
-        self.assertIn(['ALREADY MIGRATED', [id_set] * 3], output)
 
         self.assertIsNone(
-            user_models.CompletedActivitiesModel.get_by_id(self.user_a_id))
+            user_models.CompletedActivitiesModel.get_by_id(self.USER_A_GAE_ID))
         self.assertIsNone(
-            user_models.IncompleteActivitiesModel.get_by_id(self.user_a_id))
+            user_models.IncompleteActivitiesModel.get_by_id(self.USER_A_GAE_ID))
         self.assertIsNotNone(
             user_models.CompletedActivitiesModel.get_by_id(new_user_id))
         self.assertIsNotNone(
@@ -544,24 +673,24 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
     def test_idempotent_copy_model_with_new_id_and_user_id_not_migrated(self):
         new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
 
-        exp_play_model_id_1 = '%s.%s' % (self.user_a_id, 'exp_1_id')
+        exp_play_model_id_1 = '%s.%s' % (self.USER_A_GAE_ID, 'exp_1_id')
         user_models.ExpUserLastPlaythroughModel(
             id=exp_play_model_id_1,
-            user_id=self.user_a_id,
+            user_id=self.USER_A_GAE_ID,
             exploration_id='exp_id',
             last_played_exp_version=2,
             last_played_state_name='start'
         ).put()
-        exp_play_model_id_2 = '%s.%s' % (self.user_a_id, 'exp_2_id')
+        exp_play_model_id_2 = '%s.%s' % (self.USER_A_GAE_ID, 'exp_2_id')
         user_models.ExpUserLastPlaythroughModel(
             id=exp_play_model_id_2,
-            user_id=self.user_a_id,
+            user_id=self.USER_A_GAE_ID,
             exploration_id='exp_id',
             last_played_exp_version=2,
             last_played_state_name='start'
         ).put()
         output = self._run_one_off_job()
-        id_set = (self.user_a_id, new_user_id)
+        id_set = (self.USER_A_GAE_ID, new_user_id)
         self.assertIn(['SUCCESS', [id_set]], output)
 
         self.assertIsNone(
@@ -572,34 +701,33 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
                 exp_play_model_id_2))
         self.assertIsNotNone(
             user_models.ExpUserLastPlaythroughModel.get_by_id(
-                exp_play_model_id_1.replace(self.user_a_id, new_user_id)))
+                exp_play_model_id_1.replace(self.USER_A_GAE_ID, new_user_id)))
         self.assertIsNotNone(
             user_models.ExpUserLastPlaythroughModel.get_by_id(
-                exp_play_model_id_2.replace(self.user_a_id, new_user_id)))
+                exp_play_model_id_2.replace(self.USER_A_GAE_ID, new_user_id)))
 
     def test_idempotent_copy_model_with_new_id_and_user_id_half_migrated(self):
-        exp_play_model_id_1 = '%s.%s' % (self.user_a_id, 'exp_1_id')
+        exp_play_model_id_1 = '%s.%s' % (self.USER_A_GAE_ID, 'exp_1_id')
         user_models.ExpUserLastPlaythroughModel(
             id=exp_play_model_id_1,
-            user_id=self.user_a_id,
+            user_id=self.USER_A_GAE_ID,
             exploration_id='exp_id',
             last_played_exp_version=2,
             last_played_state_name='start'
         ).put()
         new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
 
-        exp_play_model_id_2 = '%s.%s' % (self.user_a_id, 'exp_2_id')
+        exp_play_model_id_2 = '%s.%s' % (self.USER_A_GAE_ID, 'exp_2_id')
         user_models.ExpUserLastPlaythroughModel(
             id=exp_play_model_id_2,
-            user_id=self.user_a_id,
+            user_id=self.USER_A_GAE_ID,
             exploration_id='exp_id',
             last_played_exp_version=2,
             last_played_state_name='start'
         ).put()
         output = self._run_one_off_job()
-        id_set = (self.user_a_id, new_user_id)
+        id_set = (self.USER_A_GAE_ID, new_user_id)
         self.assertIn(['SUCCESS', [id_set]], output)
-        self.assertIn(['ALREADY MIGRATED', [id_set]], output)
 
         self.assertIsNone(
             user_models.ExpUserLastPlaythroughModel.get_by_id(
@@ -609,24 +737,24 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
                 exp_play_model_id_2))
         self.assertIsNotNone(
             user_models.ExpUserLastPlaythroughModel.get_by_id(
-                exp_play_model_id_1.replace(self.user_a_id, new_user_id)))
+                exp_play_model_id_1.replace(self.USER_A_GAE_ID, new_user_id)))
         self.assertIsNotNone(
             user_models.ExpUserLastPlaythroughModel.get_by_id(
-                exp_play_model_id_2.replace(self.user_a_id, new_user_id)))
+                exp_play_model_id_2.replace(self.USER_A_GAE_ID, new_user_id)))
 
     def test_idempotent_copy_model_with_new_id_and_user_id_all_migrated(self):
-        exp_play_model_id_1 = '%s.%s' % (self.user_a_id, 'exp_1_id')
+        exp_play_model_id_1 = '%s.%s' % (self.USER_A_GAE_ID, 'exp_1_id')
         user_models.ExpUserLastPlaythroughModel(
             id=exp_play_model_id_1,
-            user_id=self.user_a_id,
+            user_id=self.USER_A_GAE_ID,
             exploration_id='exp_id',
             last_played_exp_version=2,
             last_played_state_name='start'
         ).put()
-        exp_play_model_id_2 = '%s.%s' % (self.user_a_id, 'exp_2_id')
+        exp_play_model_id_2 = '%s.%s' % (self.USER_A_GAE_ID, 'exp_2_id')
         user_models.ExpUserLastPlaythroughModel(
             id=exp_play_model_id_2,
-            user_id=self.user_a_id,
+            user_id=self.USER_A_GAE_ID,
             exploration_id='exp_id',
             last_played_exp_version=2,
             last_played_state_name='start'
@@ -634,9 +762,8 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
 
         output = self._run_one_off_job()
-        id_set = (self.user_a_id, new_user_id)
+        id_set = (self.USER_A_GAE_ID, new_user_id)
         self.assertIn(['SUCCESS', [id_set]], output)
-        self.assertIn(['ALREADY MIGRATED', [id_set]], output)
 
         self.assertIsNone(
             user_models.ExpUserLastPlaythroughModel.get_by_id(
@@ -646,30 +773,30 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
                 exp_play_model_id_2))
         self.assertIsNotNone(
             user_models.ExpUserLastPlaythroughModel.get_by_id(
-                exp_play_model_id_1.replace(self.user_a_id, new_user_id)))
+                exp_play_model_id_1.replace(self.USER_A_GAE_ID, new_user_id)))
         self.assertIsNotNone(
             user_models.ExpUserLastPlaythroughModel.get_by_id(
-                exp_play_model_id_2.replace(self.user_a_id, new_user_id)))
+                exp_play_model_id_2.replace(self.USER_A_GAE_ID, new_user_id)))
 
     def test_idempotent_change_model_with_one_user_id_field_not_migrated(self):
         new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
 
         exp_models.ExplorationSnapshotMetadataModel(
             id='instance_1_id',
-            committer_id=self.user_a_id,
+            committer_id=self.USER_A_GAE_ID,
             commit_type='create',
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}]
         ).put()
         exp_models.ExplorationSnapshotMetadataModel(
             id='instance_2_id',
-            committer_id=self.user_a_id,
+            committer_id=self.USER_A_GAE_ID,
             commit_type='create',
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}]
         ).put()
         output = self._run_one_off_job()
-        id_set = (self.user_a_id, new_user_id)
+        id_set = (self.USER_A_GAE_ID, new_user_id)
         self.assertIn(['SUCCESS', [id_set]], output)
 
         self.assertEqual(
@@ -682,7 +809,7 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
     def test_idempotent_change_model_with_one_user_id_field_half_migrated(self):
         exp_models.ExplorationSnapshotMetadataModel(
             id='instance_1_id',
-            committer_id=self.user_a_id,
+            committer_id=self.USER_A_GAE_ID,
             commit_type='create',
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}]
@@ -691,15 +818,14 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
 
         exp_models.ExplorationSnapshotMetadataModel(
             id='instance_2_id',
-            committer_id=self.user_a_id,
+            committer_id=self.USER_A_GAE_ID,
             commit_type='create',
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}]
         ).put()
         output = self._run_one_off_job()
-        id_set = (self.user_a_id, new_user_id)
+        id_set = (self.USER_A_GAE_ID, new_user_id)
         self.assertIn(['SUCCESS', [id_set]], output)
-        self.assertIn(['ALREADY MIGRATED', [id_set]], output)
 
         self.assertEqual(
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
@@ -711,14 +837,14 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
     def test_idempotent_change_model_with_one_user_id_field_all_migrated(self):
         exp_models.ExplorationSnapshotMetadataModel(
             id='instance_1_id',
-            committer_id=self.user_a_id,
+            committer_id=self.USER_A_GAE_ID,
             commit_type='create',
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}]
         ).put()
         exp_models.ExplorationSnapshotMetadataModel(
             id='instance_2_id',
-            committer_id=self.user_a_id,
+            committer_id=self.USER_A_GAE_ID,
             commit_type='create',
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}]
@@ -726,9 +852,8 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
 
         output = self._run_one_off_job()
-        id_set = (self.user_a_id, new_user_id)
+        id_set = (self.USER_A_GAE_ID, new_user_id)
         self.assertIn(['SUCCESS', [id_set]], output)
-        self.assertIn(['ALREADY MIGRATED', [id_set]], output)
 
         self.assertEqual(
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(

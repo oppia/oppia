@@ -47,11 +47,57 @@ class MissingUserException(Exception):
     pass
 
 
+class CreateNewUsersMigrationJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for creating new UserSettingsModels with new user ids set.
+    This migration doesn't handle the replacement of old user ids in the other
+    models, this is done by the UserIdMigrationJob.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over one type of entity class.
+        super(CreateNewUsersMigrationJob, cls).enqueue(job_id, shard_count=16)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(user_model):
+        """Implements the map function for this job."""
+        if user_model.id != user_model.gae_id:
+            yield ('ALREADY MIGRATED', (user_model.gae_id, user_model.id))
+            return
+
+        old_model = user_models.UserSettingsModel.get_by_id(user_model.gae_id)
+        model_values = old_model.to_dict()
+        model_values['id'] = user_models.UserSettingsModel.get_new_id('')
+        new_model = user_models.UserSettingsModel(**model_values)
+
+        def _replace_model():
+            """Replace old model with new one."""
+            new_model.put(update_last_updated_time=False)
+            old_model.delete()
+
+        transaction_services.run_in_transaction(_replace_model)
+        yield ('SUCCESS', (new_model.gae_id, new_model.id))
+
+    @staticmethod
+    def reduce(key, old_new_user_id_tuples):
+        """Implements the reduce function for this job."""
+        if key == 'ALREADY MIGRATED':
+            yield(key, len(old_new_user_id_tuples))
+        else:
+            yield (key, old_new_user_id_tuples)
+
+
 class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for creating new user ids for all the users and re-adding
-    models that use the user id. This migration doesn't handle snapshot content
-    models that can contain user ID, these are handled by
-    SnapshotsUserIdMigrationJob.
+    """One-off job for replacing the old user ids wit new user ids in all
+    the models according to the values in UserSettingsModel. This migration
+    doesn't handle snapshot content models that can contain user ID, these are
+    handled by SnapshotsUserIdMigrationJob.
     """
 
     @staticmethod
@@ -157,6 +203,12 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             model_class.put_multi([model], update_last_updated_time=False)
 
     @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over one type of entity class.
+        super(UserIdMigrationJob, cls).enqueue(job_id, shard_count=16)
+
+    @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
         return [user_models.UserSettingsModel]
@@ -165,12 +217,7 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     def map(user_model):
         """Implements the map function for this job."""
         old_user_id = user_model.gae_id
-        if user_model.id != user_model.gae_id:
-            new_user_id = user_model.id
-        else:
-            new_user_id = user_models.UserSettingsModel.get_new_id('')
-            UserIdMigrationJob._copy_model_with_new_id(
-                user_models.UserSettingsModel, old_user_id, new_user_id)
+        new_user_id = user_model.id
         for model_class in models.Registry.get_all_storage_model_classes():
             if (model_class.get_user_id_migration_policy() ==
                     base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE):
