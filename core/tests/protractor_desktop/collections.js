@@ -25,6 +25,7 @@ var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 
 describe('Collections', function() {
@@ -36,11 +37,16 @@ describe('Collections', function() {
   var secondExplorationId = null;
   var thirdExplorationId = null;
   var fourthExplorationId = null;
+  var libraryPage = null;
+
+  var saveInProgressLabel = element(by.css(
+    '.protractor-test-save-in-progress-label'));
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
+    libraryPage = new LibraryPage.LibraryPage();
     var EDITOR_USERNAME = 'aliceCollections';
     var PLAYER_USERNAME = 'playerCollections';
     var CREATOR_USERNAME = 'creatorExplorations';
@@ -156,12 +162,16 @@ describe('Collections', function() {
     collectionEditorPage.setObjective('This is a test collection.');
     collectionEditorPage.setCategory('Algebra');
     collectionEditorPage.saveChanges();
+    waitFor.invisibilityOf(
+      saveInProgressLabel, 'Collection is taking too long to save.');
     users.logout();
   });
 
   it('visits the collection player', function() {
     users.login('alice@collections.com');
-    browser.get('/collection/' + collectionId);
+    libraryPage.get();
+    libraryPage.findCollection('Test Collection');
+    libraryPage.playCollection('Test Collection');
     waitFor.pageToFullyLoad();
     users.logout();
   });

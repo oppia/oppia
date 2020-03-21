@@ -77,6 +77,7 @@ angular.module('oppia').factory('CollectionEditorStateService', [
           collectionId).then(
           function(newBackendCollectionObject) {
             _updateCollection(newBackendCollectionObject);
+            $rootScope.$applyAsync();
           },
           function(error) {
             AlertsService.addWarning(
@@ -87,6 +88,7 @@ angular.module('oppia').factory('CollectionEditorStateService', [
           collectionId).then(function(newBackendCollectionRightsObject) {
           _updateCollectionRights(newBackendCollectionRightsObject);
           _collectionIsLoading = false;
+          $rootScope.$applyAsync();
         }, function(error) {
           AlertsService.addWarning(
             error ||
@@ -186,7 +188,9 @@ angular.module('oppia').factory('CollectionEditorStateService', [
             _collectionIsBeingSaved = false;
             if (successCallback) {
               successCallback();
+              $rootScope.$applyAsync();
             }
+            $rootScope.$applyAsync();
           }, function(error) {
             AlertsService.addWarning(
               error || 'There was an error when saving the collection.');
