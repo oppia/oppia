@@ -639,6 +639,11 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
             contributor_ids=[
                 self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
+            contributors_summary={
+                self.USER_ID_1_OLD: 1,
+                self.USER_ID_2_OLD: 2,
+                self.USER_ID_3_OLD: 3,
+            },
         ).put()
         collection_models.CollectionSummaryModel(
             id=self.COLLECTION_ID_2,
@@ -651,6 +656,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
             editor_ids=[self.USER_ID_1_OLD],
             viewer_ids=[self.USER_ID_2_OLD],
             contributor_ids=[self.USER_ID_3_OLD],
+            contributors_summary={self.USER_ID_3_OLD: 4},
         ).put()
         collection_models.CollectionSummaryModel(
             id=self.COLLECTION_ID_3,
@@ -663,6 +669,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
             editor_ids=[self.USER_ID_2_OLD],
             viewer_ids=[],
             contributor_ids=[self.USER_ID_3_OLD],
+            contributors_summary={self.USER_ID_3_OLD: 5},
         ).put()
 
         collection_models.CollectionSummaryModel.migrate_model(
@@ -686,6 +693,12 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
             migrated_model_1.contributor_ids)
+        self.assertEqual({
+                self.USER_ID_1_NEW: 1,
+                self.USER_ID_2_NEW: 2,
+                self.USER_ID_3_NEW: 3,
+            },
+            migrated_model_1.contributors_summary)
 
         migrated_model_2 = collection_models.CollectionSummaryModel.get_by_id(
             self.COLLECTION_ID_2)
@@ -693,6 +706,8 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual([self.USER_ID_1_NEW], migrated_model_2.editor_ids)
         self.assertEqual([self.USER_ID_2_NEW], migrated_model_2.viewer_ids)
         self.assertEqual([self.USER_ID_3_NEW], migrated_model_2.contributor_ids)
+        self.assertEqual(
+            {self.USER_ID_3_NEW: 4}, migrated_model_2.contributors_summary)
 
         migrated_model_3 = collection_models.CollectionSummaryModel.get_by_id(
             self.COLLECTION_ID_3)
@@ -702,6 +717,8 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual([self.USER_ID_2_NEW], migrated_model_3.editor_ids)
         self.assertEqual([], migrated_model_3.viewer_ids)
         self.assertEqual([self.USER_ID_3_NEW], migrated_model_3.contributor_ids)
+        self.assertEqual(
+            {self.USER_ID_3_NEW: 5}, migrated_model_3.contributors_summary)
 
     def test_get_non_private(self):
         public_collection_summary_model = (

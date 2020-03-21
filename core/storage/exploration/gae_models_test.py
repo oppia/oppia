@@ -664,6 +664,11 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
                 self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
             contributor_ids=[
                 self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
+            contributors_summary={
+                self.USER_ID_1_OLD: 1,
+                self.USER_ID_2_OLD: 2,
+                self.USER_ID_3_OLD: 3,
+            }
         ).put()
         exp_models.ExpSummaryModel(
             id=self.EXPLORATION_ID_2,
@@ -677,6 +682,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             voice_artist_ids=[self.USER_ID_2_OLD],
             viewer_ids=[self.USER_ID_2_OLD],
             contributor_ids=[self.USER_ID_3_OLD],
+            contributors_summary={self.USER_ID_3_OLD: 4},
         ).put()
         exp_models.ExpSummaryModel(
             id=self.EXPLORATION_ID_3,
@@ -690,6 +696,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             voice_artist_ids=[],
             viewer_ids=[],
             contributor_ids=[self.USER_ID_3_OLD],
+            contributors_summary={self.USER_ID_3_OLD: 5},
         ).put()
 
         exp_models.ExpSummaryModel.migrate_model(
@@ -716,6 +723,12 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
             migrated_model_1.contributor_ids)
+        self.assertEqual({
+                self.USER_ID_1_NEW: 1,
+                self.USER_ID_2_NEW: 2,
+                self.USER_ID_3_NEW: 3,
+            },
+            migrated_model_1.contributors_summary)
 
         migrated_model_2 = exp_models.ExpSummaryModel.get_by_id(
             self.EXPLORATION_ID_2)
@@ -725,6 +738,8 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             [self.USER_ID_2_NEW], migrated_model_2.voice_artist_ids)
         self.assertEqual([self.USER_ID_2_NEW], migrated_model_2.viewer_ids)
         self.assertEqual([self.USER_ID_3_NEW], migrated_model_2.contributor_ids)
+        self.assertEqual(
+            {self.USER_ID_3_NEW: 4}, migrated_model_2.contributors_summary)
 
         migrated_model_3 = exp_models.ExpSummaryModel.get_by_id(
             self.EXPLORATION_ID_3)
@@ -735,6 +750,8 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual([], migrated_model_3.voice_artist_ids)
         self.assertEqual([], migrated_model_3.viewer_ids)
         self.assertEqual([self.USER_ID_3_NEW], migrated_model_3.contributor_ids)
+        self.assertEqual(
+            {self.USER_ID_3_NEW: 5}, migrated_model_3.contributors_summary)
 
     def test_get_non_private(self):
         public_exploration_summary_model = (
