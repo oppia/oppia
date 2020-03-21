@@ -76,7 +76,7 @@ angular.module('oppia').directive('skillsMasteryList', [
                     $scope, $uibModalInstance) {
                   $scope.skillIds = [skillId];
                   $scope.index = 0;
-                  $scope.currentSkill = skillDescription;
+                  $scope.modalHeader = skillDescription;
 
                   $scope.closeModal = function() {
                     $uibModalInstance.dismiss('cancel');

@@ -20,8 +20,8 @@ require('services/context.service.ts');
 require('services/rte-helper.service.ts');
 
 angular.module('oppia').directive('ckEditor4Rte', [
-  'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
-  function(ContextService, RteHelperService, PAGE_CONTEXT) {
+  'ContextService', 'RteHelperService',
+  function(ContextService, RteHelperService) {
     return {
       restrict: 'E',
       scope: {
@@ -36,15 +36,13 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
         var names = [];
         var icons = [];
-        var contextIsLessonRelated = (
-          ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
-          ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
+        var canReferToSkills = ContextService.canEntityReferToSkills();
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           if (!((scope.uiConfig() &&
             scope.uiConfig().hide_complex_extensions &&
             componentDefn.isComplex) ||
-            (!contextIsLessonRelated && componentDefn.isLessonRelated))) {
+            (!canReferToSkills && componentDefn.isLessonRelated))) {
             names.push(componentDefn.id);
             icons.push(componentDefn.iconDataUrl);
           }

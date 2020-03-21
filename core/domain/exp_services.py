@@ -222,6 +222,24 @@ def get_recently_published_exp_summaries(limit):
         exp_models.ExpSummaryModel.get_recently_published(limit))
 
 
+def get_story_id_linked_to_exploration(exp_id):
+    """Returns the ID of the story that the exploration is a part of, or None if
+    the exploration is not part of a story.
+
+    Args:
+        exp_id: str. The ID of the exploration.
+
+    Returns:
+        str|None. The ID of the story if the exploration is linked to some
+            story, otherwise None.
+    """
+    exploration_context_model = exp_models.ExplorationContextModel.get_by_id(
+        exp_id)
+    if exploration_context_model is not None:
+        return exploration_context_model.story_id
+    return None
+
+
 def get_all_exploration_summaries():
     """Returns a dict with all exploration summary domain objects,
     keyed by their id.
