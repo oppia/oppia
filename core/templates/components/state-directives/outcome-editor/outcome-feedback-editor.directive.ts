@@ -18,6 +18,7 @@
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require('services/context.service.ts');
 
 angular.module('oppia').directive('outcomeFeedbackEditor', [
   'UrlInterpolationService',
@@ -32,11 +33,15 @@ angular.module('oppia').directive('outcomeFeedbackEditor', [
         '/components/state-directives/outcome-editor/' +
         'outcome-feedback-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {
+      controller: ['ContextService', function(ContextService) {
         var ctrl = this;
         ctrl.$onInit = function() {
           ctrl.OUTCOME_FEEDBACK_SCHEMA = {
-            type: 'html'
+            type: 'html',
+            ui_config: {
+              hide_complex_extensions: (
+                ContextService.getEntityType() === 'question')
+            }
           };
         };
       }]
