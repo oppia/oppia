@@ -17,11 +17,15 @@
  * protractor tests.
  */
 
+// NOTE to devs: If this constant is renamed, make sure to edit
+// components_test.ComponentE2eTests.test_component_e2e_tests to search for the
+// correct constant name.
 var RICH_TEXT_COMPONENTS = {
   Collapsible: require('./Collapsible/protractor.js'),
   Image: require('./Image/protractor.js'),
   Link: require('./Link/protractor.js'),
   Math: require('./Math/protractor.js'),
+  Skillreview: require('./Skillreview/protractor.js'),
   Tabs: require('./Tabs/protractor.js'),
   Video: require('./Video/protractor.js')
 };

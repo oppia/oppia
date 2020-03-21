@@ -1355,6 +1355,10 @@ tags: []
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Story and saves it.
 
+        NOTE: Callers are responsible for ensuring that the
+        'corresponding_topic_id' provided is valid, unless a test explicitly
+        requires it to be invalid.
+
         Args:
             story_id: str. ID for the story to be created.
             owner_id: str. The user_id of the creator of the story.

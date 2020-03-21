@@ -28,6 +28,7 @@ from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import state_domain
 from core.domain import story_fetchers
+from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
@@ -724,6 +725,14 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
     for subtopic in topic_model.subtopics:
         subtopic_page_services.delete_subtopic_page(
             committer_id, topic_id, subtopic['id'])
+
+    all_story_references = (
+        topic_model.canonical_story_references +
+        topic_model.additional_story_references)
+    for story_reference in all_story_references:
+        story_services.delete_story(
+            committer_id, story_reference['story_id'],
+            force_deletion=force_deletion)
     topic_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED,
         force_deletion=force_deletion)

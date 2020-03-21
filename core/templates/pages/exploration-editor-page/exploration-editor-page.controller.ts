@@ -251,6 +251,9 @@ angular.module('oppia').directive('explorationEditorPage', [
             ]).then(function(combinedData) {
               var [explorationData, featuresData, openThreadsCount] =
                 combinedData;
+              if (explorationData.exploration_is_linked_to_story) {
+                ContextService.setExplorationIsLinkedToStory();
+              }
 
               ExplorationFeaturesService.init(explorationData, featuresData);
 

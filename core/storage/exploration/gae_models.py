@@ -234,6 +234,47 @@ class ExplorationModel(base_models.VersionedModel):
             ndb.put_multi_async(commit_log_models)
 
 
+class ExplorationContextModel(base_models.BaseModel):
+    """Model for storing Exploration context.
+
+    The ID of instances of this class has the form
+    {{random_hash_of_12_chars}}, which is the ID of the exploration itself.
+    """
+
+    # The ID of the story that the exploration is a part of.
+    story_id = ndb.StringProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration context should be kept if the story and exploration are
+        published.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """Check whether ExplorationContextModel references the given user.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data should
+            be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationContextModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
+
 class ExplorationRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration rights snapshot."""
