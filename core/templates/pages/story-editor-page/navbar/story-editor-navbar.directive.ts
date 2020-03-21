@@ -21,7 +21,7 @@ require(
   'loading-dots.directive.ts');
 require('domain/editor/undo_redo/base-undo-redo.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/summary/exploration-summary-backend-api.service.ts');
+require('domain/story/editable-story-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/alerts.service.ts');
@@ -37,13 +37,13 @@ angular.module('oppia').directive('storyEditorNavbar', [
         '/pages/story-editor-page/navbar/story-editor-navbar.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', 'AlertsService',
-        'ExplorationSummaryBackendApiService', 'UndoRedoService',
+        'EditableStoryBackendApiService', 'UndoRedoService',
         'StoryEditorStateService', 'UrlService',
         'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
-            ExplorationSummaryBackendApiService, UndoRedoService,
+            EditableStoryBackendApiService, UndoRedoService,
             StoryEditorStateService, UrlService,
             EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
@@ -69,10 +69,6 @@ angular.module('oppia').directive('storyEditorNavbar', [
 
           var _validateStory = function() {
             $scope.validationIssues = $scope.story.validate();
-            _validateExplorations();
-          };
-
-          var _validateExplorations = function() {
             var nodes = $scope.story.getStoryContents().getNodes();
             var explorationIds = [];
             for (var i = 0; i < nodes.length; i++) {
@@ -85,31 +81,11 @@ angular.module('oppia').directive('storyEditorNavbar', [
                   'Some chapters don\'t have exploration IDs provided.');
               }
             }
-
-            ExplorationSummaryBackendApiService.loadPublicExplorationSummaries(
-              explorationIds).then(function(summaries) {
-              if (summaries.length !== explorationIds.length) {
-                $scope.validationIssues.push(
-                  'Some explorations in story are not published.');
-              } else if (summaries.length > 0) {
-                var commonExpCategory = summaries[0].category;
-                for (var idx in summaries) {
-                  if (summaries[idx].category !== commonExpCategory) {
-                    $scope.validationIssues.push(
-                      'The explorations with IDs ' + summaries[0].id + ' and ' +
-                      summaries[idx].id + ' have different categories.'
-                    );
-                    break;
-                  }
-                  if (summaries[idx].language_code !== 'en') {
-                    $scope.validationIssues.push(
-                      'The explorations with ID ' + summaries[idx].id +
-                      ' is not in English.'
-                    );
-                    break;
-                  }
-                }
-              }
+            EditableStoryBackendApiService.validateExplorations(
+              $scope.story.getId(), explorationIds
+            ).then(function(validationIssues) {
+              $scope.validationIssues =
+                $scope.validationIssues.concat(validationIssues);
             });
           };
 

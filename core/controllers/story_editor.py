@@ -138,3 +138,19 @@ class StoryPublishHandler(base.BaseHandler):
             topic_services.unpublish_story(topic_id, story_id, self.user_id)
 
         self.render_json(self.values)
+
+
+class ValidateExplorationsHandler(base.BaseHandler):
+    """A data handler for validating the explorations in a story."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_edit_story
+    def get(self, _, exp_ids):
+        """Validation issues for explorations in the story."""
+        exp_ids = exp_ids.split(',')
+        validation_issues = story_services.validate_explorations(exp_ids, False)
+        self.values.update({
+            'validation_issues': validation_issues
+        })
+        self.render_json(self.values)

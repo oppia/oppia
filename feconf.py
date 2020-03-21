@@ -755,6 +755,7 @@ UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USER_PERMISSIONS_URL_PREFIX = '/createhandler/permissions'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
+VALIDATE_STORY_EXPLOATIONS_URL_PREFIX = '/validate_story_explorations'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'

@@ -399,6 +399,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             '2', self.user_id_admin, title='Title 3',
             category='Mathematics', language_code='en')
+        self.publish_exploration(self.user_id_admin, '0')
+        self.publish_exploration(self.user_id_admin, '1')
+        self.publish_exploration(self.user_id_admin, '2')
 
         self.assertIsNone(
             exp_services.get_story_id_linked_to_exploration('0'))
@@ -625,6 +628,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             '0', self.user_id_admin, title='Title 1',
             category='Mathematics', language_code='en')
+        self.publish_exploration(self.user_id_admin, '0')
 
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -733,6 +737,38 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception, 'Expected story to only reference valid explorations'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
+    def test_validate_exploration_returning_issues(self):
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1')
+        validation_issues = (
+            story_services.validate_explorations(
+                ['invalid_exp', 'exp_id_1'], False))
+        issue_1 = (
+            'Expected story to only reference valid explorations, but '
+            'found an exploration with ID: invalid_exp (was it deleted?)')
+        issue_2 = (
+            'Exploration with ID exp_id_1 is not public. Please publish '
+            'explorations before adding them to a story.'
+        )
+        self.assertEqual(validation_issues, [issue_1, issue_2])
+
+    def test_cannot_update_story_with_private_exploration_id(self):
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1')
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'node_id': self.NODE_ID_1,
+            'old_value': None,
+            'new_value': 'exp_id_1'
+        })]
+
+        with self.assertRaisesRegexp(
+            Exception, 'Exploration with ID exp_id_1 is not public'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
