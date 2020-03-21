@@ -18,13 +18,14 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
+require('domain/skill/skill-creation-backend-api.service.ts');
 
 angular.module('oppia').factory('SkillCreationService', [
-  '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
-  'UrlInterpolationService',
+  '$rootScope', '$timeout', '$window', 'AlertsService',
+  'SkillCreationBackendApiService', 'UrlInterpolationService',
   function(
-      $http, $rootScope, $timeout, $window, AlertsService,
-      UrlInterpolationService) {
+      $rootScope, $timeout, $window, AlertsService,
+      SkillCreationBackendApiService, UrlInterpolationService) {
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
       '/skill_editor/<skill_id>');
     var skillCreationInProgress = false;
@@ -41,21 +42,18 @@ angular.module('oppia').factory('SkillCreationService', [
         skillCreationInProgress = true;
         AlertsService.clearWarnings();
         $rootScope.loadingMessage = 'Creating skill';
-        $http.post('/skill_editor_handler/create_new', {
-          description: description,
-          linked_topic_ids: linkedTopicIds,
-          explanation_dict: explanation,
-          rubrics: rubrics
-        }).then(function(response) {
-          $timeout(function() {
-            $window.location = UrlInterpolationService.interpolateUrl(
-              CREATE_NEW_SKILL_URL_TEMPLATE, {
-                skill_id: response.data.skillId
-              });
-          }, 150);
-        }, function() {
-          $rootScope.loadingMessage = '';
-        });
+        SkillCreationBackendApiService.createSkill(
+          description, rubrics, explanation, linkedTopicIds)
+          .then(function(response) {
+            $timeout(function() {
+              $window.location = UrlInterpolationService.interpolateUrl(
+                CREATE_NEW_SKILL_URL_TEMPLATE, {
+                  skill_id: response.skillId
+                });
+            }, 150);
+          }, function() {
+            $rootScope.loadingMessage = '';
+          });
       }
     };
   }

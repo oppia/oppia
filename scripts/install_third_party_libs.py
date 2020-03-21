@@ -22,19 +22,28 @@ import os
 import subprocess
 import sys
 
-# These libraries need to be installed before running or importing any script.
-TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
-# Download and install pyyaml.
-if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
-    subprocess.check_call([
-        sys.executable, '-m', 'pip', 'install', 'pyyaml==5.1.2', '--target',
-        os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
 
-# Download and install future.
-if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
-    subprocess.check_call([
-        sys.executable, '-m', 'pip', 'install', 'future==0.17.1', '--target',
-        os.path.join('third_party', 'future-0.17.1')])
+TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
+
+# These libraries need to be installed before running or importing any script.
+
+PREREQUISITES = [
+    ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
+    ('future', '0.17.1', os.path.join('third_party', 'future-0.17.1')),
+]
+
+for package_name, version_number, target_path in PREREQUISITES:
+    if not os.path.exists(target_path):
+        command_text = [
+            sys.executable, '-m', 'pip', 'install', '%s==%s'
+            % (package_name, version_number), '--target', target_path]
+        uextention_text = ['--user', '--prefix=', '--system']
+        current_process = subprocess.Popen(
+            command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output_stderr = current_process.communicate()[1]
+        if 'can\'t combine user with prefix' in output_stderr:
+            subprocess.check_call(command_text + uextention_text)
+
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order

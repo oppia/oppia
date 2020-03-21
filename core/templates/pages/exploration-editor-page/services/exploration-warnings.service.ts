@@ -106,7 +106,6 @@ angular.module('oppia').factory('ExplorationWarningsService', [
           unreachableNodeNames.push(nodes[nodeId]);
         }
       }
-
       return unreachableNodeNames;
     };
 
