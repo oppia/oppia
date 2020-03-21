@@ -32,8 +32,8 @@ describe('Audio translation language service', () => {
       'default': false,
       lang: 'en-US',
       localService: false,
-      name: 'UK English',
-      voiceURI: 'UK English'
+      name: 'US English',
+      voiceURI: 'US English'
     }]);
   });
 
