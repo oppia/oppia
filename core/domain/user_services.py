@@ -1870,7 +1870,7 @@ def allow_user_to_review_translation_in_language(user_id, language_code):
     Args:
         user_id: str. The unique ID of the user.
         language_code: str. The code of the language. Callers should ensure that
-            the user does not has rights to review translations in the given
+            the user does not have rights to review translations in the given
             language code.
     """
     user_community_rights = get_user_community_rights(user_id)
@@ -1905,7 +1905,7 @@ def allow_user_to_review_voiceover_in_language(user_id, language_code):
     Args:
         user_id: str. The unique ID of the user.
         language_code: str. The code of the language. Callers should ensure that
-            the user does not has rights to review voiceovers in the given
+            the user does not have rights to review voiceovers in the given
             language code.
     """
     user_community_rights = get_user_community_rights(user_id)
@@ -1938,7 +1938,7 @@ def allow_user_to_review_question(user_id):
 
     Args:
         user_id: str. The unique ID of the user. Callers should ensure that
-            the given user does not has rights to review questions.
+            the given user does not have rights to review questions.
     """
     user_community_rights = get_user_community_rights(user_id)
     user_community_rights.can_review_questions = True
@@ -1974,8 +1974,8 @@ def get_community_reviewer_usernames(review_category, language_code=None):
     given review category.
 
     Args:
-        review_category: str. str. The category which for in which user can
-            review.
+        review_category: str. The review category to find the list of reviewers
+            for.
         language_code: None|str. The language code for translation or voiceover
             review category.
 
@@ -1992,7 +1992,13 @@ def get_community_reviewer_usernames(review_category, language_code=None):
             user_models.UserCommunityRightsModel
             .get_voiceover_reviewer_user_ids(language_code))
     elif review_category == constants.REVIEW_CATEGORY_QUESTION:
+        if language_code is not None:
+            raise Exception('Expected language_code to be None, found: %s' % (
+                language_code))
         reviewer_ids = (
             user_models.UserCommunityRightsModel
             .get_question_reviewer_user_ids())
+    else:
+        raise Exception('Invalid review category: %s' % review_category)
+
     return get_usernames(reviewer_ids)
