@@ -21,7 +21,7 @@ from core.tests import test_utils
 
 import python_utils
 
-from . import case_change_service 
+from . import case_change_service
 
 class CheckCaseChangeServiceTests(test_utils.GenericTestBase):
 
@@ -34,7 +34,7 @@ class CheckCaseChangeServiceTests(test_utils.GenericTestBase):
             'testString',
             'testString'
             ]
-        
+
         for i in python_utils.RANGE(len(test_strings)):
             string = test_strings[i]
             expected_result = expected_results[i]
