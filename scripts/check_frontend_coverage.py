@@ -366,6 +366,7 @@ FULLY_COVERED_FILENAMES = [
     'truncate-at-first-ellipsis.pipe.ts',
     'truncate-at-first-line.filter.ts',
     'truncate-at-first-line.pipe.ts',
+    'topic-viewer-backend-api.service.ts',
     'uiLeafletRequires.ts',
     'underscores-to-camel-case.filter.ts',
     'underscores-to-camel-case.pipe.ts',
