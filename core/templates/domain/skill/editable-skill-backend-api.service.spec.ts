@@ -22,7 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { CsrfTokenService } from
   'services/csrf-token.service';
 import { EditableSkillBackendApiService } from
-  './editable-skill-backend-api.service';
+  'domain/skill/editable-skill-backend-api.service';
 
 describe('Editable skill backend API service', function() {
   let editableSkillBackendApiService = null;

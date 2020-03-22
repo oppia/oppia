@@ -26,12 +26,12 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
 
 // TODO(#7165): Replace any with exact type.
-interface editableSkillResponseConfig{
+interface editableSkillResponseConfig {
     skill?: any;
     skills?: any;
     // eslint-disable-next-line camelcase
     grouped_skill_summaries?: any;
-  }
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -57,9 +57,9 @@ export class EditableSkillBackendApiService {
         skill: data.skill,
         groupedSkillSummaries: data.grouped_skill_summaries
       }),
-      err => {
+      error => {
         if (errorCallback) {
-          errorCallback(err.error);
+          errorCallback(error.error);
         }
       }
     );
@@ -78,9 +78,9 @@ export class EditableSkillBackendApiService {
     );
     this.http.get<editableSkillResponseConfig>(skillDataUrl).toPromise().then(
       (data: editableSkillResponseConfig) => successCallback(data.skills),
-      err => {
+      error => {
         if (errorCallback) {
-          errorCallback(err.error);
+          errorCallback(error.error);
         }
       }
     );
@@ -110,9 +110,9 @@ export class EditableSkillBackendApiService {
       editableSkillDataUrl, putData
     ).toPromise().then(
       (data: editableSkillResponseConfig) => successCallback(data.skill),
-      err => {
+      error => {
         if (errorCallback) {
-          errorCallback(err.error);
+          errorCallback(error.error);
         }
       }
     );
@@ -130,9 +130,9 @@ export class EditableSkillBackendApiService {
       });
     this.http['delete'](skillDataUrl, { observe: 'response' }).toPromise().then(
       (res) => successCallback(res.status),
-      (err) => {
+      (error) => {
         if (errorCallback) {
-          errorCallback(err.error);
+          errorCallback(error.error);
         }
       }
     );
