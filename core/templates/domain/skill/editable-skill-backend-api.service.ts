@@ -51,7 +51,7 @@ export class EditableSkillBackendApiService {
         skill_id: skillId
       }
     );
-    this.http.get<editableSkillResponseConfig>(skillDataUrl).toPromise().then(
+    this.http.get(skillDataUrl).toPromise().then(
       (data: editableSkillResponseConfig) => successCallback({
         skill: data.skill,
         groupedSkillSummaries: data.grouped_skill_summaries
@@ -74,7 +74,7 @@ export class EditableSkillBackendApiService {
         comma_separated_skill_ids: skillIds.join(',')
       }
     );
-    this.http.get<editableSkillResponseConfig>(skillDataUrl).toPromise().then(
+    this.http.get(skillDataUrl).toPromise().then(
       (data: editableSkillResponseConfig) => successCallback(data.skills),
       error => {
         if (errorCallback) {
@@ -104,7 +104,7 @@ export class EditableSkillBackendApiService {
       change_dicts: changeList
     };
 
-    this.http.put<editableSkillResponseConfig>(
+    this.http.put(
       editableSkillDataUrl, putData
     ).toPromise().then(
       (data: editableSkillResponseConfig) => successCallback(data.skill),
