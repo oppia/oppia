@@ -39,9 +39,6 @@ describe('Collections', function() {
   var fourthExplorationId = null;
   var libraryPage = null;
 
-  var saveInProgressLabel = element(by.css(
-    '.protractor-test-save-in-progress-label'));
-
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -162,8 +159,6 @@ describe('Collections', function() {
     collectionEditorPage.setObjective('This is a test collection.');
     collectionEditorPage.setCategory('Algebra');
     collectionEditorPage.saveChanges();
-    waitFor.invisibilityOf(
-      saveInProgressLabel, 'Collection is taking too long to save.');
     users.logout();
   });
 

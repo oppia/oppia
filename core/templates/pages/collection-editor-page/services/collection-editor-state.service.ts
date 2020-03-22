@@ -190,7 +190,6 @@ angular.module('oppia').factory('CollectionEditorStateService', [
               successCallback();
               $rootScope.$applyAsync();
             }
-            $rootScope.$applyAsync();
           }, function(error) {
             AlertsService.addWarning(
               error || 'There was an error when saving the collection.');

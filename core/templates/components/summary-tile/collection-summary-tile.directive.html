@@ -9,7 +9,7 @@
 <md-card class="oppia-activity-summary-tile"
          ng-class="{'oppia-activity-playlist-tile': $ctrl.isPlaylistTile()}"
          style="position: relative; z-index: 5;">
-  <a class="protractor-test-collection-summary-tile-link" ng-href="<[$ctrl.getCollectionLink()]>" style="text-decoration: none;">
+  <a ng-href="<[$ctrl.getCollectionLink()]>" style="text-decoration: none;">
     <div class="title-section" style="background-color: <[$ctrl.getThumbnailBgColor()]>;">
       <img class="collection-corner-image" ng-src="<[$ctrl.getStaticImageUrl('/general/collection_corner.svg')]>" alt="">
       <img class="thumbnail-image" ng-src="<[$ctrl.getCompleteThumbnailIconUrl()]>" alt="<[$ctrl.getCategory()]>" ng-style="$ctrl.isPlaylistTile() && {'top': '6px', 'width': '60px'}">
