@@ -167,7 +167,6 @@ describe('Collections', function() {
     libraryPage.get();
     libraryPage.findCollection('Test Collection');
     libraryPage.playCollection('Test Collection');
-    waitFor.pageToFullyLoad();
     users.logout();
   });
 
