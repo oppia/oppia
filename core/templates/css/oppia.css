@@ -131,7 +131,6 @@ md-input-group.md-default-theme label {
 }
 
 .oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled]:hover {
-  background-color: #115fd4;
   text-decoration: none;
 }
 
