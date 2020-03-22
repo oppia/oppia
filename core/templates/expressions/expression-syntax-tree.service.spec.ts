@@ -15,8 +15,8 @@
 /**
  * @fileoverview Unit tests for expression-syntax-tree.service.ts
  */
-import { ExpressionParserService } from
-  'expressions/expression-parser.service.ts';
+import { TestBed } from '@angular/core/testing';
+
 import { ExpressionSyntaxTreeService } from
   'expressions/expression-syntax-tree.service.ts';
 
@@ -25,9 +25,7 @@ describe('Expression syntax tree service', () => {
     let expressionSyntaxTreeService: ExpressionSyntaxTreeService;
 
     beforeEach(() => {
-      expressionSyntaxTreeService = new ExpressionSyntaxTreeService(
-        new ExpressionParserService()
-      );
+      expressionSyntaxTreeService = TestBed.get(ExpressionSyntaxTreeService);
     });
 
     it('should throw if environment is not found', () => {

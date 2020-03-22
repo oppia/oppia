@@ -110,11 +110,8 @@ export class ExpressionSyntaxTreeService {
   // throws an error if not. If optional expectedMax is specified, it
   // verifies the number of args is in [expectedNum, expectedMax] range
   // inclusive.
-  public verifyNumArgs(
-      args: Array<number>,
-      expectedNum: number,
-      expectedMax: number = expectedNum
-  ): void {
+  private verifyNumArgs(args: Array<number>, expectedNum: number,
+      expectedMax: number = expectedNum): void {
     if (expectedMax === undefined) {
       expectedMax = expectedNum;
     }
