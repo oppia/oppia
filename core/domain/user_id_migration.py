@@ -50,7 +50,8 @@ class MissingUserException(Exception):
 class CreateNewUsersMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for creating new UserSettingsModels with new user ids set.
     This migration doesn't handle the replacement of old user ids in the other
-    models, this is done by the UserIdMigrationJob.
+    models, this is done by the UserIdMigrationJob. The UserIdMigrationJob needs
+    to be run directly after this job to ensure data consistency.
     """
 
     @classmethod
@@ -94,10 +95,11 @@ class CreateNewUsersMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for replacing the old user ids wit new user ids in all
+    """One-off job for replacing the old user ids with new user ids in all
     the models according to the values in UserSettingsModel. This migration
     doesn't handle snapshot content models that can contain user ID, these are
-    handled by SnapshotsUserIdMigrationJob.
+    handled by SnapshotsUserIdMigrationJob. The SnapshotsUserIdMigrationJob
+    needs to be run directly after this job to ensure data consistency.
     """
 
     @staticmethod
