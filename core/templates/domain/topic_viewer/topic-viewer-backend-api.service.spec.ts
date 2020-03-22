@@ -105,7 +105,7 @@ describe('Topic viewer backend API service', () => {
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalledWith('Error fetching topic 0.');
+      expect(failHandler).toHaveBeenCalledWith('Error fetching topic 0.');
     })
   );
 });
