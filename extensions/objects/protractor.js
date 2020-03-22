@@ -179,8 +179,10 @@ var SanitizedUrlEditor = function(elem) {
 
 var SkillSelector = function(elem) {
   return {
-    setValue: function(index) {
-      elem.element(by.css('protractor-test-rte-skill-selector-item')).click();
+    setValue: function(skillDescription) {
+      elem.element(
+        by.css('.protractor-test-skill-name-input')).sendKeys(skillDescription);
+      elem.element(by.css('.protractor-test-rte-skill-selector-item')).click();
     }
   };
 };
@@ -213,6 +215,7 @@ var OBJECT_EDITORS = {
   NumberWithUnits: NumberWithUnitsEditor,
   ParameterName: ParameterNameEditor,
   SanitizedUrl: SanitizedUrlEditor,
+  SkillSelector: SkillSelector,
   UnicodeString: UnicodeStringEditor
 };
 
@@ -227,6 +230,7 @@ exports.NormalizedStringEditor = NormalizedStringEditor;
 exports.NumberWithUnitsEditor = NumberWithUnitsEditor;
 exports.ParameterNameEditor = ParameterNameEditor;
 exports.SanitizedUrlEditor = SanitizedUrlEditor;
+exports.SkillSelector = SkillSelector;
 exports.UnicodeStringEditor = UnicodeStringEditor;
 
 exports.OBJECT_EDITORS = OBJECT_EDITORS;

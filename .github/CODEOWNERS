@@ -11,6 +11,9 @@
 # - The dev workflow team will review the code quality to see if the e2e tests
 #   can be optimized further.
 
+# Android team
+/core/domain/android_validation_constants.py @BenHenning
+
 # Angular Migration team
 /core/templates/services/contextual/logger.service.ts @bansalnitish
 /core/templates/services/contextual/logger.service.spec.ts @bansalnitish
@@ -64,9 +67,12 @@
 /CONTRIBUTORS @seanlip
 /LICENSE @seanlip
 /NOTICE @seanlip
-/core/templates/pages/about-page/ @seanlip
-/core/templates/pages/privacy-page/ @seanlip
-/core/templates/pages/terms-page/ @seanlip
+/core/templates/pages/about-page/ @DubeySandeep
+/core/templates/pages/about-page/about-page.directive.html @seanlip
+/core/templates/pages/privacy-page/ @DubeySandeep
+/core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip
+/core/templates/pages/terms-page/ @DubeySandeep
+/core/templates/pages/terms-page/terms-page.mainpage.html @seanlip
 
 
 # Dashboard pages.
@@ -260,14 +266,14 @@
 
 
 # Interaction project.
-/core/domain/customization_args_util*.py @seanlip
+/core/domain/customization_args_util*.py @brianrodri
 /core/domain/interaction_registry*.py @aks681
 /core/domain/obj_services*.py @aks681
 /core/templates/components/version-diff-visualization/codemirror-mergeview.directive.ts @aks681
 /core/templates/domain/objects/ @aks681
-/core/templates/expressions/ @seanlip
+/core/templates/expressions/ @brianrodri
 /core/templates/services/code-normalizer.service*.ts @aks681
-/extensions/domain*.py @seanlip
+/extensions/domain*.py @brianrodri
 /extensions/interactions/ @aks681 @vojtechjelinek
 /extensions/objects/ @aks681
 /extensions/value_generators/ @vojtechjelinek
@@ -395,7 +401,7 @@
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
 /main_mail.py @aks681
-/main.py @nithusha21 @seanlip
+/main.py @nithusha21 @DubeySandeep
 /feconf.py @nithusha21 @seanlip
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
@@ -409,6 +415,7 @@
 /core/templates/App*.ts @ankita240796
 /core/templates/app.constants.ts @ankita240796
 /core/templates/app.constants.ajs.ts @ankita240796
+/core/templates/app-type.constants.ts @nishantwrp @ankita240796
 /core/templates/combined-tests.spec.ts @ankita240796
 /core/templates/pages/interaction-specs.constants.ajs.ts @vojtechjelinek @jameesjohn
 /core/templates/pages/interaction-specs.constants.ts @bansalnitish
@@ -417,7 +424,7 @@
 /core/templates/services/contextual/document-attribute-customization.service*.ts @bansalnitish
 /core/templates/services/contextual/meta-tag-customization.service*.ts @bansalnitish
 /core/templates/services/translation-file-hash-loader.service.ts @nithusha21
-/release_constants.py @ankita240796 @nithusha21 @seanlip
+/release_constants.py @ankita240796 @nithusha21 @DubeySandeep
 
 
 # Miscellaneous.
@@ -425,7 +432,7 @@
 /core/__init__.py @nithusha21
 /core/controllers/__init__.py @nithusha21
 /core/domain/__init__.py @nithusha21
-/core/domain/config*.py @seanlip
+/core/domain/config*.py @DubeySandeep
 /core/domain/change_domain.py @ankita240796
 /core/templates/tests/ @kevinlee12 @nithusha21
 /core/templates/domain/utilities/ @bansalnitish
@@ -435,16 +442,16 @@
 
 
 # Restricted pages.
-/core/controllers/admin*.py @seanlip @nithusha21
+/core/controllers/admin*.py @DubeySandeep @nithusha21
 /core/controllers/moderator*.py @seanlip
 /core/controllers/recent_commits*.py @seanlip
 /core/domain/moderator_services*.py @seanlip
-/core/templates/pages/admin-page/ @seanlip @nithusha21
-/core/templates/pages/moderator-page/ @seanlip @nithusha21
+/core/templates/pages/admin-page/ @DubeySandeep @nithusha21
+/core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
 
 
 # QA team.
-/core/tests/ @kevinlee12 @nithusha21
+/core/tests/ @kevinlee12 @U8NWXD
 /assets/ @nithusha21
 /data/ @nithusha21
 
@@ -474,6 +481,7 @@
 /core/storage/suggestion/ @nithusha21
 /core/templates/domain/suggestion/ @nithusha21
 /core/templates/services/suggestion-modal.service*.ts @nithusha21
+/core/templates/services/suggestions.service*.ts @nithusha21
 
 
 # Feedback project.
@@ -544,7 +552,7 @@
 
 
 # Draft version upgrade.
-/core/domain/draft_upgrade_services*.py @seanlip
+/core/domain/draft_upgrade_services*.py @DubeySandeep
 
 # Critical files.
 #
