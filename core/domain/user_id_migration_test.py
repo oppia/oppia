@@ -97,8 +97,8 @@ class CreateNewUsersMigrationJobTests(test_utils.GenericTestBase):
         )
         original_model.put()
 
-        output = self._run_one_off_job()
-        migrated_model_ids = self._get_migrated_model_ids(output)
+        migrated_model_ids = self._get_migrated_model_ids(
+            self._run_one_off_job())
         migrated_model = user_models.UserSettingsModel.get_by_id(
             migrated_model_ids[0])
 
@@ -133,8 +133,8 @@ class CreateNewUsersMigrationJobTests(test_utils.GenericTestBase):
         )
         original_models[self.USER_C_ID].put()
 
-        output = self._run_one_off_job()
-        migrated_model_ids = self._get_migrated_model_ids(output)
+        migrated_model_ids = self._get_migrated_model_ids(
+            self._run_one_off_job())
         for user_id in migrated_model_ids:
             migrated_model = user_models.UserSettingsModel.get_by_id(user_id)
             original_model = original_models[migrated_model.gae_id]
@@ -150,6 +150,33 @@ class CreateNewUsersMigrationJobTests(test_utils.GenericTestBase):
 
             self.assertIsNone(
                 user_models.UserSettingsModel.get_by_id(migrated_model.gae_id))
+
+    def test_repeated_run(self):
+        original_model = user_models.UserSettingsModel(
+            id=self.USER_A_ID,
+            gae_id=self.USER_A_ID,
+            gae_user_id=self.USER_A_ID,
+            email=self.USER_A_EMAIL,
+        )
+        original_model.put()
+
+        migrated_model_ids = self._get_migrated_model_ids(
+            self._run_one_off_job())
+        migrated_model = user_models.UserSettingsModel.get_by_id(
+            migrated_model_ids[0])
+
+        self.assertNotEqual(original_model.id, migrated_model.id)
+        self.assertEqual(original_model.gae_user_id, migrated_model.gae_user_id)
+        self.assertEqual(original_model.email, migrated_model.email)
+        self.assertEqual(original_model.created_on, migrated_model.created_on)
+        self.assertEqual(
+            original_model.last_updated, migrated_model.last_updated)
+
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.USER_A_ID))
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['ALREADY MIGRATED', 1]])
 
 
 class UserIdMigrationJobTests(test_utils.GenericTestBase):
