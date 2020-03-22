@@ -72,7 +72,7 @@ export class ContributionOpportunitiesBackendApiService {
       opportunityType: OpportunityType,
       params: ContributionOpportunityParams,
       successCallback: (
-        opportunities?: any, nextCursor?: number|string, more?: any
+        opportunities?: any, nextCursor?: string, more?: any
         ) => void,
       errorCallback: (reason?: any) => void
   ): void {
@@ -95,9 +95,9 @@ export class ContributionOpportunitiesBackendApiService {
   }
 
   fetchSkillOpportunities(
-      cursor: number|string): Promise<Object> {
+      cursor: string): Promise<Object> {
     const params: ContributionOpportunityParams = {
-      cursor: cursor.toString()
+      cursor: cursor
     };
     return new Promise((resolve, reject) => {
       this._fetchOpportunities(
@@ -106,10 +106,10 @@ export class ContributionOpportunitiesBackendApiService {
   }
 
   fetchTranslationOpportunities(
-      languageCode: string, cursor: number|string): Promise<Object> {
+      languageCode: string, cursor: string): Promise<Object> {
     const params: ContributionOpportunityParams = {
       language_code: languageCode,
-      cursor: cursor.toString()
+      cursor: cursor
     };
     return new Promise((resolve, reject) => {
       this._fetchOpportunities(
@@ -119,10 +119,10 @@ export class ContributionOpportunitiesBackendApiService {
   }
 
   fetchVoiceoverOpportunities(
-      languageCode: string, cursor: number|string): Promise<Object> {
+      languageCode: string, cursor: string): Promise<Object> {
     const params: ContributionOpportunityParams = {
       language_code: languageCode,
-      cursor: cursor.toString()
+      cursor: cursor
     };
     return new Promise((resolve, reject) => {
       this._fetchOpportunities(
