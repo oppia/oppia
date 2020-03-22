@@ -15,87 +15,100 @@
 /**
  * @fileoverview Service for fetching issues and playthroughs from the backend.
  */
-require('domain/statistics/PlaythroughObjectFactory.ts');
-require('domain/statistics/PlaythroughIssueObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
 
-require('services/services.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
-angular.module('oppia').factory('PlaythroughIssuesBackendApiService', [
-  '$http', '$q', 'PlaythroughIssueObjectFactory', 'PlaythroughObjectFactory',
-  'UrlInterpolationService', 'FETCH_ISSUES_URL', 'FETCH_PLAYTHROUGH_URL',
-  'RESOLVE_ISSUE_URL',
-  function(
-      $http, $q, PlaythroughIssueObjectFactory, PlaythroughObjectFactory,
-      UrlInterpolationService, FETCH_ISSUES_URL, FETCH_PLAYTHROUGH_URL,
-      RESOLVE_ISSUE_URL) {
-    /** @type {PlaythroughIssue[]} */
-    var cachedIssues = null;
+import { PlaythroughIssueObjectFactory } from
+  'domain/statistics/PlaythroughIssueObjectFactory.ts';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service.ts';
 
-    var getFullIssuesUrl = function(explorationId) {
-      return UrlInterpolationService.interpolateUrl(
-        FETCH_ISSUES_URL, {
-          exploration_id: explorationId
-        });
-    };
+import { ServicesConstants } from 'services/services.constants.ts';
 
-    var getFullPlaythroughUrl = function(expId, playthroughId) {
-      return UrlInterpolationService.interpolateUrl(
-        FETCH_PLAYTHROUGH_URL, {
-          exploration_id: expId,
-          playthrough_id: playthroughId
-        });
-    };
+@Injectable({
+  providedIn: 'root'
+})
 
-    var getFullResolveIssueUrl = function(explorationId) {
-      return UrlInterpolationService.interpolateUrl(
-        RESOLVE_ISSUE_URL, {
-          exploration_id: explorationId
-        });
-    };
-    return {
-      fetchIssues: function(explorationId, explorationVersion) {
-        if (cachedIssues !== null) {
-          return $q.resolve(cachedIssues);
-        } else {
-          return $http.get(getFullIssuesUrl(explorationId), {
-            params: {
-              exp_version: explorationVersion
-            }
-          }).then(function(response) {
-            var unresolvedIssueBackendDicts = response.data;
-            cachedIssues = unresolvedIssueBackendDicts.map(
-              PlaythroughIssueObjectFactory.createFromBackendDict);
-            return cachedIssues;
-          });
-        }
-      },
-      fetchPlaythrough: function(expId, playthroughId) {
-        return $http.get(getFullPlaythroughUrl(expId, playthroughId)).then(
-          function(response) {
-            var playthroughBackendDict = response.data;
-            return PlaythroughObjectFactory.createFromBackendDict(
-              playthroughBackendDict);
-          });
-      },
-      resolveIssue: function(issueToResolve, expId, expVersion) {
-        return $http.post(getFullResolveIssueUrl(expId), {
-          exp_issue_dict: issueToResolve.toBackendDict(),
-          exp_version: expVersion
-        }).then(function() {
-          var issueIndex = cachedIssues !== null ?
-            cachedIssues.findIndex(function(issue) {
-              return angular.equals(issue, issueToResolve);
-            }) : -1;
-          if (issueIndex === -1) {
-            var invalidIssueError = new Error(
-              'An issue which was not fetched from the backend has been ' +
-              'resolved');
-            return $q.reject(invalidIssueError);
-          } else {
-            cachedIssues.splice(issueIndex, 1);
-          }
-        });
-      },
-    };
-  }]);
+export class PlaythroughIssuesBackendApiService {
+  constructor(
+    private httpClient: HttpClient,
+    private urlInterpolationService: UrlInterpolationService,
+    private playthroughIssueObjectFactory: PlaythroughIssueObjectFactory) { }
+
+  private cachedIssues = null;
+
+  private getFullIssuesUrl(explorationId: string) {
+    return this.urlInterpolationService.interpolateUrl(
+      ServicesConstants.FETCH_ISSUES_URL, {
+        exploration_id: explorationId
+      });
+  }
+
+  private getFullPlaythroughUrl(expId: string, playthroughId: string) {
+    return this.urlInterpolationService.interpolateUrl(
+      ServicesConstants.FETCH_PLAYTHROUGH_URL, {
+        exploration_id: expId,
+        playthrough_id: playthroughId
+      });
+  }
+
+  private getFullResolveIssueUrl(explorationId: string) {
+    return this.urlInterpolationService.interpolateUrl(
+      ServicesConstants.RESOLVE_ISSUE_URL, {
+        exploration_id: explorationId
+      });
+  }
+
+  fetchIssues(explorationId: string, explorationVersion: any) {
+    if (this.cachedIssues !== null) {
+      return new Promise((resolve) => resolve(this.cachedIssues));
+    } else {
+      return this.httpClient.get(
+        this.getFullIssuesUrl(explorationId), {
+          params: { exp_version: explorationVersion }, observe: 'response'
+        }).toPromise().then((response: any) => {
+        var unresolvedIssueBackendDicts = response.body;
+        this.cachedIssues = unresolvedIssueBackendDicts.map(
+          this.playthroughIssueObjectFactory.createFromBackendDict);
+        return this.cachedIssues;
+      });
+    }
+  }
+
+  fetchPlaythrough(expId: string, playthroughId: string) {
+    return this.httpClient.get(
+      this.getFullPlaythroughUrl(expId, playthroughId), { observe: 'response' })
+      .toPromise().then((response: any) => {
+        var playthroughBackendDict = response.body;
+        return this.playthroughIssueObjectFactory.createFromBackendDict(
+          playthroughBackendDict);
+      });
+  }
+
+  resolveIssue(issueToResolve: any, expId: string, expVersion: number) {
+    return this.httpClient.post(
+      this.getFullResolveIssueUrl(expId), {
+        exp_issue_dict: issueToResolve.toBackendDict(),
+        exp_version: expVersion
+      }).toPromise().then(() => {
+      var issueIndex = this.cachedIssues !== null ?
+        this.cachedIssues.findIndex((issue) => {
+          return angular.equals(issue, issueToResolve);
+        }) : -1;
+      if (issueIndex === -1) {
+        var invalidIssueError = new Error(
+          'An issue which was not fetched from the backend has been ' +
+          'resolved');
+        return new Promise((reject) => reject(invalidIssueError));
+      } else {
+        this.cachedIssues.splice(issueIndex, 1);
+      }
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'PlaythroughIssuesBackendApiService', downgradeInjectable(
+    PlaythroughIssuesBackendApiService));
