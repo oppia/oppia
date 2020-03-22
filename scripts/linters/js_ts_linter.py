@@ -938,8 +938,8 @@ def get_linters(js_filepaths, ts_filepaths, verbose_mode_enabled=False):
         verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
-        tuple(JsTsLintChecksManager, ThirdPartyJsTsLintChecksManager. Returns a
-            2-tuple of custom and third_party linter objects.
+        tuple(JsTsLintChecksManager, ThirdPartyJsTsLintChecksManager. A 2-tuple
+        of custom and third_party linter objects.
     """
     js_ts_file_paths = js_filepaths + ts_filepaths
 
