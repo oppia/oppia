@@ -41,7 +41,6 @@ export class EditableSkillBackendApiService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  // TODO(#7165): Replace any with exact type.
   _fetchSkill(
       skillId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
@@ -65,7 +64,6 @@ export class EditableSkillBackendApiService {
     );
   }
 
-  // TODO(#7165): Replace any with exact type.
   _fetchMultiSkills(
       skillIds: [string],
       successCallback: (value?: Object | PromiseLike<Object>) => void,
@@ -138,14 +136,12 @@ export class EditableSkillBackendApiService {
     );
   }
 
-  // TODO(#7165): Replace any with exact type.
   fetchSkill(skillId: string): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchSkill(skillId, resolve, reject);
     });
   }
 
-  // TODO(#7165): Replace any with exact type.
   fetchMultiSkills(skillIds: [string]): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchMultiSkills(skillIds, resolve, reject);
@@ -166,7 +162,6 @@ export class EditableSkillBackendApiService {
     });
   }
 
-  // TODO(#7165): Replace any with exact type.
   deleteSkill(skillId: string): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._deleteSkill(skillId, resolve, reject);
