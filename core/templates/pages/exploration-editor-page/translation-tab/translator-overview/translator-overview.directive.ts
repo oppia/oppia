@@ -106,7 +106,7 @@ angular.module('oppia').directive('translatorOverview', [
             var progressPercent = (
               100 - ($scope.numberOfAudioNotAvailable /
                 $scope.numberOfRequiredAudio) * 100);
-            return {width: progressPercent + '%'};
+            return {width: progressPercent + '%', height: '100%'};
           };
 
           $scope.changeTranslationLanguage = function() {
