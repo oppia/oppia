@@ -338,7 +338,7 @@ def get_linters(files_to_lint, verbose_mode_enabled=False):
 
     Returns:
         linters: tuple(PythonLintChecksManager,
-            ThirdPartyPythonLintChecksManager). Return object of custom and
+            ThirdPartyPythonLintChecksManager). Returns a 2-tuple of custom and
             third_party linter objects.
     """
     custom_linter = PythonLintChecksManager(

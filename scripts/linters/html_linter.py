@@ -431,7 +431,7 @@ def get_linters(files_to_lint, verbose_mode_enabled=False):
 
     Returns:
         linters: tuple(HTMLLintChecksManager, ThirdPartyHTMLLintChecksManager).
-            Returns custom and third_party linter objects.
+            Returns a 2-tuple of custom and third_party linter objects.
     """
     custom_linter = HTMLLintChecksManager(
         files_to_lint, verbose_mode_enabled)

@@ -333,9 +333,9 @@ def _get_file_extensions(file_extensions_to_lint):
 
         if js_and_ts_is_present:
             python_utils.PRINT(
-                'Please either use "js" or "ts". As we do not have separate '
-                'linters for Js and Ts files. If both used together then JsTs '
-                'linters is going to run twice.')
+                'Please use only one of "js" or "ts", as we do not have '
+                'separate linters for JS and TS files. If both these options '
+                'are used together, then the JS/TS linter will be run twice.')
             python_utils.PRINT('Exiting...')
             sys.exit(1)
 

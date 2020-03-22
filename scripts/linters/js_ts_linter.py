@@ -939,7 +939,7 @@ def get_linters(js_filepaths, ts_filepaths, verbose_mode_enabled=False):
 
     Returns:
         linter: tuple(JsTsLintChecksManager, ThirdPartyJsTsLintChecksManager).
-            Returns custom and third_party linter objects.
+            Returns a 2-tuple of custom and third_party linter objects.
     """
     js_ts_file_paths = js_filepaths + ts_filepaths
 
