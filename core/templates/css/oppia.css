@@ -131,7 +131,6 @@ md-input-group.md-default-theme label {
 }
 
 .oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled]:hover {
-  background-color: #115fd4;
   text-decoration: none;
 }
 
@@ -601,39 +600,6 @@ textarea {
   pointer-events: none;
   position: fixed;
   z-index: 100;
-}
-
-/*
-  Styles for the link to the site feedback form.
-*/
-.oppia-site-feedback {
-  background-color: #fff;
-  border-radius: 2px;
-  bottom: 4px;
-  color: rgba(0,0,0,0.87);
-  cursor: pointer;
-  left: 4px;
-  opacity: 0.5;
-  padding: 4px 8px;
-  position: fixed;
-  /* This is needed so that the exploration summary tiles don't overlap the button in the library page. */
-  z-index: 3;
-}
-.oppia-site-feedback:hover,
-.oppia-site-feedback:focus,
-.oppia-site-feedback:active {
-  color: rgba(0,0,0,0.87);
-  opacity: 1.0;
-  text-decoration: none;
-}
-.oppia-feedback-card .btn-success {
-  margin-top: 19px;
-}
-
-@media (max-width: 1100px) {
-  .oppia-site-feedback span {
-    display: none;
-  }
 }
 
 /*
