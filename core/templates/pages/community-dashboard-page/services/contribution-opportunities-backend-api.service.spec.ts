@@ -21,7 +21,8 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ContributionOpportunitiesBackendApiService } from
-  './contribution-opportunities-backend-api.service';
+  // eslint-disable-next-line max-len
+  'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { ExplorationOpportunitySummaryObjectFactory } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 import { SkillOpportunityObjectFactory } from

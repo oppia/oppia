@@ -32,7 +32,6 @@ const constants = require('constants.ts');
 
 type OpportunityType = 'skill' | 'voiceover' | 'translation';
 
-// TODO(#7165): Replace any with exact type.
 type ContributionOpportunityParams = {
   cursor: string;
   // eslint-disable-next-line camelcase
@@ -73,7 +72,7 @@ export class ContributionOpportunitiesBackendApiService {
       opportunityType: OpportunityType,
       params: ContributionOpportunityParams,
       successCallback: (
-        opportunities?: any, nextCursor?: any, more?: any
+        opportunities?: any, nextCursor?: number|string, more?: any
         ) => void,
       errorCallback: (reason?: any) => void
   ): void {
@@ -95,7 +94,6 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
-  // TODO(#7165): Replace any with exact type.
   fetchSkillOpportunities(
       cursor: number|string): Promise<Object> {
     const params: ContributionOpportunityParams = {
@@ -107,7 +105,6 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
-  // TODO(#7165): Replace any with exact type.
   fetchTranslationOpportunities(
       languageCode: string, cursor: number|string): Promise<Object> {
     const params: ContributionOpportunityParams = {
@@ -121,7 +118,6 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
-  // TODO(#7165): Replace any with exact type.
   fetchVoiceoverOpportunities(
       languageCode: string, cursor: number|string): Promise<Object> {
     const params: ContributionOpportunityParams = {
