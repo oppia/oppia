@@ -41,11 +41,10 @@ export class EditableSkillBackendApiService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  _fetchSkill(
+  private _fetchSkill(
       skillId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void
-  ): void {
+      errorCallback: (reason?: any) => void): void {
     const skillDataUrl = this.urlInterpolationService.interpolateUrl(
       SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
         skill_id: skillId
@@ -64,11 +63,10 @@ export class EditableSkillBackendApiService {
     );
   }
 
-  _fetchMultiSkills(
+  private _fetchMultiSkills(
       skillIds: [string],
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void
-  ): void {
+      errorCallback: (reason?: any) => void): void {
     const skillDataUrl = this.urlInterpolationService.interpolateUrl(
       SkillDomainConstants.SKILL_DATA_URL_TEMPLATE, {
         comma_separated_skill_ids: skillIds.join(',')
@@ -83,15 +81,11 @@ export class EditableSkillBackendApiService {
       }
     );
   }
-  // TODO(#7165): Replace any with exact type.
-  _updateSkill(
-      skillId: string,
-      skillVersion: any,
-      commitMessage: string,
+  private _updateSkill(
+      skillId: string, skillVersion: number, commitMessage: string,
       changeList: [any],
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void
-  ): void {
+      errorCallback: (reason?: any) => void): void {
     const editableSkillDataUrl = this.urlInterpolationService.interpolateUrl(
       SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
         skill_id: skillId
@@ -116,12 +110,10 @@ export class EditableSkillBackendApiService {
     );
   }
 
-  // TODO(#7165): Replace any with exact type.
-  _deleteSkill(
+  private _deleteSkill(
       skillId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void
-  ): void {
+      errorCallback: (reason?: any) => void): void {
     const skillDataUrl = this.urlInterpolationService.interpolateUrl(
       SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
         skill_id: skillId
@@ -148,11 +140,8 @@ export class EditableSkillBackendApiService {
     });
   }
 
-  // TODO(#7165): Replace any with exact type.
   updateSkill(
-      skillId: string,
-      skillVersion: any,
-      commitMessage: string,
+      skillId: string, skillVersion: number, commitMessage: string,
       changeList: [any]
   ): Promise<Object> {
     return new Promise((resolve, reject) => {
