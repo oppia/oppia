@@ -121,10 +121,8 @@ export class ExpressionSyntaxTreeService {
     throw new ExprWrongNumArgsError(args, expectedNum, expectedMax);
   }
 
-  private _verifyArgTypesMatchExpectedType(
-      argTypes: Array<any>,
-      expectedType: string
-  ): boolean {
+  private _verifyArgTypesMatchExpectedType(argTypes: Array<any>,
+      expectedType: string): boolean {
     for (var i = 0; i < argTypes.length; i++) {
       if (argTypes[i] !== expectedType) {
         throw new ExprWrongArgTypeError(null, argTypes[i], expectedType);
@@ -140,11 +138,8 @@ export class ExpressionSyntaxTreeService {
     return true;
   }
 
-  public applyFunctionToParseTree(
-      parsed: string,
-      envs: Array<object>,
-      func: (parsed: string, envs: Array<any>) => string
-  ) {
+  public applyFunctionToParseTree(parsed: string, envs: Array<object>,
+      func: (parsed: string, envs: Array<any>) => string) {
     return func(parsed, envs.concat(this.system));
   }
 
@@ -176,11 +171,8 @@ export class ExpressionSyntaxTreeService {
     if (!isNaN(coercedValue)) {
       return coercedValue;
     }
-    throw new ExprWrongArgTypeError(
-      originalValue,
-      typeof originalValue,
-      'Number'
-    );
+    throw new ExprWrongArgTypeError(originalValue, typeof originalValue,
+      'Number');
   }
 
   // Coerces all values in the given argument array to Number, and throws
@@ -212,10 +204,8 @@ export class ExpressionSyntaxTreeService {
       },
       getType: (args: Array<any>): string => {
         this.verifyNumArgs(args, 1, 2);
-        this._verifyArgTypesMatchExpectedType(
-          args,
-          AppConstants.PARAMETER_TYPES.REAL
-        );
+        this._verifyArgTypesMatchExpectedType(args,
+          AppConstants.PARAMETER_TYPES.REAL);
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
@@ -223,16 +213,13 @@ export class ExpressionSyntaxTreeService {
       eval: (args: Array<any>): number => {
         this.verifyNumArgs(args, 1, 2);
         var numericArgs = this._coerceAllArgsToNumber(args);
-        return numericArgs.length === 1 ?
-          -numericArgs[0] :
-          numericArgs[0] - numericArgs[1];
+        return numericArgs.length === 1 ? -numericArgs[0] :
+        numericArgs[0] - numericArgs[1];
       },
       getType: (args: Array<any>): string => {
         this.verifyNumArgs(args, 1, 2);
-        this._verifyArgTypesMatchExpectedType(
-          args,
-          AppConstants.PARAMETER_TYPES.REAL
-        );
+        this._verifyArgTypesMatchExpectedType(args,
+          AppConstants.PARAMETER_TYPES.REAL);
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
@@ -244,10 +231,8 @@ export class ExpressionSyntaxTreeService {
       },
       getType: (args: Array<any>): string => {
         this.verifyNumArgs(args, 2);
-        this._verifyArgTypesMatchExpectedType(
-          args,
-          AppConstants.PARAMETER_TYPES.REAL
-        );
+        this._verifyArgTypesMatchExpectedType(args,
+          AppConstants.PARAMETER_TYPES.REAL);
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
@@ -259,10 +244,8 @@ export class ExpressionSyntaxTreeService {
       },
       getType: (args: Array<any>): string => {
         this.verifyNumArgs(args, 2);
-        this._verifyArgTypesMatchExpectedType(
-          args,
-          AppConstants.PARAMETER_TYPES.REAL
-        );
+        this._verifyArgTypesMatchExpectedType(args,
+          AppConstants.PARAMETER_TYPES.REAL);
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
@@ -274,10 +257,8 @@ export class ExpressionSyntaxTreeService {
       },
       getType: (args: Array<any>): string => {
         this.verifyNumArgs(args, 2);
-        this._verifyArgTypesMatchExpectedType(
-          args,
-          AppConstants.PARAMETER_TYPES.REAL
-        );
+        this._verifyArgTypesMatchExpectedType(args,
+          AppConstants.PARAMETER_TYPES.REAL);
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
@@ -289,10 +270,8 @@ export class ExpressionSyntaxTreeService {
       },
       getType: (args: Array<any>): string => {
         this.verifyNumArgs(args, 2);
-        this._verifyArgTypesMatchExpectedType(
-          args,
-          AppConstants.PARAMETER_TYPES.REAL
-        );
+        this._verifyArgTypesMatchExpectedType(args,
+          AppConstants.PARAMETER_TYPES.REAL);
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
@@ -304,10 +283,8 @@ export class ExpressionSyntaxTreeService {
       },
       getType: (args: Array<any>): string => {
         this.verifyNumArgs(args, 2);
-        this._verifyArgTypesMatchExpectedType(
-          args,
-          AppConstants.PARAMETER_TYPES.REAL
-        );
+        this._verifyArgTypesMatchExpectedType(args,
+          AppConstants.PARAMETER_TYPES.REAL);
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
@@ -319,10 +296,8 @@ export class ExpressionSyntaxTreeService {
       },
       getType: (args: Array<any>): string => {
         this.verifyNumArgs(args, 2);
-        this._verifyArgTypesMatchExpectedType(
-          args,
-          AppConstants.PARAMETER_TYPES.REAL
-        );
+        this._verifyArgTypesMatchExpectedType(args,
+          AppConstants.PARAMETER_TYPES.REAL);
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
@@ -334,10 +309,8 @@ export class ExpressionSyntaxTreeService {
       },
       getType: (args: Array<any>): string => {
         this.verifyNumArgs(args, 2);
-        this._verifyArgTypesMatchExpectedType(
-          args,
-          AppConstants.PARAMETER_TYPES.REAL
-        );
+        this._verifyArgTypesMatchExpectedType(args,
+          AppConstants.PARAMETER_TYPES.REAL);
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
@@ -348,10 +321,8 @@ export class ExpressionSyntaxTreeService {
       },
       getType: (args: Array<any>): string => {
         this.verifyNumArgs(args, 1);
-        this._verifyArgTypesMatchExpectedType(
-          args,
-          AppConstants.PARAMETER_TYPES.UNICODE_STRING
-        );
+        this._verifyArgTypesMatchExpectedType(args,
+          AppConstants.PARAMETER_TYPES.UNICODE_STRING);
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
@@ -383,10 +354,8 @@ export class ExpressionSyntaxTreeService {
       },
       getType: (args: Array<any>): string => {
         this.verifyNumArgs(args, 2);
-        this._verifyArgTypesMatchExpectedType(
-          args,
-          AppConstants.PARAMETER_TYPES.UNICODE_STRING
-        );
+        this._verifyArgTypesMatchExpectedType(args,
+          AppConstants.PARAMETER_TYPES.UNICODE_STRING);
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
@@ -398,10 +367,8 @@ export class ExpressionSyntaxTreeService {
       },
       getType: (args: Array<any>): string => {
         this.verifyNumArgs(args, 2);
-        this._verifyArgTypesMatchExpectedType(
-          args,
-          AppConstants.PARAMETER_TYPES.UNICODE_STRING
-        );
+        this._verifyArgTypesMatchExpectedType(args,
+          AppConstants.PARAMETER_TYPES.UNICODE_STRING);
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
@@ -416,10 +383,8 @@ export class ExpressionSyntaxTreeService {
       },
       getType: (args: Array<any>): string => {
         this.verifyNumArgs(args, 3);
-        this._verifyArgTypesMatchExpectedType(
-          [args[0]],
-          AppConstants.PARAMETER_TYPES.UNICODE_STRING
-        );
+        this._verifyArgTypesMatchExpectedType([args[0]],
+          AppConstants.PARAMETER_TYPES.UNICODE_STRING);
         this._verifyArgTypesMatch(args[1], args[2]);
         return args[1];
       }
@@ -432,10 +397,8 @@ export class ExpressionSyntaxTreeService {
       },
       getType: (args: Array<any>): string => {
         this.verifyNumArgs(args, 1);
-        this._verifyArgTypesMatchExpectedType(
-          args,
-          AppConstants.PARAMETER_TYPES.REAL
-        );
+        this._verifyArgTypesMatchExpectedType(args,
+          AppConstants.PARAMETER_TYPES.REAL);
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
@@ -447,10 +410,8 @@ export class ExpressionSyntaxTreeService {
       },
       getType: (args: Array<any>): string => {
         this.verifyNumArgs(args, 2);
-        this._verifyArgTypesMatchExpectedType(
-          args,
-          AppConstants.PARAMETER_TYPES.REAL
-        );
+        this._verifyArgTypesMatchExpectedType(args,
+          AppConstants.PARAMETER_TYPES.REAL);
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
@@ -465,10 +426,8 @@ export class ExpressionSyntaxTreeService {
       },
       getType: (args: Array<any>): string => {
         this.verifyNumArgs(args, 2);
-        this._verifyArgTypesMatchExpectedType(
-          args,
-          AppConstants.PARAMETER_TYPES.REAL
-        );
+        this._verifyArgTypesMatchExpectedType(args,
+          AppConstants.PARAMETER_TYPES.REAL);
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
@@ -480,10 +439,8 @@ export class ExpressionSyntaxTreeService {
       },
       getType: (args: Array<any>): string => {
         this.verifyNumArgs(args, 1);
-        this._verifyArgTypesMatchExpectedType(
-          args,
-          AppConstants.PARAMETER_TYPES.REAL
-        );
+        this._verifyArgTypesMatchExpectedType(args,
+          AppConstants.PARAMETER_TYPES.REAL);
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     }
