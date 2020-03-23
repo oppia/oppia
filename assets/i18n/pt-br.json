@@ -554,6 +554,8 @@
 	"I18N_TOPNAV_ABOUT_OPPIA": "Sobre o Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "Página Administrativa",
 	"I18N_TOPNAV_BLOG": "Blog",
+	"I18N_TOPNAV_CLASSROOM": "Sala de aula",
+	"I18N_TOPNAV_CLASSROOM_BASIC_MATHS": "Matemática básica",
 	"I18N_TOPNAV_CONTACT_US": "Contate-nos",
 	"I18N_TOPNAV_CREATOR_DASHBOARD": "Painel do Criador",
 	"I18N_TOPNAV_DONATE": "Doar",

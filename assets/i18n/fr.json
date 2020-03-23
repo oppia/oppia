@@ -554,6 +554,8 @@
 	"I18N_TOPNAV_ABOUT_OPPIA": "À propos d’Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "Page d’administration",
 	"I18N_TOPNAV_BLOG": "Blogue",
+	"I18N_TOPNAV_CLASSROOM": "Salle de classe",
+	"I18N_TOPNAV_CLASSROOM_BASIC_MATHS": "Mathématiques de base",
 	"I18N_TOPNAV_CONTACT_US": "Nous contacter",
 	"I18N_TOPNAV_CREATOR_DASHBOARD": "Tableau de bord du créateur",
 	"I18N_TOPNAV_DONATE": "Faire un don",
