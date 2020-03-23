@@ -1314,6 +1314,17 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
         self.question_reviewer_id = self.get_user_id_from_email(
             self.QUESTION_REVIEWER_EMAIL)
 
+    def test_add_reviewer_without_username_raise_error(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json(
+            '/removecommunityreviewerhandler', {
+                'removal_type': 'all'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Missing username param')
+
     def test_add_reviewer_with_invalid_username_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
@@ -1538,14 +1549,14 @@ class RemoveCommunityReviewerHandlerTest(test_utils.GenericTestBase):
                 self.translation_reviewer_id, language_code='hi'))
 
 
-class CommunityReviewersHandlerTest(test_utils.GenericTestBase):
-    """Tests CommunityReviewersHandler."""
+class CommunityReviewersListHandlerTest(test_utils.GenericTestBase):
+    """Tests CommunityReviewersListHandler."""
     TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
     VOICEOVER_REVIEWER_EMAIL = 'voiceoverreviewer@example.com'
     QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
 
     def setUp(self):
-        super(CommunityReviewersHandlerTest, self).setUp()
+        super(CommunityReviewersListHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
@@ -1675,4 +1686,13 @@ class CommunityReviewerRightsDataHandlerTest(test_utils.GenericTestBase):
             }, expected_status_int=400)
 
         self.assertEqual(response['error'], 'Invalid username: invalid')
+        self.logout()
+
+    def test_check_community_reviewer_rights_without_username(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.get_json(
+            '/communityreviewerrightsdatahandler', params={},
+            expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Missing username param')
         self.logout()

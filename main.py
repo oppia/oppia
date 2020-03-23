@@ -211,7 +211,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/removecommunityreviewerhandler',
         admin.RemoveCommunityReviewerHandler),
     get_redirect_route(
-        r'/getcommunityreviewershandler', admin.CommunityReviewersHandler),
+        r'/getcommunityreviewershandler', admin.CommunityReviewersListHandler),
     get_redirect_route(
         r'/communityreviewerrightsdatahandler',
         admin.CommunityReviewerRightsDataHandler),
