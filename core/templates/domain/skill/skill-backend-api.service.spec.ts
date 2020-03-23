@@ -25,7 +25,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 
-describe('Editable skill backend API service', function() {
+fdescribe('Skill backend API service', function() {
   var SkillBackendApiService = null;
   var UndoRedoService = null;
   var $httpBackend = null;

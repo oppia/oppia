@@ -114,7 +114,7 @@ class EditableSkillDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_edit_skill
+    @acl_decorators.open_access
     def get(self, skill_id):
         """Populates the data on the individual skill page."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
