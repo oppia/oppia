@@ -49,7 +49,7 @@ export class ContributionOpportunitiesBackendApiService {
   ) {}
 
   // TODO(#7165): Replace any with exact type.
-  _getOpportunityFromDict(
+  private _getOpportunityFromDict(
       opportunityType: OpportunityType,
       opportunityDict: any
   ): ExplorationOpportunitySummary | SkillOpportunity {
@@ -68,7 +68,7 @@ export class ContributionOpportunitiesBackendApiService {
   }
 
   // TODO(#7165): Replace any with exact type.
-  _fetchOpportunities(
+  private _fetchOpportunities(
       opportunityType: OpportunityType,
       params: ContributionOpportunityParams,
       successCallback: (

@@ -105,8 +105,7 @@ describe('Oppotunities backend API serice', function() {
       const failHandler = jasmine.createSpy('fail');
 
       contributionOpportunitiesBackendApiService.fetchSkillOpportunities(
-        ''
-      ).then(
+        '').then(
         successHandler, failHandler
       );
       const req = httpTestingController.expectOne(
@@ -131,8 +130,7 @@ describe('Oppotunities backend API serice', function() {
       const failHandler = jasmine.createSpy('fail');
 
       contributionOpportunitiesBackendApiService.fetchTranslationOpportunities(
-        'hi', '',
-      ).then(
+        'hi', '',).then(
         successHandler, failHandler
       );
       const req = httpTestingController.expectOne(
@@ -158,8 +156,7 @@ describe('Oppotunities backend API serice', function() {
       const failHandler = jasmine.createSpy('fail');
 
       contributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
-        'hi', '',
-      ).then(
+        'hi', '',).then(
         successHandler, failHandler
       );
       const req = httpTestingController.expectOne(
