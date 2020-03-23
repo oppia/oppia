@@ -119,7 +119,7 @@ class EditableSkillDataHandler(base.BaseHandler):
         """Populates the data on the individual skill page."""
         try:
             skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception as e:
+        except Exception:
             raise self.PageNotFoundException(Exception('Invalid skill id.'))
 
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
