@@ -91,7 +91,7 @@ jobs:
           # Python files and that is only possible if we treat it as a module.
           command: |
             python -m scripts.third_party_size_check
-            python -m scripts.pre_commit_linter --path=. --verbose
+            python -m scripts.linters.pre_commit_linter --path=. --verbose
 
   typescript_tests:
     <<: *job_defaults

@@ -26,7 +26,7 @@ import re
 import sys
 
 import python_utils
-from . import docstrings_checker
+from .. import docstrings_checker
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')

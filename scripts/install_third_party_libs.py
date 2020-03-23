@@ -63,9 +63,11 @@ Installation script for Oppia third-party libraries.
 """)
 
 PYLINT_CONFIGPARSER_FILEPATH = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pylint-1.9.4', 'configparser.py')
+    common.OPPIA_TOOLS_DIR, 'pylint-%s' % common.PYLINT_VERSION,
+    'configparser.py')
 PQ_CONFIGPARSER_FILEPATH = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pylint-quotes-0.1.8', 'configparser.py')
+    common.OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % common.PYLINT_QUOTES_VERSION,
+    'configparser.py')
 
 
 def tweak_yarn_executable():
@@ -167,12 +169,12 @@ def main():
     setup_gae.main(args=[])
     pip_dependencies = [
         ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pylint', '1.9.4', common.OPPIA_TOOLS_DIR),
+        ('pylint', common.PYLINT_VERSION, common.OPPIA_TOOLS_DIR),
         ('Pillow', '6.0.0', common.OPPIA_TOOLS_DIR),
-        ('pylint-quotes', '0.1.8', common.OPPIA_TOOLS_DIR),
+        ('pylint-quotes', common.PYLINT_QUOTES_VERSION, common.OPPIA_TOOLS_DIR),
         ('webtest', '2.0.33', common.OPPIA_TOOLS_DIR),
         ('isort', '4.3.20', common.OPPIA_TOOLS_DIR),
-        ('pycodestyle', '2.5.0', common.OPPIA_TOOLS_DIR),
+        ('pycodestyle', common.PYCODESTYLE_VERSION, common.OPPIA_TOOLS_DIR),
         ('esprima', '4.0.1', common.OPPIA_TOOLS_DIR),
         ('browsermob-proxy', '0.8.0', common.OPPIA_TOOLS_DIR),
         ('selenium', '3.13.0', common.OPPIA_TOOLS_DIR),

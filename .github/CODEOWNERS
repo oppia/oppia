@@ -109,6 +109,18 @@
 /codecov.yml @kevinlee12
 /core/templates/css/.stylelintrc @kevinlee12
 /tox.ini @kevinlee12
+/scripts/linters/__init__.py @kevinlee12 @Hudda
+/scripts/linters/codeowner_linter.py @kevinlee12 @Hudda
+/scripts/linters/css_linter.py @kevinlee12 @Hudda
+/scripts/linters/general_purpose_linter.py @kevinlee12 @Hudda
+/scripts/linters/html_linter.py @kevinlee12 @Hudda
+/scripts/linters/js_ts_linter.py @kevinlee12 @Hudda
+/scripts/linters/linter_utils.py @kevinlee12 @Hudda
+/scripts/linters/linter_utils_test.py @kevinlee12 @Hudda
+/scripts/linters/pre_commit_linter.py @kevinlee12 @Hudda
+/scripts/linters/pylint_extensions.py @kevinlee12 @Hudda
+/scripts/linters/pylint_extensions_test.py @kevinlee12 @Hudda
+/scripts/linters/python_linter.py @kevinlee12 @Hudda
 /scripts/__init__.py @kevinlee12
 /scripts/build.py @kevinlee12
 /scripts/build_test.py @kevinlee12
@@ -131,15 +143,10 @@
 /scripts/install_third_party_libs.py @kevinlee12
 /scripts/install_third_party_libs_test.py @kevinlee12
 /scripts/install_third_party_test.py @kevinlee12
-/scripts/linter_utils.py @kevinlee12
-/scripts/linter_utils_test.py @kevinlee12
 /scripts/pre_commit_hook.py @kevinlee12
 /scripts/pre_commit_hook_test.py @kevinlee12
-/scripts/pre_commit_linter.py @kevinlee12
 /scripts/pre_push_hook.py @kevinlee12
 /scripts/pre_push_hook_test.py @kevinlee12
-/scripts/pylint_extensions.py @kevinlee12
-/scripts/pylint_extensions_test.py @kevinlee12
 /scripts/release_scripts/deploy.py @ankita240796 @kevinlee12
 /scripts/release_scripts/deploy_test.py @ankita24079 @kevinlee12
 /scripts/run_backend_tests.py @kevinlee12
@@ -150,6 +157,7 @@
 /scripts/run_presubmit_checks.py @kevinlee12
 /scripts/run_tests.py @kevinlee12
 /scripts/script_import_test.py @kevinlee12
+/scripts/concurrent_task_utils.py @kevinlee12 @Hudda
 /scripts/setup.py @kevinlee12
 /scripts/setup_gae.py @kevinlee12
 /scripts/setup_gae_test.py @kevinlee12
@@ -562,7 +570,7 @@
 #     https://help.github.com/en/articles/about-code-owners
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
-# in scripts/pre_commit_linter.py in sync with the modifications.
+# in scripts/linters/pre_commit_linter.py in sync with the modifications.
 /core/controllers/acl_decorators*.py @seanlip
 /core/controllers/base*.py @seanlip
 /core/domain/html*.py @seanlip
