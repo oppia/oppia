@@ -84,9 +84,6 @@ angular.module('oppia').factory('StoryEditorStateService', [
             _setSkillSummaries(newBackendStoryObject.skillSummaries);
             _updateStory(newBackendStoryObject.story);
             _storyIsLoading = false;
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the service is migrated to angular.
-            $rootScope.$apply();
           },
           function(error) {
             AlertsService.addWarning(
@@ -175,9 +172,6 @@ angular.module('oppia').factory('StoryEditorStateService', [
             if (successCallback) {
               successCallback();
             }
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the service is migrated to angular.
-            $rootScope.$apply();
           }, function(error) {
             AlertsService.addWarning(
               error || 'There was an error when saving the story.');
@@ -200,9 +194,6 @@ angular.module('oppia').factory('StoryEditorStateService', [
             if (successCallback) {
               successCallback();
             }
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the service is migrated to angular.
-            $rootScope.$apply();
           }, function(error) {
             AlertsService.addWarning(
               error ||

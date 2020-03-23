@@ -411,9 +411,6 @@ angular.module('oppia').factory('TopicEditorStateService', [
             if (successCallback) {
               successCallback();
             }
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the service is migrated to angular.
-            $rootScope.$apply();
           }, function(error) {
             AlertsService.addWarning(
               error || 'There was an error when saving the topic.');
