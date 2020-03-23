@@ -29,7 +29,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 const Constants = require('constants.ts');
 const hashes = require('hashes.json');
 
-// This make the InterpolationValuesType like a dict whose keys and values both
+// This makes the InterpolationValuesType like a dict whose keys and values both
 // are string.
 interface InterpolationValuesType {
   [param: string]: string
