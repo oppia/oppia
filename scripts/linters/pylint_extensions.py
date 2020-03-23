@@ -1464,6 +1464,63 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
                     'no-empty-line-provided-below-fileoverview',
                     line=closing_line_index_of_fileoverview + 1)
 
+class IndentMultilineDocstringDefinitionChecker(checkers.BaseChecker):
+    """Checks that a multiline definition within a docstring has
+    hanging indents for new lines.
+    """
+
+    __implements__ = interfaces.IRawChecker
+    name = 'missing-indent-docstring-definition'
+    priority = -1
+    msgs = {
+        'C0026': (
+            'Missing indent in new line of the definition in the docstring.',
+            'missing-indent-docstring-definition',
+            'Add indents to new lines of your multiline defintion.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that any definitions within a docstring
+        are properly indented.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        is_docstring_def = False
+        is_multiline = False
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num]
+            prev_line = ''
+
+            if line_num > 0:
+                prev_line = file_content[line_num - 1]
+
+            # Check if it is a definition within a docstring.
+            if line.strip().startswith(b'Args:'):
+                is_docstring_def = True
+                continue
+
+            if is_docstring_def:
+                if (line.endswith(b'"""') or len(line.lstrip()) == 0):
+                    is_docstring_def = False
+                    is_multline = False
+                    continue
+                elif not(is_multiline) and not(b':' in line):
+                    is_multiline = True
+
+            if is_multiline:
+                if (b':' in line):
+                    is_multiline = False
+                elif ((len(line) - len(line.lstrip())) -
+                    (len(prev_line) - len(prev_line.lstrip())) != 4):
+                    self.add_message(
+                        'missing-indent-docstring-definition', line=line_num)
+
 
 def register(linter):
     """Registers the checker with pylint.
@@ -1486,3 +1543,4 @@ def register(linter):
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(DocstringChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
+    linter.register_checker(IndentMultilineDocstringDefinitionChecker(linter))
