@@ -18,65 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // FeedbackImprovementTaskObjectFactory.ts is upgraded to Angular 8.
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-import { EditabilityService } from 'services/editability.service';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
-import { FeedbackThreadObjectFactory } from
-  'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { ImprovementActionButtonObjectFactory } from
-  'domain/statistics/ImprovementActionButtonObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-/* eslint-disable max-len */
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-/* eslint-disable max-len */
-import { StateEditorService } from
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-/* eslint-enable max-len */
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-/* eslint-enable max-len */
-import { SuggestionModalService } from 'services/suggestion-modal.service';
-/* eslint-disable max-len */
-import { ThreadStatusDisplayService } from
-  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-/* eslint-enable max-len */
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-import { LearnerAnswerDetailsObjectFactory } from
-  'domain/statistics/LearnerAnswerDetailsObjectFactory';
-import { LearnerAnswerInfoObjectFactory } from
-  'domain/statistics/LearnerAnswerInfoObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 
 require('domain/statistics/AnswerDetailsImprovementTaskObjectFactory.ts');
 
@@ -93,70 +35,6 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
   var STATUS_NOT_ACTIONABLE = null;
   var STATUS_OPEN = null;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', new AngularNameService());
-    $provide.value(
-      'AnswerClassificationResultObjectFactory',
-      new AnswerClassificationResultObjectFactory());
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
-    $provide.value('EditabilityService', new EditabilityService());
-    $provide.value(
-      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
-    $provide.value(
-      'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'ImprovementActionButtonObjectFactory',
-      new ImprovementActionButtonObjectFactory());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
-      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-        new ParamChangeObjectFactory()));
-    $provide.value(
-      'StateEditorService', new StateEditorService(
-        new SolutionValidityService()));
-    $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value(
-      'StateClassifierMappingService', new StateClassifierMappingService(
-        new ClassifierObjectFactory()));
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value('SolutionValidityService', new SolutionValidityService());
-    $provide.value('SuggestionModalService', new SuggestionModalService());
-    $provide.value(
-      'ThreadStatusDisplayService', new ThreadStatusDisplayService());
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
-    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
-    $provide.value(
-      'LearnerAnswerDetailsObjectFactory',
-      new LearnerAnswerDetailsObjectFactory());
-    $provide.value(
-      'LearnerAnswerInfoObjectFactory', new LearnerAnswerInfoObjectFactory());
-  }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -187,7 +65,7 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
   }));
 
   describe('.createNew', function() {
-    it('retrieves data from passed thread', function() {
+    it('should retrieve data from passed thread', function() {
       var mockLearnerAnswerDetails = {learnerAnswerInfoData: 'sample'};
       var task = AnswerDetailsImprovementTaskObjectFactory.createNew(
         mockLearnerAnswerDetails);
@@ -199,7 +77,7 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
   });
 
   describe('.fetchTasks', function() {
-    it('fetches threads from the backend', function(done) {
+    it('should fetch threads from the backend', function(done) {
       spyOn(
         LearnerAnswerDetailsDataService,
         'fetchLearnerAnswerInfoData').and.callFake($q.resolve);
@@ -242,57 +120,62 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
     });
 
     describe('.getStatus', function() {
-      it('returns open as status', function() {
+      it('should return open as status', function() {
         expect(this.task.getStatus()).toEqual(STATUS_OPEN);
       });
 
-      it('returns not actionable as status', function() {
+      it('should return not actionable as status', function() {
         this.testLearnerAnswerDetails.learnerAnswerInfoData = [];
         expect(this.task.getStatus()).toEqual(STATUS_NOT_ACTIONABLE);
       });
     });
 
     describe('.getTitle', function() {
-      it('returns answer details as title', function() {
+      it('should return answer details as title', function() {
         expect(this.task.getTitle()).toEqual(
           'Answer details for the card "fakeStateName"');
       });
     });
 
     describe('.isObsolete', function() {
-      it('returns is obsolete as false', function() {
+      it('should return is obsolete as false', function() {
         expect(this.task.isObsolete()).toEqual(false);
       });
 
-      it('returns is obsolete as true', function() {
+      it('should return is obsolete as true', function() {
         this.testLearnerAnswerDetails.learnerAnswerInfoData = [];
         expect(this.task.isObsolete()).toEqual(true);
       });
     });
 
     describe('.getDirectiveType', function() {
-      it('returns answer details as directive type', function() {
+      it('should return answer details as directive type', function() {
         expect(this.task.getDirectiveType())
           .toEqual(ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE);
       });
     });
 
     describe('.getDirectiveData', function() {
-      it('returns the learner answer details', function() {
+      it('should return the learner answer details', function() {
         expect(this.task.getDirectiveData()).toBe(
           this.testLearnerAnswerDetails);
       });
     });
 
     describe('.getActionButtons', function() {
-      it('contains one button', function() {
+      it('should return one button', function() {
         expect(this.task.getActionButtons().length).toEqual(1);
       });
     });
 
     describe('.getLastUpdatedTime', function() {
-      it('returns the time when this task was last updated', function() {
-        expect(this.task.getLastUpdatedTime()).toBe(this.testLastUpdatedTime);
+      it('should return a number', function() {
+        expect(this.task.getLastUpdatedTime()).toEqual(jasmine.any(Number));
+      });
+
+      it('should return the time when this task was last updated', function() {
+        expect(this.task.getLastUpdatedTime())
+          .toEqual(this.testLastUpdatedTime);
       });
     });
 
@@ -301,7 +184,7 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
         this.button = this.task.getActionButtons()[0];
       });
 
-      it('opens a learner answer details modal', function() {
+      it('should open a learner answer details modal', function() {
         var spy = spyOn(ImprovementModalService, 'openLearnerAnswerDetails');
 
         this.button.execute();

@@ -15,28 +15,28 @@
 
 <div class="modal-body">
   <ol ng-if="activeThread.messages.length > 0" style="padding: 0 10px" class="thread-messages">
-    <li ng-repeat="m in activeThread.messages | orderBy:'m.message_id'"
+    <li ng-repeat="m in activeThread.messages | orderBy:'m.messageId'"
         class="protractor-test-improvements-thread-message">
       <div style="float: left">
-        <span ng-if="$index !== 0">#<[m.message_id]></span>
+        <span ng-if="$index !== 0">#<[m.messageId]></span>
         <span class="protractor-test-improvements-thread-message-author">
-          <span ng-if="m.author_username">by <strong><[m.author_username]></strong></span>
-          <em ng-if="!m.author_username">(anonymously submitted)</em>
+          <span ng-if="m.authorUsername">by <strong><[m.authorUsername]></strong></span>
+          <em ng-if="!m.authorUsername">(anonymously submitted)</em>
         </span>
       </div>
 
       <div class="text-right" style="float: right; margin-left: 2ch">
-        <[getLocaleAbbreviatedDatetimeString(m.created_on)]>
+        <[getLocaleAbbreviatedDatetimeString(m.createdOnMsecs)]>
       </div>
 
-      <div ng-if="m.message_id !== 0"
+      <div ng-if="m.messageId !== 0"
            class="protractor-test-improvements-thread-message-status-change"
            style="float: right; width: 28ch">
-        <span ng-if="m.updated_status">
-          <em>Status changed to '<[getHumanReadableStatus(m.updated_status)]>'</em>
+        <span ng-if="m.updatedStatus">
+          <em>Status changed to '<[getHumanReadableStatus(m.updatedStatus)]>'</em>
         </span>
-        <span ng-if="m.updated_subject">
-          <em>Subject changed to '<[m.updated_subject]>'</em>
+        <span ng-if="m.updatedSubject">
+          <em>Subject changed to '<[m.updatedSubject]>'</em>
         </span>
       </div>
 

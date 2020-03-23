@@ -32,43 +32,14 @@ angular.module('oppia').directive('feedbackImprovementTask', [
       controller: [
         '$scope', 'DateTimeFormatService', 'ThreadStatusDisplayService',
         function($scope, DateTimeFormatService, ThreadStatusDisplayService) {
-          $scope.getLatestMessage = function() {
-            var numMessages = $scope.getData().messages.length;
-            if (numMessages > 0) {
-              var latestMessage = $scope.getData().messages[numMessages - 1];
-              var threadIsNewlyOpened =
-                numMessages === 1 && latestMessage.updated_status === 'open';
-              return {
-                text: latestMessage.text,
-                author: latestMessage.author_username,
-                updatedOn: latestMessage.created_on,
-                updatedStatus: (
-                  threadIsNewlyOpened ? null : latestMessage.updated_status),
-              };
-            } else {
-              return {
-                text: '',
-                author: $scope.getData().originalAuthorName,
-                updatedOn: $scope.getData().lastUpdated,
-                updatedStatus: null,
-              };
-            }
+          $scope.getLastNonemptyMessageAuthorUsername = function() {
+            return $scope.getData().lastNonemptyMessageSummary.authorUsername ||
+              $scope.getData().originalAuthorName;
           };
 
-          $scope.getHumanReadableUpdatedStatus = function() {
-            var updatedStatus = $scope.getLatestMessage().updatedStatus;
-            return updatedStatus === null ? null :
-              ThreadStatusDisplayService.getHumanReadableStatus(updatedStatus);
-          };
-
-          $scope.getLocaleAbbreviatedDatetimeString = function() {
-            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-              $scope.getLatestMessage().updatedOn);
-          };
-
-          $scope.wasUpdatedToday = function() {
-            var msecsUntilToday = new Date().setHours(0, 0, 0, 0);
-            return ($scope.getLatestMessage().updatedOn >= msecsUntilToday);
+          $scope.getLastNonemptyMessageText = function() {
+            return $scope.getData().lastNonemptyMessageSummary.text ||
+              $scope.getData().subject;
           };
         }
       ]
