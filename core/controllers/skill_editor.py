@@ -117,7 +117,11 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, skill_id):
         """Populates the data on the individual skill page."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
+        try:
+            skill_domain.Skill.require_valid_skill_id(skill_id)
+        except Exception as e:
+            raise self.PageNotFoundException(Exception('Invalid skill id.'))
+
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
 
         if skill is None:
