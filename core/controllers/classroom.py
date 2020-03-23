@@ -23,7 +23,7 @@ from core.controllers import base
 from core.domain import config_domain
 from core.domain import topic_services
 import feconf
-from scripts import case_change_service
+import python_utils
 
 
 class ClassroomPage(base.BaseHandler):
@@ -79,7 +79,7 @@ class ClassroomDataHandler(base.BaseHandler):
         ]
 
         self.values.update({
-            'topicSummaryDicts': case_change_service.camelize(
+            'topicSummaryDicts': python_utils.camelize(
                 topic_summary_dicts)
         })
         self.render_json(self.values)

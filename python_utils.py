@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import io
 import os
+import re
 import sys
 
 _FUTURE_PATH = os.path.join(os.getcwd(), 'third_party', 'future-0.17.1')
@@ -432,3 +433,46 @@ def yaml_from_dict(dictionary, width=80):
     """
     dictionary = _recursively_convert_to_str(dictionary)
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
+
+
+def camelize_string(string):
+    """Changes the case of string from snake_case to camelCase.
+
+    Args:
+        string: str. The string whose case is to changed to camelCase
+        from snake_case.
+
+    Returns:
+        The string after changing the case of input string to camelCase.
+    """
+
+    snake_case_re = re.compile(r'([^\-_\s])[\-_\s]+([^\-_\s])')
+
+    return ''.join([
+        string[0].lower() if not string[:2].isupper() else string[0],
+        snake_case_re.sub(
+            lambda m: m.group(1) + m.group(2).upper(), string[1:]),
+    ])
+
+
+def camelize(obj):
+    """Changes the case of the keys of dict from snake_case to camelCase.
+
+    Args:
+        obj: any object. If the object is a dict it changes
+        the case of it's dicts else if it is a list it iterates over all
+        the items in the list and changes the case of keys to camelCase
+        if it finds another dict. However, if the object is neither a dict nor
+        a list it returns the object.
+
+    Returns:
+        The object after changing the case of keys in the dictionaries
+        in the object to camelCase.
+    """
+
+    if isinstance(obj, dict):
+        return {camelize_string(k): camelize(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [camelize(v) for v in obj]
+
+    return obj

@@ -224,6 +224,127 @@ class PythonUtilsTests(test_utils.GenericTestBase):
                 self.assertEqual(type(k), unicode)
                 self.assertEqual(type(v), bytes)
 
+    def test_camelize_string(self):
+        test_strings = [
+            'test_string',
+            'testString',
+            ]
+        expected_results = [
+            'testString',
+            'testString'
+            ]
+
+        for i in python_utils.RANGE(len(test_strings)):
+            string = test_strings[i]
+            expected_result = expected_results[i]
+            result = python_utils.camelize_string(string)
+            self.assertEqual(result, expected_result)
+
+    def test_camelize(self):
+        test_objects = [
+            [
+                {
+                    'key_one': 0,
+                    'key_two': {
+                        'key_three': 0,
+                        'key_four': [
+                            {
+                                'key_five': 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    'keySix': 0
+                }
+            ],
+            {
+                'key_one': 'value_one',
+                'key_two': {
+                    'key_Three': 'value_two'
+                }
+            },
+            [
+                'string_one',
+                'string_two'
+            ],
+            {
+                'element_one',
+                'element_two'
+            },
+            {
+                'key_one': {
+                    'element_one'
+                },
+                'key_two': [
+                    {
+                        'key_three': 0,
+                        'key_four': {
+                            'element_two'
+                        }
+                    },
+                    {
+                        'element_three'
+                    }
+                ]
+            }
+        ]
+
+        expected_results = [
+            [
+                {
+                    'keyOne': 0,
+                    'keyTwo': {
+                        'keyThree': 0,
+                        'keyFour': [
+                            {
+                                'keyFive': 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    'keySix': 0
+                }
+            ],
+            {
+                'keyOne': 'value_one',
+                'keyTwo': {
+                    'keyThree': 'value_two'
+                }
+            },
+            [
+                'string_one',
+                'string_two'
+            ],
+            {
+                'element_one',
+                'element_two'
+            },
+            {
+                'keyOne': {
+                    'element_one'
+                },
+                'keyTwo': [
+                    {
+                        'keyThree': 0,
+                        'keyFour': {
+                            'element_two'
+                        }
+                    },
+                    {
+                        'element_three'
+                    }
+                ]
+            }
+        ]
+
+        for i in python_utils.RANGE(len(test_objects)):
+            test_object = test_objects[i]
+            expected_result = expected_results[i]
+            result = python_utils.camelize(test_object)
+            self.assertEqual(result, expected_result)
+
 
 @unittest.skipUnless(
     sys.version[0] == '2', 'Test cases for ensuring Python 2 behavior only')
