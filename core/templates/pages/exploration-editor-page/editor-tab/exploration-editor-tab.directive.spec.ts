@@ -28,7 +28,6 @@ import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
-import { DebugInfoTrackerService } from 'services/debug-info-tracker.service';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { ExplorationFeaturesService } from
@@ -99,7 +98,6 @@ describe('Exploration editor tab controller', function() {
       $provide.value(
         'AnswerStatsObjectFactory', new AnswerStatsObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
-      $provide.value('DebugInfoTrackerService', new DebugInfoTrackerService());
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
       $provide.value(

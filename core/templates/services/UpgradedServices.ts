@@ -76,7 +76,6 @@ import { CreatorDashboardBackendApiService } from
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
-import { DebugInfoTrackerService } from 'services/debug-info-tracker.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
@@ -326,8 +325,6 @@ export class UpgradedServices {
     upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
-    upgradedServices['DebugInfoTrackerService'] =
-      new DebugInfoTrackerService();
     upgradedServices['DragAndDropSortInputRulesService'] =
       new DragAndDropSortInputRulesService();
     upgradedServices['EditabilityService'] = new EditabilityService();
