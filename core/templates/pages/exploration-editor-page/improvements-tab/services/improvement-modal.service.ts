@@ -41,11 +41,11 @@ require('pages/exploration-editor-page/improvements-tab/services/improvement-con
 /* eslint-enable max-len */
 
 angular.module('oppia').factory('ImprovementModalService', [
-  '$uibModal', 'UrlInterpolationService', 'UserExplorationPermissionsService',
-  'UserService',
+  '$uibModal', 'ThreadDataService', 'UrlInterpolationService',
+  'UserExplorationPermissionsService', 'UserService',
   function(
-      $uibModal, UrlInterpolationService, UserExplorationPermissionsService,
-      UserService) {
+      $uibModal, ThreadDataService, UrlInterpolationService,
+      UserExplorationPermissionsService, UserService) {
     return {
       /**
        * Opens the modal for displaying playthrough actions.
@@ -84,15 +84,15 @@ angular.module('oppia').factory('ImprovementModalService', [
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration-editor-page/improvements-tab/templates/' +
             'feedback-thread-modal.template.html'),
-          backdrop: 'static',
-          size: 'lg',
           resolve: {
-            isUserLoggedIn: () => (
-              UserService.getUserInfoAsync()
-                .then(userInfo => userInfo.isLoggedIn())),
+            messages: ThreadDataService.getMessagesAsync(thread),
+            isUserLoggedIn:
+              UserService.getUserInfoAsync().then(u => u.isLoggedIn()),
             thread: () => thread
           },
           controller: 'ImprovementFeedbackThreadModalController',
+          backdrop: 'static',
+          size: 'lg',
         });
       },
 
@@ -104,9 +104,9 @@ angular.module('oppia').factory('ImprovementModalService', [
           backdrop: 'static',
           size: 'lg',
           resolve: {
-            isUserLoggedIn: () => (
-              UserService.getUserInfoAsync()
-                .then(userInfo => userInfo.isLoggedIn())),
+            messages: ThreadDataService.getMessagesAsync(thread),
+            isUserLoggedIn:
+              UserService.getUserInfoAsync().then(u => u.isLoggedIn()),
             thread: () => thread
           },
           controller: 'ImprovementSuggestionThreadModalController',

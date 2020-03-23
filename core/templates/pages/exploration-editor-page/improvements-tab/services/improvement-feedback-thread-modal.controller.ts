@@ -37,7 +37,7 @@ angular.module('oppia').controller('ImprovementFeedbackThreadModalController', [
     // Initial load of the thread list on page load.
     $scope.tmpMessage = {
       status: $scope.activeThread.status,
-      text: '',
+      text: ''
     };
 
     $scope.getTitle = function() {
@@ -47,7 +47,7 @@ angular.module('oppia').controller('ImprovementFeedbackThreadModalController', [
     // TODO(Allan): Implement ability to edit suggestions before
     // applying.
     $scope.addNewMessage = function(tmpText, tmpStatus) {
-      if (thread.threadId === null) {
+      if ($scope.activeThread.threadId === null) {
         AlertsService.addWarning(
           'Cannot add message to thread with ID: null.');
         return;
@@ -58,15 +58,15 @@ angular.module('oppia').controller('ImprovementFeedbackThreadModalController', [
         return;
       }
       $scope.messageSendingInProgress = true;
-      ThreadDataService.addNewMessageAsync(thread, tmpText, tmpStatus)
+      ThreadDataService.addNewMessageAsync(
+        $scope.activeThread, tmpText, tmpStatus)
         .then(() => {
           $scope.tmpMessage.status = $scope.activeThread.status;
           $scope.messageSendingInProgress = false;
-        })['catch']((error) => {
+        }, () => {
           $scope.messageSendingInProgress = false;
-        })['finally']($uibModalInstance.close);
+        }).then($uibModalInstance.close);
     };
-
     $scope.close = function() {
       $uibModalInstance.close();
     };
