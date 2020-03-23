@@ -64,7 +64,7 @@ export class EditableSkillBackendApiService {
   }
 
   private _fetchMultiSkills(
-      skillIds: [string],
+      skillIds: Array<string>,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
     const skillDataUrl = this.urlInterpolationService.interpolateUrl(
@@ -134,7 +134,7 @@ export class EditableSkillBackendApiService {
     });
   }
 
-  fetchMultiSkills(skillIds: [string]): Promise<Object> {
+  fetchMultiSkills(skillIds: Array<string>): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchMultiSkills(skillIds, resolve, reject);
     });
