@@ -16,7 +16,7 @@
 
 """Pre-push hook that executes the Python/JS linters on all files that
 deviate from develop.
-(By providing the list of files to `scripts.pre_commit_linter`)
+(By providing the list of files to `scripts.linters.pre_commit_linter`)
 To install the hook manually simply execute this script from the oppia root dir
 with the `--install` flag.
 To bypass the validation upon `git push` use the following command:
@@ -51,7 +51,7 @@ FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 GIT_NULL_COMMIT = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 # CAUTION: __file__ is here *OPPIA/.git/hooks* and not in *OPPIA/scripts*.
-LINTER_MODULE = 'scripts.pre_commit_linter'
+LINTER_MODULE = 'scripts.linters.pre_commit_linter'
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir)
 LINTER_FILE_FLAG = '--files'
