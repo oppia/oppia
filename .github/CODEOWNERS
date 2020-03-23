@@ -67,9 +67,12 @@
 /CONTRIBUTORS @seanlip
 /LICENSE @seanlip
 /NOTICE @seanlip
-/core/templates/pages/about-page/ @seanlip
-/core/templates/pages/privacy-page/ @seanlip
-/core/templates/pages/terms-page/ @seanlip
+/core/templates/pages/about-page/ @DubeySandeep
+/core/templates/pages/about-page/about-page.directive.html @seanlip
+/core/templates/pages/privacy-page/ @DubeySandeep
+/core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip
+/core/templates/pages/terms-page/ @DubeySandeep
+/core/templates/pages/terms-page/terms-page.mainpage.html @seanlip
 
 
 # Dashboard pages.
@@ -106,6 +109,18 @@
 /codecov.yml @kevinlee12
 /core/templates/css/.stylelintrc @kevinlee12
 /tox.ini @kevinlee12
+/scripts/linters/__init__.py @kevinlee12 @Hudda
+/scripts/linters/codeowner_linter.py @kevinlee12 @Hudda
+/scripts/linters/css_linter.py @kevinlee12 @Hudda
+/scripts/linters/general_purpose_linter.py @kevinlee12 @Hudda
+/scripts/linters/html_linter.py @kevinlee12 @Hudda
+/scripts/linters/js_ts_linter.py @kevinlee12 @Hudda
+/scripts/linters/linter_utils.py @kevinlee12 @Hudda
+/scripts/linters/linter_utils_test.py @kevinlee12 @Hudda
+/scripts/linters/pre_commit_linter.py @kevinlee12 @Hudda
+/scripts/linters/pylint_extensions.py @kevinlee12 @Hudda
+/scripts/linters/pylint_extensions_test.py @kevinlee12 @Hudda
+/scripts/linters/python_linter.py @kevinlee12 @Hudda
 /scripts/__init__.py @kevinlee12
 /scripts/build.py @kevinlee12
 /scripts/build_test.py @kevinlee12
@@ -128,15 +143,10 @@
 /scripts/install_third_party_libs.py @kevinlee12
 /scripts/install_third_party_libs_test.py @kevinlee12
 /scripts/install_third_party_test.py @kevinlee12
-/scripts/linter_utils.py @kevinlee12
-/scripts/linter_utils_test.py @kevinlee12
 /scripts/pre_commit_hook.py @kevinlee12
 /scripts/pre_commit_hook_test.py @kevinlee12
-/scripts/pre_commit_linter.py @kevinlee12
 /scripts/pre_push_hook.py @kevinlee12
 /scripts/pre_push_hook_test.py @kevinlee12
-/scripts/pylint_extensions.py @kevinlee12
-/scripts/pylint_extensions_test.py @kevinlee12
 /scripts/release_scripts/deploy.py @ankita240796 @kevinlee12
 /scripts/release_scripts/deploy_test.py @ankita24079 @kevinlee12
 /scripts/run_backend_tests.py @kevinlee12
@@ -147,6 +157,7 @@
 /scripts/run_presubmit_checks.py @kevinlee12
 /scripts/run_tests.py @kevinlee12
 /scripts/script_import_test.py @kevinlee12
+/scripts/concurrent_task_utils.py @kevinlee12 @Hudda
 /scripts/setup.py @kevinlee12
 /scripts/setup_gae.py @kevinlee12
 /scripts/setup_gae_test.py @kevinlee12
@@ -187,7 +198,6 @@
 /core/templates/components/state-editor/ @aks681
 /core/templates/services/compute-graph.service.ts @aks681
 /core/templates/services/context.service*.ts @aks681
-/core/templates/services/debug-info-tracker.service*.ts @aks681
 /core/templates/services/editability.service*.ts @aks681
 /core/templates/services/exploration-features*.ts @aks681
 /core/templates/services/exploration-html-formatter.service*.ts @aks681
@@ -398,7 +408,7 @@
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
 /main_mail.py @aks681
-/main.py @nithusha21 @seanlip
+/main.py @nithusha21 @DubeySandeep
 /feconf.py @nithusha21 @seanlip
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
@@ -421,7 +431,7 @@
 /core/templates/services/contextual/document-attribute-customization.service*.ts @bansalnitish
 /core/templates/services/contextual/meta-tag-customization.service*.ts @bansalnitish
 /core/templates/services/translation-file-hash-loader.service.ts @nithusha21
-/release_constants.py @ankita240796 @nithusha21 @seanlip
+/release_constants.py @ankita240796 @nithusha21 @DubeySandeep
 
 
 # Miscellaneous.
@@ -429,7 +439,7 @@
 /core/__init__.py @nithusha21
 /core/controllers/__init__.py @nithusha21
 /core/domain/__init__.py @nithusha21
-/core/domain/config*.py @seanlip
+/core/domain/config*.py @DubeySandeep
 /core/domain/change_domain.py @ankita240796
 /core/templates/tests/ @kevinlee12 @nithusha21
 /core/templates/domain/utilities/ @bansalnitish
@@ -439,16 +449,16 @@
 
 
 # Restricted pages.
-/core/controllers/admin*.py @seanlip @nithusha21
+/core/controllers/admin*.py @DubeySandeep @nithusha21
 /core/controllers/moderator*.py @seanlip
 /core/controllers/recent_commits*.py @seanlip
 /core/domain/moderator_services*.py @seanlip
-/core/templates/pages/admin-page/ @seanlip @nithusha21
-/core/templates/pages/moderator-page/ @seanlip @nithusha21
+/core/templates/pages/admin-page/ @DubeySandeep @nithusha21
+/core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
 
 
 # QA team.
-/core/tests/ @kevinlee12 @nithusha21
+/core/tests/ @kevinlee12 @U8NWXD
 /assets/ @nithusha21
 /data/ @nithusha21
 
@@ -549,7 +559,7 @@
 
 
 # Draft version upgrade.
-/core/domain/draft_upgrade_services*.py @seanlip
+/core/domain/draft_upgrade_services*.py @DubeySandeep
 
 # Critical files.
 #
@@ -560,7 +570,7 @@
 #     https://help.github.com/en/articles/about-code-owners
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
-# in scripts/pre_commit_linter.py in sync with the modifications.
+# in scripts/linters/pre_commit_linter.py in sync with the modifications.
 /core/controllers/acl_decorators*.py @seanlip
 /core/controllers/base*.py @seanlip
 /core/domain/html*.py @seanlip
