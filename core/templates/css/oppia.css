@@ -131,7 +131,6 @@ md-input-group.md-default-theme label {
 }
 
 .oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled]:hover {
-  background-color: #115fd4;
   text-decoration: none;
 }
 
@@ -444,9 +443,9 @@ input.ng-dirty.ng-invalid, md-input-group.md-default-theme input.ng-dirty.ng-inv
 p {
   line-height: 1.2;
   margin-bottom: 18px;
-  text-align: left;
   word-spacing: 0;
   word-wrap: break-word;
+  text-align: start;
 }
 
 p:last-child {
@@ -601,39 +600,6 @@ textarea {
   pointer-events: none;
   position: fixed;
   z-index: 100;
-}
-
-/*
-  Styles for the link to the site feedback form.
-*/
-.oppia-site-feedback {
-  background-color: #fff;
-  border-radius: 2px;
-  bottom: 4px;
-  color: rgba(0,0,0,0.87);
-  cursor: pointer;
-  left: 4px;
-  opacity: 0.5;
-  padding: 4px 8px;
-  position: fixed;
-  /* This is needed so that the exploration summary tiles don't overlap the button in the library page. */
-  z-index: 3;
-}
-.oppia-site-feedback:hover,
-.oppia-site-feedback:focus,
-.oppia-site-feedback:active {
-  color: rgba(0,0,0,0.87);
-  opacity: 1.0;
-  text-decoration: none;
-}
-.oppia-feedback-card .btn-success {
-  margin-top: 19px;
-}
-
-@media (max-width: 1100px) {
-  .oppia-site-feedback span {
-    display: none;
-  }
 }
 
 /*
@@ -4074,6 +4040,10 @@ md-card.preview-conversation-skin-supplemental-card {
   margin: 0 auto;
   max-width: 600px;
   padding: 4% 0 1% 0;
+}
+
+.oppia-page-card h3 {
+  text-align: start;
 }
 
 .oppia-static-card-content-wide {

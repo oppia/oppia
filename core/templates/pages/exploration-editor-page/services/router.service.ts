@@ -23,17 +23,16 @@ require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/debug-info-tracker.service.ts');
 require('services/exploration-features.service.ts');
 
 angular.module('oppia').factory('RouterService', [
   '$interval', '$location', '$rootScope', '$timeout', '$window',
-  'DebugInfoTrackerService', 'ExplorationFeaturesService',
+  'ExplorationFeaturesService',
   'ExplorationInitStateNameService', 'ExplorationStatesService',
   'StateEditorService',
   function(
       $interval, $location, $rootScope, $timeout, $window,
-      DebugInfoTrackerService, ExplorationFeaturesService,
+      ExplorationFeaturesService,
       ExplorationInitStateNameService, ExplorationStatesService,
       StateEditorService) {
     var TABS = {
@@ -66,9 +65,6 @@ angular.module('oppia').factory('RouterService', [
     var PREVIEW_TAB_WAIT_TIME_MSEC = 200;
 
     var activeTabName = TABS.MAIN.name;
-
-    var isImprovementsTabEnabled =
-      ExplorationFeaturesService.isImprovementsTabEnabled;
 
     // When the URL path changes, reroute to the appropriate tab in the
     // exploration editor page.
@@ -169,29 +165,23 @@ angular.module('oppia').factory('RouterService', [
     };
 
     var _savePendingChanges = function() {
-      try {
+      // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
+      // null" error. To get around this we must use $timeout().
+      $timeout(function() {
         $rootScope.$broadcast('externalSave');
-      } catch (e) {
-        // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
-        // null" error. To get around this we must use $apply().
-        $rootScope.$apply(function() {
-          $rootScope.$broadcast('externalSave');
-        });
-      }
+      });
     };
 
     var _getCurrentStateFromLocationPath = function() {
-      if ($location.path().indexOf('/gui/') !== -1) {
-        return $location.path().substring('/gui/'.length);
+      var location = $location.path();
+      if (location.indexOf('/gui/') !== -1) {
+        return location.substring('/gui/'.length);
       } else {
         return null;
       }
     };
 
     var _actuallyNavigate = function(pathType, newStateName) {
-      if (pathType !== SLUG_GUI && pathType !== SLUG_PREVIEW) {
-        return;
-      }
       if (newStateName) {
         StateEditorService.setActiveStateName(newStateName);
       }
@@ -222,7 +212,6 @@ angular.module('oppia').factory('RouterService', [
         return _getCurrentStateFromLocationPath();
       },
       navigateToMainTab: function(stateName) {
-        DebugInfoTrackerService.reset();
         _savePendingChanges();
         if (_getCurrentStateFromLocationPath() === stateName) {
           return;
