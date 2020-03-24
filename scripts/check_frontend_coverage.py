@@ -103,7 +103,6 @@ FULLY_COVERED_FILENAMES = [
     'data.ts',
     'date-time-format.service.ts',
     'debouncer.service.ts',
-    'debug-info-tracker.service.ts',
     'device-info.service.ts',
     'document-attribute-customization.service.ts',
     'drag-and-drop-sort-input-rules.service.ts',
