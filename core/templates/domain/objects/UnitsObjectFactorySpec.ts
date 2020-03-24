@@ -47,13 +47,13 @@ describe('UnitsObjectFactory', () => {
         .toBe('cents^-1');
       expect(new Units([{ exponent: 1, unit: 'mol' }]).toString()).toBe('mol');
       expect(new Units([{ exponent: 2, unit: 'N' }]).toString()).toBe('N^2');
-      expect(new Units([{ exponent: 3, unit: 'cm' }, 
-      { exponent: -3, unit: 's' }]).toString()).toBe('cm^3 s^-3');
+      expect(new Units([{ exponent: 3, unit: 'cm' },
+        { exponent: -3, unit: 's' }]).toString()).toBe('cm^3 s^-3');
       expect(new Units(
         [{ exponent: 1, unit: 'paise' }, { exponent: -1, unit: 'kg' },
           { exponent: 1, unit: 'N' }, { exponent: 1, unit: 'm' },
           { exponent: -2, unit: 's' }]).toString())
-          .toBe('paise kg^-1 N m s^-2');
+        .toBe('paise kg^-1 N m s^-2');
     });
 
     it('should convert units to list format', () => {
@@ -79,10 +79,10 @@ describe('UnitsObjectFactory', () => {
         .toEqual(['kg', '/', 'kg^4', '*', 'K', '*', 'mol', '/', '(', 'N',
           '*', 'm', '*', 's^2', ')', 'K', '*', 's']);
       expect(units.stringToLexical('cm /(kg / (N m / s^3))'))
-        .toEqual(['cm', '/', '(', 'kg', '/', '(', 'N', '*', 'm', '/', 
+        .toEqual(['cm', '/', '(', 'kg', '/', '(', 'N', '*', 'm', '/',
           's^3', ')', ')']);
       expect(units.stringToLexical('mol per (kg per (N m per s^3) paise)'))
-        .toEqual(['mol', '/', '(', 'kg', '/', '(', 'N', '*', 
+        .toEqual(['mol', '/', '(', 'kg', '/', '(', 'N', '*',
           'm', '/', 's^3', ')', 'paise', ')']);
     });
 
@@ -118,15 +118,15 @@ describe('UnitsObjectFactory', () => {
         .toEqual(new Units([{ exponent: -1, unit: 'kg' }]));
       expect(units.fromList([{ exponent: 1, unit: 'mol' }]))
         .toEqual(new Units([{ exponent: 1, unit: 'mol' }]));
-      expect(units.fromList([{ exponent: 3, unit: 'cm' }, 
-      { exponent: -3, unit: 's' }])).toEqual(new Units
-        ([{ exponent: 3, unit: 'cm' }, { exponent: -3, unit: 's' }]));
-      expect(units.fromList([{ exponent: 1, unit: 'paise' }, 
-      { exponent: -1, unit: 'kg' },{ exponent: 1, unit: 'N' }, 
-      { exponent: 1, unit: 'm' }, { exponent: -2, unit: 's' }]))
-        .toEqual(new Units([{exponent: 1, unit: 'paise'}, 
-        {exponent: -1, unit: 'kg'},{ exponent: 1, unit: 'N' }, 
-        { exponent: 1, unit: 'm' }, { exponent: -2, unit: 's' }]));
+      expect(units.fromList([{ exponent: 3, unit: 'cm' },
+        { exponent: -3, unit: 's' }])).toEqual(new Units([
+      { exponent: 3, unit: 'cm' }, { exponent: -3, unit: 's' }]));
+      expect(units.fromList([{ exponent: 1, unit: 'paise' },
+        { exponent: -1, unit: 'kg' }, { exponent: 1, unit: 'N' },
+        { exponent: 1, unit: 'm' }, { exponent: -2, unit: 's' }]))
+        .toEqual(new Units([{exponent: 1, unit: 'paise'},
+          {exponent: -1, unit: 'kg'}, { exponent: 1, unit: 'N' },
+          { exponent: 1, unit: 'm' }, { exponent: -2, unit: 's' }]));
     });
 
     it('should have the correct division form with multiplier', () => {
@@ -145,24 +145,24 @@ describe('UnitsObjectFactory', () => {
       expect(units.unitToList(units.unitWithMultiplier(
         ['cm', '/', '(', 'kg', '/', 'N', ')'])))
         .toEqual([{ unit: 'cm', exponent: 1 },
-        { unit: 'kg', exponent: -1 }, { unit: 'N', exponent: 1 }]);
+          { unit: 'kg', exponent: -1 }, { unit: 'N', exponent: 1 }]);
       expect(units.unitToList(units.unitWithMultiplier(
         ['kg', '/', 'kg^4', '*', 'K', '*', 'mol'])))
         .toEqual([{ unit: 'kg', exponent: -3 },
-        { unit: 'K', exponent: 1 }, { unit: 'mol', exponent: 1 }]);
+          { unit: 'K', exponent: 1 }, { unit: 'mol', exponent: 1 }]);
       expect(units.unitToList(units.unitWithMultiplier(
         ['cent', '*', '(', 'kg', '/', 'N', ')'])))
         .toEqual([{ unit: 'cent', exponent: 1 },
-        { unit: 'kg', exponent: 1 }, { unit: 'N', exponent: -1 }]);
+          { unit: 'kg', exponent: 1 }, { unit: 'N', exponent: -1 }]);
     });
 
     it('should replace the special symbol because of math.js', () => {
       expect(units.toMathjsCompatibleString('cents'))
-      .toEqual('cent');
+        .toEqual('cent');
       expect(units.toMathjsCompatibleString('dollars kg'))
-      .toEqual('dollar kg');
+        .toEqual('dollar kg');
       expect(units.toMathjsCompatibleString('rupee cents'))
-      .toEqual('rupee cent');
+        .toEqual('rupee cent');
       expect(units.toMathjsCompatibleString('cent USD / Paisa'))
         .toEqual('cent dollar / paise');
     });
