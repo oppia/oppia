@@ -19,7 +19,7 @@
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { Units, UnitsObjectFactory } from
-  'domain/objects/unitsObjectFactory';
+  'domain/objects/UnitsObjectFactory';
 
 describe('UnitsObjectFactory', () => {
   describe('units object factory', () => {
