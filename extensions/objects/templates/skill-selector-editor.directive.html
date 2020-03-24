@@ -7,10 +7,10 @@
     <div class="list-group-item protractor-test-rte-skill-selector-item"
          ng-repeat="skill in $ctrl.skills | filter:skillFilterText"
          ng-click="$ctrl.selectSkill(skill.id, skill.description)"
-         ng-class="{'list-group-item-success': (skill.id === $ctrl.value.id)}"
+         ng-class="{'list-group-item-success': (skill.id === $ctrl.value)}"
          style="color: black;">
       <label class="list-group-item-heading"><[skill.description]></label>
-      <div ng-if="skill.id === $ctrl.value.id" style="color: black;">
+      <div ng-if="skill.id === $ctrl.value" style="color: black;">
         <strong> Explanation </strong>
         <div style="padding-bottom: 10px; padding-top: 5px;">
           <angular-html-bind html-data="skill.skill_contents.explanation.html">

@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,31 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for tracking the sequence of learner actions.
+ * @fileoverview Service for inspecting and managing suggestion objects.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class DebugInfoTrackerService {
-  _sequenceOfActions: Array<any> = [];
-
-  reset(): void {
-    this._sequenceOfActions = [];
-  }
-
-  addAction(action: any): void {
-    this._sequenceOfActions.push(action);
-  }
-
-  getSequenceOfActions(): Array<any> {
-    return this._sequenceOfActions;
+@Injectable({providedIn: 'root'})
+export class SuggestionsService {
+  // TODO(#7165): Replace 'any' with the exact type.
+  getThreadIdFromSuggestionBackendDict(suggestionBackendDict: any): string {
+    return suggestionBackendDict.suggestion_id;
   }
 }
 
 angular.module('oppia').factory(
-  'DebugInfoTrackerService',
-  downgradeInjectable(DebugInfoTrackerService));
+  'SuggestionsService',
+  downgradeInjectable(SuggestionsService));
+
