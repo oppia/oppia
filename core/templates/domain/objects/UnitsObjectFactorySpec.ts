@@ -120,7 +120,7 @@ describe('UnitsObjectFactory', () => {
         .toEqual(new Units([{ exponent: 1, unit: 'mol' }]));
       expect(units.fromList([{ exponent: 3, unit: 'cm' },
         { exponent: -3, unit: 's' }])).toEqual(new Units([
-      { exponent: 3, unit: 'cm' }, { exponent: -3, unit: 's' }]));
+        { exponent: 3, unit: 'cm' }, { exponent: -3, unit: 's' }]));
       expect(units.fromList([{ exponent: 1, unit: 'paise' },
         { exponent: -1, unit: 'kg' }, { exponent: 1, unit: 'N' },
         { exponent: 1, unit: 'm' }, { exponent: -2, unit: 's' }]))
