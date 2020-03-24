@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ClassroomBackendApiService.
+ * @fileoverview Unit tests for ContributionOpportunitiesBackendApiService.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
@@ -30,7 +30,7 @@ import { SkillOpportunityObjectFactory } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
-describe('Oppotunities backend API serice', function() {
+describe('Contribution Opportunities backend API service', function() {
   let contributionOpportunitiesBackendApiService:
     ContributionOpportunitiesBackendApiService = null;
   let httpTestingController: HttpTestingController;
@@ -50,7 +50,7 @@ describe('Oppotunities backend API serice', function() {
     next_cursor: '6',
     more: ''
   };
-  const sampleExplorationSumary = {
+  const sampleExplorationSummary = {
     opportunities: [{
       id: 'exp_id',
       topic_name: 'Topic',
@@ -85,12 +85,12 @@ describe('Oppotunities backend API serice', function() {
     ];
     sampleTranslationOpportunityResponse = [
       explorationOpportunitySummaryObjectFactory.createFromBackendDict(
-        sampleExplorationSumary.opportunities[0]
+        sampleExplorationSummary.opportunities[0]
       )
     ];
     sampleVoiceoverOpportunityResponse = [
       explorationOpportunitySummaryObjectFactory.createFromBackendDict(
-        sampleExplorationSumary.opportunities[0]
+        sampleExplorationSummary.opportunities[0]
       )
     ];
   });
@@ -140,7 +140,7 @@ describe('Oppotunities backend API serice', function() {
         ) + `?language_code=${'hi'}&cursor=${''}`
       );
       expect(req.request.method).toEqual('GET');
-      req.flush(sampleExplorationSumary);
+      req.flush(sampleExplorationSummary);
 
       flushMicrotasks();
 
@@ -166,7 +166,7 @@ describe('Oppotunities backend API serice', function() {
         ) + `?language_code=${'hi'}&cursor=${''}`
       );
       expect(req.request.method).toEqual('GET');
-      req.flush(sampleExplorationSumary);
+      req.flush(sampleExplorationSummary);
 
       flushMicrotasks();
 
