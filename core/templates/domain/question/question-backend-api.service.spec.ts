@@ -334,7 +334,7 @@ describe('Question backend Api service', function() {
       QuestionBackendApiService.fetchQuestionSummaries(
         [1, 2], 2, true).then(successHandler, failHandler);
       $rootScope.$digest();
-      expect(successHandler).not.toHaveBeenCalled()
+      expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
       ' strings');
     }
@@ -347,7 +347,7 @@ describe('Question backend Api service', function() {
       QuestionBackendApiService.fetchQuestionSummaries(
         null, 1, true).then(successHandler, failHandler);
       $rootScope.$digest();
-      expect(successHandler).not.toHaveBeenCalled()
+      expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
       ' strings');
     }
