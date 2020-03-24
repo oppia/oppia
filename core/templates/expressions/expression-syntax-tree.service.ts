@@ -40,7 +40,7 @@ ExprUndefinedVarError.prototype.toString = function(): string {
   return this.name + ': ' + this.varname + ' not found in ' + this.envs;
 };
 
-const ExprWrongNumArgsError = function(args: Array<number>,
+const ExprWrongNumArgsError = function(args: Array<number|string>,
     expectedMin: number, expectedMax: number): void {
   this.args = args;
   this.expectedMin = expectedMin;
@@ -54,7 +54,7 @@ ExprWrongNumArgsError.prototype.toString = function(): string {
         this.expectedMin + ',' + this.expectedMax + ']';
 };
 
-const ExprWrongArgTypeError = function(arg: string,
+const ExprWrongArgTypeError = function(arg: number|string,
     actualType: string, expectedType: string): void {
   this.arg = arg;
   this.actualType = actualType;
@@ -79,7 +79,7 @@ export class ExpressionSyntaxTreeService {
   constructor(private expressionParserService: ExpressionParserService) {}
 
   public getParamsUsedInExpression(expression: string): Array<string> {
-    let _findParams = (parseTree: Array<any>): Array<string> => {
+    let _findParams = (parseTree: Array<string>|string): Array<string> => {
       let paramsFound = [];
       if (parseTree instanceof Array) {
         if (parseTree[0] === '#') {
@@ -110,7 +110,7 @@ export class ExpressionSyntaxTreeService {
   // throws an error if not. If optional expectedMax is specified, it
   // verifies the number of args is in [expectedNum, expectedMax] range
   // inclusive.
-  private verifyNumArgs(args: Array<number>, expectedNum: number,
+  private verifyNumArgs(args: Array<number|string>, expectedNum: number,
       expectedMax: number = expectedNum): void {
     if (expectedMax === undefined) {
       expectedMax = expectedNum;
@@ -139,7 +139,7 @@ export class ExpressionSyntaxTreeService {
   }
 
   public applyFunctionToParseTree(parsed: string, envs: Array<object>,
-      func: (parsed: string, envs: Array<any>) => string) {
+      func: (parsed: string, envs: Array<object>) => string) {
     return func(parsed, envs.concat(this.system));
   }
 
@@ -178,6 +178,8 @@ export class ExpressionSyntaxTreeService {
   // Coerces all values in the given argument array to Number, and throws
   // an error if the result is NaN.
   private _coerceAllArgsToNumber(args: Array<any>): Array<number> {
+    // NOTE TO DEVELOPERS: Setting Array<number|string> and expecting
+    //  to return Array<number> wont work since args is already set!
     for (var i = 0; i < args.length; i++) {
       args[i] = this._coerceToNumber(args[i]);
     }
@@ -195,14 +197,14 @@ export class ExpressionSyntaxTreeService {
   //       for getType(): list of types of the evaluated sub-expression
   private system = {
     '+': {
-      eval: (args: Array<any>): number => {
+      eval: (args: Array<number|string>): number => {
         this.verifyNumArgs(args, 1, 2);
         var numericArgs = this._coerceAllArgsToNumber(args);
         return numericArgs.length === 1 ?
           numericArgs[0] :
           numericArgs[0] + numericArgs[1];
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<number|string>): string => {
         this.verifyNumArgs(args, 1, 2);
         this._verifyArgTypesMatchExpectedType(args,
           AppConstants.PARAMETER_TYPES.REAL);
@@ -210,13 +212,13 @@ export class ExpressionSyntaxTreeService {
       }
     },
     '-': {
-      eval: (args: Array<any>): number => {
+      eval: (args: Array<number|string>): number => {
         this.verifyNumArgs(args, 1, 2);
         var numericArgs = this._coerceAllArgsToNumber(args);
         return numericArgs.length === 1 ? -numericArgs[0] :
         numericArgs[0] - numericArgs[1];
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<number|string>): string => {
         this.verifyNumArgs(args, 1, 2);
         this._verifyArgTypesMatchExpectedType(args,
           AppConstants.PARAMETER_TYPES.REAL);
@@ -224,12 +226,12 @@ export class ExpressionSyntaxTreeService {
       }
     },
     '*': {
-      eval: (args: Array<any>): number => {
+      eval: (args: Array<number|string>): number => {
         this.verifyNumArgs(args, 2);
         var numericArgs = this._coerceAllArgsToNumber(args);
         return numericArgs[0] * numericArgs[1];
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<number|string>): string => {
         this.verifyNumArgs(args, 2);
         this._verifyArgTypesMatchExpectedType(args,
           AppConstants.PARAMETER_TYPES.REAL);
@@ -237,12 +239,12 @@ export class ExpressionSyntaxTreeService {
       }
     },
     '/': {
-      eval: (args: Array<any>): number => {
+      eval: (args: Array<number|string>): number => {
         this.verifyNumArgs(args, 2);
         var numericArgs = this._coerceAllArgsToNumber(args);
         return numericArgs[0] / numericArgs[1];
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<number|string>): string => {
         this.verifyNumArgs(args, 2);
         this._verifyArgTypesMatchExpectedType(args,
           AppConstants.PARAMETER_TYPES.REAL);
@@ -250,12 +252,12 @@ export class ExpressionSyntaxTreeService {
       }
     },
     '%': {
-      eval: (args: Array<any>): number => {
+      eval: (args: Array<number|string>): number => {
         this.verifyNumArgs(args, 2);
         var numericArgs = this._coerceAllArgsToNumber(args);
         return numericArgs[0] % numericArgs[1];
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<number|string>): string => {
         this.verifyNumArgs(args, 2);
         this._verifyArgTypesMatchExpectedType(args,
           AppConstants.PARAMETER_TYPES.REAL);
@@ -263,12 +265,12 @@ export class ExpressionSyntaxTreeService {
       }
     },
     '<=': {
-      eval: (args: Array<any>): boolean => {
+      eval: (args: Array<number|string>): boolean => {
         this.verifyNumArgs(args, 2);
         var numericArgs = this._coerceAllArgsToNumber(args);
         return numericArgs[0] <= numericArgs[1];
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<number|string>): string => {
         this.verifyNumArgs(args, 2);
         this._verifyArgTypesMatchExpectedType(args,
           AppConstants.PARAMETER_TYPES.REAL);
@@ -276,12 +278,12 @@ export class ExpressionSyntaxTreeService {
       }
     },
     '>=': {
-      eval: (args: Array<any>): boolean => {
+      eval: (args: Array<number|string>): boolean => {
         this.verifyNumArgs(args, 2);
         var numericArgs = this._coerceAllArgsToNumber(args);
         return numericArgs[0] >= numericArgs[1];
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<number|string>): string => {
         this.verifyNumArgs(args, 2);
         this._verifyArgTypesMatchExpectedType(args,
           AppConstants.PARAMETER_TYPES.REAL);
@@ -289,12 +291,12 @@ export class ExpressionSyntaxTreeService {
       }
     },
     '<': {
-      eval: (args: Array<any>): boolean => {
+      eval: (args: Array<number|string>): boolean => {
         this.verifyNumArgs(args, 2);
         var numericArgs = this._coerceAllArgsToNumber(args);
         return numericArgs[0] < numericArgs[1];
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<number|string>): string => {
         this.verifyNumArgs(args, 2);
         this._verifyArgTypesMatchExpectedType(args,
           AppConstants.PARAMETER_TYPES.REAL);
@@ -302,12 +304,12 @@ export class ExpressionSyntaxTreeService {
       }
     },
     '>': {
-      eval: (args: Array<any>): boolean => {
+      eval: (args: Array<number|string>): boolean => {
         this.verifyNumArgs(args, 2);
         var numericArgs = this._coerceAllArgsToNumber(args);
         return numericArgs[0] > numericArgs[1];
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<number|string>): string => {
         this.verifyNumArgs(args, 2);
         this._verifyArgTypesMatchExpectedType(args,
           AppConstants.PARAMETER_TYPES.REAL);
@@ -315,11 +317,11 @@ export class ExpressionSyntaxTreeService {
       }
     },
     '!': {
-      eval: (args: Array<any>): boolean => {
+      eval: (args: Array<string>): boolean => {
         this.verifyNumArgs(args, 1);
         return !args[0];
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<string>): string => {
         this.verifyNumArgs(args, 1);
         this._verifyArgTypesMatchExpectedType(args,
           AppConstants.PARAMETER_TYPES.UNICODE_STRING);
@@ -327,32 +329,31 @@ export class ExpressionSyntaxTreeService {
       }
     },
     '==': {
-      eval: (args: Array<any>): boolean => {
+      eval: (args: Array<number|string>): boolean => {
         this.verifyNumArgs(args, 2);
         return args[0] === args[1];
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<string>): string => {
         this.verifyNumArgs(args, 2);
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
     '!=': {
-      eval: (args: Array<any>): boolean => {
+      eval: (args: Array<number|string>): boolean => {
         this.verifyNumArgs(args, 2);
         return args[0] !== args[1];
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<string>): string => {
         this.verifyNumArgs(args, 2);
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
     '&&': {
-      eval: (args: Array<any>): boolean => {
-        // TODO(kashida): Make this short-circuit.
+      eval: (args: Array<number|string>): boolean => {
         this.verifyNumArgs(args, 2);
         return Boolean(args[0] && args[1]);
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<string>): string => {
         this.verifyNumArgs(args, 2);
         this._verifyArgTypesMatchExpectedType(args,
           AppConstants.PARAMETER_TYPES.UNICODE_STRING);
@@ -360,12 +361,11 @@ export class ExpressionSyntaxTreeService {
       }
     },
     '||': {
-      eval: (args: Array<any>): boolean => {
-        // TODO(kashida): Make this short-circuit.
+      eval: (args: Array<string>): boolean => {
         this.verifyNumArgs(args, 2);
         return Boolean(args[0] || args[1]);
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<string>): string => {
         this.verifyNumArgs(args, 2);
         this._verifyArgTypesMatchExpectedType(args,
           AppConstants.PARAMETER_TYPES.UNICODE_STRING);
@@ -376,12 +376,11 @@ export class ExpressionSyntaxTreeService {
     // minification (when running the deployment scripts).
     /* eslint-disable quote-props */
     if: {
-      eval: (args: Array<any>): string => {
-        // TODO(kashida): Make this short-circuit.
+      eval: (args: Array<string>): string => {
         this.verifyNumArgs(args, 3);
         return args[0] ? args[1] : args[2];
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<string>): string => {
         this.verifyNumArgs(args, 3);
         this._verifyArgTypesMatchExpectedType([args[0]],
           AppConstants.PARAMETER_TYPES.UNICODE_STRING);
@@ -390,12 +389,12 @@ export class ExpressionSyntaxTreeService {
       }
     },
     floor: {
-      eval: (args: Array<any>): number => {
+      eval: (args: Array<number|string>): number => {
         this.verifyNumArgs(args, 1);
         var numericArgs = this._coerceAllArgsToNumber(args);
         return Math.floor(numericArgs[0]);
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<number|string>): string => {
         this.verifyNumArgs(args, 1);
         this._verifyArgTypesMatchExpectedType(args,
           AppConstants.PARAMETER_TYPES.REAL);
@@ -403,12 +402,15 @@ export class ExpressionSyntaxTreeService {
       }
     },
     pow: {
-      eval: (args: Array<any>): number => {
+      eval: (args: Array<number|string>): number => {
         this.verifyNumArgs(args, 2);
         var numericArgs = this._coerceAllArgsToNumber(args);
-        return Math.pow(args[0], args[1]);
+        // NOTE TO DEVELOPERS: we need to coerce args items with
+        //  + operator in the beginning so we don't get the type
+        //  issue on args.
+        return Math.pow(+args[0], +args[1]);
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<number|string>): string => {
         this.verifyNumArgs(args, 2);
         this._verifyArgTypesMatchExpectedType(args,
           AppConstants.PARAMETER_TYPES.REAL);
@@ -416,7 +418,7 @@ export class ExpressionSyntaxTreeService {
       }
     },
     log: {
-      eval: (args: Array<any>): number => {
+      eval: (args: Array<number|string>): number => {
         this.verifyNumArgs(args, 2);
         var numericArgs = this._coerceAllArgsToNumber(args);
         var preciseAns = Math.log(numericArgs[0]) / Math.log(numericArgs[1]);
@@ -424,7 +426,7 @@ export class ExpressionSyntaxTreeService {
         // issues like log(9, 3) = 2.0000000000004.
         return Math.round(preciseAns * Math.pow(10, 9)) / Math.pow(10, 9);
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<number|string>): string => {
         this.verifyNumArgs(args, 2);
         this._verifyArgTypesMatchExpectedType(args,
           AppConstants.PARAMETER_TYPES.REAL);
@@ -432,12 +434,12 @@ export class ExpressionSyntaxTreeService {
       }
     },
     abs: {
-      eval: (args: Array<any>): number => {
+      eval: (args: Array<number|string>): number => {
         this.verifyNumArgs(args, 1);
         var numericArgs = this._coerceAllArgsToNumber(args);
         return Math.abs(numericArgs[0]);
       },
-      getType: (args: Array<any>): string => {
+      getType: (args: Array<number|string>): string => {
         this.verifyNumArgs(args, 1);
         this._verifyArgTypesMatchExpectedType(args,
           AppConstants.PARAMETER_TYPES.REAL);
