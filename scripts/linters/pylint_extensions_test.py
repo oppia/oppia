@@ -2120,6 +2120,28 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
+    def test_file_with_no_file_overview(self):
+        node_file_with_no_file_overview = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    import something
+                    import random
+                """)
+        node_file_with_no_file_overview.file = filename
+        node_file_with_no_file_overview.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_file_with_no_file_overview)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
     def test_file_overview_at_end_of_file(self):
         node_file_overview_at_end_of_file = astroid.scoped_nodes.Module(
             name='test',
