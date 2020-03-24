@@ -99,8 +99,7 @@ export class EditableSkillBackendApiService {
     };
 
     this.http.put(
-      editableSkillDataUrl, putData
-    ).toPromise().then(
+      editableSkillDataUrl, putData).toPromise().then(
       (data: editableSkillResponseConfig) => successCallback(data.skill),
       error => {
         if (errorCallback) {
@@ -118,8 +117,9 @@ export class EditableSkillBackendApiService {
       SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
         skill_id: skillId
       });
-    this.http['delete'](skillDataUrl, { observe: 'response' }).toPromise().then(
-      (res) => successCallback(res.status),
+    // eslint-disable-next-line dot-notation
+    this.http.delete(skillDataUrl, { observe: 'response' }).toPromise().then(
+      (response) => successCallback(response.status),
       (error) => {
         if (errorCallback) {
           errorCallback(error.error);
@@ -145,9 +145,8 @@ export class EditableSkillBackendApiService {
       changeList: [any]
   ): Promise<Object> {
     return new Promise((resolve, reject) => {
-      this._updateSkill(
-        skillId, skillVersion, commitMessage, changeList, resolve, reject
-      );
+      this._updateSkill(skillId, skillVersion, commitMessage,
+        changeList, resolve, reject);
     });
   }
 
