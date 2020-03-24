@@ -2068,6 +2068,130 @@ class UserContributionScoringModel(base_models.BaseModel):
             model.put()
 
 
+class UserCommunityRightsModel(base_models.BaseModel):
+    """Model for storing user's rights on community dashboard.
+
+    Instances of this class are keyed by the user id.
+    """
+    can_review_translation_for_language_codes = ndb.StringProperty(
+        repeated=True, indexed=True)
+    can_review_voiceover_for_language_codes = ndb.StringProperty(
+        repeated=True, indexed=True)
+    can_review_questions = ndb.BooleanProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """The model can be deleted since it only contains information relevant
+        to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserCommunityRightsModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserCommunityRightsModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of UserCommunityRightsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
+
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Exports the data from UserCommunityRightsModel
+        into dict format.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from UserCommunityRightsModel.
+        """
+        rights_model = cls.get_by_id(user_id)
+
+        if rights_model is None:
+            return {}
+
+        return {
+            'can_review_translation_for_language_codes': (
+                rights_model.can_review_translation_for_language_codes),
+            'can_review_voiceover_for_language_codes': (
+                rights_model.can_review_voiceover_for_language_codes),
+            'can_review_questions': rights_model.can_review_questions
+        }
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
+    @classmethod
+    def get_translation_reviewer_user_ids(cls, language_code):
+        """Returns the IDs of the users who have rights to review translations
+        in the given language code.
+
+        Args:
+            language_code: str. The code of the language.
+
+        Returns:
+            list(str). A list of IDs of users who have rights to review
+            translations in the given language code.
+        """
+        reviewer_keys = (
+            cls.query(
+                cls.can_review_translation_for_language_codes == language_code)
+            .fetch(keys_only=True))
+        return [reviewer_key.id() for reviewer_key in reviewer_keys]
+
+    @classmethod
+    def get_voiceover_reviewer_user_ids(cls, language_code):
+        """Returns the IDs of the users who have rights to review voiceovers in
+        the given language code.
+
+        Args:
+            language_code: str. The code of the language.
+
+        Returns:
+            list(str). A list of IDs of users who have rights to review
+            voiceovers in the given language code.
+        """
+        reviewer_keys = (
+            cls.query(
+                cls.can_review_voiceover_for_language_codes == language_code)
+            .fetch(keys_only=True))
+        return [reviewer_key.id() for reviewer_key in reviewer_keys]
+
+    @classmethod
+    def get_question_reviewer_user_ids(cls):
+        """Returns the IDs of the users who have rights to review questions.
+
+        Returns:
+            list(str). A list of IDs of users who have rights to review
+            questions.
+        """
+        reviewer_keys = cls.query(cls.can_review_questions == True).fetch( # pylint: disable=singleton-comparison
+            keys_only=True)
+        return [reviewer_key.id() for reviewer_key in reviewer_keys]
+
+
 class PendingDeletionRequestModel(base_models.BaseModel):
     """Model for storing pending deletion requests.
 

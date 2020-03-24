@@ -1492,7 +1492,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
                 self.author_id, None, 'en', 'audio_file.mp3', '<p>Content</p>',
                 None))
 
-    def test_validation_with_invalid_target_type_rasie_exception(self):
+    def test_validation_with_invalid_target_type_raise_exception(self):
         self.voiceover_application.validate()
 
         self.voiceover_application.target_type = 'invalid_target'
@@ -1501,7 +1501,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
             'received invalid_target'):
             self.voiceover_application.validate()
 
-    def test_validation_with_invalid_target_id_rasie_exception(self):
+    def test_validation_with_invalid_target_id_raise_exception(self):
         self.voiceover_application.validate()
 
         self.voiceover_application.target_id = 123
@@ -1509,7 +1509,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
             Exception, 'Expected target_id to be a string'):
             self.voiceover_application.validate()
 
-    def test_validation_with_invalid_status_rasie_exception(self):
+    def test_validation_with_invalid_status_raise_exception(self):
         self.voiceover_application.validate()
 
         self.voiceover_application.status = 'invalid_status'
@@ -1518,7 +1518,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
             'received invalid_status'):
             self.voiceover_application.validate()
 
-    def test_validation_with_invalid_author_id_rasie_exception(self):
+    def test_validation_with_invalid_author_id_raise_exception(self):
         self.voiceover_application.validate()
 
         self.voiceover_application.author_id = 123
@@ -1526,7 +1526,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
             Exception, 'Expected author_id to be a string'):
             self.voiceover_application.validate()
 
-    def test_validation_with_invalid_final_reviewer_id_rasie_exception(self):
+    def test_validation_with_invalid_final_reviewer_id_raise_exception(self):
         self.assertEqual(
             self.voiceover_application.status,
             suggestion_models.STATUS_IN_REVIEW)

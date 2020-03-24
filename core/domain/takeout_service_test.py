@@ -345,6 +345,12 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             content='<p>Some content</p>',
             rejection_message=None).put()
 
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True).put()
+
         user_models.UserContributionScoringModel(
             id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_ID_1),
             user_id=self.USER_ID_1,
@@ -442,6 +448,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
         expected_voiceover_application_data = {}
         expected_contrib_score_data = {}
+        expected_community_rights_data = {}
 
         expected_export = {
             'user_stats_data': stats_data,
@@ -467,7 +474,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_feedback_email_reply_to_id_data': reply_to_data,
             'general_voiceover_application_data':
                 expected_voiceover_application_data,
-            'user_contribution_scoring_data': expected_contrib_score_data
+            'user_contribution_scoring_data': expected_contrib_score_data,
+            'user_community_rights_data': expected_community_rights_data
         }
 
         # Perform export and compare.
@@ -693,6 +701,12 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             }
         }
 
+        expected_community_rights_data = {
+            'can_review_translation_for_language_codes': ['hi', 'en'],
+            'can_review_voiceover_for_language_codes': ['hi'],
+            'can_review_questions': True
+        }
+
         expected_contrib_score_data = {
             self.SCORE_CATEGORY_1: {
                 'has_email_been_sent': False,
@@ -731,7 +745,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_feedback_email_reply_to_id_data': expected_reply_to_data,
             'general_voiceover_application_data':
                 expected_voiceover_application_data,
-            'user_contribution_scoring_data': expected_contrib_score_data
+            'user_contribution_scoring_data': expected_contrib_score_data,
+            'user_community_rights_data': expected_community_rights_data
         }
 
         exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
