@@ -377,8 +377,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
                     $scope.save = function() {
                       EditorFirstTimeEventsService
                         .registerFirstSaveInteractionEvent();
-                      $uibModalInstance.close($scope.oldToNewListMappingObject.
-                        oldToNewListMapping);
+                      $uibModalInstance.close(
+                        $scope.oldToNewListMappingObject.oldToNewListMapping);
                     };
 
                     $scope.okay = function() {
