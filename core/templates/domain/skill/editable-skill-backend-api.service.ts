@@ -22,16 +22,11 @@ import { Injectable } from '@angular/core';
 
 import { SkillDomainConstants } from
   'domain/skill/skill-domain.constants';
+import { EditableSkillResponseConfig, UpdateSkillPayload, ChangeList } from
+  'domain/skill/SkillDomain.types';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
 
-// TODO(#7165): Replace any with exact type.
-interface editableSkillResponseConfig {
-    skill?: any;
-    skills?: any;
-    // eslint-disable-next-line camelcase
-    grouped_skill_summaries?: any;
-}
 @Injectable({
   providedIn: 'root'
 })
@@ -51,7 +46,7 @@ export class EditableSkillBackendApiService {
       }
     );
     this.http.get(skillDataUrl).toPromise().then(
-      (data: editableSkillResponseConfig) => successCallback({
+      (data: EditableSkillResponseConfig) => successCallback({
         skill: data.skill,
         groupedSkillSummaries: data.grouped_skill_summaries
       }),
@@ -73,7 +68,7 @@ export class EditableSkillBackendApiService {
       }
     );
     this.http.get(skillDataUrl).toPromise().then(
-      (data: editableSkillResponseConfig) => successCallback(data.skills),
+      (data: EditableSkillResponseConfig) => successCallback(data.skills),
       error => {
         if (errorCallback) {
           errorCallback(error.error);
@@ -83,7 +78,7 @@ export class EditableSkillBackendApiService {
   }
   private _updateSkill(
       skillId: string, skillVersion: number, commitMessage: string,
-      changeList: [any],
+      changeList: Array<ChangeList>,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
     const editableSkillDataUrl = this.urlInterpolationService.interpolateUrl(
@@ -92,7 +87,7 @@ export class EditableSkillBackendApiService {
       }
     );
 
-    const putData = {
+    const putData: UpdateSkillPayload = {
       version: skillVersion,
       commit_message: commitMessage,
       change_dicts: changeList
@@ -100,7 +95,7 @@ export class EditableSkillBackendApiService {
 
     this.http.put(
       editableSkillDataUrl, putData).toPromise().then(
-      (data: editableSkillResponseConfig) => successCallback(data.skill),
+      (data: EditableSkillResponseConfig) => successCallback(data.skill),
       error => {
         if (errorCallback) {
           errorCallback(error.error);
@@ -142,7 +137,7 @@ export class EditableSkillBackendApiService {
 
   updateSkill(
       skillId: string, skillVersion: number, commitMessage: string,
-      changeList: [any]
+      changeList: Array<ChangeList>
   ): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._updateSkill(skillId, skillVersion, commitMessage,
