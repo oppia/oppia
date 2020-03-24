@@ -61,7 +61,7 @@ NPM_CMD = os.path.join(
     OPPIA_PARENT_DIR, 'oppia_tools', 'node-10.18.0', 'bin', 'npm')
 YARN_CMD = os.path.join(
     OPPIA_PARENT_DIR, 'oppia_tools', 'yarn-v1.22.0', 'bin', 'yarn')
-FRONTEND_TEST_SCRIPT = 'run_frontend_tests'
+FRONTEND_TEST_SCRIPT = 'run_frontend_tests --check_coverage'
 TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT = 'check_e2e_tests_are_captured_in_ci'
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
@@ -274,9 +274,16 @@ def start_linter(files):
 
 def start_python_script(scriptname):
     """Runs the 'start.py' script and returns the returncode of the task."""
+    script_commands_list = scriptname.split(' ')
     cmd = [
         'python', '-m',
-        os.path.join('scripts', scriptname).replace('/', '.')]
+        os.path.join('scripts', script_commands_list[0]).replace('/', '.')]
+
+    script_commands_list.pop(0)
+    if len(script_commands_list):
+        for flag in script_commands_list:
+            cmd.append(flag)
+
     task = subprocess.Popen(cmd)
     task.communicate()
     task.wait()
