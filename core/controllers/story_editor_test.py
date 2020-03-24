@@ -131,7 +131,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
 class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
 
-    def test_validation_issues(self):
+    def test_validation_error_messages(self):
         # Check that admins can publish a story.
         self.login(self.ADMIN_EMAIL)
         self.save_new_valid_exploration(
@@ -141,15 +141,15 @@ class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
             '%s/%s/15,0' % (
                 feconf.VALIDATE_STORY_EXPLOATIONS_URL_PREFIX, self.story_id))
 
-        issues = json_response['validation_issues']
-        issue_1 = (
+        error_messages = json_response['validation_error_messages']
+        message_1 = (
             'Expected story to only reference valid explorations, but found '
             'an exploration with ID: 15 (was it deleted?)')
-        issue_2 = (
+        message_2 = (
             'Exploration with ID 0 is not public. Please publish '
             'explorations before adding them to a story.'
         )
-        self.assertEqual(issues, [issue_1, issue_2])
+        self.assertEqual(error_messages, [message_1, message_2])
         self.logout()
 
 

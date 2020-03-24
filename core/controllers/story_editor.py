@@ -147,10 +147,14 @@ class ValidateExplorationsHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_story
     def get(self, _, exp_ids):
-        """Validation issues for explorations in the story."""
+        """Handler that receives a list of exploration IDs, checks whether the
+        corresponding explorations are supported on mobile and returns the
+        validation error messages (if any).
+        """
         exp_ids = exp_ids.split(',')
-        validation_issues = story_services.validate_explorations(exp_ids, False)
+        validation_error_messages = (
+            story_services.validate_explorations(exp_ids, False))
         self.values.update({
-            'validation_issues': validation_issues
+            'validation_error_messages': validation_error_messages
         })
         self.render_json(self.values)

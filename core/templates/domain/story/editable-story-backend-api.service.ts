@@ -110,7 +110,7 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
 
       $http.get(validateExplorationsUrl).then(function(response) {
         if (successCallback) {
-          successCallback(response.data.validation_issues);
+          successCallback(response.data.validation_error_messages);
         }
       }, function(errorResponse) {
         if (errorCallback) {

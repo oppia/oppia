@@ -740,20 +740,20 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
-    def test_validate_exploration_returning_issues(self):
+    def test_validate_exploration_returning_error_messages(self):
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1')
-        validation_issues = (
+        validation_error_messages = (
             story_services.validate_explorations(
                 ['invalid_exp', 'exp_id_1'], False))
-        issue_1 = (
+        message_1 = (
             'Expected story to only reference valid explorations, but '
             'found an exploration with ID: invalid_exp (was it deleted?)')
-        issue_2 = (
+        message_2 = (
             'Exploration with ID exp_id_1 is not public. Please publish '
             'explorations before adding them to a story.'
         )
-        self.assertEqual(validation_issues, [issue_1, issue_2])
+        self.assertEqual(validation_error_messages, [message_1, message_2])
 
     def test_cannot_update_story_with_private_exploration_id(self):
         self.save_new_valid_exploration(

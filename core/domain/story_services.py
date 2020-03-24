@@ -191,19 +191,33 @@ def apply_change_list(story_id, change_list):
 
 def validate_explorations(exp_ids, raise_error):
     """Validates the explorations in the given story and checks whether they
-    are compatible on the mobile app.
+    are compatible with the mobile app.
 
     Args:
         exp_ids: list(str). The exp IDs to validate.
-        raise_error: bool. Whether to raise an error when an issue is
-            encountered or not. If not, a list of the issues are returned.
-            raise_error should be True when this is called before saving the
-            story and False when this function is called fromn the frontend.
+        raise_error: bool. Whether to raise an Exception when a validation error
+            is encountered. If not, a list of the error messages are
+            returned. raise_error should be True when this is called before
+            saving the story and False when this function is called from the
+            frontend.
 
     Returns:
-        list(str). The various validation issues (if raise_error is True).
+        list(str). The various validation error messages
+            (if raise_error is True).
+
+    Raises:
+        ValidationError. Expected story to only reference valid explorations.
+        ValidationError. Exploration with ID is not public. Please publish
+            explorations before adding them to a story.
+        ValidationError. All explorations in a story should be of the same
+            category.
+        ValidationError. Invalid language found for exploration.
+        ValidationError. Expected no exploration to have parameter values in it.
+        ValidationError. Invalid interaction in exploration.
+        ValidationError. RTE content in state of exploration with ID is not
+            supported on mobile.
     """
-    validation_issues = []
+    validation_error_messages = []
 
     # The first exp ID in the story to compare categories later on.
     sample_exp_id = exp_ids[0] if exp_ids else None
@@ -218,7 +232,7 @@ def validate_explorations(exp_ids, raise_error):
     exp_rights_dict = {}
 
     for rights in exp_rights:
-        if rights:
+        if rights is not None:
             exp_rights_dict[rights.id] = rights.status
 
     for exp_id in exp_ids:
@@ -229,7 +243,7 @@ def validate_explorations(exp_ids, raise_error):
                 % exp_id)
             if raise_error:
                 raise utils.ValidationError(error_string)
-            validation_issues.append(error_string)
+            validation_error_messages.append(error_string)
         else:
             if (
                     exp_rights_dict[exp_id] !=
@@ -240,7 +254,7 @@ def validate_explorations(exp_ids, raise_error):
                     % exp_id)
                 if raise_error:
                     raise utils.ValidationError(error_string)
-                validation_issues.append(error_string)
+                validation_error_messages.append(error_string)
 
     if exps_dict and sample_exp_id in exps_dict:
         common_exp_category = exps_dict[sample_exp_id].category
@@ -253,7 +267,7 @@ def validate_explorations(exp_ids, raise_error):
                     ' different categories.' % (sample_exp_id, exp_id))
                 if raise_error:
                     raise utils.ValidationError(error_string)
-                validation_issues.append(error_string)
+                validation_error_messages.append(error_string)
             if (
                     exp.language_code not in
                     android_validation_constants.SUPPORTED_LANGUAGES):
@@ -262,7 +276,7 @@ def validate_explorations(exp_ids, raise_error):
                     'with ID %s.' % (exp.language_code, exp_id))
                 if raise_error:
                     raise utils.ValidationError(error_string)
-                validation_issues.append(error_string)
+                validation_error_messages.append(error_string)
 
             if exp.param_specs or exp.param_changes:
                 error_string = (
@@ -270,7 +284,7 @@ def validate_explorations(exp_ids, raise_error):
                     'values in it. Invalid exploration: %s' % exp.id)
                 if raise_error:
                     raise utils.ValidationError(error_string)
-                validation_issues.append(error_string)
+                validation_error_messages.append(error_string)
 
             for state_name in exp.states:
                 state = exp.states[state_name]
@@ -280,7 +294,7 @@ def validate_explorations(exp_ids, raise_error):
                         'with ID: %s.' % (state.interaction.id, exp.id))
                     if raise_error:
                         raise utils.ValidationError(error_string)
-                    validation_issues.append(error_string)
+                    validation_error_messages.append(error_string)
 
                 if not state.is_rte_content_supported_on_android():
                     error_string = (
@@ -289,9 +303,9 @@ def validate_explorations(exp_ids, raise_error):
                         % (state_name, exp.id))
                     if raise_error:
                         raise utils.ValidationError(error_string)
-                    validation_issues.append(error_string)
+                    validation_error_messages.append(error_string)
 
-    return validation_issues
+    return validation_error_messages
 
 
 def _save_story(committer_id, story, commit_message, change_list):
