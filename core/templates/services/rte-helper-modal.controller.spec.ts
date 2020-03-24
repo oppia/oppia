@@ -73,7 +73,7 @@ describe('Rte Helper Modal Controller', function() {
     });
   });
 
-  describe('when customization args hasn\'t a valid youtube video',
+  describe('when customization args doesn\'t have a valid youtube video',
     function() {
       var customizationArgSpecs = [{
         name: 'heading',
