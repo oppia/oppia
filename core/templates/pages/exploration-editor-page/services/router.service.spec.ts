@@ -24,6 +24,7 @@ describe('Router Service', function() {
   var ExplorationStatesService = null;
   var ExplorationFeaturesService = null;
   var ExplorationInitStateNameService = null;
+  var LoggerService = null;
   var $rootScope = null;
   var $location = null;
   var $timeout = null, $interval = null;
@@ -41,6 +42,7 @@ describe('Router Service', function() {
     ExplorationFeaturesService = $injector.get('ExplorationFeaturesService');
     ExplorationInitStateNameService = $injector.get(
       'ExplorationInitStateNameService');
+    LoggerService = $injector.get('LoggerService');
     $rootScope = $injector.get('$rootScope');
     $location = $injector.get('$location');
     $timeout = $injector.get('$timeout');
@@ -154,7 +156,6 @@ describe('Router Service', function() {
 
       expect(RouterService.getActiveTabName()).toBe('main');
       RouterService.navigateToMainTab('newState');
-      $timeout.flush();
       // To $watch the first $location.path call.
       $rootScope.$apply();
 
@@ -194,7 +195,6 @@ describe('Router Service', function() {
 
     expect(RouterService.getActiveTabName()).toBe('main');
     RouterService.navigateToMainTab('newState');
-    $timeout.flush();
     // To $watch the first $location.path call.
     $rootScope.$apply();
 
@@ -245,7 +245,6 @@ describe('Router Service', function() {
 
       // Now go to main tab.
       RouterService.navigateToMainTab('newState');
-      $timeout.flush();
       $rootScope.$apply();
       $rootScope.$apply();
 
@@ -264,7 +263,6 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToTranslationTab();
-    $timeout.flush();
     $rootScope.$apply();
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
@@ -282,7 +280,6 @@ describe('Router Service', function() {
 
     expect(RouterService.getActiveTabName()).toBe('main');
     RouterService.navigateToPreviewTab();
-    $timeout.flush();
     $timeout.flush(200);
     $rootScope.$apply();
 
@@ -305,7 +302,6 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToStatsTab();
-    $timeout.flush();
     $rootScope.$apply();
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
@@ -322,7 +318,6 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToImprovementsTab();
-    $timeout.flush();
     $rootScope.$apply();
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
@@ -342,7 +337,6 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToSettingsTab();
-    $timeout.flush();
     $rootScope.$apply();
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
@@ -357,7 +351,6 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToHistoryTab();
-    $timeout.flush();
     $rootScope.$apply();
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
@@ -376,7 +369,6 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToFeedbackTab();
-    $timeout.flush();
     $rootScope.$apply();
 
     // $watch is called
@@ -400,7 +392,6 @@ describe('Router Service', function() {
     locationPathSpy.and.returnValue('/invalid');
 
     RouterService.navigateToMainTab(null);
-    $timeout.flush();
     $rootScope.$apply();
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
 
@@ -420,7 +411,14 @@ describe('Router Service', function() {
   it('should save pending changes', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
     RouterService.savePendingChanges();
-    $timeout.flush();
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
+  });
+
+  it('should save pending changes when function throws an error', function() {
+    spyOn(LoggerService, 'log').and.throwError(
+      'Cannot read property $$nextSibling of null');
+    var applySpy = spyOn($rootScope, '$apply').and.callThrough();
+    RouterService.savePendingChanges();
+    expect(applySpy).toHaveBeenCalled();
   });
 });
