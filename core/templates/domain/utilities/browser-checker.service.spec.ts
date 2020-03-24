@@ -53,7 +53,7 @@ describe('Browser Checker Service', function() {
 
   it('should support speech synthesis when device is desktop', () => {
     spyOnProperty(wrs.nativeWindow, 'speechSynthesis').and.returnValue({
-      getVoices: () => [{ lang: 'en-GB' }]
+      getVoices: () => [{ lang: 'en-US' }]
     });
     expect(bcs.supportsSpeechSynthesis()).toBe(true);
   });

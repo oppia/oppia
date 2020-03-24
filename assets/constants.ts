@@ -453,7 +453,7 @@ export = {
     "id": "en-auto",
     "description": "English (auto)",
     "explorationLanguage": "en",
-    "speechSynthesisCode": "en-GB",
+    "speechSynthesisCode": "en-US",
     "speechSynthesisCodeMobile": "en_US"
   }],
 
