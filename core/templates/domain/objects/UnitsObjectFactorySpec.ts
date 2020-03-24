@@ -33,53 +33,55 @@ describe('UnitsObjectFactory', () => {
     it('should test the CURRENCY_UNITS if the base unit is not null', () => {
       ObjectsDomainConstants.CURRENCY_UNITS.dollar.base_unit = '100 cent';
       expect(units.fromRawInputString('dollar').toDict()).toEqual(
-        new Units([{exponent: 1, unit: 'dollar'}]).toDict());
+        new Units([{ exponent: 1, unit: 'dollar' }]).toDict());
     });
 
     it('should test the CURRENCY_UNITS if the base unit is null', () => {
       ObjectsDomainConstants.CURRENCY_UNITS.dollar.base_unit = null;
       expect(units.fromRawInputString('dollar').toDict()).toEqual(
-        new Units([{exponent: 1, unit: 'dollar'}]).toDict());
+        new Units([{ exponent: 1, unit: 'dollar' }]).toDict());
     });
 
     it('should convert unitsList to a string in units format', () => {
-      expect(new Units([{exponent: -1, unit: 'cents'}]).toString()).toBe('cents^-1');
-      expect(new Units([{exponent: 1, unit: 'mol'}]).toString()).toBe('mol');
-      expect(new Units([{exponent: 2, unit: 'N'}]).toString()).toBe('N^2');
-      expect(new Units([{exponent: 3, unit: 'cm'}, {exponent: -3, unit:'s'}])
+      expect(new Units([{ exponent: -1, unit: 'cents' }]).toString())
+        .toBe('cents^-1');
+      expect(new Units([{ exponent: 1, unit: 'mol' }]).toString()).toBe('mol');
+      expect(new Units([{ exponent: 2, unit: 'N' }]).toString()).toBe('N^2');
+      expect(new Units([{ exponent: 3, unit: 'cm' }, { exponent: -3, unit:'s' }])
         .toString()).toBe('cm^3 s^-3');
       expect(new Units(
-        [{exponent: 1, unit: 'paise'}, {exponent: -1, unit: 'kg'},
-          {exponent: 1, unit: 'N'}, {exponent: 1, unit: 'm'},
-          {exponent: -2, unit: 's'}]).toString()).toBe('paise kg^-1 N m s^-2');
+        [{ exponent: 1, unit: 'paise' }, { exponent: -1, unit: 'kg' },
+          { exponent: 1, unit: 'N' }, { exponent: 1, unit: 'm' },
+          { exponent: -2, unit: 's' }]).toString()).toBe('paise kg^-1 N m s^-2');
     });
 
     it('should convert units to list format', () => {
-      expect(units.fromStringToList('kg / kg^4 K mol / (N m s^2) K s')).toEqual(
-        [{exponent: -3, unit: 'kg'}, {exponent: 2, unit: 'K'},
-        {exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'N'},
-          {exponent: -1, unit: 'm'}, {exponent: -1, unit: 's'}]);  
-      expect(units.fromStringToList('cm /(kg / (N m / s^3))')).toEqual(
-        [{exponent: 1, unit: 'cm'}, {exponent: -1, unit: 'kg'},
-          {exponent: 1, unit: 'N'}, {exponent: 1, unit: 'm'},
-          {exponent: -3, unit: 's'}]);
-      expect(units.fromStringToList('mol per (kg per (N m per s^3) K)')).toEqual(
-        [{exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'kg'},
-          {exponent: 1, unit: 'N'}, {exponent: 1, unit: 'm'},
-          {exponent: -3, unit: 's'}, {exponent: -1, unit: 'K'}]);
-      expect(units.fromStringToList('cents kg (N^7 per paise)')).toEqual(
-        [{exponent: 1, unit: 'cents'}, {exponent: 1, unit: 'kg'},
-          {exponent: 7, unit: 'N'}, {exponent: -1, unit: 'paise'}]);
+      expect(units.fromStringToList('kg / kg^4 K mol / (N m s^2) K s'))
+        .toEqual([{ exponent: -3, unit: 'kg' }, { exponent: 2, unit: 'K' }, 
+          { exponent: 1, unit: 'mol' }, { exponent: -1, unit: 'N' },
+          { exponent: -1, unit: 'm' }, { exponent: -1, unit: 's' }]);  
+      expect(units.fromStringToList('cm /(kg / (N m / s^3))'))
+        .toEqual([{ exponent: 1, unit: 'cm' }, { exponent: -1, unit: 'kg' }, 
+          { exponent: 1, unit: 'N' }, { exponent: 1, unit: 'm' },
+          { exponent: -3, unit: 's' }]);
+      expect(units.fromStringToList('mol per (kg per (N m per s^3) K)'))
+        .toEqual([{ exponent: 1, unit: 'mol' }, { exponent: -1, unit: 'kg' }, 
+          { exponent: 1, unit: 'N' }, { exponent: 1, unit: 'm' },
+          { exponent: -3, unit: 's' }, { exponent: -1, unit: 'K' }]);
+      expect(units.fromStringToList('cents kg (N^7 per paise)'))
+        .toEqual([{ exponent: 1, unit: 'cents' }, { exponent: 1, unit: 'kg' }, 
+          { exponent: 7, unit: 'N' }, { exponent: -1, unit: 'paise' }]);
     });
 
     it('should convert units from string to lexical format', () => {
-      expect(units.stringToLexical('kg per kg^4 K mol per (N m s^2) K s')).toEqual(
-        ['kg', '/', 'kg^4', '*', 'K', '*', 'mol', '/', '(', 'N', 
+      expect(units.stringToLexical('kg per kg^4 K mol per (N m s^2) K s'))
+        .toEqual(['kg', '/', 'kg^4', '*', 'K', '*', 'mol', '/', '(', 'N', 
           '*', 'm', '*','s^2', ')', 'K', '*', 's']);
-      expect(units.stringToLexical('cm /(kg / (N m / s^3))')).toEqual(
-        ['cm', '/', '(', 'kg', '/', '(', 'N', '*', 'm', '/', 's^3', ')',')']);
-      expect(units.stringToLexical('mol per (kg per (N m per s^3) paise)')).toEqual(
-        ['mol', '/', '(', 'kg', '/', '(', 'N', '*', 
+      expect(units.stringToLexical('cm /(kg / (N m / s^3))'))
+        .toEqual(['cm', '/', '(', 'kg', '/', '(', 'N', '*', 'm', '/', 
+          's^3', ')',')']);
+      expect(units.stringToLexical('mol per (kg per (N m per s^3) paise)'))
+        .toEqual(['mol', '/', '(', 'kg', '/', '(', 'N', '*', 
           'm', '/', 's^3', ')', 'paise', ')']);
     });
 
@@ -88,19 +90,19 @@ describe('UnitsObjectFactory', () => {
         .toDict()).toEqual(new Units([]).toDict());
       expect(units.fromRawInputString('kg per kg^4 K mol per (N m s^2) K s')
         .toDict()).toEqual(new Units([
-          {exponent: -3, unit: 'kg'}, {exponent: 2, unit: 'K'},
-          {exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'N'},
-          {exponent: -1, unit: 'm'}, {exponent: -1, unit: 's'}]).toDict());
+          { exponent: -3, unit: 'kg' }, { exponent: 2, unit: 'K' },
+          { exponent: 1, unit: 'mol' }, { exponent: -1, unit: 'N' },
+          { exponent: -1, unit: 'm' }, { exponent: -1, unit: 's' }]).toDict());
       expect(units.fromRawInputString('cm /(kg / (N m / s^3))')
         .toDict()).toEqual(new Units([
-          {exponent: 1, unit: 'cm'}, {exponent: -1, unit: 'kg'},
-          {exponent: 1, unit: 'N'}, {exponent: 1, unit: 'm'},
-          {exponent: -3, unit: 's'}]).toDict());
+          { exponent: 1, unit: 'cm' }, { exponent: -1, unit: 'kg' },
+          { exponent: 1, unit: 'N' }, { exponent: 1, unit: 'm' },
+          { exponent: -3, unit: 's' }]).toDict());
       expect(units.fromRawInputString('cent per (kg per (N m per s^3) paise)')
         .toDict()).toEqual(new Units([
-          {exponent: 1, unit: 'cent'}, {exponent: -1, unit: 'kg'},
-          {exponent: 1, unit: 'N'}, {exponent: 1, unit: 'm'},
-          {exponent: -3, unit: 's'}, {exponent: -1, unit: 'paise'}]).toDict());   
+          { exponent: 1, unit: 'cent' }, { exponent: -1, unit: 'kg' },
+          { exponent: 1, unit: 'N' }, { exponent: 1, unit: 'm' },
+          { exponent: -3, unit: 's' }, { exponent: -1, unit: 'paise' }]).toDict());   
     });
 
     it('should have units without char /, *, (, )', () => {
@@ -110,16 +112,16 @@ describe('UnitsObjectFactory', () => {
     });
 
     it('should convert new units from the list', () => {
-      expect(units.fromList([{exponent: -1, unit: 'kg'}]))
-        .toEqual(new Units([{exponent: -1, unit: 'kg'}]));
-      expect(units.fromList([{exponent: 1, unit: 'mol'}]))
-        .toEqual(new Units([{exponent: 1, unit: 'mol'}]));
-      expect(units.fromList([{exponent: 3, unit: 'cm'}, {exponent: -3, unit:'s'}]))
-        .toEqual(new Units([{exponent: 3, unit: 'cm'}, {exponent: -3, unit:'s'}]));
-      expect(units.fromList([{exponent: 1, unit: 'paise'}, {exponent: -1, unit: 'kg'},
-        {exponent: 1, unit: 'N'}, {exponent: 1, unit: 'm'},{exponent: -2, unit: 's'}]))
+      expect(units.fromList([{ exponent: -1, unit: 'kg' }]))
+        .toEqual(new Units([{ exponent: -1, unit: 'kg' }]));
+      expect(units.fromList([{ exponent: 1, unit: 'mol' }]))
+        .toEqual(new Units([{ exponent: 1, unit: 'mol' }]));
+      expect(units.fromList([{ exponent: 3, unit: 'cm' }, { exponent: -3, unit:'s' }]))
+        .toEqual(new Units([{ exponent: 3, unit: 'cm' }, { exponent: -3, unit:'s' }]));
+      expect(units.fromList([{ exponent: 1, unit: 'paise' }, { exponent: -1, unit: 'kg' },
+        { exponent: 1, unit: 'N' }, { exponent: 1, unit: 'm' },{ exponent: -2, unit: 's' }]))
           .toEqual(new Units([{exponent: 1, unit: 'paise'}, {exponent: -1, unit: 'kg'},
-            {exponent: 1, unit: 'N'}, {exponent: 1, unit: 'm'},{exponent: -2, unit: 's'}]));
+            { exponent: 1, unit: 'N' }, { exponent: 1, unit: 'm' },{ exponent: -2, unit: 's' }]));
     });
 
     it('should have the correct division form with multiplier', () => {
@@ -133,14 +135,14 @@ describe('UnitsObjectFactory', () => {
 
     it('should convert a unit dict to a list', () => {
       expect(units.unitToList(units.unitWithMultiplier(
-        ['cm', '/', '(', 'kg', '/', 'N', ')']))).toEqual([{unit: 'cm', exponent: 1},
-          {unit: 'kg', exponent: -1},{unit: 'N', exponent: 1}]);
+        ['cm', '/', '(', 'kg', '/', 'N', ')']))).toEqual([{ unit: 'cm', exponent: 1 },
+          { unit: 'kg', exponent: -1 },{ unit: 'N', exponent: 1 }]);
       expect(units.unitToList(units.unitWithMultiplier(
-        ['kg', '/', 'kg^4', '*', 'K', '*', 'mol']))).toEqual([{unit: 'kg', exponent: -3}, 
-          {unit: 'K', exponent: 1}, {unit: 'mol', exponent: 1}]);
+        ['kg', '/', 'kg^4', '*', 'K', '*', 'mol']))).toEqual([{ unit: 'kg', exponent: -3 }, 
+          { unit: 'K', exponent: 1 }, { unit: 'mol', exponent: 1 }]);
       expect(units.unitToList(units.unitWithMultiplier(
-        ['cent', '*', '(', 'kg', '/', 'N', ')']))).toEqual([{unit: 'cent', exponent: 1}, 
-          {unit: 'kg', exponent: 1}, {unit: 'N', exponent: -1}]);
+        ['cent', '*', '(', 'kg', '/', 'N', ')']))).toEqual([{ unit: 'cent', exponent: 1 }, 
+          { unit: 'kg', exponent: 1 }, { unit: 'N', exponent: -1 }]);
     });
 
     it('should replace the special symbol because of math.js', () => {
@@ -157,10 +159,12 @@ describe('UnitsObjectFactory', () => {
       }).toThrow(new Error('SyntaxError: Unit "NK" not found.'));
       expect(() => {
         units.fromRawInputString('per &kg$');
-      }).toThrow(new Error('SyntaxError: Unexpected "&" in "dollar/ &kg" at index 8'));
+      }).toThrow(new Error(
+        'SyntaxError: Unexpected "&" in "dollar/ &kg" at index 8'));
       expect(() => {
         units.fromRawInputString('cent %mol$');
-      }).toThrow(new Error('SyntaxError: Unit "dollarcent" not found.'));
+      }).toThrow(new Error(
+        'SyntaxError: Unit "dollarcent" not found.'));
     });
   });
 });
