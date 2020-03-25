@@ -45,14 +45,14 @@ describe('UnitsObjectFactory', () => {
     expect(UOF.fromList([
       { exponent: 3, unit: 'cm' },
       { exponent: -3, unit: 's' }])
-        .toString()).toBe('cm^3 s^-3');
+      .toString()).toBe('cm^3 s^-3');
     expect(UOF.fromList([
       { exponent: 1, unit: 'paise' },
       { exponent: -1, unit: 'kg' },
       { exponent: 1, unit: 'N' },
       { exponent: 1, unit: 'm' },
       { exponent: -2, unit: 's' }])
-        .toString()).toBe('paise kg^-1 N m s^-2');
+      .toString()).toBe('paise kg^-1 N m s^-2');
   });
 
   it('should convert units to list format', () => {
@@ -91,11 +91,11 @@ describe('UnitsObjectFactory', () => {
     expect(units.stringToLexical('kg per kg^4 K mol per (N m s^2) K s'))
       .toEqual([
         'kg', '/', 'kg^4', '*', 'K', '*', 'mol', '/', '(',
-        'N','*', 'm', '*', 's^2', ')', 'K', '*', 's']);
+        'N', '*', 'm', '*', 's^2', ')', 'K', '*', 's']);
     expect(units.stringToLexical('cm /(kg / (N m / s^3))'))
       .toEqual([
         'cm', '/', '(', 'kg', '/', '(',
-        'N', '*', 'm', '/','s^3', ')', ')']);
+        'N', '*', 'm', '/', 's^3', ')', ')']);
     expect(units.stringToLexical('mol per (kg per (N m per s^3) paise)'))
       .toEqual([
         'mol', '/', '(', 'kg', '/', '(', 'N', '*',
