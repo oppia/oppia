@@ -903,8 +903,10 @@ textarea {
   color: white;
   text-align: center;
 }
-.navbar-light .navbar-nav .nav-link:hover,
 .navbar-light .navbar-nav .nav-link:focus {
+  color: white;
+}
+.navbar-light .navbar-nav .nav-link:hover {
   background-color: white;
   color: #06b9ac;
 }

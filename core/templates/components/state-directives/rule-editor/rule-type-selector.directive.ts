@@ -74,7 +74,7 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
             // Suppress the search box.
             minimumResultsForSearch: -1,
             width: '350px',
-            dropdownParent: $('.rule-parent'),
+            dropdownParent: $(select2Node).parent(),
             templateSelection: function(object) {
               return $filter('truncateAtFirstEllipsis')(object.text);
             }
