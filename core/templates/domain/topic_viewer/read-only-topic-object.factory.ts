@@ -107,7 +107,6 @@ export class ReadOnlyTopic {
 @Injectable({
   providedIn: 'root'
 })
-
 export class ReadOnlyTopicObjectFactory {
   _subtopicObjectFactory: SubtopicObjectFactory;
   _skillSummaryObjectFactory: SkillSummaryObjectFactory;
@@ -119,34 +118,30 @@ export class ReadOnlyTopicObjectFactory {
     this._skillSummaryObjectFactory = skillSummaryObjectFactory;
   }
 
-  getStorySummaryArray(storyDicts: any): Array<StorySummary> {
-    let storySummaryArray: Array<StorySummary> =
-    storyDicts.map((storyDict: any) => {
-      return new StorySummary(storyDict.id, storyDict.title,
-        storyDict.node_count, storyDict.description, true);
-    });
-    return storySummaryArray;
-  }
-
   createFromBackendDict(topicDataDict: any): ReadOnlyTopic {
     let subtopics: Array<Subtopic> =
-    topicDataDict.subtopics.map((subtopic: Subtopic) => {
-      return this._subtopicObjectFactory.create(
-        subtopic, topicDataDict.skill_descriptions);
-    });
+        topicDataDict.subtopics.map((subtopic: Subtopic) => {
+          return this._subtopicObjectFactory.create(
+            subtopic, topicDataDict.skill_descriptions);
+        });
     let uncategorizedSkills: Array<SkillSummary> =
-    topicDataDict.uncategorized_skill_ids.map((skillId: string) => {
-      return this._skillSummaryObjectFactory.create(
-        skillId, topicDataDict.skill_descriptions[skillId]);
-    });
+        topicDataDict.uncategorized_skill_ids.map((skillId: string) => {
+          return this._skillSummaryObjectFactory.create(
+            skillId, topicDataDict.skill_descriptions[skillId]);
+        });
     let degreesOfMastery: IDegreesOfMastery = topicDataDict.degrees_of_mastery;
     let skillDescriptions: ISkillDescriptions =
-      topicDataDict.skill_descriptions;
-    let canonicalStories: Array<StorySummary> = this.getStorySummaryArray(
-      topicDataDict.canonical_story_dicts);
-    let additionalStories: Array<StorySummary> = this.getStorySummaryArray(
-      topicDataDict.additional_story_dicts);
-
+        topicDataDict.skill_descriptions;
+    let canonicalStories: Array<StorySummary> =
+        topicDataDict.canonical_story_dicts.map((storyDict: any) => {
+          return new StorySummary(storyDict.id, storyDict.title,
+            storyDict.node_count, storyDict.description, true);
+        });
+    let additionalStories: Array<StorySummary> =
+        topicDataDict.additional_story_dicts.map((storyDict: any) => {
+          return new StorySummary(storyDict.id, storyDict.title,
+            storyDict.node_count, storyDict.description, true);
+        });
     return new ReadOnlyTopic(
       topicDataDict.topic_name, topicDataDict.topic_id, canonicalStories,
       additionalStories, uncategorizedSkills, subtopics, degreesOfMastery,

@@ -68,14 +68,14 @@ angular.module('oppia').directive('topicViewerPage', [
             TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
               function(readOnlyTopic) {
                 ctrl.topicId = readOnlyTopic.getTopicId();
-                ctrl.canonicalStoriesList =
-                  readOnlyTopic.getCanonicalStorySummaries();
+                ctrl.canonicalStoriesList = (
+                  readOnlyTopic.getCanonicalStorySummaries());
                 ctrl.degreesOfMastery = readOnlyTopic.getDegreesOfMastery();
                 ctrl.subtopics = readOnlyTopic.getSubtopics();
                 ctrl.skillDescriptions = readOnlyTopic.getSkillDescriptions();
                 $rootScope.loadingMessage = '';
-                ctrl.trainTabShouldBeDisplayed =
-                  readOnlyTopic.getTrainTabShouldBeDisplayed();
+                ctrl.trainTabShouldBeDisplayed = (
+                  readOnlyTopic.getTrainTabShouldBeDisplayed());
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
                 $rootScope.$apply();

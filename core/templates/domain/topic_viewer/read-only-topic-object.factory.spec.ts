@@ -23,6 +23,7 @@ import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
 import { SubtopicObjectFactory } from
   'domain/topic/SubtopicObjectFactory';
+
 describe('Topic Data Object Factory', () => {
   let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory = null;
   let _sampleReadOnlyTopic: ReadOnlyTopic = null;
