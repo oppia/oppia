@@ -29,7 +29,7 @@ describe('Topics and Skills Dashboard backend API service', () => {
   let httpTestingController: HttpTestingController = null;
 
   var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
-  var TOPICS_AND_SKILLS_DASHBOARD_DATA_URL =
+  const TOPICS_AND_SKILLS_DASHBOARD_DATA_URL =
     '/topics_and_skills_dashboard/data';
 
   beforeEach(() => {
@@ -39,7 +39,7 @@ describe('Topics and Skills Dashboard backend API service', () => {
     httpTestingController = TestBed.get(HttpTestingController);
     topicsAndSkillsDashboardBackendApiService = TestBed.get(
       TopicsAndSkillsDashboardBackendApiService);
-    var sampleDataResults = {
+    let sampleDataResults = {
       topic_summary_dicts: [{
         id: SAMPLE_TOPIC_ID,
         name: 'Sample Name',
