@@ -30,7 +30,8 @@ import { UrlInterpolationService } from
 
 const constants = require('constants.ts');
 
-type OpportunityType = 'skill' | 'voiceover' | 'translation';
+type ContributionOpportunityCategoryType =
+  'skill' | 'voiceover' | 'translation';
 
 type ContributionOpportunityParams = {
   cursor: string;
@@ -50,7 +51,7 @@ export class ContributionOpportunitiesBackendApiService {
 
   // TODO(#7165): Replace any with exact type.
   private _getOpportunityFromDict(
-      opportunityType: OpportunityType,
+      opportunityType: ContributionOpportunityCategoryType,
       opportunityDict: any
   ): ExplorationOpportunitySummary | SkillOpportunity {
     if (
@@ -69,10 +70,10 @@ export class ContributionOpportunitiesBackendApiService {
 
   // TODO(#7165): Replace any with exact type.
   private _fetchOpportunities(
-      opportunityType: OpportunityType,
+      opportunityType: ContributionOpportunityCategoryType,
       params: ContributionOpportunityParams,
       successCallback: (
-        opportunities?: any, nextCursor?: string, more?: any
+        opportunities?: Array<any>, nextCursor?: string, more?: boolean
         ) => void,
       errorCallback: (reason?: any) => void
   ): void {
@@ -94,8 +95,7 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
-  fetchSkillOpportunities(
-      cursor: string): Promise<Object> {
+  fetchSkillOpportunities(cursor: string): Promise<Object> {
     const params: ContributionOpportunityParams = {
       cursor: cursor
     };
