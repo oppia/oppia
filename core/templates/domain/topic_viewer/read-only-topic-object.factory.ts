@@ -119,11 +119,11 @@ export class ReadOnlyTopicObjectFactory {
   }
 
   createFromBackendDict(topicDataDict: any): ReadOnlyTopic {
-    let subtopics: Array<Subtopic> =
-        topicDataDict.subtopics.map((subtopic: Subtopic) => {
-          return this._subtopicObjectFactory.create(
-            subtopic, topicDataDict.skill_descriptions);
-        });
+    let subtopics: Array<Subtopic> = topicDataDict.subtopics.map(
+      (subtopic: Subtopic) => {
+        return this._subtopicObjectFactory.create(
+          subtopic, topicDataDict.skill_descriptions);
+      });
     let uncategorizedSkills: Array<SkillSummary> =
         topicDataDict.uncategorized_skill_ids.map((skillId: string) => {
           return this._skillSummaryObjectFactory.create(
