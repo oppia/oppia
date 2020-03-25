@@ -21,16 +21,24 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export interface IExplorationDataDict {
-  'param_changes': string[];
-  'states': {
+  'param_changes': IParamChanges[] | [];
+  states: {
     [propsName : string]: {
-      'param_changes': string[]
+      'param_changes': IParamChanges[] | []
     }
   };
 }
 export interface IFeatureDataDict {
   'is_exploration_whitelisted': boolean;
   'is_improvements_tab_enabled': boolean;
+}
+export interface IParamChanges {
+  name: string;
+  'generator_id': string;
+  'customization_args': {
+    'parse_with_jinja': boolean,
+    value: string
+  };
 }
 
 @Injectable({

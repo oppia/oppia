@@ -19,13 +19,15 @@
 import { TestBed } from '@angular/core/testing';
 
 import { ExplorationFeaturesService, IExplorationDataDict,
-  IFeatureDataDict } from 'services/exploration-features.service';
+  IFeatureDataDict, IParamChanges } from
+  'services/exploration-features.service';
 
 describe('ExplorationFeatureService', () => {
   let explorationFeatureService: ExplorationFeaturesService = null;
   let featureData: IFeatureDataDict = null;
   let explorationData: IExplorationDataDict = null;
   let explorationData2: IExplorationDataDict = null;
+  let testParamChanges: IParamChanges = null;
 
   beforeEach(() => {
     explorationFeatureService = TestBed.get(ExplorationFeaturesService);
@@ -33,16 +35,25 @@ describe('ExplorationFeatureService', () => {
       is_improvements_tab_enabled: true,
       is_exploration_whitelisted: true,
     };
+    
     explorationData = {
-      param_changes: ['param_1', 'param_2'],
+      param_changes: [testParamChanges],
       states: {}
     };
     explorationData2 = {
       param_changes: [],
       states: {
         state_1: {
-          param_changes: ['param_1', 'param_2'],
+          param_changes: [testParamChanges],
         }
+      }
+    };
+    testParamChanges = {
+      name: 'param_1',
+      generator_id: 'test_id',
+      customization_args: {
+        parse_with_jinja: true,
+        value: '1'
       }
     };
   });
