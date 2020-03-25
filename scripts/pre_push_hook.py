@@ -272,16 +272,21 @@ def start_linter(files):
     return task.returncode
 
 
-def start_python_script(scriptname):
-    """Runs the 'start.py' script and returns the returncode of the task."""
-    script_commands_list = scriptname.split(' ')
+def run_script_and_get_returncode(script_name):
+    """Runs script and returns the returncode of the task.
+    Args:
+      script_name: The script command to be runned.
+    Returns:
+      number. The return code from the task executated.
+    """
+    script_commands = script_name.split(' ')
     cmd = [
         'python', '-m',
-        os.path.join('scripts', script_commands_list[0]).replace('/', '.')]
+        os.path.join('scripts', script_commands[0]).replace('/', '.')]
 
-    script_commands_list.pop(0)
-    if len(script_commands_list):
-        for flag in script_commands_list:
+    script_commands.pop(0)
+    if len(script_commands):
+        for flag in script_commands:
             cmd.append(flag)
 
     task = subprocess.Popen(cmd)
@@ -400,13 +405,14 @@ def main(args=None):
             frontend_status = 0
             travis_ci_check_status = 0
             if does_diff_include_js_or_ts_files(files_to_lint):
-                frontend_status = start_python_script(FRONTEND_TEST_SCRIPT)
+                frontend_status = run_script_and_get_returncode(
+                    FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
                 sys.exit(1)
             if does_diff_include_travis_yml_or_js_files(files_to_lint):
-                travis_ci_check_status = start_python_script(
+                travis_ci_check_status = run_script_and_get_returncode(
                     TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT)
             if travis_ci_check_status != 0:
                 python_utils.PRINT(
