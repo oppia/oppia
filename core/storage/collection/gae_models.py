@@ -755,10 +755,10 @@ class CollectionSummaryModel(base_models.BaseModel):
             model.viewer_ids = [
                 new_user_id if viewer_id == old_user_id else viewer_id
                 for viewer_id in model.viewer_ids]
-            if old_user_id in model.contributor_ids:
-                model.contributor_ids = [
-                    new_user_id if contributor_id == old_user_id else
-                    contributor_id for contributor_id in model.contributor_ids]
+            model.contributor_ids = [
+                new_user_id if contributor_id == old_user_id else
+                contributor_id for contributor_id in model.contributor_ids]
+            if old_user_id in model.contributors_summary:
                 model.contributors_summary[new_user_id] = (
                     model.contributors_summary[old_user_id])
                 del model.contributors_summary[old_user_id]

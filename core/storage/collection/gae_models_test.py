@@ -640,7 +640,6 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
             contributor_ids=[
                 self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
             contributors_summary={
-                self.USER_ID_1_OLD: 1,
                 self.USER_ID_2_OLD: 2,
                 self.USER_ID_3_OLD: 3,
             },
@@ -694,8 +693,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
             [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
             migrated_model_1.contributor_ids)
         self.assertEqual(
-            {self.USER_ID_1_NEW: 1, self.USER_ID_2_NEW: 2,
-             self.USER_ID_3_NEW: 3},
+            {self.USER_ID_2_NEW: 2, self.USER_ID_3_NEW: 3},
             migrated_model_1.contributors_summary)
 
         migrated_model_2 = collection_models.CollectionSummaryModel.get_by_id(
