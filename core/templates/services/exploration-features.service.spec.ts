@@ -35,7 +35,7 @@ describe('ExplorationFeatureService', () => {
       is_improvements_tab_enabled: true,
       is_exploration_whitelisted: true,
     };
-    
+
     explorationData = {
       param_changes: [testParamChanges],
       states: {}
