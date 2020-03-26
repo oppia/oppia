@@ -16,9 +16,12 @@
  * @fileoverview Factory for creating and mutating instances of frontend
  * skill rights domain objects.
  */
-
-import { Injectable } from '@angular/core';
+export interface ISkillRightBackend {
+  'can_edit_skill_description': boolean,
+  'skill_id': string
+}
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
 export class SkillRights {
   _skillId: string;
@@ -40,7 +43,7 @@ export class SkillRights {
 
   copyFromSkillRights(otherSkillRights: {
       getSkillId: () => string; canEditSkillDescription: () => boolean;
-    }): void {
+    }):void {
     this._skillId = otherSkillRights.getSkillId();
     this._skillDescriptionIsEditable =
       otherSkillRights.canEditSkillDescription();
@@ -51,11 +54,8 @@ export class SkillRights {
   providedIn: 'root'
 })
 export class SkillRightsObjectFactory {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'skillRightsBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(skillRightsBackendDict: any): SkillRights {
+  createFromBackendDict(
+      skillRightsBackendDict: ISkillRightBackend): SkillRights {
     return new SkillRights(
       skillRightsBackendDict.skill_id,
       skillRightsBackendDict.can_edit_skill_description);
