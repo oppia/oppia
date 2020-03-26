@@ -252,7 +252,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 
 class TopicEditorTests(BaseTopicEditorControllerTests):
 
-    def test_get_can_not_access_topic_page_with_invalid_topic_id(self):
+    def test_get_can_not_access_topic_page_with_nonexistent_topic_id(self):
         self.login(self.ADMIN_EMAIL)
 
         self.get_html_response(
@@ -260,6 +260,16 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 feconf.TOPIC_EDITOR_URL_PREFIX,
                 topic_services.get_new_topic_id()), expected_status_int=404)
 
+        self.logout()
+
+    def test_cannot_access_topic_editor_page_with_invalid_topic_id(self):
+        # Check that the editor page can not be accessed with an
+        # an invalid topic id.
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_URL_PREFIX, 'invalid_topic_id'),
+            expected_status_int=404)
         self.logout()
 
     def test_access_topic_editor_page(self):
@@ -272,15 +282,6 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id),
             expected_status_int=401)
-        self.logout()
-
-        # Check that the editor page can not be accessed with an
-        # an invalid topic id.
-        self.login(self.NEW_USER_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_URL_PREFIX, 'invalid_topic_id'),
-            expected_status_int=404)
         self.logout()
 
         # Check that admins can access the editor page.
