@@ -15,6 +15,7 @@
 """Registry for Oppia suggestions. Contains a BaseSuggestion class and
 subclasses for each type of suggestion.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -79,7 +80,7 @@ class BaseSuggestion(python_utils.OBJECT):
             'final_reviewer_id': self.final_reviewer_id,
             'change': self.change.to_dict(),
             'score_category': self.score_category,
-            'last_updated': utils.get_time_in_millisecs(self.last_updated)
+            'last_updated_msecs': utils.get_time_in_millisecs(self.last_updated)
         }
 
     def get_score_type(self):

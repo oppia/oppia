@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the profile page."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -355,6 +356,20 @@ class DeleteAccountHandler(base.BaseHandler):
         self.render_json({'success': True})
 
 
+class PendingAccountDeletionPage(base.BaseHandler):
+    """The account pending deletion page. This page is accessible by all users
+    even if they are not scheduled for deletion. This is because users that are
+    scheduled for deletion are logged out instantly when they try to login.
+    """
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        if not constants.ENABLE_ACCOUNT_DELETION:
+            raise self.PageNotFoundException
+        self.render_template('pending-account-deletion-page.mainpage.html')
+
+
 class UsernameCheckHandler(base.BaseHandler):
     """Checks whether a username has already been taken."""
 
@@ -397,6 +412,8 @@ class UserInfoHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
+        # The following headers are added to prevent caching of this response.
+        self.response.cache_control.no_store = True
         if self.username:
             user_actions = user_services.UserActionsInfo(self.user_id).actions
             user_settings = user_services.get_user_settings(

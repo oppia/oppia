@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for long-running jobs."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -95,6 +96,11 @@ class JobModel(base_models.BaseModel):
     def get_deletion_policy():
         """JobModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -211,6 +217,11 @@ class ContinuousComputationModel(base_models.BaseModel):
     def get_deletion_policy():
         """ContinuousComputationModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_user_id_migration_policy():

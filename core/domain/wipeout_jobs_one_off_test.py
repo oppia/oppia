@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for wipeout one-off jobs."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -62,6 +63,7 @@ class UserDeletionOneOffJobTests(test_utils.GenericTestBase):
             id=self.user_1_id, exploration_ids=[], collection_ids=[]
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
     def test_repeated_migration(self):
         output = self._run_one_off_job()
@@ -123,6 +125,7 @@ class VerifyUserDeletionOneOffJobTests(test_utils.GenericTestBase):
             id=self.user_1_id, exploration_ids=[], collection_ids=[]
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
     def test_not_deleted(self):
         output = self._run_one_off_job()

@@ -15,8 +15,11 @@
 # limitations under the License.
 
 """Tests for statistics continuous computations."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import ast
 
 from core.domain import event_services
 from core.domain import exp_domain
@@ -40,16 +43,6 @@ EMPTY_STATE_HIT_COUNTS_DICT = {
 }
 
 
-class MockInteractionAnswerSummariesAggregator(
-        stats_jobs_continuous.InteractionAnswerSummariesAggregator):
-    """A modified InteractionAnswerSummariesAggregator that does not start
-    a new batch job when the previous one has finished.
-    """
-    @classmethod
-    def _kickoff_batch_job_after_previous_one_ends(cls):
-        pass
-
-
 class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
     """Tests for interaction answer view aggregations."""
 
@@ -70,11 +63,71 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         return stats_models.StateAnswersCalcOutputModel.get_model(
             exploration_id, exploration_version, state_name, calculation_id)
 
-    def test_one_answer(self):
-        with self.swap(
+    def _disable_batch_continuation(self):
+        """Context manager that stops jobs from continuously batching tasks."""
+        class NonContinuousInteractionAnswerSummariesAggregator(
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator):
+            """A modified InteractionAnswerSummariesAggregator which does not
+            start a new batch job when the previous one has finished.
+            """
+            @classmethod
+            def _kickoff_batch_job_after_previous_one_ends(cls):
+                pass
+        return self.swap(
             stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
+            NonContinuousInteractionAnswerSummariesAggregator)
 
+    def _disable_state_name_validation(self):
+        """Context manager that disables exploration state name validation."""
+        def no_op(*unused_args, **unused_kwargs):
+            """Does nothing."""
+            pass
+        return self.swap(exp_domain.Exploration, '_validate_state_name', no_op)
+
+    def test_debug_message_for_malformed_keys(self):
+        # Create an exploration with a malformed state name.
+        exp_id = 'eid'
+        exp = self.save_new_valid_exploration(exp_id, 'author@website.com')
+        with self._disable_state_name_validation():
+            exp.rename_state(feconf.DEFAULT_INIT_STATE_NAME, '\u0000�')
+        # Record an answer in that state for the job to process.
+        event_services.AnswerSubmissionEventHandler.record(
+            exp_id, exp.version, exp.init_state_name, 'MultipleChoiceInput',
+            0, 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1',
+            5.0, {}, 'answer1')
+
+        # Check that the job runs to completion.
+        with self._disable_batch_continuation():
+            job_class, job_manager = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator,
+                stats_jobs_continuous.InteractionAnswerSummariesMRJobManager)
+            job_id = job_class.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+
+        # Parse the job output.
+        (job_key, job_output), (job_summary_key, job_summary_output) = (
+            ast.literal_eval(o) for o in job_manager.get_output(job_id))
+        # Check that the problematic values are present.
+        self.assertEqual(job_key, 'eid:1:\x00\ufffd')
+        self.assertEqual(job_summary_key, 'eid:all:\x00\ufffd')
+        # Check that helpful debug information is present.
+        self.assertRegexpMatches(
+            job_output,
+            'Expected valid exploration id, version, and state name triple, '
+            'actual: UnicodeDecodeError.*ordinal not in range')
+        self.assertRegexpMatches(
+            job_summary_output,
+            'Expected valid exploration id, version, and state name triple, '
+            'actual: UnicodeDecodeError.*ordinal not in range')
+
+    def test_one_answer(self):
+        with self._disable_batch_continuation():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -176,10 +229,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             self.assertEqual(calculation_output, expected_calculation_output)
 
     def test_one_answer_ignored_for_deleted_exploration(self):
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._disable_batch_continuation():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -231,10 +281,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             self.assertIsNone(calc_output_model)
 
     def test_answers_across_multiple_exploration_versions(self):
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._disable_batch_continuation():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -389,10 +436,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         aggregation job should not include answers corresponding to exploration
         versions which do not match the latest version's interaction ID.
         """
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._disable_batch_continuation():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -485,10 +529,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         answers are submitted to the new version, but the interaction ID is the
         same then old answers should still be aggregated.
         """
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._disable_batch_continuation():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -573,10 +614,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         interaction type with answers submitted to both versions of the
         exploration.
         """
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._disable_batch_continuation():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -718,10 +756,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 expected_calculation_all_versions_output)
 
     def test_multiple_computations_in_one_job(self):
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._disable_batch_continuation():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -801,10 +836,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
     def test_computation_with_different_interaction_id_for_same_exp_passes(
             self):
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._disable_batch_continuation():
             exp_id = 'eid'
             self.save_new_valid_exploration(exp_id, 'fake@user.com')
 

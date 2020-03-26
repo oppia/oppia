@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the topic viewer page."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -22,6 +23,7 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import question_services
 from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
@@ -105,6 +107,13 @@ class TopicPageDataHandler(base.BaseHandler):
             for skill_id in assigned_skill_ids:
                 degrees_of_mastery[skill_id] = None
 
+        train_tab_should_be_displayed = False
+        if assigned_skill_ids:
+            questions = question_services.get_questions_by_skill_ids(
+                5, assigned_skill_ids, False)
+            if len(questions) == 5:
+                train_tab_should_be_displayed = True
+
         self.values.update({
             'topic_id': topic.id,
             'topic_name': topic.name,
@@ -113,6 +122,7 @@ class TopicPageDataHandler(base.BaseHandler):
             'uncategorized_skill_ids': uncategorized_skill_ids,
             'subtopics': subtopics,
             'degrees_of_mastery': degrees_of_mastery,
-            'skill_descriptions': skill_descriptions
+            'skill_descriptions': skill_descriptions,
+            'train_tab_should_be_displayed': train_tab_should_be_displayed
         })
         self.render_json(self.values)

@@ -256,8 +256,9 @@ var ExplorationEditorMainTab = function() {
   this.addResponse = function(
       interactionId, feedbackInstructions, destStateName,
       createNewState, ruleName) {
-    expect(addResponseButton.isDisplayed()).toEqual(true);
     // Open the "Add Response" modal if it is not already open.
+    waitFor.elementToBeClickable(
+      addResponseButton, 'Response Editor button is not clickable');
     addResponseButton.click();
     this.setResponse.apply(null, arguments);
   };

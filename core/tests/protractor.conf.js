@@ -33,6 +33,10 @@ var suites = {
       'protractor_desktop/classroomPage.js'
     ],
 
+    classroomPageFileUploadFeatures: [
+      'protractor_desktop/classroomPageFileUploadFeatures.js'
+    ],
+
     collections: [
       'protractor_desktop/collections.js'
     ],
@@ -121,6 +125,10 @@ var suites = {
       'protractor_desktop/topicAndStoryEditor.js'
     ],
 
+    topicAndStoryEditorFileUploadFeatures: [
+      'protractor_desktop/topicAndStoryEditorFileUploadFeatures.js'
+    ],
+
     topicsAndSkillsDashboard: [
       'protractor_desktop/topicsAndSkillsDashboard.js'
     ],
@@ -204,6 +212,10 @@ exports.config = {
   // (Note that the hint tooltip has a 60-second timeout.)
   allScriptsTimeout: 180000,
 
+
+  // How long to wait for a page to load.
+  getPageTimeout: 60000,
+
   // ----- What tests to run -----
   //
   // When run without a command line parameter, all suites will run. If run
@@ -219,7 +231,14 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     chromeOptions: {
-      args: ['--lang=en-EN', '--window-size=1285x1000']
+      args: [
+        '--lang=en-EN',
+        '--window-size=1285x1000',
+        // These arguments let us simulate recording from a microphone
+        '--use-fake-device-for-media-stream',
+        '--use-fake-ui-for-media-stream',
+        '--use-file-for-fake-audio-capture=data/cafe.mp3',
+      ]
     },
     prefs: {
       intl: {
@@ -272,8 +291,8 @@ exports.config = {
         // Directory for screenshots
         dest: '../protractor-screenshots',
         // Function to build filenames of screenshots
-        filename: function(spec, descriptions, results, capabilities) {
-          return descriptions[1] + ' ' + descriptions[0];
+        pathBuilder: function(currentSpec) {
+          return currentSpec.fullName;
         },
         captureOnlyFailedSpecs: true
       }));

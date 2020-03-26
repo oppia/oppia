@@ -13,15 +13,26 @@
 # limitations under the License.
 
 """Tests for Oppia storage models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 
+from core.domain import takeout_service
 from core.platform import models
 from core.tests import test_utils
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(
+    base_models, collection_models, email_models,
+    exploration_models, feedback_models, skill_models,
+    topic_models, suggestion_models, user_models,
+    story_models, question_models, config_models
+) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
+    models.NAMES.topic, models.NAMES.suggestion, models.NAMES.user,
+    models.NAMES.story, models.NAMES.question, models.NAMES.config])
 
 
 class StorageModelsTest(test_utils.GenericTestBase):
@@ -142,3 +153,61 @@ class StorageModelsTest(test_utils.GenericTestBase):
             if (clazz.get_user_id_migration_policy() ==
                     base_models.USER_ID_MIGRATION_POLICY.CUSTOM):
                 self.assertTrue(hasattr(clazz, 'migrate_model'))
+
+    def test_get_models_which_should_be_exported(self):
+        """Ensure that the set of models to export is the set of models with
+        export policy CONTAINS_USER_DATA, and that all other models have
+        export policy NOT_APPLICABLE.
+        """
+        all_models = [
+            clazz
+            for clazz in self._get_model_classes()
+            if not clazz.__name__ in self.BASE_CLASSES
+        ]
+        models_with_export = (takeout_service
+                              .get_models_which_should_be_exported())
+        unimplemented_models = set()
+        for model in all_models:
+            export_policy = model.get_export_policy()
+            if model in models_with_export:
+                self.assertEqual(
+                    base_models.EXPORT_POLICY.CONTAINS_USER_DATA,
+                    export_policy
+                )
+            elif export_policy == base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED:
+                unimplemented_models.add(model)
+            else:
+                self.assertEqual(
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                    export_policy
+                )
+        # TODO(#8523): This list should not be modified under any circumstance.
+        # The export_data functions for the models in this list will eventually
+        # be implemented, and the TO_BE_IMPLEMENTED value will be removed.
+        # Contact @varun-tandon for more information.
+        expected_unimplemented = {
+            collection_models.CollectionRightsSnapshotContentModel,
+            collection_models.CollectionRightsSnapshotMetadataModel,
+            collection_models.CollectionSnapshotContentModel,
+            collection_models.CollectionSnapshotMetadataModel,
+            collection_models.CollectionCommitLogEntryModel,
+            skill_models.SkillSnapshotMetadataModel,
+            skill_models.SkillSnapshotContentModel,
+            topic_models.SubtopicPageSnapshotContentModel,
+            topic_models.SubtopicPageSnapshotMetadataModel,
+            topic_models.TopicRightsSnapshotContentModel,
+            topic_models.TopicRightsSnapshotMetadataModel,
+            topic_models.TopicSnapshotContentModel,
+            topic_models.TopicSnapshotMetadataModel,
+            story_models.StorySnapshotContentModel,
+            story_models.StorySnapshotMetadataModel,
+            question_models.QuestionSnapshotContentModel,
+            question_models.QuestionSnapshotMetadataModel,
+            exploration_models.ExplorationRightsSnapshotContentModel,
+            exploration_models.ExplorationRightsSnapshotMetadataModel,
+            exploration_models.ExplorationSnapshotContentModel,
+            exploration_models.ExplorationSnapshotMetadataModel,
+            config_models.ConfigPropertySnapshotContentModel,
+            config_models.ConfigPropertySnapshotMetadataModel
+        }
+        self.assertEqual(unimplemented_models, expected_unimplemented)

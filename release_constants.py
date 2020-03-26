@@ -47,6 +47,9 @@ RELEASE_DRIVE_URL = (
 RELEASE_NOTES_URL = (
     'https://docs.google.com/document/d/'
     '1pmcDNfM2KtmkZeYipuInC48RE5JfkSJWQYdIQAkD0hQ/edit#')
+RELEASE_ROTA_URL = (
+    'https://github.com/oppia/oppia/wiki/Release-Schedule#'
+    'release-coordinators-and-qa-coordinators-for-upcoming-releases')
 
 REPEATABLE_JOBS_SPREADSHEETS_URL = (
     'https://docs.google.com/spreadsheets/d/'
@@ -65,3 +68,6 @@ RELEASE_NOTES_TEMPLATE_URL = (
 RELEASE_NOTES_EXAMPLE_URL = (
     'https://docs.google.com/document/d/'
     '1OUwgMPNORABJAz7DS0iuDUr5A2FxcXg4Y5-qUEdgo-M/edit#heading=h.l3dbee3s55ti')
+JOBS_FORM_URL = 'https://goo.gl/forms/XIj00RJ2h5L55XzU2'
+
+OPPIA_DEV_GROUP_URL = 'https://groups.google.com/forum/#!forum/oppia-dev'

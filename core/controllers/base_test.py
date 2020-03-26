@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for generic controller behavior."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -54,7 +55,7 @@ PADDING = 1
 
 class UniqueTemplateNamesTests(test_utils.GenericTestBase):
     """Tests to ensure that all template filenames in
-    core/templates/dev/head/pages have unique filenames. This is required
+    core/templates/pages have unique filenames. This is required
     for the backend tests to work correctly since they fetch templates
     from this directory based on name of the template. For details, refer
     get_filepath_from_filename function in test_utils.py.
@@ -62,7 +63,7 @@ class UniqueTemplateNamesTests(test_utils.GenericTestBase):
 
     def test_template_filenames_are_unique(self):
         templates_dir = os.path.join(
-            'core', 'templates', 'dev', 'head', 'pages')
+            'core', 'templates', 'pages')
         all_template_names = []
         for root, _, filenames in os.walk(templates_dir):
             template_filenames = [
@@ -80,6 +81,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     TEST_CREATOR_USERNAME = 'testcreatoruser'
     TEST_EDITOR_EMAIL = 'test.editor@example.com'
     TEST_EDITOR_USERNAME = 'testeditoruser'
+    DELETED_USER_EMAIL = 'deleted.user@example.com'
+    DELETED_USER_USERNAME = 'deleteduser'
 
     class MockHandlerWithInvalidReturnType(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = 'invalid_type'
@@ -124,6 +127,14 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.signup(self.TEST_CREATOR_EMAIL, self.TEST_CREATOR_USERNAME)
         self.signup(self.TEST_EDITOR_EMAIL, self.TEST_EDITOR_USERNAME)
 
+        # Create user that is scheduled for deletion.
+        self.signup(self.DELETED_USER_EMAIL, self.DELETED_USER_USERNAME)
+        deleted_user_id = self.get_user_id_from_email(self.DELETED_USER_EMAIL)
+        deleted_user_model = (
+            user_models.UserSettingsModel.get_by_id(deleted_user_id))
+        deleted_user_model.deleted = True
+        deleted_user_model.put()
+
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
 
@@ -138,10 +149,10 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
             # This url is ignored since it is only needed for a protractor test.
             # The backend tests fetch templates from
-            # core/templates/dev/head/pages instead of webpack_bundles since we
+            # core/templates/pages instead of webpack_bundles since we
             # skip webpack compilation for backend tests.
             # The console_errors.html template is present in
-            # core/templates/dev/head/tests and we want one canonical
+            # core/templates/tests and we want one canonical
             # directory for retrieving templates so we ignore this url.
             if url == '/console_errors':
                 continue
@@ -200,6 +211,18 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         response = self.get_html_response('/', expected_status_int=302)
         self.assertIn('learner_dashboard', response.headers['location'])
         self.logout()
+
+    def test_root_redirect_rules_for_deleted_user_prod_mode(self):
+        with self.swap(constants, 'DEV_MODE', False):
+            self.login(self.DELETED_USER_EMAIL)
+            response = self.get_html_response('/', expected_status_int=302)
+            self.assertIn('pending-account-deletion', response.headers['location'])
+
+    def test_root_redirect_rules_for_deleted_user_dev_mode(self):
+        with self.swap(constants, 'DEV_MODE', True):
+            self.login(self.DELETED_USER_EMAIL)
+            response = self.get_html_response('/', expected_status_int=302)
+            self.assertIn('pending-account-deletion', response.headers['location'])
 
     def test_root_redirect_rules_for_users_with_no_user_contribution_model(
             self):
@@ -623,13 +646,25 @@ class LogoutPageTests(test_utils.GenericTestBase):
         # Logout with valid query arg. This test only validates that the login
         # cookies have expired after hitting the logout url.
         current_page = '/explore/0'
-        response = self.get_html_response(current_page)
+        self.get_html_response(current_page)
         response = self.get_html_response('/logout', expected_status_int=302)
+        expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
+        self.assertTrue(
+            datetime.datetime.utcnow() > datetime.datetime.strptime(
+                expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT'))
+
+    def test_logout_page_with_redirect_url(self):
+        exp_services.load_demo('0')
+        current_page = '/explore/0'
+        self.get_html_response(current_page)
+        response = self.get_html_response(
+            '/logout?redirect_url=library', expected_status_int=302)
         expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
 
         self.assertTrue(
             datetime.datetime.utcnow() > datetime.datetime.strptime(
-                expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT',))
+                expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT'))
+        self.assertIn('library', response.headers['Location'])
 
     def test_logout_page_with_dev_mode_disabled(self):
         with self.swap(constants, 'DEV_MODE', False):
@@ -749,6 +784,8 @@ class I18nDictsTests(test_utils.GenericTestBase):
                 key_list = [line[:line.find(':')].strip() for line in lines]
                 for key in key_list:
                     self.assertTrue(key.startswith('"I18N_'))
+                    if not key.startswith('"I18N_'):
+                        self.log_line('Bad line in file: %s' % filename)
                 self.assertEqual(sorted(key_list), key_list)
 
     def test_keys_match_en_qqq(self):
@@ -761,7 +798,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
         """Tests that keys in HTML files are present in en.json."""
         en_key_list = self._extract_keys_from_json_file('en.json')
         dirs_to_search = [
-            os.path.join('core', 'templates', 'dev', 'head'),
+            os.path.join('core', 'templates', ''),
             'extensions']
         files_checked = 0
         missing_keys_count = 0
@@ -1052,7 +1089,7 @@ class SignUpTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         response = self.get_html_response('/about', expected_status_int=302)
-        self.assertIn('Logout', response.location)
+        self.assertIn('logout', response.location)
         self.logout()
 
         response = self.post_json(

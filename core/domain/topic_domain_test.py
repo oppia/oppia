@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for topic domain objects."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -261,6 +262,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Name should be a string')
         self.topic.name = ''
         self._assert_validation_error('Name field should not be empty')
+        self.topic.name = 'Very long and therefore invalid topic name'
+        self._assert_validation_error(
+            'Topic name should be at most 35 characters')
 
     def test_subtopic_schema_version_type_validation(self):
         self.topic.subtopic_schema_version = 'invalid_version'
@@ -286,6 +290,15 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_description_validation(self):
         self.topic.description = 1
         self._assert_validation_error('Expected description to be a string')
+        self.topic.description = (
+            'Lorem ipsum dolor sit amet, consectetuer '
+            'adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. '
+            'Dum sociis natoque penatibus et magnis dis parturient montes, '
+            'nascetur ridiculus mus. Donec quam felis, ultricies nec, '
+            'pellentesque eu,'
+        )
+        self._assert_validation_error(
+            'Topic description should be at most 240 characters.')
 
     def test_next_subtopic_id_validation(self):
         self.topic.next_subtopic_id = '1'

@@ -20,31 +20,31 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaShortResponseMultipleChoiceInput', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/MultipleChoiceInput/directives/' +
-        'multiple-choice-input-short-response.directive.html'),
+      template: require(
+        './multiple-choice-input-short-response.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', '$filter',
         function($attrs, $filter) {
           var ctrl = this;
-          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-          var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
-          var response = $filter('convertToPlainText')(_choices[_answer]);
-          ctrl.response = $filter('truncateAtFirstLine')(response);
-        }]
+          ctrl.$onInit = function() {
+            var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+            var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
+            var response = $filter('convertToPlainText')(_choices[_answer]);
+            ctrl.response = $filter('truncateAtFirstLine')(response);
+          };
+        }
+      ]
     };
   }
 ]);

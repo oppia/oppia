@@ -24,22 +24,21 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaShortResponseSetInput', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/SetInput/directives/' +
-        'set-input-short-response.directive.html'),
+      template: require('./set-input-short-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        ctrl.displayedAnswer = (
-          _answer.length > 0 ? _answer.join(', ') :
-          'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER');
+        ctrl.$onInit = function() {
+          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          ctrl.displayedAnswer = (
+            _answer.length > 0 ? _answer.join(', ') :
+            'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER');
+        };
       }]
     };
   }

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for File System services."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -183,9 +184,10 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
                     micro_image_content),
                 (22, 22))
 
+
 class FileSystemClassifierDataTests(test_utils.GenericTestBase):
     """Unit tests for storing, reading and deleting classifier data."""
-    
+
     def setUp(self):
         super(FileSystemClassifierDataTests, self).setUp()
         self.fs = fs_domain.AbstractFileSystem(
@@ -205,7 +207,7 @@ class FileSystemClassifierDataTests(test_utils.GenericTestBase):
             'exp_id', 'job_id', self.classifier_data)
         classifier_data = fs_services.read_classifier_data('exp_id', 'job_id')
         self.assertEqual(classifier_data, self.classifier_data)
-    
+
     def test_remove_classifier_data(self):
         """Test that classifier data is removed upon deletion."""
         fs_services.save_classifier_data(

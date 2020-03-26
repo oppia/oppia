@@ -1,24 +1,22 @@
+## Overview
 <!--
-  - Thanks for submitting code to Oppia! Please fill out the following as part of
-  - your pull request so we can review your code more easily.
-  -->
+READ ME FIRST: Please answer *both* questions below and check off every point from the essential checklist!
+-->
 
-## Explanation
-<!--
-  - Explain what your PR does. If this PR fixes an existing bug, please include
-  - "Fixes #bugnum:" in the explanation so that GitHub can auto-close the issue
-  - when this PR is merged.
-  -->
+1. This PR fixes or fixes part of #[fill_in_number_here].
+2. This PR does the following: [Explain here what your PR does and why]
 
-## Checklist
+## Essential Checklist
+
 - [ ] The PR title starts with "Fix #bugnum: ", followed by a short, clear summary of the changes. (If this PR fixes part of an issue, prefix the title with "Fix part of #bugnum: ...".)
-- [ ] The PR explanation includes the words "Fixes #bugnum: ..." (or "Fixes part of #bugnum" if the PR only partially fixes an issue).
-- [ ] The linter/Karma presubmit checks have passed.
-  - These should run automatically, but if not, you can manually trigger them locally using `python -m scripts.pre_commit_linter` and `python -m scripts.run_frontend_tests`.
+- [ ] The linter/Karma presubmit checks have passed locally on your machine.
+- [ ] "Allow edits from maintainers" is checked. (See [here](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork) for instructions on how to enable it.)
+  - This lets reviewers restart your CircleCI tests for you.
 - [ ] The PR is made from a branch that's **not** called "develop".
-- [ ] The PR has an appropriate "CHANGELOG: ..." label (If you are unsure of which label to add, ask the reviewers for guidance).
-- [ ] The PR follows the [style guide](https://github.com/oppia/oppia/wiki/Coding-style-guide).
-- [ ] The PR addresses the points mentioned in the codeowner checks for the files/folders changed. (See the [codeowner's wiki page](https://github.com/oppia/oppia/wiki/Oppia%27s-code-owners-and-checks-to-be-carried-out-by-developers).)
-- [ ] The PR is **assigned** to an appropriate reviewer.
-  - If you're a new contributor, please ask on [Gitter](https://gitter.im/oppia/oppia-chat) for someone to assign a reviewer and don't tick this checkbox.
-  - If you're not sure who the appropriate reviewer is, please assign to the issue's "owner" -- see the "talk-to" label on the issue. Do not only request the review but also add the reviewer as an assignee.
+
+## PR Pointers
+
+- Oppiabot will notify you when you don't add a PR_CHANGELOG label. If you are unable to do so, please @-mention a code owner (who will be in the Reviewers list), or ask on [Gitter](https://gitter.im/oppia/oppia-chat).
+- For what code owners will expect, see the [Code Owner's wiki page](https://github.com/oppia/oppia/wiki/Oppia%27s-code-owners-and-checks-to-be-carried-out-by-developers).
+- Make sure your PR follows conventions in the [style guide](https://github.com/oppia/oppia/wiki/Coding-style-guide), otherwise this will lead to review delays
+- Never force push. If you do, your PR will be closed.

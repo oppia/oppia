@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the skill editor."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -93,17 +94,14 @@ class SkillRightsHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_skill
     def get(self, skill_id):
-        """Returns the SkillRights object of a skill."""
+        """Returns whether the user can edit the description of a skill."""
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
-        skill_rights = skill_services.get_skill_rights(skill_id, strict=False)
         user_actions_info = user_services.UserActionsInfo(self.user_id)
         can_edit_skill_description = check_can_edit_skill_description(
             user_actions_info)
 
         self.values.update({
-            'skill_is_private': skill_rights.skill_is_private,
-            'creator_id': skill_rights.creator_id,
             'can_edit_skill_description': can_edit_skill_description,
             'skill_id': skill_id
         })

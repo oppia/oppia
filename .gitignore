@@ -2,6 +2,7 @@
 *.pyc
 *.swp
 *.swo
+*.bak
 gae_runtime/*
 # We have added .git over here such that "git check-ignore" command should
 # ignore the files and dirs inside the .git dir.
@@ -21,6 +22,7 @@ coverage.xml
 .viminfo
 .vscode/*
 libpeerconnection.log
+readme_test_dir/*
 tsc_output_log.txt
 dev_output.txt
 tmpcompiledjs*
@@ -34,6 +36,7 @@ venv/
 .lock
 .local/*
 yarn-error.log
+.env
 
 # Oppia uses cache slugs for various resources and we need separate resource
 # directories for dev and prod. Resource directories for prod are generated

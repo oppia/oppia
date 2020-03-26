@@ -1,0 +1,47 @@
+<div class="oppia-concept-card-viewer" ng-if="!$ctrl.loadingMessage">
+  <div class="concept-card-explanation">
+    <b> Explanation </b>
+    <div style="margin-bottom: 10px">
+      <angular-html-bind class="protractor-test-concept-card-explanation"
+                         html-data="$ctrl.currentConceptCard.getExplanation().getHtml()">
+      </angular-html-bind>
+    </div>
+  </div>
+  <div class="concept-card-worked-examples">
+    <b> Worked Examples </b>
+    <div ng-repeat="example in $ctrl.currentConceptCard.getWorkedExamples()"
+         ng-if="$index < $ctrl.numberOfWorkedExamplesShown">
+      <angular-html-bind html-data="example.getHtml()"></angular-html-bind>
+    </div>
+    <button class="btn btn-secondary show-more-worked-examples-button"
+            ng-if="!$ctrl.isLastWorkedExample()"
+            ng-click="$ctrl.showMoreWorkedExamples()">
+      + Worked Examples
+    </button>
+  </div>
+</div>
+
+<div ng-if="$ctrl.loadingMessage">
+  <div class="oppia-align-center">
+    <span translate="<[$ctrl.loadingMessage]>"></span>
+    <loading-dots></loading-dots>
+  </div>
+</div>
+
+<style>
+  .oppia-concept-card-viewer .concept-card-explanation {
+    padding: 15px;
+  }
+
+  .oppia-concept-card-viewer .concept-card-worked-examples {
+    padding: 15px;
+  }
+
+  .oppia-concept-card-viewer .show-more-worked-examples-button {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: block;
+    background-color: #0D48A1;
+    color: #FFFFFF;
+  }
+</style>

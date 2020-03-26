@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """One-off jobs for explorations."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -39,7 +40,7 @@ import utils
     models.NAMES.exploration])
 gae_image_services = models.Registry.import_gae_image_services()
 
-
+SEPARATORS = ['<', '>', '=']
 ADDED_THREE_VERSIONS_TO_GCS = 'Added the three versions'
 _COMMIT_TYPE_REVERT = 'revert'
 ALL_IMAGES_VERIFIED = 'Images verified'
@@ -71,6 +72,37 @@ GCS_EXTERNAL_IMAGE_ID_REGEX = re.compile(
     r'^/([^/]+)/exploration/([^/]+)/assets/image/(([^/]+)\.(' + '|'.join(
         ALLOWED_IMAGE_EXTENSIONS) + '))$')
 SUCCESSFUL_EXPLORATION_MIGRATION = 'Successfully migrated exploration'
+
+
+class MathExpressionInputInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):  # pylint: disable=line-too-long
+    """Job that produces a list of (exploration, state) pairs that use the Math
+    Expression Interaction and that have rules that contain [<, >, =] to
+    identify and prevent usage of equation/inequalities.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if not item.deleted:
+            exploration = exp_fetchers.get_exploration_from_model(item)
+            for state_name, state in exploration.states.items():
+                if state.interaction.id == 'MathExpressionInput':
+                    for group in state.interaction.answer_groups:
+                        for rule_spec in group.rule_specs:
+                            rule = rule_spec.inputs['x']
+                            if any(sep in rule for sep in SEPARATORS):
+                                yield (
+                                    item.id,
+                                    '%s: %s' % (
+                                        state_name.encode('utf-8'),
+                                        rule.encode('utf-8')))
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
 
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):

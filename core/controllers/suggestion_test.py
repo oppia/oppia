@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for suggestion controllers."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -49,6 +50,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
     AUTHOR_EMAIL = 'author@example.com'
     AUTHOR_EMAIL_2 = 'author2@example.com'
+    REVIEWER_EMAIL = 'reviewer@example.com'
+    TRANSLATOR_EMAIL = 'translator@example.com'
     NORMAL_USER_EMAIL = 'user@example.com'
 
     def setUp(self):
@@ -59,14 +62,19 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.signup(self.AUTHOR_EMAIL_2, 'author2')
         self.signup(self.NORMAL_USER_EMAIL, 'normalUser')
+        self.signup(self.REVIEWER_EMAIL, 'reviewer')
+        self.signup(self.TRANSLATOR_EMAIL, 'translator')
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.author_id_2 = self.get_user_id_from_email(self.AUTHOR_EMAIL_2)
-        self.reviewer_id = self.editor_id
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id, 'hi')
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
         # Login and create exploration and suggestions.
@@ -118,7 +126,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'new_value': self.new_content
                 },
                 'description': 'change to state 1',
-                'final_reviewer_id': self.reviewer_id,
+                'final_reviewer_id': self.editor_id,
             }, csrf_token=csrf_token)
         self.logout()
 
@@ -142,7 +150,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'new_value': self.new_content
                 },
                 'description': 'change to state 2',
-                'final_reviewer_id': self.reviewer_id,
+                'final_reviewer_id': self.editor_id,
             }, csrf_token=csrf_token)
 
         self.post_json(
@@ -160,6 +168,28 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'state_name': 'State 3',
                     'old_value': self.old_content,
                     'new_value': self.new_content
+                },
+                'description': 'change to state 3',
+                'final_reviewer_id': self.editor_id,
+            }, csrf_token=csrf_token)
+        self.logout()
+
+        self.login(self.TRANSLATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+                'target_id': 'exp1',
+                'target_version_at_submission': exploration.version,
+                'change': {
+                    'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                    'state_name': 'State 3',
+                    'content_id': 'content',
+                    'language_code': 'hi',
+                    'content_html': '<p>old content html</p>',
+                    'translation_html': '<p>In Hindi</p>'
                 },
                 'description': 'change to state 3',
                 'final_reviewer_id': self.reviewer_id,
@@ -598,6 +628,34 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             suggestion.change.state_name, 'State 1')
         self.logout()
 
+    def test_translation_accept_suggestion_by_reviewer(self):
+        # Test reviewer can accept successfully.
+        self.login(self.REVIEWER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        suggestion_to_accept = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.translator_id))['suggestions'][0]
+
+        csrf_token = self.get_new_csrf_token()
+        self.put_json('%s/exploration/%s/%s' % (
+            feconf.SUGGESTION_ACTION_URL_PREFIX,
+            suggestion_to_accept['target_id'],
+            suggestion_to_accept['suggestion_id']), {
+                'action': u'accept',
+                'commit_message': u'commit message',
+                'review_message': u'Accepted'
+            }, csrf_token=csrf_token)
+        suggestion_post_accept = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.translator_id))['suggestions'][0]
+        self.assertEqual(
+            suggestion_post_accept['status'],
+            suggestion_models.STATUS_ACCEPTED)
+        self.logout()
+
 
 class QuestionSuggestionTests(test_utils.GenericTestBase):
 
@@ -617,7 +675,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.save_new_skill(
-            self.SKILL_ID, self.admin_id, self.SKILL_DESCRIPTION)
+            self.SKILL_ID, self.admin_id, description=self.SKILL_DESCRIPTION)
         self.question_dict = {
             'question_state_data': self._create_valid_question_data(
                 'default_state').to_dict(),
@@ -698,7 +756,6 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 question_services.get_displayable_question_skill_link_details(
                     1, [self.SKILL_ID], ''))
         self.assertEqual(len(questions), 1)
-        self.assertEqual(questions[0].creator_id, self.author_id)
         self.assertEqual(
             merged_question_skill_links[0].skill_descriptions,
             [self.SKILL_DESCRIPTION])
@@ -717,18 +774,23 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 class SkillSuggestionTests(test_utils.GenericTestBase):
 
     AUTHOR_EMAIL = 'author@example.com'
+    REVIEWER_EMAIL = 'reviewer@example.com'
 
     def setUp(self):
         super(SkillSuggestionTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
+        self.signup(self.REVIEWER_EMAIL, 'reviewer')
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
+        user_services.allow_user_to_review_question(self.reviewer_id)
 
         self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id, self.admin_id, 'Description')
+        self.save_new_skill(
+            self.skill_id, self.admin_id, description='Description')
 
         self.question_dict = {
             'question_state_data': self._create_valid_question_data(
@@ -853,16 +915,13 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
     def test_suggestion_to_skill_handler_with_invalid_action(self):
         self.login(self.ADMIN_EMAIL)
-
         csrf_token = self.get_new_csrf_token()
-
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id))['suggestions'][0]
 
         csrf_token = self.get_new_csrf_token()
-
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             response = self.put_json(
                 '%s/skill/%s/%s' % (
@@ -874,14 +933,11 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'], 'Invalid action.')
-
         self.logout()
 
     def test_reject_suggestion_to_skill(self):
         self.login(self.ADMIN_EMAIL)
-
         csrf_token = self.get_new_csrf_token()
-
         suggestion_to_reject = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
@@ -889,12 +945,10 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_reject['suggestion_id'])
-
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
 
         csrf_token = self.get_new_csrf_token()
-
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/skill/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
@@ -906,17 +960,13 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_reject['suggestion_id'])
-
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_REJECTED)
-
         self.logout()
 
     def test_accept_suggestion_to_skill(self):
         self.login(self.ADMIN_EMAIL)
-
         csrf_token = self.get_new_csrf_token()
-
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
@@ -924,12 +974,10 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_accept['suggestion_id'])
-
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
 
         csrf_token = self.get_new_csrf_token()
-
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/skill/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
@@ -943,10 +991,40 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_to_accept['suggestion_id'])
-
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_ACCEPTED)
 
+        self.logout()
+
+    def test_reviewer_accept_suggestion_to_skill(self):
+        self.login(self.REVIEWER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        suggestion_to_accept = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.author_id))['suggestions'][0]
+
+        suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion_to_accept['suggestion_id'])
+        self.assertEqual(
+            suggestion.status, suggestion_models.STATUS_IN_REVIEW)
+
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            self.put_json('%s/skill/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'Accepted!',
+                    'skill_id': self.skill_id
+                }, csrf_token=csrf_token)
+
+        suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion_to_accept['suggestion_id'])
+        self.assertEqual(
+            suggestion.status, suggestion_models.STATUS_ACCEPTED)
         self.logout()
 
 
@@ -997,7 +1075,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             })], 'Changes.')
 
         self.save_new_skill(
-            self.SKILL_ID, self.owner_id, self.SKILL_DESCRIPTION)
+            self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1128,10 +1206,13 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         super(ReviewableSuggestionsHandlerTest, self).setUp()
         self.AUTHOR_EMAIL = 'author@example.com'
+        self.REVIEWER_EMAIL = 'reviewer@example.com'
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
+        self.signup(self.REVIEWER_EMAIL, 'reviewer')
+
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.TOPIC_ID = 'topic'
@@ -1169,16 +1250,19 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             })], 'Changes.')
 
         self.save_new_skill(
-            self.SKILL_ID, self.owner_id, self.SKILL_DESCRIPTION)
+            self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
-        self.reviewer_id = self.editor_id
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
+        user_services.allow_user_to_review_question(self.reviewer_id)
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id, 'hi')
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
         self.save_new_linear_exp_with_state_names_and_interactions(
@@ -1250,7 +1334,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_exploration_handler_returns_data(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.REVIEWER_EMAIL)
 
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content')
@@ -1261,7 +1345,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response, {})
 
     def test_skill_handler_returns_data(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.REVIEWER_EMAIL)
 
         response = self.get_json(
             '/getreviewablesuggestions/skill/add_question')
@@ -1272,7 +1356,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response, {})
 
     def test_handler_with_invalid_suggestion_type_raise_error(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.REVIEWER_EMAIL)
 
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content')
@@ -1280,10 +1364,10 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.get_json(
             '/getreviewablesuggestions/exploration/invalid_suggestion_type',
-            expected_status_int=400)
+            expected_status_int=404)
 
     def test_handler_with_invalid_target_type_raise_error(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.REVIEWER_EMAIL)
 
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content')

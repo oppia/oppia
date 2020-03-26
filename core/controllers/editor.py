@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Controllers for the editor view."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -108,6 +109,8 @@ class ExplorationHandler(EditorHandler):
                 self.user_id and not has_seen_editor_tutorial)
             exploration_data['show_state_translation_tutorial_on_load'] = (
                 self.user_id and not has_seen_translation_tutorial)
+            exploration_data['exploration_is_linked_to_story'] = bool(
+                exp_services.get_story_id_linked_to_exploration(exploration_id))
         except:
             raise self.PageNotFoundException
 

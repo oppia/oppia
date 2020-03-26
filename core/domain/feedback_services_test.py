@@ -13,10 +13,10 @@
 # limitations under the License.
 
 """Tests for feedback-related services."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
 import json
 
 from core.domain import email_services
@@ -29,6 +29,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (feedback_models, email_models) = models.Registry.import_models([
     models.NAMES.feedback, models.NAMES.email])
@@ -339,8 +340,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             self.user_id)
         thread_ids.append('exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID)
         thread_summaries, number_of_unread_threads = (
-            feedback_services.get_thread_summaries(
-                self.user_id, thread_ids))
+            feedback_services.get_thread_summaries(self.user_id, thread_ids))
         exploration_titles = (
             ['Bridges in England', 'Sillat Suomi', 'Leaning tower of Pisa'])
 
@@ -352,23 +352,21 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             'exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID))
         # Check if the number of unread messages match.
         self.assertEqual(number_of_unread_threads, 0)
-        for index, thread in enumerate(threads):
-            thread_summary = {
-                'status': thread.status,
-                'original_author_id': thread.original_author_id,
-                'last_updated': thread_summaries[index]['last_updated'],
-                'last_message_text': 'not used here',
-                'total_message_count': 1,
-                'last_message_is_read': True,
-                'second_last_message_is_read': False,
-                'author_last_message': user_services.get_username(
-                    self.user_id),
-                'author_second_last_message': None,
-                'exploration_title': exploration_titles[index]
-            }
-            # Check if the summaries match.
-            self.assertDictContainsSubset(
-                thread_summary, thread_summaries[index])
+        for summary, thread, exploration_title in python_utils.ZIP(
+                thread_summaries, threads, exploration_titles):
+            self.assertEqual(summary.status, thread.status)
+            self.assertEqual(
+                summary.original_author_id, thread.original_author_id)
+            self.assertEqual(summary.last_updated, thread.last_updated)
+            self.assertEqual(summary.last_message_text, 'not used here')
+            self.assertEqual(summary.total_message_count, 1)
+            self.assertTrue(summary.last_message_is_read)
+            self.assertFalse(summary.second_last_message_is_read)
+            self.assertEqual(
+                summary.author_last_message,
+                user_services.get_username(self.user_id))
+            self.assertIsNone(summary.author_second_last_message)
+            self.assertEqual(summary.exploration_title, exploration_title)
 
         feedback_services.create_message(
             threads[0].id, self.owner_id, None, None, 'editor message')
@@ -396,8 +394,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             self.owner_id, [thread_id_1, thread_id_2])
 
         self.assertEqual(len(thread_summaries), 2)
-        self.assertEqual(thread_summaries[0]['total_message_count'], 1)
-        self.assertEqual(thread_summaries[1]['total_message_count'], 1)
+        self.assertEqual(thread_summaries[0].total_message_count, 1)
+        self.assertEqual(thread_summaries[1].total_message_count, 1)
 
     def test_update_messages_read_by_the_user(self):
         feedback_services.create_thread(

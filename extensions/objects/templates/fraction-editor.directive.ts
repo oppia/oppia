@@ -17,44 +17,50 @@
  */
 
 angular.module('oppia').directive('fractionEditor', [
-  'FractionObjectFactory', 'UrlInterpolationService',
-  function(
-      FractionObjectFactory, UrlInterpolationService) {
+  'FractionObjectFactory', function(FractionObjectFactory) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/fraction-editor.directive.html'),
+      template: require('./fraction-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
         var errorMessage = '';
         var fractionString = '0';
-        if (ctrl.value !== null) {
-          var defaultFraction = FractionObjectFactory.fromDict(ctrl.value);
-          fractionString = defaultFraction.toString();
-        }
-        ctrl.localValue = {
-          label: fractionString
-        };
-
-        $scope.$watch('$ctrl.localValue.label', function(newValue) {
-          try {
-            var INTERMEDIATE_REGEX = /^\s*-?\s*$/;
-            if (!INTERMEDIATE_REGEX.test(newValue)) {
-              ctrl.value = FractionObjectFactory.fromRawInputString(newValue);
-            }
-            errorMessage = '';
-          } catch (parsingError) {
-            errorMessage = parsingError.message;
-          }
-        });
 
         ctrl.getWarningText = function() {
           return errorMessage;
+        };
+
+        ctrl.isValidFraction = function(value) {
+          if (value.length === 0) {
+            errorMessage = 'Please enter a non-empty fraction value.';
+            return false;
+          }
+          try {
+            var INTERMEDIATE_REGEX = /^\s*-?\s*$/;
+            if (!INTERMEDIATE_REGEX.test(value)) {
+              ctrl.value = FractionObjectFactory.fromRawInputString(value);
+            }
+            errorMessage = '';
+            return true;
+          } catch (parsingError) {
+            errorMessage = parsingError.message;
+            return false;
+          }
+        };
+
+        ctrl.$onInit = function() {
+          if (ctrl.value !== null) {
+            var defaultFraction = FractionObjectFactory.fromDict(ctrl.value);
+            fractionString = defaultFraction.toString();
+          }
+          ctrl.localValue = {
+            label: fractionString
+          };
         };
       }]
     };

@@ -35,6 +35,7 @@ SECTIONS_TO_ADD = [
     '[Add your name]']
 RELEASE_MAIL_MESSAGE_TEMPLATE = (
     'Hi all,\n\n'
+    '   We are happy to announce the release of v%s of Oppia.\n'
     '   The main changes in this release are %s.\n'
     '   %s.\n'
     '   %s\n'
@@ -42,7 +43,7 @@ RELEASE_MAIL_MESSAGE_TEMPLATE = (
     'testing, bug-fixing and QA, as well as %s for leading the QA team for '
     'this release.\n\n'
     'Thanks,\n'
-    '%s\n') % tuple(SECTIONS_TO_ADD)
+    '%s\n')
 
 PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 RELEASE_MAIL_MESSAGE_FILEPATH = os.path.join(
@@ -51,8 +52,11 @@ RELEASE_MAIL_MESSAGE_FILEPATH = os.path.join(
 
 def create_new_file_with_release_message_template():
     """Adds the template message to release mail filepath."""
+    release_version = common.get_current_release_version_number(
+        common.get_current_branch_name())
     with python_utils.open_file(RELEASE_MAIL_MESSAGE_FILEPATH, 'w') as f:
-        f.write(RELEASE_MAIL_MESSAGE_TEMPLATE)
+        f.write(RELEASE_MAIL_MESSAGE_TEMPLATE % (
+            tuple([release_version] + SECTIONS_TO_ADD)))
 
     common.ask_user_to_confirm(
         'Please make updates to following file %s for generating the '
@@ -130,11 +134,49 @@ def prompt_user_to_send_announcement_email():
         'Please make sure to check that the mail ids of new authors '
         'and contributors are correct.\n' % (
             RELEASE_MAIL_MESSAGE_FILEPATH, new_contributors_mail_ids))
-
     common.open_new_tab_in_browser_if_possible(
         'https://groups.google.com/forum/#!categories/oppia/announcements')
+    common.ask_user_to_confirm('Add announcements label to the email sent.\n')
     common.ask_user_to_confirm(
         'Ensure the email sent to oppia@ is in the Announcements category')
+
+
+def prepare_for_next_release():
+    """Asks the release co-ordinator:
+        1. To create a new chat group for the next release and send a message
+        to make the release & QA co-ordinators aware.
+        2. Send message to oppia-dev to inform about next release cut.
+        3. Send message to oppia-dev as a reminder for job submissions.
+    """
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.RELEASE_ROTA_URL)
+    common.ask_user_to_confirm(
+        'Create a new chat group for the next release, '
+        'and add the release coordinator, QA lead, Ankita '
+        'and Nithesh to that group. You can find the release schedule '
+        'and coordinators here: %s\n' % release_constants.RELEASE_ROTA_URL)
+    common.ask_user_to_confirm(
+        'Please send the following message to the newly created group:\n\n'
+        'Hi all, This is the group chat for the next release. '
+        '[Release co-ordinator\'s name] and [QA Lead\'s name] will be '
+        'the release co-ordinator & QA Lead for next release. '
+        'Please follow the release process doc: '
+        '[Add link to release process doc] to ensure the release '
+        'follows the schedule. Thanks!\n')
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.OPPIA_DEV_GROUP_URL)
+    common.ask_user_to_confirm(
+        'Send the following message to oppia-dev:\n\n'
+        'Hi all, This is an update for the next month\'s release. '
+        'The next month release cut is [Add release cut date for next month]. '
+        'Make sure you plan your tasks accordingly. Thanks!\n')
+    common.ask_user_to_confirm(
+        'Send the following message to oppia-dev:\n\n'
+        'Hi all, This is a reminder to fill in the job requests '
+        'here: %s if you are planning to run your job in the next release. '
+        'Please fill in the requests by [Add a deadline which is at least 7 '
+        'days before the next release cut]. Thanks!\n' % (
+            release_constants.JOBS_FORM_URL))
 
 
 def main():
@@ -157,6 +199,7 @@ def main():
     finally:
         if os.path.exists(RELEASE_MAIL_MESSAGE_FILEPATH):
             os.remove(RELEASE_MAIL_MESSAGE_FILEPATH)
+    prepare_for_next_release()
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

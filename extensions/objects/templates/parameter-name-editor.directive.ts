@@ -20,50 +20,48 @@
 // available in the context in which it is used.
 
 angular.module('oppia').directive('parameterNameEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/parameter-name-editor.directive.html'),
+      template: require('./parameter-name-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', 'ExplorationParamSpecsService',
         function($scope, $attrs, ExplorationParamSpecsService) {
           var ctrl = this;
-          ctrl.availableParamNames =
-            ExplorationParamSpecsService.savedMemento.getParamNames();
-
-          if (ctrl.availableParamNames.length === 0) {
-            ctrl.localValue = null;
-          } else {
-            ctrl.localValue = ctrl.availableParamNames[0];
-          }
-
           ctrl.validate = function() {
             return (ctrl.availableParamNames.length === 0) ? false : true;
           };
+          ctrl.$onInit = function() {
+            // Reset the component each time the value changes (e.g. if this is
+            // part of an editable list).
+            $scope.$watch('$ctrl.value', function(newValue) {
+              if (newValue) {
+                ctrl.localValue = newValue;
+              }
+            }, true);
 
-          ctrl.SCHEMA = {
-            type: 'unicode',
-            choices: ctrl.availableParamNames
-          };
+            $scope.$watch('$ctrl.localValue', function(newValue) {
+              ctrl.value = newValue;
+            });
+            ctrl.availableParamNames =
+              ExplorationParamSpecsService.savedMemento.getParamNames();
 
-          // Reset the component each time the value changes (e.g. if this is
-          // part of an editable list).
-          $scope.$watch('$ctrl.value', function(newValue) {
-            if (newValue) {
-              ctrl.localValue = newValue;
+            if (ctrl.availableParamNames.length === 0) {
+              ctrl.localValue = null;
+            } else {
+              ctrl.localValue = ctrl.availableParamNames[0];
             }
-          }, true);
 
-          $scope.$watch('$ctrl.localValue', function(newValue) {
-            ctrl.value = newValue;
-          });
+            ctrl.SCHEMA = {
+              type: 'unicode',
+              choices: ctrl.availableParamNames
+            };
+          };
         }
       ]
     };

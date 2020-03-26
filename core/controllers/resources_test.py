@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for Oppia resource handling (e.g. templates, images)."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -149,9 +150,12 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             story_id, admin_id, 'Title', 'Description', 'Notes',
             topic_id)
         self.save_new_topic(
-            topic_id, admin_id, 'Name', 'abbrev', None,
-            'Description', [story_id], [], [], [subtopic], 2)
-        self.save_new_skill(skill_id, admin_id, 'Description')
+            topic_id, admin_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[story_id],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
+        self.save_new_skill(skill_id, admin_id, description='Description')
 
         # Page context: Exploration.
         self.login(self.EDITOR_EMAIL)
@@ -744,3 +748,26 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(response_dict['error'], 'Audio not recognized as '
                          'a mp3 file')
+
+    def test_upload_check_for_duration_sec_as_response(self):
+        """Tests the file upload and trying to confirm the
+        audio file duration_secs is accurate.
+        """
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
+            mode='rb', encoding=None) as f:
+            raw_audio = f.read()
+        response_dict = self.post_json(
+            '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
+            {'filename': self.TEST_AUDIO_FILE_MP3},
+            csrf_token=csrf_token,
+            expected_status_int=200,
+            upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
+        )
+        self.logout()
+        expected_value = ({'filename': self.TEST_AUDIO_FILE_MP3,
+                           'duration_secs': 15.255510204081633})
+        self.assertEqual(response_dict, expected_value)

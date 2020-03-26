@@ -16,7 +16,7 @@
 
 """Pre-push hook that executes the Python/JS linters on all files that
 deviate from develop.
-(By providing the list of files to `scripts.pre_commit_linter`)
+(By providing the list of files to `scripts.linters.pre_commit_linter`)
 To install the hook manually simply execute this script from the oppia root dir
 with the `--install` flag.
 To bypass the validation upon `git push` use the following command:
@@ -51,7 +51,7 @@ FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 GIT_NULL_COMMIT = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 # CAUTION: __file__ is here *OPPIA/.git/hooks* and not in *OPPIA/scripts*.
-LINTER_MODULE = 'scripts.pre_commit_linter'
+LINTER_MODULE = 'scripts.linters.pre_commit_linter'
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir)
 LINTER_FILE_FLAG = '--files'
@@ -60,8 +60,9 @@ OPPIA_PARENT_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir, os.pardir)
 NPM_CMD = os.path.join(
     OPPIA_PARENT_DIR, 'oppia_tools', 'node-10.18.0', 'bin', 'npm')
 YARN_CMD = os.path.join(
-    OPPIA_PARENT_DIR, 'oppia_tools', 'yarn-v1.17.3', 'bin', 'yarn')
+    OPPIA_PARENT_DIR, 'oppia_tools', 'yarn-v1.22.0', 'bin', 'yarn')
 FRONTEND_TEST_SCRIPT = 'run_frontend_tests'
+TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT = 'check_e2e_tests_are_captured_in_ci'
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
@@ -338,6 +339,23 @@ def does_diff_include_js_or_ts_files(files_to_lint):
     return False
 
 
+def does_diff_include_travis_yml_or_js_files(files_to_lint):
+    """Returns true if diff includes .travis.yml or Javascript files.
+
+    Args:
+        files_to_lint: list(str). List of files to be linted.
+
+    Returns:
+        bool. Whether the diff contains changes in travis.yml or
+        Javascript files.
+    """
+
+    for filename in files_to_lint:
+        if filename.endswith('.js') or filename.endswith('.travis.yml'):
+            return True
+    return False
+
+
 def main(args=None):
     """Main method for pre-push hook that executes the Python/JS linters on all
     files that deviate from develop.
@@ -373,11 +391,19 @@ def main(args=None):
                         'Push failed, please correct the linting issues above.')
                     sys.exit(1)
             frontend_status = 0
+            travis_ci_check_status = 0
             if does_diff_include_js_or_ts_files(files_to_lint):
                 frontend_status = start_python_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
+                sys.exit(1)
+            if does_diff_include_travis_yml_or_js_files(files_to_lint):
+                travis_ci_check_status = start_python_script(
+                    TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT)
+            if travis_ci_check_status != 0:
+                python_utils.PRINT(
+                    'Push aborted due to failing e2e test configuration check.')
                 sys.exit(1)
     return
 

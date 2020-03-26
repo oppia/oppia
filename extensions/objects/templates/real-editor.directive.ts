@@ -17,33 +17,32 @@
  */
 
 angular.module('oppia').directive('realEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/real-editor.directive.html'),
+      template: require('./real-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
-        ctrl.schema = {
-          type: 'float'
-        };
+        ctrl.$onInit = function() {
+          $scope.$watch('$ctrl.value', function() {
+            if (ctrl.value === '') {
+              // A new rule
+              ctrl.value = 0.0;
+            }
+          });
+          ctrl.schema = {
+            type: 'float'
+          };
 
-        $scope.$watch('$ctrl.value', function() {
           if (ctrl.value === '') {
-            // A new rule
             ctrl.value = 0.0;
           }
-        });
-
-        if (ctrl.value === '') {
-          ctrl.value = 0.0;
-        }
+        };
       }]
     };
   }]);

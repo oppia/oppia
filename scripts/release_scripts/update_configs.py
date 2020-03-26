@@ -18,7 +18,7 @@ ONLY RELEASE COORDINATORS SHOULD USE THIS SCRIPT.
 
 Usage: Run this script from your oppia root folder:
 
-    python -m scripts.update_configs
+    python -m scripts.release_scripts.update_configs
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -51,7 +51,7 @@ FECONF_REGEX = '^([A-Z_]+ = ).*$'
 CONSTANTS_REGEX = '^(  "[A-Z_]+": ).*$'
 TERMS_PAGE_URL = (
     'https://github.com/oppia/oppia/commits/develop/core/'
-    'templates/dev/head/pages/terms-page/terms-page.mainpage.html')
+    'templates/pages/terms-page/terms-page.mainpage.html')
 
 
 def apply_changes_based_on_config(

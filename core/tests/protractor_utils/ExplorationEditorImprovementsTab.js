@@ -29,6 +29,7 @@ var ExplorationEditorImprovementsTab = function() {
   var allThreadMessages =
     $$('.protractor-test-improvements-thread-message-body');
 
+  var taskCount = $('.protractor-test-improvements-tab-task-count');
   var onlyOpenInput = $('.protractor-test-improvements-only-open-input');
   var confirmModalButton = $('.protractor-test-confirm-button');
   var closeModalButton = $('.protractor-test-improvements-close-modal-button');
@@ -61,31 +62,38 @@ var ExplorationEditorImprovementsTab = function() {
   var stateNameLocator =
     by.css('.protractor-test-improvements-task-state-name');
 
-  var newTaskStateNameMatcher = (expectedStateName) => {
-    return (task) => {
+  var newTaskStateNameMatcher = function(expectedStateName) {
+    return function(task) {
       return task.element(stateNameLocator).getText()
         .then(stateName => stateName === expectedStateName);
     };
   };
 
-  var newTaskTypeMatcher = (expectedTaskType) => {
-    return (task) => {
+  var newTaskTypeMatcher = function(expectedTaskType) {
+    return function(task) {
       return task.getAttribute('class')
         .then(cssClass => cssClass.includes(expectedTaskType));
     };
   };
 
-  var newTaskContentMatcher = (expectedContent) => {
-    return (task) => {
+  var newTaskContentMatcher = function(expectedContent) {
+    return function(task) {
       return task.element(taskBodyLocator).getText()
         .then(taskBody => taskBody.includes(expectedContent));
     };
   };
 
-  var newTaskTitleMatcher = (expectedTitle) => {
-    return (task) => {
+  var newTaskTitleMatcher = function(expectedTitle) {
+    return function(task) {
       return task.element(taskTitleLocator).getText()
         .then(taskTitle => taskTitle.includes(expectedTitle));
+    };
+  };
+
+  var newTaskStatusMatcher = function(expectedStatus) {
+    return function(task) {
+      return task.element(taskStatusLocator).getText()
+        .then(taskStatus => taskStatus === expectedStatus);
     };
   };
 
@@ -96,14 +104,18 @@ var ExplorationEditorImprovementsTab = function() {
    * @param {Iterable.<(ElementFinder) => Promise.<boolean>>} matchers
    * @returns {(ElementFinder) => Promise.<boolean>}
    */
-  var reduceTaskMatchers = (matchers) => {
-    return (task) => {
+  var reduceTaskMatchers = function(matchers) {
+    return function(task) {
       return Promise.all(matchers.map(isMatch => isMatch(task)))
         .then(matchResults => matchResults.every(m => m));
     };
   };
 
-  this.getAnswerDetailsTask = (stateName) => {
+  this.getTaskByStatus = function(expectedStatus) {
+    return allTasks.filter(newTaskStatusMatcher(expectedStatus)).first();
+  };
+
+  this.getAnswerDetailsTask = function(stateName) {
     var answerDetailsTaskMatcher = reduceTaskMatchers([
       newTaskTypeMatcher('answer-details'),
       newTaskStateNameMatcher(stateName),
@@ -111,7 +123,7 @@ var ExplorationEditorImprovementsTab = function() {
     return allTasks.filter(answerDetailsTaskMatcher).first();
   };
 
-  this.getFeedbackTask = (latestMessage) => {
+  this.getFeedbackTask = function(latestMessage) {
     var feedbackTaskMatcher = reduceTaskMatchers([
       newTaskTypeMatcher('feedback'),
       newTaskContentMatcher(latestMessage),
@@ -119,7 +131,7 @@ var ExplorationEditorImprovementsTab = function() {
     return allTasks.filter(feedbackTaskMatcher).first();
   };
 
-  this.getSuggestionTask = (description) => {
+  this.getSuggestionTask = function(description) {
     var suggestionTaskMatcher = reduceTaskMatchers([
       newTaskTypeMatcher('suggestion'),
       newTaskContentMatcher(description),
@@ -127,7 +139,7 @@ var ExplorationEditorImprovementsTab = function() {
     return allTasks.filter(suggestionTaskMatcher).first();
   };
 
-  this.getPlaythroughTask = (taskTitle) => {
+  this.getPlaythroughTask = function(taskTitle) {
     var playthroughTaskMatcher = reduceTaskMatchers([
       newTaskTypeMatcher('playthrough'),
       newTaskTitleMatcher(taskTitle),
@@ -135,41 +147,50 @@ var ExplorationEditorImprovementsTab = function() {
     return allTasks.filter(playthroughTaskMatcher).first();
   };
 
-  this.getTasks = () => {
+  this.getTasks = function() {
     return allTasks;
   };
 
-  this.getTaskStatus = (task) => {
+  this.getTaskStatus = function(task) {
     return task.element(taskStatusLocator).getText();
   };
 
-  this.clickTaskActionButton = (task, buttonText) => {
+  this.clickTaskActionButton = function(task, buttonText) {
     var buttonElement = task.element(by.buttonText(buttonText));
     waitFor.elementToBeClickable(
       buttonElement, 'Action button takes too long to become clickable');
     buttonElement.click();
   };
 
-  this.getTaskActionButtons = (task) => {
+  this.getTaskActionButtons = function(task) {
     return task.all(actionButtonLocator);
   };
 
-  this.verifyAnswerDetails = (expectedDetails, expectedInfoCount) => {
+  this.verifyOutstandingTaskCount = function(expectedTaskCount) {
+    expect(taskCount.getText()).toMatch(String(expectedTaskCount));
+  };
+
+  this.verifyNoOutstandingTasks = function() {
+    expect(taskCount.isDisplayed()).toBe(false);
+  };
+
+  this.verifyAnswerDetails = function(expectedDetails, expectedInfoCount) {
     expect(answerDetails.getText()).toMatch(expectedDetails);
     expect(answerInfoCount.getText()).toMatch(String(expectedInfoCount));
   };
 
-  this.verifyReadOnlyAnswerDetails = (expectedDetails, expectedInfoCount) => {
+  this.verifyReadOnlyAnswerDetails = function(
+      expectedDetails, expectedInfoCount) {
     this.verifyAnswerDetails(expectedDetails, expectedInfoCount);
     expect($$('.protractor-test-delete-items').count()).toEqual(0);
     expect($$('.protractor-test-select-answer-detail').count()).toEqual(0);
   };
 
-  this.getThreadMessages = () => {
+  this.getThreadMessages = function() {
     return allThreadMessages.map(message => message.getText());
   };
 
-  this.sendResponseAndCloseModal = (feedbackResponse, feedbackStatus) => {
+  this.sendResponseAndCloseModal = function(feedbackResponse, feedbackStatus) {
     responseTextarea.sendKeys(feedbackResponse);
     if (feedbackStatus) {
       responseStatusSelect.click();
@@ -178,45 +199,45 @@ var ExplorationEditorImprovementsTab = function() {
     responseSendButton.click();
   };
 
-  this.acceptSuggestion = () => {
+  this.acceptSuggestion = function(commitMessage = 'Commit message') {
     waitFor.elementToBeClickable(
       reviewSuggestionButton,
       'View Suggestion button takes too long to become clickable');
     reviewSuggestionButton.click();
 
-    suggestionCommitMessageInput.sendKeys('Commit message');
+    suggestionCommitMessageInput.sendKeys(commitMessage);
     waitFor.elementToBeClickable(
       acceptSuggestionButton,
       'Accept Suggestion button takes too long to become clickable');
     acceptSuggestionButton.click();
   };
 
-  this.rejectSuggestion = () => {
+  this.rejectSuggestion = function(rejectReason = 'Commit message') {
     waitFor.elementToBeClickable(
       reviewSuggestionButton,
       'View Suggestion button takes too long to become clickable');
     reviewSuggestionButton.click();
 
-    suggestionReviewMessageInput.sendKeys('Commit message');
+    suggestionReviewMessageInput.sendKeys(rejectReason);
     waitFor.elementToBeClickable(
       rejectSuggestionButton,
       'Accept Suggestion button takes too long to become clickable');
     rejectSuggestionButton.click();
   };
 
-  this.setShowOnlyOpenTasks = (choice = true) => {
+  this.setShowOnlyOpenTasks = function(choice = true) {
     if (choice !== onlyOpenInput.isSelected()) {
       onlyOpenInput.click();
     }
   };
 
-  this.confirmAction = () => {
+  this.confirmAction = function() {
     waitFor.elementToBeClickable(
       confirmModalButton, 'Confirm button takes too long to become clickable');
     confirmModalButton.click();
   };
 
-  this.closeModal = () => {
+  this.closeModal = function() {
     waitFor.elementToBeClickable(
       closeModalButton, 'Close button takes too long to become clickable');
     closeModalButton.click();

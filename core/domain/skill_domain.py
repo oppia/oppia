@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Domain objects relating to skills."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -62,8 +63,6 @@ CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION = (
     'migrate_misconceptions_schema_to_latest_version')
 CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION = (
     'migrate_rubrics_schema_to_latest_version')
-
-CMD_PUBLISH_SKILL = 'publish_skill'
 
 
 class SkillChange(change_domain.BaseChange):
@@ -839,14 +838,13 @@ class Skill(python_utils.OBJECT):
         """Updates the explanation of the skill.
 
         Args:
-            explanation: dict. The new explanation of the skill.
+            explanation: SubtitledHtml. The new explanation of the skill.
         """
         old_content_ids = []
         if self.skill_contents.explanation:
             old_content_ids = [self.skill_contents.explanation.content_id]
 
-        self.skill_contents.explanation = (
-            state_domain.SubtitledHtml.from_dict(explanation))
+        self.skill_contents.explanation = explanation
 
         new_content_ids = [self.skill_contents.explanation.content_id]
         self._update_content_ids_in_assets(old_content_ids, new_content_ids)
@@ -1172,73 +1170,6 @@ class SkillSummary(python_utils.OBJECT):
             'skill_model_last_updated': utils.get_time_in_millisecs(
                 self.skill_model_last_updated)
         }
-
-
-class SkillRights(python_utils.OBJECT):
-    """Domain object for skill rights."""
-
-    def __init__(self, skill_id, skill_is_private, creator_id):
-        """Constructor for a skill rights domain object.
-
-        Args:
-            skill_id: str. The id of the skill.
-            skill_is_private: bool. Whether the skill is private.
-            creator_id: str. The id of the creator of this skill.
-        """
-        self.id = skill_id
-        self.skill_is_private = skill_is_private
-        self.creator_id = creator_id
-
-    def to_dict(self):
-        """Returns a dict suitable for use by the frontend.
-
-        Returns:
-            dict. A dict version of SkillRights suitable for use by the
-                frontend.
-        """
-        return {
-            'skill_id': self.id,
-            'skill_is_private': self.skill_is_private,
-            'creator_id': self.creator_id
-        }
-
-    def is_creator(self, user_id):
-        """Checks whether the given user is the creator of this skill.
-
-        Args:
-            user_id: str. Id of the user.
-
-        Returns:
-            bool. Whether the user is the creator of this skill.
-        """
-        return bool(user_id == self.creator_id)
-
-    def is_private(self):
-        """Returns whether the skill is private.
-
-        Returns:
-            bool. Whether the skill is private.
-        """
-        return self.skill_is_private
-
-
-class SkillRightsChange(change_domain.BaseChange):
-    """Domain object for changes made to a skill rights object.
-
-    The allowed commands, together with the attributes:
-        - 'create_new'
-        - 'publish_skill'.
-    """
-
-    ALLOWED_COMMANDS = [{
-        'name': CMD_CREATE_NEW,
-        'required_attribute_names': [],
-        'optional_attribute_names': []
-    }, {
-        'name': CMD_PUBLISH_SKILL,
-        'required_attribute_names': [],
-        'optional_attribute_names': []
-    }]
 
 
 class UserSkillMastery(python_utils.OBJECT):

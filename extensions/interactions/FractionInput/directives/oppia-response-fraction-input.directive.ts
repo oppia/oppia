@@ -21,21 +21,20 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaResponseFractionInput', [
-  'FractionObjectFactory', 'HtmlEscaperService', 'UrlInterpolationService',
-  function(
-      FractionObjectFactory, HtmlEscaperService, UrlInterpolationService) {
+  'FractionObjectFactory', 'HtmlEscaperService',
+  function(FractionObjectFactory, HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/FractionInput/directives/' +
-        'fraction-input-response.directive.html'),
+      template: require('./fraction-input-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        ctrl.answer = FractionObjectFactory.fromDict(answer).toString();
+        ctrl.$onInit = function() {
+          var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          ctrl.answer = FractionObjectFactory.fromDict(answer).toString();
+        };
       }]
     };
   }

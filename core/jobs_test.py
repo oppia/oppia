@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for long running jobs and continuous computations."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -96,7 +97,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
             NotImplementedError,
             'Subclasses of BaseJobManager should implement _real_enqueue().'):
             jobs.BaseJobManager._real_enqueue(  # pylint: disable=protected-access
-                'job_id', taskqueue_services.QUEUE_NAME_DEFAULT, None)
+                'job_id', taskqueue_services.QUEUE_NAME_DEFAULT, None, None)
 
     def test_failing_jobs(self):
         observed_log_messages = []
@@ -1153,7 +1154,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 stats_models.ExplorationAnnotationsModel.get(self.EXP_ID)
 
             # Launch the batch computation.
-            StartExplorationEventCounter.start_computation()
+            batch_job_id = StartExplorationEventCounter.start_computation()
             # Data in realtime layer 0 is still there.
             self.assertEqual(MockStartExplorationRealtimeModel.get(
                 '0:%s' % self.EXP_ID).count, 1)
@@ -1164,7 +1165,15 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.assertTrue(
+                MockStartExplorationMRJobManager.is_active(batch_job_id))
+            self.assertFalse(
+                MockStartExplorationMRJobManager.has_finished(batch_job_id))
             self.process_and_flush_pending_tasks()
+            self.assertFalse(
+                MockStartExplorationMRJobManager.is_active(batch_job_id))
+            self.assertTrue(
+                MockStartExplorationMRJobManager.has_finished(batch_job_id))
             self.assertEqual(
                 stats_models.ExplorationAnnotationsModel.get(
                     self.EXP_ID).num_starts, 1)

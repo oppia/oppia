@@ -22,28 +22,16 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var ClassroomPage = require('../protractor_utils/ClassroomPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var TopicsAndSkillsDashboardPage = require(
-  '../protractor_utils/TopicsAndSkillsDashboardPage.js');
-var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 
 describe('Classroom page functionality', function() {
-  var adminPage = null;
   var classroomPage = null;
   var libraryPage = null;
-  var topicsAndSkillsDashboardPage = null;
-  var topicEditorPage = null;
 
   beforeAll(function() {
-    adminPage = new AdminPage.AdminPage();
     classroomPage = new ClassroomPage.ClassroomPage();
     libraryPage = new LibraryPage.LibraryPage();
-    topicsAndSkillsDashboardPage =
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
-    topicEditorPage =
-      new TopicEditorPage.TopicEditorPage();
 
     users.createAndLoginAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
@@ -51,31 +39,6 @@ describe('Classroom page functionality', function() {
 
   beforeEach(function() {
     users.login('creator@classroomPage.com');
-  });
-
-  it('should add a new published topic to the Math classroom', function() {
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
-    topicEditorPage.submitTopicThumbnail('../data/img.png');
-    topicEditorPage.saveTopic('Added thumbnail.');
-    browser.getCurrentUrl().then(function(url) {
-      var topicId = url.split('/')[4].slice(0, -1);
-      adminPage.editConfigProperty(
-        'The set of topic IDs for each classroom page.',
-        'List',
-        function(elem) {
-          elem.editItem(0, 'Dictionary').editEntry(1, 'List').addItem(
-            'Unicode').setValue(topicId);
-        });
-      classroomPage.get('Math');
-      classroomPage.expectNumberOfTopicsToBe(0);
-      topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
-      topicEditorPage.publishTopic();
-      classroomPage.get('Math');
-      classroomPage.expectNumberOfTopicsToBe(1);
-    });
-    users.logout();
   });
 
   it('should search for explorations from classroom page', function() {

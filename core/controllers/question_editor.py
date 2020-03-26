@@ -15,6 +15,7 @@
 """Controllers for the questions editor, from where questions are edited
 and are created.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -169,10 +170,6 @@ class EditableQuestionDataHandler(base.BaseHandler):
         """Gets the data for the question overview page."""
         question = question_services.get_question_by_id(
             question_id, strict=False)
-
-        if question is None:
-            raise self.PageNotFoundException(
-                'The question with the given id doesn\'t exist.')
 
         associated_skill_dicts = [
             skill.to_dict() for skill in skill_services.get_multi_skills(

@@ -18,6 +18,7 @@
 
 Only when frontend files are changed will it run Frontend Karma unit tests.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -27,9 +28,9 @@ import subprocess
 import python_utils
 
 from . import common
-from . import pre_commit_linter
 from . import run_backend_tests
 from . import run_frontend_tests
+from .linters import pre_commit_linter
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder prior to opening a PR:

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Controllers for suggestions."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -231,7 +232,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
     suggestion type.
     """
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.can_view_reviewable_suggestions
     def get(self, target_type, suggestion_type):
         """Handles GET requests."""
         try:

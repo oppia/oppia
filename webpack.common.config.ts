@@ -29,7 +29,7 @@ var htmlMinifyConfig = {
     /<\{%[\s\S]*?%\}/,
     /<\[[\s\S]*?\]>/]
 };
-var commonPrefix = './core/templates/dev/head';
+var commonPrefix = './core/templates';
 var defaultMeta = {
   name: 'Personalized Online Learning from Oppia',
   description: 'Oppia is a free, open-source learning platform. Join ' +
@@ -40,7 +40,7 @@ module.exports = {
   resolve: {
     modules: [
       path.resolve(__dirname, 'assets'),
-      path.resolve(__dirname, 'core/templates/dev/head'),
+      path.resolve(__dirname, 'core/templates'),
       path.resolve(__dirname, 'extensions'),
       path.resolve(__dirname, 'node_modules'),
       path.resolve(__dirname, 'third_party')
@@ -103,6 +103,9 @@ module.exports = {
     notifications_dashboard:
       commonPrefix + '/pages/notifications-dashboard-page/' +
       'notifications-dashboard-page.scripts.ts',
+    pending_account_deletion:
+      commonPrefix + '/pages/pending-account-deletion-page/' +
+      'pending-account-deletion-page.scripts.ts',
     practice_session:
       commonPrefix + '/pages/practice-session-page/' +
         'practice-session-page.scripts.ts',
@@ -141,19 +144,6 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      chunks: ['admin'],
-      filename: 'admin-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Oppia is a free site for sharing knowledge via ' +
-          'interactive lessons called \'explorations\'. Learn from ' +
-          'user-created explorations, or teach and create your own.'
-      },
-      template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['about'],
       filename: 'about-page.mainpage.html',
       meta: {
@@ -163,6 +153,19 @@ module.exports = {
         'site to create 1-1 learning scenarios for others.'
       },
       template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['admin'],
+      filename: 'admin-page.mainpage.html',
+      meta: {
+        name: defaultMeta.name,
+        description: 'Oppia is a free site for sharing knowledge via ' +
+          'interactive lessons called \'explorations\'. Learn from ' +
+          'user-created explorations, or teach and create your own.'
+      },
+      template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -422,14 +425,6 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['privacy'],
-      filename: 'privacy-page.mainpage.html',
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/privacy-page/privacy-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['notifications_dashboard'],
       filename: 'notifications-dashboard-page.mainpage.html',
       meta: {
@@ -442,6 +437,16 @@ module.exports = {
         '/pages/notifications-dashboard-page/' +
         'notifications-dashboard-page.mainpage.html'
       ),
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['pending_account_deletion'],
+      filename: 'pending-account-deletion-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+          commonPrefix + '/pages/pending-account-deletion-page/' +
+          'pending-account-deletion-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -463,6 +468,14 @@ module.exports = {
       },
       template:
         commonPrefix + '/pages/preferences-page/preferences-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['privacy'],
+      filename: 'privacy-page.mainpage.html',
+      meta: defaultMeta,
+      template: commonPrefix + '/pages/privacy-page/privacy-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -630,9 +643,7 @@ module.exports = {
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],
     }),
-    new ForkTsCheckerWebpackPlugin({
-      checkSyntacticErrors: true
-    }),
+    new ForkTsCheckerWebpackPlugin(),
     new webpack.LoaderOptionsPlugin({
       options: {
         macros: {
@@ -647,25 +658,30 @@ module.exports = {
       test: /\.ts$/,
       include: [
         path.resolve(__dirname, 'assets'),
-        path.resolve(__dirname, 'core/templates/dev/head'),
+        path.resolve(__dirname, 'core/templates'),
         path.resolve(__dirname, 'extensions'),
         path.resolve(__dirname, 'typings')
       ],
       use: [
-        'cache-loader',
-        'thread-loader',
         {
           loader: 'ts-loader',
           options: {
-            // this is needed for thread-loader to work correctly
-            happyPackMode: true
+            // fork-ts-checker plugin does the type checking.
+            transpileOnly: true
           }
         }
       ]
     },
     {
-      test: /\.html$/,
+      test: {
+        include: /.html$/,
+        exclude: /directive\.html$/
+      },
       loader: 'underscore-template-loader'
+    },
+    {
+      test: /directive\.html$/,
+      loader: 'html-loader'
     },
     {
       test: /\.css$/,

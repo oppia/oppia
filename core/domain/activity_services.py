@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Commands for operating on lists of activity references."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -73,29 +74,41 @@ def update_featured_activity_references(featured_activity_references):
 
 
 def remove_featured_activity(activity_type, activity_id):
-    """Removes the specified activity reference from the
-        list of featured activity references.
+    """Removes the specified activity reference from the list of featured
+    activity references.
 
     Args:
         activity_type: str. The type of the activity to remove.
         activity_id: str. The id of the activity to remove.
     """
+    remove_featured_activities(activity_type, [activity_id])
+
+
+def remove_featured_activities(activity_type, activity_ids):
+    """Removes the specified activity references from the list of featured
+    activity references.
+
+    Args:
+        activity_type: str. The type of the activities to remove.
+        activity_ids: list(str). The ids of the activities to remove.
+    """
     featured_references = get_featured_activity_references()
 
-    activity_reference_found = False
+    activity_references_ids_found = []
     new_activity_references = []
     for reference in featured_references:
-        if reference.type != activity_type or reference.id != activity_id:
+        if reference.type != activity_type or reference.id not in activity_ids:
             new_activity_references.append(reference)
         else:
-            activity_reference_found = True
+            activity_references_ids_found.append(reference.id)
 
-    if activity_reference_found:
+    if activity_references_ids_found:
         # It is quite unusual for a featured activity to be unpublished or
         # deleted, so we log a message.
-        logging.info(
-            'The %s with id %s was removed from the featured list.' % (
-                activity_type, activity_id))
+        for activity_id in activity_references_ids_found:
+            logging.info(
+                'The %s with id %s was removed from the featured list.' % (
+                    activity_type, activity_id))
         update_featured_activity_references(new_activity_references)
 
 
