@@ -98,8 +98,8 @@ describe('UnitsObjectFactory', () => {
         'N', '*', 'm', '/', 's^3', ')', ')']);
     expect(units.stringToLexical('mol per (kg per (N m per s^3) paise)'))
       .toEqual([
-        'mol', '/', '(', 'kg', '/', '(', 'N', '*',
-        'm', '/', 's^3', ')', 'paise', ')']);
+        'mol', '/', '(', 'kg', '/', '(', 'N',
+        '*','m', '/', 's^3', ')', 'paise', ')']);
   });
 
   it('should parse valid units strings', () => {
