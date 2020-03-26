@@ -186,10 +186,6 @@ class StorageModelsTest(test_utils.GenericTestBase):
         # be implemented, and the TO_BE_IMPLEMENTED value will be removed.
         # Contact @varun-tandon for more information.
         expected_unimplemented = {
-            collection_models.CollectionRightsSnapshotContentModel,
-            collection_models.CollectionRightsSnapshotMetadataModel,
-            collection_models.CollectionSnapshotContentModel,
-            collection_models.CollectionSnapshotMetadataModel,
             skill_models.SkillSnapshotMetadataModel,
             skill_models.SkillSnapshotContentModel,
             topic_models.SubtopicPageSnapshotContentModel,

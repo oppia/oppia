@@ -1189,6 +1189,13 @@ class BaseSnapshotContentModel(BaseModel):
         """BaseSnapshotContentModel doesn't have any field with user ID."""
         return USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
+    @staticmethod
+    def get_export_policy():
+        """The contents of snapshots are not relevant to the user for
+        Takeout.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def create(cls, snapshot_id, content):
         """This method returns an instance of the BaseSnapshotContentModel for
