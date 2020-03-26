@@ -17,4 +17,4 @@
  */
 
 window.CKEDITOR_BASEPATH = '/third_party/static/ckeditor-4.12.1/';
-require('../../third_party/static/ckeditor-4.12.1/ckeditor.js');
+require('static/ckeditor-4.12.1/ckeditor.js');
