@@ -1,0 +1,15 @@
+name: Commit Issue Commenter
+
+on:
+  issue_comment:
+    types: [created]
+jobs:
+  commentCreated:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add reaction
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          comment-id: ${{ github.event.comment.id }}
+          reaction-type: eyes
