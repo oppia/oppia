@@ -34,6 +34,9 @@ PSUTIL_VERSION = '5.6.7'
 
 CURRENT_PYTHON_BIN = sys.executable
 NODE_VERSION = '10.18.0'
+PYLINT_VERSION = '1.9.4'
+PYCODESTYLE_VERSION = '2.5.0'
+PYLINT_QUOTES_VERSION = '0.1.8'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = '1.22.0'
@@ -49,6 +52,11 @@ GOOGLE_APP_ENGINE_HOME = os.path.join(
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0', 'google-cloud-sdk')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
+PYLINT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylint-%s' % PYLINT_VERSION)
+PYCODESTYLE_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'pycodestyle-%s' % PYCODESTYLE_VERSION)
+PYLINT_QUOTES_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % PYLINT_QUOTES_VERSION)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
