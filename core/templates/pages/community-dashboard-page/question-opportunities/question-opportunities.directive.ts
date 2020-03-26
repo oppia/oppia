@@ -226,7 +226,7 @@ angular.module('oppia').directive('questionOpportunities', [
                     }
                     QuestionSuggestionService.submitSuggestion(
                       $scope.question, $scope.skill, $scope.skillDifficulty,
-                      opportunity.subheading, onSubmitSuggestionSuccess);
+                      onSubmitSuggestionSuccess);
                     $uibModalInstance.close();
                   };
                   // Checking if Question contains all requirements to enable

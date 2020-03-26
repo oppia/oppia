@@ -193,16 +193,14 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
             'cmd': 'create_new_fully_specified_question',
             'question_dict': 'question_dict',
             'skill_id': 'skill_1',
-            'skill_difficulty': '0.3',
-            'topic_name': 'topic_1'
+            'skill_difficulty': '0.3'
         }
 
         change_dict = {
             'cmd': 'create_new_fully_specified_question',
             'question_dict': 'question_dict',
             'skill_id': 'skill_1',
-            'skill_difficulty': '0.3',
-            'topic_name': 'topic_1'
+            'skill_difficulty': '0.3'
         }
         observed_object = question_domain.QuestionSuggestionChange(
             change_dict=change_dict,
