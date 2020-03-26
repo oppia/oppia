@@ -1194,7 +1194,7 @@ class BaseSnapshotContentModel(BaseModel):
         """The contents of snapshots are not relevant to the user for
         Takeout.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def create(cls, snapshot_id, content):
