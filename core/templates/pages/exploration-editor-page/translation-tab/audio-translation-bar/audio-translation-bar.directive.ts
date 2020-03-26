@@ -48,7 +48,7 @@ require('services/context.service.ts');
 require('services/editability.service.ts');
 require('services/id-generation.service.ts');
 require('services/user.service.ts');
-var WaveSurfer = require('third-party-imports/wave-surfer.import.ts');
+const WaveSurfer = require('third-party-imports/wave-surfer.import.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
