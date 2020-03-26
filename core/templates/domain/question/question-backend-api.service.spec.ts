@@ -313,4 +313,43 @@ describe('Question backend Api service', function() {
       });
       expect(failHandler).not.toHaveBeenCalled();
     });
+
+  it('should use the fail handler if skill ids is not a list',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+      QuestionBackendApiService.fetchQuestionSummaries(
+        'x', 1, true).then(successHandler, failHandler);
+      $rootScope.$digest();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
+      ' strings');
+    }
+  );
+
+  it('should use the fail handler if skill ids is not a list of strings',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+      QuestionBackendApiService.fetchQuestionSummaries(
+        [1, 2], 2, true).then(successHandler, failHandler);
+      $rootScope.$digest();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
+      ' strings');
+    }
+  );
+
+  it('should use the fail handler if skill ids is sent as null',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+      QuestionBackendApiService.fetchQuestionSummaries(
+        null, 1, true).then(successHandler, failHandler);
+      $rootScope.$digest();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
+      ' strings');
+    }
+  );
 });
