@@ -149,7 +149,8 @@ def main(args=None):
         python_utils.PRINT(
             'Backup restoration process initiated!\n'
             'To check the status of the project please run: '
-            'python -m scripts.restore_backup --check_status')
+            'python -m scripts.release_scripts.restore_backup '
+            '--check_status')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
