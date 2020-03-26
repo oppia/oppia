@@ -450,6 +450,15 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_contrib_score_data = {}
         expected_community_rights_data = {}
 
+        # SnapshotMetadataModels
+        (
+            expected_collection_rights_sm, expected_collection_sm,
+            expected_skill_sm, expected_subtopic_page_sm,
+            expected_topic_rights_sm, expected_topic_sm,
+            expected_story_sm, expected_question_sm,
+            expected_exploration_rights_sm, expected_exploration_sm,
+            expected_config_property_sm) = {}
+
         expected_export = {
             'user_stats_data': stats_data,
             'user_settings_data': settings_data,
@@ -475,7 +484,25 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_voiceover_application_data':
                 expected_voiceover_application_data,
             'user_contribution_scoring_data': expected_contrib_score_data,
-            'user_community_rights_data': expected_community_rights_data
+            'user_community_rights_data': expected_community_rights_data,
+            'collection_rights_snapshot_metadata_data':
+                expected_collection_rights_sm,
+            'collection_snapshot_metadata_data':
+                expected_collection_sm,
+            'skill_snapshot_metadata_data':
+                expected_skill_sm,
+            'subtopic_page_snapshot_metadata_data':
+                expected_suboptic_page_sm,
+            'topic_rights_snapshot_metadata_data':
+                expected_topic_rights_sm,
+            'topic_snapshot_metadata_data': expected_topic_sm,
+            'story_snapshot_metadata_data': expected_story_sm,
+            'question_snapshot_metadata_data': expected_question_sm,
+            'exploration_rights_snapshot_metadata_data':
+                expected_exploration_rights_sm,
+            'exploration_snapshot_metadata_data': expected_exploration_sm,
+            'config_property_snapshot_metadata_data':
+                expected_config_property_sm
         }
 
         # Perform export and compare.
