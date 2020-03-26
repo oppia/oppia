@@ -75,7 +75,7 @@
     </div>
 
     <div class="text-right" style="float: right">
-      <button ng-click="addNewMessage(activeThread.threadId, tmpMessage.text, tmpMessage.status)"
+      <button ng-click="addNewMessage(tmpMessage.text, tmpMessage.status)"
               ng-disabled="messageSendingInProgress || (!tmpMessage.text && activeThread.status === tmpMessage.status) || (!tmpMessage.text && (tmpMessage.status === 'ignored' || tmpMessage.status === 'not_actionable'))"
               class="btn btn-success protractor-test-improvements-response-send-button"
               style="margin-left: 8px">
