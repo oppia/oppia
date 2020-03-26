@@ -16,9 +16,9 @@
  * @fileoverview End-to-end testing utilities for the GraphInput interaction.
  */
 
-var forms = require(process.cwd() + 'core/tests/protractor_utils/forms.js');
+var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 var waitFor = require(
-  process.cwd() + 'core/tests/protractor_utils/waitFor.js');
+  process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
 var customizeInteraction = function(interactionEditor, graphDict) {
   var graphInputContainer = interactionEditor.element(by.css(
