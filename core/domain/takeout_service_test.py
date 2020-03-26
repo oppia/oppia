@@ -108,6 +108,13 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     SCORE_CATEGORY = (
         suggestion_models.SCORE_TYPE_TRANSLATION +
         suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+    GENERIC_MODEL_ID = 'model-id-1'
+    COMMIT_TYPE = 'create'
+    COMMIT_MESSAGE = 'This is a commit.'
+    COMMIT_CMDS = [
+        {'cmd': 'some_command'},
+        {'cmd2': 'another_command'}
+    ]
 
     def set_up_non_trivial(self):
         """Set up all models for use in testing.
@@ -366,6 +373,72 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             has_email_been_sent=False
         ).put()
 
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id=GENERIC_MODEL_ID, committer_id=USER_ID_1,
+            commit_type=COMMIT_TYPE, commit_message=COMMIT_MESSAGE,
+            commit_cmds=COMMIT_CMDS
+        ).put()
+
+        collection_models.CollectionSnapshotMetadataModel(
+            id=GENERIC_MODEL_ID, committer_id=USER_ID_1,
+            commit_type=COMMIT_TYPE, commit_message=COMMIT_MESSAGE,
+            commit_cmds=COMMIT_CMDS
+        ).put()
+
+        skill_models.SkillSnapshotMetadataModel(
+            id=GENERIC_MODEL_ID, committer_id=USER_ID_1,
+            commit_type=COMMIT_TYPE, commit_message=COMMIT_MESSAGE,
+            commit_cmds=COMMIT_CMDS
+        ).put()
+
+        topic_models.SubtopicPageSnapshotMetadataModel(
+            id=GENERIC_MODEL_ID, committer_id=USER_ID_1,
+            commit_type=COMMIT_TYPE, commit_message=COMMIT_MESSAGE,
+            commit_cmds=COMMIT_CMDS
+        ).put()
+
+        topic_models.TopicRightsSnapshotMetadataModel(
+            id=GENERIC_MODEL_ID, committer_id=USER_ID_1,
+            commit_type=COMMIT_TYPE, commit_message=COMMIT_MESSAGE,
+            commit_cmds=COMMIT_CMDS
+        ).put()
+
+        topic_models.TopicSnapshotMetadataModel(
+            id=GENERIC_MODEL_ID, committer_id=USER_ID_1,
+            commit_type=COMMIT_TYPE, commit_message=COMMIT_MESSAGE,
+            commit_cmds=COMMIT_CMDS
+        ).put()
+
+        story_models.StorySnapshotMetadataModel(
+            id=GENERIC_MODEL_ID, committer_id=USER_ID_1,
+            commit_type=COMMIT_TYPE, commit_message=COMMIT_MESSAGE,
+            commit_cmds=COMMIT_CMDS
+        ).put()
+
+        question_models.QuestionSnapshotMetadataModel(
+            id=GENERIC_MODEL_ID, committer_id=USER_ID_1,
+            commit_type=COMMIT_TYPE, commit_message=COMMIT_MESSAGE,
+            commit_cmds=COMMIT_CMDS
+        ).put()
+
+        exploration_models.ExplorationRightsSnapshotMetadataModel(
+            id=GENERIC_MODEL_ID, committer_id=USER_ID_1,
+            commit_type=COMMIT_TYPE, commit_message=COMMIT_MESSAGE,
+            commit_cmds=COMMIT_CMDS
+        ).put()
+
+        exploration_models.ExplorationSnapshotMetadatModel(
+            id=GENERIC_MODEL_ID, committer_id=USER_ID_1,
+            commit_type=COMMIT_TYPE, commit_message=COMMIT_MESSAGE,
+            commit_cmds=COMMIT_CMDS
+        ).put()
+
+        config_modesl.ConfigPropertySnapshotMetadataModel(
+            id=GENERIC_MODEL_ID, committer_id=USER_ID_1,
+            commit_type=COMMIT_TYPE, commit_message=COMMIT_MESSAGE,
+            commit_cmds=COMMIT_CMDS
+        ).put()
+
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         super(TakeoutServiceUnitTests, self).setUp()
@@ -450,14 +523,18 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_contrib_score_data = {}
         expected_community_rights_data = {}
 
-        # SnapshotMetadataModels
-        (
-            expected_collection_rights_sm, expected_collection_sm,
-            expected_skill_sm, expected_subtopic_page_sm,
-            expected_topic_rights_sm, expected_topic_sm,
-            expected_story_sm, expected_question_sm,
-            expected_exploration_rights_sm, expected_exploration_sm,
-            expected_config_property_sm) = {}
+        # SnapshotMetadataModels.
+        expected_collection_rights_sm = {}
+        expected_collection_sm = {}
+        expected_skill_sm = {}
+        expected_subtopic_page_sm = {}
+        expected_topic_rights_sm = {}
+        expected_topic_sm = {}
+        expected_story_sm = {}
+        expected_question_sm = {}
+        expected_exploration_rights_sm = {}
+        expected_exploration_sm = {}
+        expected_config_property_sm = {}
 
         expected_export = {
             'user_stats_data': stats_data,
@@ -492,7 +569,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'skill_snapshot_metadata_data':
                 expected_skill_sm,
             'subtopic_page_snapshot_metadata_data':
-                expected_suboptic_page_sm,
+                expected_subtopic_page_sm,
             'topic_rights_snapshot_metadata_data':
                 expected_topic_rights_sm,
             'topic_snapshot_metadata_data': expected_topic_sm,
@@ -742,6 +819,85 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             self.SCORE_CATEGORY_2: {
                 'has_email_been_sent': False,
                 'score': 2
+            }
+        }
+
+        # SnapshotMetadataModels.
+        expected_collection_rights_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': COMMIT_TYPE,
+                'commit_message': COMMIT_MESSAGE,
+                'commit_cmds': COMMIT_CMDS
+            }
+        }
+        expected_collection_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': COMMIT_TYPE,
+                'commit_message': COMMIT_MESSAGE,
+                'commit_cmds': COMMIT_CMDS
+            }
+        }
+        expected_skill_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': COMMIT_TYPE,
+                'commit_message': COMMIT_MESSAGE,
+                'commit_cmds': COMMIT_CMDS
+            }
+        }
+        expected_subtopic_page_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': COMMIT_TYPE,
+                'commit_message': COMMIT_MESSAGE,
+                'commit_cmds': COMMIT_CMDS
+            }
+        }
+        expected_topic_rights_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': COMMIT_TYPE,
+                'commit_message': COMMIT_MESSAGE,
+                'commit_cmds': COMMIT_CMDS
+            }
+        }
+        expected_topic_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': COMMIT_TYPE,
+                'commit_message': COMMIT_MESSAGE,
+                'commit_cmds': COMMIT_CMDS
+            }
+        }
+        expected_story_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': COMMIT_TYPE,
+                'commit_message': COMMIT_MESSAGE,
+                'commit_cmds': COMMIT_CMDS
+            }
+        }
+        expected_question_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': COMMIT_TYPE,
+                'commit_message': COMMIT_MESSAGE,
+                'commit_cmds': COMMIT_CMDS
+            }
+        }
+        expected_exploration_rights_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': COMMIT_TYPE,
+                'commit_message': COMMIT_MESSAGE,
+                'commit_cmds': COMMIT_CMDS
+            }
+        }
+        expected_exploration_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': COMMIT_TYPE,
+                'commit_message': COMMIT_MESSAGE,
+                'commit_cmds': COMMIT_CMDS
+            }
+        }
+        expected_config_property_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': COMMIT_TYPE,
+                'commit_message': COMMIT_MESSAGE,
+                'commit_cmds': COMMIT_CMDS
             }
         }
 
