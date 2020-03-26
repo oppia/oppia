@@ -34,9 +34,11 @@ class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration snapshot."""
     pass
 
+
 class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration snapshot."""
     pass
+
 
 class ExplorationModel(base_models.VersionedModel):
     """Versioned storage model for an Oppia exploration.
@@ -264,10 +266,12 @@ class ExplorationRightsSnapshotMetadataModel(
     """Storage model for the metadata for an exploration rights snapshot."""
     pass
 
+
 class ExplorationRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration rights snapshot."""
     pass
+
 
 class ExplorationRightsModel(base_models.VersionedModel):
     """Storage model for rights related to an exploration.

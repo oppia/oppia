@@ -30,9 +30,11 @@ class SkillSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a skill snapshot."""
     pass
 
+
 class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a skill snapshot."""
     pass
+
 
 class SkillModel(base_models.VersionedModel):
     """Model for storing Skills.

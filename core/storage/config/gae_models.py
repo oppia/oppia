@@ -29,9 +29,11 @@ class ConfigPropertySnapshotMetadataModel(
     """Storage model for the metadata for a config property snapshot."""
     pass
 
+
 class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content for a config property snapshot."""
     pass
+
 
 class ConfigPropertyModel(base_models.VersionedModel):
     """A class that represents a named configuration property.

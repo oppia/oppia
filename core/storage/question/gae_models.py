@@ -38,9 +38,11 @@ class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a question snapshot."""
     pass
 
+
 class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a question snapshot."""
     pass
+
 
 class QuestionModel(base_models.VersionedModel):
     """Model for storing Questions.

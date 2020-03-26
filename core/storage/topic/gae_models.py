@@ -33,9 +33,11 @@ class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic snapshot."""
     pass
 
+
 class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic snapshot."""
     pass
+
 
 class TopicModel(base_models.VersionedModel):
     """Model for storing Topics.
@@ -280,9 +282,11 @@ class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
     pass
 
+
 class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a subtopic page snapshot."""
     pass
+
 
 class SubtopicPageModel(base_models.VersionedModel):
     """Model for storing Subtopic pages.
@@ -412,9 +416,11 @@ class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic rights snapshot."""
     pass
 
+
 class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic rights snapshot."""
     pass
+
 
 class TopicRightsModel(base_models.VersionedModel):
     """Storage model for rights related to a topic.

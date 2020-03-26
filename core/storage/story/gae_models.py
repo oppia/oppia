@@ -30,9 +30,11 @@ class StorySnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a story snapshot."""
     pass
 
+
 class StorySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a story snapshot."""
     pass
+
 
 class StoryModel(base_models.VersionedModel):
     """Model for storing stories.
