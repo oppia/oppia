@@ -49,7 +49,6 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
 EXPORT_POLICY = utils.create_enum( # pylint: disable=invalid-name
     'CONTAINS_USER_DATA',
     'NOT_APPLICABLE',
-    'TO_BE_IMPLEMENTED'
 )
 
 # Types of user id migration policies. The pragma comment is needed because
