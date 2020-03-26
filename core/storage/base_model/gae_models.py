@@ -1160,6 +1160,13 @@ class BaseSnapshotMetadataModel(BaseModel):
         """
         return self.id[self.id.rfind(_VERSION_DELIMITER) + 1:]
 
+    @staticmethod
+    def get_export_policy():
+        """The contents of snapshots are not relevant to the user for
+        Takeout.
+        """
+        return EXPORT_POLICY.CONTAINS_USER_DATA
+
     @classmethod
     def export_data(cls, user_id):
         metadata_models = (

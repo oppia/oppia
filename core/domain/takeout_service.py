@@ -39,6 +39,9 @@ def get_models_which_should_be_exported():
         list(ndb.Model). List of models whose data should be
         exported.
     """
+    for model_class in models.Registry.get_all_storage_model_classes():
+        print(model_class.__name__)
+        model_class.get_export_policy()
     return [model_class for model_class in
             models.Registry.get_all_storage_model_classes()
             if model_class.get_export_policy() ==
