@@ -81,12 +81,16 @@ angular.module('oppia').directive('storyEditorNavbar', [
                   'Some chapters don\'t have exploration IDs provided.');
               }
             }
-            EditableStoryBackendApiService.validateExplorations(
-              $scope.story.getId(), explorationIds
-            ).then(function(validationIssues) {
-              $scope.validationIssues =
-                $scope.validationIssues.concat(validationIssues);
-            });
+
+            if (StoryEditorStateService.isExpIdChanged()) {
+              StoryEditorStateService.resetExpIdChanged();
+              EditableStoryBackendApiService.validateExplorations(
+                $scope.story.getId(), explorationIds
+              ).then(function(validationIssues) {
+                $scope.validationIssues =
+                  $scope.validationIssues.concat(validationIssues);
+              });
+            }
           };
 
           $scope.saveChanges = function() {

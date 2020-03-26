@@ -104,11 +104,14 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
         storyId, expIds, successCallback, errorCallback) {
       var validateExplorationsUrl = UrlInterpolationService.interpolateUrl(
         VALIDATE_EXPLORATIONS_URL_TEMPLATE, {
-          story_id: storyId,
-          exp_ids: expIds.join(',')
+          story_id: storyId
         });
 
-      $http.get(validateExplorationsUrl).then(function(response) {
+      $http.get(validateExplorationsUrl, {
+        params: {
+          comma_separated_exp_ids: expIds.join(',')
+        }
+      }).then(function(response) {
         if (successCallback) {
           successCallback(response.data.validation_error_messages);
         }

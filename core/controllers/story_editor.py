@@ -146,11 +146,15 @@ class ValidateExplorationsHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_edit_story
-    def get(self, _, exp_ids):
+    def get(self, _):
         """Handler that receives a list of exploration IDs, checks whether the
         corresponding explorations are supported on mobile and returns the
         validation error messages (if any).
         """
+        exp_ids = self.request.get('comma_separated_exp_ids')
+        if not exp_ids:
+            raise self.InvalidInputException(
+                'Expected comma_separated_exp_ids parameter to be present.')
         exp_ids = exp_ids.split(',')
         validation_error_messages = (
             story_services.validate_explorations(exp_ids, False))

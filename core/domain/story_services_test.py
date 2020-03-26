@@ -747,8 +747,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.validate_explorations(
                 ['invalid_exp', 'exp_id_1'], False))
         message_1 = (
-            'Expected story to only reference valid explorations, but '
-            'found an exploration with ID: invalid_exp (was it deleted?)')
+            'Expected story to only reference valid explorations, but found '
+            'a reference to an invalid exploration with ID: invalid_exp')
         message_2 = (
             'Exploration with ID exp_id_1 is not public. Please publish '
             'explorations before adding them to a story.'
@@ -813,6 +813,15 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
+        validation_error_messages = (
+            story_services.validate_explorations(
+                ['exp_id_2', 'exp_id_1'], False))
+
+        self.assertEqual(
+            validation_error_messages, [
+                'All explorations in a story should be of the same category. '
+                'The explorations with ID exp_id_2 and exp_id_1 have different '
+                'categories.'])
         with self.assertRaisesRegexp(
             Exception, 'All explorations in a story should be of the '
             'same category'):
@@ -836,6 +845,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
+        validation_error_messages = (
+            story_services.validate_explorations(['exp_id_1'], False))
+        self.assertEqual(
+            validation_error_messages, [
+                'Invalid language es found for exploration with ID exp_id_1.'])
         with self.assertRaisesRegexp(
             Exception, 'Invalid language es found for exploration with '
             'ID exp_id_1'):
@@ -859,6 +873,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
+        validation_error_messages = (
+            story_services.validate_explorations(['exp_id_1'], False))
+        self.assertEqual(
+            validation_error_messages, [
+                'Invalid interaction LogicProof in exploration with ID: '
+                'exp_id_1.'])
         with self.assertRaisesRegexp(
             Exception, 'Invalid interaction LogicProof in exploration with '
             'ID: exp_id_1'):
@@ -895,6 +915,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
+        validation_error_messages = (
+            story_services.validate_explorations(['exp_id_1'], False))
+        self.assertEqual(
+            validation_error_messages, [
+                'RTE content in state Introduction of exploration with '
+                'ID exp_id_1 is not supported on mobile.'])
         with self.assertRaisesRegexp(
             Exception, 'RTE content in state Introduction of exploration with '
             'ID exp_id_1 is not supported on mobile.'):
@@ -903,8 +929,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_update_story_with_exps_with_parameter_values(self):
         self.save_new_valid_exploration(
-            'exp_id_1', self.user_id_a, title='title', category='Category 1',
-            interaction_id='LogicProof')
+            'exp_id_1', self.user_id_a, title='title', category='Category 1')
         exp_services.update_exploration(
             self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -928,6 +953,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
+        validation_error_messages = (
+            story_services.validate_explorations(['exp_id_1'], False))
+        self.assertEqual(
+            validation_error_messages, [
+                'Expected no exploration to have parameter values in'
+                ' it. Invalid exploration: exp_id_1'])
         with self.assertRaisesRegexp(
             Exception, 'Expected no exploration to have parameter values in'
             ' it. Invalid exploration: exp_id_1'):

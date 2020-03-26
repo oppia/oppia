@@ -691,7 +691,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<story_id>' % feconf.STORY_PUBLISH_HANDLER,
         story_editor.StoryPublishHandler),
     get_redirect_route(
-        r'%s/<story_id>/<exp_ids>' %
+        r'%s/<story_id>' %
         feconf.VALIDATE_STORY_EXPLOATIONS_URL_PREFIX,
         story_editor.ValidateExplorationsHandler),
 

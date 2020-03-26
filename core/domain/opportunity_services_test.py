@@ -57,6 +57,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.USER_ID = 'user'
         self.SKILL_ID = 'skill'
         self.QUESTION_ID = question_services.get_new_question_id()
+
+        # Since a valid exploration is created here, it has EndExploration
+        # state as well, so the content in that has to be taken into account as
+        # well when checking content_count in the tests.
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
             self.owner_id,

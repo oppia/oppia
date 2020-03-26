@@ -238,8 +238,8 @@ def validate_explorations(exp_ids, raise_error):
     for exp_id in exp_ids:
         if exp_id not in exps_dict:
             error_string = (
-                'Expected story to only reference valid explorations, but '
-                'found an exploration with ID: %s (was it deleted?)'
+                'Expected story to only reference valid explorations, but found'
+                ' a reference to an invalid exploration with ID: %s'
                 % exp_id)
             if raise_error:
                 raise utils.ValidationError(error_string)

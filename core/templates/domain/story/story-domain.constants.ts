@@ -25,7 +25,7 @@ export class StoryDomainConstants {
     '/story_publish_handler/<story_id>';
 
   public static VALIDATE_EXPLORATIONS_URL_TEMPLATE =
-    '/validate_story_explorations/<story_id>/<exp_ids>';
+    '/validate_story_explorations/<story_id>';
 
   // These should match the constants defined in core.domain.story_domain.
   public static CMD_ADD_STORY_NODE = 'add_story_node';
