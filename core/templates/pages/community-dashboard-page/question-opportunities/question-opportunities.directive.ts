@@ -141,7 +141,8 @@ angular.module('oppia').directive('questionOpportunities', [
                     const result = {
                       skill: $scope.skill,
                       skillDifficulty:
-                        $scope.linkedSkillsWithDifficulty[0].getDifficulty()
+                        parseFloat(
+                          $scope.linkedSkillsWithDifficulty[0].getDifficulty())
                     };
                     $uibModalInstance.close(result);
                   };

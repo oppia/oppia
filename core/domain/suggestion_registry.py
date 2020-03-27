@@ -652,7 +652,7 @@ class SuggestionAddQuestion(BaseSuggestion):
 
     def _get_skill_difficulty(self):
         """Returns the suggestion's skill difficulty."""
-        return float(self.change.skill_difficulty)
+        return self.change.skill_difficulty
 
 
 class BaseVoiceoverApplication(python_utils.OBJECT):
