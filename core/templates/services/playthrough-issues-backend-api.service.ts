@@ -92,8 +92,8 @@ export class PlaythroughIssuesBackendApiService {
   }
 
   resolveIssue(
-      issueToResolve: any, expId: string, expVersion: number)
-      : Promise<unknown> {
+      issueToResolve: PlaythroughIssue, expId: string, expVersion: number)
+      : Promise<object> {
     return this.httpClient.post(
       this.getFullResolveIssueUrl(expId), {
         exp_issue_dict: issueToResolve.toBackendDict(),
