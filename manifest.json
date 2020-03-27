@@ -524,10 +524,7 @@
         "url": "https://unpkg.com/wavesurfer.js@2.2.1/dist",
         "rootDirPrefix": "waveSurfer-js-",
         "targetDirPrefix": "wave-surfer-js-",
-        "files": ["wavesurfer.min.js"],
-        "bundle": {
-          "js": ["wavesurfer.min.js"]
-        }
+        "files": ["wavesurfer.min.js"]
       }
     },
     "oppiaTools": {
