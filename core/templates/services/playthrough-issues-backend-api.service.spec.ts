@@ -19,6 +19,7 @@
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
 import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
 import { PlaythroughIssueObjectFactory } from
@@ -73,7 +74,8 @@ describe('PlaythroughIssuesBackendApiService', () => {
       req.flush(backendIssues);
 
       flushMicrotasks();
-      expect(successHandler).toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalledWith(
+        backendIssues.map(playthroughIssueObjectFactory.createFromBackendDict));
       expect(failureHandler).not.toHaveBeenCalled();
     }));
 
@@ -92,7 +94,9 @@ describe('PlaythroughIssuesBackendApiService', () => {
 
         flushMicrotasks();
 
-        expect(successHandler).toHaveBeenCalled();
+        expect(successHandler).toHaveBeenCalledWith(
+          backendIssues.map(
+            playthroughIssueObjectFactory.createFromBackendDict));
         expect(failureHandler).not.toHaveBeenCalled();
 
         // Try to fetch another issue
@@ -138,7 +142,9 @@ describe('PlaythroughIssuesBackendApiService', () => {
       req.flush(backendPlaythrough);
 
       flushMicrotasks();
-      expect(successHandler).toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalledWith(
+        playthroughIssueObjectFactory.createFromBackendDict(
+          backendPlaythrough));
       expect(failureHandler).not.toHaveBeenCalled();
     }));
   });
@@ -193,7 +199,9 @@ describe('PlaythroughIssuesBackendApiService', () => {
         flushMicrotasks();
 
         expect(successHandler).toHaveBeenCalled();
-        expect(failHandler).not.toHaveBeenCalled();
+        expect(failHandler).not.toHaveBeenCalledWith(
+          new Error('An issue which was not fetched from the backend has ' +
+          'been resolved'));
       }));
   });
 });

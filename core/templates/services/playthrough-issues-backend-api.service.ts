@@ -20,17 +20,15 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { PlaythroughIssueObjectFactory } from
+import { PlaythroughIssueObjectFactory, PlaythroughIssue } from
   'domain/statistics/PlaythroughIssueObjectFactory.ts';
+import { ServicesConstants } from 'services/services.constants.ts';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
-
-import { ServicesConstants } from 'services/services.constants.ts';
 
 @Injectable({
   providedIn: 'root'
 })
-
 export class PlaythroughIssuesBackendApiService {
   constructor(
     private httpClient: HttpClient,
@@ -39,14 +37,14 @@ export class PlaythroughIssuesBackendApiService {
 
   private cachedIssues = null;
 
-  private getFullIssuesUrl(explorationId: string) {
+  private getFullIssuesUrl(explorationId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.FETCH_ISSUES_URL, {
         exploration_id: explorationId
       });
   }
 
-  private getFullPlaythroughUrl(expId: string, playthroughId: string) {
+  private getFullPlaythroughUrl(expId: string, playthroughId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.FETCH_PLAYTHROUGH_URL, {
         exploration_id: expId,
@@ -54,14 +52,20 @@ export class PlaythroughIssuesBackendApiService {
       });
   }
 
-  private getFullResolveIssueUrl(explorationId: string) {
+  private getFullResolveIssueUrl(explorationId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.RESOLVE_ISSUE_URL, {
         exploration_id: explorationId
       });
   }
 
-  fetchIssues(explorationId: string, explorationVersion: any) {
+  // TODO(#7165): This has been marked any since marking explorationVersion
+  // to number throws an error. "Type 'number' is not assignable to type
+  // 'string | string[]'" and if this is marked to string it throws an
+  // error "TS2345: Argument of type '1' is not assignable to parameter
+  // of type 'string'".
+
+  fetchIssues(explorationId: string, explorationVersion: any): Promise<string> {
     if (this.cachedIssues !== null) {
       return new Promise((resolve) => resolve(this.cachedIssues));
     } else {
@@ -77,7 +81,8 @@ export class PlaythroughIssuesBackendApiService {
     }
   }
 
-  fetchPlaythrough(expId: string, playthroughId: string) {
+  fetchPlaythrough(expId: string, playthroughId: string)
+  : Promise<PlaythroughIssue> {
     return this.httpClient.get(
       this.getFullPlaythroughUrl(expId, playthroughId), { observe: 'response' })
       .toPromise().then((response: any) => {
@@ -87,7 +92,8 @@ export class PlaythroughIssuesBackendApiService {
       });
   }
 
-  resolveIssue(issueToResolve: any, expId: string, expVersion: number) {
+  resolveIssue(issueToResolve: any, expId: string, expVersion: number)
+  : Promise<unknown> {
     return this.httpClient.post(
       this.getFullResolveIssueUrl(expId), {
         exp_issue_dict: issueToResolve.toBackendDict(),
