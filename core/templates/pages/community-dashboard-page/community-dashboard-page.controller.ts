@@ -66,10 +66,22 @@ angular.module('oppia').directive('communityDashboardPage', [
             COMMUNITY_DASHBOARD_TABS_DETAILS,
             DEFAULT_OPPORTUNITY_LANGUAGE_CODE) {
           var ctrl = this;
+
           var prevSelectedLanguageCode = (
             LocalStorageService.getLastSelectedTranslationLanguageCode());
-          var allAudioLanguageCodes = LanguageUtilService
-            .getAllVoiceoverLanguageCodes();
+          var allAudioLanguageCodes = (
+            LanguageUtilService.getAllVoiceoverLanguageCodes());
+
+          var getLanguageDescriptions = function(languageCodes) {
+            var languageDescriptions = [];
+            languageCodes.forEach(function(languageCode) {
+              languageDescriptions.push(
+                LanguageUtilService.getAudioLanguageDescription(
+                  languageCode));
+            });
+            return languageDescriptions;
+          };
+
           ctrl.onChangeLanguage = function() {
             TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
             LocalStorageService.updateLastSelectedTranslationLanguageCode(
@@ -87,13 +99,42 @@ angular.module('oppia').directive('communityDashboardPage', [
           ctrl.$onInit = function() {
             ctrl.profilePictureDataUrl = null;
             ctrl.username = null;
+            ctrl.userIsReviewer = false;
+            ctrl.userCanReviewTranslationSuggestionsInLanguages = [];
+            ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
+            ctrl.userCanReviewQuestions = false;
 
             UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
               ctrl.profilePictureDataUrl = dataUrl;
             });
 
+            UserService.getUserCommunityRightsData().then(
+              function(userCommunityRights) {
+                ctrl.userCanReviewTranslationSuggestionsInLanguages = (
+                  getLanguageDescriptions(
+                    userCommunityRights
+                      .can_review_translation_for_language_codes));
+
+                ctrl.userCanReviewVoiceoverSuggestionsInLanguages = (
+                  getLanguageDescriptions(
+                    userCommunityRights
+                      .can_review_voiceover_for_language_codes));
+
+                ctrl.userCanReviewQuestions = (
+                  userCommunityRights.can_review_questions);
+
+                ctrl.userIsReviewer = (
+                  ctrl.userCanReviewTranslationSuggestionsInLanguages
+                    .length > 0 ||
+                  ctrl.userCanReviewVoiceoverSuggestionsInLanguages
+                    .length > 0 ||
+                  ctrl.userCanReviewQuestions);
+              });
+
             UserService.getUserInfoAsync().then(function(userInfo) {
-              ctrl.username = userInfo.getUsername();
+              if (userInfo.isLoggedIn()) {
+                ctrl.username = userInfo.getUsername();
+              }
             });
 
             ctrl.languageCodesAndDescriptions = (

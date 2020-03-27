@@ -16,11 +16,6 @@
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-
 require('directives/focus-on.directive.ts');
 
 require('pages/Base.ts');
@@ -71,6 +66,11 @@ require('google-analytics.initializer.ts');
 // loaded after app.constants.ts
 require('I18nFooter.ts');
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
 angular.module('oppia').config([
@@ -79,6 +79,32 @@ angular.module('oppia').config([
   function(
       $compileProvider, $cookiesProvider, $httpProvider,
       $interpolateProvider, $locationProvider, $provide) {
+    var ugs = new UpgradedServices();
+    // We need to provide these services separately since they are
+    // used in the directives imported in this file and cannot be
+    // injected before bootstrapping of oppia module.
+    var servicesToProvide = [
+      'AlertsService', 'BackgroundMaskService', 'BrowserCheckerService',
+      'CodeReplRulesService', 'ContextService', 'CsrfTokenService',
+      'DateTimeFormatService', 'DebouncerService', 'DeviceInfoService',
+      'DocumentAttributeCustomizationService',
+      'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
+      'ExpressionParserService', 'ExtensionTagAssemblerService',
+      'ExtractImageFilenamesFromStateService',
+      'HtmlEscaperService', 'IdGenerationService', 'InteractionObjectFactory',
+      'LoggerService', 'MetaTagCustomizationService', 'NormalizeWhitespacePipe',
+      'PencilCodeEditorRulesService', 'SidebarStatusService',
+      'SiteAnalyticsService', 'SkillObjectFactory', 'SolutionObjectFactory',
+      'StateCardObjectFactory', 'StateImprovementSuggestionService',
+      'StateObjectFactory', 'StatesObjectFactory', 'TextInputRulesService',
+      'UrlInterpolationService', 'UrlService', 'UserInfoObjectFactory',
+      'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
+      'WindowRef'];
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      if (servicesToProvide.includes(key)) {
+        $provide.value(key, value);
+      }
+    }
     // Refer: https://docs.angularjs.org/guide/migration
     // #migrate1.5to1.6-ng-services-$location
     // The default hash-prefix used for URLs has changed from
@@ -87,11 +113,6 @@ angular.module('oppia').config([
     // the URL will become mydomain.com/#!/a/b/c.  So, the line
     // here is to change the prefix back to empty string.
     $locationProvider.hashPrefix('');
-
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
     // This improves performance by disabling debug data. For more details,
     // see https://code.angularjs.org/1.5.5/docs/guide/production
     $compileProvider.debugInfoEnabled(false);
@@ -221,7 +242,8 @@ angular.module('oppia').config(['toastrConfig', function(toastrConfig) {
 // spread over multiple lines. The errored file may be viewed on the
 // browser console where the line number should match.
 angular.module('oppia').factory('$exceptionHandler', [
-  '$log', 'CsrfTokenService', function($log, CsrfTokenService) {
+  '$log', 'CsrfTokenService', 'DEV_MODE',
+  function($log, CsrfTokenService, DEV_MODE) {
     var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
     // Refer: https://docs.angularjs.org/guide/migration#-templaterequest-
     // The tpload error namespace has changed in Angular v1.7.
@@ -255,46 +277,49 @@ angular.module('oppia').factory('$exceptionHandler', [
       if (tploadStatusCode !== null && tploadStatusCode[1] === '-1') {
         return;
       }
-      sourceMappedStackTrace.mapStackTrace(
-        exception.stack, function(mappedStack) {
-          var messageAndSourceAndStackTrace = [
-            '',
-            'Cause: ' + cause,
-            exception.message,
-            mappedStack.join('\n'),
-            '    at URL: ' + window.location.href
-          ].join('\n');
-          // To prevent an overdose of errors, throttle to at most 1 error every
-          // MIN_TIME_BETWEEN_ERRORS_MSEC.
-          if (
-            Date.now() - timeOfLastPostedError > MIN_TIME_BETWEEN_ERRORS_MSEC) {
-            // Catch all errors, to guard against infinite recursive loops.
-            try {
-              // We use jQuery here instead of Angular's $http, since the latter
-              // creates a circular dependency.
-              CsrfTokenService.getTokenAsync().then(function(token) {
-                $.ajax({
-                  type: 'POST',
-                  url: '/frontend_errors',
-                  data: $.param({
-                    csrf_token: token,
-                    payload: JSON.stringify({
-                      error: messageAndSourceAndStackTrace
-                    }),
-                    source: document.URL
-                  }, true),
-                  contentType: 'application/x-www-form-urlencoded',
-                  dataType: 'text',
-                  async: true
-                });
+      if (!DEV_MODE) {
+        sourceMappedStackTrace.mapStackTrace(
+          exception.stack, function(mappedStack) {
+            var messageAndSourceAndStackTrace = [
+              '',
+              'Cause: ' + cause,
+              exception.message,
+              mappedStack.join('\n'),
+              '    at URL: ' + window.location.href
+            ].join('\n');
+            var timeDifference = Date.now() - timeOfLastPostedError;
+            // To prevent an overdose of errors, throttle to at most 1 error
+            // every MIN_TIME_BETWEEN_ERRORS_MSEC.
+            if (timeDifference > MIN_TIME_BETWEEN_ERRORS_MSEC) {
+              // Catch all errors, to guard against infinite recursive loops.
+              try {
+                // We use jQuery here instead of Angular's $http, since the
+                // latter creates a circular dependency.
+                CsrfTokenService.getTokenAsync().then(function(token) {
+                  $.ajax({
+                    type: 'POST',
+                    url: '/frontend_errors',
+                    data: $.param({
+                      csrf_token: token,
+                      payload: JSON.stringify({
+                        error: messageAndSourceAndStackTrace
+                      }),
+                      source: document.URL
+                    }, true),
+                    contentType: 'application/x-www-form-urlencoded',
+                    dataType: 'text',
+                    async: true
+                  });
 
-                timeOfLastPostedError = Date.now();
-              });
-            } catch (loggingError) {
-              $log.warn('Error logging failed.');
+                  timeOfLastPostedError = Date.now();
+                });
+              } catch (loggingError) {
+                $log.warn('Error logging failed.');
+              }
             }
           }
-        });
+        );
+      }
       $log.error.apply($log, arguments);
     };
   }
