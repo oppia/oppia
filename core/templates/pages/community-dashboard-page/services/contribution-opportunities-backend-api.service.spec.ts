@@ -50,7 +50,7 @@ describe('Contribution Opportunities backend API service', function() {
     next_cursor: '6',
     more: true
   };
-  const skillExplorationOpportunity = {
+  const skillOpportunity = {
     opportunities: [{
       id: 'exp_id',
       topic_name: 'Topic',
@@ -85,12 +85,12 @@ describe('Contribution Opportunities backend API service', function() {
     ];
     sampleTranslationOpportunitiesResponse = [
       explorationOpportunitySummaryObjectFactory.createFromBackendDict(
-        skillExplorationOpportunity.opportunities[0]
+        skillOpportunity.opportunities[0]
       )
     ];
     sampleVoiceoverOpportunitiesResponse = [
       explorationOpportunitySummaryObjectFactory.createFromBackendDict(
-        skillExplorationOpportunity.opportunities[0]
+        skillOpportunity.opportunities[0]
       )
     ];
   });
@@ -99,7 +99,7 @@ describe('Contribution Opportunities backend API service', function() {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch the skills opportunities data',
+  it('should successfully fetch the skill opportunities data',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
@@ -141,7 +141,7 @@ describe('Contribution Opportunities backend API service', function() {
         ) + '?language_code=hi&cursor='
       );
       expect(req.request.method).toEqual('GET');
-      req.flush(skillExplorationOpportunity);
+      req.flush(skillOpportunity);
 
       flushMicrotasks();
 
@@ -167,7 +167,7 @@ describe('Contribution Opportunities backend API service', function() {
         ) + '?language_code=hi&cursor='
       );
       expect(req.request.method).toEqual('GET');
-      req.flush(skillExplorationOpportunity);
+      req.flush(skillOpportunity);
 
       flushMicrotasks();
 
