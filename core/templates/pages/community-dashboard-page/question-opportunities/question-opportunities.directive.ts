@@ -71,13 +71,6 @@ angular.module('oppia').directive('questionOpportunities', [
             QuestionObjectFactory, QuestionUndoRedoService,
             SkillBackendApiService, SkillObjectFactory) {
           const ctrl = this;
-          const getOpportunity = function(skillId) {
-            for (const index in ctrl.opportunities) {
-              if (ctrl.opportunities[index].id === skillId) {
-                return ctrl.opportunities[index];
-              }
-            }
-          };
 
           const updateWithNewOpportunities = function(opportunities, more) {
             for (const index in opportunities) {
@@ -175,7 +168,6 @@ angular.module('oppia').directive('questionOpportunities', [
 
           ctrl.createQuestion = function(skill, skillDifficulty) {
             const skillId = skill.getId();
-            const opportunity = getOpportunity(skillId);
             const question =
               QuestionObjectFactory.createDefaultQuestion([skillId]);
             const questionId = question.getId();
