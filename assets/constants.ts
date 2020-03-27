@@ -522,6 +522,15 @@ export = {
     ]
   }],
 
+  "REVIEW_CATEGORY_TRANSLATION": "translation",
+  "REVIEW_CATEGORY_VOICEOVER": "voiceover",
+  "REVIEW_CATEGORY_QUESTION": "question",
+
+  "ACTION_REMOVE_ALL_REVIEW_RIGHTS": "all",
+  "ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS": "specific",
+  "USER_FILTER_CRITERION_USERNAME": "username",
+  "USER_FILTER_CRITERION_ROLE": "role",
+
   // Interaction IDs for which answer details cannot be solicited.
   "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],
 

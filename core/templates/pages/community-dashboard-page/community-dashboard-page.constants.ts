@@ -37,20 +37,6 @@ export class CommunityDashboardConstants {
       description: 'Translate the text in the lessons to break the ' +
         'language barrier for non-English speaker.',
       customizationOptions: ['language', 'sort']
-    },
-    voiceoverTab: {
-      ariaLabel: 'See opportunities for voiceover.',
-      tabName: 'Voiceover',
-      description: 'Create voiceover in a language of your own choice ' +
-        'to give user a full experience.',
-      customizationOptions: ['language', 'sort']
-    },
-    artTab: {
-      ariaLabel: 'See opportunities for art.',
-      tabName: 'Submit art',
-      description: 'Design digital art that makes the lessons even ' +
-        'more engaging.',
-      customizationOptions: ['sort']
     }
   };
 
