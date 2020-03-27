@@ -124,25 +124,22 @@ class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         # This exploration is valid (has no equation/inequalities) therefore
         # it shouldn't be detected by this audit job.
-        answer_group_list1 = [{
-            'rule_specs': [{
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': u'[\'x+y-z\']'}
-            }],
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state1</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        answer_group_list1 = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'Introduction',
+                    state_domain.SubtitledHtml(
+                        'feedback', '<p>Outcome for state1</p>'
+                    ), False, [], None, None,
+                ),
+                [
+                    state_domain.RuleSpec(
+                        'IsMathematicallyEquivalentTo', {'x': u'[\'x+y-z\']'}
+                    ),
+                ],
+                [], None
+            ),
+        ]
 
         state1.update_interaction_answer_groups(answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -161,50 +158,44 @@ class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         # This exploration is invalid (has an equation) therefore
         # it should be detected by this audit job.
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': u'[\'y=mx+c\']'}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        answer_group_list2 = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'State1',
+                    state_domain.SubtitledHtml(
+                        'feedback', '<p>Outcome for state2</p>'
+                    ), False, [], None, None,
+                ),
+                [
+                    state_domain.RuleSpec(
+                        'IsMathematicallyEquivalentTo', {'x': u'[\'y=mx+c\']'}
+                    ),
+                ],
+                [], None
+            ),
+        ]
 
         state2.update_interaction_answer_groups(answer_group_list2)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # This exploration is invalid (has inequalities) therefore
         # it should be detected by this audit job.
-        answer_group_list3 = [{
-            'rule_specs': [{
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': u'[\'x<y>z\']'}
-            }],
-            'outcome': {
-                'dest': 'State2',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state3</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        answer_group_list3 = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'State2',
+                    state_domain.SubtitledHtml(
+                        'feedback', '<p>Outcome for state3</p>'
+                    ), False, [], None, None,
+                ),
+                [
+                    state_domain.RuleSpec(
+                        'IsMathematicallyEquivalentTo', {'x': u'[\'x<y>z\']'}
+                    ),
+                ],
+                [], None
+            ),
+        ]
 
         state3.update_interaction_answer_groups(answer_group_list3)
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -236,25 +227,22 @@ class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         state1.update_interaction_id('MathExpressionInput')
 
-        answer_group_list = [{
-            'rule_specs': [{
-                'rule_type': 'IsMathematicallyEquivalentTo',
-                'inputs': {'x': u'[\'y=mx+c\']'}
-            }],
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state1</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        answer_group_list = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'Introduction',
+                    state_domain.SubtitledHtml(
+                        'feedback', '<p>Outcome for state1</p>'
+                    ), False, [], None, None,
+                ),
+                [
+                    state_domain.RuleSpec(
+                        'IsMathematicallyEquivalentTo', {'x': u'[\'y=mx+c\']'}
+                    ),
+                ],
+                [], None
+            ),
+        ]
 
         state1.update_interaction_answer_groups(answer_group_list)
 

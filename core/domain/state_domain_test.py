@@ -245,41 +245,34 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_default_outcome(default_outcome)
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
-        answer_group_dict = {
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': (
+
+        answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name,
+                state_domain.SubtitledHtml(
+                    'feedback_1', (
                         '<p><oppia-noninteractive-tabs tab_contents-with-value='
                         '"{"title": "Hint introduction", "content": "This set '
                         'of tabs shows some hints. Click on the other tabs to '
                         'display the relevant hints."}">'
                         '</oppia-noninteractive-tabs> Other Text </p>')
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
+                ), False, [], None, None,
+            ),
+            [
+                state_domain.RuleSpec(
+                    'Contains', {'x': 'Test'}
+                ),
+            ],
+            [], None
+        ),
 
-        init_state.update_interaction_answer_groups(
-            [answer_group_dict])
+        init_state.update_interaction_answer_groups([answer_group])
         self.assertFalse(init_state.is_rte_content_supported_on_android())
-        answer_group_dict['outcome']['feedback']['html'] = (
+        answer_group.outcome.feedback.html = (
             '<p><oppia-noninteractive-image>'
             '</oppia-noninteractive-image></p>')
         init_state.update_interaction_answer_groups(
-            [answer_group_dict])
+            [answer_group])
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
         init_state.update_content(
