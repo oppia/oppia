@@ -48,6 +48,8 @@ angular.module('oppia').directive('storyEditorNavbar', [
             EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           var ctrl = this;
+          $scope.explorationValidationIssues = [];
+
           $scope.getChangeListLength = function() {
             return UndoRedoService.getChangeCount();
           };
@@ -64,6 +66,8 @@ angular.module('oppia').directive('storyEditorNavbar', [
 
           $scope.discardChanges = function() {
             UndoRedoService.clearChanges();
+            $scope.validationIssues = [];
+            $scope.explorationValidationIssues = [];
             StoryEditorStateService.loadStory($scope.story.getId());
           };
 
@@ -82,14 +86,20 @@ angular.module('oppia').directive('storyEditorNavbar', [
               }
             }
 
-            if (StoryEditorStateService.isExpIdChanged()) {
-              StoryEditorStateService.resetExpIdChanged();
+            if (StoryEditorStateService.getExpIdsChanged()) {
+              StoryEditorStateService.resetExpIdsChanged();
               EditableStoryBackendApiService.validateExplorations(
                 $scope.story.getId(), explorationIds
               ).then(function(validationIssues) {
+                $scope.explorationValidationIssues = validationIssues;
                 $scope.validationIssues =
-                  $scope.validationIssues.concat(validationIssues);
+                  $scope.validationIssues.concat(
+                    $scope.explorationValidationIssues);
               });
+            } else {
+              $scope.validationIssues =
+                $scope.validationIssues.concat(
+                  $scope.explorationValidationIssues);
             }
           };
 

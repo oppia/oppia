@@ -202,8 +202,8 @@ def validate_explorations(exp_ids, raise_error):
             frontend.
 
     Returns:
-        list(str). The various validation error messages
-            (if raise_error is True).
+        list(str). The various validation error messages (if raise_error is
+            False).
 
     Raises:
         ValidationError. Expected story to only reference valid explorations.
@@ -218,9 +218,6 @@ def validate_explorations(exp_ids, raise_error):
             supported on mobile.
     """
     validation_error_messages = []
-
-    # The first exp ID in the story to compare categories later on.
-    sample_exp_id = exp_ids[0] if exp_ids else None
 
     # Strict = False, since the existence of explorations is checked below.
     exps_dict = (
@@ -245,9 +242,7 @@ def validate_explorations(exp_ids, raise_error):
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
         else:
-            if (
-                    exp_rights_dict[exp_id] !=
-                    constants.ACTIVITY_STATUS_PUBLIC):
+            if exp_rights_dict[exp_id] != constants.ACTIVITY_STATUS_PUBLIC:
                 error_string = (
                     'Exploration with ID %s is not public. Please publish '
                     'explorations before adding them to a story.'
@@ -256,7 +251,11 @@ def validate_explorations(exp_ids, raise_error):
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
 
-    if exps_dict and sample_exp_id in exps_dict:
+    if exps_dict:
+        for exp_id in exp_ids:
+            if exp_id in exps_dict:
+                sample_exp_id = exp_id
+                break
         common_exp_category = exps_dict[sample_exp_id].category
         for exp_id in exps_dict:
             exp = exps_dict[exp_id]

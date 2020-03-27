@@ -151,11 +151,11 @@ class ValidateExplorationsHandler(base.BaseHandler):
         corresponding explorations are supported on mobile and returns the
         validation error messages (if any).
         """
-        exp_ids = self.request.get('comma_separated_exp_ids')
-        if not exp_ids:
+        comma_separated_exp_ids = self.request.get('comma_separated_exp_ids')
+        if not comma_separated_exp_ids:
             raise self.InvalidInputException(
                 'Expected comma_separated_exp_ids parameter to be present.')
-        exp_ids = exp_ids.split(',')
+        exp_ids = comma_separated_exp_ids.split(',')
         validation_error_messages = (
             story_services.validate_explorations(exp_ids, False))
         self.values.update({

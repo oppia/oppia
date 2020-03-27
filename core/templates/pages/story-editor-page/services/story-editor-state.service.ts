@@ -40,7 +40,7 @@ angular.module('oppia').factory('StoryEditorStateService', [
     var _topicName = null;
     var _storyIsPublished = false;
     var _skillSummaries = [];
-    var _expIdChanged = false;
+    var _expIdsChanged = false;
 
     var _setStory = function(story) {
       _story.copyFromStory(story);
@@ -109,16 +109,16 @@ angular.module('oppia').factory('StoryEditorStateService', [
         return _storyIsInitialized;
       },
 
-      setExpIdChanged: function() {
-        _expIdChanged = true;
+      setExpIdsChanged: function() {
+        _expIdsChanged = true;
       },
 
-      resetExpIdChanged: function() {
-        _expIdChanged = false;
+      resetExpIdsChanged: function() {
+        _expIdsChanged = false;
       },
 
-      isExpIdChanged: function() {
-        return _expIdChanged;
+      getExpIdsChanged: function() {
+        return _expIdsChanged;
       },
 
       /**

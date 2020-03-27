@@ -139,7 +139,7 @@ class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
             category='Mathematics', language_code='en')
         json_response = self.get_json(
             '%s/%s' % (
-                feconf.VALIDATE_STORY_EXPLOATIONS_URL_PREFIX, self.story_id),
+                feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX, self.story_id),
             params={
                 'comma_separated_exp_ids': '15,0'
             })
@@ -160,7 +160,7 @@ class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
         self.login(self.ADMIN_EMAIL)
         self.get_json(
             '%s/%s' % (
-                feconf.VALIDATE_STORY_EXPLOATIONS_URL_PREFIX, self.story_id),
+                feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX, self.story_id),
             expected_status_int=400)
         self.logout()
 
