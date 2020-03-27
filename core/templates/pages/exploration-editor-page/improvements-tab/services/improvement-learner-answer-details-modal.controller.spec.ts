@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for ImprovementLearnerAnswerDetailsModalController.
  */
 
+import { UpgradedServices } from 'services/UpgradedServices';
+
 describe('Improvement Learner Answer Details Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -27,6 +29,12 @@ describe('Improvement Learner Answer Details Modal Controller', function() {
   var learnerAnswerInfo = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     LearnerAnswerDetailsObjectFactory = $injector.get(
       'LearnerAnswerDetailsObjectFactory');

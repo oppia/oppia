@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for ImprovementPlaythoughModalController.
  */
 
+import { UpgradedServices } from 'services/UpgradedServices';
+
 describe('Improvement Playthough Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -24,6 +26,12 @@ describe('Improvement Playthough Modal Controller', function() {
   var playthrough = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
   beforeEach(angular.mock.module(function($provide) {
     $provide.value('ExplorationStatesService', {
       getState: () => ({ interaction: null })

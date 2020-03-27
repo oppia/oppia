@@ -22,8 +22,6 @@ import { BrowserXhr } from '@angular/http';
 import { Injectable } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import {
-  HttpClient,
-  HttpXhrBackend,
   // eslint-disable-next-line camelcase
   ɵangular_packages_common_http_http_d
 } from '@angular/common/http';
