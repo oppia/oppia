@@ -46,9 +46,11 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/question/QuestionObjectFactory.ts');
+require('domain/state/StateObjectFactory.ts');
 
 describe('Question object factory', function() {
   var QuestionObjectFactory = null;
+  var StateObjectFactory = null;
   var _sampleQuestion = null;
   var _sampleQuestionBackendDict = null;
   var misconceptionObjectFactory = null;
@@ -107,6 +109,7 @@ describe('Question object factory', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
+    StateObjectFactory = $injector.get('StateObjectFactory');
     // The injector is required because this service is directly used in this
     // spec, therefore even though MisconceptionObjectFactory is upgraded to
     // Angular, it cannot be used just by instantiating it by its class but
@@ -202,6 +205,10 @@ describe('Question object factory', function() {
   it('should correctly get various fields of the question', function() {
     expect(_sampleQuestion.getId()).toEqual('question_id');
     expect(_sampleQuestion.getLanguageCode()).toEqual('en');
+    expect(_sampleQuestion.getVersion()).toEqual(1);
+    _sampleQuestion.setLinkedSkillIds(['skill_id1', 'skill_id2']);
+    expect(_sampleQuestion.getLinkedSkillIds()).toEqual(
+      ['skill_id1', 'skill_id2']);
     var stateData = _sampleQuestion.getStateData();
     expect(stateData.name).toEqual('question');
     expect(stateData.content.getHtml()).toEqual('Question 1');
@@ -237,6 +244,9 @@ describe('Question object factory', function() {
       skillId1: [misconception1],
       skillId2: [misconception2, misconception3]
     };
+    
+    expect(_sampleQuestion.validate([])).toBe(false);
+
     expect(
       _sampleQuestion.validate(misconceptionsDict)).toEqual(
       'Click on (or create) an answer ' +
@@ -255,5 +265,22 @@ describe('Question object factory', function() {
     interaction.hints = [];
     expect(_sampleQuestion.validate([])).toEqual(
       'At least 1 hint should be specfied');
+    
+    interaction.id = null
+    expect(_sampleQuestion.validate([])).toEqual(
+      'An interaction must be specified');
+  });
+
+  it('should correctly create a Default Question', function() {
+    var sampleQuestion1 = QuestionObjectFactory.createDefaultQuestion(
+      ['skill_id3', 'skill_id4']);
+    var state = StateObjectFactory.createDefaultState(null);
+
+    expect(sampleQuestion1.getId()).toEqual(null);
+    expect(sampleQuestion1.getLanguageCode()).toEqual('en');
+    expect(sampleQuestion1.getVersion()).toEqual(1);
+    expect(sampleQuestion1.getStateData()).toEqual(state);
+    expect(sampleQuestion1.getLinkedSkillIds()).toEqual(
+      ['skill_id3', 'skill_id4']);
   });
 });
