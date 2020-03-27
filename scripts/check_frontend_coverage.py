@@ -412,6 +412,7 @@ FULLY_COVERED_FILENAMES = [
     'validators.service.ts',
     'valueGeneratorsRequires.ts',
     'VoiceoverObjectFactory.ts',
+    'wave-surfer.import.ts',
     'window-dimensions.service.ts',
     'window-ref.service.ts',
     'winnowing-preprocessing.service.ts',
