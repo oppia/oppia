@@ -244,7 +244,7 @@ describe('Question object factory', function() {
       skillId1: [misconception1],
       skillId2: [misconception2, misconception3]
     };
-    
+
     expect(_sampleQuestion.validate([])).toBe(false);
 
     expect(
@@ -265,8 +265,8 @@ describe('Question object factory', function() {
     interaction.hints = [];
     expect(_sampleQuestion.validate([])).toEqual(
       'At least 1 hint should be specfied');
-    
-    interaction.id = null
+
+    interaction.id = null;
     expect(_sampleQuestion.validate([])).toEqual(
       'An interaction must be specified');
   });
