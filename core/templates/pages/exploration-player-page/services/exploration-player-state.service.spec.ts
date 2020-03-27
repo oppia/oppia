@@ -144,7 +144,8 @@ describe('Exploration Player State Service', () => {
     deferred.resolve([{
       version: 1,
       exploration: {
-        title: 'exploration title'
+        title: 'exploration title',
+        states: {}
       },
       session_id: '123'
     }, {}, {}]);

@@ -15,6 +15,9 @@
 /**
  * @fileoverview Unit tests for TrainingDataEditorPanelServiceModalController.
  */
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('TrainingDataEditorPanelServiceModalController', function() {
   var $scope = null;
@@ -29,6 +32,12 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
   var SubtitledHtmlObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
   beforeEach(angular.mock.module(function($provide) {
     $provide.value('StateEditorService', {
       getActiveStateName: function() {

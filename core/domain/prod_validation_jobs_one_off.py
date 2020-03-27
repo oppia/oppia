@@ -52,6 +52,7 @@ from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
+from core.domain import user_domain
 from core.domain import user_services
 from core.domain import voiceover_services
 from core.platform import models
@@ -2428,6 +2429,19 @@ class QuestionModelValidator(BaseModelValidator):
         }
 
 
+class ExplorationContextModelValidator(BaseModelValidator):
+    """Class for validating ExplorationContextModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'story_ids': (
+                story_models.StoryModel, [item.story_id]),
+            'exp_ids': (
+                exp_models.ExplorationModel, [item.id])
+        }
+
+
 class QuestionSkillLinkModelValidator(BaseModelValidator):
     """Class for validating QuestionSkillLinkModel."""
 
@@ -4786,6 +4800,24 @@ class UserContributionScoringModelValidator(BaseUserModelValidator):
             cls._validate_score]
 
 
+class UserCommunityRightsModelValidator(BaseUserModelValidator):
+    """Class for validating UserCommunityRightsModel."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return user_domain.UserCommunityRights(
+            item.id, item.can_review_translation_for_language_codes,
+            item.can_review_voiceover_for_language_codes,
+            item.can_review_questions)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (
+                user_models.UserSettingsModel, [item.id])
+        }
+
+
 class PendingDeletionRequestModelValidator(BaseUserModelValidator):
     """Class for validating PendingDeletionRequestModels."""
 
@@ -4889,6 +4921,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
     email_models.BulkEmailModel: BulkEmailModelValidator,
     email_models.GeneralFeedbackEmailReplyToIdModel: (
         GeneralFeedbackEmailReplyToIdModelValidator),
+    exp_models.ExplorationContextModel: (
+        ExplorationContextModelValidator),
     exp_models.ExplorationModel: ExplorationModelValidator,
     exp_models.ExplorationSnapshotMetadataModel: (
         ExplorationSnapshotMetadataModelValidator),
@@ -4989,6 +5023,7 @@ MODEL_TO_VALIDATOR_MAPPING = {
     user_models.UserSkillMasteryModel: UserSkillMasteryModelValidator,
     user_models.UserContributionScoringModel: (
         UserContributionScoringModelValidator),
+    user_models.UserCommunityRightsModel: UserCommunityRightsModelValidator,
     user_models.PendingDeletionRequestModel: (
         PendingDeletionRequestModelValidator)
 }
@@ -5336,6 +5371,14 @@ class QuestionSkillLinkModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [question_models.QuestionSkillLinkModel]
+
+
+class ExplorationContextModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationContextModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationContextModel]
 
 
 class QuestionSnapshotMetadataModelAuditOneOffJob(
@@ -5761,6 +5804,14 @@ class UserContributionScoringModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.UserContributionScoringModel]
+
+
+class UserCommunityRightsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserCommunityRightsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserCommunityRightsModel]
 
 
 class PendingDeletionRequestModelAuditOneOffJob(ProdValidationAuditOneOffJob):
