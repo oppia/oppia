@@ -50,7 +50,7 @@ require('domain/state/StateObjectFactory.ts');
 
 describe('Question object factory', function() {
   var QuestionObjectFactory = null;
-  var StateObjectFactory = null;
+  var stateObjectFactory = null;
   var _sampleQuestion = null;
   var _sampleQuestionBackendDict = null;
   var misconceptionObjectFactory = null;
@@ -109,7 +109,7 @@ describe('Question object factory', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-    StateObjectFactory = $injector.get('StateObjectFactory');
+    stateObjectFactory = $injector.get('StateObjectFactory');
     // The injector is required because this service is directly used in this
     // spec, therefore even though MisconceptionObjectFactory is upgraded to
     // Angular, it cannot be used just by instantiating it by its class but
@@ -274,7 +274,7 @@ describe('Question object factory', function() {
   it('should correctly create a Default Question', function() {
     var sampleQuestion1 = QuestionObjectFactory.createDefaultQuestion(
       ['skill_id3', 'skill_id4']);
-    var state = StateObjectFactory.createDefaultState(null);
+    var state = stateObjectFactory.createDefaultState(null);
 
     expect(sampleQuestion1.getId()).toEqual(null);
     expect(sampleQuestion1.getLanguageCode()).toEqual('en');
