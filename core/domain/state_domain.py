@@ -1873,6 +1873,10 @@ class State(python_utils.OBJECT):
         """
         old_content_id_list = []
         new_content_id_list = []
+        if self.__solution_answer_is_invalid__(solution):
+            raise Exception(
+                'Solution answer %s is invalid ' % solution.correct_answer)
+
         if self.interaction.solution:
             old_content_id_list.append(
                 self.interaction.solution.explanation.content_id)
@@ -1883,6 +1887,14 @@ class State(python_utils.OBJECT):
                 self.interaction.solution.explanation.content_id)
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
+
+    def __solution_answer_is_invalid__(self, solution):
+        if solution is None:
+            return False
+
+        normalized_answer = interaction_registry.Registry.get_interaction_by_id(
+            self.interaction.id).normalize_answer(solution.correct_answer)
+        return normalized_answer != solution.correct_answer
 
     def update_recorded_voiceovers(self, recorded_voiceovers):
         """Update the recorded_voiceovers of a state.
