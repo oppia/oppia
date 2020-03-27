@@ -81,7 +81,7 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
 import { DragAndDropSortInputRulesService } from
-// eslint-disable-next-line max-len
+  // eslint-disable-next-line max-len
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from
@@ -611,12 +611,18 @@ export class UpgradedServices {
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
       upgradedServices['ContextService'],
       upgradedServices['PlayerTranscriptService']);
+    upgradedServices['PlaythroughIssuesBackendApiService'] =
+      new PlaythroughIssuesBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['PlaythroughIssuesBackendApiService']
+      );
     upgradedServices['SkillObjectFactory'] =
-    new SkillObjectFactory(
-      upgradedServices['ConceptCardObjectFactory'],
-      upgradedServices['MisconceptionObjectFactory'],
-      upgradedServices['RubricObjectFactory'],
-      upgradedServices['ValidatorsService']);
+      new SkillObjectFactory(
+        upgradedServices['ConceptCardObjectFactory'],
+        upgradedServices['MisconceptionObjectFactory'],
+        upgradedServices['RubricObjectFactory'],
+        upgradedServices['ValidatorsService']);
     upgradedServices['StateCardObjectFactory'] =
       new StateCardObjectFactory(
         upgradedServices['AudioTranslationLanguageService']);
@@ -624,12 +630,6 @@ export class UpgradedServices {
       upgradedServices['SubtopicObjectFactory'],
       upgradedServices['StoryReferenceObjectFactory'],
       upgradedServices['SkillSummaryObjectFactory']);
-    upgradedServices['PlaythroughIssuesBackendApiService'] =
-      new PlaythroughIssuesBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['PlaythroughIssuesBackendApiService']
-      );
 
     // Topological level: 4.
     upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(

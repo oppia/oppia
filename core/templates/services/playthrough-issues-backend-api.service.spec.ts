@@ -103,7 +103,8 @@ describe('PlaythroughIssuesBackendApiService', () => {
         playthroughIssuesBackendApiService.fetchIssues('8', 1).then(
           successHandler, failureHandler);
 
-        expect(successHandler).toHaveBeenCalled();
+        expect(successHandler).toHaveBeenCalledWith(backendIssues.map(
+          playthroughIssueObjectFactory.createFromBackendDict));
         expect(failureHandler).not.toHaveBeenCalled();
       }));
 
@@ -201,7 +202,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         expect(successHandler).toHaveBeenCalled();
         expect(failHandler).not.toHaveBeenCalledWith(
           new Error('An issue which was not fetched from the backend has ' +
-          'been resolved'));
+            'been resolved'));
       }));
   });
 });
