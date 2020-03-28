@@ -336,23 +336,23 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '</oppia-noninteractive-link></i></p>'
             ],
             'state2': [
-            '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
-            'This is a tag with Italic&amp;quot;"'
-            ' url-with-value="&amp;quot;&amp;quot;">'
-            '</oppia-noninteractive-link></i></p>',
-            '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
-            'This is a tag with Italic&amp;quot;"'
-            ' url-with-value="&amp;quot;https://www.abc.com&amp;quot;">'
-            '</oppia-noninteractive-link></i></p>'
+                '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
+                'This is a tag with Italic&amp;quot;"'
+                ' url-with-value="&amp;quot;&amp;quot;">'
+                '</oppia-noninteractive-link></i></p>',
+                '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
+                'This is a tag with Italic&amp;quot;"'
+                ' url-with-value="&amp;quot;https://www.abc.com&amp;quot;">'
+                '</oppia-noninteractive-link></i></p>'
             ],
             'state3': [
-            '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
-            'This is a tag with Italic&amp;quot;">'
-            '</oppia-noninteractive-link></i></p>',
-            '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
-            'This is a tag with Italic&amp;quot;"'
-            ' url-with-value="">'
-            '</oppia-noninteractive-link></i></p>'
+                '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
+                'This is a tag with Italic&amp;quot;">'
+                '</oppia-noninteractive-link></i></p>',
+                '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
+                'This is a tag with Italic&amp;quot;"'
+                ' url-with-value="">'
+                '</oppia-noninteractive-link></i></p>'
             ]
         }
 
