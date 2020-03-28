@@ -329,39 +329,57 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
     def test_validate_url_with_value_for_links(self):
         test_case = {
-            'html_content': [(
+            'state1': [
                 '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
                 'This is a tag with Italic&amp;quot;"'
                 ' url-with-value="&amp;quot;mailto:somelink&amp;quot;">'
                 '</oppia-noninteractive-link></i></p>'
-            ), (
-                '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
-                'This is a tag with Italic&amp;quot;"'
-                ' url-with-value="&amp;quot;&amp;quot;">'
-                '</oppia-noninteractive-link></i></p>'
-            ), (
-                '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
-                'This is a tag with Italic&amp;quot;"'
-                ' url-with-value="&amp;quot;https://www.abc.com&amp;quot;">'
-                '</oppia-noninteractive-link></i></p>'
-            )],
-            'expected_output': [(
-                '<oppia-noninteractive-link text-with-value="&amp;quot;'
-                'This is a tag with Italic&amp;quot;"'
-                ' url-with-value="&amp;quot;mailto:somelink&amp;quot;">'
-                '</oppia-noninteractive-link>'
-            ), (
-                '<oppia-noninteractive-link text-with-value="&amp;quot;'
-                'This is a tag with Italic&amp;quot;"'
-                ' url-with-value="&amp;quot;&amp;quot;">'
-                '</oppia-noninteractive-link>'
-            )]
+            ],
+            'state2': [
+            '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
+            'This is a tag with Italic&amp;quot;"'
+            ' url-with-value="&amp;quot;&amp;quot;">'
+            '</oppia-noninteractive-link></i></p>',
+            '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
+            'This is a tag with Italic&amp;quot;"'
+            ' url-with-value="&amp;quot;https://www.abc.com&amp;quot;">'
+            '</oppia-noninteractive-link></i></p>'
+            ],
+            'state3': [
+            '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
+            'This is a tag with Italic&amp;quot;">'
+            '</oppia-noninteractive-link></i></p>',
+            '<p><i><oppia-noninteractive-link text-with-value="&amp;quot;'
+            'This is a tag with Italic&amp;quot;"'
+            ' url-with-value="">'
+            '</oppia-noninteractive-link></i></p>'
+            ]
+        }
+
+        expected_output = {
+            u'escaped_quotes': [
+                u'<oppia-noninteractive-link text-with-value="&amp;quot;This '
+                'is a tag with Italic&amp;quot;" url-with-value="&amp;quot;'
+                '&amp;quot;"></oppia-noninteractive-link> state: state2'],
+            u'mailto': [
+                u'<oppia-noninteractive-link text-with-value="&amp;quot;This '
+                'is a tag with Italic&amp;quot;" url-with-value="&amp;quot;'
+                'mailto:somelink&amp;quot;"></oppia-noninteractive-link> '
+                'state: state1'],
+            u'no_attr': [
+                u'<oppia-noninteractive-link text-with-value="&amp;quot;This '
+                'is a tag with Italic&amp;quot;"></oppia-noninteractive-link> '
+                'state: state3'],
+            u'quotes': [
+                u'<oppia-noninteractive-link text-with-value="&amp;quot;This '
+                'is a tag with Italic&amp;quot;" url-with-value="">'
+                '</oppia-noninteractive-link> state: state3']
         }
 
         self.assertEqual(
-            set(test_case['expected_output']),
-            set(html_validation_service.validate_url_with_value_for_links(
-                test_case['html_content'])))
+            expected_output,
+            html_validation_service.validate_url_with_value_for_links(
+                test_case))
 
     def test_validate_rte_format(self):
         test_cases_for_textangular = [

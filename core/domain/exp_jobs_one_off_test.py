@@ -2459,7 +2459,8 @@ class LinkComponentValidationAuditJobTests(test_utils.GenericTestBase):
             u'[u\'escaped_quotes\', [u\'<oppia-noninteractive-link '
             'text-with-value="&amp;quot;This is a tag with Italic&amp;quot;" '
             'url-with-value="&amp;quot;&amp;quot;">'
-            '</oppia-noninteractive-link> state: State3\', u\'Exp Id: exp_id0\']]',
+            '</oppia-noninteractive-link> state: State3\', '
+            'u\'Exp Id: exp_id0\']]',
             u'[u\'mailto\', [u\'<oppia-noninteractive-link text-with-value='
             '"&amp;quot;What is a link?&amp;quot;" url-with-value="&amp;quot;'
             'https://mailto:link@link.com&amp;quot;">'

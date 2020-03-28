@@ -722,8 +722,8 @@ def validate_url_with_value_for_links(state_names_to_html_list_mapping):
             the list of html strings to be validated.
 
     Returns:
-        dict: A mapping of .. List of all the html strings where the link component is
-            invalid.
+        dict: A mapping of validation error to the corresponding
+            invalid html strings.
     """
     # Dictionary to hold html strings in which link components
     # are invalid.
@@ -743,15 +743,19 @@ def validate_url_with_value_for_links(state_names_to_html_list_mapping):
                 if not link.has_attr('url-with-value'):
                     err_dict['no_attr'].append('%s state: %s' % (
                         python_utils.UNICODE(link), state_name))
+                    continue
                 if link['url-with-value'] == '':
                     err_dict['quotes'].append('%s state: %s' % (
                         python_utils.UNICODE(link), state_name))
+                    continue
                 if link['url-with-value'] == '&quot;&quot;':
                     err_dict['escaped_quotes'].append('%s state: %s' % (
                         python_utils.UNICODE(link), state_name))
+                    continue
                 if re.match(r'.*mailto:.*', link['url-with-value']):
                     err_dict['mailto'].append('%s state: %s' % (
                         python_utils.UNICODE(link), state_name))
+                    continue
     return err_dict
 
 
