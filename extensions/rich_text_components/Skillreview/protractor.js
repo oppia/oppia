@@ -17,9 +17,8 @@
  * end-to-end testing with Protractor.js
  */
 
-var objects = require('../../objects/protractor.js');
-var forms = require(
-  '../../../core/tests/protractor_utils/forms.js');
+var objects = require(process.cwd() + '/extensions/objects/protractor.js');
+var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 
 var customizeComponent = function(modal, text, skillDescription) {
   objects.UnicodeStringEditor(
