@@ -68,15 +68,15 @@ angular.module('oppia').directive('topNavigationBar', [
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
           ctrl.onLoginButtonClicked = function() {
-            SiteAnalyticsService.registerStartLoginEvent('loginButton');
             UserService.getLoginUrlAsync().then(
               function(loginUrl) {
                 if (loginUrl) {
+                  SiteAnalyticsService.registerStartLoginEvent('loginButton');
                   $timeout(function() {
                     $window.location = loginUrl;
                   }, 150);
                 } else {
-                  throw Error('Login url not found.');
+                  $window.location.reload();
                 }
               }
             );
