@@ -111,8 +111,8 @@ def execute_tasks(tasks, semaphore):
     while remaining_tasks:
         task = remaining_tasks.pop()
         semaphore.acquire()
-        task.start()
         task.start_time = time.time()
+        task.start()
         currently_running_tasks.append(task)
 
         if len(remaining_tasks) % 5 == 0:
