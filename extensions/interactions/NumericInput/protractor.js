@@ -17,8 +17,6 @@
  * interaction.
  */
 
-var objects = require('../../objects/protractor.js');
-
 var customizeInteraction = function() {
   // There are no customizations.
 };

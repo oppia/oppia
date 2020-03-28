@@ -186,7 +186,7 @@ export = {
     "description": "فارسی (Persian)"
   }, {
     "code": "pl",
-    "description": "polski (Polish)"
+    "description": "polszczyzna (Polish)"
   }, {
     "code": "pt",
     "description": "português (Portuguese)"
@@ -195,10 +195,10 @@ export = {
     "description": "română (Romanian)"
   }, {
     "code": "ru",
-    "description": "русский (Russian)"
+    "description": "pусский (Russian)"
   }, {
     "code": "sr",
-    "description": "српски (Serbian)"
+    "description": "cрпски (Serbian)"
   }, {
     "code": "sk",
     "description": "slovenčina (Slovak)"
@@ -219,7 +219,7 @@ export = {
     "description": "Türkçe (Turkish)"
   }, {
     "code": "uk",
-    "description": "українська (Ukrainian)"
+    "description": "yкраїнська (Ukrainian)"
   }, {
     "code": "vi",
     "description": "Tiếng Việt (Vietnamese)"
@@ -453,7 +453,7 @@ export = {
     "id": "en-auto",
     "description": "English (auto)",
     "explorationLanguage": "en",
-    "speechSynthesisCode": "en-GB",
+    "speechSynthesisCode": "en-US",
     "speechSynthesisCodeMobile": "en_US"
   }],
 
@@ -521,6 +521,15 @@ export = {
       "InteractiveMap"
     ]
   }],
+
+  "REVIEW_CATEGORY_TRANSLATION": "translation",
+  "REVIEW_CATEGORY_VOICEOVER": "voiceover",
+  "REVIEW_CATEGORY_QUESTION": "question",
+
+  "ACTION_REMOVE_ALL_REVIEW_RIGHTS": "all",
+  "ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS": "specific",
+  "USER_FILTER_CRITERION_USERNAME": "username",
+  "USER_FILTER_CRITERION_ROLE": "role",
 
   // Interaction IDs for which answer details cannot be solicited.
   "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],

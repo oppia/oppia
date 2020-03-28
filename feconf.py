@@ -445,6 +445,7 @@ EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
 EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
 EMAIL_INTENT_ONBOARD_REVIEWER = 'onboard_reviewer'
+EMAIL_INTENT_REMOVE_REVIEWER = 'remove_reviewer'
 EMAIL_INTENT_REVIEW_SUGGESTIONS = 'review_suggestions'
 EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES = 'voiceover_application_updates'
 EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
@@ -500,8 +501,12 @@ MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
 # category.
 MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
 
-# The number of medium question skill difficulty.
+# The difficulty value of an easy question.
+EASY_SKILL_DIFFICULTY = 0.3
+# The difficulty value of a medium question.
 MEDIUM_SKILL_DIFFICULTY = 0.6
+# The difficulty value of a hard question.
+HARD_SKILL_DIFFICULTY = 0.9
 
 # The maximum number of skills to be requested at one time when fetching
 # questions.
@@ -885,8 +890,8 @@ ROLE_ACTION_UPDATE = 'update'
 ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
 ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
-VIEW_METHOD_ROLE = 'role'
-VIEW_METHOD_USERNAME = 'username'
+USER_FILTER_CRITERION_ROLE = 'role'
+USER_FILTER_CRITERION_USERNAME = 'username'
 
 QUESTION_BATCH_SIZE = 10
 
