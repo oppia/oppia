@@ -270,6 +270,7 @@ FULLY_COVERED_FILENAMES = [
     'questions-list.constants.ajs.ts',
     'questions-list.constants.ts',
     'questions-list.service.ts',
+    'QuestionObjectFactory.ts',
     'QuestionSummaryForOneSkillObjectFactory.ts',
     'QuestionSummaryObjectFactory.ts',
     'read-only-exploration-backend-api.service.ts',
