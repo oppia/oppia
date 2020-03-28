@@ -134,6 +134,8 @@ angular.module('oppia').directive('communityDashboardPage', [
             UserService.getUserInfoAsync().then(function(userInfo) {
               if (userInfo.isLoggedIn()) {
                 ctrl.username = userInfo.getUsername();
+              } else {
+                ctrl.username = 'Guest';
               }
             });
 
