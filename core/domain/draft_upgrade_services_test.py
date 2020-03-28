@@ -144,6 +144,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
+    # pylint: disable=anomalous-backslash-in-string
     def test_convert_states_v32_dict_to_v33_dict(self):
         html_content = (
             '<oppia-noninteractive-collapsible content-with-value="&amp;'

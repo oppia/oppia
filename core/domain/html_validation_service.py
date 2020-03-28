@@ -880,8 +880,8 @@ def add_dims_to_img_in_complex_rte(exploration_fs, html_string):
     # To add dimensions to images inside the collapsible component.
     for collapsible_component in soup.findAll(
             name='oppia-noninteractive-collapsible'):
-        # content-with-value attribute contains the html with image tags
-        # so we check for existense of this attribute.
+        # The content-with-value attribute contains the html with image tags.
+        # So we check for the existense of this attribute.
         if (not collapsible_component.has_attr('content-with-value') or
                 collapsible_component['content-with-value'] == ''):
             continue
@@ -900,8 +900,8 @@ def add_dims_to_img_in_complex_rte(exploration_fs, html_string):
     # To add dimensions to images inside the tab component.
     for tab_component in soup.findAll(
             name='oppia-noninteractive-tabs'):
-        # tab_contents-with-value attribute contains the html with image tags
-        # so we check for existense of this attribute.
+        # The tab_contents-with-value attribute contains the html with image
+        # tags. So we check for the existense of this attribute.
         if (not tab_component.has_attr('tab_contents-with-value') or
                 tab_component['tab_contents-with-value'] == ''):
             continue
