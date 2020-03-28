@@ -130,7 +130,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             # TODO in core/tests/protractor_desktop/embedding.js pointing to the
             # same issue. The following was placed due to a necessary sleep as
             # a temporary measure to keep the embedding tests from failing.
-            'core/tests/protractor_desktop/embedding.js'
+            'core/tests/protractor_desktop/embedding.js',
         ),
         'excluded_dirs': ()
     },
@@ -165,7 +165,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'message': 'The directives must be directly referenced.',
         'excluded_files': (
             'core/templates/pages/exploration-player-page/'
-            'FeedbackPopupDirective.js'
+            'FeedbackPopupDirective.js',
         ),
         'excluded_dirs': (
             'extensions/answer_summarizers/',
@@ -186,7 +186,13 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'regexp': re.compile(r'require\(.*\.\..*\);'),
         'message': 'Please, don\'t use relative imports in require().',
         'excluded_files': (),
-        'excluded_dirs': ('core/tests/')
+        'excluded_dirs': ('core/tests/',)
+    },
+    {
+        'regexp': re.compile(r'innerHTML'),
+        'message': 'Please do not use innerHTML property.',
+        'excluded_files': ('core/templates/Polyfills.ts',),
+        'excluded_dirs': ('core/tests/',)
     }
 ]
 
@@ -262,7 +268,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     {
         'regexp': re.compile(r'\sprint\('),
         'message': 'Please use python_utils.PRINT().',
-        'excluded_files': ('python_utils.py'),
+        'excluded_files': ('python_utils.py',),
         'excluded_dirs': ()
     },
     {
@@ -285,7 +291,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     {
         'regexp': re.compile(r'with open\(|= open\('),
         'message': 'Please use python_utils.open_file() instead of open().',
-        'excluded_files': ('python_utils.py'),
+        'excluded_files': ('python_utils.py',),
         'excluded_dirs': ()
     },
     {
@@ -328,37 +334,37 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     {
         'regexp': re.compile(r'urlsplit'),
         'message': 'Please use python_utils.url_split().',
-        'excluded_files': ('python_utils.py'),
+        'excluded_files': ('python_utils.py',),
         'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'urlparse'),
         'message': 'Please use python_utils.url_parse().',
-        'excluded_files': ('python_utils.py'),
+        'excluded_files': ('python_utils.py',),
         'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'urlunsplit'),
         'message': 'Please use python_utils.url_unsplit().',
-        'excluded_files': ('python_utils.py'),
+        'excluded_files': ('python_utils.py',),
         'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'parse_qs'),
         'message': 'Please use python_utils.parse_query_string().',
-        'excluded_files': ('python_utils.py'),
+        'excluded_files': ('python_utils.py',),
         'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'\Wunquote\('),
         'message': 'Please use python_utils.urllib_unquote().',
-        'excluded_files': ('python_utils.py'),
+        'excluded_files': ('python_utils.py',),
         'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'urljoin'),
         'message': 'Please use python_utils.url_join().',
-        'excluded_files': ('python_utils.py'),
+        'excluded_files': ('python_utils.py',),
         'excluded_dirs': ()
     },
     {
@@ -410,7 +416,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
             'used in webapp2\'s built-in methods or for strings used directly '
             'in NDB datastore models. If you need to cast ints/floats to '
             'strings, please use python_utils.UNICODE() instead.'),
-        'excluded_files': ('python_utils.py'),
+        'excluded_files': ('python_utils.py',),
         'excluded_dirs': ()
     },
     {
@@ -422,7 +428,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     {
         'regexp': re.compile(r'basestring'),
         'message': 'Please use python_utils.BASESTRING.',
-        'excluded_files': ('python_utils.py'),
+        'excluded_files': ('python_utils.py',),
         'excluded_dirs': ()
     },
     {
