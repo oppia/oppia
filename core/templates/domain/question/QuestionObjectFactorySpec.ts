@@ -205,6 +205,8 @@ describe('Question object factory', function() {
   it('should correctly get various fields of the question', function() {
     expect(_sampleQuestion.getId()).toEqual('question_id');
     expect(_sampleQuestion.getLanguageCode()).toEqual('en');
+    _sampleQuestion.setLanguageCode('cn');
+    expect(_sampleQuestion.getLanguageCode()).toEqual('cn');
     expect(_sampleQuestion.getVersion()).toEqual(1);
     _sampleQuestion.setLinkedSkillIds(['skill_id1', 'skill_id2']);
     expect(_sampleQuestion.getLinkedSkillIds()).toEqual(
