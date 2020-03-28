@@ -16,8 +16,6 @@
  * @fileoverview End-to-end testing utilities for the LogicProof interaction.
  */
 
-var objects = require('../../objects/protractor.js');
-
 var customizeInteraction = function(elem, assumption, target, defaultText) {
   elem.element(by.id('logicQuestionAssumptions')).sendKeys(assumption);
   elem.element(by.id('logicQuestionTarget')).sendKeys(target);

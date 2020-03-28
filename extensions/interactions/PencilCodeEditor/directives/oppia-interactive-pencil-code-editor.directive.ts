@@ -144,24 +144,29 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
               if (errorIsHappening || hasSubmittedAnswer) {
                 return;
               }
+              // The first argument in the method below gets executed in the
+              // pencilcode output-frame iframe context. The code input by the
+              // user is sanitized by pencilcode so there is no security
+              // issue in this case.
+              pce.eval(
+                'document.body.innerHTML', // disable-bad-pattern-check
+                function(pencilCodeHtml) {
+                  var normalizedCode = getNormalizedCode();
 
-              pce.eval('document.body.innerHTML', function(pencilCodeHtml) {
-                var normalizedCode = getNormalizedCode();
+                  // Get all the divs, and extract their textual content.
+                  var output = $.map(
+                    $(pencilCodeHtml).filter('div'), function(elem) {
+                      return $(elem).text();
+                    }).join('\n');
 
-                // Get all the divs, and extract their textual content.
-                var output = $.map(
-                  $(pencilCodeHtml).filter('div'), function(elem) {
-                    return $(elem).text();
-                  }).join('\n');
-
-                hasSubmittedAnswer = true;
-                CurrentInteractionService.onSubmit({
-                  code: normalizedCode,
-                  output: output || '',
-                  evaluation: '',
-                  error: ''
-                }, PencilCodeEditorRulesService);
-              }, true);
+                  hasSubmittedAnswer = true;
+                  CurrentInteractionService.onSubmit({
+                    code: normalizedCode,
+                    output: output || '',
+                    evaluation: '',
+                    error: ''
+                  }, PencilCodeEditorRulesService);
+                }, true);
             });
 
             pce.on('error', function(error) {

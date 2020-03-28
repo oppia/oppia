@@ -17,8 +17,6 @@
  * tests.
  */
 
-var forms = require('../../core/tests/protractor_utils/forms.js');
-
 // NOTE: all editors for objects that are used as parameters in a rule must
 // implement a setValue() function to which a single argument can be sent
 // that will completely determine the object.
