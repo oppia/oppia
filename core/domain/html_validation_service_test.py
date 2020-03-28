@@ -1363,7 +1363,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 test_case['expected_output'])
 
     # pylint: disable=anomalous-backslash-in-string
-    def test_add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks(self): # pylint: disable=line-too-long
+    def test_add_dims_to_img_in_complex_rte(self):
         test_cases = [{
             'html_content': (
                 '<oppia-noninteractive-collapsible content-with-value="&amp;'
@@ -1549,12 +1549,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         for test_case in test_cases:
             self.assertEqual(
-                html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks( # pylint: disable=line-too-long
+                html_validation_service.add_dims_to_img_in_complex_rte(
                     fs, test_case['html_content']),
                 test_case['expected_output'])
 
     # pylint: disable=anomalous-backslash-in-string
-    def test_add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks_for_questions( # pylint: disable=line-too-long
+    def test_add_dims_to_img_in_complex_rte_for_questions(
             self):
         html_content = (
             '<oppia-noninteractive-collapsible content-with-value="&amp;'
@@ -1590,7 +1590,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_QUESTION, exp_id))
         fs.commit('image/abc2.png', raw_image, mimetype='image/png')
         self.assertEqual(
-            html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks( # pylint: disable=line-too-long
+            html_validation_service.add_dims_to_img_in_complex_rte(
                 fs, html_content), expected_output)
 
     def test_add_dimensions_to_image_tags_with_invalid_filepath_with_value(
@@ -1631,7 +1631,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             observed_log_messages[0],
             'exploration exp_id failed to load image: abc1.png')
 
-    def test_add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks_with_invalid_filepath_with_value( # pylint: disable=line-too-long
+    def test_add_dims_to_img_in_complex_rte_with_invalid_filepath_with_value(
             self):
 
         observed_log_messages = []
@@ -1666,7 +1666,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         fs.commit('image/new.png', raw_image, mimetype='image/png')
 
         with assert_raises_context_manager, logging_swap:
-            html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks( # pylint: disable=line-too-long
+            html_validation_service.add_dims_to_img_in_complex_rte(
                 fs, html_content)
 
         self.assertEqual(len(observed_log_messages), 1)

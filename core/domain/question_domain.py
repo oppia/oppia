@@ -287,11 +287,11 @@ class Question(python_utils.OBJECT):
             dict. The converted question_state_dict.
         """
         file_system_class = fs_services.get_entity_file_system_class()
-        file_system = fs_domain.AbstractFileSystem(file_system_class(
+        exploration_fs = fs_domain.AbstractFileSystem(file_system_class(
             feconf.ENTITY_TYPE_QUESTION, question_id))
         add_dimensions_to_image_tags = functools.partial(
-            html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks, # pylint: disable=line-too-long
-            file_system)
+            html_validation_service.add_dims_to_img_in_complex_rte,
+            exploration_fs)
         question_state_dict = state_domain.State.convert_html_fields_in_state( # pylint: disable=line-too-long
             question_state_dict,
             add_dimensions_to_image_tags)

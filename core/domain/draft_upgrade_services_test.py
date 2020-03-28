@@ -124,7 +124,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': 32,
                 'to_version': 33
-                }])
+            }])
         self.assertEqual(
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 self.DRAFT_CHANGELIST, 32, 33, exp_id),
@@ -145,13 +145,35 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
     def test_convert_states_v32_dict_to_v33_dict(self):
+        html_content = (
+            '<oppia-noninteractive-collapsible content-with-value="&amp;'
+            'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
+            'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
+            'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
+            'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
+            'quot;abc2.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
+            '/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You '
+            'have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;'
+            'quot;" heading-with-value="&amp;quot;Sample Header&amp;quot;'
+            '"></oppia-noninteractive-collapsible>')
+        expected_output = (
+            u'<oppia-noninteractive-collapsible content-with-value="&amp;'
+            'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
+            'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
+            'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
+            'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
+            'quot;abc2_height_120_width_120.png&amp;amp;amp;quot;\&amp;quot;'
+            '&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;'
+            'p&amp;gt;You have opened the collapsible block.&amp;lt;/p'
+            '&amp;gt;&amp;quot;" heading-with-value="&amp;quot;Sample '
+            'Header&amp;quot;"></oppia-noninteractive-collapsible>')
         draft_change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'new_value': {
-                    'html': 'html_content',
+                    'html': html_content,
                     'content_id': 'content_id'
                 }
             }),
@@ -164,7 +186,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     'rule_specs': [],
                     'outcome': {
                         'feedback': {
-                            'html': '<p>hi</p>',
+                            'html': html_content,
                             'content_id': 'cid'
                         }
                     },
@@ -178,7 +200,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
                 'new_value': [{
                     'hint_content': {
-                        'html': 'html_content',
+                        'html': html_content,
                         'content_id': 'content_id'
                     }
                 }]
@@ -193,15 +215,25 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     'correct_answer': '',
                     'explanation': {
                         'content_id': 'cid',
-                        'html': '<p>hello</p>'
+                        'html': html_content
                     }
                 }
             })]
-        for i in python_utils.RANGE(len(draft_change_list)):
-            self.assertEqual(
-                draft_upgrade_services.DraftUpgradeUtil._convert_states_v32_dict_to_v33_dict(  # pylint: disable=protected-access,line-too-long
-                    'exp_id', draft_change_list)[i].to_dict(),
-                draft_change_list[i].to_dict())
+        converted_change_list = (
+            draft_upgrade_services.DraftUpgradeUtil._convert_states_v32_dict_to_v33_dict(  # pylint: disable=protected-access,line-too-long
+                'exp_id', draft_change_list))
+        self.assertEqual(
+            converted_change_list[0].to_dict()[u'new_value'][u'html'],
+            expected_output)
+        self.assertEqual(
+            converted_change_list[1].to_dict()[u'new_value'][0][u'outcome'][u'feedback'][u'html'], # pylint: disable=line-too-long
+            expected_output)
+        self.assertEqual(
+            converted_change_list[2].to_dict()[u'new_value'][0][u'hint_content'][u'html'], # pylint: disable=line-too-long
+            expected_output)
+        self.assertEqual(
+            converted_change_list[3].to_dict()[u'new_value'][u'explanation'][u'html'], # pylint: disable=line-too-long
+            expected_output)
 
     def test_convert_states_v31_dict_to_v32_dict(self):
         draft_change_list = [

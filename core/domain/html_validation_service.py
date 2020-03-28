@@ -818,12 +818,12 @@ def regenerate_image_filename_using_dimensions(filename, height, width):
     return new_filename
 
 
-def add_dimensions_to_image_tags(file_system, html_string):
+def add_dimensions_to_image_tags(exploration_fs, html_string):
     """Adds dimensions to all oppia-noninteractive-image tags. Removes image
     tags that have no filepath.
 
     Args:
-        file_system: GcsFileSystem. File system of the entity.
+        exploration_fs: GcsFileSystem. File system of the Exploration entity.
         html_string: str. HTML string to modify.
 
     Returns:
@@ -843,10 +843,10 @@ def add_dimensions_to_image_tags(file_system, html_string):
             filename = json.loads(
                 unescape_html(image['filepath-with-value'].replace('\\"', '')))
             image['filepath-with-value'] = escape_html(json.dumps(
-                get_filename_with_dimensions(file_system, filename)))
+                get_filename_with_dimensions(exploration_fs, filename)))
         except Exception as e:
-            entity_type = file_system.impl.assets_path.split('/')[0]
-            entity_id = file_system.impl.assets_path.split('/')[1]
+            entity_type = exploration_fs.impl.assets_path.split('/')[0]
+            entity_id = exploration_fs.impl.assets_path.split('/')[1]
             logging.error(
                 '%s %s failed to load image: %s' % (
                     entity_type, entity_id,
@@ -855,13 +855,12 @@ def add_dimensions_to_image_tags(file_system, html_string):
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
-def add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks(
-        file_system, html_string):
+def add_dims_to_img_in_complex_rte(exploration_fs, html_string):
     """Adds dimensions to all oppia-noninteractive-image tags inside tabs and
     collapsible blocks. Removes image tags that have no filepath.
 
     Args:
-        file_system: GcsFileSystem. File system of the entity.
+        exploration_fs: GcsFileSystem. File system of the Exploration entity.
         html_string: str. HTML string to modify.
 
     Returns:
@@ -881,44 +880,52 @@ def add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks(
     # To add dimensions to images inside the collapsible component.
     for collapsible_component in soup.findAll(
             name='oppia-noninteractive-collapsible'):
+        # content-with-value attribute contains the html with image tags
+        # so we check for existense of this attribute.
         if (not collapsible_component.has_attr('content-with-value') or
                 collapsible_component['content-with-value'] == ''):
             continue
-
-        collapsible_component_html_string = unescape_html(
+        # Create a new soup with the content-with-value html string.
+        content_with_html_string = unescape_html(
             collapsible_component['content-with-value'])
-        collapsible_component_soup = bs4.BeautifulSoup(
-            collapsible_component_html_string, 'html.parser')
-        _modify_image_filename(
-            file_system, collapsible_component_soup)
+        content_soup = bs4.BeautifulSoup(
+            content_with_html_string, 'html.parser')
+        # Modify the filenames for the image tags in the content soup.
+        _modify_image_filename(exploration_fs, content_soup)
+        # content_soup contains the updated filepath. This is copied
+        # into the content-with-value attribute of the original soup.
         collapsible_component['content-with-value'] = (
-            escape_html(python_utils.UNICODE(collapsible_component_soup)
-                        .replace('\'', '')))
+            escape_html(python_utils.UNICODE(content_soup).replace('\'', '')))
 
     # To add dimensions to images inside the tab component.
     for tab_component in soup.findAll(
             name='oppia-noninteractive-tabs'):
+        # tab_contents-with-value attribute contains the html with image tags
+        # so we check for existense of this attribute.
         if (not tab_component.has_attr('tab_contents-with-value') or
                 tab_component['tab_contents-with-value'] == ''):
             continue
-
-        tab_component_html_string = unescape_html(
+        # Create a new soup with the tab_contents-with-value html string.
+        content_with_html_string = unescape_html(
             tab_component['tab_contents-with-value'])
-        tab_component_soup = bs4.BeautifulSoup(
-            tab_component_html_string, 'html.parser')
-        _modify_image_filename(file_system, tab_component_soup)
+        content_soup = bs4.BeautifulSoup(
+            content_with_html_string, 'html.parser')
+        # Modify the filenames for the image tags in the content soup.
+        _modify_image_filename(exploration_fs, content_soup)
+        # content_soup contains the updated filepath. This is copied
+        # into the tab_contents-with-value attribute of the original soup.
         tab_component['tab_contents-with-value'] = (
-            escape_html(python_utils.UNICODE(tab_component_soup)
+            escape_html(python_utils.UNICODE(content_soup)
                         .replace('\'', '')))
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
-def _modify_image_filename(file_system, soup):
+def _modify_image_filename(exploration_fs, soup):
     """Modifies filenames of images. This is a helper method for
-    add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks.
+    add_dims_to_img_in_complex_rte.
 
     Args:
-        file_system: GcsFileSystem. File system of the entity.
+        exploration_fs: GcsFileSystem. File system of the Exploration entity.
         soup: bs4.BeautifulSoup. The html soup whose image file is
             to be renamed.
     """
@@ -935,11 +942,11 @@ def _modify_image_filename(file_system, soup):
                                          .replace('\\"', ''))))
             escaped_filename = escape_html(
                 json.dumps(
-                    get_filename_with_dimensions(file_system, filename)))
+                    get_filename_with_dimensions(exploration_fs, filename)))
             image['filepath-with-value'] = '\\"' + escaped_filename + '\\"'
         except Exception as e:
-            entity_type = file_system.impl.assets_path.split('/')[0]
-            entity_id = file_system.impl.assets_path.split('/')[1]
+            (entity_type, entity_id) = (
+                exploration_fs.impl.assets_path.split('/'))
             logging.error(
                 '%s %s failed to load image: %s' % (
                     entity_type, entity_id,
@@ -947,11 +954,11 @@ def _modify_image_filename(file_system, soup):
             raise e
 
 
-def get_filename_with_dimensions(file_system, old_filename):
+def get_filename_with_dimensions(exploration_fs, old_filename):
     """Gets the filename with dimensions of the image file in it.
 
     Args:
-        file_system: GcsFileSystem. File system of the entity.
+        exploration_fs: GcsFileSystem. File system of the Exploration entity.
         old_filename: str. Name of the file whose dimensions need to be
             calculated.
 
@@ -960,7 +967,7 @@ def get_filename_with_dimensions(file_system, old_filename):
     """
     filepath = 'image/%s' % old_filename
     try:
-        content = file_system.get(filepath.encode('utf-8'))
+        content = exploration_fs.get(filepath.encode('utf-8'))
         height, width = gae_image_services.get_image_dimensions(content)
     except IOError:
         height = 120
