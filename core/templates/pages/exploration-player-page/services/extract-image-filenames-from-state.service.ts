@@ -133,11 +133,12 @@ export class ExtractImageFilenamesFromStateService {
     _extractFilepathValueFromOppiaNonInteractiveImageTag(
         strHtml: string): Array<any> {
       let filenames = [];
-      let dummyElement = document.createElement('div');
-      dummyElement.innerHTML = (
+      let unescapedHtmlString = (
         this.htmlEscaperService.escapedStrToUnescapedStr(strHtml));
+      let dummyDocument = (
+        new DOMParser().parseFromString(unescapedHtmlString, 'text/html'));
 
-      let imageTagList = dummyElement.getElementsByTagName(
+      let imageTagList = dummyDocument.getElementsByTagName(
         'oppia-noninteractive-image');
       for (let i = 0; i < imageTagList.length; i++) {
         // We have the attribute of filepath in oppia-noninteractive-image tag.
