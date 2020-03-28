@@ -3671,6 +3671,24 @@ class Exploration(python_utils.OBJECT):
 
         return html_list
 
+    def get_all_html_content_strings_with_state_name(self):
+        """Gets all html content strings used in this exploration with the
+        corresponding state name.
+
+        Returns:
+            dict. Mapping html content strings to state name.
+        """
+        html_list = []
+        state_names_to_html_strings_mapping = {}
+        for state_name in self.states:
+            state = self.states[state_name]
+            content_html = state.content.html
+            interaction_html_list = (
+                state.interaction.get_all_html_content_strings())
+            html_list = [content_html] + interaction_html_list
+            state_names_to_html_strings_mapping[state_name] = html_list
+        return state_names_to_html_strings_mapping
+
 
 class ExplorationSummary(python_utils.OBJECT):
     """Domain object for an Oppia exploration summary."""

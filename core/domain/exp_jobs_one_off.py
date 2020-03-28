@@ -578,14 +578,25 @@ class LinkComponentValidationAuditJob(
                 % python_utils.convert_to_bytes(e), [item.id])
             return
 
-        html_list = exploration.get_all_html_content_strings()
+        state_names_to_html_list_mapping = (
+            exploration.get_all_html_content_strings_with_state_name())
 
-        err_list = html_validation_service.validate_url_with_value_for_links(
-            html_list)
+        err_dict = html_validation_service.validate_url_with_value_for_links(
+            state_names_to_html_list_mapping)
 
-        for html in err_list:
-            yield (item.id, html)
+        for key in err_dict:
+            if err_dict[key]:
+                yield ('%s Exp Id: %s' % (key, item.id), err_dict[key])
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        final_values = [ast.literal_eval(value) for value in values]
+        # Combine all values from multiple lists into a single list
+        # for that error type.
+        output_values = list(set().union(*final_values))
+        exp_id_index = key.find('Exp Id:')
+        if exp_id_index == -1:
+            yield (key, output_values)
+        else:
+            output_values.append(key[exp_id_index:])
+            yield (key[:exp_id_index - 1], output_values)

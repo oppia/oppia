@@ -713,30 +713,46 @@ def add_caption_attr_to_image(html_string):
     return python_utils.UNICODE(soup)
 
 
-def validate_url_with_value_for_links(html_list):
+def validate_url_with_value_for_links(state_names_to_html_list_mapping):
     """Validates url-with-value field in link component in a list of
     html string.
 
     Args:
-        html_list: list(str). List of html strings to be validated.
+        state_names_to_html_list_mapping: dict. A dict mapping state names to
+            the list of html strings to be validated.
 
     Returns:
-        list(str): List of all the html strings where the link component is
+        dict: A mapping of .. List of all the html strings where the link component is
             invalid.
     """
-    err_list = []
+    # Dictionary to hold html strings in which link components
+    # are invalid.
+    err_dict = {
+        'escaped_quotes': [],
+        'mailto': [],
+        'no_attr': [],
+        'quotes': []
+    }
 
-    for html_string in html_list:
-        soup = bs4.BeautifulSoup(
-            html_string.encode(encoding='utf-8'), 'html.parser')
+    for state_name in state_names_to_html_list_mapping:
+        for html_string in state_names_to_html_list_mapping[state_name]:
+            soup = bs4.BeautifulSoup(
+                html_string.encode(encoding='utf-8'), 'html.parser')
 
-        for link in soup.findAll(name='oppia-noninteractive-link'):
-            if (not link.has_attr('url-with-value') or
-                    link['url-with-value'] == '' or
-                    link['url-with-value'] == '&quot;&quot;' or
-                    re.match(r'.*mailto:.*', link['url-with-value'])):
-                err_list.append(python_utils.UNICODE(link))
-    return err_list
+            for link in soup.findAll(name='oppia-noninteractive-link'):
+                if not link.has_attr('url-with-value'):
+                    err_dict['no_attr'].append('%s state: %s' % (
+                        python_utils.UNICODE(link), state_name))
+                if link['url-with-value'] == '':
+                    err_dict['quotes'].append('%s state: %s' % (
+                        python_utils.UNICODE(link), state_name))
+                if link['url-with-value'] == '&quot;&quot;':
+                    err_dict['escaped_quotes'].append('%s state: %s' % (
+                        python_utils.UNICODE(link), state_name))
+                if re.match(r'.*mailto:.*', link['url-with-value']):
+                    err_dict['mailto'].append('%s state: %s' % (
+                        python_utils.UNICODE(link), state_name))
+    return err_dict
 
 
 def validate_customization_args(html_list):

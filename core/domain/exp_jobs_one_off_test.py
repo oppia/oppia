@@ -2456,13 +2456,15 @@ class LinkComponentValidationAuditJobTests(test_utils.GenericTestBase):
             .LinkComponentValidationAuditJob.get_output(job_id))
 
         expected_output = [
-            u'[u\'exp_id0\', [u\'<oppia-noninteractive-link '
-            'text-with-value="&amp;quot;What is a link?&amp;quot;" '
-            'url-with-value="&amp;quot;https://mailto:link@link.com&amp;quot;"'
-            '></oppia-noninteractive-link>\', '
-            'u\'<oppia-noninteractive-link text-with-value="&amp;quot;'
-            'This is a tag with Italic&amp;quot;" url-with-value="&amp;quot;'
-            '&amp;quot;"></oppia-noninteractive-link>\']]']
+            u'[u\'escaped_quotes\', [u\'<oppia-noninteractive-link '
+            'text-with-value="&amp;quot;This is a tag with Italic&amp;quot;" '
+            'url-with-value="&amp;quot;&amp;quot;">'
+            '</oppia-noninteractive-link> state: State3\', u\'Exp Id: exp_id0\']]',
+            u'[u\'mailto\', [u\'<oppia-noninteractive-link text-with-value='
+            '"&amp;quot;What is a link?&amp;quot;" url-with-value="&amp;quot;'
+            'https://mailto:link@link.com&amp;quot;">'
+            '</oppia-noninteractive-link> state: State2\', '
+            'u\'Exp Id: exp_id0\']]']
 
         self.assertEqual(actual_output, expected_output)
 
