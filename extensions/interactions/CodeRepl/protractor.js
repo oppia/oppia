@@ -17,7 +17,8 @@
  * Editor.
  */
 
-var waitFor = require('../../../core/tests/protractor_utils/waitFor.js');
+var waitFor = require(
+  process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
 var customizeInteraction = function(interactionEditor, placeHolderText) {
   browser.executeScript(
