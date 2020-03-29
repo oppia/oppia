@@ -443,6 +443,7 @@
 /core/domain/change_domain.py @ankita240796
 /core/templates/tests/ @kevinlee12 @nithusha21
 /core/templates/domain/utilities/ @bansalnitish
+/core/templates/Polyfills.ts @ankita240796
 /schema_utils*.py @seanlip
 /utils*.py @aks681
 /python_utils*.py @kevinlee12
