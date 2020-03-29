@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for EditableSkillBackendApiService.
+ * @fileoverview Unit tests for SkillBackendApiService.
  */
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
@@ -21,11 +21,11 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { CsrfTokenService } from
   'services/csrf-token.service';
-import { EditableSkillBackendApiService } from
-  'domain/skill/editable-skill-backend-api.service';
+import { SkillBackendApiService } from
+  'domain/skill/skill-backend-api.service';
 
 describe('Editable skill backend API service', function() {
-  let editableSkillBackendApiService = null;
+  let skillBackendApiService = null;
   let httpTestingController: HttpTestingController;
   let sampleResponse = null;
   let csrfService = null;
@@ -34,8 +34,8 @@ describe('Editable skill backend API service', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    editableSkillBackendApiService =
-      TestBed.get(EditableSkillBackendApiService);
+    skillBackendApiService =
+      TestBed.get(SkillBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
     csrfService = TestBed.get(CsrfTokenService);
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
@@ -104,7 +104,7 @@ describe('Editable skill backend API service', function() {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      editableSkillBackendApiService.fetchSkill('1').then(
+      skillBackendApiService.fetchSkill('1').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/skill_editor_handler/data/1');
@@ -127,7 +127,7 @@ describe('Editable skill backend API service', function() {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      editableSkillBackendApiService.fetchSkill('1').then(
+      skillBackendApiService.fetchSkill('1').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/skill_editor_handler/data/1');
@@ -151,7 +151,7 @@ describe('Editable skill backend API service', function() {
       const failHandler = jasmine.createSpy('fail');
 
       let skillDict = null;
-      editableSkillBackendApiService.fetchSkill('1').then(
+      skillBackendApiService.fetchSkill('1').then(
         data => skillDict = data.skill);
 
       const req = httpTestingController.expectOne(
@@ -162,7 +162,7 @@ describe('Editable skill backend API service', function() {
       req.flush(sampleResponse);
       flushMicrotasks();
 
-      editableSkillBackendApiService.updateSkill(
+      skillBackendApiService.updateSkill(
         skillDict.id, skillDict.version, 'commit message', []
       ).then(successHandler, failHandler);
 
@@ -184,7 +184,7 @@ describe('Editable skill backend API service', function() {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
       let skillDict = null;
-      editableSkillBackendApiService.fetchSkill('1').then(
+      skillBackendApiService.fetchSkill('1').then(
         data => skillDict = data.skill);
 
       const req = httpTestingController.expectOne(
@@ -195,7 +195,7 @@ describe('Editable skill backend API service', function() {
       req.flush(sampleResponse);
       flushMicrotasks();
 
-      editableSkillBackendApiService.updateSkill(
+      skillBackendApiService.updateSkill(
         skillDict.id, skillDict.version, 'commit message', []
       ).then(successHandler, failHandler);
 
@@ -220,7 +220,7 @@ describe('Editable skill backend API service', function() {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      editableSkillBackendApiService.fetchMultiSkills(['1', '2']).then(
+      skillBackendApiService.fetchMultiSkills(['1', '2']).then(
         successHandler, failHandler);
       const skillDataUrl = '/skill_data_handler/' + encodeURIComponent('1,2');
       const req = httpTestingController.expectOne(skillDataUrl);
@@ -241,7 +241,7 @@ describe('Editable skill backend API service', function() {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    editableSkillBackendApiService.fetchMultiSkills(['1', '2']).then(
+    skillBackendApiService.fetchMultiSkills(['1', '2']).then(
       successHandler, failHandler);
     const skillDataUrl = '/skill_data_handler/' + encodeURIComponent('1,2');
     const req = httpTestingController.expectOne(skillDataUrl);
@@ -265,7 +265,7 @@ describe('Editable skill backend API service', function() {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      editableSkillBackendApiService.deleteSkill('1').then(
+      skillBackendApiService.deleteSkill('1').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/skill_editor_handler/data/1');
@@ -285,7 +285,7 @@ describe('Editable skill backend API service', function() {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      editableSkillBackendApiService.deleteSkill('1').then(
+      skillBackendApiService.deleteSkill('1').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/skill_editor_handler/data/1');

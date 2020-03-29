@@ -30,7 +30,7 @@ import { UrlInterpolationService } from
 @Injectable({
   providedIn: 'root'
 })
-export class EditableSkillBackendApiService {
+export class SkillBackendApiService {
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
@@ -153,5 +153,5 @@ export class EditableSkillBackendApiService {
 }
 
 angular.module('oppia').factory(
-  'EditableSkillBackendApiService',
-  downgradeInjectable(EditableSkillBackendApiService));
+  'SkillBackendApiService',
+  downgradeInjectable(SkillBackendApiService));

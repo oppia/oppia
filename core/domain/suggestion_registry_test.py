@@ -122,7 +122,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
                 'old_value': None
             },
             'score_category': 'content.Algebra',
-            'last_updated_msecs': utils.get_time_in_millisecs(self.fake_date)
+            'last_updated': utils.get_time_in_millisecs(self.fake_date)
         }
 
     def test_create_suggestion_edit_state_content(self):
@@ -625,7 +625,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
                 'translation_html': '<p>This is translated html.</p>'
             },
             'score_category': 'translation.Algebra',
-            'last_updated_msecs': utils.get_time_in_millisecs(self.fake_date)
+            'last_updated': utils.get_time_in_millisecs(self.fake_date)
         }
 
     def test_create_suggestion_add_translation(self):
@@ -1071,10 +1071,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                     'linked_skill_ids': ['skill_1']
                 },
                 'skill_id': 'skill_1',
-                'topic_name': 'topic_1'
+                'skill_difficulty': 0.3,
             },
             'score_category': 'question.topic_1',
-            'last_updated_msecs': utils.get_time_in_millisecs(self.fake_date)
+            'last_updated': utils.get_time_in_millisecs(self.fake_date)
         }
 
     def test_create_suggestion_add_question(self):
@@ -1155,7 +1155,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception,
-            'Expected change to be an instance of QuestionChange'):
+            'Expected change to be an instance of QuestionSuggestionChange'):
             suggestion.validate()
 
     def test_validate_change_cmd(self):
@@ -1241,6 +1241,41 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             Exception,
             'Expected question state schema version to be between 1 and '
             '%s' % feconf.CURRENT_STATE_SCHEMA_VERSION):
+            suggestion.validate()
+
+    def test_validate_change_skill_difficulty_none(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+        suggestion.validate()
+
+        suggestion.change.skill_difficulty = None
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected change to contain skill_difficulty'):
+            suggestion.validate()
+
+    def test_validate_change_skill_difficulty_invalid_value(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+        suggestion.validate()
+
+        suggestion.change.skill_difficulty = 0.4
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected change skill_difficulty to be one of '):
             suggestion.validate()
 
     def test_pre_accept_validate_change_skill_id(self):
@@ -1424,7 +1459,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION)
             },
-            'skill_id': 'skill_1'
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3
         }
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1438,7 +1474,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'The new change question_dict must not be equal to the '
             'old question_dict'):
             suggestion.pre_update_validate(
-                question_domain.QuestionChange(change))
+                question_domain.QuestionSuggestionChange(change))
 
 
 class MockInvalidVoiceoverApplication(
