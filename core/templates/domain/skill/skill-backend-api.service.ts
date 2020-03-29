@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 import { SkillDomainConstants } from
   'domain/skill/skill-domain.constants';
 import { EditableSkillResponseConfig, UpdateSkillPayload, ChangeList } from
-  'domain/skill/SkillDomain.types';
+  'domain/skill/skill-domain.types';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
 

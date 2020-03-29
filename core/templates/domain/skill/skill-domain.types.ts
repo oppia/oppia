@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Contains types for objects in the Skill Domain
+ * @fileoverview Contains types for objects in the Skill domain.
  */
 
 // TODO(#7165): Replace any with exact type.

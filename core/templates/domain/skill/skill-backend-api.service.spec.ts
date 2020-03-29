@@ -45,7 +45,7 @@ describe('Editable skill backend API service', function() {
     }
     );
 
-    let misconceptionDict1 = {
+    const misconceptionDict1 = {
       id: '2',
       name: 'test name',
       notes: 'test notes',
@@ -53,7 +53,7 @@ describe('Editable skill backend API service', function() {
       must_be_addressed: true
     };
 
-    let misconceptionDict2 = {
+    const misconceptionDict2 = {
       id: '4',
       name: 'test name',
       notes: 'test notes',
@@ -61,12 +61,12 @@ describe('Editable skill backend API service', function() {
       must_be_addressed: true
     };
 
-    let skillContentsDict = {
+    const skillContentsDict = {
       explanation: 'test explanation',
       worked_examples: ['test worked example 1', 'test worked example 2']
     };
 
-    let skillDict = {
+    const skillDict = {
       id: '1',
       description: 'test description',
       misconceptions: [misconceptionDict1, misconceptionDict2],
@@ -76,7 +76,7 @@ describe('Editable skill backend API service', function() {
       prerequisite_skill_ids: []
     };
 
-    let skillDict2 = {
+    const skillDict2 = {
       id: '2',
       description: 'test description 2',
       misconceptions: [misconceptionDict1],

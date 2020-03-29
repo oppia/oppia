@@ -21,7 +21,6 @@
 /core/templates/services/request-interceptor.service.ts @bansalnitish
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
-/core/templates/domain/skill/SkillDomain.types.ts @bansalnitish
 
 
 # Answer classification team.
@@ -331,6 +330,7 @@
 
 
 # New structures team.
+/core/templates/domain/skill/skill-domain.types.ts @bansalnitish
 # Question project.
 /core/controllers/practice_sessions*.py @vinitamurthi
 /core/controllers/question*.py @aks681 @vinitamurthi
