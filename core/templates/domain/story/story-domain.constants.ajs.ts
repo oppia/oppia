@@ -28,6 +28,10 @@ angular.module('oppia').constant(
   'STORY_PUBLISH_URL_TEMPLATE',
   StoryDomainConstants.STORY_PUBLISH_URL_TEMPLATE);
 
+angular.module('oppia').constant(
+  'VALIDATE_EXPLORATIONS_URL_TEMPLATE',
+  StoryDomainConstants.VALIDATE_EXPLORATIONS_URL_TEMPLATE);
+
 // These should match the constants defined in core.domain.story_domain.
 angular.module('oppia').constant(
   'CMD_ADD_STORY_NODE', StoryDomainConstants.CMD_ADD_STORY_NODE);
