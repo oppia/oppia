@@ -21,7 +21,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import {EditableTopicBackendApiService} from
   'domain/topic/editable-topic-backend-api.service.ts';
-import {CsrfTokenService} from 'services/csrf-token.service.ts';   
+import {CsrfTokenService} from 'services/csrf-token.service.ts';
 
 describe('Editable topic backend API service', () => {
   let CsrfService: CsrfTokenService = null;
@@ -87,15 +87,15 @@ describe('Editable topic backend API service', () => {
     editableTopicBackendApiService = TestBed.get(
       EditableTopicBackendApiService);
 
-      spyOn(CsrfService, 'getTokenAsync').and.returnValue(() => {
-        return new Promise((resolve) => {
-          resolve('sample-csrf-token');
-        });
-        
-        //var deferred = $q.defer();
-        //deferred.resolve('sample-csrf-token');
-        //return deferred.promise;
+    spyOn(CsrfService, 'getTokenAsync').and.returnValue(() => {
+      return new Promise((resolve) => {
+        resolve('sample-csrf-token');
       });
+      
+      //var deferred = $q.defer();
+      //deferred.resolve('sample-csrf-token');
+      //return deferred.promise;
+    });
   });
 
   afterEach(() => {
