@@ -22,7 +22,7 @@ require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +
   'topic-selector.directive.ts');
 
-require('domain/skill/editable-skill-backend-api.service.ts');
+require('domain/skill/skill-backend-api.service.ts');
 require('domain/topic/editable-topic-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
@@ -50,12 +50,12 @@ angular.module('oppia').directive('skillsList', [
         'skills-list.directive.html'),
       controller: [
         '$scope', '$uibModal', '$rootScope', '$timeout',
-        'EditableTopicBackendApiService', 'EditableSkillBackendApiService',
+        'EditableTopicBackendApiService', 'SkillBackendApiService',
         'TopicsAndSkillsDashboardBackendApiService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
             $scope, $uibModal, $rootScope, $timeout,
-            EditableTopicBackendApiService, EditableSkillBackendApiService,
+            EditableTopicBackendApiService, SkillBackendApiService,
             TopicsAndSkillsDashboardBackendApiService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           var ctrl = this;
@@ -91,7 +91,7 @@ angular.module('oppia').directive('skillsList', [
             });
 
             modalInstance.result.then(function() {
-              EditableSkillBackendApiService.deleteSkill(skillId).then(
+              SkillBackendApiService.deleteSkill(skillId).then(
                 function(status) {
                   $timeout(function() {
                     $rootScope.$broadcast(

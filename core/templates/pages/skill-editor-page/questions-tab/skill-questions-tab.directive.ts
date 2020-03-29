@@ -25,8 +25,8 @@ require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/editable-skill-backend-api.service.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/skill/skill-backend-api.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -46,7 +46,7 @@ angular.module('oppia').directive('questionsTab', [
       controller: [
         '$scope', '$http', '$q', '$uibModal', '$window', 'AlertsService',
         'SkillEditorStateService', 'QuestionCreationService', 'UrlService',
-        'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
+        'EditableQuestionBackendApiService', 'SkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionsListService',
         'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
@@ -54,7 +54,7 @@ angular.module('oppia').directive('questionsTab', [
         'NUM_QUESTIONS_PER_PAGE', function(
             $scope, $http, $q, $uibModal, $window, AlertsService,
             SkillEditorStateService, QuestionCreationService, UrlService,
-            EditableQuestionBackendApiService, EditableSkillBackendApiService,
+            EditableQuestionBackendApiService, SkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
             QuestionsListService,
             StateEditorService, QuestionUndoRedoService, UndoRedoService,

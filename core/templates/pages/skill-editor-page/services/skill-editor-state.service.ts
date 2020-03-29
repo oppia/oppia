@@ -19,24 +19,23 @@
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/question-backend-api.service.ts');
-require('domain/skill/editable-skill-backend-api.service.ts');
 require('domain/skill/SkillObjectFactory.ts');
-require('domain/skill/skill-rights-backend-api.service.ts');
 require('domain/skill/SkillRightsObjectFactory.ts');
+require('domain/skill/skill-backend-api.service.ts');
+require('domain/skill/skill-rights-backend-api.service.ts');
+require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 require('services/alerts.service.ts');
 require('services/questions-list.service.ts');
 
-require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
-
 angular.module('oppia').factory('SkillEditorStateService', [
-  '$rootScope', 'AlertsService', 'EditableSkillBackendApiService',
-  'QuestionsListService', 'SkillObjectFactory', 'SkillRightsBackendApiService',
-  'SkillRightsObjectFactory', 'UndoRedoService',
+  '$rootScope', 'AlertsService', 'QuestionsListService',
+  'SkillBackendApiService', 'SkillObjectFactory',
+  'SkillRightsBackendApiService', 'SkillRightsObjectFactory', 'UndoRedoService',
   'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
   function(
-      $rootScope, AlertsService, EditableSkillBackendApiService,
-      QuestionsListService, SkillObjectFactory, SkillRightsBackendApiService,
-      SkillRightsObjectFactory, UndoRedoService,
+      $rootScope, AlertsService, QuestionsListService,
+      SkillBackendApiService, SkillObjectFactory,
+      SkillRightsBackendApiService, SkillRightsObjectFactory, UndoRedoService,
       EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
     var _skillRights = (
@@ -113,7 +112,7 @@ angular.module('oppia').factory('SkillEditorStateService', [
        */
       loadSkill: function(skillId) {
         _skillIsBeingLoaded = true;
-        EditableSkillBackendApiService.fetchSkill(
+        SkillBackendApiService.fetchSkill(
           skillId).then(
           function(newBackendSkillObject) {
             _updateSkill(newBackendSkillObject.skill);
@@ -185,7 +184,7 @@ angular.module('oppia').factory('SkillEditorStateService', [
           return false;
         }
         _skillIsBeingSaved = true;
-        EditableSkillBackendApiService.updateSkill(
+        SkillBackendApiService.updateSkill(
           _skill.getId(), _skill.getVersion(), commitMessage,
           UndoRedoService.getCommittableChangeList()).then(
           function(skillBackendObject) {

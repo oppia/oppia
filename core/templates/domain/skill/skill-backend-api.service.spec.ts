@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for EditableSkillBackendApiService.
+ * @fileoverview Unit tests for SkillBackendApiService.
  */
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/skill/editable-skill-backend-api.service.ts');
+require('domain/skill/skill-backend-api.service.ts');
 require('services/csrf-token.service.ts');
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -25,8 +25,8 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 
-describe('Editable skill backend API service', function() {
-  var EditableSkillBackendApiService = null;
+describe('Skill backend API service', function() {
+  var SkillBackendApiService = null;
   var UndoRedoService = null;
   var $httpBackend = null;
   var sampleResponse = null;
@@ -42,8 +42,8 @@ describe('Editable skill backend API service', function() {
   }));
 
   beforeEach(angular.mock.inject(function($injector, $q) {
-    EditableSkillBackendApiService = $injector.get(
-      'EditableSkillBackendApiService');
+    SkillBackendApiService = $injector.get(
+      'SkillBackendApiService');
     UndoRedoService = $injector.get('UndoRedoService');
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
@@ -118,7 +118,7 @@ describe('Editable skill backend API service', function() {
 
       $httpBackend.expect('GET', '/skill_editor_handler/data/1').respond(
         sampleResponse);
-      EditableSkillBackendApiService.fetchSkill('1').then(
+      SkillBackendApiService.fetchSkill('1').then(
         successHandler, failHandler);
       $httpBackend.flush();
 
@@ -136,7 +136,7 @@ describe('Editable skill backend API service', function() {
 
       $httpBackend.expect('GET', '/skill_editor_handler/data/1').respond(
         500, 'Error loading skill 1.');
-      EditableSkillBackendApiService.fetchSkill('1').then(
+      SkillBackendApiService.fetchSkill('1').then(
         successHandler, failHandler);
       $httpBackend.flush();
 
@@ -153,7 +153,7 @@ describe('Editable skill backend API service', function() {
         sampleResponse);
 
       var skillDict = null;
-      EditableSkillBackendApiService.fetchSkill('1').then(
+      SkillBackendApiService.fetchSkill('1').then(
         function(data) {
           skillDict = data.skill;
         });
@@ -163,7 +163,7 @@ describe('Editable skill backend API service', function() {
         skill: skillDict
       });
 
-      EditableSkillBackendApiService.updateSkill(
+      SkillBackendApiService.updateSkill(
         skillDict.id, skillDict.version, 'commit message', []
       ).then(successHandler, failHandler);
       $httpBackend.flush();
@@ -180,7 +180,7 @@ describe('Editable skill backend API service', function() {
     $httpBackend.expect('GET', '/skill_editor_handler/data/1').respond(
       sampleResponse);
     var skillDict = null;
-    EditableSkillBackendApiService.fetchSkill('1').then(
+    SkillBackendApiService.fetchSkill('1').then(
       function(data) {
         skillDict = data.skill;
       });
@@ -188,7 +188,7 @@ describe('Editable skill backend API service', function() {
 
     $httpBackend.expect('PUT', '/skill_editor_handler/data/1').respond(
       500, 'Error on update skill 1.');
-    EditableSkillBackendApiService.updateSkill(
+    SkillBackendApiService.updateSkill(
       skillDict.id, skillDict.version, 'commit message', []
     ).then(successHandler, failHandler);
     $httpBackend.flush();
@@ -204,7 +204,7 @@ describe('Editable skill backend API service', function() {
 
       var skillDataUrl = '/skill_data_handler/' + encodeURIComponent('1,2');
       $httpBackend.expect('GET', skillDataUrl).respond(sampleResponse2);
-      EditableSkillBackendApiService.fetchMultiSkills(['1', '2']).then(
+      SkillBackendApiService.fetchMultiSkills(['1', '2']).then(
         successHandler, failHandler);
       $httpBackend.flush();
 
@@ -220,7 +220,7 @@ describe('Editable skill backend API service', function() {
     var skillDataUrl = '/skill_data_handler/' + encodeURIComponent('1,2');
     $httpBackend.expect('GET', skillDataUrl).respond(
       500, 'Error on fetching skills 1 and 2.');
-    EditableSkillBackendApiService.fetchMultiSkills(['1', '2']).then(
+    SkillBackendApiService.fetchMultiSkills(['1', '2']).then(
       successHandler, failHandler);
     $httpBackend.flush();
 
@@ -234,7 +234,7 @@ describe('Editable skill backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     $httpBackend.expect('DELETE', '/skill_editor_handler/data/1').respond(200);
-    EditableSkillBackendApiService.deleteSkill('1').then(
+    SkillBackendApiService.deleteSkill('1').then(
       successHandler, failHandler);
     $httpBackend.flush();
 
@@ -249,7 +249,7 @@ describe('Editable skill backend API service', function() {
 
       $httpBackend.expect('DELETE', '/skill_editor_handler/data/1').respond(
         500, 'It is not possible to delete skill 1.');
-      EditableSkillBackendApiService.deleteSkill('1').then(
+      SkillBackendApiService.deleteSkill('1').then(
         successHandler, failHandler);
       $httpBackend.flush();
 
