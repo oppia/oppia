@@ -23,17 +23,16 @@ require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/debug-info-tracker.service.ts');
 require('services/exploration-features.service.ts');
 
 angular.module('oppia').factory('RouterService', [
   '$interval', '$location', '$rootScope', '$timeout', '$window',
-  'DebugInfoTrackerService', 'ExplorationFeaturesService',
+  'ExplorationFeaturesService',
   'ExplorationInitStateNameService', 'ExplorationStatesService',
   'StateEditorService',
   function(
       $interval, $location, $rootScope, $timeout, $window,
-      DebugInfoTrackerService, ExplorationFeaturesService,
+      ExplorationFeaturesService,
       ExplorationInitStateNameService, ExplorationStatesService,
       StateEditorService) {
     var TABS = {
@@ -213,7 +212,6 @@ angular.module('oppia').factory('RouterService', [
         return _getCurrentStateFromLocationPath();
       },
       navigateToMainTab: function(stateName) {
-        DebugInfoTrackerService.reset();
         _savePendingChanges();
         if (_getCurrentStateFromLocationPath() === stateName) {
           return;
