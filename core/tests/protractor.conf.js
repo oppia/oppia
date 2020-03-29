@@ -50,7 +50,10 @@ var suites = {
     ],
 
     creatorDashboard: [
-      'protractor_desktop/creatorDashboard.js'
+      'protractor_desktop/creatorDashboard.js',
+      'protractor_desktop/classroomPage.js',
+      'protractor_desktop/preferences.js'
+
     ],
 
     embedding: [
