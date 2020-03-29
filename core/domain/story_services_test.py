@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
+from core.domain import exp_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
