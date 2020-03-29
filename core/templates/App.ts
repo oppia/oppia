@@ -82,7 +82,7 @@ angular.module('oppia').config([
       $compileProvider, $cookiesProvider, $httpProvider,
       $interpolateProvider, $locationProvider, $provide) {
     var ugs = new UpgradedServices();
-    // We need to provide these services separately since they are
+    // We need to provide these services and pipes separately since they are
     // used in the directives imported in this file and cannot be
     // injected before bootstrapping of oppia module.
     var servicesToProvide = [
