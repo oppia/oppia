@@ -129,6 +129,42 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
             expected_status_int=401)
 
 
+class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
+
+    def test_validation_error_messages(self):
+        # Check that admins can publish a story.
+        self.login(self.ADMIN_EMAIL)
+        self.save_new_valid_exploration(
+            '0', self.admin_id, title='Title 1',
+            category='Mathematics', language_code='en')
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX, self.story_id),
+            params={
+                'comma_separated_exp_ids': '15,0'
+            })
+
+        error_messages = json_response['validation_error_messages']
+        message_1 = (
+            'Expected story to only reference valid explorations, but found '
+            'a reference to an invalid exploration with ID: 15')
+        message_2 = (
+            'Exploration with ID 0 is not public. Please publish '
+            'explorations before adding them to a story.'
+        )
+        self.assertEqual(error_messages, [message_1, message_2])
+        self.logout()
+
+    def test_invalid_input_exception_when_no_exp_ids_passed(self):
+        # Check that admins can publish a story.
+        self.login(self.ADMIN_EMAIL)
+        self.get_json(
+            '%s/%s' % (
+                feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX, self.story_id),
+            expected_status_int=400)
+        self.logout()
+
+
 class StoryEditorTests(BaseStoryEditorControllerTests):
 
     def test_can_not_access_story_editor_page_with_invalid_story_id(self):

@@ -329,9 +329,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         topic_id = 'topic'
         story_id = 'story'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            '0', title='title')
-        exp_services.save_new_exploration(owner_id, exploration)
+        self.save_new_valid_exploration(
+            '0', owner_id, title='title',
+            end_state_name='End State')
+        self.publish_exploration(owner_id, '0')
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id=topic_id, name='topic', abbreviated_name='abbrev')

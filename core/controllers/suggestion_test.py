@@ -1046,9 +1046,10 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         # Needs to be 12 characters long.
         self.SKILL_ID = 'skill1234567'
         self.SKILL_DESCRIPTION = 'skill to link question to'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, title='Exploration title')
-        exp_services.save_new_exploration(self.owner_id, exploration)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, title='Exploration title',
+            end_state_name='End State')
+        self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
@@ -1221,9 +1222,10 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         # Needs to be 12 characters long.
         self.SKILL_ID = 'skill1234567'
         self.SKILL_DESCRIPTION = 'skill to link question to'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, title='Exploration title')
-        exp_services.save_new_exploration(self.owner_id, exploration)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, title='Exploration title',
+            end_state_name='End State')
+        self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
