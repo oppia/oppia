@@ -24,16 +24,52 @@ from core.domain import search_services
 from core.platform import models
 import feconf
 
-(
-    collection_models, config_models,
-    exp_models, question_models,
-    skill_models, story_models,
-    topic_models) = (
-        models.Registry.import_models([
-            models.NAMES.collection, models.NAMES.config,
-            models.NAMES.exploration, models.NAMES.question,
-            models.NAMES.skill, models.NAMES.story,
-            models.NAMES.topic]))
+(collection_models, exp_models) = models.Registry.import_models(
+    [models.NAMES.collection, models.NAMES.exploration])
+
+
+class AuditContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Audit job that compares the contents of contributor_ids and
+    contributors_summary.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExpSummaryModel,
+                collection_models.CollectionSummaryModel]
+
+    @staticmethod
+    def map(model):
+        ids_set = set(model.contributor_ids)
+        summary_set = set(model.contributors_summary)
+        if len(ids_set) != len(model.contributor_ids):
+            # When the contributor_ids contain duplicate ids.
+            yield (
+                'DUPLICATE_IDS',
+                (model.id, model.contributor_ids, model.contributors_summary)
+            )
+        if ids_set - summary_set:
+            # When the contributor_ids contain id that is not in
+            # contributors_summary.
+            yield (
+                'MISSING_IN_SUMMARY',
+                (model.id, model.contributor_ids, model.contributors_summary)
+            )
+        if summary_set - ids_set:
+            # When the contributors_summary contains id that is not in
+            # contributor_ids.
+            yield (
+                'MISSING_IN_IDS',
+                (model.id, model.contributor_ids, model.contributors_summary)
+            )
+        yield ('SUCCESS', model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)
 
 
 class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
