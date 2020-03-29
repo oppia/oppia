@@ -378,6 +378,7 @@ FULLY_COVERED_FILENAMES = [
     'topic-landing-page.constants.ts',
     'topic-landing-page.controller.ts',
     'topic-rights-backend-api.service.ts',
+    'topic-viewer-backend-api.service.ts',
     'topic-viewer-domain.constants.ajs.ts',
     'topic-viewer-domain.constants.ts',
     'TopicRightsObjectFactory.ts',
