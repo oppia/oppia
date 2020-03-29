@@ -160,7 +160,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
           };
 
           var centerGraph = function() {
-            if ($scope.graphLoaded && $scope.centerAtCurrentState) {
+            if ($scope.graphData() && $scope.centerAtCurrentState) {
               if ($scope.allowPanning) {
                 makeGraphPannable();
               }
