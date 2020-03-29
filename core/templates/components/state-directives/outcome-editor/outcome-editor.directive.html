@@ -87,7 +87,7 @@
         to...</strong>
         <strong ng-if="!$ctrl.displayFeedback">Oppia directs the learner to...</strong>
         <span ng-if="!$ctrl.isSelfLoop($ctrl.outcome)" style="position: relative;">
-          <[outcome.dest]>
+          <[$ctrl.outcome.dest]>
         </span>
         <span ng-if="$ctrl.isSelfLoop($ctrl.outcome)" style="position: relative;">
           <span ng-if="!$ctrl.outcome.refresherExplorationId">(try again)</span>
