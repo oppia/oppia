@@ -565,6 +565,14 @@ export = {
 
   "SKILL_DIFFICULTIES": ["Easy", "Medium", "Hard"],
 
+  // The skill difficulty values here should correspond to the SKILL_DIFFICULTY
+  // constant values in feconf.py.
+  "SKILL_DIFFICULTY_LABEL_TO_FLOAT": {
+    "Easy": 0.3,
+    "Medium": 0.6,
+    "Hard": 0.9
+  },
+
   "ENABLE_PREREQUISITE_SKILLS": false,
 
   // For the full new structures viewer features, both
