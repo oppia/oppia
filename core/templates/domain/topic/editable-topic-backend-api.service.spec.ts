@@ -91,10 +91,6 @@ describe('Editable topic backend API service', () => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');
       });
-      
-      //var deferred = $q.defer();
-      //deferred.resolve('sample-csrf-token');
-      //return deferred.promise;
     });
   });
 
