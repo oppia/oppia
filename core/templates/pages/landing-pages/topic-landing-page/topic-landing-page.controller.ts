@@ -39,12 +39,12 @@ angular.module('oppia').directive('topicLandingPage', [
         'topic-landing-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$filter', '$timeout', '$window', 'PageTitleService',
-        'SiteAnalyticsService', 'UrlInterpolationService',
+        '$filter', '$timeout', 'PageTitleService',
+        'SiteAnalyticsService', 'UrlInterpolationService', 'WindowRef',
         'TOPIC_LANDING_PAGE_DATA',
         function(
-            $filter, $timeout, $window, PageTitleService,
-            SiteAnalyticsService, UrlInterpolationService,
+            $filter, $timeout, PageTitleService,
+            SiteAnalyticsService, UrlInterpolationService, WindowRef,
             TOPIC_LANDING_PAGE_DATA) {
           var ctrl = this;
           var pathArray, topic, topicData, landingPageData, assetsPathFormat;
@@ -63,8 +63,9 @@ angular.module('oppia').directive('topicLandingPage', [
               };
             }
           };
+
           ctrl.getVideoUrl = function() {
-            if (landingPageData.video) {
+            if (landingPageData && landingPageData.video) {
               var videoPath = UrlInterpolationService.interpolateUrl(
                 angular.copy(assetsPathFormat), {
                   subject: ctrl.subject,
@@ -83,8 +84,8 @@ angular.module('oppia').directive('topicLandingPage', [
             SiteAnalyticsService.registerOpenCollectionFromLandingPageEvent(
               collectionId);
             $timeout(function() {
-              $window.location = UrlInterpolationService.interpolateUrl(
-                '/collection/<collection_id>', {
+              WindowRef.nativeWindow.location = UrlInterpolationService
+                .interpolateUrl('/collection/<collection_id>', {
                   collection_id: collectionId
                 });
             }, 150);
@@ -92,17 +93,17 @@ angular.module('oppia').directive('topicLandingPage', [
 
           ctrl.onClickLearnMoreButton = function() {
             $timeout(function() {
-              $window.location = '/splash';
+              WindowRef.nativeWindow.location = '/splash';
             }, 150);
           };
 
           ctrl.onClickExploreLessonsButton = function() {
             $timeout(function() {
-              $window.location = '/library';
+              WindowRef.nativeWindow.location = '/library';
             }, 150);
           };
           ctrl.$onInit = function() {
-            pathArray = $window.location.pathname.split('/');
+            pathArray = WindowRef.nativeWindow.location.pathname.split('/');
             ctrl.subject = pathArray[2];
             topic = pathArray[3];
             topicData = TOPIC_LANDING_PAGE_DATA[ctrl.subject][topic];

@@ -54,7 +54,6 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/editability.service.ts');
 require('services/exploration-html-formatter.service.ts');
-require('services/generate-content-id.service.ts');
 
 require('components/state-editor/state-editor.constants.ajs.ts');
 
@@ -148,14 +147,15 @@ angular.module('oppia').directive('stateSolutionEditor', [
                 'modal-templates/add-or-update-solution-modal.template.html'),
               backdrop: 'static',
               controller: [
-                '$scope', '$uibModalInstance', 'StateSolutionService',
-                'StateCustomizationArgsService',
-                'CurrentInteractionService', 'INTERACTION_SPECS',
-                'COMPONENT_NAME_SOLUTION', 'GenerateContentIdService', function(
-                    $scope, $uibModalInstance, StateSolutionService,
-                    StateCustomizationArgsService,
-                    CurrentInteractionService, INTERACTION_SPECS,
-                    COMPONENT_NAME_SOLUTION, GenerateContentIdService) {
+                '$scope', '$uibModalInstance', 'ContextService',
+                'CurrentInteractionService', 'StateCustomizationArgsService',
+                'StateSolutionService', 'COMPONENT_NAME_SOLUTION',
+                'INTERACTION_SPECS',
+                function(
+                    $scope, $uibModalInstance, ContextService,
+                    CurrentInteractionService, StateCustomizationArgsService,
+                    StateSolutionService, COMPONENT_NAME_SOLUTION,
+                    INTERACTION_SPECS) {
                   $scope.StateSolutionService = StateSolutionService;
                   $scope.correctAnswerEditorHtml = (
                     ExplorationHtmlFormatterService.getInteractionHtml(
@@ -165,7 +165,10 @@ angular.module('oppia').directive('stateSolutionEditor', [
                       $scope.SOLUTION_EDITOR_FOCUS_LABEL));
                   $scope.EXPLANATION_FORM_SCHEMA = {
                     type: 'html',
-                    ui_config: {}
+                    ui_config: {
+                      hide_complex_extensions: (
+                        ContextService.getEntityType() === 'question')
+                    }
                   };
 
                   $scope.answerIsValid = false;

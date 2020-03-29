@@ -34,11 +34,13 @@ angular.module('oppia').directive('stewardsLandingPage', [
         'stewards-landing-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', '$window', 'SiteAnalyticsService',
+        '$scope', '$timeout', 'SiteAnalyticsService',
         'UrlInterpolationService', 'UrlService', 'WindowDimensionsService',
+        'WindowRef',
         function(
-            $scope, $timeout, $window, SiteAnalyticsService,
-            UrlInterpolationService, UrlService, WindowDimensionsService) {
+            $scope, $timeout, SiteAnalyticsService,
+            UrlInterpolationService, UrlService, WindowDimensionsService,
+            WindowRef) {
           var ctrl = this;
           ctrl.setActiveTabName = function(newActiveTabName) {
             ctrl.activeTabName = newActiveTabName;
@@ -106,7 +108,7 @@ angular.module('oppia').directive('stewardsLandingPage', [
             SiteAnalyticsService.registerStewardsLandingPageEvent(
               ctrl.activeTabName, buttonDefinition.text);
             $timeout(function() {
-              $window.location = buttonDefinition.href;
+              WindowRef.nativeWindow.location = buttonDefinition.href;
             }, 150);
           };
 

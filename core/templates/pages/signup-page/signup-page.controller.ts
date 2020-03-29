@@ -204,7 +204,7 @@ angular.module('oppia').directive('signupPage', [
                             $window.location = loginUrl;
                           }, 150);
                         } else {
-                          throw new Error('Login url not found.');
+                          $window.location.reload();
                         }
                       }
                     );

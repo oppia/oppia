@@ -17,14 +17,15 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
+require('domain/topic/topic-creation-backend-api.service.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').factory('TopicCreationService', [
-  '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
-  'UrlInterpolationService',
+  '$rootScope', '$uibModal', '$window', 'AlertsService',
+  'TopicCreationBackendApiService', 'UrlInterpolationService',
   function(
-      $http, $rootScope, $timeout, $uibModal, $window, AlertsService,
-      UrlInterpolationService) {
+      $rootScope, $uibModal, $window, AlertsService,
+      TopicCreationBackendApiService, UrlInterpolationService) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
     var topicCreationInProgress = false;
 
@@ -77,20 +78,17 @@ angular.module('oppia').factory('TopicCreationService', [
           AlertsService.clearWarnings();
 
           $rootScope.loadingMessage = 'Creating topic';
-          $http.post('/topic_editor_handler/create_new', {
-            name: topic.topicName,
-            abbreviated_name: topic.abbreviatedTopicName
-          }).then(function(response) {
-            $timeout(function() {
+          TopicCreationBackendApiService.createTopic(
+            topic.topicName, topic.abbreviatedTopicName).then(
+            function(response) {
               $window.location = UrlInterpolationService.interpolateUrl(
                 TOPIC_EDITOR_URL_TEMPLATE, {
-                  topic_id: response.data.topicId
+                  topic_id: response.topicId
                 }
               );
-            }, 150);
-          }, function() {
-            $rootScope.loadingMessage = '';
-          });
+            }, function() {
+              $rootScope.loadingMessage = '';
+            });
         });
       }
     };

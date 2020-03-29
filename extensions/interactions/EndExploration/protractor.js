@@ -17,7 +17,7 @@
  * interaction.
  */
 
-var objects = require('../../objects/protractor.js');
+var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 /**
  * Add recommended exploration Id to End Exploration interaction.
  * @param {Object} elem - The Customize Exploration modal for End Exploration.
