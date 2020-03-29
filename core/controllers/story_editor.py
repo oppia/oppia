@@ -157,7 +157,7 @@ class ValidateExplorationsHandler(base.BaseHandler):
                 'Expected comma_separated_exp_ids parameter to be present.')
         exp_ids = comma_separated_exp_ids.split(',')
         validation_error_messages = (
-            story_services.validate_explorations(exp_ids, False))
+            story_services.validate_explorations_for_story(exp_ids, False))
         self.values.update({
             'validation_error_messages': validation_error_messages
         })

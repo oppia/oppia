@@ -189,7 +189,7 @@ def apply_change_list(story_id, change_list):
         raise
 
 
-def validate_explorations(exp_ids, raise_error):
+def validate_explorations_for_story(exp_ids, raise_error):
     """Validates the explorations in the given story and checks whether they
     are compatible with the mobile app.
 
@@ -333,7 +333,7 @@ def _save_story(committer_id, story, commit_message, change_list):
     exp_ids = [
         node.exploration_id for node in story.story_contents.nodes
         if node.exploration_id is not None]
-    validate_explorations(exp_ids, True)
+    validate_explorations_for_story(exp_ids, True)
 
     # Story model cannot be None as story is passed as parameter here and that
     # is only possible if a story model with that story id exists. Also this is

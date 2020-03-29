@@ -744,7 +744,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1')
         validation_error_messages = (
-            story_services.validate_explorations(
+            story_services.validate_explorations_for_story(
                 ['invalid_exp', 'exp_id_1'], False))
         message_1 = (
             'Expected story to only reference valid explorations, but found '
@@ -814,7 +814,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         validation_error_messages = (
-            story_services.validate_explorations(
+            story_services.validate_explorations_for_story(
                 ['exp_id_2', 'exp_id_1'], False))
 
         self.assertEqual(
@@ -846,7 +846,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         validation_error_messages = (
-            story_services.validate_explorations(['exp_id_1'], False))
+            story_services.validate_explorations_for_story(['exp_id_1'], False))
         self.assertEqual(
             validation_error_messages, [
                 'Invalid language es found for exploration with ID exp_id_1.'])
@@ -874,7 +874,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         validation_error_messages = (
-            story_services.validate_explorations(['exp_id_1'], False))
+            story_services.validate_explorations_for_story(['exp_id_1'], False))
         self.assertEqual(
             validation_error_messages, [
                 'Invalid interaction LogicProof in exploration with ID: '
@@ -916,7 +916,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         validation_error_messages = (
-            story_services.validate_explorations(['exp_id_1'], False))
+            story_services.validate_explorations_for_story(['exp_id_1'], False))
         self.assertEqual(
             validation_error_messages, [
                 'RTE content in state Introduction of exploration with '
@@ -954,7 +954,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         ]
 
         validation_error_messages = (
-            story_services.validate_explorations(['exp_id_1'], False))
+            story_services.validate_explorations_for_story(['exp_id_1'], False))
         self.assertEqual(
             validation_error_messages, [
                 'Expected no exploration to have parameter values in'
