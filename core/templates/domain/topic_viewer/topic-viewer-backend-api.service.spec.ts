@@ -88,7 +88,7 @@ describe('Topic viewer backend API service', () => {
     })
   );
 
-  it('should use rejection handler if acnkend request failed',
+  it('should use rejection handler if backend request failed',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
