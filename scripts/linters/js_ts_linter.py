@@ -111,18 +111,21 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             validating and parsing the files.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
-    def __init__(self, js_files, ts_files, verbose_mode_enabled):
+    def __init__(self, js_files, ts_files, file_cache, verbose_mode_enabled):
         """Constructs a JsTsLintChecksManager object.
 
         Args:
             js_files: list(str). The list of js filepaths to be linted.
             ts_files: list(str). The list of ts filepaths to be linted.
+            file_cache: object(FileCache). Provides thread-safe access to cached
+                file content.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
         os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
 
         self.js_files = js_files
         self.ts_files = ts_files
+        self.file_cache = file_cache
         self.verbose_mode_enabled = verbose_mode_enabled
         self.parsed_js_and_ts_files = []
         self.parsed_expressions_in_files = []
@@ -164,7 +167,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             if self.verbose_mode_enabled:
                 python_utils.PRINT(
                     'Validating and parsing %s file ...' % filepath)
-            file_content = FILE_CACHE.read(filepath)
+            file_content = self.file_cache.read(filepath)
 
             try:
                 # Use esprima to parse a JS or TS file.
@@ -179,7 +182,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 try:
                     compiled_js_filepath = self._compile_ts_file(
                         filepath, compiled_js_dir)
-                    file_content = FILE_CACHE.read(compiled_js_filepath)
+                    file_content = self.file_cache.read(compiled_js_filepath)
                     parsed_js_and_ts_files[filepath] = esprima.parseScript(
                         file_content)
                 except Exception as e:
@@ -574,7 +577,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         stdout = sys.stdout
         with linter_utils.redirect_stdout(stdout):
             for filepath in files_to_check:
-                file_content = FILE_CACHE.read(filepath)
+                file_content = self.file_cache.read(filepath)
                 matched_patterns = re.findall(pattern_to_match, file_content)
                 for matched_pattern in matched_patterns:
                     stringfied_dependencies, function_parameters = (
@@ -650,7 +653,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             compiled_js_filepath = self._compile_ts_file(
                                 corresponding_angularjs_filepath,
                                 compiled_js_dir)
-                            file_content = FILE_CACHE.read(
+                            file_content = self.file_cache.read(
                                 compiled_js_filepath).decode('utf-8')
 
                             parsed_script = esprima.parseScript(file_content)
@@ -710,7 +713,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 # Check that the constants are declared only in a
                 # *.constants.ajs.ts file.
                 if not filepath.endswith('.constants.ajs.ts'):
-                    for line_num, line in enumerate(FILE_CACHE.readlines(
+                    for line_num, line in enumerate(self.file_cache.readlines(
                             filepath)):
                         if 'oppia.constant(' in line:
                             failed = True
@@ -928,13 +931,16 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         return self._lint_js_and_ts_files()
 
 
-def get_linters(js_filepaths, ts_filepaths, verbose_mode_enabled=False):
+def get_linters(
+        js_filepaths, ts_filepaths, file_cache, verbose_mode_enabled=False):
     """Creates JsTsLintChecksManager and ThirdPartyJsTsLintChecksManager
         objects and return them.
 
     Args:
         js_filepaths: list(str). A list of js filepaths to lint.
         ts_filepaths: list(str). A list of ts filepaths to lint.
+        file_cache: object(FileCache). Provides thread-safe access to cached
+            file content.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
@@ -944,7 +950,7 @@ def get_linters(js_filepaths, ts_filepaths, verbose_mode_enabled=False):
     js_ts_file_paths = js_filepaths + ts_filepaths
 
     custom_linter = JsTsLintChecksManager(
-        js_filepaths, ts_filepaths, verbose_mode_enabled)
+        js_filepaths, ts_filepaths, file_cache, verbose_mode_enabled)
 
     third_party_linter = ThirdPartyJsTsLintChecksManager(
         js_ts_file_paths, verbose_mode_enabled)

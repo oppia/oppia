@@ -153,7 +153,7 @@ def check_for_important_patterns_at_bottom_of_codeowners(important_patterns):
     return failed
 
 
-def check_codeowner_file(verbose_mode_enabled):
+def check_codeowner_file(file_cache, verbose_mode_enabled):
     """Checks the CODEOWNERS file for any uncovered dirs/files and also
     checks that every pattern in the CODEOWNERS file matches at least one
     file/dir. Note that this checks the CODEOWNERS file according to the
@@ -177,7 +177,7 @@ def check_codeowner_file(verbose_mode_enabled):
         important_rules_in_critical_section = []
         file_patterns = []
         dir_patterns = []
-        for line_num, line in enumerate(FILE_CACHE.readlines(
+        for line_num, line in enumerate(file_cache.readlines(
                 CODEOWNER_FILEPATH)):
             stripped_line = line.strip()
             if '# Critical files' in line:

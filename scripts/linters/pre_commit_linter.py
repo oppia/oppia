@@ -236,20 +236,21 @@ def _lint_all_files(
         general_files_to_lint = file_extensions_to_lint
 
     custom_linter, third_party_linter = general_purpose_linter.get_linters(
-        _FILES[general_files_to_lint],
+        _FILES[general_files_to_lint], FILE_CACHE,
         verbose_mode_enabled=verbose_mode_enabled)
     custom_linters.append(custom_linter)
 
     if js_ts_file_extension_type:
         custom_linter, third_party_linter = js_ts_linter.get_linters(
-            js_filepaths, ts_filepaths,
+            js_filepaths, ts_filepaths, FILE_CACHE,
             verbose_mode_enabled=verbose_mode_enabled)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
     if html_file_extension_type:
         custom_linter, third_party_linter = html_linter.get_linters(
-            html_filepaths, verbose_mode_enabled=verbose_mode_enabled)
+            html_filepaths, FILE_CACHE,
+            verbose_mode_enabled=verbose_mode_enabled)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
@@ -516,7 +517,7 @@ def main(args=None):
         all_messages += task.output
 
     all_messages += codeowner_linter.check_codeowner_file(
-        verbose_mode_enabled)
+        FILE_CACHE, verbose_mode_enabled)
 
     _print_complete_summary_of_errors(all_messages)
 
@@ -535,7 +536,7 @@ def main(args=None):
 NAME_SPACE = multiprocessing.Manager().Namespace()
 PROCESSES = multiprocessing.Manager().dict()
 NAME_SPACE.files = FileCache()
-__builtins__.FILE_CACHE = NAME_SPACE.files
+FILE_CACHE = NAME_SPACE.files
 
 
 if __name__ == '__main__':

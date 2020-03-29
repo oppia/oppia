@@ -233,14 +233,17 @@ class HTMLLintChecksManager(python_utils.OBJECT):
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
     def __init__(
-            self, files_to_lint, verbose_mode_enabled):
+            self, files_to_lint, file_cache, verbose_mode_enabled):
         """Constructs a HTMLLintChecksManager object.
 
         Args:
             files_to_lint: list(str). A list of filepaths to lint.
+            file_cache: object(FileCache). Provides thread-safe access to cached
+                file content.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
         self.files_to_lint = files_to_lint
+        self.file_cache = file_cache
         self.verbose_mode_enabled = verbose_mode_enabled
 
     @property
@@ -268,8 +271,8 @@ class HTMLLintChecksManager(python_utils.OBJECT):
 
         with linter_utils.redirect_stdout(stdout):
             for filepath in html_files_to_lint:
-                file_content = FILE_CACHE.read(filepath)
-                file_lines = FILE_CACHE.readlines(filepath)
+                file_content = self.file_cache.read(filepath)
+                file_lines = self.file_cache.readlines(filepath)
                 parser = CustomHTMLParser(filepath, file_lines, debug)
                 parser.feed(file_content)
 
@@ -421,12 +424,14 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
         return self._lint_html_files()
 
 
-def get_linters(files_to_lint, verbose_mode_enabled=False):
+def get_linters(files_to_lint, file_cache, verbose_mode_enabled=False):
     """Creates HTMLLintChecksManager and ThirdPartyHTMLLintChecksManager
         objects and returns them.
 
     Args:
         files_to_lint: list(str). A list of filepaths to lint.
+        file_cache: object(FileCache). Provides thread-safe access to cached
+            file content.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
@@ -434,7 +439,7 @@ def get_linters(files_to_lint, verbose_mode_enabled=False):
         of custom and third_party linter objects.
     """
     custom_linter = HTMLLintChecksManager(
-        files_to_lint, verbose_mode_enabled)
+        files_to_lint, file_cache, verbose_mode_enabled)
 
     third_party_linter = ThirdPartyHTMLLintChecksManager(
         files_to_lint, verbose_mode_enabled)

@@ -549,11 +549,13 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
 
-    def __init__(self, files_to_lint, verbose_mode_enabled):
+    def __init__(self, files_to_lint, file_cache, verbose_mode_enabled):
         """Constructs a GeneralPurposeLinter object.
 
         Args:
             files_to_lint: list(str). A list of filepaths to lint.
+            file_cache: object(FileCache). Provides thread-safe access to cached
+                file content.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
         # Set path for node.
@@ -563,6 +565,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
 
         self.files_to_lint = files_to_lint
+        self.file_cache = file_cache
         self.verbose_mode_enabled = verbose_mode_enabled
 
     @property
@@ -586,7 +589,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         # This boolean list keeps track of the regex matches
         # found in the file.
         pattern_found_list = []
-        file_content = FILE_CACHE.readlines(filepath)
+        file_content = self.file_cache.readlines(filepath)
         for index, regexp_to_check in enumerate(
                 pattern_list):
             if (any([filepath.endswith(
@@ -662,7 +665,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         stdout = sys.stdout
         with linter_utils.redirect_stdout(stdout):
             for filepath in all_filepaths:
-                file_content = FILE_CACHE.read(filepath)
+                file_content = self.file_cache.read(filepath)
                 total_files_checked += 1
                 for pattern in BAD_PATTERNS:
                     if (pattern in file_content and
@@ -729,11 +732,13 @@ class GeneralPurposeLinter(python_utils.OBJECT):
 
 
 def get_linters(
-        files_to_lint, verbose_mode_enabled=False):
+        files_to_lint, file_cache, verbose_mode_enabled=False):
     """Creates GeneralPurposeLinter object and returns it.
 
     Args:
         files_to_lint: list(str). A list of filepaths to lint.
+        file_cache: object(FileCache). Provides thread-safe access to cached
+            file content.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
@@ -741,6 +746,6 @@ def get_linters(
         linter objects.
     """
     custom_linter = GeneralPurposeLinter(
-        files_to_lint, verbose_mode_enabled)
+        files_to_lint, file_cache, verbose_mode_enabled)
 
     return custom_linter, None
