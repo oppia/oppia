@@ -16,180 +16,179 @@
  * @fileoverview Service to send changes to a topic to the backend.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-require('domain/topic/topic-domain.constants.ajs.ts');
+import cloneDeep from 'lodash/cloneDeep';
 
-angular.module('oppia').factory('EditableTopicBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService',
-  'EDITABLE_TOPIC_DATA_URL_TEMPLATE', 'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
-  'TOPIC_EDITOR_STORY_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService,
-      EDITABLE_TOPIC_DATA_URL_TEMPLATE, SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE,
-      TOPIC_EDITOR_STORY_URL_TEMPLATE) {
-    var _fetchTopic = function(
-        topicId, successCallback, errorCallback) {
-      var topicDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
-          topic_id: topicId
-        });
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
+import { AppConstants } from 'app.constants';
 
-      $http.get(topicDataUrl).then(function(response) {
-        if (successCallback) {
-          // The response is passed as a dict with 2 fields and not as 2
-          // parameters, because the successCallback is called as the resolve
-          // callback function in $q in fetchTopic(), and according to its
-          // documentation (https://docs.angularjs.org/api/ng/service/$q),
-          // resolve or reject can have only a single parameter.
-          successCallback({
-            topicDict: angular.copy(response.data.topic_dict),
-            groupedSkillSummaries: angular.copy(
-              response.data.grouped_skill_summary_dicts),
-            skillIdToDescriptionDict: angular.copy(
-              response.data.skill_id_to_description_dict),
-            skillIdToRubricsDict: angular.copy(
-              response.data.skill_id_to_rubrics_dict)
-          });
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
+@Injectable({
+  providedIn: 'root'
+})
+export class EditableTopicBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private urlInterpolation: UrlInterpolationService) { }
+
+  private _fetchTopic(
+      topicId: string, successCallback: any, errorCallback: any): any {
+    var topicDataUrl = this.urlInterpolation.interpolateUrl(
+      AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
+        topic_id: topicId
       });
-    };
 
-    var _fetchStories = function(
-        topicId, successCallback, errorCallback) {
-      var storiesDataUrl = UrlInterpolationService.interpolateUrl(
-        TOPIC_EDITOR_STORY_URL_TEMPLATE, {
-          topic_id: topicId
-        });
+    this.http.get(topicDataUrl).toPromise().then((response: any) => {
+      if (successCallback) {
+        // The response is passed as a dict with 2 fields and not as 2
+        // parameters, because the successCallback is called as the resolve
+        // callback function in $q in fetchTopic(), and according to its
+        // documentation (https://docs.angularjs.org/api/ng/service/$q),
+        // resolve or reject can have only a single parameter.
 
-      $http.get(storiesDataUrl).then(function(response) {
-        var canonicalStorySummaries = angular.copy(
-          response.data.canonical_story_summary_dicts);
-        if (successCallback) {
-          successCallback(canonicalStorySummaries);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    var _fetchSubtopicPage = function(
-        topicId, subtopicId, successCallback, errorCallback) {
-      var subtopicPageDataUrl = UrlInterpolationService.interpolateUrl(
-        SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, {
-          topic_id: topicId,
-          subtopic_id: subtopicId.toString()
-        });
-
-      $http.get(subtopicPageDataUrl).then(function(response) {
-        var topic = angular.copy(response.data.subtopic_page);
-        if (successCallback) {
-          successCallback(topic);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    var _deleteTopic = function(
-        topicId, successCallback, errorCallback) {
-      var topicDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
-          topic_id: topicId
-        });
-      $http['delete'](topicDataUrl).then(function(response) {
-        if (successCallback) {
-          successCallback(response.status);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    var _updateTopic = function(
-        topicId, topicVersion, commitMessage, changeList,
-        successCallback, errorCallback) {
-      var editableTopicDataUrl = UrlInterpolationService.interpolateUrl(
-        EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
-          topic_id: topicId
-        });
-
-      var putData = {
-        version: topicVersion,
-        commit_message: commitMessage,
-        topic_and_subtopic_page_change_dicts: changeList
-      };
-      $http.put(editableTopicDataUrl, putData).then(function(response) {
-        if (successCallback) {
-          // Here also, a dict with 2 fields are passed instead of just 2
-          // parameters, due to the same reason as written for _fetchTopic().
-          successCallback({
-            topicDict: angular.copy(response.data.topic_dict),
-            skillIdToDescriptionDict: angular.copy(
-              response.data.skill_id_to_description_dict),
-            skillIdToRubricsDict: angular.copy(
-              response.data.skill_id_to_rubrics_dict)
-          });
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    return {
-      fetchTopic: function(topicId) {
-        return $q(function(resolve, reject) {
-          _fetchTopic(topicId, resolve, reject);
-        });
-      },
-
-      fetchStories: function(topicId) {
-        return $q(function(resolve, reject) {
-          _fetchStories(topicId, resolve, reject);
-        });
-      },
-
-      fetchSubtopicPage: function(topicId, subtopicId) {
-        return $q(function(resolve, reject) {
-          _fetchSubtopicPage(topicId, subtopicId, resolve, reject);
-        });
-      },
-
-      /**
-       * Updates a topic in the backend with the provided topic ID.
-       * The changes only apply to the topic of the given version and the
-       * request to update the topic will fail if the provided topic
-       * version is older than the current version stored in the backend. Both
-       * the changes and the message to associate with those changes are used
-       * to commit a change to the topic. The new topic is passed to
-       * the success callback, if one is provided to the returned promise
-       * object. Errors are passed to the error callback, if one is provided.
-       */
-      updateTopic: function(
-          topicId, topicVersion, commitMessage, changeList) {
-        return $q(function(resolve, reject) {
-          _updateTopic(
-            topicId, topicVersion, commitMessage, changeList,
-            resolve, reject);
-        });
-      },
-
-      deleteTopic: function(topicId) {
-        return $q(function(resolve, reject) {
-          _deleteTopic(topicId, resolve, reject);
+        successCallback({
+          topicDict: cloneDeep(response.topic_dict),
+          groupedSkillSummaries: cloneDeep(
+            response.grouped_skill_summary_dicts),
+          skillIdToDescriptionDict: cloneDeep(
+            response.skill_id_to_description_dict),
+          skillIdToRubricsDict: cloneDeep(response.skill_id_to_rubrics_dict)
         });
       }
-    };
+    }, (errorResponse) => {
+      if (errorCallback) {
+        errorCallback(errorResponse);
+      }
+    });
   }
-]);
+
+  private _fetchStories(
+      topicId: string, successCallback: any, errorCallback: any): any {
+    var storiesDataUrl = this.urlInterpolation.interpolateUrl(
+      TopicDomainConstants.TOPIC_EDITOR_STORY_URL_TEMPLATE, {
+        topic_id: topicId
+      });
+
+    this.http.get(storiesDataUrl).toPromise().then((response: any) => {
+      let canonicalStorySummaries = cloneDeep(
+        response.canonical_story_summary_dicts);
+      if (successCallback) {
+        successCallback(canonicalStorySummaries);
+      }
+    }, (errorResponse) => {
+      if (errorCallback) {
+        errorCallback(errorResponse.body);
+      }
+    });
+  }
+
+  private _fetchSubtopicPage(
+      topicId: string, subtopicId: number, successCallback: any,
+      errorCallback: any): any {
+    let subtopicPageDataUrl = this.urlInterpolation.interpolateUrl(
+      AppConstants.SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, {
+        topic_id: topicId,
+        subtopic_id: subtopicId.toString()
+      });
+
+    this.http.get(subtopicPageDataUrl).toPromise().then((response: any) => {
+      let topic = cloneDeep(response.subtopic_page);
+      if (successCallback) {
+        successCallback(topic);
+      }
+    }, (errorResponse) => {
+      if (errorCallback) {
+        errorCallback(errorResponse.body);
+      }
+    });
+  }
+
+  private _deleteTopic(
+      topicId: string, successCallback: any, errorCallback: any): any {
+    let topicDataUrl = this.urlInterpolation.interpolateUrl(
+      AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
+        topic_id: topicId
+      });
+    this.http['delete'](topicDataUrl).toPromise().then((response: any) => {
+      if (successCallback) {
+        successCallback(200);
+      }
+    }, (errorResponse) => {
+      if (errorCallback) {
+        errorCallback(errorResponse.body);
+      }
+    });
+  }
+
+  private _updateTopic(
+      topicId: string, topicVersion: string, commitMessage: string,
+      changeList: Array<Object>,
+      successCallback: any, errorCallback: any): any {
+    let editableTopicDataUrl = this.urlInterpolation.interpolateUrl(
+      AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
+        topic_id: topicId
+      });
+
+    var putData = {
+      version: topicVersion,
+      commit_message: commitMessage,
+      topic_and_subtopic_page_change_dicts: changeList
+    };
+    this.http.put(editableTopicDataUrl, putData).toPromise().then(
+      (response: any) => {
+        if (successCallback) {
+        // Here also, a dict with 2 fields are passed instead of just 2
+        // parameters, due to the same reason as written for _fetchTopic().
+          successCallback({
+            topicDict: cloneDeep(response.topic_dict),
+            skillIdToDescriptionDict: cloneDeep(
+              response.skill_id_to_description_dict),
+            skillIdToRubricsDict: cloneDeep(response.skill_id_to_rubrics_dict)
+          });
+        }
+      }, (errorResponse) => {
+        if (errorCallback) {
+          errorCallback(errorResponse.body);
+        }
+      });
+  }
+
+  fetchTopic(topicId: string): Promise<object> {
+    return new Promise((resolve, reject) => {
+      this._fetchTopic(topicId, resolve, reject);
+    });
+  }
+
+  fetchStories(topicId: string): Promise<object> {
+    return new Promise((resolve, reject) => {
+      this._fetchStories(topicId, resolve, reject);
+    });
+  }
+
+  fetchSubtopicPage(topicId: string, subtopicId: number): Promise<object> {
+    return new Promise((resolve, reject) => {
+      this._fetchSubtopicPage(topicId, subtopicId, resolve, reject);
+    });
+  }
+
+  updateTopic(topicId: string, topicVersion: string, commitMessage: string,
+      changeList: Array<Object>): Promise<object> {
+    return new Promise((resolve, reject) => {
+      this._updateTopic(topicId, topicVersion, commitMessage,
+        changeList, resolve, reject);
+    });
+  }
+
+  deleteTopic(topicId: string): Promise<object> {
+    return new Promise((resolve, reject) => {
+      this._deleteTopic(topicId, resolve, reject);
+    });
+  }
+}
+
+angular.module('oppia').factory('EditableTopicBackendApiService',
+  downgradeInjectable(EditableTopicBackendApiService));
