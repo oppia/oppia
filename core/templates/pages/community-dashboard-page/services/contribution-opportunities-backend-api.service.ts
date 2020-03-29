@@ -20,15 +20,24 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import {
-  UrlInterpolationService
-} from 'domain/utilities/url-interpolation.service';
-import {
-  ExplorationOpportunitySummary
-} from 'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
-import {
-  SkillOpportunity
-} from 'domain/opportunity/SkillOpportunityObjectFactory';
+
+import { ExplorationOpportunitySummary } from
+  'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+import { SkillOpportunity } from
+  'domain/opportunity/SkillOpportunityObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
+const constants = require('constants.ts');
+
+type ContributionOpportunityCategoryType =
+  'skill' | 'voiceover' | 'translation';
+
+type ContributionOpportunityParams = {
+  cursor: string;
+  // eslint-disable-next-line camelcase
+  language_code?: string;
+};
 
 @Injectable({
   providedIn: 'root'
@@ -39,66 +48,90 @@ export class ContributionOpportunitiesBackendApiService {
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient
   ) {}
-  /**  TODO(srijanreddy98): for some reason not able to import types (
-  * OPPORTUNITY_TYPE_SKILL,
-  * OPPORTUNITY_TYPE_TRANSLATION,
-  * OPPORTUNITY_TYPE_VOICEOVER
-  * )from constants.ts in assets */
-  _getOpportunityFromDict(opportunityType, opportunityDict) {
+
+  // TODO(#7165): Replace any with exact type.
+  private _getOpportunityFromDict(
+      opportunityType: ContributionOpportunityCategoryType,
+      opportunityDict: any
+  ): ExplorationOpportunitySummary | SkillOpportunity {
     if (
-      opportunityType === 'voiceover' ||
-      opportunityType === 'translation') {
+      opportunityType === constants.OPPORTUNITY_TYPE_VOICEOVER ||
+      opportunityType === constants.OPPORTUNITY_TYPE_TRANSLATION) {
       return new ExplorationOpportunitySummary(opportunityDict.id,
         opportunityDict.topic_name, opportunityDict.story_title,
         opportunityDict.chapter_title, opportunityDict.content_count,
         opportunityDict.translation_counts);
-    } else if (opportunityType === 'skill') {
+    } else if (opportunityType === constants.OPPORTUNITY_TYPE_SKILL) {
       return new SkillOpportunity(
         opportunityDict.id, opportunityDict.skill_description,
         opportunityDict.topic_name, opportunityDict.question_count);
     }
   }
 
-  _fetchOpportunities(opportunityType, params, successCallback) {
+  // TODO(#7165): Replace any with exact type.
+  private _fetchOpportunities(
+      opportunityType: ContributionOpportunityCategoryType,
+      params: ContributionOpportunityParams,
+      successCallback: (
+        opportunities?: Array<any>, nextCursor?: string, more?: boolean
+        ) => void,
+      errorCallback: (reason?: any) => void
+  ): void {
     this.http.get(this.urlInterpolationService.interpolateUrl(
       this.urlTemplate, { opportunityType }
-    ), {
-      params
-    }).toPromise().then((data: any) => {
-      let opportunities = [];
-      for (let index in data.opportunities) {
+    ), { params }).toPromise().then((data: any) => {
+      const opportunities = [];
+      for (const index in data.opportunities) {
         opportunities.push(this._getOpportunityFromDict(
           opportunityType, data.opportunities[index]));
       }
       if (successCallback) {
         successCallback(opportunities, data.next_cursor, data.more);
       }
-    }, (err) => {
-      // console.log(err);
+    }, (error) => {
+      if (errorCallback) {
+        errorCallback(error);
+      }
     });
   }
-  fetchSkillOpportunities(cursor, successCallback) {
-    let params = {
+
+  fetchSkillOpportunities(cursor: string): Promise<Object> {
+    const params: ContributionOpportunityParams = {
       cursor: cursor
     };
-    return this._fetchOpportunities(
-      'skill', params, successCallback);
+    return new Promise((resolve, reject) => {
+      this._fetchOpportunities(
+        constants.OPPORTUNITY_TYPE_SKILL, params, resolve, reject);
+    });
   }
-  fetchTranslationOpportunities( languageCode, cursor, successCallback ) {
-    let params = {
+
+  fetchTranslationOpportunities(
+      languageCode: string, cursor: string): Promise<Object> {
+    const params: ContributionOpportunityParams = {
       language_code: languageCode,
       cursor: cursor
     };
-    return this._fetchOpportunities(
-      'translation', params, successCallback);
+    return new Promise((resolve, reject) => {
+      this._fetchOpportunities(
+        constants.OPPORTUNITY_TYPE_TRANSLATION,
+        params, resolve, reject);
+    });
   }
-  fetchVoiceoverOpportunities(languageCode, cursor, successCallback) {
-    const params = {
+
+  fetchVoiceoverOpportunities(
+      languageCode: string, cursor: string): Promise<Object> {
+    const params: ContributionOpportunityParams = {
       language_code: languageCode,
       cursor: cursor
     };
-    return this._fetchOpportunities(
-      'voiceover', params, successCallback);
+    return new Promise((resolve, reject) => {
+      this._fetchOpportunities(
+        constants.OPPORTUNITY_TYPE_VOICEOVER,
+        params, resolve, reject);
+    });
   }
 }
 
+angular.module('oppia').factory(
+  'ContributionOpportunitiesBackendApiService',
+  downgradeInjectable(ContributionOpportunitiesBackendApiService));
