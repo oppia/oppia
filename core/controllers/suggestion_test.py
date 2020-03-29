@@ -288,7 +288,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     question_domain
                     .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                 'question_dict': question_dict,
-                'skill_id': None
+                'skill_id': None,
+                'skill_difficulty': 0.3
             }, None, None)
 
         suggestion_id = suggestion_services.query_suggestions(
@@ -699,7 +700,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                         question_domain
                         .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                     'question_dict': self.question_dict,
-                    'skill_id': None
+                    'skill_id': self.SKILL_ID,
+                    'skill_difficulty': 0.3
                 },
                 'description': 'Add new question to skill'
             }, csrf_token=csrf_token)
@@ -816,7 +818,8 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
                         question_domain
                         .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                     'question_dict': self.question_dict,
-                    'skill_id': None
+                    'skill_id': self.skill_id,
+                    'skill_difficulty': 0.3
                 },
                 'description': 'Add new question to skill'
             }, csrf_token=csrf_token)
@@ -832,14 +835,13 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', False):
-            self.put_json(
-                '%s/skill/%s/%s' % (
-                    feconf.SUGGESTION_ACTION_URL_PREFIX, self.skill_id,
-                    thread_id), {
-                        'action': u'reject',
-                        'review_message': u'Rejected!'
-                    }, csrf_token=csrf_token, expected_status_int=404)
+        self.put_json(
+            '%s/skill/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX, self.skill_id,
+                thread_id), {
+                    'action': u'reject',
+                    'review_message': u'Rejected!'
+                }, csrf_token=csrf_token, expected_status_int=400)
 
         self.logout()
 
@@ -1046,9 +1048,10 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         # Needs to be 12 characters long.
         self.SKILL_ID = 'skill1234567'
         self.SKILL_DESCRIPTION = 'skill to link question to'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, title='Exploration title')
-        exp_services.save_new_exploration(self.owner_id, exploration)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, title='Exploration title',
+            end_state_name='End State')
+        self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
@@ -1148,7 +1151,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                         question_domain
                         .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                     'question_dict': self.question_dict,
-                    'skill_id': None
+                    'skill_id': None,
+                    'skill_difficulty': 0.3
                 },
                 'description': 'Add new question to skill'
             }, csrf_token=csrf_token)
@@ -1221,9 +1225,10 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         # Needs to be 12 characters long.
         self.SKILL_ID = 'skill1234567'
         self.SKILL_DESCRIPTION = 'skill to link question to'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, title='Exploration title')
-        exp_services.save_new_exploration(self.owner_id, exploration)
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id, title='Exploration title',
+            end_state_name='End State')
+        self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
@@ -1326,7 +1331,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                         question_domain
                         .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                     'question_dict': self.question_dict,
-                    'skill_id': None
+                    'skill_id': None,
+                    'skill_difficulty': 0.3
                 },
                 'description': 'Add new question to skill'
             }, csrf_token=csrf_token)
