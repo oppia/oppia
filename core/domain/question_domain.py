@@ -292,7 +292,7 @@ class Question(python_utils.OBJECT):
         add_dimensions_to_image_tags = functools.partial(
             html_validation_service.add_dims_to_img_in_complex_rte,
             exploration_fs)
-        question_state_dict = state_domain.State.convert_html_fields_in_state( # pylint: disable=line-too-long
+        question_state_dict = state_domain.State.convert_html_fields_in_state(
             question_state_dict,
             add_dimensions_to_image_tags)
 
@@ -326,7 +326,11 @@ class Question(python_utils.OBJECT):
             getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
                 current_state_schema_version, next_state_schema_version)))
 
-        if current_state_schema_version == 32:
+        # The following schema versions require question_id to be passed
+        # as an additional parameter in the conversion_fn.
+        special_case_schema_versions = [32]
+
+        if current_state_schema_version in special_case_schema_versions:
             versioned_question_state['state'] = conversion_fn(
                 question_id, versioned_question_state['state'])
         else:

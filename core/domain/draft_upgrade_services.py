@@ -126,7 +126,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                updated_answer_groups = []
+                updated_answer_group_dicts = []
                 for answer_group_index in python_utils.RANGE(
                         len(change.new_value)):
                     outcome = (
@@ -136,37 +136,39 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         html_validation_service.add_dims_to_img_in_complex_rte(
                             exploration_fs, html_string))
                     outcome['feedback']['html'] = converted_html_string
-                    updated_answer_groups.append({
+                    updated_answer_group_dicts.append({
                         'rule_specs': (
                             change.new_value[answer_group_index]['rule_specs']),
                         'outcome': outcome,
                         'training_data': (
-                            change.new_value[answer_group_index]['training_data']), # pylint: disable=line-too-long
+                            change.new_value[answer_group_index][
+                                'training_data']),
                         'tagged_skill_misconception_id': (
-                            change.new_value[answer_group_index]['tagged_skill_misconception_id']) # pylint: disable=line-too-long
+                            change.new_value[answer_group_index][
+                                'tagged_skill_misconception_id'])
                     })
 
-                draft_change_list[i].new_value = updated_answer_groups
+                draft_change_list[i].new_value = updated_answer_group_dicts
 
             # Changes for html in hints.
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
-                updated_hints = []
+                updated_hint_dicts = []
                 for hint_index in python_utils.RANGE(len(change.new_value)):
                     hint_content = change.new_value[hint_index]['hint_content']
                     html_string = hint_content['html']
                     converted_html_string = (
                         html_validation_service.add_dims_to_img_in_complex_rte(
                             exploration_fs, html_string))
-                    updated_hints.append({
+                    updated_hint_dicts.append({
                         'hint_content': {
                             'content_id': hint_content['content_id'],
                             'html': converted_html_string
                         }
                     })
 
-                draft_change_list[i].new_value = updated_hints
+                draft_change_list[i].new_value = updated_hint_dicts
 
             # Changes for html in solution.
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and

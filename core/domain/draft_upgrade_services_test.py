@@ -223,17 +223,21 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         converted_change_list = (
             draft_upgrade_services.DraftUpgradeUtil._convert_states_v32_dict_to_v33_dict(  # pylint: disable=protected-access,line-too-long
                 'exp_id', draft_change_list))
+        content_dict = converted_change_list[0].to_dict()
+        answer_group_dict = converted_change_list[1].to_dict()
+        hint_dict = converted_change_list[2].to_dict()
+        solution_dict = converted_change_list[3].to_dict()
         self.assertEqual(
-            converted_change_list[0].to_dict()[u'new_value'][u'html'],
+            content_dict['new_value']['html'],
             expected_output)
         self.assertEqual(
-            converted_change_list[1].to_dict()[u'new_value'][0][u'outcome'][u'feedback'][u'html'], # pylint: disable=line-too-long
+            answer_group_dict['new_value'][0]['outcome']['feedback']['html'],
             expected_output)
         self.assertEqual(
-            converted_change_list[2].to_dict()[u'new_value'][0][u'hint_content'][u'html'], # pylint: disable=line-too-long
+            hint_dict['new_value'][0]['hint_content']['html'],
             expected_output)
         self.assertEqual(
-            converted_change_list[3].to_dict()[u'new_value'][u'explanation'][u'html'], # pylint: disable=line-too-long
+            solution_dict['new_value']['explanation']['html'],
             expected_output)
 
     def test_convert_states_v31_dict_to_v32_dict(self):

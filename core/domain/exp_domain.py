@@ -2412,7 +2412,7 @@ class Exploration(python_utils.OBJECT):
             feconf.ENTITY_TYPE_EXPLORATION, exp_id))
         for key, state_dict in states_dict.items():
             add_dimensions_to_image_tags = functools.partial(
-                html_validation_service.add_dims_to_img_in_complex_rte, # pylint: disable=line-too-long
+                html_validation_service.add_dims_to_img_in_complex_rte,
                 exploration_fs)
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
@@ -2444,7 +2444,7 @@ class Exploration(python_utils.OBJECT):
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
         # The following schema versions require exploration_id to be passed
-        # as additional parameter in the conversion_fn.
+        # as an additional parameter in the conversion_fn.
         special_case_schema_versions = [24, 32]
 
         conversion_fn = getattr(cls, '_convert_states_v%s_dict_to_v%s_dict' % (

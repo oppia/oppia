@@ -901,7 +901,7 @@ def add_dims_to_img_in_complex_rte(exploration_fs, html_string):
     for tab_component in soup.findAll(
             name='oppia-noninteractive-tabs'):
         # The tab_contents-with-value attribute contains the html with image
-        # tags. So we check for the existense of this attribute.
+        # tags. So we check for the existence of this attribute.
         if (not tab_component.has_attr('tab_contents-with-value') or
                 tab_component['tab_contents-with-value'] == ''):
             continue
@@ -943,7 +943,7 @@ def _modify_image_filename(exploration_fs, soup):
             escaped_filename = escape_html(
                 json.dumps(
                     get_filename_with_dimensions(exploration_fs, filename)))
-            image['filepath-with-value'] = '\\"' + escaped_filename + '\\"'
+            image['filepath-with-value'] = '\\"%s\\"' % escaped_filename
         except Exception as e:
             (entity_type, entity_id) = (
                 exploration_fs.impl.assets_path.split('/'))
