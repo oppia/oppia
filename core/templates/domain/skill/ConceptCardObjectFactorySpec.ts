@@ -22,36 +22,55 @@ import { ConceptCardObjectFactory} from
   'domain/skill/ConceptCardObjectFactory';
 import { SubtitledHtmlObjectFactory} from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { WorkedExampleObjectFactory} from
+  'domain/skill/WorkedExampleObjectFactory';
 
 describe('Concept card object factory', () => {
   let conceptCardObjectFactory: ConceptCardObjectFactory;
   let conceptCardDict;
+  let example1;
+  let example2;
   let subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory;
+  let workedExampleObjectFactory: WorkedExampleObjectFactory;
 
   beforeEach(() => {
     conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
     subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
+    workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
 
+    example1 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1'
+      },
+      answer: {
+        html: 'worked example answer 1',
+        content_id: 'worked_example_a_1'
+      }
+    };
+    example2 = {
+      question: {
+        html: 'worked example question 2',
+        content_id: 'worked_example_q_2'
+      },
+      answer: {
+        html: 'worked example answer 2',
+        content_id: 'worked_example_a_2'
+      }
+    };
     conceptCardDict = {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
       },
-      worked_examples: [
-        {
-          html: 'worked example 1',
-          content_id: 'worked_example_1'
-        },
-        {
-          html: 'worked example 2',
-          content_id: 'worked_example_2'
-        }
-      ],
+      worked_examples: [example1, example2],
       recorded_voiceovers: {
         voiceovers_mapping: {
           explanation: {},
-          worked_example_1: {},
-          worked_example_2: {}
+          worked_example_q_1: {},
+          worked_example_a_1: {},
+          worked_example_q_2: {},
+          worked_example_a_2: {}
         }
       }
     };
@@ -64,10 +83,19 @@ describe('Concept card object factory', () => {
       subtitledHtmlObjectFactory.createDefault(
         'test explanation', 'explanation'));
     expect(conceptCard.getWorkedExamples()).toEqual(
-      [subtitledHtmlObjectFactory.createDefault(
-        'worked example 1', 'worked_example_1'),
-      subtitledHtmlObjectFactory.createDefault(
-        'worked example 2', 'worked_example_2')]);
+      [
+        workedExampleObjectFactory.create(
+          subtitledHtmlObjectFactory.createDefault(
+            'worked example question 1', 'worked_example_q_1'),
+          subtitledHtmlObjectFactory.createDefault(
+            'worked example answer 1', 'worked_example_a_1')),
+        workedExampleObjectFactory.create(
+          subtitledHtmlObjectFactory.createDefault(
+            'worked example question 2', 'worked_example_q_2'),
+          subtitledHtmlObjectFactory.createDefault(
+            'worked example answer 2', 'worked_example_a_2'))
+      ]
+    );
   });
 
   it('should convert to a backend dictionary', () => {

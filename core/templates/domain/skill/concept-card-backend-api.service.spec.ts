@@ -42,26 +42,59 @@ describe('Concept card backend API service', function() {
       'ConceptCardBackendApiService');
     $httpBackend = $injector.get('$httpBackend');
 
+    var example1 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1'
+      },
+      answer: {
+        html: 'worked example answer 1',
+        content_id: 'worked_example_a_1'
+      }
+    };
+    var example2 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1'
+      },
+      answer: {
+        html: 'worked example answer 1',
+        content_id: 'worked_example_a_1'
+      }
+    };
+    var example3 = {
+      question: {
+        html: 'worked example question 3',
+        content_id: 'worked_example_q_3'
+      },
+      answer: {
+        html: 'worked example answer 3',
+        content_id: 'worked_example_a_3'
+      }
+    };
+    var example4 = {
+      question: {
+        html: 'worked example question 4',
+        content_id: 'worked_example_q_4'
+      },
+      answer: {
+        html: 'worked example answer 4',
+        content_id: 'worked_example_a_4'
+      }
+    };
     var conceptCardDict1 = {
       explanation: {
         html: 'test explanation 1',
         content_id: 'explanation_1'
       },
-      worked_examples: [
-        {
-          html: 'test worked example 1',
-          content_id: 'worked_example_1'
-        },
-        {
-          html: 'test worked example 2',
-          content_id: 'worked_example_2'
-        }
-      ],
+      worked_examples: [example1, example2],
       recorded_voiceovers: {
         voiceovers_mapping: {
           explanation: {},
-          worked_example_1: {},
-          worked_example_2: {}
+          worked_example_q_1: {},
+          worked_example_a_1: {},
+          worked_example_q_2: {},
+          worked_example_a_2: {}
         }
       }
     };
@@ -71,21 +104,14 @@ describe('Concept card backend API service', function() {
         html: 'test explanation 2',
         content_id: 'explanation_2'
       },
-      worked_examples: [
-        {
-          html: 'test worked example 3',
-          content_id: 'worked_example_3'
-        },
-        {
-          html: 'test worked example 4',
-          content_id: 'worked_example_4'
-        }
-      ],
+      worked_examples: [example3, example4],
       recorded_voiceovers: {
         voiceovers_mapping: {
           explanation: {},
-          worked_example_3: {},
-          worked_example_4: {}
+          worked_example_q_3: {},
+          worked_example_a_3: {},
+          worked_example_q_4: {},
+          worked_example_a_4: {}
         }
       }
     };
