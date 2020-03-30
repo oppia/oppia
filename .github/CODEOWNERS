@@ -118,6 +118,7 @@
 /scripts/linters/linter_utils.py @kevinlee12 @Hudda
 /scripts/linters/linter_utils_test.py @kevinlee12 @Hudda
 /scripts/linters/pre_commit_linter.py @kevinlee12 @Hudda
+/scripts/linters/pre_commit_linter_test.py @kevinlee12 @Hudda
 /scripts/linters/pylint_extensions.py @kevinlee12 @Hudda
 /scripts/linters/pylint_extensions_test.py @kevinlee12 @Hudda
 /scripts/linters/python_linter.py @kevinlee12 @Hudda

@@ -36,9 +36,9 @@ EXCLUDED_PATHS = (
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
     'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
-    'webpack_bundles/*', 'core/tests/services_sources/*',
-    'core/tests/release_sources/tmp_unzip.zip',
+    'core/tests/linter_tests/*', '*.mp3', '*.mp4', 'node_modules/*',
+    'typings/*', 'local_compiled_js/*', 'webpack_bundles/*',
+    'core/tests/services_sources/*', 'core/tests/release_sources/tmp_unzip.zip',
     'core/tests/release_sources/tmp_unzip.tar.gz')
 
 GENERATED_FILE_PATHS = (
@@ -249,7 +249,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
         'regexp': re.compile(r'\$parent'),
         'message': 'Please do not access parent properties ' +
-                   'using $parent. Use the scope object' +
+                   'using $parent. Use the scope object ' +
                    'for this purpose.',
         'excluded_files': (),
         'excluded_dirs': ()
@@ -495,8 +495,11 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
             Object containing details for the pattern to be checked.
 
     Returns:
-        bool. True if there is bad pattern else false.
+        failed: bool. True if there is bad pattern else false.
+        summary_messages: list(str). Summary of failed messages.
     """
+    summary_messages = []
+    failed = False
     regexp = pattern['regexp']
     if not (any(filepath.startswith(excluded_dir)
                 for excluded_dir in pattern['excluded_dirs'])
@@ -506,13 +509,16 @@ def check_bad_pattern_in_file(filepath, file_content, pattern):
             if line.endswith('disable-bad-pattern-check'):
                 continue
             if regexp.search(line):
-                python_utils.PRINT('%s --> Line %s: %s' % (
+                summary_message = ('%s --> Line %s: %s' % (
                     filepath, line_num, pattern['message']))
+                python_utils.PRINT(summary_message)
+                summary_messages.append(summary_message)
                 python_utils.PRINT('')
                 bad_pattern_count += 1
         if bad_pattern_count:
-            return True
-    return False
+            failed = True
+            return failed, summary_messages
+    return failed, summary_messages
 
 
 def check_file_type_specific_bad_pattern(filepath, content):
@@ -525,17 +531,23 @@ def check_file_type_specific_bad_pattern(filepath, content):
      Returns:
         failed: bool. True if there is bad pattern else false.
         total_error_count: int. The number of errors.
+        summary_messages: list(str). Summary of failed messages.
     """
+    summary_messages = []
+    failed = False
     _, extension = os.path.splitext(filepath)
     pattern = BAD_PATTERNS_MAP.get(extension)
-    failed = False
     total_error_count = 0
     if pattern:
         for regexp in pattern:
-            if check_bad_pattern_in_file(filepath, content, regexp):
-                failed = True
+            failed, summary_message = check_bad_pattern_in_file(
+                filepath, content, regexp)
+            summary_messages.extend(summary_message)
+            if failed:
                 total_error_count += 1
-    return failed, total_error_count
+    if total_error_count:
+        failed = True
+    return failed, total_error_count, summary_messages
 
 
 class GeneralPurposeLinter(python_utils.OBJECT):
@@ -672,21 +684,26 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                             not is_filepath_excluded_for_bad_patterns_check(
                                 pattern, filepath)):
                         failed = True
-                        python_utils.PRINT('%s --> %s' % (
+                        summary_message = ('%s --> %s' % (
                             filepath, BAD_PATTERNS[pattern]['message']))
+                        python_utils.PRINT(summary_message)
                         python_utils.PRINT('')
+                        summary_messages.append(summary_message)
                         total_error_count += 1
 
                 for regexp in BAD_PATTERNS_REGEXP:
-                    if check_bad_pattern_in_file(
-                            filepath, file_content, regexp):
-                        failed = True
+                    failed, summary_message = check_bad_pattern_in_file(
+                        filepath, file_content, regexp)
+                    if failed:
+                        summary_messages.extend(summary_message)
                         total_error_count += 1
 
-                temp_failed, temp_count = check_file_type_specific_bad_pattern(
-                    filepath, file_content)
+                temp_failed, temp_count, summary_message = (
+                    check_file_type_specific_bad_pattern(
+                        filepath, file_content))
                 failed = failed or temp_failed
                 total_error_count += temp_count
+                summary_messages.extend(summary_message)
 
                 if filepath == 'constants.ts':
                     for pattern in REQUIRED_STRINGS_CONSTANTS:
