@@ -2498,3 +2498,29 @@ class LinkComponentValidationAuditJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self, exp_jobs_one_off.LinkComponentValidationAuditJob)
+
+    def test_validation_job_fails_for_invalid_schema_version(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+        exploration_model.states_schema_version = 100
+        exploration_model.commit(
+            self.albert_id, 'Changed states_schema_version.', [])
+        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
+
+        job_id = (
+            exp_jobs_one_off.LinkComponentValidationAuditJob.create_new())
+        exp_jobs_one_off.LinkComponentValidationAuditJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .LinkComponentValidationAuditJob.get_output(job_id))
+        expected_output = [
+            u'[u\'Error Sorry, we can only process v1-v%s and unversioned '
+            'exploration state schemas at present. when loading exploration\', '
+            '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
+
+        self.assertEqual(actual_output, expected_output)
