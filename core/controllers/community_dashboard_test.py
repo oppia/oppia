@@ -23,6 +23,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
+from core.domain import user_services
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -56,14 +57,16 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
 
-        explorations = [exp_domain.Exploration.create_default_exploration(
+        explorations = [self.save_new_valid_exploration(
             '%s' % i,
+            self.owner_id,
             title='title %d' % i,
             category='category%d' % i,
+            end_state_name='End State'
         ) for i in python_utils.RANGE(2)]
 
         for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
+            self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id='0', name='topic', abbreviated_name='abbrev')
@@ -115,12 +118,15 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     'new_value': explorations[index].id
                 })], 'Changes.')
 
+        # The content_count is 3 for the expected dicts below since a valid
+        # exploration with EndExploration is created above, so the content in
+        # the last state is also included in the count.
         self.expected_opportunity_dict_1 = {
             'id': '0',
             'topic_name': 'topic',
             'story_title': 'title 0',
             'chapter_title': 'Node1',
-            'content_count': 2,
+            'content_count': 3,
             'translation_counts': {}
         }
 
@@ -129,7 +135,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'topic_name': 'topic',
             'story_title': 'title 1',
             'chapter_title': 'Node1',
-            'content_count': 2,
+            'content_count': 3,
             'translation_counts': {}
         }
 
@@ -307,14 +313,16 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        explorations = [exp_domain.Exploration.create_default_exploration(
+        explorations = [self.save_new_valid_exploration(
             '%s' % i,
+            self.owner_id,
             title='title %d' % i,
             category='category%d' % i,
+            end_state_name='End State'
         ) for i in python_utils.RANGE(2)]
 
         for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
+            self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id='0', name='topic', abbreviated_name='abbrev')
@@ -392,8 +400,49 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'state_names_to_content_id_mapping': {
                 'Introduction': {
                     'content': '<p>A content to translate.</p>'
+                },
+                'End State': {
+                    'content': ''
                 }
             }
         }
 
         self.assertEqual(output, expected_output)
+
+
+class UserCommunityRightsDataHandlerTest(test_utils.GenericTestBase):
+    """Test for the UserCommunityRightsDataHandler."""
+
+    def test_guest_user_check_community_rights(self):
+        response = self.get_json('/usercommunityrightsdatahandler')
+
+        self.assertEqual(
+            response, {
+                'can_review_translation_for_language_codes': [],
+                'can_review_voiceover_for_language_codes': [],
+                'can_review_questions': False
+            })
+
+    def test_user_check_community_rights(self):
+        user_email = 'user@example.com'
+        self.signup(user_email, 'user')
+        user_id = self.get_user_id_from_email(user_email)
+        self.login(user_email)
+
+        response = self.get_json('/usercommunityrightsdatahandler')
+        self.assertEqual(
+            response, {
+                'can_review_translation_for_language_codes': [],
+                'can_review_voiceover_for_language_codes': [],
+                'can_review_questions': False
+            })
+
+        user_services.allow_user_to_review_question(user_id)
+
+        response = self.get_json('/usercommunityrightsdatahandler')
+        self.assertEqual(
+            response, {
+                'can_review_translation_for_language_codes': [],
+                'can_review_voiceover_for_language_codes': [],
+                'can_review_questions': True
+            })
