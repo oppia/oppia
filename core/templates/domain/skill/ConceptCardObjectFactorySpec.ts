@@ -18,11 +18,11 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ConceptCardObjectFactory} from
+import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
-import { SubtitledHtmlObjectFactory} from
+import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { WorkedExampleObjectFactory} from
+import { WorkedExampleObjectFactory } from
   'domain/skill/WorkedExampleObjectFactory';
 
 describe('Concept card object factory', () => {

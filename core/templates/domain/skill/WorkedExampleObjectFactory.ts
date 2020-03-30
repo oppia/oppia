@@ -24,9 +24,9 @@ export interface IWorkedExampleBackendDict {
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { SubtitledHtml, SubtitledHtmlObjectFactory,
-  ISubtitledHtmlBackendDict} from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import {
+  SubtitledHtml, SubtitledHtmlObjectFactory, ISubtitledHtmlBackendDict
+} from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 export class WorkedExample {
   _question: SubtitledHtml;

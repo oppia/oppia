@@ -8,10 +8,22 @@
     </div>
   </div>
   <div class="concept-card-worked-examples">
-    <b> Worked Examples </b>
-    <div ng-repeat="example in $ctrl.currentConceptCard.getWorkedExamples()"
+    <strong> Worked Examples </strong>
+    <div style="margin-top: 2vh;"
+         ng-repeat="example in $ctrl.currentConceptCard.getWorkedExamples()"
          ng-if="$index < $ctrl.numberOfWorkedExamplesShown">
-      <angular-html-bind html-data="example.getHtml()"></angular-html-bind>
+      <strong> Question: </strong>
+      <angular-html-bind class="example-content" html-data="example.getQuestion().getHtml()"></angular-html-bind>
+
+      <button class="btn btn-secondary show-example-answer-button"
+              ng-if="!$ctrl.answerIsShown && $index == $ctrl.numberOfWorkedExamplesShown - 1"
+              ng-click="$ctrl.answerIsShown = true;">
+        Show Answer
+      </button>
+      <div ng-if="$ctrl.answerIsShown || $index < $ctrl.numberOfWorkedExamplesShown - 1">
+        <strong> Example Answer </strong>
+        <angular-html-bind class="example-content" html-data="example.getAnswer().getHtml()"></angular-html-bind>
+      </div>
     </div>
     <button class="btn btn-secondary show-more-worked-examples-button"
             ng-if="!$ctrl.isLastWorkedExample()"
@@ -35,6 +47,16 @@
 
   .oppia-concept-card-viewer .concept-card-worked-examples {
     padding: 15px;
+  }
+
+  .oppia-concept-card-viewer .show-example-answer-button {
+    background-color: #009688;
+    color: white;
+    margin-top: 1vh;
+  }
+
+  .oppia-concept-card-viewer .example-content {
+    margin-top: 1vh;
   }
 
   .oppia-concept-card-viewer .show-more-worked-examples-button {

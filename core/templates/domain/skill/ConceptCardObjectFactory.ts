@@ -29,12 +29,12 @@ import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers, RecordedVoiceoversObjectFactory,
   IRecordedVoiceOverBackendDict } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SubtitledHtml, SubtitledHtmlObjectFactory,
-  ISubtitledHtmlBackendDict} from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { WorkedExample, WorkedExampleObjectFactory,
-  IWorkedExampleBackendDict} from
-  'domain/skill/WorkedExampleObjectFactory';
+import {
+  SubtitledHtml, SubtitledHtmlObjectFactory, ISubtitledHtmlBackendDict
+} from 'domain/exploration/SubtitledHtmlObjectFactory';
+import {
+  WorkedExample, WorkedExampleObjectFactory, IWorkedExampleBackendDict
+} from 'domain/skill/WorkedExampleObjectFactory';
 
 export class ConceptCard {
   _explanation: SubtitledHtml;
