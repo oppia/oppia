@@ -272,12 +272,14 @@ def start_linter(files):
     return task.returncode
 
 
-def run_script_and_get_returncode(script_name):
-    """Runs script and returns the returncode of the task.
+def build_python_script_cmd_list_command(script_name):
+    """Build python script cmd list from a script name.
+
     Args:
-      script_name: The script command to be runned.
+        script_name: The python script that will be executed.
+
     Returns:
-      number. The return code from the task executated.
+        list(str). The cmd list to execute the python script.
     """
     script_commands = script_name.split(' ')
     cmd = [
@@ -288,8 +290,19 @@ def run_script_and_get_returncode(script_name):
     if len(script_commands):
         for flag in script_commands:
             cmd.append(flag)
+    return cmd
 
-    task = subprocess.Popen(cmd)
+
+def run_script_and_get_returncode(cmd_list):
+    """Runs script and returns the returncode of the task.
+
+    Args:
+        cmd_list: The cmd list containing the command to be run.
+
+    Returns:
+        int. The return code from the task executed.
+    """
+    task = subprocess.Popen(cmd_list)
     task.communicate()
     task.wait()
     return task.returncode
@@ -406,14 +419,15 @@ def main(args=None):
             travis_ci_check_status = 0
             if does_diff_include_js_or_ts_files(files_to_lint):
                 frontend_status = run_script_and_get_returncode(
-                    FRONTEND_TEST_SCRIPT)
+                    build_python_script_cmd_list_command(FRONTEND_TEST_SCRIPT))
             if frontend_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
                 sys.exit(1)
             if does_diff_include_travis_yml_or_js_files(files_to_lint):
                 travis_ci_check_status = run_script_and_get_returncode(
-                    TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT)
+                    build_python_script_cmd_list_command(
+                        TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT))
             if travis_ci_check_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing e2e test configuration check.')
