@@ -831,29 +831,8 @@ def add_dimensions_to_image_tags(exploration_fs, html_string):
             oppia-noninteractive-image tags.
     """
     soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
-
-    for image in soup.findAll(name='oppia-noninteractive-image'):
-        if (not image.has_attr('filepath-with-value') or
-                image['filepath-with-value'] == '' or
-                image['filepath-with-value'] == '&quot;&quot;'):
-            image.decompose()
-            continue
-
-        try:
-            filename = json.loads(
-                unescape_html(image['filepath-with-value'].replace('\\"', '')))
-            image['filepath-with-value'] = escape_html(json.dumps(
-                get_filename_with_dimensions(exploration_fs, filename)))
-        except Exception as e:
-            entity_type = exploration_fs.impl.assets_path.split('/')[0]
-            entity_id = exploration_fs.impl.assets_path.split('/')[1]
-            logging.error(
-                '%s %s failed to load image: %s' % (
-                    entity_type, entity_id,
-                    image['filepath-with-value'].encode('utf-8')))
-            raise e
+    _modify_image_filename(exploration_fs, soup)
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
-
 
 def add_dims_to_img_in_complex_rte(exploration_fs, html_string):
     """Adds dimensions to all oppia-noninteractive-image tags inside tabs and
@@ -873,6 +852,7 @@ def add_dims_to_img_in_complex_rte(exploration_fs, html_string):
     for image in soup.findAll(name='oppia-noninteractive-image'):
         if (not image.has_attr('filepath-with-value') or
                 image['filepath-with-value'] == '' or
+                image['filepath-with-value'] == '""' or
                 image['filepath-with-value'] == '&quot;&quot;'):
             image.decompose()
             continue
@@ -886,8 +866,10 @@ def add_dims_to_img_in_complex_rte(exploration_fs, html_string):
                 collapsible_component['content-with-value'] == ''):
             continue
         # Create a new soup with the content-with-value html string.
-        content_with_html_string = unescape_html(
-            collapsible_component['content-with-value'])
+        # Replace \n with '' because json.loads() cannot process it.
+        content_with_html_string = json.loads(
+            unescape_html(collapsible_component['content-with-value']).replace(
+                '\n', ''))
         content_soup = bs4.BeautifulSoup(
             content_with_html_string, 'html.parser')
         # Modify the filenames for the image tags in the content soup.
@@ -895,7 +877,7 @@ def add_dims_to_img_in_complex_rte(exploration_fs, html_string):
         # content_soup contains the updated filepath. This is copied
         # into the content-with-value attribute of the original soup.
         collapsible_component['content-with-value'] = (
-            escape_html(python_utils.UNICODE(content_soup).replace('\'', '')))
+            escape_html(json.dumps(python_utils.UNICODE(content_soup))))
 
     # To add dimensions to images inside the tab component.
     for tab_component in soup.findAll(
@@ -905,18 +887,27 @@ def add_dims_to_img_in_complex_rte(exploration_fs, html_string):
         if (not tab_component.has_attr('tab_contents-with-value') or
                 tab_component['tab_contents-with-value'] == ''):
             continue
-        # Create a new soup with the tab_contents-with-value html string.
-        content_with_html_string = unescape_html(
-            tab_component['tab_contents-with-value'])
-        content_soup = bs4.BeautifulSoup(
-            content_with_html_string, 'html.parser')
-        # Modify the filenames for the image tags in the content soup.
-        _modify_image_filename(exploration_fs, content_soup)
-        # content_soup contains the updated filepath. This is copied
-        # into the tab_contents-with-value attribute of the original soup.
+        # Extract the list of dicts in tab_contents-with-value.
+        # Replace \n with '' because json.loads() cannot process it.
+        tab_content_dict_list = json.loads(
+            unescape_html(tab_component['tab_contents-with-value']).replace(
+                '\n', ''))
+        # For each dict in tab_content_dict_list, create a soup with the content
+        # property which contains the html string and modify the filename.
+        for index, tab_content_dict in enumerate(tab_content_dict_list):
+            content_soup = bs4.BeautifulSoup(
+                tab_content_dict['content'], 'html.parser')
+            # Modify the filenames for the image tags in the content soup.
+            _modify_image_filename(exploration_fs, content_soup)
+            # Store the modified content value back into the content property
+            # of the dict.
+            tab_content_dict_list[index]['content'] = (
+                python_utils.UNICODE(content_soup))
+
+        # Update tab_contents-with-value with tab_content_dict_list
+        # which contains the updated filenames.
         tab_component['tab_contents-with-value'] = (
-            escape_html(python_utils.UNICODE(content_soup)
-                        .replace('\'', '')))
+            escape_html(json.dumps(tab_content_dict_list)))
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
@@ -932,20 +923,20 @@ def _modify_image_filename(exploration_fs, soup):
     for image in soup.findAll(name='oppia-noninteractive-image'):
         if (not image.has_attr('filepath-with-value') or
                 image['filepath-with-value'] == '' or
-                image['filepath-with-value'] == '\\"""\\"'):
+                image['filepath-with-value'] == '""' or
+                image['filepath-with-value'] == '&quot;&quot;'):
             image.decompose()
             continue
 
         try:
             filename = (
-                json.loads(unescape_html(image['filepath-with-value']
-                                         .replace('\\"', ''))))
+                json.loads(unescape_html(image['filepath-with-value'])))
             escaped_filename = escape_html(
                 json.dumps(
                     get_filename_with_dimensions(exploration_fs, filename)))
-            image['filepath-with-value'] = '\\"%s\\"' % escaped_filename
+            image['filepath-with-value'] = escaped_filename
         except Exception as e:
-            (entity_type, entity_id) = (
+            (entity_type, entity_id, assets) = (
                 exploration_fs.impl.assets_path.split('/'))
             logging.error(
                 '%s %s failed to load image: %s' % (
