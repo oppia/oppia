@@ -22,8 +22,9 @@
         </span>
       </div>
       <div class="oppia-contributor-username-container" data-tab-name="username">
-        <lazy-loading ng-show="!$ctrl.username"></lazy-loading>
-        <span ng-show="$ctrl.username"><[$ctrl.username]></span>
+        <lazy-loading ng-show="$ctrl.userInfoIsLoading"></lazy-loading>
+        <span ng-show="!$ctrl.userInfoIsLoading && $ctrl.userIsLoggedIn"><[$ctrl.username]></span>
+        <span ng-show="!$ctrl.userInfoIsLoading && !$ctrl.userIsLoggedIn">Guest</span>
       </div>
       <div class="oppia-review-right-details-container" ng-if="$ctrl.userIsReviewer">
         <strong>Review rights:</strong>
@@ -53,7 +54,7 @@
         <[$ctrl.tabsDetails[$ctrl.activeTabName].description]>
       </div>
       <div class="oppia-dashboard-language-container" ng-if="$ctrl.showLanguageSelector()">
-        <span class="oppia-dashboard-language-container-label"><[$ctrl.tabsDetails[$ctrl.activeTabName].tabName]> in:</span>
+        <span class="oppia-dashboard-language-container-label">Translate text to:</span>
         <select class="oppia-opportunity-language-selector protractor-test-language-selector"
                 ng-change="$ctrl.onChangeLanguage()"
                 ng-model="$ctrl.languageCode"
