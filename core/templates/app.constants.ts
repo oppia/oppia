@@ -116,7 +116,10 @@ export class AppConstants {
   public static COMPONENT_NAME_SOLUTION = 'solution';
   public static COMPONENT_NAME_FEEDBACK = 'feedback';
   public static COMPONENT_NAME_EXPLANATION = 'explanation';
-  public static COMPONENT_NAME_WORKED_EXAMPLE = 'worked_example';
+  public static COMPONENT_NAME_WORKED_EXAMPLE = {
+    QUESTION: 'worked_example_question',
+    ANSWER: 'worked_example_answer'
+  };
 
   public static ACTION_TYPE_EXPLORATION_START = 'ExplorationStart';
   public static ACTION_TYPE_ANSWER_SUBMIT = 'AnswerSubmit';

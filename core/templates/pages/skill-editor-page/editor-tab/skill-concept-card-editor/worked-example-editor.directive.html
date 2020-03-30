@@ -1,32 +1,33 @@
 <div style="height: 100%">
-  <div ng-if="!editorIsOpen"
+  <!-- Question Editor -->
+  <div ng-if="!questionEditorIsOpen"
        style="height: 100%"
-       ng-attr-title="Edit worked example">
+       ng-attr-title="Edit worked example question">
     <div class="oppia-readonly-rule-title"
          ng-class="{'oppia-editable-section': isEditable()}">
       <div class="oppia-rule-preview">
-        <div class="oppia-click-to-start-editing" ng-click="openEditor()">
+        <div class="oppia-click-to-start-editing" ng-click="openQuestionEditor()">
           <i ng-if="isEditable()"
              class="material-icons oppia-editor-edit-icon float-right"
              title="Edit Worked Example">&#xE254;
           </i>
         </div>
 
-        <strong>Worked Example</strong>
-        <angular-html-bind html-data="container.workedExampleHtml"></angular-html-bind>
+        <strong>Example Question</strong>
+        <angular-html-bind html-data="container.workedExampleQuestionHtml"></angular-html-bind>
       </div>
     </div>
   </div>
 
-  <div ng-if="isEditable() && editorIsOpen">
+  <div ng-if="isEditable() && questionEditorIsOpen">
     <form role="form"
           class="form-inline"
           name="editWorkedExampleForm"
           ng-submit="saveWorkedExample()">
       <div class="oppia-rule-details-header">
-        <strong>Worked Example</strong>
+        <strong>Example Question</strong>
         <schema-based-editor schema="WORKED_EXAMPLE_FORM_SCHEMA"
-                             local-value="container.workedExampleHtml">
+                             local-value="container.workedExampleQuestionHtml">
         </schema-based-editor>
       </div>
     </form>
@@ -35,13 +36,65 @@
       <div class="float-right">
         <button type="button"
                 class="btn btn-secondary"
-                ng-click="cancelEdit()">
+                ng-click="cancelEditQuestion()">
           Cancel
         </button>
         <button type="button"
                 class="btn btn-success"
-                ng-disabled="!container.workedExampleHtml || editWorkedExampleForm.$invalid"
-                ng-click="saveWorkedExample()">
+                ng-disabled="!container.workedExampleQuestionHtml || editWorkedExampleForm.$invalid"
+                ng-click="saveWorkedExample(true)">
+          Save
+        </button>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+  </div>
+
+  <!-- Answer Editor -->
+  <div ng-if="!answerEditorIsOpen"
+       style="height: 100%;"
+       class="worked-example-answer-section"
+       ng-attr-title="Edit worked example answer">
+    <div class="oppia-readonly-rule-title"
+         ng-class="{'oppia-editable-section': isEditable()}">
+      <div class="oppia-rule-preview">
+        <div class="oppia-click-to-start-editing" ng-click="openAnswerEditor()">
+          <i ng-if="isEditable()"
+             class="material-icons oppia-editor-edit-icon float-right"
+             title="Edit Worked Example">&#xE254;
+          </i>
+        </div>
+
+        <strong>Example Answer</strong>
+        <angular-html-bind html-data="container.workedExampleAnswerHtml"></angular-html-bind>
+      </div>
+    </div>
+  </div>
+
+  <div ng-if="isEditable() && answerEditorIsOpen">
+    <form role="form"
+          class="form-inline worked-example-answer-section"
+          name="editWorkedExampleForm"
+          ng-submit="saveWorkedExample()">
+      <div class="oppia-rule-details-header">
+        <strong>Example Answer</strong>
+        <schema-based-editor schema="WORKED_EXAMPLE_FORM_SCHEMA"
+                             local-value="container.workedExampleAnswerHtml">
+        </schema-based-editor>
+      </div>
+    </form>
+
+    <div class="oppia-rule-save-cancel-buttons">
+      <div class="float-right">
+        <button type="button"
+                class="btn btn-secondary"
+                ng-click="cancelEditAnswer()">
+          Cancel
+        </button>
+        <button type="button"
+                class="btn btn-success"
+                ng-disabled="!container.workedExampleAnswerHtml || editWorkedExampleForm.$invalid"
+                ng-click="saveWorkedExample(false)">
           Save
         </button>
       </div>
@@ -49,3 +102,8 @@
     </div>
   </div>
 </div>
+<style>
+  .worked-example-answer-section {
+    margin-top: 2.5vh;
+  }
+</style>

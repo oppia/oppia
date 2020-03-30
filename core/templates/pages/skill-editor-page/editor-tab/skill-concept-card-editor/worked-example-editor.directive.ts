@@ -27,8 +27,7 @@ angular.module('oppia').directive('workedExampleEditor', [
       scope: {
         workedExample: '=',
         getIndex: '&index',
-        isEditable: '&isEditable',
-        getOnSaveFn: '&onSave',
+        isEditable: '&isEditable'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
@@ -37,41 +36,69 @@ angular.module('oppia').directive('workedExampleEditor', [
         '$scope', 'SkillUpdateService', 'SkillEditorStateService',
         function($scope, SkillUpdateService, SkillEditorStateService) {
           var ctrl = this;
-          $scope.openEditor = function() {
+
+          $scope.openQuestionEditor = function() {
             if ($scope.isEditable()) {
-              $scope.workedExampleMemento =
-                angular.copy($scope.container.workedExampleHtml);
-              $scope.editorIsOpen = true;
+              $scope.workedExampleQuestionMemento =
+                angular.copy($scope.container.workedExampleQuestionHtml);
+              $scope.questionEditorIsOpen = true;
             }
           };
 
-          $scope.saveWorkedExample = function() {
-            $scope.editorIsOpen = false;
-            var contentHasChanged = (
-              $scope.workedExampleMemento !==
-              $scope.container.workedExampleHtml);
-            $scope.workedExampleMemento = null;
+          $scope.openAnswerEditor = function() {
+            if ($scope.isEditable()) {
+              $scope.workedExampleAnswerMemento =
+                angular.copy($scope.container.workedExampleAnswerHtml);
+              $scope.answerEditorIsOpen = true;
+            }
+          };
+
+          $scope.saveWorkedExample = function(inQuestionEditor) {
+            if (inQuestionEditor) {
+              $scope.questionEditorIsOpen = false;
+            } else {
+              $scope.answerEditorIsOpen = false;
+            }
+            var contentHasChanged = ((
+              $scope.workedExampleQuestionMemento !==
+              $scope.container.workedExampleQuestionHtml) ||
+              ($scope.workedExampleAnswerMemento !==
+              $scope.container.workedExampleAnswerHtml)
+            );
+            $scope.workedExampleQuestionMemento = null;
+            $scope.workedExampleAnswerMemento = null;
 
             if (contentHasChanged) {
               SkillUpdateService.updateWorkedExample(
                 SkillEditorStateService.getSkill(),
                 $scope.getIndex(),
-                $scope.container.workedExampleHtml);
-              $scope.getOnSaveFn()();
+                $scope.container.workedExampleQuestionHtml,
+                $scope.container.workedExampleAnswerHtml);
             }
           };
 
-          $scope.cancelEdit = function() {
-            $scope.container.workedExampleHtml = angular.copy(
-              $scope.workedExampleMemento);
-            $scope.workedExampleMemento = null;
-            $scope.editorIsOpen = false;
+          $scope.cancelEditQuestion = function() {
+            $scope.container.workedExampleQuestionHtml = angular.copy(
+              $scope.workedExampleQuestionMemento);
+            $scope.workedExampleQuestionMemento = null;
+            $scope.questionEditorIsOpen = false;
+          };
+
+          $scope.cancelEditAnswer = function() {
+            $scope.container.workedExampleAnswerHtml = angular.copy(
+              $scope.workedExampleAnswerMemento);
+            $scope.workedExampleAnswerMemento = null;
+            $scope.answerEditorIsOpen = false;
           };
 
           ctrl.$onInit = function() {
-            $scope.editorIsOpen = false;
+            $scope.questionEditorIsOpen = false;
+            $scope.answerEditorIsOpen = false;
             $scope.container = {
-              workedExampleHtml: $scope.workedExample.getHtml()
+              workedExampleQuestionHtml:
+                $scope.workedExample.getQuestion().getHtml(),
+              workedExampleAnswerHtml:
+                $scope.workedExample.getAnswer().getHtml()
             };
 
             $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
