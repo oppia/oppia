@@ -11,6 +11,41 @@ var suites = {
       'protractor_desktop/*.js'
     ],
 
+    suite1: [
+      'protractor_desktop/additionalEditorFeatures.js',
+      'protractor_desktop/additionalPlayerFeatures.js',
+      'protractor_desktop/classroomPage.js',
+      'protractor_desktop/collections.js'
+    ],
+
+    suite2: [
+      'protractor_desktop/coreEditorAndPlayerFeatures.js',
+      'protractor_desktop/creatorDashboard.js',
+      'protractor_desktop/explorationFeedbackTab.js',
+      'protractor_desktop/explorationHistoryTab.js',
+      'protractor_desktop/explorationImprovementsTab.js',
+      'protractor/profileMenuFlow.js'
+    ],
+
+    suite3: [
+      'protractor_desktop/explorationStatisticsTab.js',
+      'protractor_desktop/explorationTranslationTab.js',
+      'protractor_desktop/extensions.js',
+      'protractor_desktop/learnerDashboard.js',
+      'protractor/learnerFlow.js',
+      'protractor_desktop/preferences.js'
+    ],
+
+    suite4: [
+      'protractor_desktop/profileFeatures.js',
+      'protractor_desktop/publicationAndLibrary.js',
+      'protractor_desktop/skillEditor.js',
+      'protractor/subscriptionsFlow.js',
+      'protractor_desktop/topicsAndSkillsDashboard.js',
+      'protractor_desktop/topicAndStoryEditor.js',
+      'protractor_desktop/userJourneys.js'
+    ],
+
     // Unfortunately, adding more than one file to a test suite results in
     // severe instability as of Chromedriver 2.38 (Chrome 66).
     accessibility: [
@@ -51,9 +86,6 @@ var suites = {
 
     creatorDashboard: [
       'protractor_desktop/creatorDashboard.js',
-      'protractor_desktop/classroomPage.js',
-      'protractor_desktop/preferences.js'
-
     ],
 
     embedding: [
