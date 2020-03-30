@@ -16,7 +16,7 @@
  * @fileoverview Directive for CK Editor.
  */
 
-require('ckeditor.import.ts');
+require('third-party-imports/ckeditor.import.ts');
 require('services/context.service.ts');
 require('services/rte-helper.service.ts');
 

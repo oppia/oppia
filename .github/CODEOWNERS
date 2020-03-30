@@ -525,7 +525,6 @@
 /app_dev.yaml @jameesjohn @vojtechjelinek
 /core/templates/google-analytics.initializer.ts @jameesjohn @vojtechjelinek
 /core/templates/base-components/ @jameesjohn @vojtechjelinek
-/core/templates/ckeditor.import.ts @nishantwrp @vojtechjelinek
 /core/templates/pages/Base.ts @jameesjohn @vojtechjelinek
 /core/templates/pages/oppia_footer_directive.html @jameesjohn @vojtechjelinek
 /core/templates/pages/OppiaFooterDirective.ts @jameesjohn @vojtechjelinek
