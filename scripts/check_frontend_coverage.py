@@ -265,6 +265,7 @@ FULLY_COVERED_FILENAMES = [
     'question-player.constants.ajs.ts',
     'question-player.constants.ts',
     'question-undo-redo.service.ts',
+    'QuestionObjectFactory.ts',
     'questions-list.constants.ajs.ts',
     'questions-list.constants.ts',
     'questions-list.service.ts',
