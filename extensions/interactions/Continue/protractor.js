@@ -17,8 +17,9 @@
  * interaction.
  */
 
-var objects = require('../../objects/protractor.js');
-var waitFor = require('../../../core/tests/protractor_utils/waitFor.js');
+var objects = require(process.cwd() + '/extensions/objects/protractor.js');
+var waitFor = require(
+  process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
 var customizeInteraction = function(elem, buttonText) {
   if (buttonText) {

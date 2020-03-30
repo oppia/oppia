@@ -60,14 +60,16 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         self.USER_ID = 'user'
         self.SKILL_ID = 'skill'
         self.QUESTION_ID = question_services.get_new_question_id()
-        explorations = [exp_domain.Exploration.create_default_exploration(
+        explorations = [self.save_new_valid_exploration(
             '%s' % i,
+            self.owner_id,
             title='title %d' % i,
             category='category%d' % i,
+            end_state_name='End State'
         ) for i in python_utils.RANGE(2)]
 
         for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
+            self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
