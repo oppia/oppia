@@ -21,7 +21,7 @@
         Show Answer
       </button>
       <div ng-if="$ctrl.answerIsShown || $index < $ctrl.numberOfWorkedExamplesShown - 1">
-        <strong> Example Answer </strong>
+        <strong> Answer: </strong>
         <angular-html-bind class="example-content" html-data="example.getAnswer().getHtml()"></angular-html-bind>
       </div>
     </div>
