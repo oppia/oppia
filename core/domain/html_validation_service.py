@@ -831,7 +831,7 @@ def add_dimensions_to_image_tags(exploration_fs, html_string):
             oppia-noninteractive-image tags.
     """
     soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
-    _modify_image_filename(exploration_fs, soup)
+    _add_dimensions_to_image_filenames(exploration_fs, soup)
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
@@ -867,18 +867,20 @@ def add_dims_to_img_in_complex_rte(exploration_fs, html_string):
                 collapsible_component['content-with-value'] == ''):
             continue
         # Create a new soup with the content-with-value html string.
-        # Replace \n with '' because json.loads() cannot process it.
+        # Escape \n like \\n so that json.loads() can process it.
         content_with_html_string = json.loads(
             unescape_html(collapsible_component['content-with-value']).replace(
-                '\n', ''))
+                '\n', '\\n'))
         content_soup = bs4.BeautifulSoup(
             content_with_html_string, 'html.parser')
         # Modify the filenames for the image tags in the content soup.
-        _modify_image_filename(exploration_fs, content_soup)
+        _add_dimensions_to_image_filenames(exploration_fs, content_soup)
         # content_soup contains the updated filepath. This is copied
         # into the content-with-value attribute of the original soup.
+        # Unescape \\n in order to retain original HTML string.
         collapsible_component['content-with-value'] = (
-            escape_html(json.dumps(python_utils.UNICODE(content_soup))))
+            escape_html(json.dumps(python_utils.UNICODE(
+                content_soup))).replace('\\n', '\n'))
 
     # To add dimensions to images inside the tab component.
     for tab_component in soup.findAll(
@@ -889,17 +891,17 @@ def add_dims_to_img_in_complex_rte(exploration_fs, html_string):
                 tab_component['tab_contents-with-value'] == ''):
             continue
         # Extract the list of dicts in tab_contents-with-value.
-        # Replace \n with '' because json.loads() cannot process it.
+        # Escape \n like \\n so that json.loads() can process it.
         tab_content_dict_list = json.loads(
             unescape_html(tab_component['tab_contents-with-value']).replace(
-                '\n', ''))
+                '\n', '\\n'))
         # For each dict in tab_content_dict_list, create a soup with the content
         # property which contains the html string and modify the filename.
         for index, tab_content_dict in enumerate(tab_content_dict_list):
             content_soup = bs4.BeautifulSoup(
                 tab_content_dict['content'], 'html.parser')
             # Modify the filenames for the image tags in the content soup.
-            _modify_image_filename(exploration_fs, content_soup)
+            _add_dimensions_to_image_filenames(exploration_fs, content_soup)
             # Store the modified content value back into the content property
             # of the dict.
             tab_content_dict_list[index]['content'] = (
@@ -907,12 +909,14 @@ def add_dims_to_img_in_complex_rte(exploration_fs, html_string):
 
         # Update tab_contents-with-value with tab_content_dict_list
         # which contains the updated filenames.
+        # Unescape \\n in order to retain original HTML string.
         tab_component['tab_contents-with-value'] = (
-            escape_html(json.dumps(tab_content_dict_list)))
+            escape_html(json.dumps(tab_content_dict_list)).replace(
+                '\\n', '\n'))
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
-def _modify_image_filename(exploration_fs, soup):
+def _add_dimensions_to_image_filenames(exploration_fs, soup):
     """Modifies filenames of images. This is a helper method for
     add_dims_to_img_in_complex_rte.
 
