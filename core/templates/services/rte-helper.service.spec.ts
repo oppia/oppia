@@ -271,7 +271,7 @@ describe('Rte Helper Service', function() {
     expect(RteHelperService.isInlineComponent('image')).toBe(false);
   });
 
-  it('should create customization arg dic from attributes', function() {
+  it('should create customization arg dict from attributes', function() {
     var logSpy = spyOn($log, 'error').and.callThrough();
     var attrs = [{
       name: 'class'
