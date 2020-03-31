@@ -579,7 +579,7 @@ class LinkComponentValidationAuditJob(
             return
 
         state_names_to_html_list_mapping = (
-            exploration.get_all_html_strings())
+            exploration.get_state_names_to_html_list_mapping())
 
         err_dict = html_validation_service.validate_url_with_value_for_links(
             state_names_to_html_list_mapping)

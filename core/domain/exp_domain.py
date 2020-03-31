@@ -3671,7 +3671,7 @@ class Exploration(python_utils.OBJECT):
 
         return html_list
 
-    def get_all_html_strings(self):
+    def get_state_names_to_html_list_mapping(self):
         """Gets all html strings used in this exploration with the
         corresponding state name.
 
