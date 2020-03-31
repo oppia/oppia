@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,12 +33,12 @@ describe('State name service', () => {
     sns = TestBed.get(StateNameService);
   });
 
-  it('tests the initialization', () =>{
+  it('should evaluate properties before the initialization', () =>{
     expect((sns as any).savedMemento).toBeNull();
     expect((sns as any).stateNameEditorIsShown).toBeFalse();
   });
 
-  it('tests that the set function is called after init', () => {
+  it('should call set state functions after init', () => {
     spyOn(sns, 'setStateNameSavedMemento');
     spyOn(sns, 'setStateNameEditorVisibility');
     sns.init();
@@ -50,12 +50,8 @@ describe('State name service', () => {
 
   it('tests the get function', () => {
     expect(sns.getStateNameSavedMemento()).toBeNull();
-    (sns as any).savedMemento = 'SomeValue';
-    expect(sns.getStateNameSavedMemento()).toBe('SomeValue');
-  });
-
-  it('tests the set function', () => {
     sns.setStateNameSavedMemento('SomeValue');
+    expect(sns.getStateNameSavedMemento()).toBe('SomeValue');
     expect((sns as any).savedMemento).toBe('SomeValue');
     sns.setStateNameEditorVisibility(true);
     expect((sns as any).stateNameEditorIsShown).toBe(true);
