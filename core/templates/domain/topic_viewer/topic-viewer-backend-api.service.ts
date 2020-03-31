@@ -35,8 +35,11 @@ export class TopicViewerBackendApiService {
 
   private topicDataDict = null;
   private _fetchTopicData(
-      topicName: string, successCallback: any, errorCallback: any): any {
-    var topicDataUrl = this.urlInterpolation.interpolateUrl(
+      topicName: string,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void
+  ): void {
+    const topicDataUrl = this.urlInterpolation.interpolateUrl(
       TopicViewerDomainConstants.TOPIC_DATA_URL_TEMPLATE, {
         topic_name: topicName
       });
@@ -50,7 +53,7 @@ export class TopicViewerBackendApiService {
         }
       }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse.body);
+          errorCallback(errorResponse.error);
         }
       });
   }
