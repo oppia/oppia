@@ -278,7 +278,7 @@ def run_script_and_get_returncode(cmd_list):
     """Runs script and returns the returncode of the task.
 
     Args:
-        cmd_list: The cmd list containing the command to be run.
+        cmd_list: list(str). The cmd list containing the command to be run.
 
     Returns:
         int. The return code from the task executed.
