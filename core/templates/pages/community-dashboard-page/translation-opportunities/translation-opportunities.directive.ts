@@ -164,7 +164,7 @@ angular.module('oppia').directive(
                         TranslationLanguageService.getActiveLanguageCode(),
                         function() {
                           AlertsService.addSuccessMessage(
-                            'Submitted suggestion!');
+                            'Submitted translation for review.');
                           if ($scope.moreAvailable) {
                             var textAndAvailability = (
                               TranslateTextService.getTextToTranslate());

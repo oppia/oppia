@@ -93,7 +93,7 @@ angular.module('oppia').directive('questionOpportunities', [
           };
 
           const onSubmitSuggestionSuccess = function() {
-            AlertsService.addSuccessMessage('Submitted question suggestion.');
+            AlertsService.addSuccessMessage('Submitted question for review.');
           };
 
           ctrl.onLoadMoreOpportunities = function() {
