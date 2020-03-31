@@ -30,11 +30,11 @@ import { RecordedVoiceovers, RecordedVoiceoversObjectFactory,
   IRecordedVoiceOverBackendDict } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import {
-  SubtitledHtml, SubtitledHtmlObjectFactory, ISubtitledHtmlBackendDict
-} from 'domain/exploration/SubtitledHtmlObjectFactory';
+  SubtitledHtml, SubtitledHtmlObjectFactory, ISubtitledHtmlBackendDict } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 import {
-  WorkedExample, WorkedExampleObjectFactory, IWorkedExampleBackendDict
-} from 'domain/skill/WorkedExampleObjectFactory';
+  WorkedExample, WorkedExampleObjectFactory, IWorkedExampleBackendDict } from
+  'domain/skill/WorkedExampleObjectFactory';
 
 export class ConceptCard {
   _explanation: SubtitledHtml;

@@ -7,7 +7,7 @@
       </angular-html-bind>
     </div>
   </div>
-  <div class="concept-card-worked-examples">
+  <div class="concept-card-worked-examples" ng-if="$ctrl.numberOfWorkedExamplesShown > 0">
     <strong> Worked Examples </strong>
     <div style="margin-top: 2vh;"
          ng-repeat="example in $ctrl.currentConceptCard.getWorkedExamples()"
