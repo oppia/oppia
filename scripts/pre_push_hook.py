@@ -61,8 +61,10 @@ NPM_CMD = os.path.join(
     OPPIA_PARENT_DIR, 'oppia_tools', 'node-10.18.0', 'bin', 'npm')
 YARN_CMD = os.path.join(
     OPPIA_PARENT_DIR, 'oppia_tools', 'yarn-v1.22.0', 'bin', 'yarn')
-FRONTEND_TEST_SCRIPT = 'run_frontend_tests --check_coverage'
-TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT = 'check_e2e_tests_are_captured_in_ci'
+FRONTEND_TEST_CMDS = [
+    PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage']
+TRAVIS_CI_PROTRACTOR_CHECK_CMDS = [
+    PYTHON_CMD, '-m', 'scripts.check_e2e_tests_are_captured_in_ci']
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
@@ -272,27 +274,6 @@ def start_linter(files):
     return task.returncode
 
 
-def build_python_script_cmd_list_command(script_name):
-    """Build python script cmd list from a script name.
-
-    Args:
-        script_name: The python script that will be executed.
-
-    Returns:
-        list(str). The cmd list to execute the python script.
-    """
-    script_commands = script_name.split(' ')
-    cmd = [
-        'python', '-m',
-        os.path.join('scripts', script_commands[0]).replace('/', '.')]
-
-    script_commands.pop(0)
-    if len(script_commands):
-        for flag in script_commands:
-            cmd.append(flag)
-    return cmd
-
-
 def run_script_and_get_returncode(cmd_list):
     """Runs script and returns the returncode of the task.
 
@@ -419,15 +400,14 @@ def main(args=None):
             travis_ci_check_status = 0
             if does_diff_include_js_or_ts_files(files_to_lint):
                 frontend_status = run_script_and_get_returncode(
-                    build_python_script_cmd_list_command(FRONTEND_TEST_SCRIPT))
+                    FRONTEND_TEST_CMDS)
             if frontend_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
                 sys.exit(1)
             if does_diff_include_travis_yml_or_js_files(files_to_lint):
                 travis_ci_check_status = run_script_and_get_returncode(
-                    build_python_script_cmd_list_command(
-                        TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT))
+                    TRAVIS_CI_PROTRACTOR_CHECK_CMDS)
             if travis_ci_check_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing e2e test configuration check.')

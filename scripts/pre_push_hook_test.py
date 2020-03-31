@@ -329,27 +329,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.popen_swap:
             self.assertEqual(pre_push_hook.start_linter(['files']), 0)
 
-    def test_build_cmd_list_command(self):
-        def mock_os_path_join(*args):
-            return 'scripts.' + args[1]
-        os_path_join_swap = self.swap(
-            os.path, 'join', mock_os_path_join)
-        with os_path_join_swap:
-            self.assertEqual(
-                pre_push_hook.build_cmd_list_command('run_test'),
-                ['python', '-m', 'scripts.run_test'])
-
-    def test_build_cmd_list_command_when_has_flags(self):
-        def mock_os_path_join(*args):
-            return 'scripts.' + args[1]
-        os_path_join_swap = self.swap(
-            os.path, 'join', mock_os_path_join)
-        with os_path_join_swap:
-            self.assertEqual(
-                pre_push_hook.build_cmd_list_command(
-                    'run_test --flag1 --flag2'),
-                ['python', '-m', 'scripts.run_test', '--flag1', '--flag2'])
-
     def test_run_script_and_get_returncode(self):
         with self.popen_swap:
             self.assertEqual(
