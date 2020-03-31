@@ -340,7 +340,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             self.user_id)
         thread_ids.append('exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID)
         thread_summaries, number_of_unread_threads = (
-            feedback_services.get_exp_thread_summaries(self.user_id, thread_ids))
+            feedback_services.get_exp_thread_summaries(
+                self.user_id, thread_ids))
         exploration_titles = (
             ['Bridges in England', 'Sillat Suomi', 'Leaning tower of Pisa'])
 
@@ -371,7 +372,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         feedback_services.create_message(
             threads[0].id, self.owner_id, None, None, 'editor message')
         _, number_of_unread_threads = (
-            feedback_services.get_exp_thread_summaries(self.user_id, thread_ids))
+            feedback_services.get_exp_thread_summaries(
+                self.user_id, thread_ids))
 
         # Check if the number of unread messages is equal to 1.
         self.assertEqual(number_of_unread_threads, 1)
