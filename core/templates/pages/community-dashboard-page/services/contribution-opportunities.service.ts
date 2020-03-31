@@ -33,29 +33,29 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
 
     var _getSkillOpportunities = function(cursor, successCallback) {
       ContributionOpportunitiesBackendApiService.fetchSkillOpportunities(
-        cursor, function(opportunities, nextCursor, more) {
-          skillOpportunitiesCursor = nextCursor;
-          moreSkillOpportunitiesAvailable = more;
-          successCallback(opportunities, more);
-        });
+        cursor).then((opportunities, nextCursor, more) => {
+        skillOpportunitiesCursor = nextCursor;
+        moreSkillOpportunitiesAvailable = more;
+        successCallback(opportunities, more);
+      });
     };
     var _getTranslationOpportunities = function(
         languageCode, cursor, successCallback) {
       ContributionOpportunitiesBackendApiService.fetchTranslationOpportunities(
-        languageCode, cursor, function(opportunities, nextCursor, more) {
-          translationOpportunitiesCursor = nextCursor;
-          moreTranslationOpportunitiesAvailable = more;
-          successCallback(opportunities, more);
-        });
+        languageCode, cursor).then((opportunities, nextCursor, more) => {
+        translationOpportunitiesCursor = nextCursor;
+        moreTranslationOpportunitiesAvailable = more;
+        successCallback(opportunities, more);
+      });
     };
     var _getVoiceoverOpportunities = function(
         languageCode, cursor, successCallback) {
       ContributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
-        languageCode, cursor, function(opportunities, nextCursor, more) {
-          voiceoverOpportunitiesCursor = nextCursor;
-          moreVoiceoverOpportunitiesAvailable = more;
-          successCallback(opportunities, more);
-        });
+        languageCode, cursor).then(function(opportunities, nextCursor, more) {
+        voiceoverOpportunitiesCursor = nextCursor;
+        moreVoiceoverOpportunitiesAvailable = more;
+        successCallback(opportunities, more);
+      });
     };
 
     return {
