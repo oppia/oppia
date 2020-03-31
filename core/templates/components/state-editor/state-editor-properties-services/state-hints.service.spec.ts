@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,10 +19,8 @@
 import { TestBed } from '@angular/core/testing';
 import { UtilsService } from 'services/utils.service';
 import { AlertsService } from 'services/alerts.service';
-/* eslint-disable max-len */
-import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
-/* eslint-enable max-len */
-
+import { StateHintsService } from
+  'components/state-editor/state-editor-properties-services/state-hints.service';
 
 describe('State hints service', () => {
   let shs: StateHintsService = null;
@@ -38,14 +36,14 @@ describe('State hints service', () => {
   });
 
 
-  it('tests that the constructor should have been called', () =>{
+  it('should called the constructor', () =>{
     expect(shs.setterMethodKey).toBe('saveHints');
   });
 
-  it('tests that the setActiveHintIndex should be called after init', () =>{
+  it('should called setActiveHintIndex after init', () =>{
     spyOn(shs, 'setActiveHintIndex');
-    var StateName = 'Introduction';
-    var value = {0: {
+    const StateName = 'Introduction';
+    const value = {0: {
       _html: '<p>math</p>',
       _contentId: 'hint_1'
     }
@@ -54,7 +52,7 @@ describe('State hints service', () => {
     expect(shs.setActiveHintIndex).toHaveBeenCalled();
   });
 
-  it('tests set and get ActiveHintIndex function', () =>{
+  it('should set and get activeHintIndex correctly', () =>{
     shs.setActiveHintIndex(1);
     expect(shs.getActiveHintIndex()).toBe(1);
     shs.setActiveHintIndex(2);
