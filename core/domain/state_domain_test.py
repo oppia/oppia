@@ -194,6 +194,111 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             init_state.get_content_html('hint_1'), '<p>Changed hint one</p>')
 
+    def test_android_validation(self):
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': (
+                    '<p><oppia-noninteractive-math>'
+                    '</oppia-noninteractive-math></p>')
+            },
+        }
+
+        init_state.update_interaction_solution(solution_dict)
+        self.assertFalse(init_state.is_rte_content_supported_on_android())
+        solution_dict['explanation']['html'] = ''
+        init_state.update_interaction_solution(solution_dict)
+        self.assertTrue(init_state.is_rte_content_supported_on_android())
+
+        hints_list = []
+        hints_list.append(
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p><oppia-noninteractive-collapsible>'
+                    '</oppia-noninteractive-collapsible></p>'
+                )
+            )
+        )
+        init_state.update_interaction_hints(hints_list)
+        self.assertFalse(init_state.is_rte_content_supported_on_android())
+        hints_list[0].hint_content.html = ''
+        init_state.update_interaction_hints(hints_list)
+        self.assertTrue(init_state.is_rte_content_supported_on_android())
+
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', (
+                    '<p><oppia-noninteractive-math>'
+                    '</oppia-noninteractive-math></p>')),
+            False, [], None, None
+        )
+
+        init_state.update_interaction_default_outcome(default_outcome)
+        self.assertFalse(init_state.is_rte_content_supported_on_android())
+        default_outcome.feedback.html = ''
+        init_state.update_interaction_default_outcome(default_outcome)
+        self.assertTrue(init_state.is_rte_content_supported_on_android())
+
+        answer_group_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': (
+                        '<p><oppia-noninteractive-tabs tab_contents-with-value='
+                        '"{"title": "Hint introduction", "content": "This set '
+                        'of tabs shows some hints. Click on the other tabs to '
+                        'display the relevant hints."}">'
+                        '</oppia-noninteractive-tabs> Other Text </p>')
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        init_state.update_interaction_answer_groups(
+            [answer_group_dict])
+        self.assertFalse(init_state.is_rte_content_supported_on_android())
+        answer_group_dict['outcome']['feedback']['html'] = (
+            '<p><oppia-noninteractive-image>'
+            '</oppia-noninteractive-image></p>')
+        init_state.update_interaction_answer_groups(
+            [answer_group_dict])
+        self.assertTrue(init_state.is_rte_content_supported_on_android())
+
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': (
+                    '<p><oppia-noninteractive-tabs>'
+                    '</oppia-noninteractive-tabs></p>')
+            }))
+        self.assertFalse(init_state.is_rte_content_supported_on_android())
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': (
+                    '<p><oppia-noninteractive-link>'
+                    '</oppia-noninteractive-link></p>')
+            }))
+        self.assertTrue(init_state.is_rte_content_supported_on_android())
+
     def test_get_content_html_with_invalid_content_id_raise_error(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
@@ -1579,7 +1684,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             re.escape('Expected content_id value to be a dict, received []')):
             written_translations.validate(None)
 
-    def test_validation_with_invalid_type_langauge_code_raise_error(self):
+    def test_validation_with_invalid_type_language_code_raise_error(self):
         written_translations_dict = {
             'translations_mapping': {
                 'content': {
@@ -1598,7 +1703,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected language_code to be a string, '):
             written_translations.validate(['content'])
 
-    def test_validation_with_unknown_langauge_code_raise_error(self):
+    def test_validation_with_unknown_language_code_raise_error(self):
         written_translations_dict = {
             'translations_mapping': {
                 'content': {
@@ -1869,7 +1974,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             re.escape('Expected content_id value to be a dict, received []')):
             recorded_voiceovers.validate(None)
 
-    def test_validation_with_invalid_type_langauge_code_raise_error(self):
+    def test_validation_with_invalid_type_language_code_raise_error(self):
         recorded_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content': {
@@ -1890,7 +1995,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected language_code to be a string, '):
             recorded_voiceovers.validate(['content'])
 
-    def test_validation_with_unknown_langauge_code_raise_error(self):
+    def test_validation_with_unknown_language_code_raise_error(self):
         recorded_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content': {

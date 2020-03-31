@@ -16,42 +16,49 @@
  * @fileoverview Unit tests for LearnerAnswerDetailsBackendApiService
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { LearnerAnswerDetailsBackendApiService } from 'domain/statistics/learner-answer-details-backend-api.service';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from
+  '@angular/core/testing';
+
+import { LearnerAnswerDetailsBackendApiService } from
+  'domain/statistics/learner-answer-details-backend-api.service';
 
 describe('Learner answer info backend Api service', () => {
-    let learnerAnswerDetailsBackendApiService: LearnerAnswerDetailsBackendApiService = null;
-    let httpTestingController: HttpTestingController;
+  let learnerAnswerDetailsBackendApiService:
+    LearnerAnswerDetailsBackendApiService = null;
+  let httpTestingController: HttpTestingController;
 
-    beforeEach(() => {
-        TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule],
-        });
-        httpTestingController = TestBed.get(HttpTestingController);
-        learnerAnswerDetailsBackendApiService = TestBed.get(learnerAnswerDetailsBackendApiService);
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
     });
+    httpTestingController = TestBed.get(HttpTestingController);
+    learnerAnswerDetailsBackendApiService = TestBed
+      .get(LearnerAnswerDetailsBackendApiService);
+  });
 
-    afterEach(() => {
-        httpTestingController.verify();
-    });
+  afterEach(() => {
+    httpTestingController.verify();
+  });
 
-    it('should successfully record the learner answer details',
-        fakeAsync(() => {
-            var successHandler = jasmine.createSpy('success');
-            var failHandler = jasmine.createSpy('fail');
+  it('should successfully record the learner answer details',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-            learnerAnswerDetailsBackendApiService.recordLearnerAnswerDetails('exp123', 'Introduction', 'TextInput', 'sample answer',
-                'sample answer details').then(
-                    successHandler, failHandler);
-            var req = httpTestingController.expectOne(
-                '/learneranswerdetailshandler/exploration/exp123');
-            expect(req.request.method).toEqual('PUT');
-            req.flush(200);
+      learnerAnswerDetailsBackendApiService.recordLearnerAnswerDetails(
+        'exp123', 'Introduction', 'TextInput', 'sample answer',
+        'sample answer details').then(
+        successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/learneranswerdetailshandler/exploration/exp123');
+      expect(req.request.method).toEqual('PUT');
+      req.flush(200);
 
-            flushMicrotasks();
+      flushMicrotasks();
 
-            expect(successHandler).toHaveBeenCalled();
-            expect(failHandler).not.toHaveBeenCalled();
-        }));
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
 });
