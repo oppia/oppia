@@ -34,7 +34,7 @@ export class ExplorationFeaturesBackendApiService {
     private http: HttpClient
   ) {}
 
-  _fetchExplorationFeatures(explorationId: String): Promise<Object> {
+  _fetchExplorationFeatures(explorationId: string): Promise<Object> {
     return this.http.get(
       this.urlInterpolationService.interpolateUrl(
         ServicesConstants.EXPLORATION_FEATURES_URL,
@@ -43,7 +43,7 @@ export class ExplorationFeaturesBackendApiService {
     ).toPromise();
   }
 
-  fetchExplorationFeatures(explorationId: String): Promise<Object> {
+  fetchExplorationFeatures(explorationId: string): Promise<Object> {
     return this._fetchExplorationFeatures(explorationId);
   }
 }

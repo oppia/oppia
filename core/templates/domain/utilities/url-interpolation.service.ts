@@ -28,6 +28,12 @@ import { UtilsService } from 'services/utils.service';
 const Constants = require('constants.ts');
 const hashes = require('hashes.json');
 
+// This makes the InterpolationValuesType like a dict whose keys and values both
+// are string.
+interface InterpolationValuesType {
+  [param: string]: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -102,7 +108,9 @@ export class UrlInterpolationService {
    * If a URL requires a value which is not keyed within the
    * interpolationValues object, this will return null.
    */
-  interpolateUrl(urlTemplate: string, interpolationValues: any): string {
+  interpolateUrl(
+      urlTemplate: string,
+      interpolationValues: InterpolationValuesType): string {
     if (!urlTemplate) {
       this.alertsService.fatalWarning(
         'Invalid or empty URL template passed in: \'' + urlTemplate + '\'');

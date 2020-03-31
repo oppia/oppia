@@ -22,6 +22,12 @@ import { Injectable } from '@angular/core';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 
+// This makes the UrlParamsType like a dict whose keys and values both are
+// string.
+interface UrlParamsType {
+  [param: string]: string
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -43,7 +49,7 @@ export class UrlService {
    since the keys generated depend on the URL being provided.
   So exact type of this function can not be determined
   https://github.com/oppia/oppia/pull/7834#issuecomment-547896982 */
-  getUrlParams(): Object {
+  getUrlParams(): UrlParamsType {
     let params = {};
     let parts = this.getCurrentQueryString().replace(
       /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
@@ -168,7 +174,7 @@ export class UrlService {
   }
 
   getCollectionIdFromExplorationUrl(): string | null {
-    let urlParams: any = this.getUrlParams();
+    let urlParams: UrlParamsType = this.getUrlParams();
     if (urlParams.hasOwnProperty('parent')) {
       return null;
     }
@@ -203,7 +209,7 @@ export class UrlService {
   }
 
   getExplorationVersionFromUrl(): number | null {
-    let urlParams: any = this.getUrlParams();
+    let urlParams: UrlParamsType = this.getUrlParams();
     if (urlParams.hasOwnProperty('v')) {
       let version = urlParams.v;
       if (version.includes('#')) {
