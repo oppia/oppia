@@ -23,54 +23,83 @@ import { AppConstants } from 'app.constants';
 import { ExpressionParserService } from
   'expressions/expression-parser.service.ts';
 
-// Exceptions that can be thrown from the evaluation of expressions.
-const ExpressionError = function(): void {};
-ExpressionError.prototype = new Error();
-ExpressionError.prototype.constructor = ExpressionError;
-
-const ExprUndefinedVarError = function(varname: string,
-    envs: Array<object>): void {
-  this.varname = varname;
-  this.envs = envs;
-};
-ExprUndefinedVarError.prototype = new ExpressionError();
-ExprUndefinedVarError.prototype.constructor = ExprUndefinedVarError;
-ExprUndefinedVarError.prototype.name = 'ExprUndefinedVarError';
-ExprUndefinedVarError.prototype.toString = function(): string {
-  return this.name + ': ' + this.varname + ' not found in ' + this.envs;
-};
-
-const ExprWrongNumArgsError = function(args: Array<number|string>,
-    expectedMin: number, expectedMax: number): void {
-  this.args = args;
-  this.expectedMin = expectedMin;
-  this.expectedMax = expectedMax;
-};
-ExprWrongNumArgsError.prototype = new ExpressionError();
-ExprWrongNumArgsError.prototype.constructor = ExprWrongNumArgsError;
-ExprWrongNumArgsError.prototype.name = 'ExprWrongNumArgsError';
-ExprWrongNumArgsError.prototype.toString = function(): string {
-  return this.name + ': {' + this.args + '} not in range [' +
-        this.expectedMin + ',' + this.expectedMax + ']';
-};
-
-const ExprWrongArgTypeError = function(arg: number|string,
-    actualType: string, expectedType: string): void {
-  this.arg = arg;
-  this.actualType = actualType;
-  this.expectedType = expectedType;
-};
-ExprWrongArgTypeError.prototype = new ExpressionError();
-ExprWrongArgTypeError.prototype.constructor = ExprWrongArgTypeError;
-ExprWrongArgTypeError.prototype.name = 'ExprWrongArgTypeError';
-ExprWrongArgTypeError.prototype.toString = function(): string {
-  if (this.arg === null) {
-    return this.name + ': Type ' + this.actualType +
-        ' does not match expected type ' + this.expectedType;
+class ExpressionError extends Error {
+  constructor() {
+    super();
+    // NOTE TO DEVELOPERS: As per the recommendation of TypeScript
+    //  we need to adjust the prototype manually right after the super() call
+    //  For more information refer to this link below:
+    //  https://github.com/Microsoft/TypeScript-wiki/blob/master/Breaking-Changes.md#extending-built-ins-like-error-array-and-map-may-no-longer-work
+    Object.setPrototypeOf(this, ExpressionError.prototype);
   }
-  return this.name + ': ' + this.arg + ' has type ' + this.actualType +
+}
+
+class ExprUndefinedVarError extends ExpressionError {
+  constructor(public varname: string, public envs: Array<object>) {
+    super();
+    // NOTE TO DEVELOPERS: As per the recommendation of TypeScript
+    //  we need to adjust the prototype manually right after the super() call
+    //  For more information refer to this link below:
+    //  https://github.com/Microsoft/TypeScript-wiki/blob/master/Breaking-Changes.md#extending-built-ins-like-error-array-and-map-may-no-longer-work
+    Object.setPrototypeOf(this, ExprUndefinedVarError.prototype);
+    this.varname = varname;
+    this.envs = envs;
+  }
+
+  public name: string = 'ExprUndefinedVarError';
+
+  public toString(): string {
+    return this.name + ': ' + this.varname + ' not found in ' + this.envs;
+  }
+}
+
+class ExprWrongNumArgsError extends ExpressionError {
+  constructor(public args: Array<number|string>, public expectedMin: number,
+      public expectedMax: number) {
+    super();
+    // NOTE TO DEVELOPERS: As per the recommendation of TypeScript
+    //  we need to adjust the prototype manually right after the super() call
+    // For more information refer to this link below:
+    // https://github.com/Microsoft/TypeScript-wiki/blob/master/Breaking-Changes.md#extending-built-ins-like-error-array-and-map-may-no-longer-work
+    Object.setPrototypeOf(this, ExprWrongNumArgsError.prototype);
+    this.args = args;
+    this.expectedMin = expectedMin;
+    this.expectedMax = expectedMax;
+  }
+
+  public name: string = 'ExprWrongNumArgsError';
+
+  public toString(): string {
+    return this.name + ': {' + this.args + '} not in range [' +
+        this.expectedMin + ',' + this.expectedMax + ']';
+  }
+}
+
+class ExprWrongArgTypeError extends ExpressionError {
+  constructor(public arg: number|string, public actualType: string,
+    public expectedType: string) {
+    super();
+    // NOTE TO DEVELOPERS: As per the recommendation of TypeScript
+    //  we need to adjust the prototype manually right after the super() call
+    // For more information refer to this link below:
+    // https://github.com/Microsoft/TypeScript-wiki/blob/master/Breaking-Changes.md#extending-built-ins-like-error-array-and-map-may-no-longer-work
+    Object.setPrototypeOf(this, ExprWrongArgTypeError.prototype);
+    this.arg = arg;
+    this.actualType = actualType;
+    this.expectedType = expectedType;
+  }
+
+  public name: string = 'ExprWrongArgTypeError';
+
+  public toString(): string {
+    if (this.arg === null) {
+      return this.name + ': Type ' + this.actualType +
+        ' does not match expected type ' + this.expectedType;
+    }
+    return this.name + ': ' + this.arg + ' has type ' + this.actualType +
         ' which does not match expected type ' + this.expectedType;
-};
+  }
+}
 
 @Injectable({
   providedIn: 'root'
