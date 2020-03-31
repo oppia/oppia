@@ -19,8 +19,9 @@
 import { TestBed } from '@angular/core/testing';
 import { UtilsService } from 'services/utils.service';
 import { AlertsService } from 'services/alerts.service';
-import { StateHintsService } from
-  'components/state-editor/state-editor-properties-services/state-hints.service';
+/* eslint-disable max-len */
+import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
+/* eslint-disable max-len */
 
 describe('State hints service', () => {
   let shs: StateHintsService = null;
