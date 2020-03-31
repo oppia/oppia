@@ -834,6 +834,7 @@ def add_dimensions_to_image_tags(exploration_fs, html_string):
     _modify_image_filename(exploration_fs, soup)
     return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
+
 def add_dims_to_img_in_complex_rte(exploration_fs, html_string):
     """Adds dimensions to all oppia-noninteractive-image tags inside tabs and
     collapsible blocks. Removes image tags that have no filepath.
