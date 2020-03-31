@@ -445,6 +445,7 @@ EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
 EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
 EMAIL_INTENT_ONBOARD_REVIEWER = 'onboard_reviewer'
+EMAIL_INTENT_REMOVE_REVIEWER = 'remove_reviewer'
 EMAIL_INTENT_REVIEW_SUGGESTIONS = 'review_suggestions'
 EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES = 'voiceover_application_updates'
 EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
@@ -755,6 +756,7 @@ UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USER_PERMISSIONS_URL_PREFIX = '/createhandler/permissions'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
+VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -889,8 +891,8 @@ ROLE_ACTION_UPDATE = 'update'
 ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
 ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
-VIEW_METHOD_ROLE = 'role'
-VIEW_METHOD_USERNAME = 'username'
+USER_FILTER_CRITERION_ROLE = 'role'
+USER_FILTER_CRITERION_USERNAME = 'username'
 
 QUESTION_BATCH_SIZE = 10
 

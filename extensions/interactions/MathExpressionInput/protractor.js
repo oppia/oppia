@@ -17,8 +17,6 @@
  * interaction
  */
 
-var objects = require('../../objects/protractor.js');
-
 var mathExpressionInputTag = function(parentElement) {
   return parentElement.element(by.tagName(
     'oppia-interactive-math-expression-input'));
