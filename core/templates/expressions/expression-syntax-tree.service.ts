@@ -114,26 +114,26 @@ export class ExpressionSyntaxTreeService {
   }
 
   private findParams = (parseTree: Array<string>|string): Array<string> => {
-      let paramsFound = [];
-      if (parseTree instanceof Array) {
-        if (parseTree[0] === '#') {
-          paramsFound.push(parseTree[1]);
-        } else {
-          for (let i = 1; i < parseTree.length; i++) {
+    let paramsFound = [];
+    if (parseTree instanceof Array) {
+      if (parseTree[0] === '#') {
+        paramsFound.push(parseTree[1]);
+      } else {
+        for (let i = 1; i < parseTree.length; i++) {
           paramsFound = paramsFound.concat(this.findParams(parseTree[i]));
-          }
         }
       }
+    }
 
-      let uniqueParams = [];
-      for (let i = 0; i < paramsFound.length; i++) {
-        if (uniqueParams.indexOf(paramsFound[i]) === -1) {
-          uniqueParams.push(paramsFound[i]);
-        }
+    let uniqueParams = [];
+    for (let i = 0; i < paramsFound.length; i++) {
+      if (uniqueParams.indexOf(paramsFound[i]) === -1) {
+        uniqueParams.push(paramsFound[i]);
       }
+    }
 
-      return uniqueParams.sort();
-    };
+    return uniqueParams.sort();
+  };
 
   // Checks if the args array has the expectedNum number of elements and
   // throws an error if not. If optional expectedMax is specified, it
@@ -144,10 +144,9 @@ export class ExpressionSyntaxTreeService {
     if (expectedMax === undefined) {
       expectedMax = expectedNum;
     }
-    if (args.length >= expectedNum && args.length <= expectedMax) {
-      return;
+    if (args.length < expectedNum || args.length > expectedMax) {
+      throw new ExprWrongNumArgsError(args, expectedNum, expectedMax);
     }
-    throw new ExprWrongNumArgsError(args, expectedNum, expectedMax);
   }
 
   private verifyArgTypesMatchExpectedType(argTypes: Array<string>,
