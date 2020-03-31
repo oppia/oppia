@@ -18,7 +18,8 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { throwError } from 'rxjs';
 
 import { PlaythroughIssueObjectFactory, PlaythroughIssue } from
   'domain/statistics/PlaythroughIssueObjectFactory.ts';
@@ -32,8 +33,8 @@ import { UrlInterpolationService } from
 export class PlaythroughIssuesBackendApiService {
   constructor(
     private httpClient: HttpClient,
-    private urlInterpolationService: UrlInterpolationService,
-    private playthroughIssueObjectFactory: PlaythroughIssueObjectFactory) { }
+    private playthroughIssueObjectFactory: PlaythroughIssueObjectFactory,
+    private urlInterpolationService: UrlInterpolationService) { }
 
   private cachedIssues = null;
 
@@ -44,10 +45,11 @@ export class PlaythroughIssuesBackendApiService {
       });
   }
 
-  private getFullPlaythroughUrl(expId: string, playthroughId: string): string {
+  private getFullPlaythroughUrl(
+      explorationId: string, playthroughId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.FETCH_PLAYTHROUGH_URL, {
-        exploration_id: expId,
+        exploration_id: explorationId,
         playthrough_id: playthroughId
       });
   }
@@ -71,43 +73,45 @@ export class PlaythroughIssuesBackendApiService {
       return this.httpClient.get(
         this.getFullIssuesUrl(explorationId), {
           params: { exp_version: explorationVersion }, observe: 'response'
-        }).toPromise().then((response: any) => {
-        var unresolvedIssueBackendDicts = response.body;
-        this.cachedIssues = unresolvedIssueBackendDicts.map(
-          this.playthroughIssueObjectFactory.createFromBackendDict);
-        return this.cachedIssues;
-      });
+        }).toPromise().then(
+        (response: HttpResponse<Array<PlaythroughIssue>>) => {
+          let unresolvedIssueBackendDicts = response.body;
+          this.cachedIssues = unresolvedIssueBackendDicts.map(
+            this.playthroughIssueObjectFactory.createFromBackendDict);
+          return this.cachedIssues;
+        });
     }
   }
 
   fetchPlaythrough(
-      expId: string, playthroughId: string): Promise<PlaythroughIssue> {
+      explorationId: string, playthroughId: string): Promise<PlaythroughIssue> {
     return this.httpClient.get(
-      this.getFullPlaythroughUrl(expId, playthroughId), { observe: 'response' })
-      .toPromise().then((response: any) => {
-        var playthroughBackendDict = response.body;
+      this.getFullPlaythroughUrl(
+        explorationId, playthroughId), { observe: 'response' })
+      .toPromise().then((response: HttpResponse<PlaythroughIssue>) => {
+        let playthroughBackendDict = response.body;
         return this.playthroughIssueObjectFactory.createFromBackendDict(
           playthroughBackendDict);
       });
   }
 
   resolveIssue(
-      issueToResolve: PlaythroughIssue, expId: string, expVersion: number)
-      : Promise<object> {
+      issueToResolve: PlaythroughIssue, explorationId: string,
+      expVersion: number): Promise<object> {
     return this.httpClient.post(
-      this.getFullResolveIssueUrl(expId), {
+      this.getFullResolveIssueUrl(explorationId), {
         exp_issue_dict: issueToResolve.toBackendDict(),
         exp_version: expVersion
       }).toPromise().then(() => {
-      var issueIndex = this.cachedIssues !== null ?
-        this.cachedIssues.findIndex((issue) => {
+      let issueIndex = this.cachedIssues !== null ?
+        this.cachedIssues.findIndex(issue => {
           return angular.equals(issue, issueToResolve);
         }) : -1;
       if (issueIndex === -1) {
-        var invalidIssueError = new Error(
+        let invalidIssueError = new Error(
           'An issue which was not fetched from the backend has been ' +
           'resolved');
-        return new Promise((reject) => reject(invalidIssueError));
+        return throwError(invalidIssueError);
       } else {
         this.cachedIssues.splice(issueIndex, 1);
       }
