@@ -453,7 +453,7 @@ export = {
     "id": "en-auto",
     "description": "English (auto)",
     "explorationLanguage": "en",
-    "speechSynthesisCode": "en-GB",
+    "speechSynthesisCode": "en-US",
     "speechSynthesisCodeMobile": "en_US"
   }],
 
@@ -522,6 +522,15 @@ export = {
     ]
   }],
 
+  "REVIEW_CATEGORY_TRANSLATION": "translation",
+  "REVIEW_CATEGORY_VOICEOVER": "voiceover",
+  "REVIEW_CATEGORY_QUESTION": "question",
+
+  "ACTION_REMOVE_ALL_REVIEW_RIGHTS": "all",
+  "ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS": "specific",
+  "USER_FILTER_CRITERION_USERNAME": "username",
+  "USER_FILTER_CRITERION_ROLE": "role",
+
   // Interaction IDs for which answer details cannot be solicited.
   "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],
 
@@ -555,6 +564,14 @@ export = {
   "INLINE_RTE_COMPONENTS": ["link", "math", "skillreview"],
 
   "SKILL_DIFFICULTIES": ["Easy", "Medium", "Hard"],
+
+  // The skill difficulty values here should correspond to the SKILL_DIFFICULTY
+  // constant values in feconf.py.
+  "SKILL_DIFFICULTY_LABEL_TO_FLOAT": {
+    "Easy": 0.3,
+    "Medium": 0.6,
+    "Hard": 0.9
+  },
 
   "ENABLE_PREREQUISITE_SKILLS": false,
 
