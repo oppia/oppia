@@ -412,8 +412,8 @@ def _get_thread_from_model(thread_model):
 
 
 def get_exp_thread_summaries(user_id, thread_ids):
-    """Returns a list of summaries corresponding to the exploration-threads of
-    the given thread is. Non-exploration threads are not included in the list.
+    """Returns a list of summaries corresponding to the exploration threads from
+    the given thread ids. Non-exploration threads are not included in the list.
     It also returns the number of threads that are currently not read by the
     user.
 
