@@ -29,12 +29,12 @@ angular.module('oppia').factory('RouterService', [
   '$interval', '$location', '$rootScope', '$timeout', '$window',
   'ExplorationFeaturesService',
   'ExplorationInitStateNameService', 'ExplorationStatesService',
-  'LoggerService', 'StateEditorService',
+  'StateEditorService',
   function(
       $interval, $location, $rootScope, $timeout, $window,
       ExplorationFeaturesService,
       ExplorationInitStateNameService, ExplorationStatesService,
-      LoggerService, StateEditorService) {
+      StateEditorService) {
     var TABS = {
       MAIN: {name: 'main', path: '/main'},
       TRANSLATION: {name: 'translation', path: '/translation'},
@@ -167,12 +167,6 @@ angular.module('oppia').factory('RouterService', [
     var _savePendingChanges = function() {
       try {
         $rootScope.$broadcast('externalSave');
-        // Important: The log call below is for only unit tests purposes.
-        // For some reason, when spying on an AngularJS native method like
-        // $broadcast in order to throw an Error and catch be called,
-        // the tests fails. When spying a Javascript native method in order
-        // to throw an error, catch is called and the tests pass.
-        LoggerService.log();
       } catch (e) {
         // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
         // null" error. To get around this we must use $apply().

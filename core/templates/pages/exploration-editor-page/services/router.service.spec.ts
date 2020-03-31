@@ -24,7 +24,6 @@ describe('Router Service', function() {
   var ExplorationStatesService = null;
   var ExplorationFeaturesService = null;
   var ExplorationInitStateNameService = null;
-  var LoggerService = null;
   var $rootScope = null;
   var $location = null;
   var $timeout = null, $interval = null;
@@ -42,7 +41,6 @@ describe('Router Service', function() {
     ExplorationFeaturesService = $injector.get('ExplorationFeaturesService');
     ExplorationInitStateNameService = $injector.get(
       'ExplorationInitStateNameService');
-    LoggerService = $injector.get('LoggerService');
     $rootScope = $injector.get('$rootScope');
     $location = $injector.get('$location');
     $timeout = $injector.get('$timeout');
@@ -415,9 +413,14 @@ describe('Router Service', function() {
   });
 
   it('should save pending changes when function throws an error', function() {
-    spyOn(LoggerService, 'log').and.throwError(
+    spyOn($rootScope, '$broadcast').and.throwError(
       'Cannot read property $$nextSibling of null');
     var applySpy = spyOn($rootScope, '$apply').and.callThrough();
+    // $destroy is being mocked here because it is being called
+    // in the test and it calls $broadcast which throws an error on
+    // AngularJS because of spyOn.
+    spyOn($rootScope, '$destroy').and.callFake(function() {});
+
     RouterService.savePendingChanges();
     expect(applySpy).toHaveBeenCalled();
   });
