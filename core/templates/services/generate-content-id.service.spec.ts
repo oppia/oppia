@@ -42,8 +42,9 @@ describe('GenerateContentIdService', () => {
       gcis.getNextId(['worked_example_question_1'], 'worked_example_question')
     ).toEqual('worked_example_question_2');
     expect(
-      gcis.getNextId(['worked_example_answer_1'], 'worked_example_answer')
-    ).toEqual('worked_example_answer_2');
+      gcis.getNextId(
+        ['worked_example_explanation_1'], 'worked_example_explanation')
+    ).toEqual('worked_example_explanation_2');
   });
 
   it('should throw error for unknown content id', () => {

@@ -197,9 +197,9 @@ describe('Skill editor state service', function() {
         html: 'worked example question 1',
         content_id: 'worked_example_q_1'
       },
-      answer: {
-        html: 'worked example answer 1',
-        content_id: 'worked_example_a_1'
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
       }
     };
 
@@ -208,9 +208,9 @@ describe('Skill editor state service', function() {
         html: 'worked example question 2',
         content_id: 'worked_example_q_2'
       },
-      answer: {
-        html: 'worked example answer 2',
-        content_id: 'worked_example_a_2'
+      explanation: {
+        html: 'worked example explanation 2',
+        content_id: 'worked_example_e_2'
       }
     };
 

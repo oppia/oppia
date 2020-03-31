@@ -46,7 +46,7 @@ angular.module('oppia').directive('conceptCard', [
           };
 
           ctrl.showMoreWorkedExamples = function() {
-            ctrl.answerIsShown = false;
+            ctrl.explanationIsShown = false;
             ctrl.numberOfWorkedExamplesShown++;
           };
 

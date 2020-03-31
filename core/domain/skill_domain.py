@@ -328,15 +328,16 @@ class Rubric(python_utils.OBJECT):
 class WorkedExample(python_utils.OBJECT):
     """Domain object for representing the worked_example dict."""
 
-    def __init__(self, question, answer):
+    def __init__(self, question, explanation):
         """Constructs a WorkedExample domain object.
 
         Args:
             question: SubtitledHtml. The example question.
-            answer: SubtitledHtml. The answer for the above example question.
+            explanation: SubtitledHtml. The explanation for the above example
+                question.
         """
         self.question = question
-        self.answer = answer
+        self.explanation = explanation
 
     def validate(self):
         """Validates various properties of the WorkedExample object.
@@ -350,11 +351,11 @@ class WorkedExample(python_utils.OBJECT):
                 'Expected example question to be a SubtitledHtml object, '
                 'received %s' % self.question)
         self.question.validate()
-        if not isinstance(self.answer, state_domain.SubtitledHtml):
+        if not isinstance(self.explanation, state_domain.SubtitledHtml):
             raise utils.ValidationError(
-                'Expected example answer to be a SubtitledHtml object, '
+                'Expected example explanation to be a SubtitledHtml object, '
                 'received %s' % self.question)
-        self.answer.validate()
+        self.explanation.validate()
 
     def to_dict(self):
         """Returns a dict representing this WorkedExample domain object.
@@ -364,7 +365,7 @@ class WorkedExample(python_utils.OBJECT):
         """
         return {
             'question': self.question.to_dict(),
-            'answer': self.answer.to_dict()
+            'explanation': self.explanation.to_dict()
         }
 
     @classmethod
@@ -383,8 +384,8 @@ class WorkedExample(python_utils.OBJECT):
                 worked_example_dict['question']['content_id'],
                 worked_example_dict['question']['html']),
             state_domain.SubtitledHtml(
-                worked_example_dict['answer']['content_id'],
-                worked_example_dict['answer']['html'])
+                worked_example_dict['explanation']['content_id'],
+                worked_example_dict['explanation']['html'])
         )
 
         return worked_example
@@ -442,12 +443,12 @@ class SkillContents(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Found a duplicate content id %s'
                     % example.question.content_id)
-            if example.answer.content_id in available_content_ids:
+            if example.explanation.content_id in available_content_ids:
                 raise utils.ValidationError(
                     'Found a duplicate content id %s'
-                    % example.answer.content_id)
+                    % example.explanation.content_id)
             available_content_ids.add(example.question.content_id)
-            available_content_ids.add(example.answer.content_id)
+            available_content_ids.add(example.explanation.content_id)
 
         self.recorded_voiceovers.validate(available_content_ids)
         self.written_translations.validate(available_content_ids)
@@ -929,14 +930,14 @@ class Skill(python_utils.OBJECT):
         old_content_ids = [
             example_field.content_id
             for example in self.skill_contents.worked_examples
-            for example_field in (example.question, example.answer)]
+            for example_field in (example.question, example.explanation)]
 
         self.skill_contents.worked_examples = list(worked_examples)
 
         new_content_ids = [
             example_field.content_id
             for example in self.skill_contents.worked_examples
-            for example_field in (example.question, example.answer)]
+            for example_field in (example.question, example.explanation)]
 
         self._update_content_ids_in_assets(old_content_ids, new_content_ids)
 

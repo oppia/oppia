@@ -37,15 +37,22 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         super(SkillDomainUnitTests, self).setUp()
         example_1 = skill_domain.WorkedExample(
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Answer 1</p>')
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
         )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>'), [example_1],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}, '3': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}, '3': {}}}))
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'name', '<p>notes</p>',
             '<p>default_feedback</p>', True)]
@@ -237,17 +244,17 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected worked example to be a WorkedExample object')
 
-        example = skill_domain.WorkedExample('question', 'answer')
+        example = skill_domain.WorkedExample('question', 'explanation')
         self.skill.skill_contents.worked_examples = [example]
         self._assert_validation_error(
             'Expected example question to be a SubtitledHtml object')
 
         example = skill_domain.WorkedExample(
             state_domain.SubtitledHtml(
-                '2', '<p>Example Question 1</p>'), 'answer')
+                '2', '<p>Example Question 1</p>'), 'explanation')
         self.skill.skill_contents.worked_examples = [example]
         self._assert_validation_error(
-            'Expected example answer to be a SubtitledHtml object')
+            'Expected example explanation to be a SubtitledHtml object')
 
         self.skill.skill_contents.explanation = 'explanation'
         self._assert_validation_error(
@@ -350,10 +357,17 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}, '3': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}, '3': {}}}))
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         skill_contents_dict = skill_contents.to_dict()
         skill_contents_from_dict = skill_domain.SkillContents.from_dict(
             skill_contents_dict)
@@ -393,24 +407,24 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'question_1',
             'html': '<p>Worked example question 1</p>'
         }
-        answer_1 = {
-            'content_id': 'answer_1',
-            'html': '<p>Worked example answer 1</p>'
+        explanation_1 = {
+            'content_id': 'explanation_1',
+            'html': '<p>Worked example explanation 1</p>'
         }
         question_2 = {
             'content_id': 'question_2',
             'html': '<p>Worked example question 2</p>'
         }
-        answer_2 = {
-            'content_id': 'answer_2',
-            'html': '<p>Worked example answer 2</p>'
+        explanation_2 = {
+            'content_id': 'explanation_2',
+            'html': '<p>Worked example explanation 2</p>'
         }
         worked_examples_dict_list = [{
             'question': question_1,
-            'answer': answer_1
+            'explanation': explanation_1
         }, {
             'question': question_2,
-            'answer': answer_2
+            'explanation': explanation_2
         }]
 
         worked_examples_object_list = [

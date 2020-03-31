@@ -19,7 +19,7 @@
 
 export interface IWorkedExampleBackendDict {
   question: ISubtitledHtmlBackendDict,
-  answer: ISubtitledHtmlBackendDict
+  explanation: ISubtitledHtmlBackendDict
 }
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -30,17 +30,17 @@ import {
 
 export class WorkedExample {
   _question: SubtitledHtml;
-  _answer: SubtitledHtml;
+  _explanation: SubtitledHtml;
 
-  constructor(question: SubtitledHtml, answer: SubtitledHtml) {
+  constructor(question: SubtitledHtml, explanation: SubtitledHtml) {
     this._question = question;
-    this._answer = answer;
+    this._explanation = explanation;
   }
 
   toBackendDict(): IWorkedExampleBackendDict {
     return {
       question: this._question.toBackendDict(),
-      answer: this._answer.toBackendDict()
+      explanation: this._explanation.toBackendDict()
     };
   }
 
@@ -48,8 +48,8 @@ export class WorkedExample {
     return this._question;
   }
 
-  getAnswer(): SubtitledHtml {
-    return this._answer;
+  getExplanation(): SubtitledHtml {
+    return this._explanation;
   }
 }
 
@@ -66,12 +66,12 @@ export class WorkedExampleObjectFactory {
       this.subtitledHtmlObjectFactory.createFromBackendDict(
         workedExampleDict.question),
       this.subtitledHtmlObjectFactory.createFromBackendDict(
-        workedExampleDict.answer)
+        workedExampleDict.explanation)
     );
   }
 
-  create(question: SubtitledHtml, answer: SubtitledHtml) {
-    return new WorkedExample(question, answer);
+  create(question: SubtitledHtml, explanation: SubtitledHtml) {
+    return new WorkedExample(question, explanation);
   }
 }
 

@@ -10,10 +10,10 @@
       <schema-based-editor schema="WORKED_EXAMPLE_FORM_SCHEMA"
                            local-value="tmpWorkedExampleQuestionHtml">
       </schema-based-editor>
-      <div class="worked-example-answer-section">
-        <strong>Example Answer</strong>
+      <div class="worked-example-explanation-section">
+        <strong>Example Explanation</strong>
         <schema-based-editor schema="WORKED_EXAMPLE_FORM_SCHEMA"
-                             local-value="tmpWorkedExampleAnswerHtml">
+                             local-value="tmpWorkedExampleExplanationHtml">
         </schema-based-editor>
       </div>
     </div>
@@ -24,12 +24,12 @@
   <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
   <button class="btn btn-success protractor-test-save-worked-example-button"
           ng-click="saveWorkedExample()"
-          ng-disabled="!(tmpWorkedExampleQuestionHtml && tmpWorkedExampleAnswerHtml)">
+          ng-disabled="!(tmpWorkedExampleQuestionHtml && tmpWorkedExampleExplanationHtml)">
     Save
   </button>
 </div>
 <style>
-  .worked-example-answer-section {
+  .worked-example-explanation-section {
     margin-top: 2.5vh;
   }
 </style>

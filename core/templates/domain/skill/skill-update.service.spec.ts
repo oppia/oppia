@@ -102,9 +102,9 @@ describe('Skill update service', function() {
         html: 'worked example question 1',
         content_id: 'worked_example_q_1'
       },
-      answer: {
-        html: 'worked example answer 1',
-        content_id: 'worked_example_a_1'
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
       }
     };
 
@@ -113,9 +113,9 @@ describe('Skill update service', function() {
         html: 'worked example question 2',
         content_id: 'worked_example_q_2'
       },
-      answer: {
-        html: 'worked example answer 2',
-        content_id: 'worked_example_a_2'
+      explanation: {
+        html: 'worked example explanation 2',
+        content_id: 'worked_example_e_2'
       }
     };
 
@@ -129,9 +129,9 @@ describe('Skill update service', function() {
         voiceovers_mapping: {
           explanation: {},
           worked_example_q_1: {},
-          worked_example_a_1: {},
+          worked_example_e_1: {},
           worked_example_q_2: {},
-          worked_example_a_2: {}
+          worked_example_e_2: {}
         }
       }
     };
@@ -343,9 +343,9 @@ describe('Skill update service', function() {
         html: 'worked example question 1',
         content_id: 'worked_example_q_1'
       },
-      answer: {
-        html: 'worked example answer 1',
-        content_id: 'worked_example_a_1'
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
       }
     };
     var example2 = {
@@ -353,9 +353,9 @@ describe('Skill update service', function() {
         html: 'worked example question 2',
         content_id: 'worked_example_q_2'
       },
-      answer: {
-        html: 'worked example answer 2',
-        content_id: 'worked_example_a_2'
+      explanation: {
+        html: 'worked example explanation 2',
+        content_id: 'worked_example_e_2'
       }
     };
     var newExample = {
@@ -363,9 +363,9 @@ describe('Skill update service', function() {
         html: 'worked example question 3',
         content_id: 'worked_example_q_3'
       },
-      answer: {
-        html: 'worked example answer 3',
-        content_id: 'worked_example_a_3'
+      explanation: {
+        html: 'worked example explanation 3',
+        content_id: 'worked_example_e_3'
       }
     };
     SkillUpdateService.addWorkedExample(
@@ -393,9 +393,9 @@ describe('Skill update service', function() {
         html: 'worked example question 1',
         content_id: 'worked_example_q_1'
       },
-      answer: {
-        html: 'worked example answer 1',
-        content_id: 'worked_example_a_1'
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
       }
     };
     var example2 = {
@@ -403,9 +403,9 @@ describe('Skill update service', function() {
         html: 'worked example question 2',
         content_id: 'worked_example_q_2'
       },
-      answer: {
-        html: 'worked example answer 2',
-        content_id: 'worked_example_a_2'
+      explanation: {
+        html: 'worked example explanation 2',
+        content_id: 'worked_example_e_2'
       }
     };
     SkillUpdateService.deleteWorkedExample(skill, 0);
@@ -430,9 +430,9 @@ describe('Skill update service', function() {
         html: 'worked example question 1',
         content_id: 'worked_example_q_1'
       },
-      answer: {
-        html: 'worked example answer 1',
-        content_id: 'worked_example_a_1'
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
       }
     };
     var example2 = {
@@ -440,9 +440,9 @@ describe('Skill update service', function() {
         html: 'worked example question 2',
         content_id: 'worked_example_q_2'
       },
-      answer: {
-        html: 'worked example answer 2',
-        content_id: 'worked_example_a_2'
+      explanation: {
+        html: 'worked example explanation 2',
+        content_id: 'worked_example_e_2'
       }
     };
     var modifiedExample1 = {
@@ -450,13 +450,13 @@ describe('Skill update service', function() {
         html: 'new question 1',
         content_id: 'worked_example_q_1'
       },
-      answer: {
-        html: 'new answer 1',
-        content_id: 'worked_example_a_1'
+      explanation: {
+        html: 'new explanation 1',
+        content_id: 'worked_example_e_1'
       }
     };
     SkillUpdateService.updateWorkedExample(
-      skill, 0, 'new question 1', 'new answer 1');
+      skill, 0, 'new question 1', 'new explanation 1');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_skill_contents_property',
       property_name: 'worked_examples',

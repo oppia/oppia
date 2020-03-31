@@ -136,14 +136,14 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                   };
 
                   $scope.tmpWorkedExampleQuestionHtml = '';
-                  $scope.tmpWorkedExampleAnswerHtml = '';
+                  $scope.tmpWorkedExampleExplanationHtml = '';
 
                   $scope.saveWorkedExample = function() {
                     $uibModalInstance.close({
                       workedExampleQuestionHtml:
                         $scope.tmpWorkedExampleQuestionHtml,
-                      workedExampleAnswerHtml:
-                        $scope.tmpWorkedExampleAnswerHtml
+                      workedExampleExplanationHtml:
+                        $scope.tmpWorkedExampleExplanationHtml
                     });
                   };
 
@@ -161,11 +161,11 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                     ).getAllContentId(),
                     COMPONENT_NAME_WORKED_EXAMPLE.QUESTION)),
                 SubtitledHtmlObjectFactory.createDefault(
-                  result.workedExampleAnswerHtml,
+                  result.workedExampleExplanationHtml,
                   GenerateContentIdService.getNextId(
                     $scope.skill.getConceptCard().getRecordedVoiceovers(
                     ).getAllContentId(),
-                    COMPONENT_NAME_WORKED_EXAMPLE.ANSWER))
+                    COMPONENT_NAME_WORKED_EXAMPLE.EXPLANATION))
               );
               SkillUpdateService.addWorkedExample(
                 $scope.skill, newExample);

@@ -84,9 +84,9 @@ describe('Skill object factory', () => {
         html: 'worked example question 1',
         content_id: 'worked_example_q_1'
       },
-      answer: {
-        html: 'worked example answer 1',
-        content_id: 'worked_example_a_1'
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
       }
     };
     example2 = {
@@ -94,9 +94,9 @@ describe('Skill object factory', () => {
         html: 'worked example question 1',
         content_id: 'worked_example_q_1'
       },
-      answer: {
-        html: 'worked example answer 1',
-        content_id: 'worked_example_a_1'
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
       }
     };
 

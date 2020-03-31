@@ -47,9 +47,9 @@ describe('Concept card backend API service', function() {
         html: 'worked example question 1',
         content_id: 'worked_example_q_1'
       },
-      answer: {
-        html: 'worked example answer 1',
-        content_id: 'worked_example_a_1'
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
       }
     };
     var example2 = {
@@ -57,9 +57,9 @@ describe('Concept card backend API service', function() {
         html: 'worked example question 1',
         content_id: 'worked_example_q_1'
       },
-      answer: {
-        html: 'worked example answer 1',
-        content_id: 'worked_example_a_1'
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
       }
     };
     var example3 = {
@@ -67,9 +67,9 @@ describe('Concept card backend API service', function() {
         html: 'worked example question 3',
         content_id: 'worked_example_q_3'
       },
-      answer: {
-        html: 'worked example answer 3',
-        content_id: 'worked_example_a_3'
+      explanation: {
+        html: 'worked example explanation 3',
+        content_id: 'worked_example_e_3'
       }
     };
     var example4 = {
@@ -77,9 +77,9 @@ describe('Concept card backend API service', function() {
         html: 'worked example question 4',
         content_id: 'worked_example_q_4'
       },
-      answer: {
-        html: 'worked example answer 4',
-        content_id: 'worked_example_a_4'
+      explanation: {
+        html: 'worked example explanation 4',
+        content_id: 'worked_example_e_4'
       }
     };
     var conceptCardDict1 = {
@@ -92,9 +92,9 @@ describe('Concept card backend API service', function() {
         voiceovers_mapping: {
           explanation: {},
           worked_example_q_1: {},
-          worked_example_a_1: {},
+          worked_example_e_1: {},
           worked_example_q_2: {},
-          worked_example_a_2: {}
+          worked_example_e_2: {}
         }
       }
     };
@@ -109,9 +109,9 @@ describe('Concept card backend API service', function() {
         voiceovers_mapping: {
           explanation: {},
           worked_example_q_3: {},
-          worked_example_a_3: {},
+          worked_example_e_3: {},
           worked_example_q_4: {},
-          worked_example_a_4: {}
+          worked_example_e_4: {}
         }
       }
     };

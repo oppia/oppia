@@ -37,9 +37,9 @@ describe('Worked example object factory', () => {
         html: 'worked example question 1',
         content_id: 'worked_example_q_1'
       },
-      answer: {
-        html: 'worked example answer 1',
-        content_id: 'worked_example_a_1'
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
       }
     };
   });
@@ -50,9 +50,9 @@ describe('Worked example object factory', () => {
     expect(workedExample.getQuestion()).toEqual(
       subtitledHtmlObjectFactory.createDefault(
         'worked example question 1', 'worked_example_q_1'));
-    expect(workedExample.getAnswer()).toEqual(
+    expect(workedExample.getExplanation()).toEqual(
       subtitledHtmlObjectFactory.createDefault(
-        'worked example answer 1', 'worked_example_a_1'));
+        'worked example explanation 1', 'worked_example_e_1'));
   });
 
   it('should convert to a backend dictionary', () => {

@@ -118,7 +118,7 @@ export class AppConstants {
   public static COMPONENT_NAME_EXPLANATION = 'explanation';
   public static COMPONENT_NAME_WORKED_EXAMPLE = {
     QUESTION: 'worked_example_question',
-    ANSWER: 'worked_example_answer'
+    EXPLANATION: 'worked_example_explanation'
   };
 
   public static ACTION_TYPE_EXPLORATION_START = 'ExplorationStart';

@@ -45,11 +45,11 @@ angular.module('oppia').directive('workedExampleEditor', [
             }
           };
 
-          $scope.openAnswerEditor = function() {
+          $scope.openExplanationEditor = function() {
             if ($scope.isEditable()) {
-              $scope.workedExampleAnswerMemento =
-                angular.copy($scope.container.workedExampleAnswerHtml);
-              $scope.answerEditorIsOpen = true;
+              $scope.workedExampleExplanationMemento =
+                angular.copy($scope.container.workedExampleExplanationHtml);
+              $scope.explanationEditorIsOpen = true;
             }
           };
 
@@ -57,23 +57,23 @@ angular.module('oppia').directive('workedExampleEditor', [
             if (inQuestionEditor) {
               $scope.questionEditorIsOpen = false;
             } else {
-              $scope.answerEditorIsOpen = false;
+              $scope.explanationEditorIsOpen = false;
             }
             var contentHasChanged = ((
               $scope.workedExampleQuestionMemento !==
               $scope.container.workedExampleQuestionHtml) ||
-              ($scope.workedExampleAnswerMemento !==
-              $scope.container.workedExampleAnswerHtml)
+              ($scope.workedExampleExplanationMemento !==
+              $scope.container.workedExampleExplanationHtml)
             );
             $scope.workedExampleQuestionMemento = null;
-            $scope.workedExampleAnswerMemento = null;
+            $scope.workedExampleExplanationMemento = null;
 
             if (contentHasChanged) {
               SkillUpdateService.updateWorkedExample(
                 SkillEditorStateService.getSkill(),
                 $scope.getIndex(),
                 $scope.container.workedExampleQuestionHtml,
-                $scope.container.workedExampleAnswerHtml);
+                $scope.container.workedExampleExplanationHtml);
             }
           };
 
@@ -84,21 +84,21 @@ angular.module('oppia').directive('workedExampleEditor', [
             $scope.questionEditorIsOpen = false;
           };
 
-          $scope.cancelEditAnswer = function() {
-            $scope.container.workedExampleAnswerHtml = angular.copy(
-              $scope.workedExampleAnswerMemento);
-            $scope.workedExampleAnswerMemento = null;
-            $scope.answerEditorIsOpen = false;
+          $scope.cancelEditExplanation = function() {
+            $scope.container.workedExampleExplanationHtml = angular.copy(
+              $scope.workedExampleExplanationMemento);
+            $scope.workedExampleExplanationMemento = null;
+            $scope.explanationEditorIsOpen = false;
           };
 
           ctrl.$onInit = function() {
             $scope.questionEditorIsOpen = false;
-            $scope.answerEditorIsOpen = false;
+            $scope.explanationEditorIsOpen = false;
             $scope.container = {
               workedExampleQuestionHtml:
                 $scope.workedExample.getQuestion().getHtml(),
-              workedExampleAnswerHtml:
-                $scope.workedExample.getAnswer().getHtml()
+              workedExampleExplanationHtml:
+                $scope.workedExample.getExplanation().getHtml()
             };
 
             $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
