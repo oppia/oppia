@@ -290,6 +290,8 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { from } from 'rxjs';
+import { LearnerAnswerDetailsBackendApiService } from
+  'domain/statistics/learner-answer-details-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -588,6 +590,11 @@ export class UpgradedServices {
     upgradedServices['ValidatorsService'] = new ValidatorsService(
       upgradedServices['AlertsService'],
       upgradedServices['NormalizeWhitespacePipe']);
+    upgradedServices['LearnerAnswerDetailsBackendApiService'] =
+      new LearnerAnswerDetailsBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']
+      );
 
     // Topological level: 3.
     upgradedServices['AudioTranslationLanguageService'] =
