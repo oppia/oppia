@@ -194,7 +194,10 @@ module.exports = function(config) {
       },
       plugins: [
         new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })
-      ]
+      ],
+      node: {
+        fs: 'empty'
+      }
     }
   });
 };
