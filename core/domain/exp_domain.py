@@ -3671,8 +3671,8 @@ class Exploration(python_utils.OBJECT):
 
         return html_list
 
-    def get_all_html_strings(self):
-        """Gets all html strings used in this exploration with the
+    def get_all_html_content_strings_with_state_name(self):
+        """Gets all html content strings used in this exploration with the
         corresponding state name.
 
         Returns:
