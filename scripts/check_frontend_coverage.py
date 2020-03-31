@@ -204,6 +204,7 @@ FULLY_COVERED_FILENAMES = [
     'learner-playlist-modal.controller.ts',
     'learner-playlist.service.ts',
     'LearnerActionObjectFactory.ts',
+    'learner-answer-details-backend-api.service.ts',
     'LearnerAnswerDetailsObjectFactory.ts',
     'LearnerAnswerInfoObjectFactory.ts',
     'LearnerDashboardActivityIdsObjectFactory.ts',
