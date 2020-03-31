@@ -108,14 +108,19 @@ export class ExpressionSyntaxTreeService {
   constructor(private expressionParserService: ExpressionParserService) {}
 
   public getParamsUsedInExpression(expression: string): Array<string> {
-    let findParams = (parseTree: Array<string>|string): Array<string> => {
+    let parsed = this.expressionParserService.parse(expression);
+
+    return this.findParams(parsed);
+  }
+
+  private findParams = (parseTree: Array<string>|string): Array<string> => {
       let paramsFound = [];
       if (parseTree instanceof Array) {
         if (parseTree[0] === '#') {
           paramsFound.push(parseTree[1]);
         } else {
           for (let i = 1; i < parseTree.length; i++) {
-            paramsFound = paramsFound.concat(findParams(parseTree[i]));
+          paramsFound = paramsFound.concat(this.findParams(parseTree[i]));
           }
         }
       }
@@ -129,11 +134,6 @@ export class ExpressionSyntaxTreeService {
 
       return uniqueParams.sort();
     };
-
-    let parsed = this.expressionParserService.parse(expression);
-
-    return findParams(parsed);
-  }
 
   // Checks if the args array has the expectedNum number of elements and
   // throws an error if not. If optional expectedMax is specified, it
