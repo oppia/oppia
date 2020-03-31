@@ -47,11 +47,11 @@ angular.module('oppia').directive(
       'translation-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$uibModal', 'AlertsService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService',
         'ContributionOpportunitiesService', 'TranslateTextService',
         'TranslationLanguageService', 'UserService',
         function(
-            $scope, $uibModal, AlertsService,
+            $rootScope, $scope, $uibModal, AlertsService,
             ContributionOpportunitiesService, TranslateTextService,
             TranslationLanguageService, UserService) {
           var ctrl = this;
@@ -87,6 +87,8 @@ angular.module('oppia').directive(
             }
             ctrl.moreOpportunitiesAvailable = more;
             ctrl.opportunitiesAreLoading = false;
+            // TODO(#8521): Remove the use of $rootScope.$apply().
+            $rootScope.$apply();
           };
 
           ctrl.onLoadMoreOpportunities = function() {
