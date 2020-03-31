@@ -936,8 +936,8 @@ def _modify_image_filename(exploration_fs, soup):
                     get_filename_with_dimensions(exploration_fs, filename)))
             image['filepath-with-value'] = escaped_filename
         except Exception as e:
-            (entity_type, entity_id, assets) = (
-                exploration_fs.impl.assets_path.split('/'))
+            (entity_type, entity_id) = (
+                exploration_fs.impl.assets_path.split('/')[:2])
             logging.error(
                 '%s %s failed to load image: %s' % (
                     entity_type, entity_id,
