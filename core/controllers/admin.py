@@ -736,9 +736,9 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self):
-        username = self.payload.get('username')
-        removal_type = self.payload.get('removal_type')
-
+        username = self.payload.get('username', None)
+        if username is None:
+            raise self.InvalidInputException('Missing username param')
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
@@ -750,6 +750,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid language_code: %s' % language_code)
 
+        removal_type = self.payload.get('removal_type')
         if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
             user_services.remove_community_reviewer(user_id)
         elif removal_type == constants.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS:
@@ -789,7 +790,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
         self.render_json({})
 
 
-class CommunityReviewersHandler(base.BaseHandler):
+class CommunityReviewersListHandler(base.BaseHandler):
     """Handler to show the existing reviewers."""
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -818,7 +819,9 @@ class CommunityReviewerRightsDataHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        username = self.request.get('username')
+        username = self.request.get('username', None)
+        if username is None:
+            raise self.InvalidInputException('Missing username param')
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(

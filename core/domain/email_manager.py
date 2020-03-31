@@ -1304,7 +1304,6 @@ def send_email_to_new_community_reviewer(
             constants.REVIEW_CATEGORY_VOICEOVER]:
         language_description = utils.get_supported_audio_language_description(
             language_code).capitalize()
-        # Adding 's' at the end of 'translation' to make it 'translations'.
         review_category_description = (
             review_category_data['description_template'] % language_description)
         reviewer_rights_message = (

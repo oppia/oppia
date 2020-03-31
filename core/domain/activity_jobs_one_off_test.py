@@ -37,7 +37,221 @@ import python_utils
 
 gae_search_services = models.Registry.import_search_services()
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(collection_models, exp_models) = models.Registry.import_models(
+    [models.NAMES.collection, models.NAMES.exploration])
+
+
+class AuditContributorsOneOffJobTests(test_utils.GenericTestBase):
+
+    USER_1_ID = 'user_1_id'
+    USER_2_ID = 'user_2_id'
+    USER_3_ID = 'user_3_id'
+    USER_4_ID = 'user_4_id'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = activity_jobs_one_off.AuditContributorsOneOffJob.create_new()
+        activity_jobs_one_off.AuditContributorsOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            activity_jobs_one_off.AuditContributorsOneOffJob.get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        for item in eval_output:
+            if isinstance(item[1], list):
+                item[1] = [ast.literal_eval(triple) for triple in item[1]]
+        return eval_output
+
+    def test_correct_models(self):
+        exp_models.ExpSummaryModel(
+            id='id_1',
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='language_code',
+            community_owned=False,
+            contributor_ids=[self.USER_1_ID],
+            contributors_summary={self.USER_1_ID: 4},
+        ).put()
+
+        collection_models.CollectionSummaryModel(
+            id='id_1',
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='language_code',
+            community_owned=False,
+            contributor_ids=[self.USER_2_ID],
+            contributors_summary={self.USER_2_ID: 4},
+        ).put()
+
+        output = self._run_one_off_job()
+
+        self.assertEqual(len(output), 1)
+        self.assertEqual([['SUCCESS', 2]], output)
+
+    def test_duplicate_ids_models(self):
+        exp_models.ExpSummaryModel(
+            id='id_1',
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='language_code',
+            community_owned=False,
+            contributor_ids=[self.USER_1_ID, self.USER_1_ID],
+            contributors_summary={self.USER_1_ID: 4},
+        ).put()
+
+        collection_models.CollectionSummaryModel(
+            id='id_2',
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='language_code',
+            community_owned=False,
+            contributor_ids=[self.USER_2_ID, self.USER_2_ID],
+            contributors_summary={self.USER_2_ID: 4},
+        ).put()
+
+        output = self._run_one_off_job()
+
+        self.assertEqual(len(output), 2)
+        self.assertIn(['SUCCESS', 2], output)
+        self.assertIn([
+            'DUPLICATE_IDS', [
+                ('id_1', [self.USER_1_ID, self.USER_1_ID], {self.USER_1_ID: 4}),
+                ('id_2', [self.USER_2_ID, self.USER_2_ID], {self.USER_2_ID: 4})
+            ]], output)
+
+    def test_missing_in_summary_models(self):
+        exp_models.ExpSummaryModel(
+            id='id_1',
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='language_code',
+            community_owned=False,
+            contributor_ids=[self.USER_1_ID, self.USER_2_ID],
+            contributors_summary={self.USER_1_ID: 4},
+        ).put()
+
+        collection_models.CollectionSummaryModel(
+            id='id_2',
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='language_code',
+            community_owned=False,
+            contributor_ids=[self.USER_1_ID, self.USER_2_ID],
+            contributors_summary={self.USER_2_ID: 4},
+        ).put()
+
+        output = self._run_one_off_job()
+
+        self.assertEqual(len(output), 2)
+        self.assertIn(['SUCCESS', 2], output)
+        self.assertIn([
+            'MISSING_IN_SUMMARY', [
+                ('id_1', [self.USER_1_ID, self.USER_2_ID], {self.USER_1_ID: 4}),
+                ('id_2', [self.USER_1_ID, self.USER_2_ID], {self.USER_2_ID: 4})
+            ]], output)
+
+    def test_missing_in_ids_models(self):
+        exp_models.ExpSummaryModel(
+            id='id_1',
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='language_code',
+            community_owned=False,
+            contributor_ids=[self.USER_1_ID],
+            contributors_summary={self.USER_1_ID: 2, self.USER_2_ID: 4},
+        ).put()
+
+        collection_models.CollectionSummaryModel(
+            id='id_2',
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='language_code',
+            community_owned=False,
+            contributor_ids=[self.USER_2_ID],
+            contributors_summary={self.USER_1_ID: 1, self.USER_2_ID: 3},
+        ).put()
+
+        output = self._run_one_off_job()
+
+        self.assertEqual(len(output), 2)
+        self.assertIn(['SUCCESS', 2], output)
+        self.assertIn([
+            'MISSING_IN_IDS', [
+                (
+                    'id_1',
+                    [self.USER_1_ID],
+                    {self.USER_1_ID: 2, self.USER_2_ID: 4}
+                ),
+                (
+                    'id_2',
+                    [self.USER_2_ID],
+                    {self.USER_1_ID: 1, self.USER_2_ID: 3}
+                )
+            ]], output)
+
+    def test_combined_models(self):
+        exp_models.ExpSummaryModel(
+            id='id_1',
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='language_code',
+            community_owned=False,
+            contributor_ids=[self.USER_1_ID, self.USER_1_ID, self.USER_2_ID],
+            contributors_summary={self.USER_2_ID: 4},
+        ).put()
+
+        collection_models.CollectionSummaryModel(
+            id='id_2',
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='language_code',
+            community_owned=False,
+            contributor_ids=[self.USER_2_ID, self.USER_3_ID],
+            contributors_summary={self.USER_1_ID: 4, self.USER_2_ID: 4},
+        ).put()
+
+        output = self._run_one_off_job()
+
+        self.assertEqual(len(output), 4)
+        self.assertIn(['SUCCESS', 2], output)
+        self.assertIn([
+            'DUPLICATE_IDS', [(
+                'id_1',
+                [self.USER_1_ID, self.USER_1_ID, self.USER_2_ID],
+                {self.USER_2_ID: 4}
+            )]], output)
+        self.assertIn([
+            'MISSING_IN_SUMMARY', [
+                (
+                    'id_1',
+                    [self.USER_1_ID, self.USER_1_ID, self.USER_2_ID],
+                    {self.USER_2_ID: 4}
+                ),
+                (
+                    'id_2',
+                    [self.USER_2_ID, self.USER_3_ID],
+                    {self.USER_1_ID: 4, self.USER_2_ID: 4}
+                )
+            ]], output)
+        self.assertIn([
+            'MISSING_IN_IDS', [(
+                'id_2',
+                [self.USER_2_ID, self.USER_3_ID],
+                {self.USER_1_ID: 4, self.USER_2_ID: 4}
+            )]], output)
 
 
 class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):

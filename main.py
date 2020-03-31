@@ -211,7 +211,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/removecommunityreviewerhandler',
         admin.RemoveCommunityReviewerHandler),
     get_redirect_route(
-        r'/getcommunityreviewershandler', admin.CommunityReviewersHandler),
+        r'/getcommunityreviewershandler', admin.CommunityReviewersListHandler),
     get_redirect_route(
         r'/communityreviewerrightsdatahandler',
         admin.CommunityReviewerRightsDataHandler),
@@ -690,6 +690,10 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_PUBLISH_HANDLER,
         story_editor.StoryPublishHandler),
+    get_redirect_route(
+        r'%s/<story_id>' %
+        feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX,
+        story_editor.ValidateExplorationsHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(

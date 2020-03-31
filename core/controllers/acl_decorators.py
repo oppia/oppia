@@ -2502,6 +2502,9 @@ def get_decorator_for_accepting_suggestion(decorator):
             if suggestion is None:
                 raise self.PageNotFoundException
 
+            # TODO(#6671): Currently, the check_user_can_review_in_category is
+            # not in use as the suggestion scoring system is not enabled.
+            # Remove this check once the new scoring structure gets implemented.
             if suggestion_services.check_user_can_review_in_category(
                     self.user_id, suggestion.score_category):
                 return handler(self, target_id, suggestion_id, **kwargs)
