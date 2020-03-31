@@ -8436,6 +8436,6 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             '<p>This is value2 for DragAndDropSortInput</p>'
         ]
 
-        actual_outcome_list = exploration.get_all_html_content_strings()
+        actual_outcome_list = exploration.get_all_html_strings()
 
         self.assertEqual(actual_outcome_list, expected_html_list)

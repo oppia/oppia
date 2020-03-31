@@ -3656,8 +3656,8 @@ class Exploration(python_utils.OBJECT):
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
         }
 
-    def get_all_html_content_strings(self):
-        """Gets all html content strings used in this exploration.
+    def get_all_html_strings(self):
+        """Gets all html strings used in this exploration.
 
         Returns:
             list(str). The list of html content strings.
@@ -3666,7 +3666,7 @@ class Exploration(python_utils.OBJECT):
         for state in self.states.values():
             content_html = state.content.html
             interaction_html_list = (
-                state.interaction.get_all_html_content_strings())
+                state.interaction.get_all_html_strings())
             html_list = html_list + [content_html] + interaction_html_list
 
         return html_list
@@ -3684,7 +3684,7 @@ class Exploration(python_utils.OBJECT):
             state = self.states[state_name]
             content_html = state.content.html
             interaction_html_list = (
-                state.interaction.get_all_html_content_strings())
+                state.interaction.get_all_html_strings())
             html_list = [content_html] + interaction_html_list
             state_names_to_html_strings_mapping[state_name] = html_list
         return state_names_to_html_strings_mapping

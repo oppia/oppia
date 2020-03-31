@@ -442,7 +442,7 @@ class ExplorationContentValidationJobForCKEditor(
                 % python_utils.convert_to_bytes(e), [item.id])
             return
 
-        html_list = exploration.get_all_html_content_strings()
+        html_list = exploration.get_all_html_strings()
 
         err_dict = html_validation_service.validate_rte_format(
             html_list, feconf.RTE_FORMAT_CKEDITOR)
@@ -488,7 +488,7 @@ class InteractionCustomizationArgsValidationJob(
                 % python_utils.UNICODE(e), [item.id])
             return
 
-        html_list = exploration.get_all_html_content_strings()
+        html_list = exploration.get_all_html_strings()
         err_dict = html_validation_service.validate_customization_args(
             html_list)
 

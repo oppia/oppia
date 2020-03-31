@@ -42,7 +42,7 @@ def mock_get_filename_with_dimensions(filename, unused_exp_id):
 class StateDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on states."""
 
-    def test_get_all_html_content_strings(self):
+    def test_get_all_html_strings(self):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'owner_id', end_state_name='END',
             interaction_id='DragAndDropSortInput')
@@ -73,7 +73,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict(answer_group_dict)]
 
         html_list = (
-            exploration.init_state.interaction.get_all_html_content_strings())
+            exploration.init_state.interaction.get_all_html_strings())
         self.assertEqual(
             html_list,
             ['<p>Feedback</p>', '<p>list_of_sets_of_html_strings</p>', '', ''])

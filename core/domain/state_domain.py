@@ -522,8 +522,8 @@ class InteractionInstance(python_utils.OBJECT):
             cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], {})
 
 
-    def get_all_html_content_strings(self):
-        """Get all html content strings in the interaction.
+    def get_all_html_strings(self):
+        """Get all html strings in the interaction.
 
         Returns:
             list(str): The list of all html content strings in the interaction.

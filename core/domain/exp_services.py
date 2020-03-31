@@ -1403,7 +1403,7 @@ def get_image_filenames_from_exploration(exploration):
             filenames.append(state.interaction.customization_args[
                 'imageAndRegions']['value']['imagePath'])
 
-    html_list = exploration.get_all_html_content_strings()
+    html_list = exploration.get_all_html_strings()
     rte_components_in_exp = []
     for html_string in html_list:
         rte_components_in_exp = (
