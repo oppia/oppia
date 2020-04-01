@@ -53,15 +53,26 @@ def remove_release_labels(repo):
             repo.get_issues(
                 state='open', labels=[released_label]))
 
-    if current_release_prs:
-        raise Exception(
-            'Following PRs are not released: %s.' % (
-                [pr.number for pr in current_release_prs]))
-
     released_prs = repo.get_issues(state='closed', labels=[released_label])
+
+    current_release_pr_numbers = [pr.number for pr in current_release_prs]
+    released_pr_numbers = [pr.number for pr in released_prs]
+
+    unreleased_pr_numbers = [
+        pr_num for pr_num in current_release_pr_numbers if pr_num not in (
+            released_pr_numbers)]
+    if unreleased_pr_numbers:
+        raise Exception(
+            'Following PRs are not released: %s.' % unreleased_pr_numbers)
+
+    for pr in current_release_prs:
+        pr.remove_from_labels(release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
+        python_utils.PRINT('%s label removed from PR: #%s' % (
+            release_constants.LABEL_FOR_CURRENT_RELEASE_PRS, pr.number))
     for pr in released_prs:
         pr.remove_from_labels(release_constants.LABEL_FOR_RELEASED_PRS)
-        python_utils.PRINT('Label removed from PR: #%s' % pr.number)
+        python_utils.PRINT('%s label removed from PR: #%s' % (
+            release_constants.LABEL_FOR_RELEASED_PRS, pr.number))
 
 
 def remove_blocking_bugs_milestone_from_issues(repo):
