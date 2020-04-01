@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for TopicViewerBackendApiService.
  */
+
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
@@ -117,7 +118,7 @@ describe('Topic viewer backend API service', () => {
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResultsObjects);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );

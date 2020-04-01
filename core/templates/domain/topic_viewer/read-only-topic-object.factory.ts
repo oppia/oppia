@@ -48,7 +48,8 @@ export class ReadOnlyTopic {
   _skillDescriptions: ISkillDescriptions;
   _trainTabShouldBeDisplayed: boolean;
 
-  constructor(topicName: string, topicId: string,
+  constructor(
+      topicName: string, topicId: string,
       canonicalStorySummaries: Array<StorySummary>,
       additionalStorySummaries: Array<StorySummary>,
       uncategorizedSkillSummaries: Array<SkillSummary>,
@@ -117,7 +118,7 @@ export class ReadOnlyTopicObjectFactory {
     this._subtopicObjectFactory = subtopicObjectFactory;
     this._skillSummaryObjectFactory = skillSummaryObjectFactory;
   }
-
+  // TODO(#7165): Replace any with exact type
   createFromBackendDict(topicDataDict: any): ReadOnlyTopic {
     let subtopics: Array<Subtopic> = topicDataDict.subtopics.map(
       (subtopic: Subtopic) => {
