@@ -340,7 +340,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             self.user_id)
         thread_ids.append('exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID)
         thread_summaries, number_of_unread_threads = (
-            feedback_services.get_thread_summaries(self.user_id, thread_ids))
+            feedback_services.get_exp_thread_summaries(
+                self.user_id, thread_ids))
         exploration_titles = (
             ['Bridges in England', 'Sillat Suomi', 'Leaning tower of Pisa'])
 
@@ -371,7 +372,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         feedback_services.create_message(
             threads[0].id, self.owner_id, None, None, 'editor message')
         _, number_of_unread_threads = (
-            feedback_services.get_thread_summaries(self.user_id, thread_ids))
+            feedback_services.get_exp_thread_summaries(
+                self.user_id, thread_ids))
 
         # Check if the number of unread messages is equal to 1.
         self.assertEqual(number_of_unread_threads, 1)
@@ -390,12 +392,25 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread.message_count = 0
         thread.put()
 
-        thread_summaries, _ = feedback_services.get_thread_summaries(
+        thread_summaries, _ = feedback_services.get_exp_thread_summaries(
             self.owner_id, [thread_id_1, thread_id_2])
 
         self.assertEqual(len(thread_summaries), 2)
         self.assertEqual(thread_summaries[0].total_message_count, 1)
         self.assertEqual(thread_summaries[1].total_message_count, 1)
+
+    def test_get_thread_summaries_only_returns_threads_for_explorations(self):
+        exp_thread_id = feedback_services.create_thread(
+            'exploration', self.EXP_ID_1, None, 'unused subject', 'unused text')
+        skill_thread_id = feedback_services.create_thread(
+            'skill', 'skillid1', None, 'unused subject', 'unused text')
+
+        thread_summaries, _ = feedback_services.get_exp_thread_summaries(
+            self.owner_id, [exp_thread_id, skill_thread_id])
+
+        self.assertEqual(len(thread_summaries), 1)
+        self.assertEqual(
+            thread_summaries[0].exploration_title, 'Bridges in England')
 
     def test_update_messages_read_by_the_user(self):
         feedback_services.create_thread(
