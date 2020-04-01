@@ -739,8 +739,6 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
         username = self.payload.get('username', None)
         if username is None:
             raise self.InvalidInputException('Missing username param')
-        removal_type = self.payload.get('removal_type')
-
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
@@ -752,6 +750,7 @@ class RemoveCommunityReviewerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid language_code: %s' % language_code)
 
+        removal_type = self.payload.get('removal_type')
         if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
             user_services.remove_community_reviewer(user_id)
         elif removal_type == constants.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS:

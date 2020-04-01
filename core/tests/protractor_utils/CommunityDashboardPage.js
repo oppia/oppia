@@ -24,10 +24,59 @@ var CommunityDashboardPage = function() {
   var navigateToTranslateTextTabButton = element(
     by.css('.protractor-test-translateTextTab'));
 
+  var reviewRightsDiv = element(by.css('.protractor-test-review-rights'));
+
+  this.get = function() {
+    browser.get('/community_dashboard');
+    waitFor.pageToFullyLoad();
+  };
+
   this.getTranslateTextTab = function() {
     return new CommunityDashboardTranslateTextTab
       .CommunityDashboardTranslateTextTab();
   };
+
+  this.expectUserToBeTranslationReviewer = function(language) {
+    waitFor.visibilityOf(
+      reviewRightsDiv, 'User does not have rights to review translation');
+
+    var translationReviewRightsElement = element(by.css(
+      '.protractor-test-translation-' + language + '-reviewer'));
+    waitFor.visibilityOf(
+      translationReviewRightsElement,
+      'User does not have rights to review translation in language: ' + language
+    );
+  };
+
+  var _expecteUserToBeReviewer = function(
+      reviewCategory, langaugeDescription = null) {
+    waitFor.visibilityOf(
+      reviewRightsDiv, 'User does not have rights to review translation');
+
+    var reviewRightsElementClassName = ('.protractor-test-' + reviewCategory);
+    if (langaugeDescription !== null) {
+      reviewRightsElementClassName += '-' + langaugeDescription;
+    }
+    reviewRightsElementClassName += '-reviewer';
+
+    var reviewRightsElement = element(by.css(reviewRightsElementClassName));
+    waitFor.visibilityOf(
+      reviewRightsElement,
+      'User does not have rights to review ' + reviewCategory);
+  };
+
+  this.expectUserToBeTranslationReviewer = function(langaugeDescription) {
+    _expecteUserToBeReviewer('translation', langaugeDescription);
+  };
+
+  this.expectUserToBeVoiceoverReviewer = function(langaugeDescription) {
+    _expecteUserToBeReviewer('voiceover', langaugeDescription);
+  };
+
+  this.expectUserToBeQuestionReviewer = function() {
+    _expecteUserToBeReviewer('question');
+  };
+
   this.navigateToTranslateTextTab = function() {
     waitFor.elementToBeClickable(
       navigateToTranslateTextTabButton, 'Translate text tab is not clickable');

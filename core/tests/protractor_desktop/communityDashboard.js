@@ -17,7 +17,9 @@
  */
 
 var general = require('../protractor_utils/general.js');
+var users = require('../protractor_utils/users.js');
 
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var CommunityDashboardPage = require(
   '../protractor_utils/CommunityDashboardPage.js');
 
@@ -30,13 +32,69 @@ describe('Community dashboard page', function() {
       new CommunityDashboardPage.CommunityDashboardPage());
     communityDashboardTranslateTextTab = (
       communityDashboardPage.getTranslateTextTab());
-    browser.get('/community_dashboard');
   });
 
   it('should allow user to switch to translate text tab', function() {
+    communityDashboardPage.get();
     communityDashboardPage.navigateToTranslateTextTab();
     communityDashboardTranslateTextTab.changeLanguage('Hindi');
     communityDashboardTranslateTextTab.expectSelectedLanguageToBe('Hindi');
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
+});
+
+describe('Admin page community reviewer form', function() {
+  var adminPage = null;
+  var communityDashboardPage = null;
+
+  beforeAll(function() {
+    adminPage = new AdminPage.AdminPage();
+    communityDashboardPage = (
+      new CommunityDashboardPage.CommunityDashboardPage());
+    users.createUser('translator@community.com', 'translator');
+    users.createUser('voiceartist@community.com', 'voiceartist');
+    users.createUser('questionreviewer@community.com', 'questionreviewer');
+    users.createAdmin('management@adminTab.com', 'management');
+  });
+
+  beforeEach(function() {
+    users.login('management@adminTab.com', true);
+  });
+
+  it('should allow admin to add translation reviewer', function() {
+    adminPage.get();
+    adminPage.assignTranslationReviewer('Hindi', 'translator');
+    users.logout();
+
+    users.login('translator@community.com');
+    communityDashboardPage.get();
+    communityDashboardPage.expectUserToBeTranslationReviewer('Hindi');
+    users.logout();
+  });
+
+  it('should allow admin to add voiceover reviewer', function() {
+    adminPage.get();
+    adminPage.assignVoiceoverReviewer('Hindi', 'voiceartist');
+    users.logout();
+
+    users.login('voiceartist@community.com');
+    communityDashboardPage.get();
+    communityDashboardPage.expectUserToBeVoiceoverReviewer('Hindi');
+    users.logout();
+  });
+
+  it('should allow admin to add question reviewer', function() {
+    adminPage.get();
+    adminPage.assignQuestionReviewer('questionreviewer');
+    users.logout();
+
+    users.login('questionreviewer@community.com');
+    communityDashboardPage.get();
+    communityDashboardPage.expectUserToBeQuestionReviewer('Hindi');
+    users.logout();
   });
 
   afterEach(function() {
