@@ -323,8 +323,8 @@ angular.module('oppia').factory('ResponsesService', [
       // Updates answer choices when the interaction requires it -- for
       // example, the rules for multiple choice need to refer to the multiple
       // choice interaction's customization arguments.
-      updateAnswerChoices: function(newAnswerChoices, oldToNewListMapping,
-          callback) {
+      updateAnswerChoices: function(
+          newAnswerChoices, oldToNewListMapping, callback) {
         var oldAnswerChoices = angular.copy(_answerChoices);
         _answerChoices = newAnswerChoices;
 
@@ -370,9 +370,10 @@ angular.module('oppia').factory('ResponsesService', [
           }
           _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
             var newRules = angular.copy(answerGroup.rules);
-            _updateAnswerGroup(answerGroupIndex, {
-              rules: newRules
-            }, callback);
+            _updateAnswerGroup(
+              answerGroupIndex, {
+                rules: newRules
+              }, callback);
           });
         }
 
