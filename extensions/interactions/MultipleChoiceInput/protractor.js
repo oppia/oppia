@@ -19,16 +19,35 @@
 
 var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 
-// The members of richTextInstructionsArray are functions, one for each option,
-// which will each be passed a 'handler' that they can use to edit the
+// The customizeInstructionsArray contains two elements, The first element is
+// an object, which contains information regrading the type of customization to
+// be done on the interaction(i.e intialize or create interaction, add elements,
+// delete elements). The second element of customizeInstructionsArray is an
+// array, whose elements containing instructions regarding editing of rich text
+// area of options. The members of this array are functions, one for each
+// option, which will each be passed a 'handler' that they can use to edit the
 // rich-text area of the option, for example by
 //   handler.appendUnderlineText('emphasised');
-var customizeInteraction = function(elem, richTextInstructionsArray) {
-  forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
-  for (var i = 0; i < richTextInstructionsArray.length; i++) {
-    var richTextEditor = forms.ListEditor(elem).editItem(i, 'RichText');
-    richTextEditor.clear();
-    richTextInstructionsArray[i](richTextEditor);
+var customizeInteraction = function(elem, customizeInstructionsArray) {
+  if (customizeInstructionsArray[0].editAction === 'delete') {
+    for (var i = 0; i < customizeInstructionsArray[1].length; i++) {
+      forms.ListEditor(elem).deleteItem(customizeInstructionsArray[1][i]);
+    }
+  } else if (
+    customizeInstructionsArray[0].editAction === 'add') {
+    for (var i = 0; i < customizeInstructionsArray[1].length; i++) {
+      var richTextEditor = forms.ListEditor(elem).addItem('RichText');
+      richTextEditor.clear();
+      customizeInstructionsArray[1][i](richTextEditor);
+    }
+  } else if (
+    customizeInstructionsArray[0].editAction === 'create') {
+    forms.ListEditor(elem).setLength(customizeInstructionsArray[1].length);
+    for (var i = 0; i < customizeInstructionsArray[1].length; i++) {
+      var richTextEditor = forms.ListEditor(elem).editItem(i, 'RichText');
+      richTextEditor.clear();
+      customizeInstructionsArray[1][i](richTextEditor);
+    }
   }
 };
 

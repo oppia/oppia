@@ -94,9 +94,10 @@ describe('Enable correctness feedback and set correctness', function() {
 
     // Create interaction first.
     explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
-      forms.toRichText('Correct!'),
-      forms.toRichText('Wrong!')
-    ]);
+      { editAction: 'create'},
+      [forms.toRichText('Correct!'),
+        forms.toRichText('Wrong!')
+      ]]);
     explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', forms.toRichText('Good!'),
       'End', true, 'Equals', 'Correct!');
@@ -187,9 +188,10 @@ describe('Enable correctness feedback and set correctness', function() {
       'Select the right option.'));
 
     explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
-      forms.toRichText('Correct!'),
-      forms.toRichText('Wrong!')
-    ]);
+      { editAction: 'create'}, [
+        forms.toRichText('Correct!'),
+        forms.toRichText('Wrong!')
+      ]]);
     explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', forms.toRichText('Good!'),
       'Second', true, 'Equals', 'Correct!');
@@ -203,8 +205,9 @@ describe('Enable correctness feedback and set correctness', function() {
       'Select the right option.'));
 
     explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
-      forms.toRichText('Correct!'),
-      forms.toRichText('Wrong!')
+      { editAction: 'create'},
+      [forms.toRichText('Correct!'),
+        forms.toRichText('Wrong!')]
     ]);
     explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', forms.toRichText('Good!'),
@@ -309,10 +312,50 @@ describe('Core exploration functionality', function() {
       richTextEditor.appendUnorderedList(['an entry', 'another entry']);
     });
     explorationEditorMainTab.setInteraction(
-      'MultipleChoiceInput',
-      [forms.toRichText('option A'), forms.toRichText('option B')]);
+      'MultipleChoiceInput', [{ editAction: 'create'},
+        [forms.toRichText('option A'), forms.toRichText('option B'),
+          forms.toRichText('option C'), forms.toRichText('option D'),
+          forms.toRichText('option E'), forms.toRichText('option F')]]);
+    explorationEditorMainTab.addResponse('MultipleChoiceInput',
+      function(richTextEditor) {
+        richTextEditor.appendBoldText('correct');
+      }, 'final card', true, 'Equals', 'option A');
+    explorationEditorMainTab.getResponseEditor(0)
+      .addRule('MultipleChoiceInput', 'Equals', 'option C');
+    explorationEditorMainTab.getResponseEditor(0)
+      .addRule('MultipleChoiceInput', 'Equals', 'option F');
+    explorationEditorMainTab.getResponseEditor(0)
+      .expectFeedbackInstructionToBe('correct');
+
+    explorationEditorMainTab.getResponseEditor(0).expectMultipleRulesToBe(
+      [['MultipleChoiceInput', 'Equals', ['option A']],
+        ['MultipleChoiceInput', 'Equals', ['option C']],
+        ['MultipleChoiceInput', 'Equals', ['option F']]]);
+    // delete the options corresponding to answer rules.
+    element(by.css('.protractor-test-interaction')).click();
+    explorationEditorMainTab.editInteraction(
+      'MultipleChoiceInput', [{editAction: 'delete'}, [0, 1, 3]]);
+    // add 3 more options to the interaction.
+    element(by.css('.protractor-test-interaction')).click();
+    explorationEditorMainTab.editInteraction(
+      'MultipleChoiceInput', [{editAction: 'add'},
+        [forms.toRichText('option G '),
+          forms.toRichText('option H'), forms.toRichText('option I')]]);
+    // validates that the answer rules are invalid if the corresponding option
+    // is deleted
+    explorationEditorMainTab.getResponseEditor(0).expectMultipleRulesToBe(
+      [['MultipleChoiceInput', 'Equals', ['[INVALID]']],
+        ['MultipleChoiceInput', 'Equals', ['[INVALID]']],
+        ['MultipleChoiceInput', 'Equals', ['[INVALID]']]]);
+
+    // delete the the invalid response and add a new response.
+    explorationEditorMainTab.getResponseEditor(0).deleteResponse();
+    explorationEditorMainTab.addResponse('MultipleChoiceInput',
+      function(richTextEditor) {
+        richTextEditor.appendBoldText('correct');
+      }, 'final card', false, 'Equals', 'option I');
     explorationEditorMainTab.getResponseEditor('default').setDestination(
-      'final card', true, null);
+      'final card', false, null);
 
     // Setup a terminating state.
     explorationEditorMainTab.moveToState('final card');
@@ -323,8 +366,11 @@ describe('Core exploration functionality', function() {
     explorationPlayerPage.expectExplorationToNotBeOver();
     explorationPlayerPage.expectInteractionToMatch(
       'MultipleChoiceInput',
-      [forms.toRichText('option A'), forms.toRichText('option B')]);
-    explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'option B');
+      [forms.toRichText('option B'), forms.toRichText('option D'),
+        forms.toRichText('option E'), forms.toRichText('option G'),
+        forms.toRichText('option H'), forms.toRichText('option I')]);
+    explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'option I');
+    explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToBeOver();
   });
 

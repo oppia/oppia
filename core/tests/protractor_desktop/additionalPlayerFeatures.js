@@ -23,7 +23,7 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
+var workflow = require('../protractor_utiprotractor_utilsls/workflow.js');
 
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
@@ -260,8 +260,8 @@ describe('Full exploration editor', function() {
     explorationEditorMainTab.setContent(forms.toRichText(
       'Parent Exploration Content'));
     explorationEditorMainTab.setInteraction(
-      'MultipleChoiceInput',
-      [forms.toRichText('Correct'), forms.toRichText('Incorrect')]);
+      'MultipleChoiceInput', [{ editAction: 'create'},
+        [forms.toRichText('Correct'), forms.toRichText('Incorrect')]]);
     explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', null, 'card 2', true,
       'Equals', 'Correct');
@@ -285,8 +285,8 @@ describe('Full exploration editor', function() {
     explorationEditorMainTab.setContent(forms.toRichText(
       'Parent Exploration Content'));
     explorationEditorMainTab.setInteraction(
-      'MultipleChoiceInput',
-      [forms.toRichText('Correct'), forms.toRichText('Incorrect')]);
+      'MultipleChoiceInput', [{ editAction: 'create'},
+        [forms.toRichText('Correct'), forms.toRichText('Incorrect')]]);
     explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', null, 'card 2', true,
       'Equals', 'Correct');
@@ -396,8 +396,8 @@ describe('Full exploration editor', function() {
     explorationEditorMainTab.setContent(forms.toRichText(
       'this is card 2 with previous answer {{answer}}'));
     explorationEditorMainTab.setInteraction(
-      'MultipleChoiceInput',
-      [forms.toRichText('return'), forms.toRichText('complete')]);
+      'MultipleChoiceInput', [{ editAction: 'create'},
+        [forms.toRichText('return'), forms.toRichText('complete')]]);
     explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', null, 'card 1', false,
       'Equals', 'return');

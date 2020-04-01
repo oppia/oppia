@@ -30,7 +30,7 @@ describe('Responses Service', function() {
   var interactionData = null;
   var interactionDataWithRules = null;
   var LoggerService = null;
-
+  var oldToNewListMapping = {};
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -327,7 +327,7 @@ describe('Responses Service', function() {
       val: 'b'
     }, {
       val: 'c'
-    }], function() {});
+    }], oldToNewListMapping, function() {});
     ResponsesService.changeActiveAnswerGroupIndex(0);
 
     var newAnswerChoices = [{
@@ -338,7 +338,8 @@ describe('Responses Service', function() {
       val: 'a'
     }];
     var callbackSpy = jasmine.createSpy('callback');
-    ResponsesService.updateAnswerChoices(newAnswerChoices, callbackSpy);
+    ResponsesService.updateAnswerChoices(
+      newAnswerChoices, oldToNewListMapping, callbackSpy);
 
     var expectedRules = ['c'];
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
@@ -362,7 +363,7 @@ describe('Responses Service', function() {
       val: 'b'
     }, {
       val: 'c'
-    }], function() {});
+    }], oldToNewListMapping, function() {});
 
     var newAnswerChoices = [{
       val: 'd'
@@ -372,7 +373,8 @@ describe('Responses Service', function() {
       val: 'f'
     }];
     var callbackSpy = jasmine.createSpy('callback');
-    ResponsesService.updateAnswerChoices(newAnswerChoices, callbackSpy);
+    ResponsesService.updateAnswerChoices(
+      newAnswerChoices, oldToNewListMapping, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
     expectedAnswerGroup[0].rules[0].inputs.x = ['f', 'd', 'e'];
@@ -402,7 +404,7 @@ describe('Responses Service', function() {
       val: 'b'
     }, {
       val: 'c'
-    }], function() {});
+    }], oldToNewListMapping, function() {});
 
     var newAnswerChoices = [{
       val: 'c'
@@ -410,7 +412,8 @@ describe('Responses Service', function() {
       val: 'b'
     }];
     var callbackSpy = jasmine.createSpy('callback');
-    ResponsesService.updateAnswerChoices(newAnswerChoices, callbackSpy);
+    ResponsesService.updateAnswerChoices(
+      newAnswerChoices, oldToNewListMapping, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
     expectedAnswerGroup[0].rules[0].inputs.x = '';
@@ -438,7 +441,7 @@ describe('Responses Service', function() {
       val: 'b'
     }, {
       val: 'c'
-    }], function() {});
+    }], oldToNewListMapping, function() {});
 
     var newAnswerChoices = [{
       val: 'd'
@@ -448,7 +451,8 @@ describe('Responses Service', function() {
       val: 'f'
     }];
     var callbackSpy = jasmine.createSpy('callback');
-    ResponsesService.updateAnswerChoices(newAnswerChoices, callbackSpy);
+    ResponsesService.updateAnswerChoices(
+      newAnswerChoices, oldToNewListMapping, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
     expectedAnswerGroup[0].rules[0].inputs.x = '';
@@ -475,7 +479,7 @@ describe('Responses Service', function() {
       val: 'b'
     }, {
       val: 'c'
-    }], function() {});
+    }], oldToNewListMapping, function() {});
 
     var newAnswerChoices = [{
       val: 'd'
@@ -485,7 +489,8 @@ describe('Responses Service', function() {
       val: 'f'
     }];
     var callbackSpy = jasmine.createSpy('callback');
-    ResponsesService.updateAnswerChoices(newAnswerChoices, callbackSpy);
+    ResponsesService.updateAnswerChoices(
+      newAnswerChoices, oldToNewListMapping, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
     expectedAnswerGroup[0].rules[0].inputs.x = [];
@@ -507,7 +512,7 @@ describe('Responses Service', function() {
       val: 'b'
     }, {
       val: 'c'
-    }], function() {});
+    }], oldToNewListMapping, function() {});
 
     var newAnswerChoices = [{
       val: 'c'
@@ -517,7 +522,8 @@ describe('Responses Service', function() {
       val: 'a'
     }];
     var callbackSpy = jasmine.createSpy('callback');
-    ResponsesService.updateAnswerChoices(newAnswerChoices, callbackSpy);
+    ResponsesService.updateAnswerChoices(
+      newAnswerChoices, oldToNewListMapping, callbackSpy);
 
     expect(callbackSpy).not.toHaveBeenCalled();
     expect(ResponsesService.getAnswerGroup(0)).toEqual(
