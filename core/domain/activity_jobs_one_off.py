@@ -72,7 +72,7 @@ class FixContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 (model.id, model.contributor_ids, model.contributors_summary)
             )
         if modified:
-            model.put()
+            model.put(update_last_updated_time=False)
             yield ('SUCCESS_FIXED', model.id)
         else:
             yield ('SUCCESS_CORRECT', model.id)
