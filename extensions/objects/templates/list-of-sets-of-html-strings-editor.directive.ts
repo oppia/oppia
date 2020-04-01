@@ -39,9 +39,10 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
           return allowedList;
         };
 
-        ctrl.selectedItem = function(choiceListIndex, selectedRankString) {
+        ctrl.selectedItem = function(choiceListIndex) {
           var choiceHtml = ctrl.choices[choiceListIndex].id;
-          var selectedRank = parseInt(selectedRankString) - 1;
+          var selectedRank = parseInt(
+            ctrl.choices[choiceListIndex].selectedRank) - 1;
           errorMessage = '';
           // Reorder the ctrl.choices array to make it consistent with the
           // selected rank.
@@ -93,10 +94,6 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
           return errorMessage;
         };
         ctrl.$onInit = function() {
-          if (!ctrl.selectedRank) {
-            ctrl.selectedRank = '';
-          }
-
           if (!ctrl.maxPrevIndex) {
             ctrl.maxPrevIndex = 1;
           }
@@ -123,11 +120,6 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
                 }
               }
             }
-          }
-
-          if (ctrl.selectedRank !== '') {
-            ctrl.maxPrevIndex = math.max(parseInt(ctrl.selectedRank),
-              ctrl.maxPrevIndex);
           }
         };
       }]
