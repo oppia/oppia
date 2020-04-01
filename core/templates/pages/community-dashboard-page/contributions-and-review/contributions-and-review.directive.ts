@@ -441,7 +441,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                       });
                     }
                     if (ctrl.reviewTabs.length > 0) {
-                      ctrl.switchToReviewTab(ctrl.SUGGESTION_TYPE_QUESTION);
+                      ctrl.switchToReviewTab(ctrl.reviewTabs[0].suggestionType);
                     } else {
                       ctrl.switchToContributionsTab(
                         ctrl.SUGGESTION_TYPE_QUESTION);
