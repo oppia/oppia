@@ -26,27 +26,19 @@ import { ExpressionParserService } from
 class ExpressionError extends Error {
   constructor() {
     super();
-    // NOTE TO DEVELOPERS: As per the recommendation of TypeScript
-    //  we need to adjust the prototype manually right after the super() call
-    //  For more information refer to this link below:
-    //  https://github.com/Microsoft/TypeScript-wiki/blob/master/Breaking-Changes.md#extending-built-ins-like-error-array-and-map-may-no-longer-work
-    Object.setPrototypeOf(this, ExpressionError.prototype);
+    // NOTE TO DEVELOPERS: As per recommendation of TypeScript
+    // extending Error would need to adjust the protoype manually
+    // This code below would restore the protoype chain
+    // Source: https://stackoverflow.com/a/58417721/4859885
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.name = new.target.name;
   }
 }
 
 class ExprUndefinedVarError extends ExpressionError {
   constructor(public varname: string, public envs: Array<object>) {
     super();
-    // NOTE TO DEVELOPERS: As per the recommendation of TypeScript
-    //  we need to adjust the prototype manually right after the super() call
-    //  For more information refer to this link below:
-    //  https://github.com/Microsoft/TypeScript-wiki/blob/master/Breaking-Changes.md#extending-built-ins-like-error-array-and-map-may-no-longer-work
-    Object.setPrototypeOf(this, ExprUndefinedVarError.prototype);
-    this.varname = varname;
-    this.envs = envs;
   }
-
-  public name: string = 'ExprUndefinedVarError';
 
   public toString(): string {
     return this.name + ': ' + this.varname + ' not found in ' + this.envs;
@@ -57,21 +49,11 @@ class ExprWrongNumArgsError extends ExpressionError {
   constructor(public args: Array<number|string>, public expectedMin: number,
       public expectedMax: number) {
     super();
-    // NOTE TO DEVELOPERS: As per the recommendation of TypeScript
-    //  we need to adjust the prototype manually right after the super() call
-    // For more information refer to this link below:
-    // https://github.com/Microsoft/TypeScript-wiki/blob/master/Breaking-Changes.md#extending-built-ins-like-error-array-and-map-may-no-longer-work
-    Object.setPrototypeOf(this, ExprWrongNumArgsError.prototype);
-    this.args = args;
-    this.expectedMin = expectedMin;
-    this.expectedMax = expectedMax;
   }
-
-  public name: string = 'ExprWrongNumArgsError';
 
   public toString(): string {
     return this.name + ': {' + this.args + '} not in range [' +
-        this.expectedMin + ',' + this.expectedMax + ']';
+    this.expectedMin + ',' + this.expectedMax + ']';
   }
 }
 
@@ -79,17 +61,7 @@ class ExprWrongArgTypeError extends ExpressionError {
   constructor(public arg: number|string, public actualType: string,
     public expectedType: string) {
     super();
-    // NOTE TO DEVELOPERS: As per the recommendation of TypeScript
-    //  we need to adjust the prototype manually right after the super() call
-    // For more information refer to this link below:
-    // https://github.com/Microsoft/TypeScript-wiki/blob/master/Breaking-Changes.md#extending-built-ins-like-error-array-and-map-may-no-longer-work
-    Object.setPrototypeOf(this, ExprWrongArgTypeError.prototype);
-    this.arg = arg;
-    this.actualType = actualType;
-    this.expectedType = expectedType;
   }
-
-  public name: string = 'ExprWrongArgTypeError';
 
   public toString(): string {
     if (this.arg === null) {
