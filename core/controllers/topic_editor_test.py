@@ -647,6 +647,15 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             response['error'],
             'You must be logged in to access this resource.')
 
+    def test_cannot_delete_invalid_topic(self):
+        # Check that an invalid topic can not be deleted.
+        self.login(self.ADMIN_EMAIL)
+        self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                'invalid_topic_id'), expected_status_int=404)
+        self.logout()
+
     def test_editable_topic_handler_delete(self):
         # Check that admins can delete a topic.
         self.login(self.ADMIN_EMAIL)
@@ -673,14 +682,6 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
                 topic_services.get_new_topic_id()), expected_status_int=404)
 
-        self.logout()
-
-        # Check that an invalid topic can not be deleted.
-        self.login(self.ADMIN_EMAIL)
-        self.delete_json(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
-                'invalid_topic_id'), expected_status_int=404)
         self.logout()
 
 
