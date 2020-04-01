@@ -13,7 +13,7 @@
   <div>
     <div class="oppia-translatable-text-section">
       <strong>Please translate the given content in <[languageDescription]>:</strong>
-      <a class="oppia-skip-button" ng-disabled="false" ng-click="skipActiveTranslation()"> skip </a>
+      <a class="oppia-skip-button" href="" ng-if="moreAvailable" ng-click="skipActiveTranslation()">skip</a>
     </div>
     <div class="oppia-loading-text" ng-if="loadingData || uploadingTranslation">
       <div class="oppia-loading-text1 oppia-animate-fadein">

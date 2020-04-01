@@ -27,15 +27,15 @@ export class CommunityDashboardConstants {
     submitQuestionTab: {
       ariaLabel: 'See opportunities for adding new questions.',
       tabName: 'Submit Question',
-      description: 'Provide question in a topic of your choice for ' +
-        'students to answer.',
+      description: 'Submit a question for students to answer while ' +
+        'practicing that skill.',
       customizationOptions: ['sort']
     },
     translateTextTab: {
       ariaLabel: 'See opportunities for translation.',
       tabName: 'Translate Text',
-      description: 'Translate the text in the lessons to break the ' +
-        'language barrier for non-English speaker.',
+      description: 'Translate the lesson text to help non-English speakers ' +
+        'follow the lessons.',
       customizationOptions: ['language', 'sort']
     }
   };

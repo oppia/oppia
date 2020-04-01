@@ -17,7 +17,7 @@
   <div class="oppia-end-availability" ng-if="!opportunityDataIsLoading && !isMoreOpportunitiesAvailable()">
     <div class="oppia-end-availability-line"></div>
     <div class="oppia-opportunity-availablity-message" ng-if="getOpportunities().length === 0">No opportunity available!</div>
-    <div class="oppia-opportunity-availablity-message" ng-if="getOpportunities().length !== 0">***</div>
+    <div class="oppia-opportunity-availablity-message" ng-if="getOpportunities().length !== 0">End of results.</div>
     <div class="oppia-end-availability-line"></div>
   </div>
 </div>
@@ -25,7 +25,9 @@
   .oppia-opportunity-availablity-message {
     color: #ababab;
     font-style: italic;
+    overflow: hidden;
     padding: 0 2%;
+    white-space: nowrap;
   }
   .oppia-end-availability {
     align-items: center;
@@ -41,7 +43,7 @@
     margin: auto;
     max-width: 1200px;
     overflow: auto;
-    width: 85%;
+    width: 80%;
   }
   /* All of the css for opportunities-list-item is added here to avoid having duplicate css properties.*/
   .oppia-opportunities-button {
@@ -70,7 +72,8 @@
     height: 12px;
   }
   .oppia-opportunities-progress-label {
-    margin-left: 1px;
+    font-size: 12px;
+    margin-left: 5px;
     margin-top: -6px;
   }
   .oppia-opportunities-subheading {
@@ -103,8 +106,7 @@
   .oppia-opportunities-label {
     background-color: #ffffff;
     border-radius: 8px;
-    height: 20px;
-    min-width: 200px;
+    min-width: 150px;
     text-align: center;
     opacity: 0.8;
   }

@@ -322,9 +322,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(SuggestionModel). A list of suggestions that are of the given
                 type, which the given user has created.
         """
-        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
+        return cls.get_all().filter(
             cls.suggestion_type == suggestion_type).filter(
-                cls.author_id == user_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+                cls.author_id == user_id).order(-cls.created_on).fetch(
+                    feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_all_score_categories(cls):

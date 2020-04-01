@@ -22,10 +22,11 @@
         </span>
       </div>
       <div class="oppia-contributor-username-container" data-tab-name="username">
-        <span ng-show="!$ctrl.username">Guest</span>
-        <span ng-show="$ctrl.username"><[$ctrl.username]></span>
+        <lazy-loading ng-show="$ctrl.userInfoIsLoading"></lazy-loading>
+        <span ng-show="!$ctrl.userInfoIsLoading && $ctrl.userIsLoggedIn"><[$ctrl.username]></span>
+        <span ng-show="!$ctrl.userInfoIsLoading && !$ctrl.userIsLoggedIn">Guest</span>
       </div>
-      <div ng-if="$ctrl.userIsReviewer">
+      <div class="oppia-review-right-details-container" ng-if="$ctrl.userIsReviewer">
         <strong>Review rights:</strong>
         <div ng-if="$ctrl.userCanReviewTranslationSuggestionsInLanguages.length > 0">
           Translations in languages:
@@ -53,7 +54,7 @@
         <[$ctrl.tabsDetails[$ctrl.activeTabName].description]>
       </div>
       <div class="oppia-dashboard-language-container" ng-if="$ctrl.showLanguageSelector()">
-        <span class="oppia-dashboard-language-container-label"><[$ctrl.tabsDetails[$ctrl.activeTabName].tabName]> in:</span>
+        <span class="oppia-dashboard-language-container-label">Translate text to:</span>
         <select class="oppia-opportunity-language-selector protractor-test-language-selector"
                 ng-change="$ctrl.onChangeLanguage()"
                 ng-model="$ctrl.languageCode"
@@ -105,14 +106,18 @@
     font-size: 24px;
     position: absolute;
   }
-  .oppia-contributor-username-container,
-  .oppia-review-right-details-container {
+  .oppia-contributor-username-container {
     color: #009688;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 24px;
+    height: 30%;
     padding-top: 25px;
     position: relative;
-    width: 40%;
+    width: 10%;
+  }
+  .oppia-review-right-details-container {
+    position: relative;
+    left: 40%;
   }
   .oppia-contributor-username-container::before {
     bottom: 65%;
@@ -143,7 +148,7 @@
     max-width: 1500px;
     padding-left: 0;
     text-align: center;
-    width: 85%;
+    width: 80%;
   }
 .oppia-opportunities-tab-item {
     align-items: center;
@@ -158,7 +163,7 @@
     height: 100%;
     margin: auto;
     max-width: 1200px;
-    width: 85%;
+    width: 80%;
   }
   .oppia-opportunities-tab-custmization-container {
     align-items: center;
@@ -171,10 +176,10 @@
   .oppia-opportunities-tabs-list li {
     display: flex;
     max-width: 250px;
-    width: -webkit-calc(100% / 5);
-    width: -moz-calc(100% / 5);
-    width: -o-calc(100% / 5);
-    width: calc(100% / 5);
+    width: -webkit-calc(100% / 3);
+    width: -moz-calc(100% / 3);
+    width: -o-calc(100% / 3);
+    width: calc(100% / 3);
   }
   .oppia-opportunities-tabs-text {
     color: #4a4a4a;
