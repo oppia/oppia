@@ -136,6 +136,17 @@ describe('Interactions', function() {
         explorationEditorMainTab.setInteraction.apply(
           null, [interactionId].concat(test.interactionArguments));
 
+        var deleteResponseButton = element(by.css(
+          '.protractor-test-delete-response'));
+        var confirmDeleteResponseButton = element(by.css(
+          '.protractor-test-confirm-delete-response'));
+        deleteResponseButton.isPresent().then(function(isPresent) {
+          if (isPresent) {
+            deleteResponseButton.click();
+            confirmDeleteResponseButton.click();
+          }
+        });
+
         explorationEditorMainTab.addResponse.apply(explorationEditorMainTab, [
           interactionId, forms.toRichText('yes'), null, false
         ].concat(test.ruleArguments));
@@ -166,6 +177,7 @@ describe('Interactions', function() {
             clearHelpcardButton.click();
           }
         });
+        
         for (var j = 0; j < test.correctAnswers.length; j++) {
           explorationPlayerPage.submitAnswer(
             interactionId, test.correctAnswers[j]);

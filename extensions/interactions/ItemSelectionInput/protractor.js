@@ -53,6 +53,9 @@ var expectInteractionDetailsToMatch = function(
     });
 };
 
+var answerObjectType = 'SetOfHtmlString'; // type of object returned by interaction
+
+
 // 'elem' is the HTML element containing the form to submit the answer to.
 // 'answer' Set([{String}]) is the text on the multiple-choice item to select.
 // answer = an array of strings, iterate over each of the items in the array and click on each item
@@ -70,9 +73,25 @@ var submitAnswer = function(elem, answer) {
   submitAnswerButton.click();
 };
 
-var answerObjectType = 'SetOfHtmlString'; // type of object returned by interaction
-
-var testSuite = [{
+var testSuite = [{ 
+  interactionArguments: [[function(editor) {
+    editor.appendBoldText('answer1');
+  }, function(editor) {
+    editor.appendItalicText('answer2');
+  }, function(editor) {
+    editor.appendItalicText('answer3');
+  }], 3],
+  ruleArguments: ['DoesNotContainAtLeastOneOf', ['answer1', 'answer2']],
+  expectedInteractionDetails: [[function(checker) {
+    checker.readBoldText('answer1');
+  }, function(checker) {
+    checker.readItalicText('answer2');
+  }, function(checker) {
+    checker.readItalicText('answer3');
+  }]],
+  wrongAnswers: [['answer1', 'answer2']],
+  correctAnswers: [['answer3']]
+}, {
   interactionArguments: [[function(editor) {
     editor.appendBoldText('answer1');
   }, function(editor) {
@@ -98,7 +117,7 @@ var testSuite = [{
   }, function(editor) {
     editor.appendItalicText('answer3');
   }], 3],
-  ruleArguments: ['ContainsAtLeastOneOf', ['answer1', 'answer2']],
+  ruleArguments: ['IsProperSubsetOf', ['answer1', 'answer2']],
   expectedInteractionDetails: [[function(checker) {
     checker.readBoldText('answer1');
   }, function(checker) {
@@ -108,7 +127,7 @@ var testSuite = [{
   }]],
   wrongAnswers: [['answer3']],
   correctAnswers: [['answer1']]
-}, { 
+}, {
   interactionArguments: [[function(editor) {
     editor.appendBoldText('answer1');
   }, function(editor) {
@@ -116,7 +135,7 @@ var testSuite = [{
   }, function(editor) {
     editor.appendItalicText('answer3');
   }], 3],
-  ruleArguments: ['IsProperSubsetOf', ['answer1', 'answer2']],
+  ruleArguments: ['ContainsAtLeastOneOf', ['answer1', 'answer2']],
   expectedInteractionDetails: [[function(checker) {
     checker.readBoldText('answer1');
   }, function(checker) {
@@ -124,27 +143,10 @@ var testSuite = [{
   }, function(checker) {
     checker.readItalicText('answer3');
   }]],
-  wrongAnswers: [['answer1', 'answer2']],
-  correctAnswers: [['answer1']]
-}, { 
-  interactionArguments: [[function(editor) {
-    editor.appendBoldText('answer1');
-  }, function(editor) {
-    editor.appendItalicText('answer2');
-  }, function(editor) {
-    editor.appendItalicText('answer3');
-  }], 3],
-  ruleArguments: ['DoesNotContainAtLeastOneOf', ['answer1', 'answer2']],
-  expectedInteractionDetails: [[function(checker) {
-    checker.readBoldText('answer1');
-  }, function(checker) {
-    checker.readItalicText('answer2');
-  }, function(checker) {
-    checker.readItalicText('answer3');
-  }]],
-  wrongAnswers: [['answer1', 'answer2']],
-  correctAnswers: [['answer3']]
-}];
+  wrongAnswers: [['answer3']],
+  correctAnswers: [['answer2']]
+}
+];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
