@@ -41,7 +41,7 @@ gae_search_services = models.Registry.import_search_services()
     [models.NAMES.collection, models.NAMES.exploration])
 
 
-class AuditContributorsOneOffJobTests(test_utils.GenericTestBase):
+class FixContributorsOneOffJobTests(test_utils.GenericTestBase):
 
     USER_1_ID = 'user_1_id'
     USER_2_ID = 'user_2_id'
@@ -50,14 +50,14 @@ class AuditContributorsOneOffJobTests(test_utils.GenericTestBase):
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
-        job_id = activity_jobs_one_off.AuditContributorsOneOffJob.create_new()
-        activity_jobs_one_off.AuditContributorsOneOffJob.enqueue(job_id)
+        job_id = activity_jobs_one_off.FixContributorsOneOffJob.create_new()
+        activity_jobs_one_off.FixContributorsOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         stringified_output = (
-            activity_jobs_one_off.AuditContributorsOneOffJob.get_output(job_id))
+            activity_jobs_one_off.FixContributorsOneOffJob.get_output(job_id))
         eval_output = [ast.literal_eval(stringified_item) for
                        stringified_item in stringified_output]
         for item in eval_output:
@@ -76,7 +76,6 @@ class AuditContributorsOneOffJobTests(test_utils.GenericTestBase):
             contributor_ids=[self.USER_1_ID],
             contributors_summary={self.USER_1_ID: 4},
         ).put()
-
         collection_models.CollectionSummaryModel(
             id='id_1',
             title='title',
@@ -89,9 +88,8 @@ class AuditContributorsOneOffJobTests(test_utils.GenericTestBase):
         ).put()
 
         output = self._run_one_off_job()
-
         self.assertEqual(len(output), 1)
-        self.assertEqual([['SUCCESS', 2]], output)
+        self.assertEqual([['SUCCESS_CORRECT', 2]], output)
 
     def test_duplicate_ids_models(self):
         exp_models.ExpSummaryModel(
@@ -104,7 +102,6 @@ class AuditContributorsOneOffJobTests(test_utils.GenericTestBase):
             contributor_ids=[self.USER_1_ID, self.USER_1_ID],
             contributors_summary={self.USER_1_ID: 4},
         ).put()
-
         collection_models.CollectionSummaryModel(
             id='id_2',
             title='title',
@@ -117,14 +114,21 @@ class AuditContributorsOneOffJobTests(test_utils.GenericTestBase):
         ).put()
 
         output = self._run_one_off_job()
-
         self.assertEqual(len(output), 2)
-        self.assertIn(['SUCCESS', 2], output)
+        self.assertIn(['SUCCESS_FIXED', 2], output)
         self.assertIn([
             'DUPLICATE_IDS', [
-                ('id_1', [self.USER_1_ID, self.USER_1_ID], {self.USER_1_ID: 4}),
-                ('id_2', [self.USER_2_ID, self.USER_2_ID], {self.USER_2_ID: 4})
+                ('id_1', [self.USER_1_ID], {self.USER_1_ID: 4}),
+                ('id_2', [self.USER_2_ID], {self.USER_2_ID: 4})
             ]], output)
+
+        self.assertEqual(
+            exp_models.ExpSummaryModel.get_by_id('id_1').contributor_ids,
+            [self.USER_1_ID])
+        self.assertEqual(
+            collection_models.CollectionSummaryModel.get_by_id('id_2')
+            .contributor_ids,
+            [self.USER_2_ID])
 
     def test_missing_in_summary_models(self):
         exp_models.ExpSummaryModel(
@@ -137,7 +141,6 @@ class AuditContributorsOneOffJobTests(test_utils.GenericTestBase):
             contributor_ids=[self.USER_1_ID, self.USER_2_ID],
             contributors_summary={self.USER_1_ID: 4},
         ).put()
-
         collection_models.CollectionSummaryModel(
             id='id_2',
             title='title',
@@ -146,18 +149,33 @@ class AuditContributorsOneOffJobTests(test_utils.GenericTestBase):
             language_code='language_code',
             community_owned=False,
             contributor_ids=[self.USER_1_ID, self.USER_2_ID],
-            contributors_summary={self.USER_2_ID: 4},
+            contributors_summary={self.USER_2_ID: 3},
         ).put()
 
         output = self._run_one_off_job()
-
         self.assertEqual(len(output), 2)
-        self.assertIn(['SUCCESS', 2], output)
+        self.assertIn(['SUCCESS_FIXED', 2], output)
         self.assertIn([
             'MISSING_IN_SUMMARY', [
-                ('id_1', [self.USER_1_ID, self.USER_2_ID], {self.USER_1_ID: 4}),
-                ('id_2', [self.USER_1_ID, self.USER_2_ID], {self.USER_2_ID: 4})
+                (
+                    'id_1',
+                    [self.USER_1_ID, self.USER_2_ID],
+                    {self.USER_1_ID: 4, self.USER_2_ID: 1}
+                ),
+                (
+                    'id_2',
+                    [self.USER_1_ID, self.USER_2_ID],
+                    {self.USER_1_ID: 1, self.USER_2_ID: 3}
+                )
             ]], output)
+
+        self.assertEqual(
+            exp_models.ExpSummaryModel.get_by_id('id_1').contributors_summary,
+            {self.USER_1_ID: 4, self.USER_2_ID: 1})
+        self.assertEqual(
+            collection_models.CollectionSummaryModel.get_by_id('id_2')
+            .contributors_summary,
+            {self.USER_1_ID: 1, self.USER_2_ID: 3})
 
     def test_missing_in_ids_models(self):
         exp_models.ExpSummaryModel(
@@ -170,7 +188,6 @@ class AuditContributorsOneOffJobTests(test_utils.GenericTestBase):
             contributor_ids=[self.USER_1_ID],
             contributors_summary={self.USER_1_ID: 2, self.USER_2_ID: 4},
         ).put()
-
         collection_models.CollectionSummaryModel(
             id='id_2',
             title='title',
@@ -183,22 +200,29 @@ class AuditContributorsOneOffJobTests(test_utils.GenericTestBase):
         ).put()
 
         output = self._run_one_off_job()
-
         self.assertEqual(len(output), 2)
-        self.assertIn(['SUCCESS', 2], output)
+        self.assertIn(['SUCCESS_FIXED', 2], output)
         self.assertIn([
             'MISSING_IN_IDS', [
                 (
                     'id_1',
-                    [self.USER_1_ID],
+                    [self.USER_1_ID, self.USER_2_ID],
                     {self.USER_1_ID: 2, self.USER_2_ID: 4}
                 ),
                 (
                     'id_2',
-                    [self.USER_2_ID],
+                    [self.USER_1_ID, self.USER_2_ID],
                     {self.USER_1_ID: 1, self.USER_2_ID: 3}
                 )
             ]], output)
+
+        self.assertEqual(
+            exp_models.ExpSummaryModel.get_by_id('id_1').contributor_ids,
+            [self.USER_1_ID, self.USER_2_ID])
+        self.assertEqual(
+            collection_models.CollectionSummaryModel.get_by_id('id_2')
+            .contributor_ids,
+            [self.USER_1_ID, self.USER_2_ID])
 
     def test_combined_models(self):
         exp_models.ExpSummaryModel(
@@ -211,7 +235,6 @@ class AuditContributorsOneOffJobTests(test_utils.GenericTestBase):
             contributor_ids=[self.USER_1_ID, self.USER_1_ID, self.USER_2_ID],
             contributors_summary={self.USER_2_ID: 4},
         ).put()
-
         collection_models.CollectionSummaryModel(
             id='id_2',
             title='title',
@@ -224,34 +247,48 @@ class AuditContributorsOneOffJobTests(test_utils.GenericTestBase):
         ).put()
 
         output = self._run_one_off_job()
-
         self.assertEqual(len(output), 4)
-        self.assertIn(['SUCCESS', 2], output)
+        self.assertIn(['SUCCESS_FIXED', 2], output)
         self.assertIn([
             'DUPLICATE_IDS', [(
                 'id_1',
-                [self.USER_1_ID, self.USER_1_ID, self.USER_2_ID],
+                [self.USER_1_ID, self.USER_2_ID],
                 {self.USER_2_ID: 4}
             )]], output)
         self.assertIn([
             'MISSING_IN_SUMMARY', [
                 (
                     'id_1',
-                    [self.USER_1_ID, self.USER_1_ID, self.USER_2_ID],
-                    {self.USER_2_ID: 4}
+                    [self.USER_1_ID, self.USER_2_ID],
+                    {self.USER_1_ID: 1, self.USER_2_ID: 4}
                 ),
                 (
                     'id_2',
                     [self.USER_2_ID, self.USER_3_ID],
-                    {self.USER_1_ID: 4, self.USER_2_ID: 4}
+                    {self.USER_1_ID: 4, self.USER_2_ID: 4, self.USER_3_ID: 1}
                 )
             ]], output)
         self.assertIn([
             'MISSING_IN_IDS', [(
                 'id_2',
-                [self.USER_2_ID, self.USER_3_ID],
-                {self.USER_1_ID: 4, self.USER_2_ID: 4}
+                [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID],
+                {self.USER_1_ID: 4, self.USER_2_ID: 4, self.USER_3_ID: 1}
             )]], output)
+
+        self.assertEqual(
+            exp_models.ExpSummaryModel.get_by_id('id_1').contributor_ids,
+            [self.USER_1_ID, self.USER_2_ID])
+        self.assertEqual(
+            exp_models.ExpSummaryModel.get_by_id('id_1').contributors_summary,
+            {self.USER_1_ID: 1, self.USER_2_ID: 4})
+        self.assertEqual(
+            collection_models.CollectionSummaryModel.get_by_id('id_2')
+            .contributor_ids,
+            [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID])
+        self.assertEqual(
+            collection_models.CollectionSummaryModel.get_by_id('id_2')
+            .contributors_summary,
+            {self.USER_1_ID: 4, self.USER_2_ID: 4, self.USER_3_ID: 1})
 
 
 class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):

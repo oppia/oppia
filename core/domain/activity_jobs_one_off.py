@@ -28,7 +28,7 @@ import feconf
     [models.NAMES.collection, models.NAMES.exploration])
 
 
-class AuditContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class FixContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Audit job that compares the contents of contributor_ids and
     contributors_summary.
     """
@@ -42,8 +42,11 @@ class AuditContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(model):
         ids_set = set(model.contributor_ids)
         summary_set = set(model.contributors_summary)
+        modified = False
         if len(ids_set) != len(model.contributor_ids):
             # When the contributor_ids contain duplicate ids.
+            modified = True
+            model.contributor_ids = list(ids_set)
             yield (
                 'DUPLICATE_IDS',
                 (model.id, model.contributor_ids, model.contributors_summary)
@@ -51,6 +54,10 @@ class AuditContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if ids_set - summary_set:
             # When the contributor_ids contain id that is not in
             # contributors_summary.
+            modified = True
+            for user_id in ids_set:
+                model.contributors_summary[user_id] = (
+                    model.contributors_summary.get(user_id, 1))
             yield (
                 'MISSING_IN_SUMMARY',
                 (model.id, model.contributor_ids, model.contributors_summary)
@@ -58,15 +65,21 @@ class AuditContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if summary_set - ids_set:
             # When the contributors_summary contains id that is not in
             # contributor_ids.
+            modified = True
+            model.contributor_ids = list(sorted(model.contributors_summary))
             yield (
                 'MISSING_IN_IDS',
                 (model.id, model.contributor_ids, model.contributors_summary)
             )
-        yield ('SUCCESS', model.id)
+        if modified:
+            model.put()
+            yield ('SUCCESS_FIXED', model.id)
+        else:
+            yield ('SUCCESS_CORRECT', model.id)
 
     @staticmethod
     def reduce(key, values):
-        if key == 'SUCCESS':
+        if key.startswith('SUCCESS'):
             yield (key, len(values))
         else:
             yield (key, values)
