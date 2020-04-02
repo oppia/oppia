@@ -125,13 +125,8 @@ class InteractionAnswerSummariesMRJobManager(
                     Occurs when the key to reduce cannot be split into
                     components.
         """
-        try:
-            exploration_id, exploration_version, state_name = (
-                key.decode('utf-8').split(':'))
-        except Exception as e:
-            yield (key, 'ERROR: Expected valid exploration id, version, and '
-                        'state name triple, actual: %r' % e)
-            return
+        exploration_id, exploration_version, state_name = (
+            key.decode('utf-8').split(':'))
 
         value_dicts = [
             ast.literal_eval(stringified_value)
