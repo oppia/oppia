@@ -37,6 +37,10 @@ var SkillEditorPage = function() {
   var workedExampleSummary = function(index) {
     return element(by.css('.protractor-test-worked-example-' + index));
   };
+  var workedExampleQuestionField = element(
+    by.css('.protractor-test-worked-example-question'));
+  var workedExampleExplanationField = element(
+    by.css('.protractor-test-worked-example-explanation'));
   var deleteWorkedExampleButton = function(index) {
     return element(
       by.css('.protractor-test-worked-example-' + index))
@@ -189,7 +193,7 @@ var SkillEditorPage = function() {
     });
   };
 
-  this.addWorkedExample = function(example) {
+  this.addWorkedExample = function(question, explanation) {
     addWorkedExampleButton.click();
 
     var addWorkedExampleModal =
@@ -198,7 +202,11 @@ var SkillEditorPage = function() {
       addWorkedExampleModal,
       'Add Worked Example Modal takes too long to appear');
 
-    browser.switchTo().activeElement().sendKeys(example);
+    workedExampleQuestionField.click();
+    browser.switchTo().activeElement().sendKeys(question);
+
+    workedExampleExplanationField.click();
+    browser.switchTo().activeElement().sendKeys(explanation);
 
     waitFor.elementToBeClickable(
       saveWorkedExampleButton,

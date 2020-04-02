@@ -82,20 +82,18 @@ describe('Concept card object factory', () => {
     expect(conceptCard.getExplanation()).toEqual(
       subtitledHtmlObjectFactory.createDefault(
         'test explanation', 'explanation'));
-    expect(conceptCard.getWorkedExamples()).toEqual(
-      [
-        workedExampleObjectFactory.create(
-          subtitledHtmlObjectFactory.createDefault(
-            'worked example question 1', 'worked_example_q_1'),
-          subtitledHtmlObjectFactory.createDefault(
-            'worked example explanation 1', 'worked_example_e_1')),
-        workedExampleObjectFactory.create(
-          subtitledHtmlObjectFactory.createDefault(
-            'worked example question 2', 'worked_example_q_2'),
-          subtitledHtmlObjectFactory.createDefault(
-            'worked example explanation 2', 'worked_example_e_2'))
-      ]
-    );
+    expect(conceptCard.getWorkedExamples()).toEqual([
+      workedExampleObjectFactory.create(
+        subtitledHtmlObjectFactory.createDefault(
+          'worked example question 1', 'worked_example_q_1'),
+        subtitledHtmlObjectFactory.createDefault(
+          'worked example explanation 1', 'worked_example_e_1')),
+      workedExampleObjectFactory.create(
+        subtitledHtmlObjectFactory.createDefault(
+          'worked example question 2', 'worked_example_q_2'),
+        subtitledHtmlObjectFactory.createDefault(
+          'worked example explanation 2', 'worked_example_e_2'))
+    ]);
   });
 
   it('should convert to a backend dictionary', () => {

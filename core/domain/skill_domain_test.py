@@ -271,6 +271,13 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 self.skill.skill_contents.explanation)])
         self._assert_validation_error('Found a duplicate content id 1')
 
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('4', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('1', '<p>Example Explanation 1</p>')
+        )
+        self.skill.skill_contents.worked_examples = [example_1]
+        self._assert_validation_error('Found a duplicate content id 1')
+
     def test_misconception_id_validation(self):
         self.skill.misconceptions = [
             skill_domain.Misconception(
