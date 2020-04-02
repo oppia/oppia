@@ -269,7 +269,8 @@ describe('Topic update service', function() {
     'skill id when an error is encountered',
   function() {
     expect(function() {
-      TopicUpdateService.removeUncategorizedSkill(_sampleTopic, _thirdSkillSummary);
+      TopicUpdateService.removeUncategorizedSkill(
+        _sampleTopic, _thirdSkillSummary);
     }).toThrowError('Given skillId is not an uncategorized skill.');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });

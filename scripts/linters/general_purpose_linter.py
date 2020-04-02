@@ -175,6 +175,41 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'extensions/visualizations/')
     },
     {
+        'regexp': re.compile(r'toThrow\('),
+        'message': 'Please use \'toThrowError\' instead of '
+                   '\'toThrow\'',
+        'excluded_files': (
+            # In these excluded_files given below, we use custom errors,
+            # and there is no particular regular expression to catch these
+            # custom error.These custom errors will be deprecated soon as
+            # it is challenging to maintain them. We throw errors as an
+            # object in these files, and object error cannot handle by the
+            # regular expression mentioned above.
+            'extensions/interactions/LogicProof/static/js/student.spec.ts',
+            'extensions/interactions/LogicProof/static/js/complete.spec.ts',
+            'extensions/interactions/LogicProof/static/js/teacher.spec.ts'),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'throw\s\b(\bError|\bTypeError|\bRangeError)\('),
+        'message': 'Please use \'throw new\' instead of \'throw\'',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'throw\s\b(\bSyntaxError|\bDimensionError)\('),
+        'message': 'Please use \'throw new \' instead of \'throw\'',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'throw\s*\''),
+        'message': 'Please use '
+                   '\'throw new Error\' instead of \'throw\'',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': re.compile(r'\$parent'),
         'message': 'Please do not access parent properties ' +
                    'using $parent. Use the scope object' +
