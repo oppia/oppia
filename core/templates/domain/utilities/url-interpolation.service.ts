@@ -23,11 +23,16 @@ import { Injectable } from '@angular/core';
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UtilsService } from 'services/utils.service';
-import { LoggerService } from 'services/contextual/logger.service';
 
 
 const Constants = require('constants.ts');
 const hashes = require('hashes.json');
+
+// This makes the InterpolationValuesType like a dict whose keys and values both
+// are string.
+interface InterpolationValuesType {
+  [param: string]: string
+}
 
 @Injectable({
   providedIn: 'root'
@@ -103,7 +108,9 @@ export class UrlInterpolationService {
    * If a URL requires a value which is not keyed within the
    * interpolationValues object, this will return null.
    */
-  interpolateUrl(urlTemplate: string, interpolationValues: any): string {
+  interpolateUrl(
+      urlTemplate: string,
+      interpolationValues: InterpolationValuesType): string {
     if (!urlTemplate) {
       this.alertsService.fatalWarning(
         'Invalid or empty URL template passed in: \'' + urlTemplate + '\'');
@@ -134,15 +141,18 @@ export class UrlInterpolationService {
       return null;
     }
 
+    let nonStringParams = Object.entries(interpolationValues).filter(
+      ([key, val]) => !this.utilsService.isString(val));
+    if (nonStringParams.length > 0) {
+      this.alertsService.fatalWarning(
+        'Every parameter passed into interpolateUrl must have string values, ' +
+        'but received: {' + nonStringParams.map(
+          ([key, val]) => key + ': ' + angular.toJson(val)).join(', ') + '}');
+    }
+
     let escapedInterpolationValues = {};
     for (let varName in interpolationValues) {
       let value = interpolationValues[varName];
-      if (!this.utilsService.isString(value)) {
-        this.alertsService.fatalWarning(
-          'Parameters passed into interpolateUrl must be strings.');
-        return null;
-      }
-
       escapedInterpolationValues[varName] = encodeURIComponent(value);
     }
 

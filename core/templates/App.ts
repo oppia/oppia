@@ -71,6 +71,8 @@ require('google-analytics.initializer.ts');
 // loaded after app.constants.ts
 require('I18nFooter.ts');
 
+require('Polyfills.ts');
+
 const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
 angular.module('oppia').config([
@@ -221,7 +223,8 @@ angular.module('oppia').config(['toastrConfig', function(toastrConfig) {
 // spread over multiple lines. The errored file may be viewed on the
 // browser console where the line number should match.
 angular.module('oppia').factory('$exceptionHandler', [
-  '$log', 'CsrfTokenService', function($log, CsrfTokenService) {
+  '$log', 'CsrfTokenService', 'DEV_MODE',
+  function($log, CsrfTokenService, DEV_MODE) {
     var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
     // Refer: https://docs.angularjs.org/guide/migration#-templaterequest-
     // The tpload error namespace has changed in Angular v1.7.
@@ -255,179 +258,50 @@ angular.module('oppia').factory('$exceptionHandler', [
       if (tploadStatusCode !== null && tploadStatusCode[1] === '-1') {
         return;
       }
-      sourceMappedStackTrace.mapStackTrace(
-        exception.stack, function(mappedStack) {
-          var messageAndSourceAndStackTrace = [
-            '',
-            'Cause: ' + cause,
-            exception.message,
-            mappedStack.join('\n'),
-            '    at URL: ' + window.location.href
-          ].join('\n');
-          // To prevent an overdose of errors, throttle to at most 1 error every
-          // MIN_TIME_BETWEEN_ERRORS_MSEC.
-          if (
-            Date.now() - timeOfLastPostedError > MIN_TIME_BETWEEN_ERRORS_MSEC) {
-            // Catch all errors, to guard against infinite recursive loops.
-            try {
-              // We use jQuery here instead of Angular's $http, since the latter
-              // creates a circular dependency.
-              CsrfTokenService.getTokenAsync().then(function(token) {
-                $.ajax({
-                  type: 'POST',
-                  url: '/frontend_errors',
-                  data: $.param({
-                    csrf_token: token,
-                    payload: JSON.stringify({
-                      error: messageAndSourceAndStackTrace
-                    }),
-                    source: document.URL
-                  }, true),
-                  contentType: 'application/x-www-form-urlencoded',
-                  dataType: 'text',
-                  async: true
-                });
+      if (!DEV_MODE) {
+        sourceMappedStackTrace.mapStackTrace(
+          exception.stack, function(mappedStack) {
+            var messageAndSourceAndStackTrace = [
+              '',
+              'Cause: ' + cause,
+              exception.message,
+              mappedStack.join('\n'),
+              '    at URL: ' + window.location.href
+            ].join('\n');
+            var timeDifference = Date.now() - timeOfLastPostedError;
+            // To prevent an overdose of errors, throttle to at most 1 error
+            // every MIN_TIME_BETWEEN_ERRORS_MSEC.
+            if (timeDifference > MIN_TIME_BETWEEN_ERRORS_MSEC) {
+              // Catch all errors, to guard against infinite recursive loops.
+              try {
+                // We use jQuery here instead of Angular's $http, since the
+                // latter creates a circular dependency.
+                CsrfTokenService.getTokenAsync().then(function(token) {
+                  $.ajax({
+                    type: 'POST',
+                    url: '/frontend_errors',
+                    data: $.param({
+                      csrf_token: token,
+                      payload: JSON.stringify({
+                        error: messageAndSourceAndStackTrace
+                      }),
+                      source: document.URL
+                    }, true),
+                    contentType: 'application/x-www-form-urlencoded',
+                    dataType: 'text',
+                    async: true
+                  });
 
-                timeOfLastPostedError = Date.now();
-              });
-            } catch (loggingError) {
-              $log.warn('Error logging failed.');
+                  timeOfLastPostedError = Date.now();
+                });
+              } catch (loggingError) {
+                $log.warn('Error logging failed.');
+              }
             }
           }
-        });
+        );
+      }
       $log.error.apply($log, arguments);
     };
   }
 ]);
-
-// Add a String.prototype.trim() polyfill for IE8.
-if (typeof String.prototype.trim !== 'function') {
-  String.prototype.trim = function() {
-    return this.replace(/^\s+|\s+$/g, '');
-  };
-}
-
-// Add an Object.create() polyfill for IE8.
-if (typeof Object.create !== 'function') {
-  (function() {
-    var F = function() {};
-    Object.create = function(o) {
-      if (arguments.length > 1) {
-        throw Error('Second argument for Object.create() is not supported');
-      }
-      if (o === null) {
-        throw Error('Cannot set a null [[Prototype]]');
-      }
-      if (typeof o !== 'object') {
-        throw TypeError('Argument must be an object');
-      }
-      F.prototype = o;
-      return new F();
-    };
-  })();
-}
-
-// Add a Number.isInteger() polyfill for IE.
-Number.isInteger = Number.isInteger || function(value) {
-  return (
-    typeof value === 'number' && isFinite(value) &&
-    Math.floor(value) === value);
-};
-
-
-// Add Array.fill() polyfill for IE.
-if (!Array.prototype.fill) {
-  Object.defineProperty(Array.prototype, 'fill', {
-    value: function(value) {
-      // Steps 1-2.
-      if (this === null) {
-        throw new TypeError('this is null or not defined');
-      }
-
-      var O = Object(this);
-
-      // Steps 3-5.
-      var len = O.length >>> 0;
-
-      // Steps 6-7.
-      var start = arguments[1];
-      var relativeStart = start >> 0;
-
-      // Step 8.
-      var k = relativeStart < 0 ?
-        Math.max(len + relativeStart, 0) :
-        Math.min(relativeStart, len);
-
-      // Steps 9-10.
-      var end = arguments[2];
-      var relativeEnd = end === undefined ?
-        len : end >> 0;
-
-      // Step 11.
-      var final = relativeEnd < 0 ?
-        Math.max(len + relativeEnd, 0) :
-        Math.min(relativeEnd, len);
-
-      // Step 12.
-      while (k < final) {
-        O[k] = value;
-        k++;
-      }
-
-      // Step 13.
-      return O;
-    }
-  });
-}
-
-
-// Add SVGElement.prototype.outerHTML polyfill for IE
-if (!('outerHTML' in SVGElement.prototype)) {
-  Object.defineProperty(SVGElement.prototype, 'outerHTML', {
-    get: function() {
-      var $node, $temp;
-      $temp = document.createElement('div');
-      $node = this.cloneNode(true);
-      $temp.appendChild($node);
-      return $temp.innerHTML;
-    },
-    enumerable: false,
-    configurable: true
-  });
-}
-
-
-// Older browsers might not implement mediaDevices at all,
-// so we set an empty object first.
-if (navigator.mediaDevices === undefined) {
-  // @ts-ignore: mediaDevices is read-only error.
-  navigator.mediaDevices = {};
-}
-
-// Some browsers partially implement mediaDevices.
-// We can't just assign an object with getUserMedia
-// as it would overwrite existing properties.
-// Here, we will just add the getUserMedia property
-// if it's missing.
-if (navigator.mediaDevices.getUserMedia === undefined) {
-  navigator.mediaDevices.getUserMedia = function(constraints) {
-    // First get ahold of the legacy getUserMedia, if present.
-    var getUserMedia = (
-      // @ts-ignore: 'webkitGetUserMedia' and 'mozGetUserMedia'
-      // property does not exist error.
-      navigator.webkitGetUserMedia || navigator.mozGetUserMedia);
-
-    // If getUserMedia is not implemented, return a rejected promise
-    // with an error to keep a consistent interface.
-    if (!getUserMedia) {
-      return Promise.reject(
-        new Error('getUserMedia is not implemented in this browser'));
-    }
-
-    // Otherwise, wrap the call to the old navigator.getUserMedia
-    // with a Promise.
-    return new Promise(function(resolve, reject) {
-      getUserMedia.call(navigator, constraints, resolve, reject);
-    });
-  };
-}

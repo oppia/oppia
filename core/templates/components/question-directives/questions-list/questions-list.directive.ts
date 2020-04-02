@@ -30,8 +30,8 @@ require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/editable-skill-backend-api.service.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/SkillDifficultyObjectFactory.ts');
 require('domain/skill/SkillSummaryObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -69,7 +69,7 @@ angular.module('oppia').directive('questionsList', [
         '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
         '$location', 'AlertsService', 'QuestionCreationService', 'UrlService',
         'NUM_QUESTIONS_PER_PAGE', 'EditableQuestionBackendApiService',
-        'EditableSkillBackendApiService', 'MisconceptionObjectFactory',
+        'SkillBackendApiService', 'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'SkillDifficultyObjectFactory',
         'SkillSummaryObjectFactory', 'DEFAULT_SKILL_DIFFICULTY',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'MODE_SELECT_DIFFICULTY',
@@ -79,7 +79,7 @@ angular.module('oppia').directive('questionsList', [
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
             $location, AlertsService, QuestionCreationService, UrlService,
             NUM_QUESTIONS_PER_PAGE, EditableQuestionBackendApiService,
-            EditableSkillBackendApiService, MisconceptionObjectFactory,
+            SkillBackendApiService, MisconceptionObjectFactory,
             QuestionObjectFactory, SkillDifficultyObjectFactory,
             SkillSummaryObjectFactory, DEFAULT_SKILL_DIFFICULTY,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, MODE_SELECT_DIFFICULTY,
@@ -311,12 +311,16 @@ angular.module('oppia').directive('questionsList', [
                 ctrl.initializeNewQuestionCreation(
                   ctrl.newQuestionSkillIds);
               }
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
           ctrl.populateMisconceptions = function(skillIds) {
             ctrl.misconceptionsBySkill = {};
-            EditableSkillBackendApiService.fetchMultiSkills(
+            SkillBackendApiService.fetchMultiSkills(
               skillIds).then(
               function(skillDicts) {
                 skillDicts.forEach(function(skillDict) {
@@ -621,6 +625,10 @@ angular.module('oppia').directive('questionsList', [
                         id: summary.id,
                         task: 'add'
                       });
+                    }, function() {
+                      // Note to developers:
+                      // This callback is triggered when the Cancel button is
+                      // clicked. No further action is needed.
                     });
                   };
 

@@ -78,7 +78,7 @@ const bootstrapFn = (extraProviders: StaticProvider[]) => {
 };
 const downgradedModule = downgradeModule(bootstrapFn);
 
-declare var angular: any;
+declare var angular: ng.IAngularStatic;
 
 angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
