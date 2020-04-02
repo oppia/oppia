@@ -37,15 +37,7 @@ class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
 class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
-
+    pass
 
 class CollectionModel(base_models.VersionedModel):
     """Versioned storage model for an Oppia collection.
@@ -212,7 +204,7 @@ class CollectionRightsSnapshotContentModel(
 
        TODO(#8523): Implement this function.
        """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class CollectionRightsModel(base_models.VersionedModel):

@@ -44,14 +44,7 @@ class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
 class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class ExplorationModel(base_models.VersionedModel):
@@ -291,14 +284,7 @@ class ExplorationRightsSnapshotMetadataModel(
 class ExplorationRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration rights snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class ExplorationRightsModel(base_models.VersionedModel):

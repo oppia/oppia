@@ -43,14 +43,7 @@ class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
 class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class TopicModel(base_models.VersionedModel):
@@ -306,14 +299,7 @@ class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
 class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a subtopic page snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class SubtopicPageModel(base_models.VersionedModel):
@@ -454,14 +440,7 @@ class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
 class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic rights snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class TopicRightsModel(base_models.VersionedModel):

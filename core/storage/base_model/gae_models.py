@@ -1190,6 +1190,13 @@ class BaseSnapshotContentModel(BaseModel):
     content = ndb.JsonProperty(indexed=False)
 
     @staticmethod
+    def get_export_policy():
+        """The contents of snapshots are not relevant to the user for
+        Takeout.
+        """
+        return EXPORT_POLICY.NOT_APPLICABLE
+
+    @staticmethod
     def get_user_id_migration_policy():
         """BaseSnapshotContentModel doesn't have any field with user ID."""
         return USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
