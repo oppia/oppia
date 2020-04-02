@@ -2455,7 +2455,7 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
                                     self.TEST_AUDIO_FILE_MP3))
         self.assertEqual(
             observed_log_messages,
-            ['Mp3 audio file not found for %s ,caused by: '
+            ['Mp3 audio file not found for %s , caused by: '
              'File %s not found.'
              % (self.TEST_AUDIO_FILE_MP3, relative_path)])
 
@@ -2580,7 +2580,7 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, expected_output)
 
 
-        updated_model = (
+        updated_exploration = (
             exp_fetchers.get_exploration_by_id(self.VALID_EXP_ID).to_dict())
         expected_updated_value = {
             'voiceovers_mapping': {
@@ -2601,6 +2601,7 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
                 'default_outcome': {}
             }
         }
-        actual_value = updated_model['states']['State1']['recorded_voiceovers']
+        actual_value = (
+            updated_exploration['states']['State1']['recorded_voiceovers'])
         # Validate the data is updated in the exploration correctly.
         self.assertEqual(expected_updated_value, actual_value)

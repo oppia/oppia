@@ -619,7 +619,7 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         except Exception as e:
                             logging.error(
                                 'Mp3 audio file not found for %s '
-                                ',caused by: %s' %
+                                ', caused by: %s' %
                                 (filename, e))
                 # Create commits to update the exploration.
                 commit_cmds = [exp_domain.ExplorationChange({
