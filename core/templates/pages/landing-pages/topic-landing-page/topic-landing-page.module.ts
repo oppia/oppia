@@ -23,6 +23,8 @@ import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { RequestInterceptor } from 'services/request-interceptor.service';
 
 // This component is needed to force-bootstrap Angular at the beginning of the
 // app.
@@ -57,7 +59,12 @@ import { TopicLandingPageConstants } from
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,
     ServicesConstants,
-    TopicLandingPageConstants
+    TopicLandingPageConstants,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RequestInterceptor,
+      multi: true
+    }
   ]
 })
 class TopicLandingPageModule {
