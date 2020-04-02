@@ -471,11 +471,10 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-        TODO(#8523): Implement this function.
+        """The history of commits is not relevant to a user for the purposes of
+        Takeout.
         """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _get_instance_id(cls, collection_id, version):
