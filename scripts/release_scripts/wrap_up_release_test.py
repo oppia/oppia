@@ -166,9 +166,17 @@ class WrapReleaseTests(test_utils.GenericTestBase):
             requester='', headers='',
             attributes={'name': release_constants.LABEL_FOR_RELEASED_PRS},
             completed='')
-        pr_for_current_release = github.PullRequest.PullRequest(
+        pr_for_current_release_1 = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={'label': label_for_current_release_prs, 'number': 7567},
+            completed='')
+        pr_for_current_release_2 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={'label': label_for_current_release_prs, 'number': 7568},
+            completed='')
+        released_pr = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={'label': label_for_released_prs, 'number': 7568},
             completed='')
         def mock_get_label(unused_self, name):
             if name == release_constants.LABEL_FOR_RELEASED_PRS:
@@ -179,9 +187,9 @@ class WrapReleaseTests(test_utils.GenericTestBase):
         def mock_get_issues(unused_self, state, labels):
             if labels[0].name == (
                     release_constants.LABEL_FOR_CURRENT_RELEASE_PRS):
-                return [pr_for_current_release]
+                return [pr_for_current_release_1, pr_for_current_release_2]
             else:
-                return []
+                return [released_pr]
         # pylint: enable=unused-argument
 
         get_label_swap = self.swap(
@@ -204,16 +212,22 @@ class WrapReleaseTests(test_utils.GenericTestBase):
             requester='', headers='',
             attributes={'name': release_constants.LABEL_FOR_RELEASED_PRS},
             completed='')
+        pr_for_current_release = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={'label': label_for_current_release_prs, 'number': 7567},
+            completed='')
         released_pr = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={'label': label_for_released_prs, 'number': 7567},
             completed='')
 
         check_function_calls = {
-            'remove_from_labels_gets_called': False
+            'remove_from_labels_gets_called_for_current_release_prs': False,
+            'remove_from_labels_gets_called_for_released_prs': False
         }
         expected_function_calls = {
-            'remove_from_labels_gets_called': True
+            'remove_from_labels_gets_called_for_current_release_prs': True,
+            'remove_from_labels_gets_called_for_released_prs': True
         }
 
         def mock_get_label(unused_self, name):
@@ -226,10 +240,16 @@ class WrapReleaseTests(test_utils.GenericTestBase):
             if state == 'closed':
                 return [released_pr]
             else:
-                return []
+                return [pr_for_current_release]
         # pylint: enable=unused-argument
-        def mock_remove_from_labels(unused_self, unused_name):
-            check_function_calls['remove_from_labels_gets_called'] = True
+        def mock_remove_from_labels(unused_self, name):
+            if name == release_constants.LABEL_FOR_RELEASED_PRS: # pylint: disable=simplifiable-if-statement
+                check_function_calls[
+                    'remove_from_labels_gets_called_for_released_prs'] = True
+            else:
+                check_function_calls[
+                    'remove_from_labels_gets_called_for_current_release_prs'
+                    ] = True
 
         get_label_swap = self.swap(
             github.Repository.Repository, 'get_label', mock_get_label)
