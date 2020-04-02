@@ -35,6 +35,7 @@ export class ContextService {
     private entityContextObjectFactory: EntityContextObjectFactory) {}
 
   pageContext = null;
+  explorationIsLinkedToStory = false;
   explorationId = null;
   questionId = null;
   editorContext = null;
@@ -109,6 +110,22 @@ export class ContextService {
     }
   }
 
+  canEntityReferToSkills(): boolean {
+    return (
+      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR ||
+      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR ||
+      (
+        this.getPageContext() === (
+          ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR) &&
+        this.explorationIsLinkedToStory
+      )
+    );
+  }
+
+  setExplorationIsLinkedToStory(): void {
+    this.explorationIsLinkedToStory = true;
+  }
+
   isInExplorationContext(): boolean {
     return (this.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR ||
@@ -159,7 +176,7 @@ export class ContextService {
         return AppConstants.ENTITY_TYPE.EXPLORATION;
       }
       if (pathnameArray[i] === 'topic_editor') {
-        if (hashValues.length === 3 && hashValues[1] === '/questions') {
+        if (hashValues.length >= 2 && hashValues[1] === '/questions') {
           return AppConstants.ENTITY_TYPE.QUESTION;
         }
         return AppConstants.ENTITY_TYPE.TOPIC;
@@ -171,7 +188,7 @@ export class ContextService {
         return AppConstants.ENTITY_TYPE.STORY;
       }
       if (pathnameArray[i] === 'skill_editor') {
-        if (hashValues.length === 3 && hashValues[1] === '/questions') {
+        if (hashValues.length >= 2 && hashValues[1] === '/questions') {
           return AppConstants.ENTITY_TYPE.QUESTION;
         }
         return AppConstants.ENTITY_TYPE.SKILL;
