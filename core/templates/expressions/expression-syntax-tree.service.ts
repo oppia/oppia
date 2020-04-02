@@ -85,6 +85,11 @@ export class ExpressionSyntaxTreeService {
     return [...this.findParams(parsed)].sort();
   }
 
+  // TODO(8966): Using Set causes unexpected results during the test:
+  // "Expression evaluator service should get params used in expressions"
+  // When expressions are parsed it's not returning the expectedParams.
+  // Example: "log(9,3)" should return [] but gets ["log", 9, 3].
+  // And you get TypeError: .forEach not found on undefined.
   private findParams(parseTree: string[]|string): string[] {
     let paramsFound = [];
     if (parseTree instanceof Array) {
