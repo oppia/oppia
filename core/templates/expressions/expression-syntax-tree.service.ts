@@ -370,7 +370,7 @@ export class ExpressionSyntaxTreeService {
     // Note that removing quotation marks from this key causes issues with
     // minification (when running the deployment scripts).
     /* eslint-disable quote-props */
-    if: {
+    'if': {
       eval: (args: string[]): string => {
         this.verifyNumArgs(args, 3);
         return args[0] ? args[1] : args[2];
@@ -383,7 +383,7 @@ export class ExpressionSyntaxTreeService {
         return args[1];
       }
     },
-    floor: {
+    'floor': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 1);
         var numericArgs = this.coerceAllArgsToNumber(args);
@@ -396,7 +396,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
-    pow: {
+    'pow': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 2);
         var numericArgs = this.coerceAllArgsToNumber(args);
@@ -409,7 +409,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
-    log: {
+    'log': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 2);
         var numericArgs = this.coerceAllArgsToNumber(args);
@@ -425,7 +425,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
-    abs: {
+    'abs': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 1);
         var numericArgs = this.coerceAllArgsToNumber(args);
