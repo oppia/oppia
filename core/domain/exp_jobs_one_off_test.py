@@ -2436,9 +2436,41 @@ class LinkComponentValidationAuditJobTests(test_utils.GenericTestBase):
             )
         }
 
+        state2_answer_group_dict = {
+            'outcome': {
+                'dest': 'State2',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': (
+                        '<p><oppia-noninteractive-tabs tab_contents-with-value='
+                        '"{"title": "Hint introduction", "content": "This set '
+                        'of tabs shows some hints. Click on the other tabs to '
+                        'display the relevant hints."}">'
+                        '</oppia-noninteractive-tabs> Other Text </p>')
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [
+                        ['This <span>is a span element</span>.', '<br>'],
+                        ['<span>hello world!</span>']
+                    ]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
         with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
             state1.update_content(
                 state_domain.SubtitledHtml.from_dict(content1_dict))
+            state2.update_interaction_id('DragAndDropSortInput')
+            state2.update_interaction_answer_groups([state2_answer_group_dict])
             state2.update_interaction_default_outcome(default_outcome2)
             state3.update_content(
                 state_domain.SubtitledHtml.from_dict(content3_dict))
@@ -2466,6 +2498,151 @@ class LinkComponentValidationAuditJobTests(test_utils.GenericTestBase):
             'https://mailto:link@link.com&amp;quot;">'
             '</oppia-noninteractive-link> state: State2\', '
             'u\'Exp Id: exp_id0\']]']
+
+        self.assertEqual(actual_output, expected_output)
+
+    def test_link_component_validation_for_drag_and_drop_interactions(self):
+        """Validates the link RTE for the drag and drop interaction."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exploration.add_states(['State1', 'State2', 'State3'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+        state1_answer_group_dict = {
+            'outcome': {
+                'dest': 'State2',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': (
+                        '<p><oppia-noninteractive-tabs tab_contents-with-value'
+                        '="{"title": "Hint introduction", "content": "This set'
+                        ' of tabs shows some hints. Click on the other tabs to'
+                        ' display the relevant hints."}">'
+                        '</oppia-noninteractive-tabs> Other Text </p>')
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [
+                        ['This <span>is a span element</span>.', '<br>'],
+                        [
+                            '<p><oppia-noninteractive-link text-with-value="'
+                            '&amp;quot;What is a link?&amp;quot;" url-with-'
+                            'value="&amp;quot;https://mailto:link@link.com&amp'
+                            ';quot;"></oppia-noninteractive-link></p>'
+                        ]
+                    ]
+                },
+                'rule_type': 'IsEqualToOrdering'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        state2_answer_group_dict = {
+            'outcome': {
+                'dest': 'State2',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': (
+                        '<p><oppia-noninteractive-tabs tab_contents-with-value'
+                        '="{"title": "Hint introduction", "content": "This set'
+                        ' of tabs shows some hints. Click on the other tabs to'
+                        ' display the relevant hints."}">'
+                        '</oppia-noninteractive-tabs> Other Text </p>')
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': (
+                        '<p><oppia-noninteractive-link text-with-value="'
+                        '&amp;quot;What is a link?&amp;quot;" url-with-'
+                        'value="&amp;quot;https://mailto:xyz@xyz.com&amp'
+                        ';quot;"></oppia-noninteractive-link></p>'
+                    ),
+                    'y': 1
+                },
+                'rule_type': 'HasElementXAtPositionY'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        state3_answer_group_dict = {
+            'outcome': {
+                'dest': 'State2',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': (
+                        '<p><oppia-noninteractive-tabs tab_contents-with-value'
+                        '="{"title": "Hint introduction", "content": "This set'
+                        ' of tabs shows some hints. Click on the other tabs to'
+                        ' display the relevant hints."}">'
+                        '</oppia-noninteractive-tabs> Other Text </p>')
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': (
+                        '<p><oppia-noninteractive-link text-with-value="'
+                        '&amp;quot;What is a link?&amp;quot;" url-with-'
+                        'value="&amp;quot;https://mailto:abc@link.com&amp'
+                        ';quot;"></oppia-noninteractive-link></p>'
+                    ),
+                    'y': '<span>hello world!</span>'
+                },
+                'rule_type': 'HasElementXBeforeElementY'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        state1.update_interaction_id('DragAndDropSortInput')
+        state1.update_interaction_answer_groups([state1_answer_group_dict])
+        state2.update_interaction_id('DragAndDropSortInput')
+        state2.update_interaction_answer_groups([state2_answer_group_dict])
+        state3.update_interaction_id('DragAndDropSortInput')
+        state3.update_interaction_answer_groups([state3_answer_group_dict])
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start LinkComponentValidationAuditJob job on sample exploration.
+        job_id = (
+            exp_jobs_one_off.LinkComponentValidationAuditJob.create_new())
+        exp_jobs_one_off.LinkComponentValidationAuditJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .LinkComponentValidationAuditJob.get_output(job_id))
+
+        expected_output = [
+            u'[u\'mailto\', [u\'<oppia-noninteractive-link text-with-va'
+            'lue="&amp;quot;What is a link?&amp;quot;" url-with-value="&'
+            'amp;quot;https://mailto:xyz@xyz.com&amp;quot;"></oppia-noni'
+            'nteractive-link> state: State2\', u\'<oppia-noninteractive-'
+            'link text-with-value="&amp;quot;What is a link?&amp;quot;" '
+            'url-with-value="&amp;quot;https://mailto:link@link.com&amp;'
+            'quot;"></oppia-noninteractive-link> state: State1\', u\'<op'
+            'pia-noninteractive-link text-with-value="&amp;quot;What is '
+            'a link?&amp;quot;" url-with-value="&amp;quot;https://mailto'
+            ':abc@link.com&amp;quot;"></oppia-noninteractive-link> state'
+            ': State3\', u\'Exp Id: exp_id0\']]'
+        ]
 
         self.assertEqual(actual_output, expected_output)
 
