@@ -385,6 +385,12 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
+        skill_models.SkillSnapshotMetadataModel(
+             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+             commit_cmds=self.COMMIT_CMDS
+         ).put()
+
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         super(TakeoutServiceUnitTests, self).setUp()
@@ -470,6 +476,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_community_rights_data = {}
         expected_collection_rights_sm = {}
         expected_collection_sm = {}
+        expected_skill_sm = {}
         expected_export = {
             'user_stats_data': stats_data,
             'user_settings_data': settings_data,
@@ -498,8 +505,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'user_community_rights_data': expected_community_rights_data,
             'collection_rights_snapshot_metadata_data':
                  expected_collection_rights_sm,
-             'collection_snapshot_metadata_data':
+            'collection_snapshot_metadata_data':
                  expected_collection_sm,
+            'skill_snapshot_metadata_data':
+                 expected_skill_sm,
         }
 
         # Perform export and compare.
@@ -756,6 +765,14 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             }
         }
 
+        expected_skill_sm = {
+             self.GENERIC_MODEL_ID: {
+                 'commit_type': self.COMMIT_TYPE,
+                 'commit_message': self.COMMIT_MESSAGE,
+                 'commit_cmds': self.COMMIT_CMDS
+             }
+        }
+
         expected_export = {
             'user_stats_data': expected_stats_data,
             'user_settings_data': expected_settings_data,
@@ -786,9 +803,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'user_contribution_scoring_data': expected_contrib_score_data,
             'user_community_rights_data': expected_community_rights_data,
             'collection_rights_snapshot_metadata_data':
-                 expected_collection_rights_sm,
-             'collection_snapshot_metadata_data':
-                 expected_collection_sm,
+                expected_collection_rights_sm,
+            'collection_snapshot_metadata_data':
+                expected_collection_sm,
+            'skill_snapshot_metadata_data':
+                expected_skill_sm,
         }
 
         exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
