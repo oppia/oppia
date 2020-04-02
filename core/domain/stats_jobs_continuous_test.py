@@ -75,7 +75,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
             NonContinuousInteractionAnswerSummariesAggregator)
 
-    def test_answer_for_state_with_unicode_name(self):
+    def test_answers_for_states_with_unicode_names(self):
         exp_id = 'eid'
         exp = self.save_new_valid_exploration(exp_id, 'author@website.com')
         # State names used by our test server to confirm unicode support.
