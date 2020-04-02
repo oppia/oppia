@@ -82,22 +82,29 @@ export class ExpressionSyntaxTreeService {
   public getParamsUsedInExpression(expression: string): string[] {
     let parsed = this.expressionParserService.parse(expression);
 
-    return Array.from(this.findParams(parsed)).sort();
+    return [...this.findParams(parsed)].sort();
   }
 
-  private findParams(parseTree: string[]|string): Set<string> {
-    let paramsFound = new Set<string>();
+  private findParams(parseTree: string[]|string): string[] {
+    let paramsFound = [];
     if (parseTree instanceof Array) {
       if (parseTree[0] === '#') {
-        paramsFound.add(parseTree[1]);
+        paramsFound.push(parseTree[1]);
       } else {
         for (let i = 1; i < parseTree.length; i++) {
-          this.findParams(parseTree[i]).forEach((p: string) =>
-            paramsFound.add(p));
+          paramsFound = paramsFound.concat(this.findParams(parseTree[i]));
         }
       }
-      return paramsFound;
     }
+
+    let uniqueParams = [];
+    for (let i = 0; i < paramsFound.length; i++) {
+      if (uniqueParams.indexOf(paramsFound[i]) === -1) {
+        uniqueParams.push(paramsFound[i]);
+      }
+    }
+
+    return uniqueParams;
   }
 
   // Checks if the args array has the expectedNum number of elements and
