@@ -32,14 +32,7 @@ from google.appengine.ext import ndb
 
 class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
@@ -206,14 +199,7 @@ class CollectionModel(base_models.VersionedModel):
 class CollectionRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection rights snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class CollectionRightsSnapshotContentModel(

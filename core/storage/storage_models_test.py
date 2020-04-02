@@ -187,9 +187,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
         # Contact @varun-tandon for more information.
         expected_unimplemented = {
             collection_models.CollectionRightsSnapshotContentModel,
-            collection_models.CollectionRightsSnapshotMetadataModel,
             collection_models.CollectionSnapshotContentModel,
-            collection_models.CollectionSnapshotMetadataModel,
             collection_models.CollectionCommitLogEntryModel,
             skill_models.SkillSnapshotMetadataModel,
             skill_models.SkillSnapshotContentModel,
