@@ -22,50 +22,45 @@ angular.module('oppia').factory('ExpressionSyntaxTreeService', [
   'ExpressionParserService', 'PARAMETER_TYPES',
   function(ExpressionParserService, PARAMETER_TYPES) {
     // Exceptions that can be thrown from the evaluation of expressions.
-    const ExpressionError = function() {};
-    ExpressionError.prototype = new Error();
-    ExpressionError.prototype.constructor = ExpressionError;
+      const ExpressionError = function() {};
+      ExpressionError.prototype = new Error();
+      ExpressionError.prototype.constructor = ExpressionError;
 
-    var ExprUndefinedVarError = function(varname, envs) {
-      this.varname = varname;
-      this.envs = envs;
-    };
-    ExprUndefinedVarError.prototype = new ExpressionError();
-    ExprUndefinedVarError.prototype.constructor = ExprUndefinedVarError;
-    ExprUndefinedVarError.prototype.name = 'ExprUndefinedVarError';
-    ExprUndefinedVarError.prototype.toString = function() {
-      return this.name + ': ' + this.varname + ' not found in ' + this.envs;
-    };
+      var ExprUndefinedVarError = function(varname, envs) {
+        this.varname = varname;
+        this.envs = envs;
+        this.name = 'ExprUndefinedVarError';
+        this.message = this.varname + ' not found in ' + JSON.stringify(this.envs);
+      };
+      ExprUndefinedVarError.prototype = new ExpressionError();
+      ExprUndefinedVarError.prototype.constructor = ExprUndefinedVarError;
 
     var ExprWrongNumArgsError = function(args, expectedMin, expectedMax) {
       this.args = args;
       this.expectedMin = expectedMin;
       this.expectedMax = expectedMax;
+      this.name = 'ExprWrongNumArgsError';
+      this.message =  '{' + this.args + '} not in range [' +
+        this.expectedMin + ',' + this.expectedMax + ']';
     };
     ExprWrongNumArgsError.prototype = new ExpressionError();
     ExprWrongNumArgsError.prototype.constructor = ExprWrongNumArgsError;
-    ExprWrongNumArgsError.prototype.name = 'ExprWrongNumArgsError';
-    ExprWrongNumArgsError.prototype.toString = function() {
-      return this.name + ': {' + this.args + '} not in range [' +
-        this.expectedMin + ',' + this.expectedMax + ']';
-    };
 
     var ExprWrongArgTypeError = function(arg, actualType, expectedType) {
       this.arg = arg;
       this.actualType = actualType;
       this.expectedType = expectedType;
+      this.name = 'ExprWrongArgTypeError'
+      if (this.arg === null) {
+        this.message =   'Type ' + this.actualType +
+        ' does not match expected type ' + this.expectedType;
+      } else {
+        this.message = this.arg + ' has type ' + this.actualType +
+        ' which does not match expected type ' + this.expectedType;
+      }
     };
     ExprWrongArgTypeError.prototype = new ExpressionError();
     ExprWrongArgTypeError.prototype.constructor = ExprWrongArgTypeError;
-    ExprWrongArgTypeError.prototype.name = 'ExprWrongArgTypeError';
-    ExprWrongArgTypeError.prototype.toString = function() {
-      if (this.arg === null) {
-        return this.name + ': Type ' + this.actualType +
-        ' does not match expected type ' + this.expectedType;
-      }
-      return this.name + ': ' + this.arg + ' has type ' + this.actualType +
-        ' which does not match expected type ' + this.expectedType;
-    };
 
     var getParamsUsedInExpression = function(expression) {
       var _findParams = function(parseTree) {

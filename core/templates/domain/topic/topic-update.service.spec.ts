@@ -203,7 +203,7 @@ describe('Topic update service', function() {
   function() {
     expect(function() {
       TopicUpdateService.removeAdditionalStory(_sampleTopic, 'story_5');
-    }).toThrowError();
+    }).toThrowError('Given story id not present in canonical story ids.');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -233,7 +233,7 @@ describe('Topic update service', function() {
   function() {
     expect(function() {
       TopicUpdateService.removeCanonicalStory(_sampleTopic, 'story_10');
-    }).toThrowError();
+    }).toThrowError('Given story id not present in additional story ids.');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -269,8 +269,8 @@ describe('Topic update service', function() {
     'skill id when an error is encountered',
   function() {
     expect(function() {
-      TopicUpdateService.removeUncategorizedSkill(_sampleTopic, 'skill_10');
-    }).toThrowError();
+      TopicUpdateService.removeUncategorizedSkill(_sampleTopic, _thirdSkillSummary);
+    }).toThrowError('Given skillId is not an uncategorized skill.');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -343,7 +343,7 @@ describe('Topic update service', function() {
   function() {
     expect(function() {
       TopicUpdateService.setSubtopicTitle(_sampleTopic, 10, 'title2');
-    }).toThrowError();
+    }).toThrowError('Subtopic doesn\'t exist');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -380,7 +380,7 @@ describe('Topic update service', function() {
 
     expect(function() {
       UndoRedoService.undoChange(_sampleTopic);
-    }).toThrowError();
+    }).toThrowError('A deleted subtopic cannot be restored');
   });
 
   it('should properly remove/add a newly created subtopic', function() {
@@ -414,7 +414,7 @@ describe('Topic update service', function() {
   function() {
     expect(function() {
       TopicUpdateService.deleteSubtopic(_sampleTopic, 10);
-    }).toThrowError();
+    }).toThrowError('Subtopic doesn\'t exist');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -527,11 +527,11 @@ describe('Topic update service', function() {
     expect(function() {
       TopicUpdateService.moveSkillToSubtopic(
         _sampleTopic, null, 1, _secondSkillSummary);
-    }).toThrowError();
+    }).toThrowError('Given skillId is not an uncategorized skill.');
     expect(function() {
       TopicUpdateService.moveSkillToSubtopic(
         _sampleTopic, 1, 2, _secondSkillSummary);
-    }).toThrowError();
+    }).toThrowError('Cannot read property \'addSkill\' of null');//issue
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -576,7 +576,7 @@ describe('Topic update service', function() {
     expect(function() {
       TopicUpdateService.removeSkillFromSubtopic(
         _sampleTopic, 1, _firstSkillSummary);
-    }).toThrowError();
+    }).toThrowError('The given skill doesn\'t exist in the subtopic');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 

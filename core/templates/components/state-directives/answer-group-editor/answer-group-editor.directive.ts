@@ -348,23 +348,10 @@ angular.module('oppia').directive('answerGroupEditor', [
 
           ctrl.isCurrentInteractionTrainable = function() {
             var interactionId = ctrl.getCurrentInteractionId();
-            try {
-              return INTERACTION_SPECS[interactionId].is_trainable;
-            } catch (e) {
-              var additionalInfo = (
-                '\nUndefined interaction spec error debug logs:' +
-                '\nInteraction ID: ' + interactionId +
-                '\nExploration ID: ' + ContextService.getExplorationId() +
-                '\nState Name: ' + StateEditorService.getActiveStateName()
-              );
-              e.message += additionalInfo;
-              var errorStr = (
-                'name: ' + e.name +
-                '\nmessage: ' + e.message +
-                '\nstack: ' + e.stack
-              );
-              throw new Error(errorStr);
+            if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
+              throw new Error('Invalid interaction id');
             }
+            return INTERACTION_SPECS[interactionId].is_trainable;
           };
 
           ctrl.openTrainingDataEditor = function() {

@@ -99,24 +99,9 @@ angular.module('oppia').factory('AssetsBackendApiService', [
                          window.MozBlobBuilder ||
                          window.MSBlobBuilder;
           if (exception.name === 'TypeError' && window.BlobBuilder) {
-            try {
-              var blobBuilder = new BlobBuilder();
-              blobBuilder.append(data);
-              assetBlob = blobBuilder.getBlob(assetType.concat('/*'));
-            } catch (e) {
-              var additionalInfo = (
-                '\nBlobBuilder construction error debug logs:' +
-                '\nAsset type: ' + assetType +
-                '\nData: ' + data
-              );
-              e.message += additionalInfo;
-              var errorStr = (
-                'name: ' + e.name +
-                '\nmessage: ' + e.message +
-                '\nstack: ' + e.stack
-              );
-              throw new Error(errorStr);
-            }
+            var blobBuilder = new BlobBuilder();
+            blobBuilder.append(data);
+            assetBlob = blobBuilder.getBlob(assetType.concat('/*'));
           } else {
             var additionalInfo = (
               '\nBlob construction error debug logs:' +
@@ -124,7 +109,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
               '\nData: ' + data
             );
             exception.message += additionalInfo;
-            throw new Error(exception);
+            throw exception;
           }
         }
         assetsCache[filename] = assetBlob;

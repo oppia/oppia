@@ -207,14 +207,12 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'message': 'Please use \'toThrowError\' instead of '
                    '\'toThrow\'',
         'excluded_files': (
-            # The toThrow error is standardised toThrowError and currently
-            # the toThrowError unable to handle to the object as thrown
-            # message we made custom Error in these files and there isn't
-            # to way to capture those using reglar expression alone.
-            # We decided that we are going to look into deprecating it,
-            # since it is not space-efficient and we are running into
-            # maintenance issues such as the one you are describing here
-            # For more detail you can check the PR #8522.
+            # In these excluded_files given below, we use custom errors,
+            # and there is no particular regular expression to catch these 
+            # custom error.These custom errors will be deprecated soon as 
+            # it is challenging to maintain them. We throw errors as an
+            # object in these files, and object error cannot handle by the
+            # regular expression mentioned above.
             'extensions/interactions/LogicProof/static/js/student.spec.ts',
             'extensions/interactions/LogicProof/static/js/complete.spec.ts',
             'extensions/interactions/LogicProof/static/js/teacher.spec.ts'),
@@ -233,15 +231,11 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'\b(\bthrow\s*\'|\bthrow\s\w+;)'),
+        'regexp': re.compile(r'\b(\bthrow\s*\''),
         'message': 'Please use '
                    '\'throw new Error\' instead of \'throw\'',
         'excluded_files': (),
-        'excluded_dirs': (
-            # The throw error is standardised throw new Error and currently
-            # the throw new Error is unable to handle the custom made error
-            # object.
-            'extensions/interactions/LogicProof/static')
+        'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'\b(beforeEach\(inject\(function)\('),
