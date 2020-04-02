@@ -113,39 +113,6 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         # A successful job should output nothing.
         self.assertEqual(job_manager.get_output(job_id), [])
 
-    def test_answer_for_state_with_malformed_unicode_name(self):
-        # Create an exploration with a malformed state name.
-        exp_id = 'eid'
-        exp = self.save_new_valid_exploration(exp_id, 'author@website.com')
-
-        disable_state_name_validation = self.swap(
-            exp_domain.Exploration, '_validate_state_name', lambda *args: None)
-
-        with disable_state_name_validation:
-            exp.rename_state(feconf.DEFAULT_INIT_STATE_NAME, '\u0000�')
-        # Record an answer in that state for the job to process.
-        event_services.AnswerSubmissionEventHandler.record(
-            exp_id, exp.version, exp.init_state_name, 'MultipleChoiceInput',
-            0, 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1',
-            5.0, {}, 'answer1')
-
-        # Check that the job runs to completion.
-        with self._disable_batch_continuation():
-            job_class, job_manager = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator,
-                stats_jobs_continuous.InteractionAnswerSummariesMRJobManager)
-            job_id = job_class.start_computation()
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
-
-        # A successful job should output nothing.
-        self.assertEqual(job_manager.get_output(job_id), [])
-
     def test_one_answer(self):
         with self._disable_batch_continuation():
             # Setup example exploration.
