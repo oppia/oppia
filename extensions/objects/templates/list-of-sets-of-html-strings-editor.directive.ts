@@ -108,7 +108,7 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
             for (var i = 0; i < ctrl.choices.length; i++) {
               ctrl.value[0].push(ctrl.choices[i].id);
               ctrl.initValues.push(1);
-              ctrl.choices[i].selectedRank = i + 1;
+              ctrl.choices[i].selectedRank = '';
             }
           } else {
             for (var i = 0; i < ctrl.choices.length; i++) {
