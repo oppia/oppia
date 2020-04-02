@@ -18,10 +18,13 @@
 
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CommunityDashboardPage = require(
   '../protractor_utils/CommunityDashboardPage.js');
+var TopicsAndSkillsDashboardPage =
+  require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 
 describe('Community dashboard page', function() {
   var communityDashboardPage = null;
@@ -39,6 +42,46 @@ describe('Community dashboard page', function() {
     communityDashboardPage.navigateToTranslateTextTab();
     communityDashboardTranslateTextTab.changeLanguage('Hindi');
     communityDashboardTranslateTextTab.expectSelectedLanguageToBe('Hindi');
+  });
+
+  describe('Submit question tab', function() {
+    const topicName0 = 'Topic 0';
+    const skillDescription0 = 'Skill 0';
+    const reviewMaterial0 = 'Review Material 0';
+    const topicName1 = 'Topic 1';
+    const skillDescription1 = 'Skill 1';
+    const reviewMaterial1 = 'Review Material 1';
+    const adminEmail = 'management@community.com';
+
+    let topicsAndSkillsDashboardPage = null;
+
+    beforeAll(function() {
+      users.createAndLoginAdminUser(adminEmail, 'management');
+      topicsAndSkillsDashboardPage =
+        new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
+      topicsAndSkillsDashboardPage.get();
+      topicsAndSkillsDashboardPage.createTopic(topicName0, 'abbrev');
+      topicsAndSkillsDashboardPage.get();
+      topicsAndSkillsDashboardPage.createTopic(topicName1, 'abbrev');
+      workflow.createSkillAndAssignTopic(
+        skillDescription0, reviewMaterial0, topicName0);
+      topicsAndSkillsDashboardPage.get();
+      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+        skillDescription1, reviewMaterial1);
+      users.logout();
+    });
+
+    fit('should list skill opportunities', function() {
+      users.login('admin@example.com');
+      communityDashboardPage.get();
+      communityDashboardPage.navigateToSubmitQuestionTab();
+      communityDashboardPage.waitForOpportunitiesToLoad();
+
+      communityDashboardPage.expectNumberOfOpportunitiesToBe(1);
+      communityDashboardPage.expectOpportunityListItemHeadingToBe(
+        skillDescription0, 0);
+    });
+
   });
 
   afterEach(function() {

@@ -16,6 +16,7 @@
  * @fileoverview Page object for the community dashboard, for use in Protractor
  * tests.
  */
+var until = protractor.ExpectedConditions;
 var waitFor = require('./waitFor.js');
 
 var CommunityDashboardTranslateTextTab = require(
@@ -23,6 +24,14 @@ var CommunityDashboardTranslateTextTab = require(
 var CommunityDashboardPage = function() {
   var navigateToTranslateTextTabButton = element(
     by.css('.protractor-test-translateTextTab'));
+  var submitQuestionTabButton = element(
+    by.css('.protractor-test-submitQuestionTab'));
+  var opportunityLoadingPlaceholder = element(
+    by.css('.protractor-test-opportunity-loading-placeholder'));
+  var opportunityListItems = element.all(
+    by.css('.protractor-test-opportunity-list-item'));
+  var opportunityListItemHeadings = element.all(
+    by.css('.protractor-test-opportunity-list-item-heading'));
 
   var reviewRightsDiv = element(by.css('.protractor-test-review-rights'));
 
@@ -35,6 +44,12 @@ var CommunityDashboardPage = function() {
     return new CommunityDashboardTranslateTextTab
       .CommunityDashboardTranslateTextTab();
   };
+
+  this.waitForOpportunitiesToLoad = function() {
+    return browser.driver.wait(
+      until.invisibilityOf(opportunityLoadingPlaceholder), 30000,
+      'Opportunity placeholders take too long to become invisible.');
+  }
 
   this.expectUserToBeTranslationReviewer = function(language) {
     waitFor.visibilityOf(
@@ -77,10 +92,29 @@ var CommunityDashboardPage = function() {
     _expecteUserToBeReviewer('question');
   };
 
+  this.expectNumberOfOpportunitiesToBe = function(number) {
+    opportunityListItems.then(function(items) {
+      expect(items.length).toBe(number);
+    });
+  };
+
+  this.expectOpportunityListItemHeadingToBe = function(heading, index) {
+    opportunityListItemHeadings.then(function(headings) {
+      expect(headings[index].getText()).toEqual(heading);
+    });
+  };
+
   this.navigateToTranslateTextTab = function() {
     waitFor.elementToBeClickable(
       navigateToTranslateTextTabButton, 'Translate text tab is not clickable');
     navigateToTranslateTextTabButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.navigateToSubmitQuestionTab = function() {
+    waitFor.elementToBeClickable(
+      submitQuestionTabButton, 'Submit Question tab is not clickable');
+      submitQuestionTabButton.click();
     waitFor.pageToFullyLoad();
   };
 };
