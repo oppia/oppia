@@ -75,26 +75,27 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
             NonContinuousInteractionAnswerSummariesAggregator)
 
-    def _disable_state_name_validation(self):
-        """Context manager that disables exploration state name validation."""
-        def no_op(*unused_args, **unused_kwargs):
-            """Does nothing."""
-            pass
-        return self.swap(exp_domain.Exploration, '_validate_state_name', no_op)
-
     def test_answer_for_state_with_unicode_name(self):
         exp_id = 'eid'
         exp = self.save_new_valid_exploration(exp_id, 'author@website.com')
-        exp.rename_state(
-            exp.init_state_name,
-            # A name we've used on Oppia's test server which has raised errors.
-            '\u041a\u0430\u043a\u0438\u0435\u043f\u043e\u0437\u0438\u0446\u0438'
-            '\u0438?\u0424\u0440\u0430\u0437\u044b \u043d\u0430\u0434\u0438'
-            '\u0430\u0433\u043d\u043e\u0441\u0442\u0438\u043a\u0443')
+        # State names used by our test server to confirm unicode support.
+        unicode_state_names = [
+            'ÐšÐ°ÐºÐ¸Ðµ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸? Ð¤Ñ€Ð°Ð·Ñ‹ Ð½Ð° Ð´Ð¸Ð°Ð',
+            'SadrÅ¾aj 1'
+        ]
+        exp = self.save_new_linear_exp_with_state_names_and_interactions(
+            exp_id, 'author@website.com', unicode_state_names,
+            ['MultipleChoiceInput'])
+
         event_services.AnswerSubmissionEventHandler.record(
-            exp_id, exp.version, exp.init_state_name, 'MultipleChoiceInput',
+            exp_id, exp.version, unicode_state_names[0], 'MultipleChoiceInput',
             0, 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1',
             5.0, {}, 'answer1')
+
+        event_services.AnswerSubmissionEventHandler.record(
+            exp_id, exp.version, unicode_state_names[1], 'MultipleChoiceInput',
+            0, 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1',
+            5.0, {}, 'answer2')
 
         with self._disable_batch_continuation():
             job_class, job_manager = (
@@ -116,7 +117,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         # Create an exploration with a malformed state name.
         exp_id = 'eid'
         exp = self.save_new_valid_exploration(exp_id, 'author@website.com')
-        with self._disable_state_name_validation():
+
+        disable_state_name_validation = self.swap(
+            exp_domain.Exploration, '_validate_state_name', lambda *args: None)
+
+        with disable_state_name_validation:
             exp.rename_state(feconf.DEFAULT_INIT_STATE_NAME, '\u0000�')
         # Record an answer in that state for the job to process.
         event_services.AnswerSubmissionEventHandler.record(
