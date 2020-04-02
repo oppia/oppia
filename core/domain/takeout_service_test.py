@@ -408,6 +408,24 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
+        story_models.StorySnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
+        question_models.QuestionSnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
+        config_models.ConfigPropertySnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         super(TakeoutServiceUnitTests, self).setUp()
@@ -497,6 +515,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_subtopic_page_sm = {}
         expected_topic_rights_sm = {}
         expected_topic_sm = {}
+        expected_story_sm = {}
+        expected_question_sm = {}
+        expected_config_property_sm = {}
+
         expected_export = {
             'user_stats_data': stats_data,
             'user_settings_data': settings_data,
@@ -534,6 +556,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'topic_rights_snapshot_metadata_data':
                 expected_topic_rights_sm,
             'topic_snapshot_metadata_data': expected_topic_sm,
+            'story_snapshot_metadata_data': expected_story_sm,
+            'question_snapshot_metadata_data': expected_question_sm,
+            'config_property_snapshot_metadata_data':
+                expected_config_property_sm
         }
 
         # Perform export and compare.
@@ -819,6 +845,28 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             }
         }
 
+        expected_story_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
+        }
+        expected_question_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
+        }
+        expected_config_property_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
+        }
+
         expected_export = {
             'user_stats_data': expected_stats_data,
             'user_settings_data': expected_settings_data,
@@ -859,6 +907,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'topic_rights_snapshot_metadata_data':
                 expected_topic_rights_sm,
             'topic_snapshot_metadata_data': expected_topic_sm,
+            'story_snapshot_metadata_data': expected_story_sm,
+            'question_snapshot_metadata_data': expected_question_sm,
+            'config_property_snapshot_metadata_data':
+                expected_config_property_sm
         }
 
         exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
