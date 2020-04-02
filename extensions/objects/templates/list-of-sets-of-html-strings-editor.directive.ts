@@ -114,7 +114,7 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
             for (var i = 0; i < ctrl.choices.length; i++) {
               for (var j = 0; j < ctrl.value.length; j++) {
                 var choice = ctrl.choices[i].id;
-                choice.selectedRank = '';
+                ctrl.choices[i].selectedRank = '';
                 if (ctrl.value[j].indexOf(choice) !== -1) {
                   ctrl.initValues.push(j + 1);
                   ctrl.maxPrevIndex = math.max(ctrl.maxPrevIndex, j + 1);
