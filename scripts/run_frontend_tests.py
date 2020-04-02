@@ -88,11 +88,19 @@ def main(args=None):
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts')]
 
-    task = subprocess.Popen(cmd)
-    task.communicate()
+    task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    out, _ = task.communicate()
     task.wait()
 
+    python_utils.PRINT(out)
     python_utils.PRINT('Done!')
+
+    if 'Trying to get the Angular injector' in python_utils.UNICODE(
+            out, 'utf-8'):
+        python_utils.PRINT(
+            'Please refer https://github.com/oppia/oppia/wiki/'
+            'Frontend-test-best-practices#fixing-frontend-test-errors if '
+            'you need help in fixing the errors.')
 
     if parsed_args.check_coverage:
         if task.returncode:
