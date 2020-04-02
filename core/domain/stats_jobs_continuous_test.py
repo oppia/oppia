@@ -84,7 +84,37 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             pass
         return self.swap(exp_domain.Exploration, '_validate_state_name', no_op)
 
-    def test_debug_message_for_malformed_keys(self):
+    def test_answer_for_state_with_unicode_name(self):
+        exp_id = 'eid'
+        exp = self.save_new_valid_exploration(exp_id, 'author@website.com')
+        exp.rename_state(
+            exp.init_state_name,
+            # A name we've used on Oppia's test server which has raised errors.
+            '\u041a\u0430\u043a\u0438\u0435\u043f\u043e\u0437\u0438\u0446\u0438'
+            '\u0438?\u0424\u0440\u0430\u0437\u044b \u043d\u0430\u0434\u0438'
+            '\u0430\u0433\u043d\u043e\u0441\u0442\u0438\u043a\u0443')
+        event_services.AnswerSubmissionEventHandler.record(
+            exp_id, exp.version, exp.init_state_name, 'MultipleChoiceInput',
+            0, 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1',
+            5.0, {}, 'answer1')
+
+        with self._disable_batch_continuation():
+            job_class, job_manager = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator,
+                stats_jobs_continuous.InteractionAnswerSummariesMRJobManager)
+            job_id = job_class.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+
+        # A successful job should output nothing.
+        self.assertEqual(job_manager.get_output(job_id), [])
+
+    def test_answer_for_state_with_malformed_unicode_name(self):
         # Create an exploration with a malformed state name.
         exp_id = 'eid'
         exp = self.save_new_valid_exploration(exp_id, 'author@website.com')
@@ -110,21 +140,8 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
-        # Parse the job output.
-        (job_key, job_output), (job_summary_key, job_summary_output) = (
-            ast.literal_eval(o) for o in job_manager.get_output(job_id))
-        # Check that the problematic values are present.
-        self.assertEqual(job_key, 'eid:1:\x00\ufffd')
-        self.assertEqual(job_summary_key, 'eid:all:\x00\ufffd')
-        # Check that helpful debug information is present.
-        self.assertRegexpMatches(
-            job_output,
-            'Expected valid exploration id, version, and state name triple, '
-            'actual: UnicodeDecodeError.*ordinal not in range')
-        self.assertRegexpMatches(
-            job_summary_output,
-            'Expected valid exploration id, version, and state name triple, '
-            'actual: UnicodeDecodeError.*ordinal not in range')
+        # A successful job should output nothing.
+        self.assertEqual(job_manager.get_output(job_id), [])
 
     def test_one_answer(self):
         with self._disable_batch_continuation():
