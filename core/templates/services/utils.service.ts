@@ -24,7 +24,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class UtilsService {
-  isEmpty(obj: any): boolean {
+  // The function here is to check whether the argument is empty or not. So, we
+  // cannot have any specific type defined for the argument and the argument
+  // is given a generic type of Object.
+  isEmpty(obj: Object): boolean {
     for (var property in obj) {
       if (obj.hasOwnProperty(property)) {
         return false;
@@ -33,11 +36,17 @@ export class UtilsService {
     return true;
   }
 
-  isString(input: any): boolean {
+  // The function here is to check whether the argument is a string. So, we
+  // cannot have any specific type defined for the argument and the argument
+  // is given a generic type of Object.
+  isString(input: Object): boolean {
     return (typeof input === 'string' || input instanceof String);
   }
 
-  isEquivalent(a: any, b: any): boolean {
+  // The function here is to check whether the two arguments are equivalent or
+  // not empty or not. So, we cannot have any specific type defined for the
+  // arguments and the arguments are given a generic type of Object.
+  isEquivalent(a: Object, b: Object): boolean {
     if (a === null || b === null) {
       return a === b;
     }

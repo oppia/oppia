@@ -25,7 +25,7 @@ require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/editable-skill-backend-api.service.ts');
+require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
@@ -48,7 +48,7 @@ angular.module('oppia').directive('questionsTab', [
         '$scope', '$q', '$uibModal', '$window',
         'AlertsService', 'TopicEditorStateService', 'QuestionCreationService',
         'UrlService', 'EditableQuestionBackendApiService',
-        'EditableSkillBackendApiService', 'MisconceptionObjectFactory',
+        'SkillBackendApiService', 'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'QuestionsListService',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
         'QuestionUndoRedoService', 'UndoRedoService',
@@ -57,7 +57,7 @@ angular.module('oppia').directive('questionsTab', [
             $scope, $q, $uibModal, $window,
             AlertsService, TopicEditorStateService, QuestionCreationService,
             UrlService, EditableQuestionBackendApiService,
-            EditableSkillBackendApiService, MisconceptionObjectFactory,
+            SkillBackendApiService, MisconceptionObjectFactory,
             QuestionObjectFactory, QuestionsListService,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
             QuestionUndoRedoService, UndoRedoService,
