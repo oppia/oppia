@@ -208,8 +208,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
                    '\'toThrow\'',
         'excluded_files': (
             # In these excluded_files given below, we use custom errors,
-            # and there is no particular regular expression to catch these 
-            # custom error.These custom errors will be deprecated soon as 
+            # and there is no particular regular expression to catch these
+            # custom error.These custom errors will be deprecated soon as
             # it is challenging to maintain them. We throw errors as an
             # object in these files, and object error cannot handle by the
             # regular expression mentioned above.
@@ -231,7 +231,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'\b(\bthrow\s*\''),
+        'regexp': re.compile(r'throw\s*\''),
         'message': 'Please use '
                    '\'throw new Error\' instead of \'throw\'',
         'excluded_files': (),

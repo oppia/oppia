@@ -203,7 +203,7 @@ describe('Topic update service', function() {
   function() {
     expect(function() {
       TopicUpdateService.removeAdditionalStory(_sampleTopic, 'story_5');
-    }).toThrowError('Given story id not present in canonical story ids.');
+    }).toThrowError( 'Given story id not present in additional story ids.');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -233,7 +233,7 @@ describe('Topic update service', function() {
   function() {
     expect(function() {
       TopicUpdateService.removeCanonicalStory(_sampleTopic, 'story_10');
-    }).toThrowError('Given story id not present in additional story ids.');
+    }).toThrowError('Given story id not present in canonical story ids.');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -531,7 +531,7 @@ describe('Topic update service', function() {
     expect(function() {
       TopicUpdateService.moveSkillToSubtopic(
         _sampleTopic, 1, 2, _secondSkillSummary);
-    }).toThrowError('Cannot read property \'addSkill\' of null');//issue
+    }).toThrowError('Cannot read property \'addSkill\' of null');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 

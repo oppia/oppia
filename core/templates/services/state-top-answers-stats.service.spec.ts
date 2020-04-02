@@ -382,10 +382,8 @@ describe('StateTopAnswersStatsService', function() {
         expect(function() {
           StateTopAnswersStatsService.getStateStats('Me Llamo');
         }).toThrowError('Me Llamo does not exist.');
-    
 
         ExplorationStatesService.addState('Me Llamo');
-
         expect(StateTopAnswersStatsService.getStateStats('Me Llamo'))
           .toEqual([]);
       });

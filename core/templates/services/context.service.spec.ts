@@ -262,7 +262,7 @@ describe('Context service', () => {
 
     it('should throw an error when trying to retrieve the exploration id',
       () => {
-        expect(() => ecs.getExplorationId()).toThrowError( 
+        expect(() => ecs.getExplorationId()).toThrowError(
           'ContextService should not be used outside the ' +
           'context of an exploration or a question.');
       }

@@ -22,25 +22,26 @@ angular.module('oppia').factory('ExpressionSyntaxTreeService', [
   'ExpressionParserService', 'PARAMETER_TYPES',
   function(ExpressionParserService, PARAMETER_TYPES) {
     // Exceptions that can be thrown from the evaluation of expressions.
-      const ExpressionError = function() {};
-      ExpressionError.prototype = new Error();
-      ExpressionError.prototype.constructor = ExpressionError;
+    const ExpressionError = function() { };
+    ExpressionError.prototype = new Error();
+    ExpressionError.prototype.constructor = ExpressionError;
 
-      var ExprUndefinedVarError = function(varname, envs) {
-        this.varname = varname;
-        this.envs = envs;
-        this.name = 'ExprUndefinedVarError';
-        this.message = this.varname + ' not found in ' + JSON.stringify(this.envs);
-      };
-      ExprUndefinedVarError.prototype = new ExpressionError();
-      ExprUndefinedVarError.prototype.constructor = ExprUndefinedVarError;
+    var ExprUndefinedVarError = function(varname, envs) {
+      this.varname = varname;
+      this.envs = envs;
+      this.name = 'ExprUndefinedVarError';
+      this.message = this.varname + ' not found in ' +
+        JSON.stringify(this.envs);
+    };
+    ExprUndefinedVarError.prototype = new ExpressionError();
+    ExprUndefinedVarError.prototype.constructor = ExprUndefinedVarError;
 
     var ExprWrongNumArgsError = function(args, expectedMin, expectedMax) {
       this.args = args;
       this.expectedMin = expectedMin;
       this.expectedMax = expectedMax;
       this.name = 'ExprWrongNumArgsError';
-      this.message =  '{' + this.args + '} not in range [' +
+      this.message = '{' + this.args + '} not in range [' +
         this.expectedMin + ',' + this.expectedMax + ']';
     };
     ExprWrongNumArgsError.prototype = new ExpressionError();
@@ -50,13 +51,13 @@ angular.module('oppia').factory('ExpressionSyntaxTreeService', [
       this.arg = arg;
       this.actualType = actualType;
       this.expectedType = expectedType;
-      this.name = 'ExprWrongArgTypeError'
+      this.name = 'ExprWrongArgTypeError';
       if (this.arg === null) {
-        this.message =   'Type ' + this.actualType +
-        ' does not match expected type ' + this.expectedType;
+        this.message = 'Type ' + this.actualType +
+          ' does not match expected type ' + this.expectedType;
       } else {
         this.message = this.arg + ' has type ' + this.actualType +
-        ' which does not match expected type ' + this.expectedType;
+          ' which does not match expected type ' + this.expectedType;
       }
     };
     ExprWrongArgTypeError.prototype = new ExpressionError();

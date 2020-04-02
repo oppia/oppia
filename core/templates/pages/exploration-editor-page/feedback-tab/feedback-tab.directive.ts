@@ -193,7 +193,7 @@ angular.module('oppia').directive('feedbackTab', [
             ctrl.messageSendingInProgress = true;
             let thread = ThreadDataService.getThread(threadId);
             if (thread === null) {
-              throw new  Error(
+              throw new Error(
                 'Trying to add message to a non-existent thread.');
             }
             ThreadDataService.addNewMessageAsync(thread, tmpText, tmpStatus)
