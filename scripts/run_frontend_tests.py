@@ -98,9 +98,10 @@ def main(args=None):
     if 'Trying to get the Angular injector' in python_utils.UNICODE(
             out, 'utf-8'):
         python_utils.PRINT(
-            'Please refer https://github.com/oppia/oppia/wiki/'
-            'Frontend-test-best-practices#fixing-frontend-test-errors if '
-            'you need help in fixing the errors.')
+            'If you run into the error "Trying to get the Angular injector",'
+            ' please see https://github.com/oppia/oppia/wiki/'
+            'Frontend-test-best-practices#fixing-frontend-test-errors'
+            ' for details on how to fix it.')
 
     if parsed_args.check_coverage:
         if task.returncode:
