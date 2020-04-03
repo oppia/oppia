@@ -186,7 +186,6 @@ class StorageModelsTest(test_utils.GenericTestBase):
         # be implemented, and the TO_BE_IMPLEMENTED value will be removed.
         # Contact @varun-tandon for more information.
         expected_unimplemented = {
-            exploration_models.ExplorationRightsSnapshotMetadataModel,
-            exploration_models.ExplorationSnapshotMetadataModel,
+            exploration_models.ExplorationSnapshotMetadataModel
         }
         self.assertEqual(unimplemented_models, expected_unimplemented)

@@ -426,6 +426,18 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
+        exploration_models.ExplorationRightsSnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
+        # exploration_models.ExplorationSnapshotMetadataModel(
+        #     id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+        #     commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+        #     commit_cmds=self.COMMIT_CMDS
+        # ).put()
+
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         super(TakeoutServiceUnitTests, self).setUp()
@@ -518,6 +530,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_story_sm = {}
         expected_question_sm = {}
         expected_config_property_sm = {}
+        expected_exploration_rights_sm = {}
+        # expected_exploration_sm = {}
 
         expected_export = {
             'user_stats_data': stats_data,
@@ -559,7 +573,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'story_snapshot_metadata_data': expected_story_sm,
             'question_snapshot_metadata_data': expected_question_sm,
             'config_property_snapshot_metadata_data':
-                expected_config_property_sm
+                expected_config_property_sm,
+            'exploration_rights_snapshot_metadata_data':
+                expected_exploration_rights_sm,
+            # 'exploration_snapshot_metadata_data': expected_exploration_sm,
         }
 
         # Perform export and compare.
@@ -867,6 +884,22 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             }
         }
 
+        expected_exploration_rights_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
+            }
+        }
+
+        # expected_exploration_sm = {
+        #     self.GENERIC_MODEL_ID: {
+        #         'commit_type': self.COMMIT_TYPE,
+        #         'commit_message': self.COMMIT_MESSAGE,
+        #         'commit_cmds': self.COMMIT_CMDS
+        #     }
+        # }
+
         expected_export = {
             'user_stats_data': expected_stats_data,
             'user_settings_data': expected_settings_data,
@@ -910,7 +943,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'story_snapshot_metadata_data': expected_story_sm,
             'question_snapshot_metadata_data': expected_question_sm,
             'config_property_snapshot_metadata_data':
-                expected_config_property_sm
+                expected_config_property_sm,
+            'exploration_rights_snapshot_metadata_data':
+                expected_exploration_rights_sm,
+            # 'exploration_snapshot_metadata_data': expected_exploration_sm,
         }
 
         exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
