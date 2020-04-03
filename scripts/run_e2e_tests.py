@@ -110,9 +110,6 @@ _PARSER.add_argument(
     help='Run the tests in prod mode. Static resources are served from'
          ' build directory and use cache slugs.',
     action='store_true')
-_PARSER.add_argument(
-    '--community_dashboard_enabled', action='store_true',
-    help='Run the test after enabling the community dashboard page.')
 
 _PARSER.add_argument(
     '--suite', default='full',
@@ -236,21 +233,6 @@ def update_dev_mode_in_constants_js(constant_file, dev_mode_setting):
     replace = '"DEV_MODE": %s' % (
         'true' if dev_mode_setting else 'false')
     common.inplace_replace_file(constant_file, pattern, replace)
-
-
-def update_community_dashboard_status_in_feconf_file(
-        feconf_file_path, enable_community_dashboard):
-    """Change feconf.py file based on whether the community dashboard is
-    enabled.
-
-    Args:
-        feconf_file_path: str. Path to the feconf.py file.
-        enable_community_dashboard: bool. Represents whether community
-            dashboard is enabled.
-    """
-    pattern = 'COMMUNITY_DASHBOARD_ENABLED = .*'
-    replace = 'COMMUNITY_DASHBOARD_ENABLED = %s' % enable_community_dashboard
-    common.inplace_replace_file(feconf_file_path, pattern, replace)
 
 
 def run_webdriver_manager(parameters):
@@ -448,8 +430,6 @@ def main(args=None):
     atexit.register(cleanup)
 
     dev_mode = not parsed_args.prod_env
-    update_community_dashboard_status_in_feconf_file(
-        FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
     if not parsed_args.skip_build:
         build_js_files(dev_mode)
     start_webdriver_manager()
