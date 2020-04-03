@@ -266,6 +266,7 @@ class ExplorationRightsSnapshotMetadataModel(
     """Storage model for the metadata for an exploration rights snapshot."""
     pass
 
+
 class ExplorationRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration rights snapshot."""

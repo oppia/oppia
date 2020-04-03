@@ -39,6 +39,7 @@ class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection snapshot."""
     pass
 
+
 class CollectionModel(base_models.VersionedModel):
     """Versioned storage model for an Oppia collection.
 

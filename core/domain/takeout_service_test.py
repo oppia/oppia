@@ -374,10 +374,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         ).put()
 
         collection_models.CollectionRightsSnapshotMetadataModel(
-             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
-             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
-             commit_cmds=self.COMMIT_CMDS
-         ).put()
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
 
         collection_models.CollectionSnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
@@ -554,11 +554,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'user_contribution_scoring_data': expected_contrib_score_data,
             'user_community_rights_data': expected_community_rights_data,
             'collection_rights_snapshot_metadata_data':
-                 expected_collection_rights_sm,
+                expected_collection_rights_sm,
             'collection_snapshot_metadata_data':
-                 expected_collection_sm,
+                expected_collection_sm,
             'skill_snapshot_metadata_data':
-                 expected_skill_sm,
+                expected_skill_sm,
             'subtopic_page_snapshot_metadata_data':
                 expected_subtopic_page_sm,
             'topic_rights_snapshot_metadata_data':
@@ -828,11 +828,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
 
         expected_skill_sm = {
-             self.GENERIC_MODEL_ID: {
+            self.GENERIC_MODEL_ID: {
                  'commit_type': self.COMMIT_TYPE,
                  'commit_message': self.COMMIT_MESSAGE,
                  'commit_cmds': self.COMMIT_CMDS
-             }
+            }
         }
         expected_subtopic_page_sm = {
             self.GENERIC_MODEL_ID: {
@@ -840,7 +840,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 'commit_message': self.COMMIT_MESSAGE,
                 'commit_cmds': self.COMMIT_CMDS
             }
-         }
+        }
         expected_topic_rights_sm = {
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
@@ -894,7 +894,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                     'cmd': 'create_new',
                     'title': 'A title'
                 }],
-                'commit_message': "New exploration created with title 'A title'."
+                'commit_message':
+                    'New exploration created with title \'A title\'.'
             },
             'exp_1-2': {
                 'commit_type': 'edit',

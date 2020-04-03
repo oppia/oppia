@@ -166,7 +166,6 @@ class StorageModelsTest(test_utils.GenericTestBase):
         ]
         models_with_export = (takeout_service
                               .get_models_which_should_be_exported())
-        unimplemented_models = set()
         for model in all_models:
             export_policy = model.get_export_policy()
             if model in models_with_export:
