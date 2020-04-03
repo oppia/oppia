@@ -88,7 +88,7 @@ describe('Community dashboard page', function() {
     communityDashboardTranslateTextTab.expectSelectedLanguageToBe('Hindi');
   });
 
-  it('should allow users to accept question suggestions', function() {
+  fit('should allow users to accept question suggestions', function() {
     // Baseline verification.
     users.login(user1Email);
     communityDashboardPage.get();
@@ -152,7 +152,7 @@ describe('Community dashboard page', function() {
       'Accepted', 0);
   });
 
-  it('should allow users to reject question suggestions', function() {
+  fit('should allow users to reject question suggestions', function() {
     // Baseline verification.
     users.login(user1Email);
     communityDashboardPage.get();
