@@ -234,7 +234,6 @@ describe('Community dashboard page', function() {
       communityDashboardPage.expectOpportunityListItemHeadingToBe(
         skillDescription0, 0);
     });
-
   });
 
   afterEach(function() {

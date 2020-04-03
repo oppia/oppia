@@ -64,7 +64,7 @@ var CommunityDashboardPage = function() {
     waitFor.invisibilityOf(
       opportunityLoadingPlaceholder,
       'Opportunity placeholders take too long to become invisible.');
-  }
+  };
 
   this.expectUserToBeTranslationReviewer = function(language) {
     waitFor.visibilityOf(
@@ -139,14 +139,14 @@ var CommunityDashboardPage = function() {
 
   this.expectOpportunityListItemProgressPercentageToBe = function(
       percentage, index) {
-      opportunityListItemProgressPercentages.then(function(percentages) {
+    opportunityListItemProgressPercentages.then(function(percentages) {
       expect(percentages[index].getText()).toEqual(percentage);
     });
   };
 
   this.clickOpportunityListItemButton = function(index) {
     opportunityListItemButtons.then(function(buttons) {
-      buttons[index].click()
+      buttons[index].click();
     });
   };
 
@@ -176,7 +176,7 @@ var CommunityDashboardPage = function() {
   this.navigateToSubmitQuestionTab = function() {
     waitFor.elementToBeClickable(
       submitQuestionTabButton, 'Submit Question tab is not clickable');
-      submitQuestionTabButton.click();
+    submitQuestionTabButton.click();
     waitFor.pageToFullyLoad();
   };
 };
