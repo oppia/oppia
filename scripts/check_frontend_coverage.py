@@ -272,6 +272,7 @@ FULLY_COVERED_FILENAMES = [
     'QuestionSummaryForOneSkillObjectFactory.ts',
     'QuestionSummaryObjectFactory.ts',
     'read-only-exploration-backend-api.service.ts',
+    'read-only-topic-object.factory.ts',
     'ReadOnlyStoryNodeObjectFactory.ts',
     'ReadOnlySubtopicPageObjectFactory.ts',
     'replace-inputs-with-ellipses.filter.ts',
