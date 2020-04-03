@@ -185,7 +185,5 @@ class StorageModelsTest(test_utils.GenericTestBase):
         # The export_data functions for the models in this list will eventually
         # be implemented, and the TO_BE_IMPLEMENTED value will be removed.
         # Contact @varun-tandon for more information.
-        expected_unimplemented = {
-            exploration_models.ExplorationSnapshotMetadataModel
-        }
+        expected_unimplemented = {}
         self.assertEqual(unimplemented_models, expected_unimplemented)

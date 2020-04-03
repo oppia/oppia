@@ -432,12 +432,6 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
-        # exploration_models.ExplorationSnapshotMetadataModel(
-        #     id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
-        #     commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
-        #     commit_cmds=self.COMMIT_CMDS
-        # ).put()
-
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         super(TakeoutServiceUnitTests, self).setUp()
@@ -531,7 +525,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_question_sm = {}
         expected_config_property_sm = {}
         expected_exploration_rights_sm = {}
-        # expected_exploration_sm = {}
+        expected_exploration_sm = {}
 
         expected_export = {
             'user_stats_data': stats_data,
@@ -576,7 +570,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 expected_config_property_sm,
             'exploration_rights_snapshot_metadata_data':
                 expected_exploration_rights_sm,
-            # 'exploration_snapshot_metadata_data': expected_exploration_sm,
+            'exploration_snapshot_metadata_data': expected_exploration_sm,
         }
 
         # Perform export and compare.
@@ -892,13 +886,27 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        # expected_exploration_sm = {
-        #     self.GENERIC_MODEL_ID: {
-        #         'commit_type': self.COMMIT_TYPE,
-        #         'commit_message': self.COMMIT_MESSAGE,
-        #         'commit_cmds': self.COMMIT_CMDS
-        #     }
-        # }
+        expected_exploration_sm = {
+            'exp_1-1': {
+                'commit_type': 'create',
+                'commit_cmds': [{
+                    'category': 'A category',
+                    'cmd': 'create_new',
+                    'title': 'A title'
+                }],
+                'commit_message': "New exploration created with title 'A title'."
+            },
+            'exp_1-2': {
+                'commit_type': 'edit',
+                'commit_cmds': [{
+                    'new_value': 'the objective',
+                    'cmd': 'edit_exploration_property',
+                    'old_value': None,
+                    'property_name': 'objective'
+                }],
+                'commit_message': 'Test edit'
+            }
+        }
 
         expected_export = {
             'user_stats_data': expected_stats_data,
@@ -946,8 +954,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 expected_config_property_sm,
             'exploration_rights_snapshot_metadata_data':
                 expected_exploration_rights_sm,
-            # 'exploration_snapshot_metadata_data': expected_exploration_sm,
+            'exploration_snapshot_metadata_data': expected_exploration_sm,
         }
-
+        # self.maxDiff = None
         exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
+        print(exported_data['exploration_snapshot_metadata_data'])
         self.assertEqual(exported_data, expected_export)
