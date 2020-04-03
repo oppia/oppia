@@ -51,6 +51,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.story = story_domain.Story.create_default_story(
             self.story_id, 'story_title', self.topic_id_1)
         self.story.description = 'story_description'
+        self.story.node_count = 0
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'public_topic_name', 'abbrev')
@@ -122,7 +123,9 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                 'canonical_story_dicts': [{
                     'id': self.story.id,
                     'title': self.story.title,
-                    'description': self.story.description
+                    'description': self.story.description,
+                    'node_count': self.story.node_count,
+                    'published': True
                 }],
                 'additional_story_dicts': [],
                 'uncategorized_skill_ids': [self.skill_id_1],
@@ -168,7 +171,9 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                     'canonical_story_dicts': [{
                         'id': self.story.id,
                         'title': self.story.title,
-                        'description': self.story.description
+                        'description': self.story.description,
+                        'node_count': self.story.node_count,
+                        'published': True
                     }],
                     'additional_story_dicts': [],
                     'uncategorized_skill_ids': [self.skill_id_1],
