@@ -956,7 +956,5 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata_data': expected_exploration_sm,
         }
-        # self.maxDiff = None
         exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
-        print(exported_data['exploration_snapshot_metadata_data'])
         self.assertEqual(exported_data, expected_export)
