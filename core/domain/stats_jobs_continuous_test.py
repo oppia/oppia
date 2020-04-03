@@ -19,8 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import ast
-
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -77,26 +75,28 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
             NonContinuousInteractionAnswerSummariesAggregator)
 
-    def _disable_state_name_validation(self):
-        """Context manager that disables exploration state name validation."""
-        def no_op(*unused_args, **unused_kwargs):
-            """Does nothing."""
-            pass
-        return self.swap(exp_domain.Exploration, '_validate_state_name', no_op)
-
-    def test_debug_message_for_malformed_keys(self):
-        # Create an exploration with a malformed state name.
+    def test_answers_for_states_with_unicode_names(self):
         exp_id = 'eid'
         exp = self.save_new_valid_exploration(exp_id, 'author@website.com')
-        with self._disable_state_name_validation():
-            exp.rename_state(feconf.DEFAULT_INIT_STATE_NAME, '\u0000�')
-        # Record an answer in that state for the job to process.
+        # State names used by our test server to confirm unicode support.
+        unicode_state_names = [
+            'ÐšÐ°ÐºÐ¸Ðµ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸? Ð¤Ñ€Ð°Ð·Ñ‹ Ð½Ð° Ð´Ð¸Ð°Ð',
+            'SadrÅ¾aj 1'
+        ]
+        exp = self.save_new_linear_exp_with_state_names_and_interactions(
+            exp_id, 'author@website.com', unicode_state_names,
+            ['MultipleChoiceInput'])
+
         event_services.AnswerSubmissionEventHandler.record(
-            exp_id, exp.version, exp.init_state_name, 'MultipleChoiceInput',
+            exp_id, exp.version, unicode_state_names[0], 'MultipleChoiceInput',
             0, 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1',
             5.0, {}, 'answer1')
 
-        # Check that the job runs to completion.
+        event_services.AnswerSubmissionEventHandler.record(
+            exp_id, exp.version, unicode_state_names[1], 'MultipleChoiceInput',
+            0, 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1',
+            5.0, {}, 'answer2')
+
         with self._disable_batch_continuation():
             job_class, job_manager = (
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator,
@@ -110,21 +110,8 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
-        # Parse the job output.
-        (job_key, job_output), (job_summary_key, job_summary_output) = (
-            ast.literal_eval(o) for o in job_manager.get_output(job_id))
-        # Check that the problematic values are present.
-        self.assertEqual(job_key, 'eid:1:\x00\ufffd')
-        self.assertEqual(job_summary_key, 'eid:all:\x00\ufffd')
-        # Check that helpful debug information is present.
-        self.assertRegexpMatches(
-            job_output,
-            'Expected valid exploration id, version, and state name triple, '
-            'actual: UnicodeDecodeError.*ordinal not in range')
-        self.assertRegexpMatches(
-            job_summary_output,
-            'Expected valid exploration id, version, and state name triple, '
-            'actual: UnicodeDecodeError.*ordinal not in range')
+        # A successful job should output nothing.
+        self.assertEqual(job_manager.get_output(job_id), [])
 
     def test_one_answer(self):
         with self._disable_batch_continuation():
