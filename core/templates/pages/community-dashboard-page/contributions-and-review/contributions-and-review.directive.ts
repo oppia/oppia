@@ -343,9 +343,9 @@ angular.module('oppia').directive('contributionsAndReview', [
             ctrl.contributionsDataLoading = true;
             ctrl.contributionSummaries = [];
             if (suggestionType === ctrl.SUGGESTION_TYPE_QUESTION) {
+              ctrl.activeContributionTab = ctrl.SUGGESTION_TYPE_QUESTION;
               ContributionAndReviewService.getUserCreatedQuestionSuggestions(
                 function(suggestionIdToSuggestions) {
-                  ctrl.activeContributionTab = ctrl.SUGGESTION_TYPE_QUESTION;
                   ctrl.contributions = suggestionIdToSuggestions;
                   ctrl.contributionSummaries = (
                     getQuestionContributionsSummary());
@@ -353,10 +353,10 @@ angular.module('oppia').directive('contributionsAndReview', [
                 });
             }
             if (suggestionType === ctrl.SUGGESTION_TYPE_TRANSLATE) {
+              ctrl.activeContributionTab = ctrl.SUGGESTION_TYPE_TRANSLATE;
               ContributionAndReviewService
                 .getUserCreatedTranslationSuggestions(
                   function(suggestionIdToSuggestions) {
-                    ctrl.activeContributionTab = ctrl.SUGGESTION_TYPE_TRANSLATE;
                     ctrl.contributions = suggestionIdToSuggestions;
                     ctrl.contributionSummaries = (
                       getTranslationContributionsSummary());
@@ -371,9 +371,9 @@ angular.module('oppia').directive('contributionsAndReview', [
             ctrl.contributionSummaries = [];
 
             if (suggestionType === ctrl.SUGGESTION_TYPE_QUESTION) {
+              ctrl.activeReviewTab = ctrl.SUGGESTION_TYPE_QUESTION;
               ContributionAndReviewService.getReviewableQuestionSuggestions(
                 function(suggestionIdToSuggestions) {
-                  ctrl.activeReviewTab = ctrl.SUGGESTION_TYPE_QUESTION;
                   ctrl.contributions = suggestionIdToSuggestions;
                   ctrl.contributionSummaries = (
                     getQuestionContributionsSummary());
@@ -382,10 +382,10 @@ angular.module('oppia').directive('contributionsAndReview', [
               );
             }
             if (suggestionType === ctrl.SUGGESTION_TYPE_TRANSLATE) {
+              ctrl.activeReviewTab = ctrl.SUGGESTION_TYPE_TRANSLATE;
               ContributionAndReviewService
                 .getReviewableTranslationSuggestions(
                   function(suggestionIdToSuggestions) {
-                    ctrl.activeReviewTab = ctrl.SUGGESTION_TYPE_TRANSLATE;
                     ctrl.contributions = suggestionIdToSuggestions;
                     ctrl.contributionSummaries = (
                       getTranslationContributionsSummary());

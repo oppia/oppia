@@ -9,9 +9,16 @@
   <section class="oppia-suggestion-review-container">
     <div class="oppia-question-suggestion">
       <div>
-        Skill Difficulty: <strong><[skillDifficultyLabel]></strong>
-        <br>
-        Skill Difficulty Explanation: <[skillRubricExplanation]>
+        <div class="oppia-question-suggestion-rubric">
+          <span>
+            <strong>Skill Difficulty: </strong><[skillDifficultyLabel]>
+          </span>
+        </div>
+        <div>
+          <strong>Skill Difficulty Explanation:</strong>
+          <angular-html-bind html-data="skillRubricExplanation">
+          </angular-html-bind>
+        </div>
       </div>
       <question-editor question-id="questionId"
                        misconceptions-by-skill="misconceptionsBySkill"
@@ -43,6 +50,10 @@
 <style>
   .author-header {
     margin-top: -12px;
+  }
+  .oppia-question-suggestion-rubric {
+    display: flex;
+    flex-direction: column;
   }
   .oppia-question-suggestion {
     height: 100%;
