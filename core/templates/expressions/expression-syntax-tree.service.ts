@@ -23,7 +23,7 @@ import { AppConstants } from 'app.constants';
 import { ExpressionParserService } from
   'expressions/expression-parser.service.ts';
 
-class ExpressionError extends Error {
+export class ExpressionError extends Error {
   constructor() {
     super();
     // NOTE TO DEVELOPERS: As per recommendation of TypeScript
@@ -35,7 +35,7 @@ class ExpressionError extends Error {
   }
 }
 
-class ExprUndefinedVarError extends ExpressionError {
+export class ExprUndefinedVarError extends ExpressionError {
   constructor(public varname: string, public envs: any[]) {
     super();
   }
@@ -45,7 +45,7 @@ class ExprUndefinedVarError extends ExpressionError {
   }
 }
 
-class ExprWrongNumArgsError extends ExpressionError {
+export class ExprWrongNumArgsError extends ExpressionError {
   constructor(public args: Array<number|string>, public expectedMin: number,
       public expectedMax: number) {
     super();
@@ -57,7 +57,7 @@ class ExprWrongNumArgsError extends ExpressionError {
   }
 }
 
-class ExprWrongArgTypeError extends ExpressionError {
+export class ExprWrongArgTypeError extends ExpressionError {
   constructor(public arg: number|string, public actualType: string,
     public expectedType: string) {
     super();

@@ -17,7 +17,9 @@
  */
 import { TestBed } from '@angular/core/testing';
 
-import { ExpressionSyntaxTreeService } from
+import { ExpressionSyntaxTreeService, ExpressionError,
+  ExprUndefinedVarError, ExprWrongArgTypeError,
+  ExprWrongNumArgsError } from
   'expressions/expression-syntax-tree.service.ts';
 
 describe('Expression syntax tree service', () => {
@@ -39,6 +41,51 @@ describe('Expression syntax tree service', () => {
       ]);
 
       expect(expected).toBe(actual);
+    });
+  });
+
+  describe('ExpressionError', () => {
+    let expressionError: ExpressionError;
+
+    it('should extend Error object', () => {
+      expressionError = new ExpressionError();
+
+      expect(expressionError.name).toBe('ExpressionError');
+      expect(expressionError instanceof Error).toBe(true);
+    });
+  });
+
+  describe('ExprUndefinedVarError', () => {
+    let exprUndifinedVarError: ExprUndefinedVarError;
+
+    it('should extend ExpressionError class', () => {
+      const exampleVar = undefined;
+      exprUndifinedVarError = new ExprUndefinedVarError(exampleVar, []);
+
+      expect(exprUndifinedVarError.name).toBe('ExprUndefinedVarError');
+      expect(exprUndifinedVarError instanceof ExpressionError).toBe(true);
+    });
+  });
+
+  describe('ExprWrongNumArgsError', () => {
+    let exprWrongNumArgsError: ExprWrongNumArgsError;
+
+    it('should extend ExpressionError class', () => {
+      exprWrongNumArgsError = new ExprWrongNumArgsError([], 0, 1);
+
+      expect(exprWrongNumArgsError.name).toBe('ExprWrongNumArgsError');
+      expect(exprWrongNumArgsError instanceof ExpressionError).toBe(true);
+    });
+  });
+
+  describe('ExprWrongArgTypeError', () => {
+    let exprWrongArgTypeError: ExprWrongArgTypeError;
+
+    it('should extend ExpressionError class', () => {
+      exprWrongArgTypeError = new ExprWrongArgTypeError(undefined, '0', '1');
+
+      expect(exprWrongArgTypeError.name).toBe('ExprWrongArgTypeError');
+      expect(exprWrongArgTypeError instanceof ExpressionError).toBe(true);
     });
   });
 });
