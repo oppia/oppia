@@ -178,6 +178,8 @@ import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
 import { ReadOnlyStoryNodeObjectFactory } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
+import { ReadOnlyTopicObjectFactory } from
+  'domain/topic_viewer/read-only-topic-object.factory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RubricObjectFactory } from
@@ -619,6 +621,10 @@ export class UpgradedServices {
       upgradedServices['SubtopicObjectFactory'],
       upgradedServices['StoryReferenceObjectFactory'],
       upgradedServices['SkillSummaryObjectFactory']);
+    upgradedServices['ReadOnlyTopicObjectFactory'] =
+      new ReadOnlyTopicObjectFactory(
+        upgradedServices['SubtopicObjectFactory'],
+        upgradedServices['SkillSummaryObjectFactory']);
 
     // Topological level: 4.
     upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(

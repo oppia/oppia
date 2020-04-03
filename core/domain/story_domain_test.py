@@ -264,7 +264,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         expected_dict = {
             'id': self.STORY_ID,
             'title': 'Title',
-            'description': 'Description'
+            'description': 'Description',
+            'node_count': 0
         }
 
         self.assertEqual(expected_dict, story_summary.to_human_readable_dict())
