@@ -322,16 +322,32 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 # Order by cls.key is needed alongside cls.last_updated so as to
                 # resolve conflicts, if any.
                 # Reference SO link: https://stackoverflow.com/q/12449197
-            ).order(-cls.last_updated, cls.key).fetch_page(
+            ).order(cls.question_id, cls.key).fetch_page(
                 question_skill_count,
                 start_cursor=cursor
             )
         else:
-            question_skill_link_models, next_cursor, more = cls.query(
+            random_id = utils.convert_to_hash(
+                python_utils.UNICODE(
+                    utils.get_random_int(base_models.RAND_RANGE)),
+                base_models.ID_LENGTH)
+            questions_list, next_cursor, more = cls.query(
                 cls.skill_id.IN(skill_ids)
-            ).order(-cls.last_updated, cls.key).fetch_page(
-                question_skill_count
-            )
+            ).order(cls.question_id, cls.key).filter(
+                cls.question_id > random_id
+            ).fetch_page(question_skill_count)
+            if len(questions_list) < question_skill_count:
+                # The next cursor should not be updated because
+                # we are moving the start point and not the end point.
+                question_list_extra, cursor, more = cls.query(
+                    cls.skill_id.IN(skill_ids)
+                ).order(-cls.question_id, cls.key).filter(
+                    cls.question_id <= random_id
+                ).fetch_page(question_skill_count)
+                question_list_extra.extend(questions_list)
+                questions_list = question_list_extra
+            question_skill_link_models = questions_list
+
         next_cursor_str = (
             next_cursor.urlsafe() if (next_cursor and more) else None
         )
