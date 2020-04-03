@@ -237,9 +237,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_COLLECTION_URL,
         creator_dashboard.NewCollectionHandler),
     get_redirect_route(
-        r'%s' % feconf.COMMUNITY_DASHBOARD_URL,
-        community_dashboard.CommunityDashboardPage),
-    get_redirect_route(
         r'%s/<opportunity_type>' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
         community_dashboard.ContributionOpportunitiesHandler),
     get_redirect_route(
