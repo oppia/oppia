@@ -228,6 +228,8 @@ var AdminPage = function() {
     updateFormName.sendKeys(name);
     var roleOption = roleSelect.element(
       by.cssContainingText('option', newRole));
+    waitFor.visibilityOf(
+      roleOption, 'Admin Role option is not visible');
     roleOption.click();
     updateFormSubmit.click();
     waitFor.textToBePresentInElement(

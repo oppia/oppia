@@ -16,6 +16,7 @@
  * @fileoverview End-to-end tests for the community dashboard page.
  */
 
+var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
@@ -23,18 +24,61 @@ var workflow = require('../protractor_utils/workflow.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CommunityDashboardPage = require(
   '../protractor_utils/CommunityDashboardPage.js');
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
+var SkillEditorPage =
+  require('../protractor_utils/SkillEditorPage.js');
 var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 
 describe('Community dashboard page', function() {
-  var communityDashboardPage = null;
-  var communityDashboardTranslateTextTab = null;
+  const topicName0 = 'Topic 0';
+  const skillDescription0 = 'Skill 0';
+  const reviewMaterial0 = 'Review Material 0';
+  const topicName1 = 'Topic 1';
+  const skillDescription1 = 'Skill 1';
+  const reviewMaterial1 = 'Review Material 1';
+  const adminEmail = 'management@community.com';
+  const user1Email = 'user1@community.com';
+  const user2Email = 'user2@community.com';
+
+  let communityDashboardPage = null;
+  let communityDashboardTranslateTextTab = null;
+  let topicsAndSkillsDashboardPage = null;
+  let skillEditorPage = null;
+  let explorationEditorPage = null;
+  let explorationEditorMainTab = null;
+  let adminPage = null;
 
   beforeAll(function() {
     communityDashboardPage = (
       new CommunityDashboardPage.CommunityDashboardPage());
     communityDashboardTranslateTextTab = (
       communityDashboardPage.getTranslateTextTab());
+    topicsAndSkillsDashboardPage =
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
+    skillEditorPage =
+      new SkillEditorPage.SkillEditorPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    adminPage = new AdminPage.AdminPage();
+    users.createUser(user1Email, 'user1');
+    users.createUser(user2Email, 'user2');
+    users.createAndLoginAdminUser(adminEmail, 'management');
+    // Create 2 topics and 2 skills. Link 1 skill to 1 topic.
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createTopic(topicName0, 'abbrev');
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createTopic(topicName1, 'abbrev');
+    workflow.createSkillAndAssignTopic(
+      skillDescription0, reviewMaterial0, topicName0);
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      skillDescription1, reviewMaterial1);
+    // Allow user2 to review suggestions.
+    adminPage.get();
+    adminPage.assignQuestionReviewer('user2');
+    users.logout();
   });
 
   it('should allow user to switch to translate text tab', function() {
@@ -44,40 +88,149 @@ describe('Community dashboard page', function() {
     communityDashboardTranslateTextTab.expectSelectedLanguageToBe('Hindi');
   });
 
-  describe('Submit question tab', function() {
-    const topicName0 = 'Topic 0';
-    const skillDescription0 = 'Skill 0';
-    const reviewMaterial0 = 'Review Material 0';
-    const topicName1 = 'Topic 1';
-    const skillDescription1 = 'Skill 1';
-    const reviewMaterial1 = 'Review Material 1';
-    const adminEmail = 'management@community.com';
+  it('should allow users to accept question suggestions', function() {
+    // Baseline verification.
+    users.login(user1Email);
+    communityDashboardPage.get();
+    // Initially, there should be no opportunity contributions, only the 2
+    // placeholder opportunities used when loading.
+    communityDashboardPage.waitForOpportunitiesToLoad();
+    communityDashboardPage.expectNumberOfOpportunitiesToBe(2);
+    communityDashboardPage.navigateToSubmitQuestionTab();
+    communityDashboardPage.waitForOpportunitiesToLoad();
+    // Before submission, progress percentage should be 0/50 = 0%.
+    communityDashboardPage.expectOpportunityListItemProgressPercentageToBe(
+      '(0.00%)', 0);
+    communityDashboardPage.expectOpportunityListItemHeadingToBe(
+      skillDescription0, 0);
 
-    let topicsAndSkillsDashboardPage = null;
-
-    beforeAll(function() {
-      users.createAndLoginAdminUser(adminEmail, 'management');
-      topicsAndSkillsDashboardPage =
-        new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
-      topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.createTopic(topicName0, 'abbrev');
-      topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.createTopic(topicName1, 'abbrev');
-      workflow.createSkillAndAssignTopic(
-        skillDescription0, reviewMaterial0, topicName0);
-      topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-        skillDescription1, reviewMaterial1);
-      users.logout();
+    // Submit suggestion as user1.
+    communityDashboardPage.clickOpportunityListItemButton(0);
+    skillEditorPage.confirmSkillDifficulty();
+    explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
+    explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Correct Answer'), null, false,
+      'FuzzyEquals', 'correct');
+    explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
+    explorationEditorMainTab.addHint('Hint 1');
+    explorationEditorMainTab.addSolution('TextInput', {
+      correctAnswer: 'correct',
+      explanation: 'It is correct'
     });
+    skillEditorPage.saveQuestion();
+    users.logout();
 
-    fit('should list skill opportunities', function() {
-      users.login('admin@example.com');
+    // Review and accept the suggestion as user2.
+    users.login(user2Email);
+    communityDashboardPage.get();
+    communityDashboardPage.waitForOpportunitiesToLoad();
+    communityDashboardPage.clickOpportunityListItemButton(0);
+    communityDashboardPage.clickAcceptQuestionSuggestionButton();
+    communityDashboardPage.waitForOpportunitiesToLoad();
+    communityDashboardPage.expectEmptyOpportunityAvailabilityMessage();
+
+    // Validate progress percentage was updated in the opportunity.
+    communityDashboardPage.get();
+    communityDashboardPage.navigateToSubmitQuestionTab();
+    communityDashboardPage.waitForOpportunitiesToLoad();
+    // After acceptance, progress percentage should be 1/50 = 2%.
+    communityDashboardPage.expectOpportunityListItemProgressPercentageToBe(
+      '(2.00%)', 0);
+    users.logout();
+
+    // Validate the contribution status changed.
+    users.login(user1Email);
+    communityDashboardPage.get();
+    communityDashboardPage.waitForOpportunitiesToLoad();
+    communityDashboardPage.expectNumberOfOpportunitiesToBe(3);
+    communityDashboardPage.expectOpportunityListItemHeadingToBe(
+      'Question 1', 0);
+    communityDashboardPage.expectOpportunityListItemSubheadingToBe(
+      skillDescription0, 0);
+    communityDashboardPage.expectOpportunityListItemLabelToBe(
+      'Accepted', 0);
+  });
+
+  it('should allow users to reject question suggestions', function() {
+    // Baseline verification.
+    users.login(user1Email);
+    communityDashboardPage.get();
+    communityDashboardPage.navigateToSubmitQuestionTab();
+    communityDashboardPage.waitForOpportunitiesToLoad();
+    communityDashboardPage.expectOpportunityListItemProgressPercentageToBe(
+      '(2.00%)', 0);
+
+    // Submit suggestion as user1.
+    communityDashboardPage.clickOpportunityListItemButton(0);
+    skillEditorPage.confirmSkillDifficulty();
+    explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
+    explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Correct Answer'), null, false,
+      'FuzzyEquals', 'correct');
+    explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
+    explorationEditorMainTab.addHint('Hint 1');
+    explorationEditorMainTab.addSolution('TextInput', {
+      correctAnswer: 'correct',
+      explanation: 'It is correct'
+    });
+    skillEditorPage.saveQuestion();
+    users.logout();
+
+    // Review and reject the suggestion as user2.
+    users.login(user2Email);
+    communityDashboardPage.get();
+    communityDashboardPage.waitForOpportunitiesToLoad();
+    communityDashboardPage.clickOpportunityListItemButton(0);
+    communityDashboardPage.setQuestionSuggestionReviewMessage('review message');
+    communityDashboardPage.clickRejectQuestionSuggestionButton();
+    communityDashboardPage.waitForOpportunitiesToLoad();
+    communityDashboardPage.expectEmptyOpportunityAvailabilityMessage();
+
+    // Validate progress percentage remains the same in the opportunity.
+    communityDashboardPage.get();
+    communityDashboardPage.navigateToSubmitQuestionTab();
+    communityDashboardPage.waitForOpportunitiesToLoad();
+    // After rejection, progress percentage should still be 0%.
+    communityDashboardPage.expectOpportunityListItemProgressPercentageToBe(
+      '(2.00%)', 0);
+    users.logout();
+
+    // Validate the contribution status changed.
+    users.login(user1Email);
+    communityDashboardPage.get();
+    communityDashboardPage.waitForOpportunitiesToLoad();
+    communityDashboardPage.expectNumberOfOpportunitiesToBe(4);
+    communityDashboardPage.expectOpportunityListItemHeadingToBe(
+      'Question 1', 0);
+    communityDashboardPage.expectOpportunityListItemSubheadingToBe(
+      skillDescription0, 0);
+    communityDashboardPage.expectOpportunityListItemLabelToBe(
+      'Rejected', 0);
+  });
+
+  describe('Submit question tab', function() {
+    it('should list skill opportunities for admin user', function() {
+      users.login(adminEmail, true /* isSuperAdmin */);
       communityDashboardPage.get();
       communityDashboardPage.navigateToSubmitQuestionTab();
       communityDashboardPage.waitForOpportunitiesToLoad();
 
-      communityDashboardPage.expectNumberOfOpportunitiesToBe(1);
+      // There are always at least 2 placeholder opportunity list items.
+      communityDashboardPage.expectNumberOfOpportunitiesToBe(3);
+      communityDashboardPage.expectOpportunityListItemHeadingToBe(
+        skillDescription0, 0);
+    });
+
+    it('should list skill opportunities for non-admin user', function() {
+      users.login(user1Email);
+      communityDashboardPage.get();
+      communityDashboardPage.navigateToSubmitQuestionTab();
+      communityDashboardPage.waitForOpportunitiesToLoad();
+
+      // There are always at least 2 placeholder opportunity list items.
+      communityDashboardPage.expectNumberOfOpportunitiesToBe(3);
       communityDashboardPage.expectOpportunityListItemHeadingToBe(
         skillDescription0, 0);
     });
