@@ -829,9 +829,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
         expected_skill_sm = {
             self.GENERIC_MODEL_ID: {
-                 'commit_type': self.COMMIT_TYPE,
-                 'commit_message': self.COMMIT_MESSAGE,
-                 'commit_cmds': self.COMMIT_CMDS
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+                'commit_cmds': self.COMMIT_CMDS
             }
         }
         expected_subtopic_page_sm = {
