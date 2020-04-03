@@ -174,16 +174,8 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     base_models.EXPORT_POLICY.CONTAINS_USER_DATA,
                     export_policy
                 )
-            elif export_policy == base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED:
-                unimplemented_models.add(model)
             else:
                 self.assertEqual(
                     base_models.EXPORT_POLICY.NOT_APPLICABLE,
                     export_policy
                 )
-        # TODO(#8523): This list should not be modified under any circumstance.
-        # The export_data functions for the models in this list will eventually
-        # be implemented, and the TO_BE_IMPLEMENTED value will be removed.
-        # Contact @varun-tandon for more information.
-        expected_unimplemented = {}
-        self.assertEqual(unimplemented_models, expected_unimplemented)
