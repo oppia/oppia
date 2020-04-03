@@ -5,9 +5,9 @@
       <lazy-loading ng-show="$ctrl.opportunityDataIsLoading"></lazy-loading>
     </div>
     <div class="oppia-opportunities-heading oppia-animate-fadein">
-      <span
-        class="protractor-test-opportunity-list-item-heading"
-        ng-show="!$ctrl.opportunityDataIsLoading"><[$ctrl.opportunity.heading | wrapTextWithEllipsis : 30]>
+      <span class="protractor-test-opportunity-list-item-heading"
+            ng-show="!$ctrl.opportunityDataIsLoading">
+        <[$ctrl.opportunity.heading | wrapTextWithEllipsis : 30]>
       </span>
       <lazy-loading ng-show="$ctrl.opportunityDataIsLoading"></lazy-loading>
     </div>
