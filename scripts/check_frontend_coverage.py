@@ -405,6 +405,7 @@ FULLY_COVERED_FILENAMES = [
     'underscores-to-camel-case.filter.ts',
     'underscores-to-camel-case.pipe.ts',
     'undo-redo.service.ts',
+    'UnitsObjectFactory.ts',
     'UpgradedServices.ts',
     'url.service.ts',
     'user-email-preferences.service.ts',

@@ -39,9 +39,9 @@ angular.module('oppia').directive('voiceoverOpportunities', [
       'translation-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'ContributionOpportunitiesService',
+        '$rootScope', '$scope', 'ContributionOpportunitiesService',
         'TranslationLanguageService', function(
-            $scope, ContributionOpportunitiesService,
+            $rootScope, $scope, ContributionOpportunitiesService,
             TranslationLanguageService) {
           var ctrl = this;
           var updateWithNewOpportunities = function(opportunities, more) {
@@ -58,6 +58,8 @@ angular.module('oppia').directive('voiceoverOpportunities', [
             }
             ctrl.moreOpportunitiesAvailable = more;
             ctrl.opportunitiesAreLoading = false;
+            // TODO(#8521): Remove the use of $rootScope.$apply().
+            $rootScope.$apply();
           };
 
           ctrl.onLoadMoreOpportunities = function() {
