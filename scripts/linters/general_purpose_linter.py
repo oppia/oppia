@@ -212,7 +212,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'(?s)(?:(?<=catch).*?throw(?=\s.*;))|(throw\s\w+[;]'),
+        'regexp': re.compile(r'(?s)(?:(?<=catch).*?throw(?=\s.*;))|(throw\s\w+[;])'),
         'message': 'Please use '
                    '\'throw new Error\' instead of \'throw\'',
         'excluded_files': (),
