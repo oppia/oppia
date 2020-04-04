@@ -92,7 +92,7 @@ export class ExpressionSyntaxTreeService {
   }
 
   private findParams(parseTree: string[]|string): Set<string> {
-    let paramsFound = new Set<string>();
+    const paramsFound = new Set<string>();
     if (parseTree instanceof Array) {
       if (parseTree[0] === '#') {
         paramsFound.add(parseTree[1]);
@@ -133,7 +133,7 @@ export class ExpressionSyntaxTreeService {
 
   // Coerces the argument to a Number, and throws an error if the result is NaN.
   private coerceToNumber(originalValue: string|number): number {
-    let coercedValue = +originalValue;
+    const coercedValue = +originalValue;
     if (!isNaN(coercedValue)) {
       return coercedValue;
     }
@@ -157,7 +157,7 @@ export class ExpressionSyntaxTreeService {
     '+': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 1, 2);
-        let numericArgs = this.coerceAllArgsToNumber(args);
+        const numericArgs = this.coerceAllArgsToNumber(args);
         return numericArgs.length === 1 ?
           numericArgs[0] :
           numericArgs[0] + numericArgs[1];
@@ -172,7 +172,7 @@ export class ExpressionSyntaxTreeService {
     '-': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 1, 2);
-        let numericArgs = this.coerceAllArgsToNumber(args);
+        const numericArgs = this.coerceAllArgsToNumber(args);
         return numericArgs.length === 1 ?
           -numericArgs[0] :
           numericArgs[0] - numericArgs[1];
@@ -187,7 +187,7 @@ export class ExpressionSyntaxTreeService {
     '*': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 2);
-        let numericArgs = this.coerceAllArgsToNumber(args);
+        const numericArgs = this.coerceAllArgsToNumber(args);
         return numericArgs[0] * numericArgs[1];
       },
       getType: (args: string[]): string => {
@@ -200,7 +200,7 @@ export class ExpressionSyntaxTreeService {
     '/': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 2);
-        let numericArgs = this.coerceAllArgsToNumber(args);
+        const numericArgs = this.coerceAllArgsToNumber(args);
         return numericArgs[0] / numericArgs[1];
       },
       getType: (args: string[]): string => {
@@ -213,7 +213,7 @@ export class ExpressionSyntaxTreeService {
     '%': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 2);
-        let numericArgs = this.coerceAllArgsToNumber(args);
+        const numericArgs = this.coerceAllArgsToNumber(args);
         return numericArgs[0] % numericArgs[1];
       },
       getType: (args: string[]): string => {
@@ -226,7 +226,7 @@ export class ExpressionSyntaxTreeService {
     '<=': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 2);
-        let numericArgs = this.coerceAllArgsToNumber(args);
+        const numericArgs = this.coerceAllArgsToNumber(args);
         return numericArgs[0] <= numericArgs[1];
       },
       getType: (args: string[]): string => {
@@ -239,7 +239,7 @@ export class ExpressionSyntaxTreeService {
     '>=': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 2);
-        let numericArgs = this.coerceAllArgsToNumber(args);
+        const numericArgs = this.coerceAllArgsToNumber(args);
         return numericArgs[0] >= numericArgs[1];
       },
       getType: (args: string[]): string => {
@@ -252,7 +252,7 @@ export class ExpressionSyntaxTreeService {
     '<': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 2);
-        let numericArgs = this.coerceAllArgsToNumber(args);
+        const numericArgs = this.coerceAllArgsToNumber(args);
         return numericArgs[0] < numericArgs[1];
       },
       getType: (args: string[]): string => {
@@ -265,7 +265,7 @@ export class ExpressionSyntaxTreeService {
     '>': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 2);
-        let numericArgs = this.coerceAllArgsToNumber(args);
+        const numericArgs = this.coerceAllArgsToNumber(args);
         return numericArgs[0] > numericArgs[1];
       },
       getType: (args: string[]): string => {
@@ -350,7 +350,7 @@ export class ExpressionSyntaxTreeService {
     'floor': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 1);
-        let numericArgs = this.coerceAllArgsToNumber(args);
+        const numericArgs = this.coerceAllArgsToNumber(args);
         return Math.floor(numericArgs[0]);
       },
       getType: (args: string[]): string => {
@@ -363,7 +363,7 @@ export class ExpressionSyntaxTreeService {
     'pow': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 2);
-        let numericArgs = this.coerceAllArgsToNumber(args);
+        const numericArgs = this.coerceAllArgsToNumber(args);
         return Math.pow(numericArgs[0], numericArgs[1]);
       },
       getType: (args: string[]): string => {
@@ -376,8 +376,8 @@ export class ExpressionSyntaxTreeService {
     'log': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 2);
-        let numericArgs = this.coerceAllArgsToNumber(args);
-        let preciseAns = Math.log(numericArgs[0]) / Math.log(numericArgs[1]);
+        const numericArgs = this.coerceAllArgsToNumber(args);
+        const preciseAns = Math.log(numericArgs[0]) / Math.log(numericArgs[1]);
         // We round answers to 9 decimal places, so that we don't run into
         // issues like log(9, 3) = 2.0000000000004.
         return Math.round(preciseAns * Math.pow(10, 9)) / Math.pow(10, 9);
@@ -392,7 +392,7 @@ export class ExpressionSyntaxTreeService {
     'abs': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 1);
-        let numericArgs = this.coerceAllArgsToNumber(args);
+        const numericArgs = this.coerceAllArgsToNumber(args);
         return Math.abs(numericArgs[0]);
       },
       getType: (args: string[]): string => {
