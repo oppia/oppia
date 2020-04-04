@@ -44,13 +44,13 @@ var expectInteractionDetailsToMatch = function(
         optionElements[i].element(by.css(
           '.protractor-test-multiple-choice-option'
         )).getText().then(function(text) {
-          choices.push(text)
-          if(choices.length == 4){
-            for(var j=0;j < choices.length; j++){
+          choices.push(text);
+          if (choices.length === 4) {
+            for (var j = 0;j < choices.length; j++) {
               expect(richTextInstructionsArray).toContain(choices[j]);
             }
           }
-        })
+        });
       }
     });
 };
