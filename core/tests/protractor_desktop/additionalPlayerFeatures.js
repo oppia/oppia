@@ -260,8 +260,8 @@ describe('Full exploration editor', function() {
     explorationEditorMainTab.setContent(forms.toRichText(
       'Parent Exploration Content'));
     explorationEditorMainTab.setInteraction(
-      'MultipleChoiceInput', [{ editAction: 'create'},
-        [forms.toRichText('Correct'), forms.toRichText('Incorrect')]]);
+      'MultipleChoiceInput',
+      [forms.toRichText('Correct'), forms.toRichText('Incorrect')]);
     explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', null, 'card 2', true,
       'Equals', 'Correct');
@@ -285,8 +285,8 @@ describe('Full exploration editor', function() {
     explorationEditorMainTab.setContent(forms.toRichText(
       'Parent Exploration Content'));
     explorationEditorMainTab.setInteraction(
-      'MultipleChoiceInput', [{ editAction: 'create'},
-        [forms.toRichText('Correct'), forms.toRichText('Incorrect')]]);
+      'MultipleChoiceInput',
+      [forms.toRichText('Correct'), forms.toRichText('Incorrect')]);
     explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', null, 'card 2', true,
       'Equals', 'Correct');
@@ -396,8 +396,8 @@ describe('Full exploration editor', function() {
     explorationEditorMainTab.setContent(forms.toRichText(
       'this is card 2 with previous answer {{answer}}'));
     explorationEditorMainTab.setInteraction(
-      'MultipleChoiceInput', [{ editAction: 'create'},
-        [forms.toRichText('return'), forms.toRichText('complete')]]);
+      'MultipleChoiceInput',
+      [forms.toRichText('return'), forms.toRichText('complete')]);
     explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', null, 'card 1', false,
       'Equals', 'return');

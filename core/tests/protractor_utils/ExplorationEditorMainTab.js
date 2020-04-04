@@ -35,6 +35,7 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-add-response-details'));
   var addResponseHeader = element(
     by.css('.protractor-test-add-response-modal-header'));
+  var getAnswerTabs = element.all(by.css('.protractor-test-answer-tab'));
   var multipleChoiceAnswerOptions = function(optionNum) {
     return element(
       by.cssContainingText('.protractor-test-html-select-option', optionNum));
@@ -330,45 +331,27 @@ var ExplorationEditorMainTab = function() {
        * Check for correct rule parameters.
        * @param {string} [interactionId] - Interaction type.
        * @param {string} [ruleName] - Appropriate rule of provided interaction.
+       * @param {integer} [ruleIndex] - The index of the rule to check.
        * @param {string[]} [feedbackTextArray] - Exact feedback text to match.
        */
-      expectRuleToBe: function(interactionId, ruleName, feedbackTextArray) {
-        var ruleDescription = _getRuleDescription(interactionId, ruleName);
-        // Replace selectors with feedbackTextArray's elements.
-        ruleDescription = _replaceRuleInputPlaceholders(
-          ruleDescription, feedbackTextArray, interactionId);
-        ruleDescription += '...';
-        // Adding "..." to end of string.
-        var answerTab = element(by.css('.protractor-test-answer-tab'));
-        expect(answerTab.getText()).toEqual(ruleDescription);
-      },
-      /**
-       * Check for correct rule parameters in the case of multiple rules in an
-         answer group.
-       * @param {string[][]} - A 2 dimensional array , where each 1 dimensional
-         array contains the parameters for a particular rule.
-       */
-      expectMultipleRulesToBe: function(ruleParamatersArray) {
-        element.all(by.css('.protractor-test-answer-tab')).then(
+      expectRuleToBe: function(
+          interactionId, ruleName, ruleIndex, feedbackTextArray) {
+        getAnswerTabs.then(
           function(answerTabs) {
-            for (var i = 0; i < ruleParamatersArray.length; i++) {
-              var ruleDescription = _getRuleDescription(
-                ruleParamatersArray[i][0], ruleParamatersArray[i][1]);
-                // From second rule onwards, we need add an "or" before the
-                // rule description.
-              if (i > 0) {
-                ruleDescription = 'or ' + _replaceRuleInputPlaceholders(
-                  ruleDescription, ruleParamatersArray[i][2],
-                  ruleParamatersArray[i][0]);
-              } else {
-                ruleDescription = _replaceRuleInputPlaceholders(
-                  ruleDescription, ruleParamatersArray[i][2],
-                  ruleParamatersArray[i][0]);
-              }
-              ruleDescription += '...';
-              // Adding "..." to end of string.
-              expect(answerTabs[i].getText()).toEqual(ruleDescription);
+            var ruleDescription = _getRuleDescription(interactionId, ruleName);
+            // Replace selectors with feedbackTextArray's elements.
+            if (ruleIndex > 0) {
+            // From second rule onwards, we need add an "or" before the
+            // rule description.
+              ruleDescription = 'or ' + _replaceRuleInputPlaceholders(
+                ruleDescription, feedbackTextArray, interactionId);
+            } else {
+              ruleDescription = _replaceRuleInputPlaceholders(
+                ruleDescription, feedbackTextArray, interactionId);
             }
+            // Adding "..." to end of string.
+            ruleDescription += '...';
+            expect(answerTabs[ruleIndex].getText()).toEqual(ruleDescription);
           });
       },
       /**
@@ -670,7 +653,7 @@ var ExplorationEditorMainTab = function() {
       interaction, 'interaction takes too long to appear');
   };
   // This function will be used as the standard way to modify an interaction
-  // after it has been created.Additional arguments may be sent to this
+  // after it has been created. Additional arguments may be sent to this
   // function, and they will be passed on to the relevant interaction editor.
   this.editInteraction = function(interactionId) {
     customizeInteraction.apply(null, arguments);

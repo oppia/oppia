@@ -324,7 +324,7 @@ angular.module('oppia').factory('ResponsesService', [
       // example, the rules for multiple choice need to refer to the multiple
       // choice interaction's customization arguments.
       updateAnswerChoices: function(
-          newAnswerChoices, oldToNewListMapping, callback) {
+          newAnswerChoices, oldToNewAnswerChoicesMapping, callback) {
         var oldAnswerChoices = angular.copy(_answerChoices);
         _answerChoices = newAnswerChoices;
 
@@ -335,15 +335,14 @@ angular.module('oppia').factory('ResponsesService', [
           // based on the information about the modification of answer choices
           // from the schema-based-list editor.
           // The information regarding the modifications of answer choices is
-          // present in oldToNewListMapping.
+          // present in oldToNewAnswerChoicesMapping.
 
-          if (oldToNewListMapping !== undefined) {
-            var deletedIndexes = oldToNewListMapping.deletedIndexes;
+          if (
+            oldToNewAnswerChoicesMapping !== undefined &&
+               oldToNewAnswerChoicesMapping.hasOwnProperty('deletedIndexes')) {
+            var deletedIndexes = oldToNewAnswerChoicesMapping.deletedIndexes;
             var answerGroups = angular.copy(_answerGroups);
-            if (deletedIndexes === undefined) {
-              return;
-            }
-            deletedIndexes.forEach( function(deletedIndex) {
+            deletedIndexes.forEach(function(deletedIndex) {
               for (var i = 0; i < answerGroups.length; i++) {
                 var rules = answerGroups[i].rules;
                 for (var j = 0; j < rules.length; j++) {
@@ -355,7 +354,7 @@ angular.module('oppia').factory('ResponsesService', [
                     // deleted.
                     _answerGroups[i].rules[j].inputs.x--;
                   } else if (deletedIndex === rules[j].inputs.x) {
-                    // if deletedindex corresponds to a rule index we make the
+                    // If deletedIndex corresponds to a rule index we make the
                     // corresponding rule invalid. For an answer group to be
                     // invalid a rule index in that answer group should be
                     // greater than the number of choices.

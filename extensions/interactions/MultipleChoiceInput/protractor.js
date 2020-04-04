@@ -19,34 +19,50 @@
 
 var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 
-// The customizeInstructionsArray contains two elements, The first element is
-// an object, which contains information regrading the type of customization to
-// be done on the interaction(i.e intialize or create interaction, add elements,
-// delete elements). The second element of customizeInstructionsArray is an
-// array, whose elements containing instructions regarding editing of rich text
-// area of options. The members of this array are functions, one for each
-// option, which will each be passed a 'handler' that they can use to edit the
+
+// The members of richTextInstructionsArray are functions, one for each option,
+// which will each be passed a 'handler' that they can use to edit the
 // rich-text area of the option, for example by
 //   handler.appendUnderlineText('emphasised');
-var customizeInteraction = function(elem, customizeInstructionsArray) {
-  if (customizeInstructionsArray[0].editAction === 'delete') {
-    for (var i = 0; i < customizeInstructionsArray[1].length; i++) {
-      forms.ListEditor(elem).deleteItem(customizeInstructionsArray[1][i]);
-    }
-  } else if (
-    customizeInstructionsArray[0].editAction === 'add') {
-    for (var i = 0; i < customizeInstructionsArray[1].length; i++) {
-      var richTextEditor = forms.ListEditor(elem).addItem('RichText');
-      richTextEditor.clear();
-      customizeInstructionsArray[1][i](richTextEditor);
-    }
-  } else if (
-    customizeInstructionsArray[0].editAction === 'create') {
-    forms.ListEditor(elem).setLength(customizeInstructionsArray[1].length);
-    for (var i = 0; i < customizeInstructionsArray[1].length; i++) {
+// The second arguement(optional) editInstructions is used to edit the
+// interaction after its creation. The editInstructions contains two elements,
+// the first is a command('edit', 'delete', 'add') and second element is the
+// index of the object to be edited or deleted. In the case of 'add',
+// the editInstructions has only one element.
+var customizeInteraction = function(
+    elem, richTextInstructionsArray, editInstructions) {
+  if (editInstructions === undefined) {
+    forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
+    for (var i = 0; i < richTextInstructionsArray.length; i++) {
       var richTextEditor = forms.ListEditor(elem).editItem(i, 'RichText');
       richTextEditor.clear();
-      customizeInstructionsArray[1][i](richTextEditor);
+      richTextInstructionsArray[i](richTextEditor);
+    }
+  } else {
+    if (
+      editInstructions[0] === 'delete' &&
+         richTextInstructionsArray === null) {
+      forms.ListEditor(elem).deleteItem(editInstructions[1]);
+    } else if (
+      editInstructions[0] === 'add' &&
+         richTextInstructionsArray !== null &&
+         richTextInstructionsArray.length === 1) {
+      var richTextEditor = forms.ListEditor(elem).addItem('RichText');
+      richTextEditor.clear();
+      richTextInstructionsArray[0](richTextEditor);
+    } else if (
+      editInstructions[0] === 'edit' &&
+         richTextInstructionsArray !== null &&
+         richTextInstructionsArray.length === 1) {
+      elem.all(by.repeater('item in localValue track by $index')).count().then(
+        function(length) {
+          if (editInstructions[1] < length) {
+            var richTextEditor = forms.ListEditor(elem).editItem(
+              editInstructions[1], 'RichText');
+            richTextEditor.clear();
+            richTextInstructionsArray[0](richTextEditor);
+          }
+        });
     }
   }
 };

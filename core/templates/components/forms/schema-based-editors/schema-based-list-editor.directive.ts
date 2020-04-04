@@ -48,7 +48,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
         labelForFocusTarget: '&',
         // Variable to keep track of the changes in the list-editor on
         // addition and deletion of elements.
-        oldToNewListMapping: '='
+        oldToNewAnswerChoicesMapping: '='
       },
       template: require('./schema-based-list-editor.directive.html'),
       restrict: 'E',
@@ -84,26 +84,31 @@ angular.module('oppia').directive('schemaBasedListEditor', [
           return false;
         };
 
-        var initializeOldToNewListMapping = function() {
-          if ($scope.oldToNewListMapping !== undefined) {
+        var initializeoldToNewAnswerChoicesMapping = function() {
+          if ($scope.oldToNewAnswerChoicesMapping !== undefined) {
             for (var i = 0; i < $scope.localValue.length; i++) {
-              $scope.oldToNewListMapping.newToOldListPosition.push(i);
+              $scope.oldToNewAnswerChoicesMapping.
+                newToOldAnswerChoicesPostion.push(i);
             }
           }
         };
-        var updateOldToNewListMappingOnDeleteElement = function(index) {
-          if ($scope.oldToNewListMapping !== undefined) {
-            var deletedIndex = $scope.oldToNewListMapping.
-              newToOldListPosition[index];
-            if (deletedIndex !== -1) {
-              $scope.oldToNewListMapping.deletedIndexes.push(deletedIndex);
-            }
-            $scope.oldToNewListMapping.newToOldListPosition.splice(index, 1);
-          }
-        };
-        var updateOldToNewListMappingOnAddElement = function() {
-          if ($scope.oldToNewListMapping !== undefined) {
-            $scope.oldToNewListMapping.newToOldListPosition.push(-1);
+        var updateoldToNewAnswerChoicesMappingOnDeleteElement =
+            function(index) {
+              if ($scope.oldToNewAnswerChoicesMapping !== undefined) {
+                var deletedIndex = $scope.oldToNewAnswerChoicesMapping.
+                  newToOldAnswerChoicesPostion[index];
+                if (deletedIndex !== -1) {
+                  $scope.oldToNewAnswerChoicesMapping.deletedIndexes.push(
+                    deletedIndex);
+                }
+                $scope.oldToNewAnswerChoicesMapping.
+                  newToOldAnswerChoicesPostion.splice(index, 1);
+              }
+            };
+        var updateoldToNewAnswerChoicesMappingOnAddElement = function() {
+          if ($scope.oldToNewAnswerChoicesMapping !== undefined) {
+            $scope.oldToNewAnswerChoicesMapping.
+              newToOldAnswerChoicesPostion.push(-1);
           }
         };
 
@@ -168,7 +173,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
                 SchemaDefaultValueService.getDefaultValue($scope.itemSchema()));
               FocusManagerService.setFocus(
                 $scope.getFocusLabel($scope.localValue.length - 1));
-              updateOldToNewListMappingOnAddElement();
+              updateoldToNewAnswerChoicesMappingOnAddElement();
             };
 
             var _deleteLastElementIfUndefined = function() {
@@ -239,10 +244,10 @@ angular.module('oppia').directive('schemaBasedListEditor', [
               'submittedSchemaBasedFloatForm', $scope._onChildFormSubmit);
             $scope.$on(
               'submittedSchemaBasedUnicodeForm', $scope._onChildFormSubmit);
-            initializeOldToNewListMapping();
+            initializeoldToNewAnswerChoicesMapping();
 
             $scope.deleteElement = function(index) {
-              updateOldToNewListMappingOnDeleteElement(index);
+              updateoldToNewAnswerChoicesMappingOnDeleteElement(index);
               // Need to let the RTE know that HtmlContent has been changed.
               $scope.$broadcast('externalHtmlContentChange');
               $scope.localValue.splice(index, 1);
