@@ -331,8 +331,8 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
-    // Note that removing quotation marks from these keys causes issues with
-    // minification when running the deployment scripts.
+    // NOTE TO DEVELOPERS: Removing the quotation marks from the following keys
+    // causes issues with minification when running the deployment scripts.
     'if': { // eslint-disable-line quote-props
       eval: (args: string[]): string => {
         this.verifyNumArgs(args, 3);
