@@ -1,11 +1,11 @@
 <div class="audio-header" ng-if="isAudioBarAvailable()">
   <div ng-if="audioBarIsExpanded" class="audio-controls">
     <div class="audio-header-control-buttons">
-      <div>
+      <div class="audio-header-control-icons">
         <span class="oppia-replay-white-circle" ng-click="onBackwardButtonClicked()" ng-if="progressBarIsShown">
-        <i class="fas fa-undo audio-undo-icon"></i>
+          <i class="fas fa-undo audio-undo-icon"></i>
           <span class="oppia-five-back">5</span>
-      </span>
+        </span>
         <i class="fas audio-controls-button-icon"
            ng-click="onPlayButtonClicked()"
            ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle': !isAudioPlaying(), 'fa-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
@@ -13,9 +13,9 @@
            tooltip-append-to-body="true" tooltip-placement="right">
         </i>
         <span class="oppia-replay-white-circle oppia-replay-white-circle-forward" ng-click="onForwardButtonClicked()"  ng-if="progressBarIsShown">
-        <i class="fas fa-undo audio-undo-icon audio-undo-icon-forward"></i>
+          <i class="fas fa-undo audio-undo-icon audio-undo-icon-forward"></i>
           <span class="oppia-five-back">5</span>
-      </span>
+        </span>
       </div>
       <div class="slider-section" ng-if="progressBarIsShown">
         <div ng-if="audioLoadingIndicatorIsShown">
@@ -31,11 +31,11 @@
         <span class="audio-controls-message">&zwnj;</span>
       </div>
       <div class="audio-header-select">
-      <select class="audio-language-select"
-              ng-model="selectedLanguage.value"
-              ng-options="o.value as o.displayed for o in languagesInExploration"
-              ng-change="onNewLanguageSelected()">
-      </select>
+        <select class="audio-language-select"
+                ng-model="selectedLanguage.value"
+                ng-options="o.value as o.displayed for o in languagesInExploration"
+                ng-change="onNewLanguageSelected()">
+        </select>
       </div>
     </div>
     <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()"><i class="fas fa-sort-up"></i></div>
@@ -178,23 +178,6 @@
     position: relative;
     bottom: 7px;
   }
-  @media screen and (max-width: 768px) {
-    .audio-header-control-buttons {
-      justify-content: space-evenly;
-    }
-
-    .oppia-replay-white-circle {
-      padding: 5px;
-      width: 26px;
-    }
-
-    .audio-header-select {
-      width: 20%;
-    }
-    .audio-header-select select {
-      width: 100%;
-    }
-    }
   .audio-controls-button-image {
     width: 21px;
     height: 21px;
@@ -283,9 +266,33 @@
     margin-top: -270px;
   }
 
-  @media screen and (max-width: 700px) {
-      audio-bar .slider-section {
-          width: auto;
-      }
+  @media screen and (max-width: 768px) {
+    .audio-header-control-buttons {
+      justify-content: space-evenly;
+    }
+    .oppia-replay-white-circle {
+      padding: 5px;
+      width: 26px;
+    }
+    .audio-header-select select {
+      width: 100%;
+    }
+    .audio-header-control-icons {
+      order: 2;
+    }
+    audio-bar .slider-section {
+      order: 1;
+      width: 90%;
+    }
+    .audio-header-select {
+      order: 3;
+      width: 50%;
+    }
+    .audio-collapse-button {
+      top: 80px;
+    }
+    .audio-controls {
+      height: 80px;
+    }
   }
 </style>

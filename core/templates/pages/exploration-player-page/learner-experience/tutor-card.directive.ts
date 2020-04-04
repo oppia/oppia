@@ -203,6 +203,7 @@ angular.module('oppia').directive('tutorCard', [
           ctrl.$onInit = function() {
             $scope.arePreviousResponsesShown = false;
             $scope.waitingForOppiaFeedback = false;
+            $scope.isAudioPlaying = false;
             $scope.windowDimensionsService = WindowDimensionsService;
             $scope.isIframed = UrlService.isIframed();
             $scope.canAskLearnerForAnswerInfo = (
