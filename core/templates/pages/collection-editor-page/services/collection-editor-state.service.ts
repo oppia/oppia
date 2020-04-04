@@ -77,6 +77,9 @@ angular.module('oppia').factory('CollectionEditorStateService', [
           collectionId).then(
           function(newBackendCollectionObject) {
             _updateCollection(newBackendCollectionObject);
+            // TODO(#8521): Remove the use of $rootScope.$applyAsync()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
           },
           function(error) {
             AlertsService.addWarning(
@@ -87,6 +90,9 @@ angular.module('oppia').factory('CollectionEditorStateService', [
           collectionId).then(function(newBackendCollectionRightsObject) {
           _updateCollectionRights(newBackendCollectionRightsObject);
           _collectionIsLoading = false;
+          // TODO(#8521): Remove the use of $rootScope.$applyAsync()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         }, function(error) {
           AlertsService.addWarning(
             error ||
@@ -187,6 +193,9 @@ angular.module('oppia').factory('CollectionEditorStateService', [
             if (successCallback) {
               successCallback();
             }
+            // TODO(#8521): Remove the use of $rootScope.$applyAsync()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
           }, function(error) {
             AlertsService.addWarning(
               error || 'There was an error when saving the collection.');

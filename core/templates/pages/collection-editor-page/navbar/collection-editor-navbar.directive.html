@@ -63,7 +63,7 @@
         </span>
       </span>
 
-      <span ng-if="$ctrl.isSaveInProgress()">
+      <span ng-if="$ctrl.isSaveInProgress()" class="protractor-test-save-in-progress-label">
         <span ng-if="$ctrl.collectionRights.isPrivate()" class="oppia-save-publish-button-label">Saving</span>
         <span ng-if="$ctrl.collectionRights.isPublic()" class="oppia-save-publish-button-label">Publishing</span>
         <loading-dots></loading-dots>

@@ -95,6 +95,24 @@ class QuestionChange(change_domain.BaseChange):
     }]
 
 
+class QuestionSuggestionChange(change_domain.BaseChange):
+    """Domain object for changes made to question suggestion object.
+
+    The allowed commands, together with the attributes:
+        - 'create_new_fully_specified_question' (with question_dict,
+        skill_id, skill_difficulty)
+    """
+
+    ALLOWED_COMMANDS = [
+        {
+            'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'required_attribute_names': [
+                'question_dict', 'skill_id', 'skill_difficulty'],
+            'optional_attribute_names': []
+        }
+    ]
+
+
 class Question(python_utils.OBJECT):
     """Domain object for a question."""
 

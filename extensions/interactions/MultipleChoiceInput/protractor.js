@@ -17,7 +17,7 @@
  * interaction.
  */
 
-var forms = require('../../../core/tests/protractor_utils/forms.js');
+var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 
 // The members of richTextInstructionsArray are functions, one for each option,
 // which will each be passed a 'handler' that they can use to edit the
