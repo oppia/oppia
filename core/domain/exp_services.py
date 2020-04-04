@@ -222,6 +222,24 @@ def get_recently_published_exp_summaries(limit):
         exp_models.ExpSummaryModel.get_recently_published(limit))
 
 
+def get_story_id_linked_to_exploration(exp_id):
+    """Returns the ID of the story that the exploration is a part of, or None if
+    the exploration is not part of a story.
+
+    Args:
+        exp_id: str. The ID of the exploration.
+
+    Returns:
+        str|None. The ID of the story if the exploration is linked to some
+            story, otherwise None.
+    """
+    exploration_context_model = exp_models.ExplorationContextModel.get_by_id(
+        exp_id)
+    if exploration_context_model is not None:
+        return exploration_context_model.story_id
+    return None
+
+
 def get_all_exploration_summaries():
     """Returns a dict with all exploration summary domain objects,
     keyed by their id.
@@ -374,7 +392,12 @@ def apply_change_list(exploration_id, change_list):
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
-                    state.update_interaction_hints(change.new_value)
+                    if not isinstance(change.new_value, list):
+                        raise Exception('Expected hints_list to be a list,'
+                                        ' received %s' % change.new_value)
+                    new_hints_list = [state_domain.Hint.from_dict(hint_dict)
+                                      for hint_dict in change.new_value]
+                    state.update_interaction_hints(new_hints_list)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):

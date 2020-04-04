@@ -16,6 +16,8 @@
  * @fileoverview Shared constants for the Oppia module.
  */
 
+import { WARNING_TYPES_CONSTANT } from 'app-type.constants';
+
 export class AppConstants {
   public static DEFAULT_TRANSLATIONS = {
     I18N_LIBRARY_PAGE_TITLE: 'Library',
@@ -56,7 +58,7 @@ export class AppConstants {
      Not called when a card is selected by clicking progress dots */
   public static EVENT_NEW_CARD_AVAILABLE = 'newCardAvailable';
 
-  public static WARNING_TYPES = {
+  public static WARNING_TYPES: WARNING_TYPES_CONSTANT = {
     // These must be fixed before the exploration can be saved.
     CRITICAL: 'critical',
     // These must be fixed before publishing an exploration to the public
@@ -114,7 +116,10 @@ export class AppConstants {
   public static COMPONENT_NAME_SOLUTION = 'solution';
   public static COMPONENT_NAME_FEEDBACK = 'feedback';
   public static COMPONENT_NAME_EXPLANATION = 'explanation';
-  public static COMPONENT_NAME_WORKED_EXAMPLE = 'worked_example';
+  public static COMPONENT_NAME_WORKED_EXAMPLE = {
+    QUESTION: 'worked_example_question',
+    EXPLANATION: 'worked_example_explanation'
+  };
 
   public static ACTION_TYPE_EXPLORATION_START = 'ExplorationStart';
   public static ACTION_TYPE_ANSWER_SUBMIT = 'AnswerSubmit';
