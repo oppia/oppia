@@ -39,30 +39,50 @@ var customizeInteraction = function(
       richTextInstructionsArray[i](richTextEditor);
     }
   } else {
-    if (
-      editInstructions[0] === 'delete' &&
-         richTextInstructionsArray === null) {
-      forms.ListEditor(elem).deleteItem(editInstructions[1]);
-    } else if (
-      editInstructions[0] === 'add' &&
-         richTextInstructionsArray !== null &&
-         richTextInstructionsArray.length === 1) {
-      var richTextEditor = forms.ListEditor(elem).addItem('RichText');
-      richTextEditor.clear();
-      richTextInstructionsArray[0](richTextEditor);
-    } else if (
-      editInstructions[0] === 'edit' &&
-         richTextInstructionsArray !== null &&
-         richTextInstructionsArray.length === 1) {
-      elem.all(by.repeater('item in localValue track by $index')).count().then(
-        function(length) {
-          if (editInstructions[1] < length) {
-            var richTextEditor = forms.ListEditor(elem).editItem(
-              editInstructions[1], 'RichText');
-            richTextEditor.clear();
-            richTextInstructionsArray[0](richTextEditor);
-          }
-        });
+    if (editInstructions[0] === 'delete') {
+      if (richTextInstructionsArray === null) {
+        elem.all(by.repeater('item in localValue track by $index')).count().
+          then(
+            function(length) {
+              if (editInstructions[1] < length) {
+                forms.ListEditor(elem).deleteItem(editInstructions[1]);
+              } else {
+                throw Error('The given index is invalid.');
+              }
+            });
+      } else {
+        throw Error('richTextInstructionsArray should be null.');
+      }
+    } else if (editInstructions[0] === 'add') {
+      if (richTextInstructionsArray !== null &&
+            richTextInstructionsArray.length === 1) {
+        var richTextEditor = forms.ListEditor(elem).addItem('RichText');
+        richTextEditor.clear();
+        richTextInstructionsArray[0](richTextEditor);
+      } else {
+        throw Error(
+          'richTextInstructionsArray should have only one element.');
+      }
+    } else if (editInstructions[0] === 'edit') {
+      if (
+        richTextInstructionsArray !== null &&
+          richTextInstructionsArray.length === 1) {
+        elem.all(by.repeater('item in localValue track by $index')).count().
+          then(
+            function(length) {
+              if (editInstructions[1] < length) {
+                var richTextEditor = forms.ListEditor(elem).editItem(
+                  editInstructions[1], 'RichText');
+                richTextEditor.clear();
+                richTextInstructionsArray[0](richTextEditor);
+              } else {
+                throw Error('The given index is invalid.');
+              }
+            });
+      } else {
+        throw Error(
+          'richTextInstructionsArray should have only one element.');
+      }
     }
   }
 };
