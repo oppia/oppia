@@ -110,9 +110,31 @@
   <div ng-if="recommendedExplorationSummaries !== null && (collectionSummary || recommendedExplorationSummaries.length > 0)"
        class="conversation-skin-final-recommendations">
     <div ng-if="recommendedExplorationSummaries.length > 0">
+      <span ng-if="collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
+            translate="I18N_PLAYER_NEXT_LESSON">
+      </span>
       <span ng-if="!collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
             translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS">
       </span>
+
+      <div class="oppia-exp-summary-tiles-container conversation-skin-recommended-activities-container">
+        <exploration-summary-tile ng-repeat="exp in (recommendedExplorationSummaries|limitTo:3) track by $index"
+                                  collection-id="collectionId"
+                                  exploration-id="exp.id"
+                                  exploration-title="exp.title"
+                                  node-id="nextNodeId"
+                                  parent-exploration-ids="parentExplorationIds"
+                                  last-updated-msec="exp.last_updated_msec"
+                                  objective="exp.objective"
+                                  category="exp.category"
+                                  ratings="exp.ratings"
+                                  thumbnail-icon-url="exp.thumbnail_icon_url"
+                                  thumbnail-bg-color="exp.thumbnail_bg_color"
+                                  num-views="exp.num_views"
+                                  is-community-owned="exp.community_owned"
+                                  style="margin-left: 10px;">
+        </exploration-summary-tile>
+      </div>
 
       <div ng-if="collectionSummary && !isRefresherExploration" class="conversation-skin-back-to-collection-container">
         <a ng-href="/collection/<[collectionId]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>

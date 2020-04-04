@@ -1355,6 +1355,10 @@ tags: []
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Story and saves it.
 
+        NOTE: Callers are responsible for ensuring that the
+        'corresponding_topic_id' provided is valid, unless a test explicitly
+        requires it to be invalid.
+
         Args:
             story_id: str. ID for the story to be created.
             owner_id: str. The user_id of the creator of the story.
@@ -2152,12 +2156,11 @@ class AppEngineTestBase(TestBase):
                 'html': '<p>This is a solution.</p>'
             }
         }
-        hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>This is a hint.</p>'
-            }
-        }]
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
+            )
+        ]
         state.update_interaction_solution(solution_dict)
         state.update_interaction_hints(hints_list)
         state.interaction.customization_args = {

@@ -16,7 +16,7 @@
  * @fileoverview General config file for Webpack.
  */
 
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
@@ -643,9 +643,7 @@ module.exports = {
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],
     }),
-    new ForkTsCheckerWebpackPlugin({
-      checkSyntacticErrors: true
-    }),
+    new ForkTsCheckerWebpackPlugin(),
     new webpack.LoaderOptionsPlugin({
       options: {
         macros: {
@@ -665,13 +663,11 @@ module.exports = {
         path.resolve(__dirname, 'typings')
       ],
       use: [
-        'cache-loader',
-        'thread-loader',
         {
           loader: 'ts-loader',
           options: {
-            // this is needed for thread-loader to work correctly
-            happyPackMode: true
+            // fork-ts-checker plugin does the type checking.
+            transpileOnly: true
           }
         }
       ]

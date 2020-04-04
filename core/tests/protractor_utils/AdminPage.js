@@ -138,6 +138,7 @@ var AdminPage = function() {
       propertyName, objectType, editingInstructions) {
     this.get();
     configTab.click();
+    waitFor.elementToBeClickable(saveAllConfigs);
     configProperties.map(function(x) {
       return saveConfigProperty(
         x, propertyName, objectType, editingInstructions);
@@ -222,6 +223,7 @@ var AdminPage = function() {
     waitFor.textToBePresentInElement(
       statusMessage, 'successfully updated to',
       'Could not set role successfully');
+    waitFor.visibilityOf(statusMessage, 'Confirmation message not visible');
   };
 
   this.getUsersAsssignedToRole = function(role) {
