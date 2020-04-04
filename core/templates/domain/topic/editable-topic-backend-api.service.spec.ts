@@ -272,7 +272,7 @@ describe('Editable topic backend API service', () => {
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(
-      sampleDataResults.canonical_story_summary_dicts);
+      sampleDataResults.topic_dict.canonical_story_summary_dicts);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
