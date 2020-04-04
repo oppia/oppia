@@ -42,8 +42,8 @@ export class ExprUndefinedVarError extends ExpressionError {
 
 export class ExprWrongNumArgsError extends ExpressionError {
   constructor(
-      public args: Array<number|string>, public expectedMin: number,
-      public expectedMax: number) {
+      public args: Array<number|string>,
+      public expectedMin: number, public expectedMax: number) {
     super(
       '{' + args + '} not in range [' + expectedMin + ',' + expectedMax + ']');
   }
@@ -51,8 +51,8 @@ export class ExprWrongNumArgsError extends ExpressionError {
 
 export class ExprWrongArgTypeError extends ExpressionError {
   constructor(
-      public arg: number|string, public actualType: string,
-      public expectedType: string) {
+      public arg: number|string,
+      public actualType: string, public expectedType: string) {
     super(
       (arg !== null ?
         (arg + ' has type ' + actualType + ' which') : ('Type ' + actualType)) +
@@ -97,7 +97,7 @@ export class ExpressionSyntaxTreeService {
       if (parseTree[0] === '#') {
         paramsFound.add(parseTree[1]);
       } else {
-        for (let i = 1; i < parseTree.length; i++) {
+        for (let i = 1; i < parseTree.length; ++i) {
           this.findParams(parseTree[i]).forEach(p => paramsFound.add(p));
         }
       }
@@ -105,14 +105,14 @@ export class ExpressionSyntaxTreeService {
     return paramsFound;
   }
 
-  // Checks if the args array has the expectedNum number of elements and throws
-  // an error if not. If optional expectedMax is specified, it verifies the
-  // number of args is in [expectedNum, expectedMax] range inclusive.
+  // Checks if the args array has the expectedLow number of elements and throws
+  // an error if not. If optional expectedHigh is specified, it verifies the
+  // number of args is in the inclusive range: [expectedLow, expectedHigh].
   private verifyNumArgs(
-      args: string[], expectedNum: number,
-      expectedMax: number = expectedNum): void {
-    if (args.length < expectedNum || args.length > expectedMax) {
-      throw new ExprWrongNumArgsError(args, expectedNum, expectedMax);
+      args: string[],
+      expectedLow: number, expectedHigh: number = expectedLow): void {
+    if (args.length < expectedLow || args.length > expectedHigh) {
+      throw new ExprWrongNumArgsError(args, expectedLow, expectedHigh);
     }
   }
 
@@ -134,11 +134,11 @@ export class ExpressionSyntaxTreeService {
   // Coerces the argument to a Number, and throws an error if the result is NaN.
   private coerceToNumber(originalValue: string|number): number {
     const coercedValue = +originalValue;
-    if (!isNaN(coercedValue)) {
-      return coercedValue;
+    if (isNaN(coercedValue)) {
+      throw new ExprWrongArgTypeError(
+        originalValue, typeof originalValue, 'Number');
     }
-    throw new ExprWrongArgTypeError(
-      originalValue, typeof originalValue, 'Number');
+    return coercedValue;
   }
 
   private coerceAllArgsToNumber(args: Array<number|string>): number[] {
@@ -149,10 +149,12 @@ export class ExpressionSyntaxTreeService {
   // first ensure that existing explorations do not use this parameter name.
   // Also, to prevent future explorations using it, modify
   // constants.INVALID_PARAMETER_NAMES accordingly.
+  //
   // TODO(kashida): Document each operator's input and output contracts.
+  //
   // Arguments:
-  // args: for eval(): list of values of the evaluated sub-expression
-  //       for getType(): list of types of the evaluated sub-expression
+  //    for eval(): list of values of the evaluated sub-expression.
+  //    for getType(): list of types of the evaluated sub-expression.
   private system = {
     '+': {
       eval: (args: string[]): number => {
@@ -169,6 +171,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
+
     '-': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 1, 2);
@@ -184,6 +187,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
+
     '*': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 2);
@@ -197,6 +201,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
+
     '/': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 2);
@@ -210,6 +215,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
+
     '%': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 2);
@@ -223,6 +229,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
+
     '<=': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 2);
@@ -236,6 +243,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
+
     '>=': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 2);
@@ -249,6 +257,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
+
     '<': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 2);
@@ -262,6 +271,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
+
     '>': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 2);
@@ -275,6 +285,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
+
     '!': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 1);
@@ -287,6 +298,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
+
     '==': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 2);
@@ -297,6 +309,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
+
     '!=': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 2);
@@ -307,6 +320,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
+
     '&&': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 2);
@@ -319,6 +333,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
+
     '||': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 2);
@@ -331,6 +346,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
+
     // NOTE TO DEVELOPERS: Removing the quotation marks from the following keys
     // causes issues with minification when running the deployment scripts.
     'if': { // eslint-disable-line quote-props
@@ -346,6 +362,7 @@ export class ExpressionSyntaxTreeService {
         return args[1];
       }
     },
+
     'floor': { // eslint-disable-line quote-props
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 1);
@@ -359,6 +376,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
+
     'pow': { // eslint-disable-line quote-props
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 2);
@@ -372,6 +390,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
+
     'log': { // eslint-disable-line quote-props
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 2);
@@ -388,6 +407,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
+
     'abs': { // eslint-disable-line quote-props
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 1);
