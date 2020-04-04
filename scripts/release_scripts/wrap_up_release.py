@@ -99,7 +99,7 @@ def remove_blocking_bugs_milestone_from_issues(repo):
         issue.edit(milestone=None)
 
 
-def remove_protection_rule():
+def ask_user_to_remove_protection_rule():
     """Asks the release co-ordinator to perform the steps for deletion of
     github protection rule for release branch.
     """
@@ -115,7 +115,7 @@ def remove_protection_rule():
             common.get_current_branch_name()))
 
 
-def update_jobs_tracker():
+def ask_user_to_update_jobs_tracker():
     """Asks the release co-ordinator to update the status of jobs run
     in the release.
     """
@@ -145,8 +145,8 @@ def main():
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
 
-    remove_protection_rule()
-    update_jobs_tracker()
+    ask_user_to_remove_protection_rule()
+    ask_user_to_update_jobs_tracker()
     remove_blocking_bugs_milestone_from_issues(repo)
     remove_release_labels(repo)
 
