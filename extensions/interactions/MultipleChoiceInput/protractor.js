@@ -38,7 +38,20 @@ var expectInteractionDetailsToMatch = function(
     elem, richTextInstructionsArray) {
   elem.all(by.repeater('choice in $ctrl.choices'))
     .then(function(optionElements) {
+      var choices = [];
       expect(optionElements.length).toEqual(richTextInstructionsArray.length);
+      for (var i = 0; i < optionElements.length; i++) {
+        optionElements[i].element(by.css(
+          '.protractor-test-multiple-choice-option'
+        )).getText().then(function(text) {
+          choices.push(text)
+          if(choices.length == 4){
+            for(var j=0;j < choices.length; j++){
+              expect(richTextInstructionsArray).toContain(choices[j]);
+            }
+          }
+        })
+      }
     });
 };
 
@@ -62,15 +75,7 @@ var testSuite = [{
     editor.appendItalicText('wrong3');
   }]],
   ruleArguments: ['Equals', ['right']],
-  expectedInteractionDetails: [[function(checker) {
-    checker.readBoldText('right');
-  }, function(checker) {
-    checker.readItalicText('wrong1');
-  }, function(checker) {
-    checker.readItalicText('wrong2');
-  }, function(checker) {
-    checker.readItalicText('wrong3');
-  }]],
+  expectedInteractionDetails: [['right', 'wrong1', 'wrong2', 'wrong3']],
   wrongAnswers: ['wrong1', 'wrong2', 'wrong3'],
   correctAnswers: ['right']
 }];

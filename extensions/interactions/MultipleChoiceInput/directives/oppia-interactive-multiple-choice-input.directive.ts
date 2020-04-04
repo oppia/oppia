@@ -77,8 +77,8 @@ angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
           };
 
           ctrl.$onInit = function() {
-            var showChoicesInShuffledOrder =
-            ($attrs.showChoicesInShuffledOrderWithValue === 'true');
+            var showChoicesInShuffledOrder = (
+              $attrs.showChoicesInShuffledOrderWithValue === 'true');
             var choicesWithValue = HtmlEscaperService.escapedJsonToObj(
               $attrs.choicesWithValue);
             var choicesWithIndex = choicesWithValue.map(
@@ -87,13 +87,12 @@ angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
               }
             );
             var shuffleChoices = function(choices) {
-              var currentIndex = choices.length;
+              var currentIndex = choices.length - 1;
               var temporaryValue = null;
               var randomIndex = null;
 
-              while (0 !== currentIndex) {
-                randomIndex = Math.floor(Math.random() * currentIndex);
-                currentIndex -= 1;
+              for (; currentIndex >= 0; currentIndex--) {
+                randomIndex = Math.floor(Math.random() * (currentIndex + 1));
                 temporaryValue = choices[currentIndex];
                 choices[currentIndex] = choices[randomIndex];
                 choices[randomIndex] = temporaryValue;

@@ -7635,7 +7635,7 @@ states:
           - <p>This is </p><p>value1 <br>for MultipleChoice</p>
           - <p>This is value2 for <br>MultipleChoice</p>
         showChoicesInShuffledOrder:
-          value: true
+          value: false
       default_outcome:
         dest: state2
         feedback:

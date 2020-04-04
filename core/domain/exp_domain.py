@@ -2407,7 +2407,7 @@ class Exploration(python_utils.OBJECT):
                     'interaction']['customization_args']
                 customization_args.update({
                     'showChoicesInShuffledOrder': {
-                        'value': True
+                        'value': False
                     }
                 })
 
