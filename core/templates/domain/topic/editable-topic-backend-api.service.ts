@@ -36,8 +36,8 @@ export class EditableTopicBackendApiService {
     private urlInterpolation: UrlInterpolationService) { }
 
   private _fetchTopic(topicId: string,
-    successCallback: (value?: Object | PromiseLike<Object>) => void,
-    errorCallback: (reason?: any) => void): void {
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
     var topicDataUrl = this.urlInterpolation.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
         topic_id: topicId
@@ -62,14 +62,14 @@ export class EditableTopicBackendApiService {
       }
     }, (errorResponse) => {
       if (errorCallback) {
-        errorCallback(errorResponse);
+        errorCallback(errorResponse.error);
       }
     });
   }
 
   private _fetchStories(topicId: string,
-    successCallback: (value?: Object | PromiseLike<Object>) => void,
-    errorCallback: (reason?: any) => void): void {
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
     var storiesDataUrl = this.urlInterpolation.interpolateUrl(
       TopicDomainConstants.TOPIC_EDITOR_STORY_URL_TEMPLATE, {
         topic_id: topicId
@@ -83,7 +83,7 @@ export class EditableTopicBackendApiService {
       }
     }, (errorResponse) => {
       if (errorCallback) {
-        errorCallback(errorResponse.body);
+        errorCallback(errorResponse.error);
       }
     });
   }
@@ -105,7 +105,7 @@ export class EditableTopicBackendApiService {
       }
     }, (errorResponse) => {
       if (errorCallback) {
-        errorCallback(errorResponse.body);
+        errorCallback(errorResponse.error);
       }
     });
   }
@@ -129,7 +129,7 @@ export class EditableTopicBackendApiService {
   }
 
   private _updateTopic(
-      topicId: string,topicVersion: string, commitMessage: string,
+      topicId: string, topicVersion: string, commitMessage: string,
       changeList: Array<Object>,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
@@ -157,7 +157,7 @@ export class EditableTopicBackendApiService {
         }
       }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse.body);
+          errorCallback(errorResponse.error);
         }
       });
   }

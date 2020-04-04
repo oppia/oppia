@@ -21,7 +21,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { EditableTopicBackendApiService } from
   'domain/topic/editable-topic-backend-api.service.ts';
-import { CsrfTokenService } from 'services/csrf-token.service.ts';   
+import { CsrfTokenService } from 'services/csrf-token.service.ts';
 
 describe('Editable topic backend API service', () => {
   let CsrfService: CsrfTokenService = null;
@@ -87,11 +87,11 @@ describe('Editable topic backend API service', () => {
     editableTopicBackendApiService = TestBed.get(
       EditableTopicBackendApiService);
 
-      spyOn(CsrfService, 'getTokenAsync').and.returnValue(() => {
-        return new Promise((resolve) => {
-          resolve('sample-csrf-token');
-        });
+    spyOn(CsrfService, 'getTokenAsync').and.returnValue(() => {
+      return new Promise((resolve) => {
+        resolve('sample-csrf-token');
       });
+    });
   });
 
   afterEach(() => {
@@ -133,7 +133,7 @@ describe('Editable topic backend API service', () => {
       var req = httpTestingController.expectOne(
         '/topic_editor_handler/data/1');
       expect(req.request.method).toEqual('GET');
-      req.flush('Error loading topic 1', {
+      req.flush('Error loading topic 1.', {
         status: 500, statusText: 'Invalid Request'
       });
 
@@ -174,7 +174,7 @@ describe('Editable topic backend API service', () => {
     var req = httpTestingController.expectOne(
       '/subtopic_page_editor_handler/data/topicId/1');
     expect(req.request.method).toEqual('GET');
-    req.flush('Error loading subtopic 1', {
+    req.flush('Error loading subtopic 1.', {
       status: 500, statusText: 'Invalid Request'
     });
 
