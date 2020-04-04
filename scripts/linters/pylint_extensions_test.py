@@ -1552,6 +1552,28 @@ class DivisionOperatorCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
+    def test_division_operator_inside_multiline_docstring(self):
+        node_division_inside_multiline_docstring = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    \"\"\"This is inside a multiline docstring
+                    in scripts/linter/pre_commit_linter.\"\"\"
+                """)
+        node_division_inside_multiline_docstring.file = filename
+        node_division_inside_multiline_docstring.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_division_inside_multiline_docstring)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
     def test_divide_method_used(self):
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',

@@ -54,6 +54,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
             failed: bool. true if the HTML indentation check fails.
         """
         html.parser.HTMLParser.__init__(self)
+        self.summary_messages = []
         self.tag_stack = []
         self.debug = debug
         self.failed = failed
@@ -88,23 +89,27 @@ class CustomHTMLParser(html.parser.HTMLParser):
             next_line_column_number = len(next_line) - len(next_line.lstrip())
 
             if next_line_column_number != next_line_expected_indentation:
-                python_utils.PRINT(
+                summary_message = (
                     '%s --> Expected indentation '
                     'of %s, found indentation of %s '
                     'for content of %s tag on line %s ' % (
                         self.filepath, next_line_expected_indentation,
                         next_line_column_number, tag, line_number + 1))
+                self.summary_messages.append(summary_message)
+                python_utils.PRINT(summary_message)
                 python_utils.PRINT('')
                 self.failed = True
 
         if tag_line.startswith(opening_tag) and (
                 column_number != expected_indentation):
-            python_utils.PRINT(
+            summary_message = (
                 '%s --> Expected indentation '
                 'of %s, found indentation of %s '
                 'for %s tag on line %s ' % (
                     self.filepath, expected_indentation,
                     column_number, tag, line_number))
+            self.summary_messages.append(summary_message)
+            python_utils.PRINT(summary_message)
             python_utils.PRINT('')
             self.failed = True
 
@@ -138,12 +143,14 @@ class CustomHTMLParser(html.parser.HTMLParser):
 
                 if not expected_value in rendered_text:
                     self.failed = True
-                    python_utils.PRINT(
+                    summary_message = (
                         '%s --> The value %s of attribute '
                         '%s for the tag %s on line %s should '
                         'be enclosed within double quotes.' % (
                             self.filepath, value, attr,
                             tag, line_number))
+                    self.summary_messages.append(summary_message)
+                    python_utils.PRINT(summary_message)
                     python_utils.PRINT('')
 
         for line_num, line in enumerate(starttag_text.splitlines()):
@@ -160,12 +167,14 @@ class CustomHTMLParser(html.parser.HTMLParser):
                 continue
             if indentation_of_first_attribute != leading_spaces_count:
                 line_num_of_error = line_number + line_num
-                python_utils.PRINT(
+                summary_message = (
                     '%s --> Attribute for tag %s on line '
                     '%s should align with the leftmost '
                     'attribute on line %s ' % (
                         self.filepath, tag,
                         line_num_of_error, line_number))
+                self.summary_messages.append(summary_message)
+                python_utils.PRINT(summary_message)
                 python_utils.PRINT('')
                 self.failed = True
 
@@ -192,12 +201,14 @@ class CustomHTMLParser(html.parser.HTMLParser):
 
         if leading_spaces_count != last_starttag_col_num and (
                 last_starttag_line_num != line_number):
-            python_utils.PRINT(
+            summary_message = (
                 '%s --> Indentation for end tag %s on line '
                 '%s does not match the indentation of the '
                 'start tag %s on line %s ' % (
                     self.filepath, tag, line_number,
                     last_starttag, last_starttag_line_num))
+            self.summary_messages.append(summary_message)
+            python_utils.PRINT(summary_message)
             python_utils.PRINT('')
             self.failed = True
 
@@ -288,6 +299,7 @@ class HTMLLintChecksManager(python_utils.OBJECT):
                     'files listed above.' % _MESSAGE_TYPE_FAILED)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
+                summary_messages.extend(parser.summary_messages)
             else:
                 summary_message = '%s  HTML tag and attribute check passed' % (
                     _MESSAGE_TYPE_SUCCESS)

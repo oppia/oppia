@@ -1130,6 +1130,7 @@ class DivisionOperatorChecker(checkers.BaseChecker):
         """
 
         in_multi_line_comment = False
+        in_multi_line_docstring = False
         multi_line_indicator = b'"""'
         string_indicator = b'\''
         file_content = read_from_node(node)
@@ -1163,7 +1164,11 @@ class DivisionOperatorChecker(checkers.BaseChecker):
             if line.count(string_indicator) >= 2:
                 continue
 
-            if re.search(br'[^/]/[^/]', line):
+            if line.startswith(multi_line_indicator) or (
+                    line.endswith(multi_line_indicator)):
+                in_multi_line_docstring = not in_multi_line_docstring
+
+            if re.search(br'[^/]/[^/]', line) and not in_multi_line_docstring:
                 self.add_message(
                     'division-operator-used', line=line_num + 1)
 

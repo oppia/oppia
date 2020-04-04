@@ -66,15 +66,6 @@ REQUIRED_STRINGS_CONSTANTS = {
 }
 
 BAD_PATTERNS = {
-    '__author__': {
-        'message': 'Please remove author tags from this file.',
-        'excluded_files': (),
-        'excluded_dirs': ()},
-    'datetime.datetime.now()': {
-        'message': 'Please use datetime.datetime.utcnow() instead of'
-                   'datetime.datetime.now().',
-        'excluded_files': (),
-        'excluded_dirs': ()},
     '\t': {
         'message': 'Please use spaces instead of tabs.',
         'excluded_files': (),
@@ -258,6 +249,19 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
 
 BAD_PATTERNS_PYTHON_REGEXP = [
     {
+        'regexp': re.compile(r'__author__'),
+        'message': 'Please remove author tags from this file.',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'datetime.datetime.now\(\)'),
+        'message': 'Please use datetime.datetime.utcnow() instead of '
+                   'datetime.datetime.now().',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': re.compile(r'\Wprint\('),
         'message': 'Please do not use print statement.',
         'excluded_files': (
@@ -380,7 +384,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'[^.|\w|\s]map\('),
+        'regexp': re.compile(r'[^.|\w]map\('),
         'message': 'Please use python_utils.MAP.',
         'excluded_files': (),
         'excluded_dirs': ()
@@ -672,7 +676,8 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         summary_messages = []
         all_filepaths = [
             filepath for filepath in self.all_filepaths if not (
-                filepath.endswith('general_purpose_linter.py'))]
+                filepath.endswith('general_purpose_linter.py') or (
+                    filepath.endswith('pre_commit_linter_test.py')))]
         failed = False
         stdout = sys.stdout
         with linter_utils.redirect_stdout(stdout):
