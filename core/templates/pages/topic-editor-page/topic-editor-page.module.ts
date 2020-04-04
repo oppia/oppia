@@ -22,13 +22,9 @@ import 'zone.js';
 import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
-<<<<<<< HEAD
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-=======
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
->>>>>>> Adds http interceptor in all the modules (#8965)
 
 // This component is needed to force-bootstrap Angular at the beginning of the
 // app.
