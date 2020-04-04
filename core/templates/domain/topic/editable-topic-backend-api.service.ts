@@ -77,7 +77,7 @@ export class EditableTopicBackendApiService {
 
     this.http.get(storiesDataUrl).toPromise().then((response: any) => {
       let canonicalStorySummaries = cloneDeep(
-        response.canonical_story_summary_dicts);
+        response.topic_dict.canonical_story_summary_dicts);
       if (successCallback) {
         successCallback(canonicalStorySummaries);
       }
