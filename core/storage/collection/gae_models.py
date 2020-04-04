@@ -198,14 +198,7 @@ class CollectionRightsSnapshotMetadataModel(
 class CollectionRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection rights snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+    pass
 
 
 class CollectionRightsModel(base_models.VersionedModel):
