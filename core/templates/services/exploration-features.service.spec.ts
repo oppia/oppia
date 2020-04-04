@@ -34,9 +34,8 @@ fdescribe('ExplorationFeatureService', () => {
     explorationFeatureService = TestBed.get(ExplorationFeaturesService);
     featureData = {
       is_improvements_tab_enabled: true,
-      is_exploration_whitelisted: true,
+      is_exploration_whitelisted: false,
     };
-
     explorationData = {
       param_changes: [testParamChanges],
       states: {}
@@ -44,7 +43,7 @@ fdescribe('ExplorationFeatureService', () => {
     explorationData2 = {
       param_changes: [],
       states: {
-        state_1: {
+        testState: {
           param_changes: [testParamChanges],
         }
       }
@@ -59,20 +58,13 @@ fdescribe('ExplorationFeatureService', () => {
     };
   });
 
-  // afterEach(() => {
-  //   ExplorationFeaturesService.settings.areParametersEnabled = false;
-  //   ExplorationFeaturesService.serviceIsInitialized = false;
-  //   ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled = false;
-  //   ExplorationFeaturesService.settings.isImprovementsTabEnabled = false;
-  // });
-
   it('should init the exploration from param change', () => {
     explorationFeatureService.init(explorationData, featureData);
     expect(explorationFeatureService.isInitialized()).toEqual(true);
     expect(explorationFeatureService.areParametersEnabled()).toEqual(true);
     expect(explorationFeatureService.isImprovementsTabEnabled()).toEqual(true);
     expect(explorationFeatureService.isPlaythroughRecordingEnabled())
-      .toEqual(true);
+      .toEqual(false);
   });
 
   it('should init the exploration from state', () => {
@@ -81,7 +73,7 @@ fdescribe('ExplorationFeatureService', () => {
     expect(explorationFeatureService.areParametersEnabled()).toEqual(true);
     expect(explorationFeatureService.isImprovementsTabEnabled()).toEqual(true);
     expect(explorationFeatureService.isPlaythroughRecordingEnabled())
-      .toEqual(true);
+      .toEqual(false);
   });
 
   it('should return if service is initialized', () => {
