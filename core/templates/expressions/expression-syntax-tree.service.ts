@@ -76,7 +76,7 @@ export class ExpressionSyntaxTreeService {
 
   public applyFunctionToParseTree(
       parsed: string, envs: any[],
-      func: (parsed: string, envs: any[]) => string) {
+      func: (parsed: string, envs: any[]) => string): string {
     return func(parsed, envs.concat(this.system));
   }
 
