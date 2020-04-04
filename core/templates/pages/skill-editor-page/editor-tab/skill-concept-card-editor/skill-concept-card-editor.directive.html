@@ -41,8 +41,8 @@
                ng-class="{'oppia-rule-tab-active': activeWorkedExampleIndex === $index}">
               <summary-list-header index="$index"
                                    disable-sorting="bindableFieldsDict.displayedWorkedExamples.length === 1"
-                                   summary="getWorkedExampleSummary(workedExample.getHtml())"
-                                   short-summary="getWorkedExampleSummary(workedExample.getHtml())"
+                                   summary="getWorkedExampleSummary(workedExample.getQuestion().getHtml())"
+                                   short-summary="getWorkedExampleSummary(workedExample.getQuestion().getHtml())"
                                    is-active="$index === activeWorkedExampleIndex"
                                    is-delete-available="isEditable"
                                    on-delete-fn="deleteWorkedExample">
@@ -53,8 +53,7 @@
               <div class="oppia-editor-card-section">
                 <worked-example-editor worked-example="workedExample"
                                        index="$index"
-                                       is-editable="isEditable"
-                                       on-save="onWorkedExampleSaved">
+                                       is-editable="isEditable">
                 </worked-example-editor>
               </div>
             </div>

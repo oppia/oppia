@@ -192,21 +192,34 @@ describe('Skill editor state service', function() {
       explanation: 'explanation'
     };
 
+    var example1 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1'
+      },
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
+      }
+    };
+
+    var example2 = {
+      question: {
+        html: 'worked example question 2',
+        content_id: 'worked_example_q_2'
+      },
+      explanation: {
+        html: 'worked example explanation 2',
+        content_id: 'worked_example_e_2'
+      }
+    };
+
     var skillContentsDict = {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
       },
-      worked_examples: [
-        {
-          html: 'worked example 1',
-          content_id: 'worked_example_1'
-        },
-        {
-          html: 'worked example 2',
-          content_id: 'worked_example_2'
-        }
-      ],
+      worked_examples: [example1, example2],
       recorded_voiceovers: {
         voiceovers_mapping: {
           explanation: {},

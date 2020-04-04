@@ -35,14 +35,24 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SkillDomainUnitTests, self).setUp()
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'name', '<p>notes</p>',
             '<p>default_feedback</p>', True)]
@@ -232,7 +242,19 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         self.skill.skill_contents.worked_examples = [1]
         self._assert_validation_error(
-            'Expected worked example to be a SubtitledHtml object')
+            'Expected worked example to be a WorkedExample object')
+
+        example = skill_domain.WorkedExample('question', 'explanation')
+        self.skill.skill_contents.worked_examples = [example]
+        self._assert_validation_error(
+            'Expected example question to be a SubtitledHtml object')
+
+        example = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml(
+                '2', '<p>Example Question 1</p>'), 'explanation')
+        self.skill.skill_contents.worked_examples = [example]
+        self._assert_validation_error(
+            'Expected example explanation to be a SubtitledHtml object')
 
         self.skill.skill_contents.explanation = 'explanation'
         self._assert_validation_error(
@@ -244,7 +266,16 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_duplicate_content_id(self):
         self.skill.skill_contents.worked_examples = (
-            [self.skill.skill_contents.explanation])
+            [skill_domain.WorkedExample(
+                self.skill.skill_contents.explanation,
+                self.skill.skill_contents.explanation)])
+        self._assert_validation_error('Found a duplicate content id 1')
+
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('4', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('1', '<p>Example Explanation 1</p>')
+        )
+        self.skill.skill_contents.worked_examples = [example_1]
         self._assert_validation_error('Found a duplicate content id 1')
 
     def test_misconception_id_validation(self):
@@ -327,13 +358,23 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         """Test that to_dict and from_dict preserve all data within a
         skill_contents and misconception object.
         """
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Answer 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
-                state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+            state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         skill_contents_dict = skill_contents.to_dict()
         skill_contents_from_dict = skill_domain.SkillContents.from_dict(
             skill_contents_dict)
@@ -369,16 +410,32 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             observed_skill_mastery.to_dict())
 
     def test_update_worked_examples(self):
+        question_1 = {
+            'content_id': 'question_1',
+            'html': '<p>Worked example question 1</p>'
+        }
+        explanation_1 = {
+            'content_id': 'explanation_1',
+            'html': '<p>Worked example explanation 1</p>'
+        }
+        question_2 = {
+            'content_id': 'question_2',
+            'html': '<p>Worked example question 2</p>'
+        }
+        explanation_2 = {
+            'content_id': 'explanation_2',
+            'html': '<p>Worked example explanation 2</p>'
+        }
         worked_examples_dict_list = [{
-            'content_id': 'worked_example_1',
-            'html': '<p>Worked example</p>'
+            'question': question_1,
+            'explanation': explanation_1
         }, {
-            'content_id': 'worked_example_2',
-            'html': '<p>Another worked example</p>'
+            'question': question_2,
+            'explanation': explanation_2
         }]
 
         worked_examples_object_list = [
-            state_domain.SubtitledHtml.from_dict(worked_example)
+            skill_domain.WorkedExample.from_dict(worked_example)
             for worked_example in worked_examples_dict_list]
 
         self.skill.update_worked_examples(worked_examples_object_list)

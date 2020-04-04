@@ -166,11 +166,15 @@ angular.module('oppia').factory('SkillUpdateService', [
       },
 
       updateWorkedExample: function(
-          skill, workedExampleIndex, newWorkedExampleHtml) {
+          skill, workedExampleIndex, newWorkedExampleQuestionHtml,
+          newWorkedExampleAnswerHtml) {
         var oldWorkedExamples = angular.copy(
           skill.getConceptCard().getWorkedExamples());
         var newWorkedExamples = angular.copy(oldWorkedExamples);
-        newWorkedExamples[workedExampleIndex].setHtml(newWorkedExampleHtml);
+        newWorkedExamples[workedExampleIndex].getQuestion().setHtml(
+          newWorkedExampleQuestionHtml);
+        newWorkedExamples[workedExampleIndex].getExplanation().setHtml(
+          newWorkedExampleAnswerHtml);
         _applySkillContentsPropertyChange(
           skill, SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
           newWorkedExamples.map(function(workedExample) {

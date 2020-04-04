@@ -19,7 +19,7 @@
 
 export interface IConceptCardBackendDict {
   explanation: ISubtitledHtmlBackendDict,
-  'worked_examples': Array<ISubtitledHtmlBackendDict>,
+  'worked_examples': Array<IWorkedExampleBackendDict>,
   'recorded_voiceovers': IRecordedVoiceOverBackendDict
 }
 
@@ -29,17 +29,20 @@ import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers, RecordedVoiceoversObjectFactory,
   IRecordedVoiceOverBackendDict } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SubtitledHtml, SubtitledHtmlObjectFactory,
-  ISubtitledHtmlBackendDict} from
+import {
+  SubtitledHtml, SubtitledHtmlObjectFactory, ISubtitledHtmlBackendDict } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import {
+  WorkedExample, WorkedExampleObjectFactory, IWorkedExampleBackendDict } from
+  'domain/skill/WorkedExampleObjectFactory';
 
 export class ConceptCard {
   _explanation: SubtitledHtml;
-  _workedExamples: Array<SubtitledHtml>;
+  _workedExamples: Array<WorkedExample>;
   _recordedVoiceovers: RecordedVoiceovers;
 
   constructor(
-      explanation: SubtitledHtml, workedExamples: Array<SubtitledHtml>,
+      explanation: SubtitledHtml, workedExamples: Array<WorkedExample>,
       recordedVoiceovers: RecordedVoiceovers) {
     this._explanation = explanation;
     this._workedExamples = workedExamples;
@@ -50,7 +53,7 @@ export class ConceptCard {
     return {
       explanation: this._explanation.toBackendDict(),
       worked_examples: this._workedExamples.map(
-        (workedExample: SubtitledHtml) => {
+        (workedExample: WorkedExample) => {
           return workedExample.toBackendDict();
         }),
       recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
@@ -66,10 +69,11 @@ export class ConceptCard {
   }
 
   _extractAvailableContentIdsFromWorkedExamples(
-      workedExamples: Array<SubtitledHtml>): Set<string> {
+      workedExamples: Array<WorkedExample>): Set<string> {
     let contentIds: Set<string> = new Set();
-    workedExamples.forEach((workedExample: SubtitledHtml) => {
-      contentIds.add(workedExample.getContentId());
+    workedExamples.forEach((workedExample: WorkedExample) => {
+      contentIds.add(workedExample.getQuestion().getContentId());
+      contentIds.add(workedExample.getExplanation().getContentId());
     });
     return contentIds;
   }
@@ -82,11 +86,11 @@ export class ConceptCard {
     this._explanation = explanation;
   }
 
-  getWorkedExamples(): Array<SubtitledHtml> {
+  getWorkedExamples(): Array<WorkedExample> {
     return this._workedExamples.slice();
   }
 
-  setWorkedExamples(workedExamples: Array<SubtitledHtml>): void {
+  setWorkedExamples(workedExamples: Array<WorkedExample>): void {
     let oldContentIds = this._extractAvailableContentIdsFromWorkedExamples(
       this._workedExamples);
 
@@ -120,13 +124,14 @@ export class ConceptCardObjectFactory {
   constructor(
       private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
       private recordedVoiceoversObjectFactory:
-          RecordedVoiceoversObjectFactory) {}
+          RecordedVoiceoversObjectFactory,
+      private workedExampleObjectFactory: WorkedExampleObjectFactory) {}
 
   _generateWorkedExamplesFromBackendDict(
-      workedExampleDicts): Array<SubtitledHtml> {
+      workedExampleDicts): Array<WorkedExample> {
     return workedExampleDicts.map(
-      (workedExampleDict: ISubtitledHtmlBackendDict) => {
-        return this.subtitledHtmlObjectFactory.createFromBackendDict(
+      (workedExampleDict: IWorkedExampleBackendDict) => {
+        return this.workedExampleObjectFactory.createFromBackendDict(
           workedExampleDict);
       });
   }
