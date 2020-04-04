@@ -339,12 +339,13 @@ angular.module('oppia').factory('ResponsesService', [
 
           if (
             oldToNewAnswerChoicesMapping !== undefined &&
+               oldToNewAnswerChoicesMapping !== null &&
                oldToNewAnswerChoicesMapping.hasOwnProperty('deletedIndexes')) {
             var deletedIndexes = oldToNewAnswerChoicesMapping.deletedIndexes;
-            var answerGroups = angular.copy(_answerGroups);
+            var answerGroupsBeforeUpdating = angular.copy(_answerGroups);
             deletedIndexes.forEach(function(deletedIndex) {
-              for (var i = 0; i < answerGroups.length; i++) {
-                var rules = answerGroups[i].rules;
+              for (var i = 0; i < answerGroupsBeforeUpdating.length; i++) {
+                var rules = answerGroupsBeforeUpdating[i].rules;
                 for (var j = 0; j < rules.length; j++) {
                   if (deletedIndex < rules[j].inputs.x) {
                     // If the deletedIndex is lesser than a rule index

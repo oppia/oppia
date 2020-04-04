@@ -93,10 +93,10 @@ describe('Enable correctness feedback and set correctness', function() {
       'Select the right option.'));
 
     // Create interaction first.
-    explorationEditorMainTab.setInteraction('MultipleChoiceInput',
-      [forms.toRichText('Correct!'),
-        forms.toRichText('Wrong!')
-      ]);
+    explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
+      forms.toRichText('Correct!'),
+      forms.toRichText('Wrong!')
+    ]);
     explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', forms.toRichText('Good!'),
       'End', true, 'Equals', 'Correct!');
@@ -202,9 +202,9 @@ describe('Enable correctness feedback and set correctness', function() {
     explorationEditorMainTab.setContent(forms.toRichText(
       'Select the right option.'));
 
-    explorationEditorMainTab.setInteraction('MultipleChoiceInput',
-      [forms.toRichText('Correct!'),
-        forms.toRichText('Wrong!')]);
+    explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
+      forms.toRichText('Correct!'),
+      forms.toRichText('Wrong!')]);
     explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', forms.toRichText('Good!'),
       'End', true, 'Equals', 'Correct!');
@@ -350,14 +350,11 @@ describe('Core exploration functionality', function() {
     explorationEditorMainTab.editInteraction(
       'MultipleChoiceInput', [forms.toRichText('option X ')], ['add']);
     openInteractionCustomizationModal.click();
-
     explorationEditorMainTab.editInteraction(
       'MultipleChoiceInput', [forms.toRichText('option Y ')], ['add']);
     openInteractionCustomizationModal.click();
-
     explorationEditorMainTab.editInteraction(
       'MultipleChoiceInput', [forms.toRichText('option Z ')], ['add']);
-
     openInteractionCustomizationModal.click();
     explorationEditorMainTab.editInteraction(
       'MultipleChoiceInput', [forms.toRichText('option new')], ['edit', 1]);
@@ -371,7 +368,7 @@ describe('Core exploration functionality', function() {
     explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
       'MultipleChoiceInput', 'Equals', 2, ['[INVALID]']);
 
-    // Felete the the invalid response and add a new response.
+    // Delete the the invalid response and add a new response.
     explorationEditorMainTab.getResponseEditor(0).deleteResponse();
     explorationEditorMainTab.addResponse('MultipleChoiceInput',
       function(richTextEditor) {
