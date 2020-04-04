@@ -22,7 +22,9 @@ import 'zone.js';
 import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';	
+import { RequestInterceptor } from 'services/request-interceptor.service';
 
 // This component is needed to force-bootstrap Angular at the beginning of the
 // app.
@@ -39,7 +41,6 @@ import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
-import { RequestInterceptor } from 'services/request-interceptor.service';
 import { QuestionDomainConstants } from
   'domain/question/question-domain.constants';
 import { QuestionsListConstants } from

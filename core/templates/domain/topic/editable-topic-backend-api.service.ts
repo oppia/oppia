@@ -38,7 +38,7 @@ export class EditableTopicBackendApiService {
   private _fetchTopic(topicId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
-    var topicDataUrl = this.urlInterpolation.interpolateUrl(
+    let topicDataUrl = this.urlInterpolation.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
         topic_id: topicId
       });
@@ -70,7 +70,7 @@ export class EditableTopicBackendApiService {
   private _fetchStories(topicId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
-    var storiesDataUrl = this.urlInterpolation.interpolateUrl(
+    let storiesDataUrl = this.urlInterpolation.interpolateUrl(
       TopicDomainConstants.TOPIC_EDITOR_STORY_URL_TEMPLATE, {
         topic_id: topicId
       });
@@ -138,7 +138,7 @@ export class EditableTopicBackendApiService {
         topic_id: topicId
       });
 
-    var putData = {
+    let putData = {
       version: topicVersion,
       commit_message: commitMessage,
       topic_and_subtopic_page_change_dicts: changeList
