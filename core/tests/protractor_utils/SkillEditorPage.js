@@ -37,6 +37,16 @@ var SkillEditorPage = function() {
   var workedExampleSummary = function(index) {
     return element(by.css('.protractor-test-worked-example-' + index));
   };
+  var workedExampleQuestion = element(
+    by.css('.protractor-test-worked-example-question')
+  ).all(by.tagName('p')).last();
+  var workedExampleExplanation = element(
+    by.css('.protractor-test-worked-example-explanation')
+  ).all(by.tagName('p')).last();
+  var workedExampleQuestionField = element(
+    by.css('.protractor-test-worked-example-question-field'));
+  var workedExampleExplanationField = element(
+    by.css('.protractor-test-worked-example-explanation-field'));
   var deleteWorkedExampleButton = function(index) {
     return element(
       by.css('.protractor-test-worked-example-' + index))
@@ -189,7 +199,7 @@ var SkillEditorPage = function() {
     });
   };
 
-  this.addWorkedExample = function(example) {
+  this.addWorkedExample = function(question, explanation) {
     addWorkedExampleButton.click();
 
     var addWorkedExampleModal =
@@ -198,7 +208,11 @@ var SkillEditorPage = function() {
       addWorkedExampleModal,
       'Add Worked Example Modal takes too long to appear');
 
-    browser.switchTo().activeElement().sendKeys(example);
+    workedExampleQuestion.click();
+    browser.switchTo().activeElement().sendKeys(question);
+
+    workedExampleExplanation.click();
+    browser.switchTo().activeElement().sendKeys(explanation);
 
     waitFor.elementToBeClickable(
       saveWorkedExampleButton,
@@ -225,9 +239,23 @@ var SkillEditorPage = function() {
       'Delete Worked Example Modal takes too long to close');
   };
 
-  this.expectWorkedExampleSummariesToMatch = function(examples) {
-    for (var index in examples) {
-      expect(workedExampleSummary(index).getText()).toMatch(examples[index]);
+  this.expectWorkedExampleSummariesToMatch = function(questions, explanations) {
+    // This is declared separately since the expect() statements are in an async
+    // callback and so 'index' gets incremented before the check is done. So, we
+    // need another variable to track the correct index to check.
+    var questionIndexToCheck = 0;
+    var explanationIndexToCheck = 0;
+    for (var index in questions) {
+      workedExampleSummary(index).click();
+      workedExampleQuestionField.getText().then(function(text) {
+        expect(text).toMatch(questions[questionIndexToCheck]);
+        questionIndexToCheck++;
+      });
+      workedExampleExplanationField.getText().then(function(text) {
+        expect(text).toMatch(explanations[explanationIndexToCheck]);
+        explanationIndexToCheck++;
+      });
+      workedExampleSummary(index).click();
     }
   };
 
