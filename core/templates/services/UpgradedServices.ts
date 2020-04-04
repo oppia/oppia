@@ -102,6 +102,8 @@ import { ExplorationHtmlFormatterService } from
 import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
+import { ExpressionSyntaxTreeService } from
+  'expressions/expression-syntax-tree.service';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { ExtractImageFilenamesFromStateService } from
@@ -436,6 +438,9 @@ export class UpgradedServices {
     upgradedServices['EndExplorationValidationService'] =
       new EndExplorationValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['ExpressionSyntaxTreeService'] =
+      new ExpressionSyntaxTreeService(
+        upgradedServices['ExpressionParserService']);
     upgradedServices['FeedbackThreadObjectFactory'] =
       new FeedbackThreadObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);
