@@ -212,6 +212,13 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
+        'regexp': re.compile(r'(?s)(?:(?<=catch).*?throw(?=\s.*;))|(throw\s\w+[;]'),
+        'message': 'Please use '
+                   '\'throw new Error\' instead of \'throw\'',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': re.compile(r'\$parent'),
         'message': 'Please do not access parent properties ' +
                    'using $parent. Use the scope object' +
