@@ -331,10 +331,9 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.UNICODE_STRING;
       }
     },
-    // Note that removing quotation marks from this key causes issues with
-    // minification (when running the deployment scripts).
-    /* eslint-disable quote-props */
-    'if': {
+    // Note that removing quotation marks from these keys causes issues with
+    // minification when running the deployment scripts.
+    'if': {  // eslint-disable quote-props
       eval: (args: string[]): string => {
         this.verifyNumArgs(args, 3);
         return args[0] ? args[1] : args[2];
@@ -347,7 +346,7 @@ export class ExpressionSyntaxTreeService {
         return args[1];
       }
     },
-    'floor': {
+    'floor': {  // eslint-disable quote-props
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 1);
         const numericArgs = this.coerceAllArgsToNumber(args);
@@ -360,7 +359,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
-    'pow': {
+    'pow': {  // eslint-disable quote-props
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 2);
         const numericArgs = this.coerceAllArgsToNumber(args);
@@ -373,7 +372,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
-    'log': {
+    'log': {  // eslint-disable quote-props
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 2);
         const numericArgs = this.coerceAllArgsToNumber(args);
@@ -389,7 +388,7 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     },
-    'abs': {
+    'abs': {  // eslint-disable quote-props
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 1);
         const numericArgs = this.coerceAllArgsToNumber(args);
@@ -402,7 +401,6 @@ export class ExpressionSyntaxTreeService {
         return AppConstants.PARAMETER_TYPES.REAL;
       }
     }
-    /* eslint-enable quote-props */
   };
 }
 
