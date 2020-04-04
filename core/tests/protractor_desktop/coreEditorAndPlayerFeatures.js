@@ -204,7 +204,8 @@ describe('Enable correctness feedback and set correctness', function() {
 
     explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
       forms.toRichText('Correct!'),
-      forms.toRichText('Wrong!')]);
+      forms.toRichText('Wrong!')
+    ]);
     explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', forms.toRichText('Good!'),
       'End', true, 'Equals', 'Correct!');

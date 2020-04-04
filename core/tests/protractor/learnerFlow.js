@@ -68,11 +68,12 @@ describe('Learner dashboard functionality', function() {
     explorationEditorMainTab.moveToState('Second');
     explorationEditorMainTab.setContent(forms.toRichText(
       'So what can I tell you?'));
-    explorationEditorMainTab.setInteraction('MultipleChoiceInput',
-      [forms.toRichText('How do your explorations work?'),
-        forms.toRichText('What can you tell me about this website?'),
-        forms.toRichText('How can I contribute to Oppia?'),
-        forms.toRichText('Those were all the questions I had!')]);
+    explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
+      forms.toRichText('How do your explorations work?'),
+      forms.toRichText('What can you tell me about this website?'),
+      forms.toRichText('How can I contribute to Oppia?'),
+      forms.toRichText('Those were all the questions I had!')
+    ]);
     explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', null, 'End Card', true, 'Equals',
       'Those were all the questions I had!');
