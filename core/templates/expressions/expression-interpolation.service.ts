@@ -63,7 +63,7 @@ angular.module('oppia').factory('ExpressionInterpolationService', [
                 (e instanceof ExpressionSyntaxTreeService.ExpressionError)) {
               return EXPRESSION_ERROR_TAG;
             }
-            throw e;
+            throw 'e';
           }
         });
       },

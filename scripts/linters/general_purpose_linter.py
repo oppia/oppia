@@ -186,7 +186,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             # object in these files, and object error cannot handle by the
             # regular expression defined above. Using an object inside the
             # toThrowError({'props': 'message'}) will give error like
-            # Uncaught Error: [object object]
+            # Uncaught Error: [object object].
             'extensions/interactions/LogicProof/static/js/student.spec.ts',
             'extensions/interactions/LogicProof/static/js/complete.spec.ts',
             'extensions/interactions/LogicProof/static/js/teacher.spec.ts'),
@@ -212,7 +212,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'(?s)(?:(?<=catch).*?throw(?=\s.*;))|(throw\s\w+[;])'),
+        'regexp': re.compile(
+            r'(?s)(?:(?<=catch).*?throw\s*\w+[;](?=\s.*;))|(throw\s\w;)'),
         'message': 'Please use '
                    '\'throw new Error\' instead of \'throw\'',
         'excluded_files': (),
