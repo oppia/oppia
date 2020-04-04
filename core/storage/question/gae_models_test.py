@@ -304,7 +304,6 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
                 1, [skill_id_1, skill_id_2], next_cursor_str
             )
         )
-        self.assertEqual(len(question_skill_link_models_2), 1)
         self.assertIn(
             question_skill_link_models_2[0].skill_id, [skill_id_1, skill_id_2])
 
