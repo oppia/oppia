@@ -214,6 +214,9 @@ angular.module('oppia').directive('skillsList', [
               'description', 'worked_examples_count', 'misconception_count'
             ];
             $scope.highlightedIndex = null;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$apply();
           };
         }
       ]

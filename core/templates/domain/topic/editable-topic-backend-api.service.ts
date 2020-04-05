@@ -22,10 +22,10 @@ import { Injectable } from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
+import { AppConstants } from 'app.constants';
+import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
-import { AppConstants } from 'app.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +33,7 @@ import { AppConstants } from 'app.constants';
 export class EditableTopicBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolation: UrlInterpolationService) { }
+    private urlInterpolation: UrlInterpolationService) {}
 
   private _fetchTopic(topicId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
@@ -162,19 +162,19 @@ export class EditableTopicBackendApiService {
       });
   }
 
-  fetchTopic(topicId: string): Promise<object> {
+  fetchTopic(topicId: string): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchTopic(topicId, resolve, reject);
     });
   }
 
-  fetchStories(topicId: string): Promise<object> {
+  fetchStories(topicId: string): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchStories(topicId, resolve, reject);
     });
   }
 
-  fetchSubtopicPage(topicId: string, subtopicId: number): Promise<object> {
+  fetchSubtopicPage(topicId: string, subtopicId: number): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchSubtopicPage(topicId, subtopicId, resolve, reject);
     });
@@ -191,14 +191,14 @@ export class EditableTopicBackendApiService {
    * object. Errors are passed to the error callback, if one is provided.
    */
   updateTopic(topicId: string, topicVersion: string, commitMessage: string,
-      changeList: Array<Object>): Promise<object> {
+      changeList: Array<Object>): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._updateTopic(topicId, topicVersion, commitMessage,
         changeList, resolve, reject);
     });
   }
 
-  deleteTopic(topicId: string): Promise<object> {
+  deleteTopic(topicId: string): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._deleteTopic(topicId, resolve, reject);
     });

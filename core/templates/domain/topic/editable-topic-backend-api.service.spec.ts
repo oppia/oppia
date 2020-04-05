@@ -19,12 +19,13 @@
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
+import { CsrfTokenService } from 'services/csrf-token.service.ts';
 import { EditableTopicBackendApiService } from
   'domain/topic/editable-topic-backend-api.service.ts';
-import { CsrfTokenService } from 'services/csrf-token.service.ts';
 
 describe('Editable topic backend API service', () => {
-  let CsrfService: CsrfTokenService = null;
+  let csrfTokenService: CsrfTokenService = null;
   let editableTopicBackendApiService: EditableTopicBackendApiService = null;
   let httpTestingController: HttpTestingController;
   let sampleDataResults = {
@@ -82,12 +83,12 @@ describe('Editable topic backend API service', () => {
       providers: [EditableTopicBackendApiService]
     });
 
-    CsrfService = TestBed.get(CsrfTokenService);
+    csrfTokenService = TestBed.get(CsrfTokenService);
     httpTestingController = TestBed.get(HttpTestingController);
     editableTopicBackendApiService = TestBed.get(
       EditableTopicBackendApiService);
 
-    spyOn(CsrfService, 'getTokenAsync').and.returnValue(() => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(() => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');
       });
