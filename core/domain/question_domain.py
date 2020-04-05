@@ -20,14 +20,10 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import functools
 
 from constants import constants
 from core.domain import change_domain
-from core.domain import fs_domain
-from core.domain import fs_services
 from core.domain import html_cleaner
-from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
@@ -249,7 +245,6 @@ class Question(python_utils.OBJECT):
         Returns:
             dict. The converted question_state_dict.
         """
-
         # Get the voiceovers_mapping metadata.
         voiceovers_mapping = (question_state_dict['recorded_voiceovers']
                               ['voiceovers_mapping'])
@@ -288,38 +283,10 @@ class Question(python_utils.OBJECT):
 
         return question_state_dict
 
-    @classmethod
-    def _convert_state_v32_dict_to_v33_dict(
-            cls, question_id, question_state_dict):
-        """Converts from version 32 to 33. Version 33 adds
-        dimensions to images in the oppia-noninteractive-image tags
-        located inside tabs and collapsible blocks.
-
-        Args:
-            question_id: str. Question id.
-            question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
-                initalize a State domain object.
-
-        Returns:
-            dict. The converted question_state_dict.
-        """
-        file_system_class = fs_services.get_entity_file_system_class()
-        exploration_fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_QUESTION, question_id))
-        add_dimensions_to_image_tags = functools.partial(
-            html_validation_service.add_dims_to_img_in_complex_rte,
-            exploration_fs)
-        question_state_dict = state_domain.State.convert_html_fields_in_state(
-            question_state_dict,
-            add_dimensions_to_image_tags)
-
-        return question_state_dict
 
     @classmethod
     def update_state_from_model(
-            cls, question_id, versioned_question_state,
-            current_state_schema_version):
+            cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
         versioned_question_state dict from current_state_schema_version to
         current_state_schema_version + 1.
@@ -327,7 +294,6 @@ class Question(python_utils.OBJECT):
         in-place.
 
         Args:
-            question_id: str. Question id.
             versioned_question_state: dict. A dict with two keys:
                 - state_schema_version: int. The state schema version for the
                     question.
@@ -336,25 +302,14 @@ class Question(python_utils.OBJECT):
             current_state_schema_version: int. The current state
                 schema version.
         """
-        next_state_schema_version = current_state_schema_version + 1
         versioned_question_state['state_schema_version'] = (
-            next_state_schema_version)
+            current_state_schema_version + 1)
 
-        conversion_fn = (
-            getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
-                current_state_schema_version, next_state_schema_version)))
+        conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
+            current_state_schema_version, current_state_schema_version + 1))
 
-        # The following schema versions require question_id to be passed
-        # as an additional parameter in the conversion_fn.
-        special_case_schema_versions = [32]
-
-        if current_state_schema_version in special_case_schema_versions:
-            versioned_question_state['state'] = conversion_fn(
-                question_id, versioned_question_state['state'])
-        else:
-            versioned_question_state['state'] = conversion_fn(
-                versioned_question_state['state'])
-
+        versioned_question_state['state'] = conversion_fn(
+            versioned_question_state['state'])
 
     def partial_validate(self):
         """Validates the Question domain object, but doesn't require the

@@ -19,15 +19,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import functools
 import logging
 
 from core.domain import exp_domain
-from core.domain import fs_domain
-from core.domain import fs_services
-from core.domain import html_validation_service
 from core.platform import models
-import feconf
 import python_utils
 import utils
 
@@ -85,8 +80,6 @@ def try_upgrading_draft_to_exp_version(
             logging.warning('%s is not implemented' % conversion_fn_name)
             return
         conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
-        if commit.commit_cmds[0]['from_version'] == 32:
-            conversion_fn = functools.partial(conversion_fn, exp_id)
         draft_change_list = conversion_fn(draft_change_list)
         upgrade_times += 1
     return draft_change_list
@@ -94,93 +87,6 @@ def try_upgrading_draft_to_exp_version(
 
 class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
-
-    @classmethod
-    def _convert_states_v32_dict_to_v33_dict(cls, exp_id, draft_change_list):
-        """Converts draft change list from state version 32 to 33. State
-        version 33 adds image dimensions to images inside collapsible
-        blocks and tabs, for which there should be no changes to drafts.
-
-        Args:
-            exp_id: str. Exploration id.
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
-
-        Returns:
-            list(ExplorationChange). The converted draft_change_list.
-        """
-        file_system_class = fs_services.get_entity_file_system_class()
-        exploration_fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-        for i, change in enumerate(draft_change_list):
-            # Changes for html in state content.
-            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-                    change.property_name == exp_domain.STATE_PROPERTY_CONTENT):
-                html_string = change.new_value['html']
-                converted_html_string = (
-                    html_validation_service.add_dims_to_img_in_complex_rte(
-                        exploration_fs, html_string))
-                draft_change_list[i].new_value[u'html'] = converted_html_string
-
-            # Changes for html in interaction answer groups.
-            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-                    change.property_name ==
-                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                updated_answer_group_dicts = []
-                for answer_group_index in python_utils.RANGE(
-                        len(change.new_value)):
-                    outcome = (
-                        change.new_value[answer_group_index]['outcome'])
-                    html_string = outcome['feedback']['html']
-                    converted_html_string = (
-                        html_validation_service.add_dims_to_img_in_complex_rte(
-                            exploration_fs, html_string))
-                    outcome['feedback']['html'] = converted_html_string
-                    updated_answer_group_dicts.append({
-                        'rule_specs': (
-                            change.new_value[answer_group_index]['rule_specs']),
-                        'outcome': outcome,
-                        'training_data': (
-                            change.new_value[answer_group_index][
-                                'training_data']),
-                        'tagged_skill_misconception_id': (
-                            change.new_value[answer_group_index][
-                                'tagged_skill_misconception_id'])
-                    })
-
-                draft_change_list[i].new_value = updated_answer_group_dicts
-
-            # Changes for html in hints.
-            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-                    change.property_name ==
-                    exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
-                updated_hint_dicts = []
-                for hint_index in python_utils.RANGE(len(change.new_value)):
-                    hint_content = change.new_value[hint_index]['hint_content']
-                    html_string = hint_content['html']
-                    converted_html_string = (
-                        html_validation_service.add_dims_to_img_in_complex_rte(
-                            exploration_fs, html_string))
-                    updated_hint_dicts.append({
-                        'hint_content': {
-                            'content_id': hint_content['content_id'],
-                            'html': converted_html_string
-                        }
-                    })
-
-                draft_change_list[i].new_value = updated_hint_dicts
-
-            # Changes for html in solution.
-            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-                    change.property_name ==
-                    exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
-                html_string = change.new_value['explanation']['html']
-                converted_html_string = (
-                    html_validation_service.add_dims_to_img_in_complex_rte(
-                        exploration_fs, html_string))
-                draft_change_list[i].new_value[u'explanation'][u'html'] = (
-                    converted_html_string)
-        return draft_change_list
 
     @classmethod
     def _convert_states_v31_dict_to_v32_dict(cls, draft_change_list):
