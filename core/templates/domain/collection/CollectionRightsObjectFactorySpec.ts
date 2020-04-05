@@ -98,7 +98,7 @@ describe('Collection rights object factory', () => {
 
       expect(() => {
         sampleCollectionRights.setPublic();
-      }).toThrow('User is not allowed to edit this collection.');
+      }).toThrowError('User is not allowed to edit this collection.');
       expect(sampleCollectionRights.isPrivate()).toBe(true);
       expect(sampleCollectionRights.isPublic()).toBe(false);
     }
