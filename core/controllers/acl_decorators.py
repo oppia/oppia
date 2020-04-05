@@ -1563,6 +1563,11 @@ def can_edit_topic(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
+        try:
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
@@ -1772,6 +1777,11 @@ def can_add_new_story_to_topic(handler):
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
+
+        try:
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
@@ -2046,6 +2056,11 @@ def can_delete_topic(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
+        try:
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
         if role_services.ACTION_DELETE_TOPIC in user_actions_info.actions:
@@ -2174,7 +2189,10 @@ def can_view_any_topic_editor(handler):
         """
         if not self.user_id:
             raise self.NotLoggedInException
-        topic_domain.Topic.require_valid_topic_id(topic_id)
+        try:
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
@@ -2246,10 +2264,11 @@ def can_change_topic_publication_status(handler):
             if the user can publish or unpublish a topic.
     """
 
-    def test_can_change_topic_publication_status(self, **kwargs):
+    def test_can_change_topic_publication_status(self, topic_id, **kwargs):
         """Checks whether the user can can publish or unpublish a topic.
 
         Args:
+            topic_id: str. The topic id.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -2263,12 +2282,17 @@ def can_change_topic_publication_status(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
+        try:
+            topic_domain.Topic.require_valid_topic_id(topic_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
         if (
                 role_services.ACTION_CHANGE_TOPIC_STATUS in
                 user_actions_info.actions):
-            return handler(self, **kwargs)
+            return handler(self, topic_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 '%s does not have enough rights to publish or unpublish the '

@@ -252,7 +252,7 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 
 class TopicEditorTests(BaseTopicEditorControllerTests):
 
-    def test_get_can_not_access_topic_page_with_invalid_topic_id(self):
+    def test_get_can_not_access_topic_page_with_nonexistent_topic_id(self):
         self.login(self.ADMIN_EMAIL)
 
         self.get_html_response(
@@ -260,6 +260,16 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 feconf.TOPIC_EDITOR_URL_PREFIX,
                 topic_services.get_new_topic_id()), expected_status_int=404)
 
+        self.logout()
+
+    def test_cannot_access_topic_editor_page_with_invalid_topic_id(self):
+        # Check that the editor page can not be accessed with an
+        # an invalid topic id.
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_URL_PREFIX, 'invalid_topic_id'),
+            expected_status_int=404)
         self.logout()
 
     def test_access_topic_editor_page(self):
@@ -636,6 +646,15 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         self.assertEqual(
             response['error'],
             'You must be logged in to access this resource.')
+
+    def test_cannot_delete_invalid_topic(self):
+        # Check that an invalid topic can not be deleted.
+        self.login(self.ADMIN_EMAIL)
+        self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                'invalid_topic_id'), expected_status_int=404)
+        self.logout()
 
     def test_editable_topic_handler_delete(self):
         # Check that admins can delete a topic.
