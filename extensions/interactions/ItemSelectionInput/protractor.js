@@ -25,7 +25,8 @@ var waitFor = require('../../../core/tests/protractor_utils/waitFor.js');
 // which will each be passed a 'handler' that they can use to edit the
 // rich-text area of the option, for example by
 //   handler.appendUnderlineText('emphasised');
-var customizeInteraction = function(elem, richTextInstructionsArray, maxSelectionAllowed) {
+var customizeInteraction = function(
+    elem, richTextInstructionsArray,maxSelectionAllowed) {
   objects.IntEditor(
     elem.all(by.tagName('schema-based-int-editor')).last()
   ).setValue(maxSelectionAllowed);
@@ -53,27 +54,30 @@ var expectInteractionDetailsToMatch = function(
     });
 };
 
-var answerObjectType = 'SetOfHtmlString'; // type of object returned by interaction
-
+// type of object returned by interaction
+var answerObjectType = 'SetOfHtmlString'; 
 
 // 'elem' is the HTML element containing the form to submit the answer to.
 // 'answer' Set([{String}]) is the text on the multiple-choice item to select.
-// answer = an array of strings, iterate over each of the items in the array and click on each item
 var submitAnswer = function(elem, answer) {
   var answerArray = Array.from(answer);
 
   for (var i = 0; i < answerArray.length; i++) {
     var desiredAnswer = answerArray[i];
-    elem.element(by.cssContainingText(".protractor-test-item-selection-input-item", desiredAnswer))
-      .element(by.css('.protractor-test-item-selection-input-checkbox')).click();
+    elem.element(by.cssContainingText(
+      '.protractor-test-item-selection-input-item',desiredAnswer))
+      .element(by.css(
+        '.protractor-test-item-selection-input-checkbox')).click();
   }
 
-  var submitAnswerButton = element(by.css('.protractor-test-submit-answer-button'));
-  waitFor.elementToBeClickable(submitAnswerButton, 'Submit Answer button is not clickable');
+  var submitAnswerButton = element(by.css(
+    '.protractor-test-submit-answer-button'));
+  waitFor.elementToBeClickable(submitAnswerButton,
+    'Submit Answer button is not clickable');
   submitAnswerButton.click();
 };
 
-var testSuite = [{ 
+var testSuite = [{
   interactionArguments: [[function(editor) {
     editor.appendBoldText('answer1');
   }, function(editor) {
@@ -109,7 +113,7 @@ var testSuite = [{
   }]],
   wrongAnswers: [['answer1', 'answer3']],
   correctAnswers: [['answer1', 'answer2']]
-}, { 
+}, {
   interactionArguments: [[function(editor) {
     editor.appendBoldText('answer1');
   }, function(editor) {

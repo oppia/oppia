@@ -167,7 +167,7 @@ describe('Interactions', function() {
           explorationPlayerPage.submitAnswer(
             interactionId, test.wrongAnswers[j]);
           explorationPlayerPage.expectLatestFeedbackToMatch(
-                forms.toRichText('no'));
+            forms.toRichText('no'));
         }
         // Dismiss conversation help card.
         var clearHelpcardButton = element(by.css(
@@ -177,7 +177,7 @@ describe('Interactions', function() {
             clearHelpcardButton.click();
           }
         });
-        
+
         for (var j = 0; j < test.correctAnswers.length; j++) {
           explorationPlayerPage.submitAnswer(
             interactionId, test.correctAnswers[j]);

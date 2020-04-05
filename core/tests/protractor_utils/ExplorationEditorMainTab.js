@@ -42,7 +42,7 @@ var ExplorationEditorMainTab = function() {
   var itemSelectionAnswerOptions = function(optionNum) {
     return element(
       by.cssContainingText('.protractor-test-html-select-option', optionNum));
-  }
+  };
   var neutralElement = element.all(by.css('.protractor-test-neutral-element'))
     .first();
   var defaultResponseTab = element(
@@ -896,8 +896,8 @@ var ExplorationEditorMainTab = function() {
           .click();
       } else if (interactionId === 'ItemSelectionInput') {
         var answerArray = Array.from(parameterValues[i]);
-          for (var i = 0; i < answerArray.length; i++) {
-            itemSelectionAnswerOptions(answerArray[i]).click();
+        for (var i = 0; i < answerArray.length; i++) {
+        	itemSelectionAnswerOptions(answerArray[i]).click();
         }
       } else {
         parameterEditor.setValue(parameterValues[i]);
