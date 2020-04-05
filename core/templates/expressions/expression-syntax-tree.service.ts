@@ -27,7 +27,7 @@ export class ExpressionError extends Error {
   constructor(message?: string) {
     super(message);
     // NOTE TO DEVELOPERS: In order to properly extend Error, we must manually
-    // reset the prototype chain because it gets broken after calling `super`.
+    // rebuild the prototype chain because it is broken by the call to `super`.
     // For details, please see: https://stackoverflow.com/a/58417721/4859885.
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = new.target.name;
@@ -36,7 +36,7 @@ export class ExpressionError extends Error {
 
 export class ExprUndefinedVarError extends ExpressionError {
   constructor(public varname: string, public envs: any[]) {
-    super(varname + ' not found in ' + envs);
+    super(varname + ' not found in ' + angular.toJson(envs));
   }
 }
 
