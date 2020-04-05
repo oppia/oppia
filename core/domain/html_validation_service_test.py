@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 import os
+
 import bs4
 from core.domain import fs_domain
 from core.domain import html_validation_service
@@ -1359,236 +1360,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         for test_case in test_cases:
             self.assertEqual(
                 html_validation_service.add_dimensions_to_image_tags(
-                    fs, test_case['html_content']),
+                    exp_id, test_case['html_content']),
                 test_case['expected_output'])
-
-    # pylint: disable=anomalous-backslash-in-string
-    def test_add_dims_to_img_in_complex_rte(self):
-        test_cases = [{
-            'html_content': (
-                '<oppia-noninteractive-collapsible content-with-value="&amp;'
-                'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
-                'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
-                'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
-                'quot;\&amp;quot; filepath-with-value=\&quot;&amp;amp;quot;'
-                '&amp;amp;quot;\&quot;&gt;&amp;lt;'
-                '/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You '
-                'have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;'
-                'quot;" heading-with-value="&amp;quot;Sample Header&amp;quot;'
-                '"></oppia-noninteractive-collapsible>'
-            ),
-            'expected_output': (
-                u'<oppia-noninteractive-collapsible content-with-value="&amp;'
-                'quot;&amp;lt;p&amp;gt;You have opened the collapsible block.'
-                '&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;'
-                'Sample Header&amp;quot;"></oppia-noninteractive-collapsible>'
-            )
-        }, {
-            'html_content': (
-                '<oppia-noninteractive-image caption-with-value="&amp;quot;'
-                '&amp;quot;" filepath-with-value="">'
-                '</oppia-noninteractive-image>'
-                '<oppia-noninteractive-collapsible content-with-value="&amp;'
-                'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
-                'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
-                'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
-                'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
-                'quot;abc2.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
-                '/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You '
-                'have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;'
-                'quot;" heading-with-value="&amp;quot;Sample Header&amp;quot;'
-                '"></oppia-noninteractive-collapsible>'
-            ),
-            'expected_output': (
-                u'<oppia-noninteractive-collapsible content-with-value="&amp;'
-                'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
-                'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
-                'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
-                'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
-                'quot;abc2_height_32_width_32.png&amp;amp;amp;quot;\&amp;quot;'
-                '&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;'
-                'p&amp;gt;You have opened the collapsible block.&amp;lt;/p'
-                '&amp;gt;&amp;quot;" heading-with-value="&amp;quot;Sample '
-                'Header&amp;quot;"></oppia-noninteractive-collapsible>'
-            )
-        }, {
-            'html_content': (
-                '<oppia-noninteractive-collapsible content-with-value="&amp;'
-                'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
-                'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
-                'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
-                'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
-                'quot;abc2.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
-                '/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You '
-                'have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;'
-                'quot;" heading-with-value="&amp;quot;Sample Header&amp;quot;'
-                '"></oppia-noninteractive-collapsible>'
-            ),
-            'expected_output': (
-                u'<oppia-noninteractive-collapsible content-with-value="&amp;'
-                'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
-                'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
-                'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
-                'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
-                'quot;abc2_height_32_width_32.png&amp;amp;amp;quot;\&amp;quot;'
-                '&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;'
-                'p&amp;gt;You have opened the collapsible block.&amp;lt;/p'
-                '&amp;gt;&amp;quot;" heading-with-value="&amp;quot;Sample '
-                'Header&amp;quot;"></oppia-noninteractive-collapsible>'
-            )
-        }, {
-            'html_content': (
-                '<oppia-noninteractive-collapsible content-with-value="" '
-                'heading-with-value="&amp;quot;Sample Header&amp;quot;'
-                '"></oppia-noninteractive-collapsible>'
-                '<oppia-noninteractive-collapsible content-with-value="&amp;'
-                'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
-                'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
-                'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
-                'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
-                'quot;abc2.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
-                '/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You '
-                'have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;'
-                'quot;" heading-with-value="&amp;quot;Sample Header&amp;quot;'
-                '"></oppia-noninteractive-collapsible>'
-            ),
-            'expected_output': (
-                u'<oppia-noninteractive-collapsible content-with-value="" '
-                'heading-with-value="&amp;quot;Sample Header&amp;quot;'
-                '"></oppia-noninteractive-collapsible>'
-                '<oppia-noninteractive-collapsible content-with-value="&amp;'
-                'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
-                'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
-                'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
-                'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
-                'quot;abc2_height_32_width_32.png&amp;amp;amp;quot;\&amp;quot;'
-                '&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;'
-                'p&amp;gt;You have opened the collapsible block.&amp;lt;/p'
-                '&amp;gt;&amp;quot;" heading-with-value="&amp;quot;Sample '
-                'Header&amp;quot;"></oppia-noninteractive-collapsible>'
-            )
-        }, {
-            'html_content': (
-                '<oppia-noninteractive-tabs tab_contents-with-value="">'
-                '</oppia-noninteractive-tabs>'
-                '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;'
-                'quot;title&amp;quot;:&amp;quot;tab1&amp;quot;,&amp;quot;'
-                'content&amp;quot;:&amp;quot;&amp;lt;'
-                'oppia-noninteractive-image alt-with-value=\&amp;quot;&amp;'
-                'amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
-                'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;'
-                'amp;quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;'
-                'amp;quot;abc1.png'
-                '&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
-                '/oppia-noninteractive-image&amp;gt;&amp;lt;'
-                'oppia-noninteractive-image alt-with-value=\&amp;quot;&amp;'
-                'amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
-                'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
-                'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
-                'quot;abc2.png'
-                '&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
-                '/oppia-noninteractive-image&amp;gt;\n&amp;lt;p&amp;gt;this is'
-                ' tab1&amp;lt;/p&amp;gt;&amp;quot;},{&amp;quot;title&amp;quot;'
-                ':&amp;quot;tab2&amp;quot;,&amp;quot;content&amp;quot;:&amp;'
-                'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
-                'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
-                'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
-                'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
-                'quot;abc3.png'
-                '&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
-                '/oppia-noninteractive-image&amp;gt;\n&amp;lt;p&amp;gt;this is'
-                ' tab2&amp;lt;/p&amp;gt;&amp;quot;}]">'
-                '</oppia-noninteractive-tabs>'
-            ),
-            'expected_output': (
-                u'<oppia-noninteractive-tabs tab_contents-with-value="">'
-                '</oppia-noninteractive-tabs><oppia-noninteractive-tabs '
-                'tab_contents-with-value="[{&amp;quot;content&amp;quot;: '
-                '&amp;quot;&amp;lt;oppia-noninteractive-image alt-with-value='
-                '\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot;'
-                ' caption-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;'
-                'amp;quot;\\&amp;quot; filepath-with-value=\\&amp;quot;&amp;'
-                'amp;amp;quot;abc1_height_32_width_32.png&amp;amp;amp;quot;\\'
-                '&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;'
-                '&amp;lt;oppia-noninteractive-image alt-with-value=\\&amp;'
-                'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot; '
-                'caption-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;'
-                'amp;quot;\\&amp;quot; filepath-with-value=\\&amp;quot;'
-                '&amp;amp;amp;quot;abc2_height_32_width_32.png&amp;amp;'
-                'amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive'
-                '-image&amp;gt;\n&amp;lt;p&amp;gt;this is tab1&amp;lt;/p&amp;'
-                'gt;&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;tab1&amp;'
-                'quot;}, {&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;oppia'
-                '-noninteractive-image alt-with-value=\\&amp;quot;&amp;amp;'
-                'amp;quot;&amp;amp;amp;quot;\\&amp;quot; caption-with-value='
-                '\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\\&amp;quot;'
-                ' filepath-with-value=\\&amp;quot;&amp;amp;amp;quot;'
-                'abc3_height_32_width_32.png&amp;amp;amp;quot;\\&amp;quot;'
-                '&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;\n&amp;'
-                'lt;p&amp;gt;this is tab2&amp;lt;/p&amp;gt;&amp;quot;, '
-                '&amp;quot;title&amp;quot;: &amp;quot;tab2&amp;quot;}]">'
-                '</oppia-noninteractive-tabs>'
-            )
-        }]
-
-        exp_id = 'eid'
-
-        with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-            encoding=None) as f:
-            raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-        fs.commit('image/abc1.png', raw_image, mimetype='image/png')
-        fs.commit('image/abc2.png', raw_image, mimetype='image/png')
-        fs.commit('image/abc3.png', raw_image, mimetype='image/png')
-
-        for test_case in test_cases:
-            self.assertEqual(
-                html_validation_service.add_dims_to_img_in_complex_rte(
-                    fs, test_case['html_content']),
-                test_case['expected_output'])
-
-    # pylint: disable=anomalous-backslash-in-string
-    def test_add_dims_to_img_in_complex_rte_for_questions(
-            self):
-        html_content = (
-            '<oppia-noninteractive-collapsible content-with-value="&amp;'
-            'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
-            'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
-            'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
-            'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
-            'quot;abc2.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
-            '/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You '
-            'have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;'
-            'quot;" heading-with-value="&amp;quot;Sample Header&amp;quot;'
-            '"></oppia-noninteractive-collapsible>')
-        expected_output = (
-            u'<oppia-noninteractive-collapsible content-with-value="&amp;'
-            'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
-            'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
-            'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
-            'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
-            'quot;abc2_height_32_width_32.png&amp;amp;amp;quot;\&amp;quot;'
-            '&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;'
-            'p&amp;gt;You have opened the collapsible block.&amp;lt;/p'
-            '&amp;gt;&amp;quot;" heading-with-value="&amp;quot;Sample '
-            'Header&amp;quot;"></oppia-noninteractive-collapsible>')
-
-        exp_id = 'eid'
-
-        with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-            encoding=None) as f:
-            raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_QUESTION, exp_id))
-        fs.commit('image/abc2.png', raw_image, mimetype='image/png')
-        self.assertEqual(
-            html_validation_service.add_dims_to_img_in_complex_rte(
-                fs, html_content), expected_output)
 
     def test_add_dimensions_to_image_tags_with_invalid_filepath_with_value(
             self):
@@ -1621,55 +1394,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         with assert_raises_context_manager, logging_swap:
             html_validation_service.add_dimensions_to_image_tags(
-                fs, html_content)
+                exp_id, html_content)
 
         self.assertEqual(len(observed_log_messages), 1)
         self.assertEqual(
             observed_log_messages[0],
-            'exploration exp_id failed to load image: abc1.png')
-
-    def test_add_dims_to_img_in_complex_rte_with_invalid_filepath_with_value(
-            self):
-
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_context_manager = self.assertRaises(Exception)
-
-        html_content = (
-            '<oppia-noninteractive-collapsible content-with-value="&amp;'
-            'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
-            'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
-            'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
-            'quot;\&amp;quot; filepath-with-value=new.png&amp;gt;&amp;lt;'
-            '/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You '
-            'have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;'
-            'quot;" heading-with-value="&amp;quot;Sample Header&amp;quot;'
-            '"></oppia-noninteractive-collapsible>')
-
-        exp_id = 'exp_id'
-
-        with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-            encoding=None) as f:
-            raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-        fs.commit('image/new.png', raw_image, mimetype='image/png')
-
-        with assert_raises_context_manager, logging_swap:
-            html_validation_service.add_dims_to_img_in_complex_rte(
-                fs, html_content)
-
-        self.assertEqual(len(observed_log_messages), 1)
-        self.assertEqual(
-            observed_log_messages[0],
-            'exploration exp_id failed to load image: new.png')
+            'Exploration exp_id failed to load image: abc1.png')
 
     def test_add_dimensions_to_image_tags_when_no_filepath_specified(self):
         test_cases = [{
@@ -1715,30 +1445,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'filepath-with-value="&amp;quot;abc3_height_32_width_32.png'
                 '&amp;quot;"></oppia-noninteractive-image></p>'
             )
-        }, {
-            'html_content': (
-                '<oppia-noninteractive-image alt-with-value="&amp;quot;'
-                '&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" '
-                'filepath-with-value="&amp;quot;&amp;quot;">'
-                '</oppia-noninteractive-image>'
-                '<p>Some text.</p><p>Some more text.</p><p>Yet more text.</p>'
-                '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
-                'img.png&amp;quot;"></oppia-noninteractive-image>Hello this'
-                ' is test case to check that dimensions are added to the oppia'
-                ' noninteractive image tags.<oppia-noninteractive-image '
-                'filepath-with-value="&amp;quot;abc3.png&amp;quot;">'
-                '</oppia-noninteractive-image></p>'
-            ),
-            'expected_output': (
-                u'<p>Some text.</p><p>Some more text.</p><p>Yet more text.</p>'
-                '<p><oppia-noninteractive-image filepath-with-value="'
-                '&amp;quot;img_height_32_width_32.png&amp;quot;">'
-                '</oppia-noninteractive-image>Hello this is test case '
-                'to check that dimensions are added to the oppia'
-                ' noninteractive image tags.<oppia-noninteractive-image '
-                'filepath-with-value="&amp;quot;abc3_height_32_width_32.png'
-                '&amp;quot;"></oppia-noninteractive-image></p>'
-            )
         }]
 
         exp_id = 'eid'
@@ -1756,7 +1462,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         for test_case in test_cases:
             self.assertEqual(
                 html_validation_service.add_dimensions_to_image_tags(
-                    fs, test_case['html_content']),
+                    exp_id, test_case['html_content']),
                 test_case['expected_output'])
 
     def test_regenerate_image_filename_using_dimensions(self):

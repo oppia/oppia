@@ -23,13 +23,9 @@ from core.domain import draft_upgrade_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.platform import models
 from core.tests import test_utils
 import feconf
-import python_utils
 import utils
-
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
 class DraftUpgradeUnitTests(test_utils.GenericTestBase):
@@ -110,26 +106,6 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
                 self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID),
             self.DRAFT_CHANGELIST)
 
-    def test_try_upgrade_from_v32_to_v33(self):
-        exp_id = 'exp1'
-        self.save_new_exp_with_states_schema_v0(
-            exp_id, self.USER_ID, 'Old Title')
-        exploration_model = exp_models.ExplorationModel.get(
-            exp_id, strict=True, version=None)
-        for i in python_utils.RANGE(31):
-            exploration_model.commit(
-                self.USER_ID, 'Changed title %s.' % i, [])
-        exploration_model.commit(
-            self.USER_ID, 'Migrate from v32 to v33', [{
-                'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-                'from_version': 32,
-                'to_version': 33
-            }])
-        self.assertEqual(
-            draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                self.DRAFT_CHANGELIST, 32, 33, exp_id),
-            self.DRAFT_CHANGELIST)
-
 
 class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
     """Test the DraftUpgradeUtil module."""
@@ -143,102 +119,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 draft_upgrade_services.DraftUpgradeUtil, conversion_fn_name),
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
-
-    # pylint: disable=anomalous-backslash-in-string
-    def test_convert_states_v32_dict_to_v33_dict(self):
-        html_content = (
-            '<oppia-noninteractive-collapsible content-with-value="&amp;'
-            'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
-            'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
-            'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
-            'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
-            'quot;abc2.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
-            '/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You '
-            'have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;'
-            'quot;" heading-with-value="&amp;quot;Sample Header&amp;quot;'
-            '"></oppia-noninteractive-collapsible>')
-        expected_output = (
-            u'<oppia-noninteractive-collapsible content-with-value="&amp;'
-            'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
-            'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
-            'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
-            'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
-            'quot;abc2_height_120_width_120.png&amp;amp;amp;quot;\&amp;quot;'
-            '&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;'
-            'p&amp;gt;You have opened the collapsible block.&amp;lt;/p'
-            '&amp;gt;&amp;quot;" heading-with-value="&amp;quot;Sample '
-            'Header&amp;quot;"></oppia-noninteractive-collapsible>')
-        draft_change_list = [
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'Intro',
-                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                'new_value': {
-                    'html': html_content,
-                    'content_id': 'content_id'
-                }
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'Intro',
-                'property_name': (
-                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
-                'new_value': [{
-                    'rule_specs': [],
-                    'outcome': {
-                        'feedback': {
-                            'html': html_content,
-                            'content_id': 'cid'
-                        }
-                    },
-                    'training_data': [],
-                    'tagged_skill_misconception_id': None
-                }]
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'Intro',
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
-                'new_value': [{
-                    'hint_content': {
-                        'html': html_content,
-                        'content_id': 'content_id'
-                    }
-                }]
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'Intro',
-                'property_name': (
-                    exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION),
-                'new_value': {
-                    'answer_is_exclusive': True,
-                    'correct_answer': '',
-                    'explanation': {
-                        'content_id': 'cid',
-                        'html': html_content
-                    }
-                }
-            })]
-        converted_change_list = (
-            draft_upgrade_services.DraftUpgradeUtil._convert_states_v32_dict_to_v33_dict(  # pylint: disable=protected-access,line-too-long
-                'exp_id', draft_change_list))
-        content_dict = converted_change_list[0].to_dict()
-        answer_group_dict = converted_change_list[1].to_dict()
-        hint_dict = converted_change_list[2].to_dict()
-        solution_dict = converted_change_list[3].to_dict()
-        self.assertEqual(
-            content_dict['new_value']['html'],
-            expected_output)
-        self.assertEqual(
-            answer_group_dict['new_value'][0]['outcome']['feedback']['html'],
-            expected_output)
-        self.assertEqual(
-            hint_dict['new_value'][0]['hint_content']['html'],
-            expected_output)
-        self.assertEqual(
-            solution_dict['new_value']['explanation']['html'],
-            expected_output)
 
     def test_convert_states_v31_dict_to_v32_dict(self):
         draft_change_list = [
