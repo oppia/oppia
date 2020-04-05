@@ -45,7 +45,7 @@ export class ExprWrongNumArgsError extends ExpressionError {
       public args: Array<number|string>,
       public expectedMin: number, public expectedMax: number) {
     super(
-      '{' + args + '} not in range [' + expectedMin + ',' + expectedMax + ']');
+      '{' + args + '} not in range [' + expectedMin + ', ' + expectedMax + ']');
   }
 }
 
@@ -105,14 +105,14 @@ export class ExpressionSyntaxTreeService {
     return paramsFound;
   }
 
-  // Checks if the args array has the expectedLow number of elements and throws
-  // an error if not. If optional expectedHigh is specified, it verifies the
-  // number of args is in the inclusive range: [expectedLow, expectedHigh].
+  // Checks if the args array has the expectedMin number of elements and throws
+  // an error if not. If optional expectedMax is specified, it verifies the
+  // number of args is in the inclusive range: [expectedMin, expectedMax].
   private verifyNumArgs(
       args: string[],
-      expectedLow: number, expectedHigh: number = expectedLow): void {
-    if (args.length < expectedLow || args.length > expectedHigh) {
-      throw new ExprWrongNumArgsError(args, expectedLow, expectedHigh);
+      expectedMin: number, expectedMax: number = expectedMin): void {
+    if (args.length < expectedMin || args.length > expectedMax) {
+      throw new ExprWrongNumArgsError(args, expectedMin, expectedMax);
     }
   }
 
