@@ -541,14 +541,14 @@ class InteractionInstance(python_utils.OBJECT):
         if self.id in self.INTERACTIONS_STORING_HTML_RULE_SPEC_INPUT:
             for answer_group in self.answer_groups:
                 for rule_spec in answer_group.rule_specs:
-                    for input in rule_spec.inputs.values():
-                        if isinstance(input, python_utils.BASESTRING):
-                            html_list += [input]
-                        elif isinstance(input[0], list):
+                    for value in rule_spec.inputs.values():
+                        if isinstance(value, python_utils.BASESTRING):
+                            html_list += [value]
+                        elif isinstance(value[0], list):
                             html_list += [
-                                item for sublist in input for item in sublist]
+                                item for sublist in value for item in sublist]
                         else:
-                            html_list += input
+                            html_list += value
 
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html
