@@ -113,7 +113,7 @@ class SkillChange(change_domain.BaseChange):
         'optional_attribute_names': []
     }, {
         'name': CMD_ADD_SKILL_MISCONCEPTION,
-        'required_attribute_names': ['new_misconception_dict'],
+        'required_attribute_names': ['misconception', 'misconception_id'],
         'optional_attribute_names': []
     }, {
         'name': CMD_DELETE_SKILL_MISCONCEPTION,
@@ -982,21 +982,16 @@ class Skill(python_utils.OBJECT):
                 return ind
         return None
 
-    def add_misconception(self, misconception_dict):
+    def add_misconception(self, misconception, misconception_id):
         """Adds a new misconception to the skill.
 
         Args:
-            misconception_dict: dict. The misconception to be added.
+            misconception: misconception. The misconception to be added.
+            misconception_id: int. The id of the misconception.
         """
-        misconception = Misconception(
-            misconception_dict['id'],
-            misconception_dict['name'],
-            misconception_dict['notes'],
-            misconception_dict['feedback'],
-            misconception_dict['must_be_addressed'])
         self.misconceptions.append(misconception)
         self.next_misconception_id = self.get_incremented_misconception_id(
-            misconception_dict['id'])
+            misconception_id)
 
     def _find_prerequisite_skill_id_index(self, skill_id_to_find):
         """Returns the index of the skill_id in the prerequisite_skill_ids
