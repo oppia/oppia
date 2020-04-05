@@ -1005,9 +1005,8 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
         contributors_summary = compute_exploration_contributors_summary(
             exploration.id)
     elif contributor_id_to_add not in constants.SYSTEM_USER_IDS:
-        if contributor_id_to_add in contributors_summary:
-            contributors_summary[contributor_id_to_add] += (
-                contributors_summary.get(contributor_id_to_add, 1) + 1)
+        contributors_summary[contributor_id_to_add] = (
+            contributors_summary.get(contributor_id_to_add, 0) + 1)
     contributor_ids = list(contributors_summary)
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(

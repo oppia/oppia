@@ -1002,7 +1002,7 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
             collection.id)
     elif contributor_id_to_add not in constants.SYSTEM_USER_IDS:
         contributors_summary[contributor_id_to_add] = (
-            contributors_summary.get(contributor_id_to_add, 1) + 1)
+            contributors_summary.get(contributor_id_to_add, 0) + 1)
     contributor_ids = list(contributors_summary)
 
     collection_model_last_updated = collection.last_updated
