@@ -27,6 +27,7 @@ import re
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.domain import state_domain
 from core.tests import test_utils
@@ -34,7 +35,8 @@ import feconf
 import utils
 
 
-def mock_get_filename_with_dimensions(filename, unused_exp_id):
+def mock_get_filename_with_dimensions(
+        unused_exploration_file_system, filename):
     return html_validation_service.regenerate_image_filename_using_dimensions(
         filename, 490, 120)
 
@@ -665,10 +667,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_dict,
                 html_validation_service.add_caption_attr_to_image),
             state_dict_with_image_caption)
-
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, 'eid'))
         add_dimensions_to_image_tags = functools.partial(
-            html_validation_service.add_dimensions_to_image_tags,
-            'eid')
+            html_validation_service.add_dimensions_to_image_tags, fs)
 
         with self.swap(
             html_validation_service, 'get_filename_with_dimensions',
