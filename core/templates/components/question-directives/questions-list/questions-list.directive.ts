@@ -345,21 +345,21 @@ angular.module('oppia').directive('questionsList', [
             EditableQuestionBackendApiService.fetchQuestion(
               questionSummaryForOneSkill.getQuestionId()).then(
               function(response) {
-                if (response.associated_skill_dicts) {
-                  response.associated_skill_dicts.forEach(function(skillDict) {
-                    ctrl.misconceptionsBySkill[skillDict.id] =
-                      skillDict.misconceptions.map(function(misconception) {
-                        return MisconceptionObjectFactory.createFromBackendDict(
-                          misconception);
-                      });
-                    ctrl.associatedSkillSummaries.push(
-                      SkillSummaryObjectFactory.create(
-                        skillDict.id, skillDict.description));
-                  });
+                if (response.associatedSkillObjects) {
+                  response.associatedSkillObjects
+                    .forEach(function(skillObject) {
+                      ctrl.misconceptionsBySkill[skillObject.getId()] =
+                        skillObject.getMisconceptions()
+                          .map(function(misconception) {
+                            return MisconceptionObjectFactory
+                              .createFromBackendDict(misconception);
+                          });
+                      ctrl.associatedSkillSummaries.push(
+                        SkillSummaryObjectFactory.create(
+                          skillObject.getId(), skillObject.getDescription()));
+                    });
                 }
-                ctrl.question =
-                  QuestionObjectFactory.createFromBackendDict(
-                    response.question_dict);
+                ctrl.question = angular.copy(response.questionObject);
                 ctrl.questionId = ctrl.question.getId();
                 ctrl.questionStateData = ctrl.question.getStateData();
                 ctrl.questionIsBeingUpdated = true;
