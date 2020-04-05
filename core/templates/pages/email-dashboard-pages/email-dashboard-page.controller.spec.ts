@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for the email dashboard page.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+
 describe('Email Dashboard Page', function() {
   var $scope = null;
   var ctrl = null;
@@ -32,6 +36,12 @@ describe('Email Dashboard Page', function() {
   ];
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
   beforeEach(angular.mock.inject(function($injector) {
     EmailDashboardDataService = $injector.get('EmailDashboardDataService');
     UserService = $injector.get('UserService');

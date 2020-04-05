@@ -16,11 +16,6 @@
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-
 require('directives/focus-on.directive.ts');
 
 require('pages/Base.ts');
@@ -73,6 +68,11 @@ require('I18nFooter.ts');
 
 require('Polyfills.ts');
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
+
 const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
 angular.module('oppia').config([
@@ -81,6 +81,32 @@ angular.module('oppia').config([
   function(
       $compileProvider, $cookiesProvider, $httpProvider,
       $interpolateProvider, $locationProvider, $provide) {
+    var ugs = new UpgradedServices();
+    // We need to provide these services and pipes separately since they are
+    // used in the directives imported in this file and cannot be
+    // injected before bootstrapping of oppia module.
+    var servicesToProvide = [
+      'AlertsService', 'BackgroundMaskService', 'BrowserCheckerService',
+      'CodeReplRulesService', 'ContextService', 'CsrfTokenService',
+      'DateTimeFormatService', 'DebouncerService', 'DeviceInfoService',
+      'DocumentAttributeCustomizationService',
+      'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
+      'ExpressionParserService', 'ExtensionTagAssemblerService',
+      'ExtractImageFilenamesFromStateService',
+      'HtmlEscaperService', 'IdGenerationService', 'InteractionObjectFactory',
+      'LoggerService', 'MetaTagCustomizationService', 'NormalizeWhitespacePipe',
+      'PencilCodeEditorRulesService', 'SidebarStatusService',
+      'SiteAnalyticsService', 'SkillObjectFactory', 'SolutionObjectFactory',
+      'StateCardObjectFactory', 'StateImprovementSuggestionService',
+      'StateObjectFactory', 'StatesObjectFactory', 'TextInputRulesService',
+      'UrlInterpolationService', 'UrlService', 'UserInfoObjectFactory',
+      'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
+      'WindowRef'];
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      if (servicesToProvide.includes(key)) {
+        $provide.value(key, value);
+      }
+    }
     // Refer: https://docs.angularjs.org/guide/migration
     // #migrate1.5to1.6-ng-services-$location
     // The default hash-prefix used for URLs has changed from
@@ -89,11 +115,6 @@ angular.module('oppia').config([
     // the URL will become mydomain.com/#!/a/b/c.  So, the line
     // here is to change the prefix back to empty string.
     $locationProvider.hashPrefix('');
-
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
     // This improves performance by disabling debug data. For more details,
     // see https://code.angularjs.org/1.5.5/docs/guide/production
     $compileProvider.debugInfoEnabled(false);
