@@ -32,8 +32,6 @@ import string
 
 from constants import constants
 from core.domain import change_domain
-from core.domain import fs_domain
-from core.domain import fs_services
 from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
@@ -2160,13 +2158,10 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
-        file_system_class = fs_services.get_entity_file_system_class()
-        exploration_fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_EXPLORATION, exp_id))
         for key, state_dict in states_dict.items():
             add_dimensions_to_image_tags = functools.partial(
-                html_validation_service.add_dimensions_to_image_tags,
-                exploration_fs)
+                html_validation_service.add_dimensions_to_image_tags, # pylint: disable=line-too-long
+                exp_id)
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 add_dimensions_to_image_tags)
@@ -2176,7 +2171,7 @@ class Exploration(python_utils.OBJECT):
                 state_dict['interaction']['customization_args'][
                     'imageAndRegions']['value']['imagePath'] = (
                         html_validation_service.get_filename_with_dimensions(
-                            exploration_fs, filename))
+                            filename, exp_id))
 
         return states_dict
 
@@ -2392,33 +2387,6 @@ class Exploration(python_utils.OBJECT):
 
         return states_dict
 
-    @classmethod
-    def _convert_states_v32_dict_to_v33_dict(cls, exp_id, states_dict):
-        """Converts from version 32 to 33. Version 33 adds
-        dimensions to images in the oppia-noninteractive-image tags
-        located inside tabs and collapsible blocks.
-
-        Args:
-            exp_id: str. ID of the exploration.
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
-
-        Returns:
-            dict. The converted states_dict.
-        """
-        file_system_class = fs_services.get_entity_file_system_class()
-        exploration_fs = fs_domain.AbstractFileSystem(file_system_class(
-            feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-        for key, state_dict in states_dict.items():
-            add_dimensions_to_image_tags = functools.partial(
-                html_validation_service.add_dims_to_img_in_complex_rte,
-                exploration_fs)
-            states_dict[key] = state_domain.State.convert_html_fields_in_state(
-                state_dict,
-                add_dimensions_to_image_tags)
-
-        return states_dict
 
     @classmethod
     def update_states_from_model(
@@ -2443,13 +2411,10 @@ class Exploration(python_utils.OBJECT):
         """
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
-        # The following schema versions require exploration_id to be passed
-        # as an additional parameter in the conversion_fn.
-        special_case_schema_versions = [24, 32]
 
         conversion_fn = getattr(cls, '_convert_states_v%s_dict_to_v%s_dict' % (
             current_states_schema_version, current_states_schema_version + 1))
-        if current_states_schema_version in special_case_schema_versions:
+        if current_states_schema_version == 24:
             conversion_fn = functools.partial(conversion_fn, exploration_id)
         versioned_exploration_states['states'] = conversion_fn(
             versioned_exploration_states['states'])
@@ -2458,7 +2423,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 38
+    CURRENT_EXP_SCHEMA_VERSION = 37
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3305,6 +3270,7 @@ class Exploration(python_utils.OBJECT):
 
         exploration_dict['states'] = cls._convert_states_v30_dict_to_v31_dict(
             exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 31
 
         return exploration_dict
 
@@ -3330,29 +3296,6 @@ class Exploration(python_utils.OBJECT):
 
         return exploration_dict
 
-    @classmethod
-    def _convert_v37_dict_to_v38_dict(cls, exp_id, exploration_dict):
-        """Converts a v37 exploration dict into a v38 exploration dict.
-
-        Adds dimensions to all oppia-noninteractive-image tags located
-        inside tabs and collapsible blocks.
-
-        Args:
-            exp_id: str. ID of the exploration.
-            exploration_dict: dict. The dict representation of an exploration
-                with schema version v37.
-
-        Returns:
-            dict. The dict representation of the Exploration domain object,
-            following schema version v38.
-        """
-        exploration_dict['schema_version'] = 38
-
-        exploration_dict['states'] = cls._convert_states_v32_dict_to_v33_dict(
-            exp_id, exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 33
-
-        return exploration_dict
 
     @classmethod
     def _migrate_to_latest_yaml_version(
@@ -3571,10 +3514,6 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v36_dict_to_v37_dict(
                 exploration_dict)
             exploration_schema_version = 37
-
-        if exploration_schema_version == 37:
-            exploration_dict = cls._convert_v37_dict_to_v38_dict(
-                exp_id, exploration_dict)
 
         return (exploration_dict, initial_schema_version)
 
