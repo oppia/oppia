@@ -420,6 +420,7 @@ FULLY_COVERED_FILENAMES = [
     'window-dimensions.service.ts',
     'window-ref.service.ts',
     'winnowing-preprocessing.service.ts',
+    'WorkedExampleObjectFactory.ts',
     'wrap-text-with-ellipsis.filter.ts',
     'wrap-text-with-ellipsis.pipe.ts',
     'WrittenTranslationObjectFactory.ts',
