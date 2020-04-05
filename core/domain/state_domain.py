@@ -277,6 +277,10 @@ class InteractionInstance(python_utils.OBJECT):
     # The default interaction used for a new state.
     _DEFAULT_INTERACTION_ID = None
 
+    # List of interactions storing HTML in the rule spec inputs field.
+    INTERACTIONS_STORING_HTML_RULE_SPEC_INPUT = [
+        'ItemSelectionInput', 'DragAndDropSortInput']
+
     def to_dict(self):
         """Returns a dict representing this InteractionInstance domain object.
 
@@ -534,31 +538,17 @@ class InteractionInstance(python_utils.OBJECT):
             outcome_html = answer_group.outcome.feedback.html
             html_list = html_list + [outcome_html]
 
-        # Note that ItemSelectionInput replicates the customization arg HTML
-        # in its answer groups.
-        if self.id == 'ItemSelectionInput':
+        if self.id in self.INTERACTIONS_STORING_HTML_RULE_SPEC_INPUT:
             for answer_group in self.answer_groups:
                 for rule_spec in answer_group.rule_specs:
-                    rule_spec_html = rule_spec.inputs['x']
-                    html_list = html_list + rule_spec_html
-
-        if self.id == 'DragAndDropSortInput':
-            for answer_group in self.answer_groups:
-                for rule_spec in answer_group.rule_specs:
-                    if rule_spec.rule_type in [
-                            'IsEqualToOrdering',
-                            'IsEqualToOrderingWithOneItemAtIncorrectPosition']:
-                        rule_spec_html_list = rule_spec.inputs['x']
-                        for rule_spec_html in rule_spec_html_list:
-                            html_list = html_list + rule_spec_html
-                    if rule_spec.rule_type == 'HasElementXAtPositionY':
-                        rule_spec_html = rule_spec.inputs['x']
-                        html_list = html_list + [rule_spec_html]
-                    if rule_spec.rule_type == 'HasElementXBeforeElementY':
-                        rule_spec_x_html = rule_spec.inputs['x']
-                        rule_spec_y_html = rule_spec.inputs['y']
-                        html_list = html_list + [
-                            rule_spec_x_html, rule_spec_y_html]
+                    for input in rule_spec.inputs.values():
+                        if isinstance(input, python_utils.BASESTRING):
+                            html_list += [input]
+                        elif isinstance(input[0], list):
+                            html_list += [
+                                item for sublist in input for item in sublist]
+                        else:
+                            html_list += input
 
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html

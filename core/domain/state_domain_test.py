@@ -47,8 +47,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'exp_id', 'owner_id', end_state_name='END',
             interaction_id='DragAndDropSortInput')
 
-        list_of_sets_of_html_strings = ['<p>list_of_sets_of_html_strings</p>']
-        answer_group_dict = {
+        html_string_1 = '<p>list_of_sets_of_html_strings</p>'
+        html_string_2 = '<span>hello world!</span>'
+        drag_and_drop_interaction_answer_group_dict_1 = {
             'outcome': {
                 'dest': exploration.init_state_name,
                 'feedback': {
@@ -62,21 +63,128 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [list_of_sets_of_html_strings]
+                    'x': [[html_string_1], [html_string_2]]
                 },
                 'rule_type': 'IsEqualToOrdering'
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
         }
+
+        drag_and_drop_interaction_answer_group_dict_2 = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': html_string_1
+                },
+                'rule_type': 'HasElementXBeforeElementY'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        drag_and_drop_interaction_answer_group_dict_3 = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': html_string_1,
+                    'y': html_string_2
+                },
+                'rule_type': 'HasElementXBeforeElementY'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        item_selection_interaction_answer_group_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': [html_string_1, html_string_2]
+                },
+                'rule_type': 'HasElementXBeforeElementY'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
         exploration.init_state.interaction.answer_groups = [
-            state_domain.AnswerGroup.from_dict(answer_group_dict)]
+            state_domain.AnswerGroup.from_dict(
+                drag_and_drop_interaction_answer_group_dict_1)]
 
         html_list = (
             exploration.init_state.interaction.get_all_html_strings())
         self.assertEqual(
-            html_list,
-            ['<p>Feedback</p>', '<p>list_of_sets_of_html_strings</p>', '', ''])
+            set(html_list),
+            set([
+                '<p>Feedback</p>', '<p>list_of_sets_of_html_strings</p>',
+                '<span>hello world!</span>', '', '']))
+
+        exploration.init_state.interaction.answer_groups = [
+            state_domain.AnswerGroup.from_dict(
+                drag_and_drop_interaction_answer_group_dict_2)]
+
+        html_list = (
+            exploration.init_state.interaction.get_all_html_strings())
+        self.assertEqual(
+            set(html_list),
+            set([
+                '<p>Feedback</p>',
+                '<p>list_of_sets_of_html_strings</p>', '', '']))
+
+        exploration.init_state.interaction.answer_groups = [
+            state_domain.AnswerGroup.from_dict(
+                drag_and_drop_interaction_answer_group_dict_3)]
+
+        html_list = (
+            exploration.init_state.interaction.get_all_html_strings())
+        self.assertEqual(
+            set(html_list),
+            set([
+                '<p>Feedback</p>', '<p>list_of_sets_of_html_strings</p>',
+                '<span>hello world!</span>', '', '']))
+
+        exploration.init_state.interaction.answer_groups = [
+            state_domain.AnswerGroup.from_dict(
+                item_selection_interaction_answer_group_dict)]
+
+        html_list = (
+            exploration.init_state.interaction.get_all_html_strings())
+        self.assertEqual(
+            set(html_list),
+            set([
+                '<p>Feedback</p>', '<p>list_of_sets_of_html_strings</p>',
+                '<span>hello world!</span>', '', '']))
 
     def test_export_state_to_dict(self):
         """Test exporting a state to a dict."""
