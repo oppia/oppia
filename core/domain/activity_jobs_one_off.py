@@ -20,7 +20,11 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core import jobs
+from core.domain import collection_services
+from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import search_services
+
 from core.platform import models
 import feconf
 
@@ -28,7 +32,7 @@ import feconf
     [models.NAMES.collection, models.NAMES.exploration])
 
 
-class FixContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class AuditContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Audit job that compares the contents of contributor_ids and
     contributors_summary.
     """
@@ -42,11 +46,8 @@ class FixContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(model):
         ids_set = set(model.contributor_ids)
         summary_set = set(model.contributors_summary)
-        modified = False
         if len(ids_set) != len(model.contributor_ids):
             # When the contributor_ids contain duplicate ids.
-            modified = True
-            model.contributor_ids = list(ids_set)
             yield (
                 'DUPLICATE_IDS',
                 (model.id, model.contributor_ids, model.contributors_summary)
@@ -54,10 +55,6 @@ class FixContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if ids_set - summary_set:
             # When the contributor_ids contain id that is not in
             # contributors_summary.
-            modified = True
-            for user_id in ids_set:
-                model.contributors_summary[user_id] = (
-                    model.contributors_summary.get(user_id, 1))
             yield (
                 'MISSING_IN_SUMMARY',
                 (model.id, model.contributor_ids, model.contributors_summary)
@@ -65,24 +62,48 @@ class FixContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if summary_set - ids_set:
             # When the contributors_summary contains id that is not in
             # contributor_ids.
-            modified = True
-            model.contributor_ids = list(sorted(model.contributors_summary))
             yield (
                 'MISSING_IN_IDS',
                 (model.id, model.contributor_ids, model.contributors_summary)
             )
-        if modified:
-            model.put(update_last_updated_time=False)
-            yield ('SUCCESS_FIXED', model.id)
-        else:
-            yield ('SUCCESS_CORRECT', model.id)
+        yield ('SUCCESS', model.id)
 
     @staticmethod
     def reduce(key, values):
-        if key.startswith('SUCCESS'):
+        if key == 'SUCCESS':
             yield (key, len(values))
         else:
             yield (key, values)
+
+
+class ActivityContributorsSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job that computes the number of commits done by contributors for
+    each collection and exploration.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [collection_models.CollectionModel, exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(model):
+        if isinstance(model, collection_models.CollectionModel):
+            summary = collection_services.get_collection_summary_by_id(model.id)
+            summary.contributors_summary = (
+                collection_services.compute_collection_contributors_summary(
+                    model.id))
+            summary.contributor_ids = list(summary.contributors_summary)
+            collection_services.save_collection_summary(summary)
+        else:
+            summary = exp_fetchers.get_exploration_summary_by_id(model.id)
+            summary.contributors_summary = (
+                exp_services.compute_exploration_contributors_summary(model.id))
+            summary.contributor_ids = list(summary.contributors_summary)
+            exp_services.save_exploration_summary(summary)
+        yield ('SUCCESS', model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
 
 
 class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
