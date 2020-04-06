@@ -140,24 +140,26 @@ describe('Topic editor functionality', function() {
   });
 
   it(
-    'should create a question for a skill in the topic and edit' +
-     'the contents of the question', function() {
+    'should edit the contents of the created question', function() {
       topicEditorPage.get(topicId);
       topicEditorPage.moveToQuestionsTab();
       topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
         1, 'Skill 1');
+      // Get the questions list and edit the contents of the question.
       element.all(
         by.css('.protractor-test-question-list-item')).then(
         function(questionItems) {
           questionItems[0].click();
           explorationEditorMainTab.setContent(forms.toRichText('Question 2'));
           topicEditorPage.saveQuestion();
+          // Confirm the edit by adding a commit message.
           topicEditorPage.saveCommitMessage('Edited the question content.');
         });
       topicEditorPage.get(topicId);
       topicEditorPage.moveToQuestionsTab();
       topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
         1, 'Skill 1');
+      // Confirm that the content of the question has changed.
       element.all(
         by.css('.protractor-test-question-list-item')).then(
         function(questionItems) {
@@ -170,8 +172,8 @@ describe('Topic editor functionality', function() {
     });
 
   it(
-    'should create a question for a skill in the topic and edit the skill' +
-    'linkages ', function() {
+    'should create an additional skill in the topic and edit the skill' +
+    'linkages for the existing question', function() {
       topicsAndSkillsDashboardPage.get();
       topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
         'Skill 2', 'Concept card explanation');
