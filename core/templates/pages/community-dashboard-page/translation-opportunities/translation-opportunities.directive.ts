@@ -33,6 +33,7 @@ require('pages/community-dashboard-page/services/translate-text.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-language.service.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').directive(
   'translationOpportunities', ['UrlInterpolationService', function(
@@ -46,11 +47,13 @@ angular.module('oppia').directive(
       'translation-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$uibModal', 'ContributionOpportunitiesService',
-        'TranslateTextService', 'TranslationLanguageService', 'UserService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        'ContributionOpportunitiesService', 'TranslateTextService',
+        'TranslationLanguageService', 'UserService',
         function(
-            $scope, $uibModal, ContributionOpportunitiesService,
-            TranslateTextService, TranslationLanguageService, UserService) {
+            $rootScope, $scope, $uibModal, AlertsService,
+            ContributionOpportunitiesService, TranslateTextService,
+            TranslationLanguageService, UserService) {
           var ctrl = this;
           var userIsLoggedIn = false;
           var getOpportunitySummary = function(expId) {
@@ -84,6 +87,8 @@ angular.module('oppia').directive(
             }
             ctrl.moreOpportunitiesAvailable = more;
             ctrl.opportunitiesAreLoading = false;
+            // TODO(#8521): Remove the use of $rootScope.$apply().
+            $rootScope.$apply();
           };
 
           ctrl.onLoadMoreOpportunities = function() {
@@ -144,11 +149,15 @@ angular.module('oppia').directive(
                       $scope.moreAvailable = textAndAvailability.more;
                       $scope.loadingData = false;
                     });
+
                   $scope.skipActiveTranslation = function() {
-                    $scope.textToTranslate = (
-                      TranslateTextService.getTextToTranslate().text);
+                    var textAndAvailability = (
+                      TranslateTextService.getTextToTranslate());
+                    $scope.textToTranslate = textAndAvailability.text;
+                    $scope.moreAvailable = textAndAvailability.more;
                     $scope.activeWrittenTranslation.html = '';
                   };
+
                   $scope.suggestTranslatedText = function() {
                     if (!$scope.uploadingTranslation && !$scope.loadingData) {
                       $scope.uploadingTranslation = true;
@@ -156,6 +165,8 @@ angular.module('oppia').directive(
                         $scope.activeWrittenTranslation.html,
                         TranslationLanguageService.getActiveLanguageCode(),
                         function() {
+                          AlertsService.addSuccessMessage(
+                            'Submitted translation for review.');
                           if ($scope.moreAvailable) {
                             var textAndAvailability = (
                               TranslateTextService.getTextToTranslate());
@@ -167,19 +178,12 @@ angular.module('oppia').directive(
                         });
                     }
                     if (!$scope.moreAvailable) {
-                      $uibModalInstance.dismiss('ok');
+                      $uibModalInstance.close();
                     }
-                  };
-                  $scope.done = function() {
-                    $uibModalInstance.close();
                   };
 
                   $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-
-                  $scope.ok = function() {
-                    $uibModalInstance.dismiss('ok');
+                    $uibModalInstance.close();
                   };
                 }
               ]
