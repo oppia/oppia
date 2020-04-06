@@ -68,14 +68,14 @@ export class PlaythroughIssuesBackendApiService {
   // of type 'string'".
   fetchIssues(explorationId: string, explorationVersion: any): Promise<string> {
     if (this.cachedIssues !== null) {
-      return new Promise((resolve) => resolve(this.cachedIssues));
+      return Promise.resolve(this.cachedIssues);
     } else {
       return this.httpClient.get(
         this.getFullIssuesUrl(explorationId), {
           params: { exp_version: explorationVersion },
           observe: 'response'
         }).toPromise().then(
-        (response: HttpResponse<PlaythroughIssue[]>) => {
+        (response: HttpResponse<any[]>) => {
           let unresolvedIssueBackendDicts = response.body;
           this.cachedIssues = unresolvedIssueBackendDicts.map(
             this.playthroughIssueObjectFactory.createFromBackendDict);
@@ -89,7 +89,7 @@ export class PlaythroughIssuesBackendApiService {
     return this.httpClient.get(
       this.getFullPlaythroughUrl(explorationId, playthroughId), {
         observe: 'response'
-      }).toPromise().then((response: HttpResponse<PlaythroughIssue>) => {
+      }).toPromise().then((response: HttpResponse<any>) => {
       let playthroughBackendDict = response.body;
       return this.playthroughIssueObjectFactory.createFromBackendDict(
         playthroughBackendDict);
@@ -104,10 +104,14 @@ export class PlaythroughIssuesBackendApiService {
         exp_issue_dict: issueToResolve.toBackendDict(),
         exp_version: expVersion
       }).toPromise().then(() => {
-      let issueIndex = this.cachedIssues !== null ?
-        this.cachedIssues.findIndex(issue => {
+      let issueIndex;
+      if (this.cachedIssues !== null) {
+        issueIndex = this.cachedIssues.findIndex(issue => {
           return angular.equals(issue, issueToResolve);
-        }) : -1;
+        });
+      } else {
+        issueIndex = -1;
+      }
       if (issueIndex === -1) {
         let invalidIssueError = new Error(
           'An issue which was not fetched from the backend has been ' +
