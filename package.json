@@ -70,6 +70,7 @@
     "karma-ng-html2js-preprocessor": "^1.0.0",
     "karma-webpack": "^4.0.0-rc.3",
     "loader-utils": "^2.0.0",
+    "lighthouse": "5.6.0",
     "postcss-loader": "3.0.0",
     "postcss-syntax": "^0.36.2",
     "protractor": "^5.4.2",
