@@ -38,29 +38,6 @@ export class PlaythroughIssuesBackendApiService {
 
   private cachedIssues = null;
 
-  private getFullIssuesUrl(explorationId: string): string {
-    return this.urlInterpolationService.interpolateUrl(
-      ServicesConstants.FETCH_ISSUES_URL, {
-        exploration_id: explorationId
-      });
-  }
-
-  private getFullPlaythroughUrl(
-      explorationId: string, playthroughId: string): string {
-    return this.urlInterpolationService.interpolateUrl(
-      ServicesConstants.FETCH_PLAYTHROUGH_URL, {
-        exploration_id: explorationId,
-        playthrough_id: playthroughId
-      });
-  }
-
-  private getFullResolveIssueUrl(explorationId: string): string {
-    return this.urlInterpolationService.interpolateUrl(
-      ServicesConstants.RESOLVE_ISSUE_URL, {
-        exploration_id: explorationId
-      });
-  }
-
   // TODO(#7165): This has been marked any since marking explorationVersion
   // to number throws an error. "Type 'number' is not assignable to type
   // 'string | string[]'" and if this is marked to string it throws an
@@ -123,6 +100,29 @@ export class PlaythroughIssuesBackendApiService {
         this.cachedIssues.splice(issueIndex, 1);
       }
     });
+  }
+
+  private getFullIssuesUrl(explorationId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      ServicesConstants.FETCH_ISSUES_URL, {
+        exploration_id: explorationId
+      });
+  }
+
+  private getFullPlaythroughUrl(
+      explorationId: string, playthroughId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      ServicesConstants.FETCH_PLAYTHROUGH_URL, {
+        exploration_id: explorationId,
+        playthrough_id: playthroughId
+      });
+  }
+
+  private getFullResolveIssueUrl(explorationId: string): string {
+    return this.urlInterpolationService.interpolateUrl(
+      ServicesConstants.RESOLVE_ISSUE_URL, {
+        exploration_id: explorationId
+      });
   }
 }
 
