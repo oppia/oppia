@@ -412,9 +412,6 @@ AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
 
-# Whether community dashboard is ready to use for contributors.
-COMMUNITY_DASHBOARD_ENABLED = False
-
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
     'TextInput', 'MultipleChoiceInput', 'NumericInput']
@@ -643,7 +640,6 @@ COLLECTION_PUBLISH_PREFIX = '/collection_editor_handler/publish'
 COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
-COMMUNITY_DASHBOARD_URL = '/community_dashboard'
 COMMUNITY_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
