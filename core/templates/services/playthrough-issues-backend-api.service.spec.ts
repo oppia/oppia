@@ -61,23 +61,25 @@ describe('PlaythroughIssuesBackendApiService', () => {
   });
 
   describe('.fetch', () => {
-    it('should return the issues data provided by the backend', fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failureHandler = jasmine.createSpy('failure');
+    it('should return the issues data provided by the backend', fakeAsync(
+      () => {
+        let successHandler = jasmine.createSpy('success');
+        let failureHandler = jasmine.createSpy('failure');
 
-      playthroughIssuesBackendApiService.fetchIssues('7', 1).then(
-        successHandler, failureHandler);
+        playthroughIssuesBackendApiService.fetchIssues('7', 1).then(
+          successHandler, failureHandler);
 
-      let req = httpTestingController.expectOne(
-        '/issuesdatahandler/7?exp_version=1');
-      expect(req.request.method).toEqual('GET');
-      req.flush(backendIssues);
+        let req = httpTestingController.expectOne(
+          '/issuesdatahandler/7?exp_version=1');
+        expect(req.request.method).toEqual('GET');
+        req.flush(backendIssues);
 
-      flushMicrotasks();
-      expect(successHandler).toHaveBeenCalledWith(
-        backendIssues.map(playthroughIssueObjectFactory.createFromBackendDict));
-      expect(failureHandler).not.toHaveBeenCalled();
-    }));
+        flushMicrotasks();
+        expect(successHandler).toHaveBeenCalledWith(
+          backendIssues.map(
+            playthroughIssueObjectFactory.createFromBackendDict));
+        expect(failureHandler).not.toHaveBeenCalled();
+      }));
 
     it('should not fetch an issue when another issue was already fetched',
       fakeAsync(() => {
@@ -102,7 +104,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         // Try to fetch another issue
         playthroughIssuesBackendApiService.fetchIssues('8', 1).then(
           successHandler, failureHandler);
-          
+
         flushMicrotasks();
 
         expect(successHandler).toHaveBeenCalledWith(backendIssues.map(
@@ -110,46 +112,47 @@ describe('PlaythroughIssuesBackendApiService', () => {
         expect(failureHandler).not.toHaveBeenCalled();
       }));
 
-    it('should return the playthrough data provided by the backend', fakeAsync(() => {
-      let backendPlaythrough = {
-        exp_id: 'exp_id1',
-        exp_version: 1,
-        issue_type: 'EarlyQuit',
-        issue_customization_args: {
-          state_name: {
-            value: 'state_name1'
-          },
-          time_spent_in_exp_in_msecs: {
-            value: 200
-          }
-        },
-        actions: [{
-          action_type: 'ExplorationStart',
-          action_customization_args: {
+    it('should return the playthrough data provided by the backend', fakeAsync(
+      () => {
+        let backendPlaythrough = {
+          exp_id: 'exp_id1',
+          exp_version: 1,
+          issue_type: 'EarlyQuit',
+          issue_customization_args: {
             state_name: {
               value: 'state_name1'
+            },
+            time_spent_in_exp_in_msecs: {
+              value: 200
             }
           },
-          schema_version: 1
-        }]
-      };
+          actions: [{
+            action_type: 'ExplorationStart',
+            action_customization_args: {
+              state_name: {
+                value: 'state_name1'
+              }
+            },
+            schema_version: 1
+          }]
+        };
 
-      let successHandler = jasmine.createSpy('success');
-      let failureHandler = jasmine.createSpy('failure');
+        let successHandler = jasmine.createSpy('success');
+        let failureHandler = jasmine.createSpy('failure');
 
-      playthroughIssuesBackendApiService.fetchPlaythrough('7', '1').then(
-        successHandler, failureHandler);
-      let req = httpTestingController.expectOne(
-        '/playthroughdatahandler/7/1');
-      expect(req.request.method).toEqual('GET');
-      req.flush(backendPlaythrough);
+        playthroughIssuesBackendApiService.fetchPlaythrough('7', '1').then(
+          successHandler, failureHandler);
+        let req = httpTestingController.expectOne(
+          '/playthroughdatahandler/7/1');
+        expect(req.request.method).toEqual('GET');
+        req.flush(backendPlaythrough);
 
-      flushMicrotasks();
-      expect(successHandler).toHaveBeenCalledWith(
-        playthroughIssueObjectFactory.createFromBackendDict(
-          backendPlaythrough));
-      expect(failureHandler).not.toHaveBeenCalled();
-    }));
+        flushMicrotasks();
+        expect(successHandler).toHaveBeenCalledWith(
+          playthroughIssueObjectFactory.createFromBackendDict(
+            backendPlaythrough));
+        expect(failureHandler).not.toHaveBeenCalled();
+      }));
   });
 
   describe('.resolve', () => {
@@ -164,7 +167,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         () => {
           playthroughIssuesBackendApiService.resolveIssue(
             playthroughIssue, explorationId, 1).then(
-              successHandler, failureHandler);
+            successHandler, failureHandler);
         });
       let req = httpTestingController.expectOne(
         '/issuesdatahandler/7?exp_version=1');

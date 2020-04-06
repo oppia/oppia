@@ -41,24 +41,24 @@ export class PlaythroughIssuesBackendApiService {
   private getFullIssuesUrl(explorationId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.FETCH_ISSUES_URL, {
-      exploration_id: explorationId
-    });
+        exploration_id: explorationId
+      });
   }
 
   private getFullPlaythroughUrl(
-    explorationId: string, playthroughId: string): string {
+      explorationId: string, playthroughId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.FETCH_PLAYTHROUGH_URL, {
-      exploration_id: explorationId,
-      playthrough_id: playthroughId
-    });
+        exploration_id: explorationId,
+        playthrough_id: playthroughId
+      });
   }
 
   private getFullResolveIssueUrl(explorationId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.RESOLVE_ISSUE_URL, {
-      exploration_id: explorationId
-    });
+        exploration_id: explorationId
+      });
   }
 
   // TODO(#7165): This has been marked any since marking explorationVersion
@@ -72,9 +72,9 @@ export class PlaythroughIssuesBackendApiService {
     } else {
       return this.httpClient.get(
         this.getFullIssuesUrl(explorationId), {
-        params: { exp_version: explorationVersion },
-        observe: 'response'
-      }).toPromise().then(
+          params: { exp_version: explorationVersion },
+          observe: 'response'
+        }).toPromise().then(
         (response: HttpResponse<PlaythroughIssue[]>) => {
           let unresolvedIssueBackendDicts = response.body;
           this.cachedIssues = unresolvedIssueBackendDicts.map(
@@ -85,25 +85,25 @@ export class PlaythroughIssuesBackendApiService {
   }
 
   fetchPlaythrough(
-    explorationId: string, playthroughId: string): Promise<PlaythroughIssue> {
+      explorationId: string, playthroughId: string): Promise<PlaythroughIssue> {
     return this.httpClient.get(
       this.getFullPlaythroughUrl(explorationId, playthroughId), {
-        observe: 'response' 
+        observe: 'response'
       }).toPromise().then((response: HttpResponse<PlaythroughIssue>) => {
-        let playthroughBackendDict = response.body;
-        return this.playthroughIssueObjectFactory.createFromBackendDict(
-          playthroughBackendDict);
-      });
+      let playthroughBackendDict = response.body;
+      return this.playthroughIssueObjectFactory.createFromBackendDict(
+        playthroughBackendDict);
+    });
   }
 
   resolveIssue(
-    issueToResolve: PlaythroughIssue, explorationId: string,
-    expVersion: number): Promise<any> {
+      issueToResolve: PlaythroughIssue, explorationId: string,
+      expVersion: number): Promise<any> {
     return this.httpClient.post(
       this.getFullResolveIssueUrl(explorationId), {
-      exp_issue_dict: issueToResolve.toBackendDict(),
-      exp_version: expVersion
-    }).toPromise().then(() => {
+        exp_issue_dict: issueToResolve.toBackendDict(),
+        exp_version: expVersion
+      }).toPromise().then(() => {
       let issueIndex = this.cachedIssues !== null ?
         this.cachedIssues.findIndex(issue => {
           return angular.equals(issue, issueToResolve);
