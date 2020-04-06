@@ -17,8 +17,8 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { throwError } from 'rxjs';
 
 import { PlaythroughIssueObjectFactory, PlaythroughIssue } from
@@ -34,31 +34,31 @@ export class PlaythroughIssuesBackendApiService {
   constructor(
     private httpClient: HttpClient,
     private playthroughIssueObjectFactory: PlaythroughIssueObjectFactory,
-    private urlInterpolationService: UrlInterpolationService) { }
+    private urlInterpolationService: UrlInterpolationService) {}
 
   private cachedIssues = null;
 
   private getFullIssuesUrl(explorationId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.FETCH_ISSUES_URL, {
-        exploration_id: explorationId
-      });
+      exploration_id: explorationId
+    });
   }
 
   private getFullPlaythroughUrl(
-      explorationId: string, playthroughId: string): string {
+    explorationId: string, playthroughId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.FETCH_PLAYTHROUGH_URL, {
-        exploration_id: explorationId,
-        playthrough_id: playthroughId
-      });
+      exploration_id: explorationId,
+      playthrough_id: playthroughId
+    });
   }
 
   private getFullResolveIssueUrl(explorationId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.RESOLVE_ISSUE_URL, {
-        exploration_id: explorationId
-      });
+      exploration_id: explorationId
+    });
   }
 
   // TODO(#7165): This has been marked any since marking explorationVersion
@@ -72,9 +72,10 @@ export class PlaythroughIssuesBackendApiService {
     } else {
       return this.httpClient.get(
         this.getFullIssuesUrl(explorationId), {
-          params: { exp_version: explorationVersion }, observe: 'response'
-        }).toPromise().then(
-        (response: HttpResponse<Array<PlaythroughIssue>>) => {
+        params: { exp_version: explorationVersion },
+        observe: 'response'
+      }).toPromise().then(
+        (response: HttpResponse<PlaythroughIssue[]>) => {
           let unresolvedIssueBackendDicts = response.body;
           this.cachedIssues = unresolvedIssueBackendDicts.map(
             this.playthroughIssueObjectFactory.createFromBackendDict);
@@ -84,11 +85,11 @@ export class PlaythroughIssuesBackendApiService {
   }
 
   fetchPlaythrough(
-      explorationId: string, playthroughId: string): Promise<PlaythroughIssue> {
+    explorationId: string, playthroughId: string): Promise<PlaythroughIssue> {
     return this.httpClient.get(
-      this.getFullPlaythroughUrl(
-        explorationId, playthroughId), { observe: 'response' })
-      .toPromise().then((response: HttpResponse<PlaythroughIssue>) => {
+      this.getFullPlaythroughUrl(explorationId, playthroughId), {
+        observe: 'response' 
+      }).toPromise().then((response: HttpResponse<PlaythroughIssue>) => {
         let playthroughBackendDict = response.body;
         return this.playthroughIssueObjectFactory.createFromBackendDict(
           playthroughBackendDict);
@@ -96,13 +97,13 @@ export class PlaythroughIssuesBackendApiService {
   }
 
   resolveIssue(
-      issueToResolve: PlaythroughIssue, explorationId: string,
-      expVersion: number): Promise<object> {
+    issueToResolve: PlaythroughIssue, explorationId: string,
+    expVersion: number): Promise<any> {
     return this.httpClient.post(
       this.getFullResolveIssueUrl(explorationId), {
-        exp_issue_dict: issueToResolve.toBackendDict(),
-        exp_version: expVersion
-      }).toPromise().then(() => {
+      exp_issue_dict: issueToResolve.toBackendDict(),
+      exp_version: expVersion
+    }).toPromise().then(() => {
       let issueIndex = this.cachedIssues !== null ?
         this.cachedIssues.findIndex(issue => {
           return angular.equals(issue, issueToResolve);

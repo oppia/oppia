@@ -26,11 +26,11 @@ import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
 
 describe('PlaythroughIssuesBackendApiService', () => {
+  let httpTestingController: HttpTestingController = null;
   let playthroughIssuesBackendApiService:
     PlaythroughIssuesBackendApiService = null;
-  let httpTestingController: HttpTestingController;
-
   let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory = null;
+
   let backendIssues = [{
     issue_type: 'MultipleIncorrectSubmissions',
     issue_customization_args: {
@@ -61,7 +61,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
   });
 
   describe('.fetch', () => {
-    it('returns the issues data provided by the backend', fakeAsync(() => {
+    it('should return the issues data provided by the backend', fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failureHandler = jasmine.createSpy('failure');
 
@@ -102,13 +102,15 @@ describe('PlaythroughIssuesBackendApiService', () => {
         // Try to fetch another issue
         playthroughIssuesBackendApiService.fetchIssues('8', 1).then(
           successHandler, failureHandler);
+          
+        flushMicrotasks();
 
         expect(successHandler).toHaveBeenCalledWith(backendIssues.map(
           playthroughIssueObjectFactory.createFromBackendDict));
         expect(failureHandler).not.toHaveBeenCalled();
       }));
 
-    it('returns the playthrough data provided by the backend', fakeAsync(() => {
+    it('should return the playthrough data provided by the backend', fakeAsync(() => {
       let backendPlaythrough = {
         exp_id: 'exp_id1',
         exp_version: 1,
@@ -162,7 +164,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         () => {
           playthroughIssuesBackendApiService.resolveIssue(
             playthroughIssue, explorationId, 1).then(
-            successHandler, failureHandler);
+              successHandler, failureHandler);
         });
       let req = httpTestingController.expectOne(
         '/issuesdatahandler/7?exp_version=1');
