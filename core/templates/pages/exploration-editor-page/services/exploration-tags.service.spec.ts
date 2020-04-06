@@ -13,33 +13,33 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores tags for the exploration.
+ * @fileoverview Unit test for Exploration Tags Service
  */
+
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');
 
-fdescribe ('Exploration Tag Service', () =>{
+describe ('Exploration Tag Service', () =>{
   beforeEach(angular.mock.module('oppia'));
   var component=null;
   beforeEach(angular.mock.inject(function($injector){
     component=$injector.get('ExplorationTagsService');
   }))
-  fit('value does not match TAG_REGEX', () =>{
+  it('value does not match TAG_REGEX', () =>{
     let value=["alice","bob","cat"];
     let TAG_REGEX=["alice","bob","dory"];
     expect(component.child._isvalid).toBe(false);
   })
-  fit('all tags in value match TAG_REGEX', () =>{
+  it('all tags in value match TAG_REGEX', () =>{
     let value=["alice","bob","cat"];
     let TAG_REGEX=["alice","bob","cat"];
     expect(component.child._isvalid).toBe(true)
   })
 
-  fit('tags normalised', () =>{
+  it('tags normalised', () =>{
     let value=["  alice  bob ","cat  ","  dolly naa"];
     const result=component.child._normalise;
     expect(result).toContain('alice  bob');
     expect(result).toContain('cat');
     expect(result).toContain('dolly naa');
   })
-
 })
