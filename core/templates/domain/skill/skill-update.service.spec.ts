@@ -42,7 +42,8 @@ describe('Skill update service', function() {
     misconceptionObjectFactory = null,
     rubricObjectFactory = null,
     skillDifficulties = null,
-    UndoRedoService = null;
+    UndoRedoService = null,
+    workedExampleObjectFactory = null;
   var skillDict = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -71,6 +72,7 @@ describe('Skill update service', function() {
     subtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
     misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
     rubricObjectFactory = $injector.get('RubricObjectFactory');
+    workedExampleObjectFactory = $injector.get('WorkedExampleObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
     skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
 
@@ -95,27 +97,41 @@ describe('Skill update service', function() {
       explanation: 'explanation'
     };
 
+    var example1 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1'
+      },
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
+      }
+    };
+
+    var example2 = {
+      question: {
+        html: 'worked example question 2',
+        content_id: 'worked_example_q_2'
+      },
+      explanation: {
+        html: 'worked example explanation 2',
+        content_id: 'worked_example_e_2'
+      }
+    };
 
     var skillContentsDict = {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
       },
-      worked_examples: [
-        {
-          html: 'test worked example 1',
-          content_id: 'worked_example_1',
-        },
-        {
-          html: 'test worked example 2',
-          content_id: 'worked_example_2'
-        }
-      ],
+      worked_examples: [example1, example2],
       recorded_voiceovers: {
         voiceovers_mapping: {
           explanation: {},
-          worked_example_1: {},
-          worked_example_2: {}
+          worked_example_q_1: {},
+          worked_example_e_1: {},
+          worked_example_q_2: {},
+          worked_example_e_2: {}
         }
       }
     };
@@ -322,119 +338,137 @@ describe('Skill update service', function() {
 
   it('should add a worked example', function() {
     var skill = SkillObjectFactory.createFromBackendDict(skillDict);
-    SkillUpdateService.addWorkedExample(skill,
-      subtitledHtmlObjectFactory.createDefault(
-        'a new worked example', 'worked_example_3'));
+    var example1 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1'
+      },
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
+      }
+    };
+    var example2 = {
+      question: {
+        html: 'worked example question 2',
+        content_id: 'worked_example_q_2'
+      },
+      explanation: {
+        html: 'worked example explanation 2',
+        content_id: 'worked_example_e_2'
+      }
+    };
+    var newExample = {
+      question: {
+        html: 'worked example question 3',
+        content_id: 'worked_example_q_3'
+      },
+      explanation: {
+        html: 'worked example explanation 3',
+        content_id: 'worked_example_e_3'
+      }
+    };
+    SkillUpdateService.addWorkedExample(
+      skill, workedExampleObjectFactory.createFromBackendDict(newExample));
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_skill_contents_property',
       property_name: 'worked_examples',
-      old_value: [
-        {
-          html: 'test worked example 1',
-          content_id: 'worked_example_1',
-        },
-        {
-          html: 'test worked example 2',
-          content_id: 'worked_example_2'
-        }],
-      new_value: [
-        {
-          html: 'test worked example 1',
-          content_id: 'worked_example_1',
-        },
-        {
-          html: 'test worked example 2',
-          content_id: 'worked_example_2'
-        },
-        {
-          html: 'a new worked example',
-          content_id: 'worked_example_3'
-        }]
+      old_value: [example1, example2],
+      new_value: [example1, example2, newExample]
     }]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      subtitledHtmlObjectFactory.createDefault(
-        'test worked example 1', 'worked_example_1'),
-      subtitledHtmlObjectFactory.createDefault(
-        'test worked example 2', 'worked_example_2'),
-      subtitledHtmlObjectFactory.createDefault(
-        'a new worked example', 'worked_example_3')]);
+      workedExampleObjectFactory.createFromBackendDict(example1),
+      workedExampleObjectFactory.createFromBackendDict(example2),
+      workedExampleObjectFactory.createFromBackendDict(newExample)]);
     UndoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      subtitledHtmlObjectFactory.createDefault(
-        'test worked example 1', 'worked_example_1'),
-      subtitledHtmlObjectFactory.createDefault(
-        'test worked example 2', 'worked_example_2')]);
+      workedExampleObjectFactory.createFromBackendDict(example1),
+      workedExampleObjectFactory.createFromBackendDict(example2)]);
   });
 
   it('shoud delete a worked example', function() {
     var skill = SkillObjectFactory.createFromBackendDict(skillDict);
+    var example1 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1'
+      },
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
+      }
+    };
+    var example2 = {
+      question: {
+        html: 'worked example question 2',
+        content_id: 'worked_example_q_2'
+      },
+      explanation: {
+        html: 'worked example explanation 2',
+        content_id: 'worked_example_e_2'
+      }
+    };
     SkillUpdateService.deleteWorkedExample(skill, 0);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_skill_contents_property',
       property_name: 'worked_examples',
-      old_value: [
-        {
-          html: 'test worked example 1',
-          content_id: 'worked_example_1',
-        },
-        {
-          html: 'test worked example 2',
-          content_id: 'worked_example_2'
-        }
-      ],
-      new_value: [
-        {
-          html: 'test worked example 2',
-          content_id: 'worked_example_2'
-        }
-      ]
+      old_value: [example1, example2],
+      new_value: [example2]
     }]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      subtitledHtmlObjectFactory.createDefault(
-        'test worked example 2', 'worked_example_2')]);
+      workedExampleObjectFactory.createFromBackendDict(example2)]);
     UndoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      subtitledHtmlObjectFactory.createDefault(
-        'test worked example 1', 'worked_example_1'),
-      subtitledHtmlObjectFactory.createDefault(
-        'test worked example 2', 'worked_example_2')]);
+      workedExampleObjectFactory.createFromBackendDict(example1),
+      workedExampleObjectFactory.createFromBackendDict(example2)]);
   });
 
   it('should update a worked example', function() {
     var skill = SkillObjectFactory.createFromBackendDict(skillDict);
-    SkillUpdateService.updateWorkedExample(skill, 0, 'new content');
+    var example1 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1'
+      },
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
+      }
+    };
+    var example2 = {
+      question: {
+        html: 'worked example question 2',
+        content_id: 'worked_example_q_2'
+      },
+      explanation: {
+        html: 'worked example explanation 2',
+        content_id: 'worked_example_e_2'
+      }
+    };
+    var modifiedExample1 = {
+      question: {
+        html: 'new question 1',
+        content_id: 'worked_example_q_1'
+      },
+      explanation: {
+        html: 'new explanation 1',
+        content_id: 'worked_example_e_1'
+      }
+    };
+    SkillUpdateService.updateWorkedExample(
+      skill, 0, 'new question 1', 'new explanation 1');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_skill_contents_property',
       property_name: 'worked_examples',
-      old_value: [
-        {
-          html: 'test worked example 1',
-          content_id: 'worked_example_1',
-        },
-        {
-          html: 'test worked example 2',
-          content_id: 'worked_example_2'
-        }],
-      new_value: [
-        {
-          html: 'new content',
-          content_id: 'worked_example_1',
-        },
-        {
-          html: 'test worked example 2',
-          content_id: 'worked_example_2'
-        }]
+      old_value: [example1, example2],
+      new_value: [modifiedExample1, example2]
     }]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      subtitledHtmlObjectFactory.createDefault(
-        'new content', 'worked_example_1'),
-      subtitledHtmlObjectFactory.createDefault(
-        'test worked example 2', 'worked_example_2')]);
+      workedExampleObjectFactory.createFromBackendDict(modifiedExample1),
+      workedExampleObjectFactory.createFromBackendDict(example2)]);
     UndoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      subtitledHtmlObjectFactory.createDefault(
-        'test worked example 1', 'worked_example_1'),
-      subtitledHtmlObjectFactory.createDefault(
-        'test worked example 2', 'worked_example_2')]);
+      workedExampleObjectFactory.createFromBackendDict(example1),
+      workedExampleObjectFactory.createFromBackendDict(example2)]);
   });
 });
