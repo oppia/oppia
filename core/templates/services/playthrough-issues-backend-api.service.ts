@@ -70,6 +70,7 @@ export class PlaythroughIssuesBackendApiService {
     if (this.cachedIssues !== null) {
       return Promise.resolve(this.cachedIssues);
     } else {
+      // TODO(#7165): Change `any` to a type describing the dict.
       return this.httpClient.get(
         this.getFullIssuesUrl(explorationId), {
           params: { exp_version: explorationVersion },
@@ -86,6 +87,7 @@ export class PlaythroughIssuesBackendApiService {
 
   fetchPlaythrough(
       explorationId: string, playthroughId: string): Promise<PlaythroughIssue> {
+    // TODO(#7165): Change `any` to a type describing the dict.
     return this.httpClient.get(
       this.getFullPlaythroughUrl(explorationId, playthroughId), {
         observe: 'response'
