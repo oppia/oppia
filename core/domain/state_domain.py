@@ -280,6 +280,33 @@ class InteractionInstance(python_utils.OBJECT):
     # List of interactions storing HTML in the rule spec inputs field.
     INTERACTIONS_STORING_HTML_RULE_SPEC_INPUT = [
         'ItemSelectionInput', 'DragAndDropSortInput']
+    # Rules descriptions that contain a set of html lists.
+    RULE_DESCRIPTIONS_STORING_HTML_LISTS = [
+        'IsEqualToOrdering', 'IsEqualToOrderingWithOneItemAtIncorrectPosition']
+    # Rules descriptions that contain a list of html strings
+    RULE_DESCRIPTIONS_STORING_HTML_STRINGS = [
+        'DoesNotContainAtLeastOneOf', 'ContainsAtLeastOneOf',
+        'Equals', 'IsProperSubsetOf']
+    # Rules descriptions that contain a html string for input x.
+    RULE_DESCRIPTIONS_STORING_HTML_STRING_FOR_INPUT_X = [
+        'HasElementXAtPositionY', 'HasElementXBeforeElementY']
+    # Rules descriptions that contain a html string for input y.
+    RULE_DESCRIPTIONS_STORING_HTML_STRING_FOR_INPUT_Y = [
+        'HasElementXBeforeElementY']
+    INPUT_TO_RULE_DESCRIPTION_MAPPING = {
+        'x': {
+            'html_string': RULE_DESCRIPTIONS_STORING_HTML_STRING_FOR_INPUT_X,
+            'list_of_html_strings': RULE_DESCRIPTIONS_STORING_HTML_STRINGS,
+            'list_of_sets_of_html_strings': (
+                RULE_DESCRIPTIONS_STORING_HTML_LISTS)
+        },
+        'y': {
+            'html_string': RULE_DESCRIPTIONS_STORING_HTML_STRING_FOR_INPUT_Y,
+            'list_of_html_strings': RULE_DESCRIPTIONS_STORING_HTML_STRINGS,
+            'list_of_sets_of_html_strings': (
+                RULE_DESCRIPTIONS_STORING_HTML_LISTS)
+        }
+    }
 
     def to_dict(self):
         """Returns a dict representing this InteractionInstance domain object.
@@ -525,6 +552,39 @@ class InteractionInstance(python_utils.OBJECT):
         return cls(
             cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], {})
 
+    def _is_rule_input_html_string(
+            self, rule_spec, rule_spec_input):
+        """Checks whether rule spec input contains html string.
+
+        Returns:
+            bool. Whether rule spec input contains html string.
+        """
+        return rule_spec.rule_type in (
+            self.INPUT_TO_RULE_DESCRIPTION_MAPPING[rule_spec_input][
+                'html_string'])
+
+    def _is_rule_input_list_of_html_strings(
+            self, rule_spec, rule_spec_input):
+        """Checks whether rule spec input contains list of html strings.
+
+        Returns:
+            bool. Whether rule spec input contains list of html strings.
+        """
+        return rule_spec.rule_type in (
+            self.INPUT_TO_RULE_DESCRIPTION_MAPPING[rule_spec_input][
+                'list_of_html_strings'])
+
+    def _is_rule_input_list_of_sets_of_html_strings(
+            self, rule_spec, rule_spec_input):
+        """Checks whether rule spec input contains list of sets of html
+        strings.
+
+        Returns:
+            bool. Whether rule spec input contains sets of html strings.
+        """
+        return rule_spec.rule_type in (
+            self.INPUT_TO_RULE_DESCRIPTION_MAPPING[rule_spec_input][
+                'list_of_sets_of_html_strings'])
 
     def get_all_html_strings(self):
         """Get all html strings in the interaction.
@@ -541,14 +601,18 @@ class InteractionInstance(python_utils.OBJECT):
         if self.id in self.INTERACTIONS_STORING_HTML_RULE_SPEC_INPUT:
             for answer_group in self.answer_groups:
                 for rule_spec in answer_group.rule_specs:
-                    for value in rule_spec.inputs.values():
-                        if isinstance(value, python_utils.BASESTRING):
-                            html_list += [value]
-                        elif isinstance(value[0], list):
+                    for rule_spec_input in rule_spec.inputs.keys():
+                        if self._is_rule_input_html_string(
+                                rule_spec, rule_spec_input):
+                            html_list += [rule_spec.inputs[rule_spec_input]]
+                        elif self._is_rule_input_list_of_sets_of_html_strings(
+                                rule_spec, rule_spec_input):
                             html_list += [
-                                item for sublist in value for item in sublist]
-                        else:
-                            html_list += value
+                                item for sublist in rule_spec.inputs[
+                                    rule_spec_input] for item in sublist]
+                        elif self._is_rule_input_list_of_html_strings(
+                                rule_spec, rule_spec_input):
+                            html_list += rule_spec.inputs[rule_spec_input]
 
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html
@@ -1541,6 +1605,19 @@ class State(python_utils.OBJECT):
             raise ValueError('Content ID %s does not exist' % content_id)
 
         return content_id_to_html[content_id]
+
+    def get_all_written_translation_html(self):
+        """Returns the list of written translation HTML.
+
+        Returns:
+            list(str). The list of written translation HTML.
+        """
+        html_list = []
+        for translations in (
+                self.written_translations.translations_mapping.values()):
+            html_list += [translation.html for translation in (
+                translations.values())]
+        return html_list
 
     def is_rte_content_supported_on_android(self):
         """Checks whether the RTE components used in the state are supported by

@@ -42,6 +42,8 @@ def mock_get_filename_with_dimensions(filename, unused_exp_id):
 class StateDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on states."""
 
+    _DEMO_EXPLORATION_ID = '16'
+
     def test_get_all_html_strings(self):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'owner_id', end_state_name='END',
@@ -132,7 +134,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'inputs': {
                     'x': [html_string_1, html_string_2]
                 },
-                'rule_type': 'HasElementXBeforeElementY'
+                'rule_type': 'Equals'
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -185,6 +187,122 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             set([
                 '<p>Feedback</p>', '<p>list_of_sets_of_html_strings</p>',
                 '<span>hello world!</span>', '', '']))
+
+    def test_get_all_html_string_for_all_interactions(self):
+        exp_services.load_demo(self._DEMO_EXPLORATION_ID)
+        exploration = exp_fetchers.get_exploration_by_id(
+            self._DEMO_EXPLORATION_ID)
+        html_list = []
+        expected_html_list = [
+            u'<p>Nice choice!</p>',
+            u'<p>Hmm, not quite. Perhaps the right option is below this one.'
+            '</p>',
+            u'<p>Hmm, not quite. Perhaps the answer is above this one.</p>',
+            u'',
+            u'<p>sfd</p>',
+            u'<p>First choice</p>',
+            u'<p>Second choice</p>',
+            u'<p>Third choice</p>',
+            u'<p>Penta-penta-pentagon!</p>',
+            u'<p>That\'s a triangle. Your shape needs more sides.</p>',
+            u'<p>Your shape is missing one side!</p>',
+            u'<p>That\'s not quite a pentagon. Please try again!</p>',
+            u'<p>dsf</p>',
+            u'<p>That number has more than one digit. Right!</p>',
+            u'<p>That\'s only one digit! Try again.</p>',
+            u'<p>That\'s the class definition. Try again.</p>',
+            u'<p>That\'s the class\'s docstring. Try again.</p>',
+            u'<p>That\'s a function, which is close to what you\'re looking'
+            ' for. Try again!</p>',
+            u'<p>That\'s a classmethod. It does execute code, but it doesn\'t'
+            ' construct anything. Try again!</p>',
+            u'<p>You found it! This is the code responsible for constructing a'
+            ' new class object.</p>',
+            u'<p>Constructors <em>initialize</em>\xa0an object, or <em>init</e'
+            'm>\xa0it.Constructors are also functions themselves.</p>',
+            u'<p>sdf</p>',
+            u'<p>You found the next C! Excellent.</p>',
+            u'<p>That\'s not the next C. Try again?</p>',
+            u'<p>Hint: The acronym \'FACE\' is very helpful for remembering'
+            ' notes on the C major scale.</p>',
+            u'<p>Hello! Let\'s move onto another interaction.</p>',
+            u'<p>I\'m looking for a particular \'Hello Oppia\' message. Don\'t'
+            ' you want to say hello?</p>',
+            u'<p>That\'s Washington, D.C., the capital of the United States.'
+            '</p>',
+            u'<p>Ottawa, the capital of Canada!</p>',
+            u'<p>Mexico City, Mexico. The capital of Mexico.</p>',
+            u'<p>Not quite. Try again!</p>',
+            u'<p>Hint: Try looking in the middle of Mexico. Capitals also have'
+            ' special markings on a map.</p>',
+            u'<p>No, you want the one below this one.</p>',
+            u'<p>Yes, good choice!</p>',
+            u'<p>No, you want the choice above this one.</p>',
+            u'<p>Choice 1</p>',
+            u'<p>Choice 2</p>',
+            u'<p>Choice 3</p>',
+            u'',
+            u'<p>Choice 1</p>',
+            u'<p>Choice 2</p>',
+            u'<p>Choice 3</p>',
+            u'<p>That is exactly how you find the area of a circle! Good job!<'
+            '/p>',
+            u'<p>That is not how the area of a circle is calculated. Try again'
+            '.</p>',
+            u'<p>The area of a circle is related to a constant called "pi".</p'
+            '>',
+            u'<p>Moving onward!</p>',
+            u'<p>That\'s right!</p>',
+            u'<p>That\'s not a good option!</p>',
+            u'<p>That\'s not all of the good options!</p>',
+            u'<p>That\'s good! No bad options, but make sure to choose all'
+            ' good options!</p>',
+            u'<p>Good option A.</p>',
+            u'<p>Good option C.</p>',
+            u'<p>Bad option B.</p>',
+            u'<p>Good option A.</p>',
+            u'<p>Good option C.</p>',
+            u'<p>The two good options actually have the word \'good\' in them.'
+            '</p>',
+            u'<p>sdf</p>',
+            u'<p>Good option A.</p>',
+            u'<p>Bad option B.</p>',
+            u'<p>Good option C.</p>',
+            u'<p>Nice! Orange, purple, and silver are all words that are excep'
+            'tionally hard to use in rhyming devices.</p>',
+            u'<p>Not quite.</p>',
+            u'<p>Hint #1: One of them is a precious metal and another is a col'
+            'or.<br></p>',
+            u'<p>A third one is both a color and a fruit. This fruit is of par'
+            'ticular importance to the state of Florida.<br></p>',
+            u'<p>Try orange. :) There are still two others, however!<br></p>',
+            u'<p>Yes, well done!</p>',
+            u'<p>No, that\'s not right. The answer is 2000 m/s.</p>',
+            u'<p>Omnomnom.</p>',
+            u'<p>The answer needs to contain "ate".</p>',
+            u'<p>Hint 1</p>',
+            u'<p>Yes, well done!</p>',
+            u'Choice 2',
+            u'Choice 1',
+            u'<p>No, that\'s not right.</p>',
+            u'<p>Choice 1</p>',
+            u'<p>Choice 2</p>',
+            u'<p>Goodbye! Well, not quite. We still have a little more to expl'
+            'ore.</p>',
+            u'<p>Goodbye! Well, not quite. We still have a little more to expl'
+            'ore.<br></p>',
+            u'<p>Where are your manners? You should say goodbye to me. We\'ve '
+            'explored so much, together!</p>',
+            u'<p>Yes, well done!</p>',
+            u'<p>No, that\'s not right. The answer is 2/5.</p>',
+            u'<p>You proved p!</p>',
+            u'<p>Given p, we have p. Try again.</p>']
+        for state in exploration.states:
+            html_list += (
+                exploration.states[state].interaction.get_all_html_strings())
+        self.assertEqual(
+            html_list,
+            expected_html_list)
 
     def test_export_state_to_dict(self):
         """Test exporting a state to a dict."""

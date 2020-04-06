@@ -3685,7 +3685,10 @@ class Exploration(python_utils.OBJECT):
             content_html = state.content.html
             interaction_html_list = (
                 state.interaction.get_all_html_strings())
-            html_list = [content_html] + interaction_html_list
+            written_translation_html_list = (
+                state.get_all_written_translation_html())
+            html_list = [content_html] + interaction_html_list + (
+                written_translation_html_list)
             state_names_to_html_strings_mapping[state_name] = html_list
         return state_names_to_html_strings_mapping
 

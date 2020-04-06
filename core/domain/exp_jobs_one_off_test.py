@@ -2466,6 +2466,24 @@ class LinkComponentValidationAuditJobTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }
 
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'html': (
+                            '<p><i><oppia-noninteractive-link text-with-value='
+                            '"&amp;quot;This is a tag with Italic&amp;quot;"'
+                            ' url-with-value="&amp;quot;https://mailto:a@b.'
+                            'com&amp;quot;"></oppia-noninteractive-link>'
+                            '</i></p>'
+                        ),
+                        'needs_update': True
+                    }
+                },
+                'default_outcome': {}
+            }
+        }
+
         with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
             state1.update_content(
                 state_domain.SubtitledHtml.from_dict(content1_dict))
@@ -2474,6 +2492,10 @@ class LinkComponentValidationAuditJobTests(test_utils.GenericTestBase):
             state2.update_interaction_default_outcome(default_outcome2)
             state3.update_content(
                 state_domain.SubtitledHtml.from_dict(content3_dict))
+            written_translations = (
+                state_domain.WrittenTranslations.from_dict(
+                    written_translations_dict))
+            state3.update_written_translations(written_translations)
             exp_services.save_new_exploration(self.albert_id, exploration)
 
             # Start LinkComponentValidationAuditJob job on sample exploration.
@@ -2488,16 +2510,18 @@ class LinkComponentValidationAuditJobTests(test_utils.GenericTestBase):
             .LinkComponentValidationAuditJob.get_output(job_id))
 
         expected_output = [
-            u'[u\'escaped_quotes\', [u\'<oppia-noninteractive-link '
-            'text-with-value="&amp;quot;This is a tag with Italic&amp;quot;" '
-            'url-with-value="&amp;quot;&amp;quot;">'
-            '</oppia-noninteractive-link> state: State3\', '
-            'u\'Exp Id: exp_id0\']]',
-            u'[u\'mailto\', [u\'<oppia-noninteractive-link text-with-value='
-            '"&amp;quot;What is a link?&amp;quot;" url-with-value="&amp;quot;'
-            'https://mailto:link@link.com&amp;quot;">'
-            '</oppia-noninteractive-link> state: State2\', '
-            'u\'Exp Id: exp_id0\']]']
+            u'[u\'escaped_quotes\', [u\'<oppia-noninteractive-link text-with-v'
+            'alue="&amp;quot;This is a tag with Italic&amp;quot;" url-with-val'
+            'ue="&amp;quot;&amp;quot;"></oppia-noninteractive-link> state: Sta'
+            'te3\', u\'Exp Id: exp_id0\']]',
+            u'[u\'mailto\', [u\'<oppia-nonint'
+            'eractive-link text-with-value="&amp;quot;This is a tag with Itali'
+            'c&amp;quot;" url-with-value="&amp;quot;https://mailto:a@b.com&amp'
+            ';quot;"></oppia-noninteractive-link> state: State3\', u\'<oppia-n'
+            'oninteractive-link text-with-value="&amp;quot;What is a link?&amp'
+            ';quot;" url-with-value="&amp;quot;https://mailto:link@link.com&am'
+            'p;quot;"></oppia-noninteractive-link> state: State2\', u\'Exp Id:'
+            ' exp_id0\']]']
 
         self.assertEqual(actual_output, expected_output)
 
