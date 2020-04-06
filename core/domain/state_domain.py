@@ -283,7 +283,7 @@ class InteractionInstance(python_utils.OBJECT):
     # Rules descriptions that contain a set of html lists.
     RULE_DESCRIPTIONS_STORING_HTML_LISTS = [
         'IsEqualToOrdering', 'IsEqualToOrderingWithOneItemAtIncorrectPosition']
-    # Rules descriptions that contain a list of html strings
+    # Rules descriptions that contain a list of html strings.
     RULE_DESCRIPTIONS_STORING_HTML_STRINGS = [
         'DoesNotContainAtLeastOneOf', 'ContainsAtLeastOneOf',
         'Equals', 'IsProperSubsetOf']
