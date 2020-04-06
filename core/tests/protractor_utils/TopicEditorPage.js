@@ -100,6 +100,12 @@ var TopicEditorPage = function() {
     by.css('.cropper-container'));
   var topicThumbnailSubmitButton = element(
     by.css('.protractor-test-photo-upload-submit'));
+  var linkAnotherSkillButton = element(
+    by.css('.protractor-test-link-another-skill-button'));
+  var skillSaveButton = element(
+    by.css('.protractor-test-confirm-skill-selection-button'));
+  var skillListItems = element.all(
+    by.css('.protractor-test-skills-list-item'));
 
   var dragAndDrop = function(fromElement, toElement) {
     browser.executeScript(dragAndDropScript, fromElement, toElement);
@@ -150,8 +156,38 @@ var TopicEditorPage = function() {
     });
   };
 
+  this.expectNumberOfQuestionsForSkillWithIndexToBe = function(
+      count, index) {
+    selectSkillDropdown.click();
+    element.all(by.tagName('option')).then(
+      function(options) {
+        options[index + 1].click();
+      });
+    waitFor.visibilityOf(
+      questionItem, 'Question takes too long to appear');
+    questionItems.then(function(items) {
+      expect(items.length).toEqual(count);
+    });
+  };
+
   this.saveQuestion = function() {
+    waitFor.elementToBeClickable(
+      saveQuestionButton,
+      'Save Question button takes too long to be clickable');
     saveQuestionButton.click();
+  };
+
+  this.linkAnotherSkillWithIndexToQuestion = function(skillIndex) {
+    linkAnotherSkillButton.click();
+    skillListItems.then(
+      function(skillsList) {
+        skillsList[skillIndex].click();
+        skillSaveButton.click();
+        waitFor.elementToBeClickable(
+          saveQuestionButton,
+          'Save Question button takes too long to be clickable');
+        saveQuestionButton.click();
+      });
   };
 
   this.createQuestionForSkillWithIndex = function(index) {
@@ -341,6 +377,14 @@ var TopicEditorPage = function() {
 
   this.expectTopicDescriptionToBe = function(description) {
     expect(topicDescriptionField.getAttribute('value')).toEqual(description);
+  };
+
+  this.saveCommitMessage = function(commitMessage) {
+    commitMessageField.sendKeys(commitMessage);
+    waitFor.elementToBeClickable(
+      closeSaveModalButton,
+      'Save commit button taking to long to be clickable');
+    closeSaveModalButton.click();
   };
 
   this.saveTopic = function(commitMessage) {

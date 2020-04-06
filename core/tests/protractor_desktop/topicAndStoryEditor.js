@@ -139,6 +139,62 @@ describe('Topic editor functionality', function() {
     });
   });
 
+  it(
+    'should create a question for a skill in the topic and edit' +
+     'the contents of the question', function() {
+      topicEditorPage.get(topicId);
+      topicEditorPage.moveToQuestionsTab();
+      topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
+        1, 'Skill 1');
+      element.all(
+        by.css('.protractor-test-question-list-item')).then(
+        function(questionItems) {
+          questionItems[0].click();
+          explorationEditorMainTab.setContent(forms.toRichText('Question 2'));
+          topicEditorPage.saveQuestion();
+          topicEditorPage.saveCommitMessage('Edited the question content.');
+        });
+      topicEditorPage.get(topicId);
+      topicEditorPage.moveToQuestionsTab();
+      topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
+        1, 'Skill 1');
+      element.all(
+        by.css('.protractor-test-question-list-item')).then(
+        function(questionItems) {
+          waitFor.visibilityOf(
+            questionItems[0], 'Question takes too long to appear');
+          questionItems[0].click();
+          explorationEditorMainTab.expectContentToMatch(
+            forms.toRichText('Question 2'));
+        });
+    });
+
+  it(
+    'should create a question for a skill in the topic and edit the skill' +
+    'linkages ', function() {
+      topicsAndSkillsDashboardPage.get();
+      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+        'Skill 2', 'Concept card explanation');
+
+      topicsAndSkillsDashboardPage.get();
+      topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+      topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+
+      topicEditorPage.get(topicId);
+      topicEditorPage.moveToQuestionsTab();
+      topicEditorPage.expectNumberOfQuestionsForSkillWithIndexToBe(1, 0);
+
+      element.all(
+        by.css('.protractor-test-question-list-item')).then(
+        function(questionItems) {
+          questionItems[0].click();
+          topicEditorPage.linkAnotherSkillWithIndexToQuestion(1);
+        });
+      topicEditorPage.moveToQuestionsTab();
+      topicEditorPage.expectNumberOfQuestionsForSkillWithIndexToBe(1, 1);
+    });
+
+
   it('should add a canonical story to topic correctly', function() {
     topicEditorPage.expectNumberOfStoriesToBe(0);
     topicEditorPage.createStory('Story Title');
@@ -191,13 +247,6 @@ describe('Topic editor functionality', function() {
 
   it('should assign a skill to, between, and from subtopics', function() {
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 2', 'Concept card explanation');
-
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
-
     topicEditorPage.get(topicId);
     topicEditorPage.moveToSubtopicsTab();
     topicEditorPage.addSubtopic('Subtopic 1');

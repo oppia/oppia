@@ -115,7 +115,7 @@ var TopicsAndSkillsDashboardPage = function() {
     assignSkillToTopicButtons.then(function(elems) {
       elems[index].click();
       topicsListItems.then(function(topics) {
-        topics[index].click();
+        topics[topicIndex].click();
         confirmMoveButton.click();
       });
     });
