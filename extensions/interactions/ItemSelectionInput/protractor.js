@@ -26,7 +26,7 @@ var waitFor = require('../../../core/tests/protractor_utils/waitFor.js');
 // rich-text area of the option, for example by
 //   handler.appendUnderlineText('emphasised');
 var customizeInteraction = function(
-    elem, richTextInstructionsArray,maxSelectionAllowed) {
+    elem, richTextInstructionsArray, maxSelectionAllowed) {
   objects.IntEditor(
     elem.all(by.tagName('schema-based-int-editor')).last()
   ).setValue(maxSelectionAllowed);
@@ -55,7 +55,7 @@ var expectInteractionDetailsToMatch = function(
 };
 
 // type of object returned by interaction
-var answerObjectType = 'SetOfHtmlString'; 
+var answerObjectType = 'SetOfHtmlString';
 
 // 'elem' is the HTML element containing the form to submit the answer to.
 // 'answer' Set([{String}]) is the text on the multiple-choice item to select.
@@ -65,7 +65,7 @@ var submitAnswer = function(elem, answer) {
   for (var i = 0; i < answerArray.length; i++) {
     var desiredAnswer = answerArray[i];
     elem.element(by.cssContainingText(
-      '.protractor-test-item-selection-input-item',desiredAnswer))
+      '.protractor-test-item-selection-input-item', desiredAnswer))
       .element(by.css(
         '.protractor-test-item-selection-input-checkbox')).click();
   }
