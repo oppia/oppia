@@ -24,8 +24,8 @@ angular.module('oppia').factory('ExplorationTagsService', [
   function(ExplorationPropertyService, TAG_REGEX) {
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'tags';
-    /*
-    @param {string} value - tag array to be normalized(white spaces removed and '+' replaced with ' ')
+    /**
+      *@param {string} value - tag array to be normalized(white spaces removed and '+' replaced with ' ')
     */
     child._normalize = function(value) {
       for (var i = 0; i < value.length; i++) {
@@ -35,9 +35,9 @@ angular.module('oppia').factory('ExplorationTagsService', [
       return value;
     };
 
-    /*
-      @param {string} value -tag array to be matched with TAG_REGEX
-      @return {boolean} -whether or not all tags match TAG_REGEX
+    /**
+      *@param {string} value -tag array to be matched with TAG_REGEX
+      *@return {boolean} -whether or not all tags match TAG_REGEX
     */
     child._isValid = function(value) {
       // Every tag should match the TAG_REGEX.
