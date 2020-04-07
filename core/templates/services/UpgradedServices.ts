@@ -83,6 +83,8 @@ import { DragAndDropSortInputRulesService } from
 // eslint-disable-next-line max-len
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { EditabilityService } from 'services/editability.service';
+import { EditableTopicBackendApiService } from
+  'domain/topic/editable-topic-backend-api.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { EndExplorationValidationService } from
@@ -607,6 +609,10 @@ export class UpgradedServices {
         upgradedServices['LanguageUtilService']);
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
+    upgradedServices['EditableTopicBackendApiService'] =
+      new EditableTopicBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['EmailDashboardDataService'] =
       new EmailDashboardDataService(upgradedServices['HttpClient']);
     upgradedServices['ExplorationHtmlFormatterService'] =
