@@ -45,7 +45,7 @@ export class PlaythroughIssuesBackendApiService {
       params: { exp_version: explorationVersion.toString() },
       observe: 'response'
       // TODO(#7165): Change `any` to a type describing the dict.
-    }).toPromise().then(response => {
+    }).toPromise().then((response: HttpResponse<any[]>) => {
       let unresolvedIssueBackendDicts = response.body;
       return this.cachedIssues = unresolvedIssueBackendDicts.map(
         this.playthroughIssueObjectFactory.createFromBackendDict);
@@ -58,7 +58,7 @@ export class PlaythroughIssuesBackendApiService {
       this.getFetchPlaythroughUrl(explorationId, playthroughId), {
         observe: 'response'
       }
-    ).toPromise().then(response => {
+    ).toPromise().then((response: HttpResponse<any>) => {
       let playthroughBackendDict = response.body;
       return this.playthroughIssueObjectFactory.createFromBackendDict(
         playthroughBackendDict);
