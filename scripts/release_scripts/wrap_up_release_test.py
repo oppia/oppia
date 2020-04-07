@@ -88,6 +88,46 @@ class WrapReleaseTests(test_utils.GenericTestBase):
                     'tokens and re-run the script')):
                 wrap_up_release.main()
 
+    def test_ask_user_to_remove_protection_rule(self):
+        check_function_calls = {
+            'ask_user_to_confirm_gets_called': False
+        }
+        def mock_get_current_branch_name():
+            return 'release-1.2.3'
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_gets_called'] = True
+        branch_name_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_current_branch_name)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+        with branch_name_swap, ask_user_swap:
+            wrap_up_release.ask_user_to_remove_protection_rule()
+        self.assertTrue(check_function_calls['ask_user_to_confirm_gets_called'])
+
+    def test_ask_user_to_update_jobs_tracker(self):
+        check_function_calls = {
+            'ask_user_to_confirm_gets_called': False,
+            'open_new_tab_in_browser_if_possible_gets_called': False
+        }
+        expected_check_function_calls = {
+            'ask_user_to_confirm_gets_called': True,
+            'open_new_tab_in_browser_if_possible_gets_called': True
+        }
+        def mock_open_new_tab_in_browser_if_possible(unused_url):
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_gets_called'] = True
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_gets_called'] = True
+
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible',
+            mock_open_new_tab_in_browser_if_possible)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+        with open_tab_swap, ask_user_swap:
+            wrap_up_release.ask_user_to_update_jobs_tracker()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
     def test_closed_blocking_bugs_milestone_results_in_exception(self):
         # pylint: disable=unused-argument
         def mock_get_milestone(unused_self, number):
@@ -166,9 +206,17 @@ class WrapReleaseTests(test_utils.GenericTestBase):
             requester='', headers='',
             attributes={'name': release_constants.LABEL_FOR_RELEASED_PRS},
             completed='')
-        pr_for_current_release = github.PullRequest.PullRequest(
+        pr_for_current_release_1 = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={'label': label_for_current_release_prs, 'number': 7567},
+            completed='')
+        pr_for_current_release_2 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={'label': label_for_current_release_prs, 'number': 7568},
+            completed='')
+        released_pr = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={'label': label_for_released_prs, 'number': 7568},
             completed='')
         def mock_get_label(unused_self, name):
             if name == release_constants.LABEL_FOR_RELEASED_PRS:
@@ -179,9 +227,9 @@ class WrapReleaseTests(test_utils.GenericTestBase):
         def mock_get_issues(unused_self, state, labels):
             if labels[0].name == (
                     release_constants.LABEL_FOR_CURRENT_RELEASE_PRS):
-                return [pr_for_current_release]
+                return [pr_for_current_release_1, pr_for_current_release_2]
             else:
-                return []
+                return [released_pr]
         # pylint: enable=unused-argument
 
         get_label_swap = self.swap(
@@ -204,16 +252,22 @@ class WrapReleaseTests(test_utils.GenericTestBase):
             requester='', headers='',
             attributes={'name': release_constants.LABEL_FOR_RELEASED_PRS},
             completed='')
+        pr_for_current_release = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={'label': label_for_current_release_prs, 'number': 7567},
+            completed='')
         released_pr = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={'label': label_for_released_prs, 'number': 7567},
             completed='')
 
         check_function_calls = {
-            'remove_from_labels_gets_called': False
+            'remove_from_labels_gets_called_for_current_release_prs': False,
+            'remove_from_labels_gets_called_for_released_prs': False
         }
         expected_function_calls = {
-            'remove_from_labels_gets_called': True
+            'remove_from_labels_gets_called_for_current_release_prs': True,
+            'remove_from_labels_gets_called_for_released_prs': True
         }
 
         def mock_get_label(unused_self, name):
@@ -226,10 +280,16 @@ class WrapReleaseTests(test_utils.GenericTestBase):
             if state == 'closed':
                 return [released_pr]
             else:
-                return []
+                return [pr_for_current_release]
         # pylint: enable=unused-argument
-        def mock_remove_from_labels(unused_self, unused_name):
-            check_function_calls['remove_from_labels_gets_called'] = True
+        def mock_remove_from_labels(unused_self, name):
+            if name == release_constants.LABEL_FOR_RELEASED_PRS: # pylint: disable=simplifiable-if-statement
+                check_function_calls[
+                    'remove_from_labels_gets_called_for_released_prs'] = True
+            else:
+                check_function_calls[
+                    'remove_from_labels_gets_called_for_current_release_prs'
+                    ] = True
 
         get_label_swap = self.swap(
             github.Repository.Repository, 'get_label', mock_get_label)
@@ -247,16 +307,26 @@ class WrapReleaseTests(test_utils.GenericTestBase):
         check_function_calls = {
             'remove_blocking_bugs_milestone_from_issues_gets_called': False,
             'remove_release_labels_gets_called': False,
+            'ask_user_to_remove_protection_rule_gets_called': False,
+            'ask_user_to_update_jobs_tracker_gets_called': False
         }
         expected_check_function_calls = {
             'remove_blocking_bugs_milestone_from_issues_gets_called': True,
             'remove_release_labels_gets_called': True,
+            'ask_user_to_remove_protection_rule_gets_called': True,
+            'ask_user_to_update_jobs_tracker_gets_called': True
         }
         def mock_remove_blocking_bugs_milestone_from_issues(unused_repo):
             check_function_calls[
                 'remove_blocking_bugs_milestone_from_issues_gets_called'] = True
         def mock_remove_release_labels(unused_repo):
             check_function_calls['remove_release_labels_gets_called'] = True
+        def mock_ask_user_to_remove_protection_rule():
+            check_function_calls[
+                'ask_user_to_remove_protection_rule_gets_called'] = True
+        def mock_ask_user_to_update_jobs_tracker():
+            check_function_calls[
+                'ask_user_to_update_jobs_tracker_gets_called'] = True
         def mock_get_organization(unused_self, unused_name):
             return github.Organization.Organization(
                 requester='', headers='', attributes={}, completed='')
@@ -273,6 +343,12 @@ class WrapReleaseTests(test_utils.GenericTestBase):
         remove_release_labels_swap = self.swap(
             wrap_up_release, 'remove_release_labels',
             mock_remove_release_labels)
+        remove_protection_swap = self.swap(
+            wrap_up_release, 'ask_user_to_remove_protection_rule',
+            mock_ask_user_to_remove_protection_rule)
+        update_jobs_swap = self.swap(
+            wrap_up_release, 'ask_user_to_update_jobs_tracker',
+            mock_ask_user_to_update_jobs_tracker)
         get_org_swap = self.swap(
             github.Github, 'get_organization', mock_get_organization)
         get_repo_swap = self.swap(
@@ -282,6 +358,7 @@ class WrapReleaseTests(test_utils.GenericTestBase):
         with self.branch_name_swap, self.exists_swap, get_org_swap:
             with get_repo_swap, getpass_swap, remove_release_labels_swap:
                 with remove_blocking_bugs_milestone_from_issues_swap:
-                    wrap_up_release.main()
+                    with remove_protection_swap, update_jobs_swap:
+                        wrap_up_release.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)

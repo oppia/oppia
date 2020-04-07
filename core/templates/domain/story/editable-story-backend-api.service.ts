@@ -130,6 +130,30 @@ export class EditableStoryBackendApiService {
         });
     };
 
+    private _validateExplorations = function(
+        storyId: string, expIds: string, successCallback: any, errorCallback: any) {
+      var validateExplorationsUrl = this.urlInterpolation.interpolateUrl(
+        StoryDomainConstants.VALIDATE_EXPLORATIONS_URL_TEMPLATE, {
+          story_id: storyId
+        });
+
+      this.http.get(
+        validateExplorationsUrl, {
+          params: {
+            comma_separated_exp_ids: expIds.join(',')
+          }
+        }).toPromise().then(
+        (response: any) => {
+          if (successCallback) {
+            successCallback(response.data.validation_error_messages);
+          }
+        }, function(errorResponse: any) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
+    };
+
     fetchStory(storyId: string): Promise<object> {
       return new Promise((resolve, reject) => {
         this._fetchStory(storyId, resolve, reject);
@@ -152,6 +176,14 @@ export class EditableStoryBackendApiService {
         this._updateStory(
           storyId, storyVersion, commitMessage, changeList,
           resolve, reject);
+      });
+    }
+
+    validateExplorations(
+        storyId: string, expIds: string): Promise<object> {
+      return new Promise((resolve, reject) => {
+        this._validateExplorations(
+          storyId, expIds, resolve, reject);
       });
     }
 

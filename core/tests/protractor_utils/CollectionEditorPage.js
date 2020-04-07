@@ -16,7 +16,6 @@
  * @fileoverview Page object for Collection Editor Page, for use in Protractor
  * tests.
  */
-var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
 var CollectionEditorPage = function() {
@@ -47,6 +46,8 @@ var CollectionEditorPage = function() {
   var saveDraftButton = element(
     by.css('.protractor-test-save-draft-button'));
   var saveModal = element(by.css('.protractor-test-save-modal'));
+  var saveInProgressLabel = element(by.css(
+    '.protractor-test-save-in-progress-label'));
 
   this.addExistingExploration = function(explorationId) {
     addExplorationInput.sendKeys(explorationId);
@@ -164,6 +165,8 @@ var CollectionEditorPage = function() {
     saveChangesButton.click();
     waitFor.invisibilityOf(
       saveChangesButton, 'Save Changes modal takes too long to close');
+    waitFor.invisibilityOf(
+      saveInProgressLabel, 'Collection is taking too long to save.');
   };
 };
 

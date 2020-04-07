@@ -25,8 +25,10 @@ angular.module('oppia').factory('UserService', [
   function($http, $q, $window, UrlInterpolationService, UrlService,
       UserInfoObjectFactory, DEFAULT_PROFILE_IMAGE_PATH) {
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
+    var USER_COMMUNITY_RIGHTS_DATA_URL = '/usercommunityrightsdatahandler';
 
     var userInfo = null;
+    var userCommunityRightsInfo = null;
 
     var getUserInfoAsync = function() {
       if (UrlService.getPathname() === '/signup') {
@@ -82,6 +84,18 @@ angular.module('oppia').factory('UserService', [
             return response.data.login_url;
           }
         );
+      },
+      getUserCommunityRightsData: function() {
+        if (userCommunityRightsInfo) {
+          return $q.resolve(userCommunityRightsInfo);
+        } else {
+          return $http.get(USER_COMMUNITY_RIGHTS_DATA_URL).then(
+            function(response) {
+              userCommunityRightsInfo = response.data;
+              return $q.resolve(userCommunityRightsInfo);
+            }
+          );
+        }
       },
       getUserInfoAsync: getUserInfoAsync
     };

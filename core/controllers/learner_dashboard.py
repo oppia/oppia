@@ -79,7 +79,7 @@ class LearnerDashboardHandler(base.BaseHandler):
             self.user_id)
         if len(full_thread_ids) > 0:
             thread_summaries, number_of_unread_threads = (
-                feedback_services.get_thread_summaries(
+                feedback_services.get_exp_thread_summaries(
                     self.user_id, full_thread_ids))
         else:
             thread_summaries, number_of_unread_threads = [], 0
