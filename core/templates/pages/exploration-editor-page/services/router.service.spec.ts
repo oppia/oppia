@@ -414,17 +414,22 @@ describe('Router Service', function() {
 
   it('should save pending changes even when AngularJS throws an error',
     function() {
-      spyOn($rootScope, '$broadcast').and.throwError(
+      var broadcastSpy = spyOn($rootScope, '$broadcast');
+
+      // For the first call of $broadcast.
+      broadcastSpy.and.throwError(
         'Cannot read property $$nextSibling of null');
-      var applySpy = spyOn($rootScope, '$apply').and.callThrough();
+      // For the second call of $broadcast.
+      var broadcastOriginalImplementation = broadcastSpy.and.callThrough();
+
       // $rootScope.$destroy is being mocked because it is called
       // in AngularJS flow when savePendingChanges() is executed.
       // This method calls $broadcast, that will throw an error on
-      // Angular because of spyOn().
+      // AngularJS because of the first call of $broadcast.
       // Ref: Check third_party/static/angularjs-1.7.9/angular.js:19338
       spyOn($rootScope, '$destroy').and.callFake(function() {});
 
       RouterService.savePendingChanges();
-      expect(applySpy).toHaveBeenCalled();
+      expect(broadcastOriginalImplementation).toHaveBeenCalled();
     });
 });
