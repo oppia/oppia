@@ -2422,12 +2422,13 @@ class BulkEmailsTests(test_utils.GenericTestBase):
         email_text_body = 'Dummy email body.\n'
 
         with self.can_send_emails_ctx:
-            # pylint: disable=protected-access
-            email_manager._send_bulk_mail(
-                self.recipient_ids, self.sender_id,
-                feconf.BULK_EMAIL_INTENT_MARKETING, email_subject,
-                email_html_body, self.SENDER_EMAIL, self.SENDER_USERNAME)
-            # pylint: enable=protected-access
+            email_manager.send_user_query_email(
+                self.sender_id, self.recipient_ids,
+                email_subject, email_html_body,
+                feconf.BULK_EMAIL_INTENT_MARKETING, test_only=True,
+                test_only_sender_email=self.SENDER_EMAIL,
+                test_only_sender_name=self.SENDER_USERNAME
+            )
 
         messages_a = self.mail_stub.get_sent_messages(to=self.RECIPIENT_A_EMAIL)
         self.assertEqual(len(messages_a), 1)
@@ -2484,13 +2485,13 @@ class BulkEmailsTests(test_utils.GenericTestBase):
     def test_that_exception_is_raised_for_unauthorised_sender(self):
         with self.can_send_emails_ctx, self.assertRaisesRegexp(
             Exception, 'Invalid sender_id for email'):
-            # pylint: disable=protected-access
-            email_manager._send_bulk_mail(
-                self.recipient_ids, self.fake_sender_id,
-                feconf.BULK_EMAIL_INTENT_MARKETING, 'email_subject',
-                'email_html_body', self.FAKE_SENDER_EMAIL,
-                self.FAKE_SENDER_USERNAME)
-            # pylint: enable=protected-access
+            email_manager.send_user_query_email(
+                self.fake_sender_id, self.recipient_ids,
+                'email_subject', 'email_html_body',
+                feconf.BULK_EMAIL_INTENT_MARKETING, test_only=True,
+                test_only_sender_email=self.FAKE_SENDER_EMAIL,
+                test_only_sender_name=self.FAKE_SENDER_USERNAME
+            )
 
         messages_a = self.mail_stub.get_sent_messages(to=self.RECIPIENT_A_EMAIL)
         self.assertEqual(len(messages_a), 0)
