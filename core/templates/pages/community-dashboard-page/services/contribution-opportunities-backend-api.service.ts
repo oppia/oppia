@@ -17,72 +17,121 @@
  * contributors to contribute.
  */
 
-require('domain/opportunity/ExplorationOpportunitySummaryObjectFactory.ts');
-require('domain/opportunity/SkillOpportunityObjectFactory.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('ContributionOpportunitiesBackendApiService', [
-  '$http', 'ExplorationOpportunitySummaryObjectFactory',
-  'SkillOpportunityObjectFactory', 'UrlInterpolationService',
-  'OPPORTUNITY_TYPE_SKILL', 'OPPORTUNITY_TYPE_TRANSLATION',
-  'OPPORTUNITY_TYPE_VOICEOVER',
-  function($http, ExplorationOpportunitySummaryObjectFactory,
-      SkillOpportunityObjectFactory, UrlInterpolationService,
-      OPPORTUNITY_TYPE_SKILL, OPPORTUNITY_TYPE_TRANSLATION,
-      OPPORTUNITY_TYPE_VOICEOVER) {
-    var urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
-    var _getOpportunityFromDict = function(opportunityType, opportunityDict) {
-      if (
-        opportunityType === OPPORTUNITY_TYPE_VOICEOVER ||
-        opportunityType === OPPORTUNITY_TYPE_TRANSLATION) {
-        return ExplorationOpportunitySummaryObjectFactory.createFromBackendDict(
-          opportunityDict);
-      } else if (opportunityType === OPPORTUNITY_TYPE_SKILL) {
-        return SkillOpportunityObjectFactory.createFromBackendDict(
-          opportunityDict);
+import { ExplorationOpportunitySummary } from
+  'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+import { SkillOpportunity } from
+  'domain/opportunity/SkillOpportunityObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
+const constants = require('constants.ts');
+
+type ContributionOpportunityCategoryType =
+  'skill' | 'voiceover' | 'translation';
+
+type ContributionOpportunityParams = {
+  cursor: string;
+  // eslint-disable-next-line camelcase
+  language_code?: string;
+};
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ContributionOpportunitiesBackendApiService {
+  urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private http: HttpClient
+  ) {}
+
+  // TODO(#7165): Replace any with exact type.
+  private _getOpportunityFromDict(
+      opportunityType: ContributionOpportunityCategoryType,
+      opportunityDict: any
+  ): ExplorationOpportunitySummary | SkillOpportunity {
+    if (
+      opportunityType === constants.OPPORTUNITY_TYPE_VOICEOVER ||
+      opportunityType === constants.OPPORTUNITY_TYPE_TRANSLATION) {
+      return new ExplorationOpportunitySummary(opportunityDict.id,
+        opportunityDict.topic_name, opportunityDict.story_title,
+        opportunityDict.chapter_title, opportunityDict.content_count,
+        opportunityDict.translation_counts);
+    } else if (opportunityType === constants.OPPORTUNITY_TYPE_SKILL) {
+      return new SkillOpportunity(
+        opportunityDict.id, opportunityDict.skill_description,
+        opportunityDict.topic_name, opportunityDict.question_count);
+    }
+  }
+
+  // TODO(#7165): Replace any with exact type.
+  private _fetchOpportunities(
+      opportunityType: ContributionOpportunityCategoryType,
+      params: ContributionOpportunityParams,
+      successCallback: (
+        opportunities?: Array<any>, nextCursor?: string, more?: boolean
+        ) => void,
+      errorCallback: (reason?: any) => void
+  ): void {
+    this.http.get(this.urlInterpolationService.interpolateUrl(
+      this.urlTemplate, { opportunityType }
+    ), { params }).toPromise().then((data: any) => {
+      const opportunities = [];
+      for (const index in data.opportunities) {
+        opportunities.push(this._getOpportunityFromDict(
+          opportunityType, data.opportunities[index]));
       }
-    };
-    var _fetchOpportunities = function(
-        opportunityType, params, successCallback) {
-      return $http.get(
-        UrlInterpolationService.interpolateUrl(
-          urlTemplate, {opportunityType: opportunityType}
-        ), {
-          params: params
-        }).then(function(response) {
-        var data = response.data;
-        var opportunities = [];
-        for (var index in data.opportunities) {
-          opportunities.push(_getOpportunityFromDict(
-            opportunityType, data.opportunities[index]));
-        }
+      if (successCallback) {
         successCallback(opportunities, data.next_cursor, data.more);
-      });
-    };
-    return {
-      fetchSkillOpportunities: function(cursor, successCallback) {
-        var params = {
-          cursor: cursor
-        };
-        return _fetchOpportunities(
-          OPPORTUNITY_TYPE_SKILL, params, successCallback);
-      },
-      fetchTranslationOpportunities: function(
-          languageCode, cursor, successCallback) {
-        var params = {
-          language_code: languageCode,
-          cursor: cursor
-        };
-        return _fetchOpportunities(
-          OPPORTUNITY_TYPE_TRANSLATION, params, successCallback);
-      },
-      fetchVoiceoverOpportunities: function(
-          languageCode, cursor, successCallback) {
-        var params = {
-          language_code: languageCode,
-          cursor: cursor
-        };
-        return _fetchOpportunities(
-          OPPORTUNITY_TYPE_VOICEOVER, params, successCallback);
       }
+    }, (error) => {
+      if (errorCallback) {
+        errorCallback(error);
+      }
+    });
+  }
+
+  fetchSkillOpportunities(cursor: string): Promise<Object> {
+    const params: ContributionOpportunityParams = {
+      cursor: cursor
     };
-  }]);
+    return new Promise((resolve, reject) => {
+      this._fetchOpportunities(
+        constants.OPPORTUNITY_TYPE_SKILL, params, resolve, reject);
+    });
+  }
+
+  fetchTranslationOpportunities(
+      languageCode: string, cursor: string): Promise<Object> {
+    const params: ContributionOpportunityParams = {
+      language_code: languageCode,
+      cursor: cursor
+    };
+    return new Promise((resolve, reject) => {
+      this._fetchOpportunities(
+        constants.OPPORTUNITY_TYPE_TRANSLATION,
+        params, resolve, reject);
+    });
+  }
+
+  fetchVoiceoverOpportunities(
+      languageCode: string, cursor: string): Promise<Object> {
+    const params: ContributionOpportunityParams = {
+      language_code: languageCode,
+      cursor: cursor
+    };
+    return new Promise((resolve, reject) => {
+      this._fetchOpportunities(
+        constants.OPPORTUNITY_TYPE_VOICEOVER,
+        params, resolve, reject);
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'ContributionOpportunitiesBackendApiService',
+  downgradeInjectable(ContributionOpportunitiesBackendApiService));

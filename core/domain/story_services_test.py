@@ -399,6 +399,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             '2', self.user_id_admin, title='Title 3',
             category='Mathematics', language_code='en')
+        self.publish_exploration(self.user_id_admin, '0')
+        self.publish_exploration(self.user_id_admin, '1')
+        self.publish_exploration(self.user_id_admin, '2')
 
         self.assertIsNone(
             exp_services.get_story_id_linked_to_exploration('0'))
@@ -625,6 +628,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             '0', self.user_id_admin, title='Title 1',
             category='Mathematics', language_code='en')
+        self.publish_exploration(self.user_id_admin, '0')
 
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -736,6 +740,38 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
+    def test_validate_exploration_returning_error_messages(self):
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1')
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(
+                ['invalid_exp', 'exp_id_1'], False))
+        message_1 = (
+            'Expected story to only reference valid explorations, but found '
+            'a reference to an invalid exploration with ID: invalid_exp')
+        message_2 = (
+            'Exploration with ID exp_id_1 is not public. Please publish '
+            'explorations before adding them to a story.'
+        )
+        self.assertEqual(validation_error_messages, [message_1, message_2])
+
+    def test_cannot_update_story_with_private_exploration_id(self):
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1')
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'node_id': self.NODE_ID_1,
+            'old_value': None,
+            'new_value': 'exp_id_1'
+        })]
+
+        with self.assertRaisesRegexp(
+            Exception, 'Exploration with ID exp_id_1 is not public'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
     def test_cannot_update_story_with_exps_with_different_categories(self):
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1')
@@ -777,6 +813,15 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(
+                ['exp_id_2', 'exp_id_1'], False))
+
+        self.assertEqual(
+            validation_error_messages, [
+                'All explorations in a story should be of the same category. '
+                'The explorations with ID exp_id_2 and exp_id_1 have different '
+                'categories.'])
         with self.assertRaisesRegexp(
             Exception, 'All explorations in a story should be of the '
             'same category'):
@@ -800,6 +845,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(['exp_id_1'], False))
+        self.assertEqual(
+            validation_error_messages, [
+                'Invalid language es found for exploration with ID exp_id_1.'])
         with self.assertRaisesRegexp(
             Exception, 'Invalid language es found for exploration with '
             'ID exp_id_1'):
@@ -823,6 +873,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(['exp_id_1'], False))
+        self.assertEqual(
+            validation_error_messages, [
+                'Invalid interaction LogicProof in exploration with ID: '
+                'exp_id_1.'])
         with self.assertRaisesRegexp(
             Exception, 'Invalid interaction LogicProof in exploration with '
             'ID: exp_id_1'):
@@ -859,6 +915,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(['exp_id_1'], False))
+        self.assertEqual(
+            validation_error_messages, [
+                'RTE content in state Introduction of exploration with '
+                'ID exp_id_1 is not supported on mobile.'])
         with self.assertRaisesRegexp(
             Exception, 'RTE content in state Introduction of exploration with '
             'ID exp_id_1 is not supported on mobile.'):
@@ -867,8 +929,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_update_story_with_exps_with_parameter_values(self):
         self.save_new_valid_exploration(
-            'exp_id_1', self.user_id_a, title='title', category='Category 1',
-            interaction_id='LogicProof')
+            'exp_id_1', self.user_id_a, title='title', category='Category 1')
         exp_services.update_exploration(
             self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -892,6 +953,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(['exp_id_1'], False))
+        self.assertEqual(
+            validation_error_messages, [
+                'Expected no exploration to have parameter values in'
+                ' it. Invalid exploration: exp_id_1'])
         with self.assertRaisesRegexp(
             Exception, 'Expected no exploration to have parameter values in'
             ' it. Invalid exploration: exp_id_1'):

@@ -37,15 +37,15 @@ angular.module('oppia').directive('stateTranslationEditor', [
             WrittenTranslationObjectFactory) {
           var ctrl = this;
           var showMarkAudioAsNeedingUpdateModalIfRequired = function(
-              contentId, langaugeCode) {
+              contentId, languageCode) {
             var stateName = StateEditorService.getActiveStateName();
             var state = ExplorationStatesService.getState(stateName);
             var recordedVoiceovers = state.recordedVoiceovers;
             var availableAudioLanguages = (
               recordedVoiceovers.getVoiceoverLanguageCodes(contentId));
-            if (availableAudioLanguages.indexOf(langaugeCode) !== -1) {
+            if (availableAudioLanguages.indexOf(languageCode) !== -1) {
               var voiceover = recordedVoiceovers.getVoiceover(
-                contentId, langaugeCode);
+                contentId, languageCode);
               if (voiceover.needsUpdate) {
                 return;
               }
@@ -66,7 +66,7 @@ angular.module('oppia').directive('stateTranslationEditor', [
                 }]
               }).result.then(function() {
                 recordedVoiceovers.toggleNeedsUpdateAttribute(
-                  contentId, langaugeCode);
+                  contentId, languageCode);
                 ExplorationStatesService.saveRecordedVoiceovers(
                   stateName, recordedVoiceovers);
               }, function() {
@@ -77,7 +77,7 @@ angular.module('oppia').directive('stateTranslationEditor', [
             }
           };
           var contentId = null;
-          var langaugeCode = null;
+          var languageCode = null;
           $scope.activeWrittenTranslation = null;
           $scope.translationEditorIsOpen = false;
           $scope.isEditable = function() {
@@ -89,12 +89,12 @@ angular.module('oppia').directive('stateTranslationEditor', [
             $scope.translationEditorIsOpen = false;
             contentId = (
               TranslationTabActiveContentIdService.getActiveContentId());
-            langaugeCode = TranslationLanguageService.getActiveLanguageCode();
+            languageCode = TranslationLanguageService.getActiveLanguageCode();
             if (StateWrittenTranslationsService.displayed.hasWrittenTranslation(
-              contentId, langaugeCode)) {
+              contentId, languageCode)) {
               $scope.activeWrittenTranslation = (
                 StateWrittenTranslationsService.displayed
-                  .getWrittenTranslation(contentId, langaugeCode));
+                  .getWrittenTranslation(contentId, languageCode));
             }
           };
           var saveTranslation = function() {
@@ -102,16 +102,16 @@ angular.module('oppia').directive('stateTranslationEditor', [
             var newWrittenTranslation = null;
             contentId = (
               TranslationTabActiveContentIdService.getActiveContentId());
-            langaugeCode = TranslationLanguageService.getActiveLanguageCode();
+            languageCode = TranslationLanguageService.getActiveLanguageCode();
             var oldTranslation = null;
             if (StateWrittenTranslationsService
-              .savedMemento.hasWrittenTranslation(contentId, langaugeCode)) {
+              .savedMemento.hasWrittenTranslation(contentId, languageCode)) {
               var writtenTranslation = (StateWrittenTranslationsService
-                .savedMemento.getWrittenTranslation(contentId, langaugeCode));
+                .savedMemento.getWrittenTranslation(contentId, languageCode));
               oldWrittenTranslation = writtenTranslation;
             }
             var writtenTranslation = (StateWrittenTranslationsService
-              .displayed.getWrittenTranslation(contentId, langaugeCode));
+              .displayed.getWrittenTranslation(contentId, languageCode));
             var newWrittenTranslation = writtenTranslation;
             if (oldWrittenTranslation === null || (
               oldWrittenTranslation.html !== newWrittenTranslation.html || (
@@ -119,7 +119,7 @@ angular.module('oppia').directive('stateTranslationEditor', [
                   newWrittenTranslation.needsUpdate)))) {
               var stateName = StateEditorService.getActiveStateName();
               showMarkAudioAsNeedingUpdateModalIfRequired(
-                contentId, langaugeCode);
+                contentId, languageCode);
               ExplorationStatesService.saveWrittenTranslations(
                 stateName, StateWrittenTranslationsService.displayed);
               StateWrittenTranslationsService.saveDisplayedValue();
@@ -142,13 +142,13 @@ angular.module('oppia').directive('stateTranslationEditor', [
             var displayedWrittenTranslations = (
               StateWrittenTranslationsService.displayed);
             if (displayedWrittenTranslations.hasWrittenTranslation(
-              contentId, langaugeCode)) {
+              contentId, languageCode)) {
               displayedWrittenTranslations.updateWrittenTranslationHtml(
-                contentId, langaugeCode,
+                contentId, languageCode,
                 $scope.activeWrittenTranslation.getHtml());
             } else {
               displayedWrittenTranslations.addWrittenTranslation(
-                contentId, langaugeCode,
+                contentId, languageCode,
                 $scope.activeWrittenTranslation.getHtml());
             }
 

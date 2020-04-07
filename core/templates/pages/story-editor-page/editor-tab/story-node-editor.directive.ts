@@ -142,6 +142,7 @@ angular.module('oppia').directive('storyNodeEditor', [
               explorationId).then(function(expIdIsValid) {
               $scope.expIdIsValid = expIdIsValid;
               if ($scope.expIdIsValid) {
+                StoryEditorStateService.setExpIdsChanged();
                 StoryUpdateService.setStoryNodeExplorationId(
                   $scope.story, $scope.getId(), explorationId);
                 $scope.currentExplorationId = explorationId;
