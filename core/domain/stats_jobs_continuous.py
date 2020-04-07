@@ -75,8 +75,8 @@ class InteractionAnswerSummariesMRJobManager(
         Yields:
             dict(str, str). The submitted answer in dict format.
         """
-        if InteractionAnswerSummariesMRJobManager.entity_created_before_job_queued( # pylint: disable=line-too-long
-                item):
+        if (InteractionAnswerSummariesMRJobManager
+                .entity_created_before_job_queued(item)):
             # Output answers submitted to the exploration for this exp version.
             versioned_key = u'%s:%s:%s' % (
                 item.exploration_id, item.exploration_version, item.state_name)
@@ -125,12 +125,8 @@ class InteractionAnswerSummariesMRJobManager(
                     Occurs when the key to reduce cannot be split into
                     components.
         """
-        try:
-            exploration_id, exploration_version, state_name = key.split(':')
-        except Exception as e:
-            yield (key, 'ERROR: Expected valid exploration id, version, and '
-                        'state name triple, actual: %r' % e)
-            return
+        exploration_id, exploration_version, state_name = (
+            key.decode('utf-8').split(':'))
 
         value_dicts = [
             ast.literal_eval(stringified_value)

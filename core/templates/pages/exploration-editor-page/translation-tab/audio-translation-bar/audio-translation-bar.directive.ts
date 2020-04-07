@@ -48,6 +48,7 @@ require('services/context.service.ts');
 require('services/editability.service.ts');
 require('services/id-generation.service.ts');
 require('services/user.service.ts');
+const WaveSurfer = require('third-party-imports/wave-surfer.import.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
@@ -244,7 +245,7 @@ angular.module('oppia').directive('audioTranslationBar', [
               // Create audio play and pause for unsaved recording.
               var url = $window.URL.createObjectURL($scope.audioBlob);
               // Create visualizer for playing unsaved audio.
-              $scope.waveSurfer = $window.WaveSurfer.create({
+              $scope.waveSurfer = WaveSurfer.create({
                 container: '#visualized',
                 waveColor: '#009688',
                 progressColor: '#cccccc',

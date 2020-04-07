@@ -19,11 +19,22 @@
         <strong> Worked Examples </strong>
         <ul>
           <li ng-repeat="example in skill.skill_contents.worked_examples" style="padding-top: 5px;">
-            <angular-html-bind html-data="example.html">
+            <b> Question: </b>
+            <angular-html-bind html-data="example.question.html">
             </angular-html-bind>
+            <div class="worked-example-explanation-section">
+              <b> Explanation: </b>
+              <angular-html-bind html-data="example.explanation.html">
+              </angular-html-bind>
+            </div>
           </li>
         </ul>
       </div>
     </div>
   </div>
 </div>
+<style>
+  .worked-example-explanation-section {
+    margin-top: 1.5vh;
+  }
+</style>
