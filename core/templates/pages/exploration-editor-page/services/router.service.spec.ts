@@ -431,6 +431,7 @@ describe('Router Service', function() {
       spyOn($rootScope, '$destroy').and.callFake(function() {});
 
       RouterService.savePendingChanges();
-      expect(broadcastOriginalImplementation).toHaveBeenCalled();
+      expect(broadcastOriginalImplementation).toHaveBeenCalledWith(
+        'externalSave');
     });
 });
