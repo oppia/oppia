@@ -51,10 +51,7 @@ RELEASE_ROTA_URL = (
     'https://github.com/oppia/oppia/wiki/Release-Schedule#'
     'release-coordinators-and-qa-coordinators-for-upcoming-releases')
 
-REPEATABLE_JOBS_SPREADSHEETS_URL = (
-    'https://docs.google.com/spreadsheets/d/'
-    '1cSoVEwFyT-Q6d7yonbB0N-ElYGCFz5feMWXZXsv16_Y/edit#gid=1262496785')
-ONE_TIME_JOBS_SPREADSHEET_URL = (
+JOBS_SPREADSHEETS_URL = (
     'https://docs.google.com/spreadsheets/d/'
     '1Wegd0rZhVOm3Q3VCIw0xMbLC7IWtRyrEahiPn61Fhoo/edit#gid=948463314')
 
