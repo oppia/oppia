@@ -19,17 +19,14 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { throwError } from 'rxjs';
 
-import { PlaythroughIssueObjectFactory, PlaythroughIssue } from
+import { PlaythroughIssue, PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory.ts';
 import { ServicesConstants } from 'services/services.constants.ts';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class PlaythroughIssuesBackendApiService {
   private cachedIssues = null;
 
@@ -38,69 +35,59 @@ export class PlaythroughIssuesBackendApiService {
     private playthroughIssueObjectFactory: PlaythroughIssueObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  // TODO(#7165): This has been marked any since marking explorationVersion
-  // to number throws an error. "Type 'number' is not assignable to type
-  // 'string | string[]'" and if this is marked to string it throws an
-  // error "TS2345: Argument of type '1' is not assignable to parameter
-  // of type 'string'".
-  fetchIssues(explorationId: string, explorationVersion: any
-  ): Promise<PlaythroughIssue[]> {
+  fetchIssues(
+      explorationId: string,
+      explorationVersion: number): Promise<PlaythroughIssue[]> {
     if (this.cachedIssues !== null) {
       return Promise.resolve(this.cachedIssues);
-    } else {
-      // TODO(#7165): Change `any` to a type describing the dict.
-      return this.httpClient.get(
-        this.getFullIssuesUrl(explorationId), {
-          params: { exp_version: explorationVersion },
-          observe: 'response'
-        }).toPromise().then(
-        (response: HttpResponse<any[]>) => {
-          let unresolvedIssueBackendDicts = response.body;
-          this.cachedIssues = unresolvedIssueBackendDicts.map(
-            this.playthroughIssueObjectFactory.createFromBackendDict);
-          return this.cachedIssues;
-        });
     }
+    return this.httpClient.get(this.getFullIssuesUrl(explorationId), {
+      params: { exp_version: explorationVersion.toString() },
+      observe: 'response'
+    }).toPromise().then(
+      // TODO(#7165): Change `any` to a type describing the dict.
+      (response: HttpResponse<any[]>) => {
+        let unresolvedIssueBackendDicts = response.body;
+        this.cachedIssues = unresolvedIssueBackendDicts.map(
+          this.playthroughIssueObjectFactory.createFromBackendDict);
+        return this.cachedIssues;
+      });
   }
 
   fetchPlaythrough(
       explorationId: string, playthroughId: string): Promise<PlaythroughIssue> {
-    // TODO(#7165): Change `any` to a type describing the dict.
     return this.httpClient.get(
       this.getFullPlaythroughUrl(explorationId, playthroughId), {
         observe: 'response'
-      }).toPromise().then((response: HttpResponse<any>) => {
-      let playthroughBackendDict = response.body;
-      return this.playthroughIssueObjectFactory.createFromBackendDict(
-        playthroughBackendDict);
-    });
+      }
+    ).toPromise().then(
+      // TODO(#7165): Change `any` to a type describing the dict.
+      (response: HttpResponse<any>) => {
+        let playthroughBackendDict = response.body;
+        return this.playthroughIssueObjectFactory.createFromBackendDict(
+          playthroughBackendDict);
+      });
   }
 
   resolveIssue(
       issueToResolve: PlaythroughIssue, explorationId: string,
-      explorationVersion: number): Promise<any> {
-    return this.httpClient.post(
-      this.getFullResolveIssueUrl(explorationId), {
-        exp_issue_dict: issueToResolve.toBackendDict(),
-        exp_version: explorationVersion
-      }).toPromise().then(() => {
-      let issueIndex;
-      if (this.cachedIssues !== null) {
-        issueIndex = this.cachedIssues.findIndex(issue => {
-          return angular.equals(issue, issueToResolve);
-        });
-      } else {
-        issueIndex = -1;
-      }
-      if (issueIndex === -1) {
-        let invalidIssueError = new Error(
-          'An issue which was not fetched from the backend has been ' +
-          'resolved');
-        return throwError(invalidIssueError);
-      } else {
-        this.cachedIssues.splice(issueIndex, 1);
-      }
-    });
+      explorationVersion: number): Promise<void> {
+    return this.httpClient.post(this.getFullResolveIssueUrl(explorationId), {
+      exp_issue_dict: issueToResolve.toBackendDict(),
+      exp_version: explorationVersion
+    }).toPromise().then(
+      () => {
+        if (this.cachedIssues !== null) {
+          const issueIndex = this.cachedIssues.findIndex(
+            issue => angular.equals(issue, issueToResolve));
+          if (issueIndex !== -1) {
+            this.cachedIssues.splice(issueIndex, 1);
+            return;
+          }
+        }
+        throw Error(
+          'An issue which was not fetched from the backend has been resolved');
+      });
   }
 
   private getFullIssuesUrl(explorationId: string): string {
@@ -128,5 +115,5 @@ export class PlaythroughIssuesBackendApiService {
 }
 
 angular.module('oppia').factory(
-  'PlaythroughIssuesBackendApiService', downgradeInjectable(
-    PlaythroughIssuesBackendApiService));
+  'PlaythroughIssuesBackendApiService',
+  downgradeInjectable(PlaythroughIssuesBackendApiService));
