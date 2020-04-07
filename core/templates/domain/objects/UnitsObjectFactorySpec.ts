@@ -216,7 +216,7 @@ describe('UnitsObjectFactory', () => {
       'SyntaxError: Unexpected "&" in "dollar/ &kg" at index 8');
     expect(() => {
       units.fromRawInputString('cent %mol$');
-    }).toThrow(
+    }).toThrowError(
       'SyntaxError: Unit "dollarcent" not found.');
   });
 });
