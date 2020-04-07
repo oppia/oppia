@@ -521,53 +521,59 @@ angular.module('oppia').directive('conversationSkin', [
           };
 
           $scope.getExplorationLink = function() {
-            if (!$scope.recommendedExplorationSummaries[0].id) {
-              return '#';
-            } else {
-              var result = '/explore/' +
-                $scope.recommendedExplorationSummaries[0].id;
-              var urlParams = UrlService.getUrlParams();
-              var parentExplorationIds =
-                $scope.recommendedExplorationSummaries[0].parentExplorationIds;
+            if ($scope.recommendedExplorationSummaries &&
+                $scope.recommendedExplorationSummaries[0]) {
+              if (!$scope.recommendedExplorationSummaries[0].id) {
+                return '#';
+              } else {
+                var result = '/explore/' +
+                    $scope.recommendedExplorationSummaries[0].id;
+                var urlParams = UrlService.getUrlParams();
+                var parentExplorationIds =
+                    $scope.recommendedExplorationSummaries[0]
+                      .parentExplorationIds;
 
-              var collectionIdToAdd = $scope.collectionId;
-              var storyIdToAdd = null;
-              var storyNodeIdToAdd = null;
-              // Replace the collection ID with the one in the URL if it exists
-              // in urlParams.
-              if (parentExplorationIds &&
-                  urlParams.hasOwnProperty('collection_id')) {
-                collectionIdToAdd = urlParams.collection_id;
-              } else if (
-                UrlService.getPathname().match(/\/story\/(\w|-){12}/g) &&
-                  $scope.recommendedExplorationSummaries[0].nextNodeId) {
-                storyIdToAdd = UrlService.getStoryIdFromViewerUrl();
-                storyNodeIdToAdd =
-                    $scope.recommendedExplorationSummaries[0].nextNodeId;
-              } else if (
-                urlParams.hasOwnProperty('story_id') &&
-                  urlParams.hasOwnProperty('node_id')) {
-                storyIdToAdd = urlParams.story_id;
-                storyNodeIdToAdd =
-                    $scope.recommendedExplorationSummaries[0].nextNodeId;
-              }
-
-              if (collectionIdToAdd) {
-                result = UrlService.addField(
-                  result, 'collection_id', collectionIdToAdd);
-              }
-              if (parentExplorationIds) {
-                for (var i = 0; i < parentExplorationIds.length - 1; i++) {
-                  result = UrlService.addField(
-                    result, 'parent', parentExplorationIds[i]);
+                var collectionIdToAdd = $scope.collectionId;
+                var storyIdToAdd = null;
+                var storyNodeIdToAdd = null;
+                // Replace the collection ID with the one in the URL if it
+                // exists in urlParams.
+                if (parentExplorationIds &&
+                    urlParams.hasOwnProperty('collection_id')) {
+                  collectionIdToAdd = urlParams.collection_id;
+                } else if (
+                  UrlService.getPathname().match(
+                    /\/story\/(\w|-){12}/g) &&
+                    $scope.recommendedExplorationSummaries[0].nextNodeId) {
+                  storyIdToAdd = UrlService.getStoryIdFromViewerUrl();
+                  storyNodeIdToAdd =
+                      $scope.recommendedExplorationSummaries[0].nextNodeId;
+                } else if (
+                  urlParams.hasOwnProperty('story_id') &&
+                    urlParams.hasOwnProperty('node_id')) {
+                  storyIdToAdd = urlParams.story_id;
+                  storyNodeIdToAdd =
+                      $scope.recommendedExplorationSummaries[0].nextNodeId;
                 }
+
+                if (collectionIdToAdd) {
+                  result = UrlService.addField(
+                    result, 'collection_id', collectionIdToAdd);
+                }
+                if (parentExplorationIds) {
+                  for (var i = 0; i < parentExplorationIds.length - 1; i++) {
+                    result = UrlService.addField(
+                      result, 'parent', parentExplorationIds[i]);
+                  }
+                }
+                if (storyIdToAdd && storyNodeIdToAdd) {
+                  result = UrlService.addField(
+                    result, 'story_id', storyIdToAdd);
+                  result = UrlService.addField(
+                    result, 'node_id', storyNodeIdToAdd);
+                }
+                return result;
               }
-              if (storyIdToAdd && storyNodeIdToAdd) {
-                result = UrlService.addField(result, 'story_id', storyIdToAdd);
-                result = UrlService.addField(
-                  result, 'node_id', storyNodeIdToAdd);
-              }
-              return result;
             }
           };
 
