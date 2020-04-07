@@ -31,12 +31,12 @@ import { UrlInterpolationService } from
   providedIn: 'root'
 })
 export class PlaythroughIssuesBackendApiService {
+  private cachedIssues = null;
+
   constructor(
     private httpClient: HttpClient,
     private playthroughIssueObjectFactory: PlaythroughIssueObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
-
-  private cachedIssues = null;
 
   // TODO(#7165): This has been marked any since marking explorationVersion
   // to number throws an error. "Type 'number' is not assignable to type
@@ -77,11 +77,11 @@ export class PlaythroughIssuesBackendApiService {
 
   resolveIssue(
       issueToResolve: PlaythroughIssue, explorationId: string,
-      expVersion: number): Promise<any> {
+      explorationVersion: number): Promise<any> {
     return this.httpClient.post(
       this.getFullResolveIssueUrl(explorationId), {
         exp_issue_dict: issueToResolve.toBackendDict(),
-        exp_version: expVersion
+        exp_version: explorationVersion
       }).toPromise().then(() => {
       let issueIndex;
       if (this.cachedIssues !== null) {
