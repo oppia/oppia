@@ -36,7 +36,6 @@ describe('State hints service', () => {
     shs = TestBed.get(StateHintsService);
   });
 
-
   it('should called the constructor', () =>{
     expect(shs.setterMethodKey).toBe('saveHints');
   });
@@ -66,4 +65,3 @@ describe('State hints service', () => {
     expect(shs.getActiveHintIndex()).toBe(5);
   });
 });
-
