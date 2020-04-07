@@ -80,7 +80,7 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
 import { DragAndDropSortInputRulesService } from
-// eslint-disable-next-line max-len
+  // eslint-disable-next-line max-len
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from
@@ -293,6 +293,8 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { PlaythroughIssuesBackendApiService } from
+  'services/playthrough-issues-backend-api.service';
 import { from } from 'rxjs';
 
 @Injectable({
@@ -617,15 +619,20 @@ export class UpgradedServices {
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
       upgradedServices['ContextService'],
       upgradedServices['PlayerTranscriptService']);
+    upgradedServices['PlaythroughIssuesBackendApiService'] =
+      new PlaythroughIssuesBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['PlaythroughIssuesBackendApiService'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['SkillObjectFactory'] =
-    new SkillObjectFactory(
-      upgradedServices['ConceptCardObjectFactory'],
-      upgradedServices['MisconceptionObjectFactory'],
-      upgradedServices['RubricObjectFactory'],
-      upgradedServices['ValidatorsService']);
+      new SkillObjectFactory(
+        upgradedServices['ConceptCardObjectFactory'],
+        upgradedServices['MisconceptionObjectFactory'],
+        upgradedServices['RubricObjectFactory'],
+        upgradedServices['ValidatorsService']);
     upgradedServices['StateCardObjectFactory'] =
-        new StateCardObjectFactory(
-          upgradedServices['AudioTranslationLanguageService']);
+      new StateCardObjectFactory(
+        upgradedServices['AudioTranslationLanguageService']);
     upgradedServices['TopicObjectFactory'] = new TopicObjectFactory(
       upgradedServices['SubtopicObjectFactory'],
       upgradedServices['StoryReferenceObjectFactory'],
