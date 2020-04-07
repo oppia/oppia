@@ -145,11 +145,11 @@ export class EditableStoryBackendApiService {
         }).toPromise().then(
         (response: any) => {
           if (successCallback) {
-            successCallback(response.data.validation_error_messages);
+            successCallback(response.status);
           }
         }, function(errorResponse: any) {
           if (errorCallback) {
-            errorCallback(errorResponse.data);
+            errorCallback(errorResponse.error);
           }
         });
     };
