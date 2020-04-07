@@ -43,7 +43,8 @@ export class PlaythroughIssuesBackendApiService {
   // 'string | string[]'" and if this is marked to string it throws an
   // error "TS2345: Argument of type '1' is not assignable to parameter
   // of type 'string'".
-  fetchIssues(explorationId: string, explorationVersion: any): Promise<string> {
+  fetchIssues(explorationId: string, explorationVersion: any
+  ): Promise<PlaythroughIssue[]> {
     if (this.cachedIssues !== null) {
       return Promise.resolve(this.cachedIssues);
     } else {
