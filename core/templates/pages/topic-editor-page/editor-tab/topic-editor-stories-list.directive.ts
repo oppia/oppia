@@ -113,9 +113,6 @@ angular.module('oppia').directive('storiesList', [
           ctrl.$onInit = function() {
             $scope.STORY_TABLE_COLUMN_HEADINGS = [
               'title', 'node_count', 'publication_status'];
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$apply();
           };
         }
       ]
