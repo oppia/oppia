@@ -465,7 +465,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_export_policy():
-        """The history of commits is not relevant to a user for the purposes of
+        """The history of commits is not relevant for the purposes of
         Takeout.
         """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
