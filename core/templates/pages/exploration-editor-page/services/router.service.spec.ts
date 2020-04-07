@@ -415,12 +415,13 @@ describe('Router Service', function() {
   it('should save pending changes even when AngularJS throws an error',
     function() {
       var broadcastSpy = spyOn($rootScope, '$broadcast');
+      // For the second call of $broadcast.
+      var broadcastOriginalImplementation = broadcastSpy.and.callThrough();
 
       // For the first call of $broadcast.
       broadcastSpy.and.throwError(
         'Cannot read property $$nextSibling of null');
-      // For the second call of $broadcast.
-      var broadcastOriginalImplementation = broadcastSpy.and.callThrough();
+
 
       // $rootScope.$destroy is being mocked because it is called
       // in AngularJS flow when savePendingChanges() is executed.
