@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import logging
+import re
 
 import bs4
 from core.domain import rte_component_registry
@@ -961,8 +962,19 @@ def get_filename_with_dimensions(exploration_fs, old_filename):
     Returns:
         str. The new filename of the image file.
     """
-    filepath = 'image/%s' % old_filename
+    subdirectory = 'image'
+    filepath = '%s/%s' % (subdirectory, old_filename)
     try:
+        dot_index = old_filename.rfind('.')
+        filename_without_extension = old_filename[:dot_index]
+        filename_regex = '%s/%s_height_[0-9]+_width_[0-9]+\.\w+' % (
+            subdirectory, old_filename[:dot_index])
+        # Check if the data store contains the updated filename. If it does
+        # return that filename.
+        for filename in exploration_fs.listdir(subdirectory.encode('utf-8')):
+            if re.match(new_filename_regex, filename):
+                (_, new_filename) = filename.split('/')
+                return new_filename
         content = exploration_fs.get(filepath.encode('utf-8'))
         height, width = gae_image_services.get_image_dimensions(content)
     except IOError:

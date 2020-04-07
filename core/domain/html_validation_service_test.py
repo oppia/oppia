@@ -1542,7 +1542,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION, exp_id))
         fs.commit('image/abc1.png', raw_image, mimetype='image/png')
         fs.commit('image/abc2.png', raw_image, mimetype='image/png')
-        fs.commit('image/abc3.png', raw_image, mimetype='image/png')
+        fs.commit(
+            'image/abc3_height_32_width_32.png',
+            raw_image, mimetype='image/png')
 
         for test_case in test_cases:
             self.assertEqual(
