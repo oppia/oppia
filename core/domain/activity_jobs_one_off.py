@@ -32,6 +32,36 @@ import feconf
     [models.NAMES.collection, models.NAMES.exploration])
 
 
+class ActivityContributorsSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job that computes the number of commits done by contributors for
+    each collection and exploration.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [collection_models.CollectionModel, exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(model):
+        if isinstance(model, collection_models.CollectionModel):
+            summary = collection_services.get_collection_summary_by_id(model.id)
+            summary.contributors_summary = (
+                collection_services.compute_collection_contributors_summary(
+                    model.id))
+            summary.contributor_ids = list(summary.contributors_summary)
+            collection_services.save_collection_summary(summary)
+        else:
+            summary = exp_fetchers.get_exploration_summary_by_id(model.id)
+            summary.contributors_summary = (
+                exp_services.compute_exploration_contributors_summary(model.id))
+            summary.contributor_ids = list(summary.contributors_summary)
+            exp_services.save_exploration_summary(summary)
+        yield ('SUCCESS', model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
+
+
 class AuditContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Audit job that compares the contents of contributor_ids and
     contributors_summary.
@@ -74,36 +104,6 @@ class AuditContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
-
-
-class ActivityContributorsSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job that computes the number of commits done by contributors for
-    each collection and exploration.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [collection_models.CollectionModel, exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(model):
-        if isinstance(model, collection_models.CollectionModel):
-            summary = collection_services.get_collection_summary_by_id(model.id)
-            summary.contributors_summary = (
-                collection_services.compute_collection_contributors_summary(
-                    model.id))
-            summary.contributor_ids = list(summary.contributors_summary)
-            collection_services.save_collection_summary(summary)
-        else:
-            summary = exp_fetchers.get_exploration_summary_by_id(model.id)
-            summary.contributors_summary = (
-                exp_services.compute_exploration_contributors_summary(model.id))
-            summary.contributor_ids = list(summary.contributors_summary)
-            exp_services.save_exploration_summary(summary)
-        yield ('SUCCESS', model.id)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
 
 
 class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):

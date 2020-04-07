@@ -1007,7 +1007,7 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
     elif contributor_id_to_add not in constants.SYSTEM_USER_IDS:
         contributors_summary[contributor_id_to_add] = (
             contributors_summary.get(contributor_id_to_add, 0) + 1)
-    contributor_ids = list(contributors_summary)
+    contributor_ids = list(contributors_summary.keys())
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
         python_utils.divide(
