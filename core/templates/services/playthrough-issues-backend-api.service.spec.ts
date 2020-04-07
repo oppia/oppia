@@ -65,6 +65,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
 
         let req = httpTestingController.expectOne(
           '/issuesdatahandler/7?exp_version=1');
+        expect(req.request.method).toEqual('GET');
         req.flush(backendIssues);
         flushMicrotasks();
 
@@ -84,6 +85,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
 
         let req = httpTestingController.expectOne(
           '/issuesdatahandler/7?exp_version=1');
+        expect(req.request.method).toEqual('GET');
         req.flush(backendIssues);
         flushMicrotasks();
 
@@ -129,6 +131,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
           successHandler, failureHandler);
         let req = httpTestingController.expectOne(
           '/playthroughdatahandler/7/1');
+        expect(req.request.method).toEqual('GET');
         req.flush(backendPlaythrough);
         flushMicrotasks();
 
@@ -148,12 +151,12 @@ describe('PlaythroughIssuesBackendApiService', () => {
         .createFromBackendDict(backendIssues[0]);
 
       playthroughIssuesBackendApiService.fetchIssues('7', 1)
-        .then(
-          () => playthroughIssuesBackendApiService.resolveIssue(
-            playthroughIssue, explorationId, 1))
+        .then(() => playthroughIssuesBackendApiService.resolveIssue(
+          playthroughIssue, explorationId, 1))
         .then(successHandler, failureHandler);
       let req = httpTestingController.expectOne(
         '/issuesdatahandler/7?exp_version=1');
+      expect(req.request.method).toEqual('GET');
       req.flush(backendIssues);
       flushMicrotasks();
 
@@ -179,6 +182,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
           playthroughIssue, explorationId, 1).then(successHandler, failHandler);
         let req = httpTestingController.expectOne(
           '/resolveissuehandler/' + explorationId);
+        expect(req.request.method).toEqual('POST');
         req.flush(backendIssues);
         flushMicrotasks();
 

@@ -44,12 +44,13 @@ export class PlaythroughIssuesBackendApiService {
     return this.httpClient.get(this.getFetchIssuesUrl(explorationId), {
       params: { exp_version: explorationVersion.toString() },
       observe: 'response'
+    }).toPromise()
       // TODO(#7165): Change `any` to a type describing the dict.
-    }).toPromise().then((response: HttpResponse<any[]>) => {
-      let unresolvedIssueBackendDicts = response.body;
-      return this.cachedIssues = unresolvedIssueBackendDicts.map(
-        this.playthroughIssueObjectFactory.createFromBackendDict);
-    });
+      .then((response: HttpResponse<any[]>) => {
+        let unresolvedIssueBackendDicts = response.body;
+        return this.cachedIssues = unresolvedIssueBackendDicts.map(
+          this.playthroughIssueObjectFactory.createFromBackendDict);
+      });
   }
 
   fetchPlaythrough(
@@ -58,12 +59,13 @@ export class PlaythroughIssuesBackendApiService {
       this.getFetchPlaythroughUrl(explorationId, playthroughId), {
         observe: 'response'
       }
+    ).toPromise()
       // TODO(#7165): Change `any` to a type describing the dict.
-    ).toPromise().then((response: HttpResponse<any>) => {
-      let playthroughBackendDict = response.body;
-      return this.playthroughIssueObjectFactory.createFromBackendDict(
-        playthroughBackendDict);
-    });
+      .then((response: HttpResponse<any>) => {
+        let playthroughBackendDict = response.body;
+        return this.playthroughIssueObjectFactory.createFromBackendDict(
+          playthroughBackendDict);
+      });
   }
 
   resolveIssue(
@@ -72,18 +74,19 @@ export class PlaythroughIssuesBackendApiService {
     return this.httpClient.post(this.getResolveIssueUrl(explorationId), {
       exp_issue_dict: issueToResolve.toBackendDict(),
       exp_version: explorationVersion
-    }).toPromise().then(() => {
-      if (this.cachedIssues !== null) {
-        const issueIndex = this.cachedIssues.findIndex(
-          issue => angular.equals(issue, issueToResolve));
-        if (issueIndex !== -1) {
-          this.cachedIssues.splice(issueIndex, 1);
-          return;
+    }).toPromise()
+      .then(() => {
+        if (this.cachedIssues !== null) {
+          const issueIndex =
+            this.cachedIssues.findIndex(i => angular.equals(i, issueToResolve));
+          if (issueIndex !== -1) {
+            this.cachedIssues.splice(issueIndex, 1);
+            return;
+          }
         }
-      }
-      throw Error(
-        'An issue which was not fetched from the backend has been resolved');
-    });
+        throw Error(
+          'An issue which was not fetched from the backend has been resolved');
+      });
   }
 
   private getFetchIssuesUrl(explorationId: string): string {
