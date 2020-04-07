@@ -35,12 +35,14 @@ export class PlaythroughIssuesBackendApiService {
       private playthroughIssueObjectFactory: PlaythroughIssueObjectFactory,
       private urlInterpolationService: UrlInterpolationService) {}
 
-  fetchIssues(expId: string, expVersion: number): Promise<PlaythroughIssue[]> {
+  fetchIssues(
+      explorationId: string,
+      explorationVersion: number): Promise<PlaythroughIssue[]> {
     if (this.cachedIssues !== null) {
       return Promise.resolve(this.cachedIssues);
     }
-    return this.httpClient.get(this.getFetchIssuesUrl(expId), {
-      params: { exp_version: expVersion.toString() },
+    return this.httpClient.get(this.getFetchIssuesUrl(explorationId), {
+      params: { exp_version: explorationVersion.toString() },
       observe: 'response'
       // TODO(#7165): Change `any` to a type describing the dict.
     }).toPromise().then(response => {
@@ -51,9 +53,9 @@ export class PlaythroughIssuesBackendApiService {
   }
 
   fetchPlaythrough(
-      expId: string, playthroughId: string): Promise<PlaythroughIssue> {
+      explorationId: string, playthroughId: string): Promise<PlaythroughIssue> {
     return this.httpClient.get(
-      this.getFetchPlaythroughUrl(expId, playthroughId), {
+      this.getFetchPlaythroughUrl(explorationId, playthroughId), {
         observe: 'response'
       }
     ).toPromise().then(response => {
@@ -65,10 +67,10 @@ export class PlaythroughIssuesBackendApiService {
 
   resolveIssue(
       issueToResolve: PlaythroughIssue,
-      expId: string, expVersion: number): Promise<void> {
-    return this.httpClient.post(this.getResolveIssueUrl(expId), {
+      explorationId: string, explorationVersion: number): Promise<void> {
+    return this.httpClient.post(this.getResolveIssueUrl(explorationId), {
       exp_issue_dict: issueToResolve.toBackendDict(),
-      exp_version: expVersion
+      exp_version: explorationVersion
     }).toPromise().then(() => {
       if (this.cachedIssues !== null) {
         const issueIndex = this.cachedIssues.findIndex(
@@ -83,25 +85,26 @@ export class PlaythroughIssuesBackendApiService {
     });
   }
 
-  private getFetchIssuesUrl(expId: string): string {
+  private getFetchIssuesUrl(explorationId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.FETCH_ISSUES_URL, {
-        exp_id: expId
+        exploration_id: explorationId
       });
   }
 
-  private getFetchPlaythroughUrl(expId: string, playthroughId: string): string {
+  private getFetchPlaythroughUrl(
+      explorationId: string, playthroughId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.FETCH_PLAYTHROUGH_URL, {
-        exp_id: expId,
+        exploration_id: explorationId,
         playthrough_id: playthroughId
       });
   }
 
-  private getResolveIssueUrl(expId: string): string {
+  private getResolveIssueUrl(explorationId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.RESOLVE_ISSUE_URL, {
-        exp_id: expId
+        exploration_id: explorationId
       });
   }
 }
