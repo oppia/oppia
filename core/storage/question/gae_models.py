@@ -316,17 +316,41 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         ) * question_count
 
         if not start_cursor == '':
-            cursor = datastore_query.Cursor(urlsafe=start_cursor)
-            question_skill_link_models, next_cursor, more = cls.query(
-                cls.skill_id.IN(skill_ids)
-                # Order by cls.key is needed alongside cls.last_updated so as to
-                # resolve conflicts, if any.
-                # Reference SO link: https://stackoverflow.com/q/12449197
-            ).order(cls.question_id, cls.key).fetch_page(
-                question_skill_count,
-                start_cursor=cursor
-            )
+            direction = start_cursor[-1]
+            random_id = unicode(start_cursor[-13:-1]) #pylint: disable=unicode-builtin
+            cursor = datastore_query.Cursor(urlsafe=start_cursor[:-13])
+            if direction == '1':
+                questions_list, next_cursor, more = cls.query(
+                    cls.skill_id.IN(skill_ids)
+                ).order(cls.question_id, cls.key).filter(
+                    cls.question_id > random_id
+                ).fetch_page(
+                    question_skill_count,
+                    start_cursor=cursor
+                )
+                if len(questions_list) < question_skill_count:
+                    direction = '0'
+                    question_list_extra, next_cursor, more = cls.query(
+                        cls.skill_id.IN(skill_ids)
+                    ).order(
+                        cls.question_id, cls.key
+                    ).filter(
+                        cls.question_id <= random_id
+                    ).fetch_page(
+                        question_skill_count - len(questions_list)
+                    )
+                    questions_list.extend(question_list_extra)
+            else:
+                questions_list, next_cursor, more = cls.query(
+                    cls.skill_id.IN(skill_ids)
+                ).order(cls.question_id, cls.key).filter(
+                    cls.question_id <= random_id
+                ).fetch_page(
+                    question_skill_count,
+                    start_cursor=cursor
+                )
         else:
+            direction = '1'
             random_id = utils.convert_to_hash(
                 python_utils.UNICODE(
                     utils.get_random_int(base_models.RAND_RANGE)),
@@ -337,20 +361,24 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 cls.question_id > random_id
             ).fetch_page(question_skill_count)
             if len(questions_list) < question_skill_count:
-                # The next cursor should not be updated because
-                # we are moving the start point and not the end point.
-                question_list_extra, cursor, more = cls.query(
+                direction = '0'
+                question_list_extra, next_cursor, more = cls.query(
                     cls.skill_id.IN(skill_ids)
-                ).order(-cls.question_id, cls.key).filter(
+                ).order(
+                    cls.question_id, cls.key
+                ).filter(
                     cls.question_id <= random_id
-                ).fetch_page(question_skill_count)
-                question_list_extra.extend(questions_list)
-                questions_list = question_list_extra
-            question_skill_link_models = questions_list
+                ).fetch_page(
+                    question_skill_count - len(questions_list),
+                )
+                questions_list.extend(question_list_extra)
 
+        question_skill_link_models = questions_list
         next_cursor_str = (
             next_cursor.urlsafe() if (next_cursor and more) else None
         )
+        if next_cursor_str:
+            next_cursor_str = next_cursor_str + python_utils.UNICODE(random_id) + direction # pylint: disable=line-too-long
         return question_skill_link_models, next_cursor_str
 
     @classmethod
