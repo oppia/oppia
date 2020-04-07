@@ -897,7 +897,7 @@ var ExplorationEditorMainTab = function() {
       } else if (interactionId === 'ItemSelectionInput') {
         var answerArray = Array.from(parameterValues[i]);
         for (var i = 0; i < answerArray.length; i++) {
-            itemSelectionAnswerOptions(answerArray[i]).click();
+          itemSelectionAnswerOptions(answerArray[i]).click();
         }
       } else {
         parameterEditor.setValue(parameterValues[i]);
