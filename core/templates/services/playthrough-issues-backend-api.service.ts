@@ -31,85 +31,77 @@ export class PlaythroughIssuesBackendApiService {
   private cachedIssues = null;
 
   constructor(
-    private httpClient: HttpClient,
-    private playthroughIssueObjectFactory: PlaythroughIssueObjectFactory,
-    private urlInterpolationService: UrlInterpolationService) {}
+      private httpClient: HttpClient,
+      private playthroughIssueObjectFactory: PlaythroughIssueObjectFactory,
+      private urlInterpolationService: UrlInterpolationService) {}
 
-  fetchIssues(
-      explorationId: string,
-      explorationVersion: number): Promise<PlaythroughIssue[]> {
+  fetchIssues(expId: string, expVersion: number): Promise<PlaythroughIssue[]> {
     if (this.cachedIssues !== null) {
       return Promise.resolve(this.cachedIssues);
     }
-    return this.httpClient.get(this.getFullIssuesUrl(explorationId), {
-      params: { exp_version: explorationVersion.toString() },
+    return this.httpClient.get(this.getFetchIssuesUrl(expId), {
+      params: { exp_version: expVersion.toString() },
       observe: 'response'
-    }).toPromise().then(
       // TODO(#7165): Change `any` to a type describing the dict.
-      (response: HttpResponse<any[]>) => {
-        let unresolvedIssueBackendDicts = response.body;
-        this.cachedIssues = unresolvedIssueBackendDicts.map(
-          this.playthroughIssueObjectFactory.createFromBackendDict);
-        return this.cachedIssues;
-      });
+    }).toPromise().then(response => {
+      let unresolvedIssueBackendDicts = response.body;
+      return this.cachedIssues = unresolvedIssueBackendDicts.map(
+        this.playthroughIssueObjectFactory.createFromBackendDict);
+    });
   }
 
   fetchPlaythrough(
-      explorationId: string, playthroughId: string): Promise<PlaythroughIssue> {
+      expId: string, playthroughId: string): Promise<PlaythroughIssue> {
     return this.httpClient.get(
-      this.getFullPlaythroughUrl(explorationId, playthroughId), {
+      this.getFetchPlaythroughUrl(expId, playthroughId), {
         observe: 'response'
       }
-    ).toPromise().then(
-      // TODO(#7165): Change `any` to a type describing the dict.
-      (response: HttpResponse<any>) => {
-        let playthroughBackendDict = response.body;
-        return this.playthroughIssueObjectFactory.createFromBackendDict(
-          playthroughBackendDict);
-      });
+    ).toPromise().then(response => {
+      let playthroughBackendDict = response.body;
+      return this.playthroughIssueObjectFactory.createFromBackendDict(
+        playthroughBackendDict);
+    });
   }
 
   resolveIssue(
-      issueToResolve: PlaythroughIssue, explorationId: string,
-      explorationVersion: number): Promise<void> {
-    return this.httpClient.post(this.getFullResolveIssueUrl(explorationId), {
+      issueToResolve: PlaythroughIssue,
+      expId: string, expVersion: number): Promise<void> {
+    return this.httpClient.post(this.getResolveIssueUrl(expId), {
       exp_issue_dict: issueToResolve.toBackendDict(),
-      exp_version: explorationVersion
-    }).toPromise().then(
-      () => {
-        if (this.cachedIssues !== null) {
-          const issueIndex = this.cachedIssues.findIndex(
-            issue => angular.equals(issue, issueToResolve));
-          if (issueIndex !== -1) {
-            this.cachedIssues.splice(issueIndex, 1);
-            return;
-          }
+      exp_version: expVersion
+    }).toPromise().then(() => {
+      if (this.cachedIssues !== null) {
+        const issueIndex = this.cachedIssues.findIndex(
+          issue => angular.equals(issue, issueToResolve));
+        if (issueIndex !== -1) {
+          this.cachedIssues.splice(issueIndex, 1);
+          return;
         }
-        throw Error(
-          'An issue which was not fetched from the backend has been resolved');
-      });
+      }
+      throw Error(
+        'An issue which was not fetched from the backend has been resolved');
+    });
   }
 
-  private getFullIssuesUrl(explorationId: string): string {
+  private getFetchIssuesUrl(expId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.FETCH_ISSUES_URL, {
-        exploration_id: explorationId
+        exp_id: expId
       });
   }
 
-  private getFullPlaythroughUrl(
-      explorationId: string, playthroughId: string): string {
+  private getFetchPlaythroughUrl(expId: string, playthroughId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.FETCH_PLAYTHROUGH_URL, {
-        exploration_id: explorationId,
+        exp_id: expId,
         playthrough_id: playthroughId
       });
   }
 
-  private getFullResolveIssueUrl(explorationId: string): string {
+  private getResolveIssueUrl(expId: string): string {
     return this.urlInterpolationService.interpolateUrl(
       ServicesConstants.RESOLVE_ISSUE_URL, {
-        exploration_id: explorationId
+        exp_id: expId
       });
   }
 }
