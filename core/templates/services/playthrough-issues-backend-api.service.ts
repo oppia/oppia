@@ -58,6 +58,7 @@ export class PlaythroughIssuesBackendApiService {
       this.getFetchPlaythroughUrl(explorationId, playthroughId), {
         observe: 'response'
       }
+      // TODO(#7165): Change `any` to a type describing the dict.
     ).toPromise().then((response: HttpResponse<any>) => {
       let playthroughBackendDict = response.body;
       return this.playthroughIssueObjectFactory.createFromBackendDict(
