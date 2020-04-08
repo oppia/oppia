@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_services
+from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -67,6 +68,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID)
         self.save_new_story(
             self.story_id_3, self.user_id, 'Title 3', 'Description 3', 'Notes',
+            self.TOPIC_ID)
+        self.save_new_story(
+            self.story_id_2, self.user_id, 'Title 2', 'Description 2', 'Notes',
             self.TOPIC_ID)
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
@@ -418,6 +422,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         # Throw error if exploration isn't published.
         self.save_new_default_exploration(
             'exp_id', self.user_id_admin, title='title')
+        self.publish_exploration(self.user_id_admin, 'exp_id')
 
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -431,6 +436,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, 'story_id_new', change_list,
             'Updated story node.')
 
+        rights_manager.unpublish_exploration(self.user_admin, 'exp_id')
         with self.assertRaisesRegexp(
             Exception, 'Exploration with id exp_id isn\'t published.'):
             topic_services.publish_story(
@@ -597,7 +603,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                             'en': {
                                 'filename': 'test.mp3',
                                 'file_size_bytes': 100,
-                                'needs_update': False
+                                'needs_update': False,
+                                'duration_secs': 0.3
                             }
                         }
                     }
@@ -638,7 +645,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                         'en': {
                             'filename': 'test.mp3',
                             'file_size_bytes': 100,
-                            'needs_update': False
+                            'needs_update': False,
+                            'duration_secs': 0.3
                         }
                     }
                 }

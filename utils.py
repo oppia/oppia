@@ -84,8 +84,14 @@ def get_file_contents(filepath, raw_bytes=False, mode='r'):
         *. Either the raw_bytes stream if the flag is set or the
             decoded stream in utf-8 format.
     """
-    with open(filepath, mode) as f:
-        return f.read() if raw_bytes else f.read().decode('utf-8')
+    if raw_bytes:
+        mode = 'rb'
+        encoding = None
+    else:
+        encoding = 'utf-8'
+
+    with python_utils.open_file(filepath, mode, encoding=encoding) as f:
+        return f.read()
 
 
 def get_exploration_components_from_dir(dir_path):

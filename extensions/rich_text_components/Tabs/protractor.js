@@ -17,7 +17,7 @@
  * end-to-end testing with Protractor.js
  */
 
-var forms = require('../../../core/tests/protractor_utils/forms.js');
+var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 
 // The 'tabArray' arg should be an array of dictionaries with keys:
 //   'title': a string
