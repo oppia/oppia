@@ -336,29 +336,29 @@ describe('Core exploration functionality', function() {
     // Delete the options corresponding to answer rules.
     openInteractionCustomizationModal.click();
     explorationEditorMainTab.editInteraction(
-      'MultipleChoiceInput', null, ['delete', 0]);
+      'MultipleChoiceInput', null, 'delete', 0);
     openInteractionCustomizationModal.click();
     explorationEditorMainTab.editInteraction(
-      'MultipleChoiceInput', null, ['delete', 1]);
+      'MultipleChoiceInput', null, 'delete', 1);
     openInteractionCustomizationModal.click();
     explorationEditorMainTab.editInteraction(
-      'MultipleChoiceInput', null, ['delete', 3]);
+      'MultipleChoiceInput', null, 'delete', 3);
 
     // Add 3 more options to make sure that the answer rules still remain
     // invalid even when an index corresponding to the invalid rule is added
     // back.
     openInteractionCustomizationModal.click();
     explorationEditorMainTab.editInteraction(
-      'MultipleChoiceInput', [forms.toRichText('option X ')], ['add']);
+      'MultipleChoiceInput', [forms.toRichText('option X ')], 'add');
     openInteractionCustomizationModal.click();
     explorationEditorMainTab.editInteraction(
-      'MultipleChoiceInput', [forms.toRichText('option Y ')], ['add']);
+      'MultipleChoiceInput', [forms.toRichText('option Y ')], 'add');
     openInteractionCustomizationModal.click();
     explorationEditorMainTab.editInteraction(
-      'MultipleChoiceInput', [forms.toRichText('option Z ')], ['add']);
+      'MultipleChoiceInput', [forms.toRichText('option Z ')], 'add');
     openInteractionCustomizationModal.click();
     explorationEditorMainTab.editInteraction(
-      'MultipleChoiceInput', [forms.toRichText('option new')], ['edit', 1]);
+      'MultipleChoiceInput', [forms.toRichText('option new')], 'edit', 1);
 
     // Validates that the answer rules are invalid if the corresponding option
     // is deleted.
