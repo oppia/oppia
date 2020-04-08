@@ -46,10 +46,9 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'NOT_APPLICABLE'
 )
 
-EXPORT_POLICY = utils.create_enum( # pylint: disable=invalid-name
+EXPORT_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'CONTAINS_USER_DATA',
     'NOT_APPLICABLE',
-    'TO_BE_IMPLEMENTED'
 )
 
 # Types of user id migration policies. The pragma comment is needed because
@@ -1092,6 +1091,11 @@ class BaseSnapshotMetadataModel(BaseModel):
     commit_cmds = ndb.JsonProperty(indexed=False)
 
     @staticmethod
+    def get_export_policy():
+        """Snapshot Metadata is relevant to the user for Takeout."""
+        return EXPORT_POLICY.CONTAINS_USER_DATA
+
+    @staticmethod
     def get_user_id_migration_policy():
         """BaseSnapshotMetadataModel has one field that contains user ID."""
         return USER_ID_MIGRATION_POLICY.ONE_FIELD
@@ -1183,6 +1187,13 @@ class BaseSnapshotContentModel(BaseModel):
 
     # The snapshot content, as a JSON blob.
     content = ndb.JsonProperty(indexed=False)
+
+    @staticmethod
+    def get_export_policy():
+        """The contents of snapshots are not relevant to the user for
+        Takeout.
+        """
+        return EXPORT_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_user_id_migration_policy():
