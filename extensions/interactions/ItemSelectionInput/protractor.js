@@ -21,10 +21,14 @@ var forms = require('../../../core/tests/protractor_utils/forms.js');
 var objects = require('../../objects/protractor.js');
 var waitFor = require('../../../core/tests/protractor_utils/waitFor.js');
 
-// The members of richTextInstructionsArray are functions, one for each option,
-// which will each be passed a 'handler' that they can use to edit the
+// 'elem' is the HTML element containing the input elements that set the rules
+// of the item selection interaction.
+// 'richTextInstructionsArray' is an array of functions, one for each option,
+// each of which will each be passed a 'handler' that they can use to edit the
 // rich-text area of the option, for example by
-//   handler.appendUnderlineText('emphasised');
+//    handler.appendUnderlineText('emphasised');
+// 'maxSelectionAllowed' is the maximum number of selections to be allowed in
+// this item selection interaction.
 var customizeInteraction = function(
     elem, richTextInstructionsArray, maxSelectionAllowed) {
   objects.IntEditor(
@@ -39,8 +43,9 @@ var customizeInteraction = function(
   }
 };
 
-// These members of richTextInstructionsArray each describe how to check one of
-// the options.
+// 'richTextInstructionsArray' is an array of functions, each of which describe
+// how to check the expected details of one of the options (an example member
+// function would be readPlainText).
 var expectInteractionDetailsToMatch = function(
     elem, richTextInstructionsArray) {
   elem.all(by.repeater('choice in $ctrl.choices track by $index'))
@@ -58,7 +63,7 @@ var expectInteractionDetailsToMatch = function(
 var answerObjectType = 'SetOfHtmlString';
 
 // 'elem' is the HTML element containing the form to submit the answer to.
-// 'answer' Set([{String}]) is the text on the multiple-choice item to select.
+// 'answer' is the array of item selection answer options to submit.
 var submitAnswer = function(elem, answer) {
   var answerArray = Array.from(answer);
 
@@ -77,78 +82,57 @@ var submitAnswer = function(elem, answer) {
   submitAnswerButton.click();
 };
 
+var interactionArgumentsArray = [
+  [
+    function(editor) {
+      editor.appendBoldText('answer1');
+    },
+    function(editor) {
+      editor.appendItalicText('answer2');
+    },
+    function(editor) {
+      editor.appendPlainText('answer3');
+    }
+  ], 3];
+
+var interactionDetailsArray = [
+  [
+    function(checker) {
+      checker.readBoldText('answer1');
+    },
+    function(checker) {
+      checker.readItalicText('answer2');
+    },
+    function(checker) {
+      checker.readPlainText('answer3');
+    }
+  ]
+];
+
 var testSuite = [{
-  interactionArguments: [[function(editor) {
-    editor.appendBoldText('answer1');
-  }, function(editor) {
-    editor.appendItalicText('answer2');
-  }, function(editor) {
-    editor.appendItalicText('answer3');
-  }], 3],
+  interactionArguments: interactionArgumentsArray,
   ruleArguments: ['DoesNotContainAtLeastOneOf', ['answer1', 'answer2']],
-  expectedInteractionDetails: [[function(checker) {
-    checker.readBoldText('answer1');
-  }, function(checker) {
-    checker.readItalicText('answer2');
-  }, function(checker) {
-    checker.readItalicText('answer3');
-  }]],
+  expectedInteractionDetails: interactionDetailsArray,
   wrongAnswers: [['answer1', 'answer2']],
   correctAnswers: [['answer3']]
 }, {
-  interactionArguments: [[function(editor) {
-    editor.appendBoldText('answer1');
-  }, function(editor) {
-    editor.appendItalicText('answer2');
-  }, function(editor) {
-    editor.appendItalicText('answer3');
-  }], 3],
+  interactionArguments: interactionArgumentsArray,
   ruleArguments: ['Equals', ['answer1', 'answer2']],
-  expectedInteractionDetails: [[function(checker) {
-    checker.readBoldText('answer1');
-  }, function(checker) {
-    checker.readItalicText('answer2');
-  }, function(checker) {
-    checker.readItalicText('answer3');
-  }]],
+  expectedInteractionDetails: interactionDetailsArray,
   wrongAnswers: [['answer1', 'answer3']],
   correctAnswers: [['answer1', 'answer2']]
 }, {
-  interactionArguments: [[function(editor) {
-    editor.appendBoldText('answer1');
-  }, function(editor) {
-    editor.appendItalicText('answer2');
-  }, function(editor) {
-    editor.appendItalicText('answer3');
-  }], 3],
+  interactionArguments: interactionArgumentsArray,
   ruleArguments: ['IsProperSubsetOf', ['answer1', 'answer2']],
-  expectedInteractionDetails: [[function(checker) {
-    checker.readBoldText('answer1');
-  }, function(checker) {
-    checker.readItalicText('answer2');
-  }, function(checker) {
-    checker.readItalicText('answer3');
-  }]],
-  wrongAnswers: [['answer3']],
+  expectedInteractionDetails: interactionDetailsArray,
+  wrongAnswers: [['answer3'], ['answer1', 'answer2']],
   correctAnswers: [['answer1']]
 }, {
-  interactionArguments: [[function(editor) {
-    editor.appendBoldText('answer1');
-  }, function(editor) {
-    editor.appendItalicText('answer2');
-  }, function(editor) {
-    editor.appendItalicText('answer3');
-  }], 3],
+  interactionArguments: interactionArgumentsArray,
   ruleArguments: ['ContainsAtLeastOneOf', ['answer1', 'answer2']],
-  expectedInteractionDetails: [[function(checker) {
-    checker.readBoldText('answer1');
-  }, function(checker) {
-    checker.readItalicText('answer2');
-  }, function(checker) {
-    checker.readItalicText('answer3');
-  }]],
+  expectedInteractionDetails: interactionDetailsArray,
   wrongAnswers: [['answer3']],
-  correctAnswers: [['answer2']]
+  correctAnswers: [['answer2'], ['answer1', 'answer2']]
 }
 ];
 

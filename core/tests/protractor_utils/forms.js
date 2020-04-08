@@ -260,6 +260,8 @@ var RichTextEditor = function(elem) {
   };
 };
 
+// Used to edit entries of a set of HTML strings, specifically used in the item
+// selection interaction test to customize interaction details
 var SetOfHtmlStringEditor = function(elem) {
   return {
     editEntry: function(index, objectType) {

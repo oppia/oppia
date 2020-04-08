@@ -136,6 +136,8 @@ describe('Interactions', function() {
         explorationEditorMainTab.setInteraction.apply(
           null, [interactionId].concat(test.interactionArguments));
 
+        // Delete any leftover rules that may remain from previous tests of the
+        // same interaction, so they won't interfere with the current test.
         var deleteResponseButton = element(by.css(
           '.protractor-test-delete-response'));
         var confirmDeleteResponseButton = element(by.css(
