@@ -324,7 +324,7 @@ angular.module('oppia').factory('ResponsesService', [
       // example, the rules for multiple choice need to refer to the multiple
       // choice interaction's customization arguments.
       updateAnswerChoices: function(
-          newAnswerChoices, oldToNewAnswerChoicesMapping, callback) {
+          newAnswerChoices, oldToNewListMapping, callback) {
         var oldAnswerChoices = angular.copy(_answerChoices);
         _answerChoices = newAnswerChoices;
 
@@ -335,13 +335,17 @@ angular.module('oppia').factory('ResponsesService', [
           // based on the information about the modification of answer choices
           // from the schema-based-list editor.
           // The information regarding the modifications of answer choices is
-          // present in oldToNewAnswerChoicesMapping.
+          // present in oldToNewListMapping.
 
           if (
-            oldToNewAnswerChoicesMapping !== undefined &&
-               oldToNewAnswerChoicesMapping !== null &&
-               oldToNewAnswerChoicesMapping.hasOwnProperty('deletedIndexes')) {
-            var deletedIndexes = oldToNewAnswerChoicesMapping.deletedIndexes;
+            oldToNewListMapping !== undefined &&
+               oldToNewListMapping !== null &&
+               oldToNewListMapping.hasOwnProperty('deletedIndexes')) {
+            var deletedIndexes = oldToNewListMapping.deletedIndexes;
+            // We need to make copy of _answerGroups because we make decisions
+            // based on the original value of inputs.x since the value of
+            // inputs.x in _answerGroups gets modified over the course of the
+            // algorithm.
             var answerGroupsBeforeUpdating = angular.copy(_answerGroups);
             deletedIndexes.forEach(function(deletedIndex) {
               for (var i = 0; i < answerGroupsBeforeUpdating.length; i++) {

@@ -23,15 +23,15 @@ var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 // The members of richTextInstructionsArray are functions, one for each option,
 // which will each be passed a 'handler' that they can use to edit the
 // rich-text area of the option, for example by
-//   handler.appendUnderlineText('emphasised');
-// The second arguement(optional) editInstructions is used to edit the
-// interaction after its creation. The editInstructions contains two elements,
-// the first is a command('edit', 'delete', 'add') and second element is the
-// index of the object to be edited or deleted. In the case of 'add',
-// the editInstructions has only one element.
+// handler.appendUnderlineText('emphasised');
+// The third and fourth arguments are optional and can be used to edit the
+// interaction after its creation. , The third argument editCommand is a
+// string('edit', 'delete', 'add') and the fourth argument
+// itemIndex is the index of the object to be edited or deleted. In the case of
+// 'add' command, the fourth argument itemIndex is not required.
 var customizeInteraction = function(
-    elem, richTextInstructionsArray, editInstructions) {
-  if (editInstructions === undefined) {
+    elem, richTextInstructionsArray, editCommand, itemIndex) {
+  if (editCommand === undefined) {
     forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
     for (var i = 0; i < richTextInstructionsArray.length; i++) {
       var richTextEditor = forms.ListEditor(elem).editItem(i, 'RichText');
@@ -39,13 +39,13 @@ var customizeInteraction = function(
       richTextInstructionsArray[i](richTextEditor);
     }
   } else {
-    if (editInstructions[0] === 'delete') {
+    if (editCommand === 'delete') {
       if (richTextInstructionsArray === null) {
         elem.all(by.repeater('item in localValue track by $index')).count().
           then(
             function(length) {
-              if (editInstructions[1] < length) {
-                forms.ListEditor(elem).deleteItem(editInstructions[1]);
+              if (itemIndex < length) {
+                forms.ListEditor(elem).deleteItem(itemIndex);
               } else {
                 throw Error('The given index is invalid.');
               }
@@ -53,7 +53,7 @@ var customizeInteraction = function(
       } else {
         throw Error('richTextInstructionsArray should be null.');
       }
-    } else if (editInstructions[0] === 'add') {
+    } else if (editCommand === 'add') {
       if (richTextInstructionsArray !== null &&
             richTextInstructionsArray.length === 1) {
         var richTextEditor = forms.ListEditor(elem).addItem('RichText');
@@ -61,18 +61,19 @@ var customizeInteraction = function(
         richTextInstructionsArray[0](richTextEditor);
       } else {
         throw Error(
-          'richTextInstructionsArray should have only one element.');
+          'richTextInstructionsArray should be non-null and have exactly one' +
+          ' element.');
       }
-    } else if (editInstructions[0] === 'edit') {
+    } else if (editCommand === 'edit') {
       if (
         richTextInstructionsArray !== null &&
           richTextInstructionsArray.length === 1) {
         elem.all(by.repeater('item in localValue track by $index')).count().
           then(
             function(length) {
-              if (editInstructions[1] < length) {
+              if (itemIndex < length) {
                 var richTextEditor = forms.ListEditor(elem).editItem(
-                  editInstructions[1], 'RichText');
+                  itemIndex, 'RichText');
                 richTextEditor.clear();
                 richTextInstructionsArray[0](richTextEditor);
               } else {
@@ -81,7 +82,8 @@ var customizeInteraction = function(
             });
       } else {
         throw Error(
-          'richTextInstructionsArray should have only one element.');
+          'richTextInstructionsArray should be non-null and have exactly one' +
+          ' element.');
       }
     }
   }

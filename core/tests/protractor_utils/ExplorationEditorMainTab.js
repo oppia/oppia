@@ -35,7 +35,7 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-add-response-details'));
   var addResponseHeader = element(
     by.css('.protractor-test-add-response-modal-header'));
-  var getAnswerTabs = element.all(by.css('.protractor-test-answer-tab'));
+  var answerTabs = element.all(by.css('.protractor-test-answer-tab'));
   var multipleChoiceAnswerOptions = function(optionNum) {
     return element(
       by.cssContainingText('.protractor-test-html-select-option', optionNum));
@@ -336,7 +336,7 @@ var ExplorationEditorMainTab = function() {
        */
       expectRuleToBe: function(
           interactionId, ruleName, ruleIndex, feedbackTextArray) {
-        getAnswerTabs.then(
+        answerTabs.then(
           function(answerTabs) {
             var ruleDescription = _getRuleDescription(interactionId, ruleName);
             // Replace selectors with feedbackTextArray's elements.
