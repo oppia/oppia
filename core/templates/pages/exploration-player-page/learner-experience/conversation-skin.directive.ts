@@ -529,9 +529,9 @@ angular.module('oppia').directive('conversationSkin', [
                 var result = '/explore/' +
                     $scope.recommendedExplorationSummaries[0].id;
                 var urlParams = UrlService.getUrlParams();
-                var parentExplorationIds =
-                    $scope.recommendedExplorationSummaries[0]
-                      .parentExplorationIds;
+                var parentExplorationIds = (
+                  $scope.recommendedExplorationSummaries[0]
+                    .parentExplorationIds);
 
                 var collectionIdToAdd = $scope.collectionId;
                 var storyIdToAdd = null;
@@ -542,18 +542,17 @@ angular.module('oppia').directive('conversationSkin', [
                     urlParams.hasOwnProperty('collection_id')) {
                   collectionIdToAdd = urlParams.collection_id;
                 } else if (
-                  UrlService.getPathname().match(
-                    /\/story\/(\w|-){12}/g) &&
+                  UrlService.getPathname().match(/\/story\/(\w|-){12}/g) &&
                     $scope.recommendedExplorationSummaries[0].nextNodeId) {
                   storyIdToAdd = UrlService.getStoryIdFromViewerUrl();
-                  storyNodeIdToAdd =
-                      $scope.recommendedExplorationSummaries[0].nextNodeId;
+                  storyNodeIdToAdd = (
+                    $scope.recommendedExplorationSummaries[0].nextNodeId);
                 } else if (
                   urlParams.hasOwnProperty('story_id') &&
                     urlParams.hasOwnProperty('node_id')) {
                   storyIdToAdd = urlParams.story_id;
-                  storyNodeIdToAdd =
-                      $scope.recommendedExplorationSummaries[0].nextNodeId;
+                  storyNodeIdToAdd = (
+                    $scope.recommendedExplorationSummaries[0].nextNodeId);
                 }
 
                 if (collectionIdToAdd) {
