@@ -70,9 +70,30 @@ describe('Skill backend API service', function() {
       must_be_addressed: true
     };
 
+    var example1 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1'
+      },
+      answer: {
+        html: 'worked example answer 1',
+        content_id: 'worked_example_a_1'
+      }
+    };
+    var example2 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1'
+      },
+      answer: {
+        html: 'worked example answer 1',
+        content_id: 'worked_example_a_1'
+      }
+    };
+
     var skillContentsDict = {
       explanation: 'test explanation',
-      worked_examples: ['test worked example 1', 'test worked example 2']
+      worked_examples: [example1, example2]
     };
 
     var skillDict = {
