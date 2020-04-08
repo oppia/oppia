@@ -26,11 +26,16 @@ angular.module('oppia').directive('warningLoader', [
       bindToController: {},
       template: require('./warning-loader.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['AlertsService',
-        function(AlertsService) {
+      controller: ['AlertsService', '$rootScope',
+        function(AlertsService, $rootScope) {
           var ctrl = this;
           ctrl.$onInit = function() {
             ctrl.AlertsService = AlertsService;
+            $rootScope.$on('loadingMessageChange', function(value) {
+              // eslint-disable-next-line no-console
+              console.log('here');
+              $rootScope.loadingMessage = value;
+            });
           };
         }
       ]
