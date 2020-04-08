@@ -77,8 +77,8 @@ export class PlaythroughIssuesBackendApiService {
     }).toPromise()
       .then(() => {
         if (this.cachedIssues !== null) {
-          const issueIndex =
-            this.cachedIssues.findIndex(i => angular.equals(i, issueToResolve));
+          const issueIndex = this.cachedIssues.findIndex(
+            issue => angular.equals(issue, issueToResolve));
           if (issueIndex !== -1) {
             this.cachedIssues.splice(issueIndex, 1);
             return;
