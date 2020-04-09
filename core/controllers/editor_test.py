@@ -554,7 +554,7 @@ written_translations:
 
         # Check download to JSON.
         exploration.update_objective('Test JSON download')
-        exp_services._save_exploration(  # pylint: disable=protected-access
+        exp_services.update_exploration(
             owner_id, exploration, '', [])
 
         # Download to JSON string using download handler.
