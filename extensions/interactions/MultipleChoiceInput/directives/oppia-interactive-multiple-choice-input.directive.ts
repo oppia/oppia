@@ -87,11 +87,10 @@ angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
               }
             );
             var shuffleChoices = function(choices) {
-              var currentIndex = choices.length - 1;
-              var temporaryValue = null;
-              var randomIndex = null;
-
-              for (; currentIndex >= 0; currentIndex--) {
+              for (var currentIndex = choices.length - 1;
+                currentIndex >= 0; currentIndex--) {
+                var temporaryValue = null;
+                var randomIndex = null;
                 randomIndex = Math.floor(Math.random() * (currentIndex + 1));
                 temporaryValue = choices[currentIndex];
                 choices[currentIndex] = choices[randomIndex];

@@ -129,10 +129,10 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'new_value': {
                     'choices': {
                         'value': [
-                            "<p>1</p>",
-                            "<p>2</p>",
-                            "<p>3</p>",
-                            "<p>4</p>"
+                            '<p>1</p>',
+                            '<p>2</p>',
+                            '<p>3</p>',
+                            '<p>4</p>'
                         ]
                     }
                 }
@@ -157,14 +157,14 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'new_value': {
                     'choices': {
                         'value': [
-                            "<p>1</p>",
-                            "<p>2</p>",
-                            "<p>3</p>",
-                            "<p>4</p>"
+                            '<p>1</p>',
+                            '<p>2</p>',
+                            '<p>3</p>',
+                            '<p>4</p>'
                         ]
                     },
-                    "showChoicesInShuffledOrder": {
-                        "value": True
+                    'showChoicesInShuffledOrder': {
+                        'value': True
                     }
                 }
             }).to_dict())

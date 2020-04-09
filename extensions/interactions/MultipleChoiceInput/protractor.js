@@ -45,8 +45,8 @@ var expectInteractionDetailsToMatch = function(
           '.protractor-test-multiple-choice-option'
         )).getText().then(function(text) {
           choices.push(text);
-          if (choices.length === 4) {
-            for (var j = 0;j < choices.length; j++) {
+          if (choices.length === richTextInstructionsArray.lengt) {
+            for (var j = 0; j < choices.length; j++) {
               expect(richTextInstructionsArray).toContain(choices[j]);
             }
           }

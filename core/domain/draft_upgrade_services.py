@@ -106,14 +106,14 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_ID):
-                if (change.new_value == 'MultipleChoiceInput'):
+                if change.new_value == 'MultipleChoiceInput':
                     is_multiple_choice = True
                     break
         for i, change in enumerate(draft_change_list):
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
-                if (is_multiple_choice):
+                if is_multiple_choice:
                     change.new_value['showChoicesInShuffledOrder'] = {
                         'value': True
                     }
