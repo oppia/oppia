@@ -264,7 +264,7 @@ describe('Core exploration functionality', function() {
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
   var userNumber = 1;
-  var openInteractionCustomizationModal =
+  var interactionCustomizationModal =
      element(by.css('.protractor-test-interaction'));
 
   beforeEach(function() {
@@ -334,29 +334,29 @@ describe('Core exploration functionality', function() {
       'MultipleChoiceInput', 'Equals', 2, ['option F']);
 
     // Delete the options corresponding to answer rules.
-    openInteractionCustomizationModal.click();
+    interactionCustomizationModal.click();
     explorationEditorMainTab.editInteraction(
       'MultipleChoiceInput', null, 'delete', 0);
-    openInteractionCustomizationModal.click();
+    interactionCustomizationModal.click();
     explorationEditorMainTab.editInteraction(
       'MultipleChoiceInput', null, 'delete', 1);
-    openInteractionCustomizationModal.click();
+    interactionCustomizationModal.click();
     explorationEditorMainTab.editInteraction(
       'MultipleChoiceInput', null, 'delete', 3);
 
     // Add 3 more options to make sure that the answer rules still remain
     // invalid even when an index corresponding to the invalid rule is added
     // back.
-    openInteractionCustomizationModal.click();
+    interactionCustomizationModal.click();
     explorationEditorMainTab.editInteraction(
       'MultipleChoiceInput', [forms.toRichText('option X ')], 'add');
-    openInteractionCustomizationModal.click();
+    interactionCustomizationModal.click();
     explorationEditorMainTab.editInteraction(
       'MultipleChoiceInput', [forms.toRichText('option Y ')], 'add');
-    openInteractionCustomizationModal.click();
+    interactionCustomizationModal.click();
     explorationEditorMainTab.editInteraction(
       'MultipleChoiceInput', [forms.toRichText('option Z ')], 'add');
-    openInteractionCustomizationModal.click();
+    interactionCustomizationModal.click();
     explorationEditorMainTab.editInteraction(
       'MultipleChoiceInput', [forms.toRichText('option new')], 'edit', 1);
 
@@ -465,7 +465,7 @@ describe('Core exploration functionality', function() {
     // does not have any customization options. To dismiss this modal, user
     // clicks 'Okay' implying that he/she has got the message.
     explorationEditorMainTab.setInteraction('NumericInput');
-    openInteractionCustomizationModal.click();
+    interactionCustomizationModal.click();
     var okayBtn = element(
       by.css('.protractor-test-close-no-customization-modal'));
     expect(okayBtn.isPresent()).toBe(true);
@@ -477,7 +477,7 @@ describe('Core exploration functionality', function() {
     // button.
     explorationEditorMainTab.deleteInteraction();
     explorationEditorMainTab.setInteraction('Continue');
-    openInteractionCustomizationModal.click();
+    interactionCustomizationModal.click();
     var saveInteractionBtn = element(
       by.css('.protractor-test-save-interaction'));
     expect(saveInteractionBtn.isPresent()).toBe(true);
