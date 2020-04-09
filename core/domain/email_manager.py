@@ -1029,9 +1029,7 @@ def send_query_failure_email(recipient_id, query_id, query_params):
 
 
 def send_user_query_email(
-        sender_id, recipient_ids, email_subject, email_body, email_intent,
-        test_only=False, test_only_sender_email=None,
-        test_only_sender_name=None):
+        sender_id, recipient_ids, email_subject, email_body, email_intent):
     """Sends an email to all the recipients of the query.
 
     Args:
@@ -1040,20 +1038,10 @@ def send_user_query_email(
         email_subject: str. The subject of the email.
         email_body: str. The body of the email.
         email_intent: str. The intent string, i.e. the purpose of the email.
-        test_only: bool. For testing _send_bulk_mail method.
-        test_only_sender_email: str. For testing. The test sender email.
-        test_only_sender_name: str. For testing. The test sender name.
 
     Returns:
         bulk_email_model_id: str. The ID of the bulk email model.
     """
-    # For testing the method _send_bulk_mail.
-    if test_only:
-        _send_bulk_mail(
-            recipient_ids, sender_id, email_intent, email_subject, email_body,
-            test_only_sender_email, test_only_sender_name)
-        return None
-
     bulk_email_model_id = email_models.BulkEmailModel.get_new_id('')
     sender_name = user_services.get_username(sender_id)
     sender_email = user_services.get_email_from_user_id(sender_id)
