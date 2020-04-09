@@ -1076,6 +1076,10 @@ tags: []
             language_code=language_code)
         exploration.states[exploration.init_state_name].update_interaction_id(
             interaction_id)
+
+        if interaction_id == 'EndExploration':
+            exploration.states[exploration.init_state_name].update_interaction_default_outcome(None) # pylint: disable=line-too-long
+
         exploration.objective = objective
 
         # If an end state name is provided, add terminal node with that name.
