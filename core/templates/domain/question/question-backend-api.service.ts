@@ -39,10 +39,8 @@ export class QuestionBackendApiService {
       questionsSortedByDifficulty: boolean,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
-    console.log('goes into function');
     if (!this.validateRequestParameters(
       skillIds, questionCount, errorCallback)) {
-      console.log('return');
       return;
     }
     var questionDataUrl = this.urlInterpolationService.interpolateUrl(
@@ -51,7 +49,6 @@ export class QuestionBackendApiService {
         question_count: questionCount.toString(),
         fetch_by_difficulty: questionsSortedByDifficulty.toString()
       });
-    console.log(questionDataUrl);
     this.http.get(questionDataUrl).toPromise().then((response: any) => {
       var questionDicts = cloneDeep(response.question_dicts);
       if (successCallback) {
@@ -77,7 +74,6 @@ export class QuestionBackendApiService {
         comma_separated_skill_ids: skillIds.join(','),
         cursor: cursor ? cursor : ''
       });
-
     this.http.get(questionsDataUrl).toPromise().then((response: any) => {
       var questionSummaries = cloneDeep(
         response.question_summary_dicts);
@@ -90,7 +86,7 @@ export class QuestionBackendApiService {
       }
     }, (errorResponse) => {
       if (errorCallback) {
-        errorCallback(errorResponse);
+        errorCallback(errorResponse.error);
       }
     });
   }
@@ -118,10 +114,7 @@ export class QuestionBackendApiService {
    * Checks if given input is a list and has all strings
    */
   private isListOfStrings(list): boolean {
-    console.log(list);
-    console.log(typeof list);
-    if (Array.isArray(list)) {
-      console.log('Array');
+    if (!Array.isArray(list)) {
       return false;
     }
     return list.every((obj) => {

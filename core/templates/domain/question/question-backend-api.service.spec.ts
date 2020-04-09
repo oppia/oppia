@@ -100,7 +100,7 @@ describe('Question backend Api service', () => {
     httpTestingController.verify();
   });
 
-  fit('should successfully fetch questions from the backend', fakeAsync(() => {
+  it('should successfully fetch questions from the backend', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
@@ -122,7 +122,7 @@ describe('Question backend Api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  fit('should successfully fetch questions from the backend when' +
+  it('should successfully fetch questions from the backend when' +
       'sortedByDifficulty is false', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
@@ -313,7 +313,7 @@ describe('Question backend Api service', () => {
       questionBackendApiService.fetchQuestionSummaries(
         ['1'], '1').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/questions_list_handler/1?cursor=');
+        '/questions_list_handler/1?cursor=1');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse);
 
