@@ -18,10 +18,10 @@
 
 // TODO(#7165): Replace any with exact type.
 export interface EditableSkillResponseConfig {
-    skill?: any;
-    skills?: any;
-    // eslint-disable-next-line camelcase
-    grouped_skill_summaries?: any;
+  skill?: any;
+  skills?: any;
+  // eslint-disable-next-line camelcase
+  grouped_skill_summaries?: any;
 }
 
 export interface ChangeList {

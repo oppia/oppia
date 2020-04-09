@@ -24,7 +24,7 @@ import { CsrfTokenService } from
 import { SkillBackendApiService } from
   'domain/skill/skill-backend-api.service';
 
-describe('Editable skill backend API service', function() {
+describe('Skill backend API service', function() {
   let skillBackendApiService = null;
   let httpTestingController: HttpTestingController;
   let sampleResponse = null;
@@ -257,7 +257,7 @@ describe('Editable skill backend API service', function() {
     ));
 
   it('should use the rejection handler if fetch multiple skills from the' +
-  +'backend failed',
+    'backend failed',
   fakeAsync( () => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
