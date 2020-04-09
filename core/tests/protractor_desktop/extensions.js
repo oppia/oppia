@@ -165,6 +165,7 @@ describe('Interactions', function() {
         explorationEditorPage.navigateToPreviewTab();
         explorationPlayerPage.expectInteractionToMatch.apply(
           null, [interactionId].concat(test.expectedInteractionDetails));
+
         for (var j = 0; j < test.wrongAnswers.length; j++) {
           explorationPlayerPage.submitAnswer(
             interactionId, test.wrongAnswers[j]);

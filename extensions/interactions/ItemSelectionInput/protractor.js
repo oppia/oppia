@@ -32,7 +32,13 @@ var waitFor = require('../../../core/tests/protractor_utils/waitFor.js');
 var customizeInteraction = function(
     elem, richTextInstructionsArray, maxSelectionAllowed) {
   objects.IntEditor(
-    elem.all(by.tagName('schema-based-int-editor')).last()
+    elem.all(by.repeater(
+      'customizationArgSpec in customizationArgSpecs track by $index'))
+      .filter(function(elem, index) {
+        return elem.getText().then(function(text) {
+          return text === 'Maximum number of selections permitted';
+        });
+      }).first()
   ).setValue(maxSelectionAllowed);
 
   forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
