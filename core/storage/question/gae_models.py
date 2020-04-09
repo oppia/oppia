@@ -70,6 +70,11 @@ class QuestionModel(base_models.VersionedModel):
         """Question should be kept but the creator should be anonymized."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether QuestionModel snapshots references the given user.
@@ -207,6 +212,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         anonymized and are not deleted whe user is deleted.
         """
         return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
@@ -553,6 +563,13 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def get_export_policy():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def _get_instance_id(cls, question_id, question_version):
         """Returns ID of the question commit log entry model.
@@ -601,6 +618,14 @@ class QuestionSummaryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
+    @staticmethod
+    def get_export_policy():
+        """Model data has already been exported as a part of the QuestionModel
+        export_data function, and thus a new export_data function does not
+        need to be defined here.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
         """Check whether any existing QuestionSummaryModel refers to the given
@@ -608,7 +633,7 @@ class QuestionSummaryModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The ID of the user whose data should be
-                checked.
+            checked.
 
         Returns:
             bool. Whether any models refer to the given user_id.

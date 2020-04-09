@@ -147,6 +147,11 @@ class SkillModel(base_models.VersionedModel):
         skill_commit_log_entry.skill_id = self.id
         skill_commit_log_entry.put()
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to skills.
@@ -180,6 +185,13 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             str. The commit id with the skill id and version number.
         """
         return 'skill-%s-%s' % (skill_id, version)
+
+    @staticmethod
+    def get_export_policy():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class SkillSummaryModel(base_models.BaseModel):
@@ -230,6 +242,11 @@ class SkillSummaryModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return False
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_user_id_migration_policy():

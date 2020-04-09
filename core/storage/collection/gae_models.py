@@ -78,6 +78,11 @@ class CollectionModel(base_models.VersionedModel):
         """Collection is deleted only if it is not public."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether CollectionModel snapshots references the given user.
@@ -240,6 +245,11 @@ class CollectionRightsModel(base_models.VersionedModel):
         is not public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @staticmethod
     def transform_dict_to_valid(model_dict):
@@ -453,6 +463,13 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def get_export_policy():
+        """The history of commits is not relevant for the purposes of
+        Takeout.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def _get_instance_id(cls, collection_id, version):
         """This function returns the generated id for the get_commit function
@@ -586,6 +603,14 @@ class CollectionSummaryModel(base_models.BaseModel):
         is not public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """Model data has already been exported as a part of the
+        CollectionRightsModel, and thus does not need an export_data
+        function.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

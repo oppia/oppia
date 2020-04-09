@@ -215,7 +215,7 @@ def main(args=None):
         # Unix.
         chrome_bin = '/usr/bin/chromium-browser'
     elif os.path.isfile('/usr/bin/chromium'):
-        # Arch Linux
+        # Arch Linux.
         chrome_bin = '/usr/bin/chromium'
     elif os.path.isfile(
             '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'):

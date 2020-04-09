@@ -47,8 +47,13 @@ var logout = function() {
 // The user needs to log in immediately before this method is called. Note
 // that this will fail if the user already has a username.
 var _completeSignup = function(username) {
+  // This is required since there is a redirect which can be considered
+  // as a client side navigation and the tests fail since Angular is
+  // not found due to the navigation interfering with protractor's
+  // bootstrapping.
+  browser.waitForAngularEnabled(false);
   browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
-  waitFor.pageToFullyLoad();
+  browser.waitForAngularEnabled(true);
   var usernameInput = element(by.css('.protractor-test-username-input'));
   var agreeToTermsCheckbox = element(
     by.css('.protractor-test-agree-to-terms-checkbox'));

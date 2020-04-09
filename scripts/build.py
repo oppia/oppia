@@ -55,11 +55,11 @@ EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
     'staging_dir': os.path.join('backend_prod_files', 'extensions', ''),
     'out_dir': os.path.join('build', 'extensions', '')
 }
-TEMPLATES_DEV_DIR = os.path.join('templates', 'dev', 'head', '')
+TEMPLATES_DEV_DIR = os.path.join('templates', '')
 TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS = {
-    'dev_dir': os.path.join('core', 'templates', 'dev', 'head', ''),
-    'staging_dir': os.path.join('backend_prod_files', 'templates', 'head', ''),
-    'out_dir': os.path.join('build', 'templates', 'head', '')
+    'dev_dir': os.path.join('core', 'templates', ''),
+    'staging_dir': os.path.join('backend_prod_files', 'templates', ''),
+    'out_dir': os.path.join('build', 'templates', '')
 }
 WEBPACK_DIRNAMES_TO_DIRPATHS = {
     'staging_dir': os.path.join('backend_prod_files', 'webpack_bundles', ''),
@@ -94,8 +94,7 @@ GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc', '.DS_Store')
 
 JS_FILEPATHS_NOT_TO_BUILD = (
     os.path.join(
-        'core', 'templates', 'dev', 'head', 'expressions',
-        'expression-parser.service.js'),
+        'core', 'templates', 'expressions', 'parser.js'),
     os.path.join('extensions', 'ckeditor_plugins', 'pre', 'plugin.js')
 )
 
@@ -112,6 +111,7 @@ FILEPATHS_NOT_TO_RENAME = (
     '*.bundle.js',
     '*.bundle.js.map',
     'webpack_bundles/about-page.mainpage.html',
+    'webpack_bundles/community-dashboard-page.mainpage.html',
     'webpack_bundles/contact-page.mainpage.html',
     'webpack_bundles/donate-page.mainpage.html',
     'webpack_bundles/get-started-page.mainpage.html',
@@ -164,7 +164,7 @@ def generate_app_yaml(deploy_mode=False):
                 file_path,
                 prod_file_prefix + file_path)
     # The version: default line is required to run jobs on a local server (
-    # both in prod & non-prod mode). This line is not required when app.yaml
+    # both in prod & non-prod env). This line is not required when app.yaml
     # is generated during deployment. So, we remove this if the build process
     # is being run from the deploy script.
     if deploy_mode:
@@ -573,7 +573,7 @@ def build_third_party_libs(third_party_directory_path):
 
 def build_using_webpack():
     """Execute webpack build process. This takes all TypeScript files we have in
-    /templates/dev/head and generates JS bundles according the require() imports
+    /templates and generates JS bundles according the require() imports
     and also compiles HTML pages into the /backend_prod_files/webpack_bundles
     folder. The files are later copied into /build/webpack_bundles.
 
@@ -1083,7 +1083,7 @@ def _verify_filepath_hash(relative_filepath, file_hashes):
         KeyError: The filename's hash cannot be found in the hash dict.
     """
     # Final filepath example:
-    # head/pages/base.240933e7564bd72a4dde42ee23260c5f.html.
+    # pages/base.240933e7564bd72a4dde42ee23260c5f.html.
     if not file_hashes:
         raise ValueError('Hash dict is empty')
 
@@ -1260,7 +1260,7 @@ def main(args=None):
     # build process once third party libs are minified.
     if options.minify_third_party_libs_only and not options.prod_env:
         raise Exception(
-            'minify_third_party_libs_only should not be set in non-prod mode.')
+            'minify_third_party_libs_only should not be set in non-prod env.')
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         if not options.minify_third_party_libs_only:

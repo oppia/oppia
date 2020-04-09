@@ -34,9 +34,12 @@ PSUTIL_VERSION = '5.6.7'
 
 CURRENT_PYTHON_BIN = sys.executable
 NODE_VERSION = '10.18.0'
+PYLINT_VERSION = '1.9.4'
+PYCODESTYLE_VERSION = '2.5.0'
+PYLINT_QUOTES_VERSION = '0.1.8'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
-YARN_VERSION = '1.21.1'
+YARN_VERSION = '1.22.0'
 
 COVERAGE_VERSION = '4.5.4'
 
@@ -49,8 +52,13 @@ GOOGLE_APP_ENGINE_HOME = os.path.join(
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0', 'google-cloud-sdk')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
+PYLINT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylint-%s' % PYLINT_VERSION)
+PYCODESTYLE_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'pycodestyle-%s' % PYCODESTYLE_VERSION)
+PYLINT_QUOTES_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % PYLINT_QUOTES_VERSION)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
-FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates', 'dev', 'head')
+FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
@@ -58,6 +66,7 @@ PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
 HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
+TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
 
 
 def is_windows_os():
@@ -232,6 +241,16 @@ def is_current_branch_a_release_branch():
     hotfix_match = bool(
         re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
     return release_match or release_maintenance_match or hotfix_match
+
+
+def is_current_branch_a_test_branch():
+    """Returns whether the current branch is a test branch for deployment.
+
+    Returns:
+        bool. Whether the current branch is a test branch for deployment.
+    """
+    current_branch_name = get_current_branch_name()
+    return bool(re.match(TEST_BRANCH_REGEX, current_branch_name))
 
 
 def verify_current_branch_name(expected_branch_name):

@@ -42,6 +42,7 @@ import python_utils
 # List of all manager classes for one-off batch jobs for which to show controls
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
+    activity_jobs_one_off.AuditContributorsOneOffJob,
     activity_jobs_one_off.IndexAllActivitiesJobManager,
     activity_jobs_one_off.ReplaceAdminIdOneOffJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
@@ -87,7 +88,8 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
     user_jobs_one_off.UserProfilePictureOneOffJob,
-    user_jobs_one_off.UsernameLengthDistributionOneOffJob
+    user_jobs_one_off.UsernameLengthDistributionOneOffJob,
+    exp_jobs_one_off.MathExpressionInputInteractionOneOffJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
