@@ -2422,7 +2422,7 @@ class BulkEmailsTests(test_utils.GenericTestBase):
         email_text_body = 'Dummy email body.\n'
 
         with self.can_send_emails_ctx:
-            email.manager.send_user_query_email(
+            email_manager.send_user_query_email(
                 self.sender_id, self.recipient_ids, email_subject,
                 email_html_body, feconf.BULK_EMAIL_INTENT_MARKETING)
 
