@@ -51,7 +51,6 @@
     "eslint": "^6.7.2",
     "eslint-plugin-angular": "^4.0.1",
     "eslint-plugin-html": "^6.0.0",
-    "fork-ts-checker-webpack-plugin": "^4.1.2",
     "html-dnd": "^1.2.1",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^4.0.3",

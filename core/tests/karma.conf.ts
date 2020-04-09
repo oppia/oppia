@@ -1,5 +1,4 @@
 var argv = require('yargs').argv;
-var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var path = require('path');
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (argv.prodEnv) {
@@ -191,10 +190,7 @@ module.exports = function(config) {
             use: ['style-loader', 'css-loader']
           }
         ]
-      },
-      plugins: [
-        new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })
-      ]
+      }
     }
   });
 };

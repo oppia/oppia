@@ -17,7 +17,6 @@
  */
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
@@ -643,7 +642,6 @@ module.exports = {
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],
     }),
-    new ForkTsCheckerWebpackPlugin(),
     new webpack.LoaderOptionsPlugin({
       options: {
         macros: {
@@ -666,7 +664,7 @@ module.exports = {
         {
           loader: 'ts-loader',
           options: {
-            // fork-ts-checker plugin does the type checking.
+            // Typescript checks do the type checking.
             transpileOnly: true
           }
         }
