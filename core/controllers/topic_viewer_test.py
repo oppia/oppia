@@ -44,6 +44,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 
         self.topic_id = 'topic'
         self.story_id = 'story'
+        self.story_id_1 = 'story_id'
         self.topic_id_1 = 'topic1'
         self.skill_id_1 = skill_services.get_new_skill_id()
         self.skill_id_2 = skill_services.get_new_skill_id()
@@ -62,6 +63,9 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.topic.canonical_story_references.append(
             topic_domain.StoryReference.create_default_story_reference(
                 self.story_id))
+        self.topic.additional_story_references.append(
+            topic_domain.StoryReference.create_default_story_reference(
+                self.story_id_1))
         topic_services.save_new_topic(self.admin_id, self.topic)
         story_services.save_new_story(self.admin_id, self.story)
 
@@ -143,6 +147,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                 },
                 'train_tab_should_be_displayed': False
             }
+            #print(json_response)
             self.assertDictContainsSubset(expected_dict, json_response)
 
     def test_get_with_user_logged_in(self):
@@ -191,6 +196,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                     },
                     'train_tab_should_be_displayed': False
                 }
+                #print(json_response)
                 self.assertDictContainsSubset(expected_dict, json_response)
 
             self.logout()
@@ -220,6 +226,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                 'skill_descriptions': {},
                 'train_tab_should_be_displayed': False
             }
+            #print(json_response)
             self.assertDictContainsSubset(expected_dict, json_response)
 
     def test_get_with_five_or_more_questions(self):
@@ -258,5 +265,6 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                 },
                 'train_tab_should_be_displayed': True
             }
+            #print(json_response)
             self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
