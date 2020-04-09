@@ -125,13 +125,49 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
-                'property_name': 'content',
-                'new_value': 'new value'
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            "<p>1</p>",
+                            "<p>2</p>",
+                            "<p>3</p>",
+                            "<p>4</p>"
+                        ]
+                    }
+                }
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'widget_id',
+                'new_value': 'MultipleChoiceInput'
             })]
         self.assertEqual(
             draft_upgrade_services.DraftUpgradeUtil._convert_states_v32_dict_to_v33_dict(  # pylint: disable=protected-access,line-too-long
+                draft_change_list)[1].to_dict(),
+            draft_change_list[1].to_dict())
+        self.assertEqual(
+            draft_upgrade_services.DraftUpgradeUtil._convert_states_v32_dict_to_v33_dict(  # pylint: disable=protected-access,line-too-long
                 draft_change_list)[0].to_dict(),
-            draft_change_list[0].to_dict())
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'widget_customization_args',
+                'new_value': {
+                    'choices': {
+                        'value': [
+                            "<p>1</p>",
+                            "<p>2</p>",
+                            "<p>3</p>",
+                            "<p>4</p>"
+                        ]
+                    },
+                    "showChoicesInShuffledOrder": {
+                        "value": True
+                    }
+                }
+            }).to_dict())
 
     def test_convert_states_v31_dict_to_v32_dict(self):
         draft_change_list = [
