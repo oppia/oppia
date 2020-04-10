@@ -31,9 +31,12 @@ angular.module('oppia').directive('warningLoader', [
           var ctrl = this;
           ctrl.$onInit = function() {
             ctrl.AlertsService = AlertsService;
-            $rootScope.$on('loadingMessageChange', function(value) {
-              // eslint-disable-next-line no-console
-              console.log('here');
+            /**
+             * TODO(@srijanreddy98), when migrating to angular 8 remove the $on
+             * by subscribing to the loadingMessage subject from
+             * common-events.service.ts
+             */
+            $rootScope.$on('loadingMessageChange', function(event, value) {
               $rootScope.loadingMessage = value;
             });
           };
