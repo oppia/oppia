@@ -38,7 +38,7 @@ export interface ISkillCreationBackend {
 export class SkillCreationBackendApiService {
   constructor(private http: HttpClient) {}
 
-  _createSkill(
+  private _createSkill(
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback:(reason?: any) => void,
       description: string, rubrics: IRubricBackend, explanation: string,

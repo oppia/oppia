@@ -16,45 +16,54 @@
  * @fileoverview Functionality for creating a new skill.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/alerts.service.ts');
-require('domain/skill/skill-creation-backend-api.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('SkillCreationService', [
-  '$rootScope', '$timeout', '$window', 'AlertsService',
-  'SkillCreationBackendApiService', 'UrlInterpolationService',
-  function(
-      $rootScope, $timeout, $window, AlertsService,
-      SkillCreationBackendApiService, UrlInterpolationService) {
-    var CREATE_NEW_SKILL_URL_TEMPLATE = (
-      '/skill_editor/<skill_id>');
-    var skillCreationInProgress = false;
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service.ts';
+import { AlertsService } from 'services/alerts.service';
+import { SkillCreationBackendApiService } from
+  'domain/skill/skill-creation-backend-api.service.ts';
+import { CommonEventsService } from 'services/common-events.service';
 
-    return {
-      createNewSkill: function(
-          description, rubrics, explanation, linkedTopicIds) {
-        if (skillCreationInProgress) {
-          return;
-        }
-        for (var idx in rubrics) {
-          rubrics[idx] = rubrics[idx].toBackendDict();
-        }
-        skillCreationInProgress = true;
-        AlertsService.clearWarnings();
-        $rootScope.loadingMessage = 'Creating skill';
-        SkillCreationBackendApiService.createSkill(
-          description, rubrics, explanation, linkedTopicIds)
-          .then(function(response) {
-            $timeout(function() {
-              $window.location = UrlInterpolationService.interpolateUrl(
-                CREATE_NEW_SKILL_URL_TEMPLATE, {
-                  skill_id: response.skillId
-                });
-            }, 150);
-          }, function() {
-            $rootScope.loadingMessage = '';
+@Injectable({
+  providedIn: 'root'
+})
+export class SkillCreationService {
+  CREATE_NEW_SKILL_URL_TEMPLATE = '/skill_editor/<skill_id>';
+  skillCreationInProgress = false;
+
+  constructor(
+    private alertsService: AlertsService,
+    private commonEventsService: CommonEventsService,
+    private skillCreationBackendApiService: SkillCreationBackendApiService,
+    private urlInterpolationService: UrlInterpolationService,
+  ) { }
+
+  createNewSkill(description, rubrics, explanation, linkedTopicIds) {
+    if (this.skillCreationInProgress) {
+      return;
+    }
+    for (let idx in rubrics) {
+      rubrics[idx] = rubrics[idx].toBackendDict();
+    }
+    this.skillCreationInProgress = true;
+    this.alertsService.clearWarnings();
+    this.commonEventsService.setLoadingMessage('Creating skill');
+    this.skillCreationBackendApiService.createSkill(
+      description, rubrics, explanation, linkedTopicIds
+    ).then((response: any) => {
+      setTimeout(() => {
+        // TODO(srijanreddy98) Replace window with angular router
+        window.location.href = this.urlInterpolationService.interpolateUrl(
+          this.CREATE_NEW_SKILL_URL_TEMPLATE, {
+            skill_id: response.skillId
           });
-      }
-    };
+      }, 150);
+    }, function() {
+      this.commonEventsService.setLoadingMessage('');
+    });
   }
-]);
+}
+angular.module('oppia').factory('SkillCreationService',
+  downgradeInjectable(SkillCreationService));

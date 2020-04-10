@@ -26,11 +26,19 @@ angular.module('oppia').directive('warningLoader', [
       bindToController: {},
       template: require('./warning-loader.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['AlertsService',
-        function(AlertsService) {
+      controller: ['AlertsService', '$rootScope',
+        function(AlertsService, $rootScope) {
           var ctrl = this;
           ctrl.$onInit = function() {
             ctrl.AlertsService = AlertsService;
+            /**
+           * TODO(@srijanreddy98), when migrating to angular 8 remove the $on
+           * by subscribing to the loadingMessage subject from
+           * common-events.service.ts
+           */
+            $rootScope.$on('loadingMessageChange', function(event, value) {
+              $rootScope.loadingMessage = value;
+            });
           };
         }
       ]
