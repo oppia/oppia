@@ -40,7 +40,7 @@ export class MockCsrfTokenService {
       url: '/csrfhandler',
       type: 'GET',
       dataType: 'text',
-      dataFilter: function(data: any) {
+      dataFilter: function(data: string) {
         // Remove the protective XSSI (cross-site scripting inclusion) prefix.
         let actualData = data.substring(5);
         return JSON.parse(actualData);

@@ -72,19 +72,40 @@ describe('Topic viewer backend API service', () => {
 
   it('should successfully fetch an existing topic from the backend',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
       topicViewerBackendApiService.fetchTopicData('0').then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne(
+      const req = httpTestingController.expectOne(
         '/topic_data_handler/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
       expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should use rejection handler if backend request failed',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+      topicViewerBackendApiService.fetchTopicData('0').then(
+        successHandler, failHandler);
+      const req = httpTestingController.expectOne(
+        '/topic_data_handler/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error fetching topic 0.', {
+        status: 500,
+        statusText: 'Error fetching topic 0.'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error fetching topic 0.');
     })
   );
 });

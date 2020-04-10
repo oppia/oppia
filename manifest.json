@@ -508,14 +508,14 @@
           "js": ["dist/angular-ui-tree.js"]
         }
       },
-      "uiUtils": {
-        "version": "0.1.1",
+      "uiValidate": {
+        "version": "1.2.3",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui/ui-utils/archive/v0.1.1.zip",
-        "rootDirPrefix": "ui-utils-",
-        "targetDirPrefix": "ui-utils-",
+        "url": "https://github.com/angular-ui/ui-validate/archive/1.2.3.zip",
+        "rootDirPrefix": "ui-validate-",
+        "targetDirPrefix": "ui-validate-",
         "bundle": {
-          "js": ["ui-utils.js"]
+          "js": ["src/validate.js"]
         }
       },
       "waveSurferJs": {

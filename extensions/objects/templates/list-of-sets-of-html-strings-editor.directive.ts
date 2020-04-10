@@ -39,9 +39,10 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
           return allowedList;
         };
 
-        ctrl.selectedItem = function(choiceListIndex, selectedRankString) {
+        ctrl.selectedItem = function(choiceListIndex) {
           var choiceHtml = ctrl.choices[choiceListIndex].id;
-          var selectedRank = parseInt(selectedRankString) - 1;
+          var selectedRank = parseInt(
+            ctrl.choices[choiceListIndex].selectedRank) - 1;
           errorMessage = '';
           // Reorder the ctrl.choices array to make it consistent with the
           // selected rank.
@@ -93,10 +94,6 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
           return errorMessage;
         };
         ctrl.$onInit = function() {
-          if (!ctrl.selectedRank) {
-            ctrl.selectedRank = '';
-          }
-
           if (!ctrl.maxPrevIndex) {
             ctrl.maxPrevIndex = 1;
           }
@@ -111,11 +108,13 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
             for (var i = 0; i < ctrl.choices.length; i++) {
               ctrl.value[0].push(ctrl.choices[i].id);
               ctrl.initValues.push(1);
+              ctrl.choices[i].selectedRank = '';
             }
           } else {
             for (var i = 0; i < ctrl.choices.length; i++) {
+              var choice = ctrl.choices[i].id;
+              ctrl.choices[i].selectedRank = '';
               for (var j = 0; j < ctrl.value.length; j++) {
-                var choice = ctrl.choices[i].id;
                 if (ctrl.value[j].indexOf(choice) !== -1) {
                   ctrl.initValues.push(j + 1);
                   ctrl.maxPrevIndex = math.max(ctrl.maxPrevIndex, j + 1);
@@ -123,11 +122,6 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
                 }
               }
             }
-          }
-
-          if (ctrl.selectedRank !== '') {
-            ctrl.maxPrevIndex = math.max(parseInt(ctrl.selectedRank),
-              ctrl.maxPrevIndex);
           }
         };
       }]

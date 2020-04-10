@@ -1859,6 +1859,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
             [webapp2.Route('/mock_edit_topic/<topic_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
+        self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.viewer_id, name='Name',
             abbreviated_name='abbrev', thumbnail_filename=None,
@@ -2021,6 +2022,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
                 '/mock_add_story_to_topic/<topic_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
+        self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.viewer_id, name='Name',
             abbreviated_name='abbrev', thumbnail_filename=None,
@@ -2045,6 +2047,15 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock_add_story_to_topic/%s' % self.topic_id)
         self.assertEqual(response['topic_id'], self.topic_id)
+        self.logout()
+
+    def test_topic_manager_cannot_add_story_to_topic_with_invalid_topic_id(
+            self):
+        self.login(self.manager_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_add_story_to_topic/incorrect_id',
+                expected_status_int=404)
         self.logout()
 
     def test_topic_manager_can_add_story_to_topic(self):
@@ -2374,8 +2385,10 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
         @acl_decorators.can_change_topic_publication_status
-        def get(self):
-            self.render_json({})
+        def get(self, topic_id):
+            self.render_json({
+                topic_id: topic_id
+            })
 
     def setUp(self):
         super(ChangeTopicPublicationStatusTests, self).setUp()
@@ -2387,23 +2400,42 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
         self.signup(self.banned_user_email, self.banned_user)
         self.set_banned_users([self.banned_user])
 
+        self.topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name1',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
+
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
-                '/mock_change_publication_status', self.MockHandler)],
+                '/mock_change_publication_status/<topic_id>',
+                self.MockHandler)],
             debug=feconf.DEBUG,
         ))
 
     def test_admin_can_change_topic_publication_status(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_change_publication_status')
+            self.get_json('/mock_change_publication_status/%s' % self.topic_id)
+        self.logout()
+
+    def test_can_not_change_topic_publication_status_with_invalid_topic_id(
+            self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_change_publication_status/invalid_topic_id',
+                expected_status_int=404)
         self.logout()
 
     def test_banned_user_cannot_change_topic_publication_status(self):
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/mock_change_publication_status', expected_status_int=401)
+                '/mock_change_publication_status/%s' % self.topic_id,
+                expected_status_int=401)
             self.assertIn(
                 'does not have enough rights to publish or unpublish the '
                 'topic.', response['error'])
@@ -2412,7 +2444,8 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
     def test_guest_cannot_change_topic_publication_status(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/mock_change_publication_status', expected_status_int=401)
+                '/mock_change_publication_status/%s' % self.topic_id,
+                expected_status_int=401)
         self.assertEqual(
             response['error'],
             'You must be logged in to access this resource.')
@@ -2830,6 +2863,16 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_TOPIC, topic_id))
             self.assertEqual(response['entity_id'], topic_id)
             self.assertEqual(response['entity_type'], 'topic')
+        self.logout()
+
+    def test_cannot_edit_topic_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+        topic_id = 'incorrect_id'
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_edit_entity/%s/%s' % (
+                    feconf.ENTITY_TYPE_TOPIC, topic_id),
+                expected_status_int=404)
         self.logout()
 
     def test_can_edit_skill(self):
