@@ -1078,7 +1078,9 @@ tags: []
             interaction_id)
 
         if interaction_id == 'EndExploration':
-            exploration.states[exploration.init_state_name].update_interaction_default_outcome(None) # pylint: disable=line-too-long
+            exploration.states[
+                exploration.init_state_name].update_interaction_default_outcome(
+                    None)
 
         exploration.objective = objective
 
