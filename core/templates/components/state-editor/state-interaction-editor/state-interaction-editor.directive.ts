@@ -120,7 +120,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
               interactionCustomizationArgs, false);
           };
 
-          var _updateInteractionPreviewAndAnswerChoices = function() {
+          var _updateInteractionPreviewAndAnswerChoices = function(
+              oldToNewListMapping = {}) {
             $scope.interactionId = StateInteractionIdService.savedMemento;
 
             var currentCustomizationArgs =
@@ -131,7 +132,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
             $rootScope.$broadcast(
               'updateAnswerChoices',
               StateEditorService.getAnswerChoices(
-                $scope.interactionId, currentCustomizationArgs));
+                $scope.interactionId, currentCustomizationArgs),
+              oldToNewListMapping);
           };
 
           // If a terminal interaction is selected for a state with no content,
@@ -151,7 +153,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
             $scope.onSaveStateContent(StateContentService.displayed);
           };
 
-          $scope.onCustomizationModalSavePostHook = function() {
+          $scope.onCustomizationModalSavePostHook = function(
+              oldToNewListMapping) {
             var hasInteractionIdChanged = (
               StateInteractionIdService.displayed !==
               StateInteractionIdService.savedMemento);
@@ -182,7 +185,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
             }
 
             $scope.recomputeGraph();
-            _updateInteractionPreviewAndAnswerChoices();
+            _updateInteractionPreviewAndAnswerChoices(
+              oldToNewListMapping);
           };
 
           $scope.openInteractionCustomizerModal = function() {
@@ -229,7 +233,12 @@ angular.module('oppia').directive('stateInteractionEditor', [
                         UrlInterpolationService.getInteractionThumbnailImageUrl(
                           interactionId));
                     };
-
+                    $scope.oldToNewListMappingObject = {
+                      oldToNewListMapping: {
+                        newToOldListPosition: [],
+                        deletedIndexes: []
+                      }
+                    };
                     $scope.INTERACTION_SPECS = INTERACTION_SPECS;
 
                     if (StateEditorService.isInQuestionMode()) {
@@ -369,7 +378,9 @@ angular.module('oppia').directive('stateInteractionEditor', [
                     $scope.save = function() {
                       EditorFirstTimeEventsService
                         .registerFirstSaveInteractionEvent();
-                      $uibModalInstance.close();
+                      $uibModalInstance.close(
+                        $scope.oldToNewListMappingObject.
+                          oldToNewListMapping);
                     };
 
                     $scope.okay = function() {
