@@ -32,10 +32,10 @@ angular.module('oppia').directive('warningLoader', [
           ctrl.$onInit = function() {
             ctrl.AlertsService = AlertsService;
             /**
-           * TODO(@srijanreddy98), when migrating to angular 8 remove the $on
-           * by subscribing to the loadingMessage subject from
-           * common-events.service.ts
-           */
+             * TODO(@srijanreddy98), when migrating to angular 8 remove the $on
+             * by subscribing to the loadingMessage subject from
+             * common-events.service.ts
+             */
             $rootScope.$on('loadingMessageChange', function(event, value) {
               $rootScope.loadingMessage = value;
             });
