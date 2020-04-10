@@ -357,9 +357,7 @@ angular.module('oppia').directive('questionsList', [
                         skillDict.id, skillDict.description));
                   });
                 }
-                ctrl.question =
-                  QuestionObjectFactory.createFromBackendDict(
-                    response.question_dict);
+                ctrl.question = angular.copy(response.questionObject);
                 ctrl.questionId = ctrl.question.getId();
                 ctrl.questionStateData = ctrl.question.getStateData();
                 ctrl.questionIsBeingUpdated = true;
