@@ -92,7 +92,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     def _convert_states_v32_dict_to_v33_dict(cls, draft_change_list):
         """Converts draft change list from state version 32 to 33. State
         version 33 adds showChoicesInShuffledOrder boolean variable to the
-        state, for which there should be no changes to drafts.
+        MultipleChoiceInput interaction.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of
