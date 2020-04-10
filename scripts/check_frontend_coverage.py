@@ -197,6 +197,7 @@ FULLY_COVERED_FILENAMES = [
     'ItemSelectionInput.ts',
     'learner-action-render.service.ts',
     'learner-answer-details-data.service.ts',
+    'learner-answer-details-backend-api.service.ts',
     'learner-dashboard-backend-api.service.ts',
     'learner-dashboard-ids-backend-api.service.ts',
     'learner-dashboard-page.constants.ajs.ts',
