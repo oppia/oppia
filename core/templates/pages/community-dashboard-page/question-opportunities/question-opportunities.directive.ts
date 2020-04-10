@@ -61,15 +61,17 @@ angular.module('oppia').directive('questionOpportunities', [
       'question-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$uibModal', 'QuestionSuggestionService', 'AlertsService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService',
         'ContributionOpportunitiesService', 'MisconceptionObjectFactory',
-        'QuestionObjectFactory', 'QuestionUndoRedoService',
-        'SkillBackendApiService', 'SkillObjectFactory',
+        'QuestionObjectFactory', 'QuestionSuggestionService',
+        'QuestionUndoRedoService', 'SkillBackendApiService',
+        'SkillObjectFactory',
         function(
-            $scope, $uibModal, QuestionSuggestionService, AlertsService,
+            $rootScope, $scope, $uibModal, AlertsService,
             ContributionOpportunitiesService, MisconceptionObjectFactory,
-            QuestionObjectFactory, QuestionUndoRedoService,
-            SkillBackendApiService, SkillObjectFactory) {
+            QuestionObjectFactory, QuestionSuggestionService,
+            QuestionUndoRedoService, SkillBackendApiService,
+            SkillObjectFactory) {
           const ctrl = this;
 
           const updateWithNewOpportunities = function(opportunities, more) {
@@ -90,10 +92,12 @@ angular.module('oppia').directive('questionOpportunities', [
             }
             ctrl.moreOpportunitiesAvailable = more;
             ctrl.opportunitiesAreLoading = false;
+            // TODO(#8521): Remove the use of $rootScope.$apply().
+            $rootScope.$apply();
           };
 
           const onSubmitSuggestionSuccess = function() {
-            AlertsService.addSuccessMessage('Submitted question suggestion.');
+            AlertsService.addSuccessMessage('Submitted question for review.');
           };
 
           ctrl.onLoadMoreOpportunities = function() {
