@@ -888,7 +888,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_story_with_exps_with_recommended_exps(self):
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1',
-            interaction_id='EndExploration')
+            interaction_id='TextInput', end_state_name='End')
         self.publish_exploration(self.user_id_a, 'exp_id_1')
 
         exp_services.update_exploration(
@@ -896,7 +896,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': (
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
-                'state_name': 'Introduction',
+                'state_name': 'End',
                 'new_value': {
                     'recommendedExplorationIds': {
                         'value': ['1', '2']
