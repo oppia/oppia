@@ -54,7 +54,8 @@ angular.module('oppia').directive('schemaBasedEditor', [
         localValue: '=',
         labelForFocusTarget: '&',
         onInputBlur: '=',
-        onInputFocus: '='
+        onInputFocus: '=',
+        oldToNewListMapping: '='
       },
       template: require('./schema-based-editor.directive.html'),
       controllerAs: '$ctrl',

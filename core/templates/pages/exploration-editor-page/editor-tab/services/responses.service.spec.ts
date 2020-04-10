@@ -30,7 +30,7 @@ describe('Responses Service', function() {
   var interactionData = null;
   var interactionDataWithRules = null;
   var LoggerService = null;
-
+  var oldToNewListMapping = null;
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -321,13 +321,17 @@ describe('Responses Service', function() {
     StateInteractionIdService.init('stateName', 'ItemSelectionInput');
 
     // Set _answerChoices variable
+    oldToNewListMapping = {
+      newToOldListPosition: [0, 1, 2],
+      deletedIndexes: []
+    };
     ResponsesService.updateAnswerChoices([{
       val: 'a'
     }, {
       val: 'b'
     }, {
       val: 'c'
-    }], function() {});
+    }], oldToNewListMapping, function() {});
     ResponsesService.changeActiveAnswerGroupIndex(0);
 
     var newAnswerChoices = [{
@@ -338,7 +342,8 @@ describe('Responses Service', function() {
       val: 'a'
     }];
     var callbackSpy = jasmine.createSpy('callback');
-    ResponsesService.updateAnswerChoices(newAnswerChoices, callbackSpy);
+    ResponsesService.updateAnswerChoices(
+      newAnswerChoices, oldToNewListMapping, callbackSpy);
 
     var expectedRules = ['c'];
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
@@ -356,13 +361,17 @@ describe('Responses Service', function() {
     StateEditorService.setInteraction(interactionDataWithRules);
     StateInteractionIdService.init('stateName', 'ItemSelectionInput');
 
+    oldToNewListMapping = {
+      newToOldListPosition: [0, 1, 2],
+      deletedIndexes: []
+    };
     ResponsesService.updateAnswerChoices([{
       val: 'a'
     }, {
       val: 'b'
     }, {
       val: 'c'
-    }], function() {});
+    }], oldToNewListMapping, function() {});
 
     var newAnswerChoices = [{
       val: 'd'
@@ -372,11 +381,76 @@ describe('Responses Service', function() {
       val: 'f'
     }];
     var callbackSpy = jasmine.createSpy('callback');
-    ResponsesService.updateAnswerChoices(newAnswerChoices, callbackSpy);
+    ResponsesService.updateAnswerChoices(
+      newAnswerChoices, oldToNewListMapping, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
     expectedAnswerGroup[0].rules[0].inputs.x = ['f', 'd', 'e'];
     expectedAnswerGroup[0].rules[0].inputs.y = ['d', 'e', 'f'];
+
+    expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
+    expect(ResponsesService.getAnswerGroup(0)).toEqual(
+      expectedAnswerGroup[0]);
+    expect(ResponsesService.getAnswerChoices()).toEqual(newAnswerChoices);
+  });
+
+  it('should update answer choices when savedMemento is MultipleChoiceInput' +
+    ' and choices are deleted', function() {
+    interactionDataWithRules.answerGroups = [{
+      outcome: {
+        dest: '',
+        feedback: {
+          content_id: 'feedback_1',
+          html: ''
+        },
+      },
+      rules: [{
+        type: 'Equals',
+        inputs: {
+          x: 0
+        }
+      }, {
+        type: 'Equals',
+        inputs: {
+          x: 2
+        }
+      }],
+    }];
+    ResponsesService.init(interactionDataWithRules);
+    StateEditorService.setInteraction(interactionDataWithRules);
+    StateInteractionIdService.init('stateName', 'MultipleChoiceInput');
+
+    ResponsesService.updateAnswerChoices([{
+      val: 'a'
+    }, {
+      val: 'b'
+    }, {
+      val: 'c'
+    }, {
+      val: 'd'
+    }, {
+      val: 'e'
+    }], oldToNewListMapping, function() {});
+
+    oldToNewListMapping = {
+      newToOldListPosition: [1, 3, 4],
+      deletedIndexes: [0, 2]
+    };
+    var newAnswerChoices = [{
+      val: 'b'
+    }, {
+      val: 'd'
+    }, {
+      val: 'e'
+    }];
+
+    var callbackSpy = jasmine.createSpy('callback');
+    ResponsesService.updateAnswerChoices(
+      newAnswerChoices, oldToNewListMapping, callbackSpy);
+
+    var expectedAnswerGroup = interactionDataWithRules.answerGroups;
+    expectedAnswerGroup[0].rules[0].inputs.x = Number.MAX_SAFE_INTEGER;
+    expectedAnswerGroup[0].rules[1].inputs.x = Number.MAX_SAFE_INTEGER;
 
     expect(callbackSpy).toHaveBeenCalledWith(expectedAnswerGroup);
     expect(ResponsesService.getAnswerGroup(0)).toEqual(
@@ -396,21 +470,30 @@ describe('Responses Service', function() {
     StateEditorService.setInteraction(interactionDataWithRules);
     StateInteractionIdService.init('stateName', 'DragAndDropSortInput');
 
+    oldToNewListMapping = {
+      newToOldListPosition: [0, 1, 2],
+      deletedIndexes: []
+    };
     ResponsesService.updateAnswerChoices([{
       val: 'a'
     }, {
       val: 'b'
     }, {
       val: 'c'
-    }], function() {});
+    }], oldToNewListMapping, function() {});
 
+    oldToNewListMapping = {
+      newToOldListPosition: [1, 2],
+      deletedIndexes: [0]
+    };
     var newAnswerChoices = [{
       val: 'c'
     }, {
       val: 'b'
     }];
     var callbackSpy = jasmine.createSpy('callback');
-    ResponsesService.updateAnswerChoices(newAnswerChoices, callbackSpy);
+    ResponsesService.updateAnswerChoices(
+      newAnswerChoices, oldToNewListMapping, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
     expectedAnswerGroup[0].rules[0].inputs.x = '';
@@ -432,13 +515,17 @@ describe('Responses Service', function() {
 
     StateInteractionIdService.init('stateName', 'DragAndDropSortInput');
 
+    oldToNewListMapping = {
+      newToOldListPosition: [0, 1, 2],
+      deletedIndexes: []
+    };
     ResponsesService.updateAnswerChoices([{
       val: 'a'
     }, {
       val: 'b'
     }, {
       val: 'c'
-    }], function() {});
+    }], oldToNewListMapping, function() {});
 
     var newAnswerChoices = [{
       val: 'd'
@@ -448,8 +535,13 @@ describe('Responses Service', function() {
       val: 'f'
     }];
     var callbackSpy = jasmine.createSpy('callback');
-    ResponsesService.updateAnswerChoices(newAnswerChoices, callbackSpy);
+    ResponsesService.updateAnswerChoices(
+      newAnswerChoices, oldToNewListMapping, callbackSpy);
 
+    oldToNewListMapping = {
+      newToOldListPosition: [0, 1, 2],
+      deletedIndexes: []
+    };
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
     expectedAnswerGroup[0].rules[0].inputs.x = '';
     expectedAnswerGroup[0].rules[0].inputs.y = '';
@@ -469,13 +561,17 @@ describe('Responses Service', function() {
     StateEditorService.setInteraction(interactionDataWithRules);
     StateInteractionIdService.init('stateName', 'DragAndDropSortInput');
 
+    oldToNewListMapping = {
+      newToOldListPosition: [0, 1, 2],
+      deletedIndexes: []
+    };
     ResponsesService.updateAnswerChoices([{
       val: 'a'
     }, {
       val: 'b'
     }, {
       val: 'c'
-    }], function() {});
+    }], oldToNewListMapping, function() {});
 
     var newAnswerChoices = [{
       val: 'd'
@@ -485,7 +581,8 @@ describe('Responses Service', function() {
       val: 'f'
     }];
     var callbackSpy = jasmine.createSpy('callback');
-    ResponsesService.updateAnswerChoices(newAnswerChoices, callbackSpy);
+    ResponsesService.updateAnswerChoices(
+      newAnswerChoices, oldToNewListMapping, callbackSpy);
 
     var expectedAnswerGroup = interactionDataWithRules.answerGroups;
     expectedAnswerGroup[0].rules[0].inputs.x = [];
@@ -501,13 +598,17 @@ describe('Responses Service', function() {
     StateEditorService.setInteraction(interactionDataWithRules);
     StateInteractionIdService.init('stateName', 'DragAndDropSortInput');
 
+    oldToNewListMapping = {
+      newToOldListPosition: [0, 1, 2],
+      deletedIndexes: []
+    };
     ResponsesService.updateAnswerChoices([{
       val: 'a'
     }, {
       val: 'b'
     }, {
       val: 'c'
-    }], function() {});
+    }], oldToNewListMapping, function() {});
 
     var newAnswerChoices = [{
       val: 'c'
@@ -517,7 +618,8 @@ describe('Responses Service', function() {
       val: 'a'
     }];
     var callbackSpy = jasmine.createSpy('callback');
-    ResponsesService.updateAnswerChoices(newAnswerChoices, callbackSpy);
+    ResponsesService.updateAnswerChoices(
+      newAnswerChoices, oldToNewListMapping, callbackSpy);
 
     expect(callbackSpy).not.toHaveBeenCalled();
     expect(ResponsesService.getAnswerGroup(0)).toEqual(
