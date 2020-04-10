@@ -264,6 +264,8 @@ describe('Core exploration functionality', function() {
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
   var userNumber = 1;
+  var interactionCustomizationModal =
+     element(by.css('.protractor-test-interaction'));
 
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -310,9 +312,73 @@ describe('Core exploration functionality', function() {
     });
     explorationEditorMainTab.setInteraction(
       'MultipleChoiceInput',
-      [forms.toRichText('option A'), forms.toRichText('option B')]);
+      [forms.toRichText('option A'), forms.toRichText('option B'),
+        forms.toRichText('option C'), forms.toRichText('option D'),
+        forms.toRichText('option E'), forms.toRichText('option F')]);
+    explorationEditorMainTab.addResponse('MultipleChoiceInput',
+      function(richTextEditor) {
+        richTextEditor.appendBoldText('correct');
+      }, 'final card', true, 'Equals', 'option A');
+    explorationEditorMainTab.getResponseEditor(0)
+      .addRule('MultipleChoiceInput', 'Equals', 'option C');
+    explorationEditorMainTab.getResponseEditor(0)
+      .addRule('MultipleChoiceInput', 'Equals', 'option F');
+    explorationEditorMainTab.getResponseEditor(0)
+      .expectFeedbackInstructionToBe('correct');
+
+    explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
+      'MultipleChoiceInput', 'Equals', 0, ['option A']);
+    explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
+      'MultipleChoiceInput', 'Equals', 1, ['option C']);
+    explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
+      'MultipleChoiceInput', 'Equals', 2, ['option F']);
+
+    // Delete the options corresponding to answer rules.
+    interactionCustomizationModal.click();
+    explorationEditorMainTab.editInteraction(
+      'MultipleChoiceInput', null, 'delete', 0);
+    interactionCustomizationModal.click();
+    explorationEditorMainTab.editInteraction(
+      'MultipleChoiceInput', null, 'delete', 1);
+    interactionCustomizationModal.click();
+    explorationEditorMainTab.editInteraction(
+      'MultipleChoiceInput', null, 'delete', 3);
+
+    // Add 3 more options to make sure that the answer rules still remain
+    // invalid even when an index corresponding to the invalid rule is added
+    // back.
+    interactionCustomizationModal.click();
+    explorationEditorMainTab.editInteraction(
+      'MultipleChoiceInput', [forms.toRichText('option X ')], 'add');
+    interactionCustomizationModal.click();
+    explorationEditorMainTab.editInteraction(
+      'MultipleChoiceInput', [forms.toRichText('option Y ')], 'add');
+    interactionCustomizationModal.click();
+    explorationEditorMainTab.editInteraction(
+      'MultipleChoiceInput', [forms.toRichText('option Z ')], 'add');
+    interactionCustomizationModal.click();
+    explorationEditorMainTab.editInteraction(
+      'MultipleChoiceInput', [forms.toRichText('option new')], 'edit', 1);
+
+    // Validates that the answer rules are invalid if the corresponding option
+    // is deleted.
+    explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
+      'MultipleChoiceInput', 'Equals', 0, ['[INVALID]']);
+    explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
+      'MultipleChoiceInput', 'Equals', 1, ['[INVALID]']);
+    explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
+      'MultipleChoiceInput', 'Equals', 2, ['[INVALID]']);
+
+    // Delete the the invalid response and add a new response.
+    explorationEditorMainTab.getResponseEditor(0).deleteResponse();
+    explorationEditorMainTab.addResponse('MultipleChoiceInput',
+      function(richTextEditor) {
+        richTextEditor.appendBoldText('correct');
+      }, 'final card', false, 'Equals', 'option X');
+    explorationEditorMainTab.getResponseEditor('default').
+      setFeedback(forms.toRichText('try again'));
     explorationEditorMainTab.getResponseEditor('default').setDestination(
-      'final card', true, null);
+      '(try again)', false, null);
 
     // Setup a terminating state.
     explorationEditorMainTab.moveToState('final card');
@@ -323,8 +389,16 @@ describe('Core exploration functionality', function() {
     explorationPlayerPage.expectExplorationToNotBeOver();
     explorationPlayerPage.expectInteractionToMatch(
       'MultipleChoiceInput',
-      [forms.toRichText('option A'), forms.toRichText('option B')]);
+      [forms.toRichText('option B'), forms.toRichText('option new'),
+        forms.toRichText('option E'), forms.toRichText('option X'),
+        forms.toRichText('option Y'), forms.toRichText('option Z')]);
+    // First, we enter a wrong answer to check the default response.
     explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'option B');
+    explorationPlayerPage.expectLatestFeedbackToMatch(
+      forms.toRichText('try again'));
+    // Enter the correct answer.
+    explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'option X');
+    explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToBeOver();
   });
 
@@ -336,7 +410,7 @@ describe('Core exploration functionality', function() {
         richTextEditor.appendBoldText('correct');
       }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
     explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
-      'NumericInput', 'IsInclusivelyBetween', [-1, 3]);
+      'NumericInput', 'IsInclusivelyBetween', 0, [-1, 3]);
     explorationEditorMainTab.getResponseEditor(0)
       .expectFeedbackInstructionToBe('correct');
     explorationEditorMainTab.getResponseEditor('default').setFeedback(
@@ -391,7 +465,7 @@ describe('Core exploration functionality', function() {
     // does not have any customization options. To dismiss this modal, user
     // clicks 'Okay' implying that he/she has got the message.
     explorationEditorMainTab.setInteraction('NumericInput');
-    element(by.css('.protractor-test-interaction')).click();
+    interactionCustomizationModal.click();
     var okayBtn = element(
       by.css('.protractor-test-close-no-customization-modal'));
     expect(okayBtn.isPresent()).toBe(true);
@@ -403,7 +477,7 @@ describe('Core exploration functionality', function() {
     // button.
     explorationEditorMainTab.deleteInteraction();
     explorationEditorMainTab.setInteraction('Continue');
-    element(by.css('.protractor-test-interaction')).click();
+    interactionCustomizationModal.click();
     var saveInteractionBtn = element(
       by.css('.protractor-test-save-interaction'));
     expect(saveInteractionBtn.isPresent()).toBe(true);
@@ -426,7 +500,7 @@ describe('Core exploration functionality', function() {
       'TextInput', forms.toRichText('You must be happy!'),
       'I am happy', true, 'FuzzyEquals', 'happy');
     explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
-      'TextInput', 'FuzzyEquals', ['"happy"']);
+      'TextInput', 'FuzzyEquals', 0, ['"happy"']);
     explorationEditorMainTab.getResponseEditor(0)
       .expectFeedbackInstructionToBe('You must be happy!');
     // Verify newly created state.
@@ -438,7 +512,7 @@ describe('Core exploration functionality', function() {
       'TextInput', forms.toRichText('You cannot be sad!'),
       '(try again)', false, 'FuzzyEquals', 'sad');
     explorationEditorMainTab.getResponseEditor(1).expectRuleToBe(
-      'TextInput', 'FuzzyEquals', ['"sad"']);
+      'TextInput', 'FuzzyEquals', 0, ['"sad"']);
     explorationEditorPage.saveChanges();
   });
 
