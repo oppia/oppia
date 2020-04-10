@@ -641,7 +641,7 @@ class ImageUploadHandler(EditorHandler):
             invalid_tags = html_validation_service.get_invalid_svg_tags(raw)
             if len(invalid_tags) > 0:
                 raise self.InvalidInputException(
-                    'Unsupported tags found in the SVG: %s', invalid_tags)
+                    'Unsupported tags found in the SVG: %s' % invalid_tags)
         else:
             # Verify that the data is recognized as an image.
             file_format = imghdr.what(None, h=raw)

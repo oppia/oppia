@@ -19,9 +19,10 @@
       <div ng-if="allowedColors" class="float-left">
         <div>Choose background color:</div>
         <div class="oppia-thumbnail-colour-select">
-          <div ng-repeat="color in allowedColors" 
+          <div ng-repeat="color in allowedColors"
                ng-style="{background: color}"
-               ng-click="updateBackgroundColor(color)"></div>
+               ng-click="updateBackgroundColor(color)">
+          </div>
         </div>
       </div>
       <form>
