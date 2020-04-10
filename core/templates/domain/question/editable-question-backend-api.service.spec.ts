@@ -118,7 +118,7 @@ describe('Editable question backend API service', function() {
       questionObject:
         QuestionObjectFactory.createFromBackendDict(
           sampleDataResults.question_dict),
-      associatedSkillObjects: []
+      associated_skill_dicts: []
     };
   }));
 

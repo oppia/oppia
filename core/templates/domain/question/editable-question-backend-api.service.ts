@@ -23,7 +23,6 @@ require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/ParamSpecObjectFactory.ts');
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/SkillObjectFactory.ts');
 require('domain/exploration/WrittenTranslationObjectFactory.ts');
 require('domain/objects/FractionObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -32,12 +31,12 @@ require('domain/question/question-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('EditableQuestionBackendApiService', [
   '$http', '$q', 'QuestionObjectFactory',
-  'SkillObjectFactory', 'UrlInterpolationService',
+  'UrlInterpolationService',
   'EDITABLE_QUESTION_DATA_URL_TEMPLATE', 'QUESTION_CREATION_URL',
   'QUESTION_SKILL_LINK_URL_TEMPLATE',
   function(
       $http, $q, QuestionObjectFactory,
-      SkillObjectFactory, UrlInterpolationService,
+      UrlInterpolationService,
       EDITABLE_QUESTION_DATA_URL_TEMPLATE, QUESTION_CREATION_URL,
       QUESTION_SKILL_LINK_URL_TEMPLATE) {
     var _createQuestion = function(
@@ -70,17 +69,12 @@ angular.module('oppia').factory('EditableQuestionBackendApiService', [
         var questionObject =
           QuestionObjectFactory.createFromBackendDict(
             response.data.question_dict);
-        var associatedSkillObjects =
-          response.data.associated_skill_dicts.map(
-            (skillDict) => {
-              return SkillObjectFactory
-                .createFromBackendDict(skillDict);
-            }
-          );
+        var skillDicts = angular.copy(
+          response.data.associated_skill_dicts);
         if (successCallback) {
           successCallback({
             questionObject: questionObject,
-            associatedSkillObjects: associatedSkillObjects
+            associated_skill_dicts: skillDicts
           });
         }
       }, function(errorResponse) {
