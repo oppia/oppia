@@ -260,6 +260,9 @@ class StoryNode(python_utils.OBJECT):
         Args:
             thumbnail_bg_color: str. The thumbnail background color to
             validate.
+
+        Returns:
+            bool. Whether the thumbnail background color is valid or not.
         """
         return thumbnail_bg_color in constants.NEW_STRUCTURE_TO_COLORS[
             'chapter']
@@ -693,6 +696,9 @@ class Story(python_utils.OBJECT):
         Args:
             thumbnail_bg_color: str. The thumbnail background color to
             validate.
+
+        Returns:
+            bool. Whether the thumbnail background color is valid or not.
         """
         return thumbnail_bg_color in constants.NEW_STRUCTURE_TO_COLORS[
             'story']

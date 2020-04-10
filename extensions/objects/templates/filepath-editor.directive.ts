@@ -794,7 +794,7 @@ angular.module('oppia').directive('filepathEditor', [
                 ctrl.imageContainerStyle = {
                   height: dimensions.height + 'px',
                   width: dimensions.width + 'px'
-                }
+                };
                 $scope.$apply();
               };
               img.src = getTrustedResourceUrlForImageFileName(data.filename);
@@ -821,7 +821,7 @@ angular.module('oppia').directive('filepathEditor', [
               ctrl.imageContainerStyle = {
                 height: dimensions.height + 'px',
                 width: dimensions.width + 'px'
-              }
+              };
             }
           });
           // This variable holds information about the image upload flow.

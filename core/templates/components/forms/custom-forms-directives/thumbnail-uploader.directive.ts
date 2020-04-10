@@ -160,7 +160,7 @@ angular.module('oppia').directive('thumbnailUploader', [
                     dimensions = {
                       height: Math.round(cropper.imageData.height),
                       width: Math.round(cropper.imageData.width)
-                    }
+                    };
                   };
 
                   var isUploadedImageSvg = function() {
@@ -168,8 +168,9 @@ angular.module('oppia').directive('thumbnailUploader', [
                   };
 
                   $scope.updateBackgroundColor = function(color) {
-                    var cropperContainerElement = <HTMLElement>document.querySelector(
-                      '.cropper-container');
+                    var cropperContainerElement = (
+                      <HTMLElement>document.querySelector(
+                        '.cropper-container'));
                     cropperContainerElement.style.background = color;
                     tempBgColor = color;
                   };
@@ -178,7 +179,7 @@ angular.module('oppia').directive('thumbnailUploader', [
                     let thumbnailImage = (
                       <HTMLImageElement>document.getElementById(
                         'croppable-thumbnail'));
-                    let cropperAspectRatio = 16/9;
+                    let cropperAspectRatio = 16 / 9;
                     cropper = new Cropper(thumbnailImage, {
                       minContainerHeight: 405,
                       minContainerWidth: 720,
@@ -189,41 +190,40 @@ angular.module('oppia').directive('thumbnailUploader', [
                     });
                     document.getElementById(
                       'croppable-thumbnail').addEventListener('ready', () => {
-                        let imageAspectRatio = (
-                          cropper.imageData.aspectRatio.toFixed(2));
-                        if (imageAspectRatio != (
-                            cropperAspectRatio.toFixed(2))) {
-                          $scope.uploadedImage = null;
-                          $scope.invalidAspectRatioWarningIsShown = true;
-                        }
-                        cropper.zoomTo($scope.imageSize);
-                        cropper.clear();
-                        cropper.setDragMode('none');
-                        if ($scope.allowedColors) {
-                          $scope.updateBackgroundColor(tempBgColor);
-                        }
-                      });
+                      let imageAspectRatio = (
+                        cropper.imageData.aspectRatio.toFixed(2));
+                      if (imageAspectRatio !== (
+                        cropperAspectRatio.toFixed(2))) {
+                        $scope.uploadedImage = null;
+                        $scope.invalidAspectRatioWarningIsShown = true;
+                      }
+                      cropper.zoomTo($scope.imageSize);
+                      cropper.clear();
+                      cropper.setDragMode('none');
+                      if ($scope.allowedColors) {
+                        $scope.updateBackgroundColor(tempBgColor);
+                      }
+                    });
                     document.getElementById(
                       'croppable-thumbnail').addEventListener('crop', () => {
-                        cropper.clear();
-                      });
+                      cropper.clear();
+                    });
                   };
                   $scope.adjustImageSize = function() {
                     cropper.zoomTo($scope.imageSize);
-                  }
+                  };
                   $scope.onFileChanged = function(file) {
                     uploadedImageMimeType = file.type;
                     if (isUploadedImageSvg()) {
                       $('.oppia-thumbnail-uploader').fadeOut(function() {
                         $scope.invalidImageWarningIsShown = false;
                         $scope.invalidAspectRatioWarningIsShown = false;
-  
                         var reader = new FileReader();
                         reader.onload = function(e) {
                           $scope.$apply(function() {
-                            $scope.uploadedImage = (<FileReader>e.target).result;
+                            $scope.uploadedImage = (
+                              (<FileReader>e.target).result);
                           });
-  
                           initialiseCropper();
                         };
                         reader.readAsDataURL(file);

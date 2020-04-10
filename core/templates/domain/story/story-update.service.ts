@@ -393,21 +393,21 @@ angular.module('oppia').factory('StoryUpdateService', [
        * the change in the undo/redo service.
        */
       setStoryNodeThumbnailBgColor: function(
-        story, nodeId, newThumbnailBgColor) {
-      var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
-      var oldThumbnailBgColor = storyNode.getThumbnailBgColor();
+          story, nodeId, newThumbnailBgColor) {
+        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
+        var oldThumbnailBgColor = storyNode.getThumbnailBgColor();
 
-      _applyStoryNodePropertyChange(
-        story, STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR, nodeId,
-        oldThumbnailBgColor, newThumbnailBgColor,
-        function(changeDict, story) {
-          // Apply.
-          storyNode.setThumbnailBgColor(newThumbnailBgColor);
-        }, function(changeDict, story) {
-          // Undo.
-          storyNode.setThumbnailBgColor(oldThumbnailBgColor);
-        });
-    },
+        _applyStoryNodePropertyChange(
+          story, STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR, nodeId,
+          oldThumbnailBgColor, newThumbnailBgColor,
+          function(changeDict, story) {
+            // Apply.
+            storyNode.setThumbnailBgColor(newThumbnailBgColor);
+          }, function(changeDict, story) {
+            // Undo.
+            storyNode.setThumbnailBgColor(oldThumbnailBgColor);
+          });
+      },
 
       /**
        * Sets the id of the exploration that of a node of the story is linked

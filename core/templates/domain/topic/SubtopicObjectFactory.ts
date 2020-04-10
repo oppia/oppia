@@ -163,7 +163,7 @@ export class SubtopicObjectFactory {
       title: title,
       skill_ids: [],
       thumbnail_filename: null,
-      thumbnail_bg_color: constants.NEW_STRUCTURE_TO_COLORS['subtopic'][0]
+      thumbnail_bg_color: constants.NEW_STRUCTURE_TO_COLORS.subtopic[0]
     }, {});
   }
 }

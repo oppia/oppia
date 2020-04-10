@@ -45,7 +45,7 @@ ROLE_NONE = 'none'
 TOPIC_PROPERTY_NAME = 'name'
 TOPIC_PROPERTY_ABBREVIATED_NAME = 'abbreviated_name'
 TOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
-TOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color';
+TOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color'
 TOPIC_PROPERTY_DESCRIPTION = 'description'
 TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES = 'canonical_story_references'
 TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES = 'additional_story_references'
@@ -53,7 +53,7 @@ TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
 SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
-SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color';
+SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color'
 
 CMD_ADD_SUBTOPIC = 'add_subtopic'
 CMD_DELETE_SUBTOPIC = 'delete_subtopic'
@@ -381,6 +381,9 @@ class Subtopic(python_utils.OBJECT):
         Args:
             thumbnail_bg_color: str. The thumbnail background color to
             validate.
+
+        Returns:
+            bool. Whether the thumbnail background color is valid or not.
         """
         return thumbnail_bg_color in constants.NEW_STRUCTURE_TO_COLORS[
             'subtopic']
@@ -588,6 +591,9 @@ class Topic(python_utils.OBJECT):
         Args:
             thumbnail_bg_color: str. The thumbnail background color to
             validate.
+
+        Returns:
+            bool. Whether the thumbnail background color is valid or not.
         """
         return thumbnail_bg_color in constants.NEW_STRUCTURE_TO_COLORS[
             'topic']

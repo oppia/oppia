@@ -457,26 +457,26 @@ angular.module('oppia').factory('TopicUpdateService', [
        * the change in the undo/redo service.
        */
       setSubtopicThumbnailBgColor: function(
-        topic, subtopicId, thumbnailBgColor) {
-      var subtopic = topic.getSubtopicById(subtopicId);
-      if (!subtopic) {
-        throw Error('Subtopic doesn\'t exist');
-      }
-      var oldThumbnailBgColor = angular.copy(
-        subtopic.getThumbnailBgColor());
-      _applySubtopicPropertyChange(
-        topic, SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR, subtopicId,
-        thumbnailBgColor, oldThumbnailBgColor,
-        function(changeDict, topic) {
-          // Apply
-          var thumbnailBgColor = (
-            _getNewPropertyValueFromChangeDict(changeDict));
-          subtopic.setThumbnailBgColor(thumbnailBgColor);
-        }, function(changeDict, subtopic) {
-          // Undo.
-          subtopic.setThumbnailBgColor(oldThumbnailBgColor);
-        });
-    },
+          topic, subtopicId, thumbnailBgColor) {
+        var subtopic = topic.getSubtopicById(subtopicId);
+        if (!subtopic) {
+          throw Error('Subtopic doesn\'t exist');
+        }
+        var oldThumbnailBgColor = angular.copy(
+          subtopic.getThumbnailBgColor());
+        _applySubtopicPropertyChange(
+          topic, SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR, subtopicId,
+          thumbnailBgColor, oldThumbnailBgColor,
+          function(changeDict, topic) {
+            // Apply
+            var thumbnailBgColor = (
+              _getNewPropertyValueFromChangeDict(changeDict));
+            subtopic.setThumbnailBgColor(thumbnailBgColor);
+          }, function(changeDict, subtopic) {
+            // Undo.
+            subtopic.setThumbnailBgColor(oldThumbnailBgColor);
+          });
+      },
 
       /**
        * Changes the title of a subtopic and records the change in
