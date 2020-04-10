@@ -18,16 +18,18 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import collection_services
-from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import user_services
 from core.platform import models
+import python_utils
 
 current_user_services = models.Registry.import_current_user_services()
 (base_models, story_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.story, models.NAMES.user])
 transaction_services = models.Registry.import_transaction_services()
+
+MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
 
 
 def pre_delete_user(user_id):
@@ -77,9 +79,7 @@ def delete_user(pending_deletion_model):
     """
     _delete_user_models(pending_deletion_model.id)
     _hard_delete_explorations_and_collections(pending_deletion_model)
-    _delete_story_models(pending_deletion_model.id)
-    pending_deletion_model.deletion_complete = True
-    pending_deletion_model.put()
+    _delete_story_models(pending_deletion_model)
 
 
 def verify_user_deleted(pending_deletion_model):
@@ -92,15 +92,25 @@ def verify_user_deleted(pending_deletion_model):
     Returns:
         bool. True if all the models were correctly deleted, False otherwise.
     """
-    if _verify_user_models_deleted(pending_deletion_model.id):
-        pending_deletion_model.delete()
-        email_manager.send_account_deleted_email(
-            pending_deletion_model.id, pending_deletion_model.email)
-        return True
-    else:
-        pending_deletion_model.deletion_complete = False
-        pending_deletion_model.put()
-        return False
+    user_id = pending_deletion_model.id
+    return all((
+        _verify_user_models_deleted(user_id),
+        _verify_story_models_pseudonymized(user_id)
+    ))
+
+
+def _delete_user_models(user_id):
+    """Delete the user models for the user with user_id.
+
+    Args:
+        user_id: str. The id of the user to be deleted.
+    """
+    for model_class in models.Registry.get_storage_model_classes(
+            [models.NAMES.user]):
+        if (model_class.get_deletion_policy() not in
+                [base_models.DELETION_POLICY.KEEP,
+                 base_models.DELETION_POLICY.NOT_APPLICABLE]):
+            model_class.apply_deletion_policy(user_id)
 
 
 def _hard_delete_explorations_and_collections(pending_deletion_model):
@@ -116,46 +126,72 @@ def _hard_delete_explorations_and_collections(pending_deletion_model):
         pending_deletion_model.id, pending_deletion_model.collection_ids)
 
 
-def _delete_user_models(user_id):
-    """Delete the user models for the user with user_id.
+def _generate_activity_to_user_ids_mapping(activity_ids):
+    """Generate mapping from activity IDs to user IDs.
 
     Args:
-        user_id: str. The id of the user to be deleted.
+        activity_ids: list(str). List of activity IDs for which to generate
+        new user IDs.
     """
-    for model_class in models.Registry.get_storage_model_classes(
-            [models.NAMES.user]):
-        if (model_class.get_deletion_policy() !=
-                base_models.DELETION_POLICY.KEEP):
-            model_class.apply_deletion_policy(user_id)
+    return {
+        activity_id: user_models.UserSettingsModel.get_new_id()
+        for activity_id in activity_ids
+    }
 
 
-def _delete_story_models(user_id):
-    """Delete the story models for the user with user_id.
+def _delete_story_models(pending_deletion_model):
+    """Pseudonymize the story models for the user with user_id.
 
     Args:
-        user_id: str. The id of the user to be deleted.
+        pending_deletion_model: PendingDeletionRequestModel.
     """
+    user_id = pending_deletion_model.id
     metadata_models = story_models.StorySnapshotMetadataModel.query(
         story_models.StorySnapshotMetadataModel.committer_id == user_id
     ).fetch()
     story_ids = set([
         model.get_unversioned_instance_id() for model in metadata_models])
-
     commit_log_models = story_models.StoryCommitLogEntryModel.query(
         story_models.StoryCommitLogEntryModel.user_id == user_id
     ).fetch()
     story_ids = story_ids | set(model.story_id for model in commit_log_models)
 
-    anonymous_user_ids = {
-        story_id: user_models.UserSettingsModel.get_new_id()
-        for story_id in story_ids
-    }
+    if not pending_deletion_model.story_mappings:
+        pending_deletion_model.story_mappings = (
+            _generate_activity_to_user_ids_mapping(story_ids))
+        pending_deletion_model.put()
+        print(pending_deletion_model.story_mappings)
 
-    for model in metadata_models:
-        model.committer_id = (
-            anonymous_user_ids[model.get_unversioned_instance_id()])
-    for model in commit_log_models:
-        metadata_models.user_id = anonymous_user_ids[model.story_id]
+    def _replace_models(story_related_models, user_id):
+        metadata_models = [
+            model for model in story_related_models
+            if isinstance(model, story_models.StorySnapshotMetadataModel)]
+        for metadata_model in metadata_models:
+            metadata_model.committer_id = user_id
+        story_models.StorySnapshotMetadataModel.put_multi(
+            metadata_models, update_last_updated_time=False)
+
+        commit_log_models = [
+            model for model in story_related_models
+            if isinstance(model, story_models.StoryCommitLogEntryModel)]
+        for commit_log_model in commit_log_models:
+            commit_log_model.user_id = user_id
+            commit_log_model.username = 'ANONYMOUS'
+        story_models.StoryCommitLogEntryModel.put_multi(
+            commit_log_models, update_last_updated_time=False)
+
+    for story_id, user_id in pending_deletion_model.story_mappings.items():
+        story_related_models = [
+            model for model in metadata_models
+            if model.get_unversioned_instance_id() == story_id]
+        story_related_models += [
+            model for model in commit_log_models if model.story_id == story_id]
+        for i in python_utils.RANGE(
+                0, len(story_related_models), MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+            transaction_services.run_in_transaction(
+                _replace_models,
+                story_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                user_id)
 
 
 def _verify_user_models_deleted(user_id):
@@ -170,8 +206,26 @@ def _verify_user_models_deleted(user_id):
     """
     for model_class in models.Registry.get_storage_model_classes(
             [models.NAMES.user]):
-        if (model_class.get_deletion_policy() !=
-                base_models.DELETION_POLICY.KEEP):
-            if model_class.has_reference_to_user_id(user_id):
-                return False
+        if (model_class.get_deletion_policy() not in
+                [base_models.DELETION_POLICY.KEEP,
+                 base_models.DELETION_POLICY.NOT_APPLICABLE] and
+                model_class.has_reference_to_user_id(user_id)):
+            return False
     return True
+
+
+def _verify_story_models_pseudonymized(user_id):
+    """Verify that the story models for the user with user_id are deleted.
+
+    Args:
+        user_id: str. The id of the user to be deleted.
+
+    Returns:
+        bool. True if all the story models were correctly deleted, False
+        otherwise.
+    """
+    return not any((
+        story_models.StoryModel.has_reference_to_user_id(user_id),
+        story_models.StoryCommitLogEntryModel.has_reference_to_user_id(user_id),
+        story_models.StorySummaryModel.has_reference_to_user_id(user_id),
+    ))

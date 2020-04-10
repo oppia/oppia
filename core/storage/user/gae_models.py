@@ -184,7 +184,7 @@ class UserSettingsModel(base_models.BaseModel):
         }
 
     @classmethod
-    def get_new_id(cls, unused_entity_name):
+    def get_new_id(cls, unused_entity_name=''):
         """Gets a new id for an entity, based on its name.
 
         The returned id is guaranteed to be unique among all instances of this
@@ -206,7 +206,7 @@ class UserSettingsModel(base_models.BaseModel):
                 random.choice(string.ascii_lowercase)
                 for _ in python_utils.RANGE(USER_ID_LENGTH))
             if (not cls.get_by_id(new_id) and
-                    not AnonymizedUserModel.get_by_id(new_id)):
+                    not PseudonymizedUserModel.get_by_id(new_id)):
                 return new_id
 
         raise Exception('New id generator is producing too many collisions.')
@@ -2081,10 +2081,14 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     email = ndb.StringProperty(required=True)
     # Whether the deletion is completed.
     deletion_complete = ndb.BooleanProperty(default=False, indexed=True)
+
     # IDs of all the private explorations created by this user.
     exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of all the private collections created by this user.
     collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+    # Story to pseudonymous user ID mapping.
+    story_mappings = ndb.JsonProperty(default={})
 
     @staticmethod
     def get_deletion_policy():
@@ -2121,20 +2125,20 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
 
-class AnonymizedUserModel(base_models.BaseModel):
+class PseudonymizedUserModel(base_models.BaseModel):
     """Model for storing anonymized user IDs."""
 
     @staticmethod
     def get_deletion_policy():
-        """AnonymizedIdsRegistryModel contains only anonymous ids."""
+        """PseudonymizedUserModel contains only anonymous ids."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_export_policy():
-        """AnonymizedIdsRegistryModel contains only anonymous ids."""
+        """PseudonymizedUserModel contains only anonymous ids."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_user_id_migration_policy():
-        """AnonymizedIdsRegistryModel contains only anonymous ids."""
+        """PseudonymizedUserModel contains only anonymous ids."""
         return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
