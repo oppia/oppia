@@ -3,7 +3,10 @@
     <div class="story-thumbnail">
       <label class="form-heading">Story Thumbnail</label>
       <thumbnail-uploader filename="editableThumbnailFilename"
-                          update-filename="updateStoryThumbnailFilename">
+                          update-filename="updateStoryThumbnailFilename"
+                          bg-color="editableThumbnailBgColor"
+                          update-bg-color="updateStoryThumbnailBgColor"
+                          allowed-colors="allowedColors">
       </thumbnail-uploader>
     </div>
     <div class="story-title">
@@ -126,6 +129,7 @@
           <story-node-editor ng-if="node.getId() === idOfNodeToEdit"
                              node-id="node.getId()"
                              thumbnail-filename="node.getThumbnailFilename()"
+                             thumbnail-bg-color="node.getThumbnailBgColor()"
                              outline="node.getOutline()"
                              exploration-id="node.getExplorationId()"
                              outline-finalized="node.getOutlineStatus()"

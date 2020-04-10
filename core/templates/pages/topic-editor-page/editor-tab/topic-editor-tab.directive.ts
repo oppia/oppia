@@ -60,6 +60,7 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.editableName = $scope.topic.getName();
             $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
             $scope.editableDescription = $scope.topic.getDescription();
+            $scope.allowedColors = ['#C6DCDA'];
 
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
@@ -128,6 +129,14 @@ angular.module('oppia').directive('topicEditorTab', [
             }
             TopicUpdateService.setTopicThumbnailFilename(
               $scope.topic, newThumbnailFilename);
+          };
+
+          $scope.updateTopicThumbnailBgColor = function(newThumbnailBgColor) {
+            if (newThumbnailBgColor === $scope.topic.getThumbnailBgColor()) {
+              return;
+            }
+            TopicUpdateService.setTopicThumbnailBgColor(
+              $scope.topic, newThumbnailBgColor);
           };
 
           $scope.updateTopicDescription = function(newDescription) {

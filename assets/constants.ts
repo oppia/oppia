@@ -46,6 +46,13 @@ export = {
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
+  "NEW_STRUCTURE_TO_COLORS": {
+    "chapter": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"],
+    "topic": ["#C6DCDA"],
+    "subtopic": ["#FFFFFF"],
+    "story": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"]
+  },
+
   // List of supported default categories. For now, each category has a specific
   // color associated with it. Each category also has a thumbnail icon whose
   // filename is '{{CategoryName}}.svg'.

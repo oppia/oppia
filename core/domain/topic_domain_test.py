@@ -40,7 +40,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'Name', 'abbrev')
         self.topic.subtopics = [
-            topic_domain.Subtopic(1, 'Title', ['skill_id_1'], 'image.svg')]
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.NEW_STRUCTURE_TO_COLORS['subtopic'][0])]
         self.topic.next_subtopic_id = 2
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
@@ -58,6 +60,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'name': 'Name',
             'abbreviated_name': 'abbrev',
             'thumbnail_filename': None,
+            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+                'topic'][0],
             'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
             'canonical_story_references': [],
             'additional_story_references': [],
@@ -86,13 +90,15 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_subtopics(self):
         self.topic.subtopics = [topic_domain.Subtopic(
-            1, 'Title', ['skill_id_1'], 'image.svg')]
+            1, 'Title', ['skill_id_1'], 'image.svg',
+            constants.NEW_STRUCTURE_TO_COLORS['subtopic'][0])]
         subtopics = self.topic.get_all_subtopics()
         self.assertEqual(
             subtopics, [{
                 'skill_ids': ['skill_id_1'],
                 'id': 1,
                 'thumbnail_filename': 'image.svg',
+                'thumbnail_bg_color': '#FFFFFF',
                 'title': 'Title'}])
 
     def test_delete_canonical_story(self):
@@ -414,7 +420,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_add_uncategorized_skill_id(self):
         self.topic.subtopics.append(
             topic_domain.Subtopic(
-                'id_2', 'Title2', ['skill_id_2'], 'image.svg'))
+                'id_2', 'Title2', ['skill_id_2'], 'image.svg',
+                constants.NEW_STRUCTURE_TO_COLORS['subtopic'][0]))
         with self.assertRaisesRegexp(
             Exception,
             'The skill id skill_id_1 already exists in subtopic with id 1'):
@@ -556,9 +563,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_move_existing_skill_to_subtopic(self):
         self.topic.subtopics = [
-            topic_domain.Subtopic(1, 'Title', ['skill_id_1'], 'image.svg'),
-            topic_domain.Subtopic(2, 'Another title', ['skill_id_1'],
-                                  'image.svg')]
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.NEW_STRUCTURE_TO_COLORS['subtopic'][0]),
+            topic_domain.Subtopic(
+                2, 'Another title', ['skill_id_1'], 'image.svg',
+                constants.NEW_STRUCTURE_TO_COLORS['subtopic'][0])]
         with self.assertRaisesRegexp(
             Exception,
             'Skill id skill_id_1 is already present in the target subtopic'):

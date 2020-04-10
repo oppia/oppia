@@ -3,7 +3,10 @@
     <label class="form-heading">Topic Thumbnail</label>
     <thumbnail-uploader disabled="!topicRights.canEditTopic()"
                         filename="topic.getThumbnailFilename()"
-                        update-filename="updateTopicThumbnailFilename">
+                        update-filename="updateTopicThumbnailFilename"
+                        bg-color="topic.getThumbnailBgColor()"
+                        update-bg-color="updateTopicThumbnailBgColor"
+                        allowed-colors="allowedColors">
     </thumbnail-uploader>
 
     <div class="topic-name">

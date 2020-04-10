@@ -20,6 +20,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+const constants = require('constants.ts');
+
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
 
@@ -29,13 +31,15 @@ export class Subtopic {
   _skillSummaries: any;
   _skillSummaryObjectFactory: SkillSummaryObjectFactory;
   _thumbnailFilename: string;
+  _thumbnailBgColor: string;
   constructor(
       subtopicId, title, skillIds, skillIdToDescriptionMap,
-      skillSummaryObjectFactory, thumbnailFilename) {
+      skillSummaryObjectFactory, thumbnailFilename, thumbnailBgColor) {
     this._id = subtopicId;
     this._title = title;
     this._skillSummaryObjectFactory = skillSummaryObjectFactory;
     this._thumbnailFilename = thumbnailFilename;
+    this._thumbnailBgColor = thumbnailBgColor;
     this._skillSummaries = skillIds.map(
       (skillId) => {
         return this._skillSummaryObjectFactory.create(
@@ -129,6 +133,14 @@ export class Subtopic {
   getThumbnailFilename(): string {
     return this._thumbnailFilename;
   }
+
+  setThumbnailBgColor(thumbnailBgColor: string): void {
+    this._thumbnailBgColor = thumbnailBgColor;
+  }
+
+  getThumbnailBgColor(): string {
+    return this._thumbnailBgColor;
+  }
 }
 
 @Injectable({
@@ -141,7 +153,8 @@ export class SubtopicObjectFactory {
     return new Subtopic(
       subtopicBackendDict.id, subtopicBackendDict.title,
       subtopicBackendDict.skill_ids, skillIdToDescriptionMap,
-      this.skillSummaryObjectFactory, subtopicBackendDict.thumbnail_filename);
+      this.skillSummaryObjectFactory, subtopicBackendDict.thumbnail_filename,
+      subtopicBackendDict.thumbnail_bg_color);
   }
 
   createFromTitle(subtopicId, title) {
@@ -149,7 +162,8 @@ export class SubtopicObjectFactory {
       id: subtopicId,
       title: title,
       skill_ids: [],
-      thumbnail_filename: null
+      thumbnail_filename: null,
+      thumbnail_bg_color: constants.NEW_STRUCTURE_TO_COLORS['subtopic'][0]
     }, {});
   }
 }

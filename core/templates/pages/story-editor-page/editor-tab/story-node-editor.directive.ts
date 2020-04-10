@@ -37,6 +37,7 @@ angular.module('oppia').directive('storyNodeEditor', [
         getOutline: '&outline',
         getExplorationId: '&explorationId',
         getThumbnailFilename: '&thumbnailFilename',
+        getThumbnailBgColor: '&thumbnailBgColor',
         isOutlineFinalized: '&outlineFinalized',
         getDestinationNodeIds: '&destinationNodeIds',
         getPrerequisiteSkillIds: '&prerequisiteSkillIds',
@@ -91,6 +92,8 @@ angular.module('oppia').directive('storyNodeEditor', [
                 $scope.storyNodeIds);
             _recalculateAvailableNodes();
             $scope.skillIdToSummaryMap = {};
+            $scope.allowedColors = [
+              '#F8BF74', '#D68F78', '#8EBBB6', '#B3D8F1'];
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
             for (var idx in skillSummaries) {
               $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
@@ -99,6 +102,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
             $scope.editableTitle = $scope.currentTitle;
             $scope.editableThumbnailFilename = $scope.getThumbnailFilename();
+            $scope.editableThumbnailBgColor = $scope.getThumbnailBgColor();
             $scope.oldOutline = $scope.getOutline();
             $scope.editableOutline = $scope.getOutline();
             $scope.explorationId = $scope.getExplorationId();
@@ -139,6 +143,15 @@ angular.module('oppia').directive('storyNodeEditor', [
             StoryUpdateService.setStoryNodeThumbnailFilename(
               $scope.story, $scope.getId(), newThumbnailFilename);
             $scope.editableThumbnailFilename = newThumbnailFilename;
+          };
+
+          $scope.updateThumbnailBgColor = function(newThumbnailBgColor) {
+            if (newThumbnailBgColor === $scope.editableThumbnailBgColor) {
+              return;
+            }
+            StoryUpdateService.setStoryNodeThumbnailBgColor(
+              $scope.story, $scope.getId(), newThumbnailBgColor);
+            $scope.editableThumbnailBgColor = newThumbnailBgColor;
           };
 
           $scope.viewNodeEditor = function(nodeId) {

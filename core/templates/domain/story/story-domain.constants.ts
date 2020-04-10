@@ -40,6 +40,7 @@ export class StoryDomainConstants {
 
   public static STORY_PROPERTY_TITLE = 'title';
   public static STORY_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename';
+  public static STORY_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color';
   public static STORY_PROPERTY_DESCRIPTION = 'description';
   public static STORY_PROPERTY_NOTES = 'notes';
   public static STORY_PROPERTY_LANGUAGE_CODE = 'language_code';
@@ -48,6 +49,7 @@ export class StoryDomainConstants {
 
   public static STORY_NODE_PROPERTY_TITLE = 'title';
   public static STORY_NODE_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename';
+  public static STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color';
   public static STORY_NODE_PROPERTY_OUTLINE = 'outline';
   public static STORY_NODE_PROPERTY_EXPLORATION_ID = 'exploration_id';
   public static

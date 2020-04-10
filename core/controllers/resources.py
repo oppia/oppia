@@ -89,7 +89,7 @@ class AssetDevHandler(base.BaseHandler):
 
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
-            if asset_type == 'thumbnail':
+            if file_format == 'svg':
                 self.response.headers[
                     b'Content-Type'] = python_utils.convert_to_bytes(
                         'image/svg+xml')

@@ -396,7 +396,8 @@ class TestBase(unittest.TestCase):
             'id': 'node_1',
             'title': 'Chapter 1',
             'prerequisite_skill_ids': [],
-            'thumbnail_filename': None}],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None}],
         'initial_node_id': 'node_1',
         'next_node_id': 'node_2'
     }
@@ -1449,9 +1450,11 @@ tags: []
 
     def save_new_topic(
             self, topic_id, owner_id, name='topic', abbreviated_name='topic',
-            thumbnail_filename='topic.png', description='description',
-            canonical_story_ids=None, additional_story_ids=None,
-            uncategorized_skill_ids=None, subtopics=None, next_subtopic_id=0,
+            thumbnail_filename='topic.svg',
+            thumbnail_bg_color=constants.NEW_STRUCTURE_TO_COLORS['topic'][0],
+            description='description', canonical_story_ids=None,
+            additional_story_ids=None, uncategorized_skill_ids=None,
+            subtopics=None, next_subtopic_id=0,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Topic and saves it.
 
@@ -1461,6 +1464,8 @@ tags: []
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated name of the topic.
             thumbnail_filename: str|None. The thumbnail filename of the topic.
+            thumbnail_bg_color: str|None. The thumbnail background color of the
+                topic.
             description: str. The desscription of the topic.
             canonical_story_ids: list(str). The list of ids of canonical stories
                 that are part of the topic.
@@ -1488,7 +1493,8 @@ tags: []
         uncategorized_skill_ids = (uncategorized_skill_ids or [])
         subtopics = (subtopics or [])
         topic = topic_domain.Topic(
-            topic_id, name, abbreviated_name, thumbnail_filename,
+            topic_id, name, abbreviated_name,
+            thumbnail_filename, thumbnail_bg_color,
             description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,

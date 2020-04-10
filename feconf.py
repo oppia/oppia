@@ -990,3 +990,30 @@ RTE_CONTENT_SPEC = {
 AVAILABLE_LANDING_PAGES = {
     'maths': ['fractions', 'negative-numbers', 'ratios']
 }
+
+# Valid SVG tags.
+ALLOWED_SVG_TAGS = set([
+    'circle',
+    'clipPath',
+    'defs',
+    'desc',
+    'ellipse',
+    'g',
+    'line',
+    'linearGradient',
+    'marker',
+    'mask',
+    'metadata',
+    'path',
+    'pattern',
+    'polygon',
+    'polyline',
+    'rect',
+    'solidColor',
+    'stop',
+    'svg',
+    'switch',
+    'symbol',
+    'title',
+    'use',
+    'view'])

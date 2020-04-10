@@ -64,6 +64,8 @@ class StoryModel(base_models.VersionedModel):
     title = ndb.StringProperty(required=True, indexed=True)
     # The thumbnail filename of the story.
     thumbnail_filename = ndb.StringProperty(indexed=True)
+    # The thumbnail background color of the story.
+    thumbnail_bg_color = ndb.StringProperty(indexed=True)
     # A high-level description of the story.
     description = ndb.StringProperty(indexed=False)
     # A set of notes, that describe the characters, main storyline, and setting.

@@ -33,10 +33,12 @@ export class Story {
   _version: number;
   _correspondingTopicId: string;
   _thumbnailFilename: string;
+  _thumbnailBgColor: string;
   constructor(
       id: string, title: string, description: string, notes: string,
       storyContents: StoryContents, languageCode: string, version: number,
-      correspondingTopicId: string, thumbnailFilename: string) {
+      correspondingTopicId: string, thumbnailBgColor: string,
+      thumbnailFilename: string) {
     this._id = id;
     this._title = title;
     this._description = description;
@@ -45,6 +47,7 @@ export class Story {
     this._languageCode = languageCode;
     this._version = version;
     this._correspondingTopicId = correspondingTopicId;
+    this._thumbnailBgColor = thumbnailBgColor;
     this._thumbnailFilename = thumbnailFilename;
   }
 
@@ -104,6 +107,14 @@ export class Story {
     this._thumbnailFilename = thumbnailFilename;
   }
 
+  getThumbnailBgColor(): string {
+    return this._thumbnailBgColor;
+  }
+
+  setThumbnailBgColor(thumbnailBgColor: string): void {
+    this._thumbnailBgColor = thumbnailBgColor;
+  }
+
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as
   // 'any' because the return type is a list with varying element types.
   validate(): any {
@@ -136,6 +147,7 @@ export class Story {
     this._storyContents = otherStory.getStoryContents();
     this._correspondingTopicId = otherStory.getCorrespondingTopicId();
     this._thumbnailFilename = otherStory.getThumbnailFilename();
+    this._thumbnailBgColor = otherStory.getThumbnailBgColor();
   }
 }
 
@@ -152,6 +164,7 @@ export class StoryObjectFactory {
         storyBackendDict.story_contents),
       storyBackendDict.language_code,
       storyBackendDict.version, storyBackendDict.corresponding_topic_id,
+      storyBackendDict.thumbnail_bg_color,
       storyBackendDict.thumbnail_filename
     );
   }
@@ -161,7 +174,7 @@ export class StoryObjectFactory {
   createInterstitialStory() {
     return new Story(
       null, 'Story title loading', 'Story description loading',
-      'Story notes loading', null, 'en', 1, null, null);
+      'Story notes loading', null, 'en', 1, null, null, null);
   }
 }
 

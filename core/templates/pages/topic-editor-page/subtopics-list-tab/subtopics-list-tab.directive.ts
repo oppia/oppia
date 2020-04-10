@@ -59,6 +59,7 @@ angular.module('oppia').directive('subtopicsListTab', [
           $scope.editSubtopic = function(subtopic) {
             var editableTitle = subtopic.getTitle();
             var editableThumbnailFilename = subtopic.getThumbnailFilename();
+            var editableThumbnailBgColor = subtopic.getThumbnailBgColor();
             TopicEditorStateService.loadSubtopicPage(
               $scope.topic.getId(), subtopic.getId());
             var subtopicTitles = $scope.subtopicTitles;
@@ -74,8 +75,10 @@ angular.module('oppia').directive('subtopicsListTab', [
                   $scope.subtopicTitles = subtopicTitles;
                   $scope.editableTitle = editableTitle;
                   $scope.editableThumbnailFilename = editableThumbnailFilename;
-                  $scope.subtopicPage =
-                    TopicEditorStateService.getSubtopicPage();
+                  $scope.editableThumbnailBgColor = editableThumbnailBgColor;
+                  $scope.subtopicPage = (
+                    TopicEditorStateService.getSubtopicPage());
+                  $scope.allowedColors = ['#FFFFFF'];
                   var pageContents = $scope.subtopicPage.getPageContents();
                   if (pageContents) {
                     $scope.htmlData = pageContents.getHtml();
@@ -103,6 +106,15 @@ angular.module('oppia').directive('subtopicsListTab', [
                     $scope.editableThumbnailFilename = newThumbnailFilename;
                   };
 
+                  $scope.updateSubtopicThumbnailBgColor = function(
+                      newThumbnailBgColor) {
+                    var oldThumbnailBgColor = subtopic.getThumbnailBgColor();
+                    if (newThumbnailBgColor === oldThumbnailBgColor) {
+                      return;
+                    }
+                    $scope.editableThumbnailBgColor = newThumbnailBgColor;
+                  };
+
                   $scope.updateSubtopicTitle = function(title) {
                     if (title === subtopic.getTitle()) {
                       return;
@@ -128,7 +140,8 @@ angular.module('oppia').directive('subtopicsListTab', [
                     $uibModalInstance.close({
                       newTitle: $scope.editableTitle,
                       newHtmlData: $scope.htmlData,
-                      newThumbnailFilename: $scope.editableThumbnailFilename
+                      newThumbnailFilename: $scope.editableThumbnailFilename,
+                      newThumbnailBgColor: $scope.editableThumbnailBgColor
                     });
                   };
 

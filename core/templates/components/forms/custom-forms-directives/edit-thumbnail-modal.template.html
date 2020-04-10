@@ -9,10 +9,34 @@
       </image-uploader>
     </div>
 
-    <div class="oppia-form-error" ng-if="invalidImageWarningIsShown" style="margin-top: 15px;" translate="I18N_PREFERENCES_PROFILE_PICTURE_ERROR"></div>
+    <div class="oppia-form-error" ng-if="invalidImageWarningIsShown" style="margin-top: 15px;">
+      Please upload a valid SVG image.
+    </div>
+    <div class="oppia-form-error" ng-if="invalidAspectRatioWarningIsShown" style="margin-top: 15px;">
+      Invalid aspect ratio. Please upload an SVG image that is of 16:9 width-height aspect ratio.
+    </div>
     <div ng-show="uploadedImage">
-      <span translate="I18N_PREFERENCES_PROFILE_PICTURE_DRAG"></span>
-      <div class="oppia-thumbnail-crop-area" ng-show="uploadedImage">
+      <div ng-if="allowedColors" class="float-left">
+        <div>Choose background color:</div>
+        <div class="oppia-thumbnail-colour-select">
+          <div ng-repeat="color in allowedColors" 
+               ng-style="{background: color}"
+               ng-click="updateBackgroundColor(color)"></div>
+        </div>
+      </div>
+      <form>
+        <div class="form-group col-md-3 float-right">
+          Resize preview: <[imageSize * 100 + '%']>
+          <input type="range"
+                 min="0.2"
+                 max="1"
+                 step="0.1"
+                 class="form-control-range"
+                 ng-model="imageSize"
+                 ng-change="adjustImageSize()">
+        </div>
+      </form>
+      <div class="oppia-thumbnail-crop-area float-left" ng-show="uploadedImage">
         <button class="btn btn-secondary oppia-thumbnail-reset-button" ng-click="reset()">
           <i class="material-icons oppia-vcenter">&#xE14C;</i>
         </button>
@@ -33,7 +57,6 @@
 <style>
   .oppia-thumbnail-crop-area {
     background: #E4E4E4;
-    margin-top: 20px;
     max-width: 100%;
     position: relative;
     width: 720px;
@@ -48,4 +71,22 @@
     right: -50px;
     top: 40px;
   }
+  .oppia-thumbnail-colour-select {
+    display: grid;
+    grid-template-columns: 25px 25px 25px 25px;
+    grid-template-rows: 20px;
+    grid-gap: 5px;
+  }
+
+  .oppia-thumbnail-colour-select > * {
+    border: 1px solid;
+    border-radius: 10%
+  }
+
+  .oppia-thumbnail-colour-select > *:hover,
+  .oppia-thumbnail-colour-select > *:focus {
+    border: 2px solid;
+    cursor: pointer;
+  }
+
 </style>

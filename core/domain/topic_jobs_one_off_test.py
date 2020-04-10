@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import logging
 
+from constants import constants
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_jobs_one_off

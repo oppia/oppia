@@ -20,6 +20,7 @@
 require('components/forms/custom-forms-directives/image-uploader.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
+require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('services/alerts.service.ts');
 require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
@@ -31,9 +32,11 @@ var gifshot = require('gifshot');
 
 angular.module('oppia').directive('filepathEditor', [
   '$sce', 'AlertsService', 'AssetsBackendApiService', 'ContextService',
-  'CsrfTokenService', 'ImageUploadHelperService', 'UrlInterpolationService',
+  'CsrfTokenService', 'ImagePreloaderService', 'ImageUploadHelperService',
+  'UrlInterpolationService',
   function($sce, AlertsService, AssetsBackendApiService, ContextService,
-      CsrfTokenService, ImageUploadHelperService, UrlInterpolationService) {
+      CsrfTokenService, ImagePreloaderService, ImageUploadHelperService,
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -84,6 +87,7 @@ angular.module('oppia').directive('filepathEditor', [
         CROP_CURSORS[MOUSE_BOTTOM_LEFT] = 'nesw-resize';
         CROP_CURSORS[MOUSE_LEFT] = 'ew-resize';
         CROP_CURSORS[MOUSE_INSIDE] = 'move';
+        ctrl.imageContainerStyle = {};
 
         /** Internal functions (not visible in the view) */
 
@@ -351,7 +355,8 @@ angular.module('oppia').directive('filepathEditor', [
         ctrl.resetFilePathEditor = function() {
           ctrl.data = {
             mode: MODE_EMPTY,
-            metadata: {}
+            metadata: {},
+            crop: true
           };
           ctrl.imageResizeRatio = 1;
         };
@@ -524,6 +529,12 @@ angular.module('oppia').directive('filepathEditor', [
                 document.body.style.cursor = 'default';
               });
             });
+          } else if (mimeType === 'data:image/svg+xml') {
+            var imageData = ctrl.data.metadata.uploadedImageData;
+            newImageFile = (
+              ImageUploadHelperService.convertImageDataToImageFile(
+                ctrl.data.metadata.uploadedImageData));
+            ctrl.updateDimensions(newImageFile, imageData, width, height);
           } else {
             // Generate new image data and file.
             var newImageData = getCroppedImageData(
@@ -572,6 +583,10 @@ angular.module('oppia').directive('filepathEditor', [
               'that it will fit in the card.';
           }
           return null;
+        };
+
+        ctrl.isCropAllowed = function() {
+          return ctrl.data.crop;
         };
 
         ctrl.isNoImageUploaded = function() {
@@ -628,7 +643,8 @@ angular.module('oppia').directive('filepathEditor', [
                   uploadedImageData: (<FileReader>e.target).result,
                   originalWidth: img.naturalWidth,
                   originalHeight: img.naturalHeight
-                }
+                },
+                crop: file.type !== 'image/svg+xml'
               };
               var dimensions = ctrl.calculateTargetImageDimensions();
               ctrl.cropArea = {
@@ -650,7 +666,8 @@ angular.module('oppia').directive('filepathEditor', [
             metadata: {
               savedImageFilename: filename,
               savedImageUrl: getTrustedResourceUrlForImageFileName(filename)
-            }
+            },
+            crop: true
           };
           if (updateParent) {
             AlertsService.clearWarnings();
@@ -718,6 +735,12 @@ angular.module('oppia').directive('filepathEditor', [
                 }
               });
             });
+          } else if (mimeType === 'data:image/svg+xml') {
+            resampledFile = (
+              ImageUploadHelperService.convertImageDataToImageFile(
+                imageDataURI));
+            ctrl.postImageToServer(dimensions, resampledFile, 'svg');
+            ctrl.data.crop = false;
           } else {
             const resampledImageData = getResampledImageData(
               imageDataURI, dimensions.width, dimensions.height);
@@ -766,6 +789,12 @@ angular.module('oppia').directive('filepathEditor', [
               var img = new Image();
               img.onload = function() {
                 ctrl.setSavedImageFilename(data.filename, true);
+                var dimensions = (
+                  ImagePreloaderService.getDimensionsOfImage(data.filename));
+                ctrl.imageContainerStyle = {
+                  height: dimensions.height + 'px',
+                  width: dimensions.width + 'px'
+                }
                 $scope.$apply();
               };
               img.src = getTrustedResourceUrlForImageFileName(data.filename);
@@ -787,6 +816,12 @@ angular.module('oppia').directive('filepathEditor', [
           $scope.$watch('$ctrl.value', function(newValue) {
             if (newValue) {
               ctrl.setSavedImageFilename(newValue, false);
+              var dimensions = (
+                ImagePreloaderService.getDimensionsOfImage(newValue));
+              ctrl.imageContainerStyle = {
+                height: dimensions.height + 'px',
+                width: dimensions.width + 'px'
+              }
             }
           });
           // This variable holds information about the image upload flow.
@@ -819,7 +854,7 @@ angular.module('oppia').directive('filepathEditor', [
           //       savedImageFilename: <File name of the resource for the image>
           //       savedImageUrl: <Trusted resource Url for the image>
           //     }
-          ctrl.data = { mode: MODE_EMPTY, metadata: {} };
+          ctrl.data = { mode: MODE_EMPTY, metadata: {}, crop: true };
 
           // Resizing properties.
           ctrl.imageResizeRatio = 1;

@@ -19,7 +19,8 @@
 require('services/assets-backend-api.service.ts');
 
 angular.module('oppia').factory('ImageUploadHelperService', [
-  '$sce', 'AssetsBackendApiService', function($sce, AssetsBackendApiService) {
+  '$sanitize', '$sce', 'AssetsBackendApiService',
+  function($sanitize, $sce, AssetsBackendApiService) {
     return {
       convertImageDataToImageFile: function(dataURI) {
         // Convert base64/URLEncoded data component to raw binary data
@@ -29,6 +30,11 @@ angular.module('oppia').factory('ImageUploadHelperService', [
         // Separate out the mime component.
         var mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
 
+        // If the data component is of svg+xml mime type, it must be
+        // sanitized.
+        if (mime === 'image/svg+xml') {
+          byteString = $sanitize(byteString.replace(/\n|\r/g, ' '));
+        }
         // Write the bytes of the string to a typed array.
         var ia = new Uint8Array(byteString.length);
         for (var i = 0; i < byteString.length; i++) {

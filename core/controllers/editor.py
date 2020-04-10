@@ -32,6 +32,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
+from core.domain import html_validation_service
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import search_services
@@ -635,13 +636,17 @@ class ImageUploadHandler(EditorHandler):
         allowed_formats = ', '.join(
             list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
 
-        if filename_prefix != 'thumbnail':
+        if filename.endswith('.svg'):
+            file_format = 'svg'
+            invalid_tags = html_validation_service.get_invalid_svg_tags(raw)
+            if len(invalid_tags) > 0:
+                raise self.InvalidInputException(
+                    'Unsupported tags found in the SVG: %s', invalid_tags)
+        else:
             # Verify that the data is recognized as an image.
             file_format = imghdr.what(None, h=raw)
             if file_format not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
                 raise self.InvalidInputException('Image not recognized')
-        else:
-            file_format = 'svg'
 
         # Verify that the file type matches the supplied extension.
         if not filename:

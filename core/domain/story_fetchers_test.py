@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -45,6 +46,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.save_new_topic(
             self.TOPIC_ID, self.USER_ID, name='Topic',
             abbreviated_name='abbrev', thumbnail_filename=None,
+            thumbnail_bg_color=constants.NEW_STRUCTURE_TO_COLORS['topic'][0],
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)

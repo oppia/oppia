@@ -60,6 +60,8 @@ angular.module('oppia').directive('storyEditor', [
             $scope.disconnectedNodes = [];
             $scope.linearNodesList = [];
             $scope.nodes = [];
+            $scope.allowedColors = [
+              '#F8BF74', '#D68F78', '#8EBBB6', '#B3D8F1'];
             if ($scope.storyContents &&
                 $scope.storyContents.getNodes().length > 0) {
               $scope.nodes = $scope.storyContents.getNodes();
@@ -74,6 +76,8 @@ angular.module('oppia').directive('storyEditor', [
             $scope.editableTitle = $scope.story.getTitle();
             $scope.editableThumbnailFilename = (
               $scope.story.getThumbnailFilename());
+            $scope.editableThumbnailBgColor = (
+              $scope.story.getThumbnailBgColor());
             $scope.editableNotes = $scope.story.getNotes();
             $scope.editableDescription = $scope.story.getDescription();
             $scope.editableDescriptionIsEmpty = (
@@ -221,6 +225,15 @@ angular.module('oppia').directive('storyEditor', [
             }
             StoryUpdateService.setThumbnailFilename(
               $scope.story, newThumbnailFilename);
+          };
+
+          $scope.updateStoryThumbnailBgColor = function(
+              newThumbnailBgColor) {
+            if (newThumbnailBgColor === $scope.story.getThumbnailBgColor()) {
+              return;
+            }
+            StoryUpdateService.setThumbnailBgColor(
+              $scope.story, newThumbnailBgColor);
           };
 
           $scope.updateStoryDescription = function(newDescription) {

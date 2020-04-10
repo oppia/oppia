@@ -1275,6 +1275,7 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
         subtopic_v2_dict = {
             'id': 1,
             'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
             'title': 'subtopic_title',
             'skill_ids': []
         }

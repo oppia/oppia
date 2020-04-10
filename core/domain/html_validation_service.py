@@ -875,3 +875,17 @@ def get_filename_with_dimensions(old_filename, exp_id):
     new_filename = regenerate_image_filename_using_dimensions(
         old_filename, height, width)
     return new_filename
+
+def get_invalid_svg_tags(svg_string):
+    """Returns a set of all invalid tags for the provided SVG.
+
+    Args:
+        svg_string: str. The SVG string.
+
+    Returns:
+        set. A set of invalid tags.
+    """
+
+    soup = bs4.BeautifulSoup(svg_string.encode('utf-8'), 'html.parser')
+    return set([tag.name for tag in soup.find_all()]).difference(
+        feconf.ALLOWED_SVG_TAGS)

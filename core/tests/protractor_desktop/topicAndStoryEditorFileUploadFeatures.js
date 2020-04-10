@@ -64,7 +64,7 @@ describe('Topic editor functionality', function() {
     expect(topicEditorPage.getTopicThumbnailSource())
       .not
       .toEqual(
-        topicEditorPage.submitTopicThumbnail('../data/img.png')
+        topicEditorPage.submitTopicThumbnail('../data/test_svg.svg')
           .then(function() {
             return topicEditorPage.getTopicThumbnailSource();
           })
@@ -91,7 +91,7 @@ describe('Topic editor functionality', function() {
       forms.toRichText('Subtopic Contents'));
     expect(topicEditorPage.getSubtopicThumbnailSource())
       .not.toEqual(
-        topicEditorPage.submitSubtopicThumbnail('../data/img.png')
+        topicEditorPage.submitSubtopicThumbnail('../data/test_svg.svg')
           .then(function() {
             return topicEditorPage.getSubtopicThumbnailSource();
           }));
@@ -145,7 +145,7 @@ describe('Chapter editor functionality', function() {
       var skillName = 'skillFromChapterEditor' + i.toString();
       var material = 'material' + i.toString();
       workflow.createSkillAndAssignTopic(
-        skillName, material, topicName, '../data/img.png');
+        skillName, material, topicName, '../data/test_svg.svg');
       skills.push(skillName);
     }
     return skills;
@@ -181,7 +181,7 @@ describe('Chapter editor functionality', function() {
     expect(storyEditorPage.getChapterThumbnailSource())
       .not
       .toEqual(
-        storyEditorPage.submitChapterThumbnail('../data/img.png')
+        storyEditorPage.submitChapterThumbnail('../data/test_svg.svg')
           .then(function() {
             return storyEditorPage.getChapterThumbnailSource();
           })

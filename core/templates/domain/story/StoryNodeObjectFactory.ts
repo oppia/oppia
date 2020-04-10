@@ -20,6 +20,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+const constants = require('constants.ts');
+
 import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants';
 
@@ -32,12 +34,13 @@ export class StoryNode {
   _outline: string;
   _outlineIsFinalized: boolean;
   _explorationId: string;
+  _thumbnailBgColor: string;
   _thumbnailFilename: string;
   constructor(
       id: string, title: string, destinationNodeIds: string[],
       prerequisiteSkillIds: string[], acquiredSkillIds: string[],
       outline: string, outlineIsFinalized: boolean, explorationId: string,
-      thumbnailFilename: string) {
+      thumbnailBgColor: string, thumbnailFilename: string) {
     this._id = id;
     this._title = title;
     this._destinationNodeIds = destinationNodeIds;
@@ -46,6 +49,7 @@ export class StoryNode {
     this._outline = outline;
     this._outlineIsFinalized = outlineIsFinalized;
     this._explorationId = explorationId;
+    this._thumbnailBgColor = thumbnailBgColor;
     this._thumbnailFilename = thumbnailFilename;
   }
 
@@ -107,6 +111,14 @@ export class StoryNode {
 
   setThumbnailFilename(thumbnailFilename: string): void {
     this._thumbnailFilename = thumbnailFilename;
+  }
+
+  getThumbnailBgColor(): string {
+    return this._thumbnailBgColor;
+  }
+
+  setThumbnailBgColor(thumbnailBgColor: string): void {
+    this._thumbnailBgColor = thumbnailBgColor;
   }
 
   prepublishValidate(): Array<string> {
@@ -260,12 +272,15 @@ export class StoryNodeObjectFactory {
       storyNodeBackendObject.outline,
       storyNodeBackendObject.outline_is_finalized,
       storyNodeBackendObject.exploration_id,
+      storyNodeBackendObject.thumbnail_bg_color,
       storyNodeBackendObject.thumbnail_filename
     );
   }
 
   createFromIdAndTitle(nodeId: string, title: string): StoryNode {
-    return new StoryNode(nodeId, title, [], [], [], '', false, null, null);
+    return new StoryNode(
+      nodeId, title, [], [], [], '', false, null,
+      constants.NEW_STRUCTURE_TO_COLORS['chapter'][0], null);
   }
 }
 
