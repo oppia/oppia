@@ -414,24 +414,43 @@ describe('Router Service', function() {
 
   it('should save pending changes even when AngularJS throws an error',
     function() {
-      var broadcastSpy = spyOn($rootScope, '$broadcast');
-      // For the second call of $broadcast.
-      var broadcastOriginalImplementation = broadcastSpy.and.callThrough();
+      // In savePendingChanges, the $broadcast is called twice. However,
+      // sometimes AngularJS throws an error in the first call of $broadcast.
+      // That's why there is a try/catch block in the method.
+      // In order to reproduce this behavior, a counter was created to
+      // handle it.
+      var broadcastCallsCounter = 0;
+      var EXPECTED_BROADCAST_EXTERNAL_SAVE_CALLS = 2;
+      spyOn($rootScope, '$broadcast').and.callFake(function(message) {
+        // AngularJS calls $broadcast with other parameters in its flow,
+        // but only with externalSave params is called in the method.
+        if (message === 'externalSave') {
+          broadcastCallsCounter++;
+          if (broadcastCallsCounter === 1) {
+            // First call throws an error so the catch block will be executed.
+            throw Error('Cannot read property $$nextSibling of null');
+          }
+        }
+      });
+      // Apply is called inside catch block.
+      var applySpy = spyOn($rootScope, '$apply').and.callThrough();
 
-      // For the first call of $broadcast.
-      broadcastSpy.and.throwError(
-        'Cannot read property $$nextSibling of null');
-
-
-      // $rootScope.$destroy is being mocked because it is called
-      // in AngularJS flow when savePendingChanges() is executed.
-      // This method calls $broadcast, that will throw an error on
-      // AngularJS because of the first call of $broadcast.
-      // Ref: Check third_party/static/angularjs-1.7.9/angular.js:19338
-      spyOn($rootScope, '$destroy').and.callFake(function() {});
+      // Checking if the $broadcast is being called as expected before calling
+      // savePendingChanges.
+      // Check if the first call is really throwing an error.
+      expect(function() {
+        $rootScope.$broadcast('externalSave');
+      }).toThrowError('Cannot read property $$nextSibling of null');
+      // Check if the second call will not throw an error.
+      expect(function() {
+        $rootScope.$broadcast('externalSave');
+      }).not.toThrowError('Cannot read property $$nextSibling of null');
+      // Reset the counter before calling the method to be tested.
+      broadcastCallsCounter = 0;
 
       RouterService.savePendingChanges();
-      expect(broadcastOriginalImplementation).toHaveBeenCalledWith(
-        'externalSave');
+      expect(applySpy).toHaveBeenCalled();
+      expect(broadcastCallsCounter).toBe(
+        EXPECTED_BROADCAST_EXTERNAL_SAVE_CALLS);
     });
 });
