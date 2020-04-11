@@ -957,24 +957,39 @@ def get_filename_with_dimensions(exploration_fs, old_filename):
     Args:
         exploration_fs: GcsFileSystem. File system of the Exploration entity.
         old_filename: str. Name of the file whose dimensions need to be
-            calculated.
+            calculated. The filename is not expected to contain the pattern
+            _height_<number>_width_<number>.
 
     Returns:
         str. The new filename of the image file.
+
+    Raises:
+        Exception: The old_filename provided contains the pattern
+            _height_<number>_width_<number>.
     """
     subdirectory = 'image'
     filepath = '%s/%s' % (subdirectory, old_filename)
     try:
-        dot_index = old_filename.rfind('.')
-        filename_regex = r'%s/%s_height_[0-9]+_width_[0-9]+\.\w+' % (
-            subdirectory, old_filename[:dot_index])
-        # Check if the data store contains the updated filename.
-        # If it does, return that filename.
-        for filename in exploration_fs.listdir(
-                subdirectory.encode(encoding='utf-8')):
-            if re.match(filename_regex, filename):
-                (_, new_filename) = filename.split('/')
-                return new_filename
+        # If the old_filename does not contain the pattern
+        # _height_<number>_width_<number>, it is assumed that the
+        # old_filename was not updated. In this case, the following code
+        # iterates over the image subdirectory in the datastore and
+        # looks for a filename with the pattern
+        # <old_filename>_height_<number>_width_<number>.<extension>.
+        # If such a filename is found, it is returned.
+        if re.match(r'^((?!_height_\d+_width_\d+).)*$', old_filename):
+            dot_index = old_filename.rfind('.')
+            filename_regex = r'%s/%s_height_[0-9]+_width_[0-9]+\.\w+' % (
+                subdirectory, old_filename[:dot_index])
+            for filename in exploration_fs.listdir(
+                    subdirectory.encode(encoding='utf-8')):
+                if re.match(filename_regex, filename):
+                    (_, new_filename) = filename.split('/')
+                    return new_filename
+        else:
+            raise Exception(
+                'old_filename must not contain the pattern _height_<number>'
+                '_width_<number>')
         content = exploration_fs.get(filepath.encode('utf-8'))
         height, width = gae_image_services.get_image_dimensions(content)
     except IOError:
