@@ -518,7 +518,6 @@ written_translations:
                     'cmd': exp_domain.CMD_DELETE_STATE,
                     'state_name': 'State 3',
                 })], 'changes')
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         response = self.get_html_response('/create/%s' % exp_id)
 
         # Check download to zip file.
