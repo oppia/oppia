@@ -873,6 +873,8 @@ def publish_topic(topic_id, committer_id):
     if topic_rights.topic_is_published:
         raise Exception('The topic is already published.')
     topic_rights.topic_is_published = True
+    topic = topic_fetchers.get_topic_by_id(topic_id)
+    topic.prepublish_validate()
     commit_cmds = [topic_domain.TopicRightsChange({
         'cmd': topic_domain.CMD_PUBLISH_TOPIC
     })]

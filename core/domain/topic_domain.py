@@ -687,6 +687,25 @@ class Topic(python_utils.OBJECT):
                 'The story_id %s is not present in the additional '
                 'story references list of the topic.' % story_id)
 
+    def prepublish_validate(self):
+        """Validates extra topic properties before publishing it.
+
+        Raises:
+            ValidationError: Thumbnail is not uploaded.
+            ValidationError: One or more subtopics does not have a skill ID
+                linked.
+        """
+        if not isinstance(self.thumbnail_filename, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected thumbnail filename to be a string, received %s'
+                % self.thumbnail_filename)
+
+        for subtopic in self.subtopics:
+            if not subtopic.skill_ids:
+                raise utils.ValidationError(
+                    'Subtopic with title %s does not have any skills linked.'
+                    % subtopic.title)
+
     def validate(self):
         """Validates all properties of this topic and its constituents.
 
