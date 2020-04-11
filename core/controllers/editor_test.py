@@ -553,13 +553,12 @@ written_translations:
                 'The title for ZIP download handler test!.yaml').read())
 
         # Check download to JSON.
-        exploration.update_objective('Test JSON download')
         exp_services.update_exploration(
             owner_id, exploration.id, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'objective',
-                    'new_value': 'the objective',
+                    'new_value': 'Test JSON download',
                 })], '')
 
         # Download to JSON string using download handler.
