@@ -51,6 +51,9 @@ angular.module('oppia').directive('opportunitiesListItem', [
                 'background-color': ctrl.opportunity.labelColor
               };
             }
+            if (!$scope.opportunityHeadingTruncationLength) {
+              $scope.opportunityHeadingTruncationLength = 35;
+            }
             if (ctrl.opportunity) {
               if (ctrl.opportunity.progressPercentage) {
                 ctrl.progressPercentage = (
