@@ -30,7 +30,7 @@
       </a>
     </td>
     <td>
-      <span ng-click="deleteCanonicalStory(summary.getId())" class="fas fa-trash-alt list-summary"> </span>
+      <span ng-click="deleteCanonicalStory(summary.getId())" class="fas fa-trash-alt list-summary delete-icon"> </span>
     </td>
   </tr>
 </table>
@@ -73,6 +73,10 @@
 
   stories-list .list-item:hover {
     background-color: #ededed;
+  }
+
+  stories-list .delete-icon {
+    cursor: pointer;
   }
 
   stories-list .list-summary span {
