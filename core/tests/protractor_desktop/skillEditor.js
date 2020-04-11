@@ -50,6 +50,8 @@ describe('Skill Editor functionality', function() {
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill 1', 'Concept card explanation');
     browser.getCurrentUrl().then(function(url) {
+      // eslint-disable-next-line no-console
+      console.log(url);
       skillId = url.split('/')[4];
     }, function() {
       // Note to developers:
