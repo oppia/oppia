@@ -272,6 +272,7 @@ FULLY_COVERED_FILENAMES = [
     'questions-list.service.ts',
     'QuestionSummaryForOneSkillObjectFactory.ts',
     'QuestionSummaryObjectFactory.ts',
+    'rating-computation.service.ts',
     'read-only-exploration-backend-api.service.ts',
     'ReadOnlyStoryNodeObjectFactory.ts',
     'ReadOnlySubtopicPageObjectFactory.ts',
