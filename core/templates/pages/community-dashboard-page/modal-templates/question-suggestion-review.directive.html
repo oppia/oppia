@@ -18,7 +18,7 @@
           <strong>Skill Difficulty Explanation:</strong>
           <angular-html-bind html-data="skillRubricExplanation">
           </angular-html-bind>
-          <span ng-if="skillRubricExplanation === ''"
+          <span ng-if="!skillRubricExplanation"
                 class="oppia-placeholder">
             This rubric has not yet been specified
           </span>
