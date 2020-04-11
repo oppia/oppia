@@ -102,8 +102,8 @@ angular.module('oppia').directive('signupPage', [
               ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_NO_USERNAME';
             } else if (username.indexOf(' ') !== -1) {
               ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES';
-            } else if (username.length > 50) {
-              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS';
+            } else if (username.length > 35) {
+              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_MORE_35_CHARS';
             } else if (!alphanumeric.test(username)) {
               ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM';
             } else if (admin.test(username)) {
