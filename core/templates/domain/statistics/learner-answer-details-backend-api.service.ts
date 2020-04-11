@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { StatisticsDomainConstants } from
@@ -29,36 +29,45 @@ import { UrlInterpolationService } from
   providedIn: 'root'
 })
 export class LearnerAnswerDetailsBackendApiService {
-  constructor(private httpClient: HttpClient,
+  constructor(
+    private httpClient: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
   recordLearnerAnswerDetails(
       explorationId: string, stateName: string, interactionId: string,
-      answer: string, answerDetails: string): Promise<any> {
+      answer: string, answerDetails: string): Promise<object> {
     return new Promise((resolve, reject) => {
-      let recordLearnerAnswerDetailsUrl = (
-        this.urlInterpolationService.interpolateUrl(
-          StatisticsDomainConstants.SUBMIT_LEARNER_ANSWER_DETAILS_URL, {
-            entity_type: 'exploration',
-            entity_id: explorationId
-          }));
-
-      let payload = {
-        state_name: stateName,
-        interaction_id: interactionId,
-        answer: answer,
-        answer_details: answerDetails
-      };
-
-      this.httpClient.put(recordLearnerAnswerDetailsUrl, payload).toPromise()
-        .then((response) => {
-          if (response) {
-            return resolve();
-          }
-        }, (error) => {
-          return reject(error.data);
-        });
+      this._recordLearnerAnswerDetails(
+        explorationId, stateName, interactionId, answer, answerDetails,
+        resolve, reject);
     });
+  }
+
+  private _recordLearnerAnswerDetails(
+      explorationId:string, stateName: string, interactionId: string,
+      answer: string, answerDetails: string, successCallback, errorCallback) {
+    let recordLearnerAnswerDetailsUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        StatisticsDomainConstants.SUBMIT_LEARNER_ANSWER_DETAILS_URL, {
+          entity_type: 'exploration',
+          entity_id: explorationId
+        }));
+
+    let payload = {
+      state_name: stateName,
+      interaction_id: interactionId,
+      answer: answer,
+      answer_details: answerDetails
+    };
+
+    this.httpClient.put(recordLearnerAnswerDetailsUrl, payload).toPromise()
+      .then((response: HttpResponse<any>) => {
+        if (response) {
+          successCallback();
+        }
+      }, (errorResponse) => {
+        errorCallback(errorResponse.data);
+      });
   }
 }
 

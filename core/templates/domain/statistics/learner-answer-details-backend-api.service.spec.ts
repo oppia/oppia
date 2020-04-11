@@ -42,15 +42,15 @@ describe('Learner answer info backend Api service', () => {
 
   it('should successfully record the learner answer details',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
       learnerAnswerDetailsBackendApiService.recordLearnerAnswerDetails(
         'exp123', 'Introduction', 'TextInput', 'sample answer',
         'sample answer details').then(
         successHandler, failHandler);
 
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/learneranswerdetailshandler/exploration/exp123');
       expect(req.request.method).toEqual('PUT');
       req.flush(200);
