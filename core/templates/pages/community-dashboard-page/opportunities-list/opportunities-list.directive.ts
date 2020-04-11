@@ -33,7 +33,7 @@ angular.module('oppia').directive('opportunitiesList', [
         isProgressBarRequired: '&progressBarRequired',
         onLoadMoreOpportunities: '&',
         onClickActionButton: '=',
-        opportunityHeadingTruncationLength: '='
+        getOpportunityHeadingTruncationLength: '&opportunityHeadingTruncationLength'
       },
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

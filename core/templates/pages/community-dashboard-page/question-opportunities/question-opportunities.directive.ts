@@ -274,6 +274,7 @@ angular.module('oppia').directive('questionOpportunities', [
             ctrl.opportunitiesAreLoading = true;
             ctrl.moreOpportunitiesAvailable = true;
             ctrl.progressBarRequired = true;
+            ctrl.opportunityHeadingTruncationLength = 45;
             ContributionOpportunitiesService.getSkillOpportunities(
               updateWithNewOpportunities);
           };
