@@ -613,41 +613,26 @@ class DeployTests(test_utils.GenericTestBase):
                     deploy.CURRENT_DATETIME.strftime('%Y-%m-%d %H:%M:%S'),
                 ))
 
-    def test_successful_flush_memcache(self):
-        def mock_flush_memcache(unused_app_name):
-            return True
+    def test_flush_memcache(self):
         check_function_calls = {
-            'open_tab_gets_called': False
+            'open_new_tab_in_browser_if_possible_is_called': False,
+            'ask_user_to_confirm_is_called': False
         }
         expected_check_function_calls = {
-            'open_tab_gets_called': False
+            'open_new_tab_in_browser_if_possible_is_called': True,
+            'ask_user_to_confirm_is_called': True
         }
         def mock_open_tab(unused_url):
-            check_function_calls['open_tab_gets_called'] = True
-        flush_memcache_swap = self.swap(
-            gcloud_adapter, 'flush_memcache', mock_flush_memcache)
-        open_tab_swap = self.swap(
-            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
-        with flush_memcache_swap, open_tab_swap:
-            deploy.flush_memcache('oppiaserver')
-        self.assertEqual(check_function_calls, expected_check_function_calls)
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_is_called'] = True
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_is_called'] = True
 
-    def test_unsuccessful_flush_memcache(self):
-        def mock_flush_memcache(unused_app_name):
-            return False
-        check_function_calls = {
-            'open_tab_gets_called': False
-        }
-        expected_check_function_calls = {
-            'open_tab_gets_called': True
-        }
-        def mock_open_tab(unused_url):
-            check_function_calls['open_tab_gets_called'] = True
-        flush_memcache_swap = self.swap(
-            gcloud_adapter, 'flush_memcache', mock_flush_memcache)
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
-        with flush_memcache_swap, open_tab_swap:
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+        with open_tab_swap, ask_user_swap:
             deploy.flush_memcache('oppiaserver')
         self.assertEqual(check_function_calls, expected_check_function_calls)
 

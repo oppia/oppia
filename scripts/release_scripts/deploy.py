@@ -269,9 +269,8 @@ def flush_memcache(app_name):
     memcache_url = (
         'https://pantheon.corp.google.com/appengine/memcache?'
         'project=%s') % app_name
-    if not gcloud_adapter.flush_memcache(app_name):
-        python_utils.PRINT('Memcache flushing failed. Please do it manually.')
-        common.open_new_tab_in_browser_if_possible(memcache_url)
+    common.open_new_tab_in_browser_if_possible(memcache_url)
+    common.ask_user_to_confirm('Please flush the memcache.')
 
 
 def switch_version(app_name, current_release_version):
