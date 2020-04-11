@@ -555,7 +555,12 @@ written_translations:
         # Check download to JSON.
         exploration.update_objective('Test JSON download')
         exp_services.update_exploration(
-            owner_id, exploration.id, [], '')
+            owner_id, exploration.id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'objective',
+                    'new_value': 'the objective',
+                })], '')
 
         # Download to JSON string using download handler.
         self.maxDiff = None
