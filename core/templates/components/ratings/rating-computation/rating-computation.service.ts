@@ -49,10 +49,6 @@ export class RatingComputationService {
         totalNumber += ratingFrequencies[value];
       }
 
-      if (totalNumber === 0) {
-        return undefined;
-      }
-
       return totalValue / totalNumber;
     }
   }
