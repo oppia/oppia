@@ -4,7 +4,7 @@
       <div class="audio-header-control-icons">
         <span class="oppia-replay-white-circle" ng-click="onBackwardButtonClicked()" ng-if="progressBarIsShown">
           <i class="fas fa-undo audio-undo-icon"></i>
-          <span class="oppia-five-back">5</span>
+          <span class="oppia-five-icon">5</span>
         </span>
         <i class="fas audio-controls-button-icon"
            ng-click="onPlayButtonClicked()"
@@ -14,7 +14,7 @@
         </i>
         <span class="oppia-replay-white-circle oppia-replay-white-circle-forward" ng-click="onForwardButtonClicked()"  ng-if="progressBarIsShown">
           <i class="fas fa-undo audio-undo-icon audio-undo-icon-forward"></i>
-          <span class="oppia-five-back">5</span>
+          <span class="oppia-five-icon oppia-five-icon-forward">5</span>
         </span>
       </div>
       <div class="slider-section" ng-if="progressBarIsShown">
@@ -170,13 +170,16 @@
   .audio-header-select {
     transform: translateY(5px);
   }
-  .oppia-five-back {
+  .oppia-five-icon {
     color: white;
     font-size: 10px;
     left: 3px;
     font-weight: 800;
     position: relative;
     bottom: 7px;
+  }
+  .oppia-five-icon-forward {
+    left: 0;
   }
   .audio-controls-button-image {
     width: 21px;
@@ -293,6 +296,30 @@
     }
     .audio-controls {
       height: 80px;
+    }
+  }
+
+  @media screen and (max-width: 550px) {
+    .audio-controls {
+      height: 98px;
+      padding: 0;
+    }
+    audio-bar .slider-section {
+      transform: translateY(4px);
+    }
+    .audio-collapse-button {
+      top: 98px;
+    }
+    .audio-header-control-icons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .audio-controls-button-icon {
+      font-size: 1.1em;
+      position: relative;
+      margin: 0 20px;
+      top: 4px;
     }
   }
 </style>
