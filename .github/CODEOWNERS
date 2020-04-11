@@ -536,6 +536,7 @@
 /jinja_utils*.py @jameesjohn @vojtechjelinek
 /webpack.common.config.ts @jameesjohn @vojtechjelinek
 /webpack.common.macros.ts @jameesjohn @vojtechjelinek
+/webpack.circleci.config.ts @nishantwrp @vojtechjelinek
 /webpack.dev.config.ts @jameesjohn @vojtechjelinek
 /webpack.prod.config.ts @jameesjohn @vojtechjelinek
 

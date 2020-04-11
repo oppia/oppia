@@ -126,6 +126,11 @@ _PARSER.add_argument(
          'https://www.protractortest.org/#/debugging#disabled-control-flow',
     action='store_true')
 
+_PARSER.add_argument(
+    '--circleci_env',
+    help='Run the tests in prod mode for the e2e tests in circleCI only.',
+    action='store_true')
+
 # This list contains the sub process triggered by this script. This includes
 # the oppia web server.
 SUBPROCESSES = []
@@ -257,17 +262,22 @@ def setup_and_install_dependencies(skip_install):
         install_chrome_on_travis.main(args=[])
 
 
-def build_js_files(dev_mode_setting):
+def build_js_files(dev_mode_setting, circleci_env=False):
     """Build the javascript files.
 
     Args:
         dev_mode_setting: bool. Represents whether to run the related commands
         in dev mode.
+        circleci_env: bool. Represents whether to use circleci webpack
+        compilation config.
     """
     update_dev_mode_in_constants_js(CONSTANT_FILE_PATH, dev_mode_setting)
     if not dev_mode_setting:
         python_utils.PRINT('  Generating files for production mode...')
-        build.main(args=['--prod_env'])
+        if not circleci_env:
+            build.main(args=['--prod_env'])
+        else:
+            build.main(args=['--circleci_env'])
     else:
         # The 'hashes.json' file is used by the `url-interpolation` service.
         if not os.path.isfile(HASHES_FILE_PATH):
@@ -429,9 +439,9 @@ def main(args=None):
 
     atexit.register(cleanup)
 
-    dev_mode = not parsed_args.prod_env
+    dev_mode = not (parsed_args.prod_env or parsed_args.circleci_env)
     if not parsed_args.skip_build:
-        build_js_files(dev_mode)
+        build_js_files(dev_mode, circleci_env=parsed_args.circleci_env)
     start_webdriver_manager()
 
     start_google_app_engine_server(dev_mode)
