@@ -418,7 +418,7 @@ def start_google_app_engine_server(dev_mode_setting):
 
 def main(args=None):
     """Run the scripts to start end-to-end tests."""
-
+    start_time = time.time()
     parsed_args = _PARSER.parse_args(args=args)
     oppia_instance_is_already_running = is_oppia_server_already_running()
 
@@ -438,6 +438,8 @@ def main(args=None):
 
     wait_for_port_to_be_open(WEB_DRIVER_PORT)
     wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
+    print "Time to build: %s" % (time.time() - start_time)
+    start_time = time.time()
     ensure_screenshots_dir_is_removed()
     commands = [common.NODE_BIN_PATH]
     if parsed_args.debug_mode:
@@ -448,6 +450,7 @@ def main(args=None):
 
     p = subprocess.Popen(commands)
     p.communicate()
+    print "Time to test: %s" % (time.time() - start_time)
     sys.exit(p.returncode)
 
 
