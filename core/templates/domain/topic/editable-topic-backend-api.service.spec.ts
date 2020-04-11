@@ -268,7 +268,7 @@ describe('Editable topic backend API service', () => {
     let req = httpTestingController.expectOne(
       '/topic_editor_story_handler/' + '0');
     expect(req.request.method).toEqual('GET');
-    req.flush(sampleDataResults);
+    req.flush(sampleDataResults.topic_dict);
 
     flushMicrotasks();
 
