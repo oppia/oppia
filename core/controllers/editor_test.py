@@ -554,7 +554,7 @@ written_translations:
 
         # Check download to JSON.
         exp_services.update_exploration(
-            owner_id, exploration.id, [
+            owner_id, exp_id, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'objective',
