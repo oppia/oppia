@@ -67,6 +67,8 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'id': self.NODE_ID_1,
             'title': 'Title 1',
             'thumbnail_filename': 'image_1.svg',
+            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+                'chapter'][0],
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -80,6 +82,8 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'id': self.NODE_ID_2,
             'title': 'Title 2',
             'thumbnail_filename': 'image_2.svg',
+            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+                'chapter'][0],
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -93,6 +97,8 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'id': self.NODE_ID_3,
             'title': 'Title 3',
             'thumbnail_filename': 'image_3.svg',
+            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+                'chapter'][0],
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
