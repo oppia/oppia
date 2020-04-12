@@ -378,7 +378,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             next_cursor.urlsafe() if (next_cursor and more) else None
         )
         if next_cursor_str:
-            next_cursor_str = next_cursor_str + python_utils.UNICODE(random_id) + direction # pylint: disable=line-too-long
+            next_cursor_str = (next_cursor_str +
+                               python_utils.UNICODE(random_id) + direction)
         return question_skill_link_models, next_cursor_str
 
     @classmethod
