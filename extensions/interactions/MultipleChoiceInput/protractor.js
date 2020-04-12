@@ -38,20 +38,17 @@ var expectInteractionDetailsToMatch = function(
     elem, richTextInstructionsArray) {
   elem.all(by.repeater('choice in $ctrl.choices'))
     .then(function(optionElements) {
-      var choices = [];
       expect(optionElements.length).toEqual(richTextInstructionsArray.length);
+      var promises = [];
       for (var i = 0; i < optionElements.length; i++) {
-        optionElements[i].element(by.css(
-          '.protractor-test-multiple-choice-option'
-        )).getText().then(function(text) {
-          choices.push(text);
-          if (choices.length === richTextInstructionsArray.length) {
-            for (var j = 0; j < choices.length; j++) {
-              expect(richTextInstructionsArray).toContain(choices[j]);
-            }
-          }
-        });
+        promises.push(optionElements[i].element(by.css(
+          '.protractor-test-multiple-choice-option')).getText());
       }
+      protractor.promise.all(promises).then(function(results) {
+        for (var j = 0; j < promises.length; j++) {
+          expect(richTextInstructionsArray).toContain(results[j]);
+        }
+      });
     });
 };
 

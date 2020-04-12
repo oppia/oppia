@@ -101,18 +101,12 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
-        multiple_choice_states = []
-        for i, change in enumerate(draft_change_list):
-            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-                    change.property_name ==
-                    exp_domain.STATE_PROPERTY_INTERACTION_ID):
-                if change.new_value == 'MultipleChoiceInput':
-                    multiple_choice_states.append(change.state_name)
         for i, change in enumerate(draft_change_list):
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
-                if change.state_name in multiple_choice_states:
+                if (len(change.new_value) == 1 and
+                        'choices' in change.new_value.keys()):
                     change.new_value['showChoicesInShuffledOrder'] = {
                         'value': True
                     }

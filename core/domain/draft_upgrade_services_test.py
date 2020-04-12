@@ -139,12 +139,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             }),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'state1',
-                'property_name': 'widget_id',
-                'new_value': 'MultipleChoiceInput'
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'state2',
                 'property_name': 'widget_customization_args',
                 'new_value': {
@@ -163,21 +157,11 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         'value': 1
                     }
                 }
-            }),
-            exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'state2',
-                'property_name': 'widget_id',
-                'new_value': 'ItemSelectionInput'
             })]
         expected_draft_change_list = draft_upgrade_services.DraftUpgradeUtil._convert_states_v32_dict_to_v33_dict(  # pylint: disable=protected-access,line-too-long
             draft_change_list)
         self.assertEqual(expected_draft_change_list[1].to_dict(),
                          draft_change_list[1].to_dict())
-        self.assertEqual(expected_draft_change_list[2].to_dict(),
-                         draft_change_list[2].to_dict())
-        self.assertEqual(expected_draft_change_list[3].to_dict(),
-                         draft_change_list[3].to_dict())
         self.assertEqual(expected_draft_change_list[0].to_dict(),
                          exp_domain.ExplorationChange({
                              'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
