@@ -42,6 +42,9 @@ class ActivityContributorsSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(model):
+        if model.deleted:
+            return
+
         if isinstance(model, collection_models.CollectionModel):
             summary = collection_services.get_collection_summary_by_id(model.id)
             summary.contributors_summary = (
