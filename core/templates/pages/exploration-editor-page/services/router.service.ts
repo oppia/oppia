@@ -165,11 +165,15 @@ angular.module('oppia').factory('RouterService', [
     };
 
     var _savePendingChanges = function() {
-      // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
-      // null" error. To get around this we must use $timeout().
-      $timeout(function() {
+      try {
         $rootScope.$broadcast('externalSave');
-      });
+      } catch (e) {
+        // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
+        // null" error. To get around this we must use $apply().
+        $rootScope.$apply(function() {
+          $rootScope.$broadcast('externalSave');
+        });
+      }
     };
 
     var _getCurrentStateFromLocationPath = function() {
