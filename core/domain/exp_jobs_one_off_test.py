@@ -151,7 +151,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_answer_groups(answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # Start ItemSelectionInteractionOneOff job on sample exploration.
+        # Start MultipleChoiceInteractionOneOffJob job on sample exploration.
         job_id = exp_jobs_one_off.MultipleChoiceInteractionOneOffJob.create_new(
         )
         exp_jobs_one_off.MultipleChoiceInteractionOneOffJob.enqueue(job_id)
@@ -199,7 +199,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # Start ItemSelectionInteractionOneOff job on sample exploration.
+        # Start MultipleChoiceInteractionOneOffJob job on sample exploration.
         job_id = exp_jobs_one_off.MultipleChoiceInteractionOneOffJob.create_new(
         )
         exp_jobs_one_off.MultipleChoiceInteractionOneOffJob.enqueue(job_id)
