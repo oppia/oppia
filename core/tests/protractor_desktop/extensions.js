@@ -21,6 +21,7 @@ var general = require('../protractor_utils/general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
@@ -128,11 +129,25 @@ describe('Interactions', function() {
 
     for (var interactionId in interactions.INTERACTIONS) {
       var interaction = interactions.INTERACTIONS[interactionId];
+
       for (var i = 0; i < interaction.testSuite.length; i++) {
         var test = interaction.testSuite[i];
 
         explorationEditorMainTab.setInteraction.apply(
           null, [interactionId].concat(test.interactionArguments));
+
+        // Delete any leftover rules that may remain from previous tests of the
+        // same interaction, so they won't interfere with the current test.
+        var deleteResponseButton = element(by.css(
+          '.protractor-test-delete-response'));
+        var confirmDeleteResponseButton = element(by.css(
+          '.protractor-test-confirm-delete-response'));
+        deleteResponseButton.isPresent().then(function(isPresent) {
+          if (isPresent) {
+            deleteResponseButton.click();
+            confirmDeleteResponseButton.click();
+          }
+        });
 
         explorationEditorMainTab.addResponse.apply(explorationEditorMainTab, [
           interactionId, forms.toRichText('yes'), null, false
@@ -150,6 +165,7 @@ describe('Interactions', function() {
         explorationEditorPage.navigateToPreviewTab();
         explorationPlayerPage.expectInteractionToMatch.apply(
           null, [interactionId].concat(test.expectedInteractionDetails));
+
         for (var j = 0; j < test.wrongAnswers.length; j++) {
           explorationPlayerPage.submitAnswer(
             interactionId, test.wrongAnswers[j]);
@@ -164,6 +180,7 @@ describe('Interactions', function() {
             clearHelpcardButton.click();
           }
         });
+
         for (var j = 0; j < test.correctAnswers.length; j++) {
           explorationPlayerPage.submitAnswer(
             interactionId, test.correctAnswers[j]);
