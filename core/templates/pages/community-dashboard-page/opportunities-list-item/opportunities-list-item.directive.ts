@@ -31,7 +31,9 @@ angular.module('oppia').directive('opportunitiesListItem', [
         getOpportunity: '&opportunity',
         onClickActionButton: '=',
         isLabelRequired: '&labelRequired',
-        isProgressBarRequired: '&progressBarRequired'
+        isProgressBarRequired: '&progressBarRequired',
+        getOpportunityHeadingTruncationLength:
+          '&opportunityHeadingTruncationLength'
       },
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -50,11 +52,16 @@ angular.module('oppia').directive('opportunitiesListItem', [
                 'background-color': ctrl.opportunity.labelColor
               };
             }
+            ctrl.opportunityHeadingTruncationLength =
+              $scope.getOpportunityHeadingTruncationLength();
+            if (!ctrl.opportunityHeadingTruncationLength) {
+              ctrl.opportunityHeadingTruncationLength = 35;
+            }
             if (ctrl.opportunity) {
               if (ctrl.opportunity.progressPercentage) {
                 ctrl.progressPercentage = (
                   ctrl.opportunity.progressPercentage + '%');
-                ctrl.progresBarStyle = {width: ctrl.progressPercentage};
+                ctrl.progressBarStyle = {width: ctrl.progressPercentage};
               }
             } else {
               ctrl.opportunityDataIsLoading = true;
