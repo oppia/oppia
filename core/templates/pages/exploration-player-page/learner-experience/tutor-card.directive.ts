@@ -205,12 +205,13 @@ angular.module('oppia').directive('tutorCard', [
             $scope.waitingForOppiaFeedback = false;
             $scope.windowDimensionsService = WindowDimensionsService;
             $scope.isIframed = UrlService.isIframed();
-            $scope.addMarginInMobile = false;
+            $scope.marginInMobileRequired = false;
             $rootScope.$on('audioBarIsExpanded', function() {
-              $scope.addMarginInMobile = DeviceInfoService.isMobileDevice();
+              $scope.marginInMobileRequired = (
+                DeviceInfoService.isMobileDevice());
             });
             $rootScope.$on('audioBarIsCollapsed', function() {
-              $scope.addMarginInMobile = false;
+              $scope.marginInMobileRequired = false;
             });
             $scope.canAskLearnerForAnswerInfo = (
               LearnerAnswerInfoService.canAskLearnerForAnswerInfo);

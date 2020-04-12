@@ -89,18 +89,22 @@ angular.module('oppia').factory('AudioPlayerService', [
     var _rewind = function(seconds) {
       if (_currentTrack) {
         var currentSeconds = _currentTrack.progress * _currentTrack.duration;
-        var rewindedProgress =
-          (currentSeconds - seconds) / _currentTrack.duration;
-        _currentTrack.progress = rewindedProgress;
+        if (currentSeconds - seconds > 0) {
+          var rewindedProgress =
+              (currentSeconds - seconds) / _currentTrack.duration;
+          _currentTrack.progress = rewindedProgress;
+        }
       }
     };
 
     var _forward = function(seconds) {
       if (_currentTrack) {
         var currentSeconds = _currentTrack.progress * _currentTrack.duration;
-        var forwardedProgress =
-            (currentSeconds + seconds) / _currentTrack.duration;
-        _currentTrack.progress = forwardedProgress;
+        if (currentSeconds + seconds < _currentTrack.duration) {
+          var forwardedProgress =
+              (currentSeconds + seconds) / _currentTrack.duration;
+          _currentTrack.progress = forwardedProgress;
+        }
       }
     };
 
