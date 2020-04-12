@@ -154,7 +154,6 @@ describe('Router Service', function() {
 
       expect(RouterService.getActiveTabName()).toBe('main');
       RouterService.navigateToMainTab('newState');
-      $timeout.flush();
       // To $watch the first $location.path call.
       $rootScope.$apply();
 
@@ -194,7 +193,6 @@ describe('Router Service', function() {
 
     expect(RouterService.getActiveTabName()).toBe('main');
     RouterService.navigateToMainTab('newState');
-    $timeout.flush();
     // To $watch the first $location.path call.
     $rootScope.$apply();
 
@@ -245,7 +243,6 @@ describe('Router Service', function() {
 
       // Now go to main tab.
       RouterService.navigateToMainTab('newState');
-      $timeout.flush();
       $rootScope.$apply();
       $rootScope.$apply();
 
@@ -264,7 +261,6 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToTranslationTab();
-    $timeout.flush();
     $rootScope.$apply();
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
@@ -282,7 +278,6 @@ describe('Router Service', function() {
 
     expect(RouterService.getActiveTabName()).toBe('main');
     RouterService.navigateToPreviewTab();
-    $timeout.flush();
     $timeout.flush(200);
     $rootScope.$apply();
 
@@ -305,7 +300,6 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToStatsTab();
-    $timeout.flush();
     $rootScope.$apply();
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
@@ -322,7 +316,6 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToImprovementsTab();
-    $timeout.flush();
     $rootScope.$apply();
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
@@ -342,7 +335,6 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToSettingsTab();
-    $timeout.flush();
     $rootScope.$apply();
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
@@ -357,7 +349,6 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToHistoryTab();
-    $timeout.flush();
     $rootScope.$apply();
 
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
@@ -376,7 +367,6 @@ describe('Router Service', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToFeedbackTab();
-    $timeout.flush();
     $rootScope.$apply();
 
     // $watch is called
@@ -400,7 +390,6 @@ describe('Router Service', function() {
     locationPathSpy.and.returnValue('/invalid');
 
     RouterService.navigateToMainTab(null);
-    $timeout.flush();
     $rootScope.$apply();
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
 
@@ -420,7 +409,48 @@ describe('Router Service', function() {
   it('should save pending changes', function() {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
     RouterService.savePendingChanges();
-    $timeout.flush();
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
   });
+
+  it('should save pending changes even when AngularJS throws an error',
+    function() {
+      // In savePendingChanges, the $broadcast is called twice. However,
+      // sometimes AngularJS throws an error in the first call of $broadcast.
+      // That's why there is a try/catch block in the method.
+      // In order to reproduce this behavior, a counter was created to
+      // handle it.
+      var broadcastCallsCounter = 0;
+      var EXPECTED_BROADCAST_EXTERNAL_SAVE_CALLS = 2;
+      spyOn($rootScope, '$broadcast').and.callFake(function(message) {
+        // AngularJS calls $broadcast with other parameters in its flow,
+        // but only with externalSave params is called in the method.
+        if (message === 'externalSave') {
+          broadcastCallsCounter++;
+          if (broadcastCallsCounter === 1) {
+            // First call throws an error so the catch block will be executed.
+            throw Error('Cannot read property $$nextSibling of null');
+          }
+        }
+      });
+      // Apply is called inside catch block.
+      var applySpy = spyOn($rootScope, '$apply').and.callThrough();
+
+      // Checking if the $broadcast is being called as expected before calling
+      // savePendingChanges.
+      // Check if the first call is really throwing an error.
+      expect(function() {
+        $rootScope.$broadcast('externalSave');
+      }).toThrowError('Cannot read property $$nextSibling of null');
+      // Check if the second call will not throw an error.
+      expect(function() {
+        $rootScope.$broadcast('externalSave');
+      }).not.toThrowError('Cannot read property $$nextSibling of null');
+      // Reset the counter before calling the method to be tested.
+      broadcastCallsCounter = 0;
+
+      RouterService.savePendingChanges();
+      expect(applySpy).toHaveBeenCalled();
+      expect(broadcastCallsCounter).toBe(
+        EXPECTED_BROADCAST_EXTERNAL_SAVE_CALLS);
+    });
 });
