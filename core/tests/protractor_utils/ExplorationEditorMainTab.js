@@ -35,7 +35,6 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-add-response-details'));
   var addResponseHeader = element(
     by.css('.protractor-test-add-response-modal-header'));
-  var answerTabs = element.all(by.css('.protractor-test-answer-tab'));
   var multipleChoiceAnswerOptions = function(optionNum) {
     return element(
       by.cssContainingText(
@@ -337,28 +336,17 @@ var ExplorationEditorMainTab = function() {
        * Check for correct rule parameters.
        * @param {string} [interactionId] - Interaction type.
        * @param {string} [ruleName] - Appropriate rule of provided interaction.
-       * @param {integer} [ruleIndex] - The index of the rule to check.
        * @param {string[]} [feedbackTextArray] - Exact feedback text to match.
        */
-      expectRuleToBe: function(
-          interactionId, ruleName, ruleIndex, feedbackTextArray) {
-        answerTabs.then(
-          function(answerTabs) {
-            var ruleDescription = _getRuleDescription(interactionId, ruleName);
-            // Replace selectors with feedbackTextArray's elements.
-            if (ruleIndex > 0) {
-            // From second rule onwards, we need add an "or" before the
-            // rule description.
-              ruleDescription = 'or ' + _replaceRuleInputPlaceholders(
-                ruleDescription, feedbackTextArray, interactionId);
-            } else {
-              ruleDescription = _replaceRuleInputPlaceholders(
-                ruleDescription, feedbackTextArray, interactionId);
-            }
-            // Adding "..." to end of string.
-            ruleDescription += '...';
-            expect(answerTabs[ruleIndex].getText()).toEqual(ruleDescription);
-          });
+      expectRuleToBe: function(interactionId, ruleName, feedbackTextArray) {
+        var ruleDescription = _getRuleDescription(interactionId, ruleName);
+        // Replace selectors with feedbackTextArray's elements.
+        ruleDescription = _replaceRuleInputPlaceholders(
+          ruleDescription, feedbackTextArray);
+        ruleDescription += '...';
+        // Adding "..." to end of string.
+        var answerTab = element(by.css('.protractor-test-answer-tab'));
+        expect(answerTab.getText()).toEqual(ruleDescription);
       },
       /**
        * Check for correct learner's feedback.
@@ -658,12 +646,7 @@ var ExplorationEditorMainTab = function() {
     waitFor.visibilityOf(
       interaction, 'interaction takes too long to appear');
   };
-  // This function will be used as the standard way to modify an interaction
-  // after it has been created. Additional arguments may be sent to this
-  // function, and they will be passed on to the relevant interaction editor.
-  this.editInteraction = function(interactionId) {
-    customizeInteraction.apply(null, arguments);
-  };
+
   this.setInteractionWithoutCloseAddResponse = function(interactionId) {
     createNewInteraction(interactionId);
     customizeInteraction.apply(null, arguments);
@@ -929,8 +912,7 @@ var ExplorationEditorMainTab = function() {
    * @param {string} [ruleDescription] - Interaction type.
    * @param {string[]} [providedText] - Feedback text to replace with.
    */
-  var _replaceRuleInputPlaceholders = function(
-      ruleDescription, providedText, interactionId) {
+  var _replaceRuleInputPlaceholders = function(ruleDescription, providedText) {
     // An example of rule description:
     // "is equal to {{a|NonnegativeInt}} and {{b|NonnegativeInt}}"
     // (from NumericInput).
@@ -950,22 +932,8 @@ var ExplorationEditorMainTab = function() {
             ') is expected to match # of placeholders(' +
             (placeholders.length) + ')');
           }
-          // In the case of MultipleChoiceInput, the rule description is
-          // a little different than other interactions. The placeholderElement
-          // is enclosed in a single quote.
-          // An example: " is equal to 'option C' ".
-          // Hence, we need to enclose the providedText in single
-          // quotes before adding it to the rule description. Also in the case
-          // of INVALID rule, we don't need to enclose it in single quotes.
-
-          if (interactionId === 'MultipleChoiceInput' &&
-               providedText[index].toString() !== '[INVALID]') {
-            ruleDescription = ruleDescription.replace(
-              placeholderElement, '\'' + providedText[index].toString() + '\'');
-          } else {
-            ruleDescription = ruleDescription.replace(
-              placeholderElement, providedText[index].toString());
-          }
+          ruleDescription = ruleDescription.replace(
+            placeholderElement, providedText[index].toString());
         }
       });
     }
@@ -977,8 +945,7 @@ var ExplorationEditorMainTab = function() {
   var _selectRule = function(ruleElem, interactionId, ruleName) {
     var ruleDescription = _getRuleDescription(interactionId, ruleName);
     // Replace selectors with "...".
-    ruleDescription = _replaceRuleInputPlaceholders(
-      ruleDescription, ['...'], interactionId);
+    ruleDescription = _replaceRuleInputPlaceholders(ruleDescription, ['...']);
     var ruleDescriptionInDropdown = ruleDescription;
     var answerDescription = element(
       by.css('.protractor-test-answer-description'));
