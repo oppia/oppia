@@ -16,7 +16,7 @@
       Invalid aspect ratio. Please upload an SVG image that is of 16:9 width-height aspect ratio.
     </div>
     <div ng-show="uploadedImage">
-      <div ng-if="allowedColors" class="float-left">
+      <div ng-if="allowedColors">
         <div>Choose background color:</div>
         <div class="oppia-thumbnail-colour-select">
           <div ng-repeat="color in allowedColors"
@@ -25,23 +25,15 @@
           </div>
         </div>
       </div>
-      <form>
-        <div class="form-group col-md-3 float-right">
-          Resize preview: <[imageSize * 100 + '%']>
-          <input type="range"
-                 min="0.2"
-                 max="1"
-                 step="0.1"
-                 class="form-control-range"
-                 ng-model="imageSize"
-                 ng-change="adjustImageSize()">
-        </div>
-      </form>
-      <div class="oppia-thumbnail-crop-area float-left" ng-show="uploadedImage">
+      <div class="oppia-thumbnail-container" ng-show="uploadedImage">
         <button class="btn btn-secondary oppia-thumbnail-reset-button" ng-click="reset()">
           <i class="material-icons oppia-vcenter">&#xE14C;</i>
         </button>
-        <img ng-if="uploadedImage" id="croppable-thumbnail" ng-src="<[uploadedImage]>">
+        <div>
+          <img ng-if="uploadedImage" class="oppia-thumbnail-image" ng-src="<[uploadedImage]>">
+          <div style="padding: 10px 16px 10px 16px; font-size: 18px; font-weight: bold; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">Chapter 1: What is a Fraction?</div>
+          <div style="padding: 0 16px 0 16px; font-size: 16px; line-height: 1.2; overflow: hidden; max-height: 92px; word-break: break-word;">Follow Matthew as he goes to the bakery to buy some cake, and uses fractions to communicate how much he needs to the baker.</divstyle="">
+        </div>
       </div>
     </div>
   </div>
@@ -56,11 +48,19 @@
   </button>
 </div>
 <style>
-  .oppia-thumbnail-crop-area {
-    background: #E4E4E4;
+  .oppia-thumbnail-container {
+    height: 328px;
+    width: 304px;
     max-width: 100%;
+    margin: 0 auto 15px auto;
     position: relative;
-    width: 720px;
+    border-radius: 4px 4px 4px 4px;
+    box-shadow: 0 4.5px 10px rgba(0, 0, 0, 0.25);
+  }
+  .oppia-thumbnail-container img {
+    width: 304px;
+    height: 172px;
+    border-radius: 4px 4px 0 0;
   }
   .oppia-thumbnail-reset-button {
     position: absolute;
@@ -77,6 +77,7 @@
     grid-template-columns: 25px 25px 25px 25px;
     grid-template-rows: 20px;
     grid-gap: 5px;
+    margin-bottom: 7px;
   }
 
   .oppia-thumbnail-colour-select > * {

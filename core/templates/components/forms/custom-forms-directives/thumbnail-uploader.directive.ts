@@ -16,12 +16,9 @@
  * @fileoverview Directive for uploading images.
  */
 
-import Cropper from 'cropperjs';
-
 require(
   'components/common-layout-directives/common-elements/' +
   'alert-message.directive.ts');
-require('cropperjs/dist/cropper.min.css');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
 
@@ -143,23 +140,19 @@ angular.module('oppia').directive('thumbnailUploader', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/forms/custom-forms-directives/' +
                 'edit-thumbnail-modal.template.html'),
-              size: 'lg',
               backdrop: true,
               controller: [
                 '$scope', '$timeout', '$uibModalInstance',
                 function($scope, $timeout, $uibModalInstance) {
                   $scope.uploadedImage = uploadedImage;
                   $scope.invalidImageWarningIsShown = false;
-                  $scope.invalidAspectRatioWarningIsShown = false;
-                  $scope.imageSize = 0.5;
-                  let cropper = null;
 
                   $scope.allowedColors = allowedColors;
 
-                  var setImageDimensions = function() {
+                  var setImageDimensions = function(height, width) {
                     dimensions = {
-                      height: Math.round(cropper.imageData.height),
-                      width: Math.round(cropper.imageData.width)
+                      height: Math.round(height),
+                      width: Math.round(width)
                     };
                   };
 
@@ -168,63 +161,36 @@ angular.module('oppia').directive('thumbnailUploader', [
                   };
 
                   $scope.updateBackgroundColor = function(color) {
-                    var cropperContainerElement = (
+                    var thumbnailImageElement = (
                       <HTMLElement>document.querySelector(
-                        '.cropper-container'));
-                    cropperContainerElement.style.background = color;
+                        '.oppia-thumbnail-image'));
+                    thumbnailImageElement.style.background = color;
                     tempBgColor = color;
                   };
 
-                  var initialiseCropper = function() {
-                    let thumbnailImage = (
-                      <HTMLImageElement>document.getElementById(
-                        'croppable-thumbnail'));
-                    let cropperAspectRatio = 16 / 9;
-                    cropper = new Cropper(thumbnailImage, {
-                      minContainerHeight: 405,
-                      minContainerWidth: 720,
-                      minCropBoxWidth: 180,
-                      aspectRatio: cropperAspectRatio,
-                      zoomOnTouch: false,
-                      zoomOnWheel: false
-                    });
-                    document.getElementById(
-                      'croppable-thumbnail').addEventListener('ready', () => {
-                      let imageAspectRatio = (
-                        cropper.imageData.aspectRatio.toFixed(2));
-                      if (imageAspectRatio !== (
-                        cropperAspectRatio.toFixed(2))) {
-                        $scope.uploadedImage = null;
-                        $scope.invalidAspectRatioWarningIsShown = true;
-                      }
-                      cropper.zoomTo($scope.imageSize);
-                      cropper.clear();
-                      cropper.setDragMode('none');
-                      if ($scope.allowedColors) {
-                        $scope.updateBackgroundColor(tempBgColor);
-                      }
-                    });
-                    document.getElementById(
-                      'croppable-thumbnail').addEventListener('crop', () => {
-                      cropper.clear();
-                    });
-                  };
-                  $scope.adjustImageSize = function() {
-                    cropper.zoomTo($scope.imageSize);
-                  };
                   $scope.onFileChanged = function(file) {
                     uploadedImageMimeType = file.type;
                     if (isUploadedImageSvg()) {
                       $('.oppia-thumbnail-uploader').fadeOut(function() {
                         $scope.invalidImageWarningIsShown = false;
-                        $scope.invalidAspectRatioWarningIsShown = false;
                         var reader = new FileReader();
                         reader.onload = function(e) {
                           $scope.$apply(function() {
                             $scope.uploadedImage = (
                               (<FileReader>e.target).result);
                           });
-                          initialiseCropper();
+                          $scope.updateBackgroundColor(tempBgColor);
+                          var img = new Image();
+                          img.onload = function() {
+                            // Setting a default height of 300px and width of
+                            // 150px since most browsers use these dimensions
+                            // for SVG files that do not have an explicit
+                            // height and width defined.
+                            setImageDimensions(
+                              img.naturalHeight || 150,
+                              img.naturalWidth || 300);
+                          };
+                          img.src = <string>((<FileReader>e.target).result);
                         };
                         reader.readAsDataURL(file);
                         $timeout(function() {
@@ -248,7 +214,6 @@ angular.module('oppia').directive('thumbnailUploader', [
                   };
 
                   $scope.confirm = function() {
-                    setImageDimensions();
                     $uibModalInstance.close({
                       newThumbnailDataUrl: $scope.uploadedImage,
                       newBgColor: tempBgColor
@@ -261,8 +226,8 @@ angular.module('oppia').directive('thumbnailUploader', [
 
                   if (uploadedImage) {
                     $uibModalInstance.rendered.then(() => {
-                      initialiseCropper();
                       openInUploadMode = false;
+                      $scope.updateBackgroundColor(tempBgColor);
                     });
                   }
                 }

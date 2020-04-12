@@ -641,8 +641,8 @@ angular.module('oppia').directive('filepathEditor', [
                 metadata: {
                   uploadedFile: file,
                   uploadedImageData: (<FileReader>e.target).result,
-                  originalWidth: img.naturalWidth,
-                  originalHeight: img.naturalHeight
+                  originalWidth: img.naturalWidth || 300,
+                  originalHeight: img.naturalHeight || 150
                 },
                 crop: file.type !== 'image/svg+xml'
               };
