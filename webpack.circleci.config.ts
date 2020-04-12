@@ -17,17 +17,11 @@
  */
 
 const merge = require('webpack-merge');
-const common = require('./webpack.common.config.ts');
+const prod = require('./webpack.prod.config.ts');
 const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
 
-module.exports = merge(common, {
-  mode: 'production',
-  output: {
-    filename: '[name].[contenthash].bundle.js',
-    path: path.resolve(__dirname, 'backend_prod_files/webpack_bundles')
-  },
-  devtool: 'source-map',
+module.exports = merge(prod, {
   optimization: {
     runtimeChunk: 'single',
     splitChunks: {
