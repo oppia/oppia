@@ -558,7 +558,7 @@ written_translations:
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'objective',
                     'new_value': 'Test JSON download',
-                })], '')
+                })], 'Updates exploration objective')
 
         # Download to JSON string using download handler.
         self.maxDiff = None
