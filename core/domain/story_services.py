@@ -304,6 +304,19 @@ def validate_explorations_for_story(exp_ids, raise_error):
                         raise utils.ValidationError(error_string)
                     validation_error_messages.append(error_string)
 
+                if state.interaction.id == 'EndExploration':
+                    recommended_exploration_ids = (
+                        state.interaction.customization_args[
+                            'recommendedExplorationIds']['value'])
+                    if len(recommended_exploration_ids) != 0:
+                        error_string = (
+                            'Exploration with ID: %s contains exploration '
+                            'recommendations in its EndExploration interaction.'
+                            % (exp.id))
+                        if raise_error:
+                            raise utils.ValidationError(error_string)
+                        validation_error_messages.append(error_string)
+
     return validation_error_messages
 
 
