@@ -110,7 +110,7 @@ describe('Enable correctness feedback and set correctness', function() {
     // Go back to mark the solution as correct.
     explorationEditorPage.navigateToMainTab();
     explorationEditorMainTab.moveToState('First');
-    waitFor.visibibilityOf(element(by.css('.protractor-test-response-tab')));
+    waitFor.visibilityOf(element(by.css('.protractor-test-response-tab')));
     responseEditor = explorationEditorMainTab.getResponseEditor(0);
     responseEditor.markAsCorrect();
     explorationEditorMainTab.expectTickMarkIsDisplayed();
