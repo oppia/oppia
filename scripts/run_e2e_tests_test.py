@@ -811,7 +811,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_cleanup():
             return
 
-        def mock_build_js_files(unused_arg, unused_circleci_env):
+        def mock_build_js_files(unused_arg, deparallelize_terser=False):
             return
 
         def mock_start_webdriver_manager():
@@ -902,7 +902,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_cleanup():
             return
 
-        def mock_build_js_files(unused_arg, unused_circleci_env):
+        def mock_build_js_files(unused_arg, deparallelize_terser=False):
             return
 
         def mock_start_webdriver_manager():

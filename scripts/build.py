@@ -147,8 +147,8 @@ _PARSER.add_argument(
     '--minify_third_party_libs_only', action='store_true', default=False,
     dest='minify_third_party_libs_only')
 _PARSER.add_argument(
-    '--circleci_env', action='store_true', default=False,
-    dest='circleci_env')
+    '--deparallelize_terser', action='store_true', default=False,
+    dest='deparallelize_terser')
 
 
 def generate_app_yaml(deploy_mode=False):
@@ -591,11 +591,9 @@ def build_using_webpack():
     subprocess.check_call(cmd, shell=True)
 
 
-def build_using_webpack_in_circleci_env():
-    """Execute webpack build process. This takes all TypeScript files we have in
-    /templates and generates JS bundles according the require() imports
-    and also compiles HTML pages into the /backend_prod_files/webpack_bundles
-    folder. The files are later copied into /build/webpack_bundles.
+def build_using_webpack_using_circleci_config():
+    """Execute webpack build process similar to production mode but disable
+    parallelism in terser plugin in webpack
 
     The settings for this are specified in webpack.circleci.config.ts.
     """
@@ -1281,14 +1279,14 @@ def main(args=None):
     if options.minify_third_party_libs_only and not options.prod_env:
         raise Exception(
             'minify_third_party_libs_only should not be set in non-prod env.')
-    if options.prod_env or options.circleci_env:
+    if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         if not options.minify_third_party_libs_only:
             hashes = generate_hashes()
-            if not options.circleci_env:
+            if not options.deparallelize_terser:
                 build_using_webpack()
             else:
-                build_using_webpack_in_circleci_env()
+                build_using_webpack_using_circleci_config()
             generate_app_yaml(deploy_mode=options.deploy_mode)
             generate_build_directory(hashes)
 
