@@ -920,10 +920,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             validation_error_messages, [
                 'Exploration with ID: exp_id_1 contains exploration '
-                'recomendations in its EndExploration interaction.'])
+                'recommendations in its EndExploration interaction.'])
         with self.assertRaisesRegexp(
             Exception, 'Exploration with ID: exp_id_1 contains exploration '
-            'recomendations in its EndExploration interaction.'):
+            'recommendations in its EndExploration interaction.'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 

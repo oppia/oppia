@@ -311,7 +311,7 @@ def validate_explorations_for_story(exp_ids, raise_error):
                     if len(recommended_exploration_ids) != 0:
                         error_string = (
                             'Exploration with ID: %s contains exploration '
-                            'recomendations in its EndExploration interaction.'
+                            'recommendations in its EndExploration interaction.'
                             % (exp.id))
                         if raise_error:
                             raise utils.ValidationError(error_string)
