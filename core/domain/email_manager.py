@@ -384,7 +384,11 @@ def _send_bulk_mail(
     cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
 
     def _send_bulk_mail_in_transaction(instance_id):
-        """Sends the emails in bulk to the recipients."""
+        """Sends the emails in bulk to the recipients.
+
+        Args:
+            instance_id: str. The ID of the BulkEmailModel entity instance.
+        """
         sender_name_email = '%s <%s>' % (sender_name, sender_email)
 
         email_services.send_bulk_mail(
