@@ -87,40 +87,10 @@ angular.module('oppia').directive('preferencesPage', [
             _saveDataItem('user_bio', userBio);
           };
 
-          ctrl.updateSubjectInterestsWarning = function(subjectInterests) {
-            var TAG_REGEX = new RegExp(ctrl.TAG_REGEX_STRING);
-
-            if (subjectInterests instanceof Array) {
-              for (var i = 0; i < subjectInterests.length; i++) {
-                if (UtilsService.isString(subjectInterests[i])) {
-                  if (!TAG_REGEX.test(subjectInterests[i])) {
-                    ctrl.subjectInterestsWarningText = (
-                      'Subject interests should use only lowercase letters.');
-                  }
-                } else {
-                  console.error(
-                    'Error: received bad value for a subject interest.' +
-                    ' Expected a string, got ', subjectInterests[i]);
-                  throw Error(
-                    'Error: received bad value for a subject interest.');
-                }
-              }
-            } else {
-              console.error(
-                'Error: received bad value for subject interests. Expected' +
-                ' list of strings, got ', subjectInterests);
-              throw Error('Error: received bad value for subject interests.');
-            }
-          };
-
           ctrl.onSubjectInterestsSelectionChange = function(subjectInterests) {
             AlertsService.clearWarnings();
             ctrl.subjectInterestsChangedAtLeastOnce = true;
-            ctrl.subjectInterestsWarningText = null;
-            ctrl.updateSubjectInterestsWarning(subjectInterests);
-            if (ctrl.subjectInterestsWarningText === null) {
-              _saveDataItem('subject_interests', subjectInterests);
-            }
+            _saveDataItem('subject_interests', subjectInterests);
           };
 
           ctrl.savePreferredSiteLanguageCodes = function(
@@ -287,7 +257,6 @@ angular.module('oppia').directive('preferencesPage', [
             });
             ctrl.userCanDeleteAccount = ENABLE_ACCOUNT_DELETION;
             ctrl.subjectInterestsChangedAtLeastOnce = false;
-            ctrl.subjectInterestsWarningText = null;
             ctrl.TAG_REGEX_STRING = '^[a-z ]+$';
             ctrl.LANGUAGE_CHOICES =
             LanguageUtilService.getLanguageIdsAndTexts();
