@@ -21,7 +21,7 @@
         <schema-based-editor schema="itemSchema()" is-disabled="isDisabled()" local-value="localValue[$index]"
                              label-for-focus-target="getFocusLabel($index)"
                              on-input-blur="($last ? lastElementOnBlur : showAddItemButton)"
-                             on-input-focus="($last ? hideAddItemButton : showAddItemButton)" old-to-new-list-mapping="oldToNewListMapping">
+                             on-input-focus="($last ? hideAddItemButton : showAddItemButton)">
         </schema-based-editor>
       </td>
       <td ng-if="!len && (!minListLength || localValue.length > minListLength) && localValue.length > 0" style="vertical-align: top;">

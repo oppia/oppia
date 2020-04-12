@@ -17,9 +17,10 @@
  * interaction.
  */
 
-var forms = require('../../../core/tests/protractor_utils/forms.js');
-var objects = require('../../objects/protractor.js');
-var waitFor = require('../../../core/tests/protractor_utils/waitFor.js');
+var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
+var objects = require(process.cwd() + '/extensions/objects/protractor.js');
+var waitFor = require(
+  process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
 // 'elem' is the HTML element containing the input elements that set the rules
 // of the item selection interaction.
