@@ -52,8 +52,8 @@
         </a>
       </td>
       <td class="delete-icon">
-        <a>
-          <span ng-if="canDeleteTopic()" ng-click="deleteTopic(topic.id)" class="fas fa-trash-alt list-summary protractor-test-delete-topic-button"> </span>
+        <a ng-if="canDeleteTopic()" ng-click="deleteTopic(topic.id)" class="fas fa-trash-alt list-summary protractor-test-delete-topic-button">
+          <span></span>
         </a>
       </td>
     </tr>
