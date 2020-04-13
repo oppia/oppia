@@ -288,12 +288,13 @@ angular.module('oppia').directive('stateInteractionEditor', [
                       return warningsList;
                     };
 
-                    $scope.getCustomizationArgsWarningMessage = function () {
+                    $scope.getCustomizationArgsWarningMessage = function() {
                       var warningsList = (
                         $scope.getCustomizationArgsWarningsList());
                       var warningMessage = '';
-                      if (warningsList.length !== 0)
+                      if (warningsList.length !== 0) {
                         warningMessage = warningsList[0].message;
+                      }
                       return warningMessage;
                     }
 
