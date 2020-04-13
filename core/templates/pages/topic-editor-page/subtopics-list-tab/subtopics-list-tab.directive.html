@@ -31,7 +31,7 @@
             <a class="protractor-test-assigned-skill-card-text"
                ng-if="!isSkillDeleted(skillSummary)"
                ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
-              <[skillSummary.getDescription()]>
+              <[skillSummary.getDescription(true, 18)]>
             </a>
             <span ng-if="isSkillDeleted(skillSummary)" style="color: red;">
               Skill Deleted
@@ -62,7 +62,7 @@
           <a class="protractor-test-skill-card-text"
              ng-if="!isSkillDeleted(skillSummary)"
              ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
-            <[skillSummary.getDescription()]>
+            <[skillSummary.getDescription(true, 25)]>
           </a>
           <span class="fas fa-trash-alt delete-icon" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)"></span>
           <span ng-if="isSkillDeleted(skillSummary)" style="color: red;">
