@@ -635,11 +635,9 @@ angular.module('oppia').directive('stateResponses', [
                 ResponsesService.getActiveAnswerGroupIndex());
             });
 
-            $scope.$on('updateAnswerChoices', function(
-                evt, newAnswerChoices, oldToNewListMapping) {
+            $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
               ResponsesService.updateAnswerChoices(
-                newAnswerChoices, oldToNewListMapping, function(
-                    newAnswerGroups) {
+                newAnswerChoices, function(newAnswerGroups) {
                   $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
                   $scope.refreshWarnings()();
                 });
