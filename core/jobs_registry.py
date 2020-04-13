@@ -42,12 +42,14 @@ import python_utils
 # List of all manager classes for one-off batch jobs for which to show controls
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
-    activity_jobs_one_off.ActivityContributorsSummaryOneOffJob,
     activity_jobs_one_off.AuditContributorsOneOffJob,
     activity_jobs_one_off.IndexAllActivitiesJobManager,
     activity_jobs_one_off.ReplaceAdminIdOneOffJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
+    exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
+    exp_jobs_one_off.ExpSummariesCreationOneOffJob,
+    exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob,
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationValidityJobManager,
