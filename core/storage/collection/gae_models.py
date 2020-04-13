@@ -32,26 +32,12 @@ from google.appengine.ext import ndb
 
 class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class CollectionModel(base_models.VersionedModel):
@@ -206,27 +192,13 @@ class CollectionModel(base_models.VersionedModel):
 class CollectionRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection rights snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class CollectionRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection rights snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class CollectionRightsModel(base_models.VersionedModel):
@@ -493,11 +465,10 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-        TODO(#8523): Implement this function.
+        """The history of commits is not relevant for the purposes of
+        Takeout.
         """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _get_instance_id(cls, collection_id, version):

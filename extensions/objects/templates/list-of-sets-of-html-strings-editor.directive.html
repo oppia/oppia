@@ -20,8 +20,8 @@
   <div ng-repeat="choice in $ctrl.choices track by $index">
     <div class="row">
       <div class="col-sm-1">
-        <select ng-model="$ctrl.selectedRank" ng-change="$ctrl.selectedItem($index, $ctrl.selectedRank)" aria-label="choice"
-                id="{{$index}}" ng-init="$ctrl.selectedRank = $ctrl.initValues[$index]" ng-options="index for index in $ctrl.allowedChoices()">
+        <select ng-model="choice.selectedRank" ng-change="$ctrl.selectedItem($index)" aria-label="choice"
+                id="{{$index}}" ng-options="index for index in $ctrl.allowedChoices()">
         </select>
       </div>
       <div class="col-sm-10">
