@@ -274,10 +274,10 @@ def build_js_files(dev_mode_setting, deparallelize_terser=False):
     update_dev_mode_in_constants_js(CONSTANT_FILE_PATH, dev_mode_setting)
     if not dev_mode_setting:
         python_utils.PRINT('  Generating files for production mode...')
-        if not deparallelize_terser:
-            build.main(args=['--prod_env'])
-        else:
+        if deparallelize_terser:
             build.main(args=['--prod_env', '--deparallelize_terser'])
+        else:
+            build.main(args=['--prod_env'])
     else:
         # The 'hashes.json' file is used by the `url-interpolation` service.
         if not os.path.isfile(HASHES_FILE_PATH):
