@@ -49,6 +49,12 @@ describe('Skill Editor functionality', function() {
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill 1', 'Concept card explanation');
+    var currentWindowId = browser.getCurrentWindowHandle();
+    console.log(currentWindowId);
+    var nextWindowId = parseInt(currentWindowId) + 1;
+    console.log(nextWindowId); 
+
+    browser.switchTo().window(nextWindowId.toString());
     browser.getCurrentUrl().then(function(url) {
       skillId = url.split('/')[4];
     }, function() {
