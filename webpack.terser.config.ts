@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview CircleCI e2e tests environment config file for Webpack.
+ * @fileoverview Disable parallelism on terser webpack plugin.
  */
 
 const merge = require('webpack-merge');

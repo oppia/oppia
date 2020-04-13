@@ -277,7 +277,7 @@ def build_js_files(dev_mode_setting, deparallelize_terser=False):
         if not deparallelize_terser:
             build.main(args=['--prod_env'])
         else:
-            build.main(args=['--deparallelize_terser'])
+            build.main(args=['--prod_env', '--deparallelize_terser'])
     else:
         # The 'hashes.json' file is used by the `url-interpolation` service.
         if not os.path.isfile(HASHES_FILE_PATH):

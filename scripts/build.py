@@ -82,7 +82,7 @@ PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 UGLIFY_FILE = os.path.join('node_modules', 'uglify-js', 'bin', 'uglifyjs')
 WEBPACK_FILE = os.path.join('node_modules', 'webpack', 'bin', 'webpack.js')
 WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
-WEBPACK_CIRCLECI_CONFIG = 'webpack.circleci.config.ts'
+WEBPACK_TERSER_CONFIG = 'webpack.terser.config.ts'
 
 # Files with these extensions shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
@@ -591,17 +591,17 @@ def build_using_webpack():
     subprocess.check_call(cmd, shell=True)
 
 
-def build_using_webpack_using_circleci_config():
+def build_using_webpack_using_terser_config():
     """Execute webpack build process similar to production mode but disable
     parallelism in terser plugin in webpack
 
-    The settings for this are specified in webpack.circleci.config.ts.
+    The settings for this are specified in webpack.terser.config.ts.
     """
 
     python_utils.PRINT('Building webpack')
 
     cmd = '%s %s --config %s' % (
-        common.NODE_BIN_PATH, WEBPACK_FILE, WEBPACK_CIRCLECI_CONFIG)
+        common.NODE_BIN_PATH, WEBPACK_FILE, WEBPACK_TERSER_CONFIG)
     subprocess.check_call(cmd, shell=True)
 
 
@@ -1286,7 +1286,7 @@ def main(args=None):
             if not options.deparallelize_terser:
                 build_using_webpack()
             else:
-                build_using_webpack_using_circleci_config()
+                build_using_webpack_using_terser_config()
             generate_app_yaml(deploy_mode=options.deploy_mode)
             generate_build_directory(hashes)
 
