@@ -109,7 +109,7 @@ FILEPATHS_NOT_TO_RENAME = (
     '*.py',
     'third_party/generated/js/third_party.min.js.map',
     'third_party/generated/webfonts/*',
-    '*.bundle.js',
+    '*.bundWEBPACK_PROD_CONFIGle.js',
     '*.bundle.js.map',
     'webpack_bundles/about-page.mainpage.html',
     'webpack_bundles/community-dashboard-page.mainpage.html',
@@ -575,33 +575,20 @@ def build_third_party_libs(third_party_directory_path):
             dependency_filepaths['fonts'], WEBFONTS_DIR))
 
 
-def build_using_webpack():
+def build_using_webpack(config_path):
     """Execute webpack build process. This takes all TypeScript files we have in
     /templates and generates JS bundles according the require() imports
     and also compiles HTML pages into the /backend_prod_files/webpack_bundles
     folder. The files are later copied into /build/webpack_bundles.
 
-    The settings for this are specified in webpack.prod.config.ts.
+    Args:
+        config_path: str. Webpack config to be used for building.
     """
 
     python_utils.PRINT('Building webpack')
 
     cmd = '%s %s --config %s' % (
-        common.NODE_BIN_PATH, WEBPACK_FILE, WEBPACK_PROD_CONFIG)
-    subprocess.check_call(cmd, shell=True)
-
-
-def build_using_webpack_using_terser_config():
-    """Execute webpack build process similar to production mode but disable
-    parallelism in terser plugin in webpack
-
-    The settings for this are specified in webpack.terser.config.ts.
-    """
-
-    python_utils.PRINT('Building webpack')
-
-    cmd = '%s %s --config %s' % (
-        common.NODE_BIN_PATH, WEBPACK_FILE, WEBPACK_TERSER_CONFIG)
+        common.NODE_BIN_PATH, WEBPACK_FILE, config_path)
     subprocess.check_call(cmd, shell=True)
 
 
@@ -1283,10 +1270,10 @@ def main(args=None):
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         if not options.minify_third_party_libs_only:
             hashes = generate_hashes()
-            if not options.deparallelize_terser:
-                build_using_webpack()
+            if options.deparallelize_terser:
+                build_using_webpack(WEBPACK_TERSER_CONFIG)
             else:
-                build_using_webpack_using_terser_config()
+                build_using_webpack(WEBPACK_PROD_CONFIG)
             generate_app_yaml(deploy_mode=options.deploy_mode)
             generate_build_directory(hashes)
 

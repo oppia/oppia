@@ -796,7 +796,10 @@ class BuildTests(test_utils.GenericTestBase):
             'compare_file_count_gets_called': True
         }
 
-        def mock_build_using_webpack():
+        expected_config_path = build.WEBPACK_PROD_CONFIG
+
+        def mock_build_using_webpack(config_path):
+            self.assertEqual(config_path, expected_config_path)
             check_function_calls['build_using_webpack_gets_called'] = True
 
         def mock_ensure_files_exist(unused_filepaths):
@@ -820,19 +823,21 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_build_with_deparallelize_terser(self):
         check_function_calls = {
-            'build_using_webpack_using_terser_config_gets_called': False,
+            'build_using_webpack_gets_called': False,
             'ensure_files_exist_gets_called': False,
             'compare_file_count_gets_called': False
         }
         expected_check_function_calls = {
-            'build_using_webpack_using_terser_config_gets_called': True,
+            'build_using_webpack_gets_called': True,
             'ensure_files_exist_gets_called': True,
             'compare_file_count_gets_called': True
         }
 
-        def mock_build_using_webpack_using_terser_config():
-            check_function_calls[
-                'build_using_webpack_using_terser_config_gets_called'] = True
+        expected_config_path = build.WEBPACK_TERSER_CONFIG
+
+        def mock_build_using_webpack(config_path):
+            self.assertEqual(config_path, expected_config_path)
+            check_function_calls['build_using_webpack_gets_called'] = True
 
         def mock_ensure_files_exist(unused_filepaths):
             check_function_calls['ensure_files_exist_gets_called'] = True
@@ -842,13 +847,12 @@ class BuildTests(test_utils.GenericTestBase):
 
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
-        build_using_terser_config_swap = self.swap(
-            build, 'build_using_webpack_using_terser_config', (
-                mock_build_using_webpack_using_terser_config))
+        build_using_webpack_swap = self.swap(
+            build, 'build_using_webpack', mock_build_using_webpack)
         compare_file_count_swap = self.swap(
             build, '_compare_file_count', mock_compare_file_count)
 
-        with ensure_files_exist_swap, build_using_terser_config_swap, (
+        with ensure_files_exist_swap, build_using_webpack_swap, (
             compare_file_count_swap):
             build.main(args=['--prod_env', '--deparallelize_terser'])
 
@@ -902,6 +906,6 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertEqual(cmd, expected_command)
 
         with self.swap(subprocess, 'check_call', mock_check_call):
-            build.build_using_webpack()
+            build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
 
 # pylint: enable=protected-access
