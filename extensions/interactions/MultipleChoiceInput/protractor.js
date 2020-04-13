@@ -45,8 +45,10 @@ var expectInteractionDetailsToMatch = function(
           '.protractor-test-multiple-choice-option')).getText());
       }
       protractor.promise.all(promises).then(function(results) {
+        richTextInstructionsArray.sort();
+        results.sort();
         for (var j = 0; j < promises.length; j++) {
-          expect(richTextInstructionsArray).toContain(results[j]);
+          expect(richTextInstructionsArray[j]).toEqual(results[j]);
         }
       });
     });
