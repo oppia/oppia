@@ -540,6 +540,7 @@
 /webpack.prod.config.ts @jameesjohn @vojtechjelinek
 /webpack.terser.config.ts @nishantwrp @vojtechjelinek
 
+
 # Typings.
 /typings @ankita240796
 
