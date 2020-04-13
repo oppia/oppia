@@ -93,7 +93,7 @@ declare var angular: ng.IAngularStatic;
 angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
   'ngAudio', require('angular-cookies'), 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
-  'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable', 'ui.tree',
   'ui.validate', downgradedModule
 ])
