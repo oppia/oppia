@@ -109,7 +109,7 @@ FILEPATHS_NOT_TO_RENAME = (
     '*.py',
     'third_party/generated/js/third_party.min.js.map',
     'third_party/generated/webfonts/*',
-    '*.bundWEBPACK_PROD_CONFIGle.js',
+    '*.bundle.js',
     '*.bundle.js.map',
     'webpack_bundles/about-page.mainpage.html',
     'webpack_bundles/community-dashboard-page.mainpage.html',
