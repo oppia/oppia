@@ -129,7 +129,7 @@
         ],
         "bundle": {
           "js": [
-            "angular-animate.js", "angular-resource.js", "angular-sanitize.js",
+            "angular-animate.js", "angular-sanitize.js",
             "angular-touch.js", "angular-aria.js"
           ]
         }
