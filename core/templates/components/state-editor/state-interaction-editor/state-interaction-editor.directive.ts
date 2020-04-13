@@ -296,7 +296,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
                         warningMessage = warningsList[0].message;
                       }
                       return warningMessage;
-                    }
+                    };
 
                     $scope.onChangeInteractionId = function(newInteractionId) {
                       EditorFirstTimeEventsService
