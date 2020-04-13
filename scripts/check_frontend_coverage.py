@@ -123,6 +123,7 @@ FULLY_COVERED_FILENAMES = [
     'exploration-data.service.ts',
     'exploration-editor-page.constants.ajs.ts',
     'exploration-editor-page.constants.ts',
+    'exploration-features.service.ts',
     'exploration-features-backend-api.service.ts',
     'exploration-html-formatter.service.ts',
     'exploration-id-validation.service.ts',
