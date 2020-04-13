@@ -23,7 +23,7 @@ import { ExplorationFeaturesService, IExplorationDataDict,
   IFeatureDataDict, IParamChanges } from
   'services/exploration-features.service';
 
-fdescribe('ExplorationFeatureService', () => {
+describe('ExplorationFeatureService', () => {
   let explorationFeatureService: ExplorationFeaturesService = null;
   let featureData: IFeatureDataDict = null;
   let explorationData: IExplorationDataDict = null;
@@ -32,9 +32,14 @@ fdescribe('ExplorationFeatureService', () => {
 
   beforeEach(() => {
     explorationFeatureService = TestBed.get(ExplorationFeaturesService);
+    ExplorationFeaturesService.settings.areParametersEnabled = false;
+    ExplorationFeaturesService.settings.isImprovementsTabEnabled = false;
+    ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled = false;
+    ExplorationFeaturesService.serviceIsInitialized = false;
+
     featureData = {
       is_improvements_tab_enabled: true,
-      is_exploration_whitelisted: false,
+      is_exploration_whitelisted: true,
     };
     explorationData = {
       param_changes: [testParamChanges],
@@ -64,7 +69,7 @@ fdescribe('ExplorationFeatureService', () => {
     expect(explorationFeatureService.areParametersEnabled()).toEqual(true);
     expect(explorationFeatureService.isImprovementsTabEnabled()).toEqual(true);
     expect(explorationFeatureService.isPlaythroughRecordingEnabled())
-      .toEqual(false);
+      .toEqual(true);
   });
 
   it('should init the exploration from state', () => {
@@ -73,7 +78,7 @@ fdescribe('ExplorationFeatureService', () => {
     expect(explorationFeatureService.areParametersEnabled()).toEqual(true);
     expect(explorationFeatureService.isImprovementsTabEnabled()).toEqual(true);
     expect(explorationFeatureService.isPlaythroughRecordingEnabled())
-      .toEqual(false);
+      .toEqual(true);
   });
 
   it('should return if service is initialized', () => {
