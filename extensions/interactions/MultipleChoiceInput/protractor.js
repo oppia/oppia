@@ -44,12 +44,11 @@ var expectInteractionDetailsToMatch = function(
         promises.push(optionElements[i].element(by.css(
           '.protractor-test-multiple-choice-option')).getText());
       }
+      var rteInstructionArrayCopy = [...richTextInstructionsArray];
+      rteInstructionArrayCopy.sort();
       protractor.promise.all(promises).then(function(results) {
-        richTextInstructionsArray.sort();
         results.sort();
-        for (var j = 0; j < promises.length; j++) {
-          expect(richTextInstructionsArray[j]).toEqual(results[j]);
-        }
+        expect(rteInstructionArrayCopy).toEqual(results);
       });
     });
 };
