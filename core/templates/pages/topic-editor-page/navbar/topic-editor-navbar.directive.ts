@@ -146,6 +146,12 @@ angular.module('oppia').directive('topicEditorNavbar', [
           };
 
           $scope.isTopicSaveable = function() {
+            if ($scope.topicRights.isPublished()) {
+              return (
+                $scope.getChangeListLength() > 0 &&
+                $scope.getWarningsCount() === 0 &&
+                $scope.prepublishValidationIssues.length === 0);
+            }
             return (
               $scope.getChangeListLength() > 0 &&
               $scope.getWarningsCount() === 0);

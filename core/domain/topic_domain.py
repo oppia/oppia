@@ -687,27 +687,12 @@ class Topic(python_utils.OBJECT):
                 'The story_id %s is not present in the additional '
                 'story references list of the topic.' % story_id)
 
-    def prepublish_validate(self):
-        """Validates extra topic properties before publishing it.
-
-        Raises:
-            ValidationError: Thumbnail is not uploaded.
-            ValidationError: One or more subtopics does not have a skill ID
-                linked.
-        """
-        if not isinstance(self.thumbnail_filename, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected thumbnail filename to be a string, received %s'
-                % self.thumbnail_filename)
-
-        for subtopic in self.subtopics:
-            if not subtopic.skill_ids:
-                raise utils.ValidationError(
-                    'Subtopic with title %s does not have any skills linked.'
-                    % subtopic.title)
-
-    def validate(self):
+    def validate(self, strict=False):
         """Validates all properties of this topic and its constituents.
+
+        Args:
+            strict: bool. Enable strict checks on the topic when the topic is
+                published or is going to be published.
 
         Raises:
             ValidationError: One or more attributes of the Topic are not
@@ -720,6 +705,13 @@ class Topic(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected thumbnail filename to be a string, received %s'
                 % self.thumbnail_filename)
+
+        if strict:
+            if not isinstance(self.thumbnail_filename, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected thumbnail filename to be a string, received %s'
+                    % self.thumbnail_filename)
+
         if not isinstance(self.description, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
@@ -770,6 +762,11 @@ class Topic(python_utils.OBJECT):
                     'The id for subtopic %s is greater than or equal to '
                     'next_subtopic_id %s'
                     % (subtopic.id, self.next_subtopic_id))
+            if strict:
+                if not subtopic.skill_ids:
+                    raise utils.ValidationError(
+                        'Subtopic with title %s does not have any skills '
+                        'linked.' % subtopic.title)
 
         if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(

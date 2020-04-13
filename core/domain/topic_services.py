@@ -385,7 +385,11 @@ def _save_topic(committer_id, topic, commit_message, change_list):
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
             'save topic %s: %s' % (topic.id, change_list))
-    topic.validate()
+    topic_rights = get_topic_rights(topic.id, strict=False)
+    if topic_rights.topic_is_published:
+        topic.validate(strict=True)
+    else:
+        topic.validate()
 
     topic_model = topic_models.TopicModel.get(topic.id, strict=False)
 
@@ -865,6 +869,8 @@ def publish_topic(topic_id, committer_id):
     topic_rights = get_topic_rights(topic_id, strict=False)
     if topic_rights is None:
         raise Exception('The given topic does not exist')
+    topic = topic_fetchers.get_topic_by_id(topic_id)
+    topic.validate(strict=True)
     user = user_services.UserActionsInfo(committer_id)
     if role_services.ACTION_CHANGE_TOPIC_STATUS not in user.actions:
         raise Exception(
@@ -873,8 +879,6 @@ def publish_topic(topic_id, committer_id):
     if topic_rights.topic_is_published:
         raise Exception('The topic is already published.')
     topic_rights.topic_is_published = True
-    topic = topic_fetchers.get_topic_by_id(topic_id)
-    topic.prepublish_validate()
     commit_cmds = [topic_domain.TopicRightsChange({
         'cmd': topic_domain.CMD_PUBLISH_TOPIC
     })]
