@@ -518,7 +518,6 @@ written_translations:
                     'cmd': exp_domain.CMD_DELETE_STATE,
                     'state_name': 'State 3',
                 })], 'changes')
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         response = self.get_html_response('/create/%s' % exp_id)
 
         # Check download to zip file.
@@ -553,9 +552,13 @@ written_translations:
                 'The title for ZIP download handler test!.yaml').read())
 
         # Check download to JSON.
-        exploration.update_objective('Test JSON download')
-        exp_services._save_exploration(  # pylint: disable=protected-access
-            owner_id, exploration, '', [])
+        exp_services.update_exploration(
+            owner_id, exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'objective',
+                    'new_value': 'Test JSON download',
+                })], 'Updates exploration objective')
 
         # Download to JSON string using download handler.
         self.maxDiff = None
