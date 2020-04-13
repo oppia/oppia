@@ -124,14 +124,16 @@ angular.module('oppia').directive('questionOpportunities', [
                     $scope.instructionMessage = (
                       'Select the skill(s) to link the question to:');
                     $scope.currentMode = MODE_SELECT_DIFFICULTY;
-                    $scope.linkedSkillsWithDifficulty =
-                      [SkillDifficultyObjectFactory.create(
-                        skillId, '', DEFAULT_SKILL_DIFFICULTY)];
                     SkillBackendApiService.fetchSkill(skillId)
                       .then(function(backendSkillObject) {
                         $scope.skill =
                           SkillObjectFactory.createFromBackendDict(
                             backendSkillObject.skill);
+                        $scope.linkedSkillsWithDifficulty = [
+                          SkillDifficultyObjectFactory.create(
+                            skillId, $scope.skill.getDescription(),
+                            DEFAULT_SKILL_DIFFICULTY)
+                        ];
                         $scope.skillIdToRubricsObject = {};
                         $scope.skillIdToRubricsObject[skillId] =
                           $scope.skill.getRubrics();
@@ -181,8 +183,9 @@ angular.module('oppia').directive('questionOpportunities', [
             QuestionUndoRedoService.clearChanges();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/question-directives/modal-templates/' +
-                'question-editor-modal.directive.html'),
+                '/pages/community-dashboard-page/modal-templates/' +
+                'question-suggestion-editor-modal.directive.html'),
+              size: 'lg',
               backdrop: 'static',
               keyboard: false,
               controller: [
@@ -271,6 +274,7 @@ angular.module('oppia').directive('questionOpportunities', [
             ctrl.opportunitiesAreLoading = true;
             ctrl.moreOpportunitiesAvailable = true;
             ctrl.progressBarRequired = true;
+            ctrl.opportunityHeadingTruncationLength = 45;
             ContributionOpportunitiesService.getSkillOpportunities(
               updateWithNewOpportunities);
           };
