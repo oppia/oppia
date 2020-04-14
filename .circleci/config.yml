@@ -69,28 +69,27 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install dependencies
-          command: python -m scripts.install_third_party_libs
-      - run:
           name: Merge to target branch
           command: |
             if [[ -n ${CIRCLE_PULL_REQUEST} ]]
             then
+
             regexp="[[:digit:]]\+$"
             PR_NUMBER=`echo $CIRCLE_PULL_REQUEST | grep -o $regexp`
 
             curl -L "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64" -o jq
             chmod +x jq
+
             url="https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls/$PR_NUMBER?access_token=$GITHUB_TOKEN"
             target_branch=$(
               curl "$url" | ./jq '.base.ref' | tr -d '"'
             )
 
-            echo $target_branch
-            echo $CIRCLE_PULL_REQUEST
-            echo $url
-            echo $PR_NUMBER
+            git pull origin $target_branch
             fi
+      - run:
+          name: Install dependencies
+          command: python -m scripts.install_third_party_libs
       - persist_to_workspace:
           root: /home/circleci/
           paths:
