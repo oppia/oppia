@@ -144,7 +144,7 @@ jobs:
       - run:
           name: Run e2e navigation test
           command: |
-            python -m scripts.run_e2e_tests --prod_env --skip-install --suite="navigation"
+            python -m scripts.run_e2e_tests --prod_env --deparallelize_terser --skip-install --suite="navigation"
       - persist_to_workspace:
           root: /home/circleci/
           paths:

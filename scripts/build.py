@@ -82,6 +82,7 @@ PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 UGLIFY_FILE = os.path.join('node_modules', 'uglify-js', 'bin', 'uglifyjs')
 WEBPACK_FILE = os.path.join('node_modules', 'webpack', 'bin', 'webpack.js')
 WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
+WEBPACK_TERSER_CONFIG = 'webpack.terser.config.ts'
 
 # Files with these extensions shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
@@ -145,6 +146,9 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--minify_third_party_libs_only', action='store_true', default=False,
     dest='minify_third_party_libs_only')
+_PARSER.add_argument(
+    '--deparallelize_terser', action='store_true', default=False,
+    dest='deparallelize_terser')
 
 
 def generate_app_yaml(deploy_mode=False):
@@ -571,19 +575,20 @@ def build_third_party_libs(third_party_directory_path):
             dependency_filepaths['fonts'], WEBFONTS_DIR))
 
 
-def build_using_webpack():
+def build_using_webpack(config_path):
     """Execute webpack build process. This takes all TypeScript files we have in
     /templates and generates JS bundles according the require() imports
     and also compiles HTML pages into the /backend_prod_files/webpack_bundles
     folder. The files are later copied into /build/webpack_bundles.
 
-    The settings for this are specified in webpack.prod.config.ts.
+    Args:
+        config_path: str. Webpack config to be used for building.
     """
 
     python_utils.PRINT('Building webpack')
 
     cmd = '%s %s --config %s' % (
-        common.NODE_BIN_PATH, WEBPACK_FILE, WEBPACK_PROD_CONFIG)
+        common.NODE_BIN_PATH, WEBPACK_FILE, config_path)
     subprocess.check_call(cmd, shell=True)
 
 
@@ -1265,7 +1270,10 @@ def main(args=None):
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         if not options.minify_third_party_libs_only:
             hashes = generate_hashes()
-            build_using_webpack()
+            if options.deparallelize_terser:
+                build_using_webpack(WEBPACK_TERSER_CONFIG)
+            else:
+                build_using_webpack(WEBPACK_PROD_CONFIG)
             generate_app_yaml(deploy_mode=options.deploy_mode)
             generate_build_directory(hashes)
 
