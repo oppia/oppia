@@ -386,10 +386,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
             'Unexpected error: received an invalid change list when trying to '
             'save topic %s: %s' % (topic.id, change_list))
     topic_rights = get_topic_rights(topic.id, strict=False)
-    if topic_rights.topic_is_published:
-        topic.validate(strict=True)
-    else:
-        topic.validate()
+    topic.validate(strict=topic_rights.topic_is_published)
 
     topic_model = topic_models.TopicModel.get(topic.id, strict=False)
 
