@@ -40,6 +40,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     """Test the story services module."""
 
     STORY_ID = None
+    EXP_ID = 'exp_id'
     NODE_ID_1 = story_domain.NODE_ID_PREFIX + '1'
     NODE_ID_2 = 'node_2'
     USER_ID = 'user'
@@ -47,6 +48,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(StoryServicesUnitTests, self).setUp()
+        self.signup('a@example.com', 'A')
+        self.signup('b@example.com', 'B')
+        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
+        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = topic_services.get_new_topic_id()
         self.save_new_topic(
@@ -60,27 +68,32 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID)
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.user_id_admin, end_state_name='End')
+        self.publish_exploration(self.user_id_admin, self.EXP_ID)
         changelist = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': self.NODE_ID_1,
                 'title': 'Title 1'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': self.EXP_ID
             })
         ]
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist,
             'Added node.')
         self.story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.signup('a@example.com', 'A')
-        self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
-
-        self.user_id_a = self.get_user_id_from_email('a@example.com')
-        self.user_id_b = self.get_user_id_from_email('b@example.com')
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([user_services.get_username(self.user_id_a)])
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.user_a = user_services.UserActionsInfo(self.user_id_a)
         self.user_b = user_services.UserActionsInfo(self.user_id_b)
         self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
@@ -1160,13 +1173,29 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_services.update_story(
             self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
-        change_list = [story_domain.StoryChange({
-            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-            'property_name': story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
-            'node_id': self.NODE_ID_1,
-            'old_value': '',
-            'new_value': 'exp_id'
-        })]
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_2,
+                'title': 'Title 2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+                'node_id': self.NODE_ID_1,
+                'old_value': [],
+                'new_value': [self.NODE_ID_2]
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_2,
+                'old_value': None,
+                'new_value': 'exp_id'
+            })
+        ]
 
         with self.assertRaisesRegexp(
             Exception,

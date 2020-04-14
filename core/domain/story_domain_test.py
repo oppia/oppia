@@ -356,6 +356,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Title should be a string')
 
+        self.story.title = (
+            'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
+        self._assert_validation_error(
+            'Story title should be less than 39 chars')
+
     def test_description_validation(self):
         self.story.description = 1
         self._assert_validation_error(
@@ -420,6 +425,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].title = 1
         self._assert_validation_error(
             'Expected title to be a string, received 1')
+
+        self.story.story_contents.nodes[0].title = (
+            'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
+        self._assert_validation_error(
+            'Chapter title should be less than 36 chars')
 
     def test_nodes_validation(self):
         self.story.story_contents.initial_node_id = 'node_10'

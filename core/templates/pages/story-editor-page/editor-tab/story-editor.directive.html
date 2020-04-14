@@ -4,10 +4,7 @@
       <label for="storyTitle" class="form-heading">Story Title</label>
       <input id="storyTitle" type="text" class="form-control protractor-test-story-title-field"
              ng-model="editableTitle" ng-blur="updateStoryTitle(editableTitle)"
-             placeholder="Enter a title for the story." maxlength="20" ng-trim="false">
-      <span class="form-text" style="font-size: smaller; color: red;" ng-if="editableTitle.length === 20">
-        <em>Please use at most 20 characters for the story title.</em>
-      </span>
+             placeholder="Enter a title for the story." maxlength="39" ng-trim="false">
     </div>
 
     <div class="story-description" ng-class="{'has-error': editableDescriptionIsEmpty && storyDescriptionChanged}">

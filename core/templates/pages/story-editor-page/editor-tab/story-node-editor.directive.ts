@@ -116,7 +116,7 @@ angular.module('oppia').directive('storyNodeEditor', [
 
           $scope.checkCanSaveExpId = function() {
             $scope.canSaveExpId = $scope.explorationIdPattern.test(
-              $scope.explorationId);
+              $scope.explorationId) || !$scope.explorationId;
             $scope.invalidExpErrorIsShown = false;
           };
           $scope.updateTitle = function(newTitle) {
@@ -149,18 +149,25 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.updateExplorationId = function(explorationId) {
-            ExplorationIdValidationService.isExpPublished(
-              explorationId).then(function(expIdIsValid) {
-              $scope.expIdIsValid = expIdIsValid;
-              if ($scope.expIdIsValid) {
-                StoryEditorStateService.setExpIdsChanged();
-                StoryUpdateService.setStoryNodeExplorationId(
-                  $scope.story, $scope.getId(), explorationId);
-                $scope.currentExplorationId = explorationId;
-              } else {
-                $scope.invalidExpErrorIsShown = true;
-              }
-            });
+            if (StoryEditorStateService.isStoryPublished()) {
+              ExplorationIdValidationService.isExpPublished(
+                explorationId).then(function(expIdIsValid) {
+                $scope.expIdIsValid = expIdIsValid;
+                if ($scope.expIdIsValid) {
+                  StoryEditorStateService.setExpIdsChanged();
+                  StoryUpdateService.setStoryNodeExplorationId(
+                    $scope.story, $scope.getId(), explorationId);
+                  $scope.currentExplorationId = explorationId;
+                } else {
+                  $scope.invalidExpErrorIsShown = true;
+                }
+              });
+            } else {
+              StoryEditorStateService.setExpIdsChanged();
+              StoryUpdateService.setStoryNodeExplorationId(
+                $scope.story, $scope.getId(), explorationId);
+              $scope.currentExplorationId = explorationId;
+            }
           };
 
           $scope.removePrerequisiteSkillId = function(skillId) {

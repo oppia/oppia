@@ -431,7 +431,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         rights_manager.unpublish_exploration(self.user_admin, 'exp_id')
         with self.assertRaisesRegexp(
-            Exception, 'Exploration with id exp_id isn\'t published.'):
+            Exception, 'Exploration with ID exp_id is not public. Please '
+            'publish explorations before adding them to a story.'):
             topic_services.publish_story(
                 self.TOPIC_ID, 'story_id_new', self.user_id_admin)
 
@@ -439,7 +440,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.user_id_admin, 'exp_id')
 
         with self.assertRaisesRegexp(
-            Exception, 'Exploration id exp_id doesn\'t exist.'):
+            Exception, 'Expected story to only reference valid explorations, '
+            'but found a reference to an invalid exploration with ID: exp_id'):
             topic_services.publish_story(
                 self.TOPIC_ID, 'story_id_new', self.user_id_admin)
 
