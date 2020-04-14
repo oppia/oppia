@@ -267,8 +267,8 @@ def flush_memcache(app_name):
         app_name: str. The name of the app to deploy.
     """
     memcache_url = (
-        'https://pantheon.corp.google.com/appengine/memcache?'
-        'project=%s') % app_name
+        'https://console.cloud.google.com/appengine/memcache?'
+        'src=ac&project=%s') % app_name
     common.open_new_tab_in_browser_if_possible(memcache_url)
     common.ask_user_to_confirm('Please flush the memcache.')
 
