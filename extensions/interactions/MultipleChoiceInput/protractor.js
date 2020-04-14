@@ -36,7 +36,7 @@ var customizeInteraction = function(elem, richTextInstructionsArray) {
 // the options.
 var expectInteractionDetailsToMatch = function(
     elem, richTextInstructionsArray) {
-  elem.all(by.repeater('choice in $ctrl.choices'))
+  elem.all(by.css('.protractor-test-multiple-choice-option-container'))
     .then(function(optionElements) {
       expect(optionElements.length).toEqual(richTextInstructionsArray.length);
       var promises = [];

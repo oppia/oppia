@@ -286,7 +286,7 @@ class Question(python_utils.OBJECT):
     @classmethod
     def _convert_state_v32_dict_to_v33_dict(cls, question_state_dict):
         """Converts from version 32 to 33. Version 33 adds a new
-        customization arg to MultipleChoiceInput which allows
+        customization arg to MultipleChoiceInput Interaction which allows
         answer choices to be shuffled.
 
         Args:
