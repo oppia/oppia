@@ -42,7 +42,7 @@
                           local-value="$ctrl.localValue" is-disabled="$ctrl.isDisabled()"
                           item-schema="$ctrl.schema().items" len="$ctrl.schema().len"
                           ui-config="$ctrl.schema().ui_config" validators="$ctrl.schema().validators"
-                          label-for-focus-target="$ctrl.labelForFocusTarget()" old-to-new-list-mapping="$ctrl.oldToNewListMapping">
+                          label-for-focus-target="$ctrl.labelForFocusTarget()">
 </schema-based-list-editor>
 
 <schema-based-dict-editor ng-if="$ctrl.schema().type === 'dict' && !$ctrl.schema().choices"
