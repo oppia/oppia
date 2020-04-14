@@ -32,11 +32,15 @@ angular.module('oppia').directive('thumbnailUploader', [
       restrict: 'E',
       scope: {
         disabled: '=',
-        getFilename: '&filename',
-        updateFilename: '=',
+        getAllowedColors: '&allowedColors',
         getBgColor: '&bgColor',
+        getFilename: '&filename',
+        getPreviewDescription: '&previewDescription',
+        getPreviewDescriptionBgColor: '&previewDescriptionBgColor',
+        getPreviewFooter: '&previewFooter',
+        getPreviewTitle: '&previewTitle',
         updateBgColor: '=',
-        getAllowedColors: '&allowedColors'
+        updateFilename: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/custom-forms-directives/' +
@@ -80,6 +84,10 @@ angular.module('oppia').directive('thumbnailUploader', [
               width: 0
             };
             var allowedColors = $scope.getAllowedColors();
+            var getPreviewDescription = $scope.getPreviewDescription;
+            var getPreviewDescriptionBgColor = $scope.getPreviewDescriptionBgColor;
+            var getPreviewFooter = $scope.getPreviewFooter;
+            var getPreviewTitle = $scope.getPreviewTitle;
 
             var saveThumbnailImageData = function(imageURI) {
               let resampledFile = null;
@@ -148,6 +156,11 @@ angular.module('oppia').directive('thumbnailUploader', [
                   $scope.invalidImageWarningIsShown = false;
 
                   $scope.allowedColors = allowedColors;
+                  $scope.getPreviewDescription = getPreviewDescription;
+                  $scope.getPreviewDescriptionBgColor = (
+                    getPreviewDescriptionBgColor);
+                  $scope.getPreviewFooter = getPreviewFooter;
+                  $scope.getPreviewTitle = getPreviewTitle;
 
                   var setImageDimensions = function(height, width) {
                     dimensions = {
