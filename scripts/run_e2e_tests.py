@@ -110,9 +110,6 @@ _PARSER.add_argument(
     help='Run the tests in prod mode. Static resources are served from'
          ' build directory and use cache slugs.',
     action='store_true')
-_PARSER.add_argument(
-    '--community_dashboard_enabled', action='store_true',
-    help='Run the test after enabling the community dashboard page.')
 
 _PARSER.add_argument(
     '--suite', default='full',
@@ -127,6 +124,11 @@ _PARSER.add_argument(
     help='Runs the protractor test in debugging mode. Follow the instruction '
          'provided in following URL to run e2e tests in debugging mode: '
          'https://www.protractortest.org/#/debugging#disabled-control-flow',
+    action='store_true')
+
+_PARSER.add_argument(
+    '--deparallelize_terser',
+    help='Disable parallelism on terser plugin in webpack. Use with prod_env.',
     action='store_true')
 
 # This list contains the sub process triggered by this script. This includes
@@ -238,21 +240,6 @@ def update_dev_mode_in_constants_js(constant_file, dev_mode_setting):
     common.inplace_replace_file(constant_file, pattern, replace)
 
 
-def update_community_dashboard_status_in_feconf_file(
-        feconf_file_path, enable_community_dashboard):
-    """Change feconf.py file based on whether the community dashboard is
-    enabled.
-
-    Args:
-        feconf_file_path: str. Path to the feconf.py file.
-        enable_community_dashboard: bool. Represents whether community
-            dashboard is enabled.
-    """
-    pattern = 'COMMUNITY_DASHBOARD_ENABLED = .*'
-    replace = 'COMMUNITY_DASHBOARD_ENABLED = %s' % enable_community_dashboard
-    common.inplace_replace_file(feconf_file_path, pattern, replace)
-
-
 def run_webdriver_manager(parameters):
     """Run commands of webdriver manager.
 
@@ -275,17 +262,22 @@ def setup_and_install_dependencies(skip_install):
         install_chrome_on_travis.main(args=[])
 
 
-def build_js_files(dev_mode_setting):
+def build_js_files(dev_mode_setting, deparallelize_terser=False):
     """Build the javascript files.
 
     Args:
         dev_mode_setting: bool. Represents whether to run the related commands
         in dev mode.
+        deparallelize_terser: bool. Represents whether to use webpack
+        compilation config that disables parallelism on terser plugin.
     """
     update_dev_mode_in_constants_js(CONSTANT_FILE_PATH, dev_mode_setting)
     if not dev_mode_setting:
         python_utils.PRINT('  Generating files for production mode...')
-        build.main(args=['--prod_env'])
+        if deparallelize_terser:
+            build.main(args=['--prod_env', '--deparallelize_terser'])
+        else:
+            build.main(args=['--prod_env'])
     else:
         # The 'hashes.json' file is used by the `url-interpolation` service.
         if not os.path.isfile(HASHES_FILE_PATH):
@@ -448,10 +440,9 @@ def main(args=None):
     atexit.register(cleanup)
 
     dev_mode = not parsed_args.prod_env
-    update_community_dashboard_status_in_feconf_file(
-        FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
     if not parsed_args.skip_build:
-        build_js_files(dev_mode)
+        build_js_files(
+            dev_mode, deparallelize_terser=parsed_args.deparallelize_terser)
     start_webdriver_manager()
 
     start_google_app_engine_server(dev_mode)

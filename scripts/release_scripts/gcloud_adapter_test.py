@@ -159,39 +159,3 @@ class GcloudAdapterTests(test_utils.GenericTestBase):
                 'yaml path', 'app name', version='2.1.1')
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)
-
-    def test_flush_memcache(self):
-        import dev_appserver
-        from google.appengine.ext.remote_api import remote_api_stub
-        from google.appengine.api import memcache
-
-        check_function_calls = {
-            'fix_sys_path_is_called': False,
-            'configure_remote_api_for_oauth_is_called': False,
-            'flush_all_is_called': False
-        }
-        expected_check_function_calls = {
-            'fix_sys_path_is_called': True,
-            'configure_remote_api_for_oauth_is_called': True,
-            'flush_all_is_called': True
-        }
-        def mock_fix_sys_path():
-            check_function_calls['fix_sys_path_is_called'] = True
-        def mock_configure_remote_api_for_oauth(unused_url, unused_api):
-            check_function_calls[
-                'configure_remote_api_for_oauth_is_called'] = True
-        def mock_flush_all():
-            check_function_calls['flush_all_is_called'] = True
-            return True
-
-        fix_sys_path_swap = self.swap(
-            dev_appserver, 'fix_sys_path', mock_fix_sys_path)
-        configure_swap = self.swap(
-            remote_api_stub, 'ConfigureRemoteApiForOAuth',
-            mock_configure_remote_api_for_oauth)
-        flush_all_swap = self.swap(
-            memcache, 'flush_all', mock_flush_all)
-
-        with fix_sys_path_swap, configure_swap, flush_all_swap:
-            self.assertTrue(gcloud_adapter.flush_memcache('app name'))
-        self.assertEqual(check_function_calls, expected_check_function_calls)

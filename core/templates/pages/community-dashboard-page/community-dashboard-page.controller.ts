@@ -99,6 +99,8 @@ angular.module('oppia').directive('communityDashboardPage', [
           ctrl.$onInit = function() {
             ctrl.profilePictureDataUrl = null;
             ctrl.username = null;
+            ctrl.userInfoIsLoading = true;
+            ctrl.userIsLoggedIn = false;
             ctrl.userIsReviewer = false;
             ctrl.userCanReviewTranslationSuggestionsInLanguages = [];
             ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
@@ -132,8 +134,13 @@ angular.module('oppia').directive('communityDashboardPage', [
               });
 
             UserService.getUserInfoAsync().then(function(userInfo) {
+              ctrl.userInfoIsLoading = false;
               if (userInfo.isLoggedIn()) {
+                ctrl.userIsLoggedIn = true;
                 ctrl.username = userInfo.getUsername();
+              } else {
+                ctrl.userIsLoggedIn = false;
+                ctrl.username = '';
               }
             });
 
