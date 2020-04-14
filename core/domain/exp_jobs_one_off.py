@@ -80,6 +80,45 @@ AUDIO_ENTITY_TYPE = 'exploration'
 AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION = 31
 
 
+class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that produces a list of all (exploration, state) pairs that use the
+    Multiple selection interaction and have rules that do not correspond to any
+    answer choices.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        for state_name, state in exploration.states.items():
+            if state.interaction.id == 'MultipleChoiceInput':
+                choices_length = len(
+                    state.interaction.customization_args['choices']['value'])
+                for anwer_group_index, answer_group in enumerate(
+                        state.interaction.answer_groups):
+                    for rule_index, rule_spec in enumerate(
+                            answer_group.rule_specs):
+                        if rule_spec.inputs['x'] >= choices_length:
+                            yield (
+                                item.id,
+                                'State name: %s, AnswerGroup: %s,' % (
+                                    state_name.encode('utf-8'),
+                                    anwer_group_index) +
+                                ' Rule: %s is invalid.' % (rule_index) +
+                                '(Indices here are 0-indexed.)')
+
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
 class MathExpressionInputInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):  # pylint: disable=line-too-long
     """Job that produces a list of (exploration, state) pairs that use the Math
     Expression Interaction and that have rules that contain [<, >, =] to
