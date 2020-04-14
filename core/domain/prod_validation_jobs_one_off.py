@@ -5670,6 +5670,23 @@ class UserNormalizedNameAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     sorted(values), key))
 
 
+class UsernameLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits and validates username lengths."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(model_instance):
+        if len(model_instance.username) > 36:
+            yield (model_instance.id, model_instance.username)
+
+    @staticmethod
+    def reduce(key, values):
+        yield ('UserID: %s' % key, 'Username: %s' % values)
+
+
 class CompletedActivitiesModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates CompletedActivitiesModel."""
 
