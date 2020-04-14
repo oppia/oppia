@@ -2176,8 +2176,8 @@ class IndentMultilineDocstringDefinitionCheckerTests(unittest.TestCase):
             pylint_extensions.IndentMultilineDocstringDefinitionChecker)
         self.checker_test_object.setup_method()
 
-    def test_missing_indent_docstring_definition(self):
-        node_missing_indent_docstring_definition = astroid.scoped_nodes.Module(
+    def test_missing_indent_docstring_args(self):
+        node_missing_indent_docstring_args = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
@@ -2192,6 +2192,7 @@ class IndentMultilineDocstringDefinitionCheckerTests(unittest.TestCase):
                         Args:
                             param: This is the param definition.
                             It spans multiple lines.
+                                Here is another properly indented line.
                             param2: This is the param2 defintion.
                                 It is properly indented.
 
@@ -2200,15 +2201,87 @@ class IndentMultilineDocstringDefinitionCheckerTests(unittest.TestCase):
                         \"\"\"
                         Something
                 """)
-        node_missing_indent_docstring_definition.file = filename
-        node_missing_indent_docstring_definition.path = filename
+        node_missing_indent_docstring_args.file = filename
+        node_missing_indent_docstring_args.path = filename
 
         self.checker_test_object.checker.process_module(
-            node_missing_indent_docstring_definition)
+            node_missing_indent_docstring_args)
 
         message = testutils.Message(
             msg_id='missing-indent-docstring-definition',
             line=6)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_missing_indent_docstring_returns(self):
+        node_missing_indent_docstring_returns = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class something(param):
+                        \"\"\" This is a docstring.
+
+                        Args:
+                            int. not a multiline.
+                            param: This is the param defintion.
+                                It is properly indented.
+
+                        Returns:
+                            bool: The return value.
+                            Not properly indented.
+                        \"\"\"
+                        Something
+                """)
+        node_missing_indent_docstring_returns.file = filename
+        node_missing_indent_docstring_returns.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_missing_indent_docstring_returns)
+
+        message = testutils.Message(
+            msg_id='missing-indent-docstring-definition',
+            line=11)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_missing_indent_docstring_function(self):
+        node_missing_indent_docstring_function = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    class something():
+                        def function(param, param2):
+                            \"\"\" This is a docstring.
+
+                            Args:
+                                param: This is the param defintion.
+                                It is not properly indented.
+                                param2: This is the param2 defintion.
+                                    It is properly indented.
+                            \"\"\"
+                            Something
+                """)
+        node_missing_indent_docstring_function.file = filename
+        node_missing_indent_docstring_function.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_missing_indent_docstring_function)
+
+        message = testutils.Message(
+            msg_id='missing-indent-docstring-definition',
+            line=7)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()

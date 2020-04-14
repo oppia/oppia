@@ -801,7 +801,7 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):
         function arguments order. It then adds a message accordingly.
 
         Args:
-         node: astroid.scoped_nodes.Function. Node for a function or method
+            node: astroid.scoped_nodes.Function. Node for a function or method
                 definition in the AST.
         """
 
@@ -832,7 +832,7 @@ class RestrictedImportChecker(checkers.BaseChecker):
         """Visits every import statement in the file.
 
         Args:
-         node: astroid.node_classes.Import. Node for a import statement
+            node: astroid.node_classes.Import. Node for a import statement
                  in the AST.
         """
 
@@ -1464,6 +1464,7 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
                     'no-empty-line-provided-below-fileoverview',
                     line=closing_line_index_of_fileoverview + 1)
 
+
 class IndentMultilineDocstringDefinitionChecker(checkers.BaseChecker):
     """Checks that a multiline definition within a docstring has
     hanging indents for new lines.
@@ -1495,29 +1496,32 @@ class IndentMultilineDocstringDefinitionChecker(checkers.BaseChecker):
 
         for line_num in python_utils.RANGE(file_length):
             line = file_content[line_num]
-            prev_line = ''
 
-            if line_num > 0:
-                prev_line = file_content[line_num - 1]
+            if line_num == 0:
+                prev_line = ''
 
             # Check if it is a definition within a docstring.
-            if line.strip().startswith(b'Args:'):
+            if (line.strip().startswith(b'Args:') or
+              line.strip().startswith(b'Returns:')):
                 is_docstring_def = True
                 continue
 
             if is_docstring_def:
-                if (line.endswith(b'"""') or len(line.lstrip()) == 0):
+                if ((line.lstrip().startswith(b'"""') or
+                  len(line.lstrip()) == 0)):
                     is_docstring_def = False
-                    is_multline = False
+                    is_multiline = False
                     continue
-                elif not(is_multiline) and not(b':' in line):
+                elif not is_multiline and b':' in line:
+                    prev_line = file_content[line_num]
                     is_multiline = True
+                    continue
 
             if is_multiline:
-                if (b':' in line):
-                    is_multiline = False
+                if b':' in line:
+                    continue
                 elif ((len(line) - len(line.lstrip())) -
-                    (len(prev_line) - len(prev_line.lstrip())) != 4):
+                  (len(prev_line) - len(prev_line.lstrip())) != 4):
                     self.add_message(
                         'missing-indent-docstring-definition', line=line_num)
 
