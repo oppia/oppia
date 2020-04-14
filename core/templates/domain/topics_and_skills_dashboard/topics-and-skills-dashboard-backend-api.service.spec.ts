@@ -29,7 +29,7 @@ describe('Topics and Skills Dashboard backend API service', () => {
     TopicsAndSkillsDashboardBackendApiService = null;
   let httpTestingController: HttpTestingController = null;
 
-  var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
+  const SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
   const TOPICS_AND_SKILLS_DASHBOARD_DATA_URL =
     '/topics_and_skills_dashboard/data';
 
