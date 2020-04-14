@@ -32,7 +32,7 @@ var AdminPage = function() {
   var updateFormName = element(by.css('.protractor-update-form-name'));
   var updateFormSubmit = element(by.css('.protractor-update-form-submit'));
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
-  var statusMessage = element(by.css('[ng-if="$ctrl.statusMessage"]'));
+  var statusMessage = element(by.css('.protractor-test-status-message'));
 
   // Viewing roles can be done by two methods: 1. By roles 2. By username
   var roleDropdown = element(by.css('.protractor-test-role-method'));
