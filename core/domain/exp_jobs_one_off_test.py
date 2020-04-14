@@ -22,13 +22,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import datetime
 import logging
+import os
 
-from constants import constants
-from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import user_services
@@ -37,6 +38,8 @@ from core.tests import test_utils
 import feconf
 import python_utils
 import utils
+
+from mutagen import mp3
 
 (job_models, exp_models, base_models, classifier_models) = (
     models.Registry.import_models([
@@ -86,6 +89,187 @@ def run_job_for_deleted_exp(
 
     else:
         self.assertEqual(job_class.get_output(job_id), [])
+
+
+class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(MultipleChoiceInteractionOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
+        """Checks output pairs are produced only for
+        desired interactions.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1', 'State2'])
+
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+
+        state1.update_interaction_id('MultipleChoiceInput')
+        state2.update_interaction_id('MultipleChoiceInput')
+
+        customization_args_dict1 = {
+            'choices': {'value': [
+                '<p>This is value1 for MultipleChoiceInput</p>',
+                '<p>This is value2 for MultipleChoiceInput</p>',
+            ]}
+        }
+
+        answer_group_list1 = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': '1'}
+            }],
+            'outcome': {
+                'dest': 'Introduction',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state1</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state1.update_interaction_customization_args(customization_args_dict1)
+        state1.update_interaction_answer_groups(answer_group_list1)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start MultipleChoiceInteractionOneOffJob job on sample exploration.
+        job_id = exp_jobs_one_off.MultipleChoiceInteractionOneOffJob.create_new(
+        )
+        exp_jobs_one_off.MultipleChoiceInteractionOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.MultipleChoiceInteractionOneOffJob.get_output(
+                job_id))
+        self.assertEqual(actual_output, [])
+
+        customization_args_dict2 = {
+            'choices': {'value': [
+                '<p>This is value1 for MultipleChoiceInput</p>',
+                '<p>This is value2 for MultipleChoiceInput</p>',
+                '<p>This is value3 for MultipleChoiceInput</p>',
+                '<p>This is value4 for MultipleChoiceInput</p>',
+            ]}
+        }
+
+        answer_group_list2 = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': '0'}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': '9007199254740991'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state2</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state2.update_interaction_customization_args(customization_args_dict2)
+        state2.update_interaction_answer_groups(answer_group_list2)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start MultipleChoiceInteractionOneOffJob job on sample exploration.
+        job_id = exp_jobs_one_off.MultipleChoiceInteractionOneOffJob.create_new(
+        )
+        exp_jobs_one_off.MultipleChoiceInteractionOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.MultipleChoiceInteractionOneOffJob.get_output(
+                job_id))
+        expected_output = [(
+            u'[u\'exp_id0\', '
+            u'[u\'State name: State2, AnswerGroup: 0, Rule: 1 is invalid.' +
+            '(Indices here are 0-indexed.)\']]'
+        )]
+        self.assertEqual(actual_output, expected_output)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        state1 = exploration.states['State1']
+
+        state1.update_interaction_id('MultipleChoiceInput')
+
+        customization_args_dict = {
+            'choices': {'value': [
+                '<p>This is value1 for MultipleChoiceInput</p>',
+                '<p>This is value2 for MultipleChoiceInput</p>',
+            ]}
+        }
+
+        answer_group_list = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': '0'}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': '9007199254740991'}
+            }],
+            'outcome': {
+                'dest': 'State1',
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>Outcome for state2</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state1.update_interaction_customization_args(customization_args_dict)
+        state1.update_interaction_answer_groups(answer_group_list)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.MultipleChoiceInteractionOneOffJob)
+
 
 
 class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
@@ -264,596 +448,6 @@ class MathExpressionInputInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self, exp_jobs_one_off.MathExpressionInputInteractionOneOffJob)
-
-
-class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
-    """Tests for ExpSummary aggregations."""
-
-    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
-        exp_jobs_one_off.ExpSummariesCreationOneOffJob]
-
-    # Specify explorations that will be used in the test.
-    EXP_SPECS = [{
-        'category': 'Category A',
-        'title': 'Title 1'
-    }, {
-        'category': 'Category B',
-        'title': 'Title 2'
-    }, {
-        'category': 'Category C',
-        'title': 'Title 3'
-    }, {
-        'category': 'Category A',
-        'title': 'Title 4'
-    }, {
-        'category': 'Category C',
-        'title': 'Title 5'
-    }]
-
-    def setUp(self):
-        super(ExpSummariesCreationOneOffJobTest, self).setUp()
-
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.voice_artist_id = self.get_user_id_from_email(
-            self.VOICE_ARTIST_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.login(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-
-    def test_all_exps_public(self):
-        """Test summary batch job if all explorations are public."""
-        self._run_batch_job_once_and_verify_output(
-            self.EXP_SPECS,
-            default_status=rights_manager.ACTIVITY_STATUS_PUBLIC)
-
-    def test_all_exps_private(self):
-        """Test summary batch job if all explorations are private."""
-        self._run_batch_job_once_and_verify_output(
-            self.EXP_SPECS,
-            default_status=rights_manager.ACTIVITY_STATUS_PRIVATE)
-
-    def _run_batch_job_once_and_verify_output(
-            self, exp_specs,
-            default_title='A title',
-            default_category='A category',
-            default_status=rights_manager.ACTIVITY_STATUS_PUBLIC):
-        """Run batch job for creating exploration summaries once and verify its
-        output. exp_specs is a list of dicts with exploration specifications.
-        Allowed keys are category, status, title. If a key is not specified,
-        the default value is used.
-        """
-        with self.swap(
-            jobs_registry, 'ONE_OFF_JOB_MANAGERS',
-            self.ONE_OFF_JOB_MANAGERS_FOR_TESTS
-            ):
-
-            default_spec = {
-                'title': default_title,
-                'category': default_category,
-                'status': default_status
-            }
-
-            # Create and delete an exploration (to make sure job handles
-            # deleted explorations correctly).
-            exp_id = '100'
-            self.save_new_valid_exploration(
-                exp_id,
-                self.admin_id,
-                title=default_spec['title'],
-                category=default_spec['category'])
-            exploration = exp_fetchers.get_exploration_by_id(exp_id)
-            exp_services.delete_exploration(self.admin_id, exp_id)
-
-            # Get dummy explorations.
-            num_exps = len(exp_specs)
-            expected_job_output = {}
-
-            for ind in python_utils.RANGE(num_exps):
-                exp_id = python_utils.convert_to_bytes(ind)
-                spec = default_spec
-                spec.update(exp_specs[ind])
-
-                exploration = exp_domain.Exploration.create_default_exploration(
-                    exp_id, title=spec['title'], category=spec['category'])
-                exploration.tags = ['computer science', 'analysis', 'a b c']
-                exp_services.save_new_exploration(self.admin_id, exploration)
-
-                exploration = exp_fetchers.get_exploration_by_id(exp_id)
-
-                rights_manager.assign_role_for_exploration(
-                    self.admin, exp_id, self.voice_artist_id, 'voice artist')
-                rights_manager.assign_role_for_exploration(
-                    self.admin, exp_id, self.viewer_id, 'viewer')
-                rights_manager.assign_role_for_exploration(
-                    self.admin, exp_id, self.editor_id, 'editor')
-
-                # Publish exploration.
-                if spec['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
-                    rights_manager.publish_exploration(self.admin, exp_id)
-
-                # Do not include user_id here, so all explorations are not
-                # editable for now (will be updated depending on user_id
-                # in galleries).
-                exp_rights_model = exp_models.ExplorationRightsModel.get(
-                    exp_id)
-
-                exploration = exp_fetchers.get_exploration_by_id(exp_id)
-                exploration_model_last_updated = exploration.last_updated
-                exploration_model_created_on = exploration.created_on
-                first_published_msec = (
-                    exp_rights_model.first_published_msec)
-
-                # Manually create the expected summary specifying title,
-                # category, etc.
-                expected_job_output[exp_id] = exp_domain.ExplorationSummary(
-                    exp_id,
-                    spec['title'],
-                    spec['category'],
-                    exploration.objective,
-                    exploration.language_code,
-                    exploration.tags,
-                    feconf.get_empty_ratings(),
-                    feconf.EMPTY_SCALED_AVERAGE_RATING,
-                    spec['status'],
-                    exp_rights_model.community_owned,
-                    exp_rights_model.owner_ids,
-                    exp_rights_model.editor_ids,
-                    exp_rights_model.voice_artist_ids,
-                    exp_rights_model.viewer_ids,
-                    [self.admin_id],
-                    {self.admin_id: 1},
-                    exploration.version,
-                    exploration_model_created_on,
-                    exploration_model_last_updated,
-                    first_published_msec)
-
-                # Note: Calling constructor for fields that are not required
-                # and have no default value does not work, because
-                # unspecified fields will be empty list in
-                # expected_job_output but will be unspecified in
-                # actual_job_output.
-                if exploration.tags:
-                    expected_job_output[exp_id].tags = exploration.tags
-                if exp_rights_model.owner_ids:
-                    expected_job_output[exp_id].owner_ids = (
-                        exp_rights_model.owner_ids)
-                if exp_rights_model.editor_ids:
-                    expected_job_output[exp_id].editor_ids = (
-                        exp_rights_model.editor_ids)
-                if exp_rights_model.voice_artist_ids:
-                    expected_job_output[exp_id].voice_artist_ids = (
-                        exp_rights_model.voice_artist_ids)
-                if exp_rights_model.viewer_ids:
-                    expected_job_output[exp_id].viewer_ids = (
-                        exp_rights_model.viewer_ids)
-                if exploration.version:
-                    expected_job_output[exp_id].version = (
-                        exploration.version)
-
-            # Run batch job.
-            job_id = (
-                exp_jobs_one_off.ExpSummariesCreationOneOffJob.create_new())
-            exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
-
-            # Get and check job output.
-            actual_job_output = exp_services.get_all_exploration_summaries()
-            self.assertEqual(
-                list(actual_job_output.keys()),
-                list(expected_job_output.keys()))
-
-            # Note: 'exploration_model_last_updated' is not expected to be the
-            # same, because it is now read from the version model representing
-            # the exploration's history snapshot, and not the ExplorationModel.
-            simple_props = ['id', 'title', 'category', 'objective',
-                            'language_code', 'tags', 'ratings', 'status',
-                            'community_owned', 'owner_ids',
-                            'editor_ids', 'voice_artist_ids', 'viewer_ids',
-                            'contributor_ids', 'contributors_summary',
-                            'version', 'exploration_model_created_on']
-            for exp_id in actual_job_output:
-                for prop in simple_props:
-                    self.assertEqual(
-                        getattr(actual_job_output[exp_id], prop),
-                        getattr(expected_job_output[exp_id], prop))
-
-    def test_exp_summaries_creation_job_output(self):
-        """Test that ExpSummariesCreationOneOff job output is correct."""
-
-        with self.swap(
-            jobs_registry, 'ONE_OFF_JOB_MANAGERS',
-            self.ONE_OFF_JOB_MANAGERS_FOR_TESTS
-            ):
-
-            exp_id1 = '1'
-            self.save_new_valid_exploration(
-                exp_id1,
-                self.admin_id,
-                title='title',
-                category='category')
-            rights_manager.publish_exploration(self.admin, exp_id1)
-
-            exp_id2 = '2'
-            self.save_new_valid_exploration(
-                exp_id2,
-                self.admin_id,
-                title='title',
-                category='category')
-            rights_manager.publish_exploration(self.admin, exp_id2)
-            exp_services.delete_exploration(self.admin_id, exp_id2)
-
-            # Run ExpSummariesCreationOneOff job on sample exploration.
-            job_id = (
-                exp_jobs_one_off.ExpSummariesCreationOneOffJob.create_new())
-            exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
-
-            actual_output = (
-                exp_jobs_one_off.ExpSummariesCreationOneOffJob.get_output(
-                    job_id))
-            expected_output = ['[u\'SUCCESS\', 1]']
-            self.assertEqual(actual_output, expected_output)
-
-
-class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
-
-    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
-        exp_jobs_one_off.ExpSummariesContributorsOneOffJob]
-
-    EXP_ID = 'exp_id'
-
-    USERNAME_A = 'usernamea'
-    USERNAME_B = 'usernameb'
-    EMAIL_A = 'emaila@example.com'
-    EMAIL_B = 'emailb@example.com'
-
-    def setUp(self):
-        super(ExpSummariesContributorsOneOffJobTests, self).setUp()
-
-        self.signup(self.EMAIL_A, self.USERNAME_A)
-        self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
-        self.signup(self.EMAIL_B, self.USERNAME_B)
-        self.user_b_id = self.get_user_id_from_email(self.EMAIL_B)
-
-    def test_contributors_for_valid_contribution(self):
-        """Test that if only one commit is made, that the contributor
-        list consists of that contributor's user id.
-        """
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.user_a_id)
-        job_id = (
-            exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
-        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
-            exploration.id)
-        self.assertEqual(
-            [self.user_a_id], exploration_summary.contributor_ids)
-
-    def test_repeat_contributors(self):
-        """Test that if the same user makes more than one commit that changes
-        the content of an exploration, the user is only represented once in the
-        list of contributors for that exploration.
-        """
-
-        # Have one user make two commits.
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.user_a_id, title='Original Title')
-        exploration_model = exp_models.ExplorationModel.get(
-            self.EXP_ID, strict=True, version=None)
-        exploration_model.title = 'New title'
-        exploration_model.commit(
-            self.user_a_id, 'Changed title.', [])
-
-        # Run the job to compute the contributor ids.
-        job_id = (
-            exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
-        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        # Verify that the length of the contributor list is one, and that
-        # the list contains the user who made these commits.
-        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
-            exploration.id)
-        self.assertEqual(
-            [self.user_a_id], exploration_summary.contributor_ids)
-
-    def test_contributors_with_only_reverts_not_counted(self):
-        """Test that contributors who have only done reverts do not
-        have their user id appear in the contributor list.
-        """
-        # Have one user make two commits.
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.user_a_id, title='Original Title')
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-            'property_name': 'title',
-            'new_value': 'New title'
-        })]
-        exp_services.update_exploration(
-            self.user_a_id, self.EXP_ID, change_list, 'Changed title.')
-
-        # Have the second user revert version 2 to version 1.
-        exp_services.revert_exploration(self.user_b_id, self.EXP_ID, 2, 1)
-
-        # Run the job to compute the contributor ids.
-        job_id = (
-            exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
-        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        # Verify that the committer list does not contain the user
-        # who only reverted.
-        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
-            exploration.id)
-        self.assertEqual([self.user_a_id], exploration_summary.contributor_ids)
-
-    def test_nonhuman_committers_not_counted(self):
-        """Test that only human committers are counted as contributors."""
-
-        # Create a commit with the system user id.
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, feconf.SYSTEM_COMMITTER_ID, title='Original Title')
-        # Run the job to compute the contributor ids.
-        job_id = (
-            exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
-        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-        # Check that the system id was not added to the exploration's
-        # contributor ids.
-        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
-            exploration.id)
-        self.assertNotIn(
-            feconf.SYSTEM_COMMITTER_ID,
-            exploration_summary.contributor_ids)
-
-        # Create a commit with the migration bot user id.
-        exploration_model = exp_models.ExplorationModel.get(
-            self.EXP_ID, strict=True, version=None)
-        exploration_model.title = 'New title'
-        exploration_model.commit(
-            feconf.MIGRATION_BOT_USERNAME, 'Changed title.', [])
-        # Run the job to compute the contributor ids.
-        job_id = (
-            exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
-        exp_jobs_one_off.ExpSummariesContributorsOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-        # Check that the migration bot id was not added to the exploration's
-        # contributor ids.
-        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
-            exploration.id)
-        self.assertNotIn(
-            feconf.MIGRATION_BOT_USERNAME,
-            exploration_summary.contributor_ids)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        exp_id = '100'
-        self.save_new_valid_exploration(exp_id, self.user_a_id)
-        exp_services.delete_exploration(self.user_a_id, exp_id)
-
-        run_job_for_deleted_exp(
-            self, exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
-            function_to_be_called=exp_fetchers.get_exploration_summary_by_id,
-            exp_id=exp_id)
-
-
-class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
-    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
-        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob]
-
-    EXP_ID = 'exp_id'
-
-    USERNAME_A = 'usernamea'
-    USERNAME_B = 'usernameb'
-    EMAIL_A = 'emaila@example.com'
-    EMAIL_B = 'emailb@example.com'
-
-    def setUp(self):
-        super(ExplorationContributorsSummaryOneOffJobTests, self).setUp()
-        self.signup(self.EMAIL_A, self.USERNAME_A)
-        self.signup(self.EMAIL_B, self.USERNAME_B)
-
-        self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
-        self.user_b_id = self.get_user_id_from_email(self.EMAIL_B)
-
-    def test_contributors_for_valid_nonrevert_contribution(self):
-        """Test that if only non-revert commits are made by
-        contributor then the contributions summary shows same
-        exact number of commits for that contributor's ID.
-        """
-
-        # Let USER A make three commits.
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.user_a_id, title='Exploration Title')
-
-        exp_services.update_exploration(
-            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'title',
-                'new_value': 'New Exploration Title'
-            })], 'Changed title.')
-
-        exp_services.update_exploration(
-            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'New Objective'
-            })], 'Changed Objective.')
-
-        # Run the job to compute contributors summary.
-        job_id = (
-            exp_jobs_one_off
-            .ExplorationContributorsSummaryOneOffJob.create_new()
-        )
-        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
-            exploration.id)
-
-        self.assertEqual(
-            3, exploration_summary.contributors_summary[self.user_a_id])
-
-    def test_contributors_with_only_reverts_not_included(self):
-        """Test that if only reverts are made by contributor then the
-        contributions summary shouldn’t contain that contributor’s ID.
-        """
-
-        # Let USER A make three commits.
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.user_a_id, title='Exploration Title 1')
-
-        exp_services.update_exploration(
-            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'title',
-                'new_value': 'New Exploration Title'
-            })], 'Changed title.')
-        exp_services.update_exploration(
-            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'New Objective'
-            })], 'Changed Objective.')
-
-        # Let the second user revert version 3 to version 2.
-        exp_services.revert_exploration(self.user_b_id, self.EXP_ID, 3, 2)
-
-        # Run the job to compute the contributors summary.
-        job_id = (
-            exp_jobs_one_off
-            .ExplorationContributorsSummaryOneOffJob.create_new()
-        )
-        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
-            exploration.id)
-
-        # Check that the contributors_summary does not contains user_b_id.
-        self.assertNotIn(
-            self.user_b_id, exploration_summary.contributors_summary)
-
-        # Check that the User A has only 2 commits after user b has reverted
-        # to version 2.
-        self.assertEqual(
-            2, exploration_summary.contributors_summary[self.user_a_id])
-
-    def test_reverts_not_counted(self):
-        """Test that if both non-revert commits and revert are
-        made by contributor then the contributions summary shows
-        only non-revert commits for that contributor. However,
-        the commits made after the version to which we have reverted
-        shouldn't be counted either.
-        """
-
-        # Let USER A make 3 non-revert commits.
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.user_a_id, title='Exploration Title')
-        exp_services.update_exploration(
-            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'title',
-                'new_value': 'New Exploration Title'
-            })], 'Changed title.')
-        exp_services.update_exploration(
-            self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'New Objective'
-            })], 'Changed Objective.')
-
-        # Let USER A revert version 3 to version 2.
-        exp_services.revert_exploration(self.user_a_id, self.EXP_ID, 3, 2)
-
-        # Run the job to compute the contributor summary.
-        job_id = (
-            exp_jobs_one_off
-            .ExplorationContributorsSummaryOneOffJob.create_new()
-        )
-        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        # Check that USER A's number of contributions is equal to 2.
-        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
-            exploration.id)
-        self.assertEqual(
-            2, exploration_summary.contributors_summary[self.user_a_id])
-
-    def test_nonhuman_committers_not_counted(self):
-        """Test that only human committers are counted as contributors."""
-
-        # Create a commit with the system user id.
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, feconf.SYSTEM_COMMITTER_ID, title='Original Title')
-
-        # Create commits with all the system user ids.
-        for system_id in constants.SYSTEM_USER_IDS:
-            exp_services.update_exploration(
-                system_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': 'edit_exploration_property',
-                    'property_name': 'title',
-                    'new_value': 'Title changed by %s' % system_id
-                })], 'Changed title.')
-
-        # Run the job to compute the contributor summary.
-        job_id = (
-            exp_jobs_one_off
-            .ExplorationContributorsSummaryOneOffJob.create_new())
-        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        # Check that no system id was added to the exploration's
-        # contributor's summary.
-
-        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
-            exploration.id)
-
-        for system_id in constants.SYSTEM_USER_IDS:
-            self.assertNotIn(
-                system_id,
-                exploration_summary.contributors_summary)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        exp_id = '100'
-        self.save_new_valid_exploration(exp_id, self.user_a_id)
-        exp_services.delete_exploration(self.user_a_id, exp_id)
-
-        run_job_for_deleted_exp(
-            self, exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob,
-            function_to_be_called=exp_fetchers.get_exploration_summary_by_id,
-            exp_id=exp_id)
-
-    def test_exploration_contributors_summary_job_output(self):
-        """Test that ExplorationContributorsSummaryOneOff job output is
-        correct.
-        """
-        self.save_new_valid_exploration(
-            self.EXP_ID, self.user_a_id, title='Exploration Title')
-
-        # Run the ExplorationContributorsSummaryOneOff job.
-        job_id = (
-            exp_jobs_one_off
-            .ExplorationContributorsSummaryOneOffJob.create_new())
-        exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.get_output(
-                job_id))
-        expected_output = ['[u\'SUCCESS\', 1]']
-        self.assertEqual(actual_output, expected_output)
 
 
 class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
@@ -2232,6 +1826,7 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
     USERNAME_B = 'usernameb'
     EMAIL_A = 'emaila@example.com'
     EMAIL_B = 'emailb@example.com'
+    _FILENAME_PREFIX = 'audio'
 
     def setUp(self):
         super(TranslatorToVoiceArtistOneOffJobTests, self).setUp()
@@ -2360,3 +1955,242 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
 
         run_job_for_deleted_exp(
             self, exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob)
+
+
+class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
+    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
+        exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob]
+
+    VALID_EXP_ID = 'exp_id0'
+
+    USERNAME_A = 'usernamea'
+    EMAIL_A = 'emaila@example.com'
+    TEST_AUDIO_FILE_MP3 = 'cafe.mp3'
+    AUDIO_UPLOAD_URL_PREFIX = '/createhandler/audioupload'
+    _FILENAME_PREFIX = 'audio'
+
+    def setUp(self):
+        super(VoiceoverDurationSecondsOneOffJobTests, self).setUp()
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+
+        self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+        self.process_and_flush_pending_tasks()
+
+    def test_voiceover_duration_secs_job_fails_with_invalid_exploration(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.user_a_id, exploration)
+
+        exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+        exploration_model.language_code = 'invalid_language_code'
+        exploration_model.commit(
+            self.user_a_id, 'Changed language_code.', [])
+        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
+
+        job_id = exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob.create_new()
+        exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob.enqueue(job_id)
+        with self.swap(logging, 'error', _mock_logging_function):
+            self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            observed_log_messages,
+            ['Exploration %s failed non-strict validation: '
+             'Invalid language_code: invalid_language_code'
+             % (self.VALID_EXP_ID)])
+
+    def test_jobs_fails_when_audio_file_is_not_found(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exploration.add_states(['State1'])
+        state1 = exploration.states['State1']
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': self.TEST_AUDIO_FILE_MP3,
+                        'file_size_bytes': 123,
+                        'needs_update': True,
+                        'duration_secs': 0.0
+                    }
+                },
+                'default_outcome': {}
+            }
+        }
+
+        state1.update_recorded_voiceovers(
+            state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict))
+        exp_services.save_new_exploration(self.user_a_id, exploration)
+
+        job_id = exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob.create_new()
+        exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob.enqueue(job_id)
+        with self.swap(logging, 'error', _mock_logging_function):
+            self.process_and_flush_pending_tasks()
+
+        relative_path = ('%s/%s' % (self._FILENAME_PREFIX,
+                                    self.TEST_AUDIO_FILE_MP3))
+        self.assertEqual(
+            observed_log_messages,
+            ['Mp3 audio file not found for %s , caused by: '
+             'File %s not found.'
+             % (self.TEST_AUDIO_FILE_MP3, relative_path)])
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exp_id = '100'
+        self.save_new_valid_exploration(exp_id, self.user_a_id)
+        exp_services.delete_exploration(self.user_a_id, exp_id)
+
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob)
+
+    def test_minimum_allowed_state_schema_version(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='Exploration Title 1', category='category')
+        exploration.add_states(['State1'])
+        # Test with the unaccpted state_schema_version
+        # for duration_secs which is less than 31.
+        exploration.states_schema_version = 30
+        state1 = exploration.states['State1']
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': self.TEST_AUDIO_FILE_MP3,
+                        'file_size_bytes': 123,
+                        'needs_update': True,
+                        'duration_secs': 0.0
+                    }
+                },
+                'default_outcome': {}
+            }
+        }
+
+        state1.update_recorded_voiceovers(
+            state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict))
+
+
+        exp_services.save_new_exploration(self.user_a_id, exploration)
+
+        job_id = (
+            exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob.create_new())
+        exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob.get_output(
+                job_id)
+            )
+        expected_output = [('[u\'State schema version is '
+                            'not the minimum version expected\', '
+                            '[u\'exp_id0\']]')]
+        self.assertEqual(actual_output, expected_output)
+
+    def test_duration_secs_is_updated_when_job_is_complete(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='Exploration Title 1', category='category')
+        exploration.add_states(['State1'])
+        state1 = exploration.states['State1']
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': self.TEST_AUDIO_FILE_MP3,
+                        'file_size_bytes': 123,
+                        'needs_update': True,
+                        'duration_secs': 0.0
+                    },
+                    'hi': {
+                        'filename': self.TEST_AUDIO_FILE_MP3,
+                        'file_size_bytes': 1234,
+                        'needs_update': False,
+                        'duration_secs': 0.0
+                    }
+                },
+                'default_outcome': {}
+            }
+        }
+
+        # Get the test audio file and prepare for storage.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
+            mode='rb', encoding=None) as f:
+            raw_audio = f.read()
+
+        tempbuffer = python_utils.string_io()
+        tempbuffer.write(raw_audio)
+        tempbuffer.seek(0)
+
+        audio = mp3.MP3(tempbuffer)
+
+        tempbuffer.close()
+        mimetype = audio.mime[0]
+        del audio
+
+        # Save the raw audio into the filesystem.
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
+        fs.commit(
+            '%s/%s' % (self._FILENAME_PREFIX, self.TEST_AUDIO_FILE_MP3),
+            raw_audio, mimetype=mimetype)
+
+        # Save the recorded_voiceovers.
+        state1.update_recorded_voiceovers(
+            state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict))
+        exp_services.save_new_exploration(self.user_a_id, exploration)
+
+        # Run the job.
+        job_id = (
+            exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob.create_new())
+        exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob.get_output(
+                job_id)
+            )
+        # Validate job ran successfully.
+        expected_output = ['[u\'SUCCESS\', 2]']
+        self.assertEqual(actual_output, expected_output)
+
+
+        updated_exploration = (
+            exp_fetchers.get_exploration_by_id(self.VALID_EXP_ID).to_dict())
+        expected_updated_value = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': self.TEST_AUDIO_FILE_MP3,
+                        'file_size_bytes': 123,
+                        'needs_update': True,
+                        'duration_secs': 15.255510204081633
+                    },
+                    'hi': {
+                        'filename': self.TEST_AUDIO_FILE_MP3,
+                        'file_size_bytes': 1234,
+                        'needs_update': False,
+                        'duration_secs': 15.255510204081633
+                    }
+                },
+                'default_outcome': {}
+            }
+        }
+        actual_value = (
+            updated_exploration['states']['State1']['recorded_voiceovers'])
+        # Validate the data is updated in the exploration correctly.
+        self.assertEqual(expected_updated_value, actual_value)
