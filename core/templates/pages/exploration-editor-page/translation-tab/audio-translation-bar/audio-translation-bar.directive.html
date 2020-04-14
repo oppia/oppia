@@ -155,7 +155,7 @@
     <div ng-if="isAudioAvailable && audioIsLoading">
       <[0 | formatTimer]> / <[durationSecs | formatTimer]>
     </div>
-    <div ng-if="audioTimerIsShown">
+    <div ng-if="audioTimerIsShown && !audioIsLoading">
       <[getUploadedAudioTimer()]>
     </div>
   </div>
