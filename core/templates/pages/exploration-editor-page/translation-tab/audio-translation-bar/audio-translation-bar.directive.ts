@@ -395,6 +395,7 @@ angular.module('oppia').directive('audioTranslationBar', [
               AudioPlayerService.load(audioTranslation.filename)
                 .then(function() {
                   $scope.audioLoadingIndicatorIsShown = false;
+                  $scope.isLoadingAudio = true;
                   $scope.audioTimerIsShown = true;
                   AudioPlayerService.play();
                 });
@@ -432,7 +433,7 @@ angular.module('oppia').directive('audioTranslationBar', [
               $scope.selectedRecording = false;
               $scope.audioNeedsUpdate = audioTranslationObject.needsUpdate;
               $scope.durationSecs =
-                Math.round(audioTranslationObject.duration_secs);
+                Math.round(audioTranslationObject.durationSecs);
             } else {
               $scope.isAudioAvailable = false;
               $scope.audioBlob = null;

@@ -88,7 +88,8 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserProfilePictureOneOffJob,
     user_jobs_one_off.UsernameLengthDistributionOneOffJob,
     exp_jobs_one_off.MathExpressionInputInteractionOneOffJob,
-    exp_jobs_one_off.MultipleChoiceInteractionOneOffJob
+    exp_jobs_one_off.MultipleChoiceInteractionOneOffJob,
+    exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
