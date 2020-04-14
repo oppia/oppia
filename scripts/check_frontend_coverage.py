@@ -136,6 +136,7 @@ FULLY_COVERED_FILENAMES = [
     'exploration-title.service.ts',
     'exploration-warnings.service.ts',
     'ExplorationDraftObjectFactory.ts',
+    'ExplorationMetadataObjectFactory.ts',
     'ExplorationObjectFactory.ts',
     'ExplorationOpportunitySummaryObjectFactory.ts',
     'expression-parser.service.ts',
