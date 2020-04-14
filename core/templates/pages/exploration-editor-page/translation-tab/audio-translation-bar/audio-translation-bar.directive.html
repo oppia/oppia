@@ -152,7 +152,7 @@
     </div>
   </div>
   <div class="oppia-content-wrapper oppia-recording-timer">
-    <div ng-if="isAudioAvailable && isLoadingAudio">
+    <div ng-if="isAudioAvailable && audioIsLoading">
       <[0 | formatTimer]> / <[durationSecs | formatTimer]>
     </div>
     <div ng-if="audioTimerIsShown">
