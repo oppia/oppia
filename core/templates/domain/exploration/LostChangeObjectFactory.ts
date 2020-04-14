@@ -17,14 +17,9 @@
  * domain objects.
  */
 
-import isEqual from 'lodash/cloneDeep';
-
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { UtilsService } from 'services/utils.service';
-import { SubtitledHtml } from './SubtitledHtmlObjectFactory';
-import { OutcomeObjectFactory } from './OutcomeObjectFactory';
-import { AnswerGroupObjectFactory } from './AnswerGroupObjectFactory';
 
 export class LostChange {
   cmd: string;
