@@ -85,7 +85,8 @@ angular.module('oppia').directive('thumbnailUploader', [
             };
             var allowedColors = $scope.getAllowedColors();
             var getPreviewDescription = $scope.getPreviewDescription;
-            var getPreviewDescriptionBgColor = $scope.getPreviewDescriptionBgColor;
+            var getPreviewDescriptionBgColor = (
+              $scope.getPreviewDescriptionBgColor);
             var getPreviewFooter = $scope.getPreviewFooter;
             var getPreviewTitle = $scope.getPreviewTitle;
 
