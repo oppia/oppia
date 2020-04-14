@@ -109,6 +109,8 @@ class ExplorationHandler(EditorHandler):
                 self.user_id and not has_seen_editor_tutorial)
             exploration_data['show_state_translation_tutorial_on_load'] = (
                 self.user_id and not has_seen_translation_tutorial)
+            exploration_data['exploration_is_linked_to_story'] = bool(
+                exp_services.get_story_id_linked_to_exploration(exploration_id))
         except:
             raise self.PageNotFoundException
 
@@ -386,9 +388,12 @@ class ExplorationFileDownloader(EditorHandler):
             version = exploration.version
 
         # If the title of the exploration has changed, we use the new title.
-        filename = utils.to_ascii(
-            'oppia-%s-v%s.zip'
-            % (exploration.title.replace(' ', ''), version)).decode('utf-8')
+        if not exploration.title:
+            init_filename = 'oppia-unpublished_exploration-v%s.zip' % version
+        else:
+            init_filename = 'oppia-%s-v%s.zip' % (
+                exploration.title.replace(' ', ''), version)
+        filename = utils.to_ascii(init_filename).decode('utf-8')
 
         if output_format == feconf.OUTPUT_FORMAT_ZIP:
             self.render_downloadable_file(
