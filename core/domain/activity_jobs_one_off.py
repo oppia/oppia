@@ -20,12 +20,49 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core import jobs
+from core.domain import collection_services
+from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import search_services
+
 from core.platform import models
 import feconf
 
 (collection_models, exp_models) = models.Registry.import_models(
     [models.NAMES.collection, models.NAMES.exploration])
+
+
+class ActivityContributorsSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job that computes the number of commits done by contributors for
+    each collection and exploration.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [collection_models.CollectionModel, exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(model):
+        if model.deleted:
+            return
+
+        if isinstance(model, collection_models.CollectionModel):
+            summary = collection_services.get_collection_summary_by_id(model.id)
+            summary.contributors_summary = (
+                collection_services.compute_collection_contributors_summary(
+                    model.id))
+            summary.contributor_ids = list(summary.contributors_summary)
+            collection_services.save_collection_summary(summary)
+        else:
+            summary = exp_fetchers.get_exploration_summary_by_id(model.id)
+            summary.contributors_summary = (
+                exp_services.compute_exploration_contributors_summary(model.id))
+            summary.contributor_ids = list(summary.contributors_summary)
+            exp_services.save_exploration_summary(summary)
+        yield ('SUCCESS', model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
 
 
 class AuditContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):

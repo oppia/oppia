@@ -693,6 +693,9 @@ class ExpSummaryModel(base_models.BaseModel):
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who have contributed (humans who have made a
     # positive (not just a revert) change to the exploration's content).
+    # NOTE TO DEVELOPERS: contributor_ids and contributors_summary need to be
+    # synchronized, meaning that the keys in contributors_summary need be
+    # equal to the contributor_ids list.
     contributor_ids = ndb.StringProperty(indexed=True, repeated=True)
     # A dict representing the contributors of non-trivial commits to this
     # exploration. Each key of this dict is a user_id, and the corresponding
