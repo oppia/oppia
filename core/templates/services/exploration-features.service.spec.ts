@@ -14,7 +14,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit test for exporation-feature-service
+ * @fileoverview Unit test for ExplorationFeaturesService
  */
 
 import { TestBed } from '@angular/core/testing';
@@ -63,7 +63,7 @@ describe('ExplorationFeatureService', () => {
     };
   });
 
-  it('should init the exploration from param change', () => {
+  it('should init the exploration features from param change', () => {
     explorationFeatureService.init(explorationData, featureData);
     expect(explorationFeatureService.isInitialized()).toEqual(true);
     expect(explorationFeatureService.areParametersEnabled()).toEqual(true);
@@ -72,7 +72,7 @@ describe('ExplorationFeatureService', () => {
       .toEqual(true);
   });
 
-  it('should init the exploration from state', () => {
+  it('should init the exploration features from states', () => {
     explorationFeatureService.init(explorationData2, featureData);
     expect(explorationFeatureService.isInitialized()).toEqual(true);
     expect(explorationFeatureService.areParametersEnabled()).toEqual(true);
@@ -81,13 +81,15 @@ describe('ExplorationFeatureService', () => {
       .toEqual(true);
   });
 
-  it('should return if service is initialized', () => {
-    ExplorationFeaturesService.serviceIsInitialized = true;
-    explorationFeatureService.init(explorationData, featureData);
-    expect(explorationFeatureService.isInitialized()).toEqual(true);
-    expect(explorationFeatureService.areParametersEnabled()).toEqual(false);
-    expect(explorationFeatureService.isImprovementsTabEnabled()).toEqual(false);
-    expect(explorationFeatureService.isPlaythroughRecordingEnabled())
-      .toEqual(false);
-  });
+  it('should not init the exploration feature if service is initialized',
+    () => {
+      ExplorationFeaturesService.serviceIsInitialized = true;
+      explorationFeatureService.init(explorationData, featureData);
+      expect(explorationFeatureService.isInitialized()).toEqual(true);
+      expect(explorationFeatureService.areParametersEnabled()).toEqual(false);
+      expect(explorationFeatureService.isImprovementsTabEnabled())
+        .toEqual(false);
+      expect(explorationFeatureService.isPlaythroughRecordingEnabled())
+        .toEqual(false);
+    });
 });
