@@ -273,8 +273,10 @@ def export_to_zip_file(exploration_id, version=None):
     memfile = python_utils.string_io()
     with zipfile.ZipFile(
         memfile, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
-
-        zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
+        if not exploration.title:
+            zfile.writestr('Unpublished_exploration.yaml', yaml_repr)
+        else:
+            zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
 
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(

@@ -616,6 +616,34 @@ written_translations:
 
         self.logout()
 
+    def test_exploration_download_handler_with_no_title(self):
+        # This is the case for most unpublished explorations.
+        self.login(self.EDITOR_EMAIL)
+        owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        # Create a simple exploration.
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, owner_id,
+            title='',
+            category='This is just a test category',
+            objective='')
+
+        # Download to zip file using download handler.
+        download_url = '/createhandler/download/%s' % exp_id
+        response = self.get_custom_response(download_url, 'text/plain')
+
+        # Check downloaded zip file.
+        filename = 'oppia-unpublished_exploration-v1.zip'
+        self.assertEqual(response.headers['Content-Disposition'],
+                         'attachment; filename=%s' % filename)
+
+        zf_saved = zipfile.ZipFile(
+            python_utils.string_io(buffer_value=response.body))
+        self.assertEqual(zf_saved.namelist(), ['Unpublished_exploration.yaml'])
+
+        self.logout()
+
     def test_state_yaml_handler(self):
         self.login(self.EDITOR_EMAIL)
         owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)

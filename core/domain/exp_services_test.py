@@ -1825,6 +1825,17 @@ title: A title
         self.assertEqual(
             zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
 
+    def test_export_to_zip_file_with_unpublished_exploration(self):
+        """Test the export_to_zip_file() method."""
+        self.save_new_default_exploration(
+            self.EXP_0_ID, self.owner_id, title='')
+
+        zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
+        zf = zipfile.ZipFile(python_utils.string_io(
+            buffer_value=zip_file_output))
+
+        self.assertEqual(zf.namelist(), ['Unpublished_exploration.yaml'])
+
     def test_export_to_zip_file_with_assets(self):
         """Test exporting an exploration with assets to a zip file."""
         exploration = self.save_new_valid_exploration(
