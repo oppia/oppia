@@ -131,7 +131,8 @@ export class EditableStoryBackendApiService {
     };
 
     private _validateExplorations = function(
-        storyId: string, expIds: string, successCallback: any, errorCallback: any) {
+        storyId: string, expIds: string[], successCallback: any,
+        errorCallback: any) {
       var validateExplorationsUrl = this.urlInterpolation.interpolateUrl(
         StoryDomainConstants.VALIDATE_EXPLORATIONS_URL_TEMPLATE, {
           story_id: storyId
@@ -180,7 +181,7 @@ export class EditableStoryBackendApiService {
     }
 
     validateExplorations(
-        storyId: string, expIds: string): Promise<object> {
+        storyId: string, expIds: string[]): Promise<object> {
       return new Promise((resolve, reject) => {
         this._validateExplorations(
           storyId, expIds, resolve, reject);
