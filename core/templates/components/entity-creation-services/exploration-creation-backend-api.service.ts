@@ -39,6 +39,6 @@ angular.module('oppia').factory('ExplorationCreationBackendService', [
           _createExploration(resolve, reject);
         });
       }
-    }
+    };
   }
 ]);

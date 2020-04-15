@@ -57,7 +57,7 @@ angular.module('oppia').factory('ExplorationCreationService', [
                 }
               );
             }, 150);
-          return false;
+            return false;
           }, function() {
             $rootScope.loadingMessage = '';
             explorationCreationInProgress = false;
