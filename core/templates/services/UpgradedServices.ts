@@ -482,8 +482,6 @@ export class UpgradedServices {
       upgradedServices['LearnerActionObjectFactory']);
     upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
       upgradedServices['LoggerService']);
-    upgradedServices['QuestionObjectFactory'] =
-      new QuestionObjectFactory(upgradedServices['StateObjectFactory']);
     upgradedServices['RecordedVoiceoversObjectFactory'] =
       new RecordedVoiceoversObjectFactory(
         upgradedServices['VoiceoverObjectFactory']);
@@ -664,6 +662,8 @@ export class UpgradedServices {
       upgradedServices['WrittenTranslationsObjectFactory']);
 
     // Topological level: 7.
+    upgradedServices['QuestionObjectFactory'] = new QuestionObjectFactory(
+      upgradedServices['StateObjectFactory']);
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
       upgradedServices['StateObjectFactory']);
 
