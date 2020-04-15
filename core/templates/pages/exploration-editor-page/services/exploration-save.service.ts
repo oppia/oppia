@@ -224,6 +224,8 @@ angular.module('oppia').factory('ExplorationSaveService', [
       ExplorationDataService.save(
         changeList, commitMessage,
         function(isDraftVersionValid, draftChanges) {
+          isDraftVersionValid = false;
+          draftChanges = ['a', 'b'];
           if (isDraftVersionValid === false &&
               draftChanges !== null &&
               draftChanges.length > 0) {

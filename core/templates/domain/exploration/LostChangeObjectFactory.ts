@@ -20,6 +20,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { UtilsService } from 'services/utils.service';
+import isEqual from 'lodash/isEqual';
 
 export class LostChange {
   cmd: string;
@@ -34,13 +35,16 @@ export class LostChange {
 
   // TODO(#7176): Replace 'any' with the exact type.
   constructor(
-      utilsService: UtilsService, cmd: string, stateName: string,
-      newValue: any, oldValue: any, propertyName: string) {
+      utilsService: UtilsService, cmd: string, newStateName: string,
+      oldStateName: string, stateName: string, newValue: any, oldValue: any,
+      propertyName: string) {
     this.utilsService = utilsService;
     this.cmd = cmd;
+    this.newStateName = newStateName;
+    this.oldStateName = oldStateName;
     this.stateName = stateName;
-    this.newValue = this.getStatePropertyValue(newValue);
-    this.oldValue = this.getStatePropertyValue(oldValue);
+    this.newValue = newValue;
+    this.oldValue = oldValue;
     this.propertyName = propertyName;
   }
 
@@ -69,17 +73,58 @@ export class LostChange {
     return this.utilsService.isEmpty(this.newValue);
   }
 
+  isOutcomeFeedbackEqual() {
+    if (this.newValue.outcome && this.newValue.outcome.feedback &&
+      this.oldValue.outcome && this.oldValue.outcome.feedback) {
+      return (
+        this.newValue.outcome.feedback.getHtml() ===
+        this.oldValue.outcome.feedback.getHtml());
+    }
+    return false;
+  }
+
+  isOutcomeDestEqual() {
+    if (this.newValue.outcome && this.oldValue.outcome) {
+      return (
+        this.oldValue.outcome.dest === this.newValue.outcome.dest);
+    }
+    return false;
+  }
+
+  isDestEqual() {
+    return this.oldValue.dest === this.newValue.dest;
+  }
+
+  isFeedbackEqual() {
+    if (this.newValue.feedback && this.oldValue.feedback) {
+      return (
+        this.newValue.feedback.getHtml() ===
+        this.oldValue.feedback.getHtml());
+    }
+    return false;
+  }
+
+  isRulesEqual() {
+    return isEqual(this.newValue.rules, this.oldValue.rules);
+  }
+
   // Detects whether an object of the type 'answer_group' or
   // 'default_outcome' has been added, edited or deleted.
   // Returns - 'addded', 'edited' or 'deleted' accordingly.
   getRelativeChangeToGroups(): string {
     let result = '';
 
-    if (Array.isArray(this.newValue) &&
-      Array.isArray(this.oldValue)) {
-      result = (this.newValue.length > this.oldValue.length) ?
-        'added' : (this.newValue.length === this.oldValue.length) ?
-          'edited' : 'deleted';
+    if (Array.isArray(this.newValue) && Array.isArray(this.oldValue)) {
+      if (this.newValue.length > this.oldValue.length) {
+        console.log('a');
+        result = 'added';
+      } else if (this.newValue.length === this.oldValue.length) {
+        console.log('b');
+        result = 'edited';
+      } else {
+        console.log('c');
+        result = 'deleted';
+      }
     } else {
       if (!this.utilsService.isEmpty(this.oldValue)) {
         if (!this.utilsService.isEmpty(this.newValue)) {
@@ -104,12 +149,13 @@ export class LostChangeObjectFactory {
   /**
    * @param {String} lostChangeDict - the name of the type to fetch.
    * @returns {LostChange} - The associated type, if any.
-   * @throws {Error} - When the given type name isn't registered.
    */
   createNew(lostChangeDict) {
     return new LostChange(
       this.utilsService,
       lostChangeDict.cmd,
+      lostChangeDict.new_state_name,
+      lostChangeDict.old_state_name,
       lostChangeDict.state_name,
       lostChangeDict.new_value,
       lostChangeDict.old_value,
