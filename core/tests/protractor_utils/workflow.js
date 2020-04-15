@@ -28,8 +28,8 @@ var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
 
 var thumbnailUploadInput = element(
   by.css('.protractor-test-photo-upload-input'));
-var thumbnailCropper = element(
-  by.css('.cropper-container'));
+var thumbnailContainer = element(
+  by.css('.oppia-thumbnail-container'));
 var thumbnailSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 
@@ -259,7 +259,7 @@ var getExplorationPlaytesters = function() {
 };
 
 var createSkillAndAssignTopic = function(
-    skillDescription, material, topicName, thumbnailPath) {
+    skillDescription, material, topicName) {
   var topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
   topicsAndSkillsDashboardPage.get();
@@ -273,6 +273,9 @@ var createSkillAndAssignTopic = function(
 };
 
 var getThumbnailSource = function(customThumbnailElement) {
+  waitFor.visibilityOf(
+    customThumbnailElement,
+    'Thumbnail element is taking too long to appear.');
   return customThumbnailElement.getAttribute('src');
 };
 
@@ -283,10 +286,13 @@ var uploadThumbnail = function(thumbnailClickableElement, imgPath) {
 };
 
 var submitThumbnail = function(thumbnailClickableElement, imgPath) {
+  waitFor.visibilityOf(
+    thumbnailClickableElement,
+    'Thumbnail element is taking too long to appear.');
   return this.uploadThumbnail(
     thumbnailClickableElement, imgPath).then(function() {
     waitFor.visibilityOf(
-      thumbnailCropper, 'Photo cropper is taking too long to appear');
+      thumbnailContainer, 'Thumbnail container is taking too long to appear');
   }).then(function() {
     thumbnailSubmitButton.click();
   }).then(function() {

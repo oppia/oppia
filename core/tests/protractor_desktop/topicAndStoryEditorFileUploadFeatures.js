@@ -34,6 +34,7 @@ describe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var topicName = 'Topic 1';
+  var topicId = null;
   var explorationEditorPage = null;
 
   beforeAll(function() {
@@ -46,20 +47,20 @@ describe('Topic editor functionality', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     users.createAndLoginAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic(topicName, 'abbrev');
     users.logout();
   });
 
   beforeEach(function() {
     users.login('creator@topicEditor.com');
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.editTopic(topicName);
   });
 
   it('should edit topic name, abbreviated topic name, ' +
     'thumbnail and description correctly', function() {
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
     newTopicName = 'Topic 1 edited';
+    topicsAndSkillsDashboardPage.editTopic('Topic 1');
     topicEditorPage.changeTopicName(newTopicName);
     expect(topicEditorPage.getTopicThumbnailSource())
       .not
@@ -83,6 +84,18 @@ describe('Topic editor functionality', function() {
   });
 
   it('should edit subtopic page contents correctly', function() {
+    topicsAndSkillsDashboardPage.createTopic('Topic 2', 'abbrev');
+    expect(topicEditorPage.getTopicThumbnailSource())
+      .not
+      .toEqual(
+        topicEditorPage.submitTopicThumbnail('../data/test_svg.svg')
+          .then(function() {
+            return topicEditorPage.getTopicThumbnailSource();
+          })
+      );
+    topicEditorPage.changeAbbreviatedTopicName('short name');
+    topicEditorPage.changeTopicDescription('Topic Description');
+    topicEditorPage.saveTopic('Changed topic name and description.');
     topicEditorPage.moveToSubtopicsTab();
     topicEditorPage.addSubtopic('Subtopic 1');
     topicEditorPage.editSubtopicWithIndex(0);
@@ -98,7 +111,8 @@ describe('Topic editor functionality', function() {
     topicEditorPage.saveSubtopic();
     topicEditorPage.saveTopic('Edited subtopic.');
 
-    topicEditorPage.get(topicId);
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.editTopic('Topic 2');
     topicEditorPage.moveToSubtopicsTab();
     topicEditorPage.expectTitleOfSubtopicWithIndexToMatch('Modified Title', 0);
     topicEditorPage.editSubtopicWithIndex(0);
@@ -115,12 +129,10 @@ describe('Chapter editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
-  var storyId = null;
   var explorationEditorPage = null;
   var dummyExplorationIds = [];
   var dummyExplorationInfo = [
     'Dummy exploration', 'Algorithm', 'Learn more about oppia', 'English'];
-  var dummySkills = [];
   var allowedErrors = [];
   var topicName = 'Topic 0';
   var userEmail = 'creator@chapterTest.com';
@@ -139,18 +151,6 @@ describe('Chapter editor functionality', function() {
     return ids;
   };
 
-  var createDummySkills = function(numSkills) {
-    var skills = [];
-    for (var i = 0; i < numSkills; i++) {
-      var skillName = 'skillFromChapterEditor' + i.toString();
-      var material = 'material' + i.toString();
-      workflow.createSkillAndAssignTopic(
-        skillName, material, topicName, '../data/test_svg.svg');
-      skills.push(skillName);
-    }
-    return skills;
-  };
-
   beforeAll(function() {
     topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
@@ -161,23 +161,39 @@ describe('Chapter editor functionality', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     users.createAndLoginAdminUser(
       userEmail, 'creatorChapterTest');
-    dummyExplorationIds = createDummyExplorations(3);
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic(topicName, 'abbrev');
-    topicEditorPage.createStory('Story 0');
-    browser.getCurrentUrl().then(function(url) {
-      storyId = url.split('/')[4];
-      dummySkills = createDummySkills(2);
-    });
+    dummyExplorationIds = createDummyExplorations(1);
+    users.logout();
   });
 
   beforeEach(function() {
     users.login(userEmail);
-    storyEditorPage.get(storyId);
   });
 
   it('should create a basic chapter with a thumbnail.', function() {
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createTopic(topicName, 'abbrev');
+    expect(topicEditorPage.getTopicThumbnailSource())
+      .not
+      .toEqual(
+        topicEditorPage.submitTopicThumbnail('../data/test_svg.svg')
+          .then(function() {
+            return topicEditorPage.getTopicThumbnailSource();
+          })
+      );
+    topicEditorPage.changeAbbreviatedTopicName('short name');
+    topicEditorPage.changeTopicDescription('Topic Description');
+    topicEditorPage.saveTopic('Changed topic name and description.');
+    topicEditorPage.createStory('Story 0');
+    expect(storyEditorPage.getStoryThumbnailSource())
+      .not
+      .toEqual(
+        storyEditorPage.submitStoryThumbnail('../data/test_svg.svg')
+          .then(function() {
+            return storyEditorPage.getStoryThumbnailSource();
+          })
+      );
     storyEditorPage.createInitialChapter('Chapter 1');
+    storyEditorPage.selectInitialChapterByName('Chapter 1');
     expect(storyEditorPage.getChapterThumbnailSource())
       .not
       .toEqual(
@@ -186,8 +202,8 @@ describe('Chapter editor functionality', function() {
             return storyEditorPage.getChapterThumbnailSource();
           })
       );
-    storyEditorPage.setChapterExplorationId(dummyExplorationIds[0]);
     storyEditorPage.changeNodeOutline(forms.toRichText('First outline'));
+    storyEditorPage.setChapterExplorationId(dummyExplorationIds[0]);
     storyEditorPage.saveStory('First save');
   });
 
