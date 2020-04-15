@@ -146,7 +146,7 @@ export class Question {
     return false;
   }
 
-  toBackendDict(isNewQuestion: boolean): any {
+  toBackendDict(isNewQuestion: boolean): IQuestionBackendDict {
     var questionBackendDict = {
       id: null,
       question_state_data: this._stateData.toBackendDict(),
@@ -174,7 +174,7 @@ export class QuestionObjectFactory {
       skillIds);
   }
 
-  createFromBackendDict(questionBackendDict: any): Question {
+  createFromBackendDict(questionBackendDict: IQuestionBackendDict): Question {
     var questionStateData = this.stateObjectFactory.createFromBackendDict(
       'question', questionBackendDict.question_state_data);
     return new Question(
