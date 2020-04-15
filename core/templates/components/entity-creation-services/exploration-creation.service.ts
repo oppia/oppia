@@ -17,19 +17,21 @@
  * modal.
  */
 
+// eslint-disable-next-line max-len
+require('components/entity-creation-services/exploration-creation-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/csrf-token.service.ts');
 require('services/site-analytics.service.ts');
 
 angular.module('oppia').factory('ExplorationCreationService', [
-  '$http', '$rootScope', '$timeout', '$uibModal', '$window',
-  'AlertsService', 'CsrfTokenService', 'SiteAnalyticsService',
-  'UrlInterpolationService',
+  '$rootScope', '$timeout', '$uibModal', '$window',
+  'AlertsService', 'CsrfTokenService', 'ExplorationCreationBackendService',
+  'SiteAnalyticsService', 'UrlInterpolationService',
   function(
-      $http, $rootScope, $timeout, $uibModal, $window,
-      AlertsService, CsrfTokenService, SiteAnalyticsService,
-      UrlInterpolationService) {
+      $rootScope, $timeout, $uibModal, $window,
+      AlertsService, CsrfTokenService, ExplorationCreationBackendService,
+      SiteAnalyticsService, UrlInterpolationService) {
     var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
 
     var explorationCreationInProgress = false;
@@ -44,22 +46,22 @@ angular.module('oppia').factory('ExplorationCreationService', [
         AlertsService.clearWarnings();
         $rootScope.loadingMessage = 'Creating exploration';
 
-        $http.post('/contributehandler/create_new', {
-        }).then(function(response) {
-          SiteAnalyticsService.registerCreateNewExplorationEvent(
-            response.data.explorationId);
-          $timeout(function() {
-            $window.location = UrlInterpolationService.interpolateUrl(
-              CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                exploration_id: response.data.explorationId
-              }
-            );
-          }, 150);
+        ExplorationCreationBackendService.createExploration().then(
+          function(response) {
+            SiteAnalyticsService.registerCreateNewExplorationEvent(
+              response.explorationId);
+            $timeout(function() {
+              $window.location = UrlInterpolationService.interpolateUrl(
+                CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
+                  exploration_id: response.explorationId
+                }
+              );
+            }, 150);
           return false;
-        }, function() {
-          $rootScope.loadingMessage = '';
-          explorationCreationInProgress = false;
-        });
+          }, function() {
+            $rootScope.loadingMessage = '';
+            explorationCreationInProgress = false;
+          });
       },
       showUploadExplorationModal: function() {
         AlertsService.clearWarnings();
