@@ -63,11 +63,11 @@ anchor_for_job_defaults: &job_defaults
     - image: *docker_image
 
 version: 2
-jobs:
-  setup:
-    <<: *job_defaults
+
+commands:
+  merge_target_branch:
+    description: "Merge to target branch"
     steps:
-      - checkout
       - run:
           name: Merge to target branch
           command: |
@@ -87,6 +87,13 @@ jobs:
 
             git pull origin $target_branch
             fi
+
+jobs:
+  setup:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - merge_target_branch
       - run:
           name: Install dependencies
           command: python -m scripts.install_third_party_libs
@@ -101,6 +108,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -116,6 +124,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -144,6 +153,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -158,6 +168,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -178,6 +189,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -189,6 +201,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -200,6 +213,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -211,6 +225,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -225,6 +240,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -242,6 +258,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -253,6 +270,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
