@@ -33,7 +33,7 @@ describe('Exploration Creation backend service', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for(let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
@@ -50,7 +50,7 @@ describe('Exploration Creation backend service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should successfuly create a new exploration and obtain the exploration id',
+  it('should create a new exploration and get the exploration id',
     (done) => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
@@ -59,7 +59,7 @@ describe('Exploration Creation backend service', function() {
         SUCCESS_STATUS_CODE, {explorationId: SAMPLE_CREATION_ID});
       ExplorationCreationBackendService.createExploration().then(
         successHandler, failHandler);
-      
+
       $httpBackend.flush();
       $rootScope.$digest();
 
@@ -67,23 +67,22 @@ describe('Exploration Creation backend service', function() {
       expect(failHandler).not.toHaveBeenCalled();
       done();
     });
-  
+
   it('should fail to create a new exploration and call the fail handler',
-  (done) => {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    (done) => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expectPOST('/contributehandler/create_new').respond(
-      ERROR_STATUS_CODE);
-    ExplorationCreationBackendService.createExploration().then(
-      successHandler, failHandler);
-    
-    $httpBackend.flush();
-    $rootScope.$digest();
+      $httpBackend.expectPOST('/contributehandler/create_new').respond(
+        ERROR_STATUS_CODE);
+      ExplorationCreationBackendService.createExploration().then(
+        successHandler, failHandler);
+      
+      $httpBackend.flush();
+      $rootScope.$digest();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-    done();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+      done();
   });
-  
 });
