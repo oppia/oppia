@@ -123,9 +123,20 @@ angular.module('oppia').directive('storyNodeEditor', [
             if (newTitle === $scope.currentTitle) {
               return;
             }
-            StoryUpdateService.setStoryNodeTitle(
-              $scope.story, $scope.getId(), newTitle);
-            $scope.currentTitle = newTitle;
+            var titleIsValid = true;
+            for (var idx in $scope.story.getStoryContents().getNodes()) {
+              var node = $scope.story.getStoryContents().getNodes()[idx];
+              if (node.getTitle() === newTitle) {
+                titleIsValid = false;
+                AlertsService.addInfoMessage(
+                  'A chapter already exists with given title.', 5000);
+              }
+            }
+            if (titleIsValid) {
+              StoryUpdateService.setStoryNodeTitle(
+                $scope.story, $scope.getId(), newTitle);
+              $scope.currentTitle = newTitle;
+            }
           };
 
           $scope.viewNodeEditor = function(nodeId) {

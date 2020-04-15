@@ -81,49 +81,49 @@ describe('Lost Change Object Factory', () => {
 
   it('should get state property value when it is an array from a Lost Change',
     () => {
-    const lostChange = lcof.createNew({
-      cmd: 'edit_state_property',
-      state_name: 'Edited state name',
-      new_value: ['value 1', 'value 2'],
-      old_value: ['value 2', 'value 1'],
-      property_name: 'content'
-    });
+      const lostChange = lcof.createNew({
+        cmd: 'edit_state_property',
+        state_name: 'Edited state name',
+        new_value: ['value 1', 'value 2'],
+        old_value: ['value 2', 'value 1'],
+        property_name: 'content'
+      });
 
-    expect(lostChange.getRelativeChangeToGroups()).toBe('edited');
-    expect(lostChange.isOldValueEmpty()).toBe(false);
-    expect(lostChange.isNewValueEmpty()).toBe(false);
-    expect(lostChange.getStatePropertyValue(lostChange.newValue)).toEqual(
-      'value 2');
-    expect(lostChange.getStatePropertyValue(lostChange.oldValue)).toEqual(
-      'value 1');
-  });
+      expect(lostChange.getRelativeChangeToGroups()).toBe('edited');
+      expect(lostChange.isOldValueEmpty()).toBe(false);
+      expect(lostChange.isNewValueEmpty()).toBe(false);
+      expect(lostChange.getStatePropertyValue(lostChange.newValue)).toEqual(
+        'value 2');
+      expect(lostChange.getStatePropertyValue(lostChange.oldValue)).toEqual(
+        'value 1');
+    });
 
   it('should get relative changes when changes is awways from a Lost Change',
     () => {
-    const lostChange = lcof.createNew({
-      cmd: 'edit_state_property',
-      state_name: 'Edited state name',
-      new_value: ['value 1', 'value 2', 'value 3'],
-      old_value: ['value 2', 'value 1'],
-      property_name: 'content'
+      const lostChange = lcof.createNew({
+        cmd: 'edit_state_property',
+        state_name: 'Edited state name',
+        new_value: ['value 1', 'value 2', 'value 3'],
+        old_value: ['value 2', 'value 1'],
+        property_name: 'content'
+      });
+
+      expect(lostChange.getRelativeChangeToGroups()).toBe('added');
+      expect(lostChange.isOldValueEmpty()).toBe(false);
+      expect(lostChange.isNewValueEmpty()).toBe(false);
+
+      const lostChange2 = lcof.createNew({
+        cmd: 'edit_state_property',
+        state_name: 'Edited state name',
+        new_value: ['value 1'],
+        old_value: ['value 2', 'value 1'],
+        property_name: 'content'
+      });
+
+      expect(lostChange2.getRelativeChangeToGroups()).toBe('deleted');
+      expect(lostChange2.isOldValueEmpty()).toBe(false);
+      expect(lostChange2.isNewValueEmpty()).toBe(false);
     });
-
-    expect(lostChange.getRelativeChangeToGroups()).toBe('added');
-    expect(lostChange.isOldValueEmpty()).toBe(false);
-    expect(lostChange.isNewValueEmpty()).toBe(false);
-
-    const lostChange2 = lcof.createNew({
-      cmd: 'edit_state_property',
-      state_name: 'Edited state name',
-      new_value: ['value 1'],
-      old_value: ['value 2', 'value 1'],
-      property_name: 'content'
-    });
-
-    expect(lostChange2.getRelativeChangeToGroups()).toBe('deleted');
-    expect(lostChange2.isOldValueEmpty()).toBe(false);
-    expect(lostChange2.isNewValueEmpty()).toBe(false);
-  });
 
   it('should evaluate values from a EndExploration Lost Change', () => {
     const lostChange = lcof.createNew({
@@ -227,6 +227,4 @@ describe('Lost Change Object Factory', () => {
     expect(lostChange.isDestEqual()).toBe(false);
     expect(lostChange.isOutcomeDestEqual()).toBe(false);
   });
-
-
 });

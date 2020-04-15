@@ -116,13 +116,10 @@ export class LostChange {
 
     if (Array.isArray(this.newValue) && Array.isArray(this.oldValue)) {
       if (this.newValue.length > this.oldValue.length) {
-        console.log('a');
         result = 'added';
       } else if (this.newValue.length === this.oldValue.length) {
-        console.log('b');
         result = 'edited';
       } else {
-        console.log('c');
         result = 'deleted';
       }
     } else {

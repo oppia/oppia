@@ -24,7 +24,7 @@ import { TranslatorProviderForTests } from 'tests/test.extras';
 
 // This function is a helper to clean the compiled html for each test, in
 // order to make a cleaner assertion.
-function cleanCompiledHtml(html) {
+var cleanCompiledHtml = function(html) {
   return html
     // AngularJS uses comments in some directives in order to figure out
     // where the last element was placed in relation.
@@ -72,7 +72,7 @@ function cleanCompiledHtml(html) {
     .replace(/\s{2,}/g, '')
     // Removes all line breaks.
     .replace(/\n/g, '');
-}
+};
 
 describe('Changes in Human Readable Form Directive', function() {
   var $compile = null;
@@ -107,7 +107,7 @@ describe('Changes in Human Readable Form Directive', function() {
       '</changes-in-human-readable-form>');
     var elementCompiled = $compile(element)(scope);
     scope.$digest();
-    
+
     var html = cleanCompiledHtml(elementCompiled.html());
     expect(html).toBe(
       '<div class="oppia-lost-changes">' +
@@ -132,7 +132,7 @@ describe('Changes in Human Readable Form Directive', function() {
       '</changes-in-human-readable-form>');
     var elementCompiled = $compile(element)(scope);
     scope.$digest();
-    
+
     var html = cleanCompiledHtml(elementCompiled.html());
     expect(html).toBe(
       '<div class="oppia-lost-changes">' +
@@ -157,7 +157,7 @@ describe('Changes in Human Readable Form Directive', function() {
       '</changes-in-human-readable-form>');
     var elementCompiled = $compile(element)(scope);
     scope.$digest();
-    
+
     var html = cleanCompiledHtml(elementCompiled.html());
     expect(html).toBe(
       '<div class="oppia-lost-changes">' +
@@ -171,44 +171,45 @@ describe('Changes in Human Readable Form Directive', function() {
   });
 
   it('should make human readable when editing a state with property content',
-  function() {
-    scope.lostChanges = [LostChangeObjectFactory.createNew({
-      cmd: 'edit_state_property',
-      state_name: 'Edited state name',
-      new_value: {
-        html: 'newValue'
-      },
-      old_value: {
-        html: 'oldValue'
-      },
-      property_name: 'content'
-    })];
+    function() {
+      scope.lostChanges = [LostChangeObjectFactory.createNew({
+        cmd: 'edit_state_property',
+        state_name: 'Edited state name',
+        new_value: {
+          html: 'newValue'
+        },
+        old_value: {
+          html: 'oldValue'
+        },
+        property_name: 'content'
+      })];
 
-    var element = angular.element(
-      '<changes-in-human-readable-form lost-changes="lostChanges">' +
-      '</changes-in-human-readable-form>');
-    var elementCompiled = $compile(element)(scope);
-    scope.$digest();
-    
-    var html = cleanCompiledHtml(elementCompiled.html());
-    expect(html).toBe(
-      '<div class="oppia-lost-changes">' +
-      '<ul>' +
-      '<li>' +
-      '<div>' +
-      'Edits to state: ' + scope.lostChanges[0].stateName +
-      '<div>' +
-      '<div class="state-edit-desc">' +
-      '<strong>Edited content: </strong>' +
-      '<div class="content">' + scope.lostChanges[0].newValue.html + '</div>' +
-      '</div>' +
-      '</div>' +
-      '</div>' +
-      '</li>' +
-      '</ul>' +
-      '</div>'
-    );
-  });
+      var element = angular.element(
+        '<changes-in-human-readable-form lost-changes="lostChanges">' +
+        '</changes-in-human-readable-form>');
+      var elementCompiled = $compile(element)(scope);
+      scope.$digest();
+
+      var html = cleanCompiledHtml(elementCompiled.html());
+      expect(html).toBe(
+        '<div class="oppia-lost-changes">' +
+        '<ul>' +
+        '<li>' +
+        '<div>' +
+        'Edits to state: ' + scope.lostChanges[0].stateName +
+        '<div>' +
+        '<div class="state-edit-desc">' +
+        '<strong>Edited content: </strong>' +
+        '<div class="content">' + scope.lostChanges[0].newValue.html +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</li>' +
+        '</ul>' +
+        '</div>'
+      );
+    });
 
   it('should make human readable when editing a state with property' +
   ' widget_id and exploration ended', function() {
@@ -225,7 +226,7 @@ describe('Changes in Human Readable Form Directive', function() {
       '</changes-in-human-readable-form>');
     var elementCompiled = $compile(element)(scope);
     scope.$digest();
-    
+
     var html = cleanCompiledHtml(elementCompiled.html());
     expect(html).toBe(
       '<div class="oppia-lost-changes">' +
@@ -252,13 +253,13 @@ describe('Changes in Human Readable Form Directive', function() {
       old_value: null,
       property_name: 'widget_id'
     })];
-  
+
     var element = angular.element(
       '<changes-in-human-readable-form lost-changes="lostChanges">' +
       '</changes-in-human-readable-form>');
     var elementCompiled = $compile(element)(scope);
     scope.$digest();
-    
+
     var html = cleanCompiledHtml(elementCompiled.html());
     expect(html).toBe(
       '<div class="oppia-lost-changes">' +
@@ -293,7 +294,7 @@ describe('Changes in Human Readable Form Directive', function() {
       '</changes-in-human-readable-form>');
     var elementCompiled = $compile(element)(scope);
     scope.$digest();
-    
+
     var html = cleanCompiledHtml(elementCompiled.html());
     expect(html).toBe(
       '<div class="oppia-lost-changes">' +
@@ -331,7 +332,7 @@ describe('Changes in Human Readable Form Directive', function() {
       '</changes-in-human-readable-form>');
     var elementCompiled = $compile(element)(scope);
     scope.$digest();
-    
+
     var html = cleanCompiledHtml(elementCompiled.html());
     expect(html).toBe(
       '<div class="oppia-lost-changes">' +
