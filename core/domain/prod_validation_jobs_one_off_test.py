@@ -11744,17 +11744,21 @@ class UsernameLengthAuditOneOffJobTests(test_utils.GenericTestBase):
         super(UsernameLengthAuditOneOffJobTests, self).setUp()
 
         self.signup(USER_EMAIL, USER_NAME)
+        self.signup('useremail1@example.com', 'username1')
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+        self.user_id_0 = self.get_user_id_from_email(USER_EMAIL)
+        self.user_id_1 = self.get_user_id_from_email('useremail1@example.com')
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
 
-        # Note: There will a total of 3 UserSettingsModel even though
-        # only two users signup in the test since superadmin signup
+        # Note: There will a total of 4 UserSettingsModel even though
+        # only 3 users signup in the test since superadmin signup
         # is also done in test_utils.GenericTestBase.
         self.model_instance_0 = user_models.UserSettingsModel.get_by_id(
-            self.user_id)
+            self.user_id_0)
         self.model_instance_1 = user_models.UserSettingsModel.get_by_id(
+            self.user_id_1)
+        self.model_instance_2 = user_models.UserSettingsModel.get_by_id(
             self.admin_id)
         self.job_class = (
             prod_validation_jobs_one_off.UsernameLengthAuditOneOffJob)
@@ -11764,10 +11768,19 @@ class UsernameLengthAuditOneOffJobTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output)
 
     def test_username_length(self):
-        self.model_instance_0.username = '1234567891234567891234567891234567891'
+        self.model_instance_0.username = '123456789123456789123'
+        self.model_instance_1.username = '123456789123456789124'
+        self.model_instance_2.username = '123456789123456789123456789123456789'
+
         self.model_instance_0.put()
-        expected_output = [u'[u\'UserID: %s\', u"Username: [\'%s\']"]'
-                            % (self.user_id, self.model_instance_0.username)]
+        self.model_instance_1.put()
+        self.model_instance_2.put()
+
+        expected_output = [u'[u\'Length: 21\', u"Usernames: [\'%s\', \'%s\']"]'
+                            %  (self.model_instance_0.username, 
+                                self.model_instance_1.username),
+                            u'[u\'Length: 36\', u"Usernames: [\'%s\']"]'
+                            % self.model_instance_2.username]
         run_job_and_check_output(self, expected_output, literal_eval=True)
 
 

@@ -5679,12 +5679,12 @@ class UsernameLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(model_instance):
-        if len(model_instance.username) > 36:
-            yield (model_instance.id, model_instance.username)
+        if len(model_instance.username) > 20:
+            yield (len(model_instance.username), model_instance.username)
 
     @staticmethod
     def reduce(key, values):
-        yield ('UserID: %s' % key, 'Username: %s' % values)
+        yield ('Length: %s' % key, 'Usernames: %s' % sorted(values))
 
 
 class CompletedActivitiesModelAuditOneOffJob(ProdValidationAuditOneOffJob):
