@@ -33,19 +33,11 @@ export class LearnerAnswerDetailsBackendApiService {
     private httpClient: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  recordLearnerAnswerDetails(
-      explorationId: string, stateName: string, interactionId: string,
-      answer: string, answerDetails: string): Promise<object> {
-    return new Promise((resolve, reject) => {
-      this._recordLearnerAnswerDetails(
-        explorationId, stateName, interactionId, answer, answerDetails,
-        resolve, reject);
-    });
-  }
-
   private _recordLearnerAnswerDetails(
       explorationId:string, stateName: string, interactionId: string,
-      answer: string, answerDetails: string, successCallback, errorCallback) {
+      answer: string, answerDetails: string,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
     let recordLearnerAnswerDetailsUrl = (
       this.urlInterpolationService.interpolateUrl(
         StatisticsDomainConstants.SUBMIT_LEARNER_ANSWER_DETAILS_URL, {
@@ -66,8 +58,18 @@ export class LearnerAnswerDetailsBackendApiService {
           successCallback();
         }
       }, (errorResponse) => {
-        errorCallback(errorResponse.data);
+        errorCallback(errorResponse);
       });
+  }
+
+  recordLearnerAnswerDetails(
+      explorationId: string, stateName: string, interactionId: string,
+      answer: string, answerDetails: string): Promise<object> {
+    return new Promise((resolve, reject) => {
+      this._recordLearnerAnswerDetails(
+        explorationId, stateName, interactionId, answer, answerDetails,
+        resolve, reject);
+    });
   }
 }
 
