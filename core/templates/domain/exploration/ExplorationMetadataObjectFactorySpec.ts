@@ -23,10 +23,10 @@ import { ExplorationMetadataObjectFactory } from
 
 
 describe('Exploration Metadata object factory', () => {
-  var _sampleExplorationMetadata = null;
+  let sampleExplorationMetadata = null;
 
   beforeEach(() => {
-    var sampleExplorationMetadataBackendDict = {
+    let sampleExplorationMetadataBackendDict = {
       collection_node_metadata_list: [{
         id: '12',
         objective:
@@ -41,12 +41,12 @@ describe('Exploration Metadata object factory', () => {
     };
 
 
-    _sampleExplorationMetadata = ExplorationMetadataObjectFactory.
+    sampleExplorationMetadata = ExplorationMetadataObjectFactory.
       createFromBackendDict(sampleExplorationMetadataBackendDict);
   });
 
   it('should be able to get all the values', function() {
-    expect(_sampleExplorationMetadata.getMetadataList()).toEqual([{
+    expect(sampleExplorationMetadata.getMetadataList()).toEqual([{
       id: '12',
       objective:
       'learn how to count permutations accurately and systematically',
