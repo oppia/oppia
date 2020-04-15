@@ -153,24 +153,3 @@ def deploy_application(app_yaml_path, app_name, version=None):
     if version is not None:
         args.append('--version=%s' % version)
     subprocess.check_output(args)
-
-
-def flush_memcache(app_name):
-    """Flushes memcache for the server.
-
-    Args:
-        app_name: str. The name of the GCloud project.
-
-    Returns:
-        bool. True if memcache is flushed successfully, false otherwise.
-    """
-
-    import dev_appserver
-    dev_appserver.fix_sys_path()
-
-    from google.appengine.ext.remote_api import remote_api_stub
-    from google.appengine.api import memcache
-
-    remote_api_stub.ConfigureRemoteApiForOAuth(
-        '%s.appspot.com' % app_name, '/_ah/remote_api')
-    return memcache.flush_all()
