@@ -87,7 +87,7 @@ commands:
               curl "$url" | ./jq '.base.ref' | tr -d '"'
             )
 
-            git pull origin $target_branch
+            git pull origin $target_branch --no-edit
             fi
 
 jobs:
