@@ -77,12 +77,12 @@ describe('Exploration Creation backend service', function() {
         ERROR_STATUS_CODE);
       ExplorationCreationBackendService.createExploration().then(
         successHandler, failHandler);
-      
+
       $httpBackend.flush();
       $rootScope.$digest();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
       done();
-  });
+    });
 });
