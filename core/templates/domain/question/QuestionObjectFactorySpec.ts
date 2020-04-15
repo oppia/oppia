@@ -39,13 +39,6 @@ describe('Question object factory', () => {
 
     questionObjectFactory = TestBed.get(QuestionObjectFactory);
     stateObjectFactory = TestBed.get(StateObjectFactory);
-    // The injector is required because this service is directly used in this
-    // spec, therefore even though MisconceptionObjectFactory is upgraded to
-    // Angular, it cannot be used just by instantiating it by its class but
-    // instead needs to be injected. Note that 'misconceptionObjectFactory' is
-    // the injected service instance whereas 'MisconceptionObjectFactory' is the
-    // service class itself. Therefore, use the instance instead of the class in
-    // the specs.
     misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
 
     sampleQuestionBackendDict = {
