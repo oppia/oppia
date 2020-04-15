@@ -328,18 +328,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                     question_skill_count,
                     start_cursor=cursor
                 )
-                if len(questions_list) < question_skill_count:
-                    direction = '0'
-                    question_list_extra, next_cursor, more = cls.query(
-                        cls.skill_id.IN(skill_ids)
-                    ).order(
-                        cls.question_id, cls.key
-                    ).filter(
-                        cls.question_id <= random_id
-                    ).fetch_page(
-                        question_skill_count - len(questions_list)
-                    )
-                    questions_list.extend(question_list_extra)
             else:
                 questions_list, next_cursor, more = cls.query(
                     cls.skill_id.IN(skill_ids)
@@ -360,26 +348,26 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             ).order(cls.question_id, cls.key).filter(
                 cls.question_id > random_id
             ).fetch_page(question_skill_count)
-            if len(questions_list) < question_skill_count:
-                direction = '0'
-                question_list_extra, next_cursor, more = cls.query(
-                    cls.skill_id.IN(skill_ids)
-                ).order(
-                    cls.question_id, cls.key
-                ).filter(
-                    cls.question_id <= random_id
-                ).fetch_page(
-                    question_skill_count - len(questions_list),
-                )
-                questions_list.extend(question_list_extra)
+
+        question_extra_count = question_skill_count - len(questions_list)
+        if (question_extra_count > 0 and direction != '0'):
+            direction = '0'
+            question_list_extra, next_cursor, more = cls.query(
+                cls.skill_id.IN(skill_ids)
+            ).order(
+                cls.question_id, cls.key
+            ).filter(
+                cls.question_id <= random_id
+            ).fetch_page(question_extra_count)
+            questions_list.extend(question_list_extra)
 
         question_skill_link_models = questions_list
         next_cursor_str = (
             next_cursor.urlsafe() if (next_cursor and more) else None
         )
         if next_cursor_str:
-            next_cursor_str = (next_cursor_str +
-                               python_utils.UNICODE(random_id) + direction)
+            next_cursor_str = (
+                next_cursor_str + python_utils.UNICODE(random_id) + direction)
         return question_skill_link_models, next_cursor_str
 
     @classmethod
