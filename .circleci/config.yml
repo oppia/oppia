@@ -83,9 +83,14 @@ commands:
             chmod +x jq
 
             url="https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls/$PR_NUMBER?access_token=$GITHUB_TOKEN"
+
+            curl $url
+
             target_branch=$(
               curl "$url" | ./jq '.base.ref' | tr -d '"'
             )
+
+            echo $target_branch
 
             git pull origin $target_branch --no-edit
             fi
@@ -138,6 +143,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
