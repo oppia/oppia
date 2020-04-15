@@ -28,7 +28,7 @@ MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
 def setup_and_install_dependencies():
     """Run the setup and installation scripts."""
 
-    install_third_party_libs.main()
+    # install_third_party_libs.main()
     setup.main(args=[])
     setup_gae.main(args=[])
 
@@ -135,7 +135,7 @@ def main():
                 'Exiting.' % OPPIA_SERVER_PORT)
         sys.exit(1)
 
-    # setup_and_install_dependencies()
+    setup_and_install_dependencies()
 
     python_utils.PRINT('Checking if GO is installed in %s' % GO_PATH)
     if not os.path.exists(GO_PATH):
@@ -152,7 +152,7 @@ def main():
 
 
     python_utils.PRINT('  Generating files for production mode...')
-    # build.main(args=['--prod_env'])
+    build.main(args=['--prod_env'])
 
     start_google_app_engine_server()
     wait_for_port_to_be_open(OPPIA_SERVER_PORT)
