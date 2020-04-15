@@ -30,7 +30,9 @@
       </a>
     </td>
     <td>
-      <span ng-click="deleteCanonicalStory(summary.getId())" class="fas fa-trash-alt list-summary"> </span>
+      <a ng-click="deleteCanonicalStory(summary.getId())" class="list-summary">
+        <span class="fas fa-trash-alt"></span>
+      </a>
     </td>
   </tr>
 </table>
