@@ -11777,10 +11777,11 @@ class UsernameLengthAuditOneOffJobTests(test_utils.GenericTestBase):
         self.model_instance_2.put()
 
         expected_output = [u'[u\'Length: 21\', u"Usernames: [\'%s\', \'%s\']"]'
-                            %  (self.model_instance_0.username, 
-                                self.model_instance_1.username),
-                            u'[u\'Length: 36\', u"Usernames: [\'%s\']"]'
-                            % self.model_instance_2.username]
+                           % (
+                               self.model_instance_0.username,
+                               self.model_instance_1.username),
+                           u'[u\'Length: 36\', u"Usernames: [\'%s\']"]'
+                           % self.model_instance_2.username]
         run_job_and_check_output(self, expected_output, literal_eval=True)
 
 
