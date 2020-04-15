@@ -62,9 +62,10 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
         )
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title')
+        subtopic.skill_ids = ['skill_id_1']
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
+            abbreviated_name='abbrev', thumbnail_filename='Topic.png',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[subtopic], next_subtopic_id=2)

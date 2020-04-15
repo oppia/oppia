@@ -199,6 +199,13 @@ export class Topic {
     if (!this._thumbnailFilename) {
       issues.push('Topic should have a thumbnail.');
     }
+    for (let i = 0; i < this._subtopics.length; i++) {
+      if (this._subtopics[i].getSkillSummaries().length === 0) {
+        issues.push(
+          'Subtopic with title ' + this._subtopics[i].getTitle() +
+          ' does not have any skill IDs linked.');
+      }
+    }
     return issues;
   }
 
