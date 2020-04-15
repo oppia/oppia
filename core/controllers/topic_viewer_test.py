@@ -59,6 +59,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
             1, 'subtopic_name', [self.skill_id_2], 'image.svg',
             constants.NEW_STRUCTURE_TO_COLORS['subtopic'][0]))
         self.topic.next_subtopic_id = 2
+        self.topic.thumbnail_filename = 'Image.png'
         self.topic.canonical_story_references.append(
             topic_domain.StoryReference.create_default_story_reference(
                 self.story_id))
@@ -67,6 +68,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id_1, 'private_topic_name', 'abbrev')
+        self.topic.thumbnail_filename = 'Image.png'
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
@@ -229,6 +231,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'new_topic', 'abbrev')
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
+        self.topic.thumbnail_filename = 'Image.png'
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_skill(

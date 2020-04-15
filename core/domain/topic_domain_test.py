@@ -199,6 +199,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.topic.validate()
 
+    def _assert_strict_validation_error(self, expected_error_substring):
+        """Checks that the topic passes prepublish validation."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            self.topic.validate(strict=True)
+
     def _assert_valid_topic_id(self, expected_error_substring, topic_id):
         """Checks that the skill passes strict validation."""
         with self.assertRaisesRegexp(
@@ -256,6 +262,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'Thumbnail filename should include an extension.', 'name')
         self._assert_valid_thumbnail_filename_for_topic(
             'Expected a filename ending in svg, received name.jpg', 'name.jpg')
+
+    def test_subtopic_strict_validation(self):
+        self.topic.thumbnail_filename = 'filename.svg'
+        self.topic.subtopics[0].skill_ids = []
+        self._assert_strict_validation_error(
+            'Subtopic with title Title does not have any skills linked')
 
     def test_subtopic_title_validation(self):
         self.topic.subtopics[0].title = 1

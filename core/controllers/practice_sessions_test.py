@@ -52,10 +52,12 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
             1, 'subtopic_name', [self.skill_id2], 'image.svg',
             constants.NEW_STRUCTURE_TO_COLORS['subtopic'][0]))
         self.topic.next_subtopic_id = 2
+        self.topic.thumbnail_filename = 'Topic.png'
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id_1, 'private_topic_name', 'abbrev')
+        self.topic.thumbnail_filename = 'Topic.png'
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
@@ -110,6 +112,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         topic = topic_domain.Topic.create_default_topic(
             'topic_id_3', 'topic_without_skills', 'abbrev')
         topic.uncategorized_skill_ids.append('non_existent_skill')
+        topic.thumbnail_filename = 'Topic.png'
         topic_services.save_new_topic(self.admin_id, topic)
         topic_services.publish_topic('topic_id_3', self.admin_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
