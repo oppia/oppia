@@ -1,5 +1,6 @@
+version: 2.1
+
 workflows:
-  version: 2
   circleci_tests:
     # The following jobs run in the following stages:
     # - Setup runs first.
@@ -61,8 +62,6 @@ anchor_for_job_defaults: &job_defaults
   working_directory: /home/circleci/oppia
   docker:
     - image: *docker_image
-
-version: 2
 
 commands:
   merge_target_branch:
