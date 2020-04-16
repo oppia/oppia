@@ -99,6 +99,11 @@ INVALID_URLENCODE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_urlencode.py')
 
 INVALID_TABS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_tabs.py')
+INVALID_MERGE_CONFLICT_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_merge_conflict.py')
+INVALID_GLYPHICON_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_glyphicon.html')
+INVALID_TODO_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_todo.py')
 
 
 def mock_exit(unused_status):
@@ -173,464 +178,464 @@ class LintTests(test_utils.GenericTestBase):
         self.sys_swap = self.swap(sys, 'exit', mock_exit)
 
 
-# class HTMLLintTests(LintTests):
-#     """Test the HTML lint functions."""
-#     def setUp(self):
-#         super(HTMLLintTests, self).setUp()
-#         self.check_codeowner_swap = self.swap(
-#             codeowner_linter, 'check_codeowner_file', mock_check_codeowner_file)
-#
-#     def test_valid_html_file(self):
-#         with self.print_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(args=['--path=%s' % VALID_HTML_FILEPATH])
-#         self.assertTrue(all_checks_passed(self.linter_stdout))
-#         self.assertTrue('SUCCESS   HTML linting passed' in self.linter_stdout)
-#
-#     def test_invalid_indentation(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_INDENTATION_HTML_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Indentation for end tag content on line 13 does not match the'
-#                  ' indentation of the start tag content on line 11'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_ng_template(self):
-#         with self.print_swap, self.sys_swap:
-#             with self.check_codeowner_swap:
-#                 pre_commit_linter.main(
-#                     args=['--path=%s' % INVALID_NG_TEMPLATE_HTML_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 8: The directives must be directly referenced.'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_trailing_whitespace(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_TRAILING_WHITESPACE_HTML_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 7: There should not be any trailing whitespaces.'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_parent(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_PARENT_HTML_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 12: Please do not access parent properties using '
-#                  '$parent. Use the scope object for this purpose.'],
-#                 self.linter_stdout))
-#
-#
-# class CSSLintTests(LintTests):
-#     """Test the CSS lint functions."""
-#     def setUp(self):
-#         super(CSSLintTests, self).setUp()
-#         self.check_codeowner_swap = self.swap(
-#             codeowner_linter, 'check_codeowner_file', mock_check_codeowner_file)
-#
-#     def test_valid_css_file(self):
-#         with self.print_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(args=['--path=%s' % VALID_CSS_FILEPATH])
-#         self.assertTrue(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['SUCCESS   1 CSS file linted'], self.linter_stdout))
-#
-#     def test_invalid_css_file(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(args=['--path=%s' % INVALID_CSS_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['18:16',
-#                  'Unexpected whitespace before \":\"   declaration-colon-space-'
-#                  'before'], self.linter_stdout))
-#
-#
-# class JsTsLintTests(LintTests):
-#     """Test the JsTs lint functions."""
-#     def setUp(self):
-#         super(JsTsLintTests, self).setUp()
-#         self.check_codeowner_swap = self.swap(
-#             codeowner_linter, 'check_codeowner_file', mock_check_codeowner_file)
-#
-#     def test_valid_js_file(self):
-#         with self.print_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(args=['--path=%s' % VALID_JS_FILEPATH])
-#         self.assertTrue(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['SUCCESS   1 JavaScript and Typescript files linted'],
-#                 self.linter_stdout)
-#             )
-#
-#     def test_valid_ts_file(self):
-#         with self.print_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(args=['--path=%s' % VALID_TS_FILEPATH])
-#         self.assertTrue(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['SUCCESS   1 JavaScript and Typescript files linted'],
-#                 self.linter_stdout))
-#
-#
-# class PythonLintTests(LintTests):
-#     """Test the Python lint functions."""
-#     def setUp(self):
-#         super(PythonLintTests, self).setUp()
-#         self.check_codeowner_swap = self.swap(
-#             codeowner_linter, 'check_codeowner_file', mock_check_codeowner_file)
-#
-#     def test_valid_py_file(self):
-#         with self.print_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(args=['--path=%s' % VALID_PY_FILEPATH])
-#         self.assertTrue(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['SUCCESS   1 Python files linted'],
-#                 self.linter_stdout)
-#             )
-#
-#     def test_invalid_import_order(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(args=['--path=%s' % INVALID_IMPORT_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['FAILED   Import order checks failed, file imports should be '
-#                  'alphabetized, see affect files above.'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_author(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_AUTHOR_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 24: Please remove author tags from this file.'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_datetime_now(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_DATETIME_NOW_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 38: Please use datetime.datetime.utcnow() instead '
-#                  'of datetime.datetime.now().'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_print(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_PRINT_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 38: Please use python_utils.PRINT().'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_pylint_id(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_PYLINT_ID_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 38: Please remove pylint exclusion if it is unnecessary,'
-#                  ' or make it human readable with a sentence instead of an id. '
-#                  'The id-to-message list can be seen '
-#                  'here->http://pylint-messages.wikidot.com/all-codes'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_assert_equals(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_ASSERT_EQUALS_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 38: Please do not use self.assertEquals method. This '
-#                  'method has been deprecated. Instead use self.assertEqual '
-#                  'method.'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_open(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(args=['--path=%s' % INVALID_OPEN_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 38: Please use python_utils.open_file() instead '
-#                  'of open().'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_stringio(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_STRINGIO_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 40: Please use python_utils.string_io() instead of '
-#                  'import StringIO.'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_quote(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(args=['--path=%s' % INVALID_QUOTE_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 40: Please use python_utils.url_quote().'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_unquote_plus(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_UNQUOTE_PLUS_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 40: Please use python_utils.url_unquote_plus().'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_urlencode(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_URLENCODE_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 41: Please use python_utils.url_encode().'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_urlretrieve(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_URLRETRIEVE_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 41: Please use python_utils.url_retrieve().'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_urlopen(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_URLOPEN_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 40: Please use python_utils.url_open().'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_urlsplit(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_URLSPLIT_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 40: Please use python_utils.url_split().'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_urlparse(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_URLPARSE_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 40: Please use python_utils.url_parse().'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_url_unsplit(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_URL_UNSPLIT_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 40: Please use python_utils.url_unsplit().'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_parse_qs(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_PARSE_QS_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 40: Please use python_utils.parse_query_string().'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_unquote(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_UNQUOTE_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 41: Please use python_utils.urllib_unquote().'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_urljoin(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_URLJOIN_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 42: Please use python_utils.url_join().'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_request(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_REQUEST_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 42: Please use python_utils.url_request().'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_input(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(args=['--path=%s' % INVALID_INPUT_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 38: Please use python_utils.INPUT.'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_map(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(args=['--path=%s' % INVALID_MAP_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 38: Please use python_utils.MAP.'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_next(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(args=['--path=%s' % INVALID_NEXT_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 39: Please use python_utils.NEXT.'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_object(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(args=['--path=%s' % INVALID_OBJECT_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 23: Please use python_utils.OBJECT.'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_range(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(args=['--path=%s' % INVALID_RANGE_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 38: Please use python_utils.RANGE.'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_round(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(args=['--path=%s' % INVALID_ROUND_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 38: Please use python_utils.ROUND.'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_str(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(args=['--path=%s' % INVALID_STR_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 38: Please try to use python_utils.convert_to_bytes() '
-#                  'for the strings used in webapp2\'s built-in methods or for '
-#                  'strings used directly in NDB datastore models. If you need to'
-#                  ' cast ints/floats to strings, please use '
-#                  'python_utils.UNICODE() instead.'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_zip(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(args=['--path=%s' % INVALID_ZIP_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 40: Please use python_utils.ZIP.'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_basestring(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_BASESTRING_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 38: Please use python_utils.BASESTRING.'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_metaclass(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_METACLASS_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 42: Please use python_utils.with_metaclass().'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_iteritems(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_ITERITEMS_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 38: Please use items() instead.'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_itervalues(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_ITERVALUES_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 38: Please use values() instead.'],
-#                 self.linter_stdout))
-#
-#     def test_invalid_iterkeys(self):
-#         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-#             pre_commit_linter.main(
-#                 args=['--path=%s' % INVALID_ITERKEY_FILEPATH])
-#         self.assertFalse(all_checks_passed(self.linter_stdout))
-#         self.assertTrue(
-#             appears_in_linter_stdout(
-#                 ['Line 38: Please use keys() instead.'],
-#                 self.linter_stdout))
+class HTMLLintTests(LintTests):
+    """Test the HTML lint functions."""
+    def setUp(self):
+        super(HTMLLintTests, self).setUp()
+        self.check_codeowner_swap = self.swap(
+            codeowner_linter, 'check_codeowner_file', mock_check_codeowner_file)
+
+    def test_valid_html_file(self):
+        with self.print_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % VALID_HTML_FILEPATH])
+        self.assertTrue(all_checks_passed(self.linter_stdout))
+        self.assertTrue('SUCCESS   HTML linting passed' in self.linter_stdout)
+
+    def test_invalid_indentation(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_INDENTATION_HTML_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Indentation for end tag content on line 13 does not match the'
+                 ' indentation of the start tag content on line 11'],
+                self.linter_stdout))
+
+    def test_invalid_ng_template(self):
+        with self.print_swap, self.sys_swap:
+            with self.check_codeowner_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_NG_TEMPLATE_HTML_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 8: The directives must be directly referenced.'],
+                self.linter_stdout))
+
+    def test_invalid_trailing_whitespace(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_TRAILING_WHITESPACE_HTML_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 7: There should not be any trailing whitespaces.'],
+                self.linter_stdout))
+
+    def test_invalid_parent(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_PARENT_HTML_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 12: Please do not access parent properties using '
+                 '$parent. Use the scope object for this purpose.'],
+                self.linter_stdout))
+
+
+class CSSLintTests(LintTests):
+    """Test the CSS lint functions."""
+    def setUp(self):
+        super(CSSLintTests, self).setUp()
+        self.check_codeowner_swap = self.swap(
+            codeowner_linter, 'check_codeowner_file', mock_check_codeowner_file)
+
+    def test_valid_css_file(self):
+        with self.print_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % VALID_CSS_FILEPATH])
+        self.assertTrue(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['SUCCESS   1 CSS file linted'], self.linter_stdout))
+
+    def test_invalid_css_file(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_CSS_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['18:16',
+                 'Unexpected whitespace before \":\"   declaration-colon-space-'
+                 'before'], self.linter_stdout))
+
+
+class JsTsLintTests(LintTests):
+    """Test the JsTs lint functions."""
+    def setUp(self):
+        super(JsTsLintTests, self).setUp()
+        self.check_codeowner_swap = self.swap(
+            codeowner_linter, 'check_codeowner_file', mock_check_codeowner_file)
+
+    def test_valid_js_file(self):
+        with self.print_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % VALID_JS_FILEPATH])
+        self.assertTrue(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['SUCCESS   1 JavaScript and Typescript files linted'],
+                self.linter_stdout)
+            )
+
+    def test_valid_ts_file(self):
+        with self.print_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % VALID_TS_FILEPATH])
+        self.assertTrue(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['SUCCESS   1 JavaScript and Typescript files linted'],
+                self.linter_stdout))
+
+
+class PythonLintTests(LintTests):
+    """Test the Python lint functions."""
+    def setUp(self):
+        super(PythonLintTests, self).setUp()
+        self.check_codeowner_swap = self.swap(
+            codeowner_linter, 'check_codeowner_file', mock_check_codeowner_file)
+
+    def test_valid_py_file(self):
+        with self.print_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % VALID_PY_FILEPATH])
+        self.assertTrue(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['SUCCESS   1 Python files linted'],
+                self.linter_stdout)
+            )
+
+    def test_invalid_import_order(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_IMPORT_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['FAILED   Import order checks failed, file imports should be '
+                 'alphabetized, see affect files above.'],
+                self.linter_stdout))
+
+    def test_invalid_author(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_AUTHOR_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 24: Please remove author tags from this file.'],
+                self.linter_stdout))
+
+    def test_invalid_datetime_now(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_DATETIME_NOW_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 38: Please use datetime.datetime.utcnow() instead '
+                 'of datetime.datetime.now().'],
+                self.linter_stdout))
+
+    def test_invalid_print(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_PRINT_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 38: Please use python_utils.PRINT().'],
+                self.linter_stdout))
+
+    def test_invalid_pylint_id(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_PYLINT_ID_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 38: Please remove pylint exclusion if it is unnecessary,'
+                 ' or make it human readable with a sentence instead of an id. '
+                 'The id-to-message list can be seen '
+                 'here->http://pylint-messages.wikidot.com/all-codes'],
+                self.linter_stdout))
+
+    def test_invalid_assert_equals(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_ASSERT_EQUALS_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 38: Please do not use self.assertEquals method. This '
+                 'method has been deprecated. Instead use self.assertEqual '
+                 'method.'],
+                self.linter_stdout))
+
+    def test_invalid_open(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_OPEN_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 38: Please use python_utils.open_file() instead '
+                 'of open().'],
+                self.linter_stdout))
+
+    def test_invalid_stringio(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_STRINGIO_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 40: Please use python_utils.string_io() instead of '
+                 'import StringIO.'],
+                self.linter_stdout))
+
+    def test_invalid_quote(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_QUOTE_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 40: Please use python_utils.url_quote().'],
+                self.linter_stdout))
+
+    def test_invalid_unquote_plus(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_UNQUOTE_PLUS_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 40: Please use python_utils.url_unquote_plus().'],
+                self.linter_stdout))
+
+    def test_invalid_urlencode(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_URLENCODE_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 41: Please use python_utils.url_encode().'],
+                self.linter_stdout))
+
+    def test_invalid_urlretrieve(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_URLRETRIEVE_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 41: Please use python_utils.url_retrieve().'],
+                self.linter_stdout))
+
+    def test_invalid_urlopen(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_URLOPEN_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 40: Please use python_utils.url_open().'],
+                self.linter_stdout))
+
+    def test_invalid_urlsplit(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_URLSPLIT_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 40: Please use python_utils.url_split().'],
+                self.linter_stdout))
+
+    def test_invalid_urlparse(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_URLPARSE_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 40: Please use python_utils.url_parse().'],
+                self.linter_stdout))
+
+    def test_invalid_url_unsplit(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_URL_UNSPLIT_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 40: Please use python_utils.url_unsplit().'],
+                self.linter_stdout))
+
+    def test_invalid_parse_qs(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_PARSE_QS_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 40: Please use python_utils.parse_query_string().'],
+                self.linter_stdout))
+
+    def test_invalid_unquote(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_UNQUOTE_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 41: Please use python_utils.urllib_unquote().'],
+                self.linter_stdout))
+
+    def test_invalid_urljoin(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_URLJOIN_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 42: Please use python_utils.url_join().'],
+                self.linter_stdout))
+
+    def test_invalid_request(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_REQUEST_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 42: Please use python_utils.url_request().'],
+                self.linter_stdout))
+
+    def test_invalid_input(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_INPUT_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 38: Please use python_utils.INPUT.'],
+                self.linter_stdout))
+
+    def test_invalid_map(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_MAP_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 38: Please use python_utils.MAP.'],
+                self.linter_stdout))
+
+    def test_invalid_next(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_NEXT_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 39: Please use python_utils.NEXT.'],
+                self.linter_stdout))
+
+    def test_invalid_object(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_OBJECT_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 23: Please use python_utils.OBJECT.'],
+                self.linter_stdout))
+
+    def test_invalid_range(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_RANGE_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 38: Please use python_utils.RANGE.'],
+                self.linter_stdout))
+
+    def test_invalid_round(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_ROUND_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 38: Please use python_utils.ROUND.'],
+                self.linter_stdout))
+
+    def test_invalid_str(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_STR_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 38: Please try to use python_utils.convert_to_bytes() '
+                 'for the strings used in webapp2\'s built-in methods or for '
+                 'strings used directly in NDB datastore models. If you need to'
+                 ' cast ints/floats to strings, please use '
+                 'python_utils.UNICODE() instead.'],
+                self.linter_stdout))
+
+    def test_invalid_zip(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_ZIP_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 40: Please use python_utils.ZIP.'],
+                self.linter_stdout))
+
+    def test_invalid_basestring(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_BASESTRING_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 38: Please use python_utils.BASESTRING.'],
+                self.linter_stdout))
+
+    def test_invalid_metaclass(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_METACLASS_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 42: Please use python_utils.with_metaclass().'],
+                self.linter_stdout))
+
+    def test_invalid_iteritems(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_ITERITEMS_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 38: Please use items() instead.'],
+                self.linter_stdout))
+
+    def test_invalid_itervalues(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_ITERVALUES_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 38: Please use values() instead.'],
+                self.linter_stdout))
+
+    def test_invalid_iterkeys(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_ITERKEY_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 38: Please use keys() instead.'],
+                self.linter_stdout))
 
 
 class GeneralLintTests(LintTests):
@@ -649,11 +654,33 @@ class GeneralLintTests(LintTests):
                 ['Please use spaces instead of tabs.'],
                 self.linter_stdout))
 
-    def test_invalid_tabs(self):
+    def test_invalid_merge_conflict(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_TABS_FILEPATH])
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_MERGE_CONFLICT_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Please use spaces instead of tabs.'],
+                ['Please fully resolve existing merge conflicts.',
+                 'Please fully resolve existing merge conflicts.'],
+                self.linter_stdout))
+
+    def test_invalid_glyphicon(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_GLYPHICON_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Please use equivalent material-icons instead of glyphicons.'],
+                self.linter_stdout))
+
+    def test_invalid_todo(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_TODO_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 31: Please assign TODO comments to a user in the format'
+                 ' TODO(username): XXX.'],
                 self.linter_stdout))

@@ -697,16 +697,16 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                         total_error_count += 1
 
                 for regexp in BAD_PATTERNS_REGEXP:
-                    failed, summary_message = check_bad_pattern_in_file(
+                    tmp_failed, summary_message = check_bad_pattern_in_file(
                         filepath, file_content, regexp)
-                    if failed:
+                    if tmp_failed:
                         summary_messages.extend(summary_message)
                         total_error_count += 1
 
                 temp_failed, temp_count, summary_message = (
                     check_file_type_specific_bad_pattern(
                         filepath, file_content))
-                failed = failed or temp_failed
+                failed = failed or temp_failed or tmp_failed
                 total_error_count += temp_count
                 summary_messages.extend(summary_message)
 

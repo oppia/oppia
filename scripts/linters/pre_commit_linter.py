@@ -516,8 +516,8 @@ def main(args=None):
     for task in tasks_third_party:
         all_messages += task.output
 
-    # all_messages += codeowner_linter.check_codeowner_file(
-    #     FILE_CACHE, verbose_mode_enabled)
+    all_messages += codeowner_linter.check_codeowner_file(
+        FILE_CACHE, verbose_mode_enabled)
 
     _print_complete_summary_of_errors(all_messages)
 
