@@ -121,7 +121,6 @@ FULLY_COVERED_FILENAMES = [
     'EndExploration.ts',
     'EntityContextObjectFactory.ts',
     'exploration-correctness-feedback.service.ts',
-    'exploration-data.service.ts',
     'exploration-editor-page.constants.ajs.ts',
     'exploration-editor-page.constants.ts',
     'exploration-features-backend-api.service.ts',
