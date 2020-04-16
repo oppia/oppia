@@ -230,13 +230,15 @@ def _lint_all_files(
     css_file_extension_type = 'css' in file_extensions_to_lint
     other_file_extension_type = 'other' in file_extensions_to_lint
 
-    if not other_file_extension_type:
-        general_files_to_lint = '.' + file_extensions_to_lint
+    if js_ts_file_extension_type:
+        general_files_to_lint = _FILES['.js'] + _FILES['.ts']
+    if other_file_extension_type:
+        general_files_to_lint = _FILES['other']
     else:
-        general_files_to_lint = file_extensions_to_lint
+        general_files_to_lint = _FILES['.%s' % file_extensions_to_lint]
 
     custom_linter, third_party_linter = general_purpose_linter.get_linters(
-        _FILES[general_files_to_lint],
+        general_files_to_lint,
         verbose_mode_enabled=verbose_mode_enabled)
     custom_linters.append(custom_linter)
 
