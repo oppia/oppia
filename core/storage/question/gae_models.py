@@ -317,7 +317,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         if not start_cursor == '':
             direction = start_cursor[-1]
-            random_id = unicode(start_cursor[-13:-1]) #pylint: disable=unicode-builtin
+            random_id = start_cursor[-13:-1]
             cursor = datastore_query.Cursor(urlsafe=start_cursor[:-13])
             if direction == '1':
                 questions_list, next_cursor, more = cls.query(
