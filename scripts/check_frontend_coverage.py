@@ -63,6 +63,7 @@ FULLY_COVERED_FILENAMES = [
     'capitalize.filter.ts',
     'capitalize.pipe.ts',
     'ChangeObjectFactory.ts',
+    'ckeditor.import.ts',
     'ClassifierObjectFactory.ts',
     'classifiers-extension.constants.ts',
     'classroom-domain.constants.ajs.ts',
