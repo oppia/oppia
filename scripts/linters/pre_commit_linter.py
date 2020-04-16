@@ -209,10 +209,6 @@ def _lint_all_files(file_extensions_to_lint, verbose_mode_enabled=False):
         third_party_linter: list. Third party lint checks.
     """
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-    config_path_for_css_in_html = os.path.join(
-        parent_dir, 'oppia', '.stylelintrc')
-    config_path_for_oppia_css = os.path.join(
-        parent_dir, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
     custom_linters = []
     third_party_linters = []
 
@@ -246,12 +242,16 @@ def _lint_all_files(file_extensions_to_lint, verbose_mode_enabled=False):
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
+        config_path_for_css_in_html = os.path.join(
+            parent_dir, 'oppia', '.stylelintrc')
         custom_linter, third_party_linter = css_linter.get_linters(
             config_path_for_css_in_html, _FILES['html'],
             verbose_mode_enabled=verbose_mode_enabled)
         third_party_linters.append(third_party_linter)
 
     if css_file_extension_type:
+        config_path_for_oppia_css = os.path.join(
+            parent_dir, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
         custom_linter, third_party_linter = css_linter.get_linters(
             config_path_for_oppia_css, _FILES['css'],
             verbose_mode_enabled=verbose_mode_enabled)
