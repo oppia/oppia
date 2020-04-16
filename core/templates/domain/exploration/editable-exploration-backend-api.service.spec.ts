@@ -24,7 +24,7 @@ import { EditableExplorationBackendApiService } from
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
 
-describe('Editable exploration backend API service', function() {
+describe('Editable exploration backend API service', () => {
   let editableExplorationBackendApiService = null;
   let readOnlyExplorationBackendApiService = null;
   let httpTestingController = null;
@@ -75,14 +75,14 @@ describe('Editable exploration backend API service', function() {
     };
   });
 
-  afterEach(function() {
+  afterEach(() => {
     httpTestingController.verify();
   });
 
   it('should successfully fetch an existing exploration from the backend',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
       editableExplorationBackendApiService.fetchExploration('0').then(
         successHandler, failHandler);
@@ -98,8 +98,8 @@ describe('Editable exploration backend API service', function() {
 
   it('should fetch and apply the draft of an exploration',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
       // Loading a exploration the first time should fetch it from the backend.
       editableExplorationBackendApiService.fetchApplyDraftExploration(
         '0').then(successHandler, failHandler);
@@ -116,8 +116,8 @@ describe('Editable exploration backend API service', function() {
 
   it('should use the rejection handler if the backend request failed',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
       // Loading a exploration the first time should fetch it from the backend.
       editableExplorationBackendApiService.fetchExploration('1').then(
@@ -136,9 +136,9 @@ describe('Editable exploration backend API service', function() {
 
   it('should update a exploration after fetching it from the backend',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      var exploration = null;
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let exploration = null;
 
       // Loading a exploration the first time should fetch it from the backend.
       editableExplorationBackendApiService.fetchExploration('0').then(
@@ -170,15 +170,15 @@ describe('Editable exploration backend API service', function() {
 
   it('should not cache exploration from backend into read only service',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      var exploration = null;
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let exploration = null;
 
       readOnlyExplorationBackendApiService.loadLatestExploration('0', null)
-        .then(function(data) {
+        .then((data) => {
           exploration = data;
         });
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         '/explorehandler/init/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
@@ -209,9 +209,9 @@ describe('Editable exploration backend API service', function() {
 
   it('should delete exploration from the backend',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      var exploration = null;
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let exploration = null;
 
       editableExplorationBackendApiService.fetchExploration('0')
         .then(function(data) {

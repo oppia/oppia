@@ -110,7 +110,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, story)
         self.save_new_topic(
             self.TOPIC_ID, 'user', name='Topic',
-            abbreviated_name='abbrev', thumbnail_filename=None,
+            abbreviated_name='abbrev', thumbnail_filename='Topic.png',
             description='A new topic', canonical_story_ids=[story.id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)

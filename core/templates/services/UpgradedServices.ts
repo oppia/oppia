@@ -21,10 +21,6 @@ import { HttpClient, HttpXhrBackend } from '@angular/common/http';
 import { BrowserXhr } from '@angular/http';
 import { Injectable } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import {
-  // eslint-disable-next-line camelcase
-  ɵangular_packages_common_http_http_d
-} from '@angular/common/http';
 
 import { AlertsService } from 'services/alerts.service';
 import { AngularNameService } from
@@ -80,7 +76,7 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
 import { DragAndDropSortInputRulesService } from
-// eslint-disable-next-line max-len
+  // eslint-disable-next-line max-len
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { EditableExplorationBackendApiService } from
   'domain/exploration/editable-exploration-backend-api.service';
@@ -104,6 +100,8 @@ import { ExplorationHtmlFormatterService } from
 import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
+import { ExpressionSyntaxTreeService } from
+  'expressions/expression-syntax-tree.service';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { ExtractImageFilenamesFromStateService } from
@@ -289,10 +287,14 @@ import { WindowDimensionsService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { WinnowingPreprocessingService } from
   'classifiers/winnowing-preprocessing.service';
+import { WorkedExampleObjectFactory } from
+  'domain/skill/WorkedExampleObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { PlaythroughIssuesBackendApiService } from
+  'services/playthrough-issues-backend-api.service';
 import { from } from 'rxjs';
 
 @Injectable({
@@ -332,10 +334,6 @@ export class UpgradedServices {
     upgradedServices['DragAndDropSortInputRulesService'] =
       new DragAndDropSortInputRulesService();
     upgradedServices['EditabilityService'] = new EditabilityService();
-    upgradedServices['EmailDashboardDataService'] =
-      new EmailDashboardDataService(
-        new HttpClient(new HttpXhrBackend(
-          new ɵangular_packages_common_http_http_d())));
     upgradedServices['EntityContextObjectFactory'] =
       new EntityContextObjectFactory();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
@@ -420,8 +418,6 @@ export class UpgradedServices {
       new WrittenTranslationObjectFactory();
     upgradedServices['baseInteractionValidationService'] =
       new baseInteractionValidationService();
-    upgradedServices['ɵangular_packages_common_http_http_d'] =
-      new ɵangular_packages_common_http_http_d();
     upgradedServices['Title'] = new Title({});
 
     // Topological level: 1.
@@ -439,9 +435,14 @@ export class UpgradedServices {
       upgradedServices['WindowRef']);
     upgradedServices['DocumentAttributeCustomizationService'] =
       new DocumentAttributeCustomizationService(upgradedServices['WindowRef']);
+    upgradedServices['EmailDashboardDataService'] =
+      new EmailDashboardDataService(upgradedServices['HttpClient']);
     upgradedServices['EndExplorationValidationService'] =
       new EndExplorationValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['ExpressionSyntaxTreeService'] =
+      new ExpressionSyntaxTreeService(
+        upgradedServices['ExpressionParserService']);
     upgradedServices['FeedbackThreadObjectFactory'] =
       new FeedbackThreadObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);
@@ -449,8 +450,6 @@ export class UpgradedServices {
       upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['HtmlEscaperService'] = new HtmlEscaperService(
       upgradedServices['LoggerService']);
-    upgradedServices['HttpXhrBackend'] = new HttpXhrBackend(
-      upgradedServices['ɵangular_packages_common_http_http_d']);
     upgradedServices['LocalStorageService'] = new LocalStorageService(
       upgradedServices['ExplorationDraftObjectFactory']);
     upgradedServices['MetaTagCustomizationService'] =
@@ -507,6 +506,9 @@ export class UpgradedServices {
       upgradedServices['WindowRef']);
     upgradedServices['WindowDimensionsService'] = new WindowDimensionsService(
       upgradedServices['WindowRef']);
+    upgradedServices['WorkedExampleObjectFactory'] =
+      new WorkedExampleObjectFactory(
+        upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['WrittenTranslationsObjectFactory'] =
       new WrittenTranslationsObjectFactory(
         upgradedServices['WrittenTranslationObjectFactory']);
@@ -526,7 +528,8 @@ export class UpgradedServices {
       upgradedServices['CodeNormalizerService']);
     upgradedServices['ConceptCardObjectFactory'] = new ConceptCardObjectFactory(
       upgradedServices['SubtitledHtmlObjectFactory'],
-      upgradedServices['RecordedVoiceoversObjectFactory']);
+      upgradedServices['RecordedVoiceoversObjectFactory'],
+      upgradedServices['WorkedExampleObjectFactory']);
     upgradedServices['ContextService'] = new ContextService(
       upgradedServices['UrlService'],
       upgradedServices['EntityContextObjectFactory']);
@@ -540,8 +543,6 @@ export class UpgradedServices {
     upgradedServices['ExtractImageFilenamesFromStateService'] =
       new ExtractImageFilenamesFromStateService(
         upgradedServices['HtmlEscaperService']);
-    upgradedServices['HttpClient'] = new HttpClient(
-      upgradedServices['HttpXhrBackend']);
     upgradedServices['LanguageUtilService'] = new LanguageUtilService(
       upgradedServices['AudioLanguageObjectFactory'],
       upgradedServices['AutogeneratedAudioLanguageObjectFactory'],
@@ -612,20 +613,24 @@ export class UpgradedServices {
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
       upgradedServices['ContextService'],
       upgradedServices['PlayerTranscriptService']);
+    upgradedServices['PlaythroughIssuesBackendApiService'] =
+      new PlaythroughIssuesBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['PlaythroughIssuesBackendApiService'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['ReadOnlyExplorationBackendApiService'] =
       new ReadOnlyExplorationBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['SkillObjectFactory'] =
-    new SkillObjectFactory(
-      upgradedServices['ConceptCardObjectFactory'],
-      upgradedServices['MisconceptionObjectFactory'],
-      upgradedServices['RubricObjectFactory'],
-      upgradedServices['ValidatorsService']);
-
+      new SkillObjectFactory(
+        upgradedServices['ConceptCardObjectFactory'],
+        upgradedServices['MisconceptionObjectFactory'],
+        upgradedServices['RubricObjectFactory'],
+        upgradedServices['ValidatorsService']);
     upgradedServices['StateCardObjectFactory'] =
-        new StateCardObjectFactory(
-          upgradedServices['AudioTranslationLanguageService']);
+      new StateCardObjectFactory(
+        upgradedServices['AudioTranslationLanguageService']);
     upgradedServices['TopicObjectFactory'] = new TopicObjectFactory(
       upgradedServices['SubtopicObjectFactory'],
       upgradedServices['StoryReferenceObjectFactory'],

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for ImprovementSuggestionThreadModalController.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Improvement Suggestion Thread Modal Controller', function() {

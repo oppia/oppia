@@ -443,6 +443,7 @@
 /core/domain/change_domain.py @ankita240796
 /core/templates/tests/ @kevinlee12 @nithusha21
 /core/templates/domain/utilities/ @bansalnitish
+/core/templates/Polyfills.ts @ankita240796
 /schema_utils*.py @seanlip
 /utils*.py @aks681
 /python_utils*.py @kevinlee12
@@ -458,7 +459,7 @@
 
 
 # QA team.
-/core/tests/ @kevinlee12 @U8NWXD
+/core/tests/ @U8NWXD
 /assets/ @nithusha21
 /data/ @nithusha21
 
@@ -537,6 +538,7 @@
 /webpack.common.macros.ts @jameesjohn @vojtechjelinek
 /webpack.dev.config.ts @jameesjohn @vojtechjelinek
 /webpack.prod.config.ts @jameesjohn @vojtechjelinek
+/webpack.terser.config.ts @nishantwrp @vojtechjelinek
 
 
 # Typings.

@@ -41,16 +41,16 @@ export class ReadOnlyExplorationBackendApiService {
       explorationId: string, version: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
-    var explorationDataUrl = this._getExplorationUrl(explorationId, version);
+    let explorationDataUrl = this._getExplorationUrl(explorationId, version);
 
     this.http.get(explorationDataUrl).toPromise().then((response) => {
-      var exploration = cloneDeep(response);
+      let exploration = cloneDeep(response);
       if (successCallback) {
         successCallback(exploration);
       }
     }, (errorResponse) => {
       if (errorCallback) {
-        errorCallback(errorResponse);
+        errorCallback(errorResponse.error);
       }
     });
   }

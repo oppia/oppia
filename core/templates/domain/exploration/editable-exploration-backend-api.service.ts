@@ -41,11 +41,11 @@ export class EditableExplorationBackendApiService {
       explorationId: string, applyDraft: boolean,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
-    var editableExplorationDataUrl = this._getExplorationUrl(
+    let editableExplorationDataUrl = this._getExplorationUrl(
       explorationId, applyDraft);
     this.http.get(editableExplorationDataUrl).toPromise().then(
       (response) => {
-        var exploration = cloneDeep(response);
+        let exploration = cloneDeep(response);
         if (successCallback) {
           successCallback(exploration);
         }
@@ -61,10 +61,10 @@ export class EditableExplorationBackendApiService {
       commitMessage: string, changeList: Array<string>,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
-    var editableExplorationDataUrl = this._getExplorationUrl(
+    let editableExplorationDataUrl = this._getExplorationUrl(
       explorationId, null);
 
-    var putData = {
+    let putData = {
       version: explorationVersion,
       commit_message: commitMessage,
       change_list: changeList
@@ -72,7 +72,7 @@ export class EditableExplorationBackendApiService {
     this.http.put(editableExplorationDataUrl, putData).toPromise().then(
       (response) => {
         // The returned data is an updated exploration dict.
-        var exploration = cloneDeep(response);
+        let exploration = cloneDeep(response);
 
         // Delete from the ReadOnlyExplorationBackendApiService's cache
         // As the two versions of the data (learner and editor) now differ
@@ -94,7 +94,7 @@ export class EditableExplorationBackendApiService {
       explorationId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
-    var editableExplorationDataUrl = this._getExplorationUrl(
+    let editableExplorationDataUrl = this._getExplorationUrl(
       explorationId, null);
     // eslint-disable-next-line
     this.http.delete(editableExplorationDataUrl).toPromise().then(() => {
