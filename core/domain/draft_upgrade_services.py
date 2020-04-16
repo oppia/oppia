@@ -107,7 +107,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                 if change.new_value.keys() == ['choices']:
                     change.new_value['showChoicesInShuffledOrder'] = {
-                        'value': True
+                        'value': False
                     }
                     draft_change_list[i] = exp_domain.ExplorationChange({
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,

@@ -180,7 +180,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                         ]
                     },
                     'showChoicesInShuffledOrder': {
-                        'value': True
+                        'value': False
                     }
                 }
             }).to_dict())
