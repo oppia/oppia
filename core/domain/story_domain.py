@@ -390,6 +390,7 @@ class StoryContents(python_utils.OBJECT):
 
         initial_node_is_present = False
         node_id_list = []
+        node_title_list = []
 
         for node in self.nodes:
             if not isinstance(node, StoryNode):
@@ -412,6 +413,7 @@ class StoryContents(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'The node with id %s is out of bounds.' % node.id)
             node_id_list.append(node.id)
+            node_title_list.append(node.title)
 
         if len(self.nodes) > 0:
             if not initial_node_is_present:
@@ -420,6 +422,10 @@ class StoryContents(python_utils.OBJECT):
             if len(node_id_list) > len(set(node_id_list)):
                 raise utils.ValidationError(
                     'Expected all node ids to be distinct.')
+
+            if len(node_title_list) > len(set(node_title_list)):
+                raise utils.ValidationError(
+                    'Expected all chapter titles to be distinct.')
 
             # nodes_queue stores the pending nodes to visit in the story that
             # are unlocked, in a 'queue' form with a First In First Out
