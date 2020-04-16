@@ -789,6 +789,25 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
+    def test_cannot_update_story_with_blank_exp_id(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
+
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'node_id': self.NODE_ID_1,
+            'old_value': self.EXP_ID,
+            'new_value': None
+        })]
+
+        with self.assertRaisesRegexp(
+            Exception, 'Story node with id node_1 does not contain an '
+            'exploration id.'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
     def test_cannot_update_story_with_exps_with_different_categories(self):
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
