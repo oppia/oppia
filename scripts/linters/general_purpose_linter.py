@@ -384,7 +384,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'[^.|\w]map\('),
+        'regexp': re.compile(r'[^.|\s]\(map\('),
         'message': 'Please use python_utils.MAP.',
         'excluded_files': (),
         'excluded_dirs': ()

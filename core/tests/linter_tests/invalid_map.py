@@ -35,5 +35,5 @@ class FakeClass(python_utils.OBJECT):
         Yields:
             tuple. The argument passed in but twice in a tuple.
         """
-        num = map(lambda x: x + x, num)
+        num = list(map(lambda x: x + x, num))
         yield (num, num)
