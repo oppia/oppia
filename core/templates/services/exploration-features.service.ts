@@ -52,7 +52,8 @@ export class ExplorationFeaturesService {
     isPlaythroughRecordingEnabled: false
   };
 
-  init(explorationData: IExplorationDataDict,
+  init(
+      explorationData: IExplorationDataDict,
       featuresData: IFeatureDataDict): void {
     if (ExplorationFeaturesService.serviceIsInitialized) {
       return;
@@ -96,5 +97,6 @@ export class ExplorationFeaturesService {
   }
 }
 
-angular.module('oppia').factory('ExplorationFeaturesService',
+angular.module('oppia').factory(
+  'ExplorationFeaturesService',
   downgradeInjectable(ExplorationFeaturesService));
