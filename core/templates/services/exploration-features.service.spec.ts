@@ -49,7 +49,7 @@ describe('ExplorationFeatureService', () => {
       param_changes: [],
       states: {
         testState: {
-          param_changes: [],
+          param_changes: [testParamChanges],
         }
       }
     };
