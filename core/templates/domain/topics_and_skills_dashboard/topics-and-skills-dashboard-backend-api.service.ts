@@ -36,7 +36,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
   }
 
   mergeSkills(oldSkillId, newSkillId): Promise<void> {
-    var mergeSkillsData = {
+    let mergeSkillsData = {
       old_skill_id: oldSkillId,
       new_skill_id: newSkillId
     };

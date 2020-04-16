@@ -62,11 +62,11 @@ describe('Topics and Skills Dashboard backend API service', () => {
 
     it('should use rejection handler if dashboard data backend request failed',
       fakeAsync(() => {
-        var successHandler = jasmine.createSpy('success');
-        var failHandler = jasmine.createSpy('fail');
+        let successHandler = jasmine.createSpy('success');
+        let failHandler = jasmine.createSpy('fail');
         topicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
           successHandler, failHandler);
-        var req = httpTestingController.expectOne(
+        let req = httpTestingController.expectOne(
           TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
           'Error Loading dashboard data.');
         expect(req.request.method).toEqual('GET');
@@ -76,13 +76,12 @@ describe('Topics and Skills Dashboard backend API service', () => {
     );
 
     it('should successfully fetch topics and skills dashboard data from the ' +
-      'backend',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      'backend', fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
       topicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
         successHandler, failHandler);
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         TOPICS_AND_SKILLS_DASHBOARD_DATA_URL);
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
