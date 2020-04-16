@@ -92,8 +92,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([user_services.get_username(self.user_id_a)])
-        topic_services.publish_story(
-            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.user_a = user_services.UserActionsInfo(self.user_id_a)
         self.user_b = user_services.UserActionsInfo(self.user_id_b)
         self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
@@ -739,6 +737,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, [], 'Commit message')
 
     def test_cannot_update_story_with_invalid_exploration_id(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
             'property_name': (
@@ -754,6 +754,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_validate_exploration_returning_error_messages(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1')
         validation_error_messages = (
@@ -769,6 +771,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(validation_error_messages, [message_1, message_2])
 
     def test_cannot_update_story_with_private_exploration_id(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1')
         change_list = [story_domain.StoryChange({
@@ -786,6 +790,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_cannot_update_story_with_exps_with_different_categories(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1')
         self.publish_exploration(self.user_id_a, 'exp_id_1')
@@ -842,6 +848,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_cannot_update_story_with_exps_with_other_languages(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1',
             language_code='es')
@@ -870,6 +878,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_cannot_update_story_with_exps_with_invalid_interactions(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1',
             interaction_id='LogicProof')
@@ -899,6 +909,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_cannot_update_story_with_exps_with_recommended_exps(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1',
             interaction_id='TextInput', end_state_name='End')
@@ -941,6 +953,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_cannot_update_story_with_exps_with_invalid_rte_content(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1',
             end_state_name='End')
@@ -983,6 +997,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_cannot_update_story_with_exps_with_parameter_values(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1')
         exp_services.update_exploration(
@@ -1358,7 +1374,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(story.story_contents.initial_node_id)
 
 
-class StoryProgressUnitTests(StoryServicesUnitTests):
+class StoryProgressUnitTests(test_utils.GenericTestBase):
     """Tests functions which deal with any progress a user has made within a
     story, including query and recording methods related to nodes
     which are completed in the context of the story.
@@ -1381,8 +1397,11 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
 
         self.STORY_1_ID = 'story_id'
         self.STORY_ID_1 = 'story_id_1'
+        self.NODE_ID_1 = 'node_1'
+        self.NODE_ID_2 = 'node_2'
         self.NODE_ID_3 = 'node_3'
         self.NODE_ID_4 = 'node_4'
+        self.USER_ID = 'user'
 
         self.owner_id = 'owner'
         self.TOPIC_ID = topic_services.get_new_topic_id()
@@ -1573,7 +1592,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
 
         # If the same node and another are completed within the context
         # of a different story, it shouldn't affect this one.
-        self.story = self.save_new_story(
+        self.save_new_story(
             self.STORY_ID_1, self.USER_ID, 'Title', 'Description', 'Notes',
             self.TOPIC_ID
         )

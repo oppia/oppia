@@ -65,6 +65,11 @@ angular.module('oppia').directive('storyEditorNavbar', [
           };
 
           $scope.isStorySaveable = function() {
+            if (StoryEditorStateService.isStoryPublished()) {
+              return (
+                $scope.getChangeListLength() > 0 &&
+                $scope.getTotalWarningsCount() === 0);
+            }
             return (
               $scope.getChangeListLength() > 0 &&
               $scope.getWarningsCount() === 0);
@@ -87,9 +92,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
               $scope.forceValidateExplorations) {
               $scope.explorationValidationIssues = [];
               for (var i = 0; i < nodes.length; i++) {
-                if (
-                  nodes[i].getExplorationId() !== null &&
-                  nodes[i].getExplorationId() !== '') {
+                if (nodes[i].getExplorationId() !== null) {
                   explorationIds.push(nodes[i].getExplorationId());
                 } else {
                   $scope.explorationValidationIssues.push(
@@ -103,11 +106,6 @@ angular.module('oppia').directive('storyEditorNavbar', [
                 ).then(function(validationIssues) {
                   $scope.explorationValidationIssues =
                     $scope.explorationValidationIssues.concat(validationIssues);
-                  if (StoryEditorStateService.isStoryPublished()) {
-                    $scope.validationIssues = $scope.validationIssues.concat(
-                      $scope.explorationValidationIssues);
-                    $scope.explorationValidationIssues = [];
-                  }
                 });
               }
             }

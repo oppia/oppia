@@ -93,6 +93,7 @@ angular.module('oppia').directive('storyNodeEditor', [
               $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
                 skillSummaries[idx].description;
             }
+            $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
             $scope.editableTitle = $scope.currentTitle;
             $scope.oldOutline = $scope.getOutline();
@@ -150,6 +151,12 @@ angular.module('oppia').directive('storyNodeEditor', [
 
           $scope.updateExplorationId = function(explorationId) {
             if (StoryEditorStateService.isStoryPublished()) {
+              if (explorationId === '' || explorationId === null) {
+                AlertsService.addInfoMessage(
+                  'You cannot remove an exploration from a published story.',
+                  5000);
+                return;
+              }
               ExplorationIdValidationService.isExpPublished(
                 explorationId).then(function(expIdIsValid) {
                 $scope.expIdIsValid = expIdIsValid;
@@ -163,10 +170,19 @@ angular.module('oppia').directive('storyNodeEditor', [
                 }
               });
             } else {
+              if (explorationId === '') {
+                AlertsService.addInfoMessage(
+                  'Please click the delete icon to remove an exploration ' +
+                  'from the story.', 5000);
+                return;
+              }
               StoryEditorStateService.setExpIdsChanged();
               StoryUpdateService.setStoryNodeExplorationId(
                 $scope.story, $scope.getId(), explorationId);
               $scope.currentExplorationId = explorationId;
+              if (explorationId === null) {
+                $scope.explorationId = null;
+              }
             }
           };
 
@@ -302,6 +318,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             modalInstance.result.then(function(title) {
               var nextNodeId =
                 $scope.story.getStoryContents().getNextNodeId();
+              StoryEditorStateService.setExpIdsChanged();
               StoryUpdateService.addStoryNode($scope.story, title);
               StoryUpdateService.addDestinationNodeIdToNode(
                 $scope.story, $scope.getId(), nextNodeId);
@@ -343,6 +360,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.removeDestinationNodeId = function(nodeId) {
+            StoryEditorStateService.setExpIdsChanged();
             StoryUpdateService.removeDestinationNodeIdFromNode(
               $scope.story, $scope.getId(), nodeId);
             $rootScope.$broadcast(

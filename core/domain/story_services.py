@@ -354,9 +354,13 @@ def _save_story(committer_id, story, commit_message, change_list):
     story.validate()
 
     if story_is_published:
+        for node in story.story_contents.nodes:
+            if not node.exploration_id:
+                raise Exception(
+                    'Story node with id %s does not contain an '
+                    'exploration id.' % node.id)
         exp_ids = [
-            node.exploration_id for node in story.story_contents.nodes
-            if node.exploration_id is not None]
+            node.exploration_id for node in story.story_contents.nodes]
         validate_explorations_for_story(exp_ids, True)
 
     # Story model cannot be None as story is passed as parameter here and that

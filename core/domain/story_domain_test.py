@@ -863,10 +863,14 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story_contents_from_dict.to_dict(), story_contents_dict)
 
-    def test_validate_non_str_exploration_id(self):
+    def test_validate_exploration_id(self):
         self.story.story_contents.nodes[0].exploration_id = 1
         self._assert_validation_error(
             'Expected exploration ID to be a string')
+
+        self.story.story_contents.nodes[0].exploration_id = ''
+        self._assert_validation_error(
+            'Expected exploration ID to not be an empty string')
 
     def test_validate_non_str_outline(self):
         self.story.story_contents.nodes[0].outline = 0

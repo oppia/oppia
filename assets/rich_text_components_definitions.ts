@@ -150,7 +150,7 @@ export = {
       "schema": {
         "type": "unicode"
       },
-      "default_value": "Concept Card"
+      "default_value": "concept card"
     }, {
       "name": "skill_id",
       "description": "The skill that this link refers to",

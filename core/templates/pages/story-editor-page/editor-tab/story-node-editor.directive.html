@@ -24,7 +24,10 @@
   <label style="padding-top: 2em;" class="form-heading"> Exploration ID </label>
   <form class="form-horizontal" role="form" ng-submit="updateExplorationId(explorationId)">
     <input class="protractor-test-exploration-id-input" type="text" ng-model="explorationId" ng-change="checkCanSaveExpId()">
-    <button type="submit" class="protractor-test-exploration-id-save-button btn btn-success btn-sm" ng-disabled="!canSaveExpId || (explorationId === currentExplorationId)">Save</button>
+    <span ng-if="!isStoryPublished()" ng-click="updateExplorationId(null)" class="fas fa-trash-alt list-summary"> </span>
+    <div style="margin-top: 20px;">
+      <button type="submit" class="protractor-test-exploration-id-save-button btn btn-success btn-sm" ng-disabled="!canSaveExpId || (explorationId === currentExplorationId)">Save</button>
+    </div>
     <span class="form-text error-message" ng-if="invalidExpErrorIsShown">
       <em>Please enter a valid exploration id.</em>
     </span>
