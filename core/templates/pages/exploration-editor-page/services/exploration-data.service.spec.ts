@@ -179,6 +179,7 @@ describe('Exploration data service', function() {
       $httpBackend.expectPUT('/createhandler/autosave_draft/0').respond({
         sampleDataResults
       });
+      $httpBackend.flush();
 
       // Save draft.
       eds.getData(errorCallback).then(function(data) {
