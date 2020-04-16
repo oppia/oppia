@@ -80,7 +80,7 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
 import { DragAndDropSortInputRulesService } from
-// eslint-disable-next-line max-len
+  // eslint-disable-next-line max-len
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from
@@ -102,6 +102,8 @@ import { ExplorationHtmlFormatterService } from
 import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
 import { ExpressionParserService } from 'expressions/expression-parser.service';
+import { ExpressionSyntaxTreeService } from
+  'expressions/expression-syntax-tree.service';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { ExtractImageFilenamesFromStateService } from
@@ -285,10 +287,14 @@ import { WindowDimensionsService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { WinnowingPreprocessingService } from
   'classifiers/winnowing-preprocessing.service';
+import { WorkedExampleObjectFactory } from
+  'domain/skill/WorkedExampleObjectFactory';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { PlaythroughIssuesBackendApiService } from
+  'services/playthrough-issues-backend-api.service';
 import { from } from 'rxjs';
 
 @Injectable({
@@ -436,6 +442,9 @@ export class UpgradedServices {
     upgradedServices['EndExplorationValidationService'] =
       new EndExplorationValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['ExpressionSyntaxTreeService'] =
+      new ExpressionSyntaxTreeService(
+        upgradedServices['ExpressionParserService']);
     upgradedServices['FeedbackThreadObjectFactory'] =
       new FeedbackThreadObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);
@@ -501,6 +510,9 @@ export class UpgradedServices {
       upgradedServices['WindowRef']);
     upgradedServices['WindowDimensionsService'] = new WindowDimensionsService(
       upgradedServices['WindowRef']);
+    upgradedServices['WorkedExampleObjectFactory'] =
+      new WorkedExampleObjectFactory(
+        upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['WrittenTranslationsObjectFactory'] =
       new WrittenTranslationsObjectFactory(
         upgradedServices['WrittenTranslationObjectFactory']);
@@ -520,7 +532,8 @@ export class UpgradedServices {
       upgradedServices['CodeNormalizerService']);
     upgradedServices['ConceptCardObjectFactory'] = new ConceptCardObjectFactory(
       upgradedServices['SubtitledHtmlObjectFactory'],
-      upgradedServices['RecordedVoiceoversObjectFactory']);
+      upgradedServices['RecordedVoiceoversObjectFactory'],
+      upgradedServices['WorkedExampleObjectFactory']);
     upgradedServices['ContextService'] = new ContextService(
       upgradedServices['UrlService'],
       upgradedServices['EntityContextObjectFactory']);
@@ -606,15 +619,20 @@ export class UpgradedServices {
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
       upgradedServices['ContextService'],
       upgradedServices['PlayerTranscriptService']);
+    upgradedServices['PlaythroughIssuesBackendApiService'] =
+      new PlaythroughIssuesBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['PlaythroughIssuesBackendApiService'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['SkillObjectFactory'] =
-    new SkillObjectFactory(
-      upgradedServices['ConceptCardObjectFactory'],
-      upgradedServices['MisconceptionObjectFactory'],
-      upgradedServices['RubricObjectFactory'],
-      upgradedServices['ValidatorsService']);
+      new SkillObjectFactory(
+        upgradedServices['ConceptCardObjectFactory'],
+        upgradedServices['MisconceptionObjectFactory'],
+        upgradedServices['RubricObjectFactory'],
+        upgradedServices['ValidatorsService']);
     upgradedServices['StateCardObjectFactory'] =
-        new StateCardObjectFactory(
-          upgradedServices['AudioTranslationLanguageService']);
+      new StateCardObjectFactory(
+        upgradedServices['AudioTranslationLanguageService']);
     upgradedServices['TopicObjectFactory'] = new TopicObjectFactory(
       upgradedServices['SubtopicObjectFactory'],
       upgradedServices['StoryReferenceObjectFactory'],

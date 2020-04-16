@@ -30,6 +30,7 @@ require(
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/skill/skill-update.service.ts');
+require('domain/skill/WorkedExampleObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/capitalize.filter.ts');
 require('filters/format-rte-preview.filter.ts');
@@ -41,11 +42,11 @@ require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 angular.module('oppia').directive('skillConceptCardEditor', [
   'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',
   'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
-  'COMPONENT_NAME_WORKED_EXAMPLE',
+  'WorkedExampleObjectFactory', 'COMPONENT_NAME_WORKED_EXAMPLE',
   function(
       GenerateContentIdService, SkillEditorStateService, SkillUpdateService,
       SubtitledHtmlObjectFactory, UrlInterpolationService,
-      COMPONENT_NAME_WORKED_EXAMPLE) {
+      WorkedExampleObjectFactory, COMPONENT_NAME_WORKED_EXAMPLE) {
     return {
       restrict: 'E',
       scope: {},
@@ -79,6 +80,8 @@ angular.module('oppia').directive('skillConceptCardEditor', [
 
           $scope.changeActiveWorkedExampleIndex = function(idx) {
             if (idx === $scope.activeWorkedExampleIndex) {
+              $scope.bindableFieldsDict.displayedWorkedExamples =
+                $scope.skill.getConceptCard().getWorkedExamples();
               $scope.activeWorkedExampleIndex = null;
             } else {
               $scope.activeWorkedExampleIndex = idx;
@@ -114,8 +117,8 @@ angular.module('oppia').directive('skillConceptCardEditor', [
             });
           };
 
-          $scope.getWorkedExampleSummary = function(workedExample) {
-            return $filter('formatRtePreview')(workedExample);
+          $scope.getWorkedExampleSummary = function(workedExampleQuestion) {
+            return $filter('formatRtePreview')(workedExampleQuestion);
           };
 
           $scope.openAddWorkedExampleModal = function() {
@@ -132,10 +135,15 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                     ui_config: {}
                   };
 
-                  $scope.tmpWorkedExampleHtml = '';
+                  $scope.tmpWorkedExampleQuestionHtml = '';
+                  $scope.tmpWorkedExampleExplanationHtml = '';
+
                   $scope.saveWorkedExample = function() {
                     $uibModalInstance.close({
-                      workedExampleHtml: $scope.tmpWorkedExampleHtml
+                      workedExampleQuestionHtml:
+                        $scope.tmpWorkedExampleQuestionHtml,
+                      workedExampleExplanationHtml:
+                        $scope.tmpWorkedExampleExplanationHtml
                     });
                   };
 
@@ -145,13 +153,22 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                 }
               ]
             }).result.then(function(result) {
-              SkillUpdateService.addWorkedExample(
-                $scope.skill, SubtitledHtmlObjectFactory.createDefault(
-                  result.workedExampleHtml,
+              var newExample = WorkedExampleObjectFactory.create(
+                SubtitledHtmlObjectFactory.createDefault(
+                  result.workedExampleQuestionHtml,
                   GenerateContentIdService.getNextId(
                     $scope.skill.getConceptCard().getRecordedVoiceovers(
                     ).getAllContentId(),
-                    COMPONENT_NAME_WORKED_EXAMPLE)));
+                    COMPONENT_NAME_WORKED_EXAMPLE.QUESTION)),
+                SubtitledHtmlObjectFactory.createDefault(
+                  result.workedExampleExplanationHtml,
+                  GenerateContentIdService.getNextId(
+                    $scope.skill.getConceptCard().getRecordedVoiceovers(
+                    ).getAllContentId(),
+                    COMPONENT_NAME_WORKED_EXAMPLE.EXPLANATION))
+              );
+              SkillUpdateService.addWorkedExample(
+                $scope.skill, newExample);
               $scope.bindableFieldsDict.displayedWorkedExamples =
                 $scope.skill.getConceptCard().getWorkedExamples();
             }, function() {
@@ -161,10 +178,6 @@ angular.module('oppia').directive('skillConceptCardEditor', [
             });
           };
 
-          $scope.onWorkedExampleSaved = function() {
-            $scope.bindableFieldsDict.displayedWorkedExamples =
-              $scope.skill.getConceptCard().getWorkedExamples();
-          };
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(

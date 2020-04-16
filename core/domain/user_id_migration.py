@@ -205,8 +205,8 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             try:
                 model.populate(**model_values)
             except TypeError as e:
-                logging.error(str(model_values))
-                raise TypeError(str(e))
+                logging.error(python_utils.UNICODE(model_values))
+                raise TypeError(python_utils.UNICODE(e))
             model_class.put_multi([model], update_last_updated_time=False)
 
     @classmethod

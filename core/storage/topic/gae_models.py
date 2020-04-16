@@ -31,26 +31,12 @@ from google.appengine.ext import ndb
 
 class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class TopicModel(base_models.VersionedModel):
@@ -294,26 +280,12 @@ class TopicSummaryModel(base_models.BaseModel):
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a subtopic page snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class SubtopicPageModel(base_models.VersionedModel):
@@ -442,26 +414,12 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic rights snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic rights snapshot."""
-
-    @staticmethod
-    def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+    pass
 
 
 class TopicRightsModel(base_models.VersionedModel):
