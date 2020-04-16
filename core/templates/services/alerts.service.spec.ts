@@ -36,6 +36,14 @@ describe('Alerts Service', function() {
       expect(alertsService.warnings.length).toBe(1);
     });
 
+    it('should add a fatal warning', () => {
+      expect(alertsService.warnings.length).toBe(0);
+      expect(() => {
+        alertsService.fatalWarning('Fatal Warning');
+      }).toThrowError('Fatal Warning');
+      expect(alertsService.warnings.length).toBe(1);
+    });
+
     it('should delete a warning (no duplicates)', () => {
       var warning = 'Warning 1';
       // Warning message to be deleted
@@ -112,7 +120,7 @@ describe('Alerts Service', function() {
     it('should add an info message', () => {
       var message = 'Info 1';
       expect(alertsService.messages.length).toBe(0);
-      alertsService.addInfoMessage(message, null);
+      alertsService.addInfoMessage(message);
       expect(alertsService.messages.length).toBe(1);
       expect(alertsService.messages[0].type).toBe('info');
       expect(alertsService.messages[0].content).toBe(message);
@@ -121,8 +129,8 @@ describe('Alerts Service', function() {
     it('should add a success message', () => {
       var message = 'Success 1';
       expect(alertsService.messages.length).toBe(0);
-      alertsService.addSuccessMessage(message, null);
-      alertsService.addInfoMessage('Info 1', null);
+      alertsService.addSuccessMessage(message);
+      alertsService.addInfoMessage('Info 1');
       expect(alertsService.messages.length).toBe(2);
       expect(alertsService.messages[0].type).toBe('success');
       expect(alertsService.messages[0].content).toBe(message);
@@ -131,10 +139,10 @@ describe('Alerts Service', function() {
     it('should delete a message (no duplicates)', () => {
       var message = 'Info 1';
       // Info Message to be deleted
-      alertsService.addInfoMessage(message, null);
+      alertsService.addInfoMessage(message);
       // Add a few other messages
-      alertsService.addInfoMessage('Info 2', null);
-      alertsService.addSuccessMessage('Success 1', null);
+      alertsService.addInfoMessage('Info 2');
+      alertsService.addSuccessMessage('Success 1');
 
       expect(alertsService.messages.length).toBe(3);
       alertsService.deleteMessage({
@@ -160,11 +168,11 @@ describe('Alerts Service', function() {
     it('should delete a message (with duplicates)', () => {
       var message = 'Info 1';
       // Info Message to be deleted
-      alertsService.addInfoMessage(message, null);
+      alertsService.addInfoMessage(message);
       // Add a few other messages
-      alertsService.addInfoMessage('Info 2', null);
-      alertsService.addSuccessMessage('Success 1', null);
-      alertsService.addInfoMessage(message, null);
+      alertsService.addInfoMessage('Info 2');
+      alertsService.addSuccessMessage('Success 1');
+      alertsService.addInfoMessage(message);
 
       expect(alertsService.messages.length).toBe(4);
       alertsService.deleteMessage({
@@ -190,16 +198,16 @@ describe('Alerts Service', function() {
     it('should not add more than 10 messages', () => {
       var message = 'Info ';
       for (var i = 1; i < 15; i++) {
-        alertsService.addInfoMessage(message + i, null);
+        alertsService.addInfoMessage(message + i);
       }
-      alertsService.addSuccessMessage('Success 1', null);
+      alertsService.addSuccessMessage('Success 1');
       expect(alertsService.messages.length).toBe(10);
     });
 
     it('should clear all the messages', () => {
-      alertsService.addInfoMessage('Info 1', null);
-      alertsService.addInfoMessage('Info 2', null);
-      alertsService.addSuccessMessage('Success 1', null);
+      alertsService.addInfoMessage('Info 1');
+      alertsService.addInfoMessage('Info 2');
+      alertsService.addSuccessMessage('Success 1');
       alertsService.clearMessages();
       expect(alertsService.messages.length).toBe(0);
     });

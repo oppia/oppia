@@ -118,6 +118,21 @@ describe('Read only exploration backend API service', function() {
     }
   );
 
+  it('should successfully fetch an existing exploration with version from' +
+    ' the backend', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect('GET', '/explorehandler/init/0?v=1').respond(
+      sampleDataResults);
+    ReadOnlyExplorationBackendApiService.fetchExploration(
+      '0', 1).then(successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
   it('should load a cached exploration after fetching it from the backend',
     function() {
       var successHandler = jasmine.createSpy('success');
@@ -229,5 +244,18 @@ describe('Read only exploration backend API service', function() {
       nodes: []
     });
     expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should delete a exploration from cache', function() {
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
+
+    ReadOnlyExplorationBackendApiService.cacheExploration('0', {
+      id: '0',
+      nodes: []
+    });
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(true);
+
+    ReadOnlyExplorationBackendApiService.deleteExplorationFromCache('0');
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
   });
 });
