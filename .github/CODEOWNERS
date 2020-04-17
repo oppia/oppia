@@ -582,8 +582,8 @@
 /core/storage/ @seanlip
 /core/domain/user*.py @seanlip
 /export/ @seanlip
-/manifest.json @vojtechjelinek @kevinlee12
-/package.json @vojtechjelinek @kevinlee12
-/yarn.lock @vojtechjelinek @kevinlee12
+/manifest.json @vojtechjelinek
+/package.json @vojtechjelinek
+/yarn.lock @vojtechjelinek
 /scripts/install_third_party_libs.py @vojtechjelinek @kevinlee12
 /.github/ @kevinlee12
