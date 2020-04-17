@@ -41,20 +41,12 @@ angular.module('oppia').directive('teachPage', [
             $timeout, SiteAnalyticsService,
             UrlInterpolationService, WindowRef) {
           var ctrl = this;
-          var activeTabClass = 'oppia-about-tabs-active';
-          var visibleContent = 'oppia-about-visible-content';
-          var activateTab = function(tabName) {
-            $("a[id='" + tabName + "']").parent().addClass(
-              activeTabClass
-            ).siblings().removeClass(activeTabClass);
-            $('.' + tabName).addClass(visibleContent).siblings().removeClass(
-              visibleContent
-            );
-          };
+          ctrl.activeTabName = 'teach';
+
           ctrl.onTabClick = function(tabName) {
             // Update hash
             WindowRef.nativeWindow.location.hash = '#' + tabName;
-            activateTab(tabName);
+            ctrl.activeTabName = tabName;
           };
 
           ctrl.getStaticImageUrl = function(imagePath) {
@@ -77,17 +69,17 @@ angular.module('oppia').directive('teachPage', [
             var hash = WindowRef.nativeWindow.location.hash.slice(1);
 
             if (hash === ctrl.TAB_ID_TEACH) {
-              activateTab(ctrl.TAB_ID_TEACH);
+              ctrl.activeTabName = ctrl.TAB_ID_TEACH;
             } else if (hash === ctrl.TAB_ID_PLAYBOOK) {
-              activateTab(ctrl.TAB_ID_PLAYBOOK);
+              ctrl.activeTabName = ctrl.TAB_ID_PLAYBOOK;
             }
 
             WindowRef.nativeWindow.onhashchange = function() {
               var hashChange = WindowRef.nativeWindow.location.hash.slice(1);
               if (hashChange === ctrl.TAB_ID_TEACH) {
-                activateTab(ctrl.TAB_ID_TEACH);
+                ctrl.activeTabName = ctrl.TAB_ID_TEACH;
               } else if (hashChange === ctrl.TAB_ID_PLAYBOOK) {
-                activateTab(ctrl.TAB_ID_PLAYBOOK);
+                ctrl.activeTabName = ctrl.TAB_ID_PLAYBOOK;
               }
             };
           };

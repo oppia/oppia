@@ -35,9 +35,7 @@ angular.module('oppia').directive('aboutPage', [
         'UrlInterpolationService', 'WindowRef',
         function(UrlInterpolationService, WindowRef) {
           const ctrl = this;
-          const activeTabClass = 'oppia-about-tabs-active';
           const hash = window.location.hash.slice(1);
-          const visibleContent = 'oppia-about-visible-content';
           const listOfNamesToThank = [
             'Alex Kauffmann', 'Allison Barros',
             'Amy Latten', 'Brett Barros',
@@ -54,19 +52,12 @@ angular.module('oppia').directive('aboutPage', [
             'Vikrant Nanda', 'Vinamrata Singal',
             'Yarin Feigenbaum'];
 
-          const activateTab = function(tabName: string) {
-            $("a[id='" + tabName + "']").parent().addClass(
-              activeTabClass
-            ).siblings().removeClass(activeTabClass);
-            $('.' + tabName).addClass(visibleContent).siblings().removeClass(
-              visibleContent
-            );
-          };
+          ctrl.activeTabName = 'about';
 
           ctrl.onTabClick = function(tabName: string) {
             // Update hash
             WindowRef.nativeWindow.location.hash = '#' + tabName;
-            activateTab(tabName);
+            ctrl.activeTabName = tabName;
           };
           ctrl.getStaticImageUrl = function(imagePath: string) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -79,15 +70,15 @@ angular.module('oppia').directive('aboutPage', [
 
             var hash = WindowRef.nativeWindow.location.hash.slice(1);
             if (hash === ctrl.TAB_ID_FOUNDATION || hash === 'license') {
-              activateTab(ctrl.TAB_ID_FOUNDATION);
+              ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;
             }
 
             if (hash === ctrl.TAB_ID_CREDITS) {
-              activateTab(ctrl.TAB_ID_CREDITS);
+              ctrl.activeTabName = ctrl.TAB_ID_CREDITS;
             }
 
             if (hash === ctrl.TAB_ID_ABOUT) {
-              activateTab(ctrl.TAB_ID_ABOUT);
+              ctrl.activeTabName = ctrl.TAB_ID_ABOUT;
             }
             ctrl.listOfNames = listOfNamesToThank
               .slice(0, listOfNamesToThank.length - 1).join(', ') +
@@ -99,15 +90,15 @@ angular.module('oppia').directive('aboutPage', [
               const hashChange = window.location.hash.slice(1);
               if (hashChange === ctrl.TAB_ID_FOUNDATION || (
                 hashChange === 'license')) {
-                activateTab(ctrl.TAB_ID_FOUNDATION);
+                ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;
                 // Ensure page goes to the license section
                 if (hashChange === 'license') {
                   WindowRef.nativeWindow.location.reload(true);
                 }
               } else if (hashChange === ctrl.TAB_ID_CREDITS) {
-                activateTab(ctrl.TAB_ID_CREDITS);
+                ctrl.activeTabName = ctrl.TAB_ID_CREDITS;
               } else if (hashChange === ctrl.TAB_ID_ABOUT) {
-                activateTab(ctrl.TAB_ID_ABOUT);
+                ctrl.activeTabName = ctrl.TAB_ID_ABOUT;
               }
             };
           };
