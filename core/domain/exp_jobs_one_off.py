@@ -80,6 +80,45 @@ AUDIO_ENTITY_TYPE = 'exploration'
 AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION = 31
 
 
+class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that produces a list of all (exploration, state) pairs that use the
+    Multiple selection interaction and have rules that do not correspond to any
+    answer choices.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        for state_name, state in exploration.states.items():
+            if state.interaction.id == 'MultipleChoiceInput':
+                choices_length = len(
+                    state.interaction.customization_args['choices']['value'])
+                for anwer_group_index, answer_group in enumerate(
+                        state.interaction.answer_groups):
+                    for rule_index, rule_spec in enumerate(
+                            answer_group.rule_specs):
+                        if rule_spec.inputs['x'] >= choices_length:
+                            yield (
+                                item.id,
+                                'State name: %s, AnswerGroup: %s,' % (
+                                    state_name.encode('utf-8'),
+                                    anwer_group_index) +
+                                ' Rule: %s is invalid.' % (rule_index) +
+                                '(Indices here are 0-indexed.)')
+
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
 class MathExpressionInputInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):  # pylint: disable=line-too-long
     """Job that produces a list of (exploration, state) pairs that use the Math
     Expression Interaction and that have rules that contain [<, >, =] to
@@ -109,86 +148,6 @@ class MathExpressionInputInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager
     @staticmethod
     def reduce(key, values):
         yield (key, values)
-
-
-class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that calculates summaries of explorations. For every
-    ExplorationModel entity, create a ExpSummaryModel entity containing
-    information described in ExpSummariesAggregator.
-
-    The summaries store the following information:
-        title, category, objective, language_code, tags, last_updated,
-        created_on, status (private, public), community_owned, owner_ids,
-        editor_ids, viewer_ids, version.
-
-        Note: contributor_ids field populated by
-        ExpSummariesContributorsOneOffJob.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(exploration_model):
-        if not exploration_model.deleted:
-            exp_services.create_exploration_summary(
-                exploration_model.id, None)
-            yield ('SUCCESS', exploration_model.id)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
-
-
-class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job that finds the user ids of the contributors
-    (defined as any human who has made a 'positive' -- i.e.
-    non-revert-- commit) for each exploration.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationSnapshotMetadataModel]
-
-    @staticmethod
-    def map(item):
-        if (item.commit_type != _COMMIT_TYPE_REVERT and
-                item.committer_id not in constants.SYSTEM_USER_IDS):
-            exp_id = item.get_unversioned_instance_id()
-            yield (exp_id, item.committer_id)
-
-    @staticmethod
-    def reduce(exp_id, committer_id_list):
-        exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exp_id)
-        if exp_summary_model is None:
-            return
-
-        exp_summary_model.contributor_ids = list(set(committer_id_list))
-        exp_summary_model.put()
-
-
-class ExplorationContributorsSummaryOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """One-off job that computes the number of commits
-    done by contributors for each Exploration.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        summary = exp_fetchers.get_exploration_summary_by_id(item.id)
-        summary.contributors_summary = (
-            exp_services.compute_exploration_contributors_summary(item.id))
-        exp_services.save_exploration_summary(summary)
-        yield ('SUCCESS', item.id)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
 
 
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
