@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for read-only-topic-object.factory.ts
+ * @fileoverview Tests for ReadOnlyTopicObjectFactory.
  */
 
 import { TestBed } from '@angular/core/testing';
@@ -95,7 +95,7 @@ describe('Topic Data Object Factory', () => {
       .getDescription()).toEqual('Skill Description 2');
   });
 
-  it('should return correct values of skill description', () => {
+  it('should return correct values of skill descriptions', () => {
     expect(_sampleReadOnlyTopic.getSkillDescriptions()).toEqual({
       skill_id_1: 'Skill Description 1',
       skill_id_2: 'Skill Description 2'

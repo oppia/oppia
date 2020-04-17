@@ -57,8 +57,8 @@ angular.module('oppia').directive('topicViewerPage', [
           ctrl.checkMobileView = function() {
             return (WindowDimensionsService.getWidth() < 500);
           };
-          ctrl.canonicalStoriesList = [];
           ctrl.$onInit = function() {
+            ctrl.canonicalStoriesList = [];
             ctrl.setActiveTab('story');
             ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
 

@@ -43,8 +43,8 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
 
         self.topic_id = 'topic'
-        self.story_id_1 = 'story'
-        self.story_id_2 = 'story_id'
+        self.story_id_1 = 'story_id_1'
+        self.story_id_2 = 'story_id_2'
         self.topic_id_1 = 'topic1'
         self.topic_id_2 = 'topic2'
         self.skill_id_1 = skill_services.get_new_skill_id()
