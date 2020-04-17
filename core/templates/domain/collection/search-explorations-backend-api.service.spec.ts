@@ -88,8 +88,9 @@ describe('Exploration search backend API service', () => {
         }]
       };
 
-      var explorationMetadataObject =
-      ExplorationMetadataObjectFactory.createFromBackendDict(searchResults);
+      var explorationMetadataObject = (
+        ExplorationMetadataObjectFactory.createFromBackendDict(
+          searchResults));
 
       SearchExplorationsService.fetchExplorations('count')
         .then(successHandler, failHandler);
