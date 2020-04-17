@@ -69,17 +69,17 @@ angular.module('oppia').directive('teachPage', [
             var hash = WindowRef.nativeWindow.location.hash.slice(1);
 
             if (hash === ctrl.TAB_ID_TEACH) {
-              ctrl.activeTabName = ctrl.TAB_ID_TEACH;
+              ctrl.activeTabName = hash;
             } else if (hash === ctrl.TAB_ID_PLAYBOOK) {
-              ctrl.activeTabName = ctrl.TAB_ID_PLAYBOOK;
+              ctrl.activeTabName = hash;
             }
 
             WindowRef.nativeWindow.onhashchange = function() {
               var hashChange = WindowRef.nativeWindow.location.hash.slice(1);
               if (hashChange === ctrl.TAB_ID_TEACH) {
-                ctrl.activeTabName = ctrl.TAB_ID_TEACH;
+                ctrl.activeTabName = hashChange;
               } else if (hashChange === ctrl.TAB_ID_PLAYBOOK) {
-                ctrl.activeTabName = ctrl.TAB_ID_PLAYBOOK;
+                ctrl.activeTabName = hashChange;
               }
             };
           };

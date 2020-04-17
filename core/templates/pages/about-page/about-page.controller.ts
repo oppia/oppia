@@ -67,6 +67,7 @@ angular.module('oppia').directive('aboutPage', [
             ctrl.TAB_ID_ABOUT = 'about';
             ctrl.TAB_ID_FOUNDATION = 'foundation';
             ctrl.TAB_ID_CREDITS = 'credits';
+            ctrl.TAB_ID_LICENSE = 'license';
 
             var hash = WindowRef.nativeWindow.location.hash.slice(1);
             if (hash === ctrl.TAB_ID_FOUNDATION || hash === 'license') {
@@ -74,11 +75,11 @@ angular.module('oppia').directive('aboutPage', [
             }
 
             if (hash === ctrl.TAB_ID_CREDITS) {
-              ctrl.activeTabName = ctrl.TAB_ID_CREDITS;
+              ctrl.activeTabName = hash;
             }
 
             if (hash === ctrl.TAB_ID_ABOUT) {
-              ctrl.activeTabName = ctrl.TAB_ID_ABOUT;
+              ctrl.activeTabName = hash;
             }
             ctrl.listOfNames = listOfNamesToThank
               .slice(0, listOfNamesToThank.length - 1).join(', ') +
@@ -89,16 +90,16 @@ angular.module('oppia').directive('aboutPage', [
             WindowRef.nativeWindow.onhashchange = function() {
               const hashChange = window.location.hash.slice(1);
               if (hashChange === ctrl.TAB_ID_FOUNDATION || (
-                hashChange === 'license')) {
+                hashChange === ctrl.TAB_ID_LICENSE)) {
                 ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;
                 // Ensure page goes to the license section
-                if (hashChange === 'license') {
+                if (hashChange === ctrl.TAB_ID_LICENSE) {
                   WindowRef.nativeWindow.location.reload(true);
                 }
               } else if (hashChange === ctrl.TAB_ID_CREDITS) {
-                ctrl.activeTabName = ctrl.TAB_ID_CREDITS;
+                ctrl.activeTabName = hashChange;
               } else if (hashChange === ctrl.TAB_ID_ABOUT) {
-                ctrl.activeTabName = ctrl.TAB_ID_ABOUT;
+                ctrl.activeTabName = hashChange;
               }
             };
           };

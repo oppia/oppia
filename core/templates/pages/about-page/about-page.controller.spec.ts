@@ -83,7 +83,7 @@ describe('About Page', function() {
     setTimeout(function() {
       expect(windowRef.nativeWindow.location.hash).toBe('#license');
       expect(ctrl.activeTabName).toBe('foundation');
-      // Reset spy the have the original behavior.
+      // Reset spy to have the original behavior.
       nativeWindowSpy.and.callThrough();
       done();
     });
