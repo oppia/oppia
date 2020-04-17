@@ -61,4 +61,3 @@ describe('Exploration Metadata object factory', () => {
     );
   });
 });
-
