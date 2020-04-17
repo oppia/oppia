@@ -143,14 +143,18 @@ describe('Url Service', () => {
   });
 
   it('should correctly retrieve classroom name from url', () => {
-    mockLocation.pathname = '/abcdefgijklm';
+    mockLocation.pathname = '/classroom/abcdefgijklm';
     expect(
       urlService.getClassroomNameFromUrl()
     ).toBe('abcdefgijklm');
-    mockLocation.pathname = '/class%20name';
+    mockLocation.pathname = '/classroom/class%20name';
     expect(
       urlService.getClassroomNameFromUrl()
     ).toBe('class name');
+    mockLocation.pathname = '/invalid/abcdefgijklm';
+    expect(function() {
+      urlService.getClassroomNameFromUrl();
+    }).toThrowError('Invalid URL for classroom');
   });
 
   it('should correctly retrieve subtopic id from url', () => {
