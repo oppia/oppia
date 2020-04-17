@@ -197,11 +197,11 @@ class FileCache(python_utils.OBJECT):
         return self._CACHE_DATA_DICT[key]
 
 
-def _lint_all_files(file_extensions_to_lint, verbose_mode_enabled=False):
+def _lint_all_files(file_extension_to_lint, verbose_mode_enabled=False):
     """Run all lint checks.
 
     Args:
-        file_extension_to_lint: str. The file extensions to be linted.
+        file_extension_to_lint: str. The file extension to be linted.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
@@ -212,19 +212,19 @@ def _lint_all_files(file_extensions_to_lint, verbose_mode_enabled=False):
     custom_linters = []
     third_party_linters = []
 
-    js_ts_file_extension_type = '.js' == file_extensions_to_lint or (
-        '.ts' == file_extensions_to_lint)
-    py_file_extension_type = '.py' == file_extensions_to_lint
-    html_file_extension_type = '.html' == file_extensions_to_lint
-    css_file_extension_type = '.css' == file_extensions_to_lint
-    other_file_extension_type = 'other' == file_extensions_to_lint
+    js_ts_file_extension_type = '.js' == file_extension_to_lint or (
+        '.ts' == file_extension_to_lint)
+    py_file_extension_type = '.py' == file_extension_to_lint
+    html_file_extension_type = '.html' == file_extension_to_lint
+    css_file_extension_type = '.css' == file_extension_to_lint
+    other_file_extension_type = 'other' == file_extension_to_lint
 
     if js_ts_file_extension_type:
         general_files_to_lint = _FILES['.js'] + _FILES['.ts']
     elif other_file_extension_type:
         general_files_to_lint = _FILES['other']
     else:
-        general_files_to_lint = _FILES['.%s' % file_extensions_to_lint]
+        general_files_to_lint = _FILES['.%s' % file_extension_to_lint]
 
     custom_linter, third_party_linter = general_purpose_linter.get_linters(
         general_files_to_lint,
