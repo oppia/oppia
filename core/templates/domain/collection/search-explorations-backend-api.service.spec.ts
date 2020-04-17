@@ -50,10 +50,9 @@ describe('Exploration search backend API service', () => {
       let failHandler = jasmine.createSpy('fail');
       let query = escape(btoa('three'));
 
-      var explorationMetadataObject =
+      var explorationMetadataObject = (
         ExplorationMetadataObjectFactory.createFromBackendDict(
-          {collection_node_metadata_list: []}
-        );
+          {collection_node_metadata_list: []}));
 
       SearchExplorationsService.fetchExplorations('three')
         .then(successHandler, failHandler);
