@@ -91,7 +91,8 @@ _EXCLUSIVE_GROUP.add_argument(
     '--only-check-file-extensions',
     nargs='+',
     choices=['html', 'css', 'js', 'ts', 'py', 'other'],
-    help='specific file extensions to be linted. Space separated list',
+    help='specific file extensions to be linted. Space separated list. '
+        'If either of js or ts used then both js and ts files will be linted.',
     action='store')
 
 if not os.getcwd().endswith('oppia'):
@@ -200,8 +201,7 @@ def _lint_all_files(file_extensions_to_lint, verbose_mode_enabled=False):
     """Run all lint checks.
 
     Args:
-        file_extensions_to_lint: list(str). The list of file extensions to be
-            linted.
+        file_extension_to_lint: str. The file extensions to be linted.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
@@ -212,17 +212,19 @@ def _lint_all_files(file_extensions_to_lint, verbose_mode_enabled=False):
     custom_linters = []
     third_party_linters = []
 
-    js_ts_file_extension_type = 'js' in file_extensions_to_lint or (
-        'ts' in file_extensions_to_lint)
-    py_file_extension_type = 'py' in file_extensions_to_lint
-    html_file_extension_type = 'html' in file_extensions_to_lint
-    css_file_extension_type = 'css' in file_extensions_to_lint
-    other_file_extension_type = 'other' in file_extensions_to_lint
+    js_ts_file_extension_type = '.js' == file_extensions_to_lint or (
+        '.ts' == file_extensions_to_lint)
+    py_file_extension_type = '.py' == file_extensions_to_lint
+    html_file_extension_type = '.html' == file_extensions_to_lint
+    css_file_extension_type = '.css' == file_extensions_to_lint
+    other_file_extension_type = 'other' == file_extensions_to_lint
 
     if js_ts_file_extension_type:
-        general_files_to_lint = _FILES['js'] + _FILES['ts']
+        general_files_to_lint = _FILES['.js'] + _FILES['.ts']
+    elif other_file_extension_type:
+        general_files_to_lint = _FILES['other']
     else:
-        general_files_to_lint = _FILES[file_extensions_to_lint]
+        general_files_to_lint = _FILES['.%s' % file_extensions_to_lint]
 
     custom_linter, third_party_linter = general_purpose_linter.get_linters(
         general_files_to_lint,
@@ -231,21 +233,21 @@ def _lint_all_files(file_extensions_to_lint, verbose_mode_enabled=False):
 
     if js_ts_file_extension_type:
         custom_linter, third_party_linter = js_ts_linter.get_linters(
-            _FILES['js'], _FILES['ts'],
+            _FILES['.js'], _FILES['.ts'],
             verbose_mode_enabled=verbose_mode_enabled)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
     if html_file_extension_type:
         custom_linter, third_party_linter = html_linter.get_linters(
-            _FILES['html'], verbose_mode_enabled=verbose_mode_enabled)
+            _FILES['.html'], verbose_mode_enabled=verbose_mode_enabled)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
         config_path_for_css_in_html = os.path.join(
             parent_dir, 'oppia', '.stylelintrc')
         custom_linter, third_party_linter = css_linter.get_linters(
-            config_path_for_css_in_html, _FILES['html'],
+            config_path_for_css_in_html, _FILES['.html'],
             verbose_mode_enabled=verbose_mode_enabled)
         third_party_linters.append(third_party_linter)
 
@@ -253,13 +255,13 @@ def _lint_all_files(file_extensions_to_lint, verbose_mode_enabled=False):
         config_path_for_oppia_css = os.path.join(
             parent_dir, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
         custom_linter, third_party_linter = css_linter.get_linters(
-            config_path_for_oppia_css, _FILES['css'],
+            config_path_for_oppia_css, _FILES['.css'],
             verbose_mode_enabled=verbose_mode_enabled)
         third_party_linters.append(third_party_linter)
 
     if py_file_extension_type:
         custom_linter, third_party_linter = python_linter.get_linters(
-            _FILES['py'], verbose_mode_enabled=verbose_mode_enabled)
+            _FILES['.py'], verbose_mode_enabled=verbose_mode_enabled)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
@@ -404,7 +406,7 @@ def read_files(file_paths):
 def categorize_files(file_paths):
     """Categorize all the files and store them in shared variable _FILES."""
     all_filepaths_dict = {
-        'py': [], 'html': [], 'ts': [], 'js': [], 'other': [], 'css': []
+        '.py': [], '.html': [], '.ts': [], '.js': [], 'other': [], '.css': []
     }
     for file_path in file_paths:
         _, extension = os.path.splitext(file_path)
