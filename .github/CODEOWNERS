@@ -248,6 +248,7 @@
 
 
 # Global frontend services
+/core/templates/services/audio-bar-status.service*.ts @Showtim3
 /core/templates/services/promo-bar.service*.ts @ankita240796
 /core/templates/services/html-escaper.service*.ts @ankita240796
 /core/templates/services/debouncer.service*.ts @ankita240796
