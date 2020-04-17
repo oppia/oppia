@@ -26,6 +26,10 @@ import { SkillCreationBackendApiService } from
   'domain/skill/skill-creation-backend-api.service.ts';
 import { CommonEventsService } from 'services/common-events.service';
 
+interface SkillCreationResponse {
+  skillId: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -52,8 +56,8 @@ export class SkillCreationService {
     this.commonEventsService.setLoadingMessage('Creating skill');
     this.skillCreationBackendApiService.createSkill(
       description, rubrics, explanation, linkedTopicIds
-    ).then((response: any) => {
-      // TODO(srijanreddy98) Replace window with angular router
+    ).then((response: SkillCreationResponse) => {
+      // TODO(srijanreddy98): Replace window with angular router
       window.location.href = this.urlInterpolationService.interpolateUrl(
         this.CREATE_NEW_SKILL_URL_TEMPLATE, {
           skill_id: response.skillId
