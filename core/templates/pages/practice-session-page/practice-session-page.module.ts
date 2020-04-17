@@ -16,7 +16,7 @@
  * @fileoverview Module for the practice session page.
  */
 
-import 'core-js/es/reflect';
+import 'core-js/es7/reflect';
 import 'zone.js';
 
 import { BrowserModule } from '@angular/platform-browser';
