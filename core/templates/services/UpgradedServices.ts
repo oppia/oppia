@@ -626,6 +626,10 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['PlaythroughIssuesBackendApiService'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['ReadOnlyTopicObjectFactory'] =
+      new ReadOnlyTopicObjectFactory(
+        upgradedServices['SubtopicObjectFactory'],
+        upgradedServices['SkillSummaryObjectFactory']);
     upgradedServices['SkillObjectFactory'] =
       new SkillObjectFactory(
         upgradedServices['ConceptCardObjectFactory'],
@@ -639,10 +643,6 @@ export class UpgradedServices {
       upgradedServices['SubtopicObjectFactory'],
       upgradedServices['StoryReferenceObjectFactory'],
       upgradedServices['SkillSummaryObjectFactory']);
-    upgradedServices['ReadOnlyTopicObjectFactory'] =
-      new ReadOnlyTopicObjectFactory(
-        upgradedServices['SubtopicObjectFactory'],
-        upgradedServices['SkillSummaryObjectFactory']);
 
     // Topological level: 4.
     upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(
