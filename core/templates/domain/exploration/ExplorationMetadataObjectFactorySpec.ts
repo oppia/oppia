@@ -41,7 +41,9 @@ describe('Exploration Metadata object factory', () => {
     };
 
 
-    sampleExplorationMetadata = ExplorationMetadataObjectFactory.
+    sampleExplorationMetadata = (
+      ExplorationMetadataObjectFactory.createFromBackendDict(
+        sampleExplorationMetadataBackendDict));
       createFromBackendDict(sampleExplorationMetadataBackendDict);
   });
 
@@ -60,4 +62,3 @@ describe('Exploration Metadata object factory', () => {
     );
   });
 });
-
