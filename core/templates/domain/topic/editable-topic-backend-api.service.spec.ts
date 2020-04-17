@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for EditableTopicBackendApiService.
  */
 
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { CsrfTokenService } from 'services/csrf-token.service.ts';
 import { EditableTopicBackendApiService } from
