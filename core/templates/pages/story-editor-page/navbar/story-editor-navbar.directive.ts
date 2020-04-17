@@ -88,7 +88,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
             var explorationIds = [];
 
             if (
-              StoryEditorStateService.getExpIdsChanged() ||
+              StoryEditorStateService.areAnyExpIdsChanged() ||
               $scope.forceValidateExplorations) {
               $scope.explorationValidationIssues = [];
               for (var i = 0; i < nodes.length; i++) {

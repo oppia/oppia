@@ -73,8 +73,6 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-save-concept-card'));
   var topicNamesInTopicSelectModal = element.all(
     by.css('.protractor-test-topic-name-in-topic-select-modal'));
-  var abbreviatedTopicNameField = element(
-    by.css('.protractor-test-new-abbreviated-topic-name-field'));
   var topicsTabButton = element(
     by.css('.protractor-test-topics-tab')
   );
