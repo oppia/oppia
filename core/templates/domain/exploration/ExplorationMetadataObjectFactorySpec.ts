@@ -23,10 +23,10 @@ import { ExplorationMetadataObjectFactory } from
 
 
 describe('Exploration Metadata object factory', () => {
-  var sampleExplorationMetadata = null;
+  let sampleExplorationMetadata = null;
 
   beforeEach(() => {
-    var sampleExplorationMetadataBackendDict = {
+    let sampleExplorationMetadataBackendDict = {
       collection_node_metadata_list: [{
         id: '12',
         objective:
