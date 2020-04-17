@@ -31,7 +31,7 @@ class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
         response = self.get_html_response(
             feconf.FRACTIONS_LANDING_PAGE_URL, expected_status_int=302)
         self.assertEqual(
-            'http://localhost/learn/maths/fractions',
+            'http://localhost/maths/fractions',
             response.headers['location'])
 
     def test_old_fraction_landing_url_with_viewer_type(self):
@@ -42,8 +42,18 @@ class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
             '%s?viewerType=student' % feconf.FRACTIONS_LANDING_PAGE_URL,
             expected_status_int=302)
         self.assertEqual(
-            'http://localhost/learn/maths/fractions',
+            'http://localhost/maths/fractions',
             response.headers['location'])
+
+
+class TopicRedirectPageTest(test_utils.GenericTestBase):
+    """Test for redirecting the old landing page URL to the new one."""
+
+    def test_old_topic_url_redirect(self):
+        response = self.get_html_response('/learn/maths/fractions',
+            expected_status_int=302)
+        self.assertEqual(
+            'http://localhost/maths/fractions', response.headers['location'])
 
 
 class TopicLandingPageTest(test_utils.GenericTestBase):
@@ -51,14 +61,14 @@ class TopicLandingPageTest(test_utils.GenericTestBase):
 
     def test_invalid_subject_landing_page_leads_to_404(self):
         self.get_html_response(
-            '/learn/invalid_subject/fractions', expected_status_int=404)
+            '/invalid_subject/fractions', expected_status_int=404)
 
     def test_invalid_topic_landing_page_leads_to_404(self):
         self.get_html_response(
-            '/learn/maths/invalid_topic', expected_status_int=404)
+            '/maths/invalid_topic', expected_status_int=404)
 
     def test_valid_subject_and_topic_loads_correctly(self):
-        response = self.get_html_response('/learn/maths/fractions')
+        response = self.get_html_response('/maths/fractions')
         response.mustcontain('<topic-landing-page></topic-landing-page>')
 
 

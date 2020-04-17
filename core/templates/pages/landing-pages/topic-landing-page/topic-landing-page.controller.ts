@@ -104,14 +104,15 @@ angular.module('oppia').directive('topicLandingPage', [
           };
           ctrl.$onInit = function() {
             pathArray = WindowRef.nativeWindow.location.pathname.split('/');
-            ctrl.subject = pathArray[2];
-            topic = pathArray[3];
+            ctrl.subject = pathArray[1];
+            topic = pathArray[2];
             topicData = TOPIC_LANDING_PAGE_DATA[ctrl.subject][topic];
             landingPageData = topicData.page_data;
             ctrl.topicTitle = topicData.topic_title;
             ctrl.lessons = landingPageData.lessons;
             assetsPathFormat = '/landing/<subject>/<topic>/<file_name>';
-            var pageTitle = 'Learn ' + ctrl.topicTitle + ' - Oppia';
+            var pageTitle = ctrl.topicTitle +
+              ' | Add, Subtract, Multiply and Divide | Oppia';
             PageTitleService.setPageTitle(pageTitle);
             ctrl.bookImageUrl = UrlInterpolationService.getStaticImageUrl(
               '/splash/books.svg');
