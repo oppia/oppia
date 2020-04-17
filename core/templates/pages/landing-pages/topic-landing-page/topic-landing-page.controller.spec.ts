@@ -59,7 +59,7 @@ describe('Topic Landing Page', function() {
       'Ratios & Proportional Reasoning',
       'Writing Ratios in Simplest Form'
     ]);
-    expect(ctrl.bookImageUrl).toBe('/assets/images/books.svg');
+    expect(ctrl.bookImageUrl).toBe('/assets/images/splash/books.svg');
     expect(ctrl.image1).toEqual({
       src: '/assets/images/landing/maths/ratios/ratios_James.png',
       alt: 'A boy showing 2 is to 3 ratio on a card.'

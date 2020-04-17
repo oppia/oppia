@@ -29,15 +29,17 @@ class ClassroomPage(base.BaseHandler):
     """Renders the classroom page."""
 
     @acl_decorators.open_access
-    def get(self, classroom_name):
+    def get(self):
         """Handles GET requests."""
 
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
+        classroom_name = self.request.uri.split('/')[-1]
+
         classroom_name_is_valid = False
         for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value:
-            if classroom_dict['name'] == classroom_name:
+            if classroom_dict['name'].lower() == classroom_name:
                 classroom_name_is_valid = True
                 break
 
@@ -62,7 +64,7 @@ class ClassroomDataHandler(base.BaseHandler):
 
         classroom_name_is_valid = False
         for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value:
-            if classroom_dict['name'] == classroom_name:
+            if classroom_dict['name'].lower() == classroom_name:
                 classroom_name_is_valid = True
                 topic_ids = classroom_dict['topic_ids']
                 break

@@ -114,7 +114,7 @@ angular.module('oppia').directive('topicLandingPage', [
             var pageTitle = 'Learn ' + ctrl.topicTitle + ' - Oppia';
             PageTitleService.setPageTitle(pageTitle);
             ctrl.bookImageUrl = UrlInterpolationService.getStaticImageUrl(
-              '/books.svg');
+              '/splash/books.svg');
             ctrl.image1 = getImageData(1);
             ctrl.image2 = getImageData(2);
           };
