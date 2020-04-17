@@ -47,10 +47,9 @@ export class SearchExplorationsBackendApiService {
       }
     );
     this.http.get(queryUrl).toPromise().then((response) => {
-      explorationMetadataObject =
-      ExplorationMetadataObjectFactory.createFromBackendDict(
-        angular.copy(response)
-      );
+      explorationMetadataObject = (
+        ExplorationMetadataObjectFactory.createFromBackendDict(
+          angular.copy(response)));
       successCallback(explorationMetadataObject);
     }, (errorResponse) => {
       errorCallback(errorResponse);

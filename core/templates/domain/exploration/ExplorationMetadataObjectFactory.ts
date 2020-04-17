@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Factory for creating instances of frontend
- * subtopic data domain objects.
+ * exploration metadata domain objects.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
