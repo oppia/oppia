@@ -44,7 +44,6 @@ describe('Exploration Metadata object factory', () => {
     sampleExplorationMetadata = (
       ExplorationMetadataObjectFactory.createFromBackendDict(
         sampleExplorationMetadataBackendDict));
-      createFromBackendDict(sampleExplorationMetadataBackendDict);
   });
 
   it('should be able to get all the values', function() {
