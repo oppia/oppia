@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating instances of frontend
- * subtopic data domain objects.
+ * @fileoverview Factory for creating instances of Exploration
+ * MetaData as a search exploration http request returnable.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
