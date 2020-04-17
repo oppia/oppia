@@ -87,10 +87,7 @@ export class UrlService {
 
   getClassroomNameFromUrl(): string {
     let pathname = this.getPathname();
-    if (pathname.match(/\/classroom/g)) {
-      return decodeURIComponent(pathname.split('/')[2]);
-    }
-    throw Error('Invalid URL for classroom');
+    return decodeURIComponent(pathname.split('/')[1]);
   }
 
   getSubtopicIdFromUrl(): string {

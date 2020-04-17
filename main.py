@@ -293,7 +293,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<topic_name>' % feconf.TOPIC_DATA_HANDLER,
         topic_viewer.TopicPageDataHandler),
     get_redirect_route(
-        r'%s/<classroom_name>' % feconf.CLASSROOM_URL_PREFIX,
+        r'%s' % feconf.MATH_CLASSROOM_URL,
         classroom.ClassroomPage),
     get_redirect_route(
         r'%s/<classroom_name>' % feconf.CLASSROOM_DATA_HANDLER,
