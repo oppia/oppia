@@ -52,7 +52,7 @@ angular.module('oppia').directive('classroomPage', [
           ctrl.$onInit = function() {
             ctrl.classroomName = UrlService.getClassroomNameFromUrl();
             ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
-              '/splash/books.svg');
+              '/books.svg');
 
             PageTitleService.setPageTitle(ctrl.classroomName + ' - Oppia');
 
