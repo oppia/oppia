@@ -29,12 +29,15 @@ from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.platform import models
 import feconf
 import python_utils
 import utils
+
+from mutagen import mp3
 
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
@@ -72,6 +75,48 @@ GCS_EXTERNAL_IMAGE_ID_REGEX = re.compile(
     r'^/([^/]+)/exploration/([^/]+)/assets/image/(([^/]+)\.(' + '|'.join(
         ALLOWED_IMAGE_EXTENSIONS) + '))$')
 SUCCESSFUL_EXPLORATION_MIGRATION = 'Successfully migrated exploration'
+AUDIO_FILE_PREFIX = 'audio'
+AUDIO_ENTITY_TYPE = 'exploration'
+AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION = 31
+
+
+class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that produces a list of all (exploration, state) pairs that use the
+    Multiple selection interaction and have rules that do not correspond to any
+    answer choices.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        for state_name, state in exploration.states.items():
+            if state.interaction.id == 'MultipleChoiceInput':
+                choices_length = len(
+                    state.interaction.customization_args['choices']['value'])
+                for anwer_group_index, answer_group in enumerate(
+                        state.interaction.answer_groups):
+                    for rule_index, rule_spec in enumerate(
+                            answer_group.rule_specs):
+                        if rule_spec.inputs['x'] >= choices_length:
+                            yield (
+                                item.id,
+                                'State name: %s, AnswerGroup: %s,' % (
+                                    state_name.encode('utf-8'),
+                                    anwer_group_index) +
+                                ' Rule: %s is invalid.' % (rule_index) +
+                                '(Indices here are 0-indexed.)')
+
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
 
 
 class MathExpressionInputInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):  # pylint: disable=line-too-long
@@ -103,86 +148,6 @@ class MathExpressionInputInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager
     @staticmethod
     def reduce(key, values):
         yield (key, values)
-
-
-class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that calculates summaries of explorations. For every
-    ExplorationModel entity, create a ExpSummaryModel entity containing
-    information described in ExpSummariesAggregator.
-
-    The summaries store the following information:
-        title, category, objective, language_code, tags, last_updated,
-        created_on, status (private, public), community_owned, owner_ids,
-        editor_ids, viewer_ids, version.
-
-        Note: contributor_ids field populated by
-        ExpSummariesContributorsOneOffJob.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(exploration_model):
-        if not exploration_model.deleted:
-            exp_services.create_exploration_summary(
-                exploration_model.id, None)
-            yield ('SUCCESS', exploration_model.id)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
-
-
-class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job that finds the user ids of the contributors
-    (defined as any human who has made a 'positive' -- i.e.
-    non-revert-- commit) for each exploration.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationSnapshotMetadataModel]
-
-    @staticmethod
-    def map(item):
-        if (item.commit_type != _COMMIT_TYPE_REVERT and
-                item.committer_id not in constants.SYSTEM_USER_IDS):
-            exp_id = item.get_unversioned_instance_id()
-            yield (exp_id, item.committer_id)
-
-    @staticmethod
-    def reduce(exp_id, committer_id_list):
-        exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exp_id)
-        if exp_summary_model is None:
-            return
-
-        exp_summary_model.contributor_ids = list(set(committer_id_list))
-        exp_summary_model.put()
-
-
-class ExplorationContributorsSummaryOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """One-off job that computes the number of commits
-    done by contributors for each Exploration.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        summary = exp_fetchers.get_exploration_summary_by_id(item.id)
-        summary.contributors_summary = (
-            exp_services.compute_exploration_contributors_summary(item.id))
-        exp_services.save_exploration_summary(summary)
-        yield ('SUCCESS', item.id)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
 
 
 class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -548,6 +513,91 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 item.translator_ids = []
                 item.commit('Admin', commit_message, commit_cmds)
                 yield ('SUCCESS', item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
+class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-Off Job to set every voiceover's duration to duration_secs with
+    the correct value.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_fetchers.get_exploration_by_id(item.id)
+        try:
+            exploration.validate()
+        except Exception as e:
+            logging.error(
+                'Exploration %s failed non-strict validation: %s' %
+                (item.id, e))
+            return
+        if (item.states_schema_version >=
+                AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION
+                and item.states_schema_version <=
+                feconf.CURRENT_STATE_SCHEMA_VERSION):
+            # Go through each exploration state to find voiceover recordings.
+            for state, state_value in item.states.items():
+                voiceovers_mapping = (state_value['recorded_voiceovers']
+                                      ['voiceovers_mapping'])
+                language_codes_to_audio_metadata = voiceovers_mapping.values()
+                for language_codes in language_codes_to_audio_metadata:
+                    for audio_metadata in language_codes.values():
+                        # Get files using the filename.
+                        filename = audio_metadata['filename']
+                        try:
+
+                            fs = (fs_domain.AbstractFileSystem(
+                                fs_domain.GcsFileSystem(
+                                    AUDIO_ENTITY_TYPE,
+                                    item.id)))
+                            raw = fs.get('%s/%s' % (AUDIO_FILE_PREFIX,
+                                                    filename))
+                            # Get the audio-duration from file use Mutagen.
+                            tempbuffer = python_utils.string_io()
+                            tempbuffer.write(raw)
+                            tempbuffer.seek(0)
+                            # Loads audio metadata with Mutagen.
+                            audio = mp3.MP3(tempbuffer)
+                            tempbuffer.close()
+                            # Fetch the audio file duration from the Mutagen
+                            # metadata.
+                            audio_metadata['duration_secs'] = audio.info.length
+                        except Exception as e:
+                            logging.error(
+                                'Mp3 audio file not found for %s '
+                                ', caused by: %s' %
+                                (filename, e))
+                # Create commits to update the exploration.
+                commit_cmds = [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+                    'state_name': state,
+                    'new_value': {
+                        'voiceovers_mapping': voiceovers_mapping
+                    }
+                })]
+                exp_services.update_exploration(
+                    feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+                    'Update duration_secs for each voiceover recording '
+                    'in the exploration.')
+                yield ('SUCCESS', item.id)
+        else:
+            yield ('State schema version is not the '
+                   'minimum version expected', item.id)
 
     @staticmethod
     def reduce(key, values):

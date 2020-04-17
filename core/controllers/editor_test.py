@@ -518,7 +518,6 @@ written_translations:
                     'cmd': exp_domain.CMD_DELETE_STATE,
                     'state_name': 'State 3',
                 })], 'changes')
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         response = self.get_html_response('/create/%s' % exp_id)
 
         # Check download to zip file.
@@ -553,9 +552,13 @@ written_translations:
                 'The title for ZIP download handler test!.yaml').read())
 
         # Check download to JSON.
-        exploration.update_objective('Test JSON download')
-        exp_services._save_exploration(  # pylint: disable=protected-access
-            owner_id, exploration, '', [])
+        exp_services.update_exploration(
+            owner_id, exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'objective',
+                    'new_value': 'Test JSON download',
+                })], 'Updates exploration objective')
 
         # Download to JSON string using download handler.
         self.maxDiff = None
@@ -610,6 +613,34 @@ written_translations:
         zf_saved = zipfile.ZipFile(
             python_utils.string_io(buffer_value=response.body))
         self.assertEqual(zf_saved.namelist(), [u'¡Hola!.yaml'])
+
+        self.logout()
+
+    def test_exploration_download_handler_with_no_title(self):
+        # This is the case for most unpublished explorations.
+        self.login(self.EDITOR_EMAIL)
+        owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        # Create a simple exploration.
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, owner_id,
+            title='',
+            category='This is just a test category',
+            objective='')
+
+        # Download to zip file using download handler.
+        download_url = '/createhandler/download/%s' % exp_id
+        response = self.get_custom_response(download_url, 'text/plain')
+
+        # Check downloaded zip file.
+        filename = 'oppia-unpublished_exploration-v1.zip'
+        self.assertEqual(response.headers['Content-Disposition'],
+                         'attachment; filename=%s' % filename)
+
+        zf_saved = zipfile.ZipFile(
+            python_utils.string_io(buffer_value=response.body))
+        self.assertEqual(zf_saved.namelist(), ['Unpublished_exploration.yaml'])
 
         self.logout()
 
