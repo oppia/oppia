@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview A service to notify of certain events happening in the codebase.
+ * @fileoverview A service to notify of certain events across the codebase.
  */
 
 import { Injectable } from '@angular/core';
