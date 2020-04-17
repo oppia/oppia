@@ -27,13 +27,11 @@ from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
-from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.domain import user_services
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -86,20 +84,6 @@ class LibraryPageTests(test_utils.GenericTestBase):
         }, response_dict['activity_list'][0])
 
         self.set_admins([self.ADMIN_USERNAME])
-
-        # Run migration job to create exploration summaries.
-        # This is not necessary, but serves as additional check that
-        # the migration job works well and gives correct results.
-        self.process_and_flush_pending_tasks()
-        job_id = (exp_jobs_one_off.ExpSummariesCreationOneOffJob.create_new())
-        exp_jobs_one_off.ExpSummariesCreationOneOffJob.enqueue(job_id)
-        self.assertGreaterEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
         # Change title and category.
         exp_services.update_exploration(
