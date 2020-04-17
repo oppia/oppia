@@ -87,6 +87,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
     user_jobs_one_off.UserProfilePictureOneOffJob,
     user_jobs_one_off.UsernameLengthDistributionOneOffJob,
+    user_jobs_one_off.UsernameLengthAuditOneOffJob,
     exp_jobs_one_off.MathExpressionInputInteractionOneOffJob,
     exp_jobs_one_off.MultipleChoiceInteractionOneOffJob
 ]
