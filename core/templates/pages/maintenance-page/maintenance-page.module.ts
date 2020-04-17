@@ -16,7 +16,7 @@
  * @fileoverview Module for the maintenance page.
  */
 
-import 'core-js/es7/reflect';
+import 'core-js/es/reflect';
 import 'zone.js';
 
 import { Component, NgModule, StaticProvider } from '@angular/core';
