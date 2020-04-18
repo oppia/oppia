@@ -188,7 +188,6 @@ mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 # Register the URLs with the classes responsible for handling them.
 URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/_ah/warmup', WarmupPage),
-    get_redirect_route(r'/', HomePageRedirectPage),
     get_redirect_route(r'/splash', HomePageRedirectPage),
 
     get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
