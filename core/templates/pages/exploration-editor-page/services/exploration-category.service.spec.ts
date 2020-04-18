@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the UserEmailPreferencesService.
+ * @fileoverview Unit tests for the ExplorationCategoryService.
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
