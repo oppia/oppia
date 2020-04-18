@@ -41,7 +41,7 @@ describe('Exploration Category Service', function() {
     });
   });
 
-  it('tests the child object properties', function() {
+  it('should test the child object properties', function() {
     expect(ecs.propertyName).toBe('category');
     expect(ecs._isValid('Algorithms')).toBe(true);
     var NotNormalize = '   Exploration             Category Service     ';
