@@ -50,8 +50,8 @@ class TopicRedirectPageTest(test_utils.GenericTestBase):
     """Test for redirecting the old landing page URL to the new one."""
 
     def test_old_topic_url_redirect(self):
-        response = self.get_html_response('/learn/maths/fractions',
-            expected_status_int=302)
+        response = self.get_html_response(
+            '/learn/maths/fractions', expected_status_int=302)
         self.assertEqual(
             'http://localhost/maths/fractions', response.headers['location'])
 
