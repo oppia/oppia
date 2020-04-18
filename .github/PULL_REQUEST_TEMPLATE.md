@@ -1,6 +1,8 @@
 ## Overview
 <!--
-READ ME FIRST: Please answer *both* questions below and check off every point from the essential checklist!
+READ ME FIRST:
+Please answer *both* questions below and check off every point from the Essential Checklist!
+If there is no corresponding issue number, fill in N/A where it says [fill_in_number_here] below in 1.
 -->
 
 1. This PR fixes or fixes part of #[fill_in_number_here].
