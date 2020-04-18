@@ -70,7 +70,8 @@ angular.module('oppia').directive('aboutPage', [
             ctrl.TAB_ID_LICENSE = 'license';
 
             var hash = WindowRef.nativeWindow.location.hash.slice(1);
-            if (hash === ctrl.TAB_ID_FOUNDATION || hash === 'license') {
+            if (hash === ctrl.TAB_ID_FOUNDATION || (
+              hash === ctrl.TAB_ID_LICENSE)) {
               ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;
             }
 
