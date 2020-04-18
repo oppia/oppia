@@ -46,7 +46,7 @@ describe('Topic Landing Page', function() {
   it('should get information from topic identified at pathname', function() {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        pathname: '/path/maths/ratios'
+        pathname: '/maths/ratios'
       }
     });
     ctrl.$onInit();
@@ -74,7 +74,7 @@ describe('Topic Landing Page', function() {
   it('should get video url', function() {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        pathname: '/path/maths/ratios'
+        pathname: '/maths/ratios'
       }
     });
     ctrl.$onInit();
@@ -94,7 +94,7 @@ describe('Topic Landing Page', function() {
     var nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
     nativeWindowSpy.and.returnValue({
       location: {
-        pathname: '/path/maths/ratios'
+        pathname: '/maths/ratios'
       }
     });
     var analyticsSpy = spyOn(
