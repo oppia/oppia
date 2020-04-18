@@ -54,9 +54,6 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
-import { ChangesInHumanReadableFormService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/services/changes-in-human-readable-form.service';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
@@ -138,6 +135,8 @@ import { LearnerParamsService } from
   'pages/exploration-player-page/services/learner-params.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { LoggerService } from 'services/contextual/logger.service';
+import { LostChangeObjectFactory } from
+  'domain/exploration/LostChangeObjectFactory';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { MisconceptionObjectFactory } from
@@ -365,6 +364,8 @@ export class UpgradedServices {
       new LearnerDashboardActivityIdsObjectFactory();
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
     upgradedServices['LoggerService'] = new LoggerService();
+    upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
+      new UtilsService);
     upgradedServices['MisconceptionObjectFactory'] =
       new MisconceptionObjectFactory();
     upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'] =
@@ -429,9 +430,6 @@ export class UpgradedServices {
       upgradedServices['LoggerService']);
     upgradedServices['BrowserCheckerService'] = new BrowserCheckerService(
       upgradedServices['WindowRef']);
-    upgradedServices['ChangesInHumanReadableFormService'] =
-      new ChangesInHumanReadableFormService(
-        upgradedServices['UtilsService'], document);
     // eslint-disable-next-line max-len
     upgradedServices['ContinueValidationService'] = new ContinueValidationService(
       upgradedServices['baseInteractionValidationService']);
