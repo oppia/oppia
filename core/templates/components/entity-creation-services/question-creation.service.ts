@@ -16,35 +16,49 @@
  * @fileoverview Service to create the question.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('QuestionCreationService', [
-  '$http', '$q',
-  function($http, $q) {
-    var QUESTION_CREATOR_URL = '/question_editor_handler/create_new';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
-    var _createNew = function(
-        backendQuestionDict, successCallback, errorCallback) {
-      var postData = {
-        question_dict: backendQuestionDict
-      };
-      $http.post(QUESTION_CREATOR_URL, postData).then(function(response) {
+@Injectable({
+  providedIn: 'root'
+})
+export class QuestionCreationService {
+  constructor(
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService) {}
+
+  QUESTION_CREATOR_URL = '/question_editor_handler/create_new';
+
+  private _createNew(
+      backendQuestionDict,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
+    var postData = {
+      question_dict: backendQuestionDict
+    };
+    this.http.post(this.QUESTION_CREATOR_URL, postData).toPromise().then(
+      (response) => {
         if (successCallback) {
           successCallback();
         }
-      }, function(errorResponse) {
+      }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse.data);
+          errorCallback(errorResponse);
         }
       });
-    };
-
-    return {
-      createNew: function(backendQuestionDict) {
-        return $q(function(resolve, reject) {
-          _createNew(backendQuestionDict, resolve, reject);
-        });
-      }
-    };
   }
-]);
+
+  createNew(backendQuestionDict): Promise<object> {
+    return new Promise((resolve, reject) => {
+      this._createNew(backendQuestionDict, resolve, reject);
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'QuestionCreationService',
+  downgradeInjectable(QuestionCreationService));

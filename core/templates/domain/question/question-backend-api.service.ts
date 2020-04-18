@@ -15,125 +15,141 @@
  * @fileoverview Service to receive questions for practice given a set of
  * skill_ids.
  */
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-require('domain/question/question-domain.constants.ajs.ts');
+import cloneDeep from 'lodash/cloneDeep';
 
-angular.module('oppia').factory('QuestionBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService', 'QUESTIONS_LIST_URL_TEMPLATE',
-  'QUESTION_PLAYER_URL_TEMPLATE',
-  function(
-      $http, $q, UrlInterpolationService, QUESTIONS_LIST_URL_TEMPLATE,
-      QUESTION_PLAYER_URL_TEMPLATE) {
-    var _fetchQuestions = function(
-        skillIds, questionCount, questionsSortedByDifficulty,
-        successCallback, errorCallback) {
-      if (!validateRequestParameters(skillIds, questionCount, errorCallback)) {
-        return;
-      }
-      var questionDataUrl = UrlInterpolationService.interpolateUrl(
-        QUESTION_PLAYER_URL_TEMPLATE, {
-          skill_ids: skillIds.join(','),
-          question_count: questionCount.toString(),
-          fetch_by_difficulty: questionsSortedByDifficulty.toString()
-        });
+import { QuestionDomainConstants } from
+  'domain/question/question-domain.constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
-      $http.get(questionDataUrl).then(function(response) {
-        var questionDicts = angular.copy(response.data.question_dicts);
-        if (successCallback) {
-          successCallback(questionDicts);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
+@Injectable({
+  providedIn: 'root'
+})
+export class QuestionBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService) {}
+
+  private _fetchQuestions(
+      skillIds: any, questionCount: any,
+      questionsSortedByDifficulty: boolean,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
+    if (!this.validateRequestParameters(
+      skillIds, questionCount, errorCallback)) {
+      return;
+    }
+    var questionDataUrl = this.urlInterpolationService.interpolateUrl(
+      QuestionDomainConstants.QUESTION_PLAYER_URL_TEMPLATE, {
+        skill_ids: skillIds.join(','),
+        question_count: questionCount.toString(),
+        fetch_by_difficulty: questionsSortedByDifficulty.toString()
       });
-    };
-
-    var _fetchQuestionSummaries = function(
-        skillIds, cursor, successCallback, errorCallback) {
-      if (!isListOfStrings(skillIds)) {
-        errorCallback('Skill ids should be a list of strings');
-        return false;
+    this.http.get(questionDataUrl).toPromise().then((response: any) => {
+      var questionDicts = cloneDeep(response.question_dicts);
+      if (successCallback) {
+        successCallback(questionDicts);
       }
-      var questionsDataUrl = UrlInterpolationService.interpolateUrl(
-        QUESTIONS_LIST_URL_TEMPLATE, {
-          comma_separated_skill_ids: skillIds.join(','),
-          cursor: cursor ? cursor : ''
-        });
-
-      $http.get(questionsDataUrl).then(function(response) {
-        var questionSummaries = angular.copy(
-          response.data.question_summary_dicts);
-        var nextCursor = response.data.next_start_cursor;
-        if (successCallback) {
-          successCallback({
-            questionSummaries: questionSummaries,
-            nextCursor: nextCursor
-          });
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    /**
-     * Does basic validation on input.
-     */
-    var validateRequestParameters = function(
-        skillIds, questionCount, errorCallback) {
-      if (!isListOfStrings(skillIds)) {
-        errorCallback('Skill ids should be a list of strings');
-        return false;
+    }, (errorResponse) => {
+      if (errorCallback) {
+        errorCallback(errorResponse.error);
       }
-
-      if (!isInt(questionCount) || questionCount <= 0) {
-        errorCallback('Question count has to be a positive integer');
-        return false;
-      }
-
-      return true;
-    };
-
-    /**
-     * Checks if given input is a list and has all strings
-     */
-    var isListOfStrings = function(list) {
-      if (!angular.isArray(list)) {
-        return false;
-      }
-      return list.every(function(obj) {
-        return angular.isString(obj);
-      });
-    };
-
-    /**
-     * Checks if given input is an integer
-     */
-    var isInt = function(n) {
-      return angular.isNumber(n) && n % 1 === 0;
-    };
-
-    /**
-     * Returns a list of questions based on the list of skill ids and number
-     * of questions requested.
-     */
-    return {
-      fetchQuestions: function(
-          skillIds, questionCount, questionsSortedByDifficulty) {
-        return $q(function(resolve, reject) {
-          _fetchQuestions(
-            skillIds, questionCount, questionsSortedByDifficulty,
-            resolve, reject);
-        });
-      },
-
-      fetchQuestionSummaries: function(skillIds, cursor) {
-        return $q(function(resolve, reject) {
-          _fetchQuestionSummaries(skillIds, cursor, resolve, reject);
-        });
-      }
-    };
+    });
   }
-]);
+
+  private _fetchQuestionSummaries(
+      skillIds: Array<string>, cursor: string,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void|boolean {
+    if (!this.isListOfStrings(skillIds)) {
+      errorCallback('Skill ids should be a list of strings');
+      return false;
+    }
+    var questionsDataUrl = this.urlInterpolationService.interpolateUrl(
+      QuestionDomainConstants.QUESTIONS_LIST_URL_TEMPLATE, {
+        comma_separated_skill_ids: skillIds.join(','),
+        cursor: cursor ? cursor : ''
+      });
+    this.http.get(questionsDataUrl).toPromise().then((response: any) => {
+      var questionSummaries = cloneDeep(
+        response.question_summary_dicts);
+      var nextCursor = response.next_start_cursor;
+      if (successCallback) {
+        successCallback({
+          questionSummaries: questionSummaries,
+          nextCursor: nextCursor
+        });
+      }
+    }, (errorResponse) => {
+      if (errorCallback) {
+        errorCallback(errorResponse.error);
+      }
+    });
+  }
+
+  /**
+   * Does basic validation on input.
+   */
+  private validateRequestParameters(
+      skillIds, questionCount: any,
+      errorCallback: (reason?: any) => void): boolean {
+    if (!this.isListOfStrings(skillIds)) {
+      errorCallback('Skill ids should be a list of strings');
+      return false;
+    }
+
+    if (!this.isInt(questionCount) || questionCount <= 0) {
+      errorCallback('Question count has to be a positive integer');
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Checks if given input is a list and has all strings
+   */
+  private isListOfStrings(list): boolean {
+    if (!Array.isArray(list)) {
+      return false;
+    }
+    return list.every((obj) => {
+      return typeof obj === 'string';
+    });
+  }
+
+  /**
+   * Checks if given input is an integer
+   */
+  private isInt(n: any): boolean {
+    return typeof n === 'number' && n % 1 === 0;
+  }
+
+  /**
+   * Returns a list of questions based on the list of skill ids and number
+   * of questions requested.
+   */
+  fetchQuestions(
+      skillIds: Array<string>, questionCount: any,
+      questionsSortedByDifficulty: boolean): Promise<object> {
+    return new Promise((resolve, reject) => {
+      this._fetchQuestions(
+        skillIds, questionCount, questionsSortedByDifficulty,
+        resolve, reject);
+    });
+  }
+
+  fetchQuestionSummaries(skillIds: any, cursor: string): Promise<object> {
+    return new Promise((resolve, reject) => {
+      this._fetchQuestionSummaries(skillIds, cursor, resolve, reject);
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'QuestionBackendApiService',
+  downgradeInjectable(QuestionBackendApiService));

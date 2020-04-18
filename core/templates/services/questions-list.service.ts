@@ -103,6 +103,9 @@ angular.module('oppia').factory('QuestionsListService', [
                 _setQuestionSummaries(returnObject.questionSummaries);
               }
               _setNextQuestionsCursor(returnObject.nextCursor);
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$apply();
             }
           );
         }

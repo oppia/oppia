@@ -175,6 +175,8 @@ import { PlaythroughObjectFactory } from
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
+import { QuestionBackendApiService } from
+  'domain/question/question-backend-api.service.ts';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
 import { ReadOnlyStoryNodeObjectFactory } from
@@ -621,6 +623,10 @@ export class UpgradedServices {
       new PlaythroughIssuesBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['PlaythroughIssuesBackendApiService'],
+        upgradedServices['UrlInterpolationService']);
+    upgradedServices['QuestionBackendApiService'] =
+      new QuestionBackendApiService(
+        upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
     upgradedServices['SkillObjectFactory'] =
       new SkillObjectFactory(
