@@ -42,6 +42,8 @@ angular.module('oppia').directive('adminMiscTab', [
           '/explorationdataextractionhandler');
         var SEND_DUMMY_MAIL_HANDLER_URL = (
           '/sendDummyMailToAdminHandler');
+        var GET_INTERACTIONS_BY_ID_HANDLER_URL = (
+          '/getInteractionsByExplorationId');
 
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
@@ -149,6 +151,16 @@ angular.module('oppia').directive('adminMiscTab', [
           $http.post(SEND_DUMMY_MAIL_HANDLER_URL)
             .then(function(response) {
               ctrl.setStatusMessage('Success! Mail sent to admin.');
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            });
+        };
+
+        ctrl.getExplorationInteractions = function() {
+          $http.post(GET_INTERACTIONS_BY_ID_HANDLER_URL)
+            .then(function(response) {
+              ctrl.setStatusMessage('Success! ' + response.data.title);
             }, function(errorResponse) {
               ctrl.setStatusMessage(
                 'Server error: ' + errorResponse.data.error);
