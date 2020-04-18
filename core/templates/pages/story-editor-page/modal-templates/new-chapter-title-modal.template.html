@@ -11,6 +11,11 @@
     <input class="form-control protractor-test-new-chapter-title-field" style="font-size: 12px;"
            placeholder="Enter the title for this chapter to be displayed to learners in the story viewer page (can be edited later)"
            ng-model="nodeTitle" ng-change="resetErrorMsg()" maxlength="36" autofocus>
+    <span class="oppia-input-box-subtitle">
+      <i>
+        Chapter title should be atmost 36 characters.
+      </i>
+    </span>
     <span class="form-text" style="font-size: smaller; color: red;" ng-if="errorMsg">
       <em><[errorMsg]></em>
     </span>

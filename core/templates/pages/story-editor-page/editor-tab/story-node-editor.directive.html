@@ -4,6 +4,11 @@
     <input id="storyNodeTitle" type="text" class="form-control"
            ng-model="editableTitle" ng-blur="updateTitle(editableTitle)"
            placeholder="Enter a title for the chapter." maxlength="36" ng-trim="false">
+    <span class="oppia-input-box-subtitle">
+      <i>
+        Chapter title should be atmost 36 characters.
+      </i>
+    </span>
   </div>
   <div class="protractor-test-add-chapter-outline">
     <label for="storyNodeOutline" class="form-heading"> Chapter Outline </label> <br>

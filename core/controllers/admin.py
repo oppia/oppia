@@ -408,6 +408,8 @@ class AdminHandler(base.BaseHandler):
             subtopic_page = (
                 subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                     1, topic_id_1))
+            # These explorations were chosen since they pass the validations
+            # for published stories.
             self._reload_exploration('15')
             self._reload_exploration('25')
             story = story_domain.Story.create_default_story(

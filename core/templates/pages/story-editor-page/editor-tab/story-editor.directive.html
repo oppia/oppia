@@ -5,6 +5,11 @@
       <input id="storyTitle" type="text" class="form-control protractor-test-story-title-field"
              ng-model="editableTitle" ng-blur="updateStoryTitle(editableTitle)"
              placeholder="Enter a title for the story." maxlength="39" ng-trim="false">
+      <span class="oppia-input-box-subtitle">
+        <i>
+          Story title should be atmost 39 characters.
+        </i>
+      </span>
     </div>
 
     <div class="story-description" ng-class="{'has-error': editableDescriptionIsEmpty && storyDescriptionChanged}">

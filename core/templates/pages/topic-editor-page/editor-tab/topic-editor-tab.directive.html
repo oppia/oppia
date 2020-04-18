@@ -12,6 +12,11 @@
              ng-disabled="!topicRights.canEditTopic()"
              ng-model="editableName" ng-blur="updateTopicName(editableName)"
              placeholder="Enter a name for the topic." maxlength="39" ng-trim="false">
+      <span class="oppia-input-box-subtitle">
+        <i>
+          Topic name should be atmost 39 characters.
+        </i>
+      </span>
     </div>
 
     <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
@@ -20,8 +25,14 @@
                 ng-model="editableDescription" maxlength="240"
                 ng-change="updateTopicDescriptionStatus(editableDescription)"
                 ng-blur="updateTopicDescription(editableDescription)"
-                placeholder="Enter the description of the topic">
+                placeholder="Enter the description of the topic"
+                style="height: 20vh;">
       </textarea>
+      <span class="oppia-input-box-subtitle">
+        <i>
+          Topic description should be atmost 240 characters.
+        </i>
+      </span>
       <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="form-text" style="font-size: smaller">
         What does this topic contain?
       </span>

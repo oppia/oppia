@@ -7,8 +7,13 @@
   <div class="modal-body new-topic-name-editor">
     <div class="form-group row" ng-class="{'has-error': !isTopicNameValid()}">
       <label class="col-sm-6 col-form-label">Enter a name for the topic: &nbsp;</label>
-      <div class="col-sm-6">
+      <div class="col-sm-6 topic-name-field">
         <input class="form-control protractor-test-new-topic-name-field" ng-model="topicName" maxlength="39" autofocus>
+        <span class="oppia-input-box-subtitle">
+          <i>
+            Topic name should be atmost 39 characters.
+          </i>
+        </span>
       </div>
     </div>
   </div>
@@ -24,7 +29,12 @@
     margin-left: 37.5%;
     margin-top: -3%;
   }
-  .new-topic-name-editor input {
+  .new-topic-name-editor .topic-name-field {
     height: 35px;
+    margin-left: -15%;
+  }
+
+  .new-topic-name-editor input {
+    width: 130%;
   }
 </style>

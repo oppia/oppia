@@ -5,10 +5,15 @@
 </div>
 <form ng-submit="save(storyTitle)">
   <div class="modal-body new-story-title-editor" ng-class="{'has-error': isStoryTitleEmpty(storyTitle)}">
-    <p>
-      Enter the title: &nbsp;
-      <input class="form-group protractor-test-new-story-title-field" ng-model="storyTitle" maxlength="39" autofocus>
-    </p>
+    Enter the title: &nbsp;
+    <input class="form-group protractor-test-new-story-title-field" ng-model="storyTitle" maxlength="39" autofocus>
+    <div>
+      <span class="oppia-input-box-subtitle">
+        <i>
+          Story title should be atmost 39 characters.
+        </i>
+      </span>
+    </div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
