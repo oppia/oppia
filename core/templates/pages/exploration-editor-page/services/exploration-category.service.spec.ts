@@ -24,7 +24,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require('pages/exploration-editor-page/' +
   'services/exploration-category.service.spec.ts');
 
-fdescribe('Exploration Category Service', function() {
+describe('Exploration Category Service', function() {
   var ecs = null;
 
   beforeEach(function() {
