@@ -92,7 +92,7 @@ _EXCLUSIVE_GROUP.add_argument(
     nargs='+',
     choices=['html', 'css', 'js', 'ts', 'py', 'other'],
     help='specific file extensions to be linted. Space separated list. '
-        'If either of js or ts used then both js and ts files will be linted.',
+    'If either of js or ts used then both js and ts files will be linted.',
     action='store')
 
 if not os.getcwd().endswith('oppia'):
@@ -213,8 +213,8 @@ def _get_linters_for_file_extension(
     custom_linters = []
     third_party_linters = []
 
-    file_extension_type_js_ts = '.js' == file_extension_to_lint or (
-        '.ts' == file_extension_to_lint)
+    file_extension_type_js_ts = file_extension_to_lint == 'js' or (
+        file_extension_to_lint == 'ts')
 
     if file_extension_type_js_ts:
         general_files_to_lint = _FILES['.js'] + _FILES['.ts']
@@ -235,7 +235,7 @@ def _get_linters_for_file_extension(
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
-    elif file_extension_to_lint == '.html':
+    elif file_extension_to_lint == 'html':
         custom_linter, third_party_linter = html_linter.get_linters(
             _FILES['.html'], verbose_mode_enabled=verbose_mode_enabled)
         custom_linters.append(custom_linter)
@@ -248,7 +248,7 @@ def _get_linters_for_file_extension(
             verbose_mode_enabled=verbose_mode_enabled)
         third_party_linters.append(third_party_linter)
 
-    elif file_extension_to_lint == '.css':
+    elif file_extension_to_lint == 'css':
         config_path_for_oppia_css = os.path.join(
             parent_dir, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
         custom_linter, third_party_linter = css_linter.get_linters(
@@ -256,7 +256,7 @@ def _get_linters_for_file_extension(
             verbose_mode_enabled=verbose_mode_enabled)
         third_party_linters.append(third_party_linter)
 
-    elif file_extension_to_lint == '.py':
+    elif file_extension_to_lint == 'py':
         custom_linter, third_party_linter = python_linter.get_linters(
             _FILES['.py'], verbose_mode_enabled=verbose_mode_enabled)
         custom_linters.append(custom_linter)
