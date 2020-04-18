@@ -30,22 +30,22 @@ describe('Exploration Category Service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module(function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-        $provide.value(key, value);
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
     }
   });
 
-  angular.mock.inject(function($injector) {
-    ecs = $injector.get('ExplorationCategoryService');
+    angular.mock.inject(function($injector) {
+      ecs = $injector.get('ExplorationCategoryService');
     });
   });
 
-  it('tests the child object properties',function(){
+  it('tests the child object properties', function() {
     expect(ecs.propertyName).toBe('category');
     expect(ecs._isValid('Algorithms')).toBe(true);
-    const not_normalize = '            Exploration             Category Service               ';
+    const Not_Normalize = '   Exploration             Category Service     ';
     const normalize = 'Exploration Category Service';
-    expect(ecs._normalize(not_normalize)).toBe(normalize);
+    expect(ecs._normalize(Not_Normalize)).toBe(normalize);
   });
 });
