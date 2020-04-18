@@ -32,7 +32,7 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
         var errorMessage = '';
         ctrl.allowedChoices = function() {
           var allowedList = [];
-          for (var i = 0; i <= math.min(
+          for (var i = 0; i <= Math.min(
             ctrl.maxPrevIndex, ctrl.choices.length - 1); i++) {
             allowedList.push(i + 1);
           }
@@ -49,8 +49,7 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
           // ctrl.choices.splice(selectedRank, 0, ctrl.choices.splice(
           // choiceListIndex, 1)[0]);
           var choiceHtmlHasBeenAdded = false;
-          ctrl.maxPrevIndex = math.max(selectedRank + 1,
-            ctrl.maxPrevIndex);
+          ctrl.maxPrevIndex = Math.max(selectedRank + 1, ctrl.maxPrevIndex);
 
           for (var i = 0; i < ctrl.value.length; i++) {
             choiceHtmlHasBeenAdded = false;
@@ -117,7 +116,7 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
               for (var j = 0; j < ctrl.value.length; j++) {
                 if (ctrl.value[j].indexOf(choice) !== -1) {
                   ctrl.initValues.push(j + 1);
-                  ctrl.maxPrevIndex = math.max(ctrl.maxPrevIndex, j + 1);
+                  ctrl.maxPrevIndex = Math.max(ctrl.maxPrevIndex, j + 1);
                   break;
                 }
               }

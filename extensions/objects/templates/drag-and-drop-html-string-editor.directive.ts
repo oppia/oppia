@@ -33,7 +33,7 @@ angular.module('oppia').directive('dragAndDropHtmlStringEditor', [
           ctrl.value = selectedItem;
         };
         ctrl.$onInit = function() {
-          ctrl.name = math.random().toString(36).substring(7);
+          ctrl.name = Math.random().toString(36).substring(7);
           ctrl.initArgs = ctrl.getInitArgs();
           ctrl.choices = ctrl.initArgs.choices;
 
