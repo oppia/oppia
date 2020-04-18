@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
-import logging
 
 from core import jobs
 from core.platform import models
@@ -196,17 +195,13 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         found_models = model_class.query(
             migration_field == old_user_id).fetch()
         for model in found_models:
-            model_values = model.to_dict()
             # We need to get the name of the migration_field in order to
             # retrieve its value from the model_values. The migration_field
             # needs to be in the object format so that we are able to form
             # the model query easily (on one of the previous lines).
+            model_values = model.to_dict(include=[migration_field._name])  # pylint: disable=protected-access
             model_values[migration_field._name] = new_user_id  # pylint: disable=protected-access
-            try:
-                model.populate(**model_values)
-            except TypeError as e:
-                logging.error(python_utils.UNICODE(model_values))
-                raise TypeError(python_utils.UNICODE(e))
+            model.populate(**model_values)
             model_class.put_multi([model], update_last_updated_time=False)
 
     @classmethod
