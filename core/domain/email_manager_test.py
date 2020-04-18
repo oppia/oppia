@@ -185,33 +185,31 @@ class EmailRightsTest(test_utils.GenericTestBase):
                 True, True, True, False),
         }
 
-        # pylint: disable=protected-access
         for intent in expected_validation_results:
             for ind, sender_id in enumerate(sender_ids_to_test):
                 if expected_validation_results[intent][ind]:
-                    email_manager._require_sender_id_is_valid(
+                    email_manager.require_sender_id_is_valid(
                         intent, sender_id)
                 else:
                     with self.assertRaisesRegexp(
                         Exception, 'Invalid sender_id'
                         ):
-                        email_manager._require_sender_id_is_valid(
+                        email_manager.require_sender_id_is_valid(
                             intent, sender_id)
 
         # Also test null and invalid intent strings.
         with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
-            email_manager._require_sender_id_is_valid(
+            email_manager.require_sender_id_is_valid(
                 '', feconf.SYSTEM_COMMITTER_ID)
         with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
-            email_manager._require_sender_id_is_valid(
+            email_manager.require_sender_id_is_valid(
                 '', self.admin_id)
         with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
-            email_manager._require_sender_id_is_valid(
+            email_manager.require_sender_id_is_valid(
                 'invalid_intent', feconf.SYSTEM_COMMITTER_ID)
         with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
-            email_manager._require_sender_id_is_valid(
+            email_manager.require_sender_id_is_valid(
                 'invalid_intent', self.admin_id)
-        # pylint: enable=protected-access
 
 
 class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
