@@ -32,12 +32,7 @@ export class SkillSummary {
     return this._id;
   }
 
-  getDescription(truncateDescription: bool, descriptionLength: number): string {
-    if (truncateDescription) {
-      if (this._description.length > descriptionLength) {
-        return this._description.substring(0, descriptionLength) + '...';
-      }
-    }
+  getDescription(): string {
     return this._description;
   }
 }
