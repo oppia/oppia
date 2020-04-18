@@ -54,7 +54,9 @@
         </button>
       </td>
       <td class="delete-icon">
-        <span ng-if="canDeleteSkill()" ng-click="deleteSkill(skill.id)" class="fas fa-trash-alt list-summary protractor-test-delete-skill-button"> </span>
+        <a ng-if="canDeleteSkill()" ng-click="deleteSkill(skill.id)" class="protractor-test-delete-skill-button">
+          <span class="fas fa-trash-alt list-summary"></span>
+        </a>
       </td>
     </tr>
   </table>
