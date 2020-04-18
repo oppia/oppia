@@ -32,9 +32,9 @@ describe('Exploration Category Service', function() {
     angular.mock.module(function($provide) {
       var ugs = new UpgradedServices();
       for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  });
+        $provide.value(key, value);
+      }
+    });
 
     angular.mock.inject(function($injector) {
       ecs = $injector.get('ExplorationCategoryService');
@@ -44,8 +44,8 @@ describe('Exploration Category Service', function() {
   it('tests the child object properties', function() {
     expect(ecs.propertyName).toBe('category');
     expect(ecs._isValid('Algorithms')).toBe(true);
-    const Not_Normalize = '   Exploration             Category Service     ';
-    const normalize = 'Exploration Category Service';
+    var not_normalize = '   Exploration             Category Service     ';
+    var normalize = 'Exploration Category Service';
     expect(ecs._normalize(Not_Normalize)).toBe(normalize);
   });
 });
