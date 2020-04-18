@@ -302,63 +302,74 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             question_count: int. The number of questions to be returned.
             skill_ids: list(str). The ids of skills for which the linked
                 question ids are to be retrieved.
-            start_cursor: str. The starting point from which the batch of
-                questions are to be returned. This value should be urlsafe.
+            start_cursor: str. It contains three parts. One the starting point
+                from which the batch of questions are to be returned.
+                Two the random_id used to filter and three the direction of
+                fetch.
 
         Returns:
             list(QuestionSkillLinkModel), str|None. The QuestionSkillLinkModels
-                corresponding to given skill_ids, the next cursor value to be
-                used for the next page (or None if no more pages are left). The
-                returned next cursor value is urlsafe.
+                corresponding to given skill_ids, the combined string of next
+                cursor value to be used for the next page (or None if no more
+                pages are left), random_id and direction. The returned next
+                cursor value is urlsafe.
         """
         question_skill_count = min(
             len(skill_ids), constants.MAX_SKILLS_PER_QUESTION
         ) * question_count
 
-        if not start_cursor == '':
-            direction = start_cursor[-1]
-            random_id = start_cursor[-13:-1]
-            cursor = datastore_query.Cursor(urlsafe=start_cursor[:-13])
+        def get_question_order(direction, question_id, random_id):
+            """Helper funtion. Determines the order of fetch."""
             if direction == '1':
-                questions_list, next_cursor, more = cls.query(
+                return question_id > random_id
+            else:
+                return question_id <= random_id
+
+        def get_question_list(
+                random_id, question_skill_count, direction, cursor):
+            """Helper function. Fetches the list of QuestionSKillLinkModels."""
+            if not cursor == '':
+                return cls.query(
                     cls.skill_id.IN(skill_ids)
                 ).order(cls.question_id, cls.key).filter(
-                    cls.question_id > random_id
+                    get_question_order(direction, cls.question_id, random_id)
                 ).fetch_page(
                     question_skill_count,
                     start_cursor=cursor
                 )
             else:
-                questions_list, next_cursor, more = cls.query(
+                return cls.query(
                     cls.skill_id.IN(skill_ids)
                 ).order(cls.question_id, cls.key).filter(
-                    cls.question_id <= random_id
-                ).fetch_page(
-                    question_skill_count,
-                    start_cursor=cursor
-                )
+                    get_question_order(direction, cls.question_id, random_id)
+                ).fetch_page(question_skill_count)
+
+        if not start_cursor == '':
+            direction = start_cursor[-1]
+            random_id = start_cursor[-13:-1]
+            cursor = datastore_query.Cursor(urlsafe=start_cursor[:-13])
+            questions_list, next_cursor, more = (
+                get_question_list(
+                    random_id, question_skill_count, direction, cursor
+                ))
         else:
             direction = '1'
             random_id = utils.convert_to_hash(
                 python_utils.UNICODE(
                     utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
-            questions_list, next_cursor, more = cls.query(
-                cls.skill_id.IN(skill_ids)
-            ).order(cls.question_id, cls.key).filter(
-                cls.question_id > random_id
-            ).fetch_page(question_skill_count)
+            questions_list, next_cursor, more = (
+                get_question_list(
+                    random_id, question_skill_count, direction, ''
+                    ))
 
         question_extra_count = question_skill_count - len(questions_list)
         if (question_extra_count > 0 and direction != '0'):
             direction = '0'
-            question_list_extra, next_cursor, more = cls.query(
-                cls.skill_id.IN(skill_ids)
-            ).order(
-                cls.question_id, cls.key
-            ).filter(
-                cls.question_id <= random_id
-            ).fetch_page(question_extra_count)
+            question_list_extra, next_cursor, more = (
+                get_question_list(
+                    random_id, question_extra_count, direction, ''
+                    ))
             questions_list.extend(question_list_extra)
 
         question_skill_link_models = questions_list

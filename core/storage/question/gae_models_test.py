@@ -26,6 +26,7 @@ from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
 import python_utils
+import utils
 
 (base_models, question_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.question])
@@ -309,6 +310,48 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
         self.assertNotEqual(
             question_skill_link_models[0], question_skill_link_models_2[0])
+
+    def test_get_random_question_skill_links(self):
+        skill_id_1 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_1, 'user', description='Description 1')
+        skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_2, 'user', description='Description 2')
+
+        questionskilllink_model_list = []
+        for i in python_utils.RANGE(10):
+            question_id = 'question_id%s' % python_utils.UNICODE(i)
+            if utils.get_random_int(2) == 0:
+                questionskilllink_model = (
+                    question_models.QuestionSkillLinkModel.create(
+                        question_id, skill_id_1, 0.1)
+                    )
+            else:
+                questionskilllink_model = (
+                    question_models.QuestionSkillLinkModel.create(
+                        question_id, skill_id_2, 0.3)
+                    )
+            questionskilllink_model_list.append(questionskilllink_model)
+
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            questionskilllink_model_list)
+
+        # Overriding the convert_hash_function to get expected random results.
+        utils.convert_to_hash = lambda a, b: u'question_id5'
+        question_skill_link_models, _ = (
+            question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( # pylint: disable=line-too-long
+                2, [skill_id_1, skill_id_2], ''
+            )
+        )
+        self.assertEqual(len(question_skill_link_models), 4)
+        utils.convert_to_hash = lambda a, b: u'question_id1'
+        question_skill_link_models_2, _ = (
+            question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( # pylint: disable=line-too-long
+                2, [skill_id_1, skill_id_2], ''
+            )
+        )
+        self.assertEqual(len(question_skill_link_models_2), 4)
+        for question in question_skill_link_models_2:
+            self.assertFalse(question in question_skill_link_models)
 
     def test_get_question_skill_links_by_skill_ids_many_skills(self):
         # Test the case when len(skill_ids) > constants.MAX_SKILLS_PER_QUESTION.
