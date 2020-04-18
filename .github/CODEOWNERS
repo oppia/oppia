@@ -459,7 +459,7 @@
 
 
 # QA team.
-/core/tests/ @kevinlee12 @U8NWXD
+/core/tests/ @U8NWXD
 /assets/ @nithusha21
 /data/ @nithusha21
 
@@ -538,6 +538,7 @@
 /webpack.common.macros.ts @jameesjohn @vojtechjelinek
 /webpack.dev.config.ts @jameesjohn @vojtechjelinek
 /webpack.prod.config.ts @jameesjohn @vojtechjelinek
+/webpack.terser.config.ts @nishantwrp @vojtechjelinek
 
 
 # Typings.

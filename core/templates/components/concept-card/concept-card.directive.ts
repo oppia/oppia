@@ -46,6 +46,7 @@ angular.module('oppia').directive('conceptCard', [
           };
 
           ctrl.showMoreWorkedExamples = function() {
+            ctrl.explanationIsShown = false;
             ctrl.numberOfWorkedExamplesShown++;
           };
 
@@ -56,7 +57,12 @@ angular.module('oppia').directive('conceptCard', [
             ctrl.loadingMessage = 'Loading';
             $scope.$watch('$ctrl.index', function(newIndex) {
               ctrl.currentConceptCard = ctrl.conceptCards[newIndex];
-              ctrl.numberOfWorkedExamplesShown = 0;
+              if (ctrl.currentConceptCard) {
+                ctrl.numberOfWorkedExamplesShown = 0;
+                if (ctrl.currentConceptCard.getWorkedExamples().length > 0) {
+                  ctrl.numberOfWorkedExamplesShown = 1;
+                }
+              }
             });
             ConceptCardBackendApiService.loadConceptCards(
               ctrl.getSkillIds()
@@ -68,6 +74,10 @@ angular.module('oppia').directive('conceptCard', [
               });
               ctrl.loadingMessage = '';
               ctrl.currentConceptCard = ctrl.conceptCards[ctrl.index];
+              ctrl.numberOfWorkedExamplesShown = 0;
+              if (ctrl.currentConceptCard.getWorkedExamples().length > 0) {
+                ctrl.numberOfWorkedExamplesShown = 1;
+              }
             });
           };
         }
