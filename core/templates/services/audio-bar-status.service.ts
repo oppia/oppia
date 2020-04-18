@@ -23,19 +23,19 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class AudioBarStatusService {
-    audioBarIsExpanded: boolean = false;
+  audioBarIsExpanded: boolean = false;
 
-    expandAudioBar(): void {
-      this.audioBarIsExpanded = true;
-    }
+  expandAudioBar(): void {
+    this.audioBarIsExpanded = true;
+  }
 
-    collapseAudioBar(): void {
-      this.audioBarIsExpanded = false;
-    }
+  collapseAudioBar(): void {
+    this.audioBarIsExpanded = false;
+  }
 
-    isAudioBarExpanded(): boolean {
-      return this.audioBarIsExpanded;
-    }
+  isAudioBarExpanded(): boolean {
+    return this.audioBarIsExpanded;
+  }
 }
 
 angular.module('oppia').factory('AudioBarStatusService',
