@@ -52,6 +52,7 @@ export class LearnerAnswerDetailsBackendApiService {
       answer_details: answerDetails
     };
 
+    // TODO(#7165): Change `any` to a type describing the dict.
     this.httpClient.put(recordLearnerAnswerDetailsUrl, payload).toPromise()
       .then((response: HttpResponse<any>) => {
         if (response) {
