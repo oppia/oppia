@@ -13,8 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the wavesurfer library.
+ * @fileoverview Directive to get changes in human readable form.
  */
 
-module.exports = require(
-  'static/wave-surfer-js-2.2.1/wavesurfer.min.js');
+require('domain/utilities/url-interpolation.service.ts');
+
+angular.module('oppia').directive('changesInHumanReadableForm', [
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        lostChanges: '='
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration-editor-page/' +
+        'changes-in-human-readable-form/templates/' +
+        'changes-in-human-readable-form.directive.html'),
+    };
+  }]);
