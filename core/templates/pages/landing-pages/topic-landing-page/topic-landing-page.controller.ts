@@ -111,8 +111,13 @@ angular.module('oppia').directive('topicLandingPage', [
             ctrl.topicTitle = topicData.topic_title;
             ctrl.lessons = landingPageData.lessons;
             assetsPathFormat = '/landing/<subject>/<topic>/<file_name>';
-            var pageTitle = ctrl.topicTitle +
-              ' | Add, Subtract, Multiply and Divide | Oppia';
+            var pageTitle;
+            if (ctrl.topicTitle === 'Fractions') {
+              var tagLine = 'Add, Subtract, Multiply and Divide';
+              pageTitle = [ctrl.topicTitle, tagLine, 'Oppia'].join(' | ');
+            } else {
+              pageTitle = [ctrl.topicTitle, 'Oppia'].join(' | ');
+            }
             PageTitleService.setPageTitle(pageTitle);
             ctrl.bookImageUrl = UrlInterpolationService.getStaticImageUrl(
               '/splash/books.svg');

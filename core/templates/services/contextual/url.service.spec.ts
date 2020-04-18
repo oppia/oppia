@@ -151,6 +151,10 @@ describe('Url Service', () => {
     expect(
       urlService.getClassroomNameFromUrl()
     ).toBe('class name');
+    mockLocation.pathname = '/invalid/abcdefgijklm';
+    expect(function() {
+      urlService.getClassroomNameFromUrl();
+    }).toThrowError('Invalid URL for classroom');
   });
 
   it('should correctly retrieve subtopic id from url', () => {

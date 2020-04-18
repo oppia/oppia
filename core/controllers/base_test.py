@@ -200,7 +200,9 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         """Test for a redirect in logged out state on '/'."""
 
         response = self.get_html_response('/', expected_status_int=302)
-        self.assertEqual(len(response.headers['location'].split('/')[-1]), 0)
+        response_path = response.headers['location']
+        self.assertEqual(response_path[-1], '/')
+        self.assertEqual(len(response_path.split('/')), 4)
 
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
@@ -528,8 +530,11 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
     def test_splash_redirect(self):
         # Tests that the old '/splash' URL is redirected to '/'.
+
         response = self.get_html_response('/splash', expected_status_int=302)
-        self.assertNotIn('splash', response.headers['location'])
+        response_path = response.headers['location']
+        self.assertEqual(response_path[-1], '/')
+        self.assertEqual(len(response_path.split('/')), 4)
 
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):

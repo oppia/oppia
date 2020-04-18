@@ -58,8 +58,8 @@ angular.module('oppia').directive('classroomPage', [
               ctrl.classroomName.charAt(0).toUpperCase() +
               ctrl.classroomName.slice(1));
 
-            PageTitleService.setPageTitle(ctrl.classroomDisplayName +
-                ' Classroom | Oppia');
+            PageTitleService.setPageTitle(
+              ctrl.classroomDisplayName + ' Classroom | Oppia');
 
             $rootScope.loadingMessage = 'Loading';
             ClassroomBackendApiService.fetchClassroomData(

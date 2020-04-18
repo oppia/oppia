@@ -51,11 +51,8 @@ class TopicLandingPage(base.BaseHandler):
 
         subject = self.request.uri.split('/')[-2]
 
-        if subject in feconf.AVAILABLE_LANDING_PAGES:
-            if topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
-                self.render_template('topic-landing-page.mainpage.html')
-            else:
-                raise self.PageNotFoundException
+        if topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
+            self.render_template('topic-landing-page.mainpage.html')
         else:
             raise self.PageNotFoundException
 
