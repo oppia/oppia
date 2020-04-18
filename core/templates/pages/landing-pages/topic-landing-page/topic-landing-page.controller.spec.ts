@@ -135,4 +135,16 @@ describe('Topic Landing Page', function() {
 
     expect(windowRef.nativeWindow.location).toBe('/library');
   });
+
+  it('should have a tagline in the page title', function() {
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      location: {
+        pathname: '/maths/fractions'
+      }
+    });
+    ctrl.$onInit();
+
+    expect(ctrl.pageTitle).toBe('Fractions | ' +
+      'Add, Subtract, Multiply and Divide | Oppia');
+  });
 });
