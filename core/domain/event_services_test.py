@@ -238,6 +238,8 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
             if not (directory.startswith('./core/') or
                     directory.startswith('./extensions/')):
                 continue
+            if directory.startswith('./core/tests/linter_tests'):
+                continue
             for file_name in files:
                 if not file_name.endswith('.py'):
                     continue
