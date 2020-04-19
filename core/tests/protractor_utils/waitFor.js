@@ -87,10 +87,8 @@ var visibilityOf = function(element, errorMessage) {
 /**
 * Wait for new tab is opened
 */
-var waitForNewTab = function(errorMessage) {
+var newTabToBeCreated = function(errorMessage) {
   var currentHandles = [];
-  var newHandle = null;
-  var timeElapsed = 0;
 
   return browser.driver.getAllWindowHandles().then(function(handles) {
     currentHandles = handles;
@@ -109,4 +107,4 @@ exports.invisibilityOf = invisibilityOf;
 exports.pageToFullyLoad = pageToFullyLoad;
 exports.textToBePresentInElement = textToBePresentInElement;
 exports.visibilityOf = visibilityOf;
-exports.waitForNewTab = waitForNewTab;
+exports.newTabToBeCreated = newTabToBeCreated;
