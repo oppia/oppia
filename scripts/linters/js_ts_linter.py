@@ -101,6 +101,13 @@ def _get_expression_from_node_if_one_exists(
     return expression
 
 
+def nwise(iterable, n=2):
+    iters = itertools.tee(iterable, n)
+    for i, it in enumerate(iters):
+        next(itertools.islice(it, i, i), None)
+    return itertools.izip(*iters)
+
+
 class JsTsLintChecksManager(python_utils.OBJECT):
     """Manages all the Js and Ts linting functions.
 
@@ -156,7 +163,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         files_to_check = self.all_filepaths
         parsed_js_and_ts_files = dict()
         if not files_to_check:
-            return parsed_js_and_ts_files
+            return parsed_js_and_ts_files, parsed_js_and_ts_file_tokens
         compiled_js_dir = tempfile.mkdtemp(
             dir=os.getcwd(), prefix='tmpcompiledjs')
         if not self.verbose_mode_enabled:
@@ -171,6 +178,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 # Use esprima to parse a JS or TS file.
                 parsed_js_and_ts_files[filepath] = esprima.parseScript(
                     file_content, comment=True)
+                parsed_js_and_ts_file_tokens[filepath] = esprima.tokenize(
+                    file_content)
             except Exception as e:
                 # Compile typescript file which has syntax not valid for JS
                 # file.
@@ -183,13 +192,15 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     file_content = FILE_CACHE.read(compiled_js_filepath)
                     parsed_js_and_ts_files[filepath] = esprima.parseScript(
                         file_content)
+                    parsed_js_and_ts_file_tokens[filepath] = esprima.tokenize(
+                        file_content)
                 except Exception as e:
                     shutil.rmtree(compiled_js_dir)
                     raise Exception(e)
 
         shutil.rmtree(compiled_js_dir)
 
-        return parsed_js_and_ts_files
+        return parsed_js_and_ts_files, parsed_js_and_ts_file_tokens
 
     def _get_expressions_from_parsed_script(self):
         """This function returns the expressions in the script parsed using
@@ -459,51 +470,47 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('')
         return summary_messages
 
-    def _check_js_and_ts_duplicate_functions(self):
+    def _check_js_and_ts_duplicate_function_names(self):
         """TODO"""
         if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting no duplicate functions check')
+            python_utils.PRINT('Starting no duplicate function names check')
             python_utils.PRINT('----------------------------------------')
         files_to_check = self.all_filepaths
-        components_to_check = ['controller', 'directive', 'factory', 'filter']
         failed = False
 
+        stdout = sys.stdout
         for filepath in files_to_check:
-            python_utils.PRINT('    filepath=%r' % filepath)
-            func_names_found = set()
-            func_names_reported = set()
-            parsed_expressions = self.parsed_expressions_in_files[filepath]
-            expressions = itertools.chain.from_iterable(
-                parsed_expressions[c] for c in components_to_check)
-            for expression in (e for e in expressions if e):
-                python_utils.PRINT('        expression=%r' % expression)
-                if expression.type == 'MethodDefinition':
-                    func_expr = expression.value
-                elif expression.type == 'FunctionExpression':
-                    func_expr = expression
-                else:
+            identifiers_found = set()
+            identifiers_reported = set()
+            tokens = self.parsed_js_and_ts_file_tokens[filepath]
+            for token_triple in nwise(tokens, 3):
+                if (token_triple[0].type != 'Identifier'
+                        or token_triple[1].type != 'Punctuator'
+                        or token_triple[1].value != '='
+                        or token_triple[2].type != 'Keyword'
+                        or token_triple[2].value != 'function'):
                     continue
-                if not func_expr.id or not func_expr.id.name:
-                    continue
-                stripped_func_name = func_expr.id.name.lstrip('_')
-                if stripped_func_name not in func_names_found:
-                    func_names_found.add(stripped_func_name)
-                elif stripped_func_name not in func_names_reported:
-                    python_utils.PRINT(
-                        '%s has multiple definitions for the function: %s. '
-                        'Please combine them into one.' % (
-                            filepath, stripped_func_name))
+                stripped_identifier = token_triple[0].value.lstrip('_')
+                if stripped_identifier not in identifiers_found:
+                    identifiers_found.add(stripped_identifier)
+                elif stripped_identifier not in identifiers_reported:
                     failed = True
-                    func_names_reported.add(stripped_func_name)
+                    identifiers_reported.add(stripped_identifier)
+                    with linter_utils.redirect_stdout(stdout):
+                        python_utils.PRINT(
+                            '%s has multiple definitions for the identifier: '
+                            '%s. Please combine them into one.' % (
+                                filepath, stripped_identifier))
 
+        summary_messages = []
         if failed:
             summary_messages.append(
-                '%s  No duplicate functions check failed, fix files that '
-                'have duplicate functions mentioned above' % (
+                '%s  No duplicate function names check failed, fix files that '
+                'have duplicate function names mentioned above' % (
                     _MESSAGE_TYPE_FAILED))
         else:
             summary_messages.append(
-                '%s  No duplicate functions check passed' % (
+                '%s  No duplicate function names check passed' % (
                     _MESSAGE_TYPE_SUCCESS))
 
         with linter_utils.redirect_stdout(stdout):
@@ -862,7 +869,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 'There are no JavaScript or Typescript files to lint.')
             return []
 
-        self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
+        self.parsed_js_and_ts_files, self.parsed_js_and_ts_file_tokens = (
+            self._validate_and_parse_js_and_ts_files())
         self.parsed_expressions_in_files = (
             self._get_expressions_from_parsed_script())
 
@@ -873,14 +881,14 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         sorted_dependencies_messages = self._check_sorted_dependencies()
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
-        duplicate_functions_messages = (
-            self._check_js_and_ts_duplicate_functions())
+        duplicate_function_names_messages = (
+            self._check_js_and_ts_duplicate_function_names())
 
         all_messages = (
             extra_js_files_messages +
             js_and_ts_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages +
-            duplicate_functions_messages)
+            duplicate_function_names_messages)
         return all_messages
 
 
