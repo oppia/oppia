@@ -23,6 +23,9 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { SearchExplorationsBackendApiService } from
   'domain/collection/search-explorations-backend-api.service';
 
+import { ExplorationMetadataObjectFactory } from
+  'domain/exploration/ExplorationMetadataObjectFactory';
+
 describe('Exploration search backend API service', () => {
   let SearchExplorationsService: SearchExplorationsBackendApiService = null;
   let httpTestingController: HttpTestingController;
@@ -46,6 +49,10 @@ describe('Exploration search backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       let query = escape(btoa('three'));
+
+      var explorationMetadataObject = (
+        ExplorationMetadataObjectFactory.createFromBackendDict(
+          {collection_node_metadata_list: []}));
 
       SearchExplorationsService.fetchExplorations('three')
         .then(successHandler, failHandler);
@@ -81,6 +88,9 @@ describe('Exploration search backend API service', () => {
         }]
       };
 
+      var explorationMetadataObject = (
+        ExplorationMetadataObjectFactory.createFromBackendDict(searchResults));
+
       SearchExplorationsService.fetchExplorations('count')
         .then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
@@ -89,7 +99,7 @@ describe('Exploration search backend API service', () => {
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(searchResults);
+      expect(successHandler).toHaveBeenCalledWith(explorationMetadataObject);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
