@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the wavesurfer library.
+ * @fileoverview This file imports the ckeditor library.
  */
 
-module.exports = require(
-  'static/wave-surfer-js-2.2.1/wavesurfer.min.js');
+window.CKEDITOR_BASEPATH = '/third_party/static/ckeditor-4.12.1/';
+require('static/ckeditor-4.12.1/ckeditor.js');
