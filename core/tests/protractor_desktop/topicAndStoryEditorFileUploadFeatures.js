@@ -45,7 +45,7 @@ describe('Topic editor functionality', function() {
     users.createAndLoginAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic(topicName, 'abbrev');
+    topicsAndSkillsDashboardPage.createTopic(topicName, 'abbrev', true);
     users.logout();
   });
 

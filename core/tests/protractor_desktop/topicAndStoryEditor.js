@@ -53,9 +53,10 @@ describe('Topic editor functionality', function() {
     users.createAndLoginAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
+    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev', false);
     browser.getCurrentUrl().then(function(url) {
       topicId = url.split('/')[4];
+      general.closeCurrentTab(0);
     }, function() {
       // Note to developers:
       // Promise is returned by getCurrentUrl which is handled here.
@@ -101,9 +102,10 @@ describe('Topic editor functionality', function() {
     var skillId = null;
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 1', 'Concept card explanation');
+      'Skill 1', 'Concept card explanation', false);
     browser.getCurrentUrl().then(function(url) {
       skillId = url.split('/')[4];
+      general.closeCurrentTab(0);
       topicsAndSkillsDashboardPage.get();
       topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
       topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
@@ -192,7 +194,7 @@ describe('Topic editor functionality', function() {
   it('should assign a skill to, between, and from subtopics', function() {
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 2', 'Concept card explanation');
+      'Skill 2', 'Concept card explanation', true);
 
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
@@ -278,10 +280,11 @@ describe('Chapter editor functionality', function() {
       userEmail, 'creatorChapterTest');
     dummyExplorationIds = createDummyExplorations(3);
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic(topicName, 'abbrev');
+    topicsAndSkillsDashboardPage.createTopic(topicName, 'abbrev', false);
     topicEditorPage.createStory('Story 0');
     browser.getCurrentUrl().then(function(url) {
       storyId = url.split('/')[4];
+      general.closeCurrentTab(0);
       dummySkills = createDummySkills(2);
     });
   });

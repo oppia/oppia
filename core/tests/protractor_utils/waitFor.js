@@ -84,6 +84,24 @@ var visibilityOf = function(element, errorMessage) {
     until.visibilityOf(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
+/**
+* Wait for new tab is opened
+*/
+var waitForNewTab = function(errorMessage) {
+  var currentHandles = [];
+  var newHandle = null;
+  var timeElapsed = 0;
+
+  return browser.driver.getAllWindowHandles().then(function(handles) {
+    currentHandles = handles;
+  }).then(function() {
+    return browser.wait(function() {
+      return browser.driver.getAllWindowHandles().then(function(handles) {
+        return (handles.length > currentHandles.length);
+      });
+    }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
+  });
+};
 
 exports.alertToBePresent = alertToBePresent;
 exports.elementToBeClickable = elementToBeClickable;
@@ -91,3 +109,4 @@ exports.invisibilityOf = invisibilityOf;
 exports.pageToFullyLoad = pageToFullyLoad;
 exports.textToBePresentInElement = textToBePresentInElement;
 exports.visibilityOf = visibilityOf;
+exports.waitForNewTab = waitForNewTab;

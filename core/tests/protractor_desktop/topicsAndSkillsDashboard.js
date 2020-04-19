@@ -57,7 +57,7 @@ describe('Topics and skills dashboard functionality', function() {
 
   it('should add a new topic to list', function() {
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
-    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
+    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev', true);
 
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
@@ -65,7 +65,7 @@ describe('Topics and skills dashboard functionality', function() {
 
   it('should move published skill to unused skills section', function() {
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 2', 'Concept card explanation');
+      'Skill 2', 'Concept card explanation', true);
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
@@ -82,7 +82,7 @@ describe('Topics and skills dashboard functionality', function() {
 
   it('should merge an outside skill with one in a topic', function() {
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill to be merged', 'Concept card explanation');
+      'Skill to be merged', 'Concept card explanation', false);
     skillEditorPage.moveToQuestionsTab();
     skillEditorPage.clickCreateQuestionButton();
     skillEditorPage.confirmSkillDifficulty();
@@ -98,6 +98,7 @@ describe('Topics and skills dashboard functionality', function() {
       explanation: 'It is correct'
     });
     skillEditorPage.saveQuestion();
+    general.closeCurrentTab(0);
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.mergeSkillWithIndexToSkillWithIndex(0, 0);
@@ -109,7 +110,7 @@ describe('Topics and skills dashboard functionality', function() {
 
   it('should remove a skill from list once deleted', function() {
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill to be deleted', 'Concept card explanation');
+      'Skill to be deleted', 'Concept card explanation', true);
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);

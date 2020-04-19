@@ -48,9 +48,10 @@ describe('Skill Editor functionality', function() {
       'creator@skillEditor.com', 'creatorSkillEditor');
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 1', 'Concept card explanation');
+      'Skill 1', 'Concept card explanation', false);
     browser.getCurrentUrl().then(function(url) {
       skillId = url.split('/')[4];
+      general.closeCurrentTab(0);
     }, function() {
       // Note to developers:
       // Promise is returned by getCurrentUrl which is handled here.

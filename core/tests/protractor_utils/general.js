@@ -158,6 +158,13 @@ var acceptAlert = function() {
   waitFor.pageToFullyLoad();
 };
 
+var closeCurrentTab = function(tabIndexToSwitchTo) {
+  return browser.getAllWindowHandles().then(function(handles) {
+    browser.driver.close();
+    return browser.switchTo().window(handles[tabIndexToSwitchTo]);
+  });
+};
+
 var _getUniqueLogMessages = function(logs) {
   // Returns unique log messages.
   var logsDict = {};
@@ -215,6 +222,7 @@ exports.openPlayer = openPlayer;
 exports.moveToPlayer = moveToPlayer;
 exports.moveToEditor = moveToEditor;
 exports.expect404Error = expect404Error;
+exports.closeCurrentTab = closeCurrentTab;
 
 exports.ensurePageHasNoTranslationIds = ensurePageHasNoTranslationIds;
 

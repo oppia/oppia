@@ -52,11 +52,12 @@ describe('Classroom page functionality', function() {
 
   it('should add a new published topic to the Math classroom', function() {
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
+    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev', false);
     topicEditorPage.submitTopicThumbnail('../data/img.png');
     topicEditorPage.saveTopic('Added thumbnail.');
     browser.getCurrentUrl().then(function(url) {
       var topicId = url.split('/')[4].slice(0, -1);
+      general.closeCurrentTab(0);
       adminPage.editConfigProperty(
         'The set of topic IDs for each classroom page.',
         'List',

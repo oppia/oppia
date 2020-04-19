@@ -140,7 +140,7 @@ var TopicsAndSkillsDashboardPage = function() {
     });
   };
 
-  this.createTopic = function(title, abbreviatedName) {
+  this.createTopic = function(title, abbreviatedName, closeTopicEditor) {
     waitFor.elementToBeClickable(
       createTopicButton,
       'Create Topic button takes too long to be clickable');
@@ -149,7 +149,19 @@ var TopicsAndSkillsDashboardPage = function() {
     topicNameField.sendKeys(title);
     abbreviatedTopicNameField.sendKeys(abbreviatedName);
     confirmTopicCreationButton.click();
-    waitFor.pageToFullyLoad();
+
+    waitFor.waitForNewTab('Creating topic takes too long');
+    return browser.getAllWindowHandles().then(function(handles) {
+      var firstTabHandle = handles[0];
+      var secondTabHandle = handles[1];
+      return browser.switchTo().window(secondTabHandle).then(function() {
+        waitFor.pageToFullyLoad();
+        if (closeTopicEditor) {
+          browser.driver.close();
+          return browser.switchTo().window(firstTabHandle);
+        }
+      });
+    });
   };
 
   this.deleteTopicWithIndex = function(index) {
@@ -185,7 +197,7 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.createSkillWithDescriptionAndExplanation = function(
-      description, reviewMaterial) {
+      description, reviewMaterial, closeSkillEditor) {
     waitFor.elementToBeClickable(
       createSkillButton,
       'Create Skill button takes too long to be clickable');
@@ -214,7 +226,19 @@ var TopicsAndSkillsDashboardPage = function() {
       confirmSkillCreationButton,
       'Create skill button takes too long to be clickable');
     confirmSkillCreationButton.click();
-    waitFor.pageToFullyLoad();
+
+    waitFor.waitForNewTab('Creating skill takes too long');
+    return browser.getAllWindowHandles().then(function(handles) {
+      var firstTabHandle = handles[0];
+      var secondTabHandle = handles[1];
+      return browser.switchTo().window(secondTabHandle).then(function() {
+        waitFor.pageToFullyLoad();
+        if (closeSkillEditor) {
+          browser.driver.close();
+          return browser.switchTo().window(firstTabHandle);
+        }
+      });
+    });
   };
 
   this.navigateToUnusedSkillsTab = function() {
