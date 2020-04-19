@@ -248,7 +248,7 @@ SENDER_VALIDATORS = {
 }
 
 
-def _require_sender_id_is_valid(intent, sender_id):
+def require_sender_id_is_valid(intent, sender_id):
     """Ensure that the sender ID is valid, based on the email's intent.
 
     Many emails are only allowed to be sent by a certain user or type of user,
@@ -310,7 +310,7 @@ def _send_email(
     if sender_name is None:
         sender_name = EMAIL_SENDER_NAME.value
 
-    _require_sender_id_is_valid(intent, sender_id)
+    require_sender_id_is_valid(intent, sender_id)
 
     if recipient_email is None:
         recipient_email = user_services.get_email_from_user_id(recipient_id)
@@ -366,7 +366,7 @@ def _send_bulk_mail(
             email.
         instance_id: str. The ID of the BulkEmailModel entity instance.
     """
-    _require_sender_id_is_valid(intent, sender_id)
+    require_sender_id_is_valid(intent, sender_id)
 
     recipients_settings = user_services.get_users_settings(recipient_ids)
     recipient_emails = [user.email for user in recipients_settings]
