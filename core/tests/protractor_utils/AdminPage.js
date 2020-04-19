@@ -32,7 +32,7 @@ var AdminPage = function() {
   var updateFormName = element(by.css('.protractor-update-form-name'));
   var updateFormSubmit = element(by.css('.protractor-update-form-submit'));
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
-  var statusMessage = element(by.css('[ng-if="$ctrl.statusMessage"]'));
+  var statusMessage = element(by.css('.protractor-test-status-message'));
 
   var assignReviewerForm = element(by.css('.protractor-assign-reviewer-form'));
   var viewReviewerForm = element(by.css('.protractor-view-reviewer-form'));

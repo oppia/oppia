@@ -31,7 +31,11 @@ describe('Expression syntax tree service', () => {
     });
 
     it('should throw if environment is not found', () => {
-      expect(() => expressionSyntaxTreeService.lookupEnvs('', [])).toThrow();
+      expect(() => expressionSyntaxTreeService.lookupEnvs('test', [{}]))
+        .toThrowMatching(
+          // Jasmine has no built-in matcher for classes derived from Error.
+          e => e.toString() === 'ExprUndefinedVarError: test not found in [{}]'
+        );
     });
 
     it('should return the correct environment if exists', () => {

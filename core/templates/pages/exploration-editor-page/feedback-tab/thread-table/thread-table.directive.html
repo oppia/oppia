@@ -8,24 +8,24 @@
 </style>
 <table class="table">
   <thead>
-    <tr class="row" ng-if="getThreads().length > 0">
-      <th class="col-lg-2 col-md-2 col-sm-2">Status</th>
-      <th class="col-lg-5 col-md-5 col-sm-5">Subject</th>
-      <th class="col-lg-3 col-md-3 col-sm-3">Original author</th>
-      <th class="col-lg-2 col-md-2 col-sm-2">Last updated</th>
+    <tr ng-if="getThreads().length > 0">
+      <th>Status</th>
+      <th>Subject</th>
+      <th>Original author</th>
+      <th>Last updated</th>
     </tr>
   </thead>
-  <tr ng-repeat="thread in getThreads()|orderBy:'-lastUpdatedMsecs'" ng-click="onClickRow(thread.threadId)" class="oppia-feedback-tab-row protractor-test-oppia-feedback-tab-row row">
-    <td class="col-lg-2 col-md-2 col-sm-2">
+  <tr ng-repeat="thread in getThreads()|orderBy:'-lastUpdatedMsecs'" ng-click="onClickRow(thread.threadId)" class="oppia-feedback-tab-row protractor-test-oppia-feedback-tab-row">
+    <td width="15%">
       <span ng-class="getLabelClass(thread.status)"><[getHumanReadableStatus(thread.status)]></span>
     </td>
-    <td class="col-lg-5 col-md-5 col-sm-5">
+    <td width="45%">
       <div class="protractor-test-exploration-feedback-subject"><[thread.subject | truncate:40]></div>
     </td>
-    <td class="col-lg-3 col-md-3 col-sm-3">
+    <td width="20%">
       <span ng-if="thread.originalAuthorName"><[thread.originalAuthorName]></span>
     </td>
-    <td class="col-lg-2 col-md-2 col-sm-2">
+    <td width="20%">
       <span><[getLocaleAbbreviatedDatetimeString(thread.lastUpdatedMsecs)]></span>
     </td>
   </tr>
