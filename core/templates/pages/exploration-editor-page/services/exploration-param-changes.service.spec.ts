@@ -24,7 +24,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require('pages/exploration-editor-page/' +
   'services/exploration-param-changes.service.spec.ts');
 
-fdescribe('Exploration Param Changes Service', function() {
+describe('Exploration Param Changes Service', function() {
   var epcs = null;
 
   beforeEach(function() {
