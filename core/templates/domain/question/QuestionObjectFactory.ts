@@ -27,67 +27,70 @@ import { StateObjectFactory, State } from 'domain/state/StateObjectFactory';
 
 export interface IQuestionBackendDict {
   id: string;
-  'question_state_data': State;
-  'language_code': string;
+  // eslint-disable-next-line camelcase
+  question_state_data: State;
+  // eslint-disable-next-line camelcase
+  language_code: string;
   version: number;
-  'linked_skill_ids': string[];
+  // eslint-disable-next-line camelcase
+  linked_skill_ids: string[];
 }
 
 export class Question {
-  _id: string;
-  _stateData: State;
-  _languageCode: string;
-  _version: number;
-  _linkedSkillIds: string[];
+  id: string;
+  stateData: State;
+  languageCode: string;
+  version: number;
+  linkedSkillIds: string[];
 
   constructor(id: string, stateData: State, languageCode: string,
       version: number, linkedSkillIds: string[]) {
-    this._id = id;
-    this._stateData = stateData;
-    this._languageCode = languageCode;
-    this._version = version;
-    this._linkedSkillIds = linkedSkillIds;
+    this.id = id;
+    this.stateData = stateData;
+    this.languageCode = languageCode;
+    this.version = version;
+    this.linkedSkillIds = linkedSkillIds;
   }
 
   // Instance methods
 
   getId(): string {
-    return this._id;
+    return this.id;
   }
 
   getStateData(): State {
-    return this._stateData;
+    return this.stateData;
   }
 
   setStateData(newStateData: State): void {
-    this._stateData = cloneDeep(newStateData);
+    this.stateData = cloneDeep(newStateData);
   }
 
   getLanguageCode(): string {
-    return this._languageCode;
+    return this.languageCode;
   }
 
   setLanguageCode(languageCode: string): void {
-    this._languageCode = languageCode;
+    this.languageCode = languageCode;
   }
 
   getVersion(): number {
-    return this._version;
+    return this.version;
   }
 
   getLinkedSkillIds(): string[] {
-    return this._linkedSkillIds;
+    return this.linkedSkillIds;
   }
 
   setLinkedSkillIds(linkedSkillIds: string[]): void {
-    this._linkedSkillIds = linkedSkillIds;
+    this.linkedSkillIds = linkedSkillIds;
   }
 
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'units' is a list with varying element types. An exact
   // type needs to be found for it.
   validate(misconceptionsBySkill: any): string|boolean {
-    const interaction = this._stateData.interaction;
+    const interaction = this.stateData.interaction;
     if (interaction.id === null) {
       return 'An interaction must be specified';
     }
@@ -101,7 +104,7 @@ export class Question {
     ) {
       return 'A solution must be specified';
     }
-    const answerGroups = this._stateData.interaction.answerGroups;
+    const answerGroups = this.stateData.interaction.answerGroups;
     const taggedSkillMisconceptionIds = {};
     let atLeastOneAnswerCorrect = false;
     for (let i = 0; i < answerGroups.length; i++) {
@@ -149,14 +152,14 @@ export class Question {
   toBackendDict(isNewQuestion: boolean): IQuestionBackendDict {
     var questionBackendDict = {
       id: null,
-      question_state_data: this._stateData.toBackendDict(),
-      language_code: this._languageCode,
-      linked_skill_ids: this._linkedSkillIds,
+      question_state_data: this.stateData.toBackendDict(),
+      language_code: this.languageCode,
+      linked_skill_ids: this.linkedSkillIds,
       version: 1,
     };
     if (!isNewQuestion) {
-      questionBackendDict.id = this._id;
-      questionBackendDict.version = this._version;
+      questionBackendDict.id = this.id;
+      questionBackendDict.version = this.version;
     }
     return questionBackendDict;
   }
