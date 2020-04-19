@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
+import itertools
 import os
 import re
 import shutil
@@ -458,6 +459,61 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('')
         return summary_messages
 
+    def _check_js_and_ts_duplicate_functions(self):
+        """TODO"""
+        if self.verbose_mode_enabled:
+            python_utils.PRINT('Starting no duplicate functions check')
+            python_utils.PRINT('----------------------------------------')
+        files_to_check = self.all_filepaths
+        components_to_check = ['controller', 'directive', 'factory', 'filter']
+        failed = False
+
+        for filepath in files_to_check:
+            python_utils.PRINT('    filepath=%r' % filepath)
+            func_names_found = set()
+            func_names_reported = set()
+            parsed_expressions = self.parsed_expressions_in_files[filepath]
+            expressions = itertools.chain.from_iterable(
+                parsed_expressions[c] for c in components_to_check)
+            for expression in (e for e in expressions if e):
+                python_utils.PRINT('        expression=%r' % expression)
+                if expression.type == 'MethodDefinition':
+                    func_expr = expression.value
+                elif expression.type == 'FunctionExpression':
+                    func_expr = expression
+                else:
+                    continue
+                if not func_expr.id or not func_expr.id.name:
+                    continue
+                stripped_func_name = func_expr.id.name.lstrip('_')
+                if stripped_func_name not in func_names_found:
+                    func_names_found.add(stripped_func_name)
+                elif stripped_func_name not in func_names_reported:
+                    python_utils.PRINT(
+                        '%s has multiple definitions for the function: %s. '
+                        'Please combine them into one.' % (
+                            filepath, stripped_func_name))
+                    failed = True
+                    func_names_reported.add(stripped_func_name)
+
+        if failed:
+            summary_messages.append(
+                '%s  No duplicate functions check failed, fix files that '
+                'have duplicate functions mentioned above' % (
+                    _MESSAGE_TYPE_FAILED))
+        else:
+            summary_messages.append(
+                '%s  No duplicate functions check passed' % (
+                    _MESSAGE_TYPE_SUCCESS))
+
+        with linter_utils.redirect_stdout(stdout):
+            python_utils.PRINT('')
+            python_utils.PRINT(summary_messages[0])
+            if self.verbose_mode_enabled:
+                python_utils.PRINT('----------------------------------------')
+
+        return summary_messages
+
     def _check_sorted_dependencies(self):
         """This function checks that the dependencies which are
         imported in the controllers/directives/factories in JS
@@ -817,11 +873,14 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         sorted_dependencies_messages = self._check_sorted_dependencies()
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
+        duplicate_functions_messages = (
+            self._check_js_and_ts_duplicate_functions())
 
         all_messages = (
             extra_js_files_messages +
             js_and_ts_component_messages + directive_scope_messages +
-            sorted_dependencies_messages + controller_dependency_messages)
+            sorted_dependencies_messages + controller_dependency_messages +
+            duplicate_functions_messages)
         return all_messages
 
 
