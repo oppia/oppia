@@ -199,10 +199,8 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             # retrieve its value from the model_values. The migration_field
             # needs to be in the object format so that we are able to form
             # the model query easily (on one of the previous lines).
-            model_values = model.to_dict(include=[migration_field._name])  # pylint: disable=protected-access
-            model_values[migration_field._name] = new_user_id  # pylint: disable=protected-access
-            model.populate(**model_values)
-            model_class.put_multi([model], update_last_updated_time=False)
+            setattr(model, migration_field._name, new_user_id)  # pylint: disable=protected-access
+        model_class.put_multi(found_models, update_last_updated_time=False)
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
