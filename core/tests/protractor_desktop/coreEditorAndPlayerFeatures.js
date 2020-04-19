@@ -322,8 +322,7 @@ describe('Core exploration functionality', function() {
     general.moveToPlayer();
     explorationPlayerPage.expectExplorationToNotBeOver();
     explorationPlayerPage.expectInteractionToMatch(
-      'MultipleChoiceInput',
-      [forms.toRichText('option A'), forms.toRichText('option B')]);
+      'MultipleChoiceInput', ['option A', 'option B']);
     explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'option B');
     explorationPlayerPage.expectExplorationToBeOver();
   });
