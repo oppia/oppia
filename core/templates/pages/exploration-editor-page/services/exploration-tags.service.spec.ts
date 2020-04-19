@@ -24,7 +24,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require(
     'pages/exploration-editor-page/services/exploration-tags.service.ts');
 
-fdescribe('Exploration Tags Service', function() {
+describe('Exploration Tags Service', function() {
   let ets = null;
 
   beforeEach(function() {
@@ -47,7 +47,7 @@ fdescribe('Exploration Tags Service', function() {
     let Normalize = ['angularjs', 'google cloud storage', 'python'];
     let UpperCaseNotValid = ['Angularjs', 'google cloud storage', 'Python'];
     let NumberNotValid = ['angularjs', 'google cloud storage', 'Python123'];
-    let SpecialNotValid = ['@ngularjs', 'google cloud storage', 'Python123'];
+    let SpecialNotValid = ['@ngularjs', 'google cloud storage', 'Python'];
     expect(ets._normalize(NotNormalize)).toEqual(Normalize);
     expect(ets._isValid(Normalize)).toBe(true);
     expect(ets._isValid(UpperCaseNotValid)).toBe(false);
