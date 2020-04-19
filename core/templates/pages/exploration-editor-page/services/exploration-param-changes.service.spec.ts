@@ -22,7 +22,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/' +
-  'services/exploration-param-changes.service.spec.ts');
+  'services/exploration-param-changes.service.ts');
 
 describe('Exploration Param Changes Service', function() {
   var epcs = null;
