@@ -29,20 +29,36 @@ var AdminPage = function() {
     '.protractor-test-config-property'
   ));
   var adminRolesTab = element(by.css('.protractor-test-admin-roles-tab'));
+  var adminRolesTabContainer = element(
+    by.css('.protractor-test-roles-tab-container'));
   var updateFormName = element(by.css('.protractor-update-form-name'));
   var updateFormSubmit = element(by.css('.protractor-update-form-submit'));
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
   var statusMessage = element(by.css('.protractor-test-status-message'));
 
-  var assignReviewerForm = element(by.css('.protractor-assign-reviewer-form'));
-  var viewReviewerForm = element(by.css('.protractor-view-reviewer-form'));
+  var assignReviewerForm = element(
+    by.css('.protractor-test-assign-reviewer-form'));
+  var viewReviewerForm = element(by.css('.protractor-test-view-reviewer-form'));
   var removeReviewerForm = element(by.css('.protractor-remove-reviewer-form'));
-  var languageSelectCss = by.css('.protractor-form-language-select');
-  var reviewerUsernameCss = by.css('.protractor-form-reviewer-username');
+  var languageSelectCss = by.css('.protractor-test-form-language-select');
+  var reviewerUsernameCss = by.css('.protractor-test-form-reviewer-username');
   var reviewCategorySelectCss = by.css(
-    '.protractor-form-review-category-select');
+    '.protractor-test-form-review-category-select');
   var reviewerFormSubmitButtonCss = by.css(
-    '.protractor-reviewer-form-submit-button');
+    '.protractor-test-reviewer-form-submit-button');
+  var userReviewRightsTable = by.css(
+    '.protractor-test-user-review-rights-table');
+  var userTranslationReviewerLanguageCss = by.css(
+    '.protractor-test-translation-reviewer-language');
+  var userVoiceoverReviewerLanguageCss = by.css(
+    '.protractor-test-voiceover-reviewer-language');
+  var userQuestionReviewerCss = by.css('.protractor-test-question-reviewer');
+  var viewReviewerMethodInputCss = by.css(
+    '.protractor-test-view-reviewer-method');
+
+  var REVIEW_CATEGORY_TRANSLATION = 'TRANSLATION';
+  var REVIEW_CATEGORY_VOICEOVER = 'VOICEOVER';
+  var REVIEW_CATEGORY_QUESTION = 'QUESTION';
 
   // Viewing roles can be done by two methods: 1. By roles 2. By username
   var roleDropdown = element(by.css('.protractor-test-role-method'));
@@ -115,6 +131,17 @@ var AdminPage = function() {
       });
     };
   }
+
+  var _switchToRolesTab = function() {
+    waitFor.elementToBeClickable(
+      adminRolesTab, 'Admin Roles tab is not clickable');
+    adminRolesTab.click();
+    waitFor.pageToFullyLoad();
+
+    expect(adminRolesTab.getAttribute('class')).toMatch('active');
+    waitFor.visibilityOf(
+      adminRolesTabContainer, 'Roles tab page is not visible.');
+  };
 
   var saveConfigProperty = function(
       configProperty, propertyName, objectType, editingInstructions) {
@@ -219,9 +246,7 @@ var AdminPage = function() {
   };
 
   this.updateRole = function(name, newRole) {
-    waitFor.elementToBeClickable(
-      adminRolesTab, 'Admin Roles tab is not clickable');
-    adminRolesTab.click();
+    _switchToRolesTab();
 
     // Change values for "update role" form, and submit it.
     waitFor.visibilityOf(updateFormName, 'Update Form Name is not visible');
@@ -277,11 +302,10 @@ var AdminPage = function() {
         });
       });
   };
+
   var _assignReviewer = function(
       username, reviewCategory, languageDescription = null) {
-    waitFor.elementToBeClickable(
-      adminRolesTab, 'Admin Roles tab is not clickable');
-    adminRolesTab.click();
+    _switchToRolesTab();
 
     waitFor.visibilityOf(
       assignReviewerForm, 'Assign reviewer form is not visible');
@@ -320,16 +344,97 @@ var AdminPage = function() {
       statusMessage, 'Successfully added',
       'Could not add translation reviewer successfully');
   };
-  this.assignTranslationReviewer = function(languageDescription, username) {
-    _assignReviewer(username, 'TRANSLATION', languageDescription);
+
+  var _getUserReviewRights = function(username) {
+    _switchToRolesTab();
+
+    waitFor.visibilityOf(
+      viewReviewerForm, 'View reviewer form is not visible');
+
+    var viewMethodInput = viewReviewerForm.element(viewReviewerMethodInputCss);
+    waitFor.visibilityOf(
+      viewMethodInput, 'View method dropdown taking too long to be visible');
+    viewMethodInput.sendKeys('By Username');
+
+    var usernameInputField = viewReviewerForm.element(reviewerUsernameCss);
+
+    waitFor.visibilityOf(
+      usernameInputField,
+      'Username input field is not visible in view reviewer form');
+    usernameInputField.click();
+    usernameInputField.sendKeys(username);
+
+    var submitButton = viewReviewerForm.element(reviewerFormSubmitButtonCss);
+    waitFor.elementToBeClickable(
+      submitButton, 'View role button is not clickable');
+    submitButton.click();
+
+    waitFor.textToBePresentInElement(
+      statusMessage, 'Success',
+      'Could not view reviewer rights successfully');
+
+    var reviewRightsTable = viewReviewerForm.element(userReviewRightsTable);
+
+    var translationReviewRightsLanguages = element.all(
+      userTranslationReviewerLanguageCss);
+
+    var voiceoverReviewRightsLanguages = element.all(
+      userVoiceoverReviewerLanguageCss);
+
+    var questionRevieweRights = element(userQuestionReviewerCss).getText();
+
+    var reviewRights = {
+      [REVIEW_CATEGORY_TRANSLATION]: [],
+      [REVIEW_CATEGORY_VOICEOVER]: [],
+      [REVIEW_CATEGORY_QUESTION]: false
+    };
+
+    if (questionRevieweRights === 'Allowed') {
+      reviewRights[REVIEW_CATEGORY_QUESTION] = true;
+    }
+
+    reviewRights[REVIEW_CATEGORY_TRANSLATION] = (
+      translationReviewRightsLanguages.map(function(languageElement) {
+        return languageElement.getText();
+      }));
+
+    reviewRights[REVIEW_CATEGORY_VOICEOVER] = (
+      voiceoverReviewRightsLanguages.map(function(languageElement) {
+        return languageElement.getText();
+      }));
+
+    return reviewRights;
   };
 
-  this.assignVoiceoverReviewer = function(languageDescription, username) {
-    _assignReviewer(username, 'VOICEOVER', languageDescription);
+  this.assignTranslationReviewer = function(username, languageDescription) {
+    _assignReviewer(username, REVIEW_CATEGORY_TRANSLATION, languageDescription);
+  };
+
+  this.assignVoiceoverReviewer = function(username, languageDescription) {
+    _assignReviewer(username, REVIEW_CATEGORY_VOICEOVER, languageDescription);
   };
 
   this.assignQuestionReviewer = function(username) {
-    _assignReviewer(username, 'QUESTION');
+    _assignReviewer(username, REVIEW_CATEGORY_QUESTION);
+  };
+
+  this.expectUserToBeTranslationReviewer = function(
+      username, languageDescription) {
+    var reviewRights = _getUserReviewRights(username);
+    expect(reviewRights[REVIEW_CATEGORY_TRANSLATION]).toContain(
+      languageDescription);
+  };
+
+  this.expectUserToBeVoiceoverReviewer = function(
+      username, languageDescription) {
+    var reviewRights = _getUserReviewRights(username);
+    expect(reviewRights[REVIEW_CATEGORY_VOICEOVER]).toContain(
+      languageDescription);
+  };
+
+  this.expectUserToBeQuestionReviewer = function(username) {
+    var reviewRights = _getUserReviewRights(username);
+    expect(reviewRights[REVIEW_CATEGORY_QUESTION]).toBeTrue();
   };
 };
 

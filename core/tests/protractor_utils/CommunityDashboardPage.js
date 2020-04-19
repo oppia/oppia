@@ -36,22 +36,12 @@ var CommunityDashboardPage = function() {
       .CommunityDashboardTranslateTextTab();
   };
 
-  this.expectUserToBeTranslationReviewer = function(language) {
-    waitFor.visibilityOf(
-      reviewRightsDiv, 'User does not have rights to review translation');
-
-    var translationReviewRightsElement = element(by.css(
-      '.protractor-test-translation-' + language + '-reviewer'));
-    waitFor.visibilityOf(
-      translationReviewRightsElement,
-      'User does not have rights to review translation in language: ' + language
-    );
-  };
-
-  var _expecteUserToBeReviewer = function(
+  var _expectUserToBeReviewer = function(
       reviewCategory, langaugeDescription = null) {
     waitFor.visibilityOf(
-      reviewRightsDiv, 'User does not have rights to review translation');
+      reviewRightsDiv,
+      'Review rights div is not visible, so user does not have rights to ' +
+      'review ' + reviewCategory);
 
     var reviewRightsElementClassName = ('.protractor-test-' + reviewCategory);
     if (langaugeDescription !== null) {
@@ -62,19 +52,19 @@ var CommunityDashboardPage = function() {
     var reviewRightsElement = element(by.css(reviewRightsElementClassName));
     waitFor.visibilityOf(
       reviewRightsElement,
-      'User does not have rights to review ' + reviewCategory);
+      'Review right element ' + reviewCategory + ' is not visible');
   };
 
   this.expectUserToBeTranslationReviewer = function(langaugeDescription) {
-    _expecteUserToBeReviewer('translation', langaugeDescription);
+    _expectUserToBeReviewer('translation', langaugeDescription);
   };
 
   this.expectUserToBeVoiceoverReviewer = function(langaugeDescription) {
-    _expecteUserToBeReviewer('voiceover', langaugeDescription);
+    _expectUserToBeReviewer('voiceover', langaugeDescription);
   };
 
   this.expectUserToBeQuestionReviewer = function() {
-    _expecteUserToBeReviewer('question');
+    _expectUserToBeReviewer('question');
   };
 
   this.navigateToTranslateTextTab = function() {

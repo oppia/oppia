@@ -37,8 +37,9 @@ describe('Community dashboard page', function() {
   it('should allow user to switch to translate text tab', function() {
     communityDashboardPage.get();
     communityDashboardPage.navigateToTranslateTextTab();
-    communityDashboardTranslateTextTab.changeLanguage('Hindi');
-    communityDashboardTranslateTextTab.expectSelectedLanguageToBe('Hindi');
+    communityDashboardTranslateTextTab.changeLanguage(HINDI_LANGUAGE);
+    communityDashboardTranslateTextTab.expectSelectedLanguageToBe(
+      HINDI_LANGUAGE);
   });
 
   afterEach(function() {
@@ -47,53 +48,68 @@ describe('Community dashboard page', function() {
 });
 
 describe('Admin page community reviewer form', function() {
+  var HINDI_LANGUAGE = 'Hindi';
   var adminPage = null;
   var communityDashboardPage = null;
+  var translationReviewerUsername = 'translator';
+  var translationReviewerEmail = 'translator@community.com';
+  var voiceoverReviewerUsername = 'voiceartist';
+  var voiceoverReviewerEmail = 'voiceartist@community.com';
+  var questionReviewerUsername = 'questionreviewer';
+  var questionReviewerEmail = 'questionreviewer@community.com';
+  var superAdminEmail = 'management@adminTab.com';
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     communityDashboardPage = (
       new CommunityDashboardPage.CommunityDashboardPage());
-    users.createUser('translator@community.com', 'translator');
-    users.createUser('voiceartist@community.com', 'voiceartist');
-    users.createUser('questionreviewer@community.com', 'questionreviewer');
-    users.createAdmin('management@adminTab.com', 'management');
+    users.createUser(translationReviewerEmail, translationReviewerUsername);
+    users.createUser(voiceoverReviewerEmail, voiceoverReviewerUsername);
+    users.createUser(questionReviewerEmail, questionReviewerUsername);
+    users.createUser(superAdminEmail, 'management');
   });
 
   beforeEach(function() {
-    users.login('management@adminTab.com', true);
+    users.login(superAdminEmail, true);
   });
 
   it('should allow admin to add translation reviewer', function() {
     adminPage.get();
-    adminPage.assignTranslationReviewer('Hindi', 'translator');
+    adminPage.assignTranslationReviewer(
+      translationReviewerUsername, HINDI_LANGUAGE);
+    adminPage.expectUserToBeTranslationReviewer(
+      translationReviewerUsername, HINDI_LANGUAGE);
     users.logout();
 
-    users.login('translator@community.com');
+    users.login(translationReviewerEmail);
     communityDashboardPage.get();
-    communityDashboardPage.expectUserToBeTranslationReviewer('Hindi');
+    communityDashboardPage.expectUserToBeTranslationReviewer(HINDI_LANGUAGE);
     users.logout();
   });
 
   it('should allow admin to add voiceover reviewer', function() {
     adminPage.get();
-    adminPage.assignVoiceoverReviewer('Hindi', 'voiceartist');
+    adminPage.assignVoiceoverReviewer(
+      voiceoverReviewerUsername, HINDI_LANGUAGE);
+    adminPage.expectUserToBeVoiceoverReviewer(
+      voiceoverReviewerUsername, HINDI_LANGUAGE);
     users.logout();
 
-    users.login('voiceartist@community.com');
+    users.login(voiceoverReviewerEmail);
     communityDashboardPage.get();
-    communityDashboardPage.expectUserToBeVoiceoverReviewer('Hindi');
+    communityDashboardPage.expectUserToBeVoiceoverReviewer(HINDI_LANGUAGE);
     users.logout();
   });
 
   it('should allow admin to add question reviewer', function() {
     adminPage.get();
-    adminPage.assignQuestionReviewer('questionreviewer');
+    adminPage.assignQuestionReviewer(questionReviewerUsername);
+    adminPage.expectUserToBeQuestionReviewer(questionReviewerUsername);
     users.logout();
 
-    users.login('questionreviewer@community.com');
+    users.login(questionReviewerEmail);
     communityDashboardPage.get();
-    communityDashboardPage.expectUserToBeQuestionReviewer('Hindi');
+    communityDashboardPage.expectUserToBeQuestionReviewer();
     users.logout();
   });
 
