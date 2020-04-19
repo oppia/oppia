@@ -302,6 +302,10 @@ angular.module('oppia').directive('storyNodeEditor', [
               _recalculateAvailableNodes();
               $rootScope.$broadcast(
                 'storyGraphUpdated', $scope.story.getStoryContents());
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 

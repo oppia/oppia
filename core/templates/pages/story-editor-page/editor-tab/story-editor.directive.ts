@@ -134,10 +134,14 @@ angular.module('oppia').directive('storyEditor', [
               ]
             });
 
-            modalInstance.result.then(function(title) {
+            modalInstance.result.then(function() {
               StoryUpdateService.deleteStoryNode($scope.story, nodeId);
               _initEditor();
               $scope.$broadcast('recalculateAvailableNodes');
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
