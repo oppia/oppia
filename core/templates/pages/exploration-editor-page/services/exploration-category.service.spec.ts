@@ -30,7 +30,7 @@ describe('Exploration Category Service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module(function($provide) {
-      var ugs = new UpgradedServices();
+      let ugs = new UpgradedServices();
       for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
         $provide.value(key, value);
       }
