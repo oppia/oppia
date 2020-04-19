@@ -23,7 +23,6 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
-var waitFor = require('../protractor_utils/waitFor.js');
 
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
@@ -110,7 +109,6 @@ describe('Enable correctness feedback and set correctness', function() {
     // Go back to mark the solution as correct.
     explorationEditorPage.navigateToMainTab();
     explorationEditorMainTab.moveToState('First');
-    waitFor.visibilityOf(element(by.css('.protractor-test-response-tab')));
     responseEditor = explorationEditorMainTab.getResponseEditor(0);
     responseEditor.markAsCorrect();
     explorationEditorMainTab.expectTickMarkIsDisplayed();
