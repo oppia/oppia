@@ -42,6 +42,6 @@ fdescribe('Exploration Param Changes Service', function() {
   });
 
   it('should test the child object properties', function() {
-    expect(epcs.propertyName).toBe('param_changes')
+    expect(epcs.propertyName).toBe('param_changes');
   });
 });
