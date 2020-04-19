@@ -23,9 +23,11 @@ require('services/alerts.service.ts');
 angular.module('oppia').factory('TopicCreationService', [
   '$rootScope', '$uibModal', '$window', 'AlertsService',
   'TopicCreationBackendApiService', 'UrlInterpolationService',
+  'MAX_CHARS_IN_TOPIC_NAME',
   function(
       $rootScope, $uibModal, $window, AlertsService,
-      TopicCreationBackendApiService, UrlInterpolationService) {
+      TopicCreationBackendApiService, UrlInterpolationService,
+      MAX_CHARS_IN_TOPIC_NAME) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
     var topicCreationInProgress = false;
 
@@ -44,6 +46,10 @@ angular.module('oppia').factory('TopicCreationService', [
             function($scope, $uibModalInstance) {
               $scope.topicName = '';
               $scope.abbreviatedTopicName = '';
+              $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
+              // No need for a length check below since the topic name input
+              // field in the HTML file has the maxlength attribute which
+              // disallows the user from entering more than the valid length.
               $scope.isTopicNameValid = function() {
                 return $scope.topicName !== '';
               };

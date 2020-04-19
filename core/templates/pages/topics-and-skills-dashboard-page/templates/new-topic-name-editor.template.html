@@ -8,10 +8,10 @@
     <div class="form-group row" ng-class="{'has-error': !isTopicNameValid()}">
       <label class="col-sm-6 col-form-label">Enter a name for the topic: &nbsp;</label>
       <div class="col-sm-6 topic-name-field">
-        <input class="form-control protractor-test-new-topic-name-field" ng-model="topicName" maxlength="39" autofocus>
+        <input class="form-control protractor-test-new-topic-name-field" ng-model="topicName" maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>" autofocus>
         <span class="oppia-input-box-subtitle">
           <i>
-            Topic name should be atmost 39 characters.
+            Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
           </i>
         </span>
       </div>

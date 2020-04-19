@@ -46,14 +46,15 @@ angular.module('oppia').directive('storyNodeEditor', [
         'ExplorationIdValidationService', 'StoryUpdateService',
         'UndoRedoService', 'EVENT_STORY_INITIALIZED',
         'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_STORY_NODE_EDITOR',
-        'AlertsService',
+        'AlertsService', 'MAX_CHARS_IN_CHAPTER_TITLE',
         function(
             $scope, $rootScope, $uibModal, StoryEditorStateService,
             ExplorationIdValidationService, StoryUpdateService,
             UndoRedoService, EVENT_STORY_INITIALIZED,
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
-            AlertsService) {
+            AlertsService, MAX_CHARS_IN_CHAPTER_TITLE) {
           var ctrl = this;
+          $scope.MAX_CHARS_IN_CHAPTER_TITLE = MAX_CHARS_IN_CHAPTER_TITLE;
           var _recalculateAvailableNodes = function() {
             $scope.newNodeId = null;
             $scope.availableNodes = [];

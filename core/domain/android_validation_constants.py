@@ -32,6 +32,8 @@ SUPPORTED_LANGUAGES = ['en']
 INVALID_RTE_COMPONENTS = [
     'collapsible', 'math', 'skillreview', 'tabs', 'video']
 
+# If any of the following values are changed, edit the corresponding value in
+# app.constants.ts as well.
 MAX_CHARS_IN_TOPIC_NAME = 39
 MAX_CHARS_IN_ABBREV_TOPIC_NAME = 12
 MAX_CHARS_IN_TOPIC_DESCRIPTION = 240

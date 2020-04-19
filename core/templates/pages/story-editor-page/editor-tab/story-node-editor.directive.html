@@ -3,10 +3,10 @@
     <label for="storyNodeTitle" class="form-heading">Chapter Title</label>
     <input id="storyNodeTitle" type="text" class="form-control"
            ng-model="editableTitle" ng-blur="updateTitle(editableTitle)"
-           placeholder="Enter a title for the chapter." maxlength="36" ng-trim="false">
+           placeholder="Enter a title for the chapter." maxlength="<[MAX_CHARS_IN_CHAPTER_TITLE]>" ng-trim="false">
     <span class="oppia-input-box-subtitle">
       <i>
-        Chapter title should be atmost 36 characters.
+        Chapter title should be at most <[MAX_CHARS_IN_CHAPTER_TITLE]> characters.
       </i>
     </span>
   </div>
