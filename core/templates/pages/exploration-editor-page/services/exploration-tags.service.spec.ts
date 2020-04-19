@@ -43,7 +43,7 @@ describe('Exploration Tags Service', function() {
 
   it('should test the child object properties', function() {
     expect(ets.propertyName).toBe('tags');
-    let NotNormalize = ['angularjs  ', '  google   cloud  storage   ', '  python'];
+    let NotNormalize = ['angularjs ', ' google  cloud  storage   ', ' python'];
     let Normalize = ['angularjs', 'google cloud storage', 'python'];
     let UpperCaseNotValid = ['Angularjs', 'google cloud storage', 'Python'];
     let NumberNotValid = ['angularjs', 'google cloud storage', 'Python123'];
