@@ -854,7 +854,7 @@ class GetInteractionsByExplorationId(base.BaseHandler):
     """This function returns a list of interaction id's for a exploration id."""
 
     @acl_decorators.can_access_admin_page
-    def post(self):
+    def get(self):
         exploartion_id = self.request.get('exploration_id')
         exploration = exp_fetchers.get_exploration_by_id(exploartion_id)
         self.render_json({'title': exploration.title})

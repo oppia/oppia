@@ -158,7 +158,11 @@ angular.module('oppia').directive('adminMiscTab', [
         };
 
         ctrl.getExplorationInteractions = function() {
-          $http.post(GET_INTERACTIONS_BY_ID_HANDLER_URL)
+          $http.get(GET_INTERACTIONS_BY_ID_HANDLER_URL, {
+            params: {
+              exploration_id: ctrl.explorationId
+            }
+          })
             .then(function(response) {
               ctrl.setStatusMessage('Success! ' + response.data.title);
             }, function(errorResponse) {
