@@ -65,9 +65,9 @@ angular.module('oppia').directive('collectionNodeCreator', [
               ctrl.searchQueryHasError = false;
               return SearchExplorationsBackendApiService.fetchExplorations(
                 searchQuery
-              ).then(function(explorationMetadataBackendDict) {
+              ).then(function(explorationMetadata) {
                 var options = [];
-                explorationMetadataBackendDict.collection_node_metadata_list.
+                explorationMetadata.getMetadataList().
                   map(function(item) {
                     if (!ctrl.collection.containsCollectionNode(item.id)) {
                       options.push(item.title + ' (' + item.id + ')');
