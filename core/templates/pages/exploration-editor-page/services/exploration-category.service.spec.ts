@@ -25,7 +25,7 @@ require('pages/exploration-editor-page/' +
   'services/exploration-category.service.ts');
 
 describe('Exploration Category Service', function() {
-  var ecs = null;
+  let ecs = null;
 
   beforeEach(function() {
     angular.mock.module('oppia');
@@ -44,8 +44,8 @@ describe('Exploration Category Service', function() {
   it('should test the child object properties', function() {
     expect(ecs.propertyName).toBe('category');
     expect(ecs._isValid('Algorithms')).toBe(true);
-    var NotNormalize = '   Exploration             Category Service     ';
-    var Normalize = 'Exploration Category Service';
+    let NotNormalize = '   Exploration             Category Service     ';
+    let Normalize = 'Exploration Category Service';
     expect(ecs._normalize(NotNormalize)).toBe(Normalize);
   });
 });
