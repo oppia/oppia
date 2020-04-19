@@ -125,6 +125,8 @@ import { InteractionObjectFactory } from
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
+import { LearnerAnswerDetailsBackendApiService } from
+  'domain/statistics/learner-answer-details-backend-api.service';
 import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerAnswerInfoObjectFactory } from
@@ -170,6 +172,8 @@ import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
+import { PlaythroughIssuesBackendApiService } from
+  'services/playthrough-issues-backend-api.service';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { PredictionResultObjectFactory } from
@@ -294,9 +298,6 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { PlaythroughIssuesBackendApiService } from
-  'services/playthrough-issues-backend-api.service';
-import { from } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -616,6 +617,10 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
+    upgradedServices['LearnerAnswerDetailsBackendApiService'] =
+        new LearnerAnswerDetailsBackendApiService(
+          upgradedServices['HttpClient'],
+          upgradedServices['UrlInterpolationService']);
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
       upgradedServices['ContextService'],
       upgradedServices['PlayerTranscriptService']);
