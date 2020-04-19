@@ -15,65 +15,48 @@
 /**
  * @fileoverview Unit tests for LearnerAnswerDetailsBackendApiService
  */
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { LearnerAnswerDetailsBackendApiService } from
+  'domain/statistics/learner-answer-details-backend-api.service.ts';
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/statistics/learner-answer-details-backend-api.service.ts');
-require('services/csrf-token.service.ts');
+describe('Learner answer info backend Api service', () => {
+  let httpTestingController: HttpTestingController;
+  let learnerAnswerDetailsBackendApiService:
+    LearnerAnswerDetailsBackendApiService;
 
-describe('Learner answer info backend Api service', function() {
-  var LearnerAnswerDetailsBackendApiService = null;
-  var $rootScope = null;
-  var $httpBackend = null;
-  var CsrfService = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector, $q) {
-    LearnerAnswerDetailsBackendApiService = $injector.get(
-      'LearnerAnswerDetailsBackendApiService');
-    $rootScope = $injector.get('$rootScope');
-    $httpBackend = $injector.get('$httpBackend');
-    CsrfService = $injector.get('CsrfTokenService');
-
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
     });
-  }));
+    httpTestingController = TestBed.get(HttpTestingController);
+    learnerAnswerDetailsBackendApiService = TestBed.get(
+      LearnerAnswerDetailsBackendApiService);
+  });
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should successfully record the learner answer details',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect(
-        'PUT',
-        '/learneranswerdetailshandler/exploration/exp123').respond(
-        200);
-      LearnerAnswerDetailsBackendApiService.recordLearnerAnswerDetails(
+      learnerAnswerDetailsBackendApiService.recordLearnerAnswerDetails(
         'exp123', 'Introduction', 'TextInput', 'sample answer',
         'sample answer details').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+
+      let req = httpTestingController.expectOne(
+        '/learneranswerdetailshandler/exploration/exp123');
+      expect(req.request.method).toEqual('PUT');
+      req.flush(200);
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-    });
+    }));
 });
