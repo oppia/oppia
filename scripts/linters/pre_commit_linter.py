@@ -238,7 +238,7 @@ def _get_linters_for_file_extension(
     elif file_extension_to_lint == 'html':
         custom_linter, third_party_linter = html_linter.get_linters(
             _FILES['.html'], FILE_CACHE,
-             verbose_mode_enabled=verbose_mode_enabled)
+            verbose_mode_enabled=verbose_mode_enabled)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
