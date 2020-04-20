@@ -29,7 +29,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
         uiConfig: '&'
       },
       template: '<div><div></div>' +
-                '<div contenteditable="true" class="oppia-rte">' +
+                '<div contenteditable="true" class="oppia-rte-resizer oppia-rte">' +
                 '</div></div>',
       require: '?ngModel',
 
@@ -48,6 +48,25 @@ angular.module('oppia').directive('ckEditor4Rte', [
             icons.push(componentDefn.iconDataUrl);
           }
         });
+
+        // Resize editor textbox to prevent responses from overflowing
+        var editable = document.getElementsByClassName('oppia-rte-resizer');
+        function resize() {
+          var modal_width = parseInt($('.modal-header').width()) - 15;
+          modal_width = modal_width.toString();
+
+          $('.oppia-rte-resizer').css({
+            'width': (modal_width + 'px')
+           });
+        }
+        for (var i in editable) {
+          editable[i].onchange = function() {
+            resize();
+          };
+          editable[i].onclick = function() {
+            resize();
+          };
+        }
 
         /**
          * Create rules to whitelist all the rich text components and
@@ -194,6 +213,8 @@ angular.module('oppia').directive('ckEditor4Rte', [
             .css('height', '24px')
             .css('width', '24px');
           ck.setData(wrapComponents(ngModel.$viewValue));
+
+
         });
 
         // Angular rendering of components confuses CKEditor's undo system, so
