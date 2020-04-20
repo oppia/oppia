@@ -21,6 +21,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
+import cloneDeep from 'lodash/cloneDeep';
+
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { SkillDomainConstants } from
@@ -40,15 +42,15 @@ export class ConceptCardBackendApiService {
   ) { }
 
   _fetchConceptCards(skillIds: Array<string>,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+    successCallback: (value?: Object | PromiseLike<Object>) => void,
+    errorCallback: (reason?: any) => void): void {
     let conceptCardDataUrl = this.urlInterpolationService.interpolateUrl(
       SkillDomainConstants.CONCEPT_CARD_DATA_URL_TEMPLATE, {
-        comma_separated_skill_ids: skillIds.join(',')
-      });
+      comma_separated_skill_ids: skillIds.join(',')
+    });
 
     this.http.get(conceptCardDataUrl).toPromise().then((response: any) => {
-      let conceptCards = angular.copy(response.data.concept_card_dicts);
+      let conceptCards = cloneDeep(response.data.concept_card_dicts);
 
       if (successCallback) {
         successCallback(conceptCards);
@@ -88,21 +90,21 @@ export class ConceptCardBackendApiService {
                 conceptCards.push(
                   uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
                 // Save the fetched conceptCards to avoid future fetches.
-                _conceptCardCache[skillId] = angular.copy(
+                _conceptCardCache[skillId] = cloneDeep(
                   uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
               } else {
                 conceptCards.push(
-                  angular.copy(_conceptCardCache[skillId]));
+                  cloneDeep(_conceptCardCache[skillId]));
               }
             });
             if (resolve) {
-              resolve(angular.copy(conceptCards));
+              resolve(cloneDeep(conceptCards));
             }
           }, reject);
       } else {
         // Case where all of the concept cards are cached locally.
         skillIds.forEach(function(skillId) {
-          conceptCards.push(angular.copy(_conceptCardCache[skillId]));
+          conceptCards.push(cloneDeep(_conceptCardCache[skillId]));
         });
         if (resolve) {
           resolve(conceptCards);
