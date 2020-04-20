@@ -32,7 +32,7 @@ import { SkillDomainConstants } from
 
 export class ConceptCardBackendApiService {
   // Maps previously loaded concept cards to their IDs.
-  _conceptCardCache: Array<any> = [];
+  _conceptCardCache: Object = {};
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
