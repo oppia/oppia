@@ -88,11 +88,11 @@ export class ConceptCardBackendApiService {
                 conceptCards.push(
                   uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
                 // Save the fetched conceptCards to avoid future fetches.
-                this._conceptCardCache[skillId] = angular.copy(
+                _conceptCardCache[skillId] = angular.copy(
                   uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
               } else {
                 conceptCards.push(
-                  angular.copy(this._conceptCardCache[skillId]));
+                  angular.copy(_conceptCardCache[skillId]));
               }
             });
             if (resolve) {
@@ -102,7 +102,7 @@ export class ConceptCardBackendApiService {
       } else {
         // Case where all of the concept cards are cached locally.
         skillIds.forEach(function(skillId) {
-          conceptCards.push(angular.copy(this._conceptCardCache[skillId]));
+          conceptCards.push(angular.copy(_conceptCardCache[skillId]));
         });
         if (resolve) {
           resolve(conceptCards);
