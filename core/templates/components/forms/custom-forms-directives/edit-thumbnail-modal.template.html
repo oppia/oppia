@@ -5,21 +5,31 @@
 <div class="modal-body" style="min-height: 300px;">
   <div class="oppia-thumbnail-uploader">
     <div ng-hide="uploadedImage">
+      <strong>Please upload an SVG image.</strong>
+      <div class="alert alert-warning">
+        <span>Here are some guidelines to follow:</span>
+        <ul>
+          <li>Uploaded image should have an aspect ratio of 4:3 or 16:9.</li>
+          <li>Uploaded image should have a transparent background.</li>
+        </ul>
+      </div>
       <image-uploader on-file-changed="onFileChanged">
       </image-uploader>
     </div>
-
     <div class="oppia-form-error" ng-if="invalidImageWarningIsShown" style="margin-top: 15px;">
       Please upload a valid SVG image.
     </div>
-    <div class="oppia-form-error" ng-if="invalidAspectRatioWarningIsShown" style="margin-top: 15px;">
-      Invalid aspect ratio. Please upload an SVG image that is of 16:9 width-height aspect ratio.
+    <div class="oppia-form-error" ng-if="invalidTagsAndAttributes.tags.length" style="margin-top: 15px;">
+      Unsupported SVG tags found: <[invalidTagsAndAttributes.tags]>
+    </div>
+    <div class="oppia-form-error" ng-if="invalidTagsAndAttributes.attrs.length" style="margin-top: 15px;">
+      Unsupported SVG attributes found: <[invalidTagsAndAttributes.attrs]>
     </div>
     <div ng-show="uploadedImage">
-      <div ng-if="allowedColors">
+      <div ng-if="allowedBgColors">
         <div>Choose background color:</div>
         <div class="oppia-thumbnail-colour-select">
-          <div ng-repeat="color in allowedColors"
+          <div ng-repeat="color in allowedBgColors"
                ng-style="{background: color}"
                ng-click="updateBackgroundColor(color)">
           </div>

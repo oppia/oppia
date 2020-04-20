@@ -497,7 +497,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict({
                 'id': 'node_1',
                 'thumbnail_filename': None,
-                'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+                'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                     'chapter'][0],
                 'title': 'Title 1',
                 'destination_node_ids': [self.NODE_ID_2],
@@ -556,7 +556,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'thumbnail_filename': 'image1.png',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 1',
             'destination_node_ids': ['node_3'],
@@ -569,7 +569,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'thumbnail_filename': 'image2.png',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 2',
             'destination_node_ids': ['node_1'],
@@ -582,7 +582,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_3 = {
             'id': 'node_3',
             'thumbnail_filename': 'image3.png',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 3',
             'destination_node_ids': [],
@@ -614,7 +614,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 1',
             'destination_node_ids': ['node_3'],
@@ -627,7 +627,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 2',
             'destination_node_ids': ['node_1'],
@@ -640,7 +640,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_3 = {
             'id': 'node_3',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 3',
             'destination_node_ids': [],
@@ -669,7 +669,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 1',
             'destination_node_ids': ['node_3'],
@@ -695,7 +695,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 1',
             'destination_node_ids': ['node_3'],
@@ -721,7 +721,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 1',
             'destination_node_ids': ['node_2', 'node_3'],
@@ -734,7 +734,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 2',
             'destination_node_ids': [],
@@ -747,7 +747,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_3 = {
             'id': 'node_3',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 3',
             'destination_node_ids': [],
@@ -771,7 +771,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 1',
             'destination_node_ids': ['node_2'],
@@ -784,7 +784,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 2',
             'destination_node_ids': ['node_3'],
@@ -797,7 +797,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_3 = {
             'id': 'node_3',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 3',
             'destination_node_ids': ['node_2'],
@@ -818,7 +818,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 1',
             'destination_node_ids': ['node_2'],
@@ -831,7 +831,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 2',
             'destination_node_ids': [],
@@ -844,7 +844,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_3 = {
             'id': 'node_3',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 3',
             'destination_node_ids': [],
@@ -866,7 +866,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 1',
             'destination_node_ids': ['node_2'],
@@ -879,7 +879,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 2',
             'destination_node_ids': [],
@@ -892,7 +892,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_3 = {
             'id': 'node_2',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 2',
             'destination_node_ids': [],
@@ -953,7 +953,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 1',
             'destination_node_ids': ['node_2'],
@@ -966,7 +966,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 2',
             'destination_node_ids': ['node_4', 'node_3'],
@@ -979,7 +979,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_3 = {
             'id': 'node_3',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 3',
             'destination_node_ids': [],
@@ -992,7 +992,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_4 = {
             'id': 'node_4',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 4',
             'destination_node_ids': [],
@@ -1016,7 +1016,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         """
         story_node = story_domain.StoryNode(
             self.NODE_ID_1, 'Title', None,
-            constants.NEW_STRUCTURE_TO_COLORS['chapter'][0],
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
             [self.NODE_ID_2], [self.SKILL_ID_1], [self.SKILL_ID_2],
             'Outline', False, self.EXP_ID)
         story_contents = story_domain.StoryContents(

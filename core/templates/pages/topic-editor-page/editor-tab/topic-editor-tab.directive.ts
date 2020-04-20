@@ -60,7 +60,7 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.editableName = $scope.topic.getName();
             $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
             $scope.editableDescription = $scope.topic.getDescription();
-            $scope.allowedColors = ['#C6DCDA'];
+            $scope.allowedBgColors = ['#C6DCDA'];
 
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');

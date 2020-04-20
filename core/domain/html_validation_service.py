@@ -23,10 +23,12 @@ import json
 import logging
 
 import bs4
+from constants import constants
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import rte_component_registry
 from core.platform import models
+from xml.etree import ElementTree as ET
 import feconf
 import python_utils
 
@@ -877,15 +879,39 @@ def get_filename_with_dimensions(old_filename, exp_id):
     return new_filename
 
 
-def get_invalid_svg_tags(svg_string):
-    """Returns a set of all invalid tags for the provided SVG.
+def get_invalid_svg_tags_and_attrs(svg_string):
+    """Returns a set of all invalid tags and attributes for the provided SVG.
 
     Args:
         svg_string: str. The SVG string.
 
     Returns:
-        set. A set of invalid tags.
+        tuple. A 2-tuple, the first element of which is a list of invalid tags,
+        and the second element of which is a list of invalid attributes.
     """
     soup = bs4.BeautifulSoup(svg_string.encode('utf-8'), 'html.parser')
-    return set([tag.name for tag in soup.find_all()]).difference(
-        feconf.ALLOWED_SVG_TAGS)
+    invalid_elements = []
+    invalid_attrs = []
+    for element in soup.find_all():
+        if element.name.lower() in constants.ALLOWED_SVG_TAGS:
+            for attr in element.attrs:
+                if attr.lower() not in constants.ALLOWED_SVG_ATTRS:
+                    invalid_attrs.append(attr)
+        else:
+            invalid_elements.append(element.name)
+    return (invalid_elements, invalid_attrs)
+
+def is_xml_parsable(xml_string):
+    """Checks if input string is parsable as XML.
+
+    Args:
+        xml_string: str. The XML string.
+
+    Returns:
+        bool. Whether xml_string is parsable as XML or not.
+    """
+    try:
+        ET.fromstring(xml_string)
+        return True
+    except ET.ParseError:
+        return False

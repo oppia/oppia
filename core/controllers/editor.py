@@ -638,13 +638,18 @@ class ImageUploadHandler(EditorHandler):
 
         allowed_formats = ', '.join(
             list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
-
-        if filename is not None and filename.endswith('.svg'):
+        if html_validation_service.is_xml_parsable(raw):
             file_format = 'svg'
-            invalid_tags = html_validation_service.get_invalid_svg_tags(raw)
-            if len(invalid_tags) > 0:
+            invalid_tags, invalid_attrs = (
+                html_validation_service.get_invalid_svg_tags_and_attrs(raw))
+            if invalid_tags or invalid_attrs:
+                invalid_tags_message = (
+                    'tags: %s' % invalid_tags if invalid_tags else '')
+                invalid_attrs_message = (
+                    'attributes: %s' % invalid_attrs if invalid_attrs else '')
                 raise self.InvalidInputException(
-                    'Unsupported tags found in the SVG: %s' % invalid_tags)
+                    'Unsupported tags/attributes found in the SVG:\n%s\n%s' % (
+                        invalid_tags_message, invalid_attrs_message))
         else:
             # Verify that the data is recognized as an image.
             file_format = imghdr.what(None, h=raw)

@@ -92,7 +92,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                 $scope.storyNodeIds);
             _recalculateAvailableNodes();
             $scope.skillIdToSummaryMap = {};
-            $scope.allowedColors = [
+            $scope.allowedBgColors = [
               '#F8BF74', '#D68F78', '#8EBBB6', '#B3D8F1'];
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
             for (var idx in skillSummaries) {

@@ -280,7 +280,7 @@ export class StoryNodeObjectFactory {
   createFromIdAndTitle(nodeId: string, title: string): StoryNode {
     return new StoryNode(
       nodeId, title, [], [], [], '', false, null,
-      constants.NEW_STRUCTURE_TO_COLORS.chapter[0], null);
+      constants.ALLOWED_THUMBNAIL_BG_COLORS.chapter[0], null);
   }
 }
 

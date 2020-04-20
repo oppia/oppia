@@ -57,7 +57,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.subtopics.append(topic_domain.Subtopic(
             1, 'subtopic_name', [self.skill_id_2], 'image.svg',
-            constants.NEW_STRUCTURE_TO_COLORS['subtopic'][0]))
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]))
         self.topic.next_subtopic_id = 2
         self.topic.thumbnail_filename = 'Image.png'
         self.topic.canonical_story_references.append(

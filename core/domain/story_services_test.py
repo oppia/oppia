@@ -1404,7 +1404,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.node_1 = {
             'id': self.NODE_ID_1,
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 1',
             'destination_node_ids': ['node_2'],
@@ -1417,7 +1417,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.node_2 = {
             'id': self.NODE_ID_2,
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 2',
             'destination_node_ids': ['node_3'],
@@ -1430,7 +1430,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.node_3 = {
             'id': self.NODE_ID_3,
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 3',
             'destination_node_ids': ['node_4'],
@@ -1443,7 +1443,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.node_4 = {
             'id': self.NODE_ID_4,
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 4',
             'destination_node_ids': [],
@@ -1628,7 +1628,7 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
         self.save_new_topic(
             topic_id, user_id, name='Topic',
             abbreviated_name='abbrev', thumbnail_filename=None,
-            thumbnail_bg_color=constants.NEW_STRUCTURE_TO_COLORS['topic'][0],
+            thumbnail_bg_color=constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0],
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)

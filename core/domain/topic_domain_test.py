@@ -42,7 +42,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.NEW_STRUCTURE_TO_COLORS['subtopic'][0])]
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])]
         self.topic.next_subtopic_id = 2
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
@@ -60,7 +60,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'name': 'Name',
             'abbreviated_name': 'abbrev',
             'thumbnail_filename': None,
-            'thumbnail_bg_color': constants.NEW_STRUCTURE_TO_COLORS[
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'topic'][0],
             'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
             'canonical_story_references': [],
@@ -91,7 +91,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_get_all_subtopics(self):
         self.topic.subtopics = [topic_domain.Subtopic(
             1, 'Title', ['skill_id_1'], 'image.svg',
-            constants.NEW_STRUCTURE_TO_COLORS['subtopic'][0])]
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])]
         subtopics = self.topic.get_all_subtopics()
         self.assertEqual(
             subtopics, [{
@@ -433,7 +433,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics.append(
             topic_domain.Subtopic(
                 'id_2', 'Title2', ['skill_id_2'], 'image.svg',
-                constants.NEW_STRUCTURE_TO_COLORS['subtopic'][0]))
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]))
         with self.assertRaisesRegexp(
             Exception,
             'The skill id skill_id_1 already exists in subtopic with id 1'):
@@ -577,10 +577,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.NEW_STRUCTURE_TO_COLORS['subtopic'][0]),
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]),
             topic_domain.Subtopic(
                 2, 'Another title', ['skill_id_1'], 'image.svg',
-                constants.NEW_STRUCTURE_TO_COLORS['subtopic'][0])]
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])]
         with self.assertRaisesRegexp(
             Exception,
             'Skill id skill_id_1 is already present in the target subtopic'):

@@ -264,7 +264,7 @@ class StoryNode(python_utils.OBJECT):
         Returns:
             bool. Whether the thumbnail background color is valid or not.
         """
-        return thumbnail_bg_color in constants.NEW_STRUCTURE_TO_COLORS[
+        return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
             'chapter']
 
     def to_dict(self):
@@ -321,7 +321,7 @@ class StoryNode(python_utils.OBJECT):
         """
         return cls(
             node_id, title, None,
-            constants.NEW_STRUCTURE_TO_COLORS['chapter'][0],
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
             [], [], [], '', False, None)
 
     def validate(self):
@@ -343,6 +343,12 @@ class StoryNode(python_utils.OBJECT):
                 'Chapter thumbnail background color %s is not supported.' % (
                     self.thumbnail_bg_color))
 
+        if self.thumbnail_bg_color and self.thumbnail_filename is None:
+            raise utils.ValidationError(
+                'Chapter thumbnail filename is not specified.')
+        if self.thumbnail_filename and self.thumbnail_bg_color is None:
+            raise utils.ValidationError(
+                'Chapter thumbnail background color is not specified.')
         if not isinstance(self.outline, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected outline to be a string, received %s' %
@@ -706,7 +712,7 @@ class Story(python_utils.OBJECT):
         Returns:
             bool. Whether the thumbnail background color is valid or not.
         """
-        return thumbnail_bg_color in constants.NEW_STRUCTURE_TO_COLORS[
+        return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
             'story']
 
     def validate(self):
@@ -728,7 +734,12 @@ class Story(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Story thumbnail background color %s is not supported.' % (
                     self.thumbnail_bg_color))
-
+        if self.thumbnail_bg_color and self.thumbnail_filename is None:
+            raise utils.ValidationError(
+                'Story thumbnail filename is not specified.')
+        if self.thumbnail_filename and self.thumbnail_bg_color is None:
+            raise utils.ValidationError(
+                'Story thumbnail background color is not specified.')
         if not isinstance(self.notes, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected notes to be a string, received %s' % self.notes)
@@ -880,7 +891,7 @@ class Story(python_utils.OBJECT):
         story_contents = StoryContents([], None, initial_node_id)
         return cls(
             story_id, title, None,
-            constants.NEW_STRUCTURE_TO_COLORS['story'][0],
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0],
             feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
             story_contents, feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0)

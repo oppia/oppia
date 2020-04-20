@@ -359,6 +359,10 @@ angular.module('oppia').directive('filepathEditor', [
             crop: true
           };
           ctrl.imageResizeRatio = 1;
+          ctrl.invalidTagsAndAttributes = {
+            tags: [],
+            attrs: []
+          };
         };
 
         ctrl.validate = function(data) {
@@ -736,11 +740,18 @@ angular.module('oppia').directive('filepathEditor', [
               });
             });
           } else if (mimeType === 'data:image/svg+xml') {
-            resampledFile = (
-              ImageUploadHelperService.convertImageDataToImageFile(
+            ctrl.invalidTagsAndAttributes = (
+              ImageUploadHelperService.getInvalidSvgTagsAndAttrs(
                 imageDataURI));
-            ctrl.postImageToServer(dimensions, resampledFile, 'svg');
-            ctrl.data.crop = false;
+            var tags = ctrl.invalidTagsAndAttributes.tags;
+            var attrs = ctrl.invalidTagsAndAttributes.attrs;
+            if (tags.length === 0 && attrs.length === 0) {
+              resampledFile = (
+                ImageUploadHelperService.convertImageDataToImageFile(
+                  imageDataURI));
+              ctrl.postImageToServer(dimensions, resampledFile, 'svg');
+              ctrl.data.crop = false;
+            }
           } else {
             const resampledImageData = getResampledImageData(
               imageDataURI, dimensions.width, dimensions.height);
@@ -867,6 +878,10 @@ angular.module('oppia').directive('filepathEditor', [
           ctrl.userIsDraggingCropArea = false;
           ctrl.userIsResizingCropArea = false;
           ctrl.cropAreaResizeDirection = null;
+          ctrl.invalidTagsAndAttributes = {
+            tags: [],
+            attrs: []
+          };
 
           ctrl.entityId = ContextService.getEntityId();
           ctrl.entityType = ContextService.getEntityType();

@@ -22,6 +22,7 @@ require(
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
 
+require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/image-upload-helper.service.ts');
@@ -32,7 +33,7 @@ angular.module('oppia').directive('thumbnailUploader', [
       restrict: 'E',
       scope: {
         disabled: '=',
-        getAllowedColors: '&allowedColors',
+        getAllowedBgColors: '&allowedBgColors',
         getBgColor: '&bgColor',
         getFilename: '&filename',
         getPreviewDescription: '&previewDescription',
@@ -45,20 +46,19 @@ angular.module('oppia').directive('thumbnailUploader', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/custom-forms-directives/' +
         'thumbnail-uploader.directive.html'),
-      controller: ['$scope', '$uibModal',
+      controller: ['$rootScope', '$scope', '$uibModal',
         'AlertsService', 'ContextService', 'CsrfTokenService',
         'ImageUploadHelperService',
-        function($scope, $uibModal,
+        function($rootScope, $scope, $uibModal,
             AlertsService, ContextService, CsrfTokenService,
             ImageUploadHelperService) {
           var placeholderImageUrl = '/icons/story-image-icon.png';
+          $scope.placeholderImageDataUrl = (
+            UrlInterpolationService.getStaticImageUrl(
+              placeholderImageUrl));
           var uploadedImage = null;
           $scope.imageContainerStyle = {};
-          if (!$scope.getFilename()) {
-            $scope.editableThumbnailDataUrl = (
-              UrlInterpolationService.getStaticImageUrl(
-                placeholderImageUrl));
-          } else {
+          if ($scope.getFilename()) {
             $scope.editableThumbnailDataUrl = (
               ImageUploadHelperService
                 .getTrustedResourceUrlForThumbnailFilename(
@@ -75,6 +75,8 @@ angular.module('oppia').directive('thumbnailUploader', [
               return;
             }
             var openInUploadMode = true;
+            // This refers to the temporary thumbnail background
+            // color used for preview.
             var tempBgColor = (
               $scope.imageContainerStyle.background || $scope.getBgColor());
             var tempImageName = '';
@@ -83,14 +85,21 @@ angular.module('oppia').directive('thumbnailUploader', [
               height: 0,
               width: 0
             };
-            var allowedColors = $scope.getAllowedColors();
+            var allowedBgColors = $scope.getAllowedBgColors();
             var getPreviewDescription = $scope.getPreviewDescription;
             var getPreviewDescriptionBgColor = (
               $scope.getPreviewDescriptionBgColor);
             var getPreviewFooter = $scope.getPreviewFooter;
             var getPreviewTitle = $scope.getPreviewTitle;
 
-            var saveThumbnailImageData = function(imageURI) {
+            var saveThumbnailBgColor = function(newBgColor) {
+              if (newBgColor !== $scope.getBgColor()) {
+                $scope.updateBgColor(newBgColor);
+              }
+              $scope.imageContainerStyle.background = newBgColor;
+            };
+
+            var saveThumbnailImageData = function(imageURI, callback) {
               let resampledFile = null;
               resampledFile = (
                 ImageUploadHelperService.convertImageDataToImageFile(
@@ -99,10 +108,10 @@ angular.module('oppia').directive('thumbnailUploader', [
                 AlertsService.addWarning('Could not get resampled file.');
                 return;
               }
-              postImageToServer(resampledFile);
+              postImageToServer(resampledFile, callback);
             };
 
-            var postImageToServer = function(resampledFile) {
+            var postImageToServer = function(resampledFile, callback) {
               let form = new FormData();
               form.append('image', resampledFile);
               form.append('payload', JSON.stringify({
@@ -136,6 +145,7 @@ angular.module('oppia').directive('thumbnailUploader', [
                       .getTrustedResourceUrlForThumbnailFilename(
                         data.filename, ContextService.getEntityType(),
                         ContextService.getEntityId()));
+                  callback();
                 }).fail(function(data) {
                   // Remove the XSSI prefix.
                   var transformedData = data.responseText.substring(5);
@@ -155,8 +165,12 @@ angular.module('oppia').directive('thumbnailUploader', [
                 function($scope, $timeout, $uibModalInstance) {
                   $scope.uploadedImage = uploadedImage;
                   $scope.invalidImageWarningIsShown = false;
+                  $scope.invalidTagsAndAttributes = {
+                    tags: [],
+                    attrs: []
+                  };
 
-                  $scope.allowedColors = allowedColors;
+                  $scope.allowedBgColors = allowedBgColors;
                   $scope.getPreviewDescription = getPreviewDescription;
                   $scope.getPreviewDescriptionBgColor = (
                     getPreviewDescriptionBgColor);
@@ -189,6 +203,7 @@ angular.module('oppia').directive('thumbnailUploader', [
                         $scope.invalidImageWarningIsShown = false;
                         var reader = new FileReader();
                         reader.onload = function(e) {
+                          var imgSrc = <string>((<FileReader>e.target).result);
                           $scope.$apply(function() {
                             $scope.uploadedImage = (
                               (<FileReader>e.target).result);
@@ -204,7 +219,15 @@ angular.module('oppia').directive('thumbnailUploader', [
                               img.naturalHeight || 150,
                               img.naturalWidth || 300);
                           };
-                          img.src = <string>((<FileReader>e.target).result);
+                          img.src = imgSrc;
+                          $scope.invalidTagsAndAttributes = (
+                            ImageUploadHelperService.getInvalidSvgTagsAndAttrs(
+                              imgSrc));
+                          var tags = $scope.invalidTagsAndAttributes.tags;
+                          var attrs = $scope.invalidTagsAndAttributes.attrs;
+                          if (tags.length > 0 || attrs.length > 0) {
+                            $scope.reset();
+                          }
                         };
                         reader.readAsDataURL(file);
                         $timeout(function() {
@@ -251,15 +274,15 @@ angular.module('oppia').directive('thumbnailUploader', [
                 tempImageName = (
                   ImageUploadHelperService.generateImageFilename(
                     dimensions.height, dimensions.width, 'svg'));
-                uploadedImage = data.newThumbnailDataUrl;
-                $scope.editableThumbnailDataUrl = data.newThumbnailDataUrl;
-                $scope.updateFilename(tempImageName);
-                saveThumbnailImageData(data.newThumbnailDataUrl);
+                saveThumbnailImageData(data.newThumbnailDataUrl, function() {
+                  uploadedImage = data.newThumbnailDataUrl;
+                  $scope.updateFilename(tempImageName);
+                  saveThumbnailBgColor(data.newBgColor);
+                  $rootScope.$apply();
+                });
+              } else {
+                saveThumbnailBgColor(data.newBgColor);
               }
-              if (data.newBgColor !== $scope.getBgColor()) {
-                $scope.updateBgColor(data.newBgColor);
-              }
-              $scope.imageContainerStyle.background = data.newBgColor;
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.

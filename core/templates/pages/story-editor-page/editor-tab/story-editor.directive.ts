@@ -60,7 +60,7 @@ angular.module('oppia').directive('storyEditor', [
             $scope.disconnectedNodes = [];
             $scope.linearNodesList = [];
             $scope.nodes = [];
-            $scope.allowedColors = [
+            $scope.allowedBgColors = [
               '#F8BF74', '#D68F78', '#8EBBB6', '#B3D8F1'];
             if ($scope.storyContents &&
                 $scope.storyContents.getNodes().length > 0) {

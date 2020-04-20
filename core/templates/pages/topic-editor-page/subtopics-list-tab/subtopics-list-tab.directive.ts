@@ -78,7 +78,7 @@ angular.module('oppia').directive('subtopicsListTab', [
                   $scope.editableThumbnailBgColor = editableThumbnailBgColor;
                   $scope.subtopicPage = (
                     TopicEditorStateService.getSubtopicPage());
-                  $scope.allowedColors = ['#FFFFFF'];
+                  $scope.allowedBgColors = ['#FFFFFF'];
                   var pageContents = $scope.subtopicPage.getPageContents();
                   if (pageContents) {
                     $scope.htmlData = pageContents.getHtml();

@@ -55,6 +55,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.save_new_topic(
             self.TOPIC_ID, self.albert_id, name='Name',
             abbreviated_name='abbrev', thumbnail_filename=None,
+            thumbnail_bg_color=None,
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
@@ -136,9 +137,25 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         correctly and an old story is converted to new
         version.
         """
+        MIGRATED_STORY_CONTENTS_DICT = {
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_2',
+            'nodes': [{
+                'acquired_skill_ids': [],
+                'destination_node_ids': [],
+                'exploration_id': None,
+                'id': 'node_1',
+                'outline': '',
+                'outline_is_finalized': False,
+                'prerequisite_skill_ids': [],
+                'thumbnail_bg_color': None,
+                'thumbnail_filename': None,
+                'title': 'Chapter 1'
+            }]
+        }
         # Generate story with old(v1) story contents data.
         self.save_new_story_with_story_contents_schema_v1(
-            self.STORY_ID, 'image.svg', self.albert_id, 'A title',
+            self.STORY_ID, 'image.svg', '#F8BF74', self.albert_id, 'A title',
             'A description', 'A note', self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, self.STORY_ID)
@@ -165,8 +182,11 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_story.story_contents_schema_version,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
+        self.assertEqual(
+            updated_story.story_contents.to_dict(),
+            MIGRATED_STORY_CONTENTS_DICT)
 
-        output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id)
         expected = [[u'story_migrated',
                      [u'1 stories successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])

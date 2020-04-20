@@ -87,6 +87,12 @@
       Discard
     </button>
   </div>
+  <div class="oppia-form-error" ng-if="$ctrl.invalidTagsAndAttributes.tags.length" style="margin-top: 15px;">
+    Unsupported SVG tags found: <[$ctrl.invalidTagsAndAttributes.tags]>
+  </div>
+  <div class="oppia-form-error" ng-if="$ctrl.invalidTagsAndAttributes.attrs.length" style="margin-top: 15px;">
+    Unsupported SVG attributes found: <[$ctrl.invalidTagsAndAttributes.attrs]>
+  </div>
 </div>
 
 <style>

@@ -361,7 +361,7 @@ class Subtopic(python_utils.OBJECT):
         """
         return cls(
             subtopic_id, title, [], None,
-            constants.NEW_STRUCTURE_TO_COLORS['subtopic'][0])
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
@@ -385,7 +385,7 @@ class Subtopic(python_utils.OBJECT):
         Returns:
             bool. Whether the thumbnail background color is valid or not.
         """
-        return thumbnail_bg_color in constants.NEW_STRUCTURE_TO_COLORS[
+        return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
             'subtopic']
 
     def validate(self):
@@ -401,6 +401,12 @@ class Subtopic(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Subtopic thumbnail background color %s is not supported.' % (
                     self.thumbnail_bg_color))
+        if self.thumbnail_bg_color and self.thumbnail_filename is None:
+            raise utils.ValidationError(
+                'Subtopic thumbnail filename is not specified.')
+        if self.thumbnail_filename and self.thumbnail_bg_color is None:
+            raise utils.ValidationError(
+                'Subtopic thumbnail background color is not specified.')
         if not isinstance(self.id, int):
             raise utils.ValidationError(
                 'Expected subtopic id to be an int, received %s' % self.id)
@@ -595,7 +601,7 @@ class Topic(python_utils.OBJECT):
         Returns:
             bool. Whether the thumbnail background color is valid or not.
         """
-        return thumbnail_bg_color in constants.NEW_STRUCTURE_TO_COLORS[
+        return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
             'topic']
 
     def get_all_skill_ids(self):
@@ -786,6 +792,12 @@ class Topic(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Topic thumbnail background color %s is not supported.' % (
                     self.thumbnail_bg_color))
+        if self.thumbnail_bg_color and self.thumbnail_filename is None:
+            raise utils.ValidationError(
+                'Topic thumbnail filename is not specified.')
+        if self.thumbnail_filename and self.thumbnail_bg_color is None:
+            raise utils.ValidationError(
+                'Topic thumbnail background color is not specified.')
         if strict:
             if not isinstance(self.thumbnail_filename, python_utils.BASESTRING):
                 raise utils.ValidationError(
@@ -906,7 +918,7 @@ class Topic(python_utils.OBJECT):
         """
         return cls(
             topic_id, name, abbreviated_name, None,
-            constants.NEW_STRUCTURE_TO_COLORS['topic'][0],
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0],
             feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,

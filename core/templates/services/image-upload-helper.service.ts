@@ -17,10 +17,11 @@
  */
 
 require('services/assets-backend-api.service.ts');
+const constants = require('constants.ts');
 
 angular.module('oppia').factory('ImageUploadHelperService', [
-  '$sanitize', '$sce', 'AssetsBackendApiService',
-  function($sanitize, $sce, AssetsBackendApiService) {
+  '$sce', 'AssetsBackendApiService',
+  function($sce, AssetsBackendApiService) {
     return {
       convertImageDataToImageFile: function(dataURI) {
         // Convert base64/URLEncoded data component to raw binary data
@@ -30,11 +31,6 @@ angular.module('oppia').factory('ImageUploadHelperService', [
         // Separate out the mime component.
         var mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
 
-        // If the data component is of svg+xml mime type, it must be
-        // sanitized.
-        if (mime === 'image/svg+xml') {
-          byteString = $sanitize(byteString.replace(/\n|\r/g, ' '));
-        }
         // Write the bytes of the string to a typed array.
         var ia = new Uint8Array(byteString.length);
         for (var i = 0; i < byteString.length; i++) {
@@ -48,6 +44,30 @@ angular.module('oppia').factory('ImageUploadHelperService', [
         } else {
           return null;
         }
+      },
+
+      getInvalidSvgTagsAndAttrs: function(dataURI) {
+        // Convert base64/URLEncoded data component to raw binary data
+        // held in a string.
+        var svg_string = atob(dataURI.split(',')[1]);
+        var domParser = new DOMParser();
+        var doc = domParser.parseFromString(svg_string, 'image/svg+xml');
+        var invalidTags = [];
+        var invalidAttrs = [];
+        doc.querySelectorAll('*').forEach((node) => {
+          if (Constants.ALLOWED_SVG_TAGS.indexOf(
+            node.tagName.toLowerCase()) != -1) {
+            for (var i = 0; i < node.attributes.length; i++) {
+              if (Constants.ALLOWED_SVG_ATTRS.indexOf(
+                node.attributes[i].name.toLowerCase()) === -1) {
+                invalidAttrs.push(node.attributes[i].name);
+              }
+            }
+          } else {
+            invalidTags.push(node.tagName);
+          }
+        });
+        return { tags: invalidTags, attrs: invalidAttrs };
       },
 
       getTrustedResourceUrlForThumbnailFilename: function(

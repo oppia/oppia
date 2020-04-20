@@ -55,7 +55,7 @@ var PreferencesPage = function() {
   var customProfilePhoto = element(
     by.css('.protractor-test-custom-photo'));
   var profilePhotoCropper = element(
-    by.css('.protractor-test-photo-crop'));
+    by.css('.cropper-container'));
   var profilePhotoUploadError = element(
     by.css('.protractor-test-upload-error'));
 
