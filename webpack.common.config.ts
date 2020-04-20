@@ -147,10 +147,9 @@ module.exports = {
       filename: 'about-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'With Oppia, you can access free lessons on math, physics, ' +
-         'statistics, chemistry, music, history and more from anywhere in the ' +
-         'world. Oppia is a nonprofit with the mission of providing high-quality ' +
-         'education to those who lack access to it.'
+        description: 'Oppia is an open source learning platform that ' +
+        'connects a community of teachers and learners. You can use this ' +
+        'site to create 1-1 learning scenarios for others.'
       },
       template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -161,10 +160,9 @@ module.exports = {
       filename: 'admin-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'With Oppia, you can access free lessons on math, physics, ' +
-         'statistics, chemistry, music, history and more from anywhere in the ' +
-         'world. Learn from our pre-existing explorations, or teach and create ' +
-         'your own.'
+        description: 'Oppia is a free site for sharing knowledge via ' +
+          'interactive lessons called \'explorations\'. Learn from ' +
+          'user-created explorations, or teach and create your own.'
       },
       template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -173,11 +171,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['classroom'],
       filename: 'classroom-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Learn and practice all major math topics, functions, ' +
-        'equations, and formulas through problems, stories, and examples.'
-      },
+      meta: defaultMeta,
       template:
         commonPrefix + '/pages/classroom-page/' +
         'classroom-page.mainpage.html',
@@ -266,8 +260,7 @@ module.exports = {
       filename: 'donate-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'Donate to The Oppia Foundation to enable more students to receive ' +
-        'the quality education they deserve.'
+        description: 'Donate to The Oppia Foundation.'
       },
       template: commonPrefix + '/pages/donate-page/donate-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -405,9 +398,9 @@ module.exports = {
       filename: 'library-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'Looking to learn something new? Learn any subject of your choice ' +
-          'created by professors, teachers and Oppia users! Free lessons are always ' +
-          'available for any topic and level you want.' 
+        description: 'Looking to learn something new? Find explorations ' +
+          'created by professors, teachers and Oppia users in a subject ' +
+          'you\'re interested in, and start exploring!'
       },
       template: commonPrefix + '/pages/library-page/library-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -528,10 +521,9 @@ module.exports = {
       filename: 'splash-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'With Oppia, you can access free lessons on math, physics, ' +
-        'statistics, chemistry, music, history and more from anywhere in the ' +
-        'world. Oppia is a nonprofit with the mission of providing high-quality ' +
-        'education to those who lack access to it.'
+        description: 'Oppia is a free site for sharing knowledge via ' +
+          'interactive lessons called \'explorations\'. Learn from ' +
+          'user-created explorations, or teach and create your own.'
       },
       template: commonPrefix + '/pages/splash-page/splash-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -609,7 +601,7 @@ module.exports = {
       filename: 'thanks-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'Thank you for donating to The Oppia Foundation!'
+        description: 'Thank you for donating to The Oppia Foundation.'
       },
       template: commonPrefix + '/pages/thanks-page/thanks-page.mainpage.html',
       minify: htmlMinifyConfig,
