@@ -39,6 +39,22 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
     ALBERT_NAME = 'albert'
 
     STORY_ID = 'story_id'
+    MIGRATED_STORY_CONTENTS_DICT = {
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2',
+        'nodes': [{
+            'acquired_skill_ids': [],
+            'destination_node_ids': [],
+            'exploration_id': None,
+            'id': 'node_1',
+            'outline': '',
+            'outline_is_finalized': False,
+            'prerequisite_skill_ids': [],
+            'thumbnail_bg_color': None,
+            'thumbnail_filename': None,
+            'title': 'Chapter 1'
+        }]
+    }
 
     def setUp(self):
         super(StoryMigrationOneOffJobTests, self).setUp()
@@ -137,22 +153,6 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         correctly and an old story is converted to new
         version.
         """
-        self.MIGRATED_STORY_CONTENTS_DICT = {
-            'initial_node_id': 'node_1',
-            'next_node_id': 'node_2',
-            'nodes': [{
-                'acquired_skill_ids': [],
-                'destination_node_ids': [],
-                'exploration_id': None,
-                'id': 'node_1',
-                'outline': '',
-                'outline_is_finalized': False,
-                'prerequisite_skill_ids': [],
-                'thumbnail_bg_color': None,
-                'thumbnail_filename': None,
-                'title': 'Chapter 1'
-            }]
-        }
         # Generate story with old(v1) story contents data.
         self.save_new_story_with_story_contents_schema_v1(
             self.STORY_ID, 'image.svg', '#F8BF74', self.albert_id, 'A title',

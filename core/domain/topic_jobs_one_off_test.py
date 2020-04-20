@@ -40,6 +40,14 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     TOPIC_ID = 'topic_id'
 
+    MIGRATED_SUBTOPIC_DICT = {
+        'id': 1,
+        'skill_ids': ['skill_1'],
+        'thumbnail_bg_color': None,
+        'thumbnail_filename': None,
+        'title': 'A subtitle'
+    }
+
     def setUp(self):
         super(TopicMigrationOneOffJobTests, self).setUp()
         # Setup user who will own the test topics.
@@ -120,13 +128,6 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         correctly and an old topic is converted to new
         version.
         """
-        self.MIGRATED_SUBTOPIC_DICT = {
-            'id': 1,
-            'skill_ids': ['skill_1'],
-            'thumbnail_bg_color': None,
-            'thumbnail_filename': None,
-            'title': 'A subtitle'
-        }
         # Generate topic with old(v1) subtopic data.
         self.save_new_topic_with_subtopic_schema_v1(
             self.TOPIC_ID, self.albert_id, 'A name', 'abbrev',
