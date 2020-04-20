@@ -137,7 +137,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         correctly and an old story is converted to new
         version.
         """
-        MIGRATED_STORY_CONTENTS_DICT = {
+        self.MIGRATED_STORY_CONTENTS_DICT = {
             'initial_node_id': 'node_1',
             'next_node_id': 'node_2',
             'nodes': [{
@@ -184,7 +184,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
         self.assertEqual(
             updated_story.story_contents.to_dict(),
-            MIGRATED_STORY_CONTENTS_DICT)
+            self.MIGRATED_STORY_CONTENTS_DICT)
 
         output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id)
         expected = [[u'story_migrated',

@@ -53,7 +53,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.save_new_topic(
             self.TOPIC_ID, self.user_id, name='Name',
             abbreviated_name='abbrev', thumbnail_filename='img.svg',
-            thumbnail_bg_color=constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0],
+            thumbnail_bg_color=(
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
@@ -156,7 +157,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.save_new_topic(
             topic_id, self.user_id, name='topic name',
             abbreviated_name='abbrev', thumbnail_filename='img.svg',
-            thumbnail_bg_color=constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0],
+            thumbnail_bg_color=(
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)

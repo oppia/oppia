@@ -1628,7 +1628,8 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
         self.save_new_topic(
             topic_id, user_id, name='Topic',
             abbreviated_name='abbrev', thumbnail_filename=None,
-            thumbnail_bg_color=constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0],
+            thumbnail_bg_color=(
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)

@@ -1492,8 +1492,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             ' 44 290 21 402 -60 278 -258 497 -532 586 -88 28 -324 33 -420 9z"/'
             '> </g> </svg>')
         self.assertEqual(
-            html_validation_service.get_invalid_svg_tags_and_attrs(valid_svg_string),
-            ([], []))
+            html_validation_service.get_invalid_svg_tags_and_attrs(
+                valid_svg_string), ([], []))
         invalid_svg_string = (
             '<svg version="1.0" xmlns="http://www.w3.org/2000/svg"  width="879'
             '.000000pt" height="494.000000pt" viewBox="0 0 879.000000 494.0000'
@@ -1514,5 +1514,5 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             ' 44 290 21 402 -60 278 -258 497 -532 586 -88 28 -324 33 -420 9z"/'
             ' danger="h4cK3D!"> </g> </svg>')
         self.assertEqual(
-            html_validation_service.get_invalid_svg_tags_and_attrs(invalid_svg_string),
-            (['testtag'], ['danger']))
+            html_validation_service.get_invalid_svg_tags_and_attrs(
+                invalid_svg_string), (['testtag'], ['danger']))

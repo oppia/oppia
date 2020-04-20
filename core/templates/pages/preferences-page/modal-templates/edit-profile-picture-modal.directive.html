@@ -11,9 +11,9 @@
 
     <div class="oppia-form-error" ng-if="invalidImageWarningIsShown" style="margin-top: 15px;" translate="I18N_PREFERENCES_PROFILE_PICTURE_ERROR"></div>
 
-    <div ng-show="uploadedImage" style="">
+    <div ng-show="uploadedImage">
       <span translate="I18N_PREFERENCES_PROFILE_PICTURE_DRAG"></span>
-      <div class="oppia-profile-picture-crop-area" class="protractor-test-photo-crop" ng-show="uploadedImage">
+      <div class="oppia-profile-picture-crop-area protractor-test-photo-crop" ng-show="uploadedImage">
         <button class="btn btn-secondary oppia-profile-picture-reset-button" ng-click="reset()">
           <i class="material-icons oppia-vcenter">&#xE14C;</i>
         </button>

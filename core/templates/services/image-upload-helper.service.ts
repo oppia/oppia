@@ -17,7 +17,7 @@
  */
 
 require('services/assets-backend-api.service.ts');
-const constants = require('constants.ts');
+const Constants = require('constants.ts');
 
 angular.module('oppia').factory('ImageUploadHelperService', [
   '$sce', 'AssetsBackendApiService',
@@ -49,14 +49,14 @@ angular.module('oppia').factory('ImageUploadHelperService', [
       getInvalidSvgTagsAndAttrs: function(dataURI) {
         // Convert base64/URLEncoded data component to raw binary data
         // held in a string.
-        var svg_string = atob(dataURI.split(',')[1]);
+        var svgString = atob(dataURI.split(',')[1]);
         var domParser = new DOMParser();
-        var doc = domParser.parseFromString(svg_string, 'image/svg+xml');
+        var doc = domParser.parseFromString(svgString, 'image/svg+xml');
         var invalidTags = [];
         var invalidAttrs = [];
         doc.querySelectorAll('*').forEach((node) => {
           if (Constants.ALLOWED_SVG_TAGS.indexOf(
-            node.tagName.toLowerCase()) != -1) {
+            node.tagName.toLowerCase()) !== -1) {
             for (var i = 0; i < node.attributes.length; i++) {
               if (Constants.ALLOWED_SVG_ATTRS.indexOf(
                 node.attributes[i].name.toLowerCase()) === -1) {

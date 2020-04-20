@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import logging
+from xml.etree import ElementTree as ET
 
 import bs4
 from constants import constants
@@ -28,7 +29,7 @@ from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import rte_component_registry
 from core.platform import models
-from xml.etree import ElementTree as ET
+
 import feconf
 import python_utils
 
@@ -900,6 +901,7 @@ def get_invalid_svg_tags_and_attrs(svg_string):
         else:
             invalid_elements.append(element.name)
     return (invalid_elements, invalid_attrs)
+
 
 def is_xml_parsable(xml_string):
     """Checks if input string is parsable as XML.

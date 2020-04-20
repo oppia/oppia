@@ -120,7 +120,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         correctly and an old topic is converted to new
         version.
         """
-        MIGRATED_SUBTOPIC_DICT = {
+        self.MIGRATED_SUBTOPIC_DICT = {
             'id': 1,
             'skill_ids': ['skill_1'],
             'thumbnail_bg_color': None,
@@ -155,7 +155,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
         self.assertEqual(
             updated_topic.subtopics[0].to_dict(),
-            MIGRATED_SUBTOPIC_DICT)
+            self.MIGRATED_SUBTOPIC_DICT)
 
         output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
         expected = [[u'topic_migrated',
