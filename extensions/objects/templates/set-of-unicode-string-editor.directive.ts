@@ -21,32 +21,32 @@
 // in via initArgs.
 
 angular.module('oppia').directive('setOfUnicodeStringEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/list-editor.directive.html'),
+      template: require('./list-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.SCHEMA = {
-          type: 'list',
-          items: {
-            type: 'unicode'
-          },
-          validators: [{
-            id: 'is_uniquified'
-          }]
-        };
+        ctrl.$onInit = function() {
+          ctrl.SCHEMA = {
+            type: 'list',
+            items: {
+              type: 'unicode'
+            },
+            validators: [{
+              id: 'is_uniquified'
+            }]
+          };
 
-        if (!ctrl.value) {
-          ctrl.value = [];
-        }
+          if (!ctrl.value) {
+            ctrl.value = [];
+          }
+        };
       }]
     };
   }]);

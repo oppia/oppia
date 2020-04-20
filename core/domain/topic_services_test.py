@@ -15,10 +15,12 @@
 # limitations under the License.
 
 """Tests for topic services."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_services
+from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -54,15 +56,21 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'subtopic_id': 1
         })]
         self.save_new_topic(
-            self.TOPIC_ID, self.user_id, 'Name', 'abbrev', None, 'Description',
-            [self.story_id_1, self.story_id_2], [self.story_id_3],
-            [self.skill_id_1, self.skill_id_2], [], 1
-        )
+            self.TOPIC_ID, self.user_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename='topic.png',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
         self.save_new_story(
             self.story_id_1, self.user_id, 'Title', 'Description', 'Notes',
             self.TOPIC_ID)
         self.save_new_story(
             self.story_id_3, self.user_id, 'Title 3', 'Description 3', 'Notes',
+            self.TOPIC_ID)
+        self.save_new_story(
+            self.story_id_2, self.user_id, 'Title 2', 'Description 2', 'Notes',
             self.TOPIC_ID)
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
@@ -226,9 +234,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'Moved skill to subtopic.')
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, self.user_id, 'Name 2', 'abbrev', None, 'Description',
-            [], [], [self.skill_id_1, 'skill_3'], [], 1
-        )
+            topic_id, self.user_id, name='Name 2',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id_1, 'skill_3'],
+            subtopics=[], next_subtopic_id=1)
         self.assertEqual(
             topic_services.get_all_skill_ids_assigned_to_some_topic(),
             set([self.skill_id_1, self.skill_id_2, 'skill_3']))
@@ -403,6 +415,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         # Throw error if exploration isn't published.
         self.save_new_default_exploration(
             'exp_id', self.user_id_admin, title='title')
+        self.publish_exploration(self.user_id_admin, 'exp_id')
 
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -416,6 +429,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, 'story_id_new', change_list,
             'Updated story node.')
 
+        rights_manager.unpublish_exploration(self.user_admin, 'exp_id')
         with self.assertRaisesRegexp(
             Exception, 'Exploration with id exp_id isn\'t published.'):
             topic_services.publish_story(
@@ -474,6 +488,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic.name, 'New Name')
+        self.assertEqual(topic.canonical_name, 'new name')
         self.assertEqual(topic.version, 4)
         self.assertEqual(topic_summary.name, 'New Name')
         self.assertEqual(topic_summary.version, 4)
@@ -581,7 +596,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                             'en': {
                                 'filename': 'test.mp3',
                                 'file_size_bytes': 100,
-                                'needs_update': False
+                                'needs_update': False,
+                                'duration_secs': 0.3
                             }
                         }
                     }
@@ -622,7 +638,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                         'en': {
                             'filename': 'test.mp3',
                             'file_size_bytes': 100,
-                            'needs_update': False
+                            'needs_update': False,
+                            'duration_secs': 0.3
                         }
                     }
                 }
@@ -699,16 +716,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             topic_commit_log_entry.commit_message,
             'Added skill_id_3 to uncategorized skill ids')
-
-    def test_add_unpublished_skill_throws_exception(self):
-        self.save_new_skill(
-            'skill_a', self.user_id_a, 'Description A', misconceptions=[])
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'Cannot assign unpublished skills to a topic'):
-            topic_services.add_uncategorized_skill(
-                self.user_id_a, self.TOPIC_ID, 'skill_a')
 
     def test_delete_uncategorized_skill(self):
         topic_services.delete_uncategorized_skill(
@@ -958,6 +965,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         published_topic_ids = topic_services.filter_published_topic_ids([
             self.TOPIC_ID, 'invalid_id'])
         self.assertEqual(len(published_topic_ids), 0)
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': self.subtopic_id,
+            'skill_id': 'skill_1'
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Updated subtopic skill ids.')
         topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
         published_topic_ids = topic_services.filter_published_topic_ids([
             self.TOPIC_ID, 'invalid_id'])
@@ -967,6 +983,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_publish_and_unpublish_topic(self):
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_rights.topic_is_published)
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': self.subtopic_id,
+            'skill_id': 'skill_1'
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Updated subtopic skill ids.')
         topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
 
         with self.assertRaisesRegexp(
@@ -1051,8 +1076,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Topic with name \'Name\' already exists'):
             self.save_new_topic(
-                'topic_2', self.user_id, 'Name', 'abbrev', None,
-                'Description 2', [], [], [], [], 1)
+                'topic_2', self.user_id, name='Name',
+                abbreviated_name='abbrev', thumbnail_filename=None,
+                description='Description 2', canonical_story_ids=[],
+                additional_story_ids=[], uncategorized_skill_ids=[],
+                subtopics=[], next_subtopic_id=1)
 
     def test_update_topic_language_code(self):
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
@@ -1124,7 +1152,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_publish_a_published_topic(self):
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_rights.topic_is_published)
-
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': self.subtopic_id,
+            'skill_id': 'skill_1'
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Updated subtopic skill ids.')
         topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
         self.assertTrue(topic_rights.topic_is_published)
@@ -1157,11 +1193,17 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_deassign_user_from_all_topics(self):
         self.save_new_topic(
-            'topic_2', self.user_id, 'Name 2', 'abbrev', None, 'Description 2',
-            [], [], [], [], 1)
+            'topic_2', self.user_id, name='Name 2',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description 2', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
         self.save_new_topic(
-            'topic_3', self.user_id, 'Name 3', 'abbrev', None, 'Description 3',
-            [], [], [], [], 1)
+            'topic_3', self.user_id, name='Name 3',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description 3', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
 
         topic_services.assign_role(
             self.user_admin, self.user_a,

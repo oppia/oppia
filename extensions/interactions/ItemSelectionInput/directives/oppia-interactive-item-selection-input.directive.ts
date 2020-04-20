@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+require('domain/utilities/browser-checker.service.ts');
 require(
   'interactions/ItemSelectionInput/directives/' +
   'item-selection-input-rules.service.ts');
@@ -31,17 +31,15 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
-  'HtmlEscaperService', 'ItemSelectionInputRulesService',
-  'UrlInterpolationService', function(
-      HtmlEscaperService, ItemSelectionInputRulesService,
-      UrlInterpolationService) {
+  'BrowserCheckerService', 'HtmlEscaperService',
+  'ItemSelectionInputRulesService', function(
+      BrowserCheckerService, HtmlEscaperService,
+      ItemSelectionInputRulesService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/ItemSelectionInput/directives/' +
-        'item-selection-input-interaction.directive.html'),
+      template: require('./item-selection-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'WindowDimensionsService',
@@ -50,32 +48,6 @@ angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
             $attrs, WindowDimensionsService,
             UrlService, CurrentInteractionService) {
           var ctrl = this;
-          ctrl.choices = HtmlEscaperService.escapedJsonToObj(
-            $attrs.choicesWithValue);
-          ctrl.maxAllowableSelectionCount = (
-            $attrs.maxAllowableSelectionCountWithValue);
-          ctrl.minAllowableSelectionCount = (
-            $attrs.minAllowableSelectionCountWithValue);
-
-          // The following is an associative array where the key is a choice
-          // (html) and the value is a boolean value indicating whether the
-          // choice was selected by the user (default is false).
-          ctrl.userSelections = {};
-
-          for (var i = 0; i < ctrl.choices.length; i++) {
-            ctrl.userSelections[ctrl.choices[i]] = false;
-          }
-
-          ctrl.displayCheckboxes = (ctrl.maxAllowableSelectionCount > 1);
-
-          // The following indicates that the number of answers is more than
-          // maxAllowableSelectionCount.
-          ctrl.preventAdditionalSelections = false;
-
-          // The following indicates that the number of answers is less than
-          // minAllowableSelectionCount.
-          ctrl.notEnoughSelections = (ctrl.minAllowableSelectionCount > 0);
-
           ctrl.onToggleCheckbox = function() {
             ctrl.newQuestion = false;
             ctrl.selectionCount = Object.keys(ctrl.userSelections).filter(
@@ -89,9 +61,22 @@ angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
               ctrl.selectionCount < ctrl.minAllowableSelectionCount);
           };
 
-          ctrl.submitMultipleChoiceAnswer = function(index) {
+          ctrl.submitMultipleChoiceAnswer = function(event, index) {
+            // Deselect previously selected option.
+            var selectedElement = (
+              document.querySelector(
+                'button.multiple-choice-option.selected'));
+            if (selectedElement) {
+              selectedElement.classList.remove('selected');
+            }
+            // Selected current option.
+            event.currentTarget.classList.add('selected');
+            ctrl.userSelections = {};
             ctrl.userSelections[ctrl.choices[index]] = true;
-            ctrl.submitAnswer(ctrl.userSelections);
+            ctrl.notEnoughSelections = false;
+            if (!BrowserCheckerService.isMobileDevice()) {
+              ctrl.submitAnswer(ctrl.userSelections);
+            }
           };
 
           ctrl.submitAnswer = function() {
@@ -108,8 +93,35 @@ angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
           var validityCheckFn = function() {
             return !ctrl.notEnoughSelections;
           };
-          CurrentInteractionService.registerCurrentInteraction(
-            ctrl.submitAnswer, validityCheckFn);
+          ctrl.$onInit = function() {
+            ctrl.choices = HtmlEscaperService.escapedJsonToObj(
+              $attrs.choicesWithValue);
+            ctrl.maxAllowableSelectionCount = (
+              $attrs.maxAllowableSelectionCountWithValue);
+            ctrl.minAllowableSelectionCount = (
+              $attrs.minAllowableSelectionCountWithValue);
+
+            // The following is an associative array where the key is a choice
+            // (html) and the value is a boolean value indicating whether the
+            // choice was selected by the user (default is false).
+            ctrl.userSelections = {};
+
+            for (var i = 0; i < ctrl.choices.length; i++) {
+              ctrl.userSelections[ctrl.choices[i]] = false;
+            }
+
+            ctrl.displayCheckboxes = (ctrl.maxAllowableSelectionCount > 1);
+
+            // The following indicates that the number of answers is more than
+            // maxAllowableSelectionCount.
+            ctrl.preventAdditionalSelections = false;
+
+            // The following indicates that the number of answers is less than
+            // minAllowableSelectionCount.
+            ctrl.notEnoughSelections = (ctrl.minAllowableSelectionCount > 0);
+            CurrentInteractionService.registerCurrentInteraction(
+              ctrl.submitAnswer, validityCheckFn);
+          };
         }
       ]
     };

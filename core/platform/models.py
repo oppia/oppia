@@ -15,8 +15,11 @@
 # limitations under the License.
 
 """Interface for storage model switching."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import inspect
 
 import feconf
 import python_utils
@@ -25,7 +28,7 @@ import utils
 # Valid model names.
 NAMES = utils.create_enum(
     'activity', 'audit', 'base_model', 'classifier', 'collection', 'config',
-    'email', 'exploration', 'feedback', 'file', 'job', 'opportunity',
+    'email', 'exploration', 'feedback', 'job', 'opportunity',
     'question', 'recommendations', 'skill', 'statistics', 'story', 'suggestion',
     'topic', 'user')
 
@@ -94,9 +97,6 @@ class _Gae(Platform):
             elif name == NAMES.feedback:
                 from core.storage.feedback import gae_models as feedback_models
                 returned_models.append(feedback_models)
-            elif name == NAMES.file:
-                from core.storage.file import gae_models as file_models
-                returned_models.append(file_models)
             elif name == NAMES.job:
                 from core.storage.job import gae_models as job_models
                 returned_models.append(job_models)
@@ -131,6 +131,43 @@ class _Gae(Platform):
                 raise Exception('Invalid model name: %s' % name)
 
         return tuple(returned_models)
+
+    @classmethod
+    def get_storage_model_classes(cls, model_names):
+        """Get the storage model classes that are in the modules listed in
+        model_names.
+
+        Args:
+            model_names: list(str). List of storage module names.
+
+        Returns:
+            list(class). The corresponding storage-layer model classes.
+        """
+        model_classes = []
+        for module in cls.import_models(model_names):
+            for member_name, member_obj in inspect.getmembers(module):
+                if inspect.isclass(member_obj):
+                    clazz = getattr(module, member_name)
+                    all_base_classes = [
+                        base_class.__name__ for base_class in inspect.getmro(
+                            clazz)]
+                    if 'Model' in all_base_classes:
+                        model_classes.append(clazz)
+        return model_classes
+
+    @classmethod
+    def get_all_storage_model_classes(cls):
+        """Get all model classes that are saved in the storage, NOT model
+        classes that are just inherited from (BaseModel,
+        BaseCommitLogEntryModel, etc.).
+
+        Returns:
+            list(class). The corresponding storage-layer model classes.
+        """
+        model_names = [
+            name for name in NAMES.__dict__
+            if '__' not in name and name != 'base_model']
+        return cls.get_storage_model_classes(model_names)
 
     @classmethod
     def import_transaction_services(cls):
@@ -270,6 +307,30 @@ class Registry(python_utils.OBJECT):
             list(module). The corresponding storage-layer modules.
         """
         return cls._get().import_models(model_names)
+
+    @classmethod
+    def get_storage_model_classes(cls, model_names):
+        """Get the storage model classes that are in the modules listed in
+        model_names.
+
+        Args:
+            model_names: list(str). List of storage module names.
+
+        Returns:
+            list(class). The corresponding storage-layer model classes.
+        """
+        return cls._get().get_storage_model_classes(model_names)
+
+    @classmethod
+    def get_all_storage_model_classes(cls):
+        """Get all model classes that are saved in the storage, NOT model
+        classes that are just inherited from (BaseModel,
+        BaseCommitLogEntryModel, etc.).
+
+        Returns:
+            list(class). The corresponding storage-layer model classes.
+        """
+        return cls._get().get_all_storage_model_classes()
 
     @classmethod
     def import_current_user_services(cls):

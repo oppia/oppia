@@ -27,26 +27,16 @@ require('services/html-escaper.service.ts');
 require('interactions/interactions-extension.constants.ajs.ts');
 
 angular.module('oppia').directive('oppiaResponseGraphInput', [
-  'GraphDetailService', 'HtmlEscaperService', 'UrlInterpolationService',
-  'GRAPH_INPUT_LEFT_MARGIN',
-  function(
-      GraphDetailService, HtmlEscaperService, UrlInterpolationService,
-      GRAPH_INPUT_LEFT_MARGIN) {
+  'GraphDetailService', 'HtmlEscaperService', 'GRAPH_INPUT_LEFT_MARGIN',
+  function(GraphDetailService, HtmlEscaperService, GRAPH_INPUT_LEFT_MARGIN) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/GraphInput/directives/' +
-        'graph-input-response.directive.html'),
+      template: require('./graph-input-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.graph = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        ctrl.VERTEX_RADIUS = GraphDetailService.VERTEX_RADIUS;
-        ctrl.EDGE_WIDTH = GraphDetailService.EDGE_WIDTH;
-        ctrl.GRAPH_INPUT_LEFT_MARGIN = GRAPH_INPUT_LEFT_MARGIN;
-
         ctrl.getDirectedEdgeArrowPoints = function(index) {
           return GraphDetailService.getDirectedEdgeArrowPoints(
             ctrl.graph, index);
@@ -54,6 +44,12 @@ angular.module('oppia').directive('oppiaResponseGraphInput', [
 
         ctrl.getEdgeCentre = function(index) {
           return GraphDetailService.getEdgeCentre(ctrl.graph, index);
+        };
+        ctrl.$onInit = function() {
+          ctrl.graph = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          ctrl.VERTEX_RADIUS = GraphDetailService.VERTEX_RADIUS;
+          ctrl.EDGE_WIDTH = GraphDetailService.EDGE_WIDTH;
+          ctrl.GRAPH_INPUT_LEFT_MARGIN = GRAPH_INPUT_LEFT_MARGIN;
         };
       }]
     };

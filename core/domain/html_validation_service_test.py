@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for the HTML validation."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -1344,18 +1345,17 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }]
 
         exp_id = 'eid'
-        owner_id = 'Admin'
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-        fs.commit(owner_id, 'image/abc1.png', raw_image, mimetype='image/png')
-        fs.commit(owner_id, 'image/abc2.png', raw_image, mimetype='image/png')
-        fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc1.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc2.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc3.png', raw_image, mimetype='image/png')
 
         for test_case in test_cases:
             self.assertEqual(
@@ -1382,16 +1382,15 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         )
 
         exp_id = 'exp_id'
-        owner_id = 'Admin'
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-        fs.commit(owner_id, 'image/abc1.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc1.png', raw_image, mimetype='image/png')
 
         with assert_raises_context_manager, logging_swap:
             html_validation_service.add_dimensions_to_image_tags(
@@ -1449,17 +1448,16 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }]
 
         exp_id = 'eid'
-        owner_id = 'Admin'
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-        fs.commit(owner_id, 'image/img.png', raw_image, mimetype='image/png')
-        fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
+        fs.commit('image/img.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc3.png', raw_image, mimetype='image/png')
 
         for test_case in test_cases:
             self.assertEqual(

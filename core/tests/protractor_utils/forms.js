@@ -260,6 +260,19 @@ var RichTextEditor = function(elem) {
   };
 };
 
+// Used to edit entries of a set of HTML strings, specifically used in the item
+// selection interaction test to customize interaction details
+var SetOfHtmlStringEditor = function(elem) {
+  return {
+    editEntry: function(index, objectType) {
+      var entry = elem.element(by.repeater('property in propertySchemas()').
+        row(index));
+      var editor = getEditor(objectType);
+      return editor(entry);
+    }
+  };
+};
+
 var UnicodeEditor = function(elem) {
   return {
     setValue: function(text) {
@@ -707,14 +720,25 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
   };
 };
 
+var CodeStringEditor = function(elem) {
+  return {
+    setValue: function(code) {
+      elem.element(by.tagName('textarea')).clear();
+      elem.element(by.tagName('textarea')).sendKeys(code);
+    }
+  };
+};
+
 // This is used by the list and dictionary editors to retrieve the editors of
 // their entries dynamically.
 var FORM_EDITORS = {
+  CodeString: CodeStringEditor,
   Dictionary: DictionaryEditor,
   Graph: GraphEditor,
   List: ListEditor,
   Real: RealEditor,
   RichText: RichTextEditor,
+  SetOfHtmlString: SetOfHtmlStringEditor,
   Unicode: UnicodeEditor
 };
 
@@ -728,10 +752,12 @@ var getEditor = function(formName) {
   }
 };
 
+exports.CodeStringEditor = CodeStringEditor;
 exports.DictionaryEditor = DictionaryEditor;
 exports.ListEditor = ListEditor;
 exports.RealEditor = RealEditor;
 exports.RichTextEditor = RichTextEditor;
+exports.SetOfHtmlStringEditor = SetOfHtmlStringEditor;
 exports.UnicodeEditor = UnicodeEditor;
 exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
 exports.AutocompleteMultiDropdownEditor = AutocompleteMultiDropdownEditor;

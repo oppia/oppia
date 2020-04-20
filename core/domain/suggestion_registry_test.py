@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for suggestion registry classes."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -1051,10 +1052,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         self.suggestion_dict = {
-            'suggestion_id': 'exploration.exp1.thread1',
+            'suggestion_id': 'skill1.thread1',
             'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             'target_type': suggestion_models.TARGET_TYPE_SKILL,
-            'target_id': 'exp1',
+            'target_id': 'skill1',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
             'author_name': 'author',
@@ -1069,7 +1070,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_1']
                 },
-                'skill_id': 'skill_1'
+                'skill_id': 'skill_1',
+                'skill_difficulty': 0.3,
             },
             'score_category': 'question.topic_1',
             'last_updated': utils.get_time_in_millisecs(self.fake_date)
@@ -1153,7 +1155,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception,
-            'Expected change to be an instance of QuestionChange'):
+            'Expected change to be an instance of QuestionSuggestionChange'):
             suggestion.validate()
 
     def test_validate_change_cmd(self):
@@ -1241,6 +1243,41 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             '%s' % feconf.CURRENT_STATE_SCHEMA_VERSION):
             suggestion.validate()
 
+    def test_validate_change_skill_difficulty_none(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+        suggestion.validate()
+
+        suggestion.change.skill_difficulty = None
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected change to contain skill_difficulty'):
+            suggestion.validate()
+
+    def test_validate_change_skill_difficulty_invalid_value(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+        suggestion.validate()
+
+        suggestion.change.skill_difficulty = 0.4
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected change skill_difficulty to be one of '):
+            suggestion.validate()
+
     def test_pre_accept_validate_change_skill_id(self):
         expected_suggestion_dict = self.suggestion_dict
 
@@ -1253,7 +1290,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'], self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, 'description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion.change.skill_id = skill_id
 
         suggestion.pre_accept_validate()
@@ -1277,7 +1314,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'], self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, 'description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion.change.skill_id = skill_id
 
         suggestion.pre_accept_validate()
@@ -1306,7 +1343,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'], self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, 'description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion.change.skill_id = skill_id
 
         suggestion.pre_accept_validate()
@@ -1422,7 +1459,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION)
             },
-            'skill_id': 'skill_1'
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3
         }
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1436,7 +1474,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'The new change question_dict must not be equal to the '
             'old question_dict'):
             suggestion.pre_update_validate(
-                question_domain.QuestionChange(change))
+                question_domain.QuestionSuggestionChange(change))
 
 
 class MockInvalidVoiceoverApplication(
@@ -1490,7 +1528,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
                 self.author_id, None, 'en', 'audio_file.mp3', '<p>Content</p>',
                 None))
 
-    def test_validation_with_invalid_target_type_rasie_exception(self):
+    def test_validation_with_invalid_target_type_raise_exception(self):
         self.voiceover_application.validate()
 
         self.voiceover_application.target_type = 'invalid_target'
@@ -1499,7 +1537,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
             'received invalid_target'):
             self.voiceover_application.validate()
 
-    def test_validation_with_invalid_target_id_rasie_exception(self):
+    def test_validation_with_invalid_target_id_raise_exception(self):
         self.voiceover_application.validate()
 
         self.voiceover_application.target_id = 123
@@ -1507,7 +1545,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
             Exception, 'Expected target_id to be a string'):
             self.voiceover_application.validate()
 
-    def test_validation_with_invalid_status_rasie_exception(self):
+    def test_validation_with_invalid_status_raise_exception(self):
         self.voiceover_application.validate()
 
         self.voiceover_application.status = 'invalid_status'
@@ -1516,7 +1554,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
             'received invalid_status'):
             self.voiceover_application.validate()
 
-    def test_validation_with_invalid_author_id_rasie_exception(self):
+    def test_validation_with_invalid_author_id_raise_exception(self):
         self.voiceover_application.validate()
 
         self.voiceover_application.author_id = 123
@@ -1524,7 +1562,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
             Exception, 'Expected author_id to be a string'):
             self.voiceover_application.validate()
 
-    def test_validation_with_invalid_final_reviewer_id_rasie_exception(self):
+    def test_validation_with_invalid_final_reviewer_id_raise_exception(self):
         self.assertEqual(
             self.voiceover_application.status,
             suggestion_models.STATUS_IN_REVIEW)

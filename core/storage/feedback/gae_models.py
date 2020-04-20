@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for Oppia feedback threads and messages."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -78,7 +79,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     message_count = ndb.IntegerProperty(indexed=True, default=0)
     # Cached text of the last message in the thread with non-empty content, or
     # None if there is no such message.
-    last_nonempty_message_text = ndb.StringProperty(indexed=True)
+    last_nonempty_message_text = ndb.TextProperty(indexed=False)
     # Cached ID for the user of the last message in the thread with non-empty
     # content, or None if the message was made anonymously or if there is no
     # such message.
@@ -88,6 +89,11 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     def get_deletion_policy():
         """General feedback thread needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -99,7 +105,18 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.original_author_id == user_id).get() is not None
+        return cls.query(cls.original_author_id == user_id).get(
+            keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """GeneralFeedbackThreadModel has one field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
+
+    @classmethod
+    def get_user_id_migration_field(cls):
+        """Return field that contains user ID."""
+        return cls.original_author_id
 
     @classmethod
     def export_data(cls, user_id):
@@ -217,7 +234,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     # rest of the thread, should exist only when the subject changes.
     updated_subject = ndb.StringProperty(indexed=False)
     # Message text. Allowed not to exist (e.g. post only to update the status).
-    text = ndb.StringProperty(indexed=False)
+    text = ndb.TextProperty(indexed=False)
     # Whether the incoming message is received by email (as opposed to via
     # the web).
     received_via_email = (
@@ -227,6 +244,12 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     def get_deletion_policy():
         """General feedback message needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -238,7 +261,18 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.author_id == user_id).get() is not None
+        return cls.query(cls.author_id == user_id).get(
+            keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """GeneralFeedbackMessageModel has one field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
+
+    @classmethod
+    def get_user_id_migration_field(cls):
+        """Return field that contains user ID."""
+        return cls.author_id
 
     @classmethod
     def export_data(cls, user_id):
@@ -445,6 +479,12 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
+
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether GeneralFeedbackThreadUserModel exists for user.
@@ -455,7 +495,14 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """GeneralFeedbackThreadUserModel has ID that contains user ID and one
+        field that contains user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def generate_full_id(cls, user_id, thread_id):
@@ -562,6 +609,11 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
         """FeedbackAnalyticsModel doesn't reference any user_id directly.
@@ -574,6 +626,11 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
             bool. Whether any models refer to the given user ID.
         """
         return False
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """FeedbackAnalyticsModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def create(cls, model_id, num_open_threads, num_total_threads):
@@ -620,6 +677,11 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
         """Unsent feedback email is kept until sent."""
         return base_models.DELETION_POLICY.KEEP
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether UnsentFeedbackEmailModel exists for user.
@@ -631,3 +693,10 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UnsentFeedbackEmailModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Domain objects for feedback models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -80,7 +81,8 @@ class FeedbackThread(python_utils.OBJECT):
             dict. A dict representation of the FeedbackThread object.
         """
         return {
-            'last_updated': utils.get_time_in_millisecs(self.last_updated),
+            'last_updated_msecs': (
+                utils.get_time_in_millisecs(self.last_updated)),
             'original_author_username': (
                 user_services.get_username(self.original_author_id)
                 if self.original_author_id else None),
@@ -187,14 +189,13 @@ class FeedbackMessage(python_utils.OBJECT):
             'author_username': (
                 user_services.get_username(self.author_id)
                 if self.author_id else None),
-            'created_on': utils.get_time_in_millisecs(self.created_on),
+            'created_on_msecs': utils.get_time_in_millisecs(self.created_on),
             'entity_type': self.entity_type,
             'entity_id': self.entity_id,
             'message_id': self.message_id,
             'text': self.text,
             'updated_status': self.updated_status,
-            'updated_subject': self.updated_subject,
-            'received_via_email': self.received_via_email
+            'updated_subject': self.updated_subject
         }
 
 
@@ -260,4 +261,68 @@ class FeedbackMessageReference(python_utils.OBJECT):
             'entity_id': self.entity_id,
             'thread_id': self.thread_id,
             'message_id': self.message_id
+        }
+
+
+class FeedbackThreadSummary(python_utils.OBJECT):
+    """Domain object for the summary of a particular thread.
+
+    Attributes:
+        status: str. The status of the thread.
+        original_author_id: str. The id of the original author of the thread.
+        last_updated: datetime.datetime. When was the thread last updated.
+        last_message_text: str. The text of the last message.
+        total_message_count: int. The total number of messages in the thread.
+        last_message_is_read: bool. Whether the last message is read by the
+            user.
+        second_last_message_is_read: bool. Whether the second last message is
+            read by the user,
+        author_last_message: str. The name of the author of the last message.
+        author_second_last_message: str. The name of the author of the second
+            last message.
+        exploration_title: str. The title of the exploration to which
+            exploration belongs.
+        exploration_id: str. The id of the exploration associated to the thread.
+        thread_id: str. The id of the thread this dict is describing.
+    """
+
+    def __init__(
+            self, status, original_author_id, last_updated, last_message_text,
+            total_message_count, last_message_is_read,
+            second_last_message_is_read, author_last_message,
+            author_second_last_message, exploration_title, exploration_id,
+            thread_id):
+        self.status = status
+        self.original_author_id = original_author_id
+        self.last_updated = last_updated
+        self.last_message_text = last_message_text
+        self.total_message_count = total_message_count
+        self.last_message_is_read = last_message_is_read
+        self.second_last_message_is_read = second_last_message_is_read
+        self.author_last_message = author_last_message
+        self.author_second_last_message = author_second_last_message
+        self.exploration_title = exploration_title
+        self.exploration_id = exploration_id
+        self.thread_id = thread_id
+
+    def to_dict(self):
+        """Returns dict representation of the FeedbackThreadSummary object.
+
+        Returns:
+            dict. Dict representation of the FeedbackThreadSummary object.
+        """
+        return {
+            'status': self.status,
+            'original_author_id': self.original_author_id,
+            'last_updated_msecs': (
+                utils.get_time_in_millisecs(self.last_updated)),
+            'last_message_text': self.last_message_text,
+            'total_message_count': self.total_message_count,
+            'last_message_is_read': self.last_message_is_read,
+            'second_last_message_is_read': self.second_last_message_is_read,
+            'author_last_message': self.author_last_message,
+            'author_second_last_message': self.author_second_last_message,
+            'exploration_title': self.exploration_title,
+            'exploration_id': self.exploration_id,
+            'thread_id': self.thread_id,
         }

@@ -15,12 +15,14 @@
 # limitations under the License.]
 
 """Domain objects for topics, and related models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 
 from constants import constants
+from core.domain import android_validation_constants
 from core.domain import change_domain
 from core.domain import user_services
 from core.platform import models
@@ -490,6 +492,12 @@ class Topic(python_utils.OBJECT):
         if name == '':
             raise utils.ValidationError('Name field should not be empty')
 
+        if (
+                len(name) >
+                android_validation_constants.MAX_CHARS_IN_TOPIC_NAME):
+            raise utils.ValidationError(
+                'Topic name should be at most 35 characters.')
+
     @classmethod
     def require_valid_abbreviated_name(cls, name):
         """Checks whether the abbreviated name of the topic is a valid one.
@@ -504,7 +512,9 @@ class Topic(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Abbreviated name field should not be empty.')
 
-        if len(name) > 12:
+        if (
+                len(name) >
+                android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME):
             raise utils.ValidationError(
                 'Abbreviated name field should not exceed 12 characters.')
 
@@ -677,8 +687,12 @@ class Topic(python_utils.OBJECT):
                 'The story_id %s is not present in the additional '
                 'story references list of the topic.' % story_id)
 
-    def validate(self):
+    def validate(self, strict=False):
         """Validates all properties of this topic and its constituents.
+
+        Args:
+            strict: bool. Enable strict checks on the topic when the topic is
+                published or is going to be published.
 
         Raises:
             ValidationError: One or more attributes of the Topic are not
@@ -691,10 +705,23 @@ class Topic(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected thumbnail filename to be a string, received %s'
                 % self.thumbnail_filename)
+
+        if strict:
+            if not isinstance(self.thumbnail_filename, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected thumbnail filename to be a string, received %s'
+                    % self.thumbnail_filename)
+
         if not isinstance(self.description, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
                 % self.description)
+
+        if (
+                len(self.description) >
+                android_validation_constants.MAX_CHARS_IN_TOPIC_DESCRIPTION):
+            raise utils.ValidationError(
+                'Topic description should be at most 240 characters.')
 
         if not isinstance(self.subtopics, list):
             raise utils.ValidationError(
@@ -735,6 +762,11 @@ class Topic(python_utils.OBJECT):
                     'The id for subtopic %s is greater than or equal to '
                     'next_subtopic_id %s'
                     % (subtopic.id, self.next_subtopic_id))
+            if strict:
+                if not subtopic.skill_ids:
+                    raise utils.ValidationError(
+                        'Subtopic with title %s does not have any skills '
+                        'linked.' % subtopic.title)
 
         if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -861,8 +893,14 @@ class Topic(python_utils.OBJECT):
 
         Args:
             new_name: str. The updated name for the topic.
+
+        Raises:
+            ValidationError: Name should be a string.
         """
+        if not isinstance(new_name, python_utils.BASESTRING):
+            raise utils.ValidationError('Name should be a string.')
         self.name = new_name
+        self.canonical_name = new_name.lower()
 
     def update_abbreviated_name(self, new_abbreviated_name):
         """Updates the abbreviated_name of a topic object.

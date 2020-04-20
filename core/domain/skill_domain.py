@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Domain objects relating to skills."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -62,8 +63,6 @@ CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION = (
     'migrate_misconceptions_schema_to_latest_version')
 CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION = (
     'migrate_rubrics_schema_to_latest_version')
-
-CMD_PUBLISH_SKILL = 'publish_skill'
 
 
 class SkillChange(change_domain.BaseChange):
@@ -326,6 +325,72 @@ class Rubric(python_utils.OBJECT):
                 self.explanation)
 
 
+class WorkedExample(python_utils.OBJECT):
+    """Domain object for representing the worked_example dict."""
+
+    def __init__(self, question, explanation):
+        """Constructs a WorkedExample domain object.
+
+        Args:
+            question: SubtitledHtml. The example question.
+            explanation: SubtitledHtml. The explanation for the above example
+                question.
+        """
+        self.question = question
+        self.explanation = explanation
+
+    def validate(self):
+        """Validates various properties of the WorkedExample object.
+
+        Raises:
+            ValidationError: One or more attributes of the worked example are
+            invalid.
+        """
+        if not isinstance(self.question, state_domain.SubtitledHtml):
+            raise utils.ValidationError(
+                'Expected example question to be a SubtitledHtml object, '
+                'received %s' % self.question)
+        self.question.validate()
+        if not isinstance(self.explanation, state_domain.SubtitledHtml):
+            raise utils.ValidationError(
+                'Expected example explanation to be a SubtitledHtml object, '
+                'received %s' % self.question)
+        self.explanation.validate()
+
+    def to_dict(self):
+        """Returns a dict representing this WorkedExample domain object.
+
+        Returns:
+            A dict, mapping all fields of WorkedExample instance.
+        """
+        return {
+            'question': self.question.to_dict(),
+            'explanation': self.explanation.to_dict()
+        }
+
+    @classmethod
+    def from_dict(cls, worked_example_dict):
+        """Return a WorkedExample domain object from a dict.
+
+        Args:
+            worked_example_dict: dict. The dict representation of
+                WorkedExample object.
+
+        Returns:
+            WorkedExample. The corresponding WorkedExample domain object.
+        """
+        worked_example = cls(
+            state_domain.SubtitledHtml(
+                worked_example_dict['question']['content_id'],
+                worked_example_dict['question']['html']),
+            state_domain.SubtitledHtml(
+                worked_example_dict['explanation']['content_id'],
+                worked_example_dict['explanation']['html'])
+        )
+
+        return worked_example
+
+
 class SkillContents(python_utils.OBJECT):
     """Domain object representing the skill_contents dict."""
 
@@ -337,8 +402,8 @@ class SkillContents(python_utils.OBJECT):
         Args:
             explanation: SubtitledHtml. An explanation on how to apply the
                 skill.
-            worked_examples: list(SubtitledHtml). A list of worked examples
-                for the skill. Each element should be a SubtitledHtml object.
+            worked_examples: list(WorkedExample). A list of worked examples
+                for the skill. Each element should be a WorkedExample object.
             recorded_voiceovers: RecordedVoiceovers. The recorded voiceovers for
                 the skill contents and their translations in different
                 languages.
@@ -369,15 +434,21 @@ class SkillContents(python_utils.OBJECT):
                 'Expected worked examples to be a list, received %s' %
                 self.worked_examples)
         for example in self.worked_examples:
-            if not isinstance(example, state_domain.SubtitledHtml):
+            if not isinstance(example, WorkedExample):
                 raise utils.ValidationError(
-                    'Expected worked example to be a SubtitledHtml object, '
+                    'Expected worked example to be a WorkedExample object, '
                     'received %s' % example)
-            if example.content_id in available_content_ids:
-                raise utils.ValidationError(
-                    'Found a duplicate content id %s' % example.content_id)
-            available_content_ids.add(example.content_id)
             example.validate()
+            if example.question.content_id in available_content_ids:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s'
+                    % example.question.content_id)
+            if example.explanation.content_id in available_content_ids:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s'
+                    % example.explanation.content_id)
+            available_content_ids.add(example.question.content_id)
+            available_content_ids.add(example.explanation.content_id)
 
         self.recorded_voiceovers.validate(available_content_ids)
         self.written_translations.validate(available_content_ids)
@@ -411,10 +482,8 @@ class SkillContents(python_utils.OBJECT):
             state_domain.SubtitledHtml(
                 skill_contents_dict['explanation']['content_id'],
                 skill_contents_dict['explanation']['html']),
-            [state_domain.SubtitledHtml(
-                worked_example['content_id'],
-                worked_example['html'])
-             for worked_example in skill_contents_dict['worked_examples']],
+            [WorkedExample.from_dict(example)
+             for example in skill_contents_dict['worked_examples']],
             state_domain.RecordedVoiceovers.from_dict(skill_contents_dict[
                 'recorded_voiceovers']),
             state_domain.WrittenTranslations.from_dict(skill_contents_dict[
@@ -839,14 +908,13 @@ class Skill(python_utils.OBJECT):
         """Updates the explanation of the skill.
 
         Args:
-            explanation: dict. The new explanation of the skill.
+            explanation: SubtitledHtml. The new explanation of the skill.
         """
         old_content_ids = []
         if self.skill_contents.explanation:
             old_content_ids = [self.skill_contents.explanation.content_id]
 
-        self.skill_contents.explanation = (
-            state_domain.SubtitledHtml.from_dict(explanation))
+        self.skill_contents.explanation = explanation
 
         new_content_ids = [self.skill_contents.explanation.content_id]
         self._update_content_ids_in_assets(old_content_ids, new_content_ids)
@@ -856,16 +924,20 @@ class Skill(python_utils.OBJECT):
         of the provided list.
 
         Args:
-            worked_examples: list(SubtitledHtml). The new worked examples of
+            worked_examples: list(WorkedExample). The new worked examples of
                 the skill.
         """
-        old_content_ids = [worked_example.content_id for worked_example in (
-            self.skill_contents.worked_examples)]
+        old_content_ids = [
+            example_field.content_id
+            for example in self.skill_contents.worked_examples
+            for example_field in (example.question, example.explanation)]
 
         self.skill_contents.worked_examples = list(worked_examples)
 
-        new_content_ids = [worked_example.content_id for worked_example in (
-            self.skill_contents.worked_examples)]
+        new_content_ids = [
+            example_field.content_id
+            for example in self.skill_contents.worked_examples
+            for example_field in (example.question, example.explanation)]
 
         self._update_content_ids_in_assets(old_content_ids, new_content_ids)
 
@@ -1172,73 +1244,6 @@ class SkillSummary(python_utils.OBJECT):
             'skill_model_last_updated': utils.get_time_in_millisecs(
                 self.skill_model_last_updated)
         }
-
-
-class SkillRights(python_utils.OBJECT):
-    """Domain object for skill rights."""
-
-    def __init__(self, skill_id, skill_is_private, creator_id):
-        """Constructor for a skill rights domain object.
-
-        Args:
-            skill_id: str. The id of the skill.
-            skill_is_private: bool. Whether the skill is private.
-            creator_id: str. The id of the creator of this skill.
-        """
-        self.id = skill_id
-        self.skill_is_private = skill_is_private
-        self.creator_id = creator_id
-
-    def to_dict(self):
-        """Returns a dict suitable for use by the frontend.
-
-        Returns:
-            dict. A dict version of SkillRights suitable for use by the
-                frontend.
-        """
-        return {
-            'skill_id': self.id,
-            'skill_is_private': self.skill_is_private,
-            'creator_id': self.creator_id
-        }
-
-    def is_creator(self, user_id):
-        """Checks whether the given user is the creator of this skill.
-
-        Args:
-            user_id: str. Id of the user.
-
-        Returns:
-            bool. Whether the user is the creator of this skill.
-        """
-        return bool(user_id == self.creator_id)
-
-    def is_private(self):
-        """Returns whether the skill is private.
-
-        Returns:
-            bool. Whether the skill is private.
-        """
-        return self.skill_is_private
-
-
-class SkillRightsChange(change_domain.BaseChange):
-    """Domain object for changes made to a skill rights object.
-
-    The allowed commands, together with the attributes:
-        - 'create_new'
-        - 'publish_skill'.
-    """
-
-    ALLOWED_COMMANDS = [{
-        'name': CMD_CREATE_NEW,
-        'required_attribute_names': [],
-        'optional_attribute_names': []
-    }, {
-        'name': CMD_PUBLISH_SKILL,
-        'required_attribute_names': [],
-        'optional_attribute_names': []
-    }]
 
 
 class UserSkillMastery(python_utils.OBJECT):

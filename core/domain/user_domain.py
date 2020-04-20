@@ -15,12 +15,14 @@
 # limitations under the License.
 
 """Domain objects for user."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -279,3 +281,67 @@ class UserContributionScoring(python_utils.OBJECT):
         self.score_category = score_category
         self.score = score
         self.has_email_been_sent = has_email_been_sent
+
+
+class UserCommunityRights(python_utils.OBJECT):
+    """Domain object for the UserCommunityRightsModel."""
+
+    def __init__(
+            self, user_id, can_review_translation_for_language_codes,
+            can_review_voiceover_for_language_codes, can_review_questions):
+        self.id = user_id
+        self.can_review_translation_for_language_codes = (
+            can_review_translation_for_language_codes)
+        self.can_review_voiceover_for_language_codes = (
+            can_review_voiceover_for_language_codes)
+        self.can_review_questions = can_review_questions
+
+    def can_review_at_least_one_item(self):
+        """Checks whether user has rights to review at least one item.
+
+        Returns:
+            boolean. Whether user has rights to review at east one item.
+        """
+        return (
+            self.can_review_translation_for_language_codes or
+            self.can_review_voiceover_for_language_codes or
+            self.can_review_questions)
+
+    def validate(self):
+        """Validates different attributes of the class."""
+        if not isinstance(self.can_review_translation_for_language_codes, list):
+            raise utils.ValidationError(
+                'Expected can_review_translation_for_language_codes to be a '
+                'list, found: %s' % type(
+                    self.can_review_translation_for_language_codes))
+        for language_code in self.can_review_translation_for_language_codes:
+            if not utils.is_supported_audio_language_code(language_code):
+                raise utils.ValidationError('Invalid language_code: %s' % (
+                    language_code))
+        if len(self.can_review_translation_for_language_codes) != len(set(
+                self.can_review_translation_for_language_codes)):
+            raise utils.ValidationError(
+                'Expected can_review_translation_for_language_codes list not '
+                'to have duplicate values, found: %s' % (
+                    self.can_review_translation_for_language_codes))
+
+        if not isinstance(self.can_review_voiceover_for_language_codes, list):
+            raise utils.ValidationError(
+                'Expected can_review_voiceover_for_language_codes to be a '
+                'list, found: %s' % type(
+                    self.can_review_voiceover_for_language_codes))
+        for language_code in self.can_review_voiceover_for_language_codes:
+            if not utils.is_supported_audio_language_code(language_code):
+                raise utils.ValidationError('Invalid language_code: %s' % (
+                    language_code))
+        if len(self.can_review_voiceover_for_language_codes) != len(set(
+                self.can_review_voiceover_for_language_codes)):
+            raise utils.ValidationError(
+                'Expected can_review_voiceover_for_language_codes list not to '
+                'have duplicate values, found: %s' % (
+                    self.can_review_voiceover_for_language_codes))
+
+        if not isinstance(self.can_review_questions, bool):
+            raise utils.ValidationError(
+                'Expected can_review_questions to be a boolean value, '
+                'found: %s' % type(self.can_review_questions))

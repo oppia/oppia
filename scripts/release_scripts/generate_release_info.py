@@ -96,7 +96,8 @@ def get_extra_commits_in_new_release(base_commit, repo):
         the current commit, which haven't been cherrypicked already.
     """
     get_commits_cmd = GIT_CMD_TEMPLATE_GET_NEW_COMMITS % base_commit
-    out = common.run_cmd(get_commits_cmd.split(' ')).split('\n')
+    out = python_utils.UNICODE(
+        common.run_cmd(get_commits_cmd.split(' ')), 'utf-8').split('\n')
     commits = []
     for line in out:
         # Lines that start with a - are already cherrypicked. The commits of
@@ -196,7 +197,8 @@ def get_changelog_categories(pulls):
         formatted_title = '%s (#%d)' % (pull.title, pull.number)
         for label in labels:
             if 'CHANGELOG:' in label.name:
-                category = label.name[label.name.find(':') + 2:]
+                category = label.name[
+                    label.name.find(':') + 2:label.name.find(' --')]
                 added_to_dict = True
                 result[category].append(formatted_title)
                 break
@@ -294,9 +296,6 @@ def main(personal_access_token):
             'This script should only be run from the latest release branch.')
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
-
-    common.check_blocking_bug_issue_count(repo)
-    common.check_prs_for_current_release_are_released(repo)
 
     current_release = get_current_version_tag(repo)
     current_release_tag = current_release.name
@@ -402,3 +401,10 @@ def main(personal_access_token):
 
     python_utils.PRINT('Done. Summary file generated in %s' % (
         release_constants.RELEASE_SUMMARY_FILEPATH))
+
+
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when generate_release_info.py is used as
+# a script.
+if __name__ == '__main__': # pragma: no cover
+    main(common.get_personal_access_token())

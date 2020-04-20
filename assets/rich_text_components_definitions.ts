@@ -43,27 +43,6 @@ export = {
       "default_value": "You have opened the collapsible block."
     }]
   },
-  "Concept": {
-    "backend_id": "concept",
-    "category": "Basic Input",
-    "description": "A link to the concept card of the linked skill.",
-    "frontend_id": "concept",
-    "tooltip": "Insert Concept Card Link",
-    "icon_data_url": "/rich_text_components/Concept/Concept.png",
-    "is_complex": false,
-    "requires_fs": false,
-    "is_lesson_related": true,
-    "is_block_element": false,
-    "customization_arg_specs": [{
-      "name": "skill_summary",
-      "description": "Click on skill to view concept card.",
-      "schema": {
-        "type": "custom",
-        "obj_type": "SkillSelector"
-      },
-      "default_value": ""
-    }]
-  },
   "Image": {
     "backend_id": "Image",
     "category": "Basic Input",
@@ -154,6 +133,34 @@ export = {
       "default_value": ""
     }]
   },
+  "Skillreview": {
+    "backend_id": "skillreview",
+    "category": "Basic Input",
+    "description": "A link to the concept card of the linked skill.",
+    "frontend_id": "skillreview",
+    "tooltip": "Insert Concept Card Link",
+    "icon_data_url": "/rich_text_components/Skillreview/Skillreview.png",
+    "is_complex": false,
+    "requires_fs": false,
+    "is_lesson_related": true,
+    "is_block_element": false,
+    "customization_arg_specs": [{
+      "name": "text",
+      "description": "The link to be displayed",
+      "schema": {
+        "type": "unicode"
+      },
+      "default_value": ""
+    }, {
+      "name": "skill_id",
+      "description": "The skill that this link refers to",
+      "schema": {
+        "type": "custom",
+        "obj_type": "SkillSelector"
+      },
+      "default_value": ""
+    }]
+  },
   "Tabs": {
     "backend_id": "Tabs",
     "category": "Basic Input",
@@ -194,7 +201,7 @@ export = {
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "video_id",
-      "description": "The YouTube id for this video. This is the 11-character string after \"v=\" in the video URL.",
+      "description": "The Youtube URL or the YouTube id for this video. (The Youtube id is the 11-character string after \"v=\" in the video URL.)",
       "schema": {
         "type": "unicode"
       },

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for Oppia recommendations."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -44,6 +45,11 @@ class ExplorationRecommendationsModel(
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
         """ExplorationRecommendationsModel doesn't reference any user_id
@@ -57,6 +63,13 @@ class ExplorationRecommendationsModel(
             bool. Whether any models refer to the given user ID.
         """
         return False
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationRecommendationsModel doesn't have any field with user
+        ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
 
 class TopicSimilaritiesModel(base_models.BaseModel):
@@ -79,3 +92,13 @@ class TopicSimilaritiesModel(base_models.BaseModel):
         codebase.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """TopicSimilaritiesModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE

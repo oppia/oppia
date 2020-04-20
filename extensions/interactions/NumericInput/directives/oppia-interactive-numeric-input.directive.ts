@@ -20,7 +20,6 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('interactions/NumericInput/directives/numeric-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
@@ -28,14 +27,12 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveNumericInput', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/NumericInput/directives/' +
-        'numeric-input-interaction.directive.html'),
+      template: require('./numeric-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'FocusManagerService', 'NumericInputRulesService',
@@ -44,14 +41,6 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
             $attrs, FocusManagerService, NumericInputRulesService,
             WindowDimensionsService, CurrentInteractionService) {
           var ctrl = this;
-          ctrl.answer = '';
-          ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
-
-          ctrl.NUMERIC_INPUT_FORM_SCHEMA = {
-            type: 'float',
-            ui_config: {}
-          };
-
           var isAnswerValid = function() {
             return (
               ctrl.answer !== undefined &&
@@ -68,9 +57,18 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
           var submitAnswerFn = function() {
             ctrl.submitAnswer(ctrl.answer);
           };
+          ctrl.$onInit = function() {
+            ctrl.answer = '';
+            ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
-          CurrentInteractionService.registerCurrentInteraction(
-            submitAnswerFn, isAnswerValid);
+            ctrl.NUMERIC_INPUT_FORM_SCHEMA = {
+              type: 'float',
+              ui_config: {}
+            };
+
+            CurrentInteractionService.registerCurrentInteraction(
+              submitAnswerFn, isAnswerValid);
+          };
         }
       ]
     };

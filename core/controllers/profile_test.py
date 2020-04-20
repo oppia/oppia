@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the profile page."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -581,7 +582,7 @@ class SignupTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         response = self.get_html_response(feconf.SIGNUP_URL)
         response = self.get_html_response('/create/0', expected_status_int=302)
-        self.assertIn('Logout', response.headers['location'])
+        self.assertIn('logout', response.headers['location'])
         self.assertIn('create', response.headers['location'])
 
         self.logout()
@@ -772,6 +773,35 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
             self.get_html_response('/delete-account', expected_status_int=404)
 
+
+class DeleteAccountHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(DeleteAccountHandlerTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+
+    def test_delete_delete_account_page(self):
+        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
+            data = self.delete_json('/delete-account-handler')
+            self.assertEqual(data, {'success': True})
+
+    def test_delete_delete_account_page_disabled(self):
+        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
+            self.delete_json('/delete-account-handler', expected_status_int=404)
+
+
+class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
+
+    def test_get_pending_account_deletion_page(self):
+        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
+            response = self.get_html_response('/pending-account-deletion')
+            self.assertIn('Pending Account Deletion', response.body)
+
+    def test_get_pending_account_deletion_page_disabled(self):
+        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
+            self.get_html_response('/pending-account-deletion',
+                                   expected_status_int=404)
 
 
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):

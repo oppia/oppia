@@ -16,6 +16,8 @@
  * @fileoverview Directive for coord two dim editor.
  */
 
+require('domain/utilities/url-interpolation.service.ts');
+
 angular.module('oppia').directive('coordTwoDimEditor', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {
@@ -23,66 +25,67 @@ angular.module('oppia').directive('coordTwoDimEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
-        ctrl.mapCenter = {
-          lat: ctrl.value[0],
-          lng: ctrl.value[1],
-          zoom: 0
-        };
-        ctrl.mapMarkers = {
-          mainMarker: {
-            lat: ctrl.value[0],
-            lng: ctrl.value[1],
-            focus: true,
-            draggable: true,
-            icon: {
-              iconUrl: UrlInterpolationService.getExtensionResourceUrl(
-                '/interactions/InteractiveMap/static/marker-icon.png'),
-              // The size of the icon image in pixels.
-              iconSize: [25, 41],
-              // The coordinates of the "tip" of the icon.
-              iconAnchor: [12, 41],
-              shadowUrl: UrlInterpolationService.getExtensionResourceUrl(
-                '/interactions/InteractiveMap/static/marker-shadow.png'),
-              // The size of the shadow image in pixels.
-              shadowSize: [41, 41],
-              // The coordinates of the "tip" of the shadow.
-              shadowAnchor: [13, 41],
-              // The URL to a retina sized version of the icon image.
-              // Used for Retina screen devices.
-              iconRetinaUrl: UrlInterpolationService.getExtensionResourceUrl(
-                '/interactions/InteractiveMap/static/marker-icon-2x.png'),
-              shadowRetinaUrl: UrlInterpolationService.getExtensionResourceUrl(
-                '/interactions/InteractiveMap/static/marker-shadow.png')
-            }
-          }
-        };
-        ctrl.mapEvents = {
-          map: {
-            enable: ['click'],
-            logic: 'emit'
-          },
-          markers: {
-            enable: ['dragend'],
-            logic: 'emit'
-          }
-        };
-
-        $scope.$on('leafletDirectiveMap.coordTwoDimEditor.click',
-          function(evt, args) {
-            var newLat = args.leafletEvent.latlng.lat;
-            var newLng = args.leafletEvent.latlng.lng;
-            ctrl.value = [newLat, newLng];
-            updateMarker(newLat, newLng);
-          });
-
-        $scope.$on('leafletDirectiveMarker.coordTwoDimEditor.dragend',
-          function(evt, args) {
-            ctrl.value = [args.model.lat, args.model.lng];
-          });
-
         var updateMarker = function(lat, lng) {
           ctrl.mapMarkers.mainMarker.lat = lat;
           ctrl.mapMarkers.mainMarker.lng = lng;
+        };
+        ctrl.$onInit = function() {
+          $scope.$on('leafletDirectiveMap.coordTwoDimEditor.click',
+            function(evt, args) {
+              var newLat = args.leafletEvent.latlng.lat;
+              var newLng = args.leafletEvent.latlng.lng;
+              ctrl.value = [newLat, newLng];
+              updateMarker(newLat, newLng);
+            });
+
+          $scope.$on('leafletDirectiveMarker.coordTwoDimEditor.dragend',
+            function(evt, args) {
+              ctrl.value = [args.model.lat, args.model.lng];
+            });
+          ctrl.mapCenter = {
+            lat: ctrl.value[0],
+            lng: ctrl.value[1],
+            zoom: 0
+          };
+          ctrl.mapMarkers = {
+            mainMarker: {
+              lat: ctrl.value[0],
+              lng: ctrl.value[1],
+              focus: true,
+              draggable: true,
+              icon: {
+                iconUrl: UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/InteractiveMap/static/marker-icon.png'),
+                // The size of the icon image in pixels.
+                iconSize: [25, 41],
+                // The coordinates of the "tip" of the icon.
+                iconAnchor: [12, 41],
+                shadowUrl: UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/InteractiveMap/static/marker-shadow.png'),
+                // The size of the shadow image in pixels.
+                shadowSize: [41, 41],
+                // The coordinates of the "tip" of the shadow.
+                shadowAnchor: [13, 41],
+                // The URL to a retina sized version of the icon image.
+                // Used for Retina screen devices.
+                iconRetinaUrl: UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/InteractiveMap/static/marker-icon-2x.png'),
+                shadowRetinaUrl:
+                UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/InteractiveMap/static/marker-shadow.png')
+              }
+            }
+          };
+          ctrl.mapEvents = {
+            map: {
+              enable: ['click'],
+              logic: 'emit'
+            },
+            markers: {
+              enable: ['dragend'],
+              logic: 'emit'
+            }
+          };
         };
       }],
       restrict: 'E',
@@ -90,7 +93,6 @@ angular.module('oppia').directive('coordTwoDimEditor', [
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/coord-two-dim-editor.directive.html'),
+      template: require('./coord-two-dim-editor.directive.html'),
     };
   }]);

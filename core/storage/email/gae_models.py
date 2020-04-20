@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for the content of sent emails."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -27,7 +28,8 @@ import utils
 
 from google.appengine.ext import ndb
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 
 
 class SentEmailModel(base_models.BaseModel):
@@ -63,8 +65,10 @@ class SentEmailModel(base_models.BaseModel):
         feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
         feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION,
         feconf.EMAIL_INTENT_ONBOARD_REVIEWER,
+        feconf.EMAIL_INTENT_REMOVE_REVIEWER,
         feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
         feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,
+        feconf.EMAIL_INTENT_ACCOUNT_DELETED,
         feconf.BULK_EMAIL_INTENT_TEST
     ])
     # The subject line of the email.
@@ -81,6 +85,13 @@ class SentEmailModel(base_models.BaseModel):
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
 
+    @staticmethod
+    def get_export_policy():
+        """Users already have access to this data since emails were sent
+        to them.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether SentEmailModel exists for user.
@@ -94,7 +105,33 @@ class SentEmailModel(base_models.BaseModel):
         return cls.query(ndb.OR(
             cls.recipient_id == user_id,
             cls.sender_id == user_id,
-        )).get() is not None
+        )).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """SentEmailModel has two fields with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the recipient_id and
+        sender_id.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        migrated_models = []
+        for model in cls.query(ndb.OR(
+                cls.recipient_id == old_user_id,
+                cls.sender_id == old_user_id)).fetch():
+            if model.recipient_id == old_user_id:
+                model.recipient_id = new_user_id
+            if model.sender_id == old_user_id:
+                model.sender_id = new_user_id
+            migrated_models.append(model)
+        SentEmailModel.put_multi(
+            migrated_models, update_last_updated_time=False)
 
     @classmethod
     def _generate_id(cls, intent):
@@ -255,6 +292,16 @@ class SentEmailModel(base_models.BaseModel):
 
         return False
 
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for recipient_id and sender_id."""
+        user_ids = [self.recipient_id, self.sender_id]
+        user_ids = [user_id for user_id in user_ids
+                    if user_id not in feconf.SYSTEM_USERS]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)
+
+
 
 class BulkEmailModel(base_models.BaseModel):
     """Records the content of an email sent from Oppia to multiple users.
@@ -291,6 +338,13 @@ class BulkEmailModel(base_models.BaseModel):
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
 
+    @staticmethod
+    def get_export_policy():
+        """Users already have access to this data since the emails were sent
+        to them.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether BulkEmailModel exists for user. Since recipient_ids
@@ -304,7 +358,18 @@ class BulkEmailModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.sender_id == user_id).get() is not None
+        return cls.query(cls.sender_id == user_id).get(
+            keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """BulkEmailModel has one field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
+
+    @classmethod
+    def get_user_id_migration_field(cls):
+        """Return field that contains user ID."""
+        return cls.sender_id
 
     @classmethod
     def create(
@@ -352,6 +417,11 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         """Feedback email reply to id should be deleted."""
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether GeneralFeedbackEmailReplyToIdModel exists for user.
@@ -362,7 +432,14 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """GeneralFeedbackEmailReplyToIdModel has ID that contains user id and
+        one other field that contains user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def _generate_id(cls, user_id, thread_id):

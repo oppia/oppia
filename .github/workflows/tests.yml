@@ -2,18 +2,18 @@ name: CI Tests
 on: [push]
 
 jobs:
-  frontend:
+  check_e2e_tests_are_captured_in_ci:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-18.04]
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
         with:
           python-version: '2.x'
           architecture: 'x64'
       - name: Install third party
         run: python -m scripts.install_third_party_libs
-      - name: Run frontend tests
-        run: python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+      - name: E2E Runner Test
+        run: python -m scripts.check_e2e_tests_are_captured_in_ci

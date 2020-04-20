@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for skill domain objects and methods defined on them."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -34,14 +35,24 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SkillDomainUnitTests, self).setUp()
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'name', '<p>notes</p>',
             '<p>default_feedback</p>', True)]
@@ -231,7 +242,19 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         self.skill.skill_contents.worked_examples = [1]
         self._assert_validation_error(
-            'Expected worked example to be a SubtitledHtml object')
+            'Expected worked example to be a WorkedExample object')
+
+        example = skill_domain.WorkedExample('question', 'explanation')
+        self.skill.skill_contents.worked_examples = [example]
+        self._assert_validation_error(
+            'Expected example question to be a SubtitledHtml object')
+
+        example = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml(
+                '2', '<p>Example Question 1</p>'), 'explanation')
+        self.skill.skill_contents.worked_examples = [example]
+        self._assert_validation_error(
+            'Expected example explanation to be a SubtitledHtml object')
 
         self.skill.skill_contents.explanation = 'explanation'
         self._assert_validation_error(
@@ -243,7 +266,16 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_duplicate_content_id(self):
         self.skill.skill_contents.worked_examples = (
-            [self.skill.skill_contents.explanation])
+            [skill_domain.WorkedExample(
+                self.skill.skill_contents.explanation,
+                self.skill.skill_contents.explanation)])
+        self._assert_validation_error('Found a duplicate content id 1')
+
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('4', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('1', '<p>Example Explanation 1</p>')
+        )
+        self.skill.skill_contents.worked_examples = [example_1]
         self._assert_validation_error('Found a duplicate content id 1')
 
     def test_misconception_id_validation(self):
@@ -326,13 +358,23 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         """Test that to_dict and from_dict preserve all data within a
         skill_contents and misconception object.
         """
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Answer 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
-                state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+            state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         skill_contents_dict = skill_contents.to_dict()
         skill_contents_from_dict = skill_domain.SkillContents.from_dict(
             skill_contents_dict)
@@ -367,26 +409,33 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             expected_skill_mastery_dict,
             observed_skill_mastery.to_dict())
 
-    def test_skill_rights_to_dict(self):
-        expected_dict = {
-            'creator_id': 'user',
-            'skill_is_private': True,
-            'skill_id': 'skill_id'
-        }
-        skill_rights = skill_domain.SkillRights('skill_id', True, 'user')
-        self.assertDictEqual(expected_dict, skill_rights.to_dict())
-
     def test_update_worked_examples(self):
+        question_1 = {
+            'content_id': 'question_1',
+            'html': '<p>Worked example question 1</p>'
+        }
+        explanation_1 = {
+            'content_id': 'explanation_1',
+            'html': '<p>Worked example explanation 1</p>'
+        }
+        question_2 = {
+            'content_id': 'question_2',
+            'html': '<p>Worked example question 2</p>'
+        }
+        explanation_2 = {
+            'content_id': 'explanation_2',
+            'html': '<p>Worked example explanation 2</p>'
+        }
         worked_examples_dict_list = [{
-            'content_id': 'worked_example_1',
-            'html': '<p>Worked example</p>'
+            'question': question_1,
+            'explanation': explanation_1
         }, {
-            'content_id': 'worked_example_2',
-            'html': '<p>Another worked example</p>'
+            'question': question_2,
+            'explanation': explanation_2
         }]
 
         worked_examples_object_list = [
-            state_domain.SubtitledHtml.from_dict(worked_example)
+            skill_domain.WorkedExample.from_dict(worked_example)
             for worked_example in worked_examples_dict_list]
 
         self.skill.update_worked_examples(worked_examples_object_list)
@@ -397,11 +446,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         self.skill.update_worked_examples(worked_examples_object_list)
         self.skill.validate()
-
-    def test_skill_rights_is_creator(self):
-        skill_rights = skill_domain.SkillRights(self.SKILL_ID, True, 'user')
-        self.assertTrue(skill_rights.is_creator('user'))
-        self.assertFalse(skill_rights.is_creator('fakeuser'))
 
     def test_require_valid_description_with_empty_description_raise_error(self):
         with self.assertRaisesRegexp(
@@ -627,51 +671,6 @@ class SkillChangeTests(test_utils.GenericTestBase):
         }
         skill_change_object = skill_domain.SkillChange(skill_change_dict)
         self.assertEqual(skill_change_object.to_dict(), skill_change_dict)
-
-
-class SkillRightsChangeTests(test_utils.GenericTestBase):
-
-    def test_skill_rights_change_object_with_missing_cmd(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Missing cmd key in change dict'):
-            skill_domain.SkillRightsChange({'invalid': 'data'})
-
-    def test_skill_change_rights_object_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Command invalid is not allowed'):
-            skill_domain.SkillRightsChange({'cmd': 'invalid'})
-
-    def test_skill_rights_change_object_with_extra_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'The following extra attributes are present: invalid')):
-            skill_domain.SkillRightsChange({
-                'cmd': 'publish_skill',
-                'invalid': 'invalid'
-            })
-
-    def test_skill_rights_change_object_with_create_new(self):
-        skill_rights_change_object = skill_domain.SkillRightsChange({
-            'cmd': 'create_new'
-        })
-
-        self.assertEqual(skill_rights_change_object.cmd, 'create_new')
-
-    def test_skill_rights_change_object_with_publish_skill(self):
-        skill_rights_change_object = skill_domain.SkillRightsChange({
-            'cmd': 'publish_skill'
-        })
-
-        self.assertEqual(skill_rights_change_object.cmd, 'publish_skill')
-
-    def test_to_dict(self):
-        skill_rights_change_dict = {
-            'cmd': 'publish_skill'
-        }
-        skill_rights_change_object = skill_domain.SkillRightsChange(
-            skill_rights_change_dict)
-        self.assertEqual(
-            skill_rights_change_object.to_dict(), skill_rights_change_dict)
 
 
 class SkillSummaryTests(test_utils.GenericTestBase):

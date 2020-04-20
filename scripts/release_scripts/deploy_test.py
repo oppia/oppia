@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/deploy.py."""
+"""Unit tests for scripts/release_scripts/deploy.py."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -69,7 +69,7 @@ class DeployTests(test_utils.GenericTestBase):
     def setUp(self):
         super(DeployTests, self).setUp()
         # pylint: disable=unused-argument
-        def mock_main(args):
+        def mock_main():
             pass
         def mock_copytree(unused_dir1, unused_dir2, ignore):
             pass
@@ -160,6 +160,30 @@ class DeployTests(test_utils.GenericTestBase):
             Exception, 'Cannot use custom version with production app.'):
             deploy.execute_deployment()
 
+    def test_exception_is_raised_for_deploying_test_branch_to_prod(self):
+        args_swap = self.swap(
+            sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
+        def mock_get_branch():
+            return 'test-deploy'
+        get_branch_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_branch)
+        with get_branch_swap, args_swap, self.install_swap:
+            with self.assertRaisesRegexp(
+                Exception,
+                'Test branch can only be deployed to backup server.'):
+                deploy.execute_deployment()
+
+    def test_exception_is_raised_for_deploying_test_branch_to_test_server(self):
+        def mock_get_branch():
+            return 'test-deploy'
+        get_branch_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_branch)
+        with get_branch_swap, self.args_swap, self.install_swap:
+            with self.assertRaisesRegexp(
+                Exception,
+                'Test branch can only be deployed to backup server.'):
+                deploy.execute_deployment()
+
     def test_invalid_branch(self):
         def mock_get_branch():
             return 'invalid'
@@ -168,7 +192,8 @@ class DeployTests(test_utils.GenericTestBase):
         with get_branch_swap, self.args_swap, self.install_swap:
             with self.assertRaisesRegexp(
                 Exception,
-                'The deployment script must be run from a release branch.'):
+                'The deployment script must be run from a release '
+                'or test branch.'):
                 deploy.execute_deployment()
 
     def test_invalid_release_version(self):
@@ -542,7 +567,8 @@ class DeployTests(test_utils.GenericTestBase):
         with self.swap(subprocess, 'Popen', mock_popen):
             deploy.build_scripts()
         self.assertEqual(
-            cmd_tokens, ['python', '-m', 'scripts.build', '--prod_env'])
+            cmd_tokens,
+            ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'])
 
     def test_build_failure(self):
         process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
@@ -557,7 +583,8 @@ class DeployTests(test_utils.GenericTestBase):
         with popen_swap, self.assertRaisesRegexp(Exception, 'Build failed.'):
             deploy.build_scripts()
         self.assertEqual(
-            cmd_tokens, ['python', '-m', 'scripts.build', '--prod_env'])
+            cmd_tokens,
+            ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'])
 
     def test_deploy_application(self):
         check_function_calls = {
@@ -586,41 +613,26 @@ class DeployTests(test_utils.GenericTestBase):
                     deploy.CURRENT_DATETIME.strftime('%Y-%m-%d %H:%M:%S'),
                 ))
 
-    def test_successful_flush_memcache(self):
-        def mock_flush_memcache(unused_app_name):
-            return True
+    def test_flush_memcache(self):
         check_function_calls = {
-            'open_tab_gets_called': False
+            'open_new_tab_in_browser_if_possible_is_called': False,
+            'ask_user_to_confirm_is_called': False
         }
         expected_check_function_calls = {
-            'open_tab_gets_called': False
+            'open_new_tab_in_browser_if_possible_is_called': True,
+            'ask_user_to_confirm_is_called': True
         }
         def mock_open_tab(unused_url):
-            check_function_calls['open_tab_gets_called'] = True
-        flush_memcache_swap = self.swap(
-            gcloud_adapter, 'flush_memcache', mock_flush_memcache)
-        open_tab_swap = self.swap(
-            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
-        with flush_memcache_swap, open_tab_swap:
-            deploy.flush_memcache('oppiaserver')
-        self.assertEqual(check_function_calls, expected_check_function_calls)
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_is_called'] = True
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_is_called'] = True
 
-    def test_unsuccessful_flush_memcache(self):
-        def mock_flush_memcache(unused_app_name):
-            return False
-        check_function_calls = {
-            'open_tab_gets_called': False
-        }
-        expected_check_function_calls = {
-            'open_tab_gets_called': True
-        }
-        def mock_open_tab(unused_url):
-            check_function_calls['open_tab_gets_called'] = True
-        flush_memcache_swap = self.swap(
-            gcloud_adapter, 'flush_memcache', mock_flush_memcache)
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
-        with flush_memcache_swap, open_tab_swap:
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+        with open_tab_swap, ask_user_swap:
             deploy.flush_memcache('oppiaserver')
         self.assertEqual(check_function_calls, expected_check_function_calls)
 

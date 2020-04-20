@@ -15,6 +15,7 @@
 """Controllers for the creator dashboard, notifications, and creating new
 activities.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -67,8 +68,8 @@ class NotificationsDashboardHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         job_queued_msec, recent_notifications = (
-            user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications(  # pylint: disable=line-too-long
-                self.user_id))
+            user_jobs_continuous.DashboardRecentUpdatesAggregator
+            .get_recent_user_changes(self.user_id))
 
         last_seen_msec = (
             subscription_services.get_last_seen_notifications_msec(
@@ -137,20 +138,12 @@ class CreatorDashboardHandler(base.BaseHandler):
             return python_utils.ROUND(
                 rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
 
-        # We need to do the filtering because some activities that were
-        # originally subscribed to may have been deleted since.
-        subscribed_exploration_summaries = [
-            summary for summary in
-            exp_fetchers.get_exploration_summaries_matching_ids(
-                subscription_services.get_exploration_ids_subscribed_to(
-                    self.user_id))
-            if summary is not None]
-        subscribed_collection_summaries = [
-            summary for summary in
-            collection_services.get_collection_summaries_matching_ids(
-                subscription_services.get_collection_ids_subscribed_to(
-                    self.user_id))
-            if summary is not None]
+        subscribed_exploration_summaries = (
+            exp_fetchers.get_exploration_summaries_subscribed_to(
+                self.user_id))
+        subscribed_collection_summaries = (
+            collection_services.get_collection_summaries_subscribed_to(
+                self.user_id))
 
         exploration_ids_subscribed_to = [
             summary.id for summary in subscribed_exploration_summaries]
@@ -328,8 +321,8 @@ class NotificationsHandler(base.BaseHandler):
             subscription_services.get_last_seen_notifications_msec(
                 self.user_id))
         _, recent_notifications = (
-            user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications( # pylint: disable=line-too-long
-                self.user_id))
+            user_jobs_continuous.DashboardRecentUpdatesAggregator
+            .get_recent_user_changes(self.user_id))
         for notification in recent_notifications:
             if (notification['last_updated_ms'] > last_seen_msec and
                     notification['author_id'] != self.user_id):

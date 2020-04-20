@@ -15,11 +15,13 @@
 # limitations under the License.
 
 """Models for topics and related constructs."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
+import feconf
 
 from google.appengine.ext import ndb
 
@@ -96,6 +98,11 @@ class TopicModel(base_models.VersionedModel):
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """TopicModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         """Record the event to the commit log after the model commit.
@@ -154,6 +161,11 @@ class TopicModel(base_models.VersionedModel):
             cls.canonical_name == topic_name.lower()).filter(
                 cls.deleted == False).get() #pylint: disable=singleton-comparison
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to topics.
@@ -187,6 +199,13 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             str. The commit id with the topic id and version number.
         """
         return 'topic-%s-%s' % (topic_id, version)
+
+    @staticmethod
+    def get_export_policy():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class TopicSummaryModel(base_models.BaseModel):
@@ -248,6 +267,16 @@ class TopicSummaryModel(base_models.BaseModel):
         """
         return False
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """TopicSummaryModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
@@ -296,6 +325,11 @@ class SubtopicPageModel(base_models.VersionedModel):
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """SubtopicPageModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         """Record the event to the commit log after the model commit.
@@ -329,6 +363,11 @@ class SubtopicPageModel(base_models.VersionedModel):
         )
         subtopic_page_commit_log_entry.subtopic_page_id = self.id
         subtopic_page_commit_log_entry.put()
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -364,6 +403,13 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             str. The commit id with the subtopic page id and version number.
         """
         return 'subtopicpage-%s-%s' % (subtopic_page_id, version)
+
+    @staticmethod
+    def get_export_policy():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -417,8 +463,31 @@ class TopicRightsModel(base_models.VersionedModel):
                 reconstituted_model = cls(**snapshot_content_model.content)
                 if user_id in reconstituted_model.manager_ids:
                     return True
-        return (cls.query(cls.manager_ids == user_id).get() is not None or
+        return (cls.query(cls.manager_ids == user_id).get(
+            keys_only=True) is not None or
                 cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """TopicRightsModel has one field that contains multiple user IDs."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the manager_ids.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        migrated_models = []
+        for model in cls.query(cls.manager_ids == old_user_id).fetch():
+            model.manager_ids = [
+                new_user_id if manager_id == old_user_id else manager_id
+                for manager_id in model.manager_ids]
+            migrated_models.append(model)
+        cls.put_multi(
+            migrated_models, update_last_updated_time=False)
 
     @classmethod
     def get_by_user(cls, user_id):
@@ -435,6 +504,14 @@ class TopicRightsModel(base_models.VersionedModel):
             cls.manager_ids == user_id
         )
         return topic_rights_models
+
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for all the ids in manager_ids."""
+        user_ids = [user_id for user_id in self.manager_ids
+                    if user_id not in feconf.SYSTEM_USERS]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -483,3 +560,27 @@ class TopicRightsModel(base_models.VersionedModel):
             post_commit_community_owned=False,
             post_commit_is_private=not topic_rights.topic_is_published
         ).put()
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Export user-relevant properties of TopicRightsModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+
+        Returns:
+            dict. The user-relevant properties of TopicRightsModel in a dict
+            format. In this case, we are returning all the ids of the topics
+            this user manages.
+        """
+        managed_topics = cls.get_all().filter(cls.manager_ids == user_id)
+        managed_topic_ids = [right.id for right in managed_topics]
+
+        return {
+            'managed_topic_ids': managed_topic_ids
+        }

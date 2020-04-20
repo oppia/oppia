@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for user-related one-off computations."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -268,6 +269,45 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(output['3'], 1)
         self.assertEqual(output['2'], 2)
         self.assertEqual(output['1'], 1)
+
+
+class UsernameLengthAuditOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off username length limit job."""
+
+    USER_1_EMAIL = '1@example.com'
+    USER_1_USERNAME = '123456789123456789123'
+    USER_2_EMAIL = '2@example.com'
+    USER_2_USERNAME = '123456789123456789124'
+    USER_3_EMAIL = '3@example.com'
+    USER_3_USERNAME = '123456789123456789123456789123456789'
+    USER_4_EMAIL = '4@example.com'
+    # Username 4 length is 20, so it shouldn't be in the output.
+    USER_4_USERNAME = '12345678912345678912'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.UsernameLengthAuditOneOffJob.create_new())
+        user_jobs_one_off.UsernameLengthAuditOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        return user_jobs_one_off.UsernameLengthAuditOneOffJob.get_output(job_id)
+
+    def test_username_length_limit(self):
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.signup(self.USER_3_EMAIL, self.USER_3_USERNAME)
+
+        expected_output = [u'[u\'Length: 21\', u"Usernames: [\'%s\', \'%s\']"]'
+                           % (self.USER_1_USERNAME, self.USER_2_USERNAME),
+                           u'[u\'Length: 36\', u"Usernames: [\'%s\']"]'
+                           % self.USER_3_USERNAME]
+
+        actual_output = self._run_one_off_job()
+
+        self.assertEqual(actual_output, expected_output)
 
 
 class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
@@ -1104,8 +1144,13 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         # We now manually reset the user's first_contribution_msec to None.
         # This is to test that the one off job skips over the unpublished
         # exploration and does not reset the user's first_contribution_msec.
-        user_services._update_first_contribution_msec(  # pylint: disable=protected-access
-            self.owner_id, None)
+        user_models.UserSettingsModel(
+            id=self.owner_id,
+            gae_id='gae_id',
+            email='email@email.com',
+            username='username',
+            first_contribution_msec=None
+        ).put()
         rights_manager.unpublish_exploration(self.admin, self.EXP_ID)
 
         # Test that first contribution time is not set for unpublished

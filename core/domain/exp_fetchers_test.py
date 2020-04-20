@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for core.domain.exp_fetchers."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -34,23 +35,45 @@ import python_utils
 
 class ExplorationRetrievalTests(test_utils.GenericTestBase):
     """Test the exploration retrieval methods."""
-    EXP_ID = 'An_exploration_id'
+    EXP_1_ID = 'exploration_1_id'
+    EXP_2_ID = 'exploration_2_id'
+    EXP_3_ID = 'exploration_3_id'
 
     def setUp(self):
         super(ExplorationRetrievalTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.exploration_1 = self.save_new_default_exploration(
+            self.EXP_1_ID, self.owner_id, title='Aa')
+        self.exploration_2 = self.save_new_default_exploration(
+            self.EXP_2_ID, self.owner_id, title='Bb')
+        self.exploration_3 = self.save_new_default_exploration(
+            self.EXP_3_ID, self.owner_id, title='Cc')
+
+    def test_get_exploration_summaries_matching_ids(self):
+        summaries = exp_fetchers.get_exploration_summaries_matching_ids([
+            self.EXP_1_ID, self.EXP_2_ID, self.EXP_3_ID, 'nonexistent'])
+        self.assertEqual(summaries[0].title, self.exploration_1.title)
+        self.assertEqual(summaries[1].title, self.exploration_2.title)
+        self.assertEqual(summaries[2].title, self.exploration_3.title)
+        self.assertIsNone(summaries[3])
+
+    def test_get_exploration_summaries_subscribed_to(self):
+        summaries = exp_fetchers.get_exploration_summaries_subscribed_to(
+            self.owner_id)
+        self.assertEqual(summaries[0].title, self.exploration_1.title)
+        self.assertEqual(summaries[1].title, self.exploration_2.title)
+        self.assertEqual(summaries[2].title, self.exploration_3.title)
 
     def test_retrieval_of_explorations(self):
         """Test the get_exploration_by_id() method."""
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_fetchers.get_exploration_by_id('fake_eid')
 
-        exploration = self.save_new_default_exploration(
-            self.EXP_ID, self.owner_id)
-        retrieved_exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
-        self.assertEqual(exploration.id, retrieved_exploration.id)
-        self.assertEqual(exploration.title, retrieved_exploration.title)
+        retrieved_exploration = (
+            exp_fetchers.get_exploration_by_id(self.EXP_1_ID))
+        self.assertEqual(self.exploration_1.id, retrieved_exploration.id)
+        self.assertEqual(self.exploration_1.title, retrieved_exploration.title)
 
         with self.assertRaises(Exception):
             exp_fetchers.get_exploration_by_id('fake_exploration')
@@ -62,15 +85,13 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 'fake_exp_id', [1, 2, 3])
 
     def test_retrieval_of_multiple_exploration_versions(self):
-        self.save_new_default_exploration(self.EXP_ID, self.owner_id)
-
         # Update exploration to version 2.
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state',
         })]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
         # Update exploration to version 3.
         change_list = [exp_domain.ExplorationChange({
@@ -78,13 +99,13 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'state_name': 'New state 2',
         })]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
-        exploration_latest = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+        exploration_latest = exp_fetchers.get_exploration_by_id(self.EXP_1_ID)
         latest_version = exploration_latest.version
 
         explorations = exp_fetchers.get_multiple_explorations_by_version(
-            self.EXP_ID, list(python_utils.RANGE(1, latest_version + 1)))
+            self.EXP_1_ID, list(python_utils.RANGE(1, latest_version + 1)))
 
         self.assertEqual(len(explorations), 3)
         self.assertEqual(explorations[0].version, 1)
@@ -92,15 +113,13 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         self.assertEqual(explorations[2].version, 3)
 
     def test_version_number_errors_for_get_multiple_exploration_versions(self):
-        self.save_new_default_exploration(self.EXP_ID, self.owner_id)
-
         # Update exploration to version 2.
         change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'New state',
         })]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
         # Update exploration to version 3.
         change_list = [exp_domain.ExplorationChange({
@@ -108,25 +127,25 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'state_name': 'New state 2',
         })]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
         with self.assertRaisesRegexp(
             ValueError,
             'Requested version number 4 cannot be higher than the current '
             'version number 3.'):
             exp_fetchers.get_multiple_explorations_by_version(
-                self.EXP_ID, [1, 2, 3, 4])
+                self.EXP_1_ID, [1, 2, 3, 4])
 
         with self.assertRaisesRegexp(
             ValueError,
             'At least one version number is invalid'):
             exp_fetchers.get_multiple_explorations_by_version(
-                self.EXP_ID, [1, 2, 2.5, 3])
+                self.EXP_1_ID, [1, 2, 2.5, 3])
 
     def test_retrieval_of_multiple_explorations(self):
         exps = {}
         chars = 'abcde'
-        exp_ids = ['%s%s' % (self.EXP_ID, c) for c in chars]
+        exp_ids = ['%s%s' % (self.EXP_1_ID, c) for c in chars]
         for _id in exp_ids:
             exp = self.save_new_valid_exploration(_id, self.owner_id)
             exps[_id] = exp

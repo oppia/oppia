@@ -67,6 +67,11 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_does_diff_include_js_or_ts_files(unused_files_to_lint):
             return self.does_diff_include_js_or_ts_files
 
+        self.does_diff_include_travis_yml_or_js_files = False
+        def mock_does_diff_include_travis_yml_or_js_files(
+                unused_files_to_lint):
+            return self.does_diff_include_travis_yml_or_js_files
+
         self.popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         self.get_remote_name_swap = self.swap(
             pre_push_hook, 'get_remote_name', mock_get_remote_name)
@@ -84,6 +89,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.js_or_ts_swap = self.swap(
             pre_push_hook, 'does_diff_include_js_or_ts_files',
             mock_does_diff_include_js_or_ts_files)
+        self.travis_yml_or_js_files_swap = self.swap(
+            pre_push_hook,
+            'does_diff_include_travis_yml_or_js_files',
+            mock_does_diff_include_travis_yml_or_js_files)
 
     def test_start_subprocess_for_result(self):
         with self.popen_swap:
@@ -320,9 +329,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.popen_swap:
             self.assertEqual(pre_push_hook.start_linter(['files']), 0)
 
-    def test_start_python_script(self):
+    def test_run_script_and_get_returncode(self):
         with self.popen_swap:
-            self.assertEqual(pre_push_hook.start_python_script('script'), 0)
+            self.assertEqual(
+                pre_push_hook.run_script_and_get_returncode('script'), 0)
 
     def test_has_uncommitted_files(self):
         def mock_check_output(unused_cmd_tokens):
@@ -436,6 +446,16 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook.does_diff_include_js_or_ts_files(
                 ['file1.html', 'file2.py']))
 
+    def test_does_diff_include_travis_yml_or_js_files(self):
+        self.assertTrue(
+            pre_push_hook.does_diff_include_travis_yml_or_js_files(
+                ['file1.js', 'protractor.conf.js', '.travis.yml']))
+
+    def test_does_diff_include_travis_yml_or_js_files_fail(self):
+        self.assertFalse(
+            pre_push_hook.does_diff_include_travis_yml_or_js_files(
+                ['file1.ts', 'file2.ts', 'file3.html']))
+
     def test_repo_in_dirty_state(self):
         def mock_has_uncommitted_files():
             return True
@@ -480,18 +500,38 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_frontend_test_failure(self):
         self.does_diff_include_js_or_ts_files = True
-        def mock_start_python_script(unused_script):
+        def mock_run_script_and_get_returncode(unused_script):
             return 1
-        start_python_script_swap = self.swap(
-            pre_push_hook, 'start_python_script', mock_start_python_script)
+        run_script_and_get_returncode_swap = self.swap(
+            pre_push_hook, 'run_script_and_get_returncode',
+            mock_run_script_and_get_returncode)
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
-                    with self.js_or_ts_swap, start_python_script_swap:
+                    with self.js_or_ts_swap, run_script_and_get_returncode_swap:
                         with self.assertRaises(SystemExit):
                             pre_push_hook.main(args=[])
         self.assertTrue(
             'Push aborted due to failing frontend tests.' in self.print_arr)
+
+    def test_invalid_travis_e2e_test_suites_failure(self):
+        self.does_diff_include_travis_yml_or_js_files = True
+
+        def mock_run_script_and_get_returncode(unused_script):
+            return 1
+        run_script_and_get_returncode_swap = self.swap(
+            pre_push_hook, 'run_script_and_get_returncode',
+            mock_run_script_and_get_returncode)
+        with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
+            with self.collect_files_swap, self.uncommitted_files_swap:
+                with self.check_output_swap, self.start_linter_swap:
+                    with run_script_and_get_returncode_swap:
+                        with self.travis_yml_or_js_files_swap:
+                            with self.assertRaises(SystemExit):
+                                pre_push_hook.main(args=[])
+        self.assertTrue(
+            'Push aborted due to failing e2e test configuration check.'
+            in self.print_arr)
 
     def test_main_with_install_arg(self):
         check_function_calls = {

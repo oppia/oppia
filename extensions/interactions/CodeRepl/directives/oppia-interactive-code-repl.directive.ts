@@ -22,7 +22,6 @@
 
 require('interactions/codemirrorRequires.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
 require('interactions/CodeRepl/directives/code-repl-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
@@ -30,10 +29,10 @@ require('services/html-escaper.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
-  'CodeReplRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
+  '$timeout', 'CodeReplRulesService', 'HtmlEscaperService',
   'EVENT_NEW_CARD_AVAILABLE',
   function(
-      CodeReplRulesService, HtmlEscaperService, UrlInterpolationService,
+      $timeout, CodeReplRulesService, HtmlEscaperService,
       EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
@@ -41,9 +40,7 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
       bindToController: {
         getLastAnswer: '&lastAnswer',
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/CodeRepl/directives/' +
-        'code-repl-interaction.directive.html'),
+      template: require('./code-repl-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', 'WindowDimensionsService',
@@ -52,45 +49,6 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
             $scope, $attrs, WindowDimensionsService,
             CurrentInteractionService) {
           var ctrl = this;
-          ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
-
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            ctrl.interactionIsActive = false;
-          });
-          ctrl.language = HtmlEscaperService.escapedJsonToObj(
-            $attrs.languageWithValue);
-          ctrl.placeholder = HtmlEscaperService.escapedJsonToObj(
-            $attrs.placeholderWithValue);
-          ctrl.preCode = HtmlEscaperService.escapedJsonToObj(
-            $attrs.preCodeWithValue);
-          ctrl.postCode = HtmlEscaperService.escapedJsonToObj(
-            $attrs.postCodeWithValue);
-
-          // Make sure ctrl.preCode ends with a newline:
-          if (ctrl.preCode.trim().length === 0) {
-            ctrl.preCode = '';
-          } else if (ctrl.preCode.slice(-1) !== '\n') {
-            ctrl.preCode += '\n';
-          }
-
-          // Make sure ctrl.placeholder ends with a newline.
-          if (ctrl.placeholder.slice(-1) !== '\n') {
-            ctrl.placeholder += '\n';
-          }
-
-          ctrl.hasLoaded = false;
-
-          // Keep the code string given by the user and the stdout from the
-          // evaluation until sending them back to the server.
-          if (ctrl.interactionIsActive) {
-            ctrl.code = (
-              ctrl.preCode + ctrl.placeholder + ctrl.postCode);
-            ctrl.output = '';
-          } else {
-            ctrl.code = ctrl.getLastAnswer().code;
-            ctrl.output = ctrl.getLastAnswer().output;
-          }
-
           ctrl.initCodeEditor = function(editor) {
             editor.setValue(ctrl.code);
             // Options for the ui-codemirror display.
@@ -110,7 +68,7 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
             editor.setOption('theme', 'preview default');
 
             // NOTE: this is necessary to avoid the textarea being greyed-out.
-            setTimeout(function() {
+            $timeout(function() {
               editor.refresh();
               initMarkers(editor);
             }, 200);
@@ -122,7 +80,7 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
             // Without this, the editor does not show up correctly on small
             // screens when the user switches to the supplemental interaction.
             $scope.$on('showInteraction', function() {
-              setTimeout(function() {
+              $timeout(function() {
                 editor.refresh();
                 initMarkers(editor);
               }, 200);
@@ -130,29 +88,6 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
 
             ctrl.hasLoaded = true;
           };
-
-          // Configure Skulpt.
-          Sk.configure({
-            output: function(out) {
-              // This output function is called continuously throughout the
-              // runtime of the script.
-              ctrl.output += out;
-            },
-            read: function(name) {
-              // This function is called when a builtin module is imported
-              if (Sk.builtinFiles.files[name] === undefined) {
-                // If corresponding module is not present then,
-                // removal of this block also results in failure of import.
-                throw 'module ' + name + ' not found';
-              }
-              return Sk.builtinFiles.files[name];
-            },
-            timeoutMsg: function() {
-              ctrl.sendResponse('', 'timeout');
-            },
-            execLimit: 10000
-          });
-
           ctrl.runAndSubmitCode = function(codeInput) {
             ctrl.runCode(codeInput, function(evaluation, err) {
               ctrl.sendResponse(evaluation, err);
@@ -260,9 +195,70 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
             // console will sometimes not update.
             $scope.$apply();
           };
+          ctrl.$onInit = function() {
+            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+              ctrl.interactionIsActive = false;
+            });
+            ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
+            ctrl.language = HtmlEscaperService.escapedJsonToObj(
+              $attrs.languageWithValue);
+            ctrl.placeholder = HtmlEscaperService.escapedJsonToObj(
+              $attrs.placeholderWithValue);
+            ctrl.preCode = HtmlEscaperService.escapedJsonToObj(
+              $attrs.preCodeWithValue);
+            ctrl.postCode = HtmlEscaperService.escapedJsonToObj(
+              $attrs.postCodeWithValue);
 
-          CurrentInteractionService.registerCurrentInteraction(
-            submitAnswer, null);
+            // Make sure ctrl.preCode ends with a newline:
+            if (ctrl.preCode.trim().length === 0) {
+              ctrl.preCode = '';
+            } else if (ctrl.preCode.slice(-1) !== '\n') {
+              ctrl.preCode += '\n';
+            }
+
+            // Make sure ctrl.placeholder ends with a newline.
+            if (ctrl.placeholder.slice(-1) !== '\n') {
+              ctrl.placeholder += '\n';
+            }
+
+            ctrl.hasLoaded = false;
+
+            // Keep the code string given by the user and the stdout from the
+            // evaluation until sending them back to the server.
+            if (ctrl.interactionIsActive) {
+              ctrl.code = (
+                ctrl.preCode + ctrl.placeholder + ctrl.postCode);
+              ctrl.output = '';
+            } else {
+              ctrl.code = ctrl.getLastAnswer().code;
+              ctrl.output = ctrl.getLastAnswer().output;
+            }
+
+            // Configure Skulpt.
+            Sk.configure({
+              output: function(out) {
+                // This output function is called continuously throughout the
+                // runtime of the script.
+                ctrl.output += out;
+              },
+              read: function(name) {
+                // This function is called when a builtin module is imported
+                if (Sk.builtinFiles.files[name] === undefined) {
+                  // If corresponding module is not present then,
+                  // removal of this block also results in failure of import.
+                  throw 'module ' + name + ' not found';
+                }
+                return Sk.builtinFiles.files[name];
+              },
+              timeoutMsg: function() {
+                ctrl.sendResponse('', 'timeout');
+              },
+              execLimit: 10000
+            });
+
+            CurrentInteractionService.registerCurrentInteraction(
+              submitAnswer, null);
+          };
         }
       ]
     };

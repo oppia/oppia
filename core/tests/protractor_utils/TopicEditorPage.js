@@ -97,7 +97,7 @@ var TopicEditorPage = function() {
   var topicThumbnailUploadInput = element(
     by.css('.protractor-test-photo-upload-input'));
   var topicThumbnailCropper = element(
-    by.css('.protractor-test-photo-crop'));
+    by.css('.cropper-container'));
   var topicThumbnailSubmitButton = element(
     by.css('.protractor-test-photo-upload-submit'));
 
@@ -118,6 +118,12 @@ var TopicEditorPage = function() {
     topicThumbnailClickable.click();
     absPath = path.resolve(__dirname, imgPath);
     return topicThumbnailUploadInput.sendKeys(absPath);
+  };
+
+  this.publishTopic = function() {
+    publishTopicButton.click();
+    return waitFor.invisibilityOf(
+      publishTopicButton, 'Topic is taking too long to publish.');
   };
 
   this.submitTopicThumbnail = function(imgPath) {

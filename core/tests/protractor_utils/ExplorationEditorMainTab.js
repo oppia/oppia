@@ -37,7 +37,13 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-add-response-modal-header'));
   var multipleChoiceAnswerOptions = function(optionNum) {
     return element(
-      by.cssContainingText('.protractor-test-html-select-option', optionNum));
+      by.cssContainingText(
+        '.protractor-test-html-multiple-select-option', optionNum));
+  };
+  var itemSelectionAnswerOptions = function(optionNum) {
+    return element(
+      by.cssContainingText(
+        '.protractor-test-html-item-select-option', optionNum));
   };
   var neutralElement = element.all(by.css('.protractor-test-neutral-element'))
     .first();
@@ -256,8 +262,9 @@ var ExplorationEditorMainTab = function() {
   this.addResponse = function(
       interactionId, feedbackInstructions, destStateName,
       createNewState, ruleName) {
-    expect(addResponseButton.isDisplayed()).toEqual(true);
     // Open the "Add Response" modal if it is not already open.
+    waitFor.elementToBeClickable(
+      addResponseButton, 'Response Editor button is not clickable');
     addResponseButton.click();
     this.setResponse.apply(null, arguments);
   };
@@ -889,6 +896,11 @@ var ExplorationEditorMainTab = function() {
         parameterElement.element(by.tagName('button')).click();
         multipleChoiceAnswerOptions(parameterValues[i])
           .click();
+      } else if (interactionId === 'ItemSelectionInput') {
+        var answerArray = Array.from(parameterValues[i]);
+        for (var j = 0; j < answerArray.length; j++) {
+          itemSelectionAnswerOptions(answerArray[j]).click();
+        }
       } else {
         parameterEditor.setValue(parameterValues[i]);
       }

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for core.storage.question.gae_models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -20,8 +21,6 @@ import datetime
 import types
 
 from constants import constants
-from core.domain import question_domain
-from core.domain import question_services
 from core.domain import skill_services
 from core.domain import state_domain
 from core.platform import models
@@ -51,6 +50,11 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             question_models.QuestionModel
             .has_reference_to_user_id('x_id'))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            question_models.QuestionModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
 
     def test_create_question_empty_skill_id_list(self):
         state = state_domain.State.create_default_state('ABC')
@@ -146,6 +150,12 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             question_models.QuestionSkillLinkModel
             .has_reference_to_user_id('any_id'))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            question_models.QuestionSkillLinkModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
 
     def test_create_question_skill_link(self):
         question_id = 'A Test Question Id'
@@ -258,9 +268,9 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_question_skill_links_by_skill_ids(self):
         skill_id_1 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_1, 'user', 'Description 1')
+        self.save_new_skill(skill_id_1, 'user', description='Description 1')
         skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_2, 'user', 'Description 2')
+        self.save_new_skill(skill_id_2, 'user', description='Description 2')
 
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
@@ -301,13 +311,13 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
     def test_get_question_skill_links_by_skill_ids_many_skills(self):
         # Test the case when len(skill_ids) > constants.MAX_SKILLS_PER_QUESTION.
         skill_id_1 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_1, 'user', 'Description 1')
+        self.save_new_skill(skill_id_1, 'user', description='Description 1')
         skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_2, 'user', 'Description 2')
+        self.save_new_skill(skill_id_2, 'user', description='Description 2')
         skill_id_3 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_3, 'user', 'Description 3')
+        self.save_new_skill(skill_id_3, 'user', description='Description 3')
         skill_id_4 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_4, 'user', 'Description 4')
+        self.save_new_skill(skill_id_4, 'user', description='Description 4')
 
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
@@ -525,96 +535,17 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         question_summary_model = question_models.QuestionSummaryModel(
             id='question',
-            creator_id='user_id',
             question_content='Question',
             question_model_created_on=datetime.datetime.utcnow(),
             question_model_last_updated=datetime.datetime.utcnow()
         )
         question_summary_model.put()
 
-        self.assertTrue(
-            question_models.QuestionSummaryModel
-            .has_reference_to_user_id('user_id'))
         self.assertFalse(
             question_models.QuestionSummaryModel
             .has_reference_to_user_id('user_id_x'))
 
-    def test_get_by_creator_id(self):
-        question_summary_model_1 = question_models.QuestionSummaryModel(
-            id='question_1',
-            creator_id='user',
-            question_content='Question 1',
-            question_model_created_on=datetime.datetime.utcnow(),
-            question_model_last_updated=datetime.datetime.utcnow()
-        )
-        question_summary_model_2 = question_models.QuestionSummaryModel(
-            id='question_2',
-            creator_id='user',
-            question_content='Question 2',
-            question_model_created_on=datetime.datetime.utcnow(),
-            question_model_last_updated=datetime.datetime.utcnow()
-        )
-        question_summary_model_1.put()
-        question_summary_model_2.put()
-
-        question_summaries = (
-            question_models.QuestionSummaryModel.get_by_creator_id('user'))
-        self.assertEqual(len(question_summaries), 2)
-        self.assertEqual(question_summaries[0].id, 'question_1')
-        self.assertEqual(question_summaries[1].id, 'question_2')
-
-
-class QuestionRightsModelUnitTest(test_utils.GenericTestBase):
-    """Test the QuestionRightsModel class."""
-
-    def test_get_deletion_policy(self):
+    def test_get_user_id_migration_policy(self):
         self.assertEqual(
-            question_models.QuestionRightsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
-
-    def test_has_reference_to_user_id(self):
-        with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
-            question_services.create_new_question_rights(
-                'question_id', 'owner_id')
-            self.assertTrue(
-                question_models.QuestionRightsModel
-                .has_reference_to_user_id('owner_id'))
-            # The question_rights.creator_id is by default the same as
-            # committer_id, we change it to different value so that we really
-            # check all separate fields.
-            question_rights = question_models.QuestionRightsModel.get(
-                'question_id')
-            question_rights.creator_id = 'creator_id'
-            question_rights.commit(
-                'committer_id',
-                'Update question rights',
-                [{'cmd': question_domain.CMD_CREATE_NEW}])
-            self.assertTrue(
-                question_models.QuestionRightsModel
-                .has_reference_to_user_id('owner_id'))
-            self.assertTrue(
-                question_models.QuestionRightsModel
-                .has_reference_to_user_id('creator_id'))
-            self.assertTrue(
-                question_models.QuestionRightsModel
-                .has_reference_to_user_id('committer_id'))
-            self.assertFalse(
-                question_models.QuestionRightsModel
-                .has_reference_to_user_id('x_id'))
-
-            # We change the creator_id to to see that the creator_id is still
-            # found in QuestionRightsSnapshotContentModel.
-            question_rights = question_models.QuestionRightsModel.get(
-                'question_id')
-            question_rights.creator_id = 'different_creator_id'
-            question_rights.commit(
-                'committer_id',
-                'Update question rights again',
-                [{'cmd': question_domain.CMD_CREATE_NEW}])
-
-            self.assertTrue(
-                question_models.QuestionRightsModel
-                .has_reference_to_user_id('creator_id'))
-            self.assertTrue(
-                question_models.QuestionRightsModel
-                .has_reference_to_user_id('different_creator_id'))
+            question_models.QuestionSummaryModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)

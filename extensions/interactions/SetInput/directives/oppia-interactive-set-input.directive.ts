@@ -20,21 +20,19 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('interactions/SetInput/directives/set-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveSetInput', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/SetInput/directives/' +
-        'set-input-interaction.directive.html'),
+      template: require('./set-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', '$translate', 'SetInputRulesService',
@@ -43,21 +41,6 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
             $attrs, $translate, SetInputRulesService,
             WindowDimensionsService, CurrentInteractionService) {
           var ctrl = this;
-          ctrl.schema = {
-            type: 'list',
-            items: {
-              type: 'unicode'
-            },
-            ui_config: {
-              // TODO(mili): Translate this in the HTML.
-              add_element_text: $translate.instant(
-                'I18N_INTERACTIONS_SET_INPUT_ADD_ITEM')
-            }
-          };
-
-          // Adds an input field by default
-          ctrl.answer = [''];
-
           var hasDuplicates = function(answer) {
             for (var i = 0; i < answer.length; i++) {
               for (var j = 0; j < i; j++) {
@@ -94,9 +77,30 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
           var submitAnswerFn = function() {
             ctrl.submitAnswer(ctrl.answer);
           };
+          ctrl.$onInit = function() {
+            ctrl.buttonText = HtmlEscaperService.escapedJsonToObj(
+              $attrs.buttonTextWithValue);
+            ctrl.schema = {
+              type: 'list',
+              items: {
+                type: 'unicode'
+              },
+              ui_config: {
+                // TODO(mili): Translate this in the HTML.
+                add_element_text: $translate.instant(
+                  'I18N_INTERACTIONS_SET_INPUT_ADD_ITEM')
+              }
+            };
+            if (ctrl.buttonText) {
+              ctrl.schema.ui_config.add_element_text = ctrl.buttonText;
+            }
 
-          CurrentInteractionService.registerCurrentInteraction(
-            submitAnswerFn, ctrl.isAnswerValid);
+            // Adds an input field by default
+            ctrl.answer = [''];
+
+            CurrentInteractionService.registerCurrentInteraction(
+              submitAnswerFn, ctrl.isAnswerValid);
+          };
         }
       ]
     };

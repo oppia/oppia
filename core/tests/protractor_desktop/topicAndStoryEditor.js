@@ -30,6 +30,8 @@ var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
 var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 
 describe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
@@ -54,36 +56,16 @@ describe('Topic editor functionality', function() {
     topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
     browser.getCurrentUrl().then(function(url) {
       topicId = url.split('/')[4];
+    }, function() {
+      // Note to developers:
+      // Promise is returned by getCurrentUrl which is handled here.
+      // No further action is needed.
     });
   });
 
   beforeEach(function() {
     users.login('creator@topicEditor.com');
     topicEditorPage.get(topicId);
-  });
-
-  it('should edit topic name, abbreviated topic name, ' +
-    'thumbnail and description correctly', function() {
-    topicEditorPage.changeTopicName('Topic 1 edited');
-    expect(topicEditorPage.getTopicThumbnailSource())
-      .not
-      .toEqual(
-        topicEditorPage.submitTopicThumbnail('../data/img.png')
-          .then(function() {
-            return topicEditorPage.getTopicThumbnailSource();
-          })
-      );
-    topicEditorPage.changeAbbreviatedTopicName('short name');
-    topicEditorPage.changeTopicDescription('Topic Description');
-    topicEditorPage.saveTopic('Changed topic name and description.');
-
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.expectTopicNameToBe('Topic 1 edited', 0);
-
-    topicEditorPage.get(topicId);
-    topicEditorPage.expectTopicNameToBe('Topic 1 edited');
-    topicEditorPage.expectAbbreviatedTopicNameToBe('short name');
-    topicEditorPage.expectTopicDescriptionToBe('Topic Description');
   });
 
   it('should add and delete subtopics correctly', function() {
@@ -150,6 +132,10 @@ describe('Topic editor functionality', function() {
       skillEditorPage.get(skillId);
       skillEditorPage.moveToQuestionsTab();
       skillEditorPage.expectNumberOfQuestionsToBe(1);
+    }, function() {
+      // Note to developers:
+      // Promise is returned by getCurrentUrl which is handled here.
+      // No further action is needed.
     });
   });
 
@@ -272,7 +258,7 @@ describe('Chapter editor functionality', function() {
     var skills = [];
     for (var i = 0; i < numSkills; i++) {
       var skillName = 'skillFromChapterEditor' + i.toString();
-      var material = 'material' + i.toString();
+      var material = 'reviewMaterial' + i.toString();
       workflow.createSkillAndAssignTopic(skillName, material, topicName);
       skills.push(skillName);
     }
@@ -286,6 +272,7 @@ describe('Chapter editor functionality', function() {
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     users.createAndLoginAdminUser(
       userEmail, 'creatorChapterTest');
@@ -310,6 +297,22 @@ describe('Chapter editor functionality', function() {
     storyEditorPage.changeNodeOutline(forms.toRichText('First outline'));
     storyEditorPage.saveStory('First save');
   });
+
+  it(
+    'should check presence of skillreview RTE element in exploration ' +
+    'linked to story', function() {
+      browser.get('/create/' + dummyExplorationIds[0]);
+      waitFor.pageToFullyLoad();
+      explorationEditorMainTab.setContent(function(richTextEditor) {
+        richTextEditor.addRteComponent(
+          'Skillreview', 'Description', 'skillFromChapterEditor0');
+      });
+      explorationEditorPage.navigateToPreviewTab();
+      explorationPlayerPage.expectContentToMatch(function(richTextChecker) {
+        richTextChecker.readRteComponent(
+          'Skillreview', 'Description', forms.toRichText('reviewMaterial0'));
+      });
+    });
 
   it('should add one more chapter to the story', function() {
     storyEditorPage.createNewDestinationChapter('Chapter 2');

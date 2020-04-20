@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for core.storage.email.gae_models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -24,10 +25,13 @@ import types
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
-(base_models, email_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.email])
+from google.appengine.ext import ndb
+
+(base_models, email_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.email, models.NAMES.user])
 
 
 class SentEmailModelUnitTests(test_utils.GenericTestBase):
@@ -65,6 +69,78 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                     'sender_id'))
             self.assertFalse(
                 email_models.SentEmailModel.has_reference_to_user_id('id_x'))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            email_models.SentEmailModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
+
+    def test_migrate_model(self):
+        original_model_1 = email_models.SentEmailModel(
+            id='id_1',
+            recipient_id='user_1_id_old',
+            recipient_email='user1@email.com',
+            sender_id='user_1_id_old',
+            sender_email='user1@email.com',
+            intent=feconf.EMAIL_INTENT_MARKETING,
+            subject='Email Subject 1',
+            html_body='Email Body 1',
+            sent_datetime=datetime.datetime.utcnow())
+        original_model_1.put()
+        original_model_2 = email_models.SentEmailModel(
+            id='id_2',
+            recipient_id='user_1_id_old',
+            recipient_email='user1@email.com',
+            sender_id='user_2_id_old',
+            sender_email='user2@email.com',
+            intent=feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
+            subject='Email Subject 2',
+            html_body='Email Body 2',
+            sent_datetime=datetime.datetime.utcnow())
+        original_model_2.put()
+        original_model_3 = email_models.SentEmailModel(
+            id='id_3',
+            recipient_id='user_2_id_old',
+            recipient_email='user2@email.com',
+            sender_id='user_1_id_old',
+            sender_email='user1@email.com',
+            intent=feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
+            subject='Email Subject 3',
+            html_body='Email Body 3',
+            sent_datetime=datetime.datetime.utcnow())
+        original_model_3.put()
+
+        email_models.SentEmailModel.migrate_model(
+            'user_1_id_old', 'user_1_id_new')
+        email_models.SentEmailModel.migrate_model(
+            'user_2_id_old', 'user_2_id_new')
+
+        migrated_model_1 = email_models.SentEmailModel.get_by_id('id_1')
+        self.assertEqual('user_1_id_new', migrated_model_1.recipient_id)
+        self.assertEqual('user_1_id_new', migrated_model_1.sender_id)
+        self.assertEqual(
+            original_model_1.last_updated, migrated_model_1.last_updated)
+        migrated_model_2 = email_models.SentEmailModel.get_by_id('id_2')
+        self.assertEqual('user_1_id_new', migrated_model_2.recipient_id)
+        self.assertEqual('user_2_id_new', migrated_model_2.sender_id)
+        self.assertEqual(
+            original_model_2.last_updated, migrated_model_2.last_updated)
+        migrated_model_3 = email_models.SentEmailModel.get_by_id('id_3')
+        self.assertEqual('user_2_id_new', migrated_model_3.recipient_id)
+        self.assertEqual('user_1_id_new', migrated_model_3.sender_id)
+        self.assertEqual(
+            original_model_3.last_updated, migrated_model_3.last_updated)
+
+        self.assertIsNone(
+            email_models.SentEmailModel.query(ndb.OR(
+                email_models.SentEmailModel.recipient_id == 'user_1_id_old',
+                email_models.SentEmailModel.sender_id == 'user_1_id_old')).get()
+        )
+        self.assertIsNone(
+            email_models.SentEmailModel.query(ndb.OR(
+                email_models.SentEmailModel.recipient_id == 'user_2_id_old',
+                email_models.SentEmailModel.sender_id == 'user_2_id_old')).get()
+        )
 
     def test_saved_model_can_be_retrieved_with_same_hash(self):
         with self.generate_constant_hash_ctx:
@@ -184,6 +260,46 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 email_models.GeneralFeedbackEmailReplyToIdModel.create(
                     'user', 'exploration.exp0.0')
 
+    def test_verify_model_user_ids_exist(self):
+        user_models.UserSettingsModel(
+            id='user_1_id',
+            gae_id='gae_1_id',
+            email='some@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id='user_2_id',
+            gae_id='gae_2_id',
+            email='some_other@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        model = email_models.SentEmailModel(
+            id='id_2',
+            recipient_id='user_1_id',
+            recipient_email='user1@email.com',
+            sender_id='user_2_id',
+            sender_email='user2@email.com',
+            intent=feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
+            subject='Email Subject 2',
+            html_body='Email Body 2',
+            sent_datetime=datetime.datetime.utcnow()
+        )
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.recipient_id = feconf.SYSTEM_COMMITTER_ID
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.recipient_id = feconf.MIGRATION_BOT_USER_ID
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.recipient_id = feconf.SUGGESTION_BOT_USER_ID
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.recipient_id = 'user_non_id'
+        self.assertFalse(model.verify_model_user_ids_exist())
+
+        model.recipient_id = 'user_1_id'
+        model.sender_id = 'user_non_id'
+        self.assertFalse(model.verify_model_user_ids_exist())
+
 
 class BulkEmailModelUnitTests(test_utils.GenericTestBase):
     """Test the BulkEmailModel class."""
@@ -204,6 +320,19 @@ class BulkEmailModelUnitTests(test_utils.GenericTestBase):
                 'sender_id'))
         self.assertFalse(
             email_models.BulkEmailModel.has_reference_to_user_id('id_x'))
+
+    def test_get_user_id_migration_polic(self):
+        self.assertEqual(
+            email_models.BulkEmailModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
+
+    def test_get_user_id_migration_field(self):
+        # We need to compare the field types not the field values, thus using
+        # python_utils.UNICODE.
+        self.assertEqual(
+            python_utils.UNICODE(
+                email_models.BulkEmailModel.get_user_id_migration_field()),
+            python_utils.UNICODE(email_models.BulkEmailModel.sender_id))
 
 
 class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
@@ -228,6 +357,12 @@ class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
         self.assertFalse(
             email_models.GeneralFeedbackEmailReplyToIdModel
             .has_reference_to_user_id('id_x'))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            email_models.GeneralFeedbackEmailReplyToIdModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
 
     def test_put_function(self):
         email_reply_model = email_models.GeneralFeedbackEmailReplyToIdModel(

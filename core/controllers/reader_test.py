@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the page that allows learners to play through an exploration."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -253,15 +254,18 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
-            self.skill_id, 'user', 'Description')
+            self.skill_id, 'user', description='Description')
 
     def test_get_exploration_pretests(self):
         super(ExplorationPretestsUnitTest, self).setUp()
         story_id = story_services.get_new_story_id()
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, 'user', 'Topic', 'abbrev', None, 'A new topic',
-            [], [], [], [], 0)
+            topic_id, 'user', name='Topic',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
         self.save_new_story(
             story_id, 'user', 'Title', 'Description', 'Notes', topic_id
         )
@@ -276,10 +280,10 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         ]
         story_services.update_story('user', story_id, changelist, 'Added node.')
 
-        exp_id = '0'
+        exp_id = '15'
         exp_id_2 = '1'
         exp_services.delete_demo('0')
-        exp_services.load_demo('0')
+        exp_services.load_demo('15')
         exp_services.delete_demo('1')
         exp_services.load_demo('1')
         change_list = [story_domain.StoryChange({
@@ -349,7 +353,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id, 'user', 'Description')
+        self.save_new_skill(self.skill_id, 'user', description='Description')
 
         self.question_id = question_services.get_new_question_id()
         self.save_new_question(
@@ -381,7 +385,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
     def test_multiple_skill_id_returns_questions(self):
         skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_2, 'user', 'Description')
+        self.save_new_skill(skill_id_2, 'user', description='Description')
 
         question_id_3 = question_services.get_new_question_id()
         self.save_new_question(

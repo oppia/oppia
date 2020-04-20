@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Common utilities for test classes."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -90,9 +91,9 @@ def get_filepath_from_filename(filename, rootdir):
     filename by using os.path.join(root, filename).
 
     For example signup-page.mainpage.html is present in
-    core/templates/dev/head/pages/signup-page and error-page.mainpage.html is
-    present in core/templates/dev/head/pages/error-pages. So we walk through
-    core/templates/dev/head/pages and a match for signup-page.directive.html
+    core/templates/pages/signup-page and error-page.mainpage.html is
+    present in core/templates/pages/error-pages. So we walk through
+    core/templates/pages and a match for signup-page.directive.html
     is found in signup-page subdirectory and a match for
     error-page.directive.html is found in error-pages subdirectory.
 
@@ -141,7 +142,7 @@ def mock_get_template(unused_self, filename):
         jinja2.environment.Template. The template for the given file.
     """
     filepath = get_filepath_from_filename(
-        filename, os.path.join('core', 'templates', 'dev', 'head', 'pages'))
+        filename, os.path.join('core', 'templates', 'pages'))
     with python_utils.open_file(filepath, 'r') as f:
         file_content = f.read()
     return jinja2.environment.Template(file_content)
@@ -386,7 +387,7 @@ class TestBase(unittest.TestCase):
     }
 
     VERSION_1_SUBTOPIC_DICT = {
-        'skill_ids': [],
+        'skill_ids': ['skill_1'],
         'id': 1,
         'title': 'A subtitle'
     }
@@ -913,7 +914,7 @@ tags: []
         # Signup uses a custom urlfetch mock (URLFetchServiceMock), instead
         # of the stub provided by testbed. This custom mock is disabled
         # immediately once the signup is complete. This is done to avoid
-        # external  calls being made to Gravatar when running the backend
+        # external calls being made to Gravatar when running the backend
         # tests.
         gae_id = self.get_gae_id_from_email(email)
         user_services.create_new_user(gae_id, email)
@@ -1354,6 +1355,10 @@ tags: []
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Story and saves it.
 
+        NOTE: Callers are responsible for ensuring that the
+        'corresponding_topic_id' provided is valid, unless a test explicitly
+        requires it to be invalid.
+
         Args:
             story_id: str. ID for the story to be created.
             owner_id: str. The user_id of the creator of the story.
@@ -1382,7 +1387,7 @@ tags: []
             self, story_id, owner_id, title, description, notes,
             corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
-        """Saves a new skill with a default version 1 story contents
+        """Saves a new story with a default version 1 story contents
         data dictionary.
 
         This function should only be used for creating stories in tests
@@ -1425,10 +1430,10 @@ tags: []
             }])
 
     def save_new_topic(
-            self, topic_id, owner_id, name, abbreviated_name,
-            thumbnail_filename, description,
-            canonical_story_ids, additional_story_ids,
-            uncategorized_skill_ids, subtopics, next_subtopic_id,
+            self, topic_id, owner_id, name='topic', abbreviated_name='topic',
+            thumbnail_filename='topic.png', description='description',
+            canonical_story_ids=None, additional_story_ids=None,
+            uncategorized_skill_ids=None, subtopics=None, next_subtopic_id=0,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Topic and saves it.
 
@@ -1456,12 +1461,14 @@ tags: []
         """
         canonical_story_references = [
             topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in canonical_story_ids
+            for story_id in (canonical_story_ids or [])
         ]
         additional_story_references = [
             topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in additional_story_ids
+            for story_id in (additional_story_ids or [])
         ]
+        uncategorized_skill_ids = (uncategorized_skill_ids or [])
+        subtopics = (subtopics or [])
         topic = topic_domain.Topic(
             topic_id, name, abbreviated_name, thumbnail_filename,
             description, canonical_story_references,
@@ -1474,7 +1481,7 @@ tags: []
 
     def save_new_topic_with_subtopic_schema_v1(
             self, topic_id, owner_id, name, abbreviated_name,
-            canonical_name, description,
+            canonical_name, description, thumbnail_filename,
             canonical_story_references, additional_story_references,
             uncategorized_skill_ids, next_subtopic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
@@ -1497,6 +1504,7 @@ tags: []
             abbreviated_name: str. The abbreviated name of the topic.
             canonical_name: str. The canonical name (lowercase) of the topic.
             description: str. The desscription of the topic.
+            thumbnail_filename: str. The thumbnail file name of the topic.
             canonical_story_references: list(StoryReference). A set of story
                 reference objects representing the canonical stories that are
                 part of this topic.
@@ -1518,6 +1526,7 @@ tags: []
             id=topic_id,
             name=name,
             abbreviated_name=abbreviated_name,
+            thumbnail_filename=thumbnail_filename,
             canonical_name=canonical_name,
             description=description,
             language_code=language_code,
@@ -1591,7 +1600,6 @@ tags: []
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
-        question_services.create_new_question_rights(question_id, owner_id)
         question_model = question_models.QuestionModel(
             id=question_id,
             question_state_data=self.VERSION_27_STATE_DICT,
@@ -1606,8 +1614,8 @@ tags: []
 
     def save_new_skill(
             self, skill_id, owner_id,
-            description, misconceptions=None, rubrics=None, skill_contents=None,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            description='description', misconceptions=None, rubrics=None,
+            skill_contents=None, language_code=constants.DEFAULT_LANGUAGE_CODE,
             prerequisite_skill_ids=None):
         """Creates an Oppia Skill and saves it.
 
@@ -1692,7 +1700,6 @@ tags: []
             language_code: str. The ISO 639-1 code for the language this
                 skill is written in.
         """
-        skill_services.create_new_skill_rights(skill_id, owner_id)
         if rubrics is None:
             rubrics = [
                 skill_domain.Rubric(
@@ -1837,6 +1844,97 @@ tags: []
             yield
         finally:
             setattr(obj, attr, original)
+
+    @contextlib.contextmanager
+    def swap_with_checks(
+            self, obj, attr, new_value, expected_args=None,
+            expected_kwargs=None, called=True):
+        """Swap an object's function value within the context of a
+        'with' statement. The object can be anything that supports
+        getattr and setattr, such as class instances, modules, ...
+
+        Examples:
+            If you want to check subprocess.Popen is invoked twice
+            like `subprocess.Popen(['python'], shell=True)` and
+            `subprocess.Popen(['python2], shell=False), you can first
+            define the mock function, then the swap, and just run the
+            target function in context, as follows:
+                def mock_popen(command, shell):
+                    return
+
+                popen_swap = self.swap_with_checks(
+                    subprocess, 'Popen', mock_popen, expected_args=[
+                        (['python'],), (['python2'],)], expected_kwargs=[
+                            {'shell': True,}, {'shell': False}])
+                with popen_swap:
+                    function_that_invokes_popen()
+
+        Args:
+            obj: *. the Python object whose attribute you want to swap.
+            attr: str. The name of the function to be swapped.
+            new_value: function. The new function you want to use.
+            expected_args: None|list(tuple). The expected args that you
+                want this function to be invoked with. When its value is None,
+                args will not be checked. If the value type is list, the
+                function will check whether the called args is the first element
+                in the list. If matched, this tuple will be removed from the
+                list.
+            expected_kwargs: None|list(dict). The expected keyword args
+                you want this function to be invoked with. Similar to
+                expected_args.
+            called: bool. Whether the function is expected to be invoked. This
+                will always be checked.
+
+        Yields:
+            context: The context with function replaced.
+        """
+        original = getattr(obj, attr)
+        # The actual error message will also include detail assert error message
+        # via the `self.longMessage` below.
+        msg = 'Expected checks failed when swapping out in %s.%s tests.' % (
+            obj.__name__, attr)
+
+        def wrapper(*args, **kwargs):
+            """Wrapper function for the new value. This function will do the
+            check before the wrapped function is invoked. After the function
+            finished, the wrapper will update how many times this function is
+            invoked.
+
+            Args:
+                args: tuple. The args passed into `attr` function.
+                kwargs: dict. The key word args passed into `attr` function.
+
+            Returns:
+                Result of `new_value`.
+            """
+            wrapper.called = True
+            if expected_args is not None:
+                self.assertEqual(args, expected_args[0], msg=msg)
+                expected_args.pop(0)
+            if expected_kwargs is not None:
+                self.assertEqual(kwargs, expected_kwargs[0], msg=msg)
+                expected_kwargs.pop(0)
+            result = new_value(*args, **kwargs)
+            return result
+
+        wrapper.called = False
+        setattr(obj, attr, wrapper)
+        error_occurred = False
+        try:
+            # This will show the detailed assert message.
+            self.longMessage = True
+            yield
+        except Exception:
+            error_occurred = True
+            # Raise issues thrown by the called function or assert error.
+            raise
+        finally:
+            setattr(obj, attr, original)
+            if not error_occurred:
+                self.assertEqual(wrapper.called, called, msg=msg)
+                self.assertFalse(expected_args, msg=msg)
+                self.assertFalse(expected_kwargs, msg=msg)
+            self.longMessage = False
 
     @contextlib.contextmanager
     def login_context(self, email, is_super_admin=False):
@@ -2060,12 +2158,11 @@ class AppEngineTestBase(TestBase):
                 'html': '<p>This is a solution.</p>'
             }
         }
-        hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>This is a hint.</p>'
-            }
-        }]
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
+            )
+        ]
         state.update_interaction_solution(solution_dict)
         state.update_interaction_hints(hints_list)
         state.interaction.customization_args = {

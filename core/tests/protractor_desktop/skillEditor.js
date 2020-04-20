@@ -51,6 +51,10 @@ describe('Skill Editor functionality', function() {
       'Skill 1', 'Concept card explanation');
     browser.getCurrentUrl().then(function(url) {
       skillId = url.split('/')[4];
+    }, function() {
+      // Note to developers:
+      // Promise is returned by getCurrentUrl which is handled here.
+      // No further action is needed.
     });
   });
 
@@ -76,19 +80,25 @@ describe('Skill Editor functionality', function() {
   });
 
   it('should create and delete worked examples', function() {
-    skillEditorPage.addWorkedExample('Example 1');
-    skillEditorPage.addWorkedExample('Example 2');
+    skillEditorPage.addWorkedExample(
+      'Example Question 1', 'Example Explanation 1');
+    skillEditorPage.addWorkedExample(
+      'Example Question 2', 'Example Explanation 2');
     skillEditorPage.saveOrPublishSkill('Added worked examples');
 
     skillEditorPage.get(skillId);
-    skillEditorPage.expectWorkedExampleSummariesToMatch([
-      'Example 1', 'Example 2']);
+    skillEditorPage.expectWorkedExampleSummariesToMatch(
+      ['Example Question 1', 'Example Question 2'],
+      ['Example Explanation 1', 'Example Explanation 2']
+    );
 
     skillEditorPage.deleteWorkedExampleWithIndex(0);
     skillEditorPage.saveOrPublishSkill('Deleted a worked example');
 
     skillEditorPage.get(skillId);
-    skillEditorPage.expectWorkedExampleSummariesToMatch(['Example 2']);
+    skillEditorPage.expectWorkedExampleSummariesToMatch(
+      ['Example Question 2'], ['Example Explanation 2']
+    );
   });
 
   it('should edit rubrics for the skill', function() {

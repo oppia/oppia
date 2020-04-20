@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Commands that can be used to operate on opportunity models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -763,3 +764,8 @@ def regenerate_opportunities_related_to_topic(
 def delete_all_exploration_opportunity_summary_models():
     """Deletes all of the ExplorationOpportunitySummaryModel."""
     opportunity_models.ExplorationOpportunitySummaryModel.delete_all()
+
+
+def delete_all_skill_opportunity_models():
+    """Deletes all of the SkillOpportunityModels from the datastore."""
+    opportunity_models.SkillOpportunityModel.delete_all()

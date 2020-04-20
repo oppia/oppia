@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for the exploration editor page."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -282,9 +283,7 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTests):
 
         response = self.get_html_response('/logout', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
-        self.assertEqual(
-            response.headers['location'], 'https://www.google.com/accounts' +
-            '/Logout?continue=http%3A//localhost/')
+        self.assertEqual(response.headers['location'], 'http://localhost/')
         self.logout()
 
     def test_logout_from_published_exploration_editor(self):
@@ -307,8 +306,7 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTests):
         response = self.get_html_response('/logout', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         self.assertEqual(
-            response.headers['location'], 'https://www.google.com/accounts' +
-            '/Logout?continue=http%3A//localhost/')
+            response.headers['location'], 'http://localhost/')
         self.logout()
 
 
@@ -520,7 +518,6 @@ written_translations:
                     'cmd': exp_domain.CMD_DELETE_STATE,
                     'state_name': 'State 3',
                 })], 'changes')
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
         response = self.get_html_response('/create/%s' % exp_id)
 
         # Check download to zip file.
@@ -555,9 +552,13 @@ written_translations:
                 'The title for ZIP download handler test!.yaml').read())
 
         # Check download to JSON.
-        exploration.update_objective('Test JSON download')
-        exp_services._save_exploration(  # pylint: disable=protected-access
-            owner_id, exploration, '', [])
+        exp_services.update_exploration(
+            owner_id, exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'objective',
+                    'new_value': 'Test JSON download',
+                })], 'Updates exploration objective')
 
         # Download to JSON string using download handler.
         self.maxDiff = None
@@ -612,6 +613,34 @@ written_translations:
         zf_saved = zipfile.ZipFile(
             python_utils.string_io(buffer_value=response.body))
         self.assertEqual(zf_saved.namelist(), [u'¡Hola!.yaml'])
+
+        self.logout()
+
+    def test_exploration_download_handler_with_no_title(self):
+        # This is the case for most unpublished explorations.
+        self.login(self.EDITOR_EMAIL)
+        owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        # Create a simple exploration.
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, owner_id,
+            title='',
+            category='This is just a test category',
+            objective='')
+
+        # Download to zip file using download handler.
+        download_url = '/createhandler/download/%s' % exp_id
+        response = self.get_custom_response(download_url, 'text/plain')
+
+        # Check downloaded zip file.
+        filename = 'oppia-unpublished_exploration-v1.zip'
+        self.assertEqual(response.headers['Content-Disposition'],
+                         'attachment; filename=%s' % filename)
+
+        zf_saved = zipfile.ZipFile(
+            python_utils.string_io(buffer_value=response.body))
+        self.assertEqual(zf_saved.namelist(), ['Unpublished_exploration.yaml'])
 
         self.logout()
 
@@ -2467,7 +2496,6 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
 
     def setUp(self):
         super(LearnerAnswerInfoHandlerTests, self).setUp()
-        self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
@@ -2490,6 +2518,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.answer, self.answer_details)
 
     def test_get_learner_answer_details_of_exploration_states(self):
+        self.login(self.OWNER_EMAIL)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
             response = self.get_json(
@@ -2516,8 +2545,10 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
                     feconf.ENTITY_TYPE_EXPLORATION, self.exp_id))
             self.assertEqual(response, learner_answer_info_data)
+        self.logout()
 
     def test_get_learner_answer_details_of_question_states(self):
+        self.login(self.OWNER_EMAIL)
         question_id = question_services.get_new_question_id()
         question = self.save_new_question(
             question_id, self.owner_id,
@@ -2551,8 +2582,10 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
                     feconf.ENTITY_TYPE_QUESTION, question_id))
             self.assertEqual(response, learner_answer_info_data)
+        self.logout()
 
     def test_delete_learner_answer_info_of_exploration_states(self):
+        self.login(self.OWNER_EMAIL)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
             self.delete_json(
@@ -2589,8 +2622,10 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
                     feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
                     self.state_name), expected_status_int=404)
+        self.logout()
 
     def test_delete_learner_answer_info_of_question_states(self):
+        self.login(self.ADMIN_EMAIL)
         question_id = question_services.get_new_question_id()
         question = self.save_new_question(
             question_id, self.owner_id,
@@ -2620,6 +2655,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 feconf.ENTITY_TYPE_QUESTION, state_reference)
             self.assertEqual(
                 len(learner_answer_details.learner_answer_info_list), 0)
+        self.logout()
 
 
 class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):

@@ -21,16 +21,14 @@ require('domain/skill/skill-domain.constants.ajs.ts');
 require('services/context.service.ts');
 
 angular.module('oppia').directive('skillSelectorEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/skill-selector-editor.directive.html'),
+      template: require('./skill-selector-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$scope', 'ContextService', 'ENTITY_TYPE',
@@ -39,25 +37,23 @@ angular.module('oppia').directive('skillSelectorEditor', [
             $http, $scope, ContextService, ENTITY_TYPE,
             FETCH_SKILLS_URL_TEMPLATE) {
           var ctrl = this;
-          ctrl.skills = [];
-          if (ctrl.value) {
-            ContextService.setCustomEntityContext(
-              ENTITY_TYPE.SKILL, ctrl.value.id);
-          }
-
           ctrl.selectSkill = function(skillId, skillDescription) {
             ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
-            ctrl.value = {
-              id: skillId,
-              description: skillDescription
-            };
+            ctrl.value = skillId;
           };
-          $http.get(FETCH_SKILLS_URL_TEMPLATE).then(function(response) {
-            ctrl.skills = angular.copy(response.data.skills);
-          });
-          $scope.$on('$destroy', function() {
-            ContextService.removeCustomEntityContext();
-          });
+          ctrl.$onInit = function() {
+            $scope.$on('$destroy', function() {
+              ContextService.removeCustomEntityContext();
+            });
+            ctrl.skills = [];
+            if (ctrl.value) {
+              ContextService.setCustomEntityContext(
+                ENTITY_TYPE.SKILL, ctrl.value);
+            }
+            $http.get(FETCH_SKILLS_URL_TEMPLATE).then(function(response) {
+              ctrl.skills = angular.copy(response.data.skills);
+            });
+          };
         }
       ]
     };

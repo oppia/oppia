@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Python configuration for MultipleChoiceInput interaction."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -59,6 +60,13 @@ class MultipleChoiceInput(base.BaseInteraction):
             }
         },
         'default_value': [''],
+    }, {
+        'name': 'showChoicesInShuffledOrder',
+        'description': 'Shuffle answer choices',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': True
     }]
 
     _answer_visualization_specs = [{

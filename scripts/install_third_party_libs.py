@@ -18,25 +18,32 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
-import fileinput
 import os
-import shutil
 import subprocess
 import sys
 
-# These libraries need to be installed before running or importing any script.
-TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
-# Download and install pyyaml.
-if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
-    subprocess.check_call([
-        sys.executable, '-m', 'pip', 'install', 'pyyaml==5.1.2', '--target',
-        os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
 
-# Download and install future.
-if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
-    subprocess.check_call([
-        sys.executable, '-m', 'pip', 'install', 'future==0.17.1', '--target',
-        os.path.join('third_party', 'future-0.17.1')])
+TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
+
+# These libraries need to be installed before running or importing any script.
+
+PREREQUISITES = [
+    ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
+    ('future', '0.17.1', os.path.join('third_party', 'future-0.17.1')),
+]
+
+for package_name, version_number, target_path in PREREQUISITES:
+    if not os.path.exists(target_path):
+        command_text = [
+            sys.executable, '-m', 'pip', 'install', '%s==%s'
+            % (package_name, version_number), '--target', target_path]
+        uextention_text = ['--user', '--prefix=', '--system']
+        current_process = subprocess.Popen(
+            command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output_stderr = current_process.communicate()[1]
+        if 'can\'t combine user with prefix' in output_stderr:
+            subprocess.check_call(command_text + uextention_text)
+
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
@@ -55,19 +62,12 @@ _PARSER = argparse.ArgumentParser(description="""
 Installation script for Oppia third-party libraries.
 """)
 
-_PARSER.add_argument(
-    '--nojsrepl',
-    help='optional; if specified, skips installation of skulpt.',
-    action='store_true')
-_PARSER.add_argument(
-    '--noskulpt',
-    help='optional; if specified, skips installation of skulpt.',
-    action='store_true')
-
 PYLINT_CONFIGPARSER_FILEPATH = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pylint-1.9.4', 'configparser.py')
+    common.OPPIA_TOOLS_DIR, 'pylint-%s' % common.PYLINT_VERSION,
+    'configparser.py')
 PQ_CONFIGPARSER_FILEPATH = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pylint-quotes-0.1.8', 'configparser.py')
+    common.OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % common.PYLINT_QUOTES_VERSION,
+    'configparser.py')
 
 
 def tweak_yarn_executable():
@@ -125,94 +125,25 @@ def pip_install(package, version, install_path):
 
     # The call to python -m is used to ensure that Python and Pip versions are
     # compatible.
-    subprocess.check_call([
-        sys.executable, '-m', 'pip', 'install', '%s==%s' % (package, version),
-        '--target', install_path])
-
-
-def install_skulpt(parsed_args):
-    """Download and install Skulpt. Skulpt is built using a Python script
-    included within the Skulpt repository (skulpt.py). This script normally
-    requires GitPython, however the patches to it below
-    (with the fileinput.replace) lead to it no longer being required. The Python
-    script is used to avoid having to manually recreate the Skulpt dist build
-    process in install_third_party.py. Note that skulpt.py will issue a
-    warning saying its dist command will not work properly without GitPython,
-    but it does actually work due to the patches.
-    """
-    no_skulpt = parsed_args.nojsrepl or parsed_args.noskulpt
-
-    python_utils.PRINT('Checking whether Skulpt is installed in third_party')
-    if not os.path.exists(
-            os.path.join(
-                common.THIRD_PARTY_DIR,
-                'static/skulpt-0.10.0')) and not no_skulpt:
-        if not os.path.exists(
-                os.path.join(common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0')):
-            python_utils.PRINT('Downloading Skulpt')
-            skulpt_filepath = os.path.join(
-                common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0', 'skulpt', 'skulpt.py')
-            os.chdir(common.OPPIA_TOOLS_DIR)
-            os.mkdir('skulpt-0.10.0')
-            os.chdir('skulpt-0.10.0')
-            subprocess.check_call([
-                'git', 'clone', 'https://github.com/skulpt/skulpt'])
-            os.chdir('skulpt')
-
-            # Use a specific Skulpt release.
-            subprocess.check_call(['git', 'checkout', '0.10.0'])
-
-            python_utils.PRINT('Compiling Skulpt')
-            # The Skulpt setup function needs to be tweaked. It fails without
-            # certain third party commands. These are only used for unit tests
-            # and generating documentation and are not necessary when building
-            # Skulpt.
-            for line in fileinput.input(
-                    files=[skulpt_filepath], inplace=True):
-                # Inside this loop the STDOUT will be redirected to the file,
-                # skulpt.py. The end='' is needed to avoid double line breaks.
-                python_utils.PRINT(
-                    line.replace('ret = test()', 'ret = 0'),
-                    end='')
-
-            for line in fileinput.input(
-                    files=[skulpt_filepath], inplace=True):
-                # Inside this loop the STDOUT will be redirected to the file,
-                # skulpt.py. The end='' is needed to avoid double line breaks.
-                python_utils.PRINT(
-                    line.replace('  doc()', '  pass#doc()'),
-                    end='')
-
-            for line in fileinput.input(
-                    files=[skulpt_filepath], inplace=True):
-                # This and the next command disable unit and compressed unit
-                # tests for the compressed distribution of Skulpt. These
-                # tests don't work on some Ubuntu environments and cause a
-                # libreadline dependency issue.
-                python_utils.PRINT(
-                    line.replace(
-                        'ret = os.system(\'{0}',
-                        'ret = 0 #os.system(\'{0}'),
-                    end='')
-
-            for line in fileinput.input(
-                    files=[skulpt_filepath], inplace=True):
-                python_utils.PRINT(
-                    line.replace('ret = rununits(opt=True)', 'ret = 0'),
-                    end='')
-
-            # NB: Check call cannot be used because the commands above make the
-            # git tree for skulpt dirty.
-            subprocess.call([sys.executable, skulpt_filepath, 'dist'])
-
-            # Return to the Oppia root folder.
-            os.chdir(common.CURR_DIR)
-
-        # Move the build directory to the static resources folder.
-        shutil.copytree(
-            os.path.join(
-                common.OPPIA_TOOLS_DIR, 'skulpt-0.10.0/skulpt/dist/'),
-            os.path.join(common.THIRD_PARTY_DIR, 'static/skulpt-0.10.0'))
+    command = [
+        sys.executable, '-m', 'pip', 'install', '%s==%s'
+        % (package, version), '--target', install_path]
+    process = subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode == 0:
+        python_utils.PRINT(stdout)
+    elif 'can\'t combine user with prefix' in stderr:
+        python_utils.PRINT('Trying by setting --user and --prefix flags.')
+        subprocess.check_call([
+            sys.executable, '-m', 'pip', 'install',
+            '%s==%s' % (package, version), '--target', install_path,
+            '--user', '--prefix=', '--system'])
+    else:
+        python_utils.PRINT(stderr)
+        python_utils.PRINT(
+            'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
+        raise Exception('Error installing package')
 
 
 def ensure_pip_library_is_installed(package, version, path):
@@ -232,24 +163,23 @@ def ensure_pip_library_is_installed(package, version, path):
         pip_install(package, version, exact_lib_path)
 
 
-def main(args=None):
+def main():
     """Install third-party libraries for Oppia."""
-    parsed_args = _PARSER.parse_args(args=args)
-
     setup.main(args=[])
     setup_gae.main(args=[])
     pip_dependencies = [
         ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pylint', '1.9.4', common.OPPIA_TOOLS_DIR),
+        ('pylint', common.PYLINT_VERSION, common.OPPIA_TOOLS_DIR),
         ('Pillow', '6.0.0', common.OPPIA_TOOLS_DIR),
-        ('pylint-quotes', '0.1.8', common.OPPIA_TOOLS_DIR),
+        ('pylint-quotes', common.PYLINT_QUOTES_VERSION, common.OPPIA_TOOLS_DIR),
         ('webtest', '2.0.33', common.OPPIA_TOOLS_DIR),
         ('isort', '4.3.20', common.OPPIA_TOOLS_DIR),
-        ('pycodestyle', '2.5.0', common.OPPIA_TOOLS_DIR),
+        ('pycodestyle', common.PYCODESTYLE_VERSION, common.OPPIA_TOOLS_DIR),
         ('esprima', '4.0.1', common.OPPIA_TOOLS_DIR),
         ('browsermob-proxy', '0.8.0', common.OPPIA_TOOLS_DIR),
         ('selenium', '3.13.0', common.OPPIA_TOOLS_DIR),
         ('PyGithub', '1.43.7', common.OPPIA_TOOLS_DIR),
+        ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
     ]
 
     for package, version, path in pip_dependencies:
@@ -292,9 +222,7 @@ def main(args=None):
         tweak_yarn_executable()
 
     # Install third-party node modules needed for the build process.
-    subprocess.check_call([get_yarn_command()])
-
-    install_skulpt(parsed_args)
+    subprocess.check_call([get_yarn_command(), 'install', '--pure-lockfile'])
 
     # Install pre-commit script.
     python_utils.PRINT('Installing pre-commit hook for git')

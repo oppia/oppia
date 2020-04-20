@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Models for storing the question data models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -69,6 +70,11 @@ class QuestionModel(base_models.VersionedModel):
         """Question should be kept but the creator should be anonymized."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether QuestionModel snapshots references the given user.
@@ -80,6 +86,11 @@ class QuestionModel(base_models.VersionedModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """QuestionModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _get_new_id(cls):
@@ -202,6 +213,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
         """Check whether QuestionSkillLinkModel references the given user.
@@ -214,6 +230,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return False
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """QuestionSkillLinkModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_model_id(cls, question_id, skill_id):
@@ -461,7 +482,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             list(str). The list of all question ids corresponding to the given
                 skill id.
         """
-        question_skill_link_models = cls.query(cls.skill_id == skill_id)
+        question_skill_link_models = cls.query().filter(
+            cls.skill_id == skill_id,
+            cls.deleted == False) #pylint: disable=singleton-comparison
         question_ids = [
             model.question_id for model in question_skill_link_models
         ]
@@ -540,6 +563,13 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def get_export_policy():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def _get_instance_id(cls, question_id, question_version):
         """Returns ID of the question commit log entry model.
@@ -563,13 +593,11 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     A QuestionSummaryModel instance stores the following information:
 
-    creator_id, question_model_last_updated, question_model_created_on,
+    question_model_last_updated, question_model_created_on,
     question_state_data.
 
     The key of each instance is the question id.
     """
-    # The user ID of the creator of the question.
-    creator_id = ndb.StringProperty(required=True, indexed=True)
     # Time when the question model was last updated (not to be
     # confused with last_updated, which is the time when the
     # question *summary* model was last updated).
@@ -590,85 +618,29 @@ class QuestionSummaryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
+    @staticmethod
+    def get_export_policy():
+        """Model data has already been exported as a part of the QuestionModel
+        export_data function, and thus a new export_data function does not
+        need to be defined here.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, unused_user_id):
         """Check whether any existing QuestionSummaryModel refers to the given
         user_id.
 
         Args:
-            user_id: str. The ID of the user whose data should be checked.
+            unused_user_id: str. The ID of the user whose data should be
+            checked.
 
         Returns:
             bool. Whether any models refer to the given user_id.
         """
-        return cls.query(cls.creator_id == user_id).get() is not None
-
-    @classmethod
-    def get_by_creator_id(cls, creator_id):
-        """Get QuestionSummaryModels created by the given user.
-
-        Args:
-            creator_id: str. The user ID of the creator of the questions.
-
-        Returns:
-            list(QuestionSummaryModel). The list of summary models of the
-            questions.
-        """
-        return QuestionSummaryModel.query().filter(
-            cls.creator_id == creator_id).fetch()
-
-
-class QuestionRightsSnapshotMetadataModel(
-        base_models.BaseSnapshotMetadataModel):
-    """Storage model for the metadata for a question rights snapshot."""
-    pass
-
-
-class QuestionRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
-    """Storage model for the content of a question rights snapshot."""
-    pass
-
-
-class QuestionRightsModel(base_models.VersionedModel):
-    """Storage model for rights related to a question.
-
-    The id of each instance is the id of the corresponding question.
-    """
-
-    SNAPSHOT_METADATA_CLASS = QuestionRightsSnapshotMetadataModel
-    SNAPSHOT_CONTENT_CLASS = QuestionRightsSnapshotContentModel
-    ALLOW_REVERT = False
-
-    # The user ID of the creator of the question.
-    creator_id = ndb.StringProperty(indexed=True, required=True)
+        return False
 
     @staticmethod
-    def get_deletion_policy():
-        """Question rights should be kept but the creator should be
-        anonymized.
-        """
-        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        """Check whether QuestionRightsModel or its snapshots references the
-        given user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        more_results = True
-        cursor = None
-        while more_results:
-            snapshot_content_models, cursor, more_results = (
-                cls.SNAPSHOT_CONTENT_CLASS.query().fetch_page(
-                    base_models.FETCH_BATCH_SIZE, start_cursor=cursor))
-            for snapshot_content_model in snapshot_content_models:
-                reconstituted_model = cls(**snapshot_content_model.content)
-                if user_id == reconstituted_model.creator_id:
-                    return True
-        return (cls.query(cls.creator_id == user_id).get() is not None or
-                cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+    def get_user_id_migration_policy():
+        """QuestionSummaryModel has one field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE

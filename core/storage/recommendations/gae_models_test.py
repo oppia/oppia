@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for core.storage.question.gae_models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -36,6 +37,12 @@ class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
         self.assertFalse(
             recommendations_models.ExplorationRecommendationsModel
             .has_reference_to_user_id('any_id'))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            recommendations_models.ExplorationRecommendationsModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
 
 
 class TopicSimilaritiesModelUnitTests(test_utils.GenericTestBase):

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the story editor."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -136,4 +137,28 @@ class StoryPublishHandler(base.BaseHandler):
         else:
             topic_services.unpublish_story(topic_id, story_id, self.user_id)
 
+        self.render_json(self.values)
+
+
+class ValidateExplorationsHandler(base.BaseHandler):
+    """A data handler for validating the explorations in a story."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_edit_story
+    def get(self, _):
+        """Handler that receives a list of exploration IDs, checks whether the
+        corresponding explorations are supported on mobile and returns the
+        validation error messages (if any).
+        """
+        comma_separated_exp_ids = self.request.get('comma_separated_exp_ids')
+        if not comma_separated_exp_ids:
+            raise self.InvalidInputException(
+                'Expected comma_separated_exp_ids parameter to be present.')
+        exp_ids = comma_separated_exp_ids.split(',')
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(exp_ids, False))
+        self.values.update({
+            'validation_error_messages': validation_error_messages
+        })
         self.render_json(self.values)

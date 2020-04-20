@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Stores various configuration options and constants for Oppia."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -173,7 +174,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 30
+CURRENT_STATE_SCHEMA_VERSION = 33
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -411,9 +412,6 @@ AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
 
-# Whether community dashboard is ready to use for contributors.
-COMMUNITY_DASHBOARD_ENABLED = False
-
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
     'TextInput', 'MultipleChoiceInput', 'NumericInput']
@@ -444,8 +442,10 @@ EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
 EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
 EMAIL_INTENT_ONBOARD_REVIEWER = 'onboard_reviewer'
+EMAIL_INTENT_REMOVE_REVIEWER = 'remove_reviewer'
 EMAIL_INTENT_REVIEW_SUGGESTIONS = 'review_suggestions'
 EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES = 'voiceover_application_updates'
+EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
 # Possible intents for email sent in bulk.
 BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
 BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
@@ -498,8 +498,12 @@ MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
 # category.
 MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
 
-# The number of medium question skill difficulty.
+# The difficulty value of an easy question.
+EASY_SKILL_DIFFICULTY = 0.3
+# The difficulty value of a medium question.
 MEDIUM_SKILL_DIFFICULTY = 0.6
+# The difficulty value of a hard question.
+HARD_SKILL_DIFFICULTY = 0.9
 
 # The maximum number of skills to be requested at one time when fetching
 # questions.
@@ -518,6 +522,16 @@ MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 # suggestions automatically after a threshold time.
 SUGGESTION_BOT_USER_ID = 'OppiaSuggestionBot'
 SUGGESTION_BOT_USERNAME = 'OppiaSuggestionBot'
+
+# The system usernames are reserved usernames. Before adding new value to this
+# dict, make sure that there aren't any similar usernames in the datastore.
+# Note: All bot user IDs and usernames should start with "Oppia" and end with
+# "Bot".
+SYSTEM_USERS = {
+    SYSTEM_COMMITTER_ID: SYSTEM_COMMITTER_ID,
+    MIGRATION_BOT_USER_ID: MIGRATION_BOT_USERNAME,
+    SUGGESTION_BOT_USER_ID: SUGGESTION_BOT_USERNAME
+}
 
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
@@ -626,7 +640,6 @@ COLLECTION_PUBLISH_PREFIX = '/collection_editor_handler/publish'
 COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
-COMMUNITY_DASHBOARD_URL = '/community_dashboard'
 COMMUNITY_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
@@ -697,6 +710,8 @@ QUESTIONS_URL_PREFIX = '/question_player_handler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 DELETE_ACCOUNT_URL = '/delete-account'
+DELETE_ACCOUNT_HANDLER_URL = '/delete-account-handler'
+PENDING_ACCOUNT_DELETION_URL = '/pending-account-deletion'
 REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
 REVIEW_TEST_URL_PREFIX = '/review_test'
 ROBOTS_TXT_URL = '/robots.txt'
@@ -713,7 +728,7 @@ SPLASH_URL = '/splash'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
-STORY_NODE_COMPLETION_URL_PREFIX = '/story_node_completion_handler'
+STORY_PROGRESS_URL_PREFIX = '/story_progress_handler'
 STORY_PUBLISH_HANDLER = '/story_publish_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
@@ -737,6 +752,7 @@ UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USER_PERMISSIONS_URL_PREFIX = '/createhandler/permissions'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
+VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -871,8 +887,8 @@ ROLE_ACTION_UPDATE = 'update'
 ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
 ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 
-VIEW_METHOD_ROLE = 'role'
-VIEW_METHOD_USERNAME = 'username'
+USER_FILTER_CRITERION_ROLE = 'role'
+USER_FILTER_CRITERION_USERNAME = 'username'
 
 QUESTION_BATCH_SIZE = 10
 
@@ -969,7 +985,7 @@ RTE_CONTENT_SPEC = {
 # of topics as the value.
 # Note: This dict needs to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
 # oppia constant defined in
-# core/templates/dev/head/pages/landing-pages/TopicLandingPage.js file.
+# core/templates/pages/landing-pages/TopicLandingPage.js file.
 AVAILABLE_LANDING_PAGES = {
     'maths': ['fractions', 'negative-numbers', 'ratios']
 }

@@ -37,16 +37,19 @@ angular.module('oppia').directive('copier', ['$compile', function($compile) {
     },
     template: '<span ng-include="getTemplateUrl()"></span>',
     controller: ['$scope', function($scope) {
-      $scope.generatorId = $scope.getGeneratorId();
-      $scope.initArgs = $scope.getInitArgs();
-      $scope.objType = $scope.getObjType();
-      $scope.$watch('initArgs', function() {
+      var ctrl = this;
+      ctrl.$onInit = function() {
+        $scope.generatorId = $scope.getGeneratorId();
         $scope.initArgs = $scope.getInitArgs();
-      }, true);
-
-      $scope.$watch('objType', function() {
         $scope.objType = $scope.getObjType();
-      }, true);
+        $scope.$watch('initArgs', function() {
+          $scope.initArgs = $scope.getInitArgs();
+        }, true);
+
+        $scope.$watch('objType', function() {
+          $scope.objType = $scope.getObjType();
+        }, true);
+      };
     }]
   };
 }]);

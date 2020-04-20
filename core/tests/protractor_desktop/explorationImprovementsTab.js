@@ -22,6 +22,7 @@
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
@@ -122,6 +123,7 @@ describe('Answer Details Improvements', function() {
       creatorDashboardPage.navigateToExplorationEditor();
       explorationEditorPage.navigateToImprovementsTab();
 
+      improvementsTab.verifyOutstandingTaskCount(1);
       var task = improvementsTab.getAnswerDetailsTask('One');
       improvementsTab.clickTaskActionButton(task, 'Review Answer Details');
       improvementsTab.verifyAnswerDetails('I liked this choi...', 1);
@@ -211,6 +213,8 @@ describe('Feedback Improvements', function() {
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
+
+    improvementsTab.verifyOutstandingTaskCount(1);
     var task = improvementsTab.getFeedbackTask(feedback);
     improvementsTab.clickTaskActionButton(task, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual([feedback]);
@@ -258,6 +262,7 @@ describe('Feedback Improvements', function() {
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
+    improvementsTab.verifyOutstandingTaskCount(1);
 
     // Mark thread as fixed.
     var task = improvementsTab.getFeedbackTask(feedback);
@@ -270,6 +275,7 @@ describe('Feedback Improvements', function() {
     expect(improvementsTab.getTaskStatus(task)).toEqual('Fixed');
 
     browser.driver.navigate().refresh();
+    improvementsTab.verifyNoOutstandingTasks();
 
     // Re-open the thread.
     improvementsTab.setShowOnlyOpenTasks(false);
@@ -279,6 +285,9 @@ describe('Feedback Improvements', function() {
     improvementsTab.sendResponseAndCloseModal(feedbackResponse, 'Open');
     improvementsTab.setShowOnlyOpenTasks(true);
     expect(improvementsTab.getTaskStatus(task)).toEqual('Open');
+
+    browser.driver.navigate().refresh();
+    improvementsTab.verifyOutstandingTaskCount(1);
 
     users.logout();
   });
@@ -361,6 +370,7 @@ describe('Suggestions Improvements', function() {
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
+    improvementsTab.verifyOutstandingTaskCount(2);
 
     var taskToAccept = improvementsTab.getSuggestionTask(
       suggestionDescription1);
@@ -368,7 +378,7 @@ describe('Suggestions Improvements', function() {
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription1]);
     improvementsTab.acceptSuggestion();
-    improvementsTab.closeModal();
+    waitFor.pageToFullyLoad();
 
     var taskToReject = improvementsTab.getSuggestionTask(
       suggestionDescription2);
@@ -376,15 +386,11 @@ describe('Suggestions Improvements', function() {
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription2]);
     improvementsTab.rejectSuggestion();
-    improvementsTab.closeModal();
+    waitFor.pageToFullyLoad();
 
     improvementsTab.setShowOnlyOpenTasks(false);
-    var acceptedTask = improvementsTab.getSuggestionTask(
-      suggestionDescription1);
-    var rejectedTask = improvementsTab.getSuggestionTask(
-      suggestionDescription2);
-    expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');
-    expect(improvementsTab.getTaskStatus(rejectedTask)).toEqual('Ignored');
+    expect(improvementsTab.getTaskByStatus('Fixed').isPresent()).toBe(true);
+    expect(improvementsTab.getTaskByStatus('Ignored').isPresent()).toBe(true);
 
     explorationEditorPage.navigateToPreviewTab();
     explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
@@ -524,6 +530,7 @@ describe('Playthrough Improvements', function() {
         improvementsTab.confirmAction();
 
         expect(improvementsTab.getTasks().count()).toEqual(0);
+        improvementsTab.verifyNoOutstandingTasks();
       });
     });
 
@@ -550,6 +557,7 @@ describe('Playthrough Improvements', function() {
           'learners exited the exploration in less than a minute');
 
         expect(improvementsTab.getTaskActionButtons(task).count()).toEqual(0);
+        improvementsTab.verifyNoOutstandingTasks();
       });
     });
   });

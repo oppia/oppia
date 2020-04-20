@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Services for classifier data models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -21,6 +22,7 @@ import logging
 import re
 
 from core.domain import classifier_domain
+from core.domain import fs_services
 from core.platform import models
 import feconf
 import python_utils
@@ -69,7 +71,6 @@ def handle_trainable_states(exploration, state_names):
             'state_name': state_name,
             'training_data': training_data,
             'status': feconf.TRAINING_JOB_STATUS_NEW,
-            'classifier_data': classifier_data,
             'data_schema_version': data_schema_version
         })
 
@@ -228,6 +229,8 @@ def get_classifier_training_job_from_model(classifier_training_job_model):
         classifier_training_job: ClassifierTrainingJob. Domain object for the
             classifier training job.
     """
+    classifier_data = fs_services.read_classifier_data(
+        classifier_training_job_model.exp_id, classifier_training_job_model.id)
     return classifier_domain.ClassifierTrainingJob(
         classifier_training_job_model.id,
         classifier_training_job_model.algorithm_id,
@@ -238,7 +241,7 @@ def get_classifier_training_job_from_model(classifier_training_job_model):
         classifier_training_job_model.state_name,
         classifier_training_job_model.status,
         classifier_training_job_model.training_data,
-        classifier_training_job_model.classifier_data,
+        classifier_data,
         classifier_training_job_model.data_schema_version)
 
 
@@ -333,7 +336,6 @@ def _update_scheduled_check_time_for_new_training_job(job_id):
     """
     classifier_training_job_model = (
         classifier_models.ClassifierTrainingJobModel.get(job_id))
-
     classifier_training_job_model.next_scheduled_check_time = (
         datetime.datetime.utcnow() + datetime.timedelta(
             minutes=feconf.CLASSIFIER_JOB_TTL_MINS))
@@ -371,7 +373,11 @@ def fetch_next_job():
         mark_training_jobs_failed(timed_out_job_ids)
 
     if valid_jobs:
-        next_job = get_classifier_training_job_from_model(valid_jobs[0])
+        next_job_model = valid_jobs[0]
+        # Assuming that a pending job has empty classifier data as it has not
+        # been trained yet.
+        next_job_model.classifier_data = None
+        next_job = get_classifier_training_job_from_model(next_job_model)
         _update_scheduled_check_time_for_new_training_job(next_job.job_id)
     else:
         next_job = None
@@ -396,14 +402,12 @@ def store_classifier_data(job_id, classifier_data):
         raise Exception(
             'The ClassifierTrainingJobModel corresponding to the job_id of the '
             'ClassifierTrainingJob does not exist.')
-
     classifier_training_job = get_classifier_training_job_from_model(
         classifier_training_job_model)
     classifier_training_job.update_classifier_data(classifier_data)
     classifier_training_job.validate()
-
-    classifier_training_job_model.classifier_data = classifier_data
-    classifier_training_job_model.put()
+    fs_services.save_classifier_data(
+        classifier_training_job_model.exp_id, job_id, classifier_data)
 
 
 def delete_classifier_training_job(job_id):
@@ -415,6 +419,8 @@ def delete_classifier_training_job(job_id):
     classifier_training_job_model = (
         classifier_models.ClassifierTrainingJobModel.get(job_id))
     if classifier_training_job_model is not None:
+        fs_services.delete_classifier_data(
+            classifier_training_job_model.exp_id, job_id)
         classifier_training_job_model.delete()
 
 
@@ -438,8 +444,10 @@ def get_classifier_training_jobs(exp_id, exp_version, state_names):
         if mapping_model is None:
             continue
         job_ids.append(mapping_model.job_id)
+
     classifier_training_job_models = (
         classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
+
     classifier_training_jobs = []
     for job_model in classifier_training_job_models:
         classifier_training_jobs.append(get_classifier_training_job_from_model(

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Jobs for queries personalized to individual users."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -99,6 +100,23 @@ class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         username_counter = [
             ast.literal_eval(v) for v in stringified_username_counter]
         yield (key, len(username_counter))
+
+
+class UsernameLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits and validates username lengths."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(model_instance):
+        if len(model_instance.username) > 20:
+            yield (len(model_instance.username), model_instance.username)
+
+    @staticmethod
+    def reduce(key, values):
+        yield ('Length: %s' % key, 'Usernames: %s' % sorted(values))
 
 
 class LongUserBiosOneOffJob(jobs.BaseMapReduceOneOffJobManager):

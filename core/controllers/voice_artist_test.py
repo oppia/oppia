@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the exploration voice artist work."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -53,7 +54,8 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
                 'en': {
                     'filename': 'testFile.mp3',
                     'file_size_bytes': 12200,
-                    'needs_update': False
+                    'needs_update': False,
+                    'duration_secs': 4.5
                 }
             },
             'default_outcome': {}
@@ -160,7 +162,8 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
                 'en': {
                     'filename': 'testFile.mp3',
                     'file_size_bytes': 12200,
-                    'needs_update': False
+                    'needs_update': False,
+                    'duration_secs': 4.5
                 }
             },
             'default_outcome': {}

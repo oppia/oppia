@@ -19,13 +19,17 @@ stored in the database. In particular, the various query methods should
 delegate to the Story model class. This will enable the story
 storage model to be changed without affecting this module and others above it.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
+from constants import constants
+from core.domain import android_validation_constants
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
+from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
@@ -33,8 +37,8 @@ from core.platform import models
 import feconf
 import utils
 
-(story_models, user_models,) = models.Registry.import_models(
-    [models.NAMES.story, models.NAMES.user])
+(exp_models, story_models, user_models,) = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
 memcache_services = models.Registry.import_memcache_services()
 
 
@@ -100,9 +104,12 @@ def apply_change_list(story_id, change_list):
             story.
 
     Returns:
-        Story. The resulting story domain object.
+        Story, list(str), list(str). The resulting story domain object, the
+            exploration IDs removed from story and the exploration IDs added to
+            the story.
     """
     story = story_fetchers.get_story_by_id(story_id)
+    exp_ids_in_old_story = story.story_contents.get_all_linked_exp_ids()
     try:
         for change in change_list:
             if not isinstance(change, story_domain.StoryChange):
@@ -165,7 +172,14 @@ def apply_change_list(story_id, change_list):
                 # latest schema version. As a result, simply resaving the
                 # story is sufficient to apply the schema migration.
                 continue
-        return story
+
+        exp_ids_in_modified_story = (
+            story.story_contents.get_all_linked_exp_ids())
+        exp_ids_removed_from_story = list(
+            set(exp_ids_in_old_story).difference(exp_ids_in_modified_story))
+        exp_ids_added_to_story = list(
+            set(exp_ids_in_modified_story).difference(exp_ids_in_old_story))
+        return story, exp_ids_removed_from_story, exp_ids_added_to_story
 
     except Exception as e:
         logging.error(
@@ -173,6 +187,137 @@ def apply_change_list(story_id, change_list):
                 e.__class__.__name__, e, story_id, change_list)
         )
         raise
+
+
+def validate_explorations_for_story(exp_ids, raise_error):
+    """Validates the explorations in the given story and checks whether they
+    are compatible with the mobile app.
+
+    Args:
+        exp_ids: list(str). The exp IDs to validate.
+        raise_error: bool. Whether to raise an Exception when a validation error
+            is encountered. If not, a list of the error messages are
+            returned. raise_error should be True when this is called before
+            saving the story and False when this function is called from the
+            frontend.
+
+    Returns:
+        list(str). The various validation error messages (if raise_error is
+            False).
+
+    Raises:
+        ValidationError. Expected story to only reference valid explorations.
+        ValidationError. Exploration with ID is not public. Please publish
+            explorations before adding them to a story.
+        ValidationError. All explorations in a story should be of the same
+            category.
+        ValidationError. Invalid language found for exploration.
+        ValidationError. Expected no exploration to have parameter values in it.
+        ValidationError. Invalid interaction in exploration.
+        ValidationError. RTE content in state of exploration with ID is not
+            supported on mobile.
+    """
+    validation_error_messages = []
+
+    # Strict = False, since the existence of explorations is checked below.
+    exps_dict = (
+        exp_fetchers.get_multiple_explorations_by_id(exp_ids, strict=False))
+
+    exp_rights = (
+        rights_manager.get_multiple_exploration_rights_by_ids(exp_ids))
+
+    exp_rights_dict = {}
+
+    for rights in exp_rights:
+        if rights is not None:
+            exp_rights_dict[rights.id] = rights.status
+
+    for exp_id in exp_ids:
+        if exp_id not in exps_dict:
+            error_string = (
+                'Expected story to only reference valid explorations, but found'
+                ' a reference to an invalid exploration with ID: %s'
+                % exp_id)
+            if raise_error:
+                raise utils.ValidationError(error_string)
+            validation_error_messages.append(error_string)
+        else:
+            if exp_rights_dict[exp_id] != constants.ACTIVITY_STATUS_PUBLIC:
+                error_string = (
+                    'Exploration with ID %s is not public. Please publish '
+                    'explorations before adding them to a story.'
+                    % exp_id)
+                if raise_error:
+                    raise utils.ValidationError(error_string)
+                validation_error_messages.append(error_string)
+
+    if exps_dict:
+        for exp_id in exp_ids:
+            if exp_id in exps_dict:
+                sample_exp_id = exp_id
+                break
+        common_exp_category = exps_dict[sample_exp_id].category
+        for exp_id in exps_dict:
+            exp = exps_dict[exp_id]
+            if exp.category != common_exp_category:
+                error_string = (
+                    'All explorations in a story should be of the '
+                    'same category. The explorations with ID %s and %s have'
+                    ' different categories.' % (sample_exp_id, exp_id))
+                if raise_error:
+                    raise utils.ValidationError(error_string)
+                validation_error_messages.append(error_string)
+            if (
+                    exp.language_code not in
+                    android_validation_constants.SUPPORTED_LANGUAGES):
+                error_string = (
+                    'Invalid language %s found for exploration '
+                    'with ID %s.' % (exp.language_code, exp_id))
+                if raise_error:
+                    raise utils.ValidationError(error_string)
+                validation_error_messages.append(error_string)
+
+            if exp.param_specs or exp.param_changes:
+                error_string = (
+                    'Expected no exploration to have parameter '
+                    'values in it. Invalid exploration: %s' % exp.id)
+                if raise_error:
+                    raise utils.ValidationError(error_string)
+                validation_error_messages.append(error_string)
+
+            for state_name in exp.states:
+                state = exp.states[state_name]
+                if not state.interaction.is_supported_on_android_app():
+                    error_string = (
+                        'Invalid interaction %s in exploration '
+                        'with ID: %s.' % (state.interaction.id, exp.id))
+                    if raise_error:
+                        raise utils.ValidationError(error_string)
+                    validation_error_messages.append(error_string)
+
+                if not state.is_rte_content_supported_on_android():
+                    error_string = (
+                        'RTE content in state %s of exploration '
+                        'with ID %s is not supported on mobile.'
+                        % (state_name, exp.id))
+                    if raise_error:
+                        raise utils.ValidationError(error_string)
+                    validation_error_messages.append(error_string)
+
+                if state.interaction.id == 'EndExploration':
+                    recommended_exploration_ids = (
+                        state.interaction.customization_args[
+                            'recommendedExplorationIds']['value'])
+                    if len(recommended_exploration_ids) != 0:
+                        error_string = (
+                            'Exploration with ID: %s contains exploration '
+                            'recommendations in its EndExploration interaction.'
+                            % (exp.id))
+                        if raise_error:
+                            raise utils.ValidationError(error_string)
+                        validation_error_messages.append(error_string)
+
+    return validation_error_messages
 
 
 def _save_story(committer_id, story, commit_message, change_list):
@@ -198,23 +343,10 @@ def _save_story(committer_id, story, commit_message, change_list):
             'save story %s: %s' % (story.id, change_list))
 
     story.validate()
-    # Validate that all explorations referenced by the story exist.
-    exp_ids = []
-    for node in story.story_contents.nodes:
-        if node.exploration_id is not None:
-            exp_ids.append(node.exploration_id)
-    exp_summaries = (
-        exp_fetchers.get_exploration_summaries_matching_ids(exp_ids))
-    exp_summaries_dict = {
-        exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
-    }
-    for node in story.story_contents.nodes:
-        if (node.exploration_id is not None) and (
-                not exp_summaries_dict[node.exploration_id]):
-            raise utils.ValidationError(
-                'Expected story to only reference valid explorations, '
-                'but found an exploration with ID: %s (was it deleted?)' %
-                node.exploration_id)
+    exp_ids = [
+        node.exploration_id for node in story.story_contents.nodes
+        if node.exploration_id is not None]
+    validate_explorations_for_story(exp_ids, True)
 
     # Story model cannot be None as story is passed as parameter here and that
     # is only possible if a story model with that story id exists. Also this is
@@ -274,15 +406,43 @@ def update_story(
             produce the resulting story.
         commit_message: str or None. A description of changes made to the
             story.
+
+    Raises:
+        ValidationError. Exploration is already linked to a different story.
     """
     if not commit_message:
         raise ValueError('Expected a commit message but received none.')
 
     old_story = story_fetchers.get_story_by_id(story_id)
-    new_story = apply_change_list(story_id, change_list)
+    new_story, exp_ids_removed_from_story, exp_ids_added_to_story = (
+        apply_change_list(story_id, change_list))
     _save_story(committer_id, new_story, commit_message, change_list)
     create_story_summary(new_story.id)
     opportunity_services.update_exploration_opportunities(old_story, new_story)
+
+    exploration_context_models_to_be_deleted = (
+        exp_models.ExplorationContextModel.get_multi(
+            exp_ids_removed_from_story))
+    exploration_context_models_to_be_deleted = [
+        model for model in exploration_context_models_to_be_deleted
+        if model is not None]
+    exp_models.ExplorationContextModel.delete_multi(
+        exploration_context_models_to_be_deleted)
+
+    exploration_context_models_collisions_list = (
+        exp_models.ExplorationContextModel.get_multi(
+            exp_ids_added_to_story))
+    for context_model in exploration_context_models_collisions_list:
+        if context_model is not None and context_model.story_id != story_id:
+            raise utils.ValidationError(
+                'The exploration with ID %s is already linked to story '
+                'with ID %s' % (context_model.id, context_model.story_id))
+
+    new_exploration_context_models = [exp_models.ExplorationContextModel(
+        id=exp_id,
+        story_id=story_id
+    ) for exp_id in exp_ids_added_to_story]
+    exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
 
 
 def delete_story(committer_id, story_id, force_deletion=False):
@@ -303,6 +463,18 @@ def delete_story(committer_id, story_id, force_deletion=False):
     story_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_STORY_DELETED,
         force_deletion=force_deletion)
+    exp_ids_to_be_removed = []
+    for node in story.story_contents.nodes:
+        exp_ids_to_be_removed.append(node.exploration_id)
+
+    exploration_context_models_to_be_deleted = (
+        exp_models.ExplorationContextModel.get_multi(
+            exp_ids_to_be_removed))
+    exploration_context_models_to_be_deleted = [
+        model for model in exploration_context_models_to_be_deleted
+        if model is not None]
+    exp_models.ExplorationContextModel.delete_multi(
+        exploration_context_models_to_be_deleted)
 
     # This must come after the story is retrieved. Otherwise the memcache
     # key will be reinstated.

@@ -17,8 +17,7 @@
  */
 
 angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -26,71 +25,31 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
         getInitArgs: '&',
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/' +
-        'list-of-sets-of-html-strings-editor.directive.html'),
+      template: require('./list-of-sets-of-html-strings-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
         var errorMessage = '';
-
-        if (!ctrl.selectedRank) {
-          ctrl.selectedRank = '';
-        }
-
-        if (!ctrl.maxPrevIndex) {
-          ctrl.maxPrevIndex = 1;
-        }
-
-        ctrl.initValues = [];
-        ctrl.initArgs = ctrl.getInitArgs();
-        ctrl.choices = ctrl.initArgs.choices;
-
-        // Initialize the default values.
-        if (ctrl.value[0] === undefined || ctrl.value[0].length === 0) {
-          ctrl.value = [[]];
-          for (var i = 0; i < ctrl.choices.length; i++) {
-            ctrl.value[0].push(ctrl.choices[i].id);
-            ctrl.initValues.push(1);
-          }
-        } else {
-          for (var i = 0; i < ctrl.choices.length; i++) {
-            for (var j = 0; j < ctrl.value.length; j++) {
-              var choice = ctrl.choices[i].id;
-              if (ctrl.value[j].indexOf(choice) !== -1) {
-                ctrl.initValues.push(j + 1);
-                ctrl.maxPrevIndex = math.max(ctrl.maxPrevIndex, j + 1);
-                break;
-              }
-            }
-          }
-        }
-
-        if (ctrl.selectedRank !== '') {
-          ctrl.maxPrevIndex = math.max(parseInt(ctrl.selectedRank),
-            ctrl.maxPrevIndex);
-        }
-
         ctrl.allowedChoices = function() {
           var allowedList = [];
-          for (var i = 0; i <= math.min(
+          for (var i = 0; i <= Math.min(
             ctrl.maxPrevIndex, ctrl.choices.length - 1); i++) {
             allowedList.push(i + 1);
           }
           return allowedList;
         };
 
-        ctrl.selectedItem = function(choiceListIndex, selectedRankString) {
+        ctrl.selectedItem = function(choiceListIndex) {
           var choiceHtml = ctrl.choices[choiceListIndex].id;
-          var selectedRank = parseInt(selectedRankString) - 1;
+          var selectedRank = parseInt(
+            ctrl.choices[choiceListIndex].selectedRank) - 1;
           errorMessage = '';
           // Reorder the ctrl.choices array to make it consistent with the
           // selected rank.
           // ctrl.choices.splice(selectedRank, 0, ctrl.choices.splice(
           // choiceListIndex, 1)[0]);
           var choiceHtmlHasBeenAdded = false;
-          ctrl.maxPrevIndex = math.max(selectedRank + 1,
-            ctrl.maxPrevIndex);
+          ctrl.maxPrevIndex = Math.max(selectedRank + 1, ctrl.maxPrevIndex);
 
           for (var i = 0; i < ctrl.value.length; i++) {
             choiceHtmlHasBeenAdded = false;
@@ -132,6 +91,37 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
 
         ctrl.getWarningText = function() {
           return errorMessage;
+        };
+        ctrl.$onInit = function() {
+          if (!ctrl.maxPrevIndex) {
+            ctrl.maxPrevIndex = 1;
+          }
+
+          ctrl.initValues = [];
+          ctrl.initArgs = ctrl.getInitArgs();
+          ctrl.choices = ctrl.initArgs.choices;
+
+          // Initialize the default values.
+          if (ctrl.value[0] === undefined || ctrl.value[0].length === 0) {
+            ctrl.value = [[]];
+            for (var i = 0; i < ctrl.choices.length; i++) {
+              ctrl.value[0].push(ctrl.choices[i].id);
+              ctrl.initValues.push(1);
+              ctrl.choices[i].selectedRank = '';
+            }
+          } else {
+            for (var i = 0; i < ctrl.choices.length; i++) {
+              var choice = ctrl.choices[i].id;
+              ctrl.choices[i].selectedRank = '';
+              for (var j = 0; j < ctrl.value.length; j++) {
+                if (ctrl.value[j].indexOf(choice) !== -1) {
+                  ctrl.initValues.push(j + 1);
+                  ctrl.maxPrevIndex = Math.max(ctrl.maxPrevIndex, j + 1);
+                  break;
+                }
+              }
+            }
+          }
         };
       }]
     };

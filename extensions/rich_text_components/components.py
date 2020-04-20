@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Classes for Rich Text Components in Oppia."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -105,10 +106,6 @@ class Collapsible(BaseRteComponent):
             raise Exception('Nested tabs and collapsible')
 
 
-class Concept(BaseRteComponent):
-    """Class for Concept component."""
-
-
 class Image(BaseRteComponent):
     """Class for Image component."""
 
@@ -128,6 +125,10 @@ class Link(BaseRteComponent):
 
 class Math(BaseRteComponent):
     """Class for Math component."""
+
+
+class Skillreview(BaseRteComponent):
+    """Class for Skillreview component."""
 
 
 class Tabs(BaseRteComponent):

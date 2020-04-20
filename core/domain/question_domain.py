@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Domain objects relating to questions."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -86,7 +87,7 @@ class QuestionChange(change_domain.BaseChange):
     }, {
         'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
         'required_attribute_names': ['question_dict', 'skill_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': ['topic_name']
     }, {
         'name': CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
@@ -94,18 +95,22 @@ class QuestionChange(change_domain.BaseChange):
     }]
 
 
-class QuestionRightsChange(change_domain.BaseChange):
-    """Domain object for changes made to question rights object.
+class QuestionSuggestionChange(change_domain.BaseChange):
+    """Domain object for changes made to question suggestion object.
 
     The allowed commands, together with the attributes:
-        - 'create_new'.
+        - 'create_new_fully_specified_question' (with question_dict,
+        skill_id, skill_difficulty)
     """
 
-    ALLOWED_COMMANDS = [{
-        'name': CMD_CREATE_NEW,
-        'required_attribute_names': [],
-        'optional_attribute_names': []
-    }]
+    ALLOWED_COMMANDS = [
+        {
+            'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'required_attribute_names': [
+                'question_dict', 'skill_id', 'skill_difficulty'],
+            'optional_attribute_names': []
+        }
+    ]
 
 
 class Question(python_utils.OBJECT):
@@ -224,6 +229,82 @@ class Question(python_utils.OBJECT):
         for answer_group in answer_groups:
             answer_group['tagged_skill_misconception_id'] = None
             del answer_group['tagged_misconception_id']
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v30_dict_to_v31_dict(cls, question_state_dict):
+        """Converts from version 30 to 31. Version 31 updates the
+        Voiceover model to have an initialized duration_secs attribute of 0.0.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initalize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        # Get the voiceovers_mapping metadata.
+        voiceovers_mapping = (question_state_dict['recorded_voiceovers']
+                              ['voiceovers_mapping'])
+        language_codes_to_audio_metadata = voiceovers_mapping.values()
+        for language_codes in language_codes_to_audio_metadata:
+            for audio_metadata in language_codes.values():
+                # Initialize duration_secs with 0.0 for every voiceover
+                # recording under Content, Feedback, Hints, and Solutions.
+                # This is necessary to keep the state functional
+                # when migrating to v31.
+                audio_metadata['duration_secs'] = 0.0
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v31_dict_to_v32_dict(cls, question_state_dict):
+        """Converts from version 31 to 32. Version 32 adds a new
+        customization arg to SetInput interaction which allows
+        creators to add custom text to the "Add" button.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'SetInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'buttonText': {
+                    'value': 'Add item'
+                }
+            })
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v32_dict_to_v33_dict(cls, question_state_dict):
+        """Converts from version 32 to 33. Version 33 adds a new
+        customization arg to MultipleChoiceInput Interaction which allows
+        answer choices to be shuffled.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'MultipleChoiceInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'showChoicesInShuffledOrder': {
+                    'value': True
+                }
+            })
 
         return question_state_dict
 
@@ -412,12 +493,11 @@ class Question(python_utils.OBJECT):
 class QuestionSummary(python_utils.OBJECT):
     """Domain object for Question Summary."""
     def __init__(
-            self, creator_id, question_id, question_content,
+            self, question_id, question_content,
             question_model_created_on=None, question_model_last_updated=None):
         """Constructs a Question Summary domain object.
 
         Args:
-            creator_id: str. The user ID of the creator of the question.
             question_id: str. The ID of the question.
             question_content: str. The static HTML of the question shown to
                 the learner.
@@ -427,7 +507,6 @@ class QuestionSummary(python_utils.OBJECT):
                 when the question model was last updated.
         """
         self.id = question_id
-        self.creator_id = creator_id
         self.question_content = html_cleaner.clean(question_content)
         self.created_on = question_model_created_on
         self.last_updated = question_model_last_updated
@@ -440,7 +519,6 @@ class QuestionSummary(python_utils.OBJECT):
         """
         return {
             'id': self.id,
-            'creator_id': self.creator_id,
             'question_content': self.question_content,
             'last_updated_msec': utils.get_time_in_millisecs(self.last_updated),
             'created_on_msec': utils.get_time_in_millisecs(self.created_on)
@@ -456,11 +534,6 @@ class QuestionSummary(python_utils.OBJECT):
         if not isinstance(self.id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected id to be a string, received %s' % self.id)
-
-        if not isinstance(self.creator_id, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected creator id to be a string, received %s' %
-                self.creator_id)
 
         if not isinstance(self.question_content, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -561,41 +634,3 @@ class MergedQuestionSkillLink(python_utils.OBJECT):
             'skill_descriptions': self.skill_descriptions,
             'skill_difficulties': self.skill_difficulties,
         }
-
-
-class QuestionRights(python_utils.OBJECT):
-    """Domain object for question rights."""
-
-    def __init__(self, question_id, creator_id):
-        """Constructs a QuestionRights domain object.
-
-        Args:
-            question_id: str. The id of the question.
-            creator_id: str. The id of the user who has initially created
-                the question.
-        """
-        self.id = question_id
-        self.creator_id = creator_id
-
-    def to_dict(self):
-        """Returns a dict suitable for use by the frontend.
-
-        Returns:
-            dict. A dict representation of QuestionRights suitable for use
-                by the frontend.
-        """
-        return {
-            'question_id': self.id,
-            'creator_id': self.creator_id
-        }
-
-    def is_creator(self, user_id):
-        """Checks whether given user is a creator of the question.
-
-        Args:
-            user_id: str or None. ID of the user.
-
-        Returns:
-            bool. Whether the user is creator of this question.
-        """
-        return bool(user_id == self.creator_id)

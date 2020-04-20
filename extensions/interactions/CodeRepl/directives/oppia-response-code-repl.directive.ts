@@ -20,31 +20,29 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('oppiaResponseCodeRepl', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/CodeRepl/directives/' +
-        'code-repl-response.directive.html'),
+      template: require('./code-repl-response.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'FocusManagerService',
         function($attrs, FocusManagerService) {
           var ctrl = this;
-          ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          ctrl.$onInit = function() {
+            ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
 
-          if (ctrl.answer.error) {
-            ctrl.errorFocusLabel = FocusManagerService.generateFocusLabel();
-            FocusManagerService.setFocus(ctrl.errorFocusLabel);
-          }
+            if (ctrl.answer.error) {
+              ctrl.errorFocusLabel = FocusManagerService.generateFocusLabel();
+              FocusManagerService.setFocus(ctrl.errorFocusLabel);
+            }
+          };
         }
       ]
     };

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the practice sessions page."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -39,8 +40,10 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
         self.skill_id1 = 'skill_id_1'
         self.skill_id2 = 'skill_id_2'
 
-        self.save_new_skill(self.skill_id1, self.admin_id, 'Skill 1')
-        self.save_new_skill(self.skill_id2, self.admin_id, 'Skill 2')
+        self.save_new_skill(
+            self.skill_id1, self.admin_id, description='Skill 1')
+        self.save_new_skill(
+            self.skill_id2, self.admin_id, description='Skill 2')
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'public_topic_name', 'abbrev')
@@ -48,10 +51,12 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
         self.topic.subtopics.append(topic_domain.Subtopic(
             1, 'subtopic_name', [self.skill_id2]))
         self.topic.next_subtopic_id = 2
+        self.topic.thumbnail_filename = 'Topic.png'
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id_1, 'private_topic_name', 'abbrev')
+        self.topic.thumbnail_filename = 'Topic.png'
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
@@ -106,6 +111,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
         topic = topic_domain.Topic.create_default_topic(
             'topic_id_3', 'topic_without_skills', 'abbrev')
         topic.uncategorized_skill_ids.append('non_existent_skill')
+        topic.thumbnail_filename = 'Topic.png'
         topic_services.save_new_topic(self.admin_id, topic)
         topic_services.publish_topic('topic_id_3', self.admin_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):

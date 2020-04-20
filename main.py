@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """URL routing definitions, and some basic error/warmup handlers."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -115,6 +116,15 @@ def get_redirect_route(regex_route, handler, defaults=None):
 
     Warning: this method strips off parameters after the trailing slash. URLs
     with parameters should be formulated without the trailing slash.
+
+    Args:
+        regex_route: unicode. A raw string representing a route.
+        handler: BaseHandler. A callable to handle the route.
+        defaults: dict. Optional defaults parameter to be passed
+            into the RedirectRoute object.
+
+    Returns:
+        RedirectRoute. A RedirectRoute object for redirects.
     """
     if defaults is None:
         defaults = {}
@@ -195,6 +205,16 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
+    get_redirect_route(
+        r'/addcommunityreviewerhandler', admin.AddCommunityReviewerHandler),
+    get_redirect_route(
+        r'/removecommunityreviewerhandler',
+        admin.RemoveCommunityReviewerHandler),
+    get_redirect_route(
+        r'/getcommunityreviewershandler', admin.CommunityReviewersListHandler),
+    get_redirect_route(
+        r'/communityreviewerrightsdatahandler',
+        admin.CommunityReviewerRightsDataHandler),
 
     get_redirect_route(
         feconf.NOTIFICATIONS_DASHBOARD_URL,
@@ -217,14 +237,14 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_COLLECTION_URL,
         creator_dashboard.NewCollectionHandler),
     get_redirect_route(
-        r'%s' % feconf.COMMUNITY_DASHBOARD_URL,
-        community_dashboard.CommunityDashboardPage),
-    get_redirect_route(
         r'%s/<opportunity_type>' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
         community_dashboard.ContributionOpportunitiesHandler),
     get_redirect_route(
         r'/gettranslatabletexthandler',
         community_dashboard.TranslatableTextHandler),
+    get_redirect_route(
+        r'/usercommunityrightsdatahandler',
+        community_dashboard.UserCommunityRightsDataHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
@@ -250,11 +270,11 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
     get_redirect_route(
-        r'%s/<story_id>/<node_id>' % feconf.STORY_NODE_COMPLETION_URL_PREFIX,
-        story_viewer.StoryNodeCompletionHandler),
-    get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_VIEWER_URL_PREFIX,
         story_viewer.StoryPage),
+    get_redirect_route(
+        r'%s/<story_id>/<node_id>' % feconf.STORY_PROGRESS_URL_PREFIX,
+        story_viewer.StoryProgressHandler),
     get_redirect_route(
         r'%s/<topic_name>/<subtopic_id>' %
         feconf.SUBTOPIC_DATA_HANDLER,
@@ -386,6 +406,11 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
     get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
     get_redirect_route(feconf.DELETE_ACCOUNT_URL, profile.DeleteAccountPage),
+    get_redirect_route(
+        feconf.DELETE_ACCOUNT_HANDLER_URL, profile.DeleteAccountHandler),
+    get_redirect_route(
+        feconf.PENDING_ACCOUNT_DELETION_URL,
+        profile.PendingAccountDeletionPage),
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL, profile.UsernameCheckHandler),
     get_redirect_route(
@@ -662,6 +687,10 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_PUBLISH_HANDLER,
         story_editor.StoryPublishHandler),
+    get_redirect_route(
+        r'%s/<story_id>' %
+        feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX,
+        story_editor.ValidateExplorationsHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
@@ -683,6 +712,8 @@ URLS = MAPREDUCE_HANDLERS + [
         collection_editor.ExplorationMetadataSearchHandler),
     get_redirect_route(
         r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
+    get_redirect_route(
+        r'/sendDummyMailToAdminHandler', admin.SendDummyMailToAdminHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
 

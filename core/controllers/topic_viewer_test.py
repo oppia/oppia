@@ -13,10 +13,12 @@
 # limitations under the License.
 
 """Tests for the topic viewer page."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
+from core.domain import question_services
 from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
@@ -25,6 +27,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 
 class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
@@ -55,6 +58,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.topic.subtopics.append(topic_domain.Subtopic(
             1, 'subtopic_name', [self.skill_id_2]))
         self.topic.next_subtopic_id = 2
+        self.topic.thumbnail_filename = 'Image.png'
         self.topic.canonical_story_references.append(
             topic_domain.StoryReference.create_default_story_reference(
                 self.story_id))
@@ -63,6 +67,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id_1, 'private_topic_name', 'abbrev')
+        self.topic.thumbnail_filename = 'Image.png'
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
@@ -70,9 +75,9 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
             self.topic_id, self.story_id, self.admin_id)
 
         self.save_new_skill(
-            self.skill_id_1, self.user_id, 'Skill Description 1')
+            self.skill_id_1, self.user_id, description='Skill Description 1')
         self.save_new_skill(
-            self.skill_id_2, self.user_id, 'Skill Description 2')
+            self.skill_id_2, self.user_id, description='Skill Description 2')
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, 0.3)
         skill_services.create_user_skill_mastery(
@@ -134,7 +139,8 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                 'skill_descriptions': {
                     self.skill_id_1: 'Skill Description 1',
                     self.skill_id_2: 'Skill Description 2'
-                }
+                },
+                'train_tab_should_be_displayed': False
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 
@@ -179,7 +185,8 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                     'skill_descriptions': {
                         self.skill_id_1: None,
                         self.skill_id_2: 'Skill Description 2'
-                    }
+                    },
+                    'train_tab_should_be_displayed': False
                 }
                 self.assertDictContainsSubset(expected_dict, json_response)
 
@@ -190,3 +197,64 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
             self.get_json(
                 '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'),
                 expected_status_int=404)
+
+    def test_get_with_no_skills_ids(self):
+        self.topic = topic_domain.Topic.create_default_topic(
+            self.topic_id, 'topic_with_no_skills', 'abbrev')
+        topic_services.save_new_topic(self.admin_id, self.topic)
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            json_response = self.get_json(
+                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'topic_with_no_skills'))
+            expected_dict = {
+                'topic_name': 'topic_with_no_skills',
+                'topic_id': self.topic_id,
+                'canonical_story_dicts': [],
+                'additional_story_dicts': [],
+                'uncategorized_skill_ids': [],
+                'subtopics': [],
+                'degrees_of_mastery': {},
+                'skill_descriptions': {},
+                'train_tab_should_be_displayed': False
+            }
+            self.assertDictContainsSubset(expected_dict, json_response)
+
+    def test_get_with_five_or_more_questions(self):
+        number_of_questions = 6
+        self.topic_id = 'new_topic'
+        self.skill_id_1 = skill_services.get_new_skill_id()
+        self.topic = topic_domain.Topic.create_default_topic(
+            self.topic_id, 'new_topic', 'abbrev')
+        self.topic.uncategorized_skill_ids.append(self.skill_id_1)
+        self.topic.thumbnail_filename = 'Image.png'
+        topic_services.save_new_topic(self.admin_id, self.topic)
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        self.save_new_skill(
+            self.skill_id_1, self.admin_id, description='Skill Description 1')
+        for index in python_utils.RANGE(number_of_questions):
+            question_id = question_services.get_new_question_id()
+            self.save_new_question(
+                question_id, self.admin_id,
+                self._create_valid_question_data(index), [self.skill_id_1])
+            question_services.create_new_question_skill_link(
+                self.admin_id, question_id, self.skill_id_1, 0.5)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            json_response = self.get_json(
+                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'new_topic'))
+            expected_dict = {
+                'topic_name': 'new_topic',
+                'topic_id': self.topic_id,
+                'canonical_story_dicts': [],
+                'additional_story_dicts': [],
+                'uncategorized_skill_ids': [self.skill_id_1],
+                'subtopics': [],
+                'degrees_of_mastery': {
+                    self.skill_id_1: None
+                },
+                'skill_descriptions': {
+                    self.skill_id_1: 'Skill Description 1'
+                },
+                'train_tab_should_be_displayed': True
+            }
+            self.assertDictContainsSubset(expected_dict, json_response)
+        self.logout()
