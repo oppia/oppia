@@ -871,16 +871,16 @@ def skill_has_associated_questions(skill_id):
 
 def filter_skills_by_mastery(user_id, skill_ids):
     """Given a list of skill_ids, it returns a list of
-    20 (feconf.MAX_NUMBER_OF_SKILL_IDS) skill_ids in which the user has
+    feconf.MAX_NUMBER_OF_SKILL_IDS skill_ids in which the user has
     the least mastery.(Please note that python 2.7 considers the None
     type smaller than any value, so None types will be returned first)
 
     Args:
         user_id: str. The unique user ID of the user.
-        skill_ids: list. The skill_ids that are to be filtered.
+        skill_ids: list(str). The skill_ids that are to be filtered.
 
     Returns:
-        list. A list of the filtered skill_ids.
+        list(str). A list of the filtered skill_ids.
     """
     degrees_of_mastery = get_multi_user_skill_mastery(user_id, skill_ids)
 

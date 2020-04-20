@@ -962,15 +962,17 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
             degrees_of_mastery, {skill_id_4: 0.3, skill_id_5: 0.5})
 
     def test_filter_skills_by_mastery(self):
-        # Create 20(feconf.MAX_NUMBER_OF_SKILL_IDS) + 3 skill_ids
+        # Create feconf.MAX_NUMBER_OF_SKILL_IDS + 3 skill_ids
         # to test two things:
         #   1. The skill_ids should be sorted.
-        #   2. The filtered skill_ids should be 20 in number.
+        #   2. The filtered skill_ids should be feconf.MAX_NUMBER_OF_SKILL_IDS
+        # in number.
 
         # List of mastery values (float values between 0.0 and 1.0)
         masteries = [self.DEGREE_OF_MASTERY_1, self.DEGREE_OF_MASTERY_2, None]
 
-        # Creating 20 additional user skill masteries.
+        # Creating feconf.MAX_NUMBER_OF_SKILL_IDS additional user skill
+        # masteries.
         for i in python_utils.RANGE(feconf.MAX_NUMBER_OF_SKILL_IDS):
             skill_id = skill_services.get_new_skill_id()
             mastery = random.random()
@@ -990,8 +992,8 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(arranged_filtered_skill_ids), feconf.MAX_NUMBER_OF_SKILL_IDS)
 
-        # Assert that all the returned skill_ids are a part of the first 20
-        # sorted skill_ids.
+        # Assert that all the returned skill_ids are a part of the first
+        # feconf.MAX_NUMBER_OF_SKILL_IDS sorted skill_ids.
         for i in python_utils.RANGE(feconf.MAX_NUMBER_OF_SKILL_IDS):
             self.assertIn(
                 degrees_of_masteries[arranged_filtered_skill_ids[i]],
