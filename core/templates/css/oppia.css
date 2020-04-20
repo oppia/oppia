@@ -1188,6 +1188,11 @@ textarea {
   width: 100vw;
 }
 
+.oppia-input-box-subtitle {
+  color: #595959;
+  font-size: 0.79em;
+}
+
 .oppia-fractions-landing-page-generic-title {
   color: inherit;
   font-weight: 500;

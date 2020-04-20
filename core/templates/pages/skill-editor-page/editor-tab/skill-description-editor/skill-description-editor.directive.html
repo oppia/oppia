@@ -8,11 +8,13 @@
       <p ng-class="{'has-error': !tmpSkillDescription.length > 0}">
         <input type="text" class="form-control protractor-test-skill-description-field" ng-if="canEditSkillDescription()"
                ng-model="tmpSkillDescription" ng-blur="saveSkillDescription(tmpSkillDescription)"
-               maxlength="100" ng-trim="false">
-        <span ng-if="!canEditSkillDescription()"><[tmpSkillDescription]></span>
-        <span ng-if="tmpSkillDescription.length === 100" class="form-text" style="color: red; font-size: smaller">
-          <em>Please use at most 100 characters.</em>
+               maxlength="<[MAX_CHARS_IN_SKILL_DESCRIPTION]>" ng-trim="false">
+        <span class="oppia-input-box-subtitle">
+          <i>
+            Skill description should be at most <[MAX_CHARS_IN_SKILL_DESCRIPTION]> characters.
+          </i>
         </span>
+        <span ng-if="!canEditSkillDescription()"><[tmpSkillDescription]></span>
       </p>
     </div>
   </div>

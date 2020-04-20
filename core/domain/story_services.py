@@ -342,11 +342,26 @@ def _save_story(committer_id, story, commit_message, change_list):
             'Unexpected error: received an invalid change list when trying to '
             'save story %s: %s' % (story.id, change_list))
 
+    topic = topic_fetchers.get_topic_by_id(
+        story.corresponding_topic_id, strict=False)
+
+    story_is_published = False
+    if topic is not None:
+        for story_reference in topic.get_all_story_references():
+            if story_reference.story_id == story.id:
+                story_is_published = story_reference.story_is_published
+
     story.validate()
-    exp_ids = [
-        node.exploration_id for node in story.story_contents.nodes
-        if node.exploration_id is not None]
-    validate_explorations_for_story(exp_ids, True)
+
+    if story_is_published:
+        for node in story.story_contents.nodes:
+            if not node.exploration_id:
+                raise Exception(
+                    'Story node with id %s does not contain an '
+                    'exploration id.' % node.id)
+        exp_ids = [
+            node.exploration_id for node in story.story_contents.nodes]
+        validate_explorations_for_story(exp_ids, True)
 
     # Story model cannot be None as story is passed as parameter here and that
     # is only possible if a story model with that story id exists. Also this is

@@ -172,6 +172,12 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.description = 0
         self._assert_validation_error('Description should be a string')
 
+        self.skill.description = (
+            'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyza'
+            'bcdefghijklmnopqrstuvwxyz')
+        self._assert_validation_error(
+            'Skill description should be less than 64 chars')
+
     def test_prerequisite_skill_ids_validation(self):
         self.skill.prerequisite_skill_ids = 0
         self._assert_validation_error(

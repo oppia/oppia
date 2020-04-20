@@ -22,9 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import logging
 
-from core.domain import exp_fetchers
 from core.domain import opportunity_services
-from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import state_domain
 from core.domain import story_fetchers
@@ -550,20 +548,8 @@ def publish_story(topic_id, story_id, committer_id):
                     'Story node with id %s does not contain an '
                     'exploration id.' % node.id)
             exploration_id_list.append(node.exploration_id)
-        explorations = exp_fetchers.get_multiple_explorations_by_id(
-            exploration_id_list, strict=False)
-        for node in story_nodes:
-            if not node.exploration_id in explorations:
-                raise Exception(
-                    'Exploration id %s doesn\'t exist.' % node.exploration_id)
-        multiple_exploration_rights = (
-            rights_manager.get_multiple_exploration_rights_by_ids(
-                exploration_id_list))
-        for exploration_rights in multiple_exploration_rights:
-            if exploration_rights.is_private():
-                raise Exception(
-                    'Exploration with id %s isn\'t published.'
-                    % exploration_rights.id)
+        story_services.validate_explorations_for_story(
+            exploration_id_list, True)
 
     topic = topic_fetchers.get_topic_by_id(topic_id, strict=None)
     if topic is None:

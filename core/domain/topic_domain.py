@@ -353,10 +353,18 @@ class Subtopic(python_utils.OBJECT):
         if not isinstance(self.id, int):
             raise utils.ValidationError(
                 'Expected subtopic id to be an int, received %s' % self.id)
+
         if not isinstance(self.title, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected subtopic title to be a string, received %s' %
                 self.title)
+
+        title_limit = android_validation_constants.MAX_CHARS_IN_SUBTOPIC_TITLE
+        if len(self.title) > title_limit:
+            raise utils.ValidationError(
+                'Expected subtopic title to be less than %d characters, '
+                'received %s' % (title_limit, self.title))
+
         if not isinstance(self.skill_ids, list):
             raise utils.ValidationError(
                 'Expected skill ids to be a list, received %s' %
@@ -492,11 +500,11 @@ class Topic(python_utils.OBJECT):
         if name == '':
             raise utils.ValidationError('Name field should not be empty')
 
-        if (
-                len(name) >
-                android_validation_constants.MAX_CHARS_IN_TOPIC_NAME):
+        name_limit = android_validation_constants.MAX_CHARS_IN_TOPIC_NAME
+        if len(name) > name_limit:
             raise utils.ValidationError(
-                'Topic name should be at most 35 characters.')
+                'Topic name should be at most %d characters, received %s.'
+                % (name_limit, name))
 
     @classmethod
     def require_valid_abbreviated_name(cls, name):
@@ -512,11 +520,12 @@ class Topic(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Abbreviated name field should not be empty.')
 
-        if (
-                len(name) >
-                android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME):
+        abbreviated_name_limit = (
+            android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME)
+        if len(name) > abbreviated_name_limit:
             raise utils.ValidationError(
-                'Abbreviated name field should not exceed 12 characters.')
+                'Abbreviated name field should not exceed %d characters, '
+                'received %s.' % (abbreviated_name_limit, name))
 
     def get_all_skill_ids(self):
         """Returns all the ids of all the skills present in the topic.
@@ -699,7 +708,6 @@ class Topic(python_utils.OBJECT):
                 valid.
         """
         self.require_valid_name(self.name)
-        self.require_valid_abbreviated_name(self.abbreviated_name)
         if self.thumbnail_filename is not None and not (
                 isinstance(self.thumbnail_filename, python_utils.BASESTRING)):
             raise utils.ValidationError(
@@ -717,11 +725,12 @@ class Topic(python_utils.OBJECT):
                 'Expected description to be a string, received %s'
                 % self.description)
 
-        if (
-                len(self.description) >
-                android_validation_constants.MAX_CHARS_IN_TOPIC_DESCRIPTION):
+        description_limit = (
+            android_validation_constants.MAX_CHARS_IN_TOPIC_DESCRIPTION)
+        if len(self.description) > description_limit:
             raise utils.ValidationError(
-                'Topic description should be at most 240 characters.')
+                'Topic description should be at most %d characters, '
+                'received %s.' % (description_limit, self.description))
 
         if not isinstance(self.subtopics, list):
             raise utils.ValidationError(

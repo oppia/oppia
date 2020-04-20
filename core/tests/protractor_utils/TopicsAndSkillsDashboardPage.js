@@ -73,8 +73,6 @@ var TopicsAndSkillsDashboardPage = function() {
     by.css('.protractor-test-save-concept-card'));
   var topicNamesInTopicSelectModal = element.all(
     by.css('.protractor-test-topic-name-in-topic-select-modal'));
-  var abbreviatedTopicNameField = element(
-    by.css('.protractor-test-new-abbreviated-topic-name-field'));
   var topicsTabButton = element(
     by.css('.protractor-test-topics-tab')
   );
@@ -140,14 +138,13 @@ var TopicsAndSkillsDashboardPage = function() {
     });
   };
 
-  this.createTopic = function(title, abbreviatedName) {
+  this.createTopic = function(title) {
     waitFor.elementToBeClickable(
       createTopicButton,
       'Create Topic button takes too long to be clickable');
     createTopicButton.click();
 
     topicNameField.sendKeys(title);
-    abbreviatedTopicNameField.sendKeys(abbreviatedName);
     confirmTopicCreationButton.click();
     waitFor.pageToFullyLoad();
   };
