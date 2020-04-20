@@ -46,14 +46,15 @@ angular.module('oppia').directive('storyNodeEditor', [
         'ExplorationIdValidationService', 'StoryUpdateService',
         'UndoRedoService', 'EVENT_STORY_INITIALIZED',
         'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_STORY_NODE_EDITOR',
-        'AlertsService',
+        'AlertsService', 'MAX_CHARS_IN_CHAPTER_TITLE',
         function(
             $scope, $rootScope, $uibModal, StoryEditorStateService,
             ExplorationIdValidationService, StoryUpdateService,
             UndoRedoService, EVENT_STORY_INITIALIZED,
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
-            AlertsService) {
+            AlertsService, MAX_CHARS_IN_CHAPTER_TITLE) {
           var ctrl = this;
+          $scope.MAX_CHARS_IN_CHAPTER_TITLE = MAX_CHARS_IN_CHAPTER_TITLE;
           var _recalculateAvailableNodes = function() {
             $scope.newNodeId = null;
             $scope.availableNodes = [];
@@ -93,6 +94,7 @@ angular.module('oppia').directive('storyNodeEditor', [
               $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
                 skillSummaries[idx].description;
             }
+            $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
             $scope.editableTitle = $scope.currentTitle;
             $scope.oldOutline = $scope.getOutline();
@@ -116,7 +118,7 @@ angular.module('oppia').directive('storyNodeEditor', [
 
           $scope.checkCanSaveExpId = function() {
             $scope.canSaveExpId = $scope.explorationIdPattern.test(
-              $scope.explorationId);
+              $scope.explorationId) || !$scope.explorationId;
             $scope.invalidExpErrorIsShown = false;
           };
           $scope.updateTitle = function(newTitle) {
@@ -149,18 +151,40 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.updateExplorationId = function(explorationId) {
-            ExplorationIdValidationService.isExpPublished(
-              explorationId).then(function(expIdIsValid) {
-              $scope.expIdIsValid = expIdIsValid;
-              if ($scope.expIdIsValid) {
-                StoryEditorStateService.setExpIdsChanged();
-                StoryUpdateService.setStoryNodeExplorationId(
-                  $scope.story, $scope.getId(), explorationId);
-                $scope.currentExplorationId = explorationId;
-              } else {
-                $scope.invalidExpErrorIsShown = true;
+            if (StoryEditorStateService.isStoryPublished()) {
+              if (explorationId === '' || explorationId === null) {
+                AlertsService.addInfoMessage(
+                  'You cannot remove an exploration from a published story.',
+                  5000);
+                return;
               }
-            });
+              ExplorationIdValidationService.isExpPublished(
+                explorationId).then(function(expIdIsValid) {
+                $scope.expIdIsValid = expIdIsValid;
+                if ($scope.expIdIsValid) {
+                  StoryEditorStateService.setExpIdsChanged();
+                  StoryUpdateService.setStoryNodeExplorationId(
+                    $scope.story, $scope.getId(), explorationId);
+                  $scope.currentExplorationId = explorationId;
+                } else {
+                  $scope.invalidExpErrorIsShown = true;
+                }
+              });
+            } else {
+              if (explorationId === '') {
+                AlertsService.addInfoMessage(
+                  'Please click the delete icon to remove an exploration ' +
+                  'from the story.', 5000);
+                return;
+              }
+              StoryEditorStateService.setExpIdsChanged();
+              StoryUpdateService.setStoryNodeExplorationId(
+                $scope.story, $scope.getId(), explorationId);
+              $scope.currentExplorationId = explorationId;
+              if (explorationId === null) {
+                $scope.explorationId = null;
+              }
+            }
           };
 
           $scope.removePrerequisiteSkillId = function(skillId) {
@@ -295,6 +319,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             modalInstance.result.then(function(title) {
               var nextNodeId =
                 $scope.story.getStoryContents().getNextNodeId();
+              StoryEditorStateService.setExpIdsChanged();
               StoryUpdateService.addStoryNode($scope.story, title);
               StoryUpdateService.addDestinationNodeIdToNode(
                 $scope.story, $scope.getId(), nextNodeId);
@@ -340,6 +365,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.removeDestinationNodeId = function(nodeId) {
+            StoryEditorStateService.setExpIdsChanged();
             StoryUpdateService.removeDestinationNodeIdFromNode(
               $scope.story, $scope.getId(), nodeId);
             $rootScope.$broadcast(

@@ -64,7 +64,6 @@ describe('Story node object factory', () => {
     _sampleStoryNode.setExplorationId('');
 
     expect(_sampleStoryNode.validate()).toEqual([
-      'Exploration ID fields should not be empty, once edited.',
       'The skill with id skill_2 is common to both the acquired and' +
       ' prerequisite skill id list in node with id node_1',
       'The destination node id of node with id node_1 points to itself.'
