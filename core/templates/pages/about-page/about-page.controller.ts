@@ -35,7 +35,6 @@ angular.module('oppia').directive('aboutPage', [
         'UrlInterpolationService', 'WindowRef',
         function(UrlInterpolationService, WindowRef) {
           const ctrl = this;
-          const hash = window.location.hash.slice(1);
           const listOfNamesToThank = [
             'Alex Kauffmann', 'Allison Barros',
             'Amy Latten', 'Brett Barros',
@@ -69,19 +68,18 @@ angular.module('oppia').directive('aboutPage', [
             ctrl.TAB_ID_CREDITS = 'credits';
             ctrl.TAB_ID_LICENSE = 'license';
 
-            var hash = WindowRef.nativeWindow.location.hash.slice(1);
-            if (hash === ctrl.TAB_ID_FOUNDATION || (
-              hash === ctrl.TAB_ID_LICENSE)) {
+            const allowedTabs = (
+              [ctrl.TAB_ID_ABOUT,
+                ctrl.TAB_ID_FOUNDATION,
+                ctrl.TAB_ID_CREDITS]);
+
+            const hash = WindowRef.nativeWindow.location.hash.slice(1);
+            if (hash === ctrl.TAB_ID_LICENSE) {
               ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;
-            }
-
-            if (hash === ctrl.TAB_ID_CREDITS) {
+            } else if (allowedTabs.includes(hash)) {
               ctrl.activeTabName = hash;
             }
 
-            if (hash === ctrl.TAB_ID_ABOUT) {
-              ctrl.activeTabName = hash;
-            }
             ctrl.listOfNames = listOfNamesToThank
               .slice(0, listOfNamesToThank.length - 1).join(', ') +
               ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
@@ -90,16 +88,10 @@ angular.module('oppia').directive('aboutPage', [
 
             WindowRef.nativeWindow.onhashchange = function() {
               const hashChange = window.location.hash.slice(1);
-              if (hashChange === ctrl.TAB_ID_FOUNDATION || (
-                hashChange === ctrl.TAB_ID_LICENSE)) {
+              if (hashChange === ctrl.TAB_ID_LICENSE) {
                 ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;
-                // Ensure page goes to the license section
-                if (hashChange === ctrl.TAB_ID_LICENSE) {
-                  WindowRef.nativeWindow.location.reload(true);
-                }
-              } else if (hashChange === ctrl.TAB_ID_CREDITS) {
-                ctrl.activeTabName = hashChange;
-              } else if (hashChange === ctrl.TAB_ID_ABOUT) {
+                WindowRef.nativeWindow.location.reload(true);
+              } else if (allowedTabs.includes(hashChange)) {
                 ctrl.activeTabName = hashChange;
               }
             };

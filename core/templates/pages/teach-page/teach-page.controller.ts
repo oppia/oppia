@@ -65,20 +65,17 @@ angular.module('oppia').directive('teachPage', [
             ctrl.TAB_ID_TEACH = 'teach';
             ctrl.TAB_ID_PLAYBOOK = 'playbook';
             ctrl.TEACH_FORM_URL = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
+            const allowedTabs = ([
+              ctrl.TAB_ID_TEACH, ctrl.TAB_ID_PLAYBOOK]);
 
             var hash = WindowRef.nativeWindow.location.hash.slice(1);
 
-            if (hash === ctrl.TAB_ID_TEACH) {
-              ctrl.activeTabName = hash;
-            } else if (hash === ctrl.TAB_ID_PLAYBOOK) {
+            if (allowedTabs.includes(hash)) {
               ctrl.activeTabName = hash;
             }
-
             WindowRef.nativeWindow.onhashchange = function() {
               var hashChange = WindowRef.nativeWindow.location.hash.slice(1);
-              if (hashChange === ctrl.TAB_ID_TEACH) {
-                ctrl.activeTabName = hashChange;
-              } else if (hashChange === ctrl.TAB_ID_PLAYBOOK) {
+              if (allowedTabs.includes(hashChange)) {
                 ctrl.activeTabName = hashChange;
               }
             };
