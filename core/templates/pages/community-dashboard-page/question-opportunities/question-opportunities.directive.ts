@@ -170,6 +170,10 @@ angular.module('oppia').directive('questionOpportunities', [
               if (AlertsService.warnings.length === 0) {
                 ctrl.createQuestion(result.skill, result.skillDifficulty);
               }
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
