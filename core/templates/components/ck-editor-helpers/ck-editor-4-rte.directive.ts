@@ -54,7 +54,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
         function resize() {
           var modal_width = parseInt($('.modal-header').width()) - 15;
           modal_width = modal_width.toString();
-
           $('.oppia-rte-resizer').css({
             'width': (modal_width + 'px')
            });
@@ -213,8 +212,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
             .css('height', '24px')
             .css('width', '24px');
           ck.setData(wrapComponents(ngModel.$viewValue));
-
-
         });
 
         // Angular rendering of components confuses CKEditor's undo system, so
