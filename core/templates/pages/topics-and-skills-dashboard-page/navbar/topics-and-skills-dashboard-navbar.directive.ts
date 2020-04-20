@@ -41,14 +41,14 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
         'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         'EVENT_TYPE_SKILL_CREATION_ENABLED', 'EditableTopicBackendApiService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
-        'SKILL_DIFFICULTIES',
+        'SKILL_DIFFICULTIES', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
         function(
             $scope, $rootScope, $uibModal, TopicCreationService,
             RubricObjectFactory, SkillCreationService,
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
             EVENT_TYPE_SKILL_CREATION_ENABLED, EditableTopicBackendApiService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-            SKILL_DIFFICULTIES) {
+            SKILL_DIFFICULTIES, MAX_CHARS_IN_SKILL_DESCRIPTION) {
           var ctrl = this;
           $scope.createTopic = function() {
             TopicCreationService.createNewTopic();
@@ -68,6 +68,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
+                  $scope.MAX_CHARS_IN_SKILL_DESCRIPTION =
+                    MAX_CHARS_IN_SKILL_DESCRIPTION;
                   $scope.newSkillDescription = '';
                   $scope.rubrics = rubrics;
                   $scope.bindableDict = {
