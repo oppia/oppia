@@ -248,7 +248,7 @@ SENDER_VALIDATORS = {
 }
 
 
-def _require_sender_id_is_valid(intent, sender_id):
+def require_sender_id_is_valid(intent, sender_id):
     """Ensure that the sender ID is valid, based on the email's intent.
 
     Many emails are only allowed to be sent by a certain user or type of user,
@@ -310,7 +310,7 @@ def _send_email(
     if sender_name is None:
         sender_name = EMAIL_SENDER_NAME.value
 
-    _require_sender_id_is_valid(intent, sender_id)
+    require_sender_id_is_valid(intent, sender_id)
 
     if recipient_email is None:
         recipient_email = user_services.get_email_from_user_id(recipient_id)
@@ -352,7 +352,7 @@ def _send_email(
 
 def _send_bulk_mail(
         recipient_ids, sender_id, intent, email_subject, email_html_body,
-        sender_email, sender_name, instance_id=None):
+        sender_email, sender_name, instance_id):
     """Sends an email to all given recipients.
 
     Args:
@@ -364,9 +364,9 @@ def _send_bulk_mail(
         sender_email: str. The sender's email address.
         sender_name: str. The name to be shown in the "sender" field of the
             email.
-        instance_id: str or None. The ID of the BulkEmailModel entity instance.
+        instance_id: str. The ID of the BulkEmailModel entity instance.
     """
-    _require_sender_id_is_valid(intent, sender_id)
+    require_sender_id_is_valid(intent, sender_id)
 
     recipients_settings = user_services.get_users_settings(recipient_ids)
     recipient_emails = [user.email for user in recipients_settings]
@@ -383,16 +383,18 @@ def _send_bulk_mail(
         '<br>', '\n').replace('<li>', '<li>- ').replace('</p><p>', '</p>\n<p>')
     cleaned_plaintext_body = html_cleaner.strip_html_tags(raw_plaintext_body)
 
-    def _send_bulk_mail_in_transaction(instance_id=None):
-        """Sends the emails in bulk to the recipients."""
+    def _send_bulk_mail_in_transaction(instance_id):
+        """Sends the emails in bulk to the recipients.
+
+        Args:
+            instance_id: str. The ID of the BulkEmailModel entity instance.
+        """
         sender_name_email = '%s <%s>' % (sender_name, sender_email)
 
         email_services.send_bulk_mail(
             sender_name_email, recipient_emails, email_subject,
             cleaned_plaintext_body, cleaned_html_body)
 
-        if instance_id is None:
-            instance_id = email_models.BulkEmailModel.get_new_id('')
         email_models.BulkEmailModel.create(
             instance_id, recipient_ids, sender_id, sender_name_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
@@ -1047,8 +1049,7 @@ def send_user_query_email(
     sender_email = user_services.get_email_from_user_id(sender_id)
     _send_bulk_mail(
         recipient_ids, sender_id, email_intent, email_subject, email_body,
-        sender_email, sender_name,
-        instance_id=bulk_email_model_id)
+        sender_email, sender_name, bulk_email_model_id)
     return bulk_email_model_id
 
 
