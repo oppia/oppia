@@ -21,8 +21,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
+import { UrlInterpolationService } from 
+  'domain/utilities/url-interpolation.service';
+import { SkillDomainConstants } from 
+  'domain/skill/skill-domain.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -38,12 +40,12 @@ export class ConceptCardBackendApiService {
   ) { }
 
   _fetchConceptCards(skillIds: Array<string>,
-    successCallback: (value?: Object | PromiseLike<Object>) => void,
-    errorCallback: (reason?: any) => void): void {
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
     let conceptCardDataUrl = this.urlInterpolationService.interpolateUrl(
       SkillDomainConstants.CONCEPT_CARD_DATA_URL_TEMPLATE, {
-      comma_separated_skill_ids: skillIds.join(',')
-    });
+        comma_separated_skill_ids: skillIds.join(',')
+      });
 
     this.http.get(conceptCardDataUrl).toPromise().then((response: any) => {
       let conceptCards = angular.copy(response.data.concept_card_dicts);
@@ -89,7 +91,8 @@ export class ConceptCardBackendApiService {
                 this._conceptCardCache[skillId] = angular.copy(
                   uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
               } else {
-                conceptCards.push(angular.copy(this._conceptCardCache[skillId]));
+                conceptCards.push(
+                  angular.copy(this._conceptCardCache[skillId]));
               }
             });
             if (resolve) {
