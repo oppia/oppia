@@ -32,7 +32,7 @@ import { SkillDomainConstants } from
 
 export class ConceptCardBackendApiService {
   // Maps previously loaded concept cards to their IDs.
-  _conceptCardCache: Object = {};
+  _conceptCardCache: Object<> = {};
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -60,11 +60,11 @@ export class ConceptCardBackendApiService {
     });
   }
 
-  _isCached(skillId: string): any {
+  _isCached(skillId: string): boolean {
     return this._conceptCardCache.hasOwnProperty(skillId);
   }
 
-  _getUncachedSkillIds(skillIds: Array<string>): any {
+  _getUncachedSkillIds(skillIds: Array<string>): Array<string> {
     let uncachedSkillIds = [];
     skillIds.forEach(function(skillId) {
       if (!this._isCached(skillId)) {
