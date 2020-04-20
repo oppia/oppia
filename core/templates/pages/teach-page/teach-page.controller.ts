@@ -40,8 +40,16 @@ angular.module('oppia').directive('teachPage', [
         function(
             $timeout, SiteAnalyticsService,
             UrlInterpolationService, WindowRef) {
-          var ctrl = this;
-          ctrl.activeTabName = 'teach';
+          const ctrl = this;
+          // Define constants
+          ctrl.TAB_ID_TEACH = 'teach';
+          ctrl.TAB_ID_PLAYBOOK = 'playbook';
+          ctrl.TEACH_FORM_URL = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
+
+          const ALLOWED_TABS = [
+            ctrl.TAB_ID_TEACH, ctrl.TAB_ID_PLAYBOOK];
+
+          ctrl.activeTabName = ctrl.TAB_ID_TEACH;
 
           ctrl.onTabClick = function(tabName) {
             // Update hash
@@ -60,22 +68,16 @@ angular.module('oppia').directive('teachPage', [
             }, 150);
             return false;
           };
+
           ctrl.$onInit = function() {
-            // Define constants
-            ctrl.TAB_ID_TEACH = 'teach';
-            ctrl.TAB_ID_PLAYBOOK = 'playbook';
-            ctrl.TEACH_FORM_URL = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
-            const allowedTabs = ([
-              ctrl.TAB_ID_TEACH, ctrl.TAB_ID_PLAYBOOK]);
+            const hash = WindowRef.nativeWindow.location.hash.slice(1);
 
-            var hash = WindowRef.nativeWindow.location.hash.slice(1);
-
-            if (allowedTabs.includes(hash)) {
+            if (ALLOWED_TABS.includes(hash)) {
               ctrl.activeTabName = hash;
             }
             WindowRef.nativeWindow.onhashchange = function() {
-              var hashChange = WindowRef.nativeWindow.location.hash.slice(1);
-              if (allowedTabs.includes(hashChange)) {
+              const hashChange = WindowRef.nativeWindow.location.hash.slice(1);
+              if (ALLOWED_TABS.includes(hashChange)) {
                 ctrl.activeTabName = hashChange;
               }
             };

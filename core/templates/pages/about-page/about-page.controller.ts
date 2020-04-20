@@ -50,8 +50,16 @@ angular.module('oppia').directive('aboutPage', [
             'Robyn Choo', 'Tricia Ngoon',
             'Vikrant Nanda', 'Vinamrata Singal',
             'Yarin Feigenbaum'];
+          // Define constants
+          ctrl.TAB_ID_ABOUT = 'about';
+          ctrl.TAB_ID_FOUNDATION = 'foundation';
+          ctrl.TAB_ID_CREDITS = 'credits';
+          ctrl.TAB_ID_LICENSE = 'license';
 
-          ctrl.activeTabName = 'about';
+          const ALLOWED_TABS = [
+            ctrl.TAB_ID_ABOUT, ctrl.TAB_ID_FOUNDATION, ctrl.TAB_ID_CREDITS];
+
+          ctrl.activeTabName = ctrl.TAB_ID_ABOUT;
 
           ctrl.onTabClick = function(tabName: string) {
             // Update hash
@@ -62,21 +70,10 @@ angular.module('oppia').directive('aboutPage', [
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
           ctrl.$onInit = function() {
-            // Define constants
-            ctrl.TAB_ID_ABOUT = 'about';
-            ctrl.TAB_ID_FOUNDATION = 'foundation';
-            ctrl.TAB_ID_CREDITS = 'credits';
-            ctrl.TAB_ID_LICENSE = 'license';
-
-            const allowedTabs = (
-              [ctrl.TAB_ID_ABOUT,
-                ctrl.TAB_ID_FOUNDATION,
-                ctrl.TAB_ID_CREDITS]);
-
             const hash = WindowRef.nativeWindow.location.hash.slice(1);
             if (hash === ctrl.TAB_ID_LICENSE) {
               ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;
-            } else if (allowedTabs.includes(hash)) {
+            } else if (ALLOWED_TABS.includes(hash)) {
               ctrl.activeTabName = hash;
             }
 
@@ -91,7 +88,7 @@ angular.module('oppia').directive('aboutPage', [
               if (hashChange === ctrl.TAB_ID_LICENSE) {
                 ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;
                 WindowRef.nativeWindow.location.reload(true);
-              } else if (allowedTabs.includes(hashChange)) {
+              } else if (ALLOWED_TABS.includes(hashChange)) {
                 ctrl.activeTabName = hashChange;
               }
             };
