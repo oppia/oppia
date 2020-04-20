@@ -42,12 +42,12 @@ export class ConceptCardBackendApiService {
   ) { }
 
   _fetchConceptCards(skillIds: Array<string>,
-    successCallback: (value?: Object | PromiseLike<Object>) => void,
-    errorCallback: (reason?: any) => void): void {
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
     let conceptCardDataUrl = this.urlInterpolationService.interpolateUrl(
       SkillDomainConstants.CONCEPT_CARD_DATA_URL_TEMPLATE, {
-      comma_separated_skill_ids: skillIds.join(',')
-    });
+        comma_separated_skill_ids: skillIds.join(',')
+      });
 
     this.http.get(conceptCardDataUrl).toPromise().then((response: any) => {
       let conceptCards = cloneDeep(response.data.concept_card_dicts);
