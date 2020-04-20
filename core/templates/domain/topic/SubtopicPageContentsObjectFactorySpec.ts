@@ -80,8 +80,8 @@ describe('Subtopic page contents object factory', () => {
   });
 
   it('should convert from a backend dictionary', () => {
-    const sampleSubtopicPageContents =
-      subtopicPageContentsObjectFactory.createFromBackendDict(backendDict);
+    const sampleSubtopicPageContents = (
+      subtopicPageContentsObjectFactory.createFromBackendDict(backendDict));
 
     expect(sampleSubtopicPageContents.getSubtitledHtml().getHtml())
       .toEqual('test content');
@@ -98,14 +98,14 @@ describe('Subtopic page contents object factory', () => {
   });
 
   it('should convert from a backend dictionary', () => {
-    const sampleSubtopicPageContents =
-      subtopicPageContentsObjectFactory.createFromBackendDict(backendDict);
+    const sampleSubtopicPageContents = (
+      subtopicPageContentsObjectFactory.createFromBackendDict(backendDict));
     expect(sampleSubtopicPageContents.toBackendDict()).toEqual(backendDict);
   });
 
   it('should change html from subtitleHtml property in object', () => {
-    const sampleSubtopicPageContents =
-      subtopicPageContentsObjectFactory.createFromBackendDict(backendDict);
+    const sampleSubtopicPageContents = (
+      subtopicPageContentsObjectFactory.createFromBackendDict(backendDict));
 
     expect(sampleSubtopicPageContents.getSubtitledHtml().getHtml())
       .toEqual('test content');
@@ -119,8 +119,8 @@ describe('Subtopic page contents object factory', () => {
   });
 
   it('should change subtitled html in object', () => {
-    const sampleSubtopicPageContents =
-    subtopicPageContentsObjectFactory.createFromBackendDict(backendDict);
+    const sampleSubtopicPageContents = (
+      subtopicPageContentsObjectFactory.createFromBackendDict(backendDict));
 
     expect(sampleSubtopicPageContents.getSubtitledHtml()).toEqual(
       subtitledHtmlObjectFactory.createFromBackendDict({
@@ -139,8 +139,8 @@ describe('Subtopic page contents object factory', () => {
   });
 
   it('should change recorded voiceovers in object', () => {
-    const sampleSubtopicPageContents =
-      subtopicPageContentsObjectFactory.createFromBackendDict(backendDict);
+    const sampleSubtopicPageContents = (
+      subtopicPageContentsObjectFactory.createFromBackendDict(backendDict));
 
     expect(sampleSubtopicPageContents.getRecordedVoiceovers().getVoiceover(
       'content', 'en').toBackendDict()).toEqual({

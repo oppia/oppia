@@ -45,14 +45,13 @@ describe('Misconception object factory', () => {
   });
 
   it('should convert to a backend dictionary', () => {
-    const misconception =
-      misconceptionObjectFactory.createFromBackendDict(misconceptionDict);
+    const misconception = (
+      misconceptionObjectFactory.createFromBackendDict(misconceptionDict));
     expect(misconception.toBackendDict()).toEqual(misconceptionDict);
   });
 
   it('should create a new misconception', () => {
-    const misconception =
-    misconceptionObjectFactory.create(
+    const misconception = misconceptionObjectFactory.create(
       '1', 'test name', 'test notes', 'test feedback', true);
     expect(misconception.getId()).toEqual('1');
     expect(misconception.getName()).toEqual('test name');
@@ -62,8 +61,8 @@ describe('Misconception object factory', () => {
   });
 
   it('should change the name from misconception object', () => {
-    const misconception =
-      misconceptionObjectFactory.createFromBackendDict(misconceptionDict);
+    const misconception = (
+      misconceptionObjectFactory.createFromBackendDict(misconceptionDict));
     expect(misconception.getName()).toEqual('test name');
 
     misconception.setName('new name');
@@ -72,8 +71,8 @@ describe('Misconception object factory', () => {
   });
 
   it('should change the notes from misconception object', () => {
-    const misconception =
-      misconceptionObjectFactory.createFromBackendDict(misconceptionDict);
+    const misconception = (
+      misconceptionObjectFactory.createFromBackendDict(misconceptionDict));
     expect(misconception.getNotes()).toEqual('test notes');
 
     misconception.setNotes('new notes');
@@ -82,8 +81,8 @@ describe('Misconception object factory', () => {
   });
 
   it('should change if a misconception object must be addressed', () => {
-    const misconception =
-      misconceptionObjectFactory.createFromBackendDict(misconceptionDict);
+    const misconception = (
+      misconceptionObjectFactory.createFromBackendDict(misconceptionDict));
     expect(misconception.isMandatory()).toEqual(true);
 
     misconception.setMustBeAddressed(false);
@@ -92,8 +91,8 @@ describe('Misconception object factory', () => {
   });
 
   it('should change the feedback from misconception object', () => {
-    const misconception =
-      misconceptionObjectFactory.createFromBackendDict(misconceptionDict);
+    const misconception = (
+      misconceptionObjectFactory.createFromBackendDict(misconceptionDict));
     expect(misconception.getFeedback()).toEqual('test feedback');
 
     misconception.setFeedback('new feedback');

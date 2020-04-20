@@ -45,7 +45,7 @@ describe('Alerts Service', function() {
     });
 
     it('should delete a warning (no duplicates)', () => {
-      var warning = 'Warning 1';
+      const warning = 'Warning 1';
       // Warning message to be deleted
       alertsService.addWarning(warning);
       // Add a few other warning message
@@ -60,8 +60,8 @@ describe('Alerts Service', function() {
       expect(alertsService.warnings.length).toBe(2);
 
       // Search for the deleted warning message
-      var found = false;
-      for (var i = 0; i < alertsService.warnings.length; i++) {
+      let found = false;
+      for (let i = 0; i < alertsService.warnings.length; i++) {
         if (alertsService.warnings[i].content === warning) {
           found = true;
         }
@@ -72,7 +72,7 @@ describe('Alerts Service', function() {
     });
 
     it('should delete a warning (with duplicates)', () => {
-      var warning = 'Warning 1';
+      const warning = 'Warning 1';
       // Warning message to be deleted
       alertsService.addWarning(warning);
       // Add a few other warning message
@@ -88,8 +88,8 @@ describe('Alerts Service', function() {
       expect(alertsService.warnings.length).toBe(2);
 
       // Search for the deleted warning message
-      var found = false;
-      for (var i = 0; i < alertsService.warnings.length; i++) {
+      let found = false;
+      for (let i = 0; i < alertsService.warnings.length; i++) {
         if (alertsService.warnings[i].content === warning) {
           found = true;
         }
@@ -100,8 +100,8 @@ describe('Alerts Service', function() {
     });
 
     it('should not add more than 10 warnings', () => {
-      var warning = 'Warning ';
-      for (var i = 1; i < 15; i++) {
+      const warning = 'Warning ';
+      for (let i = 1; i < 15; i++) {
         alertsService.addWarning(warning + i);
       }
       expect(alertsService.warnings.length).toBe(10);
@@ -118,7 +118,7 @@ describe('Alerts Service', function() {
 
   describe('Messages', () => {
     it('should add an info message', () => {
-      var message = 'Info 1';
+      const message = 'Info 1';
       expect(alertsService.messages.length).toBe(0);
       alertsService.addInfoMessage(message);
       expect(alertsService.messages.length).toBe(1);
@@ -127,7 +127,7 @@ describe('Alerts Service', function() {
     });
 
     it('should add a success message', () => {
-      var message = 'Success 1';
+      const message = 'Success 1';
       expect(alertsService.messages.length).toBe(0);
       alertsService.addSuccessMessage(message);
       alertsService.addInfoMessage('Info 1');
@@ -137,7 +137,7 @@ describe('Alerts Service', function() {
     });
 
     it('should delete a message (no duplicates)', () => {
-      var message = 'Info 1';
+      const message = 'Info 1';
       // Info Message to be deleted
       alertsService.addInfoMessage(message);
       // Add a few other messages
@@ -153,8 +153,8 @@ describe('Alerts Service', function() {
       expect(alertsService.messages.length).toBe(2);
 
       // Search for the message
-      var found = false;
-      for (var i = 0; i < alertsService.messages.length; i++) {
+      let found = false;
+      for (let i = 0; i < alertsService.messages.length; i++) {
         if (alertsService.messages[i].content === message &&
             alertsService.messages[i].type === 'info') {
           found = true;
@@ -166,7 +166,7 @@ describe('Alerts Service', function() {
     });
 
     it('should delete a message (with duplicates)', () => {
-      var message = 'Info 1';
+      const message = 'Info 1';
       // Info Message to be deleted
       alertsService.addInfoMessage(message);
       // Add a few other messages
@@ -183,8 +183,8 @@ describe('Alerts Service', function() {
       expect(alertsService.messages.length).toBe(2);
 
       // Search for the message
-      var found = false;
-      for (var i = 0; i < alertsService.messages.length; i++) {
+      let found = false;
+      for (let i = 0; i < alertsService.messages.length; i++) {
         if (alertsService.messages[i].content === message &&
             alertsService.messages[i].type === 'info') {
           found = true;
@@ -196,8 +196,8 @@ describe('Alerts Service', function() {
     });
 
     it('should not add more than 10 messages', () => {
-      var message = 'Info ';
-      for (var i = 1; i < 15; i++) {
+      const message = 'Info ';
+      for (let i = 1; i < 15; i++) {
         alertsService.addInfoMessage(message + i);
       }
       alertsService.addSuccessMessage('Success 1');

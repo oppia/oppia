@@ -25,23 +25,23 @@ describe('Count vectorizer service', () => {
   });
 
   it('should produce correct vector from tokens', () => {
-    var tokens = ['a', 'b', 'a', 'c', 'd', 'b', 'a'];
-    var vocabulary = {
+    const tokens = ['a', 'b', 'a', 'c', 'd', 'b', 'a'];
+    const vocabulary = {
       a: 0, b: 1, c: 2
     };
-    var vector = service.vectorize(tokens, vocabulary);
-    var expectedVector = [3, 2, 1];
+    const vector = service.vectorize(tokens, vocabulary);
+    const expectedVector = [3, 2, 1];
     expect(vector.length).toEqual(3);
     expect(vector).toEqual(expectedVector);
   });
 
   it('should produce vector filled with zeros when tokens is null', () => {
-    var tokens = null;
-    var vocabulary = {
+    const tokens = null;
+    const vocabulary = {
       a: 0, b: 1, c: 2
     };
-    var vector = service.vectorize(tokens, vocabulary);
-    var expectedVector = [0, 0, 0];
+    const vector = service.vectorize(tokens, vocabulary);
+    const expectedVector = [0, 0, 0];
     expect(vector.length).toEqual(3);
     expect(vector).toEqual(expectedVector);
   });

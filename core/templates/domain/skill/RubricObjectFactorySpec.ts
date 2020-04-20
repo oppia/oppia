@@ -33,13 +33,13 @@ describe('Rubric object factory', () => {
   });
 
   it('should create a new rubric from backend dict', () => {
-    var rubric = rubricObjectFactory.createFromBackendDict(rubricDict);
+    const rubric = rubricObjectFactory.createFromBackendDict(rubricDict);
     expect(rubric.getDifficulty()).toEqual('easy');
     expect(rubric.getExplanation()).toEqual('test explanation');
   });
 
   it('should convert to a backend dictionary', () => {
-    var rubric = rubricObjectFactory.createFromBackendDict(rubricDict);
+    const rubric = rubricObjectFactory.createFromBackendDict(rubricDict);
     expect(rubric.toBackendDict()).toEqual(rubricDict);
   });
 
