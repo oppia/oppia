@@ -46,17 +46,20 @@ getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting()
 );
+
 // Then we find all the tests, as well as any controller, directive,
 // service/factory files.
 // All files from the services_sources folder are exempted, because they
 // shouldn't be tested (those files are just intended as data files for backend
 // tests).
-// Note that known failing files are exempted.
-// corresponding issue -> https://github.com/oppia/oppia/issues/6960.
-// TODO(YashJipkate): Fix the tests that broke down after introduction of
-// Webpack due to templateCache.
+// Known failing files are exempted (#6960).
+// TODO(#6960): Fix the tests that broke down after introduction of Webpack due
+//              to templateCache.
+// The 'domhandler/src/index.spec.ts' is excluded from the tests since it is
+// coming from third party library.
 /* eslint-disable max-len */
-const context = require.context('../../', true, /((((\.s|S)pec)\.ts$)|(?<!services_sources)\/[A-Za-z0-9.-]*(controller|directive|service|Factory)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)(?<!state-name-editor\.directive\.spec\.ts)/);
+const context = require.context('../../', true, /((\.s|S)pec\.ts$|(?<!services_sources)\/[\w\d.\-]*(controller|directive|service|Factory)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)(?<!state-name-editor\.directive\.spec\.ts)(?<!domhandler\/src\/index\.spec\.ts)/);
 /* eslint-enable max-len */
+
 // And load the modules.
 context.keys().map(context);

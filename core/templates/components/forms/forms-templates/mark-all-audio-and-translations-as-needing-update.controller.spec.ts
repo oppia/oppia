@@ -17,7 +17,7 @@
  * MarkAllAudioAndTranslationsAsNeedingUpdateController.
  */
 
-describe('Mark All Audio And Translations AsNeeding Update Controller',
+describe('Mark All Audio And Translations As Needing Update Controller',
   function() {
     var $scope, $uibModalInstance;
 
