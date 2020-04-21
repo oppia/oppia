@@ -107,26 +107,28 @@ def check_ordering_of_sections(release_summary_lines):
         release_summary_lines: list(str). List of lines in
             ../release_summary.md.
 
-    Raises:
-        Exception: The expected ordering does not match the ordering
-            in release_summary.md.
+    Returns:
+        bool. Whether the ordering is correct.
     """
     sections = [
         line for line in release_summary_lines if line.startswith('###')
     ]
     for section, next_section in EXPECTED_ORDERING.items():
         if section not in sections:
-            raise Exception(
+            python_utils.PRINT(
                 'Expected release_summary to have %s section to ensure '
                 'that automatic updates to changelog and credits are '
                 'correct.' % section.strip())
+            return False
         index = sections.index(section)
         if index + 1 >= len(sections) or sections[index + 1] != next_section:
-            raise Exception(
+            python_utils.PRINT(
                 'Expected %s section to be followed by %s section in '
                 'release_summary to ensure that automatic updates to '
                 'changelog and credits are correct.' % (
                     section.strip(), next_section.strip()))
+            return False
+    return True
 
 
 def get_previous_release_version(branch_type, current_release_version_number):
@@ -447,6 +449,39 @@ def create_branch(
             target_branch, current_release_version_number))
 
 
+def get_release_summary_lines():
+    """Returns the lines from release summary file. It checks whether
+    incorrect email is present or ordering of sections is invalid.
+    In either case, the user will be asked to update the release
+    summary file and the lines will be re-read.
+    """
+    is_invalid_email_present = True
+    is_ordering_invalid = True
+    while is_invalid_email_present or is_ordering_invalid:
+        release_summary_file = python_utils.open_file(
+            release_constants.RELEASE_SUMMARY_FILEPATH, 'r')
+        release_summary_lines = release_summary_file.readlines()
+        is_invalid_email_present = any(
+            release_constants.INVALID_EMAIL_SUFFIX in line
+            for line in release_summary_lines)
+        if is_invalid_email_present:
+            common.ask_user_to_confirm(
+                'The release summary file contains emails of the form: %s '
+                'Please replace them with correct emails.' % (
+                    release_constants.INVALID_EMAIL_SUFFIX))
+        is_ordering_invalid = not(
+            check_ordering_of_sections(release_summary_lines))
+        if is_ordering_invalid:
+            common.ask_user_to_confirm(
+                'Please fix the ordering in release summary file.')
+        if is_invalid_email_present or is_ordering_invalid:
+            common.ask_user_to_confirm(
+                'Please save the file: %s with all the changes that '
+                'you have made.' % (
+                    release_constants.RELEASE_SUMMARY_FILEPATH))
+    return release_summary_lines
+
+
 def main():
     """Collects necessary info and dumps it to disk."""
     branch_name = common.get_current_branch_name()
@@ -496,8 +531,10 @@ def main():
         'Check emails and names for new authors and new contributors in the '
         'file: %s and verify that the emails are '
         'correct through welcome emails sent from welcome@oppia.org '
-        '(confirm with Sean in case of doubt).' % (
-            release_constants.RELEASE_SUMMARY_FILEPATH))
+        '(confirm with Sean in case of doubt). Please ensure that you correct '
+        'the emails of the form: %s.' % (
+            release_constants.RELEASE_SUMMARY_FILEPATH,
+            release_constants.INVALID_EMAIL_SUFFIX))
     common.open_new_tab_in_browser_if_possible(
         release_constants.CREDITS_FORM_URL)
     common.ask_user_to_confirm(
@@ -523,13 +560,7 @@ def main():
         'you have made.' % (
             release_constants.RELEASE_SUMMARY_FILEPATH))
 
-    release_summary_lines = []
-    with python_utils.open_file(
-        release_constants.RELEASE_SUMMARY_FILEPATH, 'r'
-        ) as release_summary_file:
-        release_summary_lines = release_summary_file.readlines()
-
-    check_ordering_of_sections(release_summary_lines)
+    release_summary_lines = get_release_summary_lines()
 
     update_changelog(
         branch_name, release_summary_lines, current_release_version_number)
