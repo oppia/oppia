@@ -1,5 +1,119 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.9.2 (21 Apr 2020)
+------------------------
+Learner/Creator Pages
+* Change character limits for the new editors and allowed saving of invalid exps in draft stories (#9087)
+* Fix #9045: Add customization arg warnings (#9073)
+* Fix #8951: Fix solution preview uniqueness indicator (#9067)
+* Add a pre-publish validation for topics (#9056)
+* Fix #9005: Cursor changes to a pointer for the delete icon (#9054)
+* Fix #8926: Drag and drop response order (#8960)
+* Add frontend validation for explorations in the story editor (#8899)
+* Fix #8743: Add Classroom option to top navbar and hide it under SHOW_CLASSROOM_CALLOUT flag (#8832)
+* Fix #8808: Disable collapsible block and tabs RTEs for questions (#8810)
+* Fix part of #8746: Centralize the story view icons (#8795)
+* Fix part of #6351: Add custom typing for PencilCodeEmbed (#8712)
+* Fix part of #6271: Improvise update_explanation method (#8699)
+* Fix part of #8038: HTTPS calls in frontend should only happen through topic-creation-backend-api.services (#8685)
+* Fix part of #5296: Add an audit job to find explorations with MathExpressionInput (#8669)
+* Add backend validation checks for explorations in a story (#8651)
+* Add the skillreview RTE element to explorations in stories (#8617)
+
+Contributor Pages
+* Fix #9018: Capitalize the tab name in community dashboard page (#9089)
+* Fix #9003, #9013: Display fully un-truncated text for skill description in Submit Question tab and show placeholder for empty rubric explanation (#9058)
+* Fix #7402, #8166: Enable community dashboard page (#8957)
+* Reviewer assignment functionality for community contribution (#8862)
+* Fix #8249: Surface skill difficulty/rubrics in question suggestion flow (#8353)
+* Fix not loading opportunities in the community dashboard. (#8948)
+
+Lesson analytics
+* Fix #7335: Use cached thread message summary to render improvement tasks (#8658)
+
+Speed improvement
+* Remove angular-drag-and-drop-lists.min.js from header js imports (#8929)
+* Import wave-surfer using webpack instead of including it in third_party.js file (#8922)
+* Fix #7643: Replace templateUrl with template in /extensions  (#8860)
+
+Bug fixes
+* Fix #9006 and #9009: Disallow same chapter titles in stories and fixed empty names for downloaded yaml files (#9077)
+* Fix #9040: Preferences page width in mobile devices (#9055)
+* Fix InteractionAnswerSummariesMRJobManager handling of UTF-8 strings (#8963)
+* Fix #8955: Only fetch the summaries of threads referring to explorations (#8956)
+* Fix #8802: Google Chrome on Chromebook not displaying the Speech Synthesised Voiceover (#8892)
+* Fix #8817: Fix progress bar issue in Firefox (#8881)
+* Fix #8826: Correct Continue Button Display Style to Fix Highlight Outline (#8878)
+* Fix #8815: Initialise Guppy symbols during exploration init (#8850)
+* Fix #8789: Inconsistent Capitalization in Preferred Languages Dropdown (#8796)
+* Fix #8132: Fix the category and language bar selection divs (#8723)
+* Fix #8385: Add a error message if the exploration id entered is invalid (#8431)
+
+Server Errors
+* Fix #6757: Reload page when login_url is None (#8834)
+
+Miscellaneous
+* Fix #8877: Remove DebugInfoTrackerService from the codebase (#8879)
+* Fix #8709: Load dummy skill with questions (#8724)
+* Fix part of #8038: HTTPS calls in frontend should only happen through skill-creation-backend-api.services (#8674)
+* Fix #8614: Move the site-feedback icon to the footer (#8640)
+
+Release team
+* Fix issues with release wrap up (#8952)
+* Fix path in restore backup script (#8913)
+* Updates for sending reminder to submit jobs (#8809)
+
+Angular Migration
+* Add HTTP interceptor in all the modules (#8965)
+* Migration of ExpressionSyntaxTreeService to Angular 8 (#8886)
+* Remove any from url-interpolation.service.ts, url.service.ts and some other files (#8823)
+* Update to provide only required services in App.ts (#8807)
+* Remove any from angular in all modules (#8785)
+* Remove any from numeric-input-validation.service.spec.ts (#8770)
+* Migrate CollectionRightsBackendApiService to Angular 8 (#8748)
+* Fix part of #8472: Migrate AngularJS files to Angular 8 for SkillRightBackendApiService file (#8721)
+* Fix part of #8472: Migrate EditableCollectionBackendApiService and ReadOnlyCollectionBackendApiService to Angular (#8657)
+* Fix part of #8472: Migrate AngularJS files to Angular 8 for SkillObjectFactory file (#8587)
+
+Data handling
+* Add contributors audit job (#8925)
+* Fix part of #5914: Export data for BaseSnapshotMetadataModel (#8749)
+
+QA Team
+* Fix part of #4057: Add frontend test cases to QuestionObjectFactory (#8934)
+* Fix part of #4057: Add test cases for question-backend-api.service.ts (#8916)
+* Fix #4057: Add front-end tests for UnitsObjectFactory.ts (#8915)
+* Topic viewer backend api (#8905)
+* Fix #8888: Await Visible Confirmation Message on Role Update (#8889)
+* Fix part of #4057: Add a test file for StateParamChangesService.ts (#8825)
+* Fix test file for debouncer.service.ts (#8806)
+* Increase coverage for training-data-editor-panel.service.ts (#8805)
+* Increase coverage for improvement-modal.service.ts (#8799)
+* Increase coverage for suggestion-modal-for-creator-view.service.ts (#8791)
+* Increase coverage for autosave-info-modals.service.ts (#8776)
+* Increase coverage for rte-helper.service.ts (#8775)
+* Increase coverage for training-modal.service.ts (#8771)
+* Fix part of #4057, #8472: Migrate contribution opportunities backend api to Angular 8 and creates a spec file for it (#8763)
+* Increase frontend test controllers from Milestone 4 (2nd PR) (#8736)
+* Fix part of #4057: Increase frontend test services from Milestone 3.3 (3st PR) (#8696)
+* Fix part of #4057: Increase frontend test services from Milestone 3.3 (4th PR) (#8729)
+* Fix #6240: E2e Tests for Code Editor Interaction (#8639)
+* Milestone 3.3 (1st PR) - Increase coverage for speech-synthesis-chunker.service.ts (#8636)
+* Fix part of #4057: Frontend test for ExplorationFeatureService (#8588)
+* Fix part of #4057: RuleObjectFactory test (#8558)
+
+Developer experience
+* Upgrade major versions of libraries (#8953)
+* Fix #8920: Add check frontend coverage feature on pre push hook (#8923)
+* Fix #8882: Fix collections suite flakiness (#8900)
+* Fix #8869: Add innerHTML lint check (#8870)
+* Speed up frontend tests (#8864)
+* Reorganize CircleCI tests run order (#8851)
+* Add wording to not trigger issue closure (#8837)
+* Fix #8668: Document the service file with jsdoc and fix the unused-import bug (#8773)
+* Fix #8625: Split linters to run for a specific file extension (#8656)
+
+
 v2.9.1 (29 Mar 2020)
 ------------------------
 QA Team
