@@ -85,14 +85,14 @@ describe('Read only exploration backend API service', () => {
 
       readOnlyExplorationBackendApiService.fetchExploration(
         '0', null).then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
+      var req = httpTestingController.expectOne(
         '/explorehandler/init/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
@@ -105,21 +105,21 @@ describe('Read only exploration backend API service', () => {
       // Loading a exploration the first time should fetch it from the backend.
       readOnlyExplorationBackendApiService.loadLatestExploration(
         '0').then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
+      var req = httpTestingController.expectOne(
         '/explorehandler/init/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
 
       // Loading a exploration the second time should not fetch it.
       readOnlyExplorationBackendApiService.loadLatestExploration(
         '0').then(successHandler, failHandler);
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
@@ -132,7 +132,7 @@ describe('Read only exploration backend API service', () => {
       // Loading a exploration the first time should fetch it from the backend.
       readOnlyExplorationBackendApiService.loadExploration(
         '0', null).then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
+      var req = httpTestingController.expectOne(
         '/explorehandler/init/0');
       expect(req.request.method).toEqual('GET');
       req.flush('Error loading exploration 0.', {
@@ -142,7 +142,7 @@ describe('Read only exploration backend API service', () => {
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Error loading exploration 0.');
+      expect(failHandler).toHaveBeenCalled();
     })
   );
 
@@ -156,14 +156,14 @@ describe('Read only exploration backend API service', () => {
     // Loading a exploration the first time should fetch it from the backend.
     readOnlyExplorationBackendApiService.loadLatestExploration('0').then(
       successHandler, failHandler);
-    let req = httpTestingController.expectOne(
+    var req = httpTestingController.expectOne(
       '/explorehandler/init/0');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleDataResults);
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+    expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
 
     // The exploration should now be cached.
@@ -181,14 +181,14 @@ describe('Read only exploration backend API service', () => {
 
     readOnlyExplorationBackendApiService.loadLatestExploration('0').then(
       successHandler, failHandler);
-    let req = httpTestingController.expectOne(
+    var req = httpTestingController.expectOne(
       '/explorehandler/init/0');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleDataResults);
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+    expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -215,10 +215,7 @@ describe('Read only exploration backend API service', () => {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith({
-      id: '0',
-      nodes: []
-    });
+    expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   }));
 });

@@ -169,6 +169,16 @@ export class AppConstants {
   };
 
   public static MISCONCEPTION_NAME_CHAR_LIMIT = 100;
+
+  // The following character limit constraints follow from
+  // android_validation_constants.py. Both have to be kept in sync.
+
+  public static MAX_CHARS_IN_TOPIC_NAME = 39;
+  public static MAX_CHARS_IN_TOPIC_DESCRIPTION = 240;
+  public static MAX_CHARS_IN_SUBTOPIC_TITLE = 64;
+  public static MAX_CHARS_IN_SKILL_DESCRIPTION = 64;
+  public static MAX_CHARS_IN_STORY_TITLE = 39;
+  public static MAX_CHARS_IN_CHAPTER_TITLE = 36;
 }
 
 const constants = require('constants.ts');
