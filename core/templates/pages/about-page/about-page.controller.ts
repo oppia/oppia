@@ -50,11 +50,10 @@ angular.module('oppia').directive('aboutPage', [
             'Robyn Choo', 'Tricia Ngoon',
             'Vikrant Nanda', 'Vinamrata Singal',
             'Yarin Feigenbaum'];
-          // Define constants
+          // Define constant for each tab on the page.
           ctrl.TAB_ID_ABOUT = 'about';
           ctrl.TAB_ID_FOUNDATION = 'foundation';
           ctrl.TAB_ID_CREDITS = 'credits';
-          ctrl.TAB_ID_LICENSE = 'license';
 
           const ALLOWED_TABS = [
             ctrl.TAB_ID_ABOUT, ctrl.TAB_ID_FOUNDATION, ctrl.TAB_ID_CREDITS];
@@ -71,7 +70,7 @@ angular.module('oppia').directive('aboutPage', [
           };
           ctrl.$onInit = function() {
             const hash = WindowRef.nativeWindow.location.hash.slice(1);
-            if (hash === ctrl.TAB_ID_LICENSE) {
+            if (hash === 'license') {
               ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;
             } else if (ALLOWED_TABS.includes(hash)) {
               ctrl.activeTabName = hash;
@@ -85,7 +84,7 @@ angular.module('oppia').directive('aboutPage', [
 
             WindowRef.nativeWindow.onhashchange = function() {
               const hashChange = window.location.hash.slice(1);
-              if (hashChange === ctrl.TAB_ID_LICENSE) {
+              if (hashChange === 'license') {
                 ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;
                 WindowRef.nativeWindow.location.reload(true);
               } else if (ALLOWED_TABS.includes(hashChange)) {
