@@ -30,12 +30,12 @@ require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 
 describe('Read only exploration backend API service', function() {
-  var ReadOnlyExplorationBackendApiService = null;
-  var sampleDataResults = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $httpBackend = null;
-  var shof;
+  let ReadOnlyExplorationBackendApiService = null;
+  let sampleDataResults = null;
+  let $rootScope = null;
+  let $scope = null;
+  let $httpBackend = null;
+  let shof;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -43,7 +43,7 @@ describe('Read only exploration backend API service', function() {
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
+    const ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
@@ -104,8 +104,8 @@ describe('Read only exploration backend API service', function() {
 
   it('should successfully fetch an existing exploration from the backend',
     function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect('GET', '/explorehandler/init/0').respond(
         sampleDataResults);
@@ -118,10 +118,25 @@ describe('Read only exploration backend API service', function() {
     }
   );
 
+  it('should successfully fetch an existing exploration with version from' +
+    ' the backend', function() {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect('GET', '/explorehandler/init/0?v=1').respond(
+      sampleDataResults);
+    ReadOnlyExplorationBackendApiService.fetchExploration(
+      '0', 1).then(successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
   it('should load a cached exploration after fetching it from the backend',
     function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
 
       // Loading a exploration the first time should fetch it from the backend.
       $httpBackend.expect('GET', '/explorehandler/init/0').respond(
@@ -144,8 +159,8 @@ describe('Read only exploration backend API service', function() {
 
   it('should use the rejection handler if the backend request failed',
     function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
 
       // Loading a exploration the first time should fetch it from the backend.
       $httpBackend.expect('GET', '/explorehandler/init/0').respond(
@@ -160,8 +175,8 @@ describe('Read only exploration backend API service', function() {
   );
 
   it('should report caching and support clearing the cache', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
     // The exploration should not currently be cached.
     expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
@@ -200,8 +215,8 @@ describe('Read only exploration backend API service', function() {
   });
 
   it('should report a cached exploration after caching it', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
     // The exploration should not currently be cached.
     expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
@@ -229,5 +244,18 @@ describe('Read only exploration backend API service', function() {
       nodes: []
     });
     expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should delete a exploration from cache', function() {
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
+
+    ReadOnlyExplorationBackendApiService.cacheExploration('0', {
+      id: '0',
+      nodes: []
+    });
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(true);
+
+    ReadOnlyExplorationBackendApiService.deleteExplorationFromCache('0');
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
   });
 });
