@@ -229,18 +229,15 @@ class PythonLintChecksManager(python_utils.OBJECT):
         Returns:
             all_messages: str. All the messages returned by the lint checks.
         """
-        try:
-            if not self.all_filepaths:
-                python_utils.PRINT('')
-                python_utils.PRINT('There are no Python files to lint.')
-                return []
+        if not self.all_filepaths:
+            python_utils.PRINT('')
+            python_utils.PRINT('There are no Python files to lint.')
+            return []
 
-            import_order_check_message = self._check_import_order()
-            job_registry_check_message = (
-                self._check_all_job_listed_in_job_registry_file())
-            return import_order_check_message + job_registry_check_message
-        except Exception:
-            sys.exit(1)
+        import_order_check_message = self._check_import_order()
+        job_registry_check_message = (
+            self._check_all_job_listed_in_job_registry_file())
+        return import_order_check_message + job_registry_check_message
 
 
 class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
