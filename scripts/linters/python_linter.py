@@ -145,6 +145,9 @@ class PythonLintChecksManager(python_utils.OBJECT):
                     class_names.append(name)
             return class_names
 
+        if self.verbose_mode_enabled:
+            python_utils.PRINT('Starting job registry checks')
+            python_utils.PRINT('----------------------------------------')
         summary_messages = []
         failed = False
         jobs_in_cron = [
@@ -153,11 +156,13 @@ class PythonLintChecksManager(python_utils.OBJECT):
             'UserQueryOneOffJob',
             'VerifyUserDeletionOneOffJob'
         ]
+
         jobs_registry = importlib.import_module('core.jobs_registry')
         expected_one_off_jobs_set = set([
             jobs.__name__ for jobs in jobs_registry.ONE_OFF_JOB_MANAGERS])
         expected_validation_jobs_set = set([
             jobs.__name__ for jobs in jobs_registry.AUDIT_JOB_MANAGERS])
+
         one_off_jobs_list = []
         validation_jobs_list = []
         for filepath in self.all_filepaths:
@@ -172,24 +177,21 @@ class PythonLintChecksManager(python_utils.OBJECT):
         one_off_jobs_list = [
             job for job in one_off_jobs_list if job not in jobs_in_cron]
         one_off_jobs_set = set(one_off_jobs_list)
-        # Remove the base class from the list.
-        validation_jobs_list.remove('ProdValidationAuditOneOffJob')
-        validation_jobs_set = set(validation_jobs_list)
         if len(one_off_jobs_list) != len(one_off_jobs_set):
             failed = True
-            summary_message = 'Found jobs with duplicate names'
+            summary_message = 'Found one-off jobs with duplicate names'
             python_utils.PRINT(summary_message)
             summary_messages.append(summary_message)
+
+        validation_jobs_set = set(validation_jobs_list)
         if len(validation_jobs_list) != len(validation_jobs_set):
             failed = True
-            summary_message = 'Found jobs with duplicate names'
+            summary_message = 'Found validation jobs with duplicate names'
             python_utils.PRINT(summary_message)
             summary_messages.append(summary_message)
 
         non_registered_one_off_jobs = (
             one_off_jobs_set - expected_one_off_jobs_set)
-        non_registered_validation_jobs = (
-            validation_jobs_set - expected_validation_jobs_set)
         if non_registered_one_off_jobs:
             failed = True
             summary_message = (
@@ -198,6 +200,8 @@ class PythonLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT(summary_message)
             summary_messages.append(summary_message)
 
+        non_registered_validation_jobs = (
+            validation_jobs_set - expected_validation_jobs_set)
         if non_registered_validation_jobs:
             failed = True
             summary_message = (
@@ -230,8 +234,11 @@ class PythonLintChecksManager(python_utils.OBJECT):
                 python_utils.PRINT('')
                 python_utils.PRINT('There are no Python files to lint.')
                 return []
-            return self._check_import_order() + (
+
+            import_order_check_message = self._check_import_order()
+            job_registry_check_message = (
                 self._check_all_job_listed_in_job_registry_file())
+            return import_order_check_message + job_registry_check_message
         except Exception:
             sys.exit(1)
 
