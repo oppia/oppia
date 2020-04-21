@@ -31,40 +31,58 @@ describe('Outcome object factory', () => {
     oof = TestBed.get(OutcomeObjectFactory);
   });
 
-  it(
-    'should correctly determine if an outcome is confusing given a ' +
-    'source state',
-    () => {
-      var currentState = 'A';
-      var testOutcome1 = oof.createNew('B', 'feedback_1', 'feedback', []);
-      var testOutcome2 = oof.createNew('B', 'feedback_2', '', []);
-      var testOutcome3 = oof.createNew('A', 'feedback_3', 'feedback', []);
-      var testOutcome4 = oof.createNew('A', 'feedback_4', '', []);
-      var testOutcome5 = oof.createNew('A', 'feedback_5', '   ', []);
-      expect(testOutcome1.isConfusing(currentState)).toBe(false);
-      expect(testOutcome2.isConfusing(currentState)).toBe(false);
-      expect(testOutcome3.isConfusing(currentState)).toBe(false);
-      expect(testOutcome4.isConfusing(currentState)).toBe(true);
-      expect(testOutcome5.isConfusing(currentState)).toBe(true);
-    }
-  );
+  it('should correctly determine if an outcome is confusing given a ' +
+    'source state', () => {
+    const currentState = 'A';
+    const testOutcome1 = oof.createNew('B', 'feedback_1', 'feedback', []);
+    const testOutcome2 = oof.createNew('B', 'feedback_2', '', []);
+    const testOutcome3 = oof.createNew('A', 'feedback_3', 'feedback', []);
+    const testOutcome4 = oof.createNew('A', 'feedback_4', '', []);
+    const testOutcome5 = oof.createNew('A', 'feedback_5', '   ', []);
+    expect(testOutcome1.isConfusing(currentState)).toBe(false);
+    expect(testOutcome2.isConfusing(currentState)).toBe(false);
+    expect(testOutcome3.isConfusing(currentState)).toBe(false);
+    expect(testOutcome4.isConfusing(currentState)).toBe(true);
+    expect(testOutcome5.isConfusing(currentState)).toBe(true);
+  });
 
   it('should correctly output whether an outcome has nonempty feedback',
     () => {
-      var testOutcome1 = oof.createNew('A', 'feedback_1', 'feedback', []);
-      var testOutcome2 = oof.createNew('A', 'feedback_2', '', []);
-      var testOutcome3 = oof.createNew('A', 'feedback_3', '   ', []);
+      const testOutcome1 = oof.createNew('A', 'feedback_1', 'feedback', []);
+      const testOutcome2 = oof.createNew('A', 'feedback_2', '', []);
+      const testOutcome3 = oof.createNew('A', 'feedback_3', '   ', []);
       expect(testOutcome1.hasNonemptyFeedback()).toBe(true);
       expect(testOutcome2.hasNonemptyFeedback()).toBe(false);
       expect(testOutcome3.hasNonemptyFeedback()).toBe(false);
-    }
-  );
+    });
 
-  it('should correctly set the destination of an outcome',
+  it('should correctly set the destination of an outcome', () => {
+    const testOutcome = oof.createNew('A', 'feedback_1', 'feedback', []);
+    testOutcome.setDestination('B');
+    expect(testOutcome.dest).toEqual('B');
+  });
+
+  it('should create an outcome from backend dict and convert it to dict again',
     () => {
-      var testOutcome = oof.createNew('A', 'feedback_1', 'feedback', []);
-      testOutcome.setDestination('B');
-      expect(testOutcome.dest).toEqual('B');
-    }
-  );
+      const testOutcome = oof.createFromBackendDict({
+        dest: 'A',
+        feedback: 'feedback_1',
+        labelled_as_correct: true,
+        param_changes: [],
+        refresher_exploration_id: '1',
+        missing_prerequisite_skill_id: '2'
+      });
+
+      expect(testOutcome.toBackendDict()).toEqual({
+        dest: 'A',
+        feedback: {
+          html: undefined,
+          content_id: undefined
+        },
+        labelled_as_correct: true,
+        param_changes: [],
+        refresher_exploration_id: '1',
+        missing_prerequisite_skill_id: '2'
+      });
+    });
 });
