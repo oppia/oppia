@@ -24,7 +24,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require('pages/exploration-editor-page/' +
   'services/exploration-language-code.service.ts');
 
-fdescribe('Exploration Language Code Service', function() {
+describe('Exploration Language Code Service', function() {
   let elcs = null;
 
   beforeEach(function() {
