@@ -1,5 +1,4 @@
- 
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+ // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -48,7 +47,7 @@ describe('Exploration Title Service', function() {
     let Normalize = 'Exploration Title Service';
     let Empty = '';
     let Special = 'Explor%tion Title }service';
-    let Valid= 'Exploration-1235 Title Service';
+    let Valid = 'Exploration-1235 Title Service';
     expect(ets._normalize(NotNormalize)).toBe(Normalize);
     expect(ets._isValid(Normalize)).toBe(true);
     expect(ets._isValid(Valid)).toBe(true);

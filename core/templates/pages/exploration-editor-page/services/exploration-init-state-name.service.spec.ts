@@ -1,5 +1,4 @@
- 
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+ // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,7 +38,7 @@ describe('Exploration Init State Name Service', function() {
 
     angular.mock.inject(function($injector) {
         eisns = $injector.get('ExplorationInitStateNameService');
-    });
+      });
   });
 
   it('should test the child object properties', function() {
