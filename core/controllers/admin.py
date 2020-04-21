@@ -857,4 +857,7 @@ class GetInteractionsByExplorationId(base.BaseHandler):
     def get(self):
         exploartion_id = self.request.get('exploration_id')
         exploration = exp_fetchers.get_exploration_by_id(exploartion_id)
-        self.render_json({'title': exploration.title})
+        interaction_ids = []
+        for state in exploration.states.items():
+            interaction_ids.append(state.interaction.id)
+        self.render_json({'interactions': list(set(interaction_ids))})
