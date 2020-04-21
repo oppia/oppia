@@ -1508,7 +1508,9 @@ class IndentMultilineDocstringDefinitionChecker(checkers.BaseChecker):
 
             if is_docstring_def:
                 if ((line.lstrip().startswith(b'"""') or
-                  len(line.lstrip()) == 0)):
+                  len(line.lstrip()) == 0) or ((len(prev_line) -
+                  len(prev_line.lstrip())) -
+                  (len(line) - len(line.lstrip())) == 4)):
                     is_docstring_def = False
                     is_multiline = False
                     continue
@@ -1518,7 +1520,10 @@ class IndentMultilineDocstringDefinitionChecker(checkers.BaseChecker):
                     continue
 
             if is_multiline:
-                if b':' in line:
+                if (((len(line) - len(line.lstrip())) -
+                  (len(prev_line) - len(prev_line.lstrip())) == 4) and
+                  b':' in line) or b':' in line:
+                    prev_line = file_content[line_num]
                     continue
                 elif ((len(line) - len(line.lstrip())) -
                   (len(prev_line) - len(prev_line.lstrip())) != 4):

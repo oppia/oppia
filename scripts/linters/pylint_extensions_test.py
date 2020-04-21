@@ -2233,8 +2233,27 @@ class IndentMultilineDocstringDefinitionCheckerTests(unittest.TestCase):
                                 It is properly indented.
 
                         Returns:
-                            bool: The return value.
-                            Not properly indented.
+                            - The first element is the list of dicts of
+                                ExplorationStats. Each dict contains the
+                                pairs:
+                                - num_starts_v1: int. Number of learners
+                                exploration.
+                                - num_starts_v2: int. As above, but for events
+                                - num_actual_starts_v1: int. Number of learners
+                                    attempted the exploration. These are the
+                                    completed the initial state of the
+                                    to the next state.
+                                - num_actual_starts_v2: int. As above, but for
+                                    version 2.
+                                - num_completions_v1: int. Number of learners
+                                    exploration.
+                                - num_completions_v2: int. As above, but for
+                                    version 2.
+                                - state_stats_mapping: dict. A dictionary
+                                    names of an exploration to the
+                                    dicts of the states.
+                            - The second element is the list of class
+                                instances of the corrupted statistics models.
                         \"\"\"
                         Something
                 """)
@@ -2246,7 +2265,7 @@ class IndentMultilineDocstringDefinitionCheckerTests(unittest.TestCase):
 
         message = testutils.Message(
             msg_id='missing-indent-docstring-definition',
-            line=11)
+            line=14)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
