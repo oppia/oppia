@@ -96,7 +96,7 @@ def update_sorted_file(filepath, new_list):
             f.write(line)
 
 
-def check_ordering_of_sections(release_summary_lines):
+def is_order_of_sections_valid(release_summary_lines):
     """Checks that the ordering of sections in release_summary file
     matches the expected ordering.
 
@@ -455,26 +455,27 @@ def get_release_summary_lines():
     In either case, the user will be asked to update the release
     summary file and the lines will be re-read.
     """
-    is_invalid_email_present = True
-    is_ordering_invalid = True
-    while is_invalid_email_present or is_ordering_invalid:
+    invalid_email_is_present = True
+    ordering_is_invalid = True
+    while invalid_email_is_present or ordering_is_invalid:
         release_summary_file = python_utils.open_file(
             release_constants.RELEASE_SUMMARY_FILEPATH, 'r')
         release_summary_lines = release_summary_file.readlines()
-        is_invalid_email_present = any(
+        invalid_email_is_present = any(
             release_constants.INVALID_EMAIL_SUFFIX in line
             for line in release_summary_lines)
-        if is_invalid_email_present:
+        if invalid_email_is_present:
             common.ask_user_to_confirm(
                 'The release summary file contains emails of the form: %s '
-                'Please replace them with correct emails.' % (
+                'Please replace them with the correct emails.' % (
                     release_constants.INVALID_EMAIL_SUFFIX))
-        is_ordering_invalid = not(
-            check_ordering_of_sections(release_summary_lines))
-        if is_ordering_invalid:
+        ordering_is_invalid = not(
+            is_order_of_sections_valid(release_summary_lines))
+        if ordering_is_invalid:
             common.ask_user_to_confirm(
-                'Please fix the ordering in release summary file.')
-        if is_invalid_email_present or is_ordering_invalid:
+                'Please fix the ordering in release summary file. '
+                '(See error messages above.)')
+        if invalid_email_is_present or ordering_is_invalid:
             common.ask_user_to_confirm(
                 'Please save the file: %s with all the changes that '
                 'you have made.' % (

@@ -289,7 +289,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             invalid_ordering)
         with ordering_swap:
             self.assertFalse(
-                update_changelog_and_credits.check_ordering_of_sections(
+                update_changelog_and_credits.is_order_of_sections_valid(
                     release_summary_lines))
 
     def test_invalid_ordering_of_sections_in_release_summary(self):
@@ -302,7 +302,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             invalid_ordering)
         with ordering_swap:
             self.assertFalse(
-                update_changelog_and_credits.check_ordering_of_sections(
+                update_changelog_and_credits.is_order_of_sections_valid(
                     release_summary_lines))
 
     def test_missing_span_in_about_page(self):
@@ -434,12 +434,12 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         check_function_calls = {
             'readlines_gets_called': 0,
             'ask_user_to_confirm_gets_called': 0,
-            'check_ordering_of_sections_gets_called': 0
+            'is_order_of_sections_valid_gets_called': 0
         }
         expected_check_function_calls = {
             'readlines_gets_called': 2,
             'ask_user_to_confirm_gets_called': 3,
-            'check_ordering_of_sections_gets_called': 2
+            'is_order_of_sections_valid_gets_called': 2
         }
         class MockFile(python_utils.OBJECT):
             def readlines(self):
@@ -455,11 +455,11 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             return MockFile()
         def mock_ask_user_to_confirm(unused_msg):
             check_function_calls['ask_user_to_confirm_gets_called'] += 1
-        def mock_check_ordering_of_sections(unused_release_summary_lines):
+        def mock_is_order_of_sections_valid(unused_release_summary_lines):
             check_function_calls[
-                'check_ordering_of_sections_gets_called'] += 1
+                'is_order_of_sections_valid_gets_called'] += 1
             if check_function_calls[
-                    'check_ordering_of_sections_gets_called'] == 1:
+                    'is_order_of_sections_valid_gets_called'] == 1:
                 return False
             return True
 
@@ -467,8 +467,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         ask_user_swap = self.swap(
             common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
         check_order_swap = self.swap(
-            update_changelog_and_credits, 'check_ordering_of_sections',
-            mock_check_ordering_of_sections)
+            update_changelog_and_credits, 'is_order_of_sections_valid',
+            mock_is_order_of_sections_valid)
         with open_file_swap, ask_user_swap, check_order_swap:
             self.assertEqual(
                 correct_lines,
