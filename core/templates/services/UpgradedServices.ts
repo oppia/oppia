@@ -610,9 +610,9 @@ export class UpgradedServices {
       new AudioTranslationLanguageService(
         upgradedServices['BrowserCheckerService'],
         upgradedServices['LanguageUtilService']);
-    upgradedServices['CollectionCreationBackendService'] =
+    upgradedServices['CollectionCreationBackendService'] = (
       new CollectionCreationBackendService(
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient']));
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['EmailDashboardDataService'] =
