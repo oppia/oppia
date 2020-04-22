@@ -54,7 +54,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var resize = function() {
           var modalWidth = $('.modal-header').width() - 15;
           $('.oppia-rte-resizer').css({
-            'width': (modalWidth.toString() + 'px')
+            width: (modalWidth.toString() + 'px')
           });
         };
         for (var i in editable) {
