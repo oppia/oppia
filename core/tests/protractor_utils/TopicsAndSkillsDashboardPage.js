@@ -138,25 +138,31 @@ var TopicsAndSkillsDashboardPage = function() {
     });
   };
 
-  this.createTopic = function(title, closeTopicEditor) {
-    waitFor.elementToBeClickable(
-      createTopicButton,
-      'Create Topic button takes too long to be clickable');
-    createTopicButton.click();
-
-    topicNameField.sendKeys(title);
-    confirmTopicCreationButton.click();
-
-    waitFor.newTabToBeCreated('Creating topic takes too long');
+  this.createTopic = function(topicName, shouldCloseTopicEditor) {
+    var initialHandles = [];
     return browser.getAllWindowHandles().then(function(handles) {
-      var firstTabHandle = handles[0];
-      var secondTabHandle = handles[1];
-      return browser.switchTo().window(secondTabHandle).then(function() {
-        waitFor.pageToFullyLoad();
-        if (closeTopicEditor) {
-          browser.driver.close();
-          return browser.switchTo().window(firstTabHandle);
-        }
+      initialHandles = handles;
+      return browser.getWindowHandle();
+    }).then(function(parentHandle) {
+      waitFor.elementToBeClickable(
+        createTopicButton,
+        'Create Topic button takes too long to be clickable');
+      createTopicButton.click();
+
+      topicNameField.sendKeys(topicName);
+      confirmTopicCreationButton.click();
+
+      waitFor.newTabToBeCreated('Creating topic takes too long');
+      return browser.getAllWindowHandles().then(function(handles) {
+        var newHandle = handles.filter(
+          handle => initialHandles.indexOf(handle) === -1)[0];
+        browser.switchTo().window(newHandle).then(function() {
+          if (shouldCloseTopicEditor) {
+            browser.driver.close();
+            return browser.switchTo().window(parentHandle);
+          }
+          return waitFor.pageToFullyLoad();
+        });
       });
     });
   };
@@ -193,8 +199,8 @@ var TopicsAndSkillsDashboardPage = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.createSkillWithDescriptionAndExplanation = function(
-      description, reviewMaterial, closeSkillEditor) {
+  this.createSkillWithDescriptionAndExplanation = async function(
+      description, reviewMaterial, shouldCloseSkillEditor) {
     waitFor.elementToBeClickable(
       createSkillButton,
       'Create Skill button takes too long to be clickable');
@@ -225,16 +231,29 @@ var TopicsAndSkillsDashboardPage = function() {
     confirmSkillCreationButton.click();
 
     waitFor.newTabToBeCreated('Creating skill takes too long');
-    return browser.getAllWindowHandles().then(function(handles) {
-      var firstTabHandle = handles[0];
-      var secondTabHandle = handles[1];
-      return browser.switchTo().window(secondTabHandle).then(function() {
-        waitFor.pageToFullyLoad();
-        if (closeSkillEditor) {
-          browser.driver.close();
-          return browser.switchTo().window(firstTabHandle);
+    var allHandles = [];
+    await browser.getAllWindowHandles().then(function(handles) {
+      allHandles = handles;
+      return browser.getWindowHandle();
+    }).then(function(currentHandle) {
+      for (var idx in allHandles) {
+        if (allHandles[idx] !== currentHandle) {
+          browser.switchTo().window(allHandles[idx]).then(function() {
+            return browser.getTitle();
+          }).then(function(title) {
+            if (title === 'Skill Editor') {
+              if (shouldCloseSkillEditor) {
+                browser.driver.close();
+              } else {
+                waitFor.pageToFullyLoad();
+              }
+            }
+          });
         }
-      });
+      }
+      if (shouldCloseSkillEditor) {
+        browser.switchTo().window(currentHandle);
+      }
     });
   };
 

@@ -158,11 +158,9 @@ var acceptAlert = function() {
   waitFor.pageToFullyLoad();
 };
 
-var closeCurrentTab = function(tabIndexToSwitchTo) {
-  return browser.getAllWindowHandles().then(function(handles) {
-    browser.driver.close();
-    return browser.switchTo().window(handles[tabIndexToSwitchTo]);
-  });
+var closeCurrentTabAndSwitchTo = async function(destHandle) {
+  browser.driver.close();
+  await browser.switchTo().window(destHandle);
 };
 
 var _getUniqueLogMessages = function(logs) {
@@ -222,7 +220,7 @@ exports.openPlayer = openPlayer;
 exports.moveToPlayer = moveToPlayer;
 exports.moveToEditor = moveToEditor;
 exports.expect404Error = expect404Error;
-exports.closeCurrentTab = closeCurrentTab;
+exports.closeCurrentTabAndSwitchTo = closeCurrentTabAndSwitchTo;
 
 exports.ensurePageHasNoTranslationIds = ensurePageHasNoTranslationIds;
 

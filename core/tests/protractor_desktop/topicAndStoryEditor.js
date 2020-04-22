@@ -52,15 +52,17 @@ describe('Topic editor functionality', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     users.createAndLoginAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic('Topic 1', false);
-    browser.getCurrentUrl().then(function(url) {
-      topicId = url.split('/')[4];
-      general.closeCurrentTab(0);
-    }, function() {
-      // Note to developers:
-      // Promise is returned by getCurrentUrl which is handled here.
-      // No further action is needed.
+    browser.getWindowHandle().then(function(handle) {
+      topicsAndSkillsDashboardPage.get();
+      topicsAndSkillsDashboardPage.createTopic('Topic 1', false);
+      browser.getCurrentUrl().then(function(url) {
+        topicId = url.split('/')[4];
+        general.closeCurrentTabAndSwitchTo(handle);
+      }, function() {
+        // Note to developers:
+        // Promise is returned by getCurrentUrl which is handled here.
+        // No further action is needed.
+      });
     });
   });
 
@@ -100,44 +102,46 @@ describe('Topic editor functionality', function() {
 
   it('should create a question for a skill in the topic', function() {
     var skillId = null;
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 1', 'Concept card explanation', false);
-    browser.getCurrentUrl().then(function(url) {
-      skillId = url.split('/')[4];
-      general.closeCurrentTab(0);
+    browser.getWindowHandle().then(function(handle) {
       topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-      topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+        'Skill 1', 'Concept card explanation', false);
+      browser.getCurrentUrl().then(function(url) {
+        skillId = url.split('/')[4];
+        general.closeCurrentTabAndSwitchTo(handle);
+        topicsAndSkillsDashboardPage.get();
+        topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+        topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
 
-      topicEditorPage.get(topicId);
-      topicEditorPage.moveToQuestionsTab();
-      topicEditorPage.createQuestionForSkillWithIndex(0);
-      explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
-      explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
-      explorationEditorMainTab.addResponse(
-        'TextInput', forms.toRichText('Correct Answer'), null, false,
-        'FuzzyEquals', 'correct');
-      explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
-      explorationEditorMainTab.addHint('Hint 1');
-      explorationEditorMainTab.addSolution('TextInput', {
-        correctAnswer: 'correct',
-        explanation: 'It is correct'
+        topicEditorPage.get(topicId);
+        topicEditorPage.moveToQuestionsTab();
+        topicEditorPage.createQuestionForSkillWithIndex(0);
+        explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
+        explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
+        explorationEditorMainTab.addResponse(
+          'TextInput', forms.toRichText('Correct Answer'), null, false,
+          'FuzzyEquals', 'correct');
+        explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
+        explorationEditorMainTab.addHint('Hint 1');
+        explorationEditorMainTab.addSolution('TextInput', {
+          correctAnswer: 'correct',
+          explanation: 'It is correct'
+        });
+        topicEditorPage.saveQuestion();
+
+        topicEditorPage.get(topicId);
+        topicEditorPage.moveToQuestionsTab();
+        topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
+          1, 'Skill 1');
+
+        skillEditorPage.get(skillId);
+        skillEditorPage.moveToQuestionsTab();
+        skillEditorPage.expectNumberOfQuestionsToBe(1);
+      }, function() {
+        // Note to developers:
+        // Promise is returned by getCurrentUrl which is handled here.
+        // No further action is needed.
       });
-      topicEditorPage.saveQuestion();
-
-      topicEditorPage.get(topicId);
-      topicEditorPage.moveToQuestionsTab();
-      topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
-        1, 'Skill 1');
-
-      skillEditorPage.get(skillId);
-      skillEditorPage.moveToQuestionsTab();
-      skillEditorPage.expectNumberOfQuestionsToBe(1);
-    }, function() {
-      // Note to developers:
-      // Promise is returned by getCurrentUrl which is handled here.
-      // No further action is needed.
     });
   });
 
@@ -278,14 +282,16 @@ describe('Chapter editor functionality', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     users.createAndLoginAdminUser(
       userEmail, 'creatorChapterTest');
-    dummyExplorationIds = createDummyExplorations(3);
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic(topicName, false);
-    topicEditorPage.createStory('Story 0');
-    browser.getCurrentUrl().then(function(url) {
-      storyId = url.split('/')[4];
-      general.closeCurrentTab(0);
-      dummySkills = createDummySkills(2);
+    browser.getWindowHandle().then(function(handle) {
+      dummyExplorationIds = createDummyExplorations(3);
+      topicsAndSkillsDashboardPage.get();
+      topicsAndSkillsDashboardPage.createTopic(topicName, false);
+      topicEditorPage.createStory('Story 0');
+      browser.getCurrentUrl().then(function(url) {
+        storyId = url.split('/')[4];
+        general.closeCurrentTabAndSwitchTo(handle);
+        dummySkills = createDummySkills(2);
+      });
     });
   });
 
