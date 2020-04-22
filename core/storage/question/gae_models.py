@@ -319,7 +319,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         ) * question_count
 
         def get_question_order(direction, question_id, random_id):
-            """Helper funtion. Determines the order of fetch."""
+            """Helper function. Determines the order of fetch."""
             if direction == '1':
                 return question_id > random_id
             else:
