@@ -570,7 +570,7 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                                         item.id)))
                                 raw = (
                                     fs.get('%s/%s' % (AUDIO_FILE_PREFIX,
-                                        filename)))
+                                                      filename)))
                                 # Get the audio-duration from file use Mutagen.
                                 tempbuffer = python_utils.string_io()
                                 tempbuffer.write(raw)
@@ -606,16 +606,16 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     }))
             if change_count > 0:
                 exp_services.update_exploration(
-                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
-                'Update duration_secs for each voiceover recording '
-                'in the exploration.')
+                    feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+                    'Update duration_secs for each voiceover recording '
+                    'in the exploration.')
                 yield ('SUCCESS_AUDIO_CHANGED', 'EXP_ID: %s, '
-                    'AUDIO_DURATIONS_CHANGED: %s' % 
-                    (item.id, change_count))
+                       'AUDIO_DURATIONS_CHANGED: %s' %
+                       (item.id, change_count))
             if unchanged_count > 0:
                 yield ('SUCCESS_NO_CHANGE', 'EXP_ID: %s, '
-                    'NO_DURATIONS_CHANGED: %s' %
-                    (item.id, unchanged_count))
+                       'NO_DURATIONS_CHANGED: %s' %
+                       (item.id, unchanged_count))
             if failed_count > 0:
                 yield ('FAILED_NO_CHANGE', 'EXP_ID: %s, '
                        'FAILED_DURATION_CHANGE: %s' % (item.id, failed_count))
@@ -625,4 +625,4 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-            yield (key, values)
+        yield (key, values)

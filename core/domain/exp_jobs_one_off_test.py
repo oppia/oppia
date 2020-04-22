@@ -2042,13 +2042,13 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
         relative_path = ('File %s/%s not found.' % (self._FILENAME_PREFIX,
-                                    self.TEST_AUDIO_FILE_MP3))
+                                                    self.TEST_AUDIO_FILE_MP3))
         self.assertEqual(
             observed_log_messages,
             ['MP3 audio file exception for file %s ,'
-                'EXP_ID: %s,'
-                'STATE_NAME: %s,'
-                'REASON: %s'
+             'EXP_ID: %s,'
+             'STATE_NAME: %s,'
+             'REASON: %s'
              % (self.TEST_AUDIO_FILE_MP3,
                 self.VALID_EXP_ID,
                 state_name,
@@ -2254,5 +2254,5 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
         # Validate job ran successfully.
         # Check for no change count to be updated.
         expected_output = [('[u\'SUCCESS_NO_CHANGE\', '
-                           '[u\'EXP_ID: exp_id0, NO_DURATIONS_CHANGED: 2\']]')]
+                            '[u\'EXP_ID: exp_id0, NO_DURATIONS_CHANGED: 2\']]')]
         self.assertEqual(actual_output, expected_output)
