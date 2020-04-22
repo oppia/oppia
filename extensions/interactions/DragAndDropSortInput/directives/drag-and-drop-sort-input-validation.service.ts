@@ -128,6 +128,17 @@ export class DragAndDropSortInputValidationService {
       for (var j = 0; j < rules.length; j++) {
         var inputs = rules[j].inputs;
         var rule = rules[j];
+        if (!customizationArgs.allowMultipleItemsInSamePosition.value) {
+          for (var i = 0; i < rule.inputs.x.length; i++) {
+            if (rule.inputs.x[i].length > 1) {
+              console.log('Multiple items in a single position are not allowed.');
+              warningsList.push({
+                type: AppConstants.WARNING_TYPES.ERROR,
+                message: 'Multiple items in a single position are not allowed.'
+              });
+            }
+          } 
+        }
         var range = {
           answerGroupIndex: i + 1,
           ruleIndex: j + 1

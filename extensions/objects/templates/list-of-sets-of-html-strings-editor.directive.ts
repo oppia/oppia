@@ -30,11 +30,12 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
       controller: [function() {
         var ctrl = this;
         var errorMessage = '';
+        ctrl.validOrdering = true;
+
         ctrl.allowedChoices = function() {
           var allowedList = [];
-          for (var i = 0; i <= Math.min(
-            ctrl.maxPrevIndex, ctrl.choices.length - 1); i++) {
-            allowedList.push(i + 1);
+          for (var i = 1; i <= ctrl.choices.length; i++) {
+            allowedList.push(i);
           }
           return allowedList;
         };
@@ -44,12 +45,7 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
           var selectedRank = parseInt(
             ctrl.choices[choiceListIndex].selectedRank) - 1;
           errorMessage = '';
-          // Reorder the ctrl.choices array to make it consistent with the
-          // selected rank.
-          // ctrl.choices.splice(selectedRank, 0, ctrl.choices.splice(
-          // choiceListIndex, 1)[0]);
           var choiceHtmlHasBeenAdded = false;
-          ctrl.maxPrevIndex = Math.max(selectedRank + 1, ctrl.maxPrevIndex);
 
           for (var i = 0; i < ctrl.value.length; i++) {
             choiceHtmlHasBeenAdded = false;
@@ -67,19 +63,6 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
               break;
             }
           }
-          for (var i = 0; i < ctrl.value.length; i++) {
-            if (ctrl.value[i].length === 0) {
-              if (i === ctrl.value.length - 1) {
-                // If it is empty list at the last, pop it out.
-                ctrl.value.pop();
-              } else {
-                // Continuity error.
-                errorMessage = ('No choice(s) is assigned at position ' +
-                  String(i + 1) + '. Please assign some choice at this ' +
-                  'position.');
-              }
-            }
-          }
           if (!choiceHtmlHasBeenAdded) {
             if (ctrl.value[selectedRank] === undefined) {
               ctrl.value[selectedRank] = [choiceHtml];
@@ -92,31 +75,51 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
         ctrl.getWarningText = function() {
           return errorMessage;
         };
-        ctrl.$onInit = function() {
-          if (!ctrl.maxPrevIndex) {
-            ctrl.maxPrevIndex = 1;
-          }
 
+        ctrl.isValidOrdering = function() {
+          var selectedRankList = [];
+          for (var i = 0; i < ctrl.choices.length; i++) {
+            selectedRankList.push(ctrl.choices[i].selectedRank);
+          }
+          selectedRankList.sort();
+
+          if (selectedRankList[0] !== 1) {
+            errorMessage = ('No choice(s) is assigned at position 1. ' +
+              'Please assign some choice at this position.');
+            ctrl.validOrdering = false;
+            return;
+          }
+          for (var i = 1; i < selectedRankList.length; i++) {
+            if (selectedRankList[i] - selectedRankList[i - 1] > 1) {
+              errorMessage = ('No choice(s) is assigned at position ' +
+                String(selectedRankList[i - 1] + 1) + '. Please assign some ' +
+                'choice at this position.');
+              ctrl.validOrdering = false;
+              return;
+            }
+          }
+          ctrl.validOrdering = true;
+          return;
+        };
+
+        ctrl.$onInit = function() {
           ctrl.initValues = [];
           ctrl.initArgs = ctrl.getInitArgs();
           ctrl.choices = ctrl.initArgs.choices;
 
           // Initialize the default values.
           if (ctrl.value[0] === undefined || ctrl.value[0].length === 0) {
-            ctrl.value = [[]];
+            ctrl.value = [];
             for (var i = 0; i < ctrl.choices.length; i++) {
-              ctrl.value[0].push(ctrl.choices[i].id);
-              ctrl.initValues.push(1);
-              ctrl.choices[i].selectedRank = '';
+              ctrl.value.push([ctrl.choices[i].id]);
+              ctrl.initValues.push(i + 1);
             }
           } else {
             for (var i = 0; i < ctrl.choices.length; i++) {
               var choice = ctrl.choices[i].id;
-              ctrl.choices[i].selectedRank = '';
               for (var j = 0; j < ctrl.value.length; j++) {
                 if (ctrl.value[j].indexOf(choice) !== -1) {
                   ctrl.initValues.push(j + 1);
-                  ctrl.maxPrevIndex = Math.max(ctrl.maxPrevIndex, j + 1);
                   break;
                 }
               }
