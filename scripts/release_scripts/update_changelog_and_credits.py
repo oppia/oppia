@@ -50,14 +50,16 @@ CONTRIBUTORS_FILEPATH = os.path.join('', 'CONTRIBUTORS')
 GIT_CMD_CHECKOUT = 'git checkout -- %s %s %s %s' % (
     CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
     ABOUT_PAGE_FILEPATH)
+
 # This ordering should not be changed. The automatic updates to
 # changelog and credits performed using this script will work
 # correctly only if the ordering of sections in release summary
 # file matches this expected ordering.
 EXPECTED_ORDERING = {
-    '### Changelog:\n': '### Commit History:\n',
-    '### New Authors:\n': '### Existing Authors:\n',
-    '### New Contributors:\n': '### Email C&P Blurbs about authors:\n'
+    release_constants.CHANGELOG_HEADER: release_constants.COMMIT_HISTORY_HEADER,
+    release_constants.NEW_AUTHORS_HEADER: (
+        release_constants.EXISTING_AUTHORS_HEADER),
+    release_constants.NEW_CONTRIBUTORS_HEADER: release_constants.EMAIL_HEADER
 }
 CURRENT_DATE = datetime.date.today().strftime('%d %b %Y')
 
@@ -195,8 +197,10 @@ def update_changelog(
         current_release_version_number: str. The version of current release.
     """
     python_utils.PRINT('Updating Changelog...')
-    start_index = release_summary_lines.index('### Changelog:\n') + 1
-    end_index = release_summary_lines.index('### Commit History:\n')
+    start_index = release_summary_lines.index(
+        release_constants.CHANGELOG_HEADER) + 1
+    end_index = release_summary_lines.index(
+        release_constants.COMMIT_HISTORY_HEADER)
     release_version_changelog = [
         u'v%s (%s)\n' % (current_release_version_number, CURRENT_DATE),
         u'------------------------\n'] + release_summary_lines[
@@ -242,9 +246,9 @@ def update_authors(release_summary_lines):
     """
     python_utils.PRINT('Updating AUTHORS file...')
     start_index = release_summary_lines.index(
-        '### New Authors:\n') + 1
+        release_constants.NEW_AUTHORS_HEADER) + 1
     end_index = release_summary_lines.index(
-        '### Existing Authors:\n') - 1
+        release_constants.EXISTING_AUTHORS_HEADER) - 1
     new_authors = release_summary_lines[start_index:end_index]
     new_authors = [
         '%s\n' % (author.replace('* ', '').strip()) for author in new_authors]
@@ -261,9 +265,9 @@ def update_contributors(release_summary_lines):
     """
     python_utils.PRINT('Updating CONTRIBUTORS file...')
     start_index = release_summary_lines.index(
-        '### New Contributors:\n') + 1
+        release_constants.NEW_CONTRIBUTORS_HEADER) + 1
     end_index = release_summary_lines.index(
-        '### Email C&P Blurbs about authors:\n') - 1
+        release_constants.EMAIL_HEADER) - 1
     new_contributors = (
         release_summary_lines[start_index:end_index])
     new_contributors = [
@@ -322,9 +326,9 @@ def update_developer_names(release_summary_lines):
     """
     python_utils.PRINT('Updating about-page file...')
     start_index = release_summary_lines.index(
-        '### New Contributors:\n') + 1
+        release_constants.NEW_CONTRIBUTORS_HEADER) + 1
     end_index = release_summary_lines.index(
-        '### Email C&P Blurbs about authors:\n') - 1
+        release_constants.EMAIL_HEADER) - 1
     new_contributors = (
         release_summary_lines[start_index:end_index])
     new_contributors = [
@@ -449,6 +453,34 @@ def create_branch(
             target_branch, current_release_version_number))
 
 
+def is_invalid_email_present(release_summary_lines):
+    """Returns new contributors and authors from the release
+    summary lines.
+
+    Args:
+        release_summary_lines: list(str). List of lines in
+            ../release_summary.md.
+
+    Returns:
+        list(str). A list of new contributors and authors.
+    """
+    authors_start_index = release_summary_lines.index(
+        release_constants.NEW_AUTHORS_HEADER) + 1
+    authors_end_index = release_summary_lines.index(
+        release_constants.EXISTING_AUTHORS_HEADER) - 1
+    new_authors = release_summary_lines[authors_start_index:authors_end_index]
+    contributors_start_index = release_summary_lines.index(
+        release_constants.NEW_CONTRIBUTORS_HEADER) + 1
+    contributors_end_index = release_summary_lines.index(
+        release_constants.EMAIL_HEADER) - 1
+    new_contributors = (
+        release_summary_lines[contributors_start_index:contributors_end_index])
+    new_email_ids = new_authors + new_contributors
+    return any(
+        release_constants.INVALID_EMAIL_SUFFIX in id
+        for id in new_email_ids)
+
+
 def get_release_summary_lines():
     """Returns the lines from release summary file. It checks whether
     incorrect email is present or ordering of sections is invalid.
@@ -461,9 +493,8 @@ def get_release_summary_lines():
         release_summary_file = python_utils.open_file(
             release_constants.RELEASE_SUMMARY_FILEPATH, 'r')
         release_summary_lines = release_summary_file.readlines()
-        invalid_email_is_present = any(
-            release_constants.INVALID_EMAIL_SUFFIX in line
-            for line in release_summary_lines)
+        invalid_email_is_present = is_invalid_email_present(
+            release_summary_lines)
         if invalid_email_is_present:
             common.ask_user_to_confirm(
                 'The release summary file contains emails of the form: %s '

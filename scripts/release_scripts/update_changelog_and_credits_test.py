@@ -295,7 +295,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
     def test_invalid_ordering_of_sections_in_release_summary(self):
         release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
         invalid_ordering = {
-            '### New Authors:\n': '### section2: \n'
+            release_constants.NEW_AUTHORS_HEADER: '### section2: \n'
         }
         ordering_swap = self.swap(
             update_changelog_and_credits, 'EXPECTED_ORDERING',
