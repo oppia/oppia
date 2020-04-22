@@ -29,7 +29,8 @@ angular.module('oppia').directive('ckEditor4Rte', [
         uiConfig: '&'
       },
       template: '<div><div></div>' +
-                '<div contenteditable="true" class="oppia-rte-resizer oppia-rte">' +
+                '<div contenteditable="true" ' +
+                'class="oppia-rte-resizer oppia-rte">' +
                 '</div></div>',
       require: '?ngModel',
 
@@ -49,20 +50,18 @@ angular.module('oppia').directive('ckEditor4Rte', [
           }
         });
 
-        // Resize editor textbox to prevent responses from overflowing
-        var editable = document.getElementsByClassName('oppia-rte-resizer');
-        function resize() {
-          var modal_width = parseInt($('.modal-header').width()) - 15;
-          modal_width = modal_width.toString();
+        var editable = document.querySelectorAll('.oppia-rte-resizer');
+        var resize = function() {
+          var modalWidth = $('.modal-header').width() - 15;
           $('.oppia-rte-resizer').css({
-            'width': (modal_width + 'px')
-           });
-        }
+            'width': (modalWidth.toString() + 'px')
+          });
+        };
         for (var i in editable) {
-          editable[i].onchange = function() {
+          (<HTMLElement>editable[i]).onchange = function() {
             resize();
           };
-          editable[i].onclick = function() {
+          (<HTMLElement>editable[i]).onclick = function() {
             resize();
           };
         }
