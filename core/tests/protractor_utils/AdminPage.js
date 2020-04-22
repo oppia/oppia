@@ -220,10 +220,10 @@ var AdminPage = function() {
       by.cssContainingText('option', newRole));
     roleOption.click();
     updateFormSubmit.click();
+    waitFor.visibilityOf(statusMessage, 'Confirmation message not visible');
     waitFor.textToBePresentInElement(
       statusMessage, 'successfully updated to',
       'Could not set role successfully');
-    waitFor.visibilityOf(statusMessage, 'Confirmation message not visible');
   };
 
   this.getUsersAsssignedToRole = function(role) {

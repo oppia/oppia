@@ -115,6 +115,7 @@ var TopicEditorPage = function() {
   };
 
   this.uploadThumbnail = function(imgPath) {
+    waitFor.elementToBeClickable(topicThumbnailClickable);
     topicThumbnailClickable.click();
     absPath = path.resolve(__dirname, imgPath);
     return topicThumbnailUploadInput.sendKeys(absPath);
