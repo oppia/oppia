@@ -87,7 +87,8 @@ angular.module('oppia').config([
     // injected before bootstrapping of oppia module.
     var servicesToProvide = [
       'AlertsService', 'BackgroundMaskService', 'BrowserCheckerService',
-      'CodeReplRulesService', 'ContextService', 'CsrfTokenService',
+      'CodeReplRulesService', 'CollectionCreationBackendService',
+      'ContextService', 'CsrfTokenService',
       'DateTimeFormatService', 'DebouncerService', 'DeviceInfoService',
       'DocumentAttributeCustomizationService',
       'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
