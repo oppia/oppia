@@ -165,22 +165,25 @@ class UserSettingsModel(base_models.BaseModel):
             'username': user.username,
             'normalized_username': user.normalized_username,
             'last_agreed_to_terms': (
-                str(user.last_agreed_to_terms)
+                python_utils.convert_to_bytes(user.last_agreed_to_terms)
                 if user.last_agreed_to_terms
                 else None
             ),
             'last_started_state_editor_tutorial': (
-                str(user.last_started_state_editor_tutorial)
+                python_utils.convert_to_bytes(
+                    user.last_started_state_editor_tutorial)
                 if user.last_started_state_editor_tutorial
                 else None
             ),
             'last_started_state_translation_tutorial': (
-                str(user.last_started_state_translation_tutorial)
+                python_utils.convert_to_bytes(
+                    user.last_started_state_translation_tutorial)
                 if user.last_started_state_translation_tutorial
                 else None
             ),
             'last_logged_in': (
-                str(user.last_logged_in)
+                python_utils.convert_to_bytes(
+                    user.last_logged_in)
                 if user.last_logged_in
                 else None
             ),
