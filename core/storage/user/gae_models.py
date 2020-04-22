@@ -164,13 +164,31 @@ class UserSettingsModel(base_models.BaseModel):
             'role': user.role,
             'username': user.username,
             'normalized_username': user.normalized_username,
-            'last_agreed_to_terms': user.last_agreed_to_terms,
+            'last_agreed_to_terms': (
+                str(user.last_agreed_to_terms)
+                if user.last_agreed_to_terms
+                else None
+            ),
             'last_started_state_editor_tutorial': (
-                user.last_started_state_editor_tutorial),
+                str(user.last_started_state_editor_tutorial)
+                if user.last_started_state_editor_tutorial
+                else None
+            ),
             'last_started_state_translation_tutorial': (
-                user.last_started_state_translation_tutorial),
-            'last_logged_in': user.last_logged_in,
-            'last_edited_an_exploration': user.last_edited_an_exploration,
+                str(user.last_started_state_translation_tutorial)
+                if user.last_started_state_translation_tutorial
+                else None
+            ),
+            'last_logged_in': (
+                str(user.last_logged_in)
+                if user.last_logged_in 
+                else None
+            ),
+            'last_edited_an_exploration': (
+                str(user.last_edited_an_exploration)
+                if user.last_edited_an_exploration
+                else None
+            ),
             'profile_picture_data_url': user.profile_picture_data_url,
             'default_dashboard': user.default_dashboard,
             'creator_dashboard_display_pref': (
@@ -1260,10 +1278,17 @@ class ExplorationUserDataModel(base_models.BaseModel):
         for user_model in found_models:
             user_data[user_model.exploration_id] = {
                 'rating': user_model.rating,
-                'rated_on': user_model.rated_on,
+                'rated_on': (
+                    unicode(user_model.rated_on)
+                    if user_model.rated_on
+                    else None
+                ),
                 'draft_change_list': user_model.draft_change_list,
                 'draft_change_list_last_updated': (
-                    user_model.draft_change_list_last_updated),
+                    unicode(user_model.draft_change_list_last_updated)
+                    if user_model.draft_change_list_last_updated
+                    else None
+                ),
                 'draft_change_list_exp_version': (
                     user_model.draft_change_list_exp_version),
                 'draft_change_list_id': user_model.draft_change_list_id,

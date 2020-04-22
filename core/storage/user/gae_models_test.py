@@ -171,11 +171,11 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
-            'last_agreed_to_terms': self.GENERIC_DATE,
-            'last_started_state_editor_tutorial': self.GENERIC_DATE,
-            'last_started_state_translation_tutorial': self.GENERIC_DATE,
-            'last_logged_in': self.GENERIC_DATE,
-            'last_edited_an_exploration': self.GENERIC_DATE,
+            'last_agreed_to_terms': '2019-05-20 00:00:00',
+            'last_started_state_editor_tutorial': '2019-05-20 00:00:00',
+            'last_started_state_translation_tutorial': '2019-05-20 00:00:00',
+            'last_logged_in': '2019-05-20 00:00:00',
+            'last_edited_an_exploration': '2019-05-20 00:00:00',
             'profile_picture_data_url': self.GENERIC_IMAGE_URL,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
@@ -1186,12 +1186,12 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object.user_id, self.USER_1_ID)
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_ONE)
         self.assertEqual(retrieved_object.rating, 2)
-        self.assertEqual(retrieved_object.rated_on, self.DATETIME_OBJECT)
+        self.assertEqual(unicode(retrieved_object.rated_on), '2016-02-16 00:00:00')
         self.assertEqual(
             retrieved_object.draft_change_list, {'new_content': {}})
         self.assertEqual(
-            retrieved_object.draft_change_list_last_updated,
-            self.DATETIME_OBJECT)
+            unicode(retrieved_object.draft_change_list_last_updated),
+            '2016-02-16 00:00:00')
         self.assertEqual(retrieved_object.draft_change_list_exp_version, 3)
         self.assertEqual(retrieved_object.draft_change_list_id, 1)
 
@@ -1213,9 +1213,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         expected_data = {
             self.EXP_ID_ONE: {
                 'rating': 2,
-                'rated_on': self.DATETIME_OBJECT,
+                'rated_on': '2016-02-16 00:00:00',
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': self.DATETIME_OBJECT,
+                'draft_change_list_last_updated': '2016-02-16 00:00:00',
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -1245,9 +1245,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         expected_data = {
             self.EXP_ID_ONE: {
                 'rating': 2,
-                'rated_on': self.DATETIME_OBJECT,
+                'rated_on': '2016-02-16 00:00:00',
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': self.DATETIME_OBJECT,
+                'draft_change_list_last_updated': '2016-02-16 00:00:00',
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -1269,9 +1269,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             },
             self.EXP_ID_THREE: {
                 'rating': 5,
-                'rated_on': self.DATETIME_OBJECT,
+                'rated_on': '2016-02-16 00:00:00',
                 'draft_change_list': {'new_content': {'content': 3}},
-                'draft_change_list_last_updated': self.DATETIME_OBJECT,
+                'draft_change_list_last_updated': '2016-02-16 00:00:00',
                 'draft_change_list_exp_version': 2,
                 'draft_change_list_id': 2,
                 'mute_suggestion_notifications': (

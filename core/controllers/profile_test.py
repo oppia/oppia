@@ -25,9 +25,13 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
+from core.domain import takeout_service
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 class ProfilePageTests(test_utils.GenericTestBase):
@@ -789,6 +793,35 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
     def test_delete_delete_account_page_disabled(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
             self.delete_json('/delete-account-handler', expected_status_int=404)
+
+
+class ExportAccountHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ExportAccountHandlerTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+
+        user_models.UserSubscriptionsModel(
+            id=self.get_user_id_from_email(self.EDITOR_EMAIL),
+            creator_ids=[],
+            collection_ids=[],
+            activity_ids=[],
+            general_feedback_thread_ids=[]).put()
+    
+    def test_export_account_handler(self):
+        with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True):
+            data = self.get_json('/export-account-handler')
+            self.assertEqual(
+                data, 
+                takeout_service.export_data_for_user(
+                    self.get_user_id_from_email(self.EDITOR_EMAIL)
+                )
+            )
+    
+    def test_export_account_handler_disabled(self):
+        with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', False):
+            self.get_json('/export-account-handler', expected_status_int=404)
 
 
 class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
