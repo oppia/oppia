@@ -454,15 +454,15 @@ def create_branch(
 
 
 def is_invalid_email_present(release_summary_lines):
-    """Returns new contributors and authors from the release
-    summary lines.
+    """Checks if any invalid email is present in the list of
+    new authors and contributors.
 
     Args:
         release_summary_lines: list(str). List of lines in
             ../release_summary.md.
 
     Returns:
-        list(str). A list of new contributors and authors.
+        bool. Whether invalid email is present or not.
     """
     authors_start_index = release_summary_lines.index(
         release_constants.NEW_AUTHORS_HEADER) + 1
@@ -486,6 +486,9 @@ def get_release_summary_lines():
     incorrect email is present or ordering of sections is invalid.
     In either case, the user will be asked to update the release
     summary file and the lines will be re-read.
+
+    Returns:
+        list(str). List of lines in ../release_summary.md.
     """
     invalid_email_is_present = True
     ordering_is_invalid = True
