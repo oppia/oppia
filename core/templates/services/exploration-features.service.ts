@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,29 @@
  *               the exploration editor.
  */
 
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+export interface IExplorationDataDict {
+  'param_changes': IParamChanges[] | [];
+  states: {
+    [propsName : string]: {
+      'param_changes': IParamChanges[] | []
+    }
+  };
+}
+export interface IFeatureDataDict {
+  'is_exploration_whitelisted': boolean;
+  'is_improvements_tab_enabled': boolean;
+}
+export interface IParamChanges {
+  name: string;
+  'generator_id': string;
+  'customization_args': {
+    'parse_with_jinja': boolean,
+    value: string
+  };
+}
 
 @Injectable({
   providedIn: 'root'
@@ -26,16 +47,14 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 export class ExplorationFeaturesService {
   static serviceIsInitialized = false;
   static settings = {
+    areParametersEnabled: false,
     isImprovementsTabEnabled: false,
-    isPlaythroughRecordingEnabled: false,
-    areParametersEnabled: false
+    isPlaythroughRecordingEnabled: false
   };
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'explorationData' and 'featuresData' are dicts with
-  // underscore_cased keys which give tslint errors against underscore_casing
-  // in favor of camelCasing.
-  init(explorationData: any, featuresData: any): void {
+  init(
+      explorationData: IExplorationDataDict,
+      featuresData: IFeatureDataDict): void {
     if (ExplorationFeaturesService.serviceIsInitialized) {
       return;
     }
