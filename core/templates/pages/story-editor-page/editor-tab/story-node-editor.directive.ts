@@ -289,8 +289,8 @@ angular.module('oppia').directive('storyNodeEditor', [
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
-                  $scope.MAX_CHARS_IN_CHAPTER_TITLE =
-                    MAX_CHARS_IN_CHAPTER_TITLE;
+                  $scope.MAX_CHARS_IN_CHAPTER_TITLE = (
+                    MAX_CHARS_IN_CHAPTER_TITLE);
                   $scope.nodeTitle = '';
                   $scope.nodeTitles = nodeTitles;
                   $scope.errorMsg = null;

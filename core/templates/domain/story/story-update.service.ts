@@ -216,13 +216,13 @@ angular.module('oppia').factory('StoryUpdateService', [
           title: nodeTitle
         }, function(changeDict, story) {
           // Apply.
-          StoryEditorStateService.setExpIdsChanged();
           story.getStoryContents().addNode(nodeTitle);
+          StoryEditorStateService.setExpIdsChanged();
         }, function(changeDict, story) {
           // Undo.
-          StoryEditorStateService.setExpIdsChanged();
           var nodeId = _getNodeIdFromChangeDict(changeDict);
           story.getStoryContents().deleteNode(nodeId);
+          StoryEditorStateService.setExpIdsChanged();
         });
       },
 
@@ -235,8 +235,8 @@ angular.module('oppia').factory('StoryUpdateService', [
           node_id: nodeId
         }, function(changeDict, story) {
           // Apply.
-          StoryEditorStateService.setExpIdsChanged();
           story.getStoryContents().deleteNode(nodeId);
+          StoryEditorStateService.setExpIdsChanged();
         }, function(changeDict, story) {
           // Undo.
           throw Error('A deleted story node cannot be restored.');
@@ -341,14 +341,14 @@ angular.module('oppia').factory('StoryUpdateService', [
           oldExplorationId, newExplorationId,
           function(changeDict, story) {
             // Apply.
-            StoryEditorStateService.setExpIdsChanged();
             story.getStoryContents().setNodeExplorationId(
               nodeId, newExplorationId);
+            StoryEditorStateService.setExpIdsChanged();
           }, function(changeDict, story) {
             // Undo.
-            StoryEditorStateService.setExpIdsChanged();
             story.getStoryContents().setNodeExplorationId(
               nodeId, oldExplorationId);
+            StoryEditorStateService.setExpIdsChanged();
           });
       },
 
@@ -398,14 +398,14 @@ angular.module('oppia').factory('StoryUpdateService', [
           oldDestinationNodeIds, newDestinationNodeIds,
           function(changeDict, story) {
             // Apply.
-            StoryEditorStateService.setExpIdsChanged();
             story.getStoryContents().removeDestinationNodeIdFromNode(
               nodeId, destinationNodeId);
+            StoryEditorStateService.setExpIdsChanged();
           }, function(changeDict, story) {
             // Undo.
-            StoryEditorStateService.setExpIdsChanged();
             story.getStoryContents().addDestinationNodeIdToNode(
               nodeId, destinationNodeId);
+            StoryEditorStateService.setExpIdsChanged();
           });
       },
 

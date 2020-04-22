@@ -56,8 +56,8 @@ angular.module('oppia').directive('topicEditorTab', [
             MAX_CHARS_IN_TOPIC_NAME) {
           var ctrl = this;
           $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
-          $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION =
-            MAX_CHARS_IN_TOPIC_DESCRIPTION;
+          $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
+            MAX_CHARS_IN_TOPIC_DESCRIPTION);
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.topicRights = TopicEditorStateService.getTopicRights();

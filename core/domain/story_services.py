@@ -344,24 +344,22 @@ def _save_story(committer_id, story, commit_message, change_list):
 
     topic = topic_fetchers.get_topic_by_id(
         story.corresponding_topic_id, strict=False)
-
-
-    story_is_published = False
-    story_is_present_in_topic = False
-    if topic is not None:
-        for story_reference in topic.get_all_story_references():
-            if story_reference.story_id == story.id:
-                story_is_present_in_topic = True
-                story_is_published = story_reference.story_is_published
-        if not story_is_present_in_topic:
-            raise Exception(
-                'Expected story to belong to the topic %s, but it is '
-                'neither a part of the canonical stories or the additional '
-                'stories of the topic.' % story.corresponding_topic_id)
-    else:
+    if topic is None:
         raise utils.ValidationError(
             'Expected story to only belong to a valid topic, but found no '
             'topic with ID: %s' % story.corresponding_topic_id)
+
+    story_is_published = False
+    story_is_present_in_topic = False
+    for story_reference in topic.get_all_story_references():
+        if story_reference.story_id == story.id:
+            story_is_present_in_topic = True
+            story_is_published = story_reference.story_is_published
+    if not story_is_present_in_topic:
+        raise Exception(
+            'Expected story to belong to the topic %s, but it is '
+            'neither a part of the canonical stories or the additional '
+            'stories of the topic.' % story.corresponding_topic_id)
 
     story.validate()
 

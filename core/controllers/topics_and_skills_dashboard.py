@@ -121,7 +121,7 @@ class NewTopicHandler(base.BaseHandler):
             topic_domain.Topic.require_valid_name(name)
         except:
             raise self.InvalidInputException(
-                'Invalid topic name.')
+                'Invalid topic name, received %s.' % name)
         new_topic_id = topic_services.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
             new_topic_id, name, abbreviated_name)
