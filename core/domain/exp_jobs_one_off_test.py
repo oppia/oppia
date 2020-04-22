@@ -2015,8 +2015,9 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
-        exploration.add_states(['State1'])
-        state1 = exploration.states['State1']
+        state_name = 'State1'
+        exploration.add_states([state_name])
+        state1 = exploration.states[state_name]
         recorded_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content': {
@@ -2040,13 +2041,26 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
         with self.swap(logging, 'error', _mock_logging_function):
             self.process_and_flush_pending_tasks()
 
-        relative_path = ('%s/%s' % (self._FILENAME_PREFIX,
+        relative_path = ('File %s/%s not found.' % (self._FILENAME_PREFIX,
                                     self.TEST_AUDIO_FILE_MP3))
         self.assertEqual(
             observed_log_messages,
-            ['Mp3 audio file not found for %s , caused by: '
-             'File %s not found.'
-             % (self.TEST_AUDIO_FILE_MP3, relative_path)])
+            ['MP3 audio file exception for file %s ,'
+                'EXP_ID: %s,'
+                'STATE_NAME: %s,'
+                'REASON: %s'
+             % (self.TEST_AUDIO_FILE_MP3,
+                self.VALID_EXP_ID,
+                state_name,
+                relative_path)])
+        actual_output = (
+            exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob.get_output(
+                job_id)
+            )
+        expected_output = [('[u\'FAILED_NO_CHANGE\', '
+                            '[u\'EXP_ID: exp_id0, '
+                            'FAILED_DURATION_CHANGE: 1\']]')]
+        self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
@@ -2165,7 +2179,9 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
                 job_id)
             )
         # Validate job ran successfully.
-        expected_output = ['[u\'SUCCESS\', 2]']
+        expected_output = [('[u\'SUCCESS_AUDIO_CHANGED\', '
+                            '[u\'EXP_ID: exp_id0, '
+                            'AUDIO_DURATIONS_CHANGED: 2\']]')]
         self.assertEqual(actual_output, expected_output)
 
 
@@ -2194,3 +2210,49 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
             updated_exploration['states']['State1']['recorded_voiceovers'])
         # Validate the data is updated in the exploration correctly.
         self.assertEqual(expected_updated_value, actual_value)
+
+    def test_should_not_update_value_when_test_is_run(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='Exploration Title 1', category='category')
+        exploration.add_states(['State1'])
+        state1 = exploration.states['State1']
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': self.TEST_AUDIO_FILE_MP3,
+                        'file_size_bytes': 123,
+                        'needs_update': True,
+                        'duration_secs': 12.0
+                    },
+                    'hi': {
+                        'filename': self.TEST_AUDIO_FILE_MP3,
+                        'file_size_bytes': 1234,
+                        'needs_update': False,
+                        'duration_secs': 14.0
+                    }
+                },
+                'default_outcome': {}
+            }
+        }
+
+                # Save the recorded_voiceovers.
+        state1.update_recorded_voiceovers(
+            state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict))
+        exp_services.save_new_exploration(self.user_a_id, exploration)
+
+        # Run the job.
+        job_id = (
+            exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob.create_new())
+        exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob.get_output(
+                job_id)
+            )
+        # Validate job ran successfully.
+        # Check for no change count to be updated.
+        expected_output = [('[u\'SUCCESS_NO_CHANGE\', '
+                           '[u\'EXP_ID: exp_id0, NO_DURATIONS_CHANGED: 2\']]')]
+        self.assertEqual(actual_output, expected_output)
