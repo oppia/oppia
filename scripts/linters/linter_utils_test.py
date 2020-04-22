@@ -193,7 +193,7 @@ class ListDuplicateItemsTest(test_utils.GenericTestBase):
     """Tests for the get_duplicates_from_list_of_strings function."""
 
     def test_get_duplicates_from_list_of_strings_with_duplicat_strings(self):
-        strings_list = ['A', 'B', 'B', 'C', 'C']
+        strings_list = ['A', 'B', 'B', 'C', 'C', 'C']
         duplicates = linter_utils.get_duplicates_from_list_of_strings(
             strings_list)
         self.assertEqual(sorted(duplicates), ['B', 'C'])

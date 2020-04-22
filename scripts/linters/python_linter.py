@@ -223,16 +223,12 @@ class PythonLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT(summary_message)
             summary_messages.append(summary_message)
 
-        if failed:
-            summary_message = (
-                '%s   Job registry check failed' % _MESSAGE_TYPE_FAILED)
-            python_utils.PRINT(summary_message)
-            summary_messages.append(summary_message)
-        else:
-            summary_message = (
-                '%s   Job registry check passed' % _MESSAGE_TYPE_SUCCESS)
-            python_utils.PRINT(summary_message)
-            summary_messages.append(summary_message)
+        summary_message = (
+            '%s   Job registry check %s' % (
+                (_MESSAGE_TYPE_FAILED, 'failed') if failed else
+                (_MESSAGE_TYPE_SUCCESS, 'passed')))
+        python_utils.PRINT(summary_message)
+        summary_messages.append(summary_message)
         return summary_messages
 
     def perform_all_lint_checks(self):

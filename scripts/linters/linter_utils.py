@@ -139,7 +139,7 @@ def get_duplicates_from_list_of_strings(strings):
     item_count_map = collections.defaultdict(int)
     for string in strings:
         item_count_map[string] += 1
-        # Counting as duplicate once its appeared twice in the list.
+        # Counting as duplicate once it's appeared twice in the list.
         if item_count_map[string] == 2:
             duplicates.append(string)
 
