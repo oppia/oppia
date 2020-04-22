@@ -63,6 +63,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
         'EVENT_TYPE_SKILL_CREATION_ENABLED',
         'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         'FATAL_ERROR_CODES', 'SKILL_DIFFICULTIES',
+        'MAX_CHARS_IN_SKILL_DESCRIPTION',
         function(
             $http, $rootScope, $scope, $uibModal, $window,
             AlertsService, RubricObjectFactory, SkillCreationService,
@@ -71,7 +72,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
             EVENT_TYPE_SKILL_CREATION_ENABLED,
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
-            FATAL_ERROR_CODES, SKILL_DIFFICULTIES) {
+            FATAL_ERROR_CODES, SKILL_DIFFICULTIES,
+            MAX_CHARS_IN_SKILL_DESCRIPTION) {
           var ctrl = this;
           var _initDashboard = function() {
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
@@ -147,6 +149,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   $scope.bindableDict = {
                     displayedConceptCardExplanation: ''
                   };
+                  $scope.MAX_CHARS_IN_SKILL_DESCRIPTION =
+                    MAX_CHARS_IN_SKILL_DESCRIPTION;
                   var newExplanationObject = null;
 
                   $scope.$watch('newSkillDescription', function() {

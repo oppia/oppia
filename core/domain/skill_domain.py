@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
+from core.domain import android_validation_constants
 from core.domain import change_domain
 from core.domain import html_cleaner
 from core.domain import state_domain
@@ -580,6 +581,13 @@ class Skill(python_utils.OBJECT):
 
         if description == '':
             raise utils.ValidationError('Description field should not be empty')
+
+        description_limit = (
+            android_validation_constants.MAX_CHARS_IN_SKILL_DESCRIPTION)
+        if len(description) > description_limit:
+            raise utils.ValidationError(
+                'Skill description should be less than %d chars, received %s'
+                % (description_limit, description))
 
     def validate(self):
         """Validates various properties of the Skill object.
