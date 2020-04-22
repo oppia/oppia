@@ -36,7 +36,6 @@ import feconf
 import python_utils
 import utils
 
-
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
 gae_image_services = models.Registry.import_gae_image_services()
