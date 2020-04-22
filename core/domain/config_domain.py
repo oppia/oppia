@@ -304,10 +304,6 @@ PROMO_BAR_MESSAGE = ConfigProperty(
     'promo_bar_message', UNICODE_SCHEMA,
     'The message to show to all users if the promo bar is enabled', '')
 
-COMMUNITY_MESSAGE = ConfigProperty(
-    'community_message', UNICODE_SCHEMA,
-    'The message to show to all contributors visiting community dashboard', '')
-
 VMID_SHARED_SECRET_KEY_MAPPING = ConfigProperty(
     'vmid_shared_secret_key_mapping', VMID_SHARED_SECRET_KEY_SCHEMA,
     'VMID and shared secret key corresponding to that VM',
