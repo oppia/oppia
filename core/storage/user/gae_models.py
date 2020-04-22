@@ -182,13 +182,12 @@ class UserSettingsModel(base_models.BaseModel):
                 else None
             ),
             'last_logged_in': (
-                python_utils.convert_to_bytes(
-                    user.last_logged_in)
+                python_utils.convert_to_bytes(user.last_logged_in)
                 if user.last_logged_in
                 else None
             ),
             'last_edited_an_exploration': (
-                str(user.last_edited_an_exploration)
+                python_utils.convert_to_bytes(user.last_edited_an_exploration)
                 if user.last_edited_an_exploration
                 else None
             ),
