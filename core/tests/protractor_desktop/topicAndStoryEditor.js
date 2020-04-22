@@ -53,7 +53,7 @@ describe('Topic editor functionality', function() {
     users.createAndLoginAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev', false);
+    topicsAndSkillsDashboardPage.createTopic('Topic 1', false);
     browser.getCurrentUrl().then(function(url) {
       topicId = url.split('/')[4];
       general.closeCurrentTab(0);
@@ -280,7 +280,7 @@ describe('Chapter editor functionality', function() {
       userEmail, 'creatorChapterTest');
     dummyExplorationIds = createDummyExplorations(3);
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic(topicName, 'abbrev', false);
+    topicsAndSkillsDashboardPage.createTopic(topicName, false);
     topicEditorPage.createStory('Story 0');
     browser.getCurrentUrl().then(function(url) {
       storyId = url.split('/')[4];
