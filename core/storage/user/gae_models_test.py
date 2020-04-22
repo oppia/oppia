@@ -1186,11 +1186,15 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object.user_id, self.USER_1_ID)
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_ONE)
         self.assertEqual(retrieved_object.rating, 2)
-        self.assertEqual(unicode(retrieved_object.rated_on), '2016-02-16 00:00:00')
+        self.assertEqual(
+            python_utils.UNICODE(retrieved_object.rated_on),
+            '2016-02-16 00:00:00')
         self.assertEqual(
             retrieved_object.draft_change_list, {'new_content': {}})
         self.assertEqual(
-            unicode(retrieved_object.draft_change_list_last_updated),
+            python_utils.UNICODE(
+                retrieved_object.draft_change_list_last_updated
+            ),
             '2016-02-16 00:00:00')
         self.assertEqual(retrieved_object.draft_change_list_exp_version, 3)
         self.assertEqual(retrieved_object.draft_change_list_id, 1)

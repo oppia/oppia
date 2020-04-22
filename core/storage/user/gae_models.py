@@ -181,7 +181,7 @@ class UserSettingsModel(base_models.BaseModel):
             ),
             'last_logged_in': (
                 str(user.last_logged_in)
-                if user.last_logged_in 
+                if user.last_logged_in
                 else None
             ),
             'last_edited_an_exploration': (
@@ -1279,13 +1279,14 @@ class ExplorationUserDataModel(base_models.BaseModel):
             user_data[user_model.exploration_id] = {
                 'rating': user_model.rating,
                 'rated_on': (
-                    unicode(user_model.rated_on)
+                    python_utils.UNICODE(user_model.rated_on)
                     if user_model.rated_on
                     else None
                 ),
                 'draft_change_list': user_model.draft_change_list,
                 'draft_change_list_last_updated': (
-                    unicode(user_model.draft_change_list_last_updated)
+                    python_utils.UNICODE(
+                        user_model.draft_change_list_last_updated)
                     if user_model.draft_change_list_last_updated
                     else None
                 ),

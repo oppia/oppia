@@ -24,8 +24,8 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import subscription_services
-from core.domain import user_services
 from core.domain import takeout_service
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -808,17 +808,17 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             collection_ids=[],
             activity_ids=[],
             general_feedback_thread_ids=[]).put()
-    
+
     def test_export_account_handler(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True):
             data = self.get_json('/export-account-handler')
             self.assertEqual(
-                data, 
+                data,
                 takeout_service.export_data_for_user(
                     self.get_user_id_from_email(self.EDITOR_EMAIL)
                 )
             )
-    
+
     def test_export_account_handler_disabled(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', False):
             self.get_json('/export-account-handler', expected_status_int=404)
