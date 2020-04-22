@@ -75,7 +75,9 @@ angular.module('oppia').directive('questionsTab', [
           };
           ctrl.$onInit = function() {
             _init();
-            $scope.$on(EVENT_SKILL_INITIALIZED, _init);
+            SkillEditorStateService.getEventSkillInitializedSubject().subscribe(
+              () => _init()
+            );
             $scope.$on(EVENT_SKILL_REINITIALIZED, _init);
           };
         }

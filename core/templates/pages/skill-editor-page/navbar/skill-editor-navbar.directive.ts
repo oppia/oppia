@@ -145,7 +145,9 @@ angular.module('oppia').directive('skillEditorNavbar', [
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.validationIssues = [];
-            $scope.$on(EVENT_SKILL_INITIALIZED, _validateSkill);
+            SkillEditorStateService.getEventSkillInitializedSubject().subscribe(
+              () => _validateSkill()
+            );
             $scope.$on(EVENT_SKILL_REINITIALIZED, _validateSkill);
             $scope.$on(
               EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateSkill);
