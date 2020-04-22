@@ -24,12 +24,10 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import subscription_services
-from core.domain import takeout_service
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import json
 import python_utils
 import utils
 
@@ -885,7 +883,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                     u'default_dashboard': None,
                     u'preferred_site_language_code': None,
                     u'user_bio': u'',
-                    u'profile_picture_data_url': 
+                    u'profile_picture_data_url':
                         python_utils.UNICODE(
                             user_settings.profile_picture_data_url),
                     u'role': u'EXPLORATION_EDITOR',
