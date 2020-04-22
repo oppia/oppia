@@ -29,6 +29,8 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import json
+import python_utils
 import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
@@ -811,12 +813,97 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
 
     def test_export_account_handler(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True):
+            self.maxDiff = None
             data = self.get_json('/export-account-handler')
+            user_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+            user_settings = user_models.UserSettingsModel.get(user_id)
+            expected_data = {
+                u'topic_rights_data': {
+                    u'managed_topic_ids': []
+                },
+                u'subtopic_page_snapshot_metadata_data': {},
+                u'general_voiceover_application_data': {},
+                u'collection_progress_data': {},
+                u'story_snapshot_metadata_data': {},
+                u'user_community_rights_data': {},
+                u'user_contributions_data': {
+                    u'edited_exploration_ids': [],
+                    u'created_exploration_ids': []
+                },
+                u'general_feedback_thread_user_data': {},
+                u'question_snapshot_metadata_data': {},
+                u'general_feedback_message_data': {},
+                u'story_progress_data': {},
+                u'learner_playlist_data': {},
+                u'collection_rights_data': {
+                    u'voiced_collection_ids': [],
+                    u'owned_collection_ids': [],
+                    u'viewable_collection_ids': [],
+                    u'editable_collection_ids': []
+                },
+                u'skill_snapshot_metadata_data': {},
+                u'exploration_user_data_data': {},
+                u'collection_snapshot_metadata_data': {},
+                u'exploration_rights_data': {
+                    u'viewable_exploration_ids': [],
+                    u'owned_exploration_ids': [],
+                    u'voiced_exploration_ids': [],
+                    u'editable_exploration_ids': []
+                },
+                u'topic_snapshot_metadata_data': {},
+                u'completed_activities_data': {},
+                u'general_feedback_thread_data': {},
+                u'topic_rights_snapshot_metadata_data': {},
+                u'user_stats_data': {},
+                u'exploration_rights_snapshot_metadata_data': {},
+                u'user_subscriptions_data': {
+                    u'creator_ids': [],
+                    u'collection_ids': [],
+                    u'activity_ids': [],
+                    u'general_feedback_thread_ids': [],
+                    u'last_checked': None
+                },
+                u'config_property_snapshot_metadata_data': {},
+                u'exploration_snapshot_metadata_data': {},
+                u'incomplete_activities_data': {},
+                u'user_skill_mastery_data': {},
+                u'exp_user_last_playthrough_data': {},
+                u'user_settings_data': {
+                    u'username': u'editor',
+                    u'last_agreed_to_terms':
+                        python_utils.UNICODE(
+                            user_settings.last_agreed_to_terms),
+                    u'last_started_state_translation_tutorial': None,
+                    u'last_started_state_editor_tutorial': None,
+                    u'normalized_username': u'editor',
+                    u'first_contribution_msec': None,
+                    u'preferred_language_codes': [
+                        u'en'
+                    ],
+                    u'creator_dashboard_display_pref': u'card',
+                    u'subject_interests': [],
+                    u'default_dashboard': None,
+                    u'preferred_site_language_code': None,
+                    u'user_bio': u'',
+                    u'profile_picture_data_url': 
+                        python_utils.UNICODE(
+                            user_settings.profile_picture_data_url),
+                    u'role': u'EXPLORATION_EDITOR',
+                    u'last_edited_an_exploration': None,
+                    u'email': u'editor@example.com',
+                    u'preferred_audio_language_code': None,
+                    u'last_logged_in':
+                        python_utils.UNICODE(
+                            user_settings.last_logged_in)
+                },
+                u'general_suggestion_data': {},
+                u'user_contribution_scoring_data': {},
+                u'general_feedback_email_reply_to_id_data': {},
+                u'collection_rights_snapshot_metadata_data': {}
+            }
             self.assertEqual(
                 data,
-                takeout_service.export_data_for_user(
-                    self.get_user_id_from_email(self.EDITOR_EMAIL)
-                )
+                expected_data
             )
 
     def test_export_account_handler_disabled(self):
