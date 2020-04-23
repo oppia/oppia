@@ -73,7 +73,7 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
           // Removing any empty arrays from the end.
           for (var i = 1; i < ctrl.value.length; i++) {
             if (ctrl.value[i].length === 0) {
-              // If empty array is found, all subsequent arrays must also be 
+              // If empty array is found, all subsequent arrays must also be
               // empty since rank skipping is not allowed.
               ctrl.value = ctrl.value.slice(0, i);
               break;

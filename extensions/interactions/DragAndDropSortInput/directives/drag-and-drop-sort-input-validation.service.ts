@@ -136,7 +136,8 @@ export class DragAndDropSortInputValidationService {
                 message: 'Multiple items in a single position are not allowed.'
               });
             }
-          } 
+            break;
+          }
         }
         var range = {
           answerGroupIndex: i + 1,
