@@ -193,12 +193,13 @@ class RedirectStoutTest(test_utils.GenericTestBase):
 class TempDirTest(test_utils.GenericTestBase):
     """Tests for the temp_dir function."""
 
-    def test_directory_only_exists_in_context(self):
+    def test_directory_only_exists_within_context(self):
         with linter_utils.temp_dir() as temp_dir_path:
+            self.assertTrue(os.path.exists(temp_dir_path))
             self.assertTrue(os.path.isdir(temp_dir_path))
         self.assertFalse(os.path.exists(temp_dir_path))
 
-    def test_diretory_placed_in_specified_dir(self):
+    def test_directory_is_placed_in_specified_dir(self):
         with linter_utils.temp_dir(parent=os.getcwd()) as temp_dir_path:
             parent = os.path.abspath(
                 os.path.join(temp_dir_path, os.path.pardir))

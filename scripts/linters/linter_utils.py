@@ -128,13 +128,13 @@ def redirect_stdout(new_target):
 
 @contextlib.contextmanager
 def temp_dir(suffix='', prefix='', parent=None):
-    """Creates a temporary directory which is only valid within a context.
+    """Creates a temporary directory which is only usable in a `with` context.
 
     Args:
         suffix: str. Appended to the temporary directory.
         prefix: str. Prepended to the temporary directory.
         parent: str or None. The parent directory to place the temporary one. If
-            None, a platform-dependent directory is used instead.
+            None, a platform-specific directory is used instead.
 
     Yields:
         str. The full path to the temporary directory.
