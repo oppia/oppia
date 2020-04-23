@@ -164,9 +164,11 @@ angular.module('oppia').directive('adminMiscTab', [
             }
           })
             .then(function(response) {
-              ctrl.setStatusMessage('Success! ' + response.data.interactions);
+              ctrl.explorationInteractionIds(
+                'Success! ' + response.data.interactions
+              );
             }, function(errorResponse) {
-              ctrl.setStatusMessage(
+              ctrl.explorationInteractionIds(
                 'Server error: ' + errorResponse.data.error);
             });
         };
