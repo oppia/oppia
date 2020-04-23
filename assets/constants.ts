@@ -596,7 +596,6 @@ export = {
 
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
-
   "MAX_CHARS_IN_TOPIC_NAME": 39,
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
