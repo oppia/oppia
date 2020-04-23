@@ -420,6 +420,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].title = 1
         self._assert_validation_error(
             'Expected title to be a string, received 1')
+    
+    def test_node_description_validation(self):
+        self.story.story_contents.nodes[0].description = 1
+        self._assert_validation_error(
+            'Expected description to be a string, received 1')
 
     def test_nodes_validation(self):
         self.story.story_contents.initial_node_id = 'node_10'
@@ -442,6 +447,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict({
                 'id': 'node_1',
                 'title': 'Title 1',
+                'description': 'Description 1',
                 'destination_node_ids': [self.NODE_ID_2],
                 'prerequisite_skill_ids': [],
                 'acquired_skill_ids': [],
@@ -494,6 +500,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -504,6 +511,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -514,6 +522,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_3 = {
             'id': 'node_3',
             'title': 'Title 3',
+            'description': 'Description 3',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -543,6 +552,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -553,6 +563,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -563,6 +574,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_3 = {
             'id': 'node_3',
             'title': 'Title 3',
+            'description': 'Description 3',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -589,6 +601,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -612,6 +625,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -635,6 +649,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_2', 'node_3'],
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1'],
@@ -645,6 +660,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_3'],
             'prerequisite_skill_ids': ['skill_2'],
@@ -655,6 +671,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_3 = {
             'id': 'node_3',
             'title': 'Title 3',
+            'description': 'Description 3',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_4'],
             'prerequisite_skill_ids': ['skill_3'],
@@ -676,6 +693,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1'],
@@ -686,6 +704,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': ['skill_3'],
             'prerequisite_skill_ids': ['skill_2'],
@@ -696,6 +715,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_3 = {
             'id': 'node_3',
             'title': 'Title 3',
+            'description': 'Description 3',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_4'],
             'prerequisite_skill_ids': ['skill_3'],
@@ -714,6 +734,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1'],
@@ -724,6 +745,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_3'],
             'prerequisite_skill_ids': ['skill_2'],
@@ -734,6 +756,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_3 = {
             'id': 'node_3',
             'title': 'Title 3',
+            'description': 'Description 3',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_4'],
             'prerequisite_skill_ids': ['skill_3'],
@@ -753,6 +776,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1'],
@@ -763,6 +787,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_3'],
             'prerequisite_skill_ids': ['skill_2'],
@@ -773,6 +798,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_3 = {
             'id': 'node_2',
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_4'],
             'prerequisite_skill_ids': ['skill_3'],
@@ -791,6 +817,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1'],
@@ -801,6 +828,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': ['skill_3'],
             'prerequisite_skill_ids': ['skill_2'],
@@ -811,6 +839,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_3 = {
             'id': 'node_3',
             'title': 'Title 2',
+            'description': 'Description 3',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_4'],
             'prerequisite_skill_ids': ['skill_3'],
@@ -831,6 +860,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1', 'skill_0'],
@@ -841,6 +871,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': ['node_4', 'node_3'],
             'acquired_skill_ids': ['skill_3', 'skill_4'],
             'prerequisite_skill_ids': ['skill_2'],
@@ -851,6 +882,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_3 = {
             'id': 'node_3',
             'title': 'Title 3',
+            'description': 'Description 3',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': ['skill_4'],
@@ -861,6 +893,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_4 = {
             'id': 'node_4',
             'title': 'Title 4',
+            'description': 'Description 4',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': ['skill_2'],
@@ -881,7 +914,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         story_contents object.
         """
         story_node = story_domain.StoryNode(
-            self.NODE_ID_1, 'Title', [self.NODE_ID_2],
+            self.NODE_ID_1, 'Title','Description' ,[self.NODE_ID_2],
             [self.SKILL_ID_1], [self.SKILL_ID_2],
             'Outline', False, self.EXP_ID)
         story_contents = story_domain.StoryContents(

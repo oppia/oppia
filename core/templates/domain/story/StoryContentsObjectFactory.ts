@@ -107,6 +107,24 @@ export class StoryContents {
     return nodeTitles;
   }
 
+  getNodeIdsToDescriptionMap(nodeIds: string[]): {} {
+    var nodes = this._nodes;
+    var nodeDescription = {};
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodeIds.indexOf(nodes[i].getId()) !== -1) {
+        nodeDescription[nodes[i].getId()] = nodes[i].getDescription();
+      }
+    }
+    if (Object.keys(nodeDescription).length !== nodeIds.length) {
+      for (var i = 0; i < nodeIds.length; i++) {
+        if (!nodeDescription.hasOwnProperty(nodeIds[i])) {
+          throw Error('The node with id ' + nodeIds[i] + ' is invalid');
+        }
+      }
+    }
+    return nodeDescription;
+  }
+
   getNodeIds(): string[] {
     return this._nodes.map((node: StoryNode) => {
       return node.getId();
@@ -300,6 +318,14 @@ export class StoryContents {
       throw Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].setTitle(title);
+  }
+
+  setNodeDescription(nodeId: string, description: string): void {
+    var index = this.getNodeIndex(nodeId);
+    if (index === -1) {
+      throw Error('The node with given id doesn\'t exist');
+    }
+    this._nodes[index].setDescription(description);
   }
 
   setNodeExplorationId(nodeId: string, explorationId: string): void {

@@ -68,6 +68,9 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'STORY_NODE_PROPERTY_TITLE', StoryDomainConstants.STORY_NODE_PROPERTY_TITLE);
 angular.module('oppia').constant(
+  'STORY_NODE_PROPERTY_DESCRIPTION',
+  StoryDomainConstants.STORY_NODE_PROPERTY_DESCRIPTION);
+angular.module('oppia').constant(
   'STORY_NODE_PROPERTY_OUTLINE',
   StoryDomainConstants.STORY_NODE_PROPERTY_OUTLINE);
 angular.module('oppia').constant(

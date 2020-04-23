@@ -1,11 +1,20 @@
 <div class="node-field">
-  <div class="story-node-title">
+  <div class="story-node-field">
     <label for="storyNodeTitle" class="form-heading">Chapter Title</label>
     <input id="storyNodeTitle" type="text" class="form-control"
            ng-model="editableTitle" ng-blur="updateTitle(editableTitle)"
            placeholder="Enter a title for the chapter." maxlength="20" ng-trim="false">
     <span class="form-text" style="font-size: smaller; color: red;" ng-if="editableTitle.length === 20">
       <em>Please use at most 20 characters for the story title.</em>
+    </span>
+  </div>
+  <div class="story-node-field">
+    <label for="storyNodeDescription" class="form-heading">Chapter Description</label>
+    <input id="storyNodeDescription" type="text" class="form-control protractor-test-add-chapter-description"
+           ng-model="editableDescription" ng-blur="updateDescription(editableDescription)"
+           placeholder="Enter the description for the chapter." maxlength="50" ng-trim="false">
+    <span class="form-text" style="font-size: smaller; color: red;" ng-if="editableDescription.length === 50">
+      <em>Please use at most 50 characters for the story description.</em>
     </span>
   </div>
   <div class="protractor-test-add-chapter-outline">
@@ -106,7 +115,7 @@
     margin-bottom: 1vh;
   }
 
-  story-editor .story-node-title {
+  story-editor .story-node-field {
     margin-bottom: 3%;
   }
 

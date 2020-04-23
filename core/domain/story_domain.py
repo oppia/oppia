@@ -39,6 +39,7 @@ STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS = 'acquired_skill_ids'
 STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS = 'prerequisite_skill_ids'
 STORY_NODE_PROPERTY_OUTLINE = 'outline'
 STORY_NODE_PROPERTY_TITLE = 'title'
+STORY_NODE_PROPERTY_DESCRIPTION = 'description'
 STORY_NODE_PROPERTY_EXPLORATION_ID = 'exploration_id'
 
 
@@ -99,7 +100,8 @@ class StoryChange(change_domain.BaseChange):
         STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
         STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
         STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS, STORY_NODE_PROPERTY_OUTLINE,
-        STORY_NODE_PROPERTY_EXPLORATION_ID, STORY_NODE_PROPERTY_TITLE)
+        STORY_NODE_PROPERTY_EXPLORATION_ID, STORY_NODE_PROPERTY_TITLE,
+        STORY_NODE_PROPERTY_DESCRIPTION)
 
     # The allowed list of story contente properties which can be used in
     # update_story_contents_property command.
@@ -150,7 +152,7 @@ class StoryNode(python_utils.OBJECT):
     """
 
     def __init__(
-            self, node_id, title, destination_node_ids,
+            self, node_id, title, description, destination_node_ids,
             acquired_skill_ids, prerequisite_skill_ids,
             outline, outline_is_finalized, exploration_id):
         """Initializes a StoryNode domain object.
@@ -158,6 +160,7 @@ class StoryNode(python_utils.OBJECT):
         Args:
             node_id: str. The unique id for each node.
             title: str. The title of the story node.
+            description: str. The description for the story node.
             destination_node_ids: list(str). The list of destination node ids
                 that this node points to in the story graph.
             acquired_skill_ids: list(str). The list of skill ids acquired by
@@ -177,6 +180,7 @@ class StoryNode(python_utils.OBJECT):
         """
         self.id = node_id
         self.title = title
+        self.description = description
         self.destination_node_ids = destination_node_ids
         self.acquired_skill_ids = acquired_skill_ids
         self.prerequisite_skill_ids = prerequisite_skill_ids
@@ -236,6 +240,7 @@ class StoryNode(python_utils.OBJECT):
         return {
             'id': self.id,
             'title': self.title,
+            'description': self.description,
             'destination_node_ids': self.destination_node_ids,
             'acquired_skill_ids': self.acquired_skill_ids,
             'prerequisite_skill_ids': self.prerequisite_skill_ids,
@@ -255,7 +260,7 @@ class StoryNode(python_utils.OBJECT):
             StoryNode. The corresponding StoryNode domain object.
         """
         node = cls(
-            node_dict['id'], node_dict['title'],
+            node_dict['id'], node_dict['title'], node_dict['description'],
             node_dict['destination_node_ids'],
             node_dict['acquired_skill_ids'],
             node_dict['prerequisite_skill_ids'], node_dict['outline'],
@@ -275,7 +280,7 @@ class StoryNode(python_utils.OBJECT):
             StoryNode. The StoryNode domain object with default
             value.
         """
-        return cls(node_id, title, [], [], [], '', False, None)
+        return cls(node_id, title, '', [], [], [], '', False, None)
 
     def validate(self):
         """Validates various properties of the story node.
@@ -299,6 +304,11 @@ class StoryNode(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' %
                 self.title)
+        
+        if not isinstance(self.description, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected description to be a string, received %s' %
+                self.description)
 
         if not isinstance(self.outline_is_finalized, bool):
             raise utils.ValidationError(
@@ -942,6 +952,22 @@ class Story(python_utils.OBJECT):
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
         self.story_contents.nodes[node_index].title = new_title
+    
+    def update_node_description(self, node_id, new_description):
+        """Updates the description field of a given node.
+
+        Args:
+            node_id: str. The id of the node.
+            new_description: str. The new description of the given node.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self.story_contents.get_node_index(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+        self.story_contents.nodes[node_index].description = new_description
 
     def mark_node_outline_as_finalized(self, node_id):
         """Updates the outline_is_finalized field of the node with the given

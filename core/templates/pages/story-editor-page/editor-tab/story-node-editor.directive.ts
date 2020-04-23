@@ -86,6 +86,9 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.nodeIdToTitleMap =
               $scope.story.getStoryContents().getNodeIdsToTitleMap(
                 $scope.storyNodeIds);
+            $scope.nodeIdToDescriptionMap =
+                $scope.story.getStoryContents().getNodeIdsToDescriptionMap(
+                  $scope.storyNodeIds);
             _recalculateAvailableNodes();
             $scope.skillIdToSummaryMap = {};
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
@@ -95,6 +98,8 @@ angular.module('oppia').directive('storyNodeEditor', [
             }
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
             $scope.editableTitle = $scope.currentTitle;
+            $scope.currentDescription = $scope.nodeIdToDescriptionMap[$scope.getId()];
+            $scope.editableDescription = $scope.currentDescription;
             $scope.oldOutline = $scope.getOutline();
             $scope.editableOutline = $scope.getOutline();
             $scope.explorationId = $scope.getExplorationId();
@@ -137,6 +142,15 @@ angular.module('oppia').directive('storyNodeEditor', [
                 $scope.story, $scope.getId(), newTitle);
               $scope.currentTitle = newTitle;
             }
+          };
+
+          $scope.updateDescription = function(newDescription) {
+            if (newDescription === $scope.currentDescription) {
+              return;
+            }
+            StoryUpdateService.setStoryNodeDescription(
+              $scope.story, $scope.getId(), newDescription);
+            $scope.currentTitle = newDescription;
           };
 
           $scope.viewNodeEditor = function(nodeId) {

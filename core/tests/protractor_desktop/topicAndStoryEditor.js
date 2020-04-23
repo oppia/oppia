@@ -293,6 +293,7 @@ describe('Chapter editor functionality', function() {
 
   it('should create a basic chapter.', function() {
     storyEditorPage.createInitialChapter('Chapter 1');
+    storyEditorPage.changeNodeDescription('Chapter description 1');
     storyEditorPage.setChapterExplorationId(dummyExplorationIds[0]);
     storyEditorPage.changeNodeOutline(forms.toRichText('First outline'));
     storyEditorPage.saveStory('First save');
@@ -317,6 +318,7 @@ describe('Chapter editor functionality', function() {
   it('should add one more chapter to the story', function() {
     storyEditorPage.createNewDestinationChapter('Chapter 2');
     storyEditorPage.navigateToChapterByIndex(1);
+    storyEditorPage.changeNodeDescription('Chapter description 2');
     storyEditorPage.changeNodeOutline(forms.toRichText('Second outline'));
     storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
     storyEditorPage.saveStory('Second save');

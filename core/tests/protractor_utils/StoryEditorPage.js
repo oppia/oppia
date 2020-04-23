@@ -71,6 +71,8 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-exploration-id-input'));
   var explorationIdSaveButton = element(
     by.css('.protractor-test-exploration-id-save-button'));
+  var nodeDescriptionInputField = element(
+    by.css('.protractor-test-add-chapter-description'));  
   var nodeOutlineEditor = element(
     by.css('.protractor-test-add-chapter-outline'));
   var nodeOutlineSaveButton = element(
@@ -225,6 +227,11 @@ var StoryEditorPage = function() {
     );
     explorationIdSaveButton.click();
   };
+
+  this.changeNodeDescription = function(nodeDescription) {
+    nodeDescriptionInputField.clear();
+    nodeDescriptionInputField.sendKeys(nodeDescription);
+  };  
 
   this.changeNodeOutline = function(richTextInstructions) {
     var editor = forms.RichTextEditor(

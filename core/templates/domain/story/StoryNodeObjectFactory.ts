@@ -26,6 +26,7 @@ import { StoryEditorPageConstants } from
 export class StoryNode {
   _id: string;
   _title: string;
+  _description: string;
   _destinationNodeIds: string[];
   _prerequisiteSkillIds: string[];
   _acquiredSkillIds: string[];
@@ -33,11 +34,12 @@ export class StoryNode {
   _outlineIsFinalized: boolean;
   _explorationId: string;
   constructor(
-      id: string, title: string, destinationNodeIds: string[],
+      id: string, title: string, description: string, destinationNodeIds: string[],
       prerequisiteSkillIds: string[], acquiredSkillIds: string[],
       outline: string, outlineIsFinalized: boolean, explorationId: string) {
     this._id = id;
     this._title = title;
+    this._description = description;
     this._destinationNodeIds = destinationNodeIds;
     this._prerequisiteSkillIds = prerequisiteSkillIds;
     this._acquiredSkillIds = acquiredSkillIds;
@@ -66,6 +68,10 @@ export class StoryNode {
     return this._title;
   }
 
+  getDescription(): string {
+    return this._description;
+  }
+
   getExplorationId(): string {
     return this._explorationId;
   }
@@ -84,6 +90,10 @@ export class StoryNode {
 
   setTitle(title: string): void {
     this._title = title;
+  }
+
+  setDescription(description: string): void {
+    this._description = description;
   }
 
   getOutlineStatus(): boolean {
@@ -235,6 +245,7 @@ export class StoryNodeObjectFactory {
   createFromBackendDict(storyNodeBackendObject: any): StoryNode {
     return new StoryNode(
       storyNodeBackendObject.id, storyNodeBackendObject.title,
+      storyNodeBackendObject.description,
       storyNodeBackendObject.destination_node_ids,
       storyNodeBackendObject.prerequisite_skill_ids,
       storyNodeBackendObject.acquired_skill_ids,
@@ -245,7 +256,7 @@ export class StoryNodeObjectFactory {
   }
 
   createFromIdAndTitle(nodeId: string, title: string): StoryNode {
-    return new StoryNode(nodeId, title, [], [], [], '', false, null);
+    return new StoryNode(nodeId, title, '', [], [], [], '', false, null);
   }
 }
 

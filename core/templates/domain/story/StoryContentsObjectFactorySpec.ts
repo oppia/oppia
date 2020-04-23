@@ -38,6 +38,7 @@ describe('Story contents object factory', () => {
         {
           id: 'node_1',
           title: 'Title 1',
+          description: 'Description 1',
           prerequisite_skill_ids: ['skill_1'],
           acquired_skill_ids: ['skill_2'],
           destination_node_ids: ['node_2'],
@@ -47,6 +48,7 @@ describe('Story contents object factory', () => {
         }, {
           id: 'node_2',
           title: 'Title 2',
+          description: 'Description 2',
           prerequisite_skill_ids: ['skill_2'],
           acquired_skill_ids: ['skill_3', 'skill_4'],
           destination_node_ids: [],
@@ -77,6 +79,20 @@ describe('Story contents object factory', () => {
 
     expect(() => {
       _sampleStoryContents.getNodeIdsToTitleMap(['node_1', 'node_2', 'node_3']);
+    }).toThrow();
+  });
+
+  it('should correctly correctly return the id to description map for story ' +
+    'nodes', () => {
+    expect(
+      _sampleStoryContents.getNodeIdsToDescriptionMap(['node_1', 'node_2'])
+    ).toEqual({
+      node_1: 'Description 1',
+      node_2: 'Description 2'
+    });
+
+    expect(() => {
+      _sampleStoryContents.getNodeIdsToDescriptionMap(['node_1', 'node_2', 'node_3']);
     }).toThrow();
   });
 
@@ -141,6 +157,9 @@ describe('Story contents object factory', () => {
       }).toThrow();
       expect(() => {
         _sampleStoryContents.setNodeOutline('node_5', 'Outline');
+      }).toThrow();
+      expect(() => {
+        _sampleStoryContents.setNodeDescription('node_5', 'Description');
       }).toThrow();
       expect(() => {
         _sampleStoryContents.markNodeOutlineAsFinalized('node_5');
