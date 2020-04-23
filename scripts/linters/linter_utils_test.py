@@ -199,7 +199,7 @@ class TempDirTest(test_utils.GenericTestBase):
         self.assertFalse(os.path.exists(temp_dir_path))
 
     def test_diretory_placed_in_specified_dir(self):
-        with linter_utils.temp_dir(dir=os.getcwd()) as temp_dir_path:
+        with linter_utils.temp_dir(parent=os.getcwd()) as temp_dir_path:
             parent = os.path.abspath(
                 os.path.join(temp_dir_path, os.path.pardir))
             self.assertEqual(parent, os.getcwd())

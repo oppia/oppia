@@ -127,20 +127,20 @@ def redirect_stdout(new_target):
 
 
 @contextlib.contextmanager
-def temp_dir(suffix='', prefix='', dir=None):
+def temp_dir(suffix='', prefix='', parent=None):
     """Creates a temporary directory which is only valid within a context.
 
     Args:
         suffix: str. Appended to the temporary directory.
         prefix: str. Prepended to the temporary directory.
-        dir: str or None. The parent directory to place the temporary one. If
+        parent: str or None. The parent directory to place the temporary one. If
             None, a platform-dependent directory is used instead.
 
     Yields:
         str. The full path to the temporary directory.
     """
-    temp_dir = tempfile.mkdtemp(suffix, prefix, dir)
+    new_dir = tempfile.mkdtemp(suffix=suffix, prefix=prefix, dir=parent)
     try:
-        yield temp_dir
+        yield new_dir
     finally:
-        shutil.rmtree(temp_dir)
+        shutil.rmtree(new_dir)

@@ -166,12 +166,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 # Use esprima to parse a JS or TS file.
                 parsed_js_and_ts_files[filepath] = esprima.parseScript(
                     file_content, comment=True)
-            except Exception as e:
+            except Exception:
                 if filepath.endswith('.js'):
                     raise
                 # Compile typescript file which has syntax invalid for JS file.
                 with linter_utils.temp_dir(prefix='tmpcompiledjs',
-                                           dir=os.getcwd()) as temp_dir:
+                                           parent=os.getcwd()) as temp_dir:
                     compiled_js_filepath = self._compile_ts_file(
                         filepath, temp_dir)
                     file_content = FILE_CACHE.read(compiled_js_filepath)
@@ -634,7 +634,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     filename_without_extension = filepath[:-3]
                     corresponding_angularjs_filepath = (
                         filename_without_extension + '.ajs.ts')
-                    with linter_utils.temp_dir(dir=os.getcwd()) as temp_dir:
+                    with linter_utils.temp_dir(parent=os.getcwd()) as temp_dir:
                         if os.path.isfile(corresponding_angularjs_filepath):
                             compiled_js_filepath = self._compile_ts_file(
                                 corresponding_angularjs_filepath, temp_dir)
