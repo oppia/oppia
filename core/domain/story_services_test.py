@@ -238,7 +238,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception, ('Expected story to only belong to a valid topic, but '
-                        'found an topic with ID: %s' % topic_id)):
+                        'found no topic with ID: %s' % topic_id)):
             story_services.update_story(
                 self.USER_ID, story_id, changelist, 'Added node.')
 
