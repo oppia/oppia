@@ -2045,20 +2045,15 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
                                                     self.TEST_AUDIO_FILE_MP3))
         self.assertEqual(
             observed_log_messages,
-            ['MP3 audio file exception for file %s ,'
-             'EXP_ID: %s,'
-             'STATE_NAME: %s,'
-             'REASON: %s'
-             % (self.TEST_AUDIO_FILE_MP3,
-                self.VALID_EXP_ID,
-                state_name,
-                relative_path)])
+            ['MP3 audio file exception for file %s ,EXP_ID: %s,'
+             'STATE_NAME: %s,REASON: %s' % (
+                 self.TEST_AUDIO_FILE_MP3, self.VALID_EXP_ID, state_name,
+                 relative_path)])
         actual_output = (
             exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob.get_output(
                 job_id)
             )
-        expected_output = [('[u\'FAILED_NO_CHANGE\', '
-                            '[u\'EXP_ID: exp_id0, '
+        expected_output = [('[u\'FAILED_NO_CHANGE\', [u\'EXP_ID: exp_id0, '
                             'FAILED_DURATION_CHANGE: 1\']]')]
         self.assertEqual(actual_output, expected_output)
 
@@ -2179,8 +2174,7 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
                 job_id)
             )
         # Validate job ran successfully.
-        expected_output = [('[u\'SUCCESS_AUDIO_CHANGED\', '
-                            '[u\'EXP_ID: exp_id0, '
+        expected_output = [('[u\'SUCCESS_AUDIO_CHANGED\', [u\'EXP_ID: exp_id0, '
                             'AUDIO_DURATIONS_CHANGED: 2\']]')]
         self.assertEqual(actual_output, expected_output)
 
@@ -2236,7 +2230,7 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
             }
         }
 
-                # Save the recorded_voiceovers.
+        # Save the recorded_voiceovers.
         state1.update_recorded_voiceovers(
             state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict))
         exp_services.save_new_exploration(self.user_a_id, exploration)
@@ -2253,6 +2247,6 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
             )
         # Validate job ran successfully.
         # Check for no change count to be updated.
-        expected_output = [('[u\'SUCCESS_NO_CHANGE\', '
-                            '[u\'EXP_ID: exp_id0, NO_DURATIONS_CHANGED: 2\']]')]
+        expected_output = [('[u\'SUCCESS_NO_CHANGE\', [u\'EXP_ID: exp_id0, '
+                            'NO_DURATIONS_CHANGED: 2\']]')]
         self.assertEqual(actual_output, expected_output)
