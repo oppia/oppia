@@ -59,7 +59,7 @@ class CreateNewUsersMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     def enqueue(cls, job_id, additional_job_params=None):
         # We can raise the number of shards for this job, since it goes only
         # over one type of entity class.
-        super(CreateNewUsersMigrationJob, cls).enqueue(job_id, shard_count=16)
+        super(CreateNewUsersMigrationJob, cls).enqueue(job_id, shard_count=32)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -210,7 +210,7 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     def enqueue(cls, job_id, additional_job_params=None):
         # We can raise the number of shards for this job, since it goes only
         # over one type of entity class.
-        super(UserIdMigrationJob, cls).enqueue(job_id, shard_count=16)
+        super(UserIdMigrationJob, cls).enqueue(job_id, shard_count=32)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -363,6 +363,12 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         rights_snapshot_model.put(update_last_updated_time=False)
 
     @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over three types of entity class.
+        super(SnapshotsUserIdMigrationJob, cls).enqueue(job_id, shard_count=32)
+
+    @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
         return [collection_models.CollectionRightsSnapshotContentModel,
@@ -409,6 +415,13 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     user_id, this job also checks that all the new user IDs are 32 lowercase
     chars long strings.
     """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over one type of entity class.
+        super(GaeIdNotInModelsVerificationJob, cls).enqueue(
+            job_id, shard_count=32)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -694,6 +707,12 @@ class AddAllUserIdsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
         return user_ids_only_in_snapshots
 
     @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over three types of entity class.
+        super(AddAllUserIdsVerificationJob, cls).enqueue(job_id, shard_count=32)
+
+    @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
         return [collection_models.CollectionRightsModel,
@@ -807,6 +826,13 @@ class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
             set(all_users_model.all_user_ids) |
             set(reconstituted_rights_model.manager_ids))
         all_users_model.put()
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over three types of entity class.
+        super(AddAllUserIdsSnapshotsVerificationJob, cls).enqueue(
+            job_id, shard_count=32)
 
     @classmethod
     def entity_classes_to_map_over(cls):
