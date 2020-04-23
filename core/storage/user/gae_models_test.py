@@ -753,7 +753,9 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     USER_ID_2 = 'user_id_2'
     USER_ID_3 = 'user_id_3'
     USER_ID_4 = 'user_id_4'
-    CREATOR_IDS = ['4', '8', '16']
+    USER_ID_5 = 'user_id_5'
+    USER_ID_6 = 'user_id_6'
+    CREATOR_IDS = [USER_ID_5, USER_ID_6]
     COLLECTION_IDS = ['23', '42', '4']
     ACTIVITY_IDS = ['8', '16', '23']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
@@ -797,7 +799,23 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         )
         self.assertTrue(
             user_models.UserSubscriptionsModel
+            .has_reference_to_user_id(self.USER_ID_2)
+        )
+        self.assertFalse(
+            user_models.UserSubscriptionsModel
+            .has_reference_to_user_id(self.USER_ID_3)
+        )
+        self.assertTrue(
+            user_models.UserSubscriptionsModel
             .has_reference_to_user_id(self.USER_ID_4)
+        )
+        self.assertTrue(
+            user_models.UserSubscriptionsModel
+            .has_reference_to_user_id(self.USER_ID_5)
+        )
+        self.assertTrue(
+            user_models.UserSubscriptionsModel
+            .has_reference_to_user_id(self.USER_ID_6)
         )
         self.assertFalse(
             user_models.UserSubscriptionsModel
@@ -807,7 +825,48 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
             user_models.UserSubscriptionsModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY)
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
+
+    def test_migrate_model(self):
+        user_id_1_old = 'user_id_1_old'
+        user_id_2_old = 'user_id_2_old'
+        user_id_3_old = 'user_id_3_old'
+        user_id_1_new = 'user_id_1_new'
+        user_id_2_new = 'user_id_2_new'
+        user_id_3_new = 'user_id_3_new'
+
+        user_models.UserSubscriptionsModel(id=user_id_1_old).put()
+        user_models.UserSubscriptionsModel(
+            id=user_id_2_old, creator_ids=[user_id_1_old, user_id_3_old]).put()
+        user_models.UserSubscriptionsModel(
+            id=user_id_3_old, creator_ids=[user_id_2_old]).put()
+
+        user_models.UserSubscriptionsModel.migrate_model(
+            user_id_1_old, user_id_1_new)
+        user_models.UserSubscriptionsModel.migrate_model(
+            user_id_2_old, user_id_2_new)
+        user_models.UserSubscriptionsModel.migrate_model(
+            user_id_3_old, user_id_3_new)
+
+        self.assertIsNone(
+            user_models.UserSubscriptionsModel.get_by_id(user_id_1_old))
+        self.assertIsNone(
+            user_models.UserSubscriptionsModel.get_by_id(user_id_2_old))
+        self.assertIsNone(
+            user_models.UserSubscriptionsModel.get_by_id(user_id_3_old))
+
+        migrated_model_1 = user_models.UserSubscriptionsModel.get_by_id(
+            user_id_1_new)
+        self.assertEqual(migrated_model_1.creator_ids, [])
+
+        migrated_model_2 = user_models.UserSubscriptionsModel.get_by_id(
+            user_id_2_new)
+        self.assertEqual(
+            migrated_model_2.creator_ids, [user_id_1_new, user_id_3_new])
+
+        migrated_model_3 = user_models.UserSubscriptionsModel.get_by_id(
+            user_id_3_new)
+        self.assertEqual(migrated_model_3.creator_ids, [user_id_2_new])
 
     def test_export_data_trivial(self):
         """Test if empty user data is properly exported."""
@@ -850,12 +909,14 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
+    USER_ID_3 = 'id_3'
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(UserSubscribersModelTests, self).setUp()
 
-        user_models.UserSubscribersModel(id=self.USER_ID_1).put()
+        user_models.UserSubscribersModel(
+            id=self.USER_ID_1, subscriber_ids=[self.USER_ID_3]).put()
         user_models.UserSubscribersModel(id=self.USER_ID_2, deleted=True).put()
 
     def test_get_deletion_policy(self):
@@ -881,6 +942,10 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
             user_models.UserSubscribersModel
             .has_reference_to_user_id(self.USER_ID_2)
         )
+        self.assertTrue(
+            user_models.UserSubscribersModel
+            .has_reference_to_user_id(self.USER_ID_3)
+        )
         self.assertFalse(
             user_models.UserSubscribersModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
@@ -889,7 +954,49 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
             user_models.UserSubscribersModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY)
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
+
+    def test_migrate_model(self):
+        user_id_1_old = 'user_id_1_old'
+        user_id_2_old = 'user_id_2_old'
+        user_id_3_old = 'user_id_3_old'
+        user_id_1_new = 'user_id_1_new'
+        user_id_2_new = 'user_id_2_new'
+        user_id_3_new = 'user_id_3_new'
+
+        user_models.UserSubscribersModel(id=user_id_1_old).put()
+        user_models.UserSubscribersModel(
+            id=user_id_2_old, subscriber_ids=[user_id_1_old, user_id_3_old]
+        ).put()
+        user_models.UserSubscribersModel(
+            id=user_id_3_old, subscriber_ids=[user_id_2_old]).put()
+
+        user_models.UserSubscribersModel.migrate_model(
+            user_id_1_old, user_id_1_new)
+        user_models.UserSubscribersModel.migrate_model(
+            user_id_2_old, user_id_2_new)
+        user_models.UserSubscribersModel.migrate_model(
+            user_id_3_old, user_id_3_new)
+
+        self.assertIsNone(
+            user_models.UserSubscribersModel.get_by_id(user_id_1_old))
+        self.assertIsNone(
+            user_models.UserSubscribersModel.get_by_id(user_id_2_old))
+        self.assertIsNone(
+            user_models.UserSubscribersModel.get_by_id(user_id_3_old))
+
+        migrated_model_1 = user_models.UserSubscribersModel.get_by_id(
+            user_id_1_new)
+        self.assertEqual(migrated_model_1.subscriber_ids, [])
+
+        migrated_model_2 = user_models.UserSubscribersModel.get_by_id(
+            user_id_2_new)
+        self.assertEqual(
+            migrated_model_2.subscriber_ids, [user_id_1_new, user_id_3_new])
+
+        migrated_model_3 = user_models.UserSubscribersModel.get_by_id(
+            user_id_3_new)
+        self.assertEqual(migrated_model_3.subscriber_ids, [user_id_2_new])
 
 
 class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):

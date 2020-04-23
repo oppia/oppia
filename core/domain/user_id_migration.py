@@ -223,6 +223,7 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         old_user_id = user_model.gae_id
         new_user_id = user_model.id
         for model_class in models.Registry.get_all_storage_model_classes():
+            output = None
             if (model_class.get_user_id_migration_policy() ==
                     base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE):
                 continue
@@ -230,8 +231,6 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                   base_models.USER_ID_MIGRATION_POLICY.COPY):
                 output = UserIdMigrationJob._copy_model_with_new_id(
                     model_class, old_user_id, new_user_id)
-                if output:
-                    yield output
             elif (model_class.get_user_id_migration_policy() ==
                   base_models.USER_ID_MIGRATION_POLICY.
                   COPY_AND_UPDATE_ONE_FIELD):
@@ -243,7 +242,9 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                     model_class, old_user_id, new_user_id)
             elif (model_class.get_user_id_migration_policy() ==
                   base_models.USER_ID_MIGRATION_POLICY.CUSTOM):
-                model_class.migrate_model(old_user_id, new_user_id)
+                output = model_class.migrate_model(old_user_id, new_user_id)
+            if output:
+                yield output
         yield ('SUCCESS', (old_user_id, new_user_id))
 
     @staticmethod
