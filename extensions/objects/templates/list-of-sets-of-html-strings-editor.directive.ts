@@ -41,33 +41,42 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
         };
 
         ctrl.selectedItem = function(choiceListIndex) {
-          var choiceHtml = ctrl.choices[choiceListIndex].id;
+          var choiceId = ctrl.choices[choiceListIndex].id;
           var selectedRank = parseInt(
             ctrl.choices[choiceListIndex].selectedRank) - 1;
           errorMessage = '';
-          var choiceHtmlHasBeenAdded = false;
+          var choiceIdHasBeenAdded = false;
 
           for (var i = 0; i < ctrl.value.length; i++) {
-            choiceHtmlHasBeenAdded = false;
-            var choiceHtmlIndex = ctrl.value[i].indexOf(choiceHtml);
-            if (choiceHtmlIndex > -1) {
+            choiceIdHasBeenAdded = false;
+            var choiceIdIndex = ctrl.value[i].indexOf(choiceId);
+            if (choiceIdIndex > -1) {
               if (i !== selectedRank) {
-                ctrl.value[i].splice(choiceHtmlIndex, 1);
+                ctrl.value[i].splice(choiceIdIndex, 1);
                 if (ctrl.value[selectedRank] === undefined) {
-                  ctrl.value[selectedRank] = [choiceHtml];
+                  ctrl.value[selectedRank] = [choiceId];
                 } else {
-                  ctrl.value[selectedRank].push(choiceHtml);
+                  ctrl.value[selectedRank].push(choiceId);
                 }
               }
-              choiceHtmlHasBeenAdded = true;
+              choiceIdHasBeenAdded = true;
               break;
             }
           }
-          if (!choiceHtmlHasBeenAdded) {
+          if (!choiceIdHasBeenAdded) {
             if (ctrl.value[selectedRank] === undefined) {
-              ctrl.value[selectedRank] = [choiceHtml];
+              ctrl.value[selectedRank] = [choiceId];
             } else {
-              ctrl.value[selectedRank].push(choiceHtml);
+              ctrl.value[selectedRank].push(choiceId);
+            }
+          }
+          // Removing any empty arrays from the end.
+          for (var i = 1; i < ctrl.value.length; i++) {
+            if (ctrl.value[i].length === 0) {
+              // If empty array is found, all subsequent arrays must also be 
+              // empty since rank skipping is not allowed.
+              ctrl.value = ctrl.value.slice(0, i);
+              break;
             }
           }
         };
@@ -84,20 +93,19 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
           selectedRankList.sort();
 
           if (selectedRankList[0] !== 1) {
-            errorMessage = ('No choice(s) is assigned at position 1. ' +
-              'Please assign some choice at this position.');
+            errorMessage = ('Please assign some choice at position 1.');
             ctrl.validOrdering = false;
             return;
           }
           for (var i = 1; i < selectedRankList.length; i++) {
             if (selectedRankList[i] - selectedRankList[i - 1] > 1) {
-              errorMessage = ('No choice(s) is assigned at position ' +
-                String(selectedRankList[i - 1] + 1) + '. Please assign some ' +
-                'choice at this position.');
+              errorMessage = ('Please assign some choice at position ' +
+                String(selectedRankList[i - 1] + 1) + '.');
               ctrl.validOrdering = false;
               return;
             }
           }
+          errorMessage = '';
           ctrl.validOrdering = true;
           return;
         };
