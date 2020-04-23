@@ -170,18 +170,3 @@ angular.module('oppia').constant(
 angular.module('oppia').constant('ENTITY_TYPE', AppConstants.ENTITY_TYPE);
 angular.module('oppia').constant(
   'MISCONCEPTION_NAME_CHAR_LIMIT', AppConstants.MISCONCEPTION_NAME_CHAR_LIMIT);
-
-angular.module('oppia').constant(
-  'MAX_CHARS_IN_TOPIC_NAME', AppConstants.MAX_CHARS_IN_TOPIC_NAME);
-angular.module('oppia').constant(
-  'MAX_CHARS_IN_TOPIC_DESCRIPTION',
-  AppConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION);
-angular.module('oppia').constant(
-  'MAX_CHARS_IN_SUBTOPIC_TITLE', AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE);
-angular.module('oppia').constant(
-  'MAX_CHARS_IN_SKILL_DESCRIPTION',
-  AppConstants.MAX_CHARS_IN_SKILL_DESCRIPTION);
-angular.module('oppia').constant(
-  'MAX_CHARS_IN_STORY_TITLE', AppConstants.MAX_CHARS_IN_STORY_TITLE);
-angular.module('oppia').constant(
-  'MAX_CHARS_IN_CHAPTER_TITLE', AppConstants.MAX_CHARS_IN_CHAPTER_TITLE);

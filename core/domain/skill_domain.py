@@ -582,12 +582,12 @@ class Skill(python_utils.OBJECT):
         if description == '':
             raise utils.ValidationError('Description field should not be empty')
 
-        description_limit = (
+        description_length_limit = (
             android_validation_constants.MAX_CHARS_IN_SKILL_DESCRIPTION)
-        if len(description) > description_limit:
+        if len(description) > description_length_limit:
             raise utils.ValidationError(
                 'Skill description should be less than %d chars, received %s'
-                % (description_limit, description))
+                % (description_length_limit, description))
 
     def validate(self):
         """Validates various properties of the Skill object.

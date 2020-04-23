@@ -344,23 +344,34 @@ def _save_story(committer_id, story, commit_message, change_list):
 
     topic = topic_fetchers.get_topic_by_id(
         story.corresponding_topic_id, strict=False)
+    if topic is None:
+        raise utils.ValidationError(
+            'Expected story to only belong to a valid topic, but found no '
+            'topic with ID: %s' % story.corresponding_topic_id)
 
     story_is_published = False
-    if topic is not None:
-        for story_reference in topic.get_all_story_references():
-            if story_reference.story_id == story.id:
-                story_is_published = story_reference.story_is_published
+    story_is_present_in_topic = False
+    for story_reference in topic.get_all_story_references():
+        if story_reference.story_id == story.id:
+            story_is_present_in_topic = True
+            story_is_published = story_reference.story_is_published
+    if not story_is_present_in_topic:
+        raise Exception(
+            'Expected story to belong to the topic %s, but it is '
+            'neither a part of the canonical stories or the additional '
+            'stories of the topic.' % story.corresponding_topic_id)
 
     story.validate()
 
     if story_is_published:
+        exp_ids = []
         for node in story.story_contents.nodes:
             if not node.exploration_id:
                 raise Exception(
                     'Story node with id %s does not contain an '
                     'exploration id.' % node.id)
-        exp_ids = [
-            node.exploration_id for node in story.story_contents.nodes]
+            exp_ids.append(node.exploration_id)
+
         validate_explorations_for_story(exp_ids, True)
 
     # Story model cannot be None as story is passed as parameter here and that
@@ -378,21 +389,6 @@ def _save_story(committer_id, story, commit_message, change_list):
             'Trying to update version %s of story from version %s, '
             'which is too old. Please reload the page and try again.'
             % (story_model.version, story.version))
-
-    topic = topic_fetchers.get_topic_by_id(
-        story.corresponding_topic_id, strict=False)
-    if topic is None:
-        raise utils.ValidationError(
-            'Expected story to only belong to a valid topic, but found an '
-            'topic with ID: %s' % story.corresponding_topic_id)
-
-    canonical_story_ids = topic.get_canonical_story_ids()
-    additional_story_ids = topic.get_additional_story_ids()
-    if story.id not in canonical_story_ids + additional_story_ids:
-        raise Exception(
-            'Expected story to belong to the topic %s, but it is '
-            'neither a part of the canonical stories or the additional stories '
-            'of the topic.' % story.corresponding_topic_id)
 
     story_model.description = story.description
     story_model.title = story.title

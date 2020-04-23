@@ -12,7 +12,7 @@
 #   can be optimized further.
 
 # Android team
-/core/domain/android_validation_constants.py @BenHenning
+/core/domain/android_validation_constants*.py @BenHenning
 
 # Angular Migration team
 /core/templates/services/contextual/logger.service.ts @bansalnitish
