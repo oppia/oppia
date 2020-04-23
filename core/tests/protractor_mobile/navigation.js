@@ -142,7 +142,7 @@ describe('Navigation features on mobile', function() {
         oppiaLogo, 'Could not click oppia logo');
       oppiaLogo.click();
       waitFor.pageToFullyLoad();
-      expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/splash');
+      expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/');
     });
 
   it('should navigate to the login page by clicking on the sign in button',

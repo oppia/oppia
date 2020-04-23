@@ -160,9 +160,9 @@ module.exports = {
       filename: 'admin-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'Oppia is a free site for sharing knowledge via ' +
-          'interactive lessons called \'explorations\'. Learn from ' +
-          'user-created explorations, or teach and create your own.'
+        description: 'Learn any subject through free and interactive lessons ' +
+          'in easy-to-follow language. Oppia provides a step-by-step ' +
+          'learning process to master any skills you want.'
       },
       template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -521,9 +521,9 @@ module.exports = {
       filename: 'splash-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'Oppia is a free site for sharing knowledge via ' +
-          'interactive lessons called \'explorations\'. Learn from ' +
-          'user-created explorations, or teach and create your own.'
+        description: 'Learn any subject through free and interactive lessons ' +
+          'in easy-to-follow language. Oppia provides a step-by-step ' +
+          'learning process to master any skills you want.'
       },
       template: commonPrefix + '/pages/splash-page/splash-page.mainpage.html',
       minify: htmlMinifyConfig,

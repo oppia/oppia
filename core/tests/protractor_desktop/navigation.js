@@ -141,7 +141,7 @@ describe('Meta Tags', function() {
 
 describe('DEV MODE Test', function() {
   it('should not show Dev Mode label in prod', function() {
-    browser.get('/splash');
+    browser.get('/');
     waitFor.pageToFullyLoad();
     expect(element(
       by.css('.protractor-test-dev-mode')).isPresent())
@@ -166,7 +166,7 @@ describe('Static Pages Tour', function() {
   });
 
   it('visits the Splash page', function() {
-    browser.get('/splash');
+    browser.get('/');
     waitFor.pageToFullyLoad();
     expect(element(
       by.css('.protractor-test-splash-page')).isPresent()).toBe(true);

@@ -209,7 +209,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
-- url: /splash
+- url: /
   static_files: webpack_bundles/splash-page.mainpage.html
   upload: webpack_bundles/splash-page.mainpage.html
   http_headers:

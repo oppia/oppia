@@ -46,7 +46,7 @@ describe('Topic Landing Page', function() {
   it('should get information from topic identified at pathname', function() {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        pathname: '/path/maths/ratios'
+        pathname: '/maths/ratios'
       }
     });
     ctrl.$onInit();
@@ -74,7 +74,7 @@ describe('Topic Landing Page', function() {
   it('should get video url', function() {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        pathname: '/path/maths/ratios'
+        pathname: '/maths/ratios'
       }
     });
     ctrl.$onInit();
@@ -94,7 +94,7 @@ describe('Topic Landing Page', function() {
     var nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
     nativeWindowSpy.and.returnValue({
       location: {
-        pathname: '/path/maths/ratios'
+        pathname: '/maths/ratios'
       }
     });
     var analyticsSpy = spyOn(
@@ -123,7 +123,7 @@ describe('Topic Landing Page', function() {
     ctrl.onClickLearnMoreButton();
     $timeout.flush(150);
 
-    expect(windowRef.nativeWindow.location).toBe('/splash');
+    expect(windowRef.nativeWindow.location).toBe('/');
   });
 
   it('should click exploration lessons button', function() {
@@ -134,5 +134,17 @@ describe('Topic Landing Page', function() {
     $timeout.flush(150);
 
     expect(windowRef.nativeWindow.location).toBe('/library');
+  });
+
+  it('should have a tagline in the page title', function() {
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      location: {
+        pathname: '/maths/fractions'
+      }
+    });
+    ctrl.$onInit();
+
+    expect(ctrl.pageTitle).toBe('Fractions | ' +
+      'Add, Subtract, Multiply and Divide | Oppia');
   });
 });

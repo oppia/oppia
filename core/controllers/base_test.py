@@ -200,7 +200,9 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         """Test for a redirect in logged out state on '/'."""
 
         response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('splash', response.headers['location'])
+        response_path = response.headers['location']
+        self.assertEqual(response_path[-1], '/')
+        self.assertEqual(len(response_path.split('/')), 4)
 
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
@@ -525,6 +527,14 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'https://oppiaserver.appspot.com/splash', expected_status_int=301)
         self.assertEqual(
             response.headers['Location'], 'https://oppiatestserver.appspot.com')
+
+    def test_splash_redirect(self):
+        # Tests that the old '/splash' URL is redirected to '/'.
+
+        response = self.get_html_response('/splash', expected_status_int=302)
+        response_path = response.headers['location']
+        self.assertEqual(response_path[-1], '/')
+        self.assertEqual(len(response_path.split('/')), 4)
 
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):

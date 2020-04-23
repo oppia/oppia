@@ -189,6 +189,7 @@ mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/_ah/warmup', WarmupPage),
     get_redirect_route(r'/', HomePageRedirectPage),
+    get_redirect_route(r'/splash', HomePageRedirectPage),
 
     get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
@@ -292,8 +293,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<topic_name>' % feconf.TOPIC_DATA_HANDLER,
         topic_viewer.TopicPageDataHandler),
     get_redirect_route(
-        r'%s/<classroom_name>' % feconf.CLASSROOM_URL_PREFIX,
-        classroom.ClassroomPage),
+        r'%s' % feconf.MATH_CLASSROOM_URL, classroom.ClassroomPage),
     get_redirect_route(
         r'%s/<classroom_name>' % feconf.CLASSROOM_DATA_HANDLER,
         classroom.ClassroomDataHandler),
@@ -350,6 +350,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.TOPIC_LANDING_PAGE_URL,
         custom_landing_pages.TopicLandingPage),
+    get_redirect_route(
+        r'/learn%s' % feconf.TOPIC_LANDING_PAGE_URL,
+        custom_landing_pages.TopicRedirectPage),
     get_redirect_route(
         r'%s' % feconf.CUSTOM_PARENTS_LANDING_PAGE_URL,
         custom_landing_pages.StewardsLandingPage),

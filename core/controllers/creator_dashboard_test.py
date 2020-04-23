@@ -72,9 +72,11 @@ class HomePageTests(test_utils.GenericTestBase):
 
     def test_logged_out_homepage(self):
         """Test the logged-out version of the home page."""
-        response = self.get_html_response('/', expected_status_int=302)
 
-        self.assertIn('splash', response.headers['location'])
+        response = self.get_html_response('/', expected_status_int=302)
+        response_path = response.headers['location']
+        self.assertEqual(response_path[-1], '/')
+        self.assertEqual(len(response_path.split('/')), 4)
 
     def test_notifications_dashboard_redirects_for_logged_out_users(self):
         """Test the logged-out view of the notifications dashboard."""

@@ -54,7 +54,12 @@ angular.module('oppia').directive('classroomPage', [
             ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
               '/splash/books.svg');
 
-            PageTitleService.setPageTitle(ctrl.classroomName + ' - Oppia');
+            ctrl.classroomDisplayName = (
+              ctrl.classroomName.charAt(0).toUpperCase() +
+              ctrl.classroomName.slice(1));
+
+            PageTitleService.setPageTitle(
+              ctrl.classroomDisplayName + ' Classroom | Oppia');
 
             $rootScope.loadingMessage = 'Loading';
             ClassroomBackendApiService.fetchClassroomData(
