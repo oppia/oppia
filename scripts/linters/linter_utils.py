@@ -23,7 +23,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import contextlib
 import functools
 import inspect
+import shutil
 import sys
+import tempfile
 import threading
 
 import python_utils
@@ -122,3 +124,23 @@ def redirect_stdout(new_target):
         yield new_target
     finally:
         sys.stdout = old_target
+
+
+@contextlib.contextmanager
+def temp_dir(suffix='', prefix='', dir=None):
+    """Creates a temporary directory which is only valid within a context.
+
+    Args:
+        suffix: str. Appended to the temporary directory.
+        prefix: str. Prepended to the temporary directory.
+        dir: str or None. The parent directory to place the temporary one. If
+            None, a platform-dependent directory is used instead.
+
+    Yields:
+        str. The full path to the temporary directory.
+    """
+    temp_dir = tempfile.mkdtemp(suffix, prefix, dir)
+    try:
+        yield temp_dir
+    finally:
+        shutil.rmtree(temp_dir)
