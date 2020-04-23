@@ -53,11 +53,15 @@ describe('Classroom backend API service', function() {
       name: 15,
       description: 11
     }]
-  }
+  };
   let sampleDataResultsObjects = null;
 
-  let successCallback = function(x) {console.log(x)};
-  let errorCallback = function(x) {console.log(x)};
+  let successCallback = function(x){
+    return true;
+  };
+  let errorCallback = function(x){
+    return false;
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -124,7 +128,7 @@ describe('Classroom backend API service', function() {
     })
   );
 
-  it('should successfully use the success handler with successCallback set to a function',
+  it('should work with successCallback set to a function',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success', successCallback);
       let failHandler = jasmine.createSpy('fail', errorCallback);
@@ -136,15 +140,12 @@ describe('Classroom backend API service', function() {
         '/classroom_data_handler/0');
       expect(req.request.method).toEqual('GET');
       req.flush(responseDictionaries);
-
       flushMicrotasks();
-
       expect(successHandler).toHaveBeenCalledWith(
         sampleDataResultsObjects.topic_summary_objects);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
-
 });
 
 describe('Classroom backend API service', function() {
