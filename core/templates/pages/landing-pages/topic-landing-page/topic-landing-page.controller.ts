@@ -111,12 +111,14 @@ angular.module('oppia').directive('topicLandingPage', [
             ctrl.topicTitle = topicData.topic_title;
             ctrl.lessons = landingPageData.lessons;
             assetsPathFormat = '/landing/<subject>/<topic>/<file_name>';
-            if (ctrl.topicTitle === 'Fractions') {
-              var tagLine = 'Add, Subtract, Multiply and Divide';
-              ctrl.pageTitle = [ctrl.topicTitle, tagLine, 'Oppia'].join(' | ');
-            } else {
-              ctrl.pageTitle = [ctrl.topicTitle, 'Oppia'].join(' | ');
-            }
+            var tagLines = {
+              Fractions: 'Add, Subtract, Multiply and Divide'
+            };
+            // Removing tagline from array if undefined.
+            ctrl.pageTitle = [ctrl.topicTitle, tagLines[ctrl.topicTitle],
+              'Oppia']
+              .filter(el => el !== null)
+              .join(' | ');
             PageTitleService.setPageTitle(ctrl.pageTitle);
             ctrl.bookImageUrl = UrlInterpolationService.getStaticImageUrl(
               '/splash/books.svg');

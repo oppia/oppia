@@ -46,12 +46,12 @@ describe('Topic Landing Page', function() {
   it('should get information from topic identified at pathname', function() {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        pathname: '/maths/ratios'
+        pathname: '/math/ratios'
       }
     });
     ctrl.$onInit();
 
-    expect(ctrl.subject).toBe('maths');
+    expect(ctrl.subject).toBe('math');
     expect(ctrl.topicTitle).toBe('Ratios');
     expect(ctrl.lessons).toEqual([
       'What is a Ratio?',
@@ -61,11 +61,11 @@ describe('Topic Landing Page', function() {
     ]);
     expect(ctrl.bookImageUrl).toBe('/assets/images/splash/books.svg');
     expect(ctrl.image1).toEqual({
-      src: '/assets/images/landing/maths/ratios/ratios_James.png',
+      src: '/assets/images/landing/math/ratios/ratios_James.png',
       alt: 'A boy showing 2 is to 3 ratio on a card.'
     });
     expect(ctrl.image2).toEqual({
-      src: '/assets/images/landing/maths/ratios/ratios_question.png',
+      src: '/assets/images/landing/math/ratios/ratios_question.png',
       alt: 'A smoothie shop and a card having question "What does a' +
       ' ratio tell us?" with options.'
     });
@@ -74,13 +74,13 @@ describe('Topic Landing Page', function() {
   it('should get video url', function() {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        pathname: '/maths/ratios'
+        pathname: '/math/ratios'
       }
     });
     ctrl.$onInit();
 
     expect(ctrl.getVideoUrl()).toBe(
-      '/assets/videos/landing/maths/ratios/ratios_video.mp4');
+      '/assets/videos/landing/math/ratios/ratios_video.mp4');
   });
 
   it('should not get video url if it does not exist', function() {
@@ -94,7 +94,7 @@ describe('Topic Landing Page', function() {
     var nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
     nativeWindowSpy.and.returnValue({
       location: {
-        pathname: '/maths/ratios'
+        pathname: '/math/ratios'
       }
     });
     var analyticsSpy = spyOn(
@@ -139,7 +139,7 @@ describe('Topic Landing Page', function() {
   it('should have a tagline in the page title', function() {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        pathname: '/maths/fractions'
+        pathname: '/math/fractions'
       }
     });
     ctrl.$onInit();

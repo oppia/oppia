@@ -30,7 +30,7 @@ class FractionLandingRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect('/maths/fractions')
+        self.redirect('/math/fractions')
 
 
 class TopicRedirectPage(base.BaseHandler):
@@ -39,7 +39,7 @@ class TopicRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, topic):
         """Handles GET requests."""
-        self.redirect('/maths/%s' % topic)
+        self.redirect('/math/%s' % topic)
 
 
 class TopicLandingPage(base.BaseHandler):

@@ -21,7 +21,7 @@
 
 export class TopicLandingPageConstants {
   public static TOPIC_LANDING_PAGE_DATA = {
-    maths: {
+    math: {
       fractions: {
         topic_title: 'Fractions',
         collection_id: '4UgTQUc1tala',

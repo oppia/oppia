@@ -31,7 +31,7 @@ class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
         response = self.get_html_response(
             feconf.FRACTIONS_LANDING_PAGE_URL, expected_status_int=302)
         self.assertEqual(
-            'http://localhost/maths/fractions',
+            'http://localhost/math/fractions',
             response.headers['location'])
 
     def test_old_fraction_landing_url_with_viewer_type(self):
@@ -42,7 +42,7 @@ class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
             '%s?viewerType=student' % feconf.FRACTIONS_LANDING_PAGE_URL,
             expected_status_int=302)
         self.assertEqual(
-            'http://localhost/maths/fractions',
+            'http://localhost/math/fractions',
             response.headers['location'])
 
 
@@ -51,9 +51,9 @@ class TopicRedirectPageTest(test_utils.GenericTestBase):
 
     def test_old_topic_url_redirect(self):
         response = self.get_html_response(
-            '/learn/maths/fractions', expected_status_int=302)
+            '/learn/math/fractions', expected_status_int=302)
         self.assertEqual(
-            'http://localhost/maths/fractions', response.headers['location'])
+            'http://localhost/math/fractions', response.headers['location'])
 
 
 class TopicLandingPageTest(test_utils.GenericTestBase):
@@ -61,10 +61,10 @@ class TopicLandingPageTest(test_utils.GenericTestBase):
 
     def test_invalid_topic_landing_page_leads_to_404(self):
         self.get_html_response(
-            '/maths/invalid_topic', expected_status_int=404)
+            '/math/invalid_topic', expected_status_int=404)
 
     def test_valid_subject_and_topic_loads_correctly(self):
-        response = self.get_html_response('/maths/fractions')
+        response = self.get_html_response('/math/fractions')
         response.mustcontain('<topic-landing-page></topic-landing-page>')
 
 
