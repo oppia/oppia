@@ -25,10 +25,10 @@ angular.module('oppia').factory('TopicCreationService', [
   'TopicCreationBackendApiService', 'UrlInterpolationService',
   'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
   'MAX_CHARS_IN_TOPIC_NAME', function(
-    $rootScope, $uibModal, $window, AlertsService,
-    TopicCreationBackendApiService, UrlInterpolationService,
-    EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-    MAX_CHARS_IN_TOPIC_NAME) {
+      $rootScope, $uibModal, $window, AlertsService,
+      TopicCreationBackendApiService, UrlInterpolationService,
+      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
+      MAX_CHARS_IN_TOPIC_NAME) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
     var topicCreationInProgress = false;
 
