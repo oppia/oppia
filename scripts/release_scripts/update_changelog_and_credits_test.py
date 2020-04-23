@@ -285,7 +285,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             '### section1:\n': '### section2: \n'
         }
         ordering_swap = self.swap(
-            update_changelog_and_credits, 'EXPECTED_ORDERING',
+            update_changelog_and_credits, 'EXPECTED_ORDERING_DICT',
             invalid_ordering)
         with ordering_swap:
             self.assertFalse(
@@ -298,7 +298,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             release_constants.NEW_AUTHORS_HEADER: '### section2: \n'
         }
         ordering_swap = self.swap(
-            update_changelog_and_credits, 'EXPECTED_ORDERING',
+            update_changelog_and_credits, 'EXPECTED_ORDERING_DICT',
             invalid_ordering)
         with ordering_swap:
             self.assertFalse(

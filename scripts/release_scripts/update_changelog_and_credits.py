@@ -55,7 +55,7 @@ GIT_CMD_CHECKOUT = 'git checkout -- %s %s %s %s' % (
 # changelog and credits performed using this script will work
 # correctly only if the ordering of sections in release summary
 # file matches this expected ordering.
-EXPECTED_ORDERING = {
+EXPECTED_ORDERING_DICT = {
     release_constants.CHANGELOG_HEADER: release_constants.COMMIT_HISTORY_HEADER,
     release_constants.NEW_AUTHORS_HEADER: (
         release_constants.EXISTING_AUTHORS_HEADER),
@@ -115,7 +115,7 @@ def is_order_of_sections_valid(release_summary_lines):
     sections = [
         line for line in release_summary_lines if line.startswith('###')
     ]
-    for section, next_section in EXPECTED_ORDERING.items():
+    for section, next_section in EXPECTED_ORDERING_DICT.items():
         if section not in sections:
             python_utils.PRINT(
                 'Expected release_summary to have %s section to ensure '
@@ -476,9 +476,12 @@ def is_invalid_email_present(release_summary_lines):
     new_contributors = (
         release_summary_lines[contributors_start_index:contributors_end_index])
     new_email_ids = new_authors + new_contributors
-    return any(
-        release_constants.INVALID_EMAIL_SUFFIX in id
-        for id in new_email_ids)
+    invalid_email_ids = [
+        email_id for email_id in new_email_ids
+        if release_constants.INVALID_EMAIL_SUFFIX in email_id]
+    python_utils.PRINT(
+        'Following email ids are invalid: %s' % invalid_email_ids)
+    return bool(invalid_email_ids)
 
 
 def get_release_summary_lines():
@@ -501,7 +504,8 @@ def get_release_summary_lines():
         if invalid_email_is_present:
             common.ask_user_to_confirm(
                 'The release summary file contains emails of the form: %s '
-                'Please replace them with the correct emails.' % (
+                'Please replace them with the correct emails. '
+                '(See error messages above.)' % (
                     release_constants.INVALID_EMAIL_SUFFIX))
         ordering_is_invalid = not(
             is_order_of_sections_valid(release_summary_lines))
