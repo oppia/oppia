@@ -112,7 +112,8 @@ describe('Classroom backend API service', function() {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.fetchClassroomData('0').then(successHandler, failHandler);
+      classroomBackendApiService.fetchClassroomData('0').then(
+        successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/classroom_data_handler/0');
       expect(req.request.method).toEqual('GET');
