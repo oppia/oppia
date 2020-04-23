@@ -56,10 +56,10 @@ describe('Classroom backend API service', function() {
   };
   let sampleDataResultsObjects = null;
 
-  let successCallback = function(x){
+  let successCallback = function(x) {
     return true;
   };
-  let errorCallback = function(x){
+  let errorCallback = function(x) {
     return false;
   };
 
@@ -205,23 +205,23 @@ describe('Classroom backend API service', function() {
     httpTestingController.verify();
   });
 
-    it('should accept successCallback as undefined', 
+    it('should accept successCallback as undefined',
       fakeAsync(() => {
-        let successHandler = jasmine.createSpy('success', successCallback);
-        let failHandler = jasmine.createSpy('fail', errorCallback);
+      let successHandler = jasmine.createSpy('success', successCallback);
+      let failHandler = jasmine.createSpy('fail', errorCallback);
 
-        classroomBackendApiService.fetchClassroomData('0').then(
-          successHandler, failHandler);
+      classroomBackendApiService.fetchClassroomData('0').then(
+        successHandler, failHandler);
 
-        let req = httpTestingController.expectOne(
-          '/classroom_data_handler/0');
-        expect(req.request.method).toEqual('GET');
-        req.flush(responseDictionaries);
+      let req = httpTestingController.expectOne(
+        '/classroom_data_handler/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(responseDictionaries);
 
-        flushMicrotasks();
+      flushMicrotasks();
 
-        expect(successHandler).toHaveBeenCalled();
-        expect(failHandler).not.toHaveBeenCalled();
-      })
-    );
-  });
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+});
