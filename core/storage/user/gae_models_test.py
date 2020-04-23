@@ -129,6 +129,11 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
 
+    def test_verify_model_user_ids_exist(self):
+        self.assertTrue(
+            user_models.UserSettingsModel.get_by_id(self.USER_1_ID)
+            .verify_model_user_ids_exist())
+
     def test_get_by_role(self):
         user = user_models.UserSettingsModel.get_by_role(
             feconf.ROLE_ID_ADMIN)

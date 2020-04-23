@@ -164,7 +164,7 @@ class UserSettingsModel(base_models.BaseModel):
         """We don't need to check the existence of UserSettingsModel for a
         UserSettingsModel.
         """
-        pass
+        return True
 
     @staticmethod
     def export_data(user_id):
