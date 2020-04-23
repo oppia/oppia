@@ -48,7 +48,16 @@ describe('Classroom backend API service', function() {
       uncategorized_skill_count: 3
     }]
   };
+  let brokenDicts = {
+    topic_summary_dicts: [{
+      name: 15,
+      description: 11
+    }]
+  }
   let sampleDataResultsObjects = null;
+
+  let successCallback = function(x) {console.log(x)};
+  let errorCallback = function(x) {console.log(x)};
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -93,4 +102,125 @@ describe('Classroom backend API service', function() {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+
+  it('should use the fail handler for requests that cannot be processed',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      classroomBackendApiService.fetchClassroomData('0').then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/classroom_data_handler/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Invalid request', {
+        status: 400,
+        statusText: 'Invalid request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
+
+  it('should successfully use the success handler with successCallback set to a function',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success', successCallback);
+      let failHandler = jasmine.createSpy('fail', errorCallback);
+
+      classroomBackendApiService.fetchClassroomData('0').then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/classroom_data_handler/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(responseDictionaries);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(
+        sampleDataResultsObjects.topic_summary_objects);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
 });
+
+describe('Classroom backend API service', function() {
+  let classroomBackendApiService:
+    ClassroomBackendApiService = null;
+  let httpTestingController: HttpTestingController;
+  let topicSummaryObjectFactory:
+    TopicSummaryObjectFactory = null;
+  let responseDictionaries = {
+    topic_summary_dicts: [{
+      name: 'Topic name',
+      description: 'Topic description',
+      canonical_story_count: 4,
+      subtopic_count: 5,
+      total_skill_count: 20,
+      uncategorized_skill_count: 5
+    }, {
+      name: 'Topic name 2',
+      description: 'Topic description 2',
+      canonical_story_count: 3,
+      subtopic_count: 2,
+      total_skill_count: 10,
+      uncategorized_skill_count: 3
+    }]
+  };
+  let brokenDicts = {
+    topic_summary_dicts: [{
+      name: 15,
+      description: 11
+    }]
+  }
+  let sampleDataResultsObjects = null;
+
+  let successCallback = undefined;
+  let errorCallback = undefined;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    classroomBackendApiService = TestBed.get(ClassroomBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+    topicSummaryObjectFactory = TestBed.get(TopicSummaryObjectFactory);
+
+    // Sample topic object returnable from the backend
+    sampleDataResultsObjects = {
+      topic_summary_objects: [
+        topicSummaryObjectFactory.createFromBackendDict(
+          responseDictionaries.topic_summary_dicts[0]),
+        topicSummaryObjectFactory.createFromBackendDict(
+          responseDictionaries.topic_summary_dicts[1])
+      ]
+    };
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+
+    it('should accept successCallback as undefined', 
+      fakeAsync(() => {
+        let successHandler = jasmine.createSpy('success', successCallback);
+        let failHandler = jasmine.createSpy('fail', errorCallback);
+
+        classroomBackendApiService.fetchClassroomData('0').then(
+          successHandler, failHandler);
+
+        let req = httpTestingController.expectOne(
+          '/classroom_data_handler/0');
+        expect(req.request.method).toEqual('GET');
+        req.flush(responseDictionaries);
+
+        flushMicrotasks();
+
+        expect(successHandler).toHaveBeenCalled();
+        expect(failHandler).not.toHaveBeenCalled();
+      })
+    );
+  });
