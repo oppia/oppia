@@ -30,54 +30,7 @@ const constants = require('constants.ts');
 describe('States object factory', () => {
   describe('StatesObjectFactory', () => {
     var scope, sof, ssof, statesDict, statesWithAudioDict, vof;
-
-    constants.NEW_STATE_TEMPLATE = {
-      classifier_model_id: null,
-      content: {
-        content_id: 'content',
-        html: ''
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      },
-      interaction: {
-        answer_groups: [],
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          rows: {
-            value: 1
-          },
-          placeholder: {
-            value: 'Type your answer here.'
-          }
-        },
-        default_outcome: {
-          dest: '(untitled state)',
-          feedback: {
-            content_id: 'default_outcome',
-            html: ''
-          },
-          param_changes: [],
-          labelled_as_correct: false,
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null
-        },
-        hints: [],
-        solution: null,
-        id: 'TextInput'
-      },
-      param_changes: [],
-      solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      }
-    };
+    const oldNewStateTemplate = constants.NEW_STATE_TEMPLATE;
 
     beforeEach(() => {
       TestBed.configureTestingModule({
@@ -327,6 +280,60 @@ describe('States object factory', () => {
           }
         }
       };
+    });
+
+    beforeAll(() => {
+      constants.NEW_STATE_TEMPLATE = {
+        classifier_model_id: null,
+        content: {
+          content_id: 'content',
+          html: ''
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {}
+          }
+        },
+        interaction: {
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            rows: {
+              value: 1
+            },
+            placeholder: {
+              value: 'Type your answer here.'
+            }
+          },
+          default_outcome: {
+            dest: '(untitled state)',
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
+            param_changes: [],
+            labelled_as_correct: false,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
+          },
+          hints: [],
+          solution: null,
+          id: 'TextInput'
+        },
+        param_changes: [],
+        solicit_answer_details: false,
+        written_translations: {
+          translations_mapping: {
+            content: {},
+            default_outcome: {}
+          }
+        }
+      };
+    });
+
+    afterAll(() => {
+      constants.NEW_STATE_TEMPLATE = oldNewStateTemplate;
     });
 
     it('should create a new state given a state name', () => {
