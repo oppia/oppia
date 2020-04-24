@@ -60,7 +60,7 @@
                       on-click-continue-button="showUpcomingCard()">
         </progress-nav>
       </div>
-      <div ng-if="collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript() && recommendedExplorationSummaries.length > 0" class="conversation-skin-next-lesson-wrapper">
+      <div ng-if="inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript() && recommendedExplorationSummaries.length > 0)" class="conversation-skin-next-lesson-wrapper">
         <div style="cursor: default">
           <span class="conversation-skin-next-lesson-text">Next Lesson</span>
           <span><[recommendedExplorationSummaries[0].title]></span>
@@ -110,9 +110,6 @@
   <div ng-if="!collectionSummary && recommendedExplorationSummaries !== null && recommendedExplorationSummaries.length > 0"
        class="conversation-skin-final-recommendations">
     <div ng-if="recommendedExplorationSummaries.length > 0">
-      <span ng-if="collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
-            translate="I18N_PLAYER_NEXT_LESSON">
-      </span>
       <span ng-if="!collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
             translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS">
       </span>
@@ -136,27 +133,6 @@
         </exploration-summary-tile>
       </div>
 
-      <div ng-if="collectionSummary && !isRefresherExploration" class="conversation-skin-back-to-collection-container">
-        <a ng-href="/collection/<[collectionId]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
-      </div>
-    </div>
-
-    <div ng-if="collectionSummary && recommendedExplorationSummaries.length === 0">
-      <span class="conversation-skin-final-recommendations-header"
-            translate="I18N_PLAYER_RETURN_TO_COLLECTION"
-            translate-values="{collectionTitle: collectionSummary.title}">
-      </span>
-      <div class="oppia-exp-summary-tiles-container conversation-skin-recommended-activities-container">
-        <collection-summary-tile collection-id="collectionSummary.id"
-                                 collection-title="collectionSummary.title"
-                                 last-updated-msec="collectionSummary.last_updated_msec"
-                                 node-count="collectionSummary.node_count"
-                                 objective="collectionSummary.objective"
-                                 thumbnail-icon-url="collectionSummary.thumbnail_icon_url"
-                                 thumbnail-bg-color="collectionSummary.thumbnail_bg_color"
-                                 style="margin-left: 10px;">
-        </collection-summary-tile>
-      </div>
     </div>
   </div>
 
