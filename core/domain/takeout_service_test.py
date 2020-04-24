@@ -29,6 +29,7 @@ from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import time
 import utils
 
 (
@@ -58,6 +59,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     USER_1_EMAIL = 'user1@example.com'
     GENERIC_USERNAME = 'user'
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
+    GENERIC_EPOCH = time.mktime(datetime.datetime(2019, 5, 20).timetuple())
     GENERIC_IMAGE_URL = 'www.example.com/example.png'
     GENERIC_USER_BIO = 'I am a user of Oppia!'
     GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
@@ -612,9 +614,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_exploration_data = {
             self.EXPLORATION_IDS[0]: {
                 'rating': 2,
-                'rated_on': '2019-05-20 00:00:00',
+                'rated_on': self.GENERIC_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': '2019-05-20 00:00:00',
+                'draft_change_list_last_updated': self.GENERIC_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -740,11 +742,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
-            'last_agreed_to_terms': '2019-05-20 00:00:00',
-            'last_started_state_editor_tutorial': '2019-05-20 00:00:00',
-            'last_started_state_translation_tutorial': '2019-05-20 00:00:00',
-            'last_logged_in': '2019-05-20 00:00:00',
-            'last_edited_an_exploration': '2019-05-20 00:00:00',
+            'last_agreed_to_terms': self.GENERIC_EPOCH,
+            'last_started_state_editor_tutorial': self.GENERIC_EPOCH,
+            'last_started_state_translation_tutorial': self.GENERIC_EPOCH,
+            'last_logged_in': self.GENERIC_EPOCH,
+            'last_edited_an_exploration': self.GENERIC_EPOCH,
             'profile_picture_data_url': self.GENERIC_IMAGE_URL,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',

@@ -29,6 +29,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
+import datetime
+import time
 import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
@@ -810,11 +812,22 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             general_feedback_thread_ids=[]).put()
 
     def test_export_account_handler(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True):
-            self.maxDiff = None
+        GENERIC_DATE = datetime.datetime(2019, 5, 20)
+        GENERIC_EPOCH = time.mktime(GENERIC_DATE.timetuple())
+
+        # Update user settings to constants.
+        user_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        user_settings = user_services.get_user_settings(user_id)
+        user_settings.last_agreed_to_terms = GENERIC_DATE
+        user_settings.last_logged_in = GENERIC_DATE
+        user_services._save_user_settings(user_settings)
+
+        constants_swap = self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True)
+        time_swap = self.swap(user_services,
+            'record_user_logged_in', lambda *args: None)
+
+        with constants_swap, time_swap:
             data = self.get_json('/export-account-handler')
-            user_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-            user_settings = user_models.UserSettingsModel.get(user_id)
             expected_data = {
                 u'topic_rights_data': {
                     u'managed_topic_ids': []
@@ -868,9 +881,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                 u'exp_user_last_playthrough_data': {},
                 u'user_settings_data': {
                     u'username': u'editor',
-                    u'last_agreed_to_terms':
-                        python_utils.UNICODE(
-                            user_settings.last_agreed_to_terms),
+                    u'last_agreed_to_terms': GENERIC_EPOCH,
                     u'last_started_state_translation_tutorial': None,
                     u'last_started_state_editor_tutorial': None,
                     u'normalized_username': u'editor',
@@ -883,16 +894,13 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                     u'default_dashboard': None,
                     u'preferred_site_language_code': None,
                     u'user_bio': u'',
-                    u'profile_picture_data_url':
-                        python_utils.UNICODE(
-                            user_settings.profile_picture_data_url),
+                    u'profile_picture_data_url': 
+                        user_services.DEFAULT_IDENTICON_DATA_URL,
                     u'role': u'EXPLORATION_EDITOR',
                     u'last_edited_an_exploration': None,
                     u'email': u'editor@example.com',
                     u'preferred_audio_language_code': None,
-                    u'last_logged_in':
-                        python_utils.UNICODE(
-                            user_settings.last_logged_in)
+                    u'last_logged_in': GENERIC_EPOCH
                 },
                 u'general_suggestion_data': {},
                 u'user_contribution_scoring_data': {},

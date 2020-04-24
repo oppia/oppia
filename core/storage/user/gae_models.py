@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import random
 import string
+import time
 
 from constants import constants
 from core.platform import models
@@ -165,29 +166,29 @@ class UserSettingsModel(base_models.BaseModel):
             'username': user.username,
             'normalized_username': user.normalized_username,
             'last_agreed_to_terms': (
-                python_utils.convert_to_bytes(user.last_agreed_to_terms)
+                time.mktime(user.last_agreed_to_terms.timetuple())
                 if user.last_agreed_to_terms
                 else None
             ),
             'last_started_state_editor_tutorial': (
-                python_utils.convert_to_bytes(
-                    user.last_started_state_editor_tutorial)
+                time.mktime(
+                    user.last_started_state_editor_tutorial.timetuple())
                 if user.last_started_state_editor_tutorial
                 else None
             ),
             'last_started_state_translation_tutorial': (
-                python_utils.convert_to_bytes(
-                    user.last_started_state_translation_tutorial)
+                time.mktime(
+                    user.last_started_state_translation_tutorial.timetuple())
                 if user.last_started_state_translation_tutorial
                 else None
             ),
             'last_logged_in': (
-                python_utils.convert_to_bytes(user.last_logged_in)
+                time.mktime(user.last_logged_in.timetuple())
                 if user.last_logged_in
                 else None
             ),
             'last_edited_an_exploration': (
-                python_utils.convert_to_bytes(user.last_edited_an_exploration)
+                time.mktime(user.last_edited_an_exploration.timetuple())
                 if user.last_edited_an_exploration
                 else None
             ),
@@ -1281,14 +1282,14 @@ class ExplorationUserDataModel(base_models.BaseModel):
             user_data[user_model.exploration_id] = {
                 'rating': user_model.rating,
                 'rated_on': (
-                    python_utils.UNICODE(user_model.rated_on)
+                    time.mktime(user_model.rated_on.timetuple())
                     if user_model.rated_on
                     else None
                 ),
                 'draft_change_list': user_model.draft_change_list,
                 'draft_change_list_last_updated': (
-                    python_utils.UNICODE(
-                        user_model.draft_change_list_last_updated)
+                    time.mktime(
+                        user_model.draft_change_list_last_updated.timetuple())
                     if user_model.draft_change_list_last_updated
                     else None
                 ),

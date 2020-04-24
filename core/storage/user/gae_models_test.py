@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import time
 import types
 
 from core.domain import exp_domain
@@ -51,6 +52,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     USER_3_ROLE = feconf.ROLE_ID_ADMIN
     GENERIC_USERNAME = 'user'
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
+    GENERIC_EPOCH = time.mktime(datetime.datetime(2019, 5, 20).timetuple())
     GENERIC_IMAGE_URL = 'www.example.com/example.png'
     GENERIC_USER_BIO = 'I am a user of Oppia!'
     GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
@@ -171,11 +173,11 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
-            'last_agreed_to_terms': '2019-05-20 00:00:00',
-            'last_started_state_editor_tutorial': '2019-05-20 00:00:00',
-            'last_started_state_translation_tutorial': '2019-05-20 00:00:00',
-            'last_logged_in': '2019-05-20 00:00:00',
-            'last_edited_an_exploration': '2019-05-20 00:00:00',
+            'last_agreed_to_terms': self.GENERIC_EPOCH,
+            'last_started_state_editor_tutorial': self.GENERIC_EPOCH,
+            'last_started_state_translation_tutorial': self.GENERIC_EPOCH,
+            'last_logged_in': self.GENERIC_EPOCH,
+            'last_edited_an_exploration': self.GENERIC_EPOCH,
             'profile_picture_data_url': self.GENERIC_IMAGE_URL,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
@@ -1100,6 +1102,8 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
 
     NONEXISTENT_USER_ID = 'id_x'
     DATETIME_OBJECT = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
+    DATETIME_EPOCH = time.mktime(
+            datetime.datetime.strptime('2016-02-16', '%Y-%m-%d').timetuple())
     USER_1_ID = 'id_1'
     USER_2_ID = 'id_2'
     EXP_ID_ONE = 'exp_id_one'
@@ -1187,15 +1191,11 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_ONE)
         self.assertEqual(retrieved_object.rating, 2)
         self.assertEqual(
-            python_utils.UNICODE(retrieved_object.rated_on),
-            '2016-02-16 00:00:00')
-        self.assertEqual(
             retrieved_object.draft_change_list, {'new_content': {}})
+        self.assertEqual(retrieved_object.rated_on, self.DATETIME_OBJECT)
         self.assertEqual(
-            python_utils.UNICODE(
-                retrieved_object.draft_change_list_last_updated
-            ),
-            '2016-02-16 00:00:00')
+            retrieved_object.draft_change_list_last_updated,
+            self.DATETIME_OBJECT)
         self.assertEqual(retrieved_object.draft_change_list_exp_version, 3)
         self.assertEqual(retrieved_object.draft_change_list_id, 1)
 
@@ -1217,9 +1217,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         expected_data = {
             self.EXP_ID_ONE: {
                 'rating': 2,
-                'rated_on': '2016-02-16 00:00:00',
+                'rated_on': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': '2016-02-16 00:00:00',
+                'draft_change_list_last_updated': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -1249,9 +1249,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         expected_data = {
             self.EXP_ID_ONE: {
                 'rating': 2,
-                'rated_on': '2016-02-16 00:00:00',
+                'rated_on': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': '2016-02-16 00:00:00',
+                'draft_change_list_last_updated': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -1273,9 +1273,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             },
             self.EXP_ID_THREE: {
                 'rating': 5,
-                'rated_on': '2016-02-16 00:00:00',
+                'rated_on': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {'content': 3}},
-                'draft_change_list_last_updated': '2016-02-16 00:00:00',
+                'draft_change_list_last_updated': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 2,
                 'draft_change_list_id': 2,
                 'mute_suggestion_notifications': (
