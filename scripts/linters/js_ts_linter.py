@@ -112,19 +112,25 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             validating and parsing the files.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
-    def __init__(self, js_files, ts_files, verbose_mode_enabled):
+    def __init__(
+            self, js_files, ts_files, verbose_mode_enabled,
+            enable_redundant_function_names_check):
         """Constructs a JsTsLintChecksManager object.
 
         Args:
             js_files: list(str). The list of js filepaths to be linted.
             ts_files: list(str). The list of ts filepaths to be linted.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
+            enable_redundant_function_names_check: bool. Enables the lint check
+                for redundant function names.
         """
         os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
 
         self.js_files = js_files
         self.ts_files = ts_files
         self.verbose_mode_enabled = verbose_mode_enabled
+        self.redundant_function_names_check_enabled = (
+            enable_redundant_function_names_check)
         self.parsed_js_and_ts_files = []
         self.parsed_expressions_in_files = []
 
@@ -464,10 +470,30 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('')
         return summary_messages
 
-    def _check_js_and_ts_duplicate_function_names(self):
-        """TODO"""
+    def _check_js_and_ts_redundant_function_names(self):
+        """This function checks that there aren't any redundant JS/TS functions.
+        A redundant function is one that only forwards arguments to a similarly
+        named function and returns the result.
+
+        We check for similarities by stripping any leading underscores from
+        function names. For example:
+
+            let foo = function(arg1, arg2) {
+              return _foo(arg1, arg2);
+            }
+
+            // Redundant function:
+            let _foo = function(arg1, arg2) {
+              //
+              // Actual logic.
+              //
+            }
+        """
+        if not self.enable_redundant_function_names_check:
+            return []
+
         if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting duplicate function names check')
+            python_utils.PRINT('Starting redundant function names check')
             python_utils.PRINT('----------------------------------------')
 
         failed = False
@@ -475,7 +501,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             names_found = set()
             names_reported = set()
             file_tokens = self.parsed_js_and_ts_file_tokens[filepath]
-            for i in python_utils.RANGE(0, len(file_tokens) - 3):
+            for i in python_utils.RANGE(0, len(file_tokens) - 2):
                 if (file_tokens[i].type != 'Identifier'
                         or file_tokens[i + 1].type != 'Punctuator'
                         or file_tokens[i + 1].value != '='
@@ -490,25 +516,25 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     failed = True
                     names_reported.add(stripped_name)
                     python_utils.PRINT(
-                        '{ %s } from "%s" has duplicate definitions. Please '
+                        '{ %s } from \'%s\' has redundant definitions. Please '
                         'combine them into one, or refactor them to have '
                         'distinct purposes' % (stripped_name, filepath))
-        summary_messages = []
+
         if failed:
-            summary_messages.append(
-                '%s  duplicate function names check failed, fix the files with '
-                'duplicate functions mentioned above' % _MESSAGE_TYPE_FAILED)
+            summary_message = (
+                '%s  redundant function names check failed, fix the files with '
+                'redundant functions mentioned above' % _MESSAGE_TYPE_FAILED)
         else:
-            summary_messages.append(
-                '%s  duplicate function names check passed' %
+            summary_message = (
+                '%s  redundant function names check passed' %
                 _MESSAGE_TYPE_SUCCESS)
 
         python_utils.PRINT('')
-        python_utils.PRINT(summary_messages[0])
+        python_utils.PRINT(summary_message)
         if self.verbose_mode_enabled:
             python_utils.PRINT('----------------------------------------')
 
-        return summary_messages
+        return [summary_message]
 
     def _check_sorted_dependencies(self):
         """This function checks that the dependencies which are
@@ -870,14 +896,14 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         sorted_dependencies_messages = self._check_sorted_dependencies()
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
-        duplicate_function_names_messages = (
-            self._check_js_and_ts_duplicate_function_names())
+        redundant_function_names_messages = (
+            self._check_js_and_ts_redundant_function_names())
 
         all_messages = (
             extra_js_files_messages +
             js_and_ts_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages +
-            duplicate_function_names_messages)
+            redundant_function_names_messages)
         return all_messages
 
 
@@ -984,7 +1010,9 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
         return self._lint_js_and_ts_files()
 
 
-def get_linters(js_filepaths, ts_filepaths, verbose_mode_enabled=False):
+def get_linters(
+        js_filepaths, ts_filepaths, verbose_mode_enabled=False,
+        enable_redundant_function_names_check=False):
     """Creates JsTsLintChecksManager and ThirdPartyJsTsLintChecksManager
         objects and return them.
 
@@ -992,6 +1020,8 @@ def get_linters(js_filepaths, ts_filepaths, verbose_mode_enabled=False):
         js_filepaths: list(str). A list of js filepaths to lint.
         ts_filepaths: list(str). A list of ts filepaths to lint.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
+        enable_redundant_function_names_check: bool. Enables the lint check for
+            redundant function names.
 
     Returns:
         tuple(JsTsLintChecksManager, ThirdPartyJsTsLintChecksManager. A 2-tuple
@@ -1000,7 +1030,8 @@ def get_linters(js_filepaths, ts_filepaths, verbose_mode_enabled=False):
     js_ts_file_paths = js_filepaths + ts_filepaths
 
     custom_linter = JsTsLintChecksManager(
-        js_filepaths, ts_filepaths, verbose_mode_enabled)
+        js_filepaths, ts_filepaths, verbose_mode_enabled,
+        enable_redundant_function_names_check)
 
     third_party_linter = ThirdPartyJsTsLintChecksManager(
         js_ts_file_paths, verbose_mode_enabled)

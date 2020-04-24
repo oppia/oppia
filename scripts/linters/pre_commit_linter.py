@@ -87,6 +87,10 @@ _PARSER.add_argument(
     '--verbose',
     help='verbose mode. All details will be printed.',
     action='store_true')
+_PARSER.add_argument(
+    '--enable-redundant-function-names-check',
+    help='enables the lint check for redundant function names.',
+    action='store_true')
 _EXCLUSIVE_GROUP.add_argument(
     '--only-check-file-extensions',
     nargs='+',
@@ -198,7 +202,8 @@ class FileCache(python_utils.OBJECT):
 
 def _lint_all_files(
         js_filepaths, ts_filepaths, py_filepaths, html_filepaths,
-        css_filepaths, file_extensions_to_lint, verbose_mode_enabled=False):
+        css_filepaths, file_extensions_to_lint, verbose_mode_enabled=False,
+        enable_redundant_function_names_check=False):
     """Run all lint checks.
 
     Args:
@@ -207,9 +212,11 @@ def _lint_all_files(
         py_filepaths: list(str). The list of python filepaths to be linted.
         html_filepaths: list(str). The list of HTML filepaths to be linted.
         css_filepaths: list(str). The list of CSS filepaths to be linted.
-        verbose_mode_enabled: bool. True if verbose mode is enabled.
         file_extensions_to_lint: list(str). The list of file extensions to be
             linted.
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
+        enable_redundant_function_names_check: bool. Enables the lint check for
+            redundant function names.
 
     Returns:
         custom_linter: list. Custom lint checks.
@@ -243,7 +250,8 @@ def _lint_all_files(
     if js_ts_file_extension_type:
         custom_linter, third_party_linter = js_ts_linter.get_linters(
             js_filepaths, ts_filepaths,
-            verbose_mode_enabled=verbose_mode_enabled)
+            verbose_mode_enabled=verbose_mode_enabled,
+            enable_redundant_function_names_check)
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
@@ -474,7 +482,9 @@ def main(args=None):
         custom_linter, third_party_linter = _lint_all_files(
             _FILES['.js'], _FILES['.ts'], _FILES['.py'], _FILES['.html'],
             _FILES['.css'], file_extension_type,
-            verbose_mode_enabled=verbose_mode_enabled)
+            verbose_mode_enabled=verbose_mode_enabled,
+            enable_redundant_function_names_check=(
+                parse_args.enable_redundant_function_names_check))
         custom_linters += custom_linter
         third_party_linters += third_party_linter
 
