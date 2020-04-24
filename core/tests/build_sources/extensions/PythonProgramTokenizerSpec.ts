@@ -16,29 +16,34 @@
  * @fileoverview Unit tests python program tokenizer.
  */
 
-import { TestBed } from '@angular/core/testing';
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
 
-import { LoggerService } from 'services/contextual/logger.service';
-import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
+describe('Python program tokenizer', function() {
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
-describe('Python program tokenizer', () => {
-  describe('Test python program tokenizer', () => {
-    let tokenizer: PythonProgramTokenizer = null;
-    beforeEach(() => {
-      TestBed.configureTestingModule({
-        providers: [LoggerService, PythonProgramTokenizer]
-      });
-      tokenizer = TestBed.get(PythonProgramTokenizer);
-    });
+  describe('Test python program tokenizer', function() {
+    var tokenizer;
+    beforeEach(angular.mock.inject(function($injector) {
+      tokenizer = $injector.get('PythonProgramTokenizer');
+    }));
 
-    it('should generate correct tokens for a program', () => {
-      const program = (
+    it('should generate correct tokens for a program', function() {
+      var program = (
         '# In Python, the code\n#\n#     for letter in [\'a\', \'b\']:\n#    ' +
         '     print letter\n#\n# prints:\n#\n#     a\n#     b\ns = 0;\nfor ' +
         'num in range(1000):\n  if num%7 == 0 or num%5 == 0:\n\ts +=x\n' +
         'print s');
 
-      const expectedTokens = [
+      var expectedTokens = [
         ['COMMENT', '# In Python, the code'], ['NL', ''], ['COMMENT', '#'],
         ['NL', ''], ['COMMENT', '#     for letter in [\'a\', \'b\']:'],
         ['NL', ''], ['COMMENT', '#         print letter'], ['NL', ''],
@@ -53,7 +58,7 @@ describe('Python program tokenizer', () => {
         ['NUMBER', '0'], ['OP', ':'], ['NAME', 's'], ['OP', '+='],
         ['NAME', 'x'], ['NAME', 'print'], ['NAME', 's'], ['ENDMARKER', '']];
 
-      const tokens = tokenizer.generateTokens(program.split('\n'));
+      var tokens = tokenizer.generateTokens(program.split('\n'));
       expect(tokens.length).toEqual(expectedTokens.length);
       expect(tokens).toEqual(expectedTokens);
     });
