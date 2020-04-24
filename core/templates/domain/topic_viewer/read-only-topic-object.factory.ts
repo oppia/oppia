@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Factory for creating instances of ReadOnlyTopic from
- * topic data domain objects.
+ * topic data.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
