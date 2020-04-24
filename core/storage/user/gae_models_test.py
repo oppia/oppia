@@ -29,6 +29,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
+import utils
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
@@ -52,7 +53,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     USER_3_ROLE = feconf.ROLE_ID_ADMIN
     GENERIC_USERNAME = 'user'
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
-    GENERIC_EPOCH = time.mktime(datetime.datetime(2019, 5, 20).timetuple())
+    GENERIC_EPOCH = utils.get_time_in_millisecs(datetime.datetime(2019, 5, 20))
     GENERIC_IMAGE_URL = 'www.example.com/example.png'
     GENERIC_USER_BIO = 'I am a user of Oppia!'
     GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
@@ -1102,8 +1103,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
 
     NONEXISTENT_USER_ID = 'id_x'
     DATETIME_OBJECT = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
-    DATETIME_EPOCH = time.mktime(
-        datetime.datetime.strptime('2016-02-16', '%Y-%m-%d').timetuple())
+    DATETIME_EPOCH = utils.get_time_in_millisecs(DATETIME_OBJECT)
     USER_1_ID = 'id_1'
     USER_2_ID = 'id_2'
     EXP_ID_ONE = 'exp_id_one'

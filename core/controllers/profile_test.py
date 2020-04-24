@@ -798,7 +798,7 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
 
 class ExportAccountHandlerTests(test_utils.GenericTestBase):
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
-    GENERIC_EPOCH = time.mktime(GENERIC_DATE.timetuple())
+    GENERIC_EPOCH = utils.get_time_in_millisecs(GENERIC_DATE)
 
     def setUp(self):
         super(ExportAccountHandlerTests, self).setUp()

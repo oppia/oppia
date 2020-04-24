@@ -27,6 +27,7 @@ from constants import constants
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
@@ -166,29 +167,29 @@ class UserSettingsModel(base_models.BaseModel):
             'username': user.username,
             'normalized_username': user.normalized_username,
             'last_agreed_to_terms': (
-                time.mktime(user.last_agreed_to_terms.timetuple())
+                utils.get_time_in_millisecs(user.last_agreed_to_terms)
                 if user.last_agreed_to_terms
                 else None
             ),
             'last_started_state_editor_tutorial': (
-                time.mktime(
-                    user.last_started_state_editor_tutorial.timetuple())
+                utils.get_time_in_millisecs(
+                    user.last_started_state_editor_tutorial)
                 if user.last_started_state_editor_tutorial
                 else None
             ),
             'last_started_state_translation_tutorial': (
-                time.mktime(
-                    user.last_started_state_translation_tutorial.timetuple())
+                utils.get_time_in_millisecs(
+                    user.last_started_state_translation_tutorial)
                 if user.last_started_state_translation_tutorial
                 else None
             ),
             'last_logged_in': (
-                time.mktime(user.last_logged_in.timetuple())
+                utils.get_time_in_millisecs(user.last_logged_in)
                 if user.last_logged_in
                 else None
             ),
             'last_edited_an_exploration': (
-                time.mktime(user.last_edited_an_exploration.timetuple())
+                utils.get_time_in_millisecs(user.last_edited_an_exploration)
                 if user.last_edited_an_exploration
                 else None
             ),
@@ -1282,14 +1283,14 @@ class ExplorationUserDataModel(base_models.BaseModel):
             user_data[user_model.exploration_id] = {
                 'rating': user_model.rating,
                 'rated_on': (
-                    time.mktime(user_model.rated_on.timetuple())
+                    utils.get_time_in_millisecs(user_model.rated_on)
                     if user_model.rated_on
                     else None
                 ),
                 'draft_change_list': user_model.draft_change_list,
                 'draft_change_list_last_updated': (
-                    time.mktime(
-                        user_model.draft_change_list_last_updated.timetuple())
+                    utils.get_time_in_millisecs(
+                        user_model.draft_change_list_last_updated)
                     if user_model.draft_change_list_last_updated
                     else None
                 ),
