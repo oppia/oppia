@@ -190,6 +190,22 @@ class RedirectStoutTest(test_utils.GenericTestBase):
         self.assertEqual(data, 'This is a test\n')
 
 
+class ListDuplicateItemsTest(test_utils.GenericTestBase):
+    """Tests for the get_duplicates_from_list_of_strings function."""
+
+    def test_get_duplicates_from_list_of_strings_with_duplicat_strings(self):
+        strings_list = ['A', 'B', 'B', 'C', 'C', 'C']
+        duplicates = linter_utils.get_duplicates_from_list_of_strings(
+            strings_list)
+        self.assertEqual(sorted(duplicates), ['B', 'C'])
+
+    def test_get_duplicates_from_list_of_strings_without_duplicat_strings(self):
+        strings_list = ['A', 'B', 'C']
+        duplicates = linter_utils.get_duplicates_from_list_of_strings(
+            strings_list)
+        self.assertEqual(duplicates, [])
+
+
 class TempDirTest(test_utils.GenericTestBase):
     """Tests for the temp_dir function."""
 
@@ -212,19 +228,3 @@ class TempDirTest(test_utils.GenericTestBase):
     def test_directory_has_suffix_appended(self):
         with linter_utils.temp_dir(suffix='cba') as temp_dir_path:
             self.assertTrue(os.path.basename(temp_dir_path).endswith('cba'))
-
-
-class ListDuplicateItemsTest(test_utils.GenericTestBase):
-    """Tests for the get_duplicates_from_list_of_strings function."""
-
-    def test_get_duplicates_from_list_of_strings_with_duplicat_strings(self):
-        strings_list = ['A', 'B', 'B', 'C', 'C', 'C']
-        duplicates = linter_utils.get_duplicates_from_list_of_strings(
-            strings_list)
-        self.assertEqual(sorted(duplicates), ['B', 'C'])
-
-    def test_get_duplicates_from_list_of_strings_without_duplicat_strings(self):
-        strings_list = ['A', 'B', 'C']
-        duplicates = linter_utils.get_duplicates_from_list_of_strings(
-            strings_list)
-        self.assertEqual(duplicates, [])
