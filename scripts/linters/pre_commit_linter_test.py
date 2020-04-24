@@ -45,6 +45,23 @@ INVALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.css')
 
 VALID_JS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.js')
 VALID_TS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.ts')
+INVALID_EXPLORE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_explore.js')
+INVALID_PAUSE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_pause.js')
+INVALID_SLEEP_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_sleep.js')
+INVALID_WAIT_FOR_ANGULAR_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_wait_for_angular.js')
+INVALID_FDESCRIBE_DDESCRIBE_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_ddescribe_fdescribe.ts')
+INVALID_IIT_FIT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_iit_fit.ts')
+INVALID_INJECT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_inject.ts')
+INVALID_INNER_HTML_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_innerhtml.ts')
+INVALID_RELATIVE_IMPORT_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_relative_import.js')
+INVALID_PARENT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_parent.ts')
+INVALID_TEMPLATE_URL_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_templateurl.ts')
+
 
 VALID_PY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.py')
 INVALID_IMPORT_FILEPATH = os.path.join(
@@ -285,6 +302,122 @@ class JsTsLintTests(LintTests):
         self.assertTrue(
             appears_in_linter_stdout(
                 ['SUCCESS   1 JavaScript and Typescript files linted'],
+                self.linter_stdout))
+
+    def test_invalid_browser_explore(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_EXPLORE_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 29: In tests, please do not use browser.explore().'],
+                self.linter_stdout))
+
+    def test_invalid_browser_pause(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_PAUSE_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 29: In tests, please do not use browser.pause().'],
+                self.linter_stdout))
+
+    def test_invalid_browser_sleep(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_SLEEP_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 29: In tests, please do not use browser.sleep().'],
+                self.linter_stdout))
+
+    def test_invalid_browser_wait_for_angular(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_WAIT_FOR_ANGULAR_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 29: In tests, please do not use '
+                 'browser.waitForAngular().'],
+                self.linter_stdout))
+
+    def test_invalid_fdescribe_ddescribe(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_FDESCRIBE_DDESCRIBE_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 22: In tests, please use \'describe\' instead of '
+                 '\'ddescribe\'or \'fdescribe\''], self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 26: In tests, please use \'describe\' instead of '
+                 '\'ddescribe\'or \'fdescribe\''], self.linter_stdout))
+
+    def test_invalid_iit_fit(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_IIT_FIT_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 39: In tests, please use \'it\' instead of \'iit\' or '
+                 '\'fit\''], self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 63: In tests, please use \'it\' instead of \'iit\' or '
+                 '\'fit\''], self.linter_stdout))
+
+    def test_invalid_inject(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_INJECT_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 24: In tests, please use \'angular.mock.inject\' '
+                 'instead of \'inject\''], self.linter_stdout))
+
+    def test_invalid_template_url(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_TEMPLATE_URL_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 23: The directives must be directly referenced.'],
+                self.linter_stdout))
+
+    def test_invalid_parent(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_PARENT_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 24: Please do not access parent properties using '
+                 '$parent. Use the scope objectfor this purpose.'],
+                self.linter_stdout))
+
+    def test_invalid_relative_import(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_RELATIVE_IMPORT_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 19: Please, don\'t use relative imports in require().'],
+                self.linter_stdout))
+
+    def test_invalid_inner_html(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_INNER_HTML_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 26: Please do not use innerHTML property.'],
                 self.linter_stdout))
 
 
