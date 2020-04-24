@@ -29,7 +29,7 @@ require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
-const story_constants = require('constants.ts');
+const storyConstants = require('constants.ts');
 
 angular.module('oppia').directive('storyEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -66,7 +66,7 @@ angular.module('oppia').directive('storyEditor', [
             $scope.linearNodesList = [];
             $scope.nodes = [];
             $scope.allowedBgColors = (
-              story_constants.ALLOWED_THUMBNAIL_BG_COLORS.story);
+              storyConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
             if ($scope.storyContents &&
                 $scope.storyContents.getNodes().length > 0) {
               $scope.nodes = $scope.storyContents.getNodes();

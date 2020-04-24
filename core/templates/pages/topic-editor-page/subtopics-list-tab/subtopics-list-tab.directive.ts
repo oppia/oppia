@@ -24,7 +24,7 @@ require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 
-const subtopic_constants = require('constants.ts');
+const subtopicConstants = require('constants.ts');
 
 angular.module('oppia').directive('subtopicsListTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -85,7 +85,7 @@ angular.module('oppia').directive('subtopicsListTab', [
                   $scope.subtopicPage = (
                     TopicEditorStateService.getSubtopicPage());
                   $scope.allowedBgColors = (
-                    subtopic_constants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic);
+                    subtopicConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic);
                   var pageContents = $scope.subtopicPage.getPageContents();
                   if (pageContents) {
                     $scope.htmlData = pageContents.getHtml();

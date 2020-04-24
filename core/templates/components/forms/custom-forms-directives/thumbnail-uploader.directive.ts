@@ -68,10 +68,10 @@ angular.module('oppia').directive('thumbnailUploader', [
             if (filename) {
               $scope.editableThumbnailDataUrl = (
                 ImageUploadHelperService
-                .getTrustedResourceUrlForThumbnailFilename(
-                  $scope.getFilename(),
-                  ContextService.getEntityType(),
-                  ContextService.getEntityId()));
+                  .getTrustedResourceUrlForThumbnailFilename(
+                    $scope.getFilename(),
+                    ContextService.getEntityType(),
+                    ContextService.getEntityId()));
               uploadedImage = $scope.editableThumbnailDataUrl;
             } else {
               $scope.editableThumbnailDataUrl = placeholderImageDataUrl;

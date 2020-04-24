@@ -899,7 +899,7 @@ def get_invalid_svg_tags_and_attrs(svg_string):
         if element.name.lower() in constants.SVG_ATTRS_WHITELIST.keys():
             for attr in element.attrs:
                 if attr.lower() not in (
-                    constants.SVG_ATTRS_WHITELIST[element.name.lower()]):
+                        constants.SVG_ATTRS_WHITELIST[element.name.lower()]):
                     invalid_attrs.append('%s:%s' % (element.name, attr))
         else:
             invalid_elements.append(element.name)

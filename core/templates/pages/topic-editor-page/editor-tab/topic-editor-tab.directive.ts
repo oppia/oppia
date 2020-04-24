@@ -31,7 +31,7 @@ require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/image-upload-helper.service.ts');
 
-const topic_constants = require('constants.ts');
+const topicConstants = require('constants.ts');
 
 angular.module('oppia').directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -68,7 +68,7 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
             $scope.editableDescription = $scope.topic.getDescription();
             $scope.allowedBgColors = (
-              topic_constants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
+              topicConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
 
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
