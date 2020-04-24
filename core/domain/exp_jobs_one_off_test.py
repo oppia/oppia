@@ -22,24 +22,18 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import datetime
 import logging
-import os
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
-from core.domain import fs_domain
-from core.domain import fs_services
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import python_utils
 import utils
-
-from mutagen import mp3
 
 (job_models, exp_models, base_models, classifier_models) = (
     models.Registry.import_models([
@@ -851,121 +845,6 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             ['Exploration %s failed non-strict validation: '
              'Invalid language_code: invalid_language_code'
              % (self.VALID_EXP_ID)])
-
-
-class InteractionAuditOneOffJobTests(test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(InteractionAuditOneOffJobTests, self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.process_and_flush_pending_tasks()
-
-    def test_exp_state_pairs_are_produced_for_all_interactions_in_single_exp(
-            self):
-        """Checks (exp, state) pairs are produced for all interactions
-        when there is single exploration.
-        """
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states(['End'])
-        intro_state = exploration.states['Introduction']
-        end_state = exploration.states['End']
-
-        intro_state.update_interaction_id('TextInput')
-        end_state.update_interaction_id('EndExploration')
-        end_state.update_interaction_default_outcome(None)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        # Start InteractionAuditOneOff job on sample exploration.
-        job_id = exp_jobs_one_off.InteractionAuditOneOffJob.create_new()
-        exp_jobs_one_off.InteractionAuditOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.InteractionAuditOneOffJob.get_output(
-                job_id))
-        expected_output = [
-            '[u\'EndExploration\', [u\'exp_id0 End\']]',
-            '[u\'TextInput\', [u\'exp_id0 Introduction\']]']
-        self.assertEqual(actual_output, expected_output)
-
-    def test_exp_state_pairs_are_produced_for_all_interactions_in_multiple_exps(
-            self):
-        """Checks (exp, state) pairs are produced for all interactions
-        when there are multiple explorations.
-        """
-        exploration1 = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration1.add_states(['End'])
-        intro_state = exploration1.states['Introduction']
-        end_state = exploration1.states['End']
-
-        intro_state.update_interaction_id('TextInput')
-        end_state.update_interaction_id('EndExploration')
-        end_state.update_interaction_default_outcome(None)
-
-        exp_services.save_new_exploration(self.albert_id, exploration1)
-
-        exploration2 = exp_domain.Exploration.create_default_exploration(
-            self.NEW_EXP_ID, title='title', category='category')
-
-        exploration2.add_states(['End'])
-        intro_state = exploration2.states['Introduction']
-        end_state = exploration2.states['End']
-
-        intro_state.update_interaction_id('ItemSelectionInput')
-        end_state.update_interaction_id('EndExploration')
-        end_state.update_interaction_default_outcome(None)
-
-        exp_services.save_new_exploration(self.albert_id, exploration2)
-
-        # Start InteractionAuditOneOff job on sample explorations.
-        job_id = exp_jobs_one_off.InteractionAuditOneOffJob.create_new()
-        exp_jobs_one_off.InteractionAuditOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.InteractionAuditOneOffJob.get_output(
-                job_id))
-
-        actual_output_dict = {}
-
-        for item in [ast.literal_eval(value) for value in actual_output]:
-            actual_output_dict[item[0]] = set(item[1])
-
-        expected_output_dict = {
-            'EndExploration': set(['exp_id0 End', 'exp_id1 End']),
-            'ItemSelectionInput': set(['exp_id1 Introduction']),
-            'TextInput': set(['exp_id0 Introduction'])
-        }
-
-        self.assertEqual(actual_output_dict, expected_output_dict)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
-
-        run_job_for_deleted_exp(
-            self, exp_jobs_one_off.InteractionAuditOneOffJob)
 
 
 class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):

@@ -29,15 +29,12 @@ from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.platform import models
 import feconf
 import python_utils
 import utils
-
-from mutagen import mp3
 
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
@@ -267,33 +264,6 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, len(values))
-
-
-class InteractionAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that produces a list of (exploration, state) pairs, grouped by the
-    interaction they use.
-
-    This job is for demonstration purposes. It is not enabled by default in the
-    jobs registry.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        exploration = exp_fetchers.get_exploration_from_model(item)
-        for state_name, state in exploration.states.items():
-            exp_and_state_key = '%s %s' % (item.id, state_name)
-            yield (state.interaction.id, exp_and_state_key)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
 
 
 class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
