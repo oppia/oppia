@@ -42,17 +42,17 @@ angular.module('oppia').directive('storyNodeEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/editor-tab/story-node-editor.directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', 'AlertsService',
-        'StoryEditorStateService', 'ExplorationIdValidationService',
-        'StoryUpdateService', 'UndoRedoService', 'EVENT_STORY_INITIALIZED',
+        '$scope', '$rootScope', '$uibModal', 'StoryEditorStateService',
+        'ExplorationIdValidationService', 'StoryUpdateService',
+        'UndoRedoService', 'EVENT_STORY_INITIALIZED',
         'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_STORY_NODE_EDITOR',
-        'MAX_CHARS_IN_CHAPTER_TITLE',
+        'AlertsService', 'MAX_CHARS_IN_CHAPTER_TITLE',
         function(
-            $scope, $rootScope, $uibModal, AlertsService,
-            StoryEditorStateService, ExplorationIdValidationService,
-            StoryUpdateService, UndoRedoService, EVENT_STORY_INITIALIZED,
+            $scope, $rootScope, $uibModal, StoryEditorStateService,
+            ExplorationIdValidationService, StoryUpdateService,
+            UndoRedoService, EVENT_STORY_INITIALIZED,
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
-            MAX_CHARS_IN_CHAPTER_TITLE) {
+            AlertsService, MAX_CHARS_IN_CHAPTER_TITLE) {
           var ctrl = this;
           $scope.MAX_CHARS_IN_CHAPTER_TITLE = MAX_CHARS_IN_CHAPTER_TITLE;
           var _recalculateAvailableNodes = function() {
@@ -117,7 +117,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.checkCanSaveExpId = function() {
-            $scope.expIdCanBeSaved = $scope.explorationIdPattern.test(
+            $scope.canSaveExpId = $scope.explorationIdPattern.test(
               $scope.explorationId) || !$scope.explorationId;
             $scope.invalidExpErrorIsShown = false;
           };
@@ -162,6 +162,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                 explorationId).then(function(expIdIsValid) {
                 $scope.expIdIsValid = expIdIsValid;
                 if ($scope.expIdIsValid) {
+                  StoryEditorStateService.setExpIdsChanged();
                   StoryUpdateService.setStoryNodeExplorationId(
                     $scope.story, $scope.getId(), explorationId);
                   $scope.currentExplorationId = explorationId;
@@ -176,6 +177,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                   'from the story.', 5000);
                 return;
               }
+              StoryEditorStateService.setExpIdsChanged();
               StoryUpdateService.setStoryNodeExplorationId(
                 $scope.story, $scope.getId(), explorationId);
               $scope.currentExplorationId = explorationId;
@@ -289,8 +291,6 @@ angular.module('oppia').directive('storyNodeEditor', [
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
-                  $scope.MAX_CHARS_IN_CHAPTER_TITLE = (
-                    MAX_CHARS_IN_CHAPTER_TITLE);
                   $scope.nodeTitle = '';
                   $scope.nodeTitles = nodeTitles;
                   $scope.errorMsg = null;
@@ -319,6 +319,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             modalInstance.result.then(function(title) {
               var nextNodeId =
                 $scope.story.getStoryContents().getNextNodeId();
+              StoryEditorStateService.setExpIdsChanged();
               StoryUpdateService.addStoryNode($scope.story, title);
               StoryUpdateService.addDestinationNodeIdToNode(
                 $scope.story, $scope.getId(), nextNodeId);
@@ -364,6 +365,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.removeDestinationNodeId = function(nodeId) {
+            StoryEditorStateService.setExpIdsChanged();
             StoryUpdateService.removeDestinationNodeIdFromNode(
               $scope.story, $scope.getId(), nodeId);
             $rootScope.$broadcast(
@@ -398,7 +400,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             // is not being used here, as the chapter of the story can be saved
             // with empty exploration id.
             $scope.explorationIdPattern = /^[a-zA-Z0-9_-]+$/;
-            $scope.expIdCanBeSaved = true;
+            $scope.canSaveExpId = true;
             $scope.$on(EVENT_STORY_INITIALIZED, _init);
             $scope.$on(EVENT_STORY_REINITIALIZED, _init);
             $scope.$on('recalculateAvailableNodes', _recalculateAvailableNodes);

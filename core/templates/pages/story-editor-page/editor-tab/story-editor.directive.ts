@@ -138,6 +138,7 @@ angular.module('oppia').directive('storyEditor', [
             });
 
             modalInstance.result.then(function() {
+              StoryEditorStateService.setExpIdsChanged();
               StoryUpdateService.deleteStoryNode($scope.story, nodeId);
               _initEditor();
               $scope.$broadcast('recalculateAvailableNodes');
@@ -188,6 +189,7 @@ angular.module('oppia').directive('storyEditor', [
             });
 
             modalInstance.result.then(function(title) {
+              StoryEditorStateService.setExpIdsChanged();
               StoryUpdateService.addStoryNode($scope.story, title);
               _initEditor();
               // If the first node is added, open it just after creation.
