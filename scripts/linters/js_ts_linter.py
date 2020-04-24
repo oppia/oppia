@@ -101,13 +101,6 @@ def _get_expression_from_node_if_one_exists(
     return expression
 
 
-def nwise(iterable, n=2):
-    iters = itertools.tee(iterable, n)
-    for i, it in enumerate(iters):
-        next(itertools.islice(it, i, i), None)
-    return itertools.izip(*iters)
-
-
 class JsTsLintChecksManager(python_utils.OBJECT):
     """Manages all the Js and Ts linting functions.
 
@@ -474,51 +467,46 @@ class JsTsLintChecksManager(python_utils.OBJECT):
     def _check_js_and_ts_duplicate_function_names(self):
         """TODO"""
         if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting no duplicate function names check')
+            python_utils.PRINT('Starting duplicate function names check')
             python_utils.PRINT('----------------------------------------')
-        files_to_check = self.all_filepaths
+
         failed = False
-
-        stdout = sys.stdout
-        for filepath in files_to_check:
-            identifiers_found = set()
-            identifiers_reported = set()
-            tokens = self.parsed_js_and_ts_file_tokens[filepath]
-            for token_triple in nwise(tokens, 3):
-                if (token_triple[0].type != 'Identifier'
-                        or token_triple[1].type != 'Punctuator'
-                        or token_triple[1].value != '='
-                        or token_triple[2].type != 'Keyword'
-                        or token_triple[2].value != 'function'):
+        for filepath in self.all_filepaths:
+            names_found = set()
+            names_reported = set()
+            file_tokens = self.parsed_js_and_ts_file_tokens[filepath]
+            for i in python_utils.RANGE(0, len(file_tokens) - 3):
+                if (file_tokens[i].type != 'Identifier'
+                        or file_tokens[i + 1].type != 'Punctuator'
+                        or file_tokens[i + 1].value != '='
+                        or file_tokens[i + 2].type != 'Keyword'
+                        or file_tokens[i + 2].value != 'function'):
+                    # Skip tokens that don't define a function's name.
                     continue
-                stripped_identifier = token_triple[0].value.lstrip('_')
-                if stripped_identifier not in identifiers_found:
-                    identifiers_found.add(stripped_identifier)
-                elif stripped_identifier not in identifiers_reported:
+                stripped_name = file_tokens[i].value.lstrip('_')
+                if stripped_name not in names_found:
+                    names_found.add(stripped_name)
+                elif stripped_name not in names_reported:
                     failed = True
-                    identifiers_reported.add(stripped_identifier)
-                    with linter_utils.redirect_stdout(stdout):
-                        python_utils.PRINT(
-                            '%s has multiple definitions for the identifier: '
-                            '%s. Please combine them into one.' % (
-                                filepath, stripped_identifier))
-
+                    names_reported.add(stripped_name)
+                    python_utils.PRINT(
+                        '{ %s } from "%s" has duplicate definitions. Please '
+                        'combine them into one, or refactor them to have '
+                        'distinct purposes' % (stripped_name, filepath))
         summary_messages = []
         if failed:
             summary_messages.append(
-                '%s  No duplicate function names check failed, fix files that '
-                'have duplicate function names mentioned above' % (
-                    _MESSAGE_TYPE_FAILED))
+                '%s  duplicate function names check failed, fix the files with '
+                'duplicate functions mentioned above' % _MESSAGE_TYPE_FAILED)
         else:
             summary_messages.append(
-                '%s  No duplicate function names check passed' % (
-                    _MESSAGE_TYPE_SUCCESS))
+                '%s  duplicate function names check passed' %
+                _MESSAGE_TYPE_SUCCESS)
 
-        with linter_utils.redirect_stdout(stdout):
-            python_utils.PRINT('')
-            python_utils.PRINT(summary_messages[0])
-            if self.verbose_mode_enabled:
-                python_utils.PRINT('----------------------------------------')
+        python_utils.PRINT('')
+        python_utils.PRINT(summary_messages[0])
+        if self.verbose_mode_enabled:
+            python_utils.PRINT('----------------------------------------')
 
         return summary_messages
 
