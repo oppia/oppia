@@ -88,8 +88,8 @@ _PARSER.add_argument(
     help='verbose mode. All details will be printed.',
     action='store_true')
 _PARSER.add_argument(
-    '--enable-redundant-function-names-check',
-    help='enables the lint check for redundant function names.',
+    '--enable-redundant-method-names-check',
+    help='enables the lint check for redundant method names.',
     action='store_true')
 _EXCLUSIVE_GROUP.add_argument(
     '--only-check-file-extensions',
@@ -203,14 +203,14 @@ class FileCache(python_utils.OBJECT):
 
 def _get_linters_for_file_extension(
         file_extension_to_lint, verbose_mode_enabled=False,
-        enable_redundant_function_names_check=False):
+        enable_redundant_method_names_check=False):
     """Return linters for the file extension type.
 
     Args:
         file_extension_to_lint: str. The file extension to be linted.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
-        enable_redundant_function_names_check: bool. True to enable the
-            redundant function names check.
+        enable_redundant_method_names_check: bool. True to enable the
+            redundant method names check.
 
     Returns:
         custom_linter: list. Custom lint checks.
@@ -239,8 +239,8 @@ def _get_linters_for_file_extension(
         custom_linter, third_party_linter = js_ts_linter.get_linters(
             _FILES['.js'], _FILES['.ts'],
             verbose_mode_enabled=verbose_mode_enabled,
-            enable_redundant_function_names_check=(
-                enable_redundant_function_names_check))
+            enable_redundant_method_names_check=(
+                enable_redundant_method_names_check))
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
@@ -474,8 +474,8 @@ def main(args=None):
     for file_extension_type in file_extension_types:
         custom_linter, third_party_linter = _get_linters_for_file_extension(
             file_extension_type, verbose_mode_enabled=verbose_mode_enabled,
-            enable_redundant_function_names_check=(
-                parsed_args.enable_redundant_function_names_check))
+            enable_redundant_method_names_check=(
+                parsed_args.enable_redundant_method_names_check))
         custom_linters += custom_linter
         third_party_linters += third_party_linter
 

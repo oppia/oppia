@@ -100,6 +100,23 @@ def _get_expression_from_node_if_one_exists(
     return expression
 
 
+def is_identifier(token, value=None):
+    """Returns whether token is an identifier with an optional value."""
+    return (
+        token.type == 'Identifier' and (value is None or token.value == value))
+
+
+def is_punctuator(token, value=None):
+    """Returns whether token is a punctuator with an optional value."""
+    return (
+        token.type == 'Punctuator' and (value is None or token.value == value))
+
+
+def is_keyword(token, value=None):
+    """Returns whether token is a keyword with an optional value."""
+    return token.type == 'Keyword' and (value is None or token.value == value)
+
+
 class JsTsLintChecksManager(python_utils.OBJECT):
     """Manages all the Js and Ts linting functions.
 
@@ -112,28 +129,28 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         parsed_js_and_ts_file_tokens: dict. Contains the list of lexical tokens
             of each JS file.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
-        redundant_function_names_check_enabled: bool. Enables the lint check for
-            redundant function names.
+        redundant_method_names_check_enabled: bool. Enables the lint check for
+            redundant method names.
     """
     def __init__(
             self, js_files, ts_files, verbose_mode_enabled,
-            enable_redundant_function_names_check):
+            enable_redundant_method_names_check):
         """Constructs a JsTsLintChecksManager object.
 
         Args:
             js_files: list(str). The list of js filepaths to be linted.
             ts_files: list(str). The list of ts filepaths to be linted.
             verbose_mode_enabled: bool. True if verbose mode is enabled.
-            enable_redundant_function_names_check: bool. Enables the lint check
-                for redundant function names.
+            enable_redundant_method_names_check: bool. Enables the lint check
+                for redundant method names.
         """
         os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
 
         self.js_files = js_files
         self.ts_files = ts_files
         self.verbose_mode_enabled = verbose_mode_enabled
-        self.redundant_function_names_check_enabled = (
-            enable_redundant_function_names_check)
+        self.redundant_method_names_check_enabled = (
+            enable_redundant_method_names_check)
         self.parsed_js_and_ts_files = {}
         self.parsed_js_and_ts_file_tokens = {}
         self.parsed_expressions_in_files = {}
@@ -474,9 +491,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('')
         return summary_messages
 
-    def _check_js_and_ts_redundant_function_names(self):
+    def _check_js_and_ts_redundant_method_names(self):
         """This function checks that there aren't any redundant JS/TS functions.
-        A redundant function is one that only forwards arguments to a similarly
+        A redundant method is one that only forwards arguments to a similarly
         named function and returns the result.
 
         We check for similarities by stripping any leading underscores from
@@ -493,11 +510,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
               //
             }
         """
-        if not self.redundant_function_names_check_enabled:
+        if not self.redundant_method_names_check_enabled:
             return []
 
         if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting redundant function names check')
+            python_utils.PRINT('Starting redundant method names check')
             python_utils.PRINT('----------------------------------------')
 
         suffixes_to_ignore = ['.controller.ts', '.directive.ts', '.spec.ts']
@@ -511,15 +528,16 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             names_found = set()
             names_reported = set()
             file_tokens = self.parsed_js_and_ts_file_tokens[filepath]
-            for i in python_utils.RANGE(0, len(file_tokens) - 2):
-                if (file_tokens[i].type != 'Identifier'
-                        or file_tokens[i + 1].type != 'Punctuator'
-                        or file_tokens[i + 1].value != '='
-                        or file_tokens[i + 2].type != 'Keyword'
-                        or file_tokens[i + 2].value != 'function'):
-                    # Skip tokens that don't define a function's name.
+            python_utils.PRINT('\n'.join(repr(t) for t in file_tokens))
+            for i in python_utils.RANGE(0, len(file_tokens) - 4):
+                if not (is_identifier(file_tokens[i], value='prototype')
+                        and is_punctuator(file_tokens[i + 1], value='.')
+                        and is_identifier(file_tokens[i + 2])
+                        and is_punctuator(file_tokens[i + 3], value='=')
+                        and is_keyword(file_tokens[i + 4], value='function')):
+                    # Skip statements that aren't: `prototype.NAME = function`.
                     continue
-                stripped_name = file_tokens[i].value.lstrip('_')
+                stripped_name = file_tokens[i + 2].value.lstrip('_')
                 if stripped_name not in names_found:
                     names_found.add(stripped_name)
                 elif stripped_name not in names_reported:
@@ -540,11 +558,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         if failed:
             summary_message = (
-                '%s  redundant function names check failed, fix the files with '
-                'redundant functions mentioned above' % _MESSAGE_TYPE_FAILED)
+                '%s  redundant method names check failed, fix the files with '
+                'redundant methods mentioned above' % _MESSAGE_TYPE_FAILED)
         else:
             summary_message = (
-                '%s  redundant function names check passed' %
+                '%s  redundant method names check passed' %
                 _MESSAGE_TYPE_SUCCESS)
 
         python_utils.PRINT('')
@@ -914,14 +932,14 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         sorted_dependencies_messages = self._check_sorted_dependencies()
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
-        redundant_function_names_messages = (
-            self._check_js_and_ts_redundant_function_names())
+        redundant_method_names_messages = (
+            self._check_js_and_ts_redundant_method_names())
 
         all_messages = (
             extra_js_files_messages +
             js_and_ts_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages +
-            redundant_function_names_messages)
+            redundant_method_names_messages)
         return all_messages
 
 
@@ -1030,7 +1048,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
 
 def get_linters(
         js_filepaths, ts_filepaths, verbose_mode_enabled=False,
-        enable_redundant_function_names_check=False):
+        enable_redundant_method_names_check=False):
     """Creates JsTsLintChecksManager and ThirdPartyJsTsLintChecksManager
         objects and return them.
 
@@ -1038,8 +1056,8 @@ def get_linters(
         js_filepaths: list(str). A list of js filepaths to lint.
         ts_filepaths: list(str). A list of ts filepaths to lint.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
-        enable_redundant_function_names_check: bool. Enables the lint check for
-            redundant function names.
+        enable_redundant_method_names_check: bool. Enables the lint check for
+            redundant method names.
 
     Returns:
         tuple(JsTsLintChecksManager, ThirdPartyJsTsLintChecksManager. A 2-tuple
@@ -1049,7 +1067,7 @@ def get_linters(
 
     custom_linter = JsTsLintChecksManager(
         js_filepaths, ts_filepaths, verbose_mode_enabled,
-        enable_redundant_function_names_check)
+        enable_redundant_method_names_check)
 
     third_party_linter = ThirdPartyJsTsLintChecksManager(
         js_ts_file_paths, verbose_mode_enabled)
