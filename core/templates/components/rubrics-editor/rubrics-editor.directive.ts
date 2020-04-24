@@ -132,12 +132,19 @@ angular.module('oppia').directive('rubricsEditor', [
               ctrl.editableExplanations[difficulty] = (
                 angular.copy(explanations));
             }
-            ctrl.activeRubricIndex = 0;
             ctrl.EXPLANATION_FORM_SCHEMA = {
               type: 'html',
               ui_config: {}
             };
           };
+
+          $scope.$on('skillDescriptionChanged', function(evt) {
+            var explanations = ctrl.getRubrics()[1].getExplanations();
+            var difficulty = ctrl.getRubrics()[1].getDifficulty();
+            explanationsMemento[difficulty] = angular.copy(explanations);
+            ctrl.editableExplanations[difficulty] = (
+              angular.copy(explanations));
+          });
         }
       ]
     };

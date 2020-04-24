@@ -54,12 +54,10 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
             TopicCreationService.createNewTopic();
           };
           $scope.createSkill = function() {
-            var rubrics = [];
-            for (var idx in SKILL_DIFFICULTIES) {
-              rubrics.push(
-                RubricObjectFactory.create(SKILL_DIFFICULTIES[idx], [])
-              );
-            }
+            var rubrics = [
+              RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
+              RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
+              RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
@@ -68,8 +66,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
-                  $scope.MAX_CHARS_IN_SKILL_DESCRIPTION =
-                    MAX_CHARS_IN_SKILL_DESCRIPTION;
+                  $scope.MAX_CHARS_IN_SKILL_DESCRIPTION = (
+                    MAX_CHARS_IN_SKILL_DESCRIPTION);
                   $scope.newSkillDescription = '';
                   $scope.rubrics = rubrics;
                   $scope.bindableDict = {
@@ -77,10 +75,12 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                   };
                   var newExplanationObject = null;
 
-                  // $scope.$watch('newSkillDescription', function() {
-                  //   $scope.rubrics[1].setExplanation(
-                  //     '<p>' + $scope.newSkillDescription + '</p>');
-                  // });
+                  $scope.$watch('newSkillDescription', function() {
+                    var rubrics = $scope.rubrics[1].getExplanations();
+                    rubrics[0] = '<p>' + $scope.newSkillDescription + '</p>';
+                    $scope.rubrics[1].setExplanations(rubrics);
+                    $rootScope.$broadcast('skillDescriptionChanged');
+                  });
 
                   $scope.onSaveExplanation = function(explanationObject) {
                     newExplanationObject = explanationObject.toBackendDict();

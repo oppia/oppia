@@ -132,12 +132,10 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             TopicCreationService.createNewTopic();
           };
           ctrl.createSkill = function() {
-            var rubrics = [];
-            for (var idx in SKILL_DIFFICULTIES) {
-              rubrics.push(
-                RubricObjectFactory.create(SKILL_DIFFICULTIES[idx], [])
-              );
-            }
+            var rubrics = [
+              RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
+              RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
+              RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
@@ -155,10 +153,12 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                     MAX_CHARS_IN_SKILL_DESCRIPTION;
                   var newExplanationObject = null;
 
-                  // $scope.$watch('newSkillDescription', function() {
-                  //   $scope.rubrics[1].setExplanation(
-                  //     '<p>' + $scope.newSkillDescription + '</p>');
-                  // });
+                  $scope.$watch('newSkillDescription', function() {
+                    var rubrics = $scope.rubrics[1].getExplanations();
+                    rubrics[0] = '<p>' + $scope.newSkillDescription + '</p>';
+                    $scope.rubrics[1].setExplanations(rubrics);
+                    $rootScope.$broadcast('skillDescriptionChanged');
+                  });
 
                   $scope.onSaveExplanation = function(explanationObject) {
                     newExplanationObject = explanationObject.toBackendDict();

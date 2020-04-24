@@ -29,6 +29,5 @@ angular.module('oppia').directive('questionDifficultySelector', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/question-difficulty-selector/' +
         'question-difficulty-selector.directive.html')
-      ]
     };
   }]);
