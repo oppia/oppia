@@ -520,16 +520,17 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     names_reported.add(stripped_name)
                     failed = True
 
+            names_reported = sorted(names_reported)
             if len(names_reported) > 1:
                 python_utils.PRINT(
                     '{ %s } from \'%s\' have redundant definitions. '
                     'Please update them to have a single definition.' % (
-                        ', '.join(sorted(names_reported)), filepath))
+                        ', '.join(names_reported), filepath))
             elif len(names_reported) == 1:
                 python_utils.PRINT(
                     '{ %s } from \'%s\' has redundant definitions. '
                     'Please update it to have a single definition.' % (
-                        ', '.join(sorted(names_reported)), filepath))
+                        names_reported[0], filepath))
 
         if failed:
             summary_message = (
