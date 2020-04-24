@@ -29,12 +29,15 @@ from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.platform import models
 import feconf
 import python_utils
 import utils
+
+from mutagen import mp3
 
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
