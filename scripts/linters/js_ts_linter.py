@@ -502,6 +502,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         failed = False
         for filepath in self.all_filepaths:
+            if filepath.endswith('.spec.ts') or filepath.endswith('.spec.js'):
+                continue
             names_found = set()
             names_reported = set()
             file_tokens = self.parsed_js_and_ts_file_tokens[filepath]
