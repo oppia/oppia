@@ -798,6 +798,8 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
 
 
 class ExportAccountHandlerTests(test_utils.GenericTestBase):
+    GENERIC_DATE = datetime.datetime(2019, 5, 20)
+    GENERIC_EPOCH = time.mktime(GENERIC_DATE.timetuple())
 
     def setUp(self):
         super(ExportAccountHandlerTests, self).setUp()
@@ -812,14 +814,11 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             general_feedback_thread_ids=[]).put()
 
     def test_export_account_handler(self):
-        GENERIC_DATE = datetime.datetime(2019, 5, 20)
-        GENERIC_EPOCH = time.mktime(GENERIC_DATE.timetuple())
-
         # Update user settings to constants.
         user_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         user_settings = user_services.get_user_settings(user_id)
-        user_settings.last_agreed_to_terms = GENERIC_DATE
-        user_settings.last_logged_in = GENERIC_DATE
+        user_settings.last_agreed_to_terms = self.GENERIC_DATE
+        user_settings.last_logged_in = self.GENERIC_DATE
         user_settings.validate()
         user_models.UserSettingsModel(
             id=user_settings.user_id,
