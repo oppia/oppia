@@ -23,11 +23,10 @@ require('services/alerts.service.ts');
 angular.module('oppia').factory('TopicCreationService', [
   '$rootScope', '$uibModal', '$window', 'AlertsService',
   'TopicCreationBackendApiService', 'UrlInterpolationService',
-  'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
-  'MAX_CHARS_IN_TOPIC_NAME', function(
+  'MAX_CHARS_IN_TOPIC_NAME',
+  function(
       $rootScope, $uibModal, $window, AlertsService,
       TopicCreationBackendApiService, UrlInterpolationService,
-      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
       MAX_CHARS_IN_TOPIC_NAME) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
     var topicCreationInProgress = false;
@@ -73,19 +72,18 @@ angular.module('oppia').factory('TopicCreationService', [
           }
           topicCreationInProgress = true;
           AlertsService.clearWarnings();
+
+          $rootScope.loadingMessage = 'Creating topic';
           TopicCreationBackendApiService.createTopic(
             topic.topicName, topic.abbreviatedTopicName).then(
             function(response) {
-              $rootScope.$broadcast(
-                EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
-              topicCreationInProgress = false;
-              $window.open(
-                UrlInterpolationService.interpolateUrl(
-                  TOPIC_EDITOR_URL_TEMPLATE, {
-                    topic_id: response.topicId
-                  }
-                ), '_blank'
+              $window.location = UrlInterpolationService.interpolateUrl(
+                TOPIC_EDITOR_URL_TEMPLATE, {
+                  topic_id: response.topicId
+                }
               );
+            }, function() {
+              $rootScope.loadingMessage = '';
             });
         });
       }

@@ -144,8 +144,7 @@ angular.module('oppia').directive('skillsList', [
                     ).then(function() {
                       $timeout(function() {
                         $rootScope.$broadcast(
-                          EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-                          true);
+                          EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
                       }, 100);
                     }).then(function() {
                       var successToast = (
