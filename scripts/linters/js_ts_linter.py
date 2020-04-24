@@ -500,10 +500,14 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('Starting redundant function names check')
             python_utils.PRINT('----------------------------------------')
 
+        suffixes_to_ignore = ['.controller.ts', '.directive.ts', '.spec.ts']
+        files_to_check = [
+            file for file in self.all_filepaths
+            if all(not file.endswith(suffix) for suffix in suffixes_to_ignore)
+        ]
+
         failed = False
-        for filepath in self.all_filepaths:
-            if filepath.endswith('.spec.ts') or filepath.endswith('.spec.js'):
-                continue
+        for filepath in files_to_check:
             names_found = set()
             names_reported = set()
             file_tokens = self.parsed_js_and_ts_file_tokens[filepath]
