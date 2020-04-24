@@ -15,74 +15,73 @@
  * @fileoverview Unit test for CollectionCreationBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+// eslint-disable-next-line max-len
+require('components/entity-creation-services/collection-creation-backend-api.service.ts');
 
-import { CollectionCreationBackendService } from
-  'components/entity-creation-services/collection-creation-backend-api.service';
+import { UpgradedServices } from 'services/UpgradedServices';
 
-describe('Collection Creation backend service', () => {
-  let collectionCreationBackendService: CollectionCreationBackendService = null;
-  let httpTestingController: HttpTestingController;
-  let SAMPLE_COLLECTION_ID = 'hyuy4GUlvTqJ';
-  let SUCCESS_STATUS_CODE = 200;
-  let ERROR_STATUS_CODE = 500;
+describe('Collection Creation backend service', function() {
+  var CollectionCreationBackendService = null;
+  var $httpBackend = null;
+  var $rootScope = null;
+  var SAMPLE_COLLECTION_ID = 'hyuy4GUlvTqJ';
+  var SUCCESS_STATUS_CODE = 200;
+  var ERROR_STATUS_CODE = 500;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
+  beforeEach(angular.mock.module('oppia'));
 
-    collectionCreationBackendService = TestBed.get(
-      CollectionCreationBackendService);
-    httpTestingController = TestBed.get(HttpTestingController);
-  });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
-  afterEach(() => {
-    httpTestingController.verify();
+  beforeEach(angular.mock.inject(function($injector) {
+    CollectionCreationBackendService = $injector.get(
+      'CollectionCreationBackendService');
+    $httpBackend = $injector.get('$httpBackend');
+    $rootScope = $injector.get('$rootScope');
+  }));
+
+  afterEach(function() {
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
   });
 
   it('should successfully create a new collection and obtain the collection ID',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+    (done) => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
 
-      collectionCreationBackendService.createCollection().then(
+      $httpBackend.expectPOST('/collection_editor_handler/create_new').respond(
+        SUCCESS_STATUS_CODE, {collectionId: SAMPLE_COLLECTION_ID});
+      CollectionCreationBackendService.createCollection().then(
         successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/collection_editor_handler/create_new');
-      expect(req.request.method).toEqual('POST');
-      req.flush({collectionId: SAMPLE_COLLECTION_ID});
-
-      flushMicrotasks();
+      $httpBackend.flush();
+      $rootScope.$digest();
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+      done();
+    });
 
   it('should fail to create a new collection and call the fail handler',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+    (done) => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
 
-      collectionCreationBackendService.createCollection().then(
+      $httpBackend.expectPOST('/collection_editor_handler/create_new').respond(
+        ERROR_STATUS_CODE);
+      CollectionCreationBackendService.createCollection().then(
         successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/collection_editor_handler/create_new');
-      expect(req.request.method).toEqual('POST');
-      req.flush('Error creating a new collection.', {
-        status: ERROR_STATUS_CODE,
-        statusText: 'Error creating a new collection.'
-      });
-
-      flushMicrotasks();
+      $httpBackend.flush();
+      $rootScope.$digest();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
-    })
-  );
+      done();
+    });
 });

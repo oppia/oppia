@@ -16,39 +16,29 @@
  * collection_id.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+angular.module('oppia').factory('CollectionCreationBackendService', [
+  '$http', '$q',
+  function(
+      $http, $q) {
+    var _createCollection = function(successCallback, errorCallback) {
+      $http.post('/collection_editor_handler/create_new')
+        .then(function(response) {
+          if (successCallback) {
+            successCallback(response.data);
+          }
+        }, function() {
+          if (errorCallback) {
+            errorCallback();
+          }
+        });
+    };
 
-@Injectable({
-  providedIn: 'root'
-})
-export class CollectionCreationBackendService {
-  constructor(private http: HttpClient) {}
-
-  private _createCollection(
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
-    this.http.post('/collection_editor_handler/create_new', {}).toPromise()
-      .then((response) => {
-        if (successCallback) {
-          successCallback(response);
-        }
-      }, () => {
-        if (errorCallback) {
-          errorCallback();
-        }
-      });
+    return {
+      createCollection: function() {
+        return $q(function(resolve, reject) {
+          _createCollection(resolve, reject);
+        });
+      }
+    };
   }
-
-
-  createCollection(): Promise<object> {
-    return new Promise((resolve, reject) => {
-      this._createCollection(resolve, reject);
-    });
-  }
-}
-
-angular.module('oppia').factory(
-  'CollectionCreationBackendService',
-  downgradeInjectable(CollectionCreationBackendService));
+]);
