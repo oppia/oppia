@@ -256,7 +256,7 @@ var createSkillAndAssignTopic = function(
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
   topicsAndSkillsDashboardPage.get();
   topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-    skillDescription, material);
+    skillDescription, material, true);
   topicsAndSkillsDashboardPage.get();
   topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
   topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
