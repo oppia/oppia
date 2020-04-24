@@ -943,7 +943,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
     def test_export_account_handler_disabled_logged_in(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', False):
             self.get_json('/export-account-handler', expected_status_int=404)
-    
+
     def test_export_account_hander_disabled_logged_out(self):
         self.logout()
         with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', False):
@@ -953,6 +953,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         self.logout()
         with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True):
             self.get_json('/export-account-handler', expected_status_int=401)
+
 
 class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
 
