@@ -34,9 +34,10 @@ export class StoryNode {
   _outlineIsFinalized: boolean;
   _explorationId: string;
   constructor(
-      id: string, title: string, description: string, destinationNodeIds: string[],
-      prerequisiteSkillIds: string[], acquiredSkillIds: string[],
-      outline: string, outlineIsFinalized: boolean, explorationId: string) {
+      id: string, title: string, description: string,
+      destinationNodeIds: string[], prerequisiteSkillIds: string[],
+      acquiredSkillIds: string[], outline: string, outlineIsFinalized: boolean,
+      explorationId: string) {
     this._id = id;
     this._title = title;
     this._description = description;

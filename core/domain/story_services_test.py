@@ -180,7 +180,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story.story_contents.nodes[1].outline_is_finalized, True)
         self.assertEqual(story.story_contents.nodes[1].title, 'Title 2')
-        self.assertEqual(story.story_contents.nodes[1].description, 'Description 2')
+        self.assertEqual(
+            story.story_contents.nodes[1].description, 'Description 2')
         self.assertEqual(story.story_contents.initial_node_id, self.NODE_ID_2)
         self.assertEqual(story.story_contents.next_node_id, 'node_3')
         self.assertEqual(story.version, 3)
@@ -1593,6 +1594,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.assertEqual(
             completion_model.completed_node_ids, [
                 self.NODE_ID_1, self.NODE_ID_2, self.NODE_ID_3])
+
 
 class StoryContentsMigrationTests(test_utils.GenericTestBase):
 

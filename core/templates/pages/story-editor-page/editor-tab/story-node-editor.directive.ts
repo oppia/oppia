@@ -98,7 +98,8 @@ angular.module('oppia').directive('storyNodeEditor', [
             }
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
             $scope.editableTitle = $scope.currentTitle;
-            $scope.currentDescription = $scope.nodeIdToDescriptionMap[$scope.getId()];
+            $scope.currentDescription =
+              $scope.nodeIdToDescriptionMap[$scope.getId()];
             $scope.editableDescription = $scope.currentDescription;
             $scope.oldOutline = $scope.getOutline();
             $scope.editableOutline = $scope.getOutline();

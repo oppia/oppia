@@ -483,7 +483,7 @@ describe('Story update service', function() {
     ).toBe('Description 1');
   });
 
-  it('should create a proper backend change dict for setting a node description',
+  it('should create a backend change dict for setting a node description',
     function() {
       StoryUpdateService.setStoryNodeDescription(
         _sampleStory, 'node_1', 'new description');

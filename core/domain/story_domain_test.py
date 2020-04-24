@@ -420,7 +420,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].title = 1
         self._assert_validation_error(
             'Expected title to be a string, received 1')
-    
+
     def test_node_description_validation(self):
         self.story.story_contents.nodes[0].description = 1
         self._assert_validation_error(
@@ -914,7 +914,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         story_contents object.
         """
         story_node = story_domain.StoryNode(
-            self.NODE_ID_1, 'Title','Description' ,[self.NODE_ID_2],
+            self.NODE_ID_1, 'Title', 'Description', [self.NODE_ID_2],
             [self.SKILL_ID_1], [self.SKILL_ID_2],
             'Outline', False, self.EXP_ID)
         story_contents = story_domain.StoryContents(

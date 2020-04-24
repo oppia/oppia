@@ -133,7 +133,8 @@ def apply_change_list(story_id, change_list):
                     story.update_node_title(change.node_id, change.new_value)
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_DESCRIPTION):
-                    story.update_node_description(change.node_id, change.new_value)
+                    story.update_node_description(
+                        change.node_id, change.new_value)
                 elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):
                     story.update_node_acquired_skill_ids(

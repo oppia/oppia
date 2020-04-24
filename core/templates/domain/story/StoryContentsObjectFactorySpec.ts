@@ -92,7 +92,8 @@ describe('Story contents object factory', () => {
     });
 
     expect(() => {
-      _sampleStoryContents.getNodeIdsToDescriptionMap(['node_1', 'node_2', 'node_3']);
+      _sampleStoryContents.getNodeIdsToDescriptionMap(
+        ['node_1', 'node_2', 'node_3']);
     }).toThrow();
   });
 

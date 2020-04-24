@@ -304,7 +304,7 @@ class StoryNode(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' %
                 self.title)
-        
+
         if not isinstance(self.description, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s' %
@@ -800,7 +800,7 @@ class Story(python_utils.OBJECT):
             feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
             story_contents, feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0)
-    
+
     @classmethod
     def _convert_story_contents_v1_dict_to_v2_dict(cls, story_contents_dict):
         """Converts old Story Contents schema to the modern v2 schema.
@@ -966,7 +966,7 @@ class Story(python_utils.OBJECT):
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
         self.story_contents.nodes[node_index].title = new_title
-    
+
     def update_node_description(self, node_id, new_description):
         """Updates the description field of a given node.
 
