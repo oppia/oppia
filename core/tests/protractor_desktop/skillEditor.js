@@ -47,14 +47,17 @@ describe('Skill Editor functionality', function() {
     users.createAndLoginAdminUser(
       'creator@skillEditor.com', 'creatorSkillEditor');
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 1', 'Concept card explanation');
-    browser.getCurrentUrl().then(function(url) {
-      skillId = url.split('/')[4];
-    }, function() {
-      // Note to developers:
-      // Promise is returned by getCurrentUrl which is handled here.
-      // No further action is needed.
+    browser.getWindowHandle().then(function(handle) {
+      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+        'Skill 1', 'Concept card explanation', false);
+      browser.getCurrentUrl().then(function(url) {
+        skillId = url.split('/')[4];
+        general.closeCurrentTabAndSwitchTo(handle);
+      }, function() {
+        // Note to developers:
+        // Promise is returned by getCurrentUrl which is handled here.
+        // No further action is needed.
+      });
     });
   });
 

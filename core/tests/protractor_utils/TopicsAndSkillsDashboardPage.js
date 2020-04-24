@@ -138,15 +138,33 @@ var TopicsAndSkillsDashboardPage = function() {
     });
   };
 
-  this.createTopic = function(title) {
-    waitFor.elementToBeClickable(
-      createTopicButton,
-      'Create Topic button takes too long to be clickable');
-    createTopicButton.click();
+  this.createTopic = function(topicName, shouldCloseTopicEditor) {
+    var initialHandles = [];
+    return browser.getAllWindowHandles().then(function(handles) {
+      initialHandles = handles;
+      return browser.getWindowHandle();
+    }).then(function(parentHandle) {
+      waitFor.elementToBeClickable(
+        createTopicButton,
+        'Create Topic button takes too long to be clickable');
+      createTopicButton.click();
 
-    topicNameField.sendKeys(title);
-    confirmTopicCreationButton.click();
-    waitFor.pageToFullyLoad();
+      topicNameField.sendKeys(topicName);
+      confirmTopicCreationButton.click();
+
+      waitFor.newTabToBeCreated('Creating topic takes too long');
+      return browser.getAllWindowHandles().then(function(handles) {
+        var newHandle = handles.filter(
+          handle => initialHandles.indexOf(handle) === -1)[0];
+        browser.switchTo().window(newHandle).then(function() {
+          if (shouldCloseTopicEditor) {
+            browser.driver.close();
+            return browser.switchTo().window(parentHandle);
+          }
+          return waitFor.pageToFullyLoad();
+        });
+      });
+    });
   };
 
   this.deleteTopicWithIndex = function(index) {
@@ -181,37 +199,55 @@ var TopicsAndSkillsDashboardPage = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.createSkillWithDescriptionAndExplanation = function(
-      description, reviewMaterial) {
-    waitFor.elementToBeClickable(
-      createSkillButton,
-      'Create Skill button takes too long to be clickable');
-    createSkillButton.click();
+  this.createSkillWithDescriptionAndExplanation = async function(
+      description, reviewMaterial, shouldCloseSkillEditor) {
+    var initialHandles = [];
+    return browser.getAllWindowHandles().then(function(handles) {
+      initialHandles = handles;
+      return browser.getWindowHandle();
+    }).then(function(parentHandle) {
+      waitFor.elementToBeClickable(
+        createSkillButton,
+        'Create Skill button takes too long to be clickable');
+      createSkillButton.click();
 
-    skillNameField.sendKeys(description);
-    editConceptCardExplanationButton.click();
+      skillNameField.sendKeys(description);
+      editConceptCardExplanationButton.click();
 
-    var editor = element(by.css('.protractor-test-concept-card-text'));
-    waitFor.visibilityOf(
-      editor, 'Explanation Editor takes too long to appear');
+      var editor = element(by.css('.protractor-test-concept-card-text'));
+      waitFor.visibilityOf(
+        editor, 'Explanation Editor takes too long to appear');
 
-    browser.switchTo().activeElement().sendKeys(reviewMaterial);
+      browser.switchTo().activeElement().sendKeys(reviewMaterial);
 
-    waitFor.elementToBeClickable(
-      saveConceptCardExplanationButton,
-      'Save Concept Card Explanation button takes too long to be clickable');
-    saveConceptCardExplanationButton.click();
-    waitFor.invisibilityOf(
-      editor, 'Explanation Editor takes too long to close');
+      waitFor.elementToBeClickable(
+        saveConceptCardExplanationButton,
+        'Save Concept Card Explanation button takes too long to be clickable');
+      saveConceptCardExplanationButton.click();
+      waitFor.invisibilityOf(
+        editor, 'Explanation Editor takes too long to close');
 
-    for (var i = 0; i < 3; i++) {
-      skillEditorPage.editRubricExplanationWithIndex(i, 'Explanation ' + i);
-    }
-    waitFor.elementToBeClickable(
-      confirmSkillCreationButton,
-      'Create skill button takes too long to be clickable');
-    confirmSkillCreationButton.click();
-    waitFor.pageToFullyLoad();
+      for (var i = 0; i < 3; i++) {
+        skillEditorPage.editRubricExplanationWithIndex(i, 'Explanation ' + i);
+      }
+      waitFor.elementToBeClickable(
+        confirmSkillCreationButton,
+        'Create skill button takes too long to be clickable');
+      confirmSkillCreationButton.click();
+
+      waitFor.newTabToBeCreated('Creating skill takes too long');
+      return browser.getAllWindowHandles().then(function(handles) {
+        var newHandle = handles.filter(
+          handle => initialHandles.indexOf(handle) === -1)[0];
+        browser.switchTo().window(newHandle).then(function() {
+          if (shouldCloseSkillEditor) {
+            browser.driver.close();
+            return browser.switchTo().window(parentHandle);
+          }
+          return waitFor.pageToFullyLoad();
+        });
+      });
+    });
   };
 
   this.navigateToUnusedSkillsTab = function() {
