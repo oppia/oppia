@@ -204,6 +204,18 @@ class DeployTests(test_utils.GenericTestBase):
                 'Current release version has \'.\' character.'):
                 deploy.execute_deployment()
 
+    def test_invalid_release_version_length(self):
+        args_swap = self.swap(
+            sys, 'argv', [
+                'deploy.py', '--app_name=oppiatestserver',
+                '--version=release-1.2.3-invalid-custom'])
+        with self.get_branch_swap, args_swap, self.install_swap:
+            with self.assertRaisesRegexp(
+                AssertionError,
+                'Length of version should be less than equal to 25 '
+                'characters.'):
+                deploy.execute_deployment()
+
     def test_invalid_last_commit_msg(self):
         args_swap = self.swap(
             sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
