@@ -23,11 +23,9 @@ require('services/alerts.service.ts');
 angular.module('oppia').factory('StoryCreationService', [
   '$http', '$rootScope', '$uibModal', '$window', 'AlertsService',
   'TopicEditorStateService', 'UrlInterpolationService',
-  'MAX_CHARS_IN_STORY_TITLE',
   function(
       $http, $rootScope, $uibModal, $window, AlertsService,
-      TopicEditorStateService, UrlInterpolationService,
-      MAX_CHARS_IN_STORY_TITLE) {
+      TopicEditorStateService, UrlInterpolationService) {
     var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
     var STORY_CREATOR_URL_TEMPLATE = '/topic_editor_story_handler/<topic_id>';
     var storyCreationInProgress = false;
@@ -46,7 +44,6 @@ angular.module('oppia').factory('StoryCreationService', [
             '$scope', '$uibModalInstance',
             function($scope, $uibModalInstance) {
               $scope.storyTitle = '';
-              $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
               $scope.isStoryTitleEmpty = function(storyTitle) {
                 return (storyTitle === '');
               };

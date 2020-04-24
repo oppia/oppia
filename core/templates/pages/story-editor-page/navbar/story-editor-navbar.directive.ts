@@ -58,18 +58,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
             return $scope.validationIssues.length;
           };
 
-          $scope.getTotalWarningsCount = function() {
-            return (
-              $scope.validationIssues.length +
-              $scope.explorationValidationIssues.length);
-          };
-
           $scope.isStorySaveable = function() {
-            if (StoryEditorStateService.isStoryPublished()) {
-              return (
-                $scope.getChangeListLength() > 0 &&
-                $scope.getTotalWarningsCount() === 0);
-            }
             return (
               $scope.getChangeListLength() > 0 &&
               $scope.getWarningsCount() === 0);
@@ -86,30 +75,32 @@ angular.module('oppia').directive('storyEditorNavbar', [
             $scope.validationIssues = $scope.story.validate();
             var nodes = $scope.story.getStoryContents().getNodes();
             var explorationIds = [];
-
-            if (
-              StoryEditorStateService.areAnyExpIdsChanged() ||
-              $scope.forceValidateExplorations) {
-              $scope.explorationValidationIssues = [];
-              for (var i = 0; i < nodes.length; i++) {
-                if (nodes[i].getExplorationId() !== null) {
-                  explorationIds.push(nodes[i].getExplorationId());
-                } else {
-                  $scope.explorationValidationIssues.push(
-                    'Some chapters don\'t have exploration IDs provided.');
-                }
-              }
-              $scope.forceValidateExplorations = false;
-              if (explorationIds.length > 0) {
-                EditableStoryBackendApiService.validateExplorations(
-                  $scope.story.getId(), explorationIds
-                ).then(function(validationIssues) {
-                  $scope.explorationValidationIssues =
-                    $scope.explorationValidationIssues.concat(validationIssues);
-                });
+            for (var i = 0; i < nodes.length; i++) {
+              if (
+                nodes[i].getExplorationId() !== null &&
+                nodes[i].getExplorationId() !== '') {
+                explorationIds.push(nodes[i].getExplorationId());
+              } else {
+                $scope.validationIssues.push(
+                  'Some chapters don\'t have exploration IDs provided.');
               }
             }
-            StoryEditorStateService.resetExpIdsChanged();
+
+            if (StoryEditorStateService.getExpIdsChanged()) {
+              StoryEditorStateService.resetExpIdsChanged();
+              EditableStoryBackendApiService.validateExplorations(
+                $scope.story.getId(), explorationIds
+              ).then(function(validationIssues) {
+                $scope.explorationValidationIssues = validationIssues;
+                $scope.validationIssues =
+                  $scope.validationIssues.concat(
+                    $scope.explorationValidationIssues);
+              });
+            } else {
+              $scope.validationIssues =
+                $scope.validationIssues.concat(
+                  $scope.explorationValidationIssues);
+            }
           };
 
           $scope.saveChanges = function() {
@@ -153,13 +144,10 @@ angular.module('oppia').directive('storyEditorNavbar', [
               false, function() {
                 $scope.storyIsPublished =
                   StoryEditorStateService.isStoryPublished();
-                $scope.forceValidateExplorations = true;
-                _validateStory();
               });
           };
 
           ctrl.$onInit = function() {
-            $scope.forceValidateExplorations = true;
             $scope.story = StoryEditorStateService.getStory();
             $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;

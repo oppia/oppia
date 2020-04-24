@@ -78,6 +78,7 @@ describe('Topic object factory', () => {
 
     expect(_sampleTopic.validate()).toEqual([
       'Topic name should not be empty.',
+      'Abbreviated name should not be empty.',
       'The story with id story_2 is present in both canonical ' +
       'and additional stories.',
       'The skill with id skill_1 is duplicated in the topic'
