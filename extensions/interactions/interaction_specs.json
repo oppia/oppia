@@ -591,14 +591,7 @@
         "default_value": [
           ""
         ]
-      }, {
-        "name": "showChoicesInShuffledOrder",
-        "description": "Shuffle answer choices",
-        "schema": {
-            "type": "bool"
-        },
-        "default_value": true
-    }
+      }
     ],
     "is_terminal": false,
     "default_outcome_heading": null,

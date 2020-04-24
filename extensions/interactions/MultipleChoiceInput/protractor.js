@@ -36,20 +36,14 @@ var customizeInteraction = function(elem, richTextInstructionsArray) {
 // the options.
 var expectInteractionDetailsToMatch = function(
     elem, richTextInstructionsArray) {
-  elem.all(by.css('.protractor-test-multiple-choice-option-container'))
+  elem.all(by.repeater('choice in $ctrl.choices track by $index'))
     .then(function(optionElements) {
       expect(optionElements.length).toEqual(richTextInstructionsArray.length);
-      var promises = [];
       for (var i = 0; i < optionElements.length; i++) {
-        promises.push(optionElements[i].element(by.css(
-          '.protractor-test-multiple-choice-option')).getText());
+        forms.expectRichText(optionElements[i].element(by.css(
+          '.protractor-test-multiple-choice-option'
+        ))).toMatch(richTextInstructionsArray[i]);
       }
-      var rteInstructionArrayCopy = [...richTextInstructionsArray];
-      rteInstructionArrayCopy.sort();
-      protractor.promise.all(promises).then(function(results) {
-        results.sort();
-        expect(rteInstructionArrayCopy).toEqual(results);
-      });
     });
 };
 
@@ -66,15 +60,15 @@ var testSuite = [{
   interactionArguments: [[function(editor) {
     editor.appendBoldText('right');
   }, function(editor) {
-    editor.appendItalicText('wrong1');
-  }, function(editor) {
-    editor.appendItalicText('wrong2');
-  }, function(editor) {
-    editor.appendItalicText('wrong3');
+    editor.appendItalicText('wrong');
   }]],
   ruleArguments: ['Equals', ['right']],
-  expectedInteractionDetails: [['right', 'wrong1', 'wrong2', 'wrong3']],
-  wrongAnswers: ['wrong1', 'wrong2', 'wrong3'],
+  expectedInteractionDetails: [[function(checker) {
+    checker.readBoldText('right');
+  }, function(checker) {
+    checker.readItalicText('wrong');
+  }]],
+  wrongAnswers: ['wrong'],
   correctAnswers: ['right']
 }];
 
