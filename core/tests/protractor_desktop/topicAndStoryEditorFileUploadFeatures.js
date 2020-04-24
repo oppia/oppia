@@ -45,6 +45,8 @@ describe('Topic editor functionality', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     users.createAndLoginAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createTopic(topicName, false);
     users.logout();
   });
 
@@ -69,7 +71,6 @@ describe('Topic editor functionality', function() {
             return topicEditorPage.getTopicThumbnailSource();
           })
       );
-    topicEditorPage.changeAbbreviatedTopicName('short name');
     topicEditorPage.changeTopicDescription('Topic Description');
     topicEditorPage.saveTopic('Changed topic name and description.');
 
@@ -78,7 +79,6 @@ describe('Topic editor functionality', function() {
 
     topicsAndSkillsDashboardPage.editTopic(NEW_TOPIC_NAME);
     topicEditorPage.expectTopicNameToBe('TASEFUF_1 edited');
-    topicEditorPage.expectAbbreviatedTopicNameToBe('short name');
     topicEditorPage.expectTopicDescriptionToBe('Topic Description');
   });
 

@@ -42,11 +42,14 @@ angular.module('oppia').directive('storyEditor', [
         '$scope', 'StoryEditorStateService', 'StoryUpdateService',
         'UndoRedoService', 'EVENT_VIEW_STORY_NODE_EDITOR', '$uibModal',
         'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED', 'AlertsService',
+        'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_CHAPTER_TITLE',
         function(
             $scope, StoryEditorStateService, StoryUpdateService,
             UndoRedoService, EVENT_VIEW_STORY_NODE_EDITOR, $uibModal,
-            EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED, AlertsService) {
+            EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED, AlertsService,
+            MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_CHAPTER_TITLE) {
           var ctrl = this;
+          $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyContents = $scope.story.getStoryContents();
@@ -140,10 +143,14 @@ angular.module('oppia').directive('storyEditor', [
               ]
             });
 
-            modalInstance.result.then(function(title) {
+            modalInstance.result.then(function() {
               StoryUpdateService.deleteStoryNode($scope.story, nodeId);
               _initEditor();
               $scope.$broadcast('recalculateAvailableNodes');
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -162,6 +169,8 @@ angular.module('oppia').directive('storyEditor', [
                   $scope.nodeTitle = '';
                   $scope.nodeTitles = nodeTitles;
                   $scope.errorMsg = null;
+                  $scope.MAX_CHARS_IN_CHAPTER_TITLE =
+                    MAX_CHARS_IN_CHAPTER_TITLE;
 
                   $scope.resetErrorMsg = function() {
                     $scope.errorMsg = null;

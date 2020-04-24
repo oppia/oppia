@@ -403,8 +403,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_title_validation(self):
         self.story.title = 1
+        self._assert_validation_error('Title should be a string')
+        self.story.title = (
+            'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
         self._assert_validation_error(
-            'Title should be a string')
+            'Story title should be less than 39 chars')
 
     def test_thumbnail_filename_validation(self):
         self.story.thumbnail_filename = []
@@ -475,6 +478,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].title = 1
         self._assert_validation_error(
             'Expected title to be a string, received 1')
+
+        self.story.story_contents.nodes[0].title = (
+            'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
+        self._assert_validation_error(
+            'Chapter title should be less than 36 chars')
 
     def test_nodes_validation(self):
         self.story.story_contents.initial_node_id = 'node_10'
@@ -1039,6 +1047,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].exploration_id = 1
         self._assert_validation_error(
             'Expected exploration ID to be a string')
+
+    def test_validate_empty_exploration_id(self):
+        self.story.story_contents.nodes[0].exploration_id = ''
+        self._assert_validation_error(
+            'Expected exploration ID to not be an empty string')
 
     def test_validate_non_str_outline(self):
         self.story.story_contents.nodes[0].outline = 0

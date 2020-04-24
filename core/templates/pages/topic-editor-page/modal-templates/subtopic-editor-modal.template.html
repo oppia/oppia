@@ -26,7 +26,17 @@
         <strong style="font-size: 1.2em;">Subtopic Title</strong>
       </p>
       <form class="form-horizontal" role="form">
-        <input class="form-control protractor-test-subtopic-title-field" type="text" ng-blur="updateSubtopicTitle(editableTitle)" ng-model="editableTitle" maxlength="80" ng-change="resetErrorMsg()">
+        <input class="form-control protractor-test-subtopic-title-field"
+               type="text"
+               ng-blur="updateSubtopicTitle(editableTitle)"
+               ng-model="editableTitle"
+               maxlength="<[MAX_CHARS_IN_SUBTOPIC_TITLE]>"
+               ng-change="resetErrorMsg()">
+        <span class="oppia-input-box-subtitle">
+          <i>
+            Subtopic title should be at most <[MAX_CHARS_IN_SUBTOPIC_TITLE]> characters.
+          </i>
+        </span>
       </form>
       <span class="form-text" style="font-size: smaller; color: red;" ng-if="errorMsg">
         <em><[errorMsg]></em>
@@ -48,7 +58,7 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-secondary" ng-click="cancel()"> Cancel </button>
+    <button class="btn btn-secondary" ng-click="cancel()" type="button"> Cancel </button>
     <button class="btn btn-success protractor-test-save-subtopic-button" ng-disabled="editableTitle === '' || !editableThumbnailFilename" ng-click="save()"> Save & Exit </button>
   </div>
 </div>

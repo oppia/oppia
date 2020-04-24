@@ -39,11 +39,13 @@ angular.module('oppia').directive('subtopicsListTab', [
         'UndoRedoService', 'SubtopicPageObjectFactory',
         'UrlInterpolationService', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_SUBTOPIC_PAGE_LOADED',
+        'MAX_CHARS_IN_SUBTOPIC_TITLE',
         function(
             $scope, $uibModal, TopicEditorStateService, TopicUpdateService,
             UndoRedoService, SubtopicPageObjectFactory,
             UrlInterpolationService, EVENT_TOPIC_REINITIALIZED,
-            EVENT_TOPIC_INITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED) {
+            EVENT_TOPIC_INITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED,
+            MAX_CHARS_IN_SUBTOPIC_TITLE) {
           var ctrl = this;
           var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
           var _initEditor = function() {
@@ -73,6 +75,8 @@ angular.module('oppia').directive('subtopicsListTab', [
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
+                  $scope.MAX_CHARS_IN_SUBTOPIC_TITLE =
+                    MAX_CHARS_IN_SUBTOPIC_TITLE;
                   $scope.subtopicId = subtopic.getId();
                   $scope.subtopicTitles = subtopicTitles;
                   $scope.editableTitle = editableTitle;
@@ -258,6 +262,8 @@ angular.module('oppia').directive('subtopicsListTab', [
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
+                  $scope.MAX_CHARS_IN_SUBTOPIC_TITLE =
+                    MAX_CHARS_IN_SUBTOPIC_TITLE;
                   $scope.subtopicTitle = '';
                   $scope.subtopicTitles = subtopicTitles;
                   $scope.errorMsg = null;

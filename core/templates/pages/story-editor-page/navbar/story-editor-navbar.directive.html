@@ -36,7 +36,7 @@
             class="btn btn-secondary oppia-editor-publish-button protractor-test-publish-story-button"
             ng-click="publishStory()"
             ng-class="{'btn-success': !isStorySaveable()}"
-            ng-disabled="isStorySaveable() || getWarningsCount() > 0 || validationIssues.length > 0">
+            ng-disabled="isStorySaveable() || getWarningsCount() > 0 || validationIssues.length > 0 || explorationValidationIssues.length > 0">
       <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
          alt="Publish to Oppia Library">
         &#xE2C3;
@@ -64,7 +64,7 @@
     <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
       <span class="oppia-editor-warnings-header">Warnings</span>
       <li class="oppia-editor-warnings-text protractor-test-warnings-text"
-          ng-repeat="issue in validationIssues track by $index">
+          ng-repeat="issue in validationIssues.concat(explorationValidationIssues) track by $index">
         <hr class="oppia-editor-warnings-separator">
         <[issue]>
       </li>
