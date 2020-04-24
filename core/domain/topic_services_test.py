@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import story_domain
@@ -57,7 +58,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         })]
         self.save_new_topic(
             self.TOPIC_ID, self.user_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename='topic.png',
+            abbreviated_name='abbrev', thumbnail_filename='topic.svg',
+            thumbnail_bg_color=(
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
@@ -236,9 +239,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_topic(
             topic_id, self.user_id, name='Name 2',
             abbreviated_name='abbrev', thumbnail_filename=None,
-            description='Description',
-            canonical_story_ids=[],
-            additional_story_ids=[],
+            thumbnail_bg_color=None, description='Description',
+            canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id_1, 'skill_3'],
             subtopics=[], next_subtopic_id=1)
         self.assertEqual(
@@ -297,6 +299,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'subtopic_id': 1,
             'old_value': None,
             'new_value': 'image.svg'
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': 'thumbnail_bg_color',
+            'subtopic_id': 1,
+            'old_value': None,
+            'new_value': constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
@@ -306,6 +314,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(topic.subtopics), 1)
         self.assertEqual(topic.subtopics[0].title, 'New Title')
         self.assertEqual(topic.subtopics[0].thumbnail_filename, 'image.svg')
+        self.assertEqual(
+            topic.subtopics[0].thumbnail_bg_color,
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])
 
     def test_cannot_create_topic_change_class_with_invalid_cmd(self):
         with self.assertRaisesRegexp(
@@ -1085,9 +1096,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.save_new_topic(
                 'topic_2', self.user_id, name='Name',
                 abbreviated_name='abbrev', thumbnail_filename=None,
-                description='Description 2', canonical_story_ids=[],
-                additional_story_ids=[], uncategorized_skill_ids=[],
-                subtopics=[], next_subtopic_id=1)
+                thumbnail_bg_color=None, description='Description 2',
+                canonical_story_ids=[], additional_story_ids=[],
+                uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
 
     def test_update_topic_language_code(self):
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
@@ -1202,15 +1213,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_topic(
             'topic_2', self.user_id, name='Name 2',
             abbreviated_name='abbrev', thumbnail_filename=None,
-            description='Description 2', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=1)
+            thumbnail_bg_color=None, description='Description 2',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
         self.save_new_topic(
             'topic_3', self.user_id, name='Name 3',
             abbreviated_name='abbrev', thumbnail_filename=None,
-            description='Description 3', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=1)
+            thumbnail_bg_color=None, description='Description 3',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
 
         topic_services.assign_role(
             self.user_admin, self.user_a,

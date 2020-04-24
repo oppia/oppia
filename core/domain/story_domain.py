@@ -320,8 +320,7 @@ class StoryNode(python_utils.OBJECT):
             value.
         """
         return cls(
-            node_id, title, None,
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            node_id, title, None, None,
             [], [], [], '', False, None)
 
     def validate(self):
@@ -345,7 +344,7 @@ class StoryNode(python_utils.OBJECT):
 
         if self.thumbnail_bg_color and self.thumbnail_filename is None:
             raise utils.ValidationError(
-                'Chapter thumbnail filename is not specified.')
+                'Chapter thumbnail image is not provided.')
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
             raise utils.ValidationError(
                 'Chapter thumbnail background color is not specified.')
@@ -890,8 +889,7 @@ class Story(python_utils.OBJECT):
         initial_node_id = '%s1' % NODE_ID_PREFIX
         story_contents = StoryContents([], None, initial_node_id)
         return cls(
-            story_id, title, None,
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0],
+            story_id, title, None, None,
             feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
             story_contents, feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0)

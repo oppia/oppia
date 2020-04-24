@@ -24,6 +24,8 @@ require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 
+const subtopic_constants = require('constants.ts');
+
 angular.module('oppia').directive('subtopicsListTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -78,7 +80,8 @@ angular.module('oppia').directive('subtopicsListTab', [
                   $scope.editableThumbnailBgColor = editableThumbnailBgColor;
                   $scope.subtopicPage = (
                     TopicEditorStateService.getSubtopicPage());
-                  $scope.allowedBgColors = ['#FFFFFF'];
+                  $scope.allowedBgColors = (
+                    subtopic_constants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic);
                   var pageContents = $scope.subtopicPage.getPageContents();
                   if (pageContents) {
                     $scope.htmlData = pageContents.getHtml();
@@ -157,6 +160,7 @@ angular.module('oppia').directive('subtopicsListTab', [
               var newTitle = newValues.newTitle;
               var newHtmlData = newValues.newHtmlData;
               var newThumbnailFilename = newValues.newThumbnailFilename;
+              var newThumbnailBgColor = newValues.newThumbnailBgColor;
 
               if (newTitle !== subtopic.getTitle()) {
                 TopicUpdateService.setSubtopicTitle(
@@ -174,6 +178,10 @@ angular.module('oppia').directive('subtopicsListTab', [
               if (newThumbnailFilename !== subtopic.getThumbnailFilename()) {
                 TopicUpdateService.setSubtopicThumbnailFilename(
                   $scope.topic, subtopic.getId(), newThumbnailFilename);
+              }
+              if (newThumbnailBgColor !== subtopic.getThumbnailBgColor()) {
+                TopicUpdateService.setSubtopicThumbnailBgColor(
+                  $scope.topic, subtopic.getId(), newThumbnailBgColor);
               }
             }, function() {
               // Note to developers:

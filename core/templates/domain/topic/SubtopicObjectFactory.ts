@@ -20,8 +20,6 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-const constants = require('constants.ts');
-
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
 
@@ -163,7 +161,7 @@ export class SubtopicObjectFactory {
       title: title,
       skill_ids: [],
       thumbnail_filename: null,
-      thumbnail_bg_color: constants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic[0]
+      thumbnail_bg_color: null
     }, {});
   }
 }

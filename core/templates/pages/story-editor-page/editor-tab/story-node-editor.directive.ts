@@ -28,6 +28,8 @@ require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
+const story_node_constants = require('constants.ts');
+
 angular.module('oppia').directive('storyNodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -92,8 +94,8 @@ angular.module('oppia').directive('storyNodeEditor', [
                 $scope.storyNodeIds);
             _recalculateAvailableNodes();
             $scope.skillIdToSummaryMap = {};
-            $scope.allowedBgColors = [
-              '#F8BF74', '#D68F78', '#8EBBB6', '#B3D8F1'];
+            $scope.allowedBgColors = (
+              story_node_constants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
             for (var idx in skillSummaries) {
               $scope.skillIdToSummaryMap[skillSummaries[idx].id] =

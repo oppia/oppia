@@ -53,9 +53,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_topic(
             self.TOPIC_ID, self.USER_ID, name='Topic',
             abbreviated_name='abbrev', thumbnail_filename=None,
-            description='A new topic', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=0)
+            thumbnail_bg_color=None, description='A new topic',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=0)
         self.save_new_story(
             self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
             self.TOPIC_ID)
@@ -127,6 +127,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'property_name': story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME,
                 'old_value': None,
                 'new_value': 'image.svg'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR),
+                'old_value': None,
+                'new_value': constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0]
             })
         ]
         story_services.update_story(
@@ -136,6 +143,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.title, 'New Title')
         self.assertEqual(story.description, 'New Description')
         self.assertEqual(story.thumbnail_filename, 'image.svg')
+        self.assertEqual(
+            story.thumbnail_bg_color,
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])
         self.assertEqual(story.version, 3)
 
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
@@ -177,6 +187,15 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME),
                 'old_value': None,
                 'new_value': 'image.svg'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'node_id': self.NODE_ID_2,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR),
+                'old_value': None,
+                'new_value': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                    'chapter'][0]
             })
         ]
         story_services.update_story(
@@ -184,6 +203,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(
             story.story_contents.nodes[1].thumbnail_filename, 'image.svg')
+        self.assertEqual(
+            story.story_contents.nodes[1].thumbnail_bg_color,
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0])
         self.assertEqual(
             story.story_contents.nodes[1].destination_node_ids,
             [self.NODE_ID_1])
@@ -255,9 +277,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_topic(
             topic_id, self.USER_ID, name='A New Topic',
             abbreviated_name='abbrev', thumbnail_filename=None,
-            description='A new topic description.', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=0)
+            thumbnail_bg_color=None, description='A new topic description.',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=0)
         self.save_new_story(
             story_id, self.USER_ID, 'Title', 'Description', 'Notes', topic_id)
 
@@ -1105,9 +1127,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_topic(
             topic_id, self.USER_ID, name='A different topic',
             abbreviated_name='abbrev', thumbnail_filename=None,
-            description='A new topic', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=0)
+            thumbnail_bg_color=None, description='A new topic',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[],
+            next_subtopic_id=0)
         self.save_new_story(
             story_id, self.USER_ID, 'new title', 'Description', 'Notes',
             topic_id)
@@ -1395,9 +1418,10 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.save_new_topic(
             self.TOPIC_ID, self.USER_ID, name='New Topic',
             abbreviated_name='abbrev', thumbnail_filename=None,
-            description='A new topic', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=0)
+            thumbnail_bg_color=None, description='A new topic',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[],
+            next_subtopic_id=0)
         story = story_domain.Story.create_default_story(
             self.STORY_1_ID, 'Title', self.TOPIC_ID)
         story.description = ('Description')
@@ -1628,11 +1652,9 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
         self.save_new_topic(
             topic_id, user_id, name='Topic',
             abbreviated_name='abbrev', thumbnail_filename=None,
-            thumbnail_bg_color=(
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
-            description='A new topic', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=0)
+            thumbnail_bg_color=None, description='A new topic',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=0)
         story_model = story_models.StoryModel(
             id=story_id,
             description='Description',

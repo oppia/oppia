@@ -251,6 +251,10 @@ var StoryEditorPage = function() {
     explorationIdSaveButton.click();
   };
 
+  this.expectChapterExplorationIdToBe = function(id) {
+    expect(explorationIdInput.getAttribute('value')).toEqual(id);
+  };
+
   this.changeNodeOutline = function(richTextInstructions) {
     var editor = forms.RichTextEditor(
       nodeOutlineEditor);

@@ -21,7 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import logging
-from xml.etree import ElementTree as ET
+import xml
 
 import bs4
 from constants import constants
@@ -887,23 +887,28 @@ def get_invalid_svg_tags_and_attrs(svg_string):
         svg_string: str. The SVG string.
 
     Returns:
-        tuple. A 2-tuple, the first element of which is a list of invalid tags,
-        and the second element of which is a list of invalid attributes.
+        tuple(list(str), list(str)). A 2-tuple, the first element of which
+        is a list of invalid tags, and the second element of which is a
+        list of invalid tag-specific attributes.
+        eg. (['invalid-tag1', 'invalid-tag2'], ['path:invalid-attr'])
     """
     soup = bs4.BeautifulSoup(svg_string.encode('utf-8'), 'html.parser')
     invalid_elements = []
     invalid_attrs = []
     for element in soup.find_all():
-        if element.name.lower() in constants.ALLOWED_SVG_TAGS:
+        if element.name.lower() in constants.SVG_ATTRS_WHITELIST.keys():
             for attr in element.attrs:
-                if attr.lower() not in constants.ALLOWED_SVG_ATTRS:
-                    invalid_attrs.append(attr)
+                if attr.lower() not in (
+                    constants.SVG_ATTRS_WHITELIST[element.name.lower()]):
+                    invalid_attrs.append('%s:%s' % (element.name, attr))
         else:
             invalid_elements.append(element.name)
+            for attr in element.attrs:
+                invalid_attrs.append('%s:%s' % (element.name, attr))
     return (invalid_elements, invalid_attrs)
 
 
-def is_xml_parsable(xml_string):
+def is_parsable_as_xml(xml_string):
     """Checks if input string is parsable as XML.
 
     Args:
@@ -912,8 +917,10 @@ def is_xml_parsable(xml_string):
     Returns:
         bool. Whether xml_string is parsable as XML or not.
     """
+    if not isinstance(xml_string, python_utils.BASESTRING):
+        return False
     try:
-        ET.fromstring(xml_string)
+        xml.etree.ElementTree.fromstring(xml_string)
         return True
-    except ET.ParseError:
+    except xml.etree.ElementTree.ParseError:
         return False

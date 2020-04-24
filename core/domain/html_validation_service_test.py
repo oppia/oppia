@@ -1472,6 +1472,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(regenerated_name, 'abc_height_45_width_45.png')
 
     def test_svg_string_validation(self):
+        # A Valid SVG string.
         valid_svg_string = (
             '<svg version="1.0" xmlns="http://www.w3.org/2000/svg"  width="879'
             '.000000pt" height="494.000000pt" viewBox="0 0 879.000000 494.0000'
@@ -1494,6 +1495,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             html_validation_service.get_invalid_svg_tags_and_attrs(
                 valid_svg_string), ([], []))
+        # SVG containing an invalid tag.
         invalid_svg_string = (
             '<svg version="1.0" xmlns="http://www.w3.org/2000/svg"  width="879'
             '.000000pt" height="494.000000pt" viewBox="0 0 879.000000 494.0000'
@@ -1512,7 +1514,118 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             ' -595 -23 -112 -14 -299 21 -402 70 -206 212 -368 402 -460 118 -56'
             ' 181 -69 339 -69 104 0 156 4 204 18 255 71 451 258 537 511 35 103'
             ' 44 290 21 402 -60 278 -258 497 -532 586 -88 28 -324 33 -420 9z"/'
+            '> </g> </svg>')
+        self.assertEqual(
+            html_validation_service.get_invalid_svg_tags_and_attrs(
+                invalid_svg_string), (['testtag'], []))
+        # SVG containing an invalid attribute for a valid tag.
+        invalid_svg_string = (
+            '<svg version="1.0" xmlns="http://www.w3.org/2000/svg"  width="879'
+            '.000000pt" height="494.000000pt" viewBox="0 0 879.000000 494.0000'
+            '00"  preserveAspectRatio="xMidYMid meet"> <metadata> Created by p'
+            'otrace 1.15, written by Peter Selinger 2001-2017 </metadata> <g t'
+            'ransform="translate(0.000000,494.000000) scale(0.100000,-0.100000'
+            ')" fill="#000000" stroke="none"> <path d="M4415 4900 c-1070 -219 '
+            '-2018 -685 -2855 -1404 -135 -116 -490 -471 -606 -606 -347 -404 -6'
+            '04 -785 -841 -1246 l-113 -221 0 -194 0 -194 62 145 c179 423 446 8'
+            '85 727 1260 326 436 806 914 1236 1233 774 573 1671 956 2615 1116 '
+            '587 100 1254 111 1819 30 81 -12 221 -57 371 -121 850 -361 1493 -1'
+            '083 1754 -1969 192 -653 156 -1361 -102 -1999 -95 -234 -235 -484 -'
+            '378 -673 l-44 -57 365 0 365 0 0 2085 0 2085 -47 30 c-88 55 -566 2'
+            '89 -728 355 -381 158 -834 290 -1244 366 -99 18 -159 19 -1135 18 l'
+            '-1031 0 -190 -39z"/> <path d="M5455 2632 c-290 -74 -509 -302 -572'
+            ' -595 -23 -112 -14 -299 21 -402 70 -206 212 -368 402 -460 118 -56'
+            ' 181 -69 339 -69 104 0 156 4 204 18 255 71 451 258 537 511 35 103'
+            ' 44 290 21 402 -60 278 -258 497 -532 586 -88 28 -324 33 -420 9z"/'
             ' danger="h4cK3D!"> </g> </svg>')
         self.assertEqual(
             html_validation_service.get_invalid_svg_tags_and_attrs(
-                invalid_svg_string), (['testtag'], ['danger']))
+                invalid_svg_string), ([], ['path:danger']))
+        # SVG containing an invalid attribute in an invalid tag.
+        invalid_svg_string = (
+            '<svg version="1.0" xmlns="http://www.w3.org/2000/svg"  width="879'
+            '.000000pt" height="494.000000pt" viewBox="0 0 879.000000 494.0000'
+            '00"  preserveAspectRatio="xMidYMid meet"> <metadata> Created by p'
+            'otrace 1.15, written by Peter Selinger 2001-2017 </metadata> <g t'
+            'ransform="translate(0.000000,494.000000) scale(0.100000,-0.100000'
+            ')" fill="#000000" stroke="none"> <path d="M4415 4900 c-1070 -219 '
+            '-2018 -685 -2855 -1404 -135 -116 -490 -471 -606 -606 -347 -404 -6'
+            '04 -785 -841 -1246 l-113 -221 0 -194 0 -194 62 145 c179 423 446 8'
+            '85 727 1260 326 436 806 914 1236 1233 774 573 1671 956 2615 1116 '
+            '587 100 1254 111 1819 30 81 -12 221 -57 371 -121 850 -361 1493 -1'
+            '083 1754 -1969 192 -653 156 -1361 -102 -1999 -95 -234 -235 -484 -'
+            '378 -673 l-44 -57 365 0 365 0 0 2085 0 2085 -47 30 c-88 55 -566 2'
+            '89 -728 355 -381 158 -834 290 -1244 366 -99 18 -159 19 -1135 18 l'
+            '-1031 0 -190 -39z"/> <hack d="M5455 2632 c-290 -74 -509 -302 -572'
+            ' -595 -23 -112 -14 -299 21 -402 70 -206 212 -368 402 -460 118 -56'
+            ' 181 -69 339 -69 104 0 156 4 204 18 255 71 451 258 537 511 35 103'
+            ' 44 290 21 402 -60 278 -258 497 -532 586 -88 28 -324 33 -420 9z"/'
+            ' danger="h4cK3D!"> </g> </svg>')
+        self.assertEqual(
+            html_validation_service.get_invalid_svg_tags_and_attrs(
+                invalid_svg_string), (['hack'], ['hack:d', 'hack:danger']))
+        # SVG containing a valid tag masquerading as an attribute.
+        invalid_svg_string = (
+            '<svg version="1.0" xmlns="http://www.w3.org/2000/svg"  width="879'
+            '.000000pt" height="494.000000pt" viewBox="0 0 879.000000 494.0000'
+            '00"  preserveAspectRatio="xMidYMid meet"> <metadata> Created by p'
+            'otrace 1.15, written by Peter Selinger 2001-2017 </metadata> <g t'
+            'ransform="translate(0.000000,494.000000) scale(0.100000,-0.100000'
+            ')" fill="#000000" stroke="none"> <path d="M4415 4900 c-1070 -219 '
+            '-2018 -685 -2855 -1404 -135 -116 -490 -471 -606 -606 -347 -404 -6'
+            '04 -785 -841 -1246 l-113 -221 0 -194 0 -194 62 145 c179 423 446 8'
+            '85 727 1260 326 436 806 914 1236 1233 774 573 1671 956 2615 1116 '
+            '587 100 1254 111 1819 30 81 -12 221 -57 371 -121 850 -361 1493 -1'
+            '083 1754 -1969 192 -653 156 -1361 -102 -1999 -95 -234 -235 -484 -'
+            '378 -673 l-44 -57 365 0 365 0 0 2085 0 2085 -47 30 c-88 55 -566 2'
+            '89 -728 355 -381 158 -834 290 -1244 366 -99 18 -159 19 -1135 18 l'
+            '-1031 0 -190 -39z"/> <path d="M5455 2632 c-290 -74 -509 -302 -572'
+            ' -595 -23 -112 -14 -299 21 -402 70 -206 212 -368 402 -460 118 -56'
+            ' 181 -69 339 -69 104 0 156 4 204 18 255 71 451 258 537 511 35 103'
+            ' 44 290 21 402 -60 278 -258 497 -532 586 -88 28 -324 33 -420 9z"/'
+            ' path="h4cK3D!"> </g> </svg>')
+        self.assertEqual(
+            html_validation_service.get_invalid_svg_tags_and_attrs(
+                invalid_svg_string), ([], ['path:path']))
+        # SVG containing a invalid attribute for the parent tag but valid for
+        # a different tag.
+        invalid_svg_string = (
+            '<svg version="1.0" xmlns="http://www.w3.org/2000/svg"  width="879'
+            '.000000pt" height="494.000000pt" viewBox="0 0 879.000000 494.0000'
+            '00"  preserveAspectRatio="xMidYMid meet"> <metadata> Created by p'
+            'otrace 1.15, written by Peter Selinger 2001-2017 </metadata> <g t'
+            'ransform="translate(0.000000,494.000000) scale(0.100000,-0.100000'
+            ')" fill="#000000" stroke="none"> <path d="M4415 4900 c-1070 -219 '
+            '-2018 -685 -2855 -1404 -135 -116 -490 -471 -606 -606 -347 -404 -6'
+            '04 -785 -841 -1246 l-113 -221 0 -194 0 -194 62 145 c179 423 446 8'
+            '85 727 1260 326 436 806 914 1236 1233 774 573 1671 956 2615 1116 '
+            '587 100 1254 111 1819 30 81 -12 221 -57 371 -121 850 -361 1493 -1'
+            '083 1754 -1969 192 -653 156 -1361 -102 -1999 -95 -234 -235 -484 -'
+            '378 -673 l-44 -57 365 0 365 0 0 2085 0 2085 -47 30 c-88 55 -566 2'
+            '89 -728 355 -381 158 -834 290 -1244 366 -99 18 -159 19 -1135 18 l'
+            '-1031 0 -190 -39z"/> <path d="M5455 2632 c-290 -74 -509 -302 -572'
+            ' -595 -23 -112 -14 -299 21 -402 70 -206 212 -368 402 -460 118 -56'
+            ' 181 -69 339 -69 104 0 156 4 204 18 255 71 451 258 537 511 35 103'
+            ' 44 290 21 402 -60 278 -258 497 -532 586 -88 28 -324 33 -420 9z"/'
+            ' keytimes="h4cK3D!"> </g> </svg>')
+        self.assertEqual(
+            html_validation_service.get_invalid_svg_tags_and_attrs(
+                invalid_svg_string), ([], ['path:keytimes']))
+
+    def test_parsable_as_xml(self):
+        invalid_xml = 'aDRjSzNS'
+        self.assertEqual(
+            html_validation_service.is_parsable_as_xml(invalid_xml),
+            False)
+        invalid_xml = '123'
+        self.assertEqual(
+            html_validation_service.is_parsable_as_xml(invalid_xml),
+            False)
+        invalid_xml = False
+        self.assertEqual(
+            html_validation_service.is_parsable_as_xml(invalid_xml),
+            False)
+        valid_xml = '<svg><path d="0" /></svg>'
+        self.assertEqual(
+            html_validation_service.is_parsable_as_xml(valid_xml),
+            True)

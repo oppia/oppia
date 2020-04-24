@@ -712,6 +712,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             self.save_new_topic(
                 'topic_id', self.owner_id, name='Name',
                 abbreviated_name='abbrev', thumbnail_filename=None,
+                thumbnail_bg_color=None,
                 description='Description',
                 canonical_story_ids=['story_id_1', 'story_id_2'],
                 additional_story_ids=['story_id_3'],

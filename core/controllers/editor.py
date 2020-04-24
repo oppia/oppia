@@ -638,7 +638,7 @@ class ImageUploadHandler(EditorHandler):
 
         allowed_formats = ', '.join(
             list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
-        if html_validation_service.is_xml_parsable(raw):
+        if html_validation_service.is_parsable_as_xml(raw):
             file_format = 'svg'
             invalid_tags, invalid_attrs = (
                 html_validation_service.get_invalid_svg_tags_and_attrs(raw))

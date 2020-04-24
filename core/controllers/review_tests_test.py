@@ -88,7 +88,9 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, self.story_2)
         self.save_new_topic(
             self.topic_id, 'user', name='Topic',
-            abbreviated_name='abbrev', thumbnail_filename='Topic.png',
+            abbreviated_name='abbrev', thumbnail_filename='Topic.svg',
+            thumbnail_bg_color=(
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
             description='A new topic',
             canonical_story_ids=[self.story_id_1, self.story_id_3],
             additional_story_ids=[], uncategorized_skill_ids=[],

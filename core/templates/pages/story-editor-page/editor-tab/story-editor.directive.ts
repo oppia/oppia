@@ -29,6 +29,8 @@ require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
+const story_constants = require('constants.ts');
+
 angular.module('oppia').directive('storyEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -60,8 +62,8 @@ angular.module('oppia').directive('storyEditor', [
             $scope.disconnectedNodes = [];
             $scope.linearNodesList = [];
             $scope.nodes = [];
-            $scope.allowedBgColors = [
-              '#F8BF74', '#D68F78', '#8EBBB6', '#B3D8F1'];
+            $scope.allowedBgColors = (
+              story_constants.ALLOWED_THUMBNAIL_BG_COLORS.story);
             if ($scope.storyContents &&
                 $scope.storyContents.getNodes().length > 0) {
               $scope.nodes = $scope.storyContents.getNodes();
@@ -74,10 +76,6 @@ angular.module('oppia').directive('storyEditor', [
             $scope.notesEditorIsShown = false;
             $scope.storyTitleEditorIsShown = false;
             $scope.editableTitle = $scope.story.getTitle();
-            $scope.editableThumbnailFilename = (
-              $scope.story.getThumbnailFilename());
-            $scope.editableThumbnailBgColor = (
-              $scope.story.getThumbnailBgColor());
             $scope.editableNotes = $scope.story.getNotes();
             $scope.editableDescription = $scope.story.getDescription();
             $scope.editableDescriptionIsEmpty = (

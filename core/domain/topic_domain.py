@@ -359,9 +359,7 @@ class Subtopic(python_utils.OBJECT):
             Subtopic. A subtopic object with given id, title and empty skill ids
                 list.
         """
-        return cls(
-            subtopic_id, title, [], None,
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])
+        return cls(subtopic_id, title, [], None, None)
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
@@ -917,8 +915,7 @@ class Topic(python_utils.OBJECT):
             Topic. The Topic domain object with the default values.
         """
         return cls(
-            topic_id, name, abbreviated_name, None,
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0],
+            topic_id, name, abbreviated_name, None, None,
             feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,

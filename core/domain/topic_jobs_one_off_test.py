@@ -135,8 +135,18 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         topic = (
             topic_models.TopicModel.get(self.TOPIC_ID))
         self.assertEqual(topic.subtopic_schema_version, 1)
+        self.assertEqual(
+            topic.subtopics[0],
+            {
+                'id': 1,
+                'skill_ids': ['skill_1'],
+                'title': 'A subtitle'
+            })
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.subtopic_schema_version, 2)
+        self.assertEqual(
+            topic.subtopics[0].to_dict(),
+            self.MIGRATED_SUBTOPIC_DICT)
 
         # Start migration job.
         job_id = (

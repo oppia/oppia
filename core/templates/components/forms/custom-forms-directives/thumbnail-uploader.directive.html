@@ -2,18 +2,15 @@
   <div>
     <div class="oppia-editable-section float-left" title="Change Thumbnail"
          style="height: 100px; width: 180px"
-         ng-style="imageContainerStyle">
+         ng-style="{background: getBgColor()}">
       <div class="oppia-click-to-start-editing protractor-test-photo-button"
            ng-click="showEditThumbnailModal()">
       </div>
       <i class="material-icons oppia-editor-edit-icon" style="top: 8px; right: 8px;">&#xE254;</i>
-      <img ng-if="editableThumbnailDataUrl"
+      <img ng-show="!thumbnailIsLoading"
            ng-src="<[editableThumbnailDataUrl]>"
            class="img-thumbnail protractor-test-custom-photo"
-           ng-style="imageContainerStyle">
-      <img ng-if="!editableThumbnailDataUrl"
-           ng-src="<[placeholderImageDataUrl]>"
-           class="img-thumbnail protractor-test-custom-photo">
+           ng-style="{background: getBgColor()}">
     </div>
   </div>
 </div>

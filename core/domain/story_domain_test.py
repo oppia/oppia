@@ -328,7 +328,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'id': self.STORY_ID,
             'title': 'Title',
             'thumbnail_filename': None,
-            'thumbnail_bg_color': '#F8BF74',
+            'thumbnail_bg_color': None,
             'description': feconf.DEFAULT_STORY_DESCRIPTION,
             'notes': feconf.DEFAULT_STORY_NOTES,
             'story_contents': {
@@ -497,8 +497,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict({
                 'id': 'node_1',
                 'thumbnail_filename': None,
-                'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                    'chapter'][0],
+                'thumbnail_bg_color': None,
                 'title': 'Title 1',
                 'destination_node_ids': [self.NODE_ID_2],
                 'prerequisite_skill_ids': [],
@@ -555,7 +554,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.next_node_id = 'node_4'
         node_1 = {
             'id': 'node_1',
-            'thumbnail_filename': 'image1.png',
+            'thumbnail_filename': 'image1.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 1',
@@ -568,7 +567,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
-            'thumbnail_filename': 'image2.png',
+            'thumbnail_filename': 'image2.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 2',
@@ -581,7 +580,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
-            'thumbnail_filename': 'image3.png',
+            'thumbnail_filename': 'image3.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 3',
@@ -913,6 +912,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_1 = {
             'id': 'node_1',
             'title': 'Title 1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1'],
@@ -923,6 +925,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'title': 'Title 2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': ['skill_3'],
             'prerequisite_skill_ids': ['skill_2'],
@@ -933,6 +938,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_3 = {
             'id': 'node_3',
             'title': 'Title 2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_4'],
             'prerequisite_skill_ids': ['skill_3'],

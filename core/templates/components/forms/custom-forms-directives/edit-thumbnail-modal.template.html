@@ -9,7 +9,7 @@
       <div class="alert alert-warning">
         <span>Here are some guidelines to follow:</span>
         <ul>
-          <li>Uploaded image should have an aspect ratio of 4:3 or 16:9.</li>
+          <li>Uploaded image should have an aspect ratio of <[aspectRatio]>.</li>
           <li>Uploaded image should have a transparent background.</li>
         </ul>
       </div>
@@ -35,7 +35,7 @@
           </div>
         </div>
       </div>
-      <div class="oppia-thumbnail-container" ng-show="uploadedImage" ng-style="{background: getPreviewDescriptionBgColor(), color: getPreviewDescriptionBgColor() ? '#FFFFFF' : ''}">
+      <div class="oppia-thumbnail-container protractor-test-thumbnail-container" ng-show="uploadedImage" ng-style="{background: getPreviewDescriptionBgColor(), color: getPreviewDescriptionBgColor() ? '#FFFFFF' : ''}">
         <button class="btn btn-secondary oppia-thumbnail-reset-button" ng-click="reset()">
           <i class="material-icons oppia-vcenter">&#xE14C;</i>
         </button>

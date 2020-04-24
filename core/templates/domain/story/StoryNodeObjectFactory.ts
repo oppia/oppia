@@ -20,8 +20,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-const constants = require('constants.ts');
-
 import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants';
 
@@ -280,7 +278,7 @@ export class StoryNodeObjectFactory {
   createFromIdAndTitle(nodeId: string, title: string): StoryNode {
     return new StoryNode(
       nodeId, title, [], [], [], '', false, null,
-      constants.ALLOWED_THUMBNAIL_BG_COLORS.chapter[0], null);
+      null, null);
   }
 }
 

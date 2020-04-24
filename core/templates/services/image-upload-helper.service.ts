@@ -54,13 +54,16 @@ angular.module('oppia').factory('ImageUploadHelperService', [
         var doc = domParser.parseFromString(svgString, 'image/svg+xml');
         var invalidTags = [];
         var invalidAttrs = [];
+        var allowedTags = Object.keys(Constants.SVG_ATTRS_WHITELIST);
+        var nodeTagName = null;
         doc.querySelectorAll('*').forEach((node) => {
-          if (Constants.ALLOWED_SVG_TAGS.indexOf(
-            node.tagName.toLowerCase()) !== -1) {
+          nodeTagName = node.tagName.toLowerCase();
+          if (allowedTags.indexOf(nodeTagName) !== -1) {
             for (var i = 0; i < node.attributes.length; i++) {
-              if (Constants.ALLOWED_SVG_ATTRS.indexOf(
+              if (Constants.SVG_ATTRS_WHITELIST[nodeTagName].indexOf(
                 node.attributes[i].name.toLowerCase()) === -1) {
-                invalidAttrs.push(node.attributes[i].name);
+                invalidAttrs.push(
+                  node.tagName + ':' + node.attributes[i].name);
               }
             }
           } else {

@@ -632,6 +632,7 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
         self.save_new_topic(
             self.topic_id, self.owner_id, name='Name',
             abbreviated_name='abbrev', thumbnail_filename=None,
+            thumbnail_bg_color=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)

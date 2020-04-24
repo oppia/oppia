@@ -10713,7 +10713,7 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
                 u'[u\'failed validation check for subtopic count check of Topi'
                 'cSummaryModel\', [u"Entity id 0: Subtopic count: 10 does not '
                 'match the total number of subtopics in topic model: [{u\'thum'
-                'bnail_bg_color\': u\'#FFFFFF\', u\'skill_ids\': [u\'0\', '
+                'bnail_bg_color\': None, u\'skill_ids\': [u\'0\', '
                 'u\'1\'], u\'id\': 1, u\'thumbnail_filename\': None, u\'title'
                 '\': u\'subtopic1\'}] "]]'
             ), u'[u\'fully-validated TopicSummaryModel\', 2]']

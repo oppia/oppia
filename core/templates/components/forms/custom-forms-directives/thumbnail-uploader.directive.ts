@@ -34,6 +34,7 @@ angular.module('oppia').directive('thumbnailUploader', [
       scope: {
         disabled: '=',
         getAllowedBgColors: '&allowedBgColors',
+        getAspectRatio: '&aspectRatio',
         getBgColor: '&bgColor',
         getFilename: '&filename',
         getPreviewDescription: '&previewDescription',
@@ -52,24 +53,32 @@ angular.module('oppia').directive('thumbnailUploader', [
         function($rootScope, $scope, $uibModal,
             AlertsService, ContextService, CsrfTokenService,
             ImageUploadHelperService) {
-          var placeholderImageUrl = '/icons/story-image-icon.png';
-          $scope.placeholderImageDataUrl = (
+          var placeholderImageDataUrl = (
             UrlInterpolationService.getStaticImageUrl(
-              placeholderImageUrl));
+              '/icons/story-image-icon.png'));
           var uploadedImage = null;
-          $scope.imageContainerStyle = {};
-          if ($scope.getFilename()) {
-            $scope.editableThumbnailDataUrl = (
-              ImageUploadHelperService
+          $scope.thumbnailIsLoading = false;
+          // $watch is required here to update the thumbnail image
+          // everytime the thumbnail filename changes (eg. draft is discarded).
+          // The trusted resource url for the thumbnail should not be directly
+          // bound to ngSrc because it can cause an infinite digest error.
+          // eslint-disable-next-line max-len
+          // https://github.com/angular/angular.js/blob/master/CHANGELOG.md#sce-
+          $scope.$watch('getFilename()', function(filename) {
+            if (filename) {
+              $scope.editableThumbnailDataUrl = (
+                ImageUploadHelperService
                 .getTrustedResourceUrlForThumbnailFilename(
                   $scope.getFilename(),
                   ContextService.getEntityType(),
                   ContextService.getEntityId()));
-            uploadedImage = $scope.editableThumbnailDataUrl;
-            $scope.imageContainerStyle = {
-              background: $scope.getBgColor()
-            };
-          }
+              uploadedImage = $scope.editableThumbnailDataUrl;
+            } else {
+              $scope.editableThumbnailDataUrl = placeholderImageDataUrl;
+              uploadedImage = null;
+            }
+            $scope.thumbnailIsLoading = false;
+          });
           $scope.showEditThumbnailModal = function() {
             if ($scope.disabled) {
               return;
@@ -78,7 +87,8 @@ angular.module('oppia').directive('thumbnailUploader', [
             // This refers to the temporary thumbnail background
             // color used for preview.
             var tempBgColor = (
-              $scope.imageContainerStyle.background || $scope.getBgColor());
+              $scope.getBgColor() ||
+              $scope.getAllowedBgColors()[0]);
             var tempImageName = '';
             var uploadedImageMimeType = '';
             var dimensions = {
@@ -86,6 +96,7 @@ angular.module('oppia').directive('thumbnailUploader', [
               width: 0
             };
             var allowedBgColors = $scope.getAllowedBgColors();
+            var aspecRatio = $scope.getAspectRatio();
             var getPreviewDescription = $scope.getPreviewDescription;
             var getPreviewDescriptionBgColor = (
               $scope.getPreviewDescriptionBgColor);
@@ -96,7 +107,6 @@ angular.module('oppia').directive('thumbnailUploader', [
               if (newBgColor !== $scope.getBgColor()) {
                 $scope.updateBgColor(newBgColor);
               }
-              $scope.imageContainerStyle.background = newBgColor;
             };
 
             var saveThumbnailImageData = function(imageURI, callback) {
@@ -171,6 +181,7 @@ angular.module('oppia').directive('thumbnailUploader', [
                   };
 
                   $scope.allowedBgColors = allowedBgColors;
+                  $scope.aspectRatio = aspecRatio;
                   $scope.getPreviewDescription = getPreviewDescription;
                   $scope.getPreviewDescriptionBgColor = (
                     getPreviewDescriptionBgColor);
@@ -270,6 +281,7 @@ angular.module('oppia').directive('thumbnailUploader', [
                 }
               ]
             }).result.then(function(data) {
+              $scope.thumbnailIsLoading = true;
               if (openInUploadMode) {
                 tempImageName = (
                   ImageUploadHelperService.generateImageFilename(

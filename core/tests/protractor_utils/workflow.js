@@ -29,7 +29,7 @@ var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
 var thumbnailUploadInput = element(
   by.css('.protractor-test-photo-upload-input'));
 var thumbnailContainer = element(
-  by.css('.oppia-thumbnail-container'));
+  by.css('.protractor-test-thumbnail-container'));
 var thumbnailSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 
@@ -280,6 +280,9 @@ var getThumbnailSource = function(customThumbnailElement) {
 };
 
 var uploadThumbnail = function(thumbnailClickableElement, imgPath) {
+  waitFor.visibilityOf(
+    thumbnailClickableElement,
+    'Thumbnail element is taking too long to appear.');
   thumbnailClickableElement.click();
   absPath = path.resolve(__dirname, imgPath);
   return thumbnailUploadInput.sendKeys(absPath);
@@ -296,9 +299,10 @@ var submitThumbnail = function(thumbnailClickableElement, imgPath) {
   }).then(function() {
     thumbnailSubmitButton.click();
   }).then(function() {
-    return waitFor.invisibilityOf(
+    waitFor.invisibilityOf(
       thumbnailUploadInput,
       'Photo uploader is taking too long to disappear');
+    return waitFor.pageToFullyLoad();
   });
 };
 

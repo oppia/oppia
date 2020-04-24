@@ -60,8 +60,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'name': 'Name',
             'abbreviated_name': 'abbrev',
             'thumbnail_filename': None,
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'topic'][0],
+            'thumbnail_bg_color': None,
             'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
             'canonical_story_references': [],
             'additional_story_references': [],
@@ -265,6 +264,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_subtopic_strict_validation(self):
         self.topic.thumbnail_filename = 'filename.svg'
+        self.topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.subtopics[0].skill_ids = []
         self._assert_strict_validation_error(
             'Subtopic with title Title does not have any skills linked')

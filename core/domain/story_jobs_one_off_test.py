@@ -162,8 +162,27 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         story = (
             story_models.StoryModel.get(self.STORY_ID))
         self.assertEqual(story.story_contents_schema_version, 1)
+        self.assertEqual(
+            story.story_contents,
+            {
+                'initial_node_id': 'node_1',
+                'next_node_id': 'node_2',
+                'nodes': [{
+                    'acquired_skill_ids': [],
+                    'destination_node_ids': [],
+                    'exploration_id': None,
+                    'id': 'node_1',
+                    'outline': '',
+                    'outline_is_finalized': False,
+                    'prerequisite_skill_ids': [],
+                    'title': 'Chapter 1'
+                }]
+            })
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.story_contents_schema_version, 2)
+        self.assertEqual(
+            story.story_contents.to_dict(),
+            self.MIGRATED_STORY_CONTENTS_DICT)
 
         # Start migration job.
         job_id = (
