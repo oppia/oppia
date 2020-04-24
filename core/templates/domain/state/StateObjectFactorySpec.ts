@@ -30,9 +30,12 @@ import { RecordedVoiceoversObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 
+const constants = require('constants.ts');
+
 describe('State Object Factory', () => {
   let sof, shof, iof, pcof, rvof, wtof;
   let stateObject;
+  const oldNewStateTemplate = constants.NEW_STATE_TEMPLATE;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -92,6 +95,60 @@ describe('State Object Factory', () => {
         }
       }
     };
+  });
+
+  beforeAll(() => {
+    constants.NEW_STATE_TEMPLATE = {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: ''
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: 1
+          },
+          placeholder: {
+            value: 'Type your answer here.'
+          }
+        },
+        default_outcome: {
+          dest: '(untitled state)',
+          feedback: {
+            content_id: 'default_outcome',
+            html: ''
+          },
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        hints: [],
+        solution: null,
+        id: 'TextInput'
+      },
+      param_changes: [],
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      }
+    };
+  });
+
+  afterAll(() => {
+    constants.NEW_STATE_TEMPLATE = oldNewStateTemplate;
   });
 
   it('should create a new state object from backend dict', () => {

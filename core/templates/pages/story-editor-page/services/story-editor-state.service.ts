@@ -117,7 +117,7 @@ angular.module('oppia').factory('StoryEditorStateService', [
         _expIdsChanged = false;
       },
 
-      getExpIdsChanged: function() {
+      areAnyExpIdsChanged: function() {
         return _expIdsChanged;
       },
 

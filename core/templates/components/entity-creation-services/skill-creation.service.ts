@@ -23,9 +23,11 @@ require('domain/skill/skill-creation-backend-api.service.ts');
 angular.module('oppia').factory('SkillCreationService', [
   '$rootScope', '$timeout', '$window', 'AlertsService',
   'SkillCreationBackendApiService', 'UrlInterpolationService',
+  'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
   function(
       $rootScope, $timeout, $window, AlertsService,
-      SkillCreationBackendApiService, UrlInterpolationService) {
+      SkillCreationBackendApiService, UrlInterpolationService,
+      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
       '/skill_editor/<skill_id>');
     var skillCreationInProgress = false;
@@ -41,18 +43,20 @@ angular.module('oppia').factory('SkillCreationService', [
         }
         skillCreationInProgress = true;
         AlertsService.clearWarnings();
-        $rootScope.loadingMessage = 'Creating skill';
         SkillCreationBackendApiService.createSkill(
           description, rubrics, explanation, linkedTopicIds)
           .then(function(response) {
             $timeout(function() {
-              $window.location = UrlInterpolationService.interpolateUrl(
-                CREATE_NEW_SKILL_URL_TEMPLATE, {
-                  skill_id: response.skillId
-                });
+              $rootScope.$broadcast(
+                EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, true);
+              skillCreationInProgress = false;
+              $window.open(
+                UrlInterpolationService.interpolateUrl(
+                  CREATE_NEW_SKILL_URL_TEMPLATE, {
+                    skill_id: response.skillId
+                  }), '_blank'
+              );
             }, 150);
-          }, function() {
-            $rootScope.loadingMessage = '';
           });
       }
     };
