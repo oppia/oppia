@@ -251,7 +251,8 @@ def _lint_all_files(
         custom_linter, third_party_linter = js_ts_linter.get_linters(
             js_filepaths, ts_filepaths,
             verbose_mode_enabled=verbose_mode_enabled,
-            enable_redundant_function_names_check)
+            enable_redundant_function_names_check=(
+                enable_redundant_function_names_check))
         custom_linters.append(custom_linter)
         third_party_linters.append(third_party_linter)
 
@@ -484,7 +485,7 @@ def main(args=None):
             _FILES['.css'], file_extension_type,
             verbose_mode_enabled=verbose_mode_enabled,
             enable_redundant_function_names_check=(
-                parse_args.enable_redundant_function_names_check))
+                parsed_args.enable_redundant_function_names_check))
         custom_linters += custom_linter
         third_party_linters += third_party_linter
 
