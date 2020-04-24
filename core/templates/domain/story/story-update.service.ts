@@ -24,8 +24,8 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('StoryUpdateService', [
-  'AlertsService', 'ChangeObjectFactory', 'UndoRedoService',
-  'CMD_ADD_STORY_NODE', 'CMD_DELETE_STORY_NODE',
+  'AlertsService', 'ChangeObjectFactory', 'StoryEditorStateService',
+  'UndoRedoService', 'CMD_ADD_STORY_NODE', 'CMD_DELETE_STORY_NODE',
   'CMD_UPDATE_STORY_CONTENTS_PROPERTY', 'CMD_UPDATE_STORY_NODE_OUTLINE_STATUS',
   'CMD_UPDATE_STORY_NODE_PROPERTY', 'CMD_UPDATE_STORY_PROPERTY',
   'INITIAL_NODE_ID', 'STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS',
@@ -35,8 +35,8 @@ angular.module('oppia').factory('StoryUpdateService', [
   'STORY_NODE_PROPERTY_TITLE', 'STORY_PROPERTY_DESCRIPTION',
   'STORY_PROPERTY_LANGUAGE_CODE', 'STORY_PROPERTY_NOTES',
   'STORY_PROPERTY_TITLE', function(
-      AlertsService, ChangeObjectFactory, UndoRedoService,
-      CMD_ADD_STORY_NODE, CMD_DELETE_STORY_NODE,
+      AlertsService, ChangeObjectFactory, StoryEditorStateService,
+      UndoRedoService, CMD_ADD_STORY_NODE, CMD_DELETE_STORY_NODE,
       CMD_UPDATE_STORY_CONTENTS_PROPERTY, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
       CMD_UPDATE_STORY_NODE_PROPERTY, CMD_UPDATE_STORY_PROPERTY,
       INITIAL_NODE_ID, STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
@@ -217,10 +217,12 @@ angular.module('oppia').factory('StoryUpdateService', [
         }, function(changeDict, story) {
           // Apply.
           story.getStoryContents().addNode(nodeTitle);
+          StoryEditorStateService.setExpIdsChanged();
         }, function(changeDict, story) {
           // Undo.
           var nodeId = _getNodeIdFromChangeDict(changeDict);
           story.getStoryContents().deleteNode(nodeId);
+          StoryEditorStateService.setExpIdsChanged();
         });
       },
 
@@ -234,6 +236,7 @@ angular.module('oppia').factory('StoryUpdateService', [
         }, function(changeDict, story) {
           // Apply.
           story.getStoryContents().deleteNode(nodeId);
+          StoryEditorStateService.setExpIdsChanged();
         }, function(changeDict, story) {
           // Undo.
           throw Error('A deleted story node cannot be restored.');
@@ -340,10 +343,12 @@ angular.module('oppia').factory('StoryUpdateService', [
             // Apply.
             story.getStoryContents().setNodeExplorationId(
               nodeId, newExplorationId);
+            StoryEditorStateService.setExpIdsChanged();
           }, function(changeDict, story) {
             // Undo.
             story.getStoryContents().setNodeExplorationId(
               nodeId, oldExplorationId);
+            StoryEditorStateService.setExpIdsChanged();
           });
       },
 
@@ -395,10 +400,12 @@ angular.module('oppia').factory('StoryUpdateService', [
             // Apply.
             story.getStoryContents().removeDestinationNodeIdFromNode(
               nodeId, destinationNodeId);
+            StoryEditorStateService.setExpIdsChanged();
           }, function(changeDict, story) {
             // Undo.
             story.getStoryContents().addDestinationNodeIdToNode(
               nodeId, destinationNodeId);
+            StoryEditorStateService.setExpIdsChanged();
           });
       },
 
