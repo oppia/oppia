@@ -110,7 +110,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         ts_filepaths: list(str): The list of ts filepaths to be linted.
         parsed_js_and_ts_files: dict. Contains the content of JS files, after
             validating and parsing the files.
+        parsed_js_and_ts_file_tokens: dict. Contains the list of lexical tokens
+            of each JS file.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
+        redundant_function_names_check_enabled: bool. Enables the lint check for
+            redundant function names.
     """
     def __init__(
             self, js_files, ts_files, verbose_mode_enabled,
@@ -489,7 +493,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
               //
             }
         """
-        if not self.enable_redundant_function_names_check:
+        if not self.redundant_function_names_check_enabled:
             return []
 
         if self.verbose_mode_enabled:
@@ -513,12 +517,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 if stripped_name not in names_found:
                     names_found.add(stripped_name)
                 elif stripped_name not in names_reported:
-                    failed = True
                     names_reported.add(stripped_name)
                     python_utils.PRINT(
                         '{ %s } from \'%s\' has redundant definitions. Please '
                         'combine them into one, or refactor them to have '
                         'distinct purposes' % (stripped_name, filepath))
+                    failed = True
 
         if failed:
             summary_message = (
