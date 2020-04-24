@@ -21,6 +21,7 @@ import copy
 import re
 
 from constants import constants
+from core.domain import android_validation_constants
 from core.domain import change_domain
 from core.domain import html_cleaner
 import feconf
@@ -290,6 +291,11 @@ class StoryNode(python_utils.OBJECT):
                     'Expected exploration ID to be a string, received %s' %
                     self.exploration_id)
 
+        if self.exploration_id == '':
+            raise utils.ValidationError(
+                'Expected exploration ID to not be an empty string, '
+                'received %s' % self.exploration_id)
+
         if not isinstance(self.outline, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected outline to be a string, received %s' %
@@ -299,6 +305,12 @@ class StoryNode(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' %
                 self.title)
+
+        title_limit = android_validation_constants.MAX_CHARS_IN_CHAPTER_TITLE
+        if len(self.title) > title_limit:
+            raise utils.ValidationError(
+                'Chapter title should be less than %d chars, received %s'
+                % (title_limit, self.title))
 
         if not isinstance(self.outline_is_finalized, bool):
             raise utils.ValidationError(
@@ -699,6 +711,12 @@ class Story(python_utils.OBJECT):
         if title == '':
             raise utils.ValidationError('Title field should not be empty')
 
+        title_limit = android_validation_constants.MAX_CHARS_IN_STORY_TITLE
+        if len(title) > title_limit:
+            raise utils.ValidationError(
+                'Story title should be less than %d chars, received %s'
+                % (title_limit, title))
+
     def get_acquired_skill_ids_for_node_ids(self, node_ids):
         """Returns the acquired skill ids of the nodes having the given
         node ids.
@@ -1046,7 +1064,15 @@ class Story(python_utils.OBJECT):
         if node_index is None:
             raise ValueError(
                 'The node with id %s is not part of this story.' % node_id)
-        if self._check_exploration_id_already_present(new_exploration_id):
+
+        if (
+                self.story_contents.nodes[node_index].exploration_id ==
+                new_exploration_id):
+            return
+
+        if (
+                new_exploration_id is not None and
+                self._check_exploration_id_already_present(new_exploration_id)):
             raise ValueError(
                 'A node with exploration id %s already exists.' %
                 new_exploration_id)

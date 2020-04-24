@@ -57,7 +57,7 @@ describe('Topics and skills dashboard functionality', function() {
 
   it('should add a new topic to list', function() {
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
-    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
+    topicsAndSkillsDashboardPage.createTopic('Topic 1', true);
 
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
@@ -65,7 +65,7 @@ describe('Topics and skills dashboard functionality', function() {
 
   it('should move published skill to unused skills section', function() {
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 2', 'Concept card explanation');
+      'Skill 2', 'Concept card explanation', true);
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
@@ -81,35 +81,38 @@ describe('Topics and skills dashboard functionality', function() {
   });
 
   it('should merge an outside skill with one in a topic', function() {
-    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill to be merged', 'Concept card explanation');
-    skillEditorPage.moveToQuestionsTab();
-    skillEditorPage.clickCreateQuestionButton();
-    skillEditorPage.confirmSkillDifficulty();
-    explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
-    explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
-    explorationEditorMainTab.addResponse(
-      'TextInput', forms.toRichText('Correct Answer'), null, false,
-      'FuzzyEquals', 'correct');
-    explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
-    explorationEditorMainTab.addHint('Hint 1');
-    explorationEditorMainTab.addSolution('TextInput', {
-      correctAnswer: 'correct',
-      explanation: 'It is correct'
+    browser.getWindowHandle().then(function(handle) {
+      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+        'Skill to be merged', 'Concept card explanation', false);
+      skillEditorPage.moveToQuestionsTab();
+      skillEditorPage.clickCreateQuestionButton();
+      skillEditorPage.confirmSkillDifficulty();
+      explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
+      explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
+      explorationEditorMainTab.addResponse(
+        'TextInput', forms.toRichText('Correct Answer'), null, false,
+        'FuzzyEquals', 'correct');
+      explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
+      explorationEditorMainTab.addHint('Hint 1');
+      explorationEditorMainTab.addSolution('TextInput', {
+        correctAnswer: 'correct',
+        explanation: 'It is correct'
+      });
+      skillEditorPage.saveQuestion();
+      general.closeCurrentTabAndSwitchTo(handle);
+      topicsAndSkillsDashboardPage.get();
+      topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+      topicsAndSkillsDashboardPage.mergeSkillWithIndexToSkillWithIndex(0, 0);
+      topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+      topicEditorPage.moveToQuestionsTab();
+      topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
+        1, 'Skill 2');
     });
-    skillEditorPage.saveQuestion();
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.mergeSkillWithIndexToSkillWithIndex(0, 0);
-    topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
-    topicEditorPage.moveToQuestionsTab();
-    topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
-      1, 'Skill 2');
   });
 
   it('should remove a skill from list once deleted', function() {
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill to be deleted', 'Concept card explanation');
+      'Skill to be deleted', 'Concept card explanation', true);
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
