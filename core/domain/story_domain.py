@@ -800,6 +800,20 @@ class Story(python_utils.OBJECT):
             feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
             story_contents, feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0)
+    
+    @classmethod
+    def _convert_story_contents_v1_dict_to_v2_dict(cls, story_contents_dict):
+        """Converts old Story Contents schema to the modern v2 schema.
+        v2 schema introduces the description field for Story Nodes.
+        Args:
+            story_contents_dict: dict. A dict used to initialize a Story
+                Contents domain object.
+        Returns:
+            dict. The converted story_contents_dict.
+        """
+        for index in python_utils.RANGE(len(story_contents_dict['nodes'])):
+            story_contents_dict['nodes'][index]['description'] = ''
+        return story_contents_dict
 
     @classmethod
     def update_story_contents_from_model(

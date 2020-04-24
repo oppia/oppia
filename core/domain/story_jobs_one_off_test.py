@@ -39,6 +39,21 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
     ALBERT_NAME = 'albert'
 
     STORY_ID = 'story_id'
+    MIGRATED_STORY_CONTENTS_DICT = {
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2',
+        'nodes': [{
+            'acquired_skill_ids': [],
+            'destination_node_ids': [],
+            'exploration_id': None,
+            'id': 'node_1',
+            'outline': '',
+            'outline_is_finalized': False,
+            'prerequisite_skill_ids': [],
+            'title': 'Chapter 1',
+            'description': ''
+        }]
+    }
 
     def setUp(self):
         super(StoryMigrationOneOffJobTests, self).setUp()
@@ -143,8 +158,10 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, self.STORY_ID)
         story = (
-            story_fetchers.get_story_by_id(self.STORY_ID))
+            story_models.StoryModel.get(self.STORY_ID))
         self.assertEqual(story.story_contents_schema_version, 1)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        self.assertEqual(story.story_contents_schema_version, 2)
 
         # Start migration job.
         job_id = (
@@ -154,12 +171,21 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Verify the story migrates correctly.
         updated_story = (
+            story_models.StoryModel.get(self.STORY_ID))
+        self.assertEqual(
+            updated_story.story_contents_schema_version,
+            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
+        updated_story = (
             story_fetchers.get_story_by_id(self.STORY_ID))
         self.assertEqual(
             updated_story.story_contents_schema_version,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
 
-        output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        self.assertEqual(
+            updated_story.story_contents.to_dict(),
+            self.MIGRATED_STORY_CONTENTS_DICT)
+
+        output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id)
         expected = [[u'story_migrated',
                      [u'1 stories successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])

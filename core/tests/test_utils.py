@@ -386,6 +386,21 @@ class TestBase(unittest.TestCase):
         'next_node_id': 'node_2'
     }
 
+    VERSION_2_STORY_CONTENTS_DICT = {
+        'nodes': [{
+            'outline': u'',
+            'exploration_id': None,
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
+            'description': '',
+            'prerequisite_skill_ids': []}],
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2'
+    }
+
     VERSION_1_SUBTOPIC_DICT = {
         'skill_ids': ['skill_1'],
         'id': 1,
