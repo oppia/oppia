@@ -768,6 +768,17 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(UserSubscriptionsModelTests, self).setUp()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_1,
+            gae_id='gae_1_id',
+            email='some@email.com'
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_2,
+            gae_id='gae_2_id',
+            email='some_other@email.com'
+        ).put()
+
         user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
 
         user_models.UserSubscriptionsModel(
@@ -873,6 +884,25 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             user_id_3_new)
         self.assertEqual(migrated_model_3.creator_ids, [user_id_2_new])
 
+    def test_verify_model_user_ids_exist(self):
+        model = user_models.UserSubscriptionsModel(
+            id=self.USER_ID_1, creator_ids=[self.USER_ID_2])
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.creator_ids = [feconf.SYSTEM_COMMITTER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.creator_ids = [feconf.MIGRATION_BOT_USER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.creator_ids = [feconf.SUGGESTION_BOT_USER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.creator_ids = [self.USER_ID_2, 'user_non_id']
+        self.assertFalse(model.verify_model_user_ids_exist())
+
+        model = user_models.UserSubscriptionsModel(
+            id='user_non_id', creator_ids=[self.USER_ID_2])
+        self.assertFalse(model.verify_model_user_ids_exist())
+
     def test_export_data_trivial(self):
         """Test if empty user data is properly exported."""
         user_data = (
@@ -919,6 +949,17 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(UserSubscribersModelTests, self).setUp()
+
+        user_models.UserSettingsModel(
+            id=self.USER_ID_1,
+            gae_id='gae_1_id',
+            email='some@email.com'
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_2,
+            gae_id='gae_2_id',
+            email='some_other@email.com'
+        ).put()
 
         user_models.UserSubscribersModel(
             id=self.USER_ID_1, subscriber_ids=[self.USER_ID_3]).put()
@@ -1002,6 +1043,25 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
         migrated_model_3 = user_models.UserSubscribersModel.get_by_id(
             user_id_3_new)
         self.assertEqual(migrated_model_3.subscriber_ids, [user_id_2_new])
+
+    def test_verify_model_user_ids_exist(self):
+        model = user_models.UserSubscribersModel(
+            id=self.USER_ID_1, subscriber_ids=[self.USER_ID_2])
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.subscriber_ids = [feconf.SYSTEM_COMMITTER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.subscriber_ids = [feconf.MIGRATION_BOT_USER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.subscriber_ids = [feconf.SUGGESTION_BOT_USER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.subscriber_ids = [self.USER_ID_2, 'user_non_id']
+        self.assertFalse(model.verify_model_user_ids_exist())
+
+        model = user_models.UserSubscribersModel(
+            id='user_non_id', subscriber_ids=[self.USER_ID_2])
+        self.assertFalse(model.verify_model_user_ids_exist())
 
 
 class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):

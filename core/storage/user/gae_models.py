@@ -877,6 +877,18 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
         transaction_services.run_in_transaction(_replace_model)
 
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for all the ids in creator_ids and
+        for the id.
+        """
+        user_ids = list(self.creator_ids)
+        user_ids.append(self.id)
+        user_ids = [user_id for user_id in user_ids
+                    if user_id not in feconf.SYSTEM_USERS]
+        user_settings_models = UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)
+
     @staticmethod
     def export_data(user_id):
         """Export UserSubscriptionsModel data as dict for Takeout.
@@ -987,6 +999,18 @@ class UserSubscribersModel(base_models.BaseModel):
             old_model.delete()
 
         transaction_services.run_in_transaction(_replace_model)
+
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for all the ids in subscriber_ids
+        and for the id.
+        """
+        user_ids = list(self.subscriber_ids)
+        user_ids.append(self.id)
+        user_ids = [user_id for user_id in user_ids
+                    if user_id not in feconf.SYSTEM_USERS]
+        user_settings_models = UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)
 
     @staticmethod
     def get_export_policy():
