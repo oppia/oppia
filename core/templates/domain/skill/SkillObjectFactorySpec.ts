@@ -76,7 +76,7 @@ describe('Skill object factory', () => {
 
     rubricDict = {
       difficulty: skillDifficulties[0],
-      explanation: ['explanation']
+      explanations: ['explanation']
     };
 
     example1 = {

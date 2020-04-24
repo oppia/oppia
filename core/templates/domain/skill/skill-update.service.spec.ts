@@ -94,7 +94,7 @@ describe('Skill update service', function() {
 
     var rubricDict = {
       difficulty: skillDifficulties[0],
-      explanation: ['explanation']
+      explanations: ['explanation']
     };
 
     var example1 = {
@@ -253,7 +253,7 @@ describe('Skill update service', function() {
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_rubrics',
       difficulty: skillDifficulties[0],
-      explanation: ['new explanation 1', 'new explanation 2']
+      explanations: ['new explanation 1', 'new explanation 2']
     }]);
     expect(skill.getRubrics().length).toEqual(1);
     expect(skill.getRubrics()[0].getExplanations()).toEqual([

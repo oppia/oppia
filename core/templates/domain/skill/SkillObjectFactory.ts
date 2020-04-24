@@ -200,7 +200,7 @@ export class Skill {
       }
     }
     const rubricObjectFactory = new RubricObjectFactory();
-    this._rubrics.push(rubricObjectFactory.create(difficulty, explanation));
+    this._rubrics.push(rubricObjectFactory.create(difficulty, explanations));
   }
 
   toBackendDict(): ISkillBackendDict {

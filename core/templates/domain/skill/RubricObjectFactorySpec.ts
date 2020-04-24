@@ -28,7 +28,7 @@ describe('Rubric object factory', () => {
     rubricObjectFactory = new RubricObjectFactory();
     rubricDict = {
       difficulty: 'easy',
-      explanation: ['test explanation']
+      explanations: ['test explanation']
     };
   });
 
@@ -54,7 +54,7 @@ describe('Rubric object factory', () => {
     const rubric = rubricObjectFactory.create('easy', ['test explanation']);
     expect(rubric.getExplanations()).toEqual(['test explanation']);
 
-    rubric.setExplanation(['new explanation']);
+    rubric.setExplanations(['new explanation']);
     expect(rubric.getExplanations()).toEqual(['new explanation']);
   });
 });
