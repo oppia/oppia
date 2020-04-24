@@ -503,8 +503,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         suffixes_to_ignore = ['.controller.ts', '.directive.ts', '.spec.ts']
         files_to_check = [
             filepath for filepath in self.all_filepaths
-            if all(
-                not filepath.endswith(suffix) for suffix in suffixes_to_ignore)
+            if all(not filepath.endswith(s) for s in suffixes_to_ignore)
         ]
 
         failed = False
