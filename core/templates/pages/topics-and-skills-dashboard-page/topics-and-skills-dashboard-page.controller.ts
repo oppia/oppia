@@ -135,7 +135,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             var rubrics = [];
             for (var idx in SKILL_DIFFICULTIES) {
               rubrics.push(
-                RubricObjectFactory.create(SKILL_DIFFICULTIES[idx], '')
+                RubricObjectFactory.create(SKILL_DIFFICULTIES[idx], [])
               );
             }
             $uibModal.open({
@@ -155,10 +155,10 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                     MAX_CHARS_IN_SKILL_DESCRIPTION;
                   var newExplanationObject = null;
 
-                  $scope.$watch('newSkillDescription', function() {
-                    $scope.rubrics[1].setExplanation(
-                      '<p>' + $scope.newSkillDescription + '</p>');
-                  });
+                  // $scope.$watch('newSkillDescription', function() {
+                  //   $scope.rubrics[1].setExplanation(
+                  //     '<p>' + $scope.newSkillDescription + '</p>');
+                  // });
 
                   $scope.onSaveExplanation = function(explanationObject) {
                     newExplanationObject = explanationObject.toBackendDict();
@@ -166,10 +166,10 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                       explanationObject.getHtml();
                   };
 
-                  $scope.onSaveRubric = function(difficulty, explanation) {
+                  $scope.onSaveRubric = function(difficulty, explanations) {
                     for (var idx in $scope.rubrics) {
                       if ($scope.rubrics[idx].getDifficulty() === difficulty) {
-                        $scope.rubrics[idx].setExplanation(explanation);
+                        $scope.rubrics[idx].setExplanations(explanations);
                       }
                     }
                   };

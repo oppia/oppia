@@ -55,7 +55,7 @@ angular.module('oppia').directive('rubricsEditor', [
             $scope, $filter, $uibModal, $rootScope, ContextService,
             RubricObjectFactory, EVENT_SKILL_REINITIALIZED, PAGE_CONTEXT) {
           var ctrl = this;
-          var explanationMemento = [null, null, null];
+          var explanationsMemento = {};
 
           ctrl.isEditable = function() {
             return true;
@@ -65,34 +65,73 @@ angular.module('oppia').directive('rubricsEditor', [
             return explanation === '<p></p>' || explanation === '';
           };
 
-
-          ctrl.openExplanationEditor = function(index) {
-            explanationMemento[index] = angular.copy(
-              ctrl.getRubrics()[index].getExplanation());
-            ctrl.editableExplanation[index] = explanationMemento[index];
-            ctrl.explanationEditorIsOpen[index] = true;
+          ctrl.openExplanationEditor = function(difficulty, index) {
+            ctrl.explanationEditorIsOpen[difficulty][index] = true;
           };
-          ctrl.saveExplanation = function(index) {
-            ctrl.explanationEditorIsOpen[index] = false;
+
+          ctrl.saveExplanation = function(difficulty, index) {
+            ctrl.explanationEditorIsOpen[difficulty][index] = false;
             var explanationHasChanged = (
-              ctrl.editableExplanation[index] !==
-              ctrl.getRubrics()[index].getExplanation());
+              ctrl.editableExplanations[difficulty][index] !==
+              explanationsMemento[difficulty][index]);
 
             if (explanationHasChanged) {
               ctrl.onSaveRubric(
-                ctrl.getRubrics()[index].getDifficulty(),
-                ctrl.editableExplanation[index]);
-              explanationMemento[index] = ctrl.editableExplanation[index];
+                difficulty, ctrl.editableExplanations[difficulty]);
+              explanationsMemento[difficulty][index] = (
+                ctrl.editableExplanations[difficulty][index]);
             }
           };
 
-          ctrl.cancelEditExplanation = function(index) {
-            ctrl.editableExplanation[index] = explanationMemento[index];
-            ctrl.explanationEditorIsOpen[index] = false;
+          ctrl.cancelEditExplanation = function(difficulty, index) {
+            ctrl.editableExplanations[difficulty][index] = (
+              explanationsMemento[difficulty][index]);
+            ctrl.explanationEditorIsOpen[difficulty][index] = false;
           };
+
+          ctrl.addExplanationForDifficulty = function(difficulty) {
+            ctrl.editableExplanations[difficulty].push('');
+            ctrl.onSaveRubric(
+              difficulty, ctrl.editableExplanations[difficulty]);
+            explanationsMemento[difficulty] = angular.copy(
+              ctrl.editableExplanations[difficulty]);
+            ctrl.explanationEditorIsOpen[
+              difficulty][
+              ctrl.editableExplanations[difficulty].length - 1] = true;
+          };
+
+          ctrl.deleteExplanation = function(difficulty, index) {
+            ctrl.explanationEditorIsOpen[difficulty][index] = false;
+            ctrl.editableExplanations[difficulty].splice(index, 1);
+            ctrl.onSaveRubric(
+              difficulty, ctrl.editableExplanations[difficulty]);
+            explanationsMemento[difficulty] = angular.copy(
+              ctrl.editableExplanations[difficulty]);
+          };
+
+          ctrl.isAnyExplanationEmptyForDifficulty = function(difficulty) {
+            for (var idx in explanationsMemento[difficulty]) {
+              if (
+                ctrl.isExplanationEmpty(
+                  explanationsMemento[difficulty][idx])) {
+                return true;
+              }
+            }
+            return false;
+          };
+
           ctrl.$onInit = function() {
-            ctrl.explanationEditorIsOpen = [false, false, false];
-            ctrl.editableExplanation = [null, null, null];
+            ctrl.explanationEditorIsOpen = {};
+            ctrl.editableExplanations = {};
+            for (var idx in ctrl.getRubrics()) {
+              var explanations = ctrl.getRubrics()[idx].getExplanations();
+              var difficulty = ctrl.getRubrics()[idx].getDifficulty();
+              explanationsMemento[difficulty] = angular.copy(explanations);
+              ctrl.explanationEditorIsOpen[difficulty] = (
+                Array(explanations.length).fill(false));
+              ctrl.editableExplanations[difficulty] = (
+                angular.copy(explanations));
+            }
             ctrl.activeRubricIndex = 0;
             ctrl.EXPLANATION_FORM_SCHEMA = {
               type: 'html',

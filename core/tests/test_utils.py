@@ -1651,11 +1651,11 @@ tags: []
         else:
             skill.rubrics = [
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                    constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                    constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                    constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skill.language_code = language_code
         skill.version = 0
         skill_services.save_new_skill(owner_id, skill)
@@ -1703,11 +1703,11 @@ tags: []
         if rubrics is None:
             rubrics = [
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[0], '<p>Explanation 1</p>'),
+                    constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']),
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[1], '<p>Explanation 2</p>'),
+                    constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>']),
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[2], '<p>Explanation 3</p>')]
+                    constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 3</p>'])]
         skill_model = skill_models.SkillModel(
             id=skill_id,
             description=description,
