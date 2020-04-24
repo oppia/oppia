@@ -23,42 +23,32 @@ import { UpgradedServices } from 'services/UpgradedServices';
 /* eslint-enable max-len */
 
 describe('Solution Validity Service', function() {
-  let svs: SolutionValidityService;
+  describe('SolutionValidityService', function() {
+    let svs: SolutionValidityService;
 
-  beforeEach(() => {
-    svs = new SolutionValidityService();
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+    beforeEach(() => {
+      svs = new SolutionValidityService();
+    });
+    beforeEach(angular.mock.module('oppia', function($provide) {
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+        $provide.value(key, value);
+      }
+    }));
 
-  it('should store validity of the solution correctly', () => {
-    // Initialize SolutionValidityService.
-    svs.init(['State 1']);
+    it('should store validity of the solution correctly',
+      function() {
+        // Initialize SolutionValidityService.
+        svs.init(['State 1']);
 
-    svs.updateValidity('State 1', true);
-    expect(svs.isSolutionValid('State 1')).toBe(true);
+        svs.updateValidity('State 1', true);
+        expect(svs.isSolutionValid('State 1')).toBe(true);
 
-    svs.deleteSolutionValidity('State 1');
-    expect(Object.keys(svs.getAllValidities())).toEqual([]);
+        svs.deleteSolutionValidity('State 1');
+        expect(Object.keys(svs.getAllValidities())).toEqual([]);
 
-    svs.updateValidity('State 1', false);
-    expect(svs.isSolutionValid('State 1')).toBe(false);
-  });
-
-  it('should rename stored validity state of the solution correctly', () => {
-    // Initialize SolutionValidityService.
-    svs.init(['State 1']);
-
-    svs.updateValidity('State 1', true);
-    expect(svs.isSolutionValid('State 1')).toBe(true);
-
-    svs.onRenameState('State 2', 'State 1');
-    expect(Object.keys(svs.getAllValidities())).toEqual(['State 2']);
-
-    expect(svs.isSolutionValid('State 2')).toBe(true);
+        svs.updateValidity('State 1', false);
+        expect(svs.isSolutionValid('State 1')).toBe(false);
+      });
   });
 });

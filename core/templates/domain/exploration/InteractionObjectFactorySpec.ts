@@ -31,16 +31,17 @@ import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 
 describe('Interaction object factory', () => {
-  let iof = null;
-  let oof = null;
-  let agof = null;
-  let hof = null;
-  let sof = null;
-  let answerGroupsDict = null;
-  let defaultOutcomeDict = null;
-  let solutionDict = null;
-  let hintsDict = null;
-  let interactionDict = null;
+  var iof = null;
+  var oof = null;
+  var agof = null;
+  var hof = null;
+  var sof = null;
+  var testInteraction = null;
+  var answerGroupsDict = null;
+  var defaultOutcomeDict = null;
+  var solutionDict = null;
+  var hintsDict = null;
+  var interactionDict = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -115,29 +116,18 @@ describe('Interaction object factory', () => {
       id: 'interaction_id',
       solution: solutionDict
     };
-  });
 
-  it('should create an object when default outcome is null', () => {
-    const copyInteractionDict = { ...interactionDict };
-    copyInteractionDict.default_outcome = null;
-
-    const testInteraction = iof.createFromBackendDict(copyInteractionDict);
-
-    expect(testInteraction.defaultOutcome).toBe(null);
+    testInteraction = iof.createFromBackendDict(interactionDict);
   });
 
   it('should correctly set the new ID', () => {
-    const testInteraction = iof.createFromBackendDict(interactionDict);
-
     expect(testInteraction.id).toEqual('interaction_id');
     testInteraction.setId('new_interaction_id');
     expect(testInteraction.id).toEqual('new_interaction_id');
   });
 
   it('should correctly set the new answer group', () => {
-    const testInteraction = iof.createFromBackendDict(interactionDict);
-
-    let newAnswerGroup = {
+    var newAnswerGroup = {
       rule_specs: [],
       outcome: {
         dest: 'dest_3',
@@ -175,9 +165,7 @@ describe('Interaction object factory', () => {
   });
 
   it('should correctly set the new default outcome', () => {
-    const testInteraction = iof.createFromBackendDict(interactionDict);
-
-    const newDefaultOutcomeDict = {
+    var newDefaultOutcomeDict = {
       dest: 'dest_default_new',
       feedback: {
         content_id: 'default_outcome_new',
@@ -188,7 +176,7 @@ describe('Interaction object factory', () => {
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null
     };
-    const newDefaultOutcome = oof.createFromBackendDict(newDefaultOutcomeDict);
+    var newDefaultOutcome = oof.createFromBackendDict(newDefaultOutcomeDict);
     expect(testInteraction.defaultOutcome).toEqual(
       oof.createFromBackendDict({
         dest: 'dest_default',
@@ -206,9 +194,7 @@ describe('Interaction object factory', () => {
   });
 
   it('should correctly set the new customization args', () => {
-    const testInteraction = iof.createFromBackendDict(interactionDict);
-
-    const newCustomizationArgs = {
+    var newCustomizationArgs = {
       customArgNew: {
         value: 'custom_value_new'
       }
@@ -223,9 +209,7 @@ describe('Interaction object factory', () => {
   });
 
   it('should correctly set the new solution', () => {
-    const testInteraction = iof.createFromBackendDict(interactionDict);
-
-    const newSolutionDict = {
+    var newSolutionDict = {
       answer_is_exclusive: false,
       correct_answer: 'This is a new correct answer!',
       explanation: {
@@ -233,7 +217,7 @@ describe('Interaction object factory', () => {
         html: 'This is the new explanation to the answer'
       }
     };
-    const newSolution = sof.createFromBackendDict(newSolutionDict);
+    var newSolution = sof.createFromBackendDict(newSolutionDict);
     expect(testInteraction.solution).toEqual(
       sof.createFromBackendDict({
         answer_is_exclusive: false,
@@ -248,15 +232,13 @@ describe('Interaction object factory', () => {
   });
 
   it('should correctly set the new hint', () => {
-    const testInteraction = iof.createFromBackendDict(interactionDict);
-
-    const newHintDict = {
+    var newHintDict = {
       hint_content: {
         html: '<p>New Hint</p>',
         content_id: 'content_id_new'
       }
     };
-    const newHint = hof.createFromBackendDict(newHintDict);
+    var newHint = hof.createFromBackendDict(newHintDict);
     expect(testInteraction.hints).toEqual(hintsDict.map(function(hintDict) {
       return hof.createFromBackendDict(hintDict);
     }));
@@ -265,9 +247,7 @@ describe('Interaction object factory', () => {
   });
 
   it('should correctly copy from other interaction', () => {
-    const testInteraction = iof.createFromBackendDict(interactionDict);
-
-    const newAnswerGroups = [{
+    var newAnswerGroups = [{
       rule_specs: [],
       outcome: {
         dest: 'dest_1_new',
@@ -283,7 +263,7 @@ describe('Interaction object factory', () => {
       training_data: ['training_data_new'],
       tagged_skill_misconception_id: 'skill_id-2'
     }];
-    const newDefaultOutcome = {
+    var newDefaultOutcome = {
       dest: 'dest_default_new',
       feedback: {
         content_id: 'default_outcome_new',
@@ -294,7 +274,7 @@ describe('Interaction object factory', () => {
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null
     };
-    const newHintDict = [
+    var newHintDict = [
       {
         hint_content: {
           html: '<p>New Hint</p>',
@@ -302,7 +282,7 @@ describe('Interaction object factory', () => {
         }
       }
     ];
-    const newSolutionDict = {
+    var newSolutionDict = {
       answer_is_exclusive: false,
       correct_answer: 'This is a new correct answer!',
       explanation: {
@@ -310,7 +290,7 @@ describe('Interaction object factory', () => {
         html: 'This is the new explanation to the answer'
       }
     };
-    const otherInteractionDict = {
+    var otherInteractionDict = {
       answer_groups: newAnswerGroups,
       confirmed_unclassified_answers: [],
       customization_args: {
@@ -323,7 +303,7 @@ describe('Interaction object factory', () => {
       id: 'interaction_id_new',
       solution: newSolutionDict
     };
-    const otherInteraction = iof.createFromBackendDict(otherInteractionDict);
+    var otherInteraction = iof.createFromBackendDict(otherInteractionDict);
     testInteraction.copy(otherInteraction);
     expect(testInteraction).toEqual(otherInteraction);
     otherInteraction.customizationArgs.customArg.value = 'custom_arg_new';
@@ -340,11 +320,5 @@ describe('Interaction object factory', () => {
       id: 'interaction_id_new',
       solution: newSolutionDict
     }));
-  });
-
-  it('should correctly convert it to backend dict', () => {
-    const testInteraction = iof.createFromBackendDict(interactionDict);
-
-    expect(testInteraction.toBackendDict()).toEqual(interactionDict);
   });
 });
