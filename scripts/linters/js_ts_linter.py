@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
-import itertools
 import os
 import re
 import shutil
@@ -135,8 +134,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         self.verbose_mode_enabled = verbose_mode_enabled
         self.redundant_function_names_check_enabled = (
             enable_redundant_function_names_check)
-        self.parsed_js_and_ts_files = []
-        self.parsed_expressions_in_files = []
+        self.parsed_js_and_ts_files = {}
+        self.parsed_js_and_ts_file_tokens = {}
+        self.parsed_expressions_in_files = {}
 
     @property
     def js_filepaths(self):
