@@ -13,7 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to notify about status of AudioBar
+ * @fileoverview Service to notify about status of audio bar. This services
+ * notifies that whether the upper audio bar component is expanded
+ * or collapsed.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -40,4 +42,3 @@ export class AudioBarStatusService {
 
 angular.module('oppia').factory('AudioBarStatusService',
   downgradeInjectable(AudioBarStatusService));
-

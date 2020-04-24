@@ -206,15 +206,11 @@ angular.module('oppia').directive('tutorCard', [
             $scope.waitingForOppiaFeedback = false;
             $scope.windowDimensionsService = WindowDimensionsService;
             $scope.isIframed = UrlService.isIframed();
-            $scope.audioBarIsExpandedAndOnMobileDevice = false;
-            $scope.$watch(function() {
-              return AudioBarStatusService.isAudioBarExpanded();
-            }, function(newValue, oldValue) {
-              if (newValue !== oldValue) {
-                $scope.audioBarIsExpandedAndOnMobileDevice = (
-                  newValue && DeviceInfoService.isMobileDevice());
-              }
-            });
+            $scope.audioBarIsExpandedAndOnMobileDevice = function() {
+              return (
+                AudioBarStatusService.isAudioBarExpanded() &&
+                DeviceInfoService.isMobileDevice());
+            };
             $scope.canAskLearnerForAnswerInfo = (
               LearnerAnswerInfoService.canAskLearnerForAnswerInfo);
 
