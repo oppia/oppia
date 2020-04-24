@@ -1103,7 +1103,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     DATETIME_OBJECT = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
     DATETIME_EPOCH = time.mktime(
-            datetime.datetime.strptime('2016-02-16', '%Y-%m-%d').timetuple())
+        datetime.datetime.strptime('2016-02-16', '%Y-%m-%d').timetuple())
     USER_1_ID = 'id_1'
     USER_2_ID = 'id_2'
     EXP_ID_ONE = 'exp_id_one'

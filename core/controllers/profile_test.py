@@ -30,7 +30,6 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import python_utils
 import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
@@ -852,8 +851,8 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         ).put()
 
         constants_swap = self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True)
-        time_swap = self.swap(user_services,
-            'record_user_logged_in', lambda *args: None)
+        time_swap = self.swap(
+            user_services, 'record_user_logged_in', lambda *args: None)
 
         with constants_swap, time_swap:
             data = self.get_json('/export-account-handler')
@@ -923,7 +922,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                     u'default_dashboard': None,
                     u'preferred_site_language_code': None,
                     u'user_bio': u'',
-                    u'profile_picture_data_url': 
+                    u'profile_picture_data_url':
                         user_services.DEFAULT_IDENTICON_DATA_URL,
                     u'role': u'EXPLORATION_EDITOR',
                     u'last_edited_an_exploration': None,
