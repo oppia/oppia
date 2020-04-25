@@ -17,6 +17,7 @@
  */
 
 require('services/alerts.service.ts');
+// import { LoaderService } from 'services/loader.service';
 
 angular.module('oppia').directive('warningLoader', [
   function() {
@@ -26,19 +27,19 @@ angular.module('oppia').directive('warningLoader', [
       bindToController: {},
       template: require('./warning-loader.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['AlertsService', '$rootScope',
-        function(AlertsService, $rootScope) {
+      controller: ['AlertsService', '$rootScope', 'LoaderService',
+        function(AlertsService, $rootScope, LoaderService) {
           var ctrl = this;
           ctrl.$onInit = function() {
             ctrl.AlertsService = AlertsService;
             /**
-             * TODO(@srijanreddy98), when migrating to angular 8 remove the $on
-             * by subscribing to the loadingMessage subject from
-             * common-events.service.ts
+             * TODO(@srijanreddy98): when migrating to angular 8
+             * remove the rootScope.loadingMessage and use a
+             * class variable instead. this.loadingMessage = message
              */
-            $rootScope.$on('loadingMessageChange', function(event, value) {
-              $rootScope.loadingMessage = value;
-            });
+            LoaderService.getLoadingMessageSubject().subscribe(
+              (message: string) => $rootScope.loadingMessage = message
+            );
           };
         }
       ]

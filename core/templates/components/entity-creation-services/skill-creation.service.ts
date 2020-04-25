@@ -24,7 +24,7 @@ import { UrlInterpolationService } from
 import { AlertsService } from 'services/alerts.service';
 import { SkillCreationBackendApiService } from
   'domain/skill/skill-creation-backend-api.service.ts';
-import { CommonEventsService } from 'services/common-events.service';
+import { LoaderService } from 'services/loader.service';
 
 interface SkillCreationResponse {
   skillId: string;
@@ -39,7 +39,7 @@ export class SkillCreationService {
 
   constructor(
     private alertsService: AlertsService,
-    private commonEventsService: CommonEventsService,
+    private loaderService: LoaderService,
     private skillCreationBackendApiService: SkillCreationBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
   ) { }
@@ -53,7 +53,7 @@ export class SkillCreationService {
     }
     this.skillCreationInProgress = true;
     this.alertsService.clearWarnings();
-    this.commonEventsService.setLoadingMessage('Creating skill');
+    this.loaderService.setLoadingMessage('Creating skill');
     this.skillCreationBackendApiService.createSkill(
       description, rubrics, explanation, linkedTopicIds
     ).then((response: SkillCreationResponse) => {
@@ -63,7 +63,7 @@ export class SkillCreationService {
           skill_id: response.skillId
         });
     }, function() {
-      this.commonEventsService.setLoadingMessage('');
+      this.loaderService.setLoadingMessage('');
     });
   }
 }
