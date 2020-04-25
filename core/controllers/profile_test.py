@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import re
-import time
 
 from constants import constants
 from core.domain import exp_domain

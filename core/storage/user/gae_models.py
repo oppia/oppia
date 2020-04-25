@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import random
 import string
-import time
 
 from constants import constants
 from core.platform import models
