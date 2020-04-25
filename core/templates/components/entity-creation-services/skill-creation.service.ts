@@ -57,7 +57,7 @@ export class SkillCreationService {
     this.skillCreationBackendApiService.createSkill(
       description, rubrics, explanation, linkedTopicIds
     ).then((response: SkillCreationResponse) => {
-      // TODO(srijanreddy98): Replace window with angular router
+      // TODO(#9155): Replace window with angular router
       window.location.href = this.urlInterpolationService.interpolateUrl(
         this.CREATE_NEW_SKILL_URL_TEMPLATE, {
           skill_id: response.skillId
