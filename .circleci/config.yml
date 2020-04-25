@@ -18,24 +18,24 @@ workflows:
 
     jobs:
       - setup
-      - lint_tests:
-          requires:
-            - setup
-      - frontend_tests:
-          requires:
-            - setup
-      - typescript_tests:
-          requires:
-            - frontend_tests
-      - backend_tests:
-          requires:
-            - frontend_tests
+      # - lint_tests:
+      #     requires:
+      #       - setup
+      # - frontend_tests:
+      #     requires:
+      #       - setup
+      # - typescript_tests:
+      #     requires:
+      #       - frontend_tests
+      # - backend_tests:
+      #     requires:
+      #       - frontend_tests
       - e2e_file_upload_features:
           requires:
-            - typescript_tests
+            - setup
       - e2e_navigation:
           requires:
-            - typescript_tests
+            - setup
       - e2e_classroom_topic_test:
           requires:
             - e2e_file_upload_features
@@ -202,10 +202,6 @@ jobs:
           name: Run e2e exploration history tab test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationHistoryTab" --prod_env
-      - run:
-          name: Run e2e exploration improvements tab test
-          command: |
-              python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationImprovementsTab" --prod_env
       - run:
           name: Run e2e exploration statistics tab test
           command: |
