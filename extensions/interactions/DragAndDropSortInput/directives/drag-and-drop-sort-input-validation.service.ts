@@ -135,8 +135,8 @@ export class DragAndDropSortInputValidationService {
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: 'Multiple items in a single position are not allowed.'
               });
+              break;
             }
-            break;
           }
         }
         var range = {

@@ -40,7 +40,7 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
           return allowedList;
         };
 
-        ctrl.selectedItem = function(choiceListIndex) {
+        ctrl.selectItem = function(choiceListIndex) {
           var choiceId = ctrl.choices[choiceListIndex].id;
           var selectedRank = parseInt(
             ctrl.choices[choiceListIndex].selectedRank) - 1;
@@ -79,13 +79,14 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
               break;
             }
           }
+          ctrl.validateOrdering();
         };
 
         ctrl.getWarningText = function() {
           return errorMessage;
         };
 
-        ctrl.isValidOrdering = function() {
+        ctrl.validateOrdering = function() {
           var selectedRankList = [];
           for (var i = 0; i < ctrl.choices.length; i++) {
             selectedRankList.push(ctrl.choices[i].selectedRank);

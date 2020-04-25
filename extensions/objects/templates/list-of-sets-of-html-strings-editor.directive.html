@@ -25,7 +25,7 @@
     <div class="row">
       <div class="col-sm-1">
         <select ng-model="choice.selectedRank"
-                ng-change="$ctrl.selectedItem($index); $ctrl.isValidOrdering();"
+                ng-change="$ctrl.selectItem($index);"
                 aria-label="choice" id="{{$index}}"
                 ng-options="index for index in $ctrl.allowedChoices()"
                 ng-init="choice.selectedRank = $ctrl.initValues[$index]">
