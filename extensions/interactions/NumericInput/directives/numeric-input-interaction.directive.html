@@ -6,6 +6,15 @@
         <schema-based-editor schema="$ctrl.NUMERIC_INPUT_FORM_SCHEMA" local-value="$ctrl.answer" label-for-focus-target="$ctrl.labelForFocusTarget">
         </schema-based-editor>
       </ng-form>
+      <span class="oppia-form-error oppia-numeric-input-error" ng-if="$ctrl.errorString">
+        <[$ctrl.errorString]>
+      </span>
     </div>
   </form>
 </div>
+
+<style>
+  .oppia-numeric-input-error {
+    margin-top: 10px;
+  }
+</style>

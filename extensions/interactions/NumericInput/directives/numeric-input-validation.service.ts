@@ -163,6 +163,42 @@ export class NumericInputValidationService {
 
     return warningsList;
   }
+
+  getErrorString(value: string): string {
+    value = value.trim();
+    var trailingDot = /\.\d/g;
+    var twoDecimals = /.*\..*\./g;
+    var extraChars = /[^0-9.%+-]/g;
+    var trailingHyphen = /^-/g;
+    var extraHyphen = /-.*-/g;
+    if (!value) {
+      return '';
+    }
+    if (value.includes('.') && !value.match(trailingDot)) {
+      return 'Trailing decimals not allowed.';
+    } else if (value.match(twoDecimals)) {
+      return 'At most 1 decimal point should be present';
+    } else if (value.match(extraChars)) {
+      return 'Only use numbers, hyphen, percentage and decimal(.)';
+    } else if (value.includes('-') &&
+          !value.match(trailingHyphen)) {
+      return 'Hyphen(-) only allowed in beginning';
+    } else if (value.includes('-') && value.match(extraHyphen)) {
+      return 'At most 1 Hyphen(-) should be present';
+    }
+  }
+
+  parseValue(viewValue: string): number {
+    viewValue = viewValue.trim();
+    if (viewValue.slice(-1) === '%') {
+      // This is a percentage, so the input needs to be divided by 100.
+      return parseFloat(
+        viewValue.substring(0, viewValue.length - 1).replace(',', '.')
+      ) / 100.0;
+    } else {
+      return parseFloat(viewValue.replace(',', '.'));
+    }
+  }
 }
 
 angular.module('oppia').factory(
