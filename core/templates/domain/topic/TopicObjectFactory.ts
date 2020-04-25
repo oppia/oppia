@@ -137,10 +137,6 @@ export class Topic {
       issues.push('Topic name should not be empty.');
     }
 
-    if (!this._abbreviatedName) {
-      issues.push('Abbreviated name should not be empty.');
-    }
-
     let subtopics = this._subtopics;
     let canonicalStoryIds = this.getCanonicalStoryIds();
     let additionalStoryIds = this.getAdditionalStoryIds();
@@ -198,6 +194,13 @@ export class Topic {
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Topic should have a thumbnail.');
+    }
+    for (let i = 0; i < this._subtopics.length; i++) {
+      if (this._subtopics[i].getSkillSummaries().length === 0) {
+        issues.push(
+          'Subtopic with title ' + this._subtopics[i].getTitle() +
+          ' does not have any skill IDs linked.');
+      }
     }
     return issues;
   }

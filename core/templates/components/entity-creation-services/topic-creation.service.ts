@@ -17,14 +17,18 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
+require('domain/topic/topic-creation-backend-api.service.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').factory('TopicCreationService', [
-  '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
-  'UrlInterpolationService',
-  function(
-      $http, $rootScope, $timeout, $uibModal, $window, AlertsService,
-      UrlInterpolationService) {
+  '$rootScope', '$uibModal', '$window', 'AlertsService',
+  'TopicCreationBackendApiService', 'UrlInterpolationService',
+  'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+  'MAX_CHARS_IN_TOPIC_NAME', function(
+      $rootScope, $uibModal, $window, AlertsService,
+      TopicCreationBackendApiService, UrlInterpolationService,
+      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
+      MAX_CHARS_IN_TOPIC_NAME) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
     var topicCreationInProgress = false;
 
@@ -43,15 +47,12 @@ angular.module('oppia').factory('TopicCreationService', [
             function($scope, $uibModalInstance) {
               $scope.topicName = '';
               $scope.abbreviatedTopicName = '';
-              $scope.isAbbreviateTopicNameValid = function() {
-                return (
-                  $scope.abbreviatedTopicName !== '' &&
-                  $scope.abbreviatedTopicName.length <= 12);
-              };
+              $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;
+              // No need for a length check below since the topic name input
+              // field in the HTML file has the maxlength attribute which
+              // disallows the user from entering more than the valid length.
               $scope.isTopicNameValid = function() {
-                return (
-                  $scope.topicName !== '' &&
-                  $scope.topicName.length <= 20);
+                return $scope.topicName !== '';
               };
               $scope.save = function(topicName, abbreviatedTopicName) {
                 $uibModalInstance.close({
@@ -70,27 +71,22 @@ angular.module('oppia').factory('TopicCreationService', [
           if (topic.topicName === '') {
             throw Error('Topic name cannot be empty');
           }
-          if (topic.abbreviatedTopicName === '') {
-            throw Error('Abbreviated name cannot be empty');
-          }
           topicCreationInProgress = true;
           AlertsService.clearWarnings();
-
-          $rootScope.loadingMessage = 'Creating topic';
-          $http.post('/topic_editor_handler/create_new', {
-            name: topic.topicName,
-            abbreviated_name: topic.abbreviatedTopicName
-          }).then(function(response) {
-            $timeout(function() {
-              $window.location = UrlInterpolationService.interpolateUrl(
-                TOPIC_EDITOR_URL_TEMPLATE, {
-                  topic_id: response.data.topicId
-                }
+          TopicCreationBackendApiService.createTopic(
+            topic.topicName, topic.abbreviatedTopicName).then(
+            function(response) {
+              $rootScope.$broadcast(
+                EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+              topicCreationInProgress = false;
+              $window.open(
+                UrlInterpolationService.interpolateUrl(
+                  TOPIC_EDITOR_URL_TEMPLATE, {
+                    topic_id: response.topicId
+                  }
+                ), '_blank'
               );
-            }, 150);
-          }, function() {
-            $rootScope.loadingMessage = '';
-          });
+            });
         });
       }
     };

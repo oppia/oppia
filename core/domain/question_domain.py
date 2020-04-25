@@ -95,6 +95,24 @@ class QuestionChange(change_domain.BaseChange):
     }]
 
 
+class QuestionSuggestionChange(change_domain.BaseChange):
+    """Domain object for changes made to question suggestion object.
+
+    The allowed commands, together with the attributes:
+        - 'create_new_fully_specified_question' (with question_dict,
+        skill_id, skill_difficulty)
+    """
+
+    ALLOWED_COMMANDS = [
+        {
+            'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'required_attribute_names': [
+                'question_dict', 'skill_id', 'skill_difficulty'],
+            'optional_attribute_names': []
+        }
+    ]
+
+
 class Question(python_utils.OBJECT):
     """Domain object for a question."""
 
@@ -265,6 +283,30 @@ class Question(python_utils.OBJECT):
 
         return question_state_dict
 
+    @classmethod
+    def _convert_state_v32_dict_to_v33_dict(cls, question_state_dict):
+        """Converts from version 32 to 33. Version 33 adds a new
+        customization arg to MultipleChoiceInput Interaction which allows
+        answer choices to be shuffled.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'MultipleChoiceInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'showChoicesInShuffledOrder': {
+                    'value': True
+                }
+            })
+
+        return question_state_dict
 
     @classmethod
     def update_state_from_model(

@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,31 +13,36 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for tracking the sequence of learner actions.
+ * @fileoverview Factory for creating instances of frontend
+ * exploration metadata domain objects.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+export class ExplorationMetadata {
+  metadataList;
+
+  constructor(metadataList) {
+    this.metadataList = angular.copy(metadataList);
+  }
+
+  getMetadataList() {
+    return this.metadataList;
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })
-export class DebugInfoTrackerService {
-  _sequenceOfActions: Array<any> = [];
-
-  reset(): void {
-    this._sequenceOfActions = [];
-  }
-
-  addAction(action: any): void {
-    this._sequenceOfActions.push(action);
-  }
-
-  getSequenceOfActions(): Array<any> {
-    return this._sequenceOfActions;
+export class ExplorationMetadataObjectFactory {
+  static createFromBackendDict(explorationMetadataBackendDict: any) {
+    return new ExplorationMetadata(
+      explorationMetadataBackendDict.collection_node_metadata_list
+    );
   }
 }
 
 angular.module('oppia').factory(
-  'DebugInfoTrackerService',
-  downgradeInjectable(DebugInfoTrackerService));
+  'ExplorationMetadataObjectFactory',
+  downgradeInjectable(ExplorationMetadataObjectFactory));

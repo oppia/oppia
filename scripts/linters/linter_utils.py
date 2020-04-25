@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Helpers for the scripts.pre_commit_linter module.
+"""Helpers for the scripts.linters.pre_commit_linter module.
 
 Do not use this module anywhere else in the code base!
 """
@@ -20,8 +20,11 @@ Do not use this module anywhere else in the code base!
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
+import contextlib
 import functools
 import inspect
+import sys
 import threading
 
 import python_utils
@@ -102,3 +105,42 @@ def memoize(func):
         return get_from_cache(key, factory=lambda: func(*args, **kwargs))
 
     return memoized_func
+
+
+@contextlib.contextmanager
+def redirect_stdout(new_target):
+    """Redirect stdout to the new target.
+
+    Args:
+        new_target: TextIOWrapper. The new target to which stdout is redirected.
+
+    Yields:
+        TextIOWrapper. The new target.
+    """
+    old_target = sys.stdout
+    sys.stdout = new_target
+    try:
+        yield new_target
+    finally:
+        sys.stdout = old_target
+
+
+def get_duplicates_from_list_of_strings(strings):
+    """Returns a list of duplicate strings in the list of given strings.
+
+    Args:
+        strings: list(str). A list of strings.
+
+    Returns:
+        list(str). A list of duplicate string present in the given list of
+        strings.
+    """
+    duplicates = []
+    item_count_map = collections.defaultdict(int)
+    for string in strings:
+        item_count_map[string] += 1
+        # Counting as duplicate once it's appeared twice in the list.
+        if item_count_map[string] == 2:
+            duplicates.append(string)
+
+    return duplicates

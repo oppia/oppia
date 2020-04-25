@@ -48,6 +48,7 @@ require('services/context.service.ts');
 require('services/editability.service.ts');
 require('services/id-generation.service.ts');
 require('services/user.service.ts');
+const WaveSurfer = require('third-party-imports/wave-surfer.import.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
@@ -244,7 +245,7 @@ angular.module('oppia').directive('audioTranslationBar', [
               // Create audio play and pause for unsaved recording.
               var url = $window.URL.createObjectURL($scope.audioBlob);
               // Create visualizer for playing unsaved audio.
-              $scope.waveSurfer = $window.WaveSurfer.create({
+              $scope.waveSurfer = WaveSurfer.create({
                 container: '#visualized',
                 waveColor: '#009688',
                 progressColor: '#cccccc',
@@ -298,7 +299,7 @@ angular.module('oppia').directive('audioTranslationBar', [
               StateRecordedVoiceoversService.displayed.addVoiceover(
                 contentId, languageCode, filename, recordedAudioFile.size,
                 response.duration_secs);
-              $scope.durationSecs = Math.floor(response.duration_secs);
+              $scope.durationSecs = Math.round(response.duration_secs);
               saveRecordedVoiceoversChanges();
               AlertsService.addSuccessMessage(
                 'Succesfuly uploaded recorded audio.');
@@ -431,7 +432,7 @@ angular.module('oppia').directive('audioTranslationBar', [
               $scope.selectedRecording = false;
               $scope.audioNeedsUpdate = audioTranslationObject.needsUpdate;
               $scope.durationSecs =
-                Math.floor(audioTranslationObject.duration_secs);
+                Math.round(audioTranslationObject.duration_secs);
             } else {
               $scope.isAudioAvailable = false;
               $scope.audioBlob = null;
@@ -567,7 +568,7 @@ angular.module('oppia').directive('audioTranslationBar', [
               StateRecordedVoiceoversService.displayed.addVoiceover(
                 $scope.contentId, $scope.languageCode, result.filename,
                 result.fileSizeBytes, result.durationSecs);
-              $scope.durationSecs = Math.floor(result.durationSecs);
+              $scope.durationSecs = Math.round(result.durationSecs);
               saveRecordedVoiceoversChanges();
               $scope.initAudioBar();
             }, function() {
