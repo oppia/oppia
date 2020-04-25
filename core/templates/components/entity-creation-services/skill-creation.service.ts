@@ -20,6 +20,10 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('domain/skill/skill-creation-backend-api.service.ts');
 
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'topics-and-skills-dashboard-page.constants.ajs.ts');
+
 angular.module('oppia').factory('SkillCreationService', [
   '$rootScope', '$timeout', '$window', 'AlertsService',
   'SkillCreationBackendApiService', 'UrlInterpolationService',
@@ -31,8 +35,25 @@ angular.module('oppia').factory('SkillCreationService', [
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
       '/skill_editor/<skill_id>');
     var skillCreationInProgress = false;
+    var skillDescriptionStatusMarker = 1;
 
     return {
+      markChangeInSkillDescription: function() {
+        skillDescriptionStatusMarker *= -1;
+      },
+
+      getSkillDescriptionStatus: function() {
+        return skillDescriptionStatusMarker;
+      },
+
+      disableSkillDescriptionStatusMarker: function() {
+        skillDescriptionStatusMarker = 0;
+      },
+
+      enableSkillDescriptionStatusMarker: function() {
+        skillDescriptionStatusMarker = 1;
+      },
+
       createNewSkill: function(
           description, rubrics, explanation, linkedTopicIds) {
         if (skillCreationInProgress) {

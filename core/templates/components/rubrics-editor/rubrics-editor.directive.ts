@@ -21,6 +21,7 @@ require('domain/skill/RubricObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+require('components/entity-creation-services/skill-creation.service.ts');
 require('components/forms/custom-forms-directives/image-uploader.directive.ts');
 
 require('directives/mathjax-bind.directive.ts');
@@ -50,10 +51,12 @@ angular.module('oppia').directive('rubricsEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$uibModal', '$rootScope', 'ContextService',
-        'RubricObjectFactory', 'EVENT_SKILL_REINITIALIZED', 'PAGE_CONTEXT',
+        'RubricObjectFactory', 'SkillCreationService',
+        'EVENT_SKILL_REINITIALIZED', 'PAGE_CONTEXT',
         function(
             $scope, $filter, $uibModal, $rootScope, ContextService,
-            RubricObjectFactory, EVENT_SKILL_REINITIALIZED, PAGE_CONTEXT) {
+            RubricObjectFactory, SkillCreationService,
+            EVENT_SKILL_REINITIALIZED, PAGE_CONTEXT) {
           var ctrl = this;
           var explanationsMemento = {};
 
@@ -70,6 +73,9 @@ angular.module('oppia').directive('rubricsEditor', [
           };
 
           ctrl.saveExplanation = function(difficulty, index) {
+            if (difficulty === 'Medium' && index === 0) {
+              SkillCreationService.disableSkillDescriptionStatusMarker();
+            }
             ctrl.explanationEditorIsOpen[difficulty][index] = false;
             var explanationHasChanged = (
               ctrl.editableExplanations[difficulty][index] !==
@@ -101,6 +107,9 @@ angular.module('oppia').directive('rubricsEditor', [
           };
 
           ctrl.deleteExplanation = function(difficulty, index) {
+            if (difficulty === 'Medium' && index === 0) {
+              SkillCreationService.disableSkillDescriptionStatusMarker();
+            }
             ctrl.explanationEditorIsOpen[difficulty][index] = false;
             ctrl.editableExplanations[difficulty].splice(index, 1);
             ctrl.onSaveRubric(
@@ -138,13 +147,17 @@ angular.module('oppia').directive('rubricsEditor', [
             };
           };
 
-          $scope.$on('skillDescriptionChanged', function(evt) {
-            var explanations = ctrl.getRubrics()[1].getExplanations();
-            var difficulty = ctrl.getRubrics()[1].getDifficulty();
-            explanationsMemento[difficulty] = angular.copy(explanations);
-            ctrl.editableExplanations[difficulty] = (
-              angular.copy(explanations));
-          });
+          if (ContextService.getPageContext() !== 'skill_editor') {
+            $scope.$watch(function() {
+              return SkillCreationService.getSkillDescriptionStatus();
+            }, function() {
+              var explanations = ctrl.getRubrics()[1].getExplanations();
+              var difficulty = ctrl.getRubrics()[1].getDifficulty();
+              explanationsMemento[difficulty] = angular.copy(explanations);
+              ctrl.editableExplanations[difficulty] = (
+                angular.copy(explanations));
+            });
+          }
         }
       ]
     };

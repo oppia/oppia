@@ -149,15 +149,21 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   $scope.bindableDict = {
                     displayedConceptCardExplanation: ''
                   };
-                  $scope.MAX_CHARS_IN_SKILL_DESCRIPTION =
-                    MAX_CHARS_IN_SKILL_DESCRIPTION;
+                  $scope.MAX_CHARS_IN_SKILL_DESCRIPTION = (
+                    MAX_CHARS_IN_SKILL_DESCRIPTION);
                   var newExplanationObject = null;
 
                   $scope.$watch('newSkillDescription', function() {
-                    var rubrics = $scope.rubrics[1].getExplanations();
-                    rubrics[0] = '<p>' + $scope.newSkillDescription + '</p>';
-                    $scope.rubrics[1].setExplanations(rubrics);
-                    $rootScope.$broadcast('skillDescriptionChanged');
+                    if (SkillCreationService.getSkillDescriptionStatus()) {
+                      var initParagraph = document.createElement('p');
+                      var explanations = $scope.rubrics[1].getExplanations();
+                      var newExplanation = document.createTextNode(
+                        $scope.newSkillDescription);
+                      initParagraph.appendChild(newExplanation);
+                      explanations[0] = initParagraph.outerHTML;
+                      $scope.rubrics[1].setExplanations(explanations);
+                      SkillCreationService.markChangeInSkillDescription();
+                    }
                   });
 
                   $scope.onSaveExplanation = function(explanationObject) {
@@ -183,6 +189,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   };
 
                   $scope.cancel = function() {
+                    SkillCreationService.enableSkillDescriptionStatusMarker();
                     $uibModalInstance.dismiss('cancel');
                   };
                 }
