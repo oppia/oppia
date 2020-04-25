@@ -156,9 +156,19 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
                 }
             }
         }
+        rubrics = [{
+            'difficulty': 'Easy',
+            'explanation': 'easy explanation'
+        }, {
+            'difficulty': 'Medium',
+            'explanation': 'medium explanation'
+        }, {
+            'difficulty': 'Hard',
+            'explanation': 'hard explanation'
+        }]
         self.save_new_skill_with_defined_schema_versions(
             self.SKILL_ID, self.albert_id, 'A description', 0,
-            misconceptions=[], skill_contents=skill_contents,
+            misconceptions=[], rubrics=rubrics, skill_contents=skill_contents,
             misconceptions_schema_version=1, skill_contents_schema_version=1,
             rubric_schema_version=1)
 
