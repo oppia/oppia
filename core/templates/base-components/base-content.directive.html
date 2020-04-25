@@ -2,7 +2,8 @@
   <div ng-if="$ctrl.iframed">
     <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content"
          ng-cloak>
-      <warning-loader></warning-loader>
+      <loading-message></loading-message>
+      <warning-and-alerts></warning-and-alerts>
       <div ng-show="!$root.loadingMessage">
         <div ng-transclude="content">
         </div>
@@ -45,7 +46,8 @@
 
             <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content"
                  class="protractor-test-main-content" ng-cloak>
-              <warning-loader></warning-loader>
+              <loading-message></loading-message>
+              <warning-and-alerts></warning-and-alerts>
               <div ng-show="!$root.loadingMessage">
                 <div ng-transclude="content">
                 </div>

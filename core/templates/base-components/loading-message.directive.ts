@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,24 +13,29 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for warning_loader.
+ * @fileoverview Directive for showing the loading screen with a message.
  */
 
-require('services/alerts.service.ts');
-
-angular.module('oppia').directive('warningLoader', [
+angular.module('oppia').directive('loadingMessage', [
   function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      template: require('./warning-loader.directive.html'),
+      template: require('./loading-message.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['AlertsService',
-        function(AlertsService) {
+      controller: ['$rootScope', 'LoaderService',
+        function($rootScope, LoaderService) {
           var ctrl = this;
           ctrl.$onInit = function() {
-            ctrl.AlertsService = AlertsService;
+            /**
+             * TODO(@srijanreddy98): when migrating to angular 8
+             * remove the rootScope.loadingMessage and use a
+             * class variable instead. this.loadingMessage = message
+             */
+            LoaderService.getLoadingMessageSubject().subscribe(
+              (message: string) => $rootScope.loadingMessage = message
+            );
           };
         }
       ]
