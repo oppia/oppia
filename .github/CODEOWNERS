@@ -12,7 +12,7 @@
 #   can be optimized further.
 
 # Android team
-/core/domain/android_validation_constants.py @BenHenning
+/core/domain/android_validation_constants*.py @BenHenning
 
 # Angular Migration team
 /core/templates/services/loader.service.ts @bansalnitish
@@ -460,7 +460,7 @@
 
 
 # QA team.
-/core/tests/ @kevinlee12 @U8NWXD
+/core/tests/ @U8NWXD
 /assets/ @nithusha21
 /data/ @nithusha21
 
@@ -539,6 +539,7 @@
 /webpack.common.macros.ts @jameesjohn @vojtechjelinek
 /webpack.dev.config.ts @jameesjohn @vojtechjelinek
 /webpack.prod.config.ts @jameesjohn @vojtechjelinek
+/webpack.terser.config.ts @nishantwrp @vojtechjelinek
 
 
 # Typings.

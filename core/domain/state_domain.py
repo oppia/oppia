@@ -859,7 +859,13 @@ class WrittenTranslations(python_utils.OBJECT):
     """
 
     def __init__(self, translations_mapping):
-        """Initializes a WrittenTranslations domain object."""
+        """Initializes a WrittenTranslations domain object.
+
+        Args:
+            translations_mapping: dict. A dict mapping the content Ids
+                to the dicts which is the map of abbreviated code of the
+                languages to WrittenTranslation objects.
+        """
         self.translations_mapping = translations_mapping
 
     def to_dict(self):
@@ -1079,7 +1085,13 @@ class RecordedVoiceovers(python_utils.OBJECT):
     """
 
     def __init__(self, voiceovers_mapping):
-        """Initializes a RecordedVoiceovers domain object."""
+        """Initializes a RecordedVoiceovers domain object.
+
+          Args:
+            voiceovers_mapping: dict. A dict mapping the content Ids
+                to the dicts which is the map of abbreviated code of the
+                languages to the Voiceover objects.
+        """
         self.voiceovers_mapping = voiceovers_mapping
 
     def to_dict(self):
@@ -1401,7 +1413,15 @@ class SubtitledHtml(python_utils.OBJECT):
 
     @classmethod
     def create_default_subtitled_html(cls, content_id):
-        """Create a default SubtitledHtml domain object."""
+        """Create a default SubtitledHtml domain object.
+
+        Args:
+            content_id: str. the id of the content.
+
+        Returns:
+            SubtitledHtml. A default SubtitledHtml domain object, some
+            attribute of that object will be ''.
+        """
         return cls(content_id, '')
 
 
@@ -1527,7 +1547,7 @@ class State(python_utils.OBJECT):
         """Returns the content belongs to a given content id of the object.
 
         Args:
-            content_id: The id of the content.
+            content_id: str. The id of the content.
 
         Returns:
             str. The html content corresponding to the given content id.
@@ -1559,7 +1579,14 @@ class State(python_utils.OBJECT):
         return self.interaction.is_rte_content_supported_on_android(regex)
 
     def get_training_data(self):
-        """Retrieves training data from the State domain object."""
+        """Retrieves training data from the State domain object.
+
+        Returns:
+            list(dict). A list of dicts, each of which has two key-value pairs.
+                One pair maps 'answer_group_index' to the index of the answer
+                group and the other maps 'answers' to the answer group's
+                training data.
+        """
         state_training_data_by_answer_group = []
         for (answer_group_index, answer_group) in enumerate(
                 self.interaction.answer_groups):

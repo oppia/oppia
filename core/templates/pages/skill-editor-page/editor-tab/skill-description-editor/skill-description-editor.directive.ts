@@ -25,10 +25,10 @@ require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('skillDescriptionEditor', [
   'SkillEditorStateService', 'SkillObjectFactory', 'SkillUpdateService',
-  'UrlInterpolationService',
+  'UrlInterpolationService', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
   function(
       SkillEditorStateService, SkillObjectFactory, SkillUpdateService,
-      UrlInterpolationService) {
+      UrlInterpolationService, MAX_CHARS_IN_SKILL_DESCRIPTION) {
     return {
       restrict: 'E',
       scope: {},
@@ -39,6 +39,8 @@ angular.module('oppia').directive('skillDescriptionEditor', [
         '$scope', 'EVENT_SKILL_REINITIALIZED',
         function($scope, EVENT_SKILL_REINITIALIZED) {
           var ctrl = this;
+          $scope.MAX_CHARS_IN_SKILL_DESCRIPTION =
+            MAX_CHARS_IN_SKILL_DESCRIPTION;
           $scope.canEditSkillDescription = function() {
             return $scope.skillRights.canEditSkillDescription();
           };

@@ -581,6 +581,32 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     with build_main_swap:
                         run_e2e_tests.build_js_files(False)
 
+    def test_build_js_files_in_prod_mode_with_deparallelize_terser(self):
+
+        def mock_update_dev_mode_in_constants_js(
+                unused_filename, unused_dev_mode):
+            pass
+
+        update_dev_mode_in_constants_js_swap = self.swap_with_checks(
+            run_e2e_tests, 'update_dev_mode_in_constants_js',
+            mock_update_dev_mode_in_constants_js,
+            expected_args=[(self.mock_constant_file_path, False)])
+
+        run_cmd_swap = self.swap_with_checks(
+            common, 'run_cmd', self.mock_run_cmd, called=False)
+
+        build_main_swap = self.swap_with_checks(
+            build, 'main', self.mock_build_main,
+            expected_kwargs=[{'args': [
+                '--prod_env', '--deparallelize_terser']}])
+
+        with self.constant_file_path_swap:
+            with self.node_bin_path_swap, self.webpack_bin_path_swap:
+                with update_dev_mode_in_constants_js_swap, run_cmd_swap:
+                    with build_main_swap:
+                        run_e2e_tests.build_js_files(
+                            False, deparallelize_terser=True)
+
     def test_tweak_webdriver_manager_on_x64_machine(self):
 
         def mock_is_windows():
@@ -811,7 +837,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_cleanup():
             return
 
-        def mock_build_js_files(unused_arg):
+        def mock_build_js_files(unused_arg, deparallelize_terser=False): # pylint: disable=unused-argument
             return
 
         def mock_start_webdriver_manager():
@@ -902,7 +928,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_cleanup():
             return
 
-        def mock_build_js_files(unused_arg):
+        def mock_build_js_files(unused_arg, deparallelize_terser=False): # pylint: disable=unused-argument
             return
 
         def mock_start_webdriver_manager():
