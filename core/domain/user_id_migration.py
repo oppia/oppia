@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
-import logging
 
 from core import jobs
 from core.platform import models
@@ -154,11 +153,7 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         new_models = []
         for old_model in old_models:
             model_values = old_model.to_dict()
-            try:
-                new_id = old_model.id.replace(old_user_id, new_user_id)
-            except AttributeError:
-                logging.error(python_utils.UNICODE(old_model.to_dict()))
-            model_values['id'] = new_id
+            model_values['id'] = old_model.id.replace(old_user_id, new_user_id)
             model_values['user_id'] = new_user_id
             new_models.append(model_class(**model_values))
 
