@@ -51,6 +51,9 @@ workflows:
       - e2e_library:
           requires:
             - e2e_navigation
+      - e2e_exploration_tabs:
+          requires:
+            - e2e_library
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
@@ -184,6 +187,34 @@ jobs:
           name: Run e2e embedding test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env
+
+  e2e_exploration_tabs:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run e2e exploration feedback tab test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationFeedbackTab" --prod_env
+      - run:
+          name: Run e2e exploration history tab test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationHistoryTab" --prod_env
+      - run:
+          name: Run e2e exploration improvements tab test
+          command: |
+              python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationImprovementsTab" --prod_env
+      - run:
+          name: Run e2e exploration statistics tab test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationStatisticsTab" --prod_env
+      - run:
+          name: Run e2e exploration translation tab test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationTranslationTab" --prod_env
+
 
   e2e_library:
     <<: *job_defaults
