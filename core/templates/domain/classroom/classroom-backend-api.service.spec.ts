@@ -177,7 +177,7 @@ describe('Classroom backend API service', function() {
       name: 15,
       description: 11
     }]
-  }
+  };
   let sampleDataResultsObjects = null;
 
   let successCallback = undefined;
@@ -206,8 +206,8 @@ describe('Classroom backend API service', function() {
     httpTestingController.verify();
   });
 
-    it('should accept successCallback as undefined',
-      fakeAsync(() => {
+  it('should accept successCallback as undefined',
+    fakeAsync(() => {
       let successHandler = jasmine.createSpy('success', successCallback);
       let failHandler = jasmine.createSpy('fail', errorCallback);
 
