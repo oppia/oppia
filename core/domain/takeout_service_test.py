@@ -58,7 +58,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     USER_1_EMAIL = 'user1@example.com'
     GENERIC_USERNAME = 'user'
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
-    GENERIC_EPOCH = utils.get_time_in_millisecs(datetime.datetime(2019, 5, 20))
+    GENERIC_EPOCH = utils.get_time_in_millisecs(GENERIC_DATE)
     GENERIC_IMAGE_URL = 'www.example.com/example.png'
     GENERIC_USER_BIO = 'I am a user of Oppia!'
     GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
