@@ -66,6 +66,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.node_1 = {
             'id': self.NODE_ID_1,
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -78,6 +79,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.node_2 = {
             'id': self.NODE_ID_2,
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -90,6 +92,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.node_3 = {
             'id': self.NODE_ID_3,
             'title': 'Title 3',
+            'description': 'Description 3',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
