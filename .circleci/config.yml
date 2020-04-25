@@ -36,10 +36,7 @@ workflows:
       - e2e_navigation:
           requires:
             - typescript_tests
-      - e2e_classroom_page:
-          requires:
-            - e2e_file_upload_features
-      - e2e_topic_and_story_editor:
+      - e2e_classroom_topic_test:
           requires:
             - e2e_file_upload_features
       - e2e_accessibility:
@@ -219,7 +216,7 @@ jobs:
             - oppia/third_party/generated/
             - oppia/webpack_bundles
 
-  e2e_classroom_page:
+  e2e_classroom_topic_test:
     <<: *job_defaults
     steps:
       - checkout
@@ -229,13 +226,6 @@ jobs:
           name: Run e2e classroom page test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPageFileUploadFeatures"
-
-  e2e_topic_and_story_editor:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /home/circleci/
       - run:
           name: Run e2e topic and story editor test
           command: |
