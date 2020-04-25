@@ -242,6 +242,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics[0].title = 1
         self._assert_validation_error('Expected subtopic title to be a string')
 
+        self.topic.subtopics[0].title = (
+            'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh'
+            'ijklmnopqrstuvwxyz')
+        self._assert_validation_error(
+            'Expected subtopic title to be less than 64 characters')
+
     def test_story_id_validation(self):
         self.topic.canonical_story_references = [
             topic_domain.StoryReference(123, True)
@@ -279,7 +285,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Name field should not be empty')
         self.topic.name = 'Very long and therefore invalid topic name'
         self._assert_validation_error(
-            'Topic name should be at most 35 characters')
+            'Topic name should be at most 39 characters')
 
     def test_subtopic_schema_version_type_validation(self):
         self.topic.subtopic_schema_version = 'invalid_version'

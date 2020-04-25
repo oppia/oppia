@@ -16,12 +16,13 @@
  * @fileoverview A helper service for the Rich text editor(RTE).
  */
 
-require('services/services.constants.ajs.ts');
-
 require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 require('services/stateful/focus-manager.service.ts');
 require('services/rte-helper-modal.controller.ts');
+
+require('app.constants.ajs.ts');
+require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('RteHelperService', [
   '$document', '$log', '$uibModal', 'HtmlEscaperService',
