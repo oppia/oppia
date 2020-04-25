@@ -1238,11 +1238,11 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
 
 class GaeIdNotInModelsVerificationJobTests(test_utils.GenericTestBase):
     """Tests for GaeIdNotInModelsVerificationJob."""
-    USER_1_USER_ID = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    USER_1_USER_ID = 'uid_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     USER_1_GAE_ID = 'gae_id_1'
-    USER_2_USER_ID = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
+    USER_2_USER_ID = 'uid_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
     USER_2_GAE_ID = 'gae_id_2'
-    USER_3_USER_ID = 'cccccccccccccccccccccccccccccccc'
+    USER_3_USER_ID = 'uid_cccccccccccccccccccccccccccccccc'
     USER_3_GAE_ID = 'gae_id_3'
 
     def _run_one_off_job(self):

@@ -33,7 +33,9 @@ from google.appengine.ext import ndb
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 transaction_services = models.Registry.import_transaction_services()
 
-USER_ID_LENGTH = 32
+
+USER_ID_RANDOM_PART_LENGTH = 32
+USER_ID_LENGTH = 36
 
 
 class UserSettingsModel(base_models.BaseModel):
@@ -220,7 +222,7 @@ class UserSettingsModel(base_models.BaseModel):
                 of attempts.
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
-            new_id = ''.join(
+            new_id = 'uid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
                 for _ in python_utils.RANGE(USER_ID_LENGTH))
             if not cls.get_by_id(new_id):
