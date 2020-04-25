@@ -86,6 +86,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
     user_jobs_one_off.UserProfilePictureOneOffJob,
+    user_jobs_one_off.UsernameLengthAuditOneOffJob,
     user_jobs_one_off.UsernameLengthDistributionOneOffJob,
     exp_jobs_one_off.MathExpressionInputInteractionOneOffJob,
     exp_jobs_one_off.MultipleChoiceInteractionOneOffJob
@@ -127,6 +128,7 @@ AUDIT_JOB_MANAGERS = [
     (
         prod_validation_jobs_one_off
         .GeneralFeedbackEmailReplyToIdModelAuditOneOffJob),
+    prod_validation_jobs_one_off.ExplorationContextModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationSnapshotContentModelAuditOneOffJob,
@@ -166,6 +168,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.StoryCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.StorySummaryModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralSuggestionModelAuditOneOffJob,
+    prod_validation_jobs_one_off.GeneralVoiceoverApplicationModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicSnapshotContentModelAuditOneOffJob,
@@ -199,7 +202,9 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.UserBulkEmailsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserSkillMasteryModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserContributionScoringModelAuditOneOffJob,
-    prod_validation_jobs_one_off.PendingDeletionRequestModelAuditOneOffJob
+    prod_validation_jobs_one_off.PendingDeletionRequestModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SkillOpportunityModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserCommunityRightsModelAuditOneOffJob
 ]
 
 # List of all ContinuousComputation managers to show controls for on the

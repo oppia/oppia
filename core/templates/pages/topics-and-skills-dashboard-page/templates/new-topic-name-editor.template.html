@@ -7,26 +7,19 @@
   <div class="modal-body new-topic-name-editor">
     <div class="form-group row" ng-class="{'has-error': !isTopicNameValid()}">
       <label class="col-sm-6 col-form-label">Enter a name for the topic: &nbsp;</label>
-      <div class="col-sm-6">
-        <input class="form-control protractor-test-new-topic-name-field" ng-model="topicName" maxlength="35" autofocus>
-        <p style="color: red;" ng-if="topicName.length === 35">
-          Topic name should be less than 35 characters. Please add a short topic name.
-        </p>
-      </div>
-    </div>
-    <div class="form-group row"  ng-class="{'has-error': !isAbbreviateTopicNameValid()}">
-      <label class="col-sm-6 col-form-label">Enter an abbreviated topic name: &nbsp;</label>
-      <div class="col-sm-6">
-        <input class="form-control protractor-test-new-abbreviated-topic-name-field" ng-model="abbreviatedTopicName" maxlength="12" autofocus>
-        <p style="color: red;" ng-if="abbreviatedTopicName.length === 12">
-          Abbreviated topic name should be less than 12 characters.
-        </p>
+      <div class="col-sm-6 topic-name-field">
+        <input class="form-control protractor-test-new-topic-name-field" ng-model="topicName" maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>" autofocus>
+        <span class="oppia-input-box-subtitle">
+          <i>
+            Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
+          </i>
+        </span>
       </div>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success protractor-test-confirm-topic-creation-button" type="submit" ng-disabled="!isTopicNameValid() || !isAbbreviateTopicNameValid()">
+    <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
+    <button class="btn btn-success protractor-test-confirm-topic-creation-button" type="submit" ng-disabled="!isTopicNameValid()">
       <span>Create Topic</span>
     </button>
   </div>
@@ -36,7 +29,12 @@
     margin-left: 37.5%;
     margin-top: -3%;
   }
-  .new-topic-name-editor input {
+  .new-topic-name-editor .topic-name-field {
     height: 35px;
+    margin-left: -15%;
+  }
+
+  .new-topic-name-editor input {
+    width: 130%;
   }
 </style>
