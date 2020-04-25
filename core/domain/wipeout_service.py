@@ -132,6 +132,10 @@ def _generate_activity_to_user_ids_mapping(activity_ids):
     Args:
         activity_ids: list(str). List of activity IDs for which to generate
         new user IDs.
+
+    Returns:
+        dict(str, str). Mapping between the activity IDs and pseudonymized user
+        IDs.
     """
     return {
         activity_id: user_models.UserSettingsModel.get_new_id()
@@ -160,9 +164,15 @@ def _delete_story_models(pending_deletion_model):
         pending_deletion_model.story_mappings = (
             _generate_activity_to_user_ids_mapping(story_ids))
         pending_deletion_model.put()
-        print(pending_deletion_model.story_mappings)
 
-    def _replace_models(story_related_models, user_id):
+    def _pseudonymize_models(story_related_models, user_id):
+        """Pseudonymize user ID fields in the models.
+
+        Args:
+            story_related_models: list(ndb.Model). Models which user IDs should
+                be pseudonymized.
+            user_id: str. New pseudonymized user ID to be used for the models.
+        """
         metadata_models = [
             model for model in story_related_models
             if isinstance(model, story_models.StorySnapshotMetadataModel)]
@@ -189,7 +199,7 @@ def _delete_story_models(pending_deletion_model):
         for i in python_utils.RANGE(
                 0, len(story_related_models), MAX_NUMBER_OF_OPS_IN_TRANSACTION):
             transaction_services.run_in_transaction(
-                _replace_models,
+                _pseudonymize_models,
                 story_related_models[i:i + MAX_NUMBER_OF_OPS_IN_TRANSACTION],
                 user_id)
 

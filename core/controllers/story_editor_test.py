@@ -42,8 +42,7 @@ class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.story_id = story_services.get_new_story_id()
         self.save_new_story(
-            self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+            self.story_id, self.admin_id, corresponding_topic_id=self.topic_id)
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             abbreviated_name='abbrev', thumbnail_filename=None,
@@ -69,8 +68,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
         # Raises error 404 even when story is saved as the new story id is not
         # associated with the topic.
         self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+            new_story_id, self.admin_id, corresponding_topic_id=self.topic_id)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
@@ -144,8 +142,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         # Raises error 404 even when story is saved as the new story id is not
         # associated with the topic.
         self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+            new_story_id, self.admin_id, corresponding_topic_id=self.topic_id)
 
         self.get_html_response(
             '%s/%s' % (
@@ -167,8 +164,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         # Raises error 404 even when story is saved as the new story id is not
         # associated with the topic.
         self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+            new_story_id, self.admin_id, corresponding_topic_id=self.topic_id)
         self.get_json(
             '%s/%s' % (
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, new_story_id),
@@ -181,8 +177,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         new_story_id = story_services.get_new_story_id()
         self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+            new_story_id, self.admin_id, corresponding_topic_id=self.topic_id)
 
         self.get_json(
             '%s/%s' % (
@@ -229,8 +224,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         # Raises error 404 even when story is saved as the new story id is not
         # associated with the topic.
         self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+            new_story_id, self.admin_id, corresponding_topic_id=self.topic_id)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
@@ -255,8 +249,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         }
         new_story_id = story_services.get_new_story_id()
         self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+            new_story_id, self.admin_id, corresponding_topic_id=self.topic_id)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(

@@ -56,8 +56,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
         self.save_new_story(
-            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID)
+            self.STORY_ID, self.USER_ID, corresponding_topic_id=self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID)
         changelist = [
@@ -215,8 +214,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         self.save_new_story(
-            story_id, self.USER_ID, 'Title', 'Description', 'Notes', topic_id)
-
+            story_id, self.USER_ID, corresponding_topic_id=topic_id)
         changelist = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
@@ -241,7 +239,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
         self.save_new_story(
-            story_id, self.USER_ID, 'Title', 'Description', 'Notes', topic_id)
+            story_id, self.USER_ID, corresponding_topic_id=topic_id)
 
         changelist = [
             story_domain.StoryChange({
@@ -694,8 +692,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
         self.save_new_story(
-            story_id, self.USER_ID, 'new title', 'Description', 'Notes',
-            topic_id)
+            story_id,
+            self.USER_ID,
+            title='new title',
+            corresponding_topic_id=topic_id
+        )
         topic_services.add_canonical_story(self.USER_ID, topic_id, story_id)
 
         change_list = [story_domain.StoryChange({
@@ -1148,9 +1149,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         # If the same node and another are completed within the context
         # of a different story, it shouldn't affect this one.
         self.story = self.save_new_story(
-            self.STORY_ID_1, self.USER_ID, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID
-        )
+            self.STORY_ID_1, self.USER_ID, corresponding_topic_id=self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID_1)
         story_services.record_completed_node_in_story_context(
@@ -1200,8 +1199,7 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
         self.save_new_story(
-            story_id, user_id, 'Title', 'Description', 'Notes',
-            topic_id)
+            story_id, user_id, corresponding_topic_id=topic_id)
 
         story_model = story_models.StoryModel.get(story_id)
         self.assertEqual(story_model.story_contents_schema_version, 1)

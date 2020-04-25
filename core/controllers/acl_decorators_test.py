@@ -1927,8 +1927,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.story_id = story_services.get_new_story_id()
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_story(
-            self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+            self.story_id, self.admin_id, corresponding_topic_id=self.topic_id)
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             abbreviated_name='abbrev', thumbnail_filename=None,
@@ -1949,8 +1948,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         story_id = story_services.get_new_story_id()
         topic_id = topic_services.get_new_topic_id()
         self.save_new_story(
-            story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            topic_id)
+            story_id, self.admin_id, corresponding_topic_id=topic_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_story/%s' % story_id, expected_status_int=404)
@@ -2106,8 +2104,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.story_id = story_services.get_new_story_id()
         self.save_new_story(
-            self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            self.topic_id)
+            self.story_id, self.admin_id, corresponding_topic_id=self.topic_id)
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             abbreviated_name='abbrev', thumbnail_filename=None,
@@ -2848,8 +2845,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         story_id = story_services.get_new_story_id()
         topic_id = topic_services.get_new_topic_id()
         self.save_new_story(
-            story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            topic_id)
+            story_id, self.admin_id, corresponding_topic_id=topic_id)
         self.save_new_topic(
             topic_id, self.admin_id, name='Name',
             abbreviated_name='abbrev', thumbnail_filename=None,

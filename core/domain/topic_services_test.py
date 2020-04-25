@@ -63,11 +63,14 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
         self.save_new_story(
-            self.story_id_1, self.user_id, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID)
+            self.story_id_1, self.user_id, corresponding_topic_id=self.TOPIC_ID)
         self.save_new_story(
-            self.story_id_3, self.user_id, 'Title 3', 'Description 3', 'Notes',
-            self.TOPIC_ID)
+            self.story_id_3,
+            self.user_id,
+            title='Title 3',
+            description='Description 3',
+            corresponding_topic_id=self.TOPIC_ID
+        )
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
@@ -373,8 +376,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 'invalid_story', self.user_id_admin)
 
         self.save_new_story(
-            'story_10', self.user_id, 'Title 2', 'Description 2', 'Notes',
-            self.TOPIC_ID)
+            'story_10',
+            self.user_id,
+            title='Title 2',
+            description='Description 2',
+            corresponding_topic_id=self.TOPIC_ID
+        )
         with self.assertRaisesRegexp(
             Exception, 'Story with given id doesn\'t exist in the topic'):
             topic_services.publish_story(
@@ -387,8 +394,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         # Throw error if a story node doesn't have an exploration.
         self.save_new_story(
-            'story_id_new', self.user_id, 'Title 2', 'Description 2', 'Notes',
-            self.TOPIC_ID)
+            'story_id_new',
+            self.user_id,
+            title='Title 2',
+            description='Description 2',
+            corresponding_topic_id=self.TOPIC_ID
+        )
         topic_services.add_canonical_story(
             self.user_id_admin, self.TOPIC_ID, 'story_id_new')
         changelist = [
