@@ -117,7 +117,7 @@ angular.module('oppia').directive('topicLandingPage', [
             // Removing tagline from array if undefined.
             ctrl.pageTitle = [ctrl.topicTitle, tagLines[ctrl.topicTitle],
               'Oppia']
-              .filter(el => el !== null)
+              .filter(el => el !== undefined)
               .join(' | ');
             PageTitleService.setPageTitle(ctrl.pageTitle);
             ctrl.bookImageUrl = UrlInterpolationService.getStaticImageUrl(
