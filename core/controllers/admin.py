@@ -850,14 +850,14 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
             raise self.InvalidInputException('This app cannot send emails.')
 
 
-class GetInteractionsByExplorationId(base.BaseHandler):
-    """This function returns a list of interaction id's for a exploration id."""
+class InteractionsByExplorationId(base.BaseHandler):
+    """Handler to show a list of interaction id's for a exploration id."""
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        exploartion_id = self.request.get('exploration_id')
-        exploration = exp_fetchers.get_exploration_by_id(exploartion_id)
-        interaction_ids = []
-        for state in exploration.states.items():
-            interaction_ids.append(state.interaction.id)
-        self.render_json({'interactions': list(set(interaction_ids))})
+        exploration_id = self.request.get('exploration_id')
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+        interaction_ids = {
+            state.interaction.id for state in exploration.states.items()
+            }
+        self.render_json({'interactions': interaction_ids})

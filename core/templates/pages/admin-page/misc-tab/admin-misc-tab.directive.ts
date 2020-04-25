@@ -42,8 +42,8 @@ angular.module('oppia').directive('adminMiscTab', [
           '/explorationdataextractionhandler');
         var SEND_DUMMY_MAIL_HANDLER_URL = (
           '/sendDummyMailToAdminHandler');
-        var GET_INTERACTIONS_BY_ID_HANDLER_URL = (
-          '/getInteractionsByExplorationId');
+        var INTERACTIONS_BY_ID_HANDLER_URL = (
+          '/interactionsByExplorationId');
 
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
@@ -157,16 +157,14 @@ angular.module('oppia').directive('adminMiscTab', [
             });
         };
 
-        ctrl.getExplorationInteractions = function() {
-          $http.get(GET_INTERACTIONS_BY_ID_HANDLER_URL, {
+        ctrl.retrieveExplorationInteractionIds = function() {
+          $http.get(INTERACTIONS_BY_ID_HANDLER_URL, {
             params: {
               exploration_id: ctrl.explorationId
             }
           })
             .then(function(response) {
-              ctrl.explorationInteractionIds(
-                'Success! ' + response.data.interactions
-              );
+              ctrl.explorationInteractionIds = response.data.interactions;
             }, function(errorResponse) {
               ctrl.explorationInteractionIds(
                 'Server error: ' + errorResponse.data.error);
