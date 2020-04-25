@@ -240,31 +240,49 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             email=self.USER_A_EMAIL,
         ).put()
 
-    def test_one_user_one_model_full_id(self):
-        original_model = user_models.CompletedActivitiesModel(
+    def test_one_user_two_models_full_id(self):
+        original_model_1 = user_models.CompletedActivitiesModel(
             id=self.USER_A_GAE_ID,
             exploration_ids=['1', '2'],
             collection_ids=['1', '2'])
-        original_model.put()
+        original_model_1.put()
+        original_model_2 = user_models.UserStatsModel(
+            id=self.USER_A_GAE_ID,
+            impact_score=1,
+            average_ratings=1.1)
+        original_model_2.put()
 
         migrated_model_ids = self._get_migrated_model_ids(
             self._run_one_off_job())
-        migrated_model = (
+
+        migrated_model_1 = (
             user_models.CompletedActivitiesModel.get_by_id(
                 migrated_model_ids[0]))
-        self.assertNotEqual(
-            original_model.id, migrated_model.id)
+        self.assertNotEqual(original_model_1.id, migrated_model_1.id)
         self.assertEqual(
-            original_model.exploration_ids, migrated_model.exploration_ids)
+            original_model_1.exploration_ids, migrated_model_1.exploration_ids)
         self.assertEqual(
-            original_model.collection_ids, migrated_model.collection_ids)
+            original_model_1.collection_ids, migrated_model_1.collection_ids)
         self.assertEqual(
-            original_model.created_on, migrated_model.created_on)
+            original_model_1.created_on, migrated_model_1.created_on)
         self.assertEqual(
-            original_model.last_updated, migrated_model.last_updated)
-
+            original_model_1.last_updated, migrated_model_1.last_updated)
         self.assertIsNone(
             user_models.CompletedActivitiesModel.get_by_id(self.USER_A_GAE_ID))
+
+        migrated_model_2 = (
+            user_models.UserStatsModel.get_by_id(migrated_model_ids[0]))
+        self.assertNotEqual(original_model_2.id, migrated_model_2.id)
+        self.assertEqual(
+            original_model_2.impact_score, migrated_model_2.impact_score)
+        self.assertEqual(
+            original_model_2.average_ratings, migrated_model_2.average_ratings)
+        self.assertEqual(
+            original_model_2.created_on, migrated_model_2.created_on)
+        self.assertEqual(
+            original_model_2.last_updated, migrated_model_2.last_updated)
+        self.assertIsNone(
+            user_models.UserStatsModel.get_by_id(self.USER_A_GAE_ID))
 
     def test_multiple_users_one_model_full_id(self):
         user_models.UserSettingsModel(

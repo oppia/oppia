@@ -115,6 +115,7 @@ AUDIT_JOB_MANAGERS = [
         .CollectionRightsSnapshotContentModelAuditOneOffJob),
     prod_validation_jobs_one_off.CollectionCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.CollectionSummaryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CollectionRightsAllUsersModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
         .ExplorationOpportunitySummaryModelAuditOneOffJob),
@@ -143,6 +144,7 @@ AUDIT_JOB_MANAGERS = [
         .ExplorationRightsSnapshotContentModelAuditOneOffJob),
     prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExpSummaryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExplorationRightsAllUsersModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralFeedbackThreadModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralFeedbackMessageModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralFeedbackThreadUserModelAuditOneOffJob,
@@ -179,6 +181,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.TopicRightsSnapshotContentModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicSummaryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.TopicRightsAllUsersModelAuditOneOffJob,
     prod_validation_jobs_one_off.SubtopicPageModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off

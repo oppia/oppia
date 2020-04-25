@@ -243,7 +243,7 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             elif (model_class.get_user_id_migration_policy() ==
                   base_models.USER_ID_MIGRATION_POLICY.CUSTOM):
                 output = model_class.migrate_model(old_user_id, new_user_id)
-            if output:
+            if output is not None:
                 yield output
         yield ('SUCCESS', (old_user_id, new_user_id))
 
