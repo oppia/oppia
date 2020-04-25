@@ -25,14 +25,25 @@ import { Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class LoaderService {
+  // TODO(srijanreddy98): Remove static when migration is complete.
+  /**
+   * The static keyword is used here because this service is used in both
+   * angular and angularjs. Since we are using upgradedServices.ts, where a new
+   * instance is created for angularjs and angular will creates a new instance
+   * for the angular part, we end up having two instances of the service.
+   * In order to keep the variables same, static is used until migration is
+   * complete.
+   */
   static loadingMessageSubject: Subject<string> = new Subject<string>();
   constructor() {}
 
-  setLoadingMessage(message: string) {
+  setLoadingMessage(message: string): void {
+    // TODO(srijanreddy98): Change LoaderService to this.
     LoaderService.loadingMessageSubject.next(message);
   }
 
   getLoadingMessageSubject(): Subject<string> {
+    // TODO(srijanreddy98): Change LoaderService to this.
     return LoaderService.loadingMessageSubject;
   }
 }
