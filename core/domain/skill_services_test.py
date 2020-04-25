@@ -973,7 +973,7 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
 
         # Creating feconf.MAX_NUMBER_OF_SKILL_IDS additional user skill
         # masteries.
-        for i in python_utils.RANGE(feconf.MAX_NUMBER_OF_SKILL_IDS):
+        for _ in python_utils.RANGE(feconf.MAX_NUMBER_OF_SKILL_IDS):
             skill_id = skill_services.get_new_skill_id()
             mastery = random.random()
             masteries.append(mastery)
@@ -1002,8 +1002,8 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         # Testing the arrangement.
         excluded_skill_ids = list(set(self.SKILL_IDS) - set(
             arranged_filtered_skill_ids))
-        for i in excluded_skill_ids:
-            self.SKILL_IDS.remove(i)
+        for skill_id in excluded_skill_ids:
+            self.SKILL_IDS.remove(skill_id)
         self.assertEqual(arranged_filtered_skill_ids, self.SKILL_IDS)
 
 
