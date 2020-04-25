@@ -277,6 +277,8 @@ describe('TrainingDataService', function() {
       expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
         'third answer'
       ]);
+      expect(tds.getTrainingDataOfAnswerGroup(0)).toEqual(
+        ['text answer', 'second answer']);
     }
   );
 
@@ -296,6 +298,8 @@ describe('TrainingDataService', function() {
     expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
       'third answer'
     ]);
+    expect(tds.getTrainingDataOfAnswerGroup(0)).toEqual(
+      ['text answer', 'second answer']);
 
     // Try to retrain the second answer (answer group -> default response).
     tds.associateWithDefaultResponse('second answer');
@@ -306,6 +310,8 @@ describe('TrainingDataService', function() {
     expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
       'third answer', 'second answer'
     ]);
+    expect(tds.getTrainingDataOfAnswerGroup(0)).toEqual(
+      ['text answer']);
 
     // Try to retrain the third answer (default response -> answer group).
     tds.associateWithAnswerGroup(0, 'third answer');
@@ -316,6 +322,8 @@ describe('TrainingDataService', function() {
     expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
       'second answer'
     ]);
+    expect(tds.getTrainingDataOfAnswerGroup(0)).toEqual(
+      ['text answer', 'third answer']);
   });
 
   it('should not be able to train duplicated answers', function() {
@@ -330,6 +338,8 @@ describe('TrainingDataService', function() {
     expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
       'second answer'
     ]);
+    expect(tds.getTrainingDataOfAnswerGroup(0)).toEqual(
+      ['text answer']);
 
     // Training a duplicate answer for the answer group should change nothing.
     tds.associateWithAnswerGroup(0, 'text answer');
@@ -345,6 +355,8 @@ describe('TrainingDataService', function() {
     expect(state.interaction.answerGroups[0].trainingData).toEqual([
       'text answer'
     ]);
+    expect(tds.getTrainingDataOfAnswerGroup(0)).toEqual(
+      ['text answer']);
   });
 
   it('should get all potential outcomes of an interaction', function() {
@@ -371,6 +383,8 @@ describe('TrainingDataService', function() {
     expect(state.interaction.answerGroups[0].trainingData).toEqual([
       'text answer', 'another answer'
     ]);
+    expect(tds.getTrainingDataOfAnswerGroup(0)).toEqual(
+      ['text answer', 'another answer']);
   });
 
   it('should correctly check whether answer is in confirmed unclassified ' +
@@ -389,6 +403,8 @@ describe('TrainingDataService', function() {
 
     expect(tds.isConfirmedUnclassifiedAnswer('text answer')).toBe(false);
     expect(tds.isConfirmedUnclassifiedAnswer('second answer')).toBe(true);
+    expect(tds.getTrainingDataOfAnswerGroup(0)).toEqual(
+      ['text answer', 'another answer']);
   });
 
   it('should get all the training data answers', function() {
@@ -399,5 +415,7 @@ describe('TrainingDataService', function() {
       answerGroupIndex: 0,
       answers: ['text answer', 'another answer']
     }]);
+    expect(tds.getTrainingDataOfAnswerGroup(0)).toEqual(
+      ['text answer', 'another answer']);
   });
 });
