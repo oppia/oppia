@@ -188,6 +188,8 @@ import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
 import { ReadOnlyStoryNodeObjectFactory } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
+import { ReadOnlyTopicObjectFactory } from
+  'domain/topic_viewer/read-only-topic-object.factory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RubricObjectFactory } from
@@ -640,6 +642,10 @@ export class UpgradedServices {
       new QuestionBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['ReadOnlyTopicObjectFactory'] =
+      new ReadOnlyTopicObjectFactory(
+        upgradedServices['SubtopicObjectFactory'],
+        upgradedServices['SkillSummaryObjectFactory']);
     upgradedServices['SkillObjectFactory'] =
       new SkillObjectFactory(
         upgradedServices['ConceptCardObjectFactory'],
