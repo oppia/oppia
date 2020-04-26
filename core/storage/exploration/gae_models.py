@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Model for an Oppia exploration."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -104,6 +105,11 @@ class ExplorationModel(base_models.VersionedModel):
     def get_deletion_policy():
         """Exploration is deleted only if it is not public."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -214,6 +220,47 @@ class ExplorationModel(base_models.VersionedModel):
             ndb.put_multi_async(commit_log_models)
 
 
+class ExplorationContextModel(base_models.BaseModel):
+    """Model for storing Exploration context.
+
+    The ID of instances of this class has the form
+    {{random_hash_of_12_chars}}, which is the ID of the exploration itself.
+    """
+
+    # The ID of the story that the exploration is a part of.
+    story_id = ndb.StringProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Exploration context should be kept if the story and exploration are
+        published.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """Check whether ExplorationContextModel references the given user.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data should
+            be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationContextModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
+
 class ExplorationRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration rights snapshot."""
@@ -276,6 +323,11 @@ class ExplorationRightsModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
+    @staticmethod
     def transform_dict_to_valid(model_dict):
         """Replace invalid fields and values in the ExplorationRightsModel dict.
 
@@ -311,8 +363,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether ExplorationRightsModel or its snapshots reference
-        user.
+        """Check whether ExplorationRightsModel reference user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -320,21 +371,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        more_results = True
-        cursor = None
-        while more_results:
-            snapshot_content_models, cursor, more_results = (
-                cls.SNAPSHOT_CONTENT_CLASS.query().fetch_page(
-                    base_models.FETCH_BATCH_SIZE, start_cursor=cursor))
-            for snapshot_content_model in snapshot_content_models:
-                reconstituted_model = cls(
-                    **ExplorationRightsModel.transform_dict_to_valid(
-                        snapshot_content_model.content))
-                if any((user_id in reconstituted_model.owner_ids,
-                        user_id in reconstituted_model.editor_ids,
-                        user_id in reconstituted_model.voice_artist_ids,
-                        user_id in reconstituted_model.viewer_ids)):
-                    return True
         return (
             cls.query(ndb.OR(
                 cls.owner_ids == user_id,
@@ -385,7 +421,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
         user_ids = (self.owner_ids + self.editor_ids + self.voice_artist_ids +
                     self.viewer_ids)
         user_ids = [user_id for user_id in user_ids
-                    if user_id != feconf.SYSTEM_COMMITTER_ID]
+                    if user_id not in feconf.SYSTEM_USERS]
         user_settings_models = user_models.UserSettingsModel.get_multi(
             user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
@@ -510,6 +546,13 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         exploration is not public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_multi(cls, exp_id, exp_versions):
@@ -650,6 +693,9 @@ class ExpSummaryModel(base_models.BaseModel):
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who have contributed (humans who have made a
     # positive (not just a revert) change to the exploration's content).
+    # NOTE TO DEVELOPERS: contributor_ids and contributors_summary need to be
+    # synchronized, meaning that the keys in contributors_summary need be
+    # equal to the contributor_ids list.
     contributor_ids = ndb.StringProperty(indexed=True, repeated=True)
     # A dict representing the contributors of non-trivial commits to this
     # exploration. Each key of this dict is a user_id, and the corresponding
@@ -818,6 +864,14 @@ class ExpSummaryModel(base_models.BaseModel):
             -ExpSummaryModel.first_published_msec
         ).fetch(limit)
 
+    @staticmethod
+    def get_export_policy():
+        """Model data has already been exported as a part of the
+        ExplorationModel and thus does not need a separate export_data
+        function.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for all the ids in owner_ids,
         editor_ids, voice_artist_ids, viewer_ids and contributor_ids.
@@ -825,7 +879,7 @@ class ExpSummaryModel(base_models.BaseModel):
         user_ids = (self.owner_ids + self.editor_ids + self.voice_artist_ids +
                     self.viewer_ids + self.contributor_ids)
         user_ids = [user_id for user_id in user_ids
-                    if user_id != feconf.SYSTEM_COMMITTER_ID]
+                    if user_id not in feconf.SYSTEM_USERS]
         user_settings_models = user_models.UserSettingsModel.get_multi(
             user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)

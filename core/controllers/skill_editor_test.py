@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the skill editor page."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -161,7 +162,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
     def test_editable_skill_handler_get_succeeds(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.NEW_USER_EMAIL)
         # Check that admins can access the editable skill data.
         json_response = self.get_json(self.url)
         self.assertEqual(self.skill_id, json_response['skill']['id'])
@@ -170,7 +171,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
     def test_editable_skill_handler_get_fails(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.NEW_USER_EMAIL)
         # Check GET returns 404 when cannot get skill by id.
         self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.get_json(self.url, expected_status_int=404)

@@ -13,11 +13,11 @@
 # limitations under the License.
 
 """Tests for the story viewer page"""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
-from core.domain import exp_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import summary_services
@@ -53,9 +53,16 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.EXP_ID_1 = '1'
         self.EXP_ID_7 = '7'
 
-        exp_services.load_demo(self.EXP_ID_0)
-        exp_services.load_demo(self.EXP_ID_1)
-        exp_services.load_demo(self.EXP_ID_7)
+        self.save_new_valid_exploration(
+            self.EXP_ID_0, self.admin_id, title='Title 1', end_state_name='End')
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.admin_id, title='Title 2', end_state_name='End')
+        self.save_new_valid_exploration(
+            self.EXP_ID_7, self.admin_id, title='Title 3', end_state_name='End')
+        self.publish_exploration(self.admin_id, self.EXP_ID_0)
+        self.publish_exploration(self.admin_id, self.EXP_ID_1)
+        self.publish_exploration(self.admin_id, self.EXP_ID_7)
+
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'Title', self.TOPIC_ID)
         story.description = ('Description')
@@ -109,7 +116,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, story)
         self.save_new_topic(
             self.TOPIC_ID, 'user', name='Topic',
-            abbreviated_name='abbrev', thumbnail_filename=None,
+            abbreviated_name='abbrev', thumbnail_filename='Topic.png',
             description='A new topic', canonical_story_ids=[story.id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)

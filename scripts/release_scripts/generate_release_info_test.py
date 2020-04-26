@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/generate_release_info.py."""
+"""Unit tests for scripts/release_scripts/generate_release_info.py."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -220,19 +220,19 @@ class GenerateReleaseInfoTests(test_utils.GenericTestBase):
             requester='', headers='',
             attributes={
                 'title': 'PR1', 'number': 1, 'labels': [
-                    {'name': 'CHANGELOG: Test-changes-1 -- @owner1'},
+                    {'name': 'PR CHANGELOG: Test-changes-1 -- @owner1'},
                     {'name': 'Test-label'}]}, completed='')
         pull2 = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={
                 'title': 'PR2', 'number': 2, 'labels': [
-                    {'name': 'CHANGELOG: Test-changes-1 -- @owner1'}]},
+                    {'name': 'PR CHANGELOG: Test-changes-1 -- @owner1'}]},
             completed='')
         pull3 = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={
                 'title': 'PR3', 'number': 3, 'labels': [
-                    {'name': 'CHANGELOG: Test-changes-2 -- @owner2'}]},
+                    {'name': 'PR CHANGELOG: Test-changes-2 -- @owner2'}]},
             completed='')
         pull4 = github.PullRequest.PullRequest(
             requester='', headers='',
@@ -315,10 +315,6 @@ class GenerateReleaseInfoTests(test_utils.GenericTestBase):
         self.assertEqual(actual_storgae_models, expected_storage_models)
 
     def test_release_summary_content(self):
-        def mock_check_blocking_bug_issue_count(unused_repo):
-            pass
-        def mock_check_prs_for_current_release_are_released(unused_repo):
-            pass
         def mock_get_current_version_tag(unused_repo):
             return github.Tag.Tag(
                 requester='', headers='',
@@ -363,12 +359,6 @@ class GenerateReleaseInfoTests(test_utils.GenericTestBase):
         def mock_get_changelog_categories(unused_pulls):
             return {'category': ['pr1', 'pr2']}
 
-        blocking_bug_swap = self.swap(
-            common, 'check_blocking_bug_issue_count',
-            mock_check_blocking_bug_issue_count)
-        check_prs_swap = self.swap(
-            common, 'check_prs_for_current_release_are_released',
-            mock_check_prs_for_current_release_are_released)
         version_tag_swap = self.swap(
             generate_release_info, 'get_current_version_tag',
             mock_get_current_version_tag)
@@ -403,8 +393,8 @@ class GenerateReleaseInfoTests(test_utils.GenericTestBase):
 
         with self.branch_name_swap, self.open_browser_swap:
             with self.get_organization_swap, self.get_repo_swap:
-                with self.getpass_swap, blocking_bug_swap, check_prs_swap:
-                    with version_tag_swap, extra_commits_swap, get_prs_swap:
+                with self.getpass_swap, version_tag_swap:
+                    with extra_commits_swap, get_prs_swap:
                         with gather_logs_swap, extract_issues_swap:
                             with check_versions_swap, setup_scripts_swap:
                                 with storage_models_swap, release_summary_swap:
@@ -415,5 +405,5 @@ class GenerateReleaseInfoTests(test_utils.GenericTestBase):
             expected_lines = f.readlines()
         with python_utils.open_file(tmp_file.name, 'r') as f:
             actual_lines = f.readlines()
-        update_changelog_and_credits.check_ordering_of_sections(actual_lines)
+        update_changelog_and_credits.is_order_of_sections_valid(actual_lines)
         self.assertEqual(actual_lines, expected_lines)

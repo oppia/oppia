@@ -22,19 +22,28 @@ import os
 import subprocess
 import sys
 
-# These libraries need to be installed before running or importing any script.
-TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
-# Download and install pyyaml.
-if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
-    subprocess.check_call([
-        sys.executable, '-m', 'pip', 'install', 'pyyaml==5.1.2', '--target',
-        os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
 
-# Download and install future.
-if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
-    subprocess.check_call([
-        sys.executable, '-m', 'pip', 'install', 'future==0.17.1', '--target',
-        os.path.join('third_party', 'future-0.17.1')])
+TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
+
+# These libraries need to be installed before running or importing any script.
+
+PREREQUISITES = [
+    ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
+    ('future', '0.17.1', os.path.join('third_party', 'future-0.17.1')),
+]
+
+for package_name, version_number, target_path in PREREQUISITES:
+    if not os.path.exists(target_path):
+        command_text = [
+            sys.executable, '-m', 'pip', 'install', '%s==%s'
+            % (package_name, version_number), '--target', target_path]
+        uextention_text = ['--user', '--prefix=', '--system']
+        current_process = subprocess.Popen(
+            command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output_stderr = current_process.communicate()[1]
+        if 'can\'t combine user with prefix' in output_stderr:
+            subprocess.check_call(command_text + uextention_text)
+
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
@@ -54,9 +63,11 @@ Installation script for Oppia third-party libraries.
 """)
 
 PYLINT_CONFIGPARSER_FILEPATH = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pylint-1.9.4', 'configparser.py')
+    common.OPPIA_TOOLS_DIR, 'pylint-%s' % common.PYLINT_VERSION,
+    'configparser.py')
 PQ_CONFIGPARSER_FILEPATH = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pylint-quotes-0.1.8', 'configparser.py')
+    common.OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % common.PYLINT_QUOTES_VERSION,
+    'configparser.py')
 
 
 def tweak_yarn_executable():
@@ -158,16 +169,17 @@ def main():
     setup_gae.main(args=[])
     pip_dependencies = [
         ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pylint', '1.9.4', common.OPPIA_TOOLS_DIR),
+        ('pylint', common.PYLINT_VERSION, common.OPPIA_TOOLS_DIR),
         ('Pillow', '6.0.0', common.OPPIA_TOOLS_DIR),
-        ('pylint-quotes', '0.1.8', common.OPPIA_TOOLS_DIR),
+        ('pylint-quotes', common.PYLINT_QUOTES_VERSION, common.OPPIA_TOOLS_DIR),
         ('webtest', '2.0.33', common.OPPIA_TOOLS_DIR),
         ('isort', '4.3.20', common.OPPIA_TOOLS_DIR),
-        ('pycodestyle', '2.5.0', common.OPPIA_TOOLS_DIR),
+        ('pycodestyle', common.PYCODESTYLE_VERSION, common.OPPIA_TOOLS_DIR),
         ('esprima', '4.0.1', common.OPPIA_TOOLS_DIR),
         ('browsermob-proxy', '0.8.0', common.OPPIA_TOOLS_DIR),
         ('selenium', '3.13.0', common.OPPIA_TOOLS_DIR),
         ('PyGithub', '1.43.7', common.OPPIA_TOOLS_DIR),
+        ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
     ]
 
     for package, version, path in pip_dependencies:
@@ -210,7 +222,7 @@ def main():
         tweak_yarn_executable()
 
     # Install third-party node modules needed for the build process.
-    subprocess.check_call([get_yarn_command()])
+    subprocess.check_call([get_yarn_command(), 'install', '--pure-lockfile'])
 
     # Install pre-commit script.
     python_utils.PRINT('Installing pre-commit hook for git')

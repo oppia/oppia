@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the topics and skills dashboard page."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -163,6 +164,17 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(len(topic_id), 12)
         self.assertIsNotNone(
             topic_fetchers.get_topic_by_id(topic_id, strict=False))
+        self.logout()
+
+    def test_topic_creation_with_invalid_name(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'name': 'Topic name that is too long for validation.',
+            'abbreviated_name': 'name'
+        }
+        self.post_json(
+            self.url, payload, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
 

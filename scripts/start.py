@@ -16,6 +16,7 @@
 missing third-party dependencies and starts up a local GAE development
 server.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -131,11 +132,6 @@ def main(args=None):
     # spam people accidentally.
     background_processes = []
     if not parsed_args.prod_env:
-        background_processes.append(subprocess.Popen([
-            common.NODE_BIN_PATH,
-            os.path.join(common.NODE_MODULES_PATH, 'gulp', 'bin', 'gulp.js'),
-            'watch']))
-
         # In prod mode webpack is launched through scripts/build.py
         python_utils.PRINT('Compiling webpack...')
         background_processes.append(subprocess.Popen([

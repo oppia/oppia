@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the page that allows learners to play through an exploration."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -279,10 +280,10 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         ]
         story_services.update_story('user', story_id, changelist, 'Added node.')
 
-        exp_id = '0'
+        exp_id = '15'
         exp_id_2 = '1'
         exp_services.delete_demo('0')
-        exp_services.load_demo('0')
+        exp_services.load_demo('15')
         exp_services.delete_demo('1')
         exp_services.load_demo('1')
         change_list = [story_domain.StoryChange({

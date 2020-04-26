@@ -17,7 +17,6 @@
  */
 
 require('domain/objects/FractionObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require(
   'interactions/FractionInput/directives/' +
   'fraction-input-rules.service.ts');
@@ -30,15 +29,12 @@ require('services/stateful/focus-manager.service.ts');
 require('domain/objects/objects-domain.constants.ajs.ts');
 
 angular.module('oppia').directive('oppiaInteractiveFractionInput', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/FractionInput/directives/' +
-        'fraction-input-interaction.directive.html'),
+      template: require('./fraction-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', 'FocusManagerService', 'FractionInputRulesService',
@@ -122,6 +118,7 @@ angular.module('oppia').directive('oppiaInteractiveFractionInput', [
              */
             $scope.$watch('$ctrl.answer', function(newValue) {
               var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
+              var INVALID_CHARS_LENGTH_REGEX = /\d{8,}/;
               // Accepts incomplete fraction inputs
               // (see examples above except last).
               var PARTIAL_FRACTION_REGEX =
@@ -129,7 +126,11 @@ angular.module('oppia').directive('oppiaInteractiveFractionInput', [
               // Accepts complete fraction inputs.
               var FRACTION_REGEX =
                 /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
-              if (INVALID_CHARS_REGEX.test(newValue)) {
+              if (INVALID_CHARS_LENGTH_REGEX.test(newValue)) {
+                errorMessage = FRACTION_PARSING_ERRORS.INVALID_CHARS_LENGTH;
+                ctrl.FractionInputForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, false);
+              } else if (INVALID_CHARS_REGEX.test(newValue)) {
                 errorMessage = FRACTION_PARSING_ERRORS.INVALID_CHARS;
                 ctrl.FractionInputForm.answer.$setValidity(
                   FORM_ERROR_TYPE, false);

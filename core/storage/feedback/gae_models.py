@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for Oppia feedback threads and messages."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -88,6 +89,11 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     def get_deletion_policy():
         """General feedback thread needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -228,10 +234,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     # rest of the thread, should exist only when the subject changes.
     updated_subject = ndb.StringProperty(indexed=False)
     # Message text. Allowed not to exist (e.g. post only to update the status).
-    # TODO(#8368): String properties have a size limit of 1500 bytes according
-    # to the GAE API. We should investigate the effort required to use
-    # ndb.TextProperty instead.
-    text = ndb.StringProperty(indexed=False)
+    text = ndb.TextProperty(indexed=False)
     # Whether the incoming message is received by email (as opposed to via
     # the web).
     received_via_email = (
@@ -241,6 +244,12 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     def get_deletion_policy():
         """General feedback message needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -470,6 +479,12 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
+
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether GeneralFeedbackThreadUserModel exists for user.
@@ -594,6 +609,11 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
         """FeedbackAnalyticsModel doesn't reference any user_id directly.
@@ -656,6 +676,11 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
     def get_deletion_policy():
         """Unsent feedback email is kept until sent."""
         return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

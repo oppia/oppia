@@ -41,9 +41,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/MathExpressionInput/directives/' +
-        'math-expression-input-interaction.directive.html'),
+      template: require('./math-expression-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', '$element', 'LABEL_FOR_CLEARING_FOCUS',
@@ -208,9 +206,11 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
                 }
               }
             });
-            Guppy.init({
-              symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
-                oppiaSymbolsUrl]});
+            if (angular.equals(Guppy.Symbols.symbols, {})) {
+              Guppy.init({
+                symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
+                  oppiaSymbolsUrl]});
+            }
             guppyInstance.render();
             CurrentInteractionService.registerCurrentInteraction(
               ctrl.submitAnswer, ctrl.isCurrentAnswerValid);

@@ -20,7 +20,6 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
@@ -31,20 +30,15 @@ require('services/html-escaper.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
-  '$timeout', 'HtmlEscaperService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE',
-  function(
-      $timeout, HtmlEscaperService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE) {
+  '$timeout', 'HtmlEscaperService', 'EVENT_NEW_CARD_AVAILABLE',
+  function($timeout, HtmlEscaperService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         getLastAnswer: '&lastAnswer'
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/PencilCodeEditor/directives/' +
-        'pencil-code-editor-interaction.directive.html'),
+      template: require('./pencil-code-editor-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', '$element', '$uibModal',
@@ -57,9 +51,8 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
           var iframeDiv, pce;
           ctrl.reset = function() {
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-                '/interactions/PencilCodeEditor/directives/' +
-                'pencil-code-reset-confirmation.directive.html'),
+              template: require(
+                './pencil-code-reset-confirmation.directive.html'),
               backdrop: 'static',
               keyboard: false,
               controller: [
@@ -151,24 +144,29 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
               if (errorIsHappening || hasSubmittedAnswer) {
                 return;
               }
+              // The first argument in the method below gets executed in the
+              // pencilcode output-frame iframe context. The code input by the
+              // user is sanitized by pencilcode so there is no security
+              // issue in this case.
+              pce.eval(
+                'document.body.innerHTML', // disable-bad-pattern-check
+                function(pencilCodeHtml) {
+                  var normalizedCode = getNormalizedCode();
 
-              pce.eval('document.body.innerHTML', function(pencilCodeHtml) {
-                var normalizedCode = getNormalizedCode();
+                  // Get all the divs, and extract their textual content.
+                  var output = $.map(
+                    $(pencilCodeHtml).filter('div'), function(elem) {
+                      return $(elem).text();
+                    }).join('\n');
 
-                // Get all the divs, and extract their textual content.
-                var output = $.map(
-                  $(pencilCodeHtml).filter('div'), function(elem) {
-                    return $(elem).text();
-                  }).join('\n');
-
-                hasSubmittedAnswer = true;
-                CurrentInteractionService.onSubmit({
-                  code: normalizedCode,
-                  output: output || '',
-                  evaluation: '',
-                  error: ''
-                }, PencilCodeEditorRulesService);
-              }, true);
+                  hasSubmittedAnswer = true;
+                  CurrentInteractionService.onSubmit({
+                    code: normalizedCode,
+                    output: output || '',
+                    evaluation: '',
+                    error: ''
+                  }, PencilCodeEditorRulesService);
+                }, true);
             });
 
             pce.on('error', function(error) {

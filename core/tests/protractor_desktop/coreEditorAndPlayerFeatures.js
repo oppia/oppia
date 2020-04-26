@@ -24,7 +24,6 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage =
@@ -176,6 +175,80 @@ describe('Enable correctness feedback and set correctness', function() {
       testEnableCorrectnessInPlayerPage();
     });
 
+  it('should show Learn Again button correctly', function() {
+    // Turn on correctness feedback first.
+    enableCorrectnessFeedbackSetting();
+
+    // Go to main tab to create interactions.
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorMainTab.setStateName('First');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'Select the right option.'));
+
+    explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
+      forms.toRichText('Correct!'),
+      forms.toRichText('Wrong!')
+    ]);
+    explorationEditorMainTab.addResponse(
+      'MultipleChoiceInput', forms.toRichText('Good!'),
+      'Second', true, 'Equals', 'Correct!');
+    responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setFeedback(forms.toRichText('Wrong!'));
+    responseEditor = explorationEditorMainTab.getResponseEditor(0);
+    responseEditor.markAsCorrect();
+
+    explorationEditorMainTab.moveToState('Second');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'Select the right option.'));
+
+    explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
+      forms.toRichText('Correct!'),
+      forms.toRichText('Wrong!')
+    ]);
+    explorationEditorMainTab.addResponse(
+      'MultipleChoiceInput', forms.toRichText('Good!'),
+      'End', true, 'Equals', 'Correct!');
+    explorationEditorMainTab.addResponse(
+      'MultipleChoiceInput', forms.toRichText('Wrong!'),
+      'First', false, 'Equals', 'Wrong!');
+
+    explorationEditorMainTab.moveToState('End');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
+    workflow.publishExploration();
+
+    libraryPage.get();
+    libraryPage.findExploration(explorationTitle);
+    libraryPage.playExploration(explorationTitle);
+
+    explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
+    explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
+    explorationPlayerPage.clickThroughToNextCard();
+
+    explorationPlayerPage.submitAnswer.apply(
+      null, ['MultipleChoiceInput', 'Wrong!']);
+    explorationPlayerPage.expectNextCardButtonTextToBe('LEARN AGAIN');
+    explorationPlayerPage.clickThroughToNextCard();
+
+    explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
+    explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
+    explorationPlayerPage.clickThroughToNextCard();
+
+    explorationPlayerPage.submitAnswer.apply(
+      null, ['MultipleChoiceInput', 'Wrong!']);
+    explorationPlayerPage.expectNextCardButtonTextToBe('LEARN AGAIN');
+    explorationPlayerPage.clickThroughToNextCard();
+
+    explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
+    explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
+    explorationPlayerPage.clickThroughToNextCard();
+
+    explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
+    explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.expectExplorationToBeOver();
+  });
+
   afterEach(function() {
     libraryPage.get();
     currentExplorationIndex += 1;
@@ -248,8 +321,7 @@ describe('Core exploration functionality', function() {
     general.moveToPlayer();
     explorationPlayerPage.expectExplorationToNotBeOver();
     explorationPlayerPage.expectInteractionToMatch(
-      'MultipleChoiceInput',
-      [forms.toRichText('option A'), forms.toRichText('option B')]);
+      'MultipleChoiceInput', ['option A', 'option B']);
     explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'option B');
     explorationPlayerPage.expectExplorationToBeOver();
   });

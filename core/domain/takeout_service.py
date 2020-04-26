@@ -15,6 +15,7 @@
 """Functions to export the data of all user related models from a given
 user_id.
 """
+
 from __future__ import absolute_import   # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -23,10 +24,25 @@ import re
 from core.platform import models
 
 (
-    collection_models, email_models, exploration_models, feedback_models,
-    suggestion_models, user_models) = models.Registry.import_models([
-        models.NAMES.collection, models.NAMES.email, models.NAMES.exploration,
-        models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.user])
+    base_models, collection_models, email_models,
+    exploration_models, feedback_models, topic_models,
+    suggestion_models, user_models) = models.Registry.import_models(
+        [models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
+         models.NAMES.exploration, models.NAMES.feedback, models.NAMES.topic,
+         models.NAMES.suggestion, models.NAMES.user])
+
+
+def get_models_which_should_be_exported():
+    """Returns list of models to export.
+
+    Returns:
+        list(ndb.Model). List of models whose data should be
+        exported.
+    """
+    return [model_class for model_class in
+            models.Registry.get_all_storage_model_classes()
+            if model_class.get_export_policy() ==
+            base_models.EXPORT_POLICY.CONTAINS_USER_DATA]
 
 
 def export_data_for_user(user_id):
@@ -42,30 +58,9 @@ def export_data_for_user(user_id):
                                 model export policy>
         }
     """
-    models_to_export = [
-        user_models.UserStatsModel,
-        user_models.UserSettingsModel,
-        user_models.UserSubscriptionsModel,
-        user_models.UserSkillMasteryModel,
-        user_models.UserContributionsModel,
-        user_models.ExplorationUserDataModel,
-        user_models.CompletedActivitiesModel,
-        user_models.IncompleteActivitiesModel,
-        user_models.ExpUserLastPlaythroughModel,
-        user_models.LearnerPlaylistModel,
-        user_models.CollectionProgressModel,
-        user_models.StoryProgressModel,
-        feedback_models.GeneralFeedbackThreadModel,
-        feedback_models.GeneralFeedbackMessageModel,
-        collection_models.CollectionRightsModel,
-        suggestion_models.GeneralSuggestionModel,
-        exploration_models.ExplorationRightsModel,
-        email_models.GeneralFeedbackEmailReplyToIdModel
-    ]
-
     exported_data = dict()
+    models_to_export = get_models_which_should_be_exported()
     for model in models_to_export:
-        # Split the model name by uppercase characters.
         split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]
         # Join the split name with underscores and add _data for final name.
         final_name = ('_').join([x.lower() for x in split_name]) + '_data'

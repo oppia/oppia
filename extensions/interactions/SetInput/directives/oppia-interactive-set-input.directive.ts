@@ -20,21 +20,19 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('interactions/SetInput/directives/set-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveSetInput', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/SetInput/directives/' +
-        'set-input-interaction.directive.html'),
+      template: require('./set-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', '$translate', 'SetInputRulesService',
@@ -80,6 +78,8 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
             ctrl.submitAnswer(ctrl.answer);
           };
           ctrl.$onInit = function() {
+            ctrl.buttonText = HtmlEscaperService.escapedJsonToObj(
+              $attrs.buttonTextWithValue);
             ctrl.schema = {
               type: 'list',
               items: {
@@ -91,6 +91,9 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
                   'I18N_INTERACTIONS_SET_INPUT_ADD_ITEM')
               }
             };
+            if (ctrl.buttonText) {
+              ctrl.schema.ui_config.add_element_text = ctrl.buttonText;
+            }
 
             // Adds an input field by default
             ctrl.answer = [''];

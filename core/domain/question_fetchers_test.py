@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for methods defined in question fetchers.."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -67,6 +68,12 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(questions), 1)
         self.assertEqual(
             questions[0].to_dict(), self.question.to_dict())
+
+    def test_get_no_questions_with_no_skill_ids(self):
+        questions, _, _ = (
+            question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
+                1, [], ''))
+        self.assertEqual(len(questions), 0)
 
     def test_get_questions_with_multi_skill_ids(self):
         question_id_1 = question_services.get_new_question_id()

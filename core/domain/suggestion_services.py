@@ -15,6 +15,7 @@
 """Funtions to create, accept, reject, update and perform other operations on
 suggestions.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -356,12 +357,21 @@ def get_reviewable_suggestions(user_id, suggestion_type):
         list(Suggestion). A list of suggestions which the given user is allowed
             to review.
     """
-    return ([
+    all_suggestions = ([
         get_suggestion_from_model(s) for s in (
             suggestion_models.GeneralSuggestionModel
             .get_in_review_suggestions_of_suggestion_type(
                 suggestion_type, user_id))
     ])
+    user_review_rights = user_services.get_user_community_rights(user_id)
+    if suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        language_codes = (
+            user_review_rights.can_review_translation_for_language_codes)
+        return [
+            suggestion for suggestion in all_suggestions
+            if suggestion.change.language_code in language_codes]
+
+    return all_suggestions
 
 
 def get_submitted_suggestions(user_id, suggestion_type):

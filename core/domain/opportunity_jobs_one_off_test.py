@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for opportunity one-off jobs."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -66,6 +67,7 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
+            self.publish_exploration(self.owner_id, exp.id)
 
         topic_1 = topic_domain.Topic.create_default_topic(
             topic_id=self.topic_id_1, name='topic1', abbreviated_name='abbrev')

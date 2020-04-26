@@ -16,8 +16,7 @@
  * @fileoverview General config file for Webpack.
  */
 
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
@@ -29,7 +28,7 @@ var htmlMinifyConfig = {
     /<\{%[\s\S]*?%\}/,
     /<\[[\s\S]*?\]>/]
 };
-var commonPrefix = './core/templates/dev/head';
+var commonPrefix = './core/templates';
 var defaultMeta = {
   name: 'Personalized Online Learning from Oppia',
   description: 'Oppia is a free, open-source learning platform. Join ' +
@@ -40,7 +39,7 @@ module.exports = {
   resolve: {
     modules: [
       path.resolve(__dirname, 'assets'),
-      path.resolve(__dirname, 'core/templates/dev/head'),
+      path.resolve(__dirname, 'core/templates'),
       path.resolve(__dirname, 'extensions'),
       path.resolve(__dirname, 'node_modules'),
       path.resolve(__dirname, 'third_party')
@@ -643,9 +642,6 @@ module.exports = {
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],
     }),
-    new ForkTsCheckerWebpackPlugin({
-      checkSyntacticErrors: true
-    }),
     new webpack.LoaderOptionsPlugin({
       options: {
         macros: {
@@ -660,25 +656,30 @@ module.exports = {
       test: /\.ts$/,
       include: [
         path.resolve(__dirname, 'assets'),
-        path.resolve(__dirname, 'core/templates/dev/head'),
+        path.resolve(__dirname, 'core/templates'),
         path.resolve(__dirname, 'extensions'),
         path.resolve(__dirname, 'typings')
       ],
       use: [
-        'cache-loader',
-        'thread-loader',
         {
           loader: 'ts-loader',
           options: {
-            // this is needed for thread-loader to work correctly
-            happyPackMode: true
+            // Typescript checks do the type checking.
+            transpileOnly: true
           }
         }
       ]
     },
     {
-      test: /\.html$/,
+      test: {
+        include: /.html$/,
+        exclude: /directive\.html$/
+      },
       loader: 'underscore-template-loader'
+    },
+    {
+      test: /directive\.html$/,
+      loader: 'html-loader'
     },
     {
       test: /\.css$/,

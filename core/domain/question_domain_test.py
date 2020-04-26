@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for question domain objects."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -181,6 +182,103 @@ class QuestionChangeTest(test_utils.GenericTestBase):
             'migrate_state_schema_to_latest_version', observed_object.cmd)
         self.assertEqual(0, observed_object.from_version)
         self.assertEqual(10, observed_object.to_version)
+
+
+class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
+    """Test for QuestionSuggestionChange object."""
+
+    def test_to_dict(self):
+        """Test to verify to_dict method of the Question Change object."""
+        expected_object_dict = {
+            'cmd': 'create_new_fully_specified_question',
+            'question_dict': 'question_dict',
+            'skill_id': 'skill_1',
+            'skill_difficulty': '0.3'
+        }
+
+        change_dict = {
+            'cmd': 'create_new_fully_specified_question',
+            'question_dict': 'question_dict',
+            'skill_id': 'skill_1',
+            'skill_difficulty': '0.3'
+        }
+        observed_object = question_domain.QuestionSuggestionChange(
+            change_dict=change_dict,
+        )
+
+        self.assertEqual(expected_object_dict, observed_object.to_dict())
+
+    def test_change_dict_without_cmd(self):
+        """Test to verify __init__ method of the QuestionSuggestionChange
+        object when change_dict is without cmd key.
+        """
+        self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Missing cmd key in change dict',
+            callableObj=question_domain.QuestionSuggestionChange,
+            change_dict={}
+        )
+
+    def test_change_dict_with_wrong_cmd(self):
+        """Test to verify __init__ method of the QuestionSuggestionChange object
+        when change_dict is with wrong cmd value.
+        """
+        self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Command wrong is not allowed',
+            callableObj=question_domain.QuestionSuggestionChange,
+            change_dict={'cmd': 'wrong', }
+        )
+
+    def test_change_dict_with_missing_attributes_in_cmd(self):
+        """Test to verify __init__ method of the QuestionSuggestionChange object
+        when change_dict is with missing attributes in cmd.
+        """
+        self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The following required attributes are present: new_value',
+            callableObj=question_domain.QuestionSuggestionChange,
+            change_dict={
+                'cmd': 'create_new_fully_specified_question',
+                'question_dict': 'question_dict',
+            }
+        )
+
+    def test_change_dict_with_extra_attributes_in_cmd(self):
+        """Test to verify __init__ method of the QuestionSuggestionChange object
+        when change_dict is with extra attributes in cmd.
+        """
+        self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The following extra attributes are present: invalid',
+            callableObj=question_domain.QuestionSuggestionChange,
+            change_dict={
+                'cmd': 'create_new_fully_specified_question',
+                'question_dict': 'question_dict',
+                'skill_id': 'skill_1',
+                'skill_difficulty': '0.3',
+                'invalid': 'invalid'
+            }
+        )
+
+    def test_create_new_fully_specified_question(self):
+        """Test to verify __init__ method of the QuestionSuggestionChange object
+        when cmd is create_new_fully_specified_question.
+        """
+        change_dict = {
+            'cmd': 'create_new_fully_specified_question',
+            'question_dict': {},
+            'skill_id': '10',
+            'skill_difficulty': '0.3',
+        }
+        observed_object = question_domain.QuestionSuggestionChange(
+            change_dict=change_dict,
+        )
+
+        self.assertEqual(
+            'create_new_fully_specified_question', observed_object.cmd)
+        self.assertEqual('10', observed_object.skill_id)
+        self.assertEqual({}, observed_object.question_dict)
 
 
 class QuestionDomainTest(test_utils.GenericTestBase):

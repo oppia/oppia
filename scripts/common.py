@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Common utility functions and classes used by multiple Python scripts."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -21,16 +22,24 @@ import getpass
 import os
 import platform
 import re
+import shutil
 import socket
 import subprocess
+import sys
 
 import python_utils
 import release_constants
 
+PSUTIL_VERSION = '5.6.7'
+
+CURRENT_PYTHON_BIN = sys.executable
 NODE_VERSION = '10.18.0'
+PYLINT_VERSION = '1.9.4'
+PYCODESTYLE_VERSION = '2.5.0'
+PYLINT_QUOTES_VERSION = '0.1.8'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
-YARN_VERSION = '1.21.1'
+YARN_VERSION = '1.22.0'
 
 COVERAGE_VERSION = '4.5.4'
 
@@ -43,11 +52,21 @@ GOOGLE_APP_ENGINE_HOME = os.path.join(
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0', 'google-cloud-sdk')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
+PYLINT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylint-%s' % PYLINT_VERSION)
+PYCODESTYLE_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'pycodestyle-%s' % PYCODESTYLE_VERSION)
+PYLINT_QUOTES_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % PYLINT_QUOTES_VERSION)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
-FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates', 'dev', 'head')
+FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
+PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
+RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
+RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
+HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
+TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
 
 
 def is_windows_os():
@@ -67,7 +86,8 @@ def is_linux_os():
 
 def is_x64_architecture():
     """Check if the architecture is on X64."""
-    return ARCHITECTURE == 'x86_64'
+    # https://docs.python.org/2/library/platform.html#platform.architecture
+    return sys.maxsize > 2**32
 
 
 NODE_BIN_PATH = os.path.join(
@@ -193,11 +213,15 @@ def get_current_release_version_number(release_branch_name):
     Returns:
         str. The version of release.
     """
-    release_match = re.match(r'release-(\d+\.\d+\.\d+)$', release_branch_name)
+    release_match = re.match(RELEASE_BRANCH_REGEX, release_branch_name)
+    release_maintenance_match = re.match(
+        RELEASE_MAINTENANCE_BRANCH_REGEX, release_branch_name)
     hotfix_match = re.match(
-        r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$', release_branch_name)
+        HOTFIX_BRANCH_REGEX, release_branch_name)
     if release_match:
         return release_match.group(1)
+    elif release_maintenance_match:
+        return release_maintenance_match.group(1)
     elif hotfix_match:
         return hotfix_match.group(1)
     else:
@@ -211,10 +235,22 @@ def is_current_branch_a_release_branch():
         bool. Whether the current branch is a release branch.
     """
     current_branch_name = get_current_branch_name()
-    return (
-        bool(re.match(r'release-\d+\.\d+\.\d+$', current_branch_name)) or bool(
-            re.match(
-                r'release-\d+\.\d+\.\d+-hotfix-[1-9]+$', current_branch_name)))
+    release_match = bool(re.match(RELEASE_BRANCH_REGEX, current_branch_name))
+    release_maintenance_match = bool(
+        re.match(RELEASE_MAINTENANCE_BRANCH_REGEX, current_branch_name))
+    hotfix_match = bool(
+        re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
+    return release_match or release_maintenance_match or hotfix_match
+
+
+def is_current_branch_a_test_branch():
+    """Returns whether the current branch is a test branch for deployment.
+
+    Returns:
+        bool. Whether the current branch is a test branch for deployment.
+    """
+    current_branch_name = get_current_branch_name()
+    return bool(re.match(TEST_BRANCH_REGEX, current_branch_name))
 
 
 def verify_current_branch_name(expected_branch_name):
@@ -422,6 +458,30 @@ def check_prs_for_current_release_are_released(repo):
                 'released before release summary generation.')
 
 
+def kill_processes_based_on_regex(pattern):
+    """Kill any processes whose command line matches the provided regex.
+
+    Args:
+        pattern: str. Pattern for searching processes.
+    """
+    regex = re.compile(pattern)
+    if PSUTIL_DIR not in sys.path:
+        sys.path.insert(1, PSUTIL_DIR)
+    import psutil
+    for process in psutil.process_iter():
+        try:
+            cmdline = ' '.join(process.cmdline())
+            if regex.match(cmdline) and process.is_running():
+                python_utils.PRINT('Killing %s ...' % cmdline)
+                process.kill()
+        # Possible exception raised by psutil includes: AccessDenied,
+        # NoSuchProcess, ZombieProcess, TimeoutExpired. We can safely ignore
+        # those ones and continue.
+        # https://psutil.readthedocs.io/en/latest/#exceptions
+        except psutil.Error:
+            continue
+
+
 def convert_to_posixpath(file_path):
     """Converts a Windows style filepath to posixpath format. If the operating
     system is not Windows, this function does nothing.
@@ -435,6 +495,52 @@ def convert_to_posixpath(file_path):
     if not is_windows_os():
         return file_path
     return file_path.replace('\\', '/')
+
+
+def create_readme(dir_path, readme_content):
+    """Creates a readme in a given dir path with the specified
+    readme content.
+
+    Args:
+        dir_path: str. The path of the dir where the README is to
+            be created.
+        readme_content: str. The content to be written in the README.
+    """
+    with python_utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
+        f.write(readme_content)
+
+
+def inplace_replace_file(filename, regex_pattern, replacement_string):
+    """Replace the file content in-place with regex pattern. The pattern is used
+    to replace the file's content line by line.
+
+    Note:
+        This function should only be used with files that are processed line by
+            line.
+
+    Args:
+        filename: str. The name of the file to be changed.
+        regex_pattern: str. The pattern to check.
+        replacement_string: str. The content to be replaced.
+    """
+    backup_filename = '%s.bak' % filename
+    shutil.copyfile(filename, backup_filename)
+    new_contents = []
+    try:
+        regex = re.compile(regex_pattern)
+        with python_utils.open_file(backup_filename, 'r') as f:
+            for line in f:
+                new_contents.append(regex.sub(replacement_string, line))
+
+        with python_utils.open_file(filename, 'w') as f:
+            for line in new_contents:
+                f.write(line)
+        os.remove(backup_filename)
+    except Exception:
+        # Restore the content if there was en error.
+        os.remove(filename)
+        shutil.move(backup_filename, filename)
+        raise
 
 
 class CD(python_utils.OBJECT):

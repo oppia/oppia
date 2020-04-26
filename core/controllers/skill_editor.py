@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the skill editor."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -113,10 +114,14 @@ class EditableSkillDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_edit_skill
+    @acl_decorators.open_access
     def get(self, skill_id):
         """Populates the data on the individual skill page."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
+        try:
+            skill_domain.Skill.require_valid_skill_id(skill_id)
+        except Exception:
+            raise self.PageNotFoundException(Exception('Invalid skill id.'))
+
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
 
         if skill is None:

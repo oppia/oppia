@@ -15,13 +15,14 @@
 # limitations under the License.
 
 """Controllers for suggestions."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import opportunity_services
+from core.domain import skill_services
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
@@ -81,7 +82,20 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
     target_ids = set([s.target_id for s in suggestions])
     opportunities = (
         opportunity_services.get_skill_opportunities_by_ids(list(target_ids)))
-    return {opp.id: opp.to_dict() for opp in opportunities}
+    opportunity_skill_ids = [opp.id for opp in opportunities]
+    opportunity_id_to_skill = {
+        skill.id: skill
+        for skill in skill_services.get_multi_skills(opportunity_skill_ids)
+    }
+    opportunity_id_to_opportunity = {}
+    for opp in opportunities:
+        opp_dict = opp.to_dict()
+        skill = opportunity_id_to_skill.get(opp.id)
+        if skill is not None:
+            opp_dict['skill_rubrics'] = [
+                rubric.to_dict() for rubric in skill.rubrics]
+        opportunity_id_to_opportunity[opp.id] = opp_dict
+    return opportunity_id_to_opportunity
 
 
 class SuggestionHandler(base.BaseHandler):
@@ -160,9 +174,6 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_skill)
     def put(self, target_id, suggestion_id):
-        if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
-            raise self.PageNotFoundException
-
         if suggestion_id.split('.')[0] != suggestion_models.TARGET_TYPE_SKILL:
             raise self.InvalidInputException(
                 'This handler allows actions only on suggestions to skills.')
@@ -176,14 +187,9 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         if action == suggestion_models.ACTION_TYPE_ACCEPT:
-            if (
-                    suggestion.suggestion_type ==
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
-                # The skill_id is passed only at the time of accepting the
-                # suggestion.
-                suggestion.change.skill_id = target_id
+            # Question suggestions do not use commit messages.
             suggestion_services.accept_suggestion(
-                suggestion, self.user_id, self.payload.get('commit_message'),
+                suggestion, self.user_id, 'UNUSED_COMMIT_MESSAGE',
                 self.payload.get('review_message'))
         elif action == suggestion_models.ACTION_TYPE_REJECT:
             suggestion_services.reject_suggestion(
@@ -231,7 +237,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
     suggestion type.
     """
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.can_view_reviewable_suggestions
     def get(self, target_type, suggestion_type):
         """Handles GET requests."""
         try:

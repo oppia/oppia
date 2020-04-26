@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for Question-related one-off jobs."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -127,7 +128,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
             self.QUESTION_ID, self.albert_id, [self.skill_id])
         question = (
             question_services.get_question_by_id(self.QUESTION_ID))
-        self.assertEqual(question.question_state_data_schema_version, 30)
+        self.assertEqual(question.question_state_data_schema_version, 33)
 
         # Start migration job.
         job_id = (

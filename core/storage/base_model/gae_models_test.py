@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for core.storage.base_model.gae_models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -71,6 +72,10 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
     def test_export_data(self):
         with self.assertRaises(NotImplementedError):
             base_models.BaseModel.export_data('user_id')
+
+    def test_get_export_policy(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.get_export_policy()
 
     def test_generic_query_put_get_and_delete_operations(self):
         model = base_models.BaseModel()
@@ -230,6 +235,42 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
             id='model_id-1', committer_id='committer_id', commit_type='create')
         model1.put()
         self.assertEqual(model1.get_unversioned_instance_id(), 'model_id')
+
+    def test_export_data_trivial(self):
+        user_data = (base_models
+                     .BaseSnapshotMetadataModel
+                     .export_data('trivial_user'))
+        expected_data = {}
+        self.assertEqual(user_data, expected_data)
+
+    def test_export_data_nontrivial(self):
+        version_model = TestVersionedModel(id='version_model')
+        model1 = version_model.SNAPSHOT_METADATA_CLASS.create(
+            'model_id-1', 'committer_id', 'create', None, None)
+        model1.put()
+        model2 = version_model.SNAPSHOT_METADATA_CLASS.create(
+            'model_id-2', 'committer_id', 'create', 'Hi this is a commit.',
+            [{'cmd': 'some_command'}, {'cmd2': 'another_command'}])
+        model2.put()
+        user_data = (version_model
+                     .SNAPSHOT_METADATA_CLASS
+                     .export_data('committer_id'))
+        expected_data = {
+            'model_id-1': {
+                'commit_type': 'create',
+                'commit_message': None,
+                'commit_cmds': None
+            },
+            'model_id-2': {
+                'commit_type': 'create',
+                'commit_message': 'Hi this is a commit.',
+                'commit_cmds': [
+                    {'cmd': 'some_command'},
+                    {'cmd2': 'another_command'}
+                ]
+            }
+        }
+        self.assertEqual(user_data, expected_data)
 
 
 class BaseSnapshotContentModelTests(test_utils.GenericTestBase):

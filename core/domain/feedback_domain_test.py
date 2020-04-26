@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for feedback domain objects."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -44,7 +45,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             'original_author_username': self.VIEWER_USERNAME,
             'message_count': 1,
             'subject': u'a subject',
-            'last_updated': utils.get_time_in_millisecs(fake_date),
+            'last_updated_msecs': utils.get_time_in_millisecs(fake_date),
             'last_nonempty_message_text': 'last message',
             'last_nonempty_message_author': self.VIEWER_USERNAME,
         }
@@ -96,14 +97,13 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         expected_message_dict = {
             'author_username': self.OWNER_USERNAME,
-            'created_on': utils.get_time_in_millisecs(fake_date),
+            'created_on_msecs': utils.get_time_in_millisecs(fake_date),
             'entity_type': feconf.ENTITY_TYPE_EXPLORATION,
             'entity_id': self.EXP_ID,
             'message_id': self.MESSAGE_ID,
             'text': 'a message text',
             'updated_status': 'open',
-            'updated_subject': 'an updated subject',
-            'received_via_email': False
+            'updated_subject': 'an updated subject'
         }
         observed_message = feedback_domain.FeedbackMessage(
             self.FULL_MESSAGE_ID, self.THREAD_ID, self.MESSAGE_ID,

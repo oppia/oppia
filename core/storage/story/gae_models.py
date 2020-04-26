@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Models for storing the story data models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -120,6 +121,11 @@ class StoryModel(base_models.VersionedModel):
         story_commit_log_entry.story_id = self.id
         story_commit_log_entry.put()
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
 
 class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to stories.
@@ -153,6 +159,13 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             str. The commit id with the story id and version number.
         """
         return 'story-%s-%s' % (story_id, version)
+
+    @staticmethod
+    def get_export_policy():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class StorySummaryModel(base_models.BaseModel):
@@ -205,6 +218,11 @@ class StorySummaryModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return False
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_user_id_migration_policy():

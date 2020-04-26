@@ -21,8 +21,7 @@
 // in via initArgs.
 
 angular.module('oppia').directive('codeStringEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -30,8 +29,7 @@ angular.module('oppia').directive('codeStringEditor', [
         getAlwaysEditable: '&',
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/code-string-editor.directive.html'),
+      template: require('./code-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

@@ -21,7 +21,6 @@
  */
 
 require('domain/utilities/browser-checker.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
@@ -31,17 +30,15 @@ require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
   'BrowserCheckerService', 'HtmlEscaperService',
-  'MultipleChoiceInputRulesService', 'UrlInterpolationService',
+  'MultipleChoiceInputRulesService',
   function(
       BrowserCheckerService, HtmlEscaperService,
-      MultipleChoiceInputRulesService, UrlInterpolationService) {
+      MultipleChoiceInputRulesService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/MultipleChoiceInput/directives/' +
-        'multiple-choice-input-interaction.directive.html'),
+      template: require('./multiple-choice-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'CurrentInteractionService',
@@ -80,8 +77,30 @@ angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
           };
 
           ctrl.$onInit = function() {
-            ctrl.choices = HtmlEscaperService.escapedJsonToObj(
+            var showChoicesInShuffledOrder = (
+              $attrs.showChoicesInShuffledOrderWithValue === 'true');
+            var choicesWithValue = HtmlEscaperService.escapedJsonToObj(
               $attrs.choicesWithValue);
+            var choicesWithIndex = choicesWithValue.map(
+              function(value, originalIndex) {
+                return {originalIndex: originalIndex, value: value};
+              }
+            );
+            var shuffleChoices = function(choices) {
+              for (var currentIndex = choices.length - 1;
+                currentIndex >= 0; currentIndex--) {
+                var temporaryValue = null;
+                var randomIndex = null;
+                randomIndex = Math.floor(Math.random() * (currentIndex + 1));
+                temporaryValue = choices[currentIndex];
+                choices[currentIndex] = choices[randomIndex];
+                choices[randomIndex] = temporaryValue;
+              }
+              return choices;
+            };
+            ctrl.choices = (
+              showChoicesInShuffledOrder ? shuffleChoices(choicesWithIndex) :
+              choicesWithIndex);
             ctrl.answer = null;
             CurrentInteractionService.registerCurrentInteraction(
               ctrl.submitAnswer, validityCheckFn);

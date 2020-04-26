@@ -15,18 +15,18 @@
 # limitations under the License.]
 
 """Commands for operations on topics, and related models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import logging
 
-from core.domain import exp_fetchers
 from core.domain import opportunity_services
-from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import state_domain
 from core.domain import story_fetchers
+from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
@@ -383,7 +383,8 @@ def _save_topic(committer_id, topic, commit_message, change_list):
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
             'save topic %s: %s' % (topic.id, change_list))
-    topic.validate()
+    topic_rights = get_topic_rights(topic.id, strict=False)
+    topic.validate(strict=topic_rights.topic_is_published)
 
     topic_model = topic_models.TopicModel.get(topic.id, strict=False)
 
@@ -547,20 +548,8 @@ def publish_story(topic_id, story_id, committer_id):
                     'Story node with id %s does not contain an '
                     'exploration id.' % node.id)
             exploration_id_list.append(node.exploration_id)
-        explorations = exp_fetchers.get_multiple_explorations_by_id(
-            exploration_id_list, strict=False)
-        for node in story_nodes:
-            if not node.exploration_id in explorations:
-                raise Exception(
-                    'Exploration id %s doesn\'t exist.' % node.exploration_id)
-        multiple_exploration_rights = (
-            rights_manager.get_multiple_exploration_rights_by_ids(
-                exploration_id_list))
-        for exploration_rights in multiple_exploration_rights:
-            if exploration_rights.is_private():
-                raise Exception(
-                    'Exploration with id %s isn\'t published.'
-                    % exploration_rights.id)
+        story_services.validate_explorations_for_story(
+            exploration_id_list, True)
 
     topic = topic_fetchers.get_topic_by_id(topic_id, strict=None)
     if topic is None:
@@ -723,6 +712,14 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
     for subtopic in topic_model.subtopics:
         subtopic_page_services.delete_subtopic_page(
             committer_id, topic_id, subtopic['id'])
+
+    all_story_references = (
+        topic_model.canonical_story_references +
+        topic_model.additional_story_references)
+    for story_reference in all_story_references:
+        story_services.delete_story(
+            committer_id, story_reference['story_id'],
+            force_deletion=force_deletion)
     topic_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED,
         force_deletion=force_deletion)
@@ -855,6 +852,8 @@ def publish_topic(topic_id, committer_id):
     topic_rights = get_topic_rights(topic_id, strict=False)
     if topic_rights is None:
         raise Exception('The given topic does not exist')
+    topic = topic_fetchers.get_topic_by_id(topic_id)
+    topic.validate(strict=True)
     user = user_services.UserActionsInfo(committer_id)
     if role_services.ACTION_CHANGE_TOPIC_STATUS not in user.actions:
         raise Exception(

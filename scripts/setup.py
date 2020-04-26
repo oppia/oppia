@@ -162,7 +162,17 @@ def main(args=None):
     # as $PYTHONPATH).
     create_directory(common.OPPIA_TOOLS_DIR)
     create_directory(common.THIRD_PARTY_DIR)
+    common.create_readme(
+        common.THIRD_PARTY_DIR,
+        'This folder contains third party libraries used in Oppia codebase.\n'
+        'You can regenerate this folder by deleting it and then running '
+        'the start.py script.\n')
     create_directory(common.NODE_MODULES_PATH)
+    common.create_readme(
+        common.NODE_MODULES_PATH,
+        'This folder contains node utilities used in Oppia codebase.\n'
+        'You can regenerate this folder by deleting it and then running '
+        'the start.py script.\n')
 
     # Download and install node.js.
     python_utils.PRINT(
@@ -204,6 +214,9 @@ def main(args=None):
     elif os.path.isfile('/usr/bin/chromium-browser'):
         # Unix.
         chrome_bin = '/usr/bin/chromium-browser'
+    elif os.path.isfile('/usr/bin/chromium'):
+        # Arch Linux.
+        chrome_bin = '/usr/bin/chromium'
     elif os.path.isfile(
             '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'):
         # Windows.

@@ -1,0 +1,70 @@
+<main>
+  <div ng-if="$ctrl.iframed">
+    <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content"
+         ng-cloak>
+      <warning-loader></warning-loader>
+      <div ng-show="!$root.loadingMessage">
+        <div ng-transclude="content">
+        </div>
+        <div ng-transclude="footer">
+          <!-- Loads default footer if no footer is provided -->
+          <oppia-footer></oppia-footer>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div ng-if="!$ctrl.iframed">
+    <div role="button" tabindex="0" ng-click="$ctrl.skipToMainContent()"
+         class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content
+    </div>
+    <promo-bar>
+    </promo-bar>
+    <div ng-if="$ctrl.isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
+    </div>
+
+    <div class="oppia-base-container"
+         ng-class="{'oppia-sidebar-menu-open': $ctrl.isSidebarShown(), 'oppia-sidebar-menu-closed': !$ctrl.isSidebarShown()}"
+         ng-swipe-left="$ctrl.closeSidebarOnSwipe()" ng-swipe-disable-mouse="false">
+      <div class="oppia-content-container">
+        <div id="wrapper">
+          <div class="oppia-main-body">
+            <nav class="navbar navbar-expand-lg navbar-light oppia-navbar oppia-prevent-selection" role="navigation" headroom
+                 tolerance="0" offset="0">
+              <div class="navbar-container">
+                <top-navigation-bar></top-navigation-bar>
+                <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak">
+                  <div ng-transclude="breadcrumb" class="mr-auto"></div>
+
+                  <div ng-transclude="navOptions"></div>
+                </div>
+              </div>
+            </nav>
+
+            <div class="oppia-top-of-page-padding">
+            </div>
+
+            <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content"
+                 class="protractor-test-main-content" ng-cloak>
+              <warning-loader></warning-loader>
+              <div ng-show="!$root.loadingMessage">
+                <div ng-transclude="content">
+                </div>
+                <div ng-transclude="footer">
+                  <!-- Loads default footer if no footer is provided -->
+                  <oppia-footer></oppia-footer>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <side-navigation-bar></side-navigation-bar>
+        </div>
+      </div>
+    </div>
+
+    <div ng-if="$ctrl.DEV_MODE" class="oppia-dev-mode protractor-test-dev-mode" ng-cloak>
+      Dev Mode
+    </div>
+
+  </div>
+</main>

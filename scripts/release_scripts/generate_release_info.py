@@ -96,7 +96,8 @@ def get_extra_commits_in_new_release(base_commit, repo):
         the current commit, which haven't been cherrypicked already.
     """
     get_commits_cmd = GIT_CMD_TEMPLATE_GET_NEW_COMMITS % base_commit
-    out = common.run_cmd(get_commits_cmd.split(' ')).split('\n')
+    out = python_utils.UNICODE(
+        common.run_cmd(get_commits_cmd.split(' ')), 'utf-8').split('\n')
     commits = []
     for line in out:
         # Lines that start with a - are already cherrypicked. The commits of
@@ -296,9 +297,6 @@ def main(personal_access_token):
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
 
-    common.check_blocking_bug_issue_count(repo)
-    common.check_prs_for_current_release_are_released(repo)
-
     current_release = get_current_version_tag(repo)
     current_release_tag = current_release.name
     base_commit = current_release.commit.sha
@@ -356,20 +354,20 @@ def main(personal_access_token):
         existing_author_names = [name for name, _ in existing_authors]
 
         # TODO(apb7): duplicate author handling due to email changes.
-        out.write('\n### New Authors:\n')
+        out.write('\n%s' % release_constants.NEW_AUTHORS_HEADER)
         for name, email in new_authors:
             out.write('* %s <%s>\n' % (name, email))
 
-        out.write('\n### Existing Authors:\n')
+        out.write('\n%s' % release_constants.EXISTING_AUTHORS_HEADER)
         for name, email in existing_authors:
             out.write('* %s <%s>\n' % (name, email))
 
-        out.write('\n### New Contributors:\n')
+        out.write('\n%s' % release_constants.NEW_CONTRIBUTORS_HEADER)
         for name, email in new_authors:
             out.write('* %s <%s>\n' % (name, email))
 
         # Generate the author sections of the email.
-        out.write('\n### Email C&P Blurbs about authors:\n')
+        out.write('\n%s' % release_constants.EMAIL_HEADER)
         new_author_comma_list = (
             '%s, and %s' % (', '.join(
                 new_author_names[:-1]), new_author_names[-1]))
@@ -384,22 +382,29 @@ def main(personal_access_token):
             'possible.``\n' % existing_author_comma_list)
 
         if personal_access_token:
-            out.write('\n### Changelog:\n')
+            out.write('\n%s' % release_constants.CHANGELOG_HEADER)
             for category in categorized_pr_titles:
                 out.write('%s\n' % category)
                 for pr_title in categorized_pr_titles[category]:
                     out.write('* %s\n' % pr_title)
                 out.write('\n')
 
-        out.write('\n### Commit History:\n')
+        out.write('\n%s' % release_constants.COMMIT_HISTORY_HEADER)
         for name, title in [(log.author, log.message.split('\n\n')[0])
                             for log in new_release_logs]:
             out.write('* %s\n' % title)
 
         if issue_links:
-            out.write('\n### Issues mentioned in commits:\n')
+            out.write('\n%s' % release_constants.ISSUES_HEADER)
             for link in issue_links:
                 out.write('* [%s](%s)\n' % (link, link))
 
     python_utils.PRINT('Done. Summary file generated in %s' % (
         release_constants.RELEASE_SUMMARY_FILEPATH))
+
+
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when generate_release_info.py is used as
+# a script.
+if __name__ == '__main__': # pragma: no cover
+    main(common.get_personal_access_token())

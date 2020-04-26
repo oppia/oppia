@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for the feedback controllers."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -39,11 +40,11 @@ import python_utils
 
 EXPECTED_THREAD_KEYS = [
     'status', 'original_author_username', 'state_name', 'summary',
-    'thread_id', 'subject', 'last_updated', 'message_count',
+    'thread_id', 'subject', 'last_updated_msecs', 'message_count',
     'last_nonempty_message_text', 'last_nonempty_message_author']
 EXPECTED_MESSAGE_KEYS = [
-    'author_username', 'created_on', 'entity_type', 'message_id', 'entity_id',
-    'text', 'updated_status', 'updated_subject', 'received_via_email']
+    'author_username', 'created_on_msecs', 'entity_type', 'message_id',
+    'entity_id', 'text', 'updated_status', 'updated_subject']
 
 
 class MockFeedbackAnalyticsAggregator(

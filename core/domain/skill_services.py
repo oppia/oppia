@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Commands that can be used to operate on skills."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -499,11 +500,12 @@ def apply_change_list(skill_id, change_list, committer_id):
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
-                    skill.update_explanation(change.new_value)
+                    skill.update_explanation(
+                        state_domain.SubtitledHtml.from_dict(change.new_value))
                 elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
                     worked_examples_list = [
-                        state_domain.SubtitledHtml.from_dict(worked_example)
+                        skill_domain.WorkedExample.from_dict(worked_example)
                         for worked_example in change.new_value]
                     skill.update_worked_examples(worked_examples_list)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:

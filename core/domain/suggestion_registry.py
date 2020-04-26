@@ -15,6 +15,7 @@
 """Registry for Oppia suggestions. Contains a BaseSuggestion class and
 subclasses for each type of suggestion.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -502,7 +503,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.status = status
         self.author_id = author_id
         self.final_reviewer_id = final_reviewer_id
-        self.change = question_domain.QuestionChange(change)
+        self.change = question_domain.QuestionSuggestionChange(change)
         # Update question_state_data_schema_version here instead of surfacing
         # the version in the frontend.
         self.change.question_dict['question_state_data_schema_version'] = (
@@ -525,9 +526,10 @@ class SuggestionAddQuestion(BaseSuggestion):
                 ', received "%s"' % (
                     suggestion_models.SCORE_TYPE_QUESTION,
                     self.get_score_type()))
-        if not isinstance(self.change, question_domain.QuestionChange):
+        if not isinstance(
+                self.change, question_domain.QuestionSuggestionChange):
             raise utils.ValidationError(
-                'Expected change to be an instance of QuestionChange')
+                'Expected change to be an instance of QuestionSuggestionChange')
 
         if not self.change.cmd:
             raise utils.ValidationError('Expected change to contain cmd')
@@ -542,6 +544,17 @@ class SuggestionAddQuestion(BaseSuggestion):
         if not self.change.question_dict:
             raise utils.ValidationError(
                 'Expected change to contain question_dict')
+
+        if not self.change.skill_difficulty:
+            raise utils.ValidationError(
+                'Expected change to contain skill_difficulty')
+
+        skill_difficulties = list(
+            constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.values())
+        if self._get_skill_difficulty() not in skill_difficulties:
+            raise utils.ValidationError(
+                'Expected change skill_difficulty to be one of %s, found %s '
+                % (skill_difficulties, self._get_skill_difficulty()))
 
         question = question_domain.Question(
             None, state_domain.State.from_dict(
@@ -607,7 +620,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'The skill with the given id doesn\'t exist.')
         question_services.create_new_question_skill_link(
             self.author_id, question_dict['id'], self.change.skill_id,
-            constants.DEFAULT_SKILL_DIFFICULTY)
+            self._get_skill_difficulty())
 
     def populate_old_value_of_change(self):
         """Populates old value of the change."""
@@ -636,6 +649,10 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'The new change question_dict must not be equal to the old '
                 'question_dict')
+
+    def _get_skill_difficulty(self):
+        """Returns the suggestion's skill difficulty."""
+        return self.change.skill_difficulty
 
 
 class BaseVoiceoverApplication(python_utils.OBJECT):

@@ -29,17 +29,16 @@ require('services/html-escaper.service.ts');
 angular.module('oppia').directive('oppiaNoninteractiveImage', [
   'AssetsBackendApiService', 'ContextService',
   'HtmlEscaperService', 'ImagePreloaderService',
-  'UrlInterpolationService', 'LOADING_INDICATOR_URL',
+  'UrlInterpolationService', 'ENTITY_TYPE', 'LOADING_INDICATOR_URL',
   function(
       AssetsBackendApiService, ContextService,
       HtmlEscaperService, ImagePreloaderService,
-      UrlInterpolationService, LOADING_INDICATOR_URL) {
+      UrlInterpolationService, ENTITY_TYPE, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/Image/directives/image.directive.html'),
+      template: require('./image.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
@@ -52,7 +51,16 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
           ctrl.isLoadingIndicatorShown = false;
           ctrl.isTryAgainShown = false;
 
-          if (ImagePreloaderService.inExplorationPlayer()) {
+          // If viewing a concept card in the exploration player, don't use the
+          // preloader service. Since, in that service, the image file names are
+          // extracted from the state contents to be preloaded, but when
+          // viewing a concept, the names are not available until the link is
+          // clicked, at which point an API call is done to get the skill
+          // details. So, the image file name will not be available to the
+          // preloader service beforehand.
+          if (
+            ImagePreloaderService.inExplorationPlayer() &&
+            !ContextService.getEntityType() === ENTITY_TYPE.SKILL) {
             ctrl.isLoadingIndicatorShown = true;
             ctrl.dimensions = (
               ImagePreloaderService.getDimensionsOfImage(ctrl.filepath));

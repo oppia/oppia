@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for core.storage.user.gae_models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -272,7 +273,7 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.CompletedActivitiesModel.export_data(
             self.NONEXISTENT_USER_ID)
-        self.assertEqual(None, user_data)
+        self.assertEqual({}, user_data)
 
     def test_export_data_on_existent_user(self):
         """Test if export_data works as intended on a user in datastore."""
@@ -349,7 +350,7 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.IncompleteActivitiesModel.export_data(
             self.NONEXISTENT_USER_ID)
-        self.assertEqual(None, user_data)
+        self.assertEqual({}, user_data)
 
     def test_export_data_on_existent_user(self):
         """Test if export_data works as intended on a user in datastore."""
@@ -570,7 +571,7 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.LearnerPlaylistModel.export_data(
             self.NONEXISTENT_USER_ID)
-        self.assertEqual(None, user_data)
+        self.assertEqual({}, user_data)
 
     def test_export_data_on_existent_user(self):
         """Test if export_data works as intended on a user in datastore."""
@@ -667,7 +668,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.UserContributionsModel.export_data(
             self.NONEXISTENT_USER_ID)
-        self.assertEqual(None, user_data)
+        self.assertEqual({}, user_data)
 
     def test_export_data_on_partially_involved_user(self):
         """Test export_data on user with no creations and two edits."""
@@ -1090,7 +1091,7 @@ class UserStatsModelTest(test_utils.GenericTestBase):
         """Test if export_data returns None when user is not in data store."""
         user_data = user_models.UserStatsModel.export_data(
             self.NONEXISTENT_USER_ID)
-        test_data = None
+        test_data = {}
         self.assertEqual(user_data, test_data)
 
 
@@ -1902,6 +1903,27 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
+    def test_export_data_trivial(self):
+        user_data = user_models.UserContributionScoringModel.export_data(
+            'USER_WITHOUT_DATA')
+        expected_data = {}
+        self.assertEqual(user_data, expected_data)
+
+    def test_export_data_nontrivial(self):
+        user_data = user_models.UserContributionScoringModel.export_data(
+            self.USER_1_ID)
+        expected_data = {
+            self.SCORE_CATEGORY_1: {
+                'has_email_been_sent': False,
+                'score': 1.5
+            },
+            self.SCORE_CATEGORY_2: {
+                'has_email_been_sent': False,
+                'score': 2
+            }
+        }
+        self.assertEqual(user_data, expected_data)
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.UserContributionScoringModel.get_deletion_policy(),
@@ -2039,6 +2061,155 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertIn('category1', score_categories)
         self.assertIn('category3', score_categories)
         self.assertNotIn('category2', score_categories)
+
+
+class UserCommunityRightsModelTests(test_utils.GenericTestBase):
+    """Tests for UserCommunityRightsModel."""
+
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    NONEXISTENT_USER_ID = 'id_3'
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserCommunityRightsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            user_models.UserCommunityRightsModel
+            .has_reference_to_user_id(self.USER_ID_1)
+        )
+        self.assertFalse(
+            user_models.UserCommunityRightsModel
+            .has_reference_to_user_id(self.USER_ID_2)
+        )
+        self.assertFalse(
+            user_models.UserCommunityRightsModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
+
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True).put()
+
+        self.assertTrue(
+            user_models.UserCommunityRightsModel
+            .has_reference_to_user_id(self.USER_ID_1)
+        )
+        self.assertTrue(
+            user_models.UserCommunityRightsModel
+            .has_reference_to_user_id(self.USER_ID_2)
+        )
+        self.assertFalse(
+            user_models.UserCommunityRightsModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            user_models.UserCommunityRightsModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.COPY)
+
+    def test_export_data_trivial(self):
+        user_data = user_models.UserCommunityRightsModel.export_data(
+            self.USER_ID_1)
+        expected_data = {}
+        self.assertEqual(user_data, expected_data)
+
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True).put()
+
+        user_data = user_models.UserCommunityRightsModel.export_data(
+            self.USER_ID_1)
+        expected_data = {
+            'can_review_translation_for_language_codes': ['hi', 'en'],
+            'can_review_voiceover_for_language_codes': ['hi'],
+            'can_review_questions': True
+        }
+        self.assertEqual(user_data, expected_data)
+
+    def test_get_translation_reviewer_user_ids(self):
+        translation_reviewer_ids = (
+            user_models.UserCommunityRightsModel
+            .get_translation_reviewer_user_ids('hi'))
+        self.assertEqual(len(translation_reviewer_ids), 0)
+
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True).put()
+
+        translation_reviewer_ids = (
+            user_models.UserCommunityRightsModel
+            .get_translation_reviewer_user_ids('hi'))
+        self.assertEqual(len(translation_reviewer_ids), 2)
+        self.assertTrue(self.USER_ID_1 in translation_reviewer_ids)
+        self.assertTrue(self.USER_ID_2 in translation_reviewer_ids)
+
+    def test_get_voiceover_reviewer_user_ids(self):
+        voiceover_reviewer_ids = (
+            user_models.UserCommunityRightsModel
+            .get_voiceover_reviewer_user_ids('hi'))
+        self.assertEqual(len(voiceover_reviewer_ids), 0)
+
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True).put()
+
+        voiceover_reviewer_ids = (
+            user_models.UserCommunityRightsModel
+            .get_voiceover_reviewer_user_ids('hi'))
+        self.assertEqual(len(voiceover_reviewer_ids), 1)
+        self.assertFalse(self.USER_ID_1 in voiceover_reviewer_ids)
+        self.assertTrue(self.USER_ID_2 in voiceover_reviewer_ids)
+
+    def test_get_question_reviewer_user_ids(self):
+        question_reviewer_ids = (
+            user_models.UserCommunityRightsModel
+            .get_question_reviewer_user_ids())
+        self.assertEqual(len(question_reviewer_ids), 0)
+
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=[],
+            can_review_questions=False).put()
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_for_language_codes=['hi', 'en'],
+            can_review_voiceover_for_language_codes=['hi'],
+            can_review_questions=True).put()
+
+        question_reviewer_ids = (
+            user_models.UserCommunityRightsModel
+            .get_question_reviewer_user_ids())
+        self.assertEqual(len(question_reviewer_ids), 1)
+        self.assertFalse(self.USER_ID_1 in question_reviewer_ids)
+        self.assertTrue(self.USER_ID_2 in question_reviewer_ids)
 
 
 class PendingDeletionRequestModelTests(test_utils.GenericTestBase):

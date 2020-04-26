@@ -15,14 +15,17 @@
 # limitations under the License.
 
 """Tests for rich text components."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 import os
+import re
 
 from core.tests import test_utils
 from extensions.rich_text_components import components
+import python_utils
 
 
 class ComponentValidationUnitTests(test_utils.GenericTestBase):
@@ -133,13 +136,12 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
     def test_skillreview_validation(self):
         """Tests skillreview component validation."""
         valid_items = [{
-            'skill_summary-with-value':
-                '{\'id\': \'skill_id\', \'description\': '
-                '\'skill_description\'}',
+            'skill_id-with-value': 'skill_id',
+            'text-with-value': 'Skill Link Text'
         }]
         invalid_items = [{
-            'skill_summary-with-value': 'javascript:alert(5);',
-            'text-with-value': 'Hello'
+            'skill_id-with-value': 20,
+            'url-with-value': 'Hello'
         }]
 
         self.check_validation(
@@ -221,12 +223,50 @@ class ComponentDefinitionTests(test_utils.GenericTestBase):
 
     def test_component_definition(self):
         """Test that all components are defined."""
+        rich_text_components_dir = (
+            os.path.join(os.curdir, 'extensions', 'rich_text_components'))
         actual_components = [name for name in os.listdir(
-            './extensions/rich_text_components') if os.path.isdir(os.path.join(
-                './extensions/rich_text_components', name))]
+            rich_text_components_dir) if os.path.isdir(os.path.join(
+                rich_text_components_dir, name))]
         defined_components = []
         for name, obj in inspect.getmembers(components):
             if inspect.isclass(obj):
                 defined_components.append(name)
         defined_components.remove('BaseRteComponent')
         self.assertEqual(set(defined_components), set(actual_components))
+
+
+class ComponentE2eTests(test_utils.GenericTestBase):
+    """Tests that all components have their e2e test files defined."""
+
+    def test_component_e2e_tests(self):
+        """Tests that an e2e test is defined for all rich text components."""
+        test_file = os.path.join(
+            'extensions', 'rich_text_components', 'protractor.js')
+        rich_text_components_dir = (
+            os.path.join(os.curdir, 'extensions', 'rich_text_components'))
+        actual_components = [name for name in os.listdir(
+            rich_text_components_dir) if os.path.isdir(os.path.join(
+                rich_text_components_dir, name))]
+        with python_utils.open_file(test_file, 'r') as f:
+            text = f.read()
+            # Replace all spaces and new lines with empty space.
+            text = re.sub(r' ', r'', text)
+            text = re.sub(r'\n', r'', text)
+
+            # Isolate the text inside the RICH_TEXT_COMPONENTS constant.
+            beginning_sequence = 'varRICH_TEXT_COMPONENTS={'
+            first_bracket_index = text.find(beginning_sequence)
+            last_bracket_index = text.find('};')
+            text_inside_constant = text[
+                first_bracket_index + len(beginning_sequence):
+                last_bracket_index] + ','
+
+            rte_components_with_test = []
+            while text_inside_constant.find(',') != -1:
+                rte_components_with_test.append(
+                    text_inside_constant[0:text_inside_constant.find(':')])
+                text_inside_constant = text_inside_constant[
+                    text_inside_constant.find(',') + 1:]
+
+        self.assertEqual(set(actual_components), set(rte_components_with_test))

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/update_changelog_and_credits.py."""
+"""Unit tests for scripts/release_scripts/update_changelog_and_credits.py."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -285,31 +285,25 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             '### section1:\n': '### section2: \n'
         }
         ordering_swap = self.swap(
-            update_changelog_and_credits, 'EXPECTED_ORDERING',
+            update_changelog_and_credits, 'EXPECTED_ORDERING_DICT',
             invalid_ordering)
-        with ordering_swap, self.assertRaisesRegexp(
-            Exception, (
-                'Expected release_summary to have ### section1: section to '
-                'ensure that automatic updates to changelog and credits are '
-                'correct.')):
-            update_changelog_and_credits.check_ordering_of_sections(
-                release_summary_lines)
+        with ordering_swap:
+            self.assertFalse(
+                update_changelog_and_credits.is_order_of_sections_valid(
+                    release_summary_lines))
 
     def test_invalid_ordering_of_sections_in_release_summary(self):
         release_summary_lines = read_from_file(MOCK_RELEASE_SUMMARY_FILEPATH)
         invalid_ordering = {
-            '### New Authors:\n': '### section2: \n'
+            release_constants.NEW_AUTHORS_HEADER: '### section2: \n'
         }
         ordering_swap = self.swap(
-            update_changelog_and_credits, 'EXPECTED_ORDERING',
+            update_changelog_and_credits, 'EXPECTED_ORDERING_DICT',
             invalid_ordering)
-        with ordering_swap, self.assertRaisesRegexp(
-            Exception, (
-                'Expected ### New Authors: section to be followed by ### '
-                'section2: section in release_summary to ensure that automatic '
-                'updates to changelog and credits are correct.')):
-            update_changelog_and_credits.check_ordering_of_sections(
-                release_summary_lines)
+        with ordering_swap:
+            self.assertFalse(
+                update_changelog_and_credits.is_order_of_sections_valid(
+                    release_summary_lines))
 
     def test_missing_span_in_about_page(self):
         about_page_lines = [
@@ -396,14 +390,90 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 update_changelog_and_credits.main()
 
     def test_missing_release_summary_file(self):
+        def mock_get_organization(unused_self, unused_name):
+            return github.Organization.Organization(
+                requester='', headers='', attributes={}, completed='')
+        def mock_check_blocking_bug_issue_count(unused_repo):
+            pass
+        def mock_check_prs_for_current_release_are_released(unused_repo):
+            pass
+        def mock_get_repo(unused_self, unused_repo_name):
+            return self.mock_repo
+
+        get_org_swap = self.swap(
+            github.Github, 'get_organization', mock_get_organization)
+        get_repo_swap = self.swap(github.Github, 'get_repo', mock_get_repo)
+        get_org_repo_swap = self.swap(
+            github.Organization.Organization, 'get_repo', mock_get_repo)
+        blocking_bug_swap = self.swap(
+            common, 'check_blocking_bug_issue_count',
+            mock_check_blocking_bug_issue_count)
+        check_prs_swap = self.swap(
+            common, 'check_prs_for_current_release_are_released',
+            mock_check_prs_for_current_release_are_released)
         release_summary_swap = self.swap(
             release_constants, 'RELEASE_SUMMARY_FILEPATH', 'invalid.md')
         with self.main_swap, self.branch_name_swap, release_summary_swap:
-            with self.args_swap, self.getpass_swap, self.assertRaisesRegexp(
-                Exception, (
-                    'Release summary file invalid.md is missing. '
-                    'Please re-run this script.')):
-                update_changelog_and_credits.main()
+            with self.args_swap, self.getpass_swap, blocking_bug_swap:
+                with get_org_swap, get_repo_swap, get_org_repo_swap:
+                    with check_prs_swap, self.assertRaisesRegexp(
+                        Exception, (
+                            'Release summary file invalid.md is missing. '
+                            'Please re-run this script.')):
+                        update_changelog_and_credits.main()
+
+    def test_get_release_summary_lines(self):
+        with python_utils.open_file(MOCK_RELEASE_SUMMARY_FILEPATH, 'r') as f:
+            correct_lines = f.readlines()
+            wrong_lines = []
+            for line in correct_lines:
+                line = line.replace(
+                    'gmail.com', release_constants.INVALID_EMAIL_SUFFIX)
+                wrong_lines.append(line)
+
+        check_function_calls = {
+            'readlines_gets_called': 0,
+            'ask_user_to_confirm_gets_called': 0,
+            'is_order_of_sections_valid_gets_called': 0
+        }
+        expected_check_function_calls = {
+            'readlines_gets_called': 2,
+            'ask_user_to_confirm_gets_called': 3,
+            'is_order_of_sections_valid_gets_called': 2
+        }
+        class MockFile(python_utils.OBJECT):
+            def readlines(self):
+                """Read lines of the file object."""
+                return mock_readlines()
+        def mock_readlines():
+            check_function_calls['readlines_gets_called'] += 1
+            if check_function_calls['readlines_gets_called'] == 2:
+                return correct_lines
+            return wrong_lines
+
+        def mock_open_file(unused_path, unused_mode):
+            return MockFile()
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_gets_called'] += 1
+        def mock_is_order_of_sections_valid(unused_release_summary_lines):
+            check_function_calls[
+                'is_order_of_sections_valid_gets_called'] += 1
+            if check_function_calls[
+                    'is_order_of_sections_valid_gets_called'] == 1:
+                return False
+            return True
+
+        open_file_swap = self.swap(python_utils, 'open_file', mock_open_file)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+        check_order_swap = self.swap(
+            update_changelog_and_credits, 'is_order_of_sections_valid',
+            mock_is_order_of_sections_valid)
+        with open_file_swap, ask_user_swap, check_order_swap:
+            self.assertEqual(
+                correct_lines,
+                update_changelog_and_credits.get_release_summary_lines())
+        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_create_branch(self):
         check_function_calls = {
@@ -467,25 +537,38 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
 
     def test_function_calls(self):
         check_function_calls = {
+            'check_blocking_bug_issue_count_gets_called': False,
+            'check_prs_for_current_release_are_released_gets_called': False,
             'remove_updates_and_delete_branch_gets_called': False,
             'update_changelog_gets_called': False,
             'update_authors_gets_called': False,
             'update_contributors_gets_called': False,
             'update_developer_names_gets_called': False,
-            'check_ordering_of_sections_gets_called': False,
+            'get_release_summary_lines_gets_called': False,
             'create_branch_gets_called': False,
             'open_new_tab_in_browser_if_possible_gets_called': False
         }
         expected_check_function_calls = {
+            'check_blocking_bug_issue_count_gets_called': True,
+            'check_prs_for_current_release_are_released_gets_called': True,
             'remove_updates_and_delete_branch_gets_called': True,
             'update_changelog_gets_called': True,
             'update_authors_gets_called': True,
             'update_contributors_gets_called': True,
             'update_developer_names_gets_called': True,
-            'check_ordering_of_sections_gets_called': True,
+            'get_release_summary_lines_gets_called': True,
             'create_branch_gets_called': True,
             'open_new_tab_in_browser_if_possible_gets_called': True
         }
+        def mock_get_organization(unused_self, unused_name):
+            return github.Organization.Organization(
+                requester='', headers='', attributes={}, completed='')
+        def mock_check_blocking_bug_issue_count(unused_repo):
+            check_function_calls[
+                'check_blocking_bug_issue_count_gets_called'] = True
+        def mock_check_prs_for_current_release_are_released(unused_repo):
+            check_function_calls[
+                'check_prs_for_current_release_are_released_gets_called'] = True
         def mock_remove_updates_and_delete_branch(
                 unused_repo_fork, unused_target_branch):
             check_function_calls[
@@ -500,9 +583,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             check_function_calls['update_contributors_gets_called'] = True
         def mock_update_developer_names(unused_release_summary_lines):
             check_function_calls['update_developer_names_gets_called'] = True
-        def mock_check_ordering_of_sections(unused_release_summary_lines):
-            check_function_calls[
-                'check_ordering_of_sections_gets_called'] = True
+        def mock_get_release_summary_lines():
+            check_function_calls['get_release_summary_lines_gets_called'] = True
         def mock_create_branch(
                 unused_repo_fork, unused_target_branch, unused_github_username,
                 unused_current_release_version_number):
@@ -515,6 +597,14 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             check_function_calls[
                 'open_new_tab_in_browser_if_possible_gets_called'] = True
 
+        get_org_swap = self.swap(
+            github.Github, 'get_organization', mock_get_organization)
+        blocking_bug_swap = self.swap(
+            common, 'check_blocking_bug_issue_count',
+            mock_check_blocking_bug_issue_count)
+        check_prs_swap = self.swap(
+            common, 'check_prs_for_current_release_are_released',
+            mock_check_prs_for_current_release_are_released)
         remove_updates_swap = self.swap(
             update_changelog_and_credits, 'remove_updates_and_delete_branch',
             mock_remove_updates_and_delete_branch)
@@ -530,22 +620,26 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         update_developer_names_swap = self.swap(
             update_changelog_and_credits, 'update_developer_names',
             mock_update_developer_names)
-        check_order_swap = self.swap(
-            update_changelog_and_credits, 'check_ordering_of_sections',
-            mock_check_ordering_of_sections)
+        get_lines_swap = self.swap(
+            update_changelog_and_credits, 'get_release_summary_lines',
+            mock_get_release_summary_lines)
         create_branch_swap = self.swap(
             update_changelog_and_credits, 'create_branch', mock_create_branch)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
         get_repo_swap = self.swap(github.Github, 'get_repo', mock_get_repo)
+        get_org_repo_swap = self.swap(
+            github.Organization.Organization, 'get_repo', mock_get_repo)
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
 
         with self.branch_name_swap, self.release_summary_swap, self.args_swap:
-            with self.main_swap, self.getpass_swap, input_swap:
+            with self.main_swap, self.getpass_swap, input_swap, check_prs_swap:
                 with remove_updates_swap, update_authors_swap, open_tab_swap:
                     with update_changelog_swap, update_contributors_swap:
-                        with update_developer_names_swap, check_order_swap:
+                        with update_developer_names_swap, get_lines_swap:
                             with create_branch_swap, get_repo_swap:
-                                update_changelog_and_credits.main()
+                                with blocking_bug_swap, get_org_swap:
+                                    with get_org_repo_swap:
+                                        update_changelog_and_credits.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)

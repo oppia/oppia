@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for core.domain.opportunity_services."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -56,14 +57,20 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.USER_ID = 'user'
         self.SKILL_ID = 'skill'
         self.QUESTION_ID = question_services.get_new_question_id()
-        explorations = [exp_domain.Exploration.create_default_exploration(
+
+        # Since a valid exploration is created here, it has EndExploration
+        # state as well, so the content in that has to be taken into account as
+        # well when checking content_count in the tests.
+        explorations = [self.save_new_valid_exploration(
             '%s' % i,
+            self.owner_id,
             title='title %d' % i,
             category='category%d' % i,
+            end_state_name='End State'
         ) for i in python_utils.RANGE(5)]
 
         for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
+            self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
@@ -306,7 +313,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
-        self.assertEqual(translation_opportunities[0].content_count, 2)
+        self.assertEqual(translation_opportunities[0].content_count, 3)
 
         answer_group_dict = {
             'outcome': {
@@ -378,7 +385,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)
-        self.assertEqual(translation_opportunities[0].content_count, 5)
+        self.assertEqual(translation_opportunities[0].content_count, 6)
 
     def test_create_new_skill_creates_new_skill_opportunity(self):
         skill_opportunities, _, _ = (
@@ -555,14 +562,16 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
-        explorations = [exp_domain.Exploration.create_default_exploration(
+        explorations = [self.save_new_valid_exploration(
             '%s' % i,
+            self.owner_id,
             title='title %d' % i,
             category='category%d' % i,
+            end_state_name='End State'
         ) for i in python_utils.RANGE(5)]
 
         for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
+            self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')

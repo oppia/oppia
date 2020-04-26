@@ -21,20 +21,17 @@
  */
 
 require('domain/collection/read-only-collection-backend-api.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveEndExploration', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/EndExploration/directives/' +
-        'end-exploration-interaction.directive.html'),
+      template: require('./end-exploration-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$attrs', '$q', 'UrlService',
@@ -105,7 +102,7 @@ angular.module('oppia').directive('oppiaInteractiveEndExploration', [
                   var listOfIds = missingExpIds.join('", "');
                   ctrl.errorMessage = (
                     'Warning: exploration(s) with the IDs "' + listOfIds +
-                    '" will ' + 'not be shown as recommendations because' +
+                    '" will not be shown as recommendations because ' +
                     'they either do not exist, or are not publicly viewable.');
                 }
               });

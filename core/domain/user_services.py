@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Services for user data."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -44,15 +45,6 @@ GRAVATAR_SIZE_PX = 150
 # Generated using utils.convert_png_to_data_url.
 DEFAULT_IDENTICON_DATA_URL = (
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEwAAABMCAYAAADHl1ErAAAAAXNSR0IArs4c6QAADhtJREFUeAHtXHlwVdUZ/859jyxmIQESyCaglC0iAgkJIntrIpvKphSwY2ttxbFOp9R/cGGqdhykLaMVO2OtoyRSCEKNEpYKyBIVQ1iNkBhNMCtb8shiQpJ3b7/fTW7m5uUlecu9L4nTM5Pce8895zvf93vnnPud833fEdQLKXb5jsC6%2BuZERZbHKaSMYRbGKERxgpQQUkSIIigEbAmFavlfrUKiVhCVcFa%2BIJEvJOlCcNCAnNKMFQ0o58vEfPgmhS5Mn0ot8n2KIs8lIZJJUfy8almIJqbxhRDSIbJKe2s%2BXvWlV/RcrGwqYGGp20bI1LyaeVmjKMrodp4EycGBAy6MjgsrSxozqG7O5GgxcVREeEigNDAwwBpmsUiRKGu3y1caGltstQ3yjbOFV6sPnypXTuRXBReU2GLqGprHkUKSRlMIUcD3WyUakGbbt7JYyzf6agpgYfe9O8kui/U8nB7UhJIkUTljwrBTTz449mZKUlyCEBTnjTCKQiX7T5ScfGP3Rf9j5ysny7IyTKXHPwYP690WSXnZtvcXp71pw1ldQwELm59%2BlyzbX%2BbeNL%2Btscb4EYOyNz2ZWD99wtAFnGdxxoQBefbs85f3rHsjJyivuGo60wsATe51WZJkWW/LWnXGgDZUEoYAFr58x0B7beOLPHGv5XnFIpGoS0mKOfze%2Bpmj/f2smNR9lm42teQ/8vLRgv0nyuZwVwtm1Ows5BZLSMBz1RkrbnjLiNeAhaWmPWgn%2BxYeejwkRMu9idH7tm%2BYE8/z0EhvmfOmPs9/RQ9tOJx3IKc8lUixkqBKC1nW2vat3u0NXY8Bi1%2B%2Bw6%2BktnETD7%2BnwEB4iP/pL/5xf03U4IBZ3jBkdN2K641Hkn/7YWh17c1JoM3D9PW4kIB1eRkrmjxpyyPAeK4aLttbPuAhOIU5aHpm1cTMZ1ffuRT8eMKED%2BooL6Wd%2B2Bj%2BtnFUGeYyVzJYl3Kc9sld9t2W8Dw%2BWkTWuz2fdxQ9ACr9P3Jfy7%2BZuSw0HnuNtwb5Ysqaw4mPJb5k%2BYW%2BVZuv9xqsaRWZ60%2B7w4vbgEWnrJ1hp3kTO5ZYUPCAnK%2B3bYiitWDWHca7O2yrI6U3r5yR8U1W2MiC2%2BzkLS4ev%2BaY67y1a749VQBYLUIZT/AGhUTduS7f68Y39/AgozgGbxDBsgCmSBbT/Jr710CDMMQPYvHf2DC2Mj9p95efA8TCNKI9MNrEGSALJAJskFGV%2BTocUhigrfbWz5jYtH4VdrAMksBdYVnI8vYJ/8q83hhmW0WEy23WKx39/Qh6LaHQXXA1xBgYc5isBL4/scCFoC3QCbIBhkhK2TGi65St4CpeharDvgaYoJnIv15GHaFQRBkg4w8p02BzF0VRH6XgEGDV5VS1rOgOvTHCb47wfXvIBtkhE4JmSG7/r3%2B3ilg6toQyx1OUEr7i56lF8zde8gIWVEPSz1g4IyGU8CwkMbaEMudNg3eWd0fXR5khcyQXcXAiYSdAMMWDY/ltVhIY23IdXr8kjqh21%2BzRKvMogUYAAtHQToBhv0sbNFg16GvLaQdmTfjGTJDdmCgYuHQSIfe07pTSqewn3V9z6qrvb1F48Crzx6xNTR4QXoE9tN4c2%2ByfufWqudC3VbmAYzNPwZrkf6dL%2B4LSm5Q9vkrVH79B6qs%2BoH8B1goatAtNCIqmOZOiabw4G5VJMNYREdhDD7ae6J0USsmtEwj3t7DYLCwK83f8WbbzauZP7/kq53SxiY7vfmfC5R24Fv6prTrDVEWgqbfEUlPLY2nlKkxGv%2BmXbFzG7H4/eE8g/tZyO92zbDSPoe1WncUgT14X4G189NimvjobnrhX6e6BQuo8DCho2crafnzB2n%2BMwe4PL5H5iVgACx4wEltli%2B1sXbA%2BGkNcmCwUN%2BY%2BI%2B3WOjZt3Lpl68cpQoefu6m4%2Bcqae7TWfTfk%2BXuVnWrvA4LFRtUVockjKxKc8sJmMJsWWsiON/U9eJvNmXTtk%2B%2BdYt5Z4WZX0p/bjYtmBbn7LURefaw%2BVuvwoQnBliTYCxu7WFskQb1WROjcvliKlibM/IMAQv8siD0643H6etiGx7NSBbYUlXCbRipgKnme859Ysl4jwwDrnKaV2SjDe%2B0tu9qnZ7KsQWch/YxVpt6KunZexieUVPDSIJjCC86k3lwyikJ0di%2BMS09/3au2iuMbuDr4mpKN2CIO%2BMLVnpgA4yAlVRX1ziV4fODrwOv2k2bDM4UVvEkXeaMJ0PyXn3/nCF0HIkAE2ADjICVpChiLArBMcSxsJHPmdmXjCTXiVZRRS19VVTdKd%2BIDA0bYCW1%2BWcRvGiMIN4Vjb1flHb1yrD8rM9LDKOlJ6RhA6ww6au%2BD3A50hcy%2Bt5sRRP8FpSYo8zqsBnDPax13oJ/ltEgafSqam5SU7NdezTtWsHrTzOShg2wYtWP3SQ5wZnNjMZA80Z9s1mkO9CtMakdDRtgJcGnFK3C869D6wY%2BRISp7loGUnROKtKkdtqxYawkzQGXdwNUN0nnrHiXGxxoJf40e0fEhdpRg29xoZT7RTRsgJV%2B8e0%2BJTdqJIwd4kZpz4pOGWN%2BG5Lq2s38wQHXMzZdq2XiAlllgP2%2BaH6yOX4xGjbAinejlVq0CG9l10T3rNT99wwnf96KMyvNuHMoDR0UaAr5dmwYK1YrhAoYXLtNaa2N6DAW5vFF6qLClGZeeHSyKXRBVMMGWLFaoUZYEPzgTWuxjfC6lROI/RgMb2bZ7JGUaOIcqWEDrDDp50MCBA0YLokDQRgx0p%2BdTezH4PDG88dxI8LotaeneU7AhZo6bPK5hwkVMERYuFDX6yLT2JDx99/fTVY2anibYiOCaPuGuayydDB%2BeUu2U30NG2AlCaFcRAmEo3QqaVLGynm30a6X5sHz2uMWksZH0pHXF9CIYeb/zho2CAqTgoMDvoTXCmJ3EI7isQRuVpw9KYqytyykhxk8qASuJoD84mNTKGvjveSLFQQwUeOaGCNE0Flqvs5o8b/9gZ8xwyMmj404NComZJyrzHtbLjTIjxZNv1X9C/S30pXqRrLVdd4lh7EjOX4oPfHAOHrzD9Np9l1RZMHnygeJ45kOZXxaPJ6byr6WueotdfAjhI73rGdu2ZXnn5oY7QM2OjZxx8hw%2BvPjCepf2bUfqJz/Llc1qHpb1OBAiosMpoFB5i%2BtOnLV%2BoTgL9ypYYZ8bZ0tOd6QmuUNbCiFMoN9GPM0TCbeXYoZcgvhr48kOyLlVF6AESf1UwV7G88jBbC/ISqsjzDb62wAC9UmydhoAaz6b/tWcIgQul7ntI8woMNCxQZstQOGSFYeqQriDeGI0Ud47jU2gIEae8kmtlZsWllpB6zNO2UXZwcg3rDXOO0jDbdhEIDoXs1zB6y1A4YHhP3iiuBMOJXh3tfJzuZ/qBbfX65nR5UGqmto8TUL2OoqAgZoWMNEY6KTMhOa%2Bt4ehCDfmxjz8c4X5y3UChp5hVk/j63Vpwuu0zdlNVTIrkuFfC1hkOobO%2B//Qw8LD/an26JDaFRsKI2KCWU76kCaOi6CoHYYnZY9d/DjAzllC/lDmFWz75EFevqdFmGIkbbL9hREsiI40yg/11wGhxex9PlXV%2BjEhatUU99ZQdUzpr%2BH08n1mkb1L%2BfiVf0rGs5Lo2nxkXT3HUPZ0S7WawAhsxrFy6HPwKJDY/zQqYehAPey1%2BDgDxfsSxkPwZPYaTmU7S7BPWDXkWLafayYLlWaaidW2cASK5nBWzJzOD3AG5YebCgqw5dvP4PoXab1Oveu3znK5xQIOPW31DZchL/6M6vv2sn%2B68scK3b1jDlo%2B6Hv6G878ij/e1M3cbtiQc3HML4vKZbWrbyTpowe3G1Z7SVH7e7cmHZmGXePSmtI4FhnQfVOAQMBNfhdse/CwvzsO/cf6ykapKlZpq0HCmlzxlc%2B6U2akK5c2XJNf3x4At3D29hdJUTrTnz0wxlwOrEIy5Kugum7BAyEtaGJwKVrH63mrSDn0besEdNTmz9XJ%2B6uGOoL%2BbAr/OXJJIoM77jryx%2Bh0iGL0mSENnc1FDX%2BO6gVWqZ2RfQ9I5oLQgj75fxO/q%2BvpJ9TnXTxlevr6cPjlyj5iUx2bb%2BsZ7UesqlgsayQWf/S8b7bHobC3QWYrv3rZ%2BwuXuhIs88/Y4v8vfWz4BvrdoBpj4BBejWE2W4/yupTGMJ%2BD21O/emf3j1t2bTNrYD8PgWkv7/FflvUwE8uFFelMAg2i8Uy05UTBlwCTAWtLUieJ8XA2MiQIxXX6xNYI%2B6XC3Wep%2Br5xz/Jsszij1qDVREprp4s4DJgGmjaMQzcUA5bgaNkRTbH3GxSf5SEVMoxRBUMlrnHMIB//ArounxbjgZZuWWtSzlokmyGkwWv4Bm8QwZ1GLpxZgUYcquHaRLgQ6A/SobJ4IiGpeyc7RE9ja55V/aKEOID5s/3R8loQjkeVsTzwmmeF2oYuFlamT5xFeII/4qh3LMmgR/oWT4/rEgPhONxWEKifUJW4mWikfpyvr5nBbNIkUQeD8BU7lm9fxyWHgDHA9fYQlzHg/0w/6qjuZzqdKwvb/J9PveiAl4Hz%2BE5q%2B8duKYXHjHSjkf6sXkqWyEZK4QFLIQ51iihWrr2CJKCeE6fzm2pax8Grm8e6acHDffth0YSLdF9CCoZvFye55okRU7gIetV1AkPuRJZSCfZUdefezJMYf3v0MhOwHVzLKlQxAWSRJlQlDr%2BzrPcUjjbGwbyBB2mCKH62/K7KwywjWM8b5CQq%2BH9x%2B%2BCSVZiFKH8eI4ldQQOz4jJ/P/Bt86QcSFPPVqZA50Qu4NwFK7i3tHK7HEEJ5reOFr5fwkK97jkk8ywAAAAAElFTkSuQmCC')  # pylint: disable=line-too-long
-# The system usernames are reserved usernames. Before adding new value to this
-# dict, make sure that there aren't any similar usernames in the datastore.
-# Note: All bot user IDs and usernames should start with "Oppia" and end with
-# "Bot".
-SYSTEM_USERS = {
-    feconf.SYSTEM_COMMITTER_ID: feconf.SYSTEM_COMMITTER_ID,
-    feconf.MIGRATION_BOT_USER_ID: feconf.MIGRATION_BOT_USERNAME,
-    feconf.SUGGESTION_BOT_USER_ID: feconf.SUGGESTION_BOT_USERNAME
-}
 
 
 class UserSettings(python_utils.OBJECT):
@@ -293,7 +285,7 @@ class UserSettings(python_utils.OBJECT):
         else:
             # Disallow usernames that contain the system usernames or the
             # strings "admin" or "oppia".
-            reserved_usernames = set(SYSTEM_USERS.values()) | set([
+            reserved_usernames = set(feconf.SYSTEM_USERS.values()) | set([
                 'admin', 'oppia'])
             for reserved_username in reserved_usernames:
                 if reserved_username in username.lower().strip():
@@ -532,6 +524,75 @@ def get_user_role_from_id(user_id):
     if user_settings is None:
         return feconf.ROLE_ID_GUEST
     return user_settings.role
+
+
+def get_user_community_rights(user_id):
+    """Returns the UserCommunityRights domain object for the given user_id.
+
+    Args:
+        user_id: str. The unique ID of the user.
+
+    Returns:
+        UserCommunityRights. The UserCommunityRights domain object for the
+        corresponding user.
+    """
+    user_model = (
+        user_models.UserCommunityRightsModel.get_by_id(user_id))
+    if user_model is not None:
+        return user_domain.UserCommunityRights(
+            user_id,
+            user_model.can_review_translation_for_language_codes,
+            user_model.can_review_voiceover_for_language_codes,
+            user_model.can_review_questions)
+    else:
+        return user_domain.UserCommunityRights(user_id, [], [], False)
+
+
+def get_all_community_reviewers():
+    """Returns a list of UserCommunityRights objects corresponding to each
+    UserCommunityRightsModel.
+
+    Returns:
+        list(UserCommunityRights). A list of UserCommunityRights objects.
+    """
+    reviewer_models = user_models.UserCommunityRightsModel.get_all()
+    return [user_domain.UserCommunityRights(
+        model.id, model.can_review_translation_for_language_codes,
+        model.can_review_voiceover_for_language_codes,
+        model.can_review_questions) for model in reviewer_models]
+
+
+def _save_user_community_rights(user_community_rights):
+    """Saves the UserCommunityRights object into the datastore.
+
+    Args:
+        user_community_rights: UserCommunityRights. The UserCommunityRights
+            object of the user.
+    """
+    # TODO(#8794): Add limitation on number of reviewers allowed in any
+    # category.
+    user_community_rights.validate()
+    user_models.UserCommunityRightsModel(
+        id=user_community_rights.id,
+        can_review_translation_for_language_codes=(
+            user_community_rights.can_review_translation_for_language_codes),
+        can_review_voiceover_for_language_codes=(
+            user_community_rights.can_review_voiceover_for_language_codes),
+        can_review_questions=user_community_rights.can_review_questions).put()
+
+
+def _update_user_community_rights(user_community_rights):
+    """Updates the users rights model if the updated object has review rights in
+    at least one item else delete the existing model.
+
+    Args:
+        user_community_rights: UserCommunityRights. The updated
+            UserCommunityRights object of the user.
+    """
+    if user_community_rights.can_review_at_least_one_item():
+        _save_user_community_rights(user_community_rights)
+    else:
+        remove_community_reviewer(user_community_rights.id)
 
 
 def get_usernames_by_role(role):
@@ -780,8 +841,8 @@ def get_username(user_id):
     Returns:
         str. Username corresponding to the given user_id.
     """
-    if user_id in SYSTEM_USERS:
-        return SYSTEM_USERS[user_id]
+    if user_id in feconf.SYSTEM_USERS:
+        return feconf.SYSTEM_USERS[user_id]
 
     return get_user_settings(user_id, strict=True).username
 
@@ -801,8 +862,8 @@ def get_usernames(user_ids):
     non_system_user_indices = []
     non_system_user_ids = []
     for index, user_id in enumerate(user_ids):
-        if user_id in SYSTEM_USERS:
-            usernames[index] = SYSTEM_USERS[user_id]
+        if user_id in feconf.SYSTEM_USERS:
+            usernames[index] = feconf.SYSTEM_USERS[user_id]
         else:
             non_system_user_indices.append(index)
             non_system_user_ids.append(user_id)
@@ -1737,3 +1798,207 @@ def is_topic_manager(user_id):
     if user_role == feconf.ROLE_ID_TOPIC_MANAGER:
         return True
     return False
+
+
+def can_review_translation_suggestions(user_id, language_code=None):
+    """Returns whether the user can review translation suggestions in any
+    language or in the given language.
+
+    NOTE: If the language_code is provided then this method will check whether
+    the user can review translations in the given language code. Otherwise, it
+    will check whether the user can review in any language.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        language_code: str. The code of the language.
+
+    Returns:
+        bool. Whether the user can review translation suggestions in any
+        language or in the given language.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    reviewable_language_codes = (
+        user_community_rights.can_review_translation_for_language_codes)
+    if language_code is not None:
+        return language_code in reviewable_language_codes
+    else:
+        return bool(reviewable_language_codes)
+
+
+def can_review_voiceover_applications(user_id, language_code=None):
+    """Returns whether the user can review voiceover applications in any
+    language or in the given language.
+
+    NOTE: If the language_code is provided then this method will check whether
+    the user can review voiceover in the given language code else it will
+    check whether the user can review in any language.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        language_code: str. The code of the language.
+
+    Returns:
+        bool. Whether the user can review voiceover applications in any language
+        or in the given language.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    reviewable_language_codes = (
+        user_community_rights.can_review_voiceover_for_language_codes)
+    if language_code is not None:
+        return language_code in reviewable_language_codes
+    else:
+        return bool(reviewable_language_codes)
+
+
+def can_review_question_suggestions(user_id):
+    """Checks whether the user can review question suggestions.
+
+    Args:
+        user_id: str. The unique ID of the user.
+
+    Returns:
+        bool. Whether the user can review question suggestions.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    return user_community_rights.can_review_questions
+
+
+def allow_user_to_review_translation_in_language(user_id, language_code):
+    """Allows the user with the given user id to review translation in the given
+    language_code.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        language_code: str. The code of the language. Callers should ensure that
+            the user does not have rights to review translations in the given
+            language code.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    allowed_language_codes = set(
+        user_community_rights.can_review_translation_for_language_codes)
+    allowed_language_codes.add(language_code)
+    user_community_rights.can_review_translation_for_language_codes = (
+        sorted(list(allowed_language_codes)))
+    _save_user_community_rights(user_community_rights)
+
+
+def remove_translation_review_rights_in_language(user_id, language_code):
+    """Removes the user's review rights to translation suggestions in the given
+    language_code.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        language_code: str. The code of the language. Callers should ensure that
+            the user already has rights to review translations in the given
+            language code.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    user_community_rights.can_review_translation_for_language_codes.remove(
+        language_code)
+    _update_user_community_rights(user_community_rights)
+
+
+def allow_user_to_review_voiceover_in_language(user_id, language_code):
+    """Allows the user with the given user id to review voiceover applications
+    in the given language_code.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        language_code: str. The code of the language. Callers should ensure that
+            the user does not have rights to review voiceovers in the given
+            language code.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    allowed_language_codes = set(
+        user_community_rights.can_review_voiceover_for_language_codes)
+    allowed_language_codes.add(language_code)
+    user_community_rights.can_review_voiceover_for_language_codes = (
+        sorted(list(allowed_language_codes)))
+    _save_user_community_rights(user_community_rights)
+
+
+def remove_voiceover_review_rights_in_language(user_id, language_code):
+    """Removes the user's review rights to voiceover applications in the given
+    language_code.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        language_code: str. The code of the language. Callers should ensure that
+            the user already has rights to review voiceovers in the given
+            language code.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    user_community_rights.can_review_voiceover_for_language_codes.remove(
+        language_code)
+    _update_user_community_rights(user_community_rights)
+
+
+def allow_user_to_review_question(user_id):
+    """Allows the user with the given user id to review question suggestions.
+
+    Args:
+        user_id: str. The unique ID of the user. Callers should ensure that
+            the given user does not have rights to review questions.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    user_community_rights.can_review_questions = True
+    _save_user_community_rights(user_community_rights)
+
+
+def remove_question_review_rights(user_id):
+    """Removes the user's review rights to question suggestions.
+
+    Args:
+        user_id: str. The unique ID of the user. Callers should ensure that
+            the given user already has rights to review questions.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    user_community_rights.can_review_questions = False
+    _update_user_community_rights(user_community_rights)
+
+
+def remove_community_reviewer(user_id):
+    """Deletes the UserCommunityRightsModel corresponding to the given user_id.
+
+    Args:
+        user_id: str. The unique ID of the user.
+    """
+    user_community_rights_model = (
+        user_models.UserCommunityRightsModel.get_by_id(user_id))
+    if user_community_rights_model is not None:
+        user_community_rights_model.delete()
+
+
+def get_community_reviewer_usernames(review_category, language_code=None):
+    """Returns a list of usernames of users who has rights to review item of
+    given review category.
+
+    Args:
+        review_category: str. The review category to find the list of reviewers
+            for.
+        language_code: None|str. The language code for translation or voiceover
+            review category.
+
+    Returns:
+        list(str.) A list of usernames.
+    """
+    reviewer_ids = []
+    if review_category == constants.REVIEW_CATEGORY_TRANSLATION:
+        reviewer_ids = (
+            user_models.UserCommunityRightsModel
+            .get_translation_reviewer_user_ids(language_code))
+    elif review_category == constants.REVIEW_CATEGORY_VOICEOVER:
+        reviewer_ids = (
+            user_models.UserCommunityRightsModel
+            .get_voiceover_reviewer_user_ids(language_code))
+    elif review_category == constants.REVIEW_CATEGORY_QUESTION:
+        if language_code is not None:
+            raise Exception('Expected language_code to be None, found: %s' % (
+                language_code))
+        reviewer_ids = (
+            user_models.UserCommunityRightsModel
+            .get_question_reviewer_user_ids())
+    else:
+        raise Exception('Invalid review category: %s' % review_category)
+
+    return get_usernames(reviewer_ids)
