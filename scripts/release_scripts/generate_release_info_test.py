@@ -405,5 +405,5 @@ class GenerateReleaseInfoTests(test_utils.GenericTestBase):
             expected_lines = f.readlines()
         with python_utils.open_file(tmp_file.name, 'r') as f:
             actual_lines = f.readlines()
-        update_changelog_and_credits.check_ordering_of_sections(actual_lines)
+        update_changelog_and_credits.is_order_of_sections_valid(actual_lines)
         self.assertEqual(actual_lines, expected_lines)
