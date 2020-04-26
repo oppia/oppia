@@ -143,7 +143,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
 
 
-        dev_appserver_path = '%s/dev_appserver.py' % (
+        dev_appserver_path = '%s/' % (
             common.GOOGLE_APP_ENGINE_HOME)
         webdriver_download_path = '%s/downloads' % (
             run_e2e_tests.WEBDRIVER_HOME_PATH)
@@ -187,7 +187,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
 
-        dev_appserver_path = '%s/dev_appserver.py' % (
+        dev_appserver_path = '%s/' % (
             common.GOOGLE_APP_ENGINE_HOME)
         webdriver_download_path = '%s/downloads' % (
             run_e2e_tests.WEBDRIVER_HOME_PATH)

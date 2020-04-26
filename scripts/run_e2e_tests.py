@@ -150,7 +150,7 @@ def ensure_screenshots_dir_is_removed():
 
 def cleanup():
     """Kill the running subprocesses and server fired in this program."""
-    dev_appserver_path = '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME
+    dev_appserver_path = '%s/' % common.GOOGLE_APP_ENGINE_HOME
     webdriver_download_path = '%s/downloads' % WEBDRIVER_HOME_PATH
     if common.is_windows_os():
         # In windows system, the java command line will use absolute path.
