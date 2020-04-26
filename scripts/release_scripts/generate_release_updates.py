@@ -102,7 +102,9 @@ def get_new_authors_and_contributors_mail_ids():
         release_summary_lines = f.readlines()
 
     new_authors_and_contributors_mail_ids = []
-    for line_text in ['### New Authors:\n', '### New Contributors:\n']:
+    for line_text in [
+            release_constants.NEW_AUTHORS_HEADER,
+            release_constants.NEW_CONTRIBUTORS_HEADER]:
         start_index = release_summary_lines.index(line_text)
         end_index = start_index
         for index, line in enumerate(release_summary_lines[start_index + 1:]):
