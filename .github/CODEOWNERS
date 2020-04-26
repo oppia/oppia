@@ -32,7 +32,7 @@
 
 
 # Audio and Translation team.
-/core/templates/services/audio-bar-status.service*.ts @Showtim3
+/core/templates/services/audio-bar-status.service*.ts @mzaman07
 /core/controllers/voice_artist*.py @DubeySandeep @mzaman07
 /core/templates/pages/exploration-editor-page/translation-tab/ @DubeySandeep @mzaman07
 /core/templates/services/audio-player.service.ts @DubeySandeep @mzaman07
