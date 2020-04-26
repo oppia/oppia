@@ -63,14 +63,14 @@ angular.module('oppia').directive('questionEditor', [
         'EditabilityService', 'EditableQuestionBackendApiService',
         'QuestionObjectFactory',
         'INTERACTION_SPECS', 'StateEditorService', 'ResponsesService',
-        'SolutionValidityService', 'QuestionUpdateService',
+        'SolutionValidityService', 'QuestionUpdateService', 'LoaderService',
         function(
             $scope, $rootScope, $uibModal,
             AlertsService, QuestionCreationService,
             EditabilityService, EditableQuestionBackendApiService,
             QuestionObjectFactory,
             INTERACTION_SPECS, StateEditorService, ResponsesService,
-            SolutionValidityService, QuestionUpdateService) {
+            SolutionValidityService, QuestionUpdateService, LoaderService) {
           var ctrl = this;
           ctrl.getStateContentPlaceholder = function() {
             return (
@@ -107,7 +107,7 @@ angular.module('oppia').directive('questionEditor', [
                 ctrl.interactionIsShown = true;
               }
 
-              $rootScope.loadingMessage = '';
+              LoaderService.setLoadingMessage('');
             }
             ctrl.stateEditorInitialized = true;
           };

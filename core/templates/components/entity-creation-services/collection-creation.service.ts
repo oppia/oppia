@@ -27,11 +27,11 @@ require('services/site-analytics.service.ts');
 // ExplorationCreationService.
 
 angular.module('oppia').factory('CollectionCreationService', [
-  '$rootScope', '$timeout', '$window', 'AlertsService',
+  '$timeout', '$window', 'AlertsService', 'LoaderService',
   'CollectionCreationBackendService', 'SiteAnalyticsService',
   'UrlInterpolationService',
   function(
-      $rootScope, $timeout, $window, AlertsService,
+      $timeout, $window, AlertsService, LoaderService,
       CollectionCreationBackendService, SiteAnalyticsService,
       UrlInterpolationService) {
     var CREATE_NEW_COLLECTION_URL_TEMPLATE = (
@@ -47,7 +47,7 @@ angular.module('oppia').factory('CollectionCreationService', [
         collectionCreationInProgress = true;
         AlertsService.clearWarnings();
 
-        $rootScope.loadingMessage = 'Creating collection';
+        LoaderService.setLoadingMessage('Creating collection');
 
         CollectionCreationBackendService.createCollection().then(
           function(response) {
@@ -61,7 +61,7 @@ angular.module('oppia').factory('CollectionCreationService', [
               );
             }, 150);
           }, function() {
-            $rootScope.loadingMessage = '';
+            LoaderService.setLoadingMessage('');
           }
         );
       }

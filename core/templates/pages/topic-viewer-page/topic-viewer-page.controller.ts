@@ -43,11 +43,11 @@ angular.module('oppia').directive('topicViewerPage', [
         '/pages/topic-viewer-page/topic-viewer-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$window', 'AlertsService',
+        '$rootScope', '$window', 'AlertsService', 'LoaderService',
         'PageTitleService', 'TopicViewerBackendApiService',
         'UrlService', 'WindowDimensionsService', 'FATAL_ERROR_CODES',
         function(
-            $rootScope, $window, AlertsService,
+            $rootScope, $window, AlertsService, LoaderService,
             PageTitleService, TopicViewerBackendApiService,
             UrlService, WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
@@ -63,7 +63,7 @@ angular.module('oppia').directive('topicViewerPage', [
 
             PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
 
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.setLoadingMessage('Loading');
             TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
               function(topicDataDict) {
                 ctrl.topicId = topicDataDict.topic_id;
@@ -71,7 +71,7 @@ angular.module('oppia').directive('topicViewerPage', [
                 ctrl.degreesOfMastery = topicDataDict.degrees_of_mastery;
                 ctrl.skillDescriptions = topicDataDict.skill_descriptions;
                 ctrl.subtopics = topicDataDict.subtopics;
-                $rootScope.loadingMessage = '';
+                LoaderService.setLoadingMessage('');
                 ctrl.topicId = topicDataDict.id;
                 ctrl.trainTabShouldBeDisplayed = (
                   topicDataDict.train_tab_should_be_displayed);

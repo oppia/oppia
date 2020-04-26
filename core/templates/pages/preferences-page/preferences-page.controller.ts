@@ -46,15 +46,15 @@ angular.module('oppia').directive('preferencesPage', [
         '/pages/preferences-page/preferences-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$q', '$rootScope', '$scope', '$translate', '$timeout',
-        '$window', '$uibModal', 'AlertsService', 'LanguageUtilService',
+        '$http', '$q', '$scope', '$translate', '$timeout', '$window',
+        '$uibModal', 'AlertsService', 'LanguageUtilService', 'LoaderService',
         'UrlInterpolationService', 'UserService', 'UtilsService',
         'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
         'ENABLE_ACCOUNT_DELETION', 'SUPPORTED_AUDIO_LANGUAGES',
         'SUPPORTED_SITE_LANGUAGES',
         function(
-            $http, $q, $rootScope, $scope, $translate, $timeout,
-            $window, $uibModal, AlertsService, LanguageUtilService,
+            $http, $q, $scope, $translate, $timeout, $window,
+            $uibModal, AlertsService, LanguageUtilService, LoaderService,
             UrlInterpolationService, UserService, UtilsService,
             DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
             ENABLE_ACCOUNT_DELETION, SUPPORTED_AUDIO_LANGUAGES,
@@ -210,7 +210,7 @@ angular.module('oppia').directive('preferencesPage', [
             ctrl.DASHBOARD_TYPE_LEARNER = DASHBOARD_TYPE_LEARNER;
 
             ctrl.username = '';
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.setLoadingMessage('Loading');
             var userInfoPromise = UserService.getUserInfoAsync();
             userInfoPromise.then(function(userInfo) {
               ctrl.username = userInfo.getUsername();
@@ -253,7 +253,7 @@ angular.module('oppia').directive('preferencesPage', [
             });
 
             $q.all([userInfoPromise, preferencesPromise]).then(function() {
-              $rootScope.loadingMessage = '';
+              LoaderService.setLoadingMessage('');
             });
             ctrl.userCanDeleteAccount = ENABLE_ACCOUNT_DELETION;
             ctrl.subjectInterestsChangedAtLeastOnce = false;

@@ -4,7 +4,7 @@
          ng-cloak>
       <loading-message message="$ctrl.loadingMessage"></loading-message>
       <warning-and-alerts></warning-and-alerts>
-      <div ng-show="!$root.loadingMessage && !$ctrl.loadingMessage">
+      <div ng-show="!$ctrl.loadingMessage">
         <div ng-transclude="content">
         </div>
         <div ng-transclude="footer">
@@ -48,7 +48,7 @@
                  class="protractor-test-main-content" ng-cloak>
               <loading-message message="$ctrl.loadingMessage"></loading-message>
               <warning-and-alerts></warning-and-alerts>
-              <div ng-show="!$root.loadingMessage && !$ctrl.loadingMessage">
+              <div ng-show="!$ctrl.loadingMessage">
                 <div ng-transclude="content">
                 </div>
                 <div ng-transclude="footer">
