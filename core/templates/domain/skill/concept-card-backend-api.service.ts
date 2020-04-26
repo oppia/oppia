@@ -34,8 +34,7 @@ import { SkillDomainConstants } from
 
 export class ConceptCardBackendApiService {
   // Maps previously loaded concept cards to their IDs.
-  _conceptCardCache: Array<object> = {};
-
+  _conceptCardCache: Array<object> = [];
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient
@@ -90,11 +89,11 @@ export class ConceptCardBackendApiService {
                 conceptCards.push(
                   uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
                 // Save the fetched conceptCards to avoid future fetches.
-                _conceptCardCache[skillId] = cloneDeep(
+                this._conceptCardCache[skillId] = cloneDeep(
                   uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
               } else {
                 conceptCards.push(
-                  cloneDeep(_conceptCardCache[skillId]));
+                  cloneDeep(this._conceptCardCache[skillId]));
               }
             });
             if (resolve) {
@@ -104,7 +103,7 @@ export class ConceptCardBackendApiService {
       } else {
         // Case where all of the concept cards are cached locally.
         skillIds.forEach(function(skillId) {
-          conceptCards.push(cloneDeep(_conceptCardCache[skillId]));
+          conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
         });
         if (resolve) {
           resolve(conceptCards);
