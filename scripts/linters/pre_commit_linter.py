@@ -191,7 +191,11 @@ class FileCache(python_utils.OBJECT):
         key = (filepath, mode)
         if key not in self._CACHE_DATA_DICT:
             with python_utils.open_file(filepath, mode) as f:
-                lines = f.readlines()
+                try:
+                    lines = f.readlines()
+                except Exception as e:
+                    message = e.message + "Args: " + filepath + " " + mode
+                    raise Exception(message)
                 self._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
         return self._CACHE_DATA_DICT[key]
 
