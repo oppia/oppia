@@ -17,7 +17,8 @@
  */
 
 require('base-components/base-content.directive.ts');
-
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/id-generation.service.ts');
@@ -62,12 +63,13 @@ angular.module('oppia').directive('signupPage', [
               backdrop: true,
               resolve: {},
               controller: [
-                '$scope', '$uibModalInstance', 'SITE_NAME',
-                function($scope, $uibModalInstance, SITE_NAME) {
+                '$controller', '$scope', '$uibModalInstance', 'SITE_NAME',
+                function($controller, $scope, $uibModalInstance, SITE_NAME) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $$uibModalInstance: $uibModalInstance
+                  });
                   $scope.siteName = SITE_NAME;
-                  $scope.close = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
                 }
               ]
             });

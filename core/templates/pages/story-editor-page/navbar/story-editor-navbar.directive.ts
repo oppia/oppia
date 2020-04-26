@@ -15,7 +15,8 @@
 /**
  * @fileoverview Directive for the navbar of the story editor.
  */
-
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
@@ -118,17 +119,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
                 '/pages/story-editor-page/modal-templates/' +
                 'story-editor-save-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.save = function(commitMessage) {
-                    $uibModalInstance.close(commitMessage);
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
+              controller: 'ConfirmOrCancelModalController'
             });
 
             modalInstance.result.then(function(commitMessage) {

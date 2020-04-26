@@ -16,6 +16,8 @@
  * @fileoverview Directive for the skills mastery list.
  */
 
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('components/concept-card/concept-card.directive.ts');
 require('components/skills-mastery-list/skills-mastery-list.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -71,16 +73,16 @@ angular.module('oppia').directive('skillsMasteryList', [
               ),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance',
+                '$controller', '$scope', '$uibModalInstance',
                 function(
-                    $scope, $uibModalInstance) {
+                    $controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $$uibModalInstance: $uibModalInstance
+                  });
                   $scope.skillIds = [skillId];
                   $scope.index = 0;
                   $scope.modalHeader = skillDescription;
-
-                  $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
                 }
               ]
             }).result.then(function() {}, function() {

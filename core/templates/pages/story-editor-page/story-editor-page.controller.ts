@@ -19,6 +19,8 @@
 require('objects/objectComponentsRequires.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
@@ -64,14 +66,7 @@ angular.module('oppia').directive('storyEditorPage', [
                   '/pages/story-editor-page/modal-templates/' +
                   'story-save-pending-changes-modal.template.html'),
                 backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
+                controller: 'ConfirmOrCancelModalController'
               });
             } else {
               $window.open(
