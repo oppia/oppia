@@ -16,7 +16,8 @@
  * @fileoverview Directive for the local navigation in the learner view.
  */
 
-require('components/modals/confirm-or-cancel-modal.controller.ts');
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
@@ -81,30 +82,30 @@ angular.module('oppia').directive('learnerLocalNav', [
                 'PlayerPositionService',
                 function($controller, $scope, $uibModalInstance,
                     PlayerPositionService) {
-                    $controller('ConfirmOrCancelModalController', {
-                      $scope: $scope,
-                      $uibModalInstance: $uibModalInstance
-                    });
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
 
-                    $scope.flagMessageTextareaIsShown = false;
-                    var stateName = PlayerPositionService.getCurrentStateName();
+                  $scope.flagMessageTextareaIsShown = false;
+                  var stateName = PlayerPositionService.getCurrentStateName();
 
-                    $scope.showFlagMessageTextarea = function(value) {
-                      if (value) {
-                        $scope.flagMessageTextareaIsShown = true;
-                        FocusManagerService.setFocus('flagMessageTextarea');
-                      }
-                    };
+                  $scope.showFlagMessageTextarea = function(value) {
+                    if (value) {
+                      $scope.flagMessageTextareaIsShown = true;
+                      FocusManagerService.setFocus('flagMessageTextarea');
+                    }
+                  };
 
-                    $scope.submitReport = function() {
-                      if ($scope.flagMessage) {
-                        $uibModalInstance.close({
-                          report_type: $scope.flag,
-                          report_text: $scope.flagMessage,
-                          state: stateName
-                        });
-                      }
-                    };
+                  $scope.submitReport = function() {
+                    if ($scope.flagMessage) {
+                      $uibModalInstance.close({
+                        report_type: $scope.flag,
+                        report_text: $scope.flagMessage,
+                        state: stateName
+                      });
+                    }
+                  };
                 }
               ]
             }).result.then(function(result) {

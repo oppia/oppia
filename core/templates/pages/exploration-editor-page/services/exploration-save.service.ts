@@ -22,7 +22,8 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'sharing-links.directive.ts');
-require('components/modals/confirm-or-cancel-modal.controller');
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
@@ -313,16 +314,16 @@ angular.module('oppia').factory('ExplorationSaveService', [
               'exploration-metadata-modal.template.html'),
             backdrop: 'static',
             controller: [
-              '$controller', '$scope', '$uibModalInstance','ExplorationObjectiveService',
-              'ExplorationTitleService', 'ExplorationCategoryService',
-              'ExplorationStatesService', 'ExplorationLanguageCodeService',
-              'ExplorationTagsService', 'ALL_CATEGORIES',
-              'DEFAULT_LANGUAGE_CODE', 'TAG_REGEX',
-              function($controller, $scope, $uibModalInstance, ExplorationObjectiveService,
-                  ExplorationTitleService, ExplorationCategoryService,
-                  ExplorationStatesService, ExplorationLanguageCodeService,
-                  ExplorationTagsService, ALL_CATEGORIES,
-                  DEFAULT_LANGUAGE_CODE, TAG_REGEX) {
+              '$controller', '$scope', '$uibModalInstance',
+              'ExplorationObjectiveService', 'ExplorationTitleService',
+              'ExplorationCategoryService', 'ExplorationStatesService',
+              'ExplorationLanguageCodeService', 'ExplorationTagsService',
+              'ALL_CATEGORIES', 'DEFAULT_LANGUAGE_CODE', 'TAG_REGEX',
+              function($controller, $scope, $uibModalInstance,
+                  ExplorationObjectiveService, ExplorationTitleService,
+                  ExplorationCategoryService, ExplorationStatesService,
+                  ExplorationLanguageCodeService, ExplorationTagsService,
+                  ALL_CATEGORIES, DEFAULT_LANGUAGE_CODE, TAG_REGEX) {
                 $controller('ConfirmOrCancelModalController', {
                   $scope: $scope,
                   $uibModalInstance: $uibModalInstance

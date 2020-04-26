@@ -17,7 +17,8 @@
  */
 
 require('components/concept-card/concept-card.directive.ts');
-require('components/modals/confirm-or-cancel-modal.controller.ts');
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 
