@@ -48,12 +48,24 @@ workflows:
       - e2e_embedding:
           requires:
             - e2e_navigation
-      - e2e_library:
+      - e2e_library_classroom:
           requires:
             - e2e_navigation
       - e2e_exploration_tabs:
           requires:
             - e2e_library
+      - e2e_users:
+          requires:
+            - e2e_navigation
+      - e2e_topics:
+          requires:
+            - e2e_navigation
+      - e2e_creator_editors:
+          requires:
+            - e2e_navigation
+      - e2e_learner:
+          requires:
+            - e2e_navigation
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
@@ -202,17 +214,8 @@ jobs:
           name: Run e2e exploration history tab test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationHistoryTab" --prod_env
-      - run:
-          name: Run e2e exploration statistics tab test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationStatisticsTab" --prod_env
-      - run:
-          name: Run e2e exploration translation tab test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationTranslationTab" --prod_env
 
-
-  e2e_library:
+  e2e_library_classroom:
     <<: *job_defaults
     steps:
       - checkout
@@ -222,6 +225,99 @@ jobs:
           name: Run e2e library test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
+      - run:
+        name: Run e2e classroom test
+        command: |
+          python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPage" --prod_env
+
+  e2e_topics:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run e2e topics and skills test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --prod_env
+      - run:
+          name: Run e2e topics and story test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor" --prod_env
+
+  e2e_users:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run e2e users test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env
+      - run:
+          name: Run e2e profile features test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
+      - run:
+          name: Run e2e profile menu test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
+      - run:
+          name: Run e2e preferences test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="preferences" --prod_env
+
+  e2e_creator_editors:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run e2e creators dashboard test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="creatorDashboard" --prod_env
+      - run:
+          name: Run e2e skill editor test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="skillEditor" --prod_env
+      - run:
+          name: Run e2e core editor and players test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="coreEditorAndPlayerFeatures" --prod_env
+      - run:
+          name: Run e2e publication test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="publication" --prod_env
+      - run:
+          name: Run e2e additional editor features test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="additionalEditorFeatures" --prod_env
+
+  e2e_learner:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run e2e learner test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="learner" --prod_env
+      - run:
+          name: Run e2e learner dashboard test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="learnerDashboard" --prod_env
+      - run:
+          name: Run e2e subscriptions test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="subscriptions" --prod_env
+      - run:
+          name: Run e2e additional player features test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="additionalPlayerFeatures" --prod_env
+
 
   # Non-prod e2e Tests
   # The following tests must be run in a non-production environment because they are uploading files.
