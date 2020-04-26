@@ -123,7 +123,7 @@ export class EditableTopicBackendApiService {
       }
     }, (errorResponse) => {
       if (errorCallback) {
-        errorCallback(errorResponse.body);
+        errorCallback(errorResponse.error);
       }
     });
   }
