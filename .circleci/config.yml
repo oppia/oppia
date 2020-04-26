@@ -53,7 +53,7 @@ workflows:
             - e2e_navigation
       - e2e_exploration_tabs:
           requires:
-            - e2e_library
+            - e2e_navigation
       - e2e_users:
           requires:
             - e2e_navigation
