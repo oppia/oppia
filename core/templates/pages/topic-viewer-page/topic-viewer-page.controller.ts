@@ -58,6 +58,7 @@ angular.module('oppia').directive('topicViewerPage', [
             return (WindowDimensionsService.getWidth() < 500);
           };
           ctrl.$onInit = function() {
+            ctrl.canonicalStoriesList = [];
             ctrl.setActiveTab('story');
             ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
 
@@ -65,16 +66,16 @@ angular.module('oppia').directive('topicViewerPage', [
 
             $rootScope.loadingMessage = 'Loading';
             TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
-              function(topicDataDict) {
-                ctrl.topicId = topicDataDict.topic_id;
-                ctrl.canonicalStoriesList = topicDataDict.canonical_story_dicts;
-                ctrl.degreesOfMastery = topicDataDict.degrees_of_mastery;
-                ctrl.skillDescriptions = topicDataDict.skill_descriptions;
-                ctrl.subtopics = topicDataDict.subtopics;
+              function(readOnlyTopic) {
+                ctrl.topicId = readOnlyTopic.getTopicId();
+                ctrl.canonicalStoriesList = (
+                  readOnlyTopic.getCanonicalStorySummaries());
+                ctrl.degreesOfMastery = readOnlyTopic.getDegreesOfMastery();
+                ctrl.subtopics = readOnlyTopic.getSubtopics();
+                ctrl.skillDescriptions = readOnlyTopic.getSkillDescriptions();
                 $rootScope.loadingMessage = '';
-                ctrl.topicId = topicDataDict.id;
                 ctrl.trainTabShouldBeDisplayed = (
-                  topicDataDict.train_tab_should_be_displayed);
+                  readOnlyTopic.getTrainTabShouldBeDisplayed());
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
                 $rootScope.$apply();

@@ -37,8 +37,8 @@ angular.module('oppia').directive('topicViewerNavbarBreadcrumb', [
           ctrl.$onInit = function() {
             TopicViewerBackendApiService.fetchTopicData(
               UrlService.getTopicNameFromLearnerUrl()).then(
-              function(topicDataDict) {
-                $scope.topicName = topicDataDict.topic_name;
+              function(readOnlyTopic) {
+                $scope.topicName = readOnlyTopic.getTopicName();
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
                 $rootScope.$apply();
