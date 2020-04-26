@@ -20,14 +20,40 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { ReadOnlyTopicObjectFactory } from
+  'domain/topic_viewer/read-only-topic-object.factory';
+import { SkillSummaryObjectFactory } from
+  'domain/skill/SkillSummaryObjectFactory';
+import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
+import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Topic viewer backend API service', () => {
   let topicViewerBackendApiService:
     TopicViewerBackendApiService = null;
   let httpTestingController: HttpTestingController;
   let sampleDataResults = null;
+  let sampleDataResultsObjects = null;
+  let readOnlyTopicObjectFactory = null;
+
+  beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'SkillSummaryObjectFactory', new SkillSummaryObjectFactory());
+    $provide.value(
+      'ReadOnlyObjectFactory', new ReadOnlyTopicObjectFactory(
+        new SubtopicObjectFactory(new SkillSummaryObjectFactory()),
+        new SkillSummaryObjectFactory()));
+  }));
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    let ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -35,6 +61,7 @@ describe('Topic viewer backend API service', () => {
     });
     httpTestingController = TestBed.get(HttpTestingController);
     topicViewerBackendApiService = TestBed.get(TopicViewerBackendApiService);
+    readOnlyTopicObjectFactory = TestBed.get(ReadOnlyTopicObjectFactory);
 
     // Sample topic object returnable from the backend
     sampleDataResults = {
@@ -44,11 +71,15 @@ describe('Topic viewer backend API service', () => {
         id: '0',
         title: 'Story Title',
         description: 'Story Description',
+        node_count: 1,
+        published: true
       }],
       additional_story_dicts: [{
         id: '1',
         title: 'Story Title',
         description: 'Story Description',
+        node_count: 1,
+        published: true
       }],
       uncategorized_skill_ids: ['skill_id_1'],
       subtopics: [{
@@ -62,8 +93,12 @@ describe('Topic viewer backend API service', () => {
       skill_descriptions: {
         skill_id_1: 'Skill Description 1',
         skill_id_2: 'Skill Description 2'
-      }
+      },
+      train_tab_should_be_displayed: false
     };
+
+    sampleDataResultsObjects = readOnlyTopicObjectFactory.createFromBackendDict(
+      sampleDataResults);
   });
 
   afterEach(() => {
@@ -83,7 +118,7 @@ describe('Topic viewer backend API service', () => {
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResultsObjects);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
