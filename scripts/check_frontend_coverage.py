@@ -215,6 +215,7 @@ FULLY_COVERED_FILENAMES = [
     'LearnerDashboardActivityIdsObjectFactory.ts',
     'library-page.constants.ajs.ts',
     'library-page.constants.ts',
+    'loader.service.ts',
     'loading-message.component.ts',
     'local-storage.service.ts',
     'logger.service.ts',
