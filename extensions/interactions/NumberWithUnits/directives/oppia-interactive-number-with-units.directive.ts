@@ -16,6 +16,8 @@
  * @fileoverview Directive for the NumberWithUnits interaction.
  */
 
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
@@ -78,14 +80,7 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
               template: require(
                 './number-with-units-help-modal.directive.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.close = function() {
-                    $uibModalInstance.close();
-                  };
-                }
-              ]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {}, function() {
 
             });

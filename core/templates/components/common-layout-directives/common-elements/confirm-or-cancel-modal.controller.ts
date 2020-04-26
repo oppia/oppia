@@ -20,8 +20,8 @@
 angular.module('oppia').controller('ConfirmOrCancelModalController', [
   '$scope', '$uibModalInstance',
   function($scope, $uibModalInstance) {
-    $scope.close = function() {
-      $uibModalInstance.close();
+    $scope.close = function(message) {
+      $uibModalInstance.close(message);
     };
 
     $scope.cancel = function() {

@@ -16,6 +16,8 @@
  * @fileoverview Modal and functionality for the create story button.
  */
 
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
@@ -43,18 +45,16 @@ angular.module('oppia').factory('StoryCreationService', [
             'new-story-title-editor.template.html'),
           backdrop: true,
           controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
+            '$controller', '$scope', '$uibModalInstance',
+            function($controller, $scope, $uibModalInstance) {
+              $controller('ConfirmOrCancelModalController', {
+                $scope: $scope,
+                $$uibModalInstance: $uibModalInstance
+              });
               $scope.storyTitle = '';
               $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
               $scope.isStoryTitleEmpty = function(storyTitle) {
                 return (storyTitle === '');
-              };
-              $scope.save = function(storyTitle) {
-                $uibModalInstance.close(storyTitle);
-              };
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
               };
             }
           ]
