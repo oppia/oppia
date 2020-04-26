@@ -26,8 +26,10 @@ describe('Moderator Page', function() {
   var $q = null;
   var $rootScope = null;
   var $scope = null;
+  var loadingMessage = null;
   var AlertsService = null;
   var CsrfService = null;
+  var LoaderService = null;
 
   var activityReferences = [
     { type: 'exploration', id: 1 },
@@ -62,7 +64,11 @@ describe('Moderator Page', function() {
     $rootScope = $injector.get('$rootScope');
     AlertsService = $injector.get('AlertsService');
     CsrfService = $injector.get('CsrfTokenService');
-
+    loadingMessage = '';
+    LoaderService = $injector.get('LoaderService');
+    LoaderService.getLoadingMessageSubject().subscribe(
+      (message: string) => loadingMessage = message
+    );
     spyOn(CsrfService, 'getTokenAsync')
       .and.returnValue($q.resolve('sample-csrf-token'));
 
@@ -107,10 +113,10 @@ describe('Moderator Page', function() {
     });
 
     ctrl.$onInit();
-    expect($scope.loadingMessage).toEqual('Loading');
+    expect(loadingMessage).toEqual('Loading');
     $httpBackend.flush(3);
 
-    expect($scope.loadingMessage).toEqual('');
+    expect(loadingMessage).toEqual('');
     expect(ctrl.explorationData).toEqual(explorationIdsToExplorationData);
     expect(ctrl.allCommits).toEqual(commitsResults);
     expect(ctrl.allFeedbackMessages.length).toEqual(2);
@@ -132,10 +138,10 @@ describe('Moderator Page', function() {
     $httpBackend.expectGET('/moderatorhandler/featured').respond(500);
 
     ctrl.$onInit();
-    expect($scope.loadingMessage).toEqual('Loading');
+    expect(loadingMessage).toEqual('Loading');
     $httpBackend.flush(3);
 
-    expect($scope.loadingMessage).toEqual('Loading');
+    expect(loadingMessage).toEqual('Loading');
     expect(ctrl.explorationData).toEqual({});
     expect(ctrl.allCommits).toEqual([]);
     expect(ctrl.allFeedbackMessages).toEqual([]);

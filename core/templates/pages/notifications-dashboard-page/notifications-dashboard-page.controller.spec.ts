@@ -18,6 +18,8 @@
 describe('Notifications Dashboard Page', function() {
   var $scope, ctrl;
   var $httpBackend = null;
+  var LoaderService = null;
+  var loadingMessage = null;
   var windowRefMock = {
     nativeWindow: {
       location: {
@@ -33,6 +35,11 @@ describe('Notifications Dashboard Page', function() {
   beforeEach(angular.mock.inject(function($injector, $compile, $rootScope) {
     $httpBackend = $injector.get('$httpBackend');
     $scope = $rootScope.$new();
+    loadingMessage = '';
+    LoaderService = $injector.get('LoaderService');
+    LoaderService.getLoadingMessageSubject().subscribe(
+      (message: string) => loadingMessage = message
+    );
     var directive = $injector.get('notificationsDashboardPageDirective')[0];
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope
@@ -79,10 +86,10 @@ describe('Notifications Dashboard Page', function() {
       $httpBackend.expect('GET', '/notificationsdashboardhandler/data')
         .respond(response);
       ctrl.$onInit();
-      expect($scope.loadingMessage).toBe('Loading');
+      expect(loadingMessage).toBe('Loading');
       $httpBackend.flush();
 
-      expect($scope.loadingMessage).toBe('');
+      expect(loadingMessage).toBe('');
       expect(ctrl.recentNotifications).toEqual(response.recent_notifications);
       expect(ctrl.jobQueuedMsec).toBe(response.job_queued_msec);
       expect(ctrl.lastSeenMsec).toBe(0);

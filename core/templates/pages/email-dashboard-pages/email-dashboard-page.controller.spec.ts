@@ -26,6 +26,8 @@ describe('Email Dashboard Page', function() {
   var $q = null;
   var EmailDashboardDataService = null;
   var UserService = null;
+  var LoaderService = null;
+  var loadingMessage = null;
   var firstPageQueries = [
     {id: 1, status: 'completed'},
     {id: 2, status: 'completed'}
@@ -45,6 +47,11 @@ describe('Email Dashboard Page', function() {
   beforeEach(angular.mock.inject(function($injector) {
     EmailDashboardDataService = $injector.get('EmailDashboardDataService');
     UserService = $injector.get('UserService');
+    loadingMessage = '';
+    LoaderService = $injector.get('LoaderService');
+    LoaderService.getLoadingMessageSubject().subscribe(
+      (message: string) => loadingMessage = message
+    );
     $q = $injector.get('$q');
 
     var $rootScope = $injector.get('$rootScope');
@@ -207,7 +214,7 @@ describe('Email Dashboard Page', function() {
       });
 
     ctrl.$onInit();
-    expect($scope.loadingMessage).toBe('Loading');
+    expect(loadingMessage).toBe('Loading');
     expect(ctrl.currentPageOfQueries).toEqual([]);
     // For UserService.
     $scope.$apply();
@@ -215,7 +222,7 @@ describe('Email Dashboard Page', function() {
     $scope.$apply();
 
     expect(ctrl.username).toBe('username');
-    expect($scope.loadingMessage).toBe('');
+    expect(loadingMessage).toBe('');
     expect(ctrl.currentPageOfQueries).toEqual(secondPageQueries);
 
     expect(ctrl.showLinkToResultPage('username', 'completed')).toBe(true);
