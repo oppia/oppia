@@ -208,12 +208,12 @@ class DeployTests(test_utils.GenericTestBase):
         args_swap = self.swap(
             sys, 'argv', [
                 'deploy.py', '--app_name=oppiatestserver',
-                '--version=release-1.2.3-invalid-custom'])
+                '--version=release-1.2.3-invalid-too-long'])
         with self.get_branch_swap, args_swap, self.install_swap:
             with self.assertRaisesRegexp(
                 AssertionError,
-                'Length of version should be less than equal to 25 '
-                'characters.'):
+                'The length of the "version" arg should be less than or '
+                'equal to 25 characters.'):
                 deploy.execute_deployment()
 
     def test_invalid_last_commit_msg(self):

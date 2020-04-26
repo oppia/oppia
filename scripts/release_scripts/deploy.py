@@ -480,7 +480,8 @@ def execute_deployment():
         raise Exception('Current release version has \'.\' character.')
 
     assert len(current_release_version) <= 25, (
-        'Length of version should be less than equal to 25 characters.')
+        'The length of the "version" arg should be less than or '
+        'equal to 25 characters.')
 
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
