@@ -676,6 +676,9 @@ export = {
   // Used to disable account removal until it is fully implemented.
   "ENABLE_ACCOUNT_DELETION": false,
 
+  // Used to disable account data export until it is fully implemented.
+  "ENABLE_ACCOUNT_EXPORT": false,
+
   // Used to hide the callout to classroom until it is ready.
   "SHOW_CLASSROOM_CALLOUT": false,
 

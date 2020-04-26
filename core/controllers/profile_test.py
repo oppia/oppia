@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
 import re
 
 from constants import constants
@@ -25,9 +26,12 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 class ProfilePageTests(test_utils.GenericTestBase):
@@ -789,6 +793,165 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
     def test_delete_delete_account_page_disabled(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
             self.delete_json('/delete-account-handler', expected_status_int=404)
+
+
+class ExportAccountHandlerTests(test_utils.GenericTestBase):
+    GENERIC_DATE = datetime.datetime(2019, 5, 20)
+    GENERIC_EPOCH = utils.get_time_in_millisecs(GENERIC_DATE)
+
+    def setUp(self):
+        super(ExportAccountHandlerTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+
+        user_models.UserSubscriptionsModel(
+            id=self.get_user_id_from_email(self.EDITOR_EMAIL),
+            creator_ids=[],
+            collection_ids=[],
+            activity_ids=[],
+            general_feedback_thread_ids=[]).put()
+
+    def test_export_account_handler(self):
+        # Update user settings to constants.
+        user_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        user_settings = user_services.get_user_settings(user_id)
+        user_settings.last_agreed_to_terms = self.GENERIC_DATE
+        user_settings.last_logged_in = self.GENERIC_DATE
+        user_settings.validate()
+        user_models.UserSettingsModel(
+            id=user_settings.user_id,
+            gae_id=user_settings.gae_id,
+            email=user_settings.email,
+            role=user_settings.role,
+            username=user_settings.username,
+            normalized_username=user_settings.normalized_username,
+            last_agreed_to_terms=user_settings.last_agreed_to_terms,
+            last_started_state_editor_tutorial=(
+                user_settings.last_started_state_editor_tutorial),
+            last_started_state_translation_tutorial=(
+                user_settings.last_started_state_translation_tutorial),
+            last_logged_in=user_settings.last_logged_in,
+            last_edited_an_exploration=user_settings.last_edited_an_exploration,
+            last_created_an_exploration=(
+                user_settings.last_created_an_exploration),
+            profile_picture_data_url=user_settings.profile_picture_data_url,
+            default_dashboard=user_settings.default_dashboard,
+            creator_dashboard_display_pref=(
+                user_settings.creator_dashboard_display_pref),
+            user_bio=user_settings.user_bio,
+            subject_interests=user_settings.subject_interests,
+            first_contribution_msec=user_settings.first_contribution_msec,
+            preferred_language_codes=user_settings.preferred_language_codes,
+            preferred_site_language_code=(
+                user_settings.preferred_site_language_code),
+            preferred_audio_language_code=(
+                user_settings.preferred_audio_language_code),
+            deleted=user_settings.deleted
+        ).put()
+
+        constants_swap = self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True)
+        time_swap = self.swap(
+            user_services, 'record_user_logged_in', lambda *args: None)
+
+        with constants_swap, time_swap:
+            data = self.get_json('/export-account-handler')
+            expected_data = {
+                u'topic_rights_data': {
+                    u'managed_topic_ids': []
+                },
+                u'subtopic_page_snapshot_metadata_data': {},
+                u'general_voiceover_application_data': {},
+                u'collection_progress_data': {},
+                u'story_snapshot_metadata_data': {},
+                u'user_community_rights_data': {},
+                u'user_contributions_data': {
+                    u'edited_exploration_ids': [],
+                    u'created_exploration_ids': []
+                },
+                u'general_feedback_thread_user_data': {},
+                u'question_snapshot_metadata_data': {},
+                u'general_feedback_message_data': {},
+                u'story_progress_data': {},
+                u'learner_playlist_data': {},
+                u'collection_rights_data': {
+                    u'voiced_collection_ids': [],
+                    u'owned_collection_ids': [],
+                    u'viewable_collection_ids': [],
+                    u'editable_collection_ids': []
+                },
+                u'skill_snapshot_metadata_data': {},
+                u'exploration_user_data_data': {},
+                u'collection_snapshot_metadata_data': {},
+                u'exploration_rights_data': {
+                    u'viewable_exploration_ids': [],
+                    u'owned_exploration_ids': [],
+                    u'voiced_exploration_ids': [],
+                    u'editable_exploration_ids': []
+                },
+                u'topic_snapshot_metadata_data': {},
+                u'completed_activities_data': {},
+                u'general_feedback_thread_data': {},
+                u'topic_rights_snapshot_metadata_data': {},
+                u'user_stats_data': {},
+                u'exploration_rights_snapshot_metadata_data': {},
+                u'user_subscriptions_data': {
+                    u'creator_ids': [],
+                    u'collection_ids': [],
+                    u'activity_ids': [],
+                    u'general_feedback_thread_ids': [],
+                    u'last_checked': None
+                },
+                u'config_property_snapshot_metadata_data': {},
+                u'exploration_snapshot_metadata_data': {},
+                u'incomplete_activities_data': {},
+                u'user_skill_mastery_data': {},
+                u'exp_user_last_playthrough_data': {},
+                u'user_settings_data': {
+                    u'username': u'editor',
+                    u'last_agreed_to_terms': self.GENERIC_EPOCH,
+                    u'last_started_state_translation_tutorial': None,
+                    u'last_started_state_editor_tutorial': None,
+                    u'normalized_username': u'editor',
+                    u'first_contribution_msec': None,
+                    u'preferred_language_codes': [
+                        u'en'
+                    ],
+                    u'creator_dashboard_display_pref': u'card',
+                    u'subject_interests': [],
+                    u'default_dashboard': None,
+                    u'preferred_site_language_code': None,
+                    u'user_bio': u'',
+                    u'profile_picture_data_url':
+                        user_services.DEFAULT_IDENTICON_DATA_URL,
+                    u'role': u'EXPLORATION_EDITOR',
+                    u'last_edited_an_exploration': None,
+                    u'email': u'editor@example.com',
+                    u'preferred_audio_language_code': None,
+                    u'last_logged_in': self.GENERIC_EPOCH
+                },
+                u'general_suggestion_data': {},
+                u'user_contribution_scoring_data': {},
+                u'general_feedback_email_reply_to_id_data': {},
+                u'collection_rights_snapshot_metadata_data': {}
+            }
+            self.assertEqual(
+                data,
+                expected_data
+            )
+
+    def test_export_account_handler_disabled_logged_in(self):
+        with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', False):
+            self.get_json('/export-account-handler', expected_status_int=404)
+
+    def test_export_account_hander_disabled_logged_out(self):
+        self.logout()
+        with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', False):
+            self.get_json('/export-account-handler', expected_status_int=401)
+
+    def test_export_account_handler_enabled_logged_out(self):
+        self.logout()
+        with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True):
+            self.get_json('/export-account-handler', expected_status_int=401)
 
 
 class PendingAccountDeletionPageTests(test_utils.GenericTestBase):

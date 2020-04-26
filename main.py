@@ -409,6 +409,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         feconf.DELETE_ACCOUNT_HANDLER_URL, profile.DeleteAccountHandler),
     get_redirect_route(
+        feconf.EXPORT_ACCOUNT_HANDLER_URL, profile.ExportAccountHandler),
+    get_redirect_route(
         feconf.PENDING_ACCOUNT_DELETION_URL,
         profile.PendingAccountDeletionPage),
     get_redirect_route(
