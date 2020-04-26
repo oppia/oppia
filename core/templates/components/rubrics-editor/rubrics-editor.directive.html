@@ -8,7 +8,7 @@
         <div class="oppia-rule-preview">
           <div class="oppia-click-to-start-editing" ng-click="$ctrl.openExplanationEditor(rubric.getDifficulty(), $index)">
             <i ng-if="$ctrl.isEditable()"
-               class="material-icons oppia-editor-edit-icon float-right protractor-test-edit-rubric-explanation"
+               class="material-icons oppia-editor-edit-icon float-right protractor-test-edit-rubric-explanation-<[rubricIndex]>"
                title="Edit Rubric Explanation">&#xE254;
             </i>
           </div>
@@ -20,7 +20,7 @@
                 class="oppia-placeholder">
             This rubric has not yet been specified
           </span>
-          <div class="protractor-test-rubric-explanation">
+          <div class="protractor-test-rubric-explanation-<[rubricIndex]>">
             <angular-html-bind html-data="explanation">
             </angular-html-bind>
           </div>
@@ -38,7 +38,7 @@
       <div class="oppia-rule-save-cancel-buttons">
         <div class="float-right">
           <button type="button"
-                  class="btn btn-danger"
+                  class="btn btn-danger protractor-test-delete-rubric-explanation-button"
                   ng-click="$ctrl.deleteExplanation(rubric.getDifficulty(), $index)">
             Delete
           </button>
@@ -58,7 +58,7 @@
     </div>
   </div>
   <div>
-    <button class="btn btn-success add-explanation-button"
+    <button class="btn btn-success add-explanation-button protractor-test-add-explanation-button"
             type="button"
             ng-click="$ctrl.addExplanationForDifficulty(rubric.getDifficulty())"
             ng-disabled="$ctrl.isAnyExplanationEmptyForDifficulty(rubric.getDifficulty())">

@@ -105,19 +105,27 @@ describe('Skill Editor functionality', function() {
   });
 
   it('should edit rubrics for the skill', function() {
-    skillEditorPage.expectRubricExplanationToMatch(0, 'Explanation 0');
-    skillEditorPage.expectRubricExplanationToMatch(1, 'Explanation 1');
-    skillEditorPage.expectRubricExplanationToMatch(2, 'Explanation 2');
+    skillEditorPage.expectRubricExplanationsToMatch(0, ['Explanation 0']);
+    skillEditorPage.expectRubricExplanationsToMatch(
+      1, ['Skill 1', 'Explanation 1']);
+    skillEditorPage.expectRubricExplanationsToMatch(2, ['Explanation 2']);
 
-    skillEditorPage.editRubricExplanationWithIndex(0, 'Explanation 0 edited');
-    skillEditorPage.editRubricExplanationWithIndex(1, 'Explanation 1 edited');
-    skillEditorPage.editRubricExplanationWithIndex(2, 'Explanation 2 edited');
+    skillEditorPage.editRubricExplanationWithIndex(
+      0, 0, 'Explanation 0 edited');
+    skillEditorPage.editRubricExplanationWithIndex(
+      1, 1, 'Explanation 1 edited');
+    skillEditorPage.deleteRubricExplanationWithIndex(1, 0);
+    skillEditorPage.editRubricExplanationWithIndex(
+      2, 0, 'Explanation 2 edited');
     skillEditorPage.saveOrPublishSkill('Edited rubrics');
 
     skillEditorPage.get(skillId);
-    skillEditorPage.expectRubricExplanationToMatch(0, 'Explanation 0 edited');
-    skillEditorPage.expectRubricExplanationToMatch(1, 'Explanation 1 edited');
-    skillEditorPage.expectRubricExplanationToMatch(2, 'Explanation 2 edited');
+    skillEditorPage.expectRubricExplanationsToMatch(
+      0, ['Explanation 0 edited']);
+    skillEditorPage.expectRubricExplanationsToMatch(
+      1, ['Explanation 1 edited']);
+    skillEditorPage.expectRubricExplanationsToMatch(
+      2, ['Explanation 2 edited']);
   });
 
   it('should create a question for the skill', function() {

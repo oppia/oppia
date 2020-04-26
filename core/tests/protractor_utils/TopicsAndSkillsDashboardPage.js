@@ -228,8 +228,10 @@ var TopicsAndSkillsDashboardPage = function() {
         editor, 'Explanation Editor takes too long to close');
 
       for (var i = 0; i < 3; i++) {
-        skillEditorPage.editRubricExplanationWithIndex(i, 'Explanation ' + i);
+        skillEditorPage.addRubricExplanationToDifficultyWithIndex(
+          i, 'Explanation ' + i);
       }
+
       waitFor.elementToBeClickable(
         confirmSkillCreationButton,
         'Create skill button takes too long to be clickable');

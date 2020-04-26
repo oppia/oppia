@@ -93,20 +93,20 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-question-list-item'));
   var questionItem = element(by.css('.protractor-test-question-list-item'));
 
-  var editRubricExplanationButtons = element.all(
-    by.css('.protractor-test-edit-rubric-explanation'));
+  var addRubricExplanationButton = element.all(
+    by.css('.protractor-test-add-explanation-button'));
   var saveRubricExplanationButton = element(
     by.css('.protractor-test-save-rubric-explanation-button'));
-  var rubricExplanations = element.all(
-    by.css('.protractor-test-rubric-explanation'));
+  var deleteRubricExplanationButton = element(
+    by.css('.protractor-test-delete-rubric-explanation-button'));
 
   this.get = function(skillId) {
     browser.get(EDITOR_URL_PREFIX + skillId);
     return waitFor.pageToFullyLoad();
   };
 
-  this.editRubricExplanationWithIndex = function(index, explanation) {
-    editRubricExplanationButtons.then(function(buttons) {
+  this.addRubricExplanationToDifficultyWithIndex = function(index, explanation) {
+    addRubricExplanationButton.then(function(buttons) {
       buttons[index].click();
       var editor = element(
         by.css('.protractor-test-rubric-explanation-text'));
@@ -120,11 +120,48 @@ var SkillEditorPage = function() {
     });
   };
 
-  this.expectRubricExplanationToMatch = function(index, explanation) {
-    rubricExplanations.then(function(explanations) {
-      explanations[index].getText().then(function(text) {
-        expect(text).toMatch(explanation);
-      });
+  this.deleteRubricExplanationWithIndex = function(diffIndex, explIndex) {
+    var editRubricExplanationButtons = element.all(
+      by.css('.protractor-test-edit-rubric-explanation-' + diffIndex));
+    editRubricExplanationButtons.then(function(buttons) {
+      buttons[explIndex].click();
+      var editor = element(
+        by.css('.protractor-test-rubric-explanation-text'));
+      waitFor.visibilityOf(
+        editor, 'Rubric explanation editor takes too long to appear');
+      deleteRubricExplanationButton.click();
+    });
+  };
+
+  this.editRubricExplanationWithIndex = function(
+    diffIndex, explIndex, explanation) {
+    var editRubricExplanationButtons = element.all(
+      by.css('.protractor-test-edit-rubric-explanation-' + diffIndex));
+    editRubricExplanationButtons.then(function(buttons) {
+      buttons[explIndex].click();
+      var editor = element(
+        by.css('.protractor-test-rubric-explanation-text'));
+      waitFor.visibilityOf(
+        editor, 'Rubric explanation editor takes too long to appear');
+      browser.switchTo().activeElement().sendKeys(explanation);
+      waitFor.elementToBeClickable(
+        saveRubricExplanationButton,
+        'Save Rubric Explanation button takes too long to be clickable');
+      saveRubricExplanationButton.click();
+    });
+  };
+
+  this.expectRubricExplanationsToMatch = function(index, explanations) {
+    var rubricExplanationsForDifficulty = element.all(
+      by.css('.protractor-test-rubric-explanation-' + index));
+    var explanationCounter = 0;
+    rubricExplanationsForDifficulty.then(function(explanationElements) {
+      for (var idx in explanationElements) {
+        explanationElements[idx].getText().then(function(text) {
+          expect(text).toMatch(explanations[explanationCounter]);
+          explanationCounter++;
+        });
+      }
     });
   };
 

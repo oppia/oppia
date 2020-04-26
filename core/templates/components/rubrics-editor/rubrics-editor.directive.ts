@@ -52,11 +52,11 @@ angular.module('oppia').directive('rubricsEditor', [
       controller: [
         '$scope', '$filter', '$uibModal', '$rootScope', 'ContextService',
         'RubricObjectFactory', 'SkillCreationService',
-        'EVENT_SKILL_REINITIALIZED', 'PAGE_CONTEXT',
+        'EVENT_SKILL_REINITIALIZED', 'PAGE_CONTEXT', 'SKILL_DIFFICULTIES',
         function(
             $scope, $filter, $uibModal, $rootScope, ContextService,
             RubricObjectFactory, SkillCreationService,
-            EVENT_SKILL_REINITIALIZED, PAGE_CONTEXT) {
+            EVENT_SKILL_REINITIALIZED, PAGE_CONTEXT, SKILL_DIFFICULTIES) {
           var ctrl = this;
           var explanationsMemento = {};
 
@@ -73,7 +73,7 @@ angular.module('oppia').directive('rubricsEditor', [
           };
 
           ctrl.saveExplanation = function(difficulty, index) {
-            if (difficulty === 'Medium' && index === 0) {
+            if (difficulty === SKILL_DIFFICULTIES[1] && index === 0) {
               SkillCreationService.disableSkillDescriptionStatusMarker();
             }
             ctrl.explanationEditorIsOpen[difficulty][index] = false;
@@ -107,7 +107,7 @@ angular.module('oppia').directive('rubricsEditor', [
           };
 
           ctrl.deleteExplanation = function(difficulty, index) {
-            if (difficulty === 'Medium' && index === 0) {
+            if (difficulty === SKILL_DIFFICULTIES[1] && index === 0) {
               SkillCreationService.disableSkillDescriptionStatusMarker();
             }
             ctrl.explanationEditorIsOpen[difficulty][index] = false;

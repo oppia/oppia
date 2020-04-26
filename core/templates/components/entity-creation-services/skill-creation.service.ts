@@ -34,12 +34,19 @@ angular.module('oppia').factory('SkillCreationService', [
       EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
       '/skill_editor/<skill_id>');
+    var SKILL_DESCRIPTION_STATUS_VALUES = {
+      INITIAL_VALUE: 1,
+      CHANGE_VALUE: -1,
+      DISABLE_VALUE: 0
+    };
     var skillCreationInProgress = false;
-    var skillDescriptionStatusMarker = 1;
+    var skillDescriptionStatusMarker = (
+      SKILL_DESCRIPTION_STATUS_VALUES.INITIAL_VALUE);
 
     return {
       markChangeInSkillDescription: function() {
-        skillDescriptionStatusMarker *= -1;
+        skillDescriptionStatusMarker *= (
+          SKILL_DESCRIPTION_STATUS_VALUES.CHANGE_VALUE);
       },
 
       getSkillDescriptionStatus: function() {
@@ -47,11 +54,13 @@ angular.module('oppia').factory('SkillCreationService', [
       },
 
       disableSkillDescriptionStatusMarker: function() {
-        skillDescriptionStatusMarker = 0;
+        skillDescriptionStatusMarker = (
+          SKILL_DESCRIPTION_STATUS_VALUES.DISABLE_VALUE);
       },
 
       enableSkillDescriptionStatusMarker: function() {
-        skillDescriptionStatusMarker = 1;
+        skillDescriptionStatusMarker = (
+          SKILL_DESCRIPTION_STATUS_VALUES.INITIAL_VALUE);
       },
 
       createNewSkill: function(
