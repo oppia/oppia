@@ -16,6 +16,7 @@
  * @fileoverview Directive for the local navigation in the learner view.
  */
 
+require('components/modals/confirm-or-cancel-modal.controller.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
@@ -76,31 +77,34 @@ angular.module('oppia').directive('learnerLocalNav', [
                 'flag-exploration-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance', 'PlayerPositionService',
-                function($scope, $uibModalInstance, PlayerPositionService) {
-                  $scope.flagMessageTextareaIsShown = false;
-                  var stateName = PlayerPositionService.getCurrentStateName();
+                '$controller', '$scope', '$uibModalInstance',
+                'PlayerPositionService',
+                function($controller, $scope, $uibModalInstance,
+                    PlayerPositionService) {
+                    $controller('ConfirmOrCancelModalController', {
+                      $scope: $scope,
+                      $uibModalInstance: $uibModalInstance
+                    });
 
-                  $scope.showFlagMessageTextarea = function(value) {
-                    if (value) {
-                      $scope.flagMessageTextareaIsShown = true;
-                      FocusManagerService.setFocus('flagMessageTextarea');
-                    }
-                  };
+                    $scope.flagMessageTextareaIsShown = false;
+                    var stateName = PlayerPositionService.getCurrentStateName();
 
-                  $scope.submitReport = function() {
-                    if ($scope.flagMessage) {
-                      $uibModalInstance.close({
-                        report_type: $scope.flag,
-                        report_text: $scope.flagMessage,
-                        state: stateName
-                      });
-                    }
-                  };
+                    $scope.showFlagMessageTextarea = function(value) {
+                      if (value) {
+                        $scope.flagMessageTextareaIsShown = true;
+                        FocusManagerService.setFocus('flagMessageTextarea');
+                      }
+                    };
 
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
+                    $scope.submitReport = function() {
+                      if ($scope.flagMessage) {
+                        $uibModalInstance.close({
+                          report_type: $scope.flag,
+                          report_text: $scope.flagMessage,
+                          state: stateName
+                        });
+                      }
+                    };
                 }
               ]
             }).result.then(function(result) {
@@ -122,14 +126,7 @@ angular.module('oppia').directive('learnerLocalNav', [
                   'pages/exploration-player-page/templates/' +
                   'exploration-successfully-flagged-modal.template.html'),
                 backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
-                    $scope.close = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
+                controller: 'ConfirmOrCancelModalController'
               }).result.then(function() {}, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is
