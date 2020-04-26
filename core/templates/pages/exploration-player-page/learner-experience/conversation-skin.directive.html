@@ -107,7 +107,7 @@
     </div>
   </div>
 
-  <div ng-if="!collectionSummary && recommendedExplorationSummaries !== null && recommendedExplorationSummaries.length > 0"
+  <div ng-if="!collectionSummary && !inStoryMode && recommendedExplorationSummaries !== null && recommendedExplorationSummaries.length > 0"
        class="conversation-skin-final-recommendations">
     <div ng-if="recommendedExplorationSummaries.length > 0">
       <span ng-if="!collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
