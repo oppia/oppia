@@ -1,6 +1,6 @@
-<div ng-show="$root.loadingMessage" class="oppia-loading-fullpage">
+<div ng-show="$root.loadingMessage || $ctrl.message" class="oppia-loading-fullpage">
   <div class="oppia-align-center">
-    <span translate="<[$root.loadingMessage]>"></span>
+    <span translate="<[$root.loadingMessage + $ctrl.message]>"></span>
     <span class="oppia-loading-dot-one">.</span>
     <span class="oppia-loading-dot-two">.</span>
     <span class="oppia-loading-dot-three">.</span>

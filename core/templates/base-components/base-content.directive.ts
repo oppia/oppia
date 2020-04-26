@@ -16,7 +16,7 @@
  * @fileoverview Directive for the Base Transclusion Component.
  */
 
-require('base-components/loading-message.directive.ts');
+require('base-components/loading-message.component.ts');
 require('base-components/warning-and-alerts.directive.ts');
 require('pages/OppiaFooterDirective.ts');
 
@@ -39,9 +39,9 @@ angular.module('oppia').directive('baseContent', [
       template: require('./base-content.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$rootScope', '$window', 'BackgroundMaskService',
-        'SidebarStatusService', 'UrlService',
+        'SidebarStatusService', 'UrlService', 'LoaderService',
         function($rootScope, $window, BackgroundMaskService,
-            SidebarStatusService, UrlService) {
+            SidebarStatusService, UrlService, LoaderService) {
           // Mimic redirection behaviour in the backend (see issue #7867 for
           // details).
           if ($window.location.hostname === 'oppiaserver.appspot.com') {
@@ -53,6 +53,7 @@ angular.module('oppia').directive('baseContent', [
           }
 
           var ctrl = this;
+          ctrl.loadingMessage = '';
           ctrl.isSidebarShown = () => SidebarStatusService.isSidebarShown();
           ctrl.closeSidebarOnSwipe = () => SidebarStatusService.closeSidebar();
           ctrl.isBackgroundMaskActive = () => (
@@ -71,6 +72,9 @@ angular.module('oppia').directive('baseContent', [
           ctrl.$onInit = function() {
             ctrl.iframed = UrlService.isIframed();
             ctrl.DEV_MODE = $rootScope.DEV_MODE;
+            LoaderService.getLoadingMessageSubject().subscribe(
+              (message: string) => this.loadingMessage = message
+            );
           };
         }
       ]
