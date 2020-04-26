@@ -27,12 +27,12 @@ require('services/site-analytics.service.ts');
 // ExplorationCreationService.
 
 angular.module('oppia').factory('CollectionCreationService', [
-  '$timeout', '$window', 'AlertsService', 'LoaderService',
-  'CollectionCreationBackendService', 'SiteAnalyticsService',
+  '$timeout', '$window', 'AlertsService',
+  'CollectionCreationBackendService', 'LoaderService', 'SiteAnalyticsService',
   'UrlInterpolationService',
   function(
-      $timeout, $window, AlertsService, LoaderService,
-      CollectionCreationBackendService, SiteAnalyticsService,
+      $timeout, $window, AlertsService,
+      CollectionCreationBackendService, LoaderService, SiteAnalyticsService,
       UrlInterpolationService) {
     var CREATE_NEW_COLLECTION_URL_TEMPLATE = (
       '/collection_editor/create/<collection_id>');

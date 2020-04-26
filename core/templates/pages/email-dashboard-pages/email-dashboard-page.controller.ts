@@ -35,7 +35,7 @@ angular.module('oppia').directive('emailDashboardPage', [
         '$rootScope', 'EmailDashboardDataService', 'LoaderService',
         'UserService',
         function($rootScope, EmailDashboardDataService, LoaderService,
-            UserService, ) {
+            UserService) {
           var ctrl = this;
           ctrl.resetForm = function() {
             ctrl.has_not_logged_in_for_n_days = null;

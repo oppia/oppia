@@ -31,7 +31,8 @@ angular.module('oppia').directive('activityTilesInfinityGrid', [
         'activity-tiles-infinity-grid.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'LoaderService', 'SearchService', 'WindowDimensionsService',
+        '$scope', 'LoaderService', 'SearchService',
+        'WindowDimensionsService',
         function($scope, LoaderService, SearchService,
             WindowDimensionsService) {
           var ctrl = this;
