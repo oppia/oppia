@@ -80,11 +80,6 @@ angular.module('oppia').directive('teachPage', [
               if (ALLOWED_TABS.includes(hashChange)) {
                 ctrl.activeTabName = hashChange;
               }
-
-              // A click event needs to be trigger by hand because
-              // onhashchange event doesn't update ctrl.activeTabName in
-              // the html. Just after a click the template is updated.
-              angular.element(document.querySelector('body')).click();
             };
           };
         }
