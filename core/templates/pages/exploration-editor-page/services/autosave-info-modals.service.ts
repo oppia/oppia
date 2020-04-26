@@ -17,6 +17,8 @@
  * on the type of response received as a result of the autosaving request.
  */
 
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/changes-in-human-readable-form/' +
     'changes-in-human-readable-form.directive');
@@ -106,14 +108,12 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
             'lost-changes-modal.template.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
-          controller: ['$scope', '$uibModalInstance', function(
-              $scope, $uibModalInstance) {
-            // When the user clicks on discard changes button, signal backend
-            // to discard the draft and reload the page thereafter.
-            $scope.close = function() {
-              LocalStorageService.removeExplorationDraft(explorationId);
-              $uibModalInstance.dismiss('cancel');
-            };
+          controller: ['$controller', '$scope', '$uibModalInstance', function(
+              $controller, $scope, $uibModalInstance) {
+            $controller('ConfirmOrCancelModalController', {
+              $scope: $scope,
+              $uibModalInstance: $uibModalInstance
+            });
 
             $scope.lostChanges = lostChanges.map(
               LostChangeObjectFactory.createNew);
@@ -123,6 +123,9 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
         }).result.then(function() {
           _isModalOpen = false;
         }, function() {
+          // When the user clicks on discard changes button, signal backend
+          // to discard the draft and reload the page thereafter.
+          LocalStorageService.removeExplorationDraft(explorationId);
           _isModalOpen = false;
         });
 

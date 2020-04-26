@@ -16,6 +16,8 @@
  * @fileoverview Directive for the navbar of the topic editor.
  */
 
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
@@ -85,25 +87,13 @@ angular.module('oppia').directive('topicEditorNavbar', [
 
           $scope.publishTopic = function() {
             if (!$scope.topicRights.canPublishTopic()) {
-              var modalInstance = $uibModal.open({
+              $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/topic-editor-page/modal-templates/' +
                   'topic-editor-send-mail-modal.template.html'),
                 backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
-                    $scope.sendMail = function() {
-                      $uibModalInstance.close();
-                    };
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
-              });
-
-              modalInstance.result.then(function() {
+                controller: 'ConfirmOrCancelModalController'
+              }).result.then(function() {
                 TopicRightsBackendApiService.sendMail(
                   $scope.topicId, $scope.topicName).then(function() {
                   var successToast = 'Mail Sent.';
@@ -174,16 +164,13 @@ angular.module('oppia').directive('topicEditorNavbar', [
                 'topic-editor-save-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$controller', '$scope', '$uibModalInstance',
+                function($controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
                   $scope.isTopicPublished = topicIsPublished;
-
-                  $scope.save = function(commitMessage) {
-                    $uibModalInstance.close(commitMessage);
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
                 }
               ]
             });

@@ -160,7 +160,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
                     INTERACTION_SPECS) {
                   $controller('ConfirmOrCancelModalController', {
                     $scope: $scope,
-                    $$uibModalInstance: $uibModalInstance
+                    $uibModalInstance: $uibModalInstance
                   });
                   $scope.StateSolutionService = StateSolutionService;
                   $scope.correctAnswerEditorHtml = (

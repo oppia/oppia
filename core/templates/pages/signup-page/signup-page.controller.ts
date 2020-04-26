@@ -67,7 +67,7 @@ angular.module('oppia').directive('signupPage', [
                 function($controller, $scope, $uibModalInstance, SITE_NAME) {
                   $controller('ConfirmOrCancelModalController', {
                     $scope: $scope,
-                    $$uibModalInstance: $uibModalInstance
+                    $uibModalInstance: $uibModalInstance
                   });
                   $scope.siteName = SITE_NAME;
                 }

@@ -16,6 +16,8 @@
  * @fileoverview Controller for the skills list viewer.
  */
 
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require(
   'components/skill-selector/skill-selector.directive.ts');
 require(
@@ -77,17 +79,7 @@ angular.module('oppia').directive('skillsList', [
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'delete-skill-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.confirmDeletion = function() {
-                    $uibModalInstance.close();
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
+              controller: 'ConfirmOrCancelModalController'
             });
 
             modalInstance.result.then(function() {
@@ -113,16 +105,14 @@ angular.module('oppia').directive('skillsList', [
                 'assign-skill-to-topic-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$controller', '$scope', '$uibModalInstance',
+                function($controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
                   $scope.topicSummaries = topicSummaries;
                   $scope.selectedTopicIds = [];
-                  $scope.done = function() {
-                    $uibModalInstance.close($scope.selectedTopicIds);
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
                 }
               ]
             });
@@ -169,8 +159,13 @@ angular.module('oppia').directive('skillsList', [
                 '/components/skill-selector/select-skill-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$controller', '$scope', '$uibModalInstance',
+                function($controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
+
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = '';
                   $scope.save = function() {
@@ -178,9 +173,6 @@ angular.module('oppia').directive('skillsList', [
                       {skill: skill,
                         supersedingSkillId: $scope.selectedSkillId
                       });
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]

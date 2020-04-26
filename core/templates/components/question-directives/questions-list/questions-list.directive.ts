@@ -17,6 +17,8 @@
  */
 
 require('directives/angular-html-bind.directive.ts');
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require(
   'components/question-directives/question-editor/' +
   'question-editor.directive.ts');
@@ -227,8 +229,13 @@ angular.module('oppia').directive('questionsList', [
                 'select-skill-and-difficulty-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$controller', '$scope', '$uibModalInstance',
+                function($controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
+
                   var init = function() {
                     $scope.countOfSkillsToPrioritize =
                       countOfSkillsToPrioritize;
@@ -280,14 +287,6 @@ angular.module('oppia').directive('questionsList', [
 
                   $scope.startQuestionCreation = function() {
                     $uibModalInstance.close($scope.linkedSkillsWithDifficulty);
-                  };
-
-                  $scope.cancelModal = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-
-                  $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('ok');
                   };
 
                   init();
@@ -443,22 +442,18 @@ angular.module('oppia').directive('questionsList', [
                 'change-question-difficulty-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$controller', '$scope', '$uibModalInstance',
+                function($controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
+
                   var init = function() {
                     $scope.linkedSkillsWithDifficulty =
                       linkedSkillsWithDifficulty;
                     $scope.skillIdToRubricsObject = skillIdToRubricsObject;
                   };
-
-                  $scope.cancelModal = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-
-                  $scope.done = function() {
-                    $uibModalInstance.close($scope.linkedSkillsWithDifficulty);
-                  };
-
                   init();
                 }
               ]
@@ -587,8 +582,12 @@ angular.module('oppia').directive('questionsList', [
                           'select-skill-modal.template.html'),
                       backdrop: true,
                       controller: [
-                        '$scope', '$uibModalInstance',
-                        function($scope, $uibModalInstance) {
+                        '$controller', '$scope', '$uibModalInstance',
+                        function($controller, $scope, $uibModalInstance) {
+                          $controller('ConfirmOrCancelModalController', {
+                            $scope: $scope,
+                            $uibModalInstance: $uibModalInstance
+                          });
                           $scope.skillSummaries = sortedSkillSummaries;
                           $scope.selectedSkillId = null;
                           $scope.countOfSkillsToPrioritize =
@@ -602,9 +601,6 @@ angular.module('oppia').directive('questionsList', [
                                   sortedSkillSummaries[idx]);
                               }
                             }
-                          };
-                          $scope.cancel = function() {
-                            $uibModalInstance.dismiss('cancel');
                           };
                         }
                       ]
@@ -662,17 +658,7 @@ angular.module('oppia').directive('questionsList', [
                                  '/modal-templates/' +
                                  'question-editor-save-modal.template.html'),
                         backdrop: true,
-                        controller: [
-                          '$scope', '$uibModalInstance',
-                          function($scope, $uibModalInstance) {
-                            $scope.save = function(commitMessage) {
-                              $uibModalInstance.close(commitMessage);
-                            };
-                            $scope.cancel = function() {
-                              $uibModalInstance.dismiss('cancel');
-                            };
-                          }
-                        ]
+                        controller: 'ConfirmOrCancelModalController'
                       });
                       modalInstance.result.then(function(commitMessage) {
                         returnModalObject.commitMessage = commitMessage;
@@ -722,18 +708,7 @@ angular.module('oppia').directive('questionsList', [
                             '/components/question-directives/modal-templates/' +
                             'confirm-question-modal-exit-modal.directive.html'),
                         backdrop: true,
-                        controller: [
-                          '$scope', '$uibModalInstance',
-                          function($scope, $uibModalInstance) {
-                            $scope.cancel = function() {
-                              $uibModalInstance.dismiss('cancel');
-                            };
-
-                            $scope.close = function() {
-                              $uibModalInstance.close();
-                            };
-                          }
-                        ]
+                        controller: 'ConfirmOrCancelModalController'
                       });
                       modalInstance.result.then(function() {
                         $uibModalInstance.dismiss('cancel');

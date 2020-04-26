@@ -152,7 +152,7 @@ angular.module('oppia').directive('preferencesPage', [
                     $controller, $scope, $uibModalInstance) {
                   $controller('ConfirmOrCancelModalController', {
                     $scope: $scope,
-                    $$uibModalInstance: $uibModalInstance
+                    $uibModalInstance: $uibModalInstance
                   });
 
                   $scope.uploadedImage = null;

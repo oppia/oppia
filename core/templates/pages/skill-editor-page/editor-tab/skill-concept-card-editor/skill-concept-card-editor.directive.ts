@@ -124,7 +124,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                 function($controller, $scope, $uibModalInstance) {
                   $controller('ConfirmOrCancelModalController', {
                     $scope: $scope,
-                    $$uibModalInstance: $uibModalInstance
+                    $uibModalInstance: $uibModalInstance
                   });
 
                   $scope.WORKED_EXAMPLE_FORM_SCHEMA = {

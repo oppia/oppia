@@ -20,6 +20,8 @@ require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
+require('components/common-layout-directives/common-elements/' +
+'confirm-or-cancel-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 
@@ -41,16 +43,7 @@ angular.module('oppia').directive('deleteAccountPage', [
                 '/pages/delete-account-page/templates/' +
                 'delete-account-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', function(
-                    $scope, $uibModalInstance) {
-                  $scope.reallyDelete = $uibModalInstance.close;
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               $http['delete']('/delete-account-handler').then(function() {
                 $window.location = (

@@ -73,7 +73,7 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
                 function($controller, $scope, $uibModalInstance) {
                   $controller('ConfirmOrCancelModalController', {
                     $scope: $scope,
-                    $$uibModalInstance: $uibModalInstance
+                    $uibModalInstance: $uibModalInstance
                   });
 
                   $scope.skillSummaries = sortedSkillSummaries;

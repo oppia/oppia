@@ -16,6 +16,8 @@
  * @fileoverview Directive for the audio translation bar.
  */
 
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require(
   'components/forms/custom-forms-directives/audio-file-uploader.directive.ts');
 require('filters/format-timer.filter.ts');
@@ -335,18 +337,15 @@ angular.module('oppia').directive('audioTranslationBar', [
                 }
               },
               controller: [
-                '$scope', '$uibModalInstance', 'message',
-                function( $scope, $uibModalInstance, message) {
+                '$controller', '$scope', '$uibModalInstance', 'message',
+                function($controller, $scope, $uibModalInstance, message) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
                   $scope.busyMessage = message;
-                  $scope.gotIt = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
                 }
               ]
-            }).result.then(function() {}, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
             });
           };
 
@@ -446,19 +445,8 @@ angular.module('oppia').directive('audioTranslationBar', [
                 '/pages/exploration-editor-page/translation-tab/' +
                 'modal-templates/delete-audio-translation-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function( $scope, $uibModalInstance) {
-                  $scope.reallyDelete = function() {
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            }).result.then(function(result) {
+              controller: 'ConfirmOrCancelModalController'
+            }).result.then(function() {
               StateRecordedVoiceoversService.displayed.deleteVoiceover(
                 $scope.contentId, $scope.languageCode);
               saveRecordedVoiceoversChanges();
@@ -492,13 +480,18 @@ angular.module('oppia').directive('audioTranslationBar', [
                 }
               },
               controller: [
-                '$scope', '$uibModalInstance', 'AlertsService', 'languageCode',
+                '$controller', '$scope', '$uibModalInstance', 'languageCode',
                 'ContextService', 'generatedFilename', 'isAudioAvailable',
                 'audioFile',
                 function(
-                    $scope, $uibModalInstance, AlertsService, languageCode,
+                    $controller, $scope, $uibModalInstance, languageCode,
                     ContextService, generatedFilename, isAudioAvailable,
                     audioFile) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
+
                   var ERROR_MESSAGE_BAD_FILE_UPLOAD = (
                     'There was an error uploading the audio file.');
                   var BUTTON_TEXT_SAVE = 'Save';
@@ -553,11 +546,6 @@ angular.module('oppia').directive('audioTranslationBar', [
                       });
                     }
                   };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
                 }
               ]
             }).result.then(function(result) {
@@ -572,9 +560,7 @@ angular.module('oppia').directive('audioTranslationBar', [
               saveRecordedVoiceoversChanges();
               $scope.initAudioBar();
             }, function() {
-              // Note to developers:
-              // Promise returned by uib-modal instance is handled here.
-              // No further action is needed.
+              AlertsService.clearWarnings();
             });
           };
 

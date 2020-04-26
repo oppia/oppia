@@ -16,6 +16,8 @@
  * @fileoverview Directive for the Create Exploration/Collection button.
  */
 
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('components/entity-creation-services/collection-creation.service.ts');
 require('components/entity-creation-services/exploration-creation.service.ts');
 require('domain/utilities/browser-checker.service.ts');
@@ -71,8 +73,13 @@ angular.module('oppia').directive('createActivityButton', [
                   'create-activity-modal.directive.html'),
                 backdrop: true,
                 controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
+                  '$controller', '$scope', '$uibModalInstance',
+                  function($controller, $scope, $uibModalInstance) {
+                    $controller('ConfirmOrCancelModalController', {
+                      $scope: $scope,
+                      $uibModalInstance: $uibModalInstance
+                    });
+
                     UserService.getUserInfoAsync().then(function(userInfo) {
                       $scope.canCreateCollections = (
                         userInfo.canCreateCollections());
@@ -86,10 +93,6 @@ angular.module('oppia').directive('createActivityButton', [
                     $scope.chooseCollection = function() {
                       CollectionCreationService.createNewCollection();
                       $uibModalInstance.close();
-                    };
-
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
                     };
 
                     $scope.explorationImgUrl = (

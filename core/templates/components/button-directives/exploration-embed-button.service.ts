@@ -43,7 +43,7 @@ angular.module('oppia').factory('ExplorationEmbedButtonService', [
                 explorationId) {
               $controller('ConfirmOrCancelModalController', {
                 $scope: $scope,
-                $$uibModalInstance: $uibModalInstance
+                $uibModalInstance: $uibModalInstance
               });
               $scope.explorationId = explorationId;
               $scope.serverName = (

@@ -49,7 +49,7 @@ angular.module('oppia').factory('StoryCreationService', [
             function($controller, $scope, $uibModalInstance) {
               $controller('ConfirmOrCancelModalController', {
                 $scope: $scope,
-                $$uibModalInstance: $uibModalInstance
+                $uibModalInstance: $uibModalInstance
               });
               $scope.storyTitle = '';
               $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;

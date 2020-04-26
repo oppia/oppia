@@ -78,7 +78,7 @@ angular.module('oppia').directive('skillsMasteryList', [
                     $controller, $scope, $uibModalInstance) {
                   $controller('ConfirmOrCancelModalController', {
                     $scope: $scope,
-                    $$uibModalInstance: $uibModalInstance
+                    $uibModalInstance: $uibModalInstance
                   });
                   $scope.skillIds = [skillId];
                   $scope.index = 0;
