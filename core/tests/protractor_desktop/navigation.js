@@ -213,7 +213,12 @@ describe('Static Pages Tour', function() {
     expect(element(
       by.css('.protractor-test-thanks-page')).isPresent()).toBe(true);
   });
-
+it('visits the Welcome Guide Page page', function() {
+    browser.get('/welcomeguidepage');
+    waitFor.pageToFullyLoad();
+    expect(element(
+      by.css('.protractor-test-welcome-guide-page')).isPresent()).toBe(true);
+  });
   it('shows the error page when an incorrect url is given', function() {
     browser.get('/splashes');
     waitFor.pageToFullyLoad();
