@@ -1192,5 +1192,6 @@ class StorySummary(python_utils.OBJECT):
         return {
             'id': self.id,
             'title': self.title,
-            'description': self.description
+            'description': self.description,
+            'node_count': self.node_count
         }
