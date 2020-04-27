@@ -75,6 +75,7 @@
   <div ng-if="$ctrl.activeTabName === 'voiceoverTab'">
     <voiceover-opportunities></voiceover-opportunities>
   </div>
+  <div ng-if="$ctrl.communityMessageEnabled" class="oppia-community-message-bar"><[$ctrl.communityMessage]></div>
 </div>
 <style>
   .oppia-dashboard-language-container-label {
@@ -222,5 +223,15 @@
     border-radius: 10%;
     color: #fff;
     padding: 1px 5px;
+  }
+  .oppia-community-message-bar {
+    bottom: 0;
+    position: fixed;
+    color: #fff;
+    width: 100%;
+    background-color: #00376d;
+    text-align: center;
+    font-style: italic;
+    font-size: 14px;
   }
 </style>
