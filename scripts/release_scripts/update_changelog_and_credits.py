@@ -50,14 +50,16 @@ CONTRIBUTORS_FILEPATH = os.path.join('', 'CONTRIBUTORS')
 GIT_CMD_CHECKOUT = 'git checkout -- %s %s %s %s' % (
     CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
     ABOUT_PAGE_FILEPATH)
+
 # This ordering should not be changed. The automatic updates to
 # changelog and credits performed using this script will work
 # correctly only if the ordering of sections in release summary
 # file matches this expected ordering.
-EXPECTED_ORDERING = {
-    '### Changelog:\n': '### Commit History:\n',
-    '### New Authors:\n': '### Existing Authors:\n',
-    '### New Contributors:\n': '### Email C&P Blurbs about authors:\n'
+EXPECTED_ORDERING_DICT = {
+    release_constants.CHANGELOG_HEADER: release_constants.COMMIT_HISTORY_HEADER,
+    release_constants.NEW_AUTHORS_HEADER: (
+        release_constants.EXISTING_AUTHORS_HEADER),
+    release_constants.NEW_CONTRIBUTORS_HEADER: release_constants.EMAIL_HEADER
 }
 CURRENT_DATE = datetime.date.today().strftime('%d %b %Y')
 
@@ -96,7 +98,7 @@ def update_sorted_file(filepath, new_list):
             f.write(line)
 
 
-def check_ordering_of_sections(release_summary_lines):
+def is_order_of_sections_valid(release_summary_lines):
     """Checks that the ordering of sections in release_summary file
     matches the expected ordering.
 
@@ -107,26 +109,28 @@ def check_ordering_of_sections(release_summary_lines):
         release_summary_lines: list(str). List of lines in
             ../release_summary.md.
 
-    Raises:
-        Exception: The expected ordering does not match the ordering
-            in release_summary.md.
+    Returns:
+        bool. Whether the ordering is correct.
     """
     sections = [
         line for line in release_summary_lines if line.startswith('###')
     ]
-    for section, next_section in EXPECTED_ORDERING.items():
+    for section, next_section in EXPECTED_ORDERING_DICT.items():
         if section not in sections:
-            raise Exception(
+            python_utils.PRINT(
                 'Expected release_summary to have %s section to ensure '
                 'that automatic updates to changelog and credits are '
                 'correct.' % section.strip())
+            return False
         index = sections.index(section)
         if index + 1 >= len(sections) or sections[index + 1] != next_section:
-            raise Exception(
+            python_utils.PRINT(
                 'Expected %s section to be followed by %s section in '
                 'release_summary to ensure that automatic updates to '
                 'changelog and credits are correct.' % (
                     section.strip(), next_section.strip()))
+            return False
+    return True
 
 
 def get_previous_release_version(branch_type, current_release_version_number):
@@ -193,8 +197,10 @@ def update_changelog(
         current_release_version_number: str. The version of current release.
     """
     python_utils.PRINT('Updating Changelog...')
-    start_index = release_summary_lines.index('### Changelog:\n') + 1
-    end_index = release_summary_lines.index('### Commit History:\n')
+    start_index = release_summary_lines.index(
+        release_constants.CHANGELOG_HEADER) + 1
+    end_index = release_summary_lines.index(
+        release_constants.COMMIT_HISTORY_HEADER)
     release_version_changelog = [
         u'v%s (%s)\n' % (current_release_version_number, CURRENT_DATE),
         u'------------------------\n'] + release_summary_lines[
@@ -240,9 +246,9 @@ def update_authors(release_summary_lines):
     """
     python_utils.PRINT('Updating AUTHORS file...')
     start_index = release_summary_lines.index(
-        '### New Authors:\n') + 1
+        release_constants.NEW_AUTHORS_HEADER) + 1
     end_index = release_summary_lines.index(
-        '### Existing Authors:\n') - 1
+        release_constants.EXISTING_AUTHORS_HEADER) - 1
     new_authors = release_summary_lines[start_index:end_index]
     new_authors = [
         '%s\n' % (author.replace('* ', '').strip()) for author in new_authors]
@@ -259,9 +265,9 @@ def update_contributors(release_summary_lines):
     """
     python_utils.PRINT('Updating CONTRIBUTORS file...')
     start_index = release_summary_lines.index(
-        '### New Contributors:\n') + 1
+        release_constants.NEW_CONTRIBUTORS_HEADER) + 1
     end_index = release_summary_lines.index(
-        '### Email C&P Blurbs about authors:\n') - 1
+        release_constants.EMAIL_HEADER) - 1
     new_contributors = (
         release_summary_lines[start_index:end_index])
     new_contributors = [
@@ -320,9 +326,9 @@ def update_developer_names(release_summary_lines):
     """
     python_utils.PRINT('Updating about-page file...')
     start_index = release_summary_lines.index(
-        '### New Contributors:\n') + 1
+        release_constants.NEW_CONTRIBUTORS_HEADER) + 1
     end_index = release_summary_lines.index(
-        '### Email C&P Blurbs about authors:\n') - 1
+        release_constants.EMAIL_HEADER) - 1
     new_contributors = (
         release_summary_lines[start_index:end_index])
     new_contributors = [
@@ -447,6 +453,74 @@ def create_branch(
             target_branch, current_release_version_number))
 
 
+def is_invalid_email_present(release_summary_lines):
+    """Checks if any invalid email is present in the list of
+    new authors and contributors.
+
+    Args:
+        release_summary_lines: list(str). List of lines in
+            ../release_summary.md.
+
+    Returns:
+        bool. Whether invalid email is present or not.
+    """
+    authors_start_index = release_summary_lines.index(
+        release_constants.NEW_AUTHORS_HEADER) + 1
+    authors_end_index = release_summary_lines.index(
+        release_constants.EXISTING_AUTHORS_HEADER) - 1
+    new_authors = release_summary_lines[authors_start_index:authors_end_index]
+    contributors_start_index = release_summary_lines.index(
+        release_constants.NEW_CONTRIBUTORS_HEADER) + 1
+    contributors_end_index = release_summary_lines.index(
+        release_constants.EMAIL_HEADER) - 1
+    new_contributors = (
+        release_summary_lines[contributors_start_index:contributors_end_index])
+    new_email_ids = new_authors + new_contributors
+    invalid_email_ids = [
+        email_id for email_id in new_email_ids
+        if release_constants.INVALID_EMAIL_SUFFIX in email_id]
+    python_utils.PRINT(
+        'Following email ids are invalid: %s' % invalid_email_ids)
+    return bool(invalid_email_ids)
+
+
+def get_release_summary_lines():
+    """Returns the lines from release summary file. It checks whether
+    incorrect email is present or ordering of sections is invalid.
+    In either case, the user will be asked to update the release
+    summary file and the lines will be re-read.
+
+    Returns:
+        list(str). List of lines in ../release_summary.md.
+    """
+    invalid_email_is_present = True
+    ordering_is_invalid = True
+    while invalid_email_is_present or ordering_is_invalid:
+        release_summary_file = python_utils.open_file(
+            release_constants.RELEASE_SUMMARY_FILEPATH, 'r')
+        release_summary_lines = release_summary_file.readlines()
+        invalid_email_is_present = is_invalid_email_present(
+            release_summary_lines)
+        if invalid_email_is_present:
+            common.ask_user_to_confirm(
+                'The release summary file contains emails of the form: %s '
+                'Please replace them with the correct emails. '
+                '(See error messages above.)' % (
+                    release_constants.INVALID_EMAIL_SUFFIX))
+        ordering_is_invalid = not(
+            is_order_of_sections_valid(release_summary_lines))
+        if ordering_is_invalid:
+            common.ask_user_to_confirm(
+                'Please fix the ordering in release summary file. '
+                '(See error messages above.)')
+        if invalid_email_is_present or ordering_is_invalid:
+            common.ask_user_to_confirm(
+                'Please save the file: %s with all the changes that '
+                'you have made.' % (
+                    release_constants.RELEASE_SUMMARY_FILEPATH))
+    return release_summary_lines
+
+
 def main():
     """Collects necessary info and dumps it to disk."""
     branch_name = common.get_current_branch_name()
@@ -496,8 +570,10 @@ def main():
         'Check emails and names for new authors and new contributors in the '
         'file: %s and verify that the emails are '
         'correct through welcome emails sent from welcome@oppia.org '
-        '(confirm with Sean in case of doubt).' % (
-            release_constants.RELEASE_SUMMARY_FILEPATH))
+        '(confirm with Sean in case of doubt). Please ensure that you correct '
+        'the emails of the form: %s.' % (
+            release_constants.RELEASE_SUMMARY_FILEPATH,
+            release_constants.INVALID_EMAIL_SUFFIX))
     common.open_new_tab_in_browser_if_possible(
         release_constants.CREDITS_FORM_URL)
     common.ask_user_to_confirm(
@@ -523,13 +599,7 @@ def main():
         'you have made.' % (
             release_constants.RELEASE_SUMMARY_FILEPATH))
 
-    release_summary_lines = []
-    with python_utils.open_file(
-        release_constants.RELEASE_SUMMARY_FILEPATH, 'r'
-        ) as release_summary_file:
-        release_summary_lines = release_summary_file.readlines()
-
-    check_ordering_of_sections(release_summary_lines)
+    release_summary_lines = get_release_summary_lines()
 
     update_changelog(
         branch_name, release_summary_lines, current_release_version_number)
