@@ -679,7 +679,10 @@ module.exports = {
     },
     {
       test: /directive\.html$/,
-      loader: 'html-loader'
+      loader: 'html-loader',
+      options: {
+        attributes: false,
+      },
     },
     {
       test: /\.css$/,
