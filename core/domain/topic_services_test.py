@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_services
+from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -56,7 +57,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         })]
         self.save_new_topic(
             self.TOPIC_ID, self.user_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
+            abbreviated_name='abbrev', thumbnail_filename='topic.png',
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
@@ -414,6 +415,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         # Throw error if exploration isn't published.
         self.save_new_default_exploration(
             'exp_id', self.user_id_admin, title='title')
+        self.publish_exploration(self.user_id_admin, 'exp_id')
 
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -427,8 +429,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, 'story_id_new', change_list,
             'Updated story node.')
 
+        rights_manager.unpublish_exploration(self.user_admin, 'exp_id')
         with self.assertRaisesRegexp(
-            Exception, 'Exploration with id exp_id isn\'t published.'):
+            Exception, 'Exploration with ID exp_id is not public. Please '
+            'publish explorations before adding them to a story.'):
             topic_services.publish_story(
                 self.TOPIC_ID, 'story_id_new', self.user_id_admin)
 
@@ -436,7 +440,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.user_id_admin, 'exp_id')
 
         with self.assertRaisesRegexp(
-            Exception, 'Exploration id exp_id doesn\'t exist.'):
+            Exception, 'Expected story to only reference valid explorations, '
+            'but found a reference to an invalid exploration with ID: exp_id'):
             topic_services.publish_story(
                 self.TOPIC_ID, 'story_id_new', self.user_id_admin)
 
@@ -962,6 +967,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         published_topic_ids = topic_services.filter_published_topic_ids([
             self.TOPIC_ID, 'invalid_id'])
         self.assertEqual(len(published_topic_ids), 0)
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': self.subtopic_id,
+            'skill_id': 'skill_1'
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Updated subtopic skill ids.')
         topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
         published_topic_ids = topic_services.filter_published_topic_ids([
             self.TOPIC_ID, 'invalid_id'])
@@ -971,6 +985,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_publish_and_unpublish_topic(self):
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_rights.topic_is_published)
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': self.subtopic_id,
+            'skill_id': 'skill_1'
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Updated subtopic skill ids.')
         topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
 
         with self.assertRaisesRegexp(
@@ -1131,7 +1154,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_publish_a_published_topic(self):
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_rights.topic_is_published)
-
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': self.subtopic_id,
+            'skill_id': 'skill_1'
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Updated subtopic skill ids.')
         topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
         self.assertTrue(topic_rights.topic_is_published)

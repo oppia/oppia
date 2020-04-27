@@ -25,9 +25,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
+from constants import constants
 from core.domain import android_validation_constants
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
+from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
@@ -187,6 +189,137 @@ def apply_change_list(story_id, change_list):
         raise
 
 
+def validate_explorations_for_story(exp_ids, raise_error):
+    """Validates the explorations in the given story and checks whether they
+    are compatible with the mobile app.
+
+    Args:
+        exp_ids: list(str). The exp IDs to validate.
+        raise_error: bool. Whether to raise an Exception when a validation error
+            is encountered. If not, a list of the error messages are
+            returned. raise_error should be True when this is called before
+            saving the story and False when this function is called from the
+            frontend.
+
+    Returns:
+        list(str). The various validation error messages (if raise_error is
+            False).
+
+    Raises:
+        ValidationError. Expected story to only reference valid explorations.
+        ValidationError. Exploration with ID is not public. Please publish
+            explorations before adding them to a story.
+        ValidationError. All explorations in a story should be of the same
+            category.
+        ValidationError. Invalid language found for exploration.
+        ValidationError. Expected no exploration to have parameter values in it.
+        ValidationError. Invalid interaction in exploration.
+        ValidationError. RTE content in state of exploration with ID is not
+            supported on mobile.
+    """
+    validation_error_messages = []
+
+    # Strict = False, since the existence of explorations is checked below.
+    exps_dict = (
+        exp_fetchers.get_multiple_explorations_by_id(exp_ids, strict=False))
+
+    exp_rights = (
+        rights_manager.get_multiple_exploration_rights_by_ids(exp_ids))
+
+    exp_rights_dict = {}
+
+    for rights in exp_rights:
+        if rights is not None:
+            exp_rights_dict[rights.id] = rights.status
+
+    for exp_id in exp_ids:
+        if exp_id not in exps_dict:
+            error_string = (
+                'Expected story to only reference valid explorations, but found'
+                ' a reference to an invalid exploration with ID: %s'
+                % exp_id)
+            if raise_error:
+                raise utils.ValidationError(error_string)
+            validation_error_messages.append(error_string)
+        else:
+            if exp_rights_dict[exp_id] != constants.ACTIVITY_STATUS_PUBLIC:
+                error_string = (
+                    'Exploration with ID %s is not public. Please publish '
+                    'explorations before adding them to a story.'
+                    % exp_id)
+                if raise_error:
+                    raise utils.ValidationError(error_string)
+                validation_error_messages.append(error_string)
+
+    if exps_dict:
+        for exp_id in exp_ids:
+            if exp_id in exps_dict:
+                sample_exp_id = exp_id
+                break
+        common_exp_category = exps_dict[sample_exp_id].category
+        for exp_id in exps_dict:
+            exp = exps_dict[exp_id]
+            if exp.category != common_exp_category:
+                error_string = (
+                    'All explorations in a story should be of the '
+                    'same category. The explorations with ID %s and %s have'
+                    ' different categories.' % (sample_exp_id, exp_id))
+                if raise_error:
+                    raise utils.ValidationError(error_string)
+                validation_error_messages.append(error_string)
+            if (
+                    exp.language_code not in
+                    android_validation_constants.SUPPORTED_LANGUAGES):
+                error_string = (
+                    'Invalid language %s found for exploration '
+                    'with ID %s.' % (exp.language_code, exp_id))
+                if raise_error:
+                    raise utils.ValidationError(error_string)
+                validation_error_messages.append(error_string)
+
+            if exp.param_specs or exp.param_changes:
+                error_string = (
+                    'Expected no exploration to have parameter '
+                    'values in it. Invalid exploration: %s' % exp.id)
+                if raise_error:
+                    raise utils.ValidationError(error_string)
+                validation_error_messages.append(error_string)
+
+            for state_name in exp.states:
+                state = exp.states[state_name]
+                if not state.interaction.is_supported_on_android_app():
+                    error_string = (
+                        'Invalid interaction %s in exploration '
+                        'with ID: %s.' % (state.interaction.id, exp.id))
+                    if raise_error:
+                        raise utils.ValidationError(error_string)
+                    validation_error_messages.append(error_string)
+
+                if not state.is_rte_content_supported_on_android():
+                    error_string = (
+                        'RTE content in state %s of exploration '
+                        'with ID %s is not supported on mobile.'
+                        % (state_name, exp.id))
+                    if raise_error:
+                        raise utils.ValidationError(error_string)
+                    validation_error_messages.append(error_string)
+
+                if state.interaction.id == 'EndExploration':
+                    recommended_exploration_ids = (
+                        state.interaction.customization_args[
+                            'recommendedExplorationIds']['value'])
+                    if len(recommended_exploration_ids) != 0:
+                        error_string = (
+                            'Exploration with ID: %s contains exploration '
+                            'recommendations in its EndExploration interaction.'
+                            % (exp.id))
+                        if raise_error:
+                            raise utils.ValidationError(error_string)
+                        validation_error_messages.append(error_string)
+
+    return validation_error_messages
+
+
 def _save_story(committer_id, story, commit_message, change_list):
     """Validates a story and commits it to persistent storage. If
     successful, increments the version number of the incoming story domain
@@ -209,58 +342,37 @@ def _save_story(committer_id, story, commit_message, change_list):
             'Unexpected error: received an invalid change list when trying to '
             'save story %s: %s' % (story.id, change_list))
 
+    topic = topic_fetchers.get_topic_by_id(
+        story.corresponding_topic_id, strict=False)
+    if topic is None:
+        raise utils.ValidationError(
+            'Expected story to only belong to a valid topic, but found no '
+            'topic with ID: %s' % story.corresponding_topic_id)
+
+    story_is_published = False
+    story_is_present_in_topic = False
+    for story_reference in topic.get_all_story_references():
+        if story_reference.story_id == story.id:
+            story_is_present_in_topic = True
+            story_is_published = story_reference.story_is_published
+    if not story_is_present_in_topic:
+        raise Exception(
+            'Expected story to belong to the topic %s, but it is '
+            'neither a part of the canonical stories or the additional '
+            'stories of the topic.' % story.corresponding_topic_id)
+
     story.validate()
-    # Validate that all explorations referenced by the story exist.
-    exp_ids = [
-        node.exploration_id for node in story.story_contents.nodes
-        if node.exploration_id is not None]
 
-    # The first exp ID in the story to compare categories later on.
-    sample_exp_id = exp_ids[0] if exp_ids else None
+    if story_is_published:
+        exp_ids = []
+        for node in story.story_contents.nodes:
+            if not node.exploration_id:
+                raise Exception(
+                    'Story node with id %s does not contain an '
+                    'exploration id.' % node.id)
+            exp_ids.append(node.exploration_id)
 
-    # Strict = False, since the existence of explorations is checked below.
-    exps_dict = (
-        exp_fetchers.get_multiple_explorations_by_id(exp_ids, strict=False))
-
-    for node in story.story_contents.nodes:
-        if (node.exploration_id is not None) and (
-                node.exploration_id not in exps_dict):
-            raise utils.ValidationError(
-                'Expected story to only reference valid explorations, '
-                'but found an exploration with ID: %s (was it deleted?)' %
-                node.exploration_id)
-
-    if exps_dict:
-        common_exp_category = exps_dict[sample_exp_id].category
-        for exp_id in exps_dict:
-            exp = exps_dict[exp_id]
-            if exp.category != common_exp_category:
-                raise utils.ValidationError(
-                    'All explorations in a story should be of the '
-                    'same category. The explorations with ID %s and %s have'
-                    ' different categories.' % (sample_exp_id, exp_id))
-            if (
-                    exp.language_code not in
-                    android_validation_constants.SUPPORTED_LANGUAGES):
-                raise utils.ValidationError(
-                    'Invalid language %s found for exploration with ID %s.'
-                    % (exp.language_code, exp_id))
-            if exp.param_specs or exp.param_changes:
-                raise utils.ValidationError(
-                    'Expected no exploration to have parameter values in'
-                    ' it. Invalid exploration: %s' % exp.id)
-            for state_name in exp.states:
-                state = exp.states[state_name]
-                if not state.interaction.is_supported_on_android_app():
-                    raise utils.ValidationError(
-                        'Invalid interaction %s in exploration with ID: %s.' %
-                        (state.interaction.id, exp.id))
-
-                if not state.is_rte_content_supported_on_android():
-                    raise utils.ValidationError(
-                        'RTE content in state %s of exploration with ID %s is '
-                        'not supported on mobile.' % (state_name, exp.id))
-
+        validate_explorations_for_story(exp_ids, True)
 
     # Story model cannot be None as story is passed as parameter here and that
     # is only possible if a story model with that story id exists. Also this is
@@ -277,21 +389,6 @@ def _save_story(committer_id, story, commit_message, change_list):
             'Trying to update version %s of story from version %s, '
             'which is too old. Please reload the page and try again.'
             % (story_model.version, story.version))
-
-    topic = topic_fetchers.get_topic_by_id(
-        story.corresponding_topic_id, strict=False)
-    if topic is None:
-        raise utils.ValidationError(
-            'Expected story to only belong to a valid topic, but found an '
-            'topic with ID: %s' % story.corresponding_topic_id)
-
-    canonical_story_ids = topic.get_canonical_story_ids()
-    additional_story_ids = topic.get_additional_story_ids()
-    if story.id not in canonical_story_ids + additional_story_ids:
-        raise Exception(
-            'Expected story to belong to the topic %s, but it is '
-            'neither a part of the canonical stories or the additional stories '
-            'of the topic.' % story.corresponding_topic_id)
 
     story_model.description = story.description
     story_model.title = story.title

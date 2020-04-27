@@ -192,6 +192,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.topic.validate()
 
+    def _assert_strict_validation_error(self, expected_error_substring):
+        """Checks that the topic passes prepublish validation."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            self.topic.validate(strict=True)
+
     def _assert_valid_topic_id(self, expected_error_substring, topic_id):
         """Checks that the skill passes strict validation."""
         with self.assertRaisesRegexp(
@@ -222,10 +228,25 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.thumbnail_filename = 1
         self._assert_validation_error(
             'Expected thumbnail filename to be a string, received 1')
+        self.topic.thumbnail_filename = None
+        self._assert_strict_validation_error(
+            'Expected thumbnail filename to be a string, received None')
+
+    def test_subtopic_strict_validation(self):
+        self.topic.thumbnail_filename = 'filename'
+        self.topic.subtopics[0].skill_ids = []
+        self._assert_strict_validation_error(
+            'Subtopic with title Title does not have any skills linked')
 
     def test_subtopic_title_validation(self):
         self.topic.subtopics[0].title = 1
         self._assert_validation_error('Expected subtopic title to be a string')
+
+        self.topic.subtopics[0].title = (
+            'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh'
+            'ijklmnopqrstuvwxyz')
+        self._assert_validation_error(
+            'Expected subtopic title to be less than 64 characters')
 
     def test_story_id_validation(self):
         self.topic.canonical_story_references = [
@@ -264,7 +285,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Name field should not be empty')
         self.topic.name = 'Very long and therefore invalid topic name'
         self._assert_validation_error(
-            'Topic name should be at most 35 characters')
+            'Topic name should be at most 39 characters')
 
     def test_subtopic_schema_version_type_validation(self):
         self.topic.subtopic_schema_version = 'invalid_version'

@@ -1,5 +1,4 @@
 var argv = require('yargs').argv;
-var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var path = require('path');
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (argv.prodEnv) {
@@ -12,9 +11,8 @@ module.exports = function(config) {
     basePath: '../../',
     frameworks: ['jasmine'],
     files: [
-      'local_compiled_js/core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
-      // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
+      // Since jquery, jquery-ui, angular, angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.4.1/jquery.min.js',
       'third_party/static/jqueryui-1.12.1/jquery-ui.min.js',
@@ -191,10 +189,7 @@ module.exports = function(config) {
             use: ['style-loader', 'css-loader']
           }
         ]
-      },
-      plugins: [
-        new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })
-      ]
+      }
     }
   });
 };

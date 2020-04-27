@@ -63,6 +63,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
         'EVENT_TYPE_SKILL_CREATION_ENABLED',
         'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         'FATAL_ERROR_CODES', 'SKILL_DIFFICULTIES',
+        'MAX_CHARS_IN_SKILL_DESCRIPTION',
         function(
             $http, $rootScope, $scope, $uibModal, $window,
             AlertsService, RubricObjectFactory, SkillCreationService,
@@ -71,9 +72,10 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
             EVENT_TYPE_SKILL_CREATION_ENABLED,
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
-            FATAL_ERROR_CODES, SKILL_DIFFICULTIES) {
+            FATAL_ERROR_CODES, SKILL_DIFFICULTIES,
+            MAX_CHARS_IN_SKILL_DESCRIPTION) {
           var ctrl = this;
-          var _initDashboard = function() {
+          var _initDashboard = function(stayInSameTab) {
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
               function(response) {
                 ctrl.totalTopicSummaries = response.data.topic_summary_dicts;
@@ -92,7 +94,9 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                     ctrl.untriagedSkillSummaries;
                 ctrl.mergeableSkillSummaries =
                   response.data.mergeable_skill_summary_dicts;
-                ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
+                if (!stayInSameTab || !ctrl.activeTab) {
+                  ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
+                }
                 ctrl.userCanCreateTopic = response.data.can_create_topic;
                 ctrl.userCanCreateSkill = response.data.can_create_skill;
                 $rootScope.$broadcast(
@@ -178,6 +182,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   $scope.bindableDict = {
                     displayedConceptCardExplanation: ''
                   };
+                  $scope.MAX_CHARS_IN_SKILL_DESCRIPTION =
+                    MAX_CHARS_IN_SKILL_DESCRIPTION;
                   var newExplanationObject = null;
 
                   $scope.$watch('newSkillDescription', function() {
@@ -247,11 +253,15 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
               return arr;
             };
             $scope.$on(
-              EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, _initDashboard);
+              EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, function(
+                  evt, stayInSameTab) {
+                _initDashboard(stayInSameTab);
+              }
+            );
             // The _initDashboard function is written separately since it is
             // also called in $scope.$on when some external events are
             // triggered.
-            _initDashboard();
+            _initDashboard(false);
           };
         }
       ]

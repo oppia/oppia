@@ -12,7 +12,7 @@
 #   can be optimized further.
 
 # Android team
-/core/domain/android_validation_constants.py @BenHenning
+/core/domain/android_validation_constants*.py @BenHenning
 
 # Angular Migration team
 /core/templates/services/contextual/logger.service.ts @bansalnitish
@@ -443,6 +443,7 @@
 /core/domain/change_domain.py @ankita240796
 /core/templates/tests/ @kevinlee12 @nithusha21
 /core/templates/domain/utilities/ @bansalnitish
+/core/templates/Polyfills.ts @ankita240796
 /schema_utils*.py @seanlip
 /utils*.py @aks681
 /python_utils*.py @kevinlee12
@@ -458,7 +459,7 @@
 
 
 # QA team.
-/core/tests/ @kevinlee12 @U8NWXD
+/core/tests/ @U8NWXD
 /assets/ @nithusha21
 /data/ @nithusha21
 
@@ -531,11 +532,13 @@
 /core/templates/pages/header_css_libs.html @jameesjohn @vojtechjelinek
 /core/templates/pages/header_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/services/csrf-token.service*.ts @jameesjohn @vojtechjelinek
+/core/templates/third-party-imports/ @nishantwrp @vojtechjelinek
 /jinja_utils*.py @jameesjohn @vojtechjelinek
 /webpack.common.config.ts @jameesjohn @vojtechjelinek
 /webpack.common.macros.ts @jameesjohn @vojtechjelinek
 /webpack.dev.config.ts @jameesjohn @vojtechjelinek
 /webpack.prod.config.ts @jameesjohn @vojtechjelinek
+/webpack.terser.config.ts @nishantwrp @vojtechjelinek
 
 
 # Typings.

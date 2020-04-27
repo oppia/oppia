@@ -40,6 +40,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     """Test the story services module."""
 
     STORY_ID = None
+    EXP_ID = 'exp_id'
     NODE_ID_1 = story_domain.NODE_ID_PREFIX + '1'
     NODE_ID_2 = 'node_2'
     USER_ID = 'user'
@@ -47,6 +48,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(StoryServicesUnitTests, self).setUp()
+        self.signup('a@example.com', 'A')
+        self.signup('b@example.com', 'B')
+        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
+        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = topic_services.get_new_topic_id()
         self.save_new_topic(
@@ -60,24 +68,27 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID)
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.user_id_admin, end_state_name='End')
+        self.publish_exploration(self.user_id_admin, self.EXP_ID)
         changelist = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': self.NODE_ID_1,
                 'title': 'Title 1'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': self.EXP_ID
             })
         ]
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist,
             'Added node.')
         self.story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.signup('a@example.com', 'A')
-        self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
-
-        self.user_id_a = self.get_user_id_from_email('a@example.com')
-        self.user_id_b = self.get_user_id_from_email('b@example.com')
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([user_services.get_username(self.user_id_a)])
@@ -227,7 +238,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception, ('Expected story to only belong to a valid topic, but '
-                        'found an topic with ID: %s' % topic_id)):
+                        'found no topic with ID: %s' % topic_id)):
             story_services.update_story(
                 self.USER_ID, story_id, changelist, 'Added node.')
 
@@ -399,6 +410,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             '2', self.user_id_admin, title='Title 3',
             category='Mathematics', language_code='en')
+        self.publish_exploration(self.user_id_admin, '0')
+        self.publish_exploration(self.user_id_admin, '1')
+        self.publish_exploration(self.user_id_admin, '2')
 
         self.assertIsNone(
             exp_services.get_story_id_linked_to_exploration('0'))
@@ -625,6 +639,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             '0', self.user_id_admin, title='Title 1',
             category='Mathematics', language_code='en')
+        self.publish_exploration(self.user_id_admin, '0')
 
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -722,6 +737,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, [], 'Commit message')
 
     def test_cannot_update_story_with_invalid_exploration_id(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
             'property_name': (
@@ -736,7 +753,64 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
+    def test_validate_exploration_returning_error_messages(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1')
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(
+                ['invalid_exp', 'exp_id_1'], False))
+        message_1 = (
+            'Expected story to only reference valid explorations, but found '
+            'a reference to an invalid exploration with ID: invalid_exp')
+        message_2 = (
+            'Exploration with ID exp_id_1 is not public. Please publish '
+            'explorations before adding them to a story.'
+        )
+        self.assertEqual(validation_error_messages, [message_1, message_2])
+
+    def test_cannot_update_story_with_private_exploration_id(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1')
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'node_id': self.NODE_ID_1,
+            'old_value': None,
+            'new_value': 'exp_id_1'
+        })]
+
+        with self.assertRaisesRegexp(
+            Exception, 'Exploration with ID exp_id_1 is not public'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
+    def test_cannot_update_story_with_blank_exp_id(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
+
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'node_id': self.NODE_ID_1,
+            'old_value': self.EXP_ID,
+            'new_value': None
+        })]
+
+        with self.assertRaisesRegexp(
+            Exception, 'Story node with id node_1 does not contain an '
+            'exploration id.'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
     def test_cannot_update_story_with_exps_with_different_categories(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1')
         self.publish_exploration(self.user_id_a, 'exp_id_1')
@@ -777,6 +851,15 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(
+                ['exp_id_2', 'exp_id_1'], False))
+
+        self.assertEqual(
+            validation_error_messages, [
+                'All explorations in a story should be of the same category. '
+                'The explorations with ID exp_id_2 and exp_id_1 have different '
+                'categories.'])
         with self.assertRaisesRegexp(
             Exception, 'All explorations in a story should be of the '
             'same category'):
@@ -784,6 +867,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_cannot_update_story_with_exps_with_other_languages(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1',
             language_code='es')
@@ -800,6 +885,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(['exp_id_1'], False))
+        self.assertEqual(
+            validation_error_messages, [
+                'Invalid language es found for exploration with ID exp_id_1.'])
         with self.assertRaisesRegexp(
             Exception, 'Invalid language es found for exploration with '
             'ID exp_id_1'):
@@ -807,6 +897,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_cannot_update_story_with_exps_with_invalid_interactions(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1',
             interaction_id='LogicProof')
@@ -823,13 +915,65 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(['exp_id_1'], False))
+        self.assertEqual(
+            validation_error_messages, [
+                'Invalid interaction LogicProof in exploration with ID: '
+                'exp_id_1.'])
         with self.assertRaisesRegexp(
             Exception, 'Invalid interaction LogicProof in exploration with '
             'ID: exp_id_1'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
+    def test_cannot_update_story_with_exps_with_recommended_exps(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1',
+            interaction_id='TextInput', end_state_name='End')
+        self.publish_exploration(self.user_id_a, 'exp_id_1')
+
+        exp_services.update_exploration(
+            self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': (
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                'state_name': 'End',
+                'new_value': {
+                    'recommendedExplorationIds': {
+                        'value': ['1', '2']
+                    }
+                }
+            })], 'Updated State Content')
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': 'exp_id_1'
+            })
+        ]
+
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(['exp_id_1'], False))
+        self.assertEqual(
+            validation_error_messages, [
+                'Exploration with ID: exp_id_1 contains exploration '
+                'recommendations in its EndExploration interaction.'])
+        with self.assertRaisesRegexp(
+            Exception, 'Exploration with ID: exp_id_1 contains exploration '
+            'recommendations in its EndExploration interaction.'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
     def test_cannot_update_story_with_exps_with_invalid_rte_content(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1',
             end_state_name='End')
@@ -859,6 +1003,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(['exp_id_1'], False))
+        self.assertEqual(
+            validation_error_messages, [
+                'RTE content in state Introduction of exploration with '
+                'ID exp_id_1 is not supported on mobile.'])
         with self.assertRaisesRegexp(
             Exception, 'RTE content in state Introduction of exploration with '
             'ID exp_id_1 is not supported on mobile.'):
@@ -866,9 +1016,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_cannot_update_story_with_exps_with_parameter_values(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
-            'exp_id_1', self.user_id_a, title='title', category='Category 1',
-            interaction_id='LogicProof')
+            'exp_id_1', self.user_id_a, title='title', category='Category 1')
         exp_services.update_exploration(
             self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -892,6 +1043,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(['exp_id_1'], False))
+        self.assertEqual(
+            validation_error_messages, [
+                'Expected no exploration to have parameter values in'
+                ' it. Invalid exploration: exp_id_1'])
         with self.assertRaisesRegexp(
             Exception, 'Expected no exploration to have parameter values in'
             ' it. Invalid exploration: exp_id_1'):
@@ -1051,13 +1208,29 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_services.update_story(
             self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
-        change_list = [story_domain.StoryChange({
-            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-            'property_name': story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
-            'node_id': self.NODE_ID_1,
-            'old_value': '',
-            'new_value': 'exp_id'
-        })]
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_2,
+                'title': 'Title 2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+                'node_id': self.NODE_ID_1,
+                'old_value': [],
+                'new_value': [self.NODE_ID_2]
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_2,
+                'old_value': None,
+                'new_value': 'exp_id'
+            })
+        ]
 
         with self.assertRaisesRegexp(
             Exception,
@@ -1220,7 +1393,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(story.story_contents.initial_node_id)
 
 
-class StoryProgressUnitTests(StoryServicesUnitTests):
+class StoryProgressUnitTests(test_utils.GenericTestBase):
     """Tests functions which deal with any progress a user has made within a
     story, including query and recording methods related to nodes
     which are completed in the context of the story.
@@ -1243,8 +1416,11 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
 
         self.STORY_1_ID = 'story_id'
         self.STORY_ID_1 = 'story_id_1'
+        self.NODE_ID_1 = 'node_1'
+        self.NODE_ID_2 = 'node_2'
         self.NODE_ID_3 = 'node_3'
         self.NODE_ID_4 = 'node_4'
+        self.USER_ID = 'user'
 
         self.owner_id = 'owner'
         self.TOPIC_ID = topic_services.get_new_topic_id()
@@ -1435,7 +1611,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
 
         # If the same node and another are completed within the context
         # of a different story, it shouldn't affect this one.
-        self.story = self.save_new_story(
+        self.save_new_story(
             self.STORY_ID_1, self.USER_ID, 'Title', 'Description', 'Notes',
             self.TOPIC_ID
         )
