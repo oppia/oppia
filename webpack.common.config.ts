@@ -140,7 +140,8 @@ module.exports = {
     ),
     topic_viewer:
       commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.scripts.ts',
-  },
+    welcome_guide: commonPrefix + '/pages/welcome-guide-page/welcome-guide-page.scripts.ts',
+    },
   plugins: [
     new HtmlWebpackPlugin({
       chunks: ['about'],
@@ -636,6 +637,16 @@ module.exports = {
       template:
         commonPrefix + '/pages/topic-viewer-page/' +
         'topic-viewer-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['welcome_guide'],
+      filename: 'welcome-guide-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/welcome-guide-page/' +
+        'welcome-guide-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
