@@ -57,10 +57,10 @@ export class ConceptCardBackendApiService {
           successCallback(conceptCards);
         }
       }, (error) => {
-      if (errorCallback) {
-        errorCallback(error.statusText);
-      }
-    });
+        if (errorCallback) {
+          errorCallback(error.statusText);
+        }
+      });
   }
 
   private _isCached(skillId: string): boolean {

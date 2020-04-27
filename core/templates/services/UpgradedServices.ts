@@ -541,9 +541,10 @@ export class UpgradedServices {
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['RecordedVoiceoversObjectFactory'],
       upgradedServices['WorkedExampleObjectFactory']);
-    upgradedServices['ConceptCardBackendApiService'] = new ConceptCardBackendApiService(
-      upgradedServices['UrlInterpolationService'],
-      upgradedServices['HttpClient']);
+    upgradedServices['ConceptCardBackendApiService'] = 
+      new ConceptCardBackendApiService(
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['HttpClient']);
     upgradedServices['ContextService'] = new ContextService(
       upgradedServices['UrlService'],
       upgradedServices['EntityContextObjectFactory']);

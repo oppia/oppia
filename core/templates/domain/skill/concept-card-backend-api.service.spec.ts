@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing'; 
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ConceptCardBackendApiService } from
   'domain/skill/concept-card-backend-api.service.ts';
@@ -34,8 +34,8 @@ describe('Concept card backend API service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-  httpTestingController = TestBed.get(HttpTestingController);
-  conceptCardBackendApiService = TestBed.get(ConceptCardBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+    conceptCardBackendApiService = TestBed.get(ConceptCardBackendApiService);
 
     var example1 = {
       question: {
@@ -140,9 +140,10 @@ describe('Concept card backend API service', () => {
         '/concept_card_handler/1');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse1);
-      flushMicrotasks();  
+      flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleResponse1.concept_card_dicts);
+      expect(successHandler).toHaveBeenCalledWith(
+        sampleResponse1.concept_card_dicts);
       expect(failHandler).not.toHaveBeenCalled();
     }));
 
@@ -160,7 +161,7 @@ describe('Concept card backend API service', () => {
       let req = httpTestingController.expectOne(conceptCardDataUrl);
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse3);
-      flushMicrotasks();  
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
         sampleResponse3.concept_card_dicts);
@@ -182,7 +183,7 @@ describe('Concept card backend API service', () => {
         '/concept_card_handler/1');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse1);
-      flushMicrotasks();  
+      flushMicrotasks();
 
       conceptCardBackendApiService.loadConceptCards(['1', '2']).then(
         successHandler2, failHandler2);
@@ -191,7 +192,7 @@ describe('Concept card backend API service', () => {
         '/concept_card_handler/2');
       expect(req.request.method).toEqual('GET');
       req2.flush(sampleResponse2);
-      flushMicrotasks();  
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
         sampleResponse1.concept_card_dicts);
@@ -211,9 +212,9 @@ describe('Concept card backend API service', () => {
         '/concept_card_handler/1');
       expect(req.request.method).toEqual('GET');
       req.flush('Error loading skill 1.', {
-            status: 500,
-            statusText: 'Error loading skill 1.'
-          });
+        status: 500,
+        statusText: 'Error loading skill 1.'
+      });
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
@@ -228,22 +229,22 @@ describe('Concept card backend API service', () => {
       let successHandler2 = jasmine.createSpy('success');
       let failHandler2 = jasmine.createSpy('fail');
 
-      //load collection to cache
+      //  Load collection to cache
       conceptCardBackendApiService.loadConceptCards(['1']).then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        '/concept_card_handler/1');      
+        '/concept_card_handler/1');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse1);
       flushMicrotasks();
 
-      //Reload from cache without an http flush
+      //  Reload from cache without an http flush
       conceptCardBackendApiService.loadConceptCards(['1']).then(
         successHandler2, failHandler2);
 
       expect(successHandler).toHaveBeenCalledWith(
         sampleResponse1.concept_card_dicts);
       expect(failHandler).not.toHaveBeenCalled();
-  }));
+    }));
 });
