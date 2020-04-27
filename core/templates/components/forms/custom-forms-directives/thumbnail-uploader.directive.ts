@@ -64,6 +64,11 @@ angular.module('oppia').directive('thumbnailUploader', [
           // bound to ngSrc because it can cause an infinite digest error.
           // eslint-disable-next-line max-len
           // https://github.com/angular/angular.js/blob/master/CHANGELOG.md#sce-
+          // This watcher is triggered only if the thumbnail filename of the
+          // model changes. It would change for the following operations:
+          // 1. Initial render of the page containing this directive.
+          // 2. When a thumbnail is uploaded.
+          // 3. When a saved draft is discarded.
           $scope.$watch('getFilename()', function(filename) {
             if (filename) {
               $scope.editableThumbnailDataUrl = (
@@ -96,7 +101,7 @@ angular.module('oppia').directive('thumbnailUploader', [
               width: 0
             };
             var allowedBgColors = $scope.getAllowedBgColors();
-            var aspecRatio = $scope.getAspectRatio();
+            var aspectRatio = $scope.getAspectRatio();
             var getPreviewDescription = $scope.getPreviewDescription;
             var getPreviewDescriptionBgColor = (
               $scope.getPreviewDescriptionBgColor);
@@ -181,7 +186,7 @@ angular.module('oppia').directive('thumbnailUploader', [
                   };
 
                   $scope.allowedBgColors = allowedBgColors;
-                  $scope.aspectRatio = aspecRatio;
+                  $scope.aspectRatio = aspectRatio;
                   $scope.getPreviewDescription = getPreviewDescription;
                   $scope.getPreviewDescriptionBgColor = (
                     getPreviewDescriptionBgColor);

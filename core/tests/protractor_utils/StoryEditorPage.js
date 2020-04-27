@@ -24,6 +24,8 @@ var workflow = require('../protractor_utils/workflow.js');
 
 var StoryEditorPage = function() {
   var EDITOR_URL_PREFIX = '/story_editor/';
+  var thumbnailContainer = element(
+    by.css('.protractor-test-thumbnail-container'));
   var storyTitleField = element(by.css('.protractor-test-story-title-field'));
   var storyDescriptionField = element(
     by.css('.protractor-test-story-description-field'));
@@ -74,6 +76,7 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-exploration-id-save-button'));
   var nodeOutlineEditor = element(
     by.css('.protractor-test-add-chapter-outline'));
+  var nodeOutlineEditorRteContent = element.all(by.css('.oppia-rte'));
   var nodeOutlineSaveButton = element(
     by.css('.protractor-test-node-outline-save-button'));
   var addPrerequisiteSkillButton = element(
@@ -116,19 +119,21 @@ var StoryEditorPage = function() {
   };
 
   this.getStoryThumbnailSource = function() {
-    return workflow.getThumbnailSource(storyThumbnailImageElement);
+    return workflow.getImageSource(storyThumbnailImageElement);
   };
 
   this.getChapterThumbnailSource = function() {
-    return workflow.getThumbnailSource(chapterThumbnailImageElement);
+    return workflow.getImageSource(chapterThumbnailImageElement);
   };
 
   this.submitStoryThumbnail = function(imgPath) {
-    return workflow.submitThumbnail(storyThumbnailButton, imgPath);
+    return workflow.submitImage(
+      storyThumbnailButton, thumbnailContainer, imgPath);
   };
 
   this.submitChapterThumbnail = function(imgPath) {
-    return workflow.submitThumbnail(chapterThumbnailButton, imgPath);
+    return workflow.submitImage(
+      chapterThumbnailButton, thumbnailContainer, imgPath);
   };
 
   this.publishStory = function() {
@@ -267,6 +272,11 @@ var StoryEditorPage = function() {
     chapterTitles.then(function(elements) {
       elements[index].click();
     });
+  };
+
+  this.expectNodeOutlineToMatch = function(nodeOutline) {
+    expect(
+      nodeOutlineEditorRteContent.first().getText()).toEqual(nodeOutline);
   };
 
   this.expectExplorationIdAlreadyExistWarningAndCloseIt = function() {

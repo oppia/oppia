@@ -185,19 +185,22 @@ describe('Topic editor functionality', function() {
       'Skill 2', 'Concept card explanation', true);
 
     topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createTopic('Topic 2', false);
+    topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
 
-    topicEditorPage.get(topicId);
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.editTopic('Topic 2');
     topicEditorPage.moveToSubtopicsTab();
-    topicEditorPage.addSubtopic('Subtopic1');
-    topicEditorPage.addSubtopic('Subtopic2');
+    topicEditorPage.addSubtopic('Subtopic 1');
+    topicEditorPage.addSubtopic('Subtopic 2');
     topicEditorPage.saveTopic('Added subtopics.');
 
     topicEditorPage.expectSubtopicToHaveSkills(0, []);
     topicEditorPage.expectSubtopicToHaveSkills(1, []);
 
-    topicEditorPage.dragSkillToSubtopic(1, 0);
+    topicEditorPage.dragSkillToSubtopic(0, 0);
     topicEditorPage.expectSubtopicToHaveSkills(0, ['Skill 2']);
     topicEditorPage.expectSubtopicToHaveSkills(1, []);
 

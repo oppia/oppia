@@ -414,6 +414,21 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected thumbnail filename to be a string, received')
 
+    def test_thumbnail_bg_validation(self):
+        self.story.thumbnail_bg_color = '#FFFFFF'
+        self._assert_validation_error(
+            'Story thumbnail background color #FFFFFF is not supported.')
+
+    def test_thumbnail_filename_or_thumbnail_bg_color_is_none(self):
+        self.story.thumbnail_bg_color = '#F8BF74'
+        self.story.thumbnail_filename = None
+        self._assert_validation_error(
+            'Story thumbnail image is not provided.')
+        self.story.thumbnail_bg_color = None
+        self.story.thumbnail_filename = 'test.svg'
+        self._assert_validation_error(
+            'Story thumbnail background color is not specified.')
+
     def test_description_validation(self):
         self.story.description = 1
         self._assert_validation_error(
@@ -483,6 +498,21 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
         self._assert_validation_error(
             'Chapter title should be less than 36 chars')
+
+    def test_node_thumbnail_bg_validation(self):
+        self.story.story_contents.nodes[0].thumbnail_bg_color = '#FFFFFF'
+        self._assert_validation_error(
+            'Chapter thumbnail background color #FFFFFF is not supported.')
+
+    def test_node_thumbnail_filename_or_thumbnail_bg_color_is_none(self):
+        self.story.story_contents.nodes[0].thumbnail_bg_color = '#F8BF74'
+        self.story.story_contents.nodes[0].thumbnail_filename = None
+        self._assert_validation_error(
+            'Chapter thumbnail image is not provided.')
+        self.story.story_contents.nodes[0].thumbnail_bg_color = None
+        self.story.story_contents.nodes[0].thumbnail_filename = 'test.svg'
+        self._assert_validation_error(
+            'Chapter thumbnail background color is not specified.')
 
     def test_nodes_validation(self):
         self.story.story_contents.initial_node_id = 'node_10'

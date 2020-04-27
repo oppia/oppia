@@ -61,10 +61,25 @@ angular.module('oppia').directive('imageUploader', [
           }
 
           var ONE_MB_IN_BYTES = 1048576;
-          if (file.size > ONE_MB_IN_BYTES) {
-            var currentSize = (file.size / ONE_MB_IN_BYTES).toFixed(1) + ' MB';
-            return 'The maximum allowed file size is 1 MB' +
+          var HUNDRED_KB_IN_BYTES = 102400;
+          var ALLOWED_SIZE_IN_BYTES = null;
+          var currentSize = null;
+          var errorMessage = null;
+          if (file.type.match('image.svg')) {
+            ALLOWED_SIZE_IN_BYTES = HUNDRED_KB_IN_BYTES;
+            currentSize = (
+              (file.size * 100 / HUNDRED_KB_IN_BYTES).toFixed(1) + '  KB');
+            errorMessage = 'The maximum allowed file size is 100 KB' +
               ' (' + currentSize + ' given).';
+          } else {
+            ALLOWED_SIZE_IN_BYTES = ONE_MB_IN_BYTES;
+            currentSize = (file.size / ONE_MB_IN_BYTES).toFixed(1) + ' MB';
+            errorMessage = 'The maximum allowed file size is 1 MB' +
+              ' (' + currentSize + ' given).';
+          }
+
+          if (file.size > ALLOWED_SIZE_IN_BYTES) {
+            return errorMessage;
           }
 
           return null;

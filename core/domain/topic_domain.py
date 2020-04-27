@@ -401,7 +401,7 @@ class Subtopic(python_utils.OBJECT):
                     self.thumbnail_bg_color))
         if self.thumbnail_bg_color and self.thumbnail_filename is None:
             raise utils.ValidationError(
-                'Subtopic thumbnail filename is not specified.')
+                'Subtopic thumbnail image is not provided.')
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
             raise utils.ValidationError(
                 'Subtopic thumbnail background color is not specified.')
@@ -564,27 +564,6 @@ class Topic(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Topic name should be at most %d characters, received %s.'
                 % (name_limit, name))
-
-    @classmethod
-    def require_valid_abbreviated_name(cls, name):
-        """Checks whether the abbreviated name of the topic is a valid one.
-
-        Args:
-            name: str. The abbreviated name to validate.
-        """
-        if not isinstance(name, python_utils.BASESTRING):
-            raise utils.ValidationError('Abbreviated name should be a string.')
-
-        if name == '':
-            raise utils.ValidationError(
-                'Abbreviated name field should not be empty.')
-
-        abbreviated_name_limit = (
-            android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME)
-        if len(name) > abbreviated_name_limit:
-            raise utils.ValidationError(
-                'Abbreviated name field should not exceed %d characters, '
-                'received %s.' % (abbreviated_name_limit, name))
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
@@ -792,7 +771,6 @@ class Topic(python_utils.OBJECT):
                 valid.
         """
         self.require_valid_name(self.name)
-        self.require_valid_abbreviated_name(self.abbreviated_name)
         self.require_valid_thumbnail_filename(self.thumbnail_filename)
         if self.thumbnail_bg_color is not None and not (
                 self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
@@ -801,14 +779,14 @@ class Topic(python_utils.OBJECT):
                     self.thumbnail_bg_color))
         if self.thumbnail_bg_color and self.thumbnail_filename is None:
             raise utils.ValidationError(
-                'Topic thumbnail filename is not specified.')
+                'Topic thumbnail image is not provided.')
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
             raise utils.ValidationError(
                 'Topic thumbnail background color is not specified.')
         if strict:
             if not isinstance(self.thumbnail_filename, python_utils.BASESTRING):
                 raise utils.ValidationError(
-                    'Expected thumbnail filename to be a string, received %s'
+                    'Expected thumbnail filename to be a string, received %s.'
                     % self.thumbnail_filename)
         if not isinstance(self.description, python_utils.BASESTRING):
             raise utils.ValidationError(

@@ -25,11 +25,6 @@
 
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()" translate="I18N_PREFERENCES_CANCEL_BUTTON"></button>
-  <!--
-    The two checks for ng-disabled are necessary. The former is needed because
-    img-crop loads a default white image even when nothing is uploaded. The latter
-    is needed to prevent the saving of invalid files.
-  -->
   <button class="btn btn-success protractor-test-photo-upload-submit" ng-click="confirm()"
           ng-disabled="!uploadedImage" translate="I18N_PREFERENCES_PROFILE_PICTURE_ADD">
   </button>

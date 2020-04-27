@@ -45,8 +45,6 @@ describe('Topic editor functionality', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     users.createAndLoginAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic(topicName, false);
     users.logout();
   });
 
@@ -55,13 +53,15 @@ describe('Topic editor functionality', function() {
     topicsAndSkillsDashboardPage.get();
   });
 
-  it('should edit topic name, abbreviated topic name, ' +
-    'thumbnail and description correctly', function() {
+  it('should edit topic name, thumbnail and description ' +
+    'correctly', function() {
+    var TOPIC_NAME = 'TASEFUF_1';
+    var EDITED_TOPIC_NAME = 'TASEFUF_1 edited';
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic('TASEFUF_1', 'abbrev');
-    NEW_TOPIC_NAME = 'TASEFUF_1 edited';
+    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
+    NEW_TOPIC_NAME = EDITED_TOPIC_NAME;
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.editTopic('TASEFUF_1');
+    topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
     topicEditorPage.changeTopicName(NEW_TOPIC_NAME);
     expect(topicEditorPage.getTopicThumbnailSource())
       .not
@@ -78,12 +78,17 @@ describe('Topic editor functionality', function() {
     topicsAndSkillsDashboardPage.expectTopicNameToBe(NEW_TOPIC_NAME, 0);
 
     topicsAndSkillsDashboardPage.editTopic(NEW_TOPIC_NAME);
-    topicEditorPage.expectTopicNameToBe('TASEFUF_1 edited');
+    topicEditorPage.expectTopicNameToBe(EDITED_TOPIC_NAME);
     topicEditorPage.expectTopicDescriptionToBe('Topic Description');
   });
 
   it('should edit subtopic page contents correctly', function() {
-    topicsAndSkillsDashboardPage.createTopic('TASEFUF_2', 'abbrev');
+    var TOPIC_NAME = 'TASEFUF_2';
+    var DEFAULT_THUMBNAIL_IMAGE_SOURCE = null;
+    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
+    topicEditorPage.getTopicThumbnailSource().then(function(name) {
+      DEFAULT_THUMBNAIL_IMAGE_SOURCE = name;
+    });
     expect(topicEditorPage.getTopicThumbnailSource())
       .not
       .toEqual(
@@ -92,7 +97,6 @@ describe('Topic editor functionality', function() {
             return topicEditorPage.getTopicThumbnailSource();
           })
       );
-    topicEditorPage.changeAbbreviatedTopicName('short name');
     topicEditorPage.changeTopicDescription('Topic Description');
     topicEditorPage.saveTopic('Changed topic name and description.');
     topicEditorPage.moveToSubtopicsTab();
@@ -105,16 +109,22 @@ describe('Topic editor functionality', function() {
       .not.toEqual(
         topicEditorPage.submitSubtopicThumbnail('../data/test_svg.svg')
           .then(function() {
-            return topicEditorPage.getSubtopicThumbnailSource();
+            return topicEditorPage.getTopicThumbnailSource();
           }));
     topicEditorPage.saveSubtopic();
     topicEditorPage.saveTopic('Edited subtopic.');
 
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.editTopic('TASEFUF_2');
+    topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
+    expect(topicEditorPage.getTopicThumbnailSource()).not.toEqual(
+      DEFAULT_THUMBNAIL_IMAGE_SOURCE);
+    topicEditorPage.expectTopicDescriptionToBe('Topic Description');
+
     topicEditorPage.moveToSubtopicsTab();
     topicEditorPage.expectTitleOfSubtopicWithIndexToMatch('Modified Title', 0);
     topicEditorPage.editSubtopicWithIndex(0);
+    expect(topicEditorPage.getSubtopicThumbnailSource()).not.toEqual(
+      DEFAULT_THUMBNAIL_IMAGE_SOURCE);
     topicEditorPage.expectSubtopicPageContentsToMatch('Subtopic Contents');
   });
 
@@ -169,7 +179,7 @@ describe('Chapter editor functionality', function() {
 
   it('should create a basic chapter with a thumbnail.', function() {
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, 'abbrev');
+    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
     expect(topicEditorPage.getTopicThumbnailSource())
       .not
       .toEqual(
@@ -178,8 +188,6 @@ describe('Chapter editor functionality', function() {
             return topicEditorPage.getTopicThumbnailSource();
           })
       );
-    topicEditorPage.changeAbbreviatedTopicName('short name');
-    topicEditorPage.expectAbbreviatedTopicNameToBe('short name');
     topicEditorPage.changeTopicDescription('Topic Description');
     topicEditorPage.expectTopicDescriptionToBe('Topic Description');
     topicEditorPage.saveTopic('Changed topic name and description.');
@@ -203,6 +211,7 @@ describe('Chapter editor functionality', function() {
           })
       );
     storyEditorPage.changeNodeOutline(forms.toRichText('First outline'));
+    storyEditorPage.expectNodeOutlineToMatch('First outline');
     storyEditorPage.setChapterExplorationId(dummyExplorationIds[0]);
     storyEditorPage.expectChapterExplorationIdToBe(dummyExplorationIds[0]);
     storyEditorPage.saveStory('First save');

@@ -132,11 +132,11 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.save_new_topic_with_subtopic_schema_v1(
             self.TOPIC_ID, self.albert_id, 'A name', 'abbrev',
             'a name', '', 'Image.svg', '#C6DCDA', [], [], [], 2)
-        topic = (
+        topic_model = (
             topic_models.TopicModel.get(self.TOPIC_ID))
-        self.assertEqual(topic.subtopic_schema_version, 1)
+        self.assertEqual(topic_model.subtopic_schema_version, 1)
         self.assertEqual(
-            topic.subtopics[0],
+            topic_model.subtopics[0],
             {
                 'id': 1,
                 'skill_ids': ['skill_1'],

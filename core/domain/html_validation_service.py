@@ -890,21 +890,22 @@ def get_invalid_svg_tags_and_attrs(svg_string):
         tuple(list(str), list(str)). A 2-tuple, the first element of which
         is a list of invalid tags, and the second element of which is a
         list of invalid tag-specific attributes.
+        The format for the second element is <tag>:<attribute>, where the
+        <tag> represents the SVG tag for which the attribute is invalid
+        and <attribute> represents the invalid attribute.
         eg. (['invalid-tag1', 'invalid-tag2'], ['path:invalid-attr'])
     """
     soup = bs4.BeautifulSoup(svg_string.encode('utf-8'), 'html.parser')
     invalid_elements = []
     invalid_attrs = []
     for element in soup.find_all():
-        if element.name.lower() in constants.SVG_ATTRS_WHITELIST.keys():
+        if element.name.lower() in constants.SVG_ATTRS_WHITELIST:
             for attr in element.attrs:
                 if attr.lower() not in (
                         constants.SVG_ATTRS_WHITELIST[element.name.lower()]):
                     invalid_attrs.append('%s:%s' % (element.name, attr))
         else:
             invalid_elements.append(element.name)
-            for attr in element.attrs:
-                invalid_attrs.append('%s:%s' % (element.name, attr))
     return (invalid_elements, invalid_attrs)
 
 

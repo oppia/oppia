@@ -159,11 +159,11 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             'A description', 'A note', self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, self.STORY_ID)
-        story = (
+        story_model = (
             story_models.StoryModel.get(self.STORY_ID))
-        self.assertEqual(story.story_contents_schema_version, 1)
+        self.assertEqual(story_model.story_contents_schema_version, 1)
         self.assertEqual(
-            story.story_contents,
+            story_model.story_contents,
             {
                 'initial_node_id': 'node_1',
                 'next_node_id': 'node_2',

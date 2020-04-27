@@ -313,6 +313,33 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_thumbnail_filename_for_subtopic(
             'Expected a filename ending in svg, received name.jpg', 'name.jpg')
 
+    def test_topic_thumbnail_filename_in_strict_mode(self):
+        self.topic.thumbnail_bg_color = None
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected thumbnail filename to be a string, received None.'):
+            self.topic.validate(strict=True)
+
+    def test_topic_thumbnail_bg_validation(self):
+        self.topic.thumbnail_bg_color = '#FFFFFF'
+        self._assert_validation_error(
+            'Topic thumbnail background color #FFFFFF is not supported.')
+
+    def test_subtopic_thumbnail_bg_validation(self):
+        self.topic.subtopics[0].thumbnail_bg_color = '#CACACA'
+        self._assert_validation_error(
+            'Subtopic thumbnail background color #CACACA is not supported.')
+
+    def test_subtopic_thumbnail_filename_or_thumbnail_bg_color_is_none(self):
+        self.topic.subtopics[0].thumbnail_bg_color = '#FFFFFF'
+        self.topic.subtopics[0].thumbnail_filename = None
+        self._assert_validation_error(
+            'Subtopic thumbnail image is not provided.')
+        self.topic.subtopics[0].thumbnail_bg_color = None
+        self.topic.subtopics[0].thumbnail_filename = 'test.svg'
+        self._assert_validation_error(
+            'Subtopic thumbnail background color is not specified.')
+
     def test_subtopic_skill_ids_validation(self):
         self.topic.subtopics[0].skill_ids = 'abc'
         self._assert_validation_error('Expected skill ids to be a list')
@@ -529,6 +556,11 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.update_thumbnail_filename('img.svg')
         self.assertEqual(self.topic.thumbnail_filename, 'img.svg')
 
+    def test_update_thumbnail_bg_color(self):
+        self.assertEqual(self.topic.thumbnail_bg_color, None)
+        self.topic.update_thumbnail_bg_color('#C6DCDA')
+        self.assertEqual(self.topic.thumbnail_bg_color, '#C6DCDA')
+
     def test_cannot_add_uncategorized_skill_with_existing_uncategorized_skill(
             self):
         self.assertEqual(self.topic.uncategorized_skill_ids, [])
@@ -567,6 +599,20 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'The subtopic with id invalid_id does not exist.'):
             self.topic.update_subtopic_thumbnail_filename(
                 'invalid_id', 'new title')
+
+    def test_update_subtopic_thumbnail_bg_color(self):
+        self.assertEqual(len(self.topic.subtopics), 1)
+        self.topic.subtopics[0].thumbnail_bg_color = None
+        self.assertEqual(
+            self.topic.subtopics[0].thumbnail_bg_color, None)
+        self.topic.update_subtopic_thumbnail_bg_color(1, '#FFFFFF')
+        self.assertEqual(
+            self.topic.subtopics[0].thumbnail_bg_color, '#FFFFFF')
+
+        with self.assertRaisesRegexp(
+            Exception, 'The subtopic with id invalid_id does not exist.'):
+            self.topic.update_subtopic_thumbnail_bg_color(
+                'invalid_id', '#FFFFFF')
 
     def test_cannot_remove_skill_id_from_subtopic_with_invalid_subtopic_id(
             self):

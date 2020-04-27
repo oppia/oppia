@@ -746,7 +746,7 @@ class Story(python_utils.OBJECT):
                     self.thumbnail_bg_color))
         if self.thumbnail_bg_color and self.thumbnail_filename is None:
             raise utils.ValidationError(
-                'Story thumbnail filename is not specified.')
+                'Story thumbnail image is not provided.')
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
             raise utils.ValidationError(
                 'Story thumbnail background color is not specified.')

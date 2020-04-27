@@ -26,11 +26,9 @@ var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var LibraryPage = require('./LibraryPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
 
-var thumbnailUploadInput = element(
+var imageUploadInput = element(
   by.css('.protractor-test-photo-upload-input'));
-var thumbnailContainer = element(
-  by.css('.protractor-test-thumbnail-container'));
-var thumbnailSubmitButton = element(
+var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 
 // check if the save roles button is clickable
@@ -272,43 +270,43 @@ var createSkillAndAssignTopic = function(
     0, topicName);
 };
 
-var getThumbnailSource = function(customThumbnailElement) {
+var getImageSource = function(customImageElement) {
   waitFor.visibilityOf(
-    customThumbnailElement,
-    'Thumbnail element is taking too long to appear.');
-  return customThumbnailElement.getAttribute('src');
+    customImageElement,
+    'Image element is taking too long to appear.');
+  return customImageElement.getAttribute('src');
 };
 
-var uploadThumbnail = function(thumbnailClickableElement, imgPath) {
+var uploadImage = function(imageClickableElement, imgPath) {
   waitFor.visibilityOf(
-    thumbnailClickableElement,
-    'Thumbnail element is taking too long to appear.');
-  thumbnailClickableElement.click();
+    imageClickableElement,
+    'Image element is taking too long to appear.');
+  imageClickableElement.click();
   absPath = path.resolve(__dirname, imgPath);
-  return thumbnailUploadInput.sendKeys(absPath);
+  return imageUploadInput.sendKeys(absPath);
 };
 
-var submitThumbnail = function(thumbnailClickableElement, imgPath) {
+var submitImage = function(imageClickableElement, imageContainer, imgPath) {
   waitFor.visibilityOf(
-    thumbnailClickableElement,
-    'Thumbnail element is taking too long to appear.');
-  return this.uploadThumbnail(
-    thumbnailClickableElement, imgPath).then(function() {
+    imageClickableElement,
+    'Image element is taking too long to appear.');
+  return this.uploadImage(
+    imageClickableElement, imgPath).then(function() {
     waitFor.visibilityOf(
-      thumbnailContainer, 'Thumbnail container is taking too long to appear');
+      imageContainer, 'Image container is taking too long to appear');
   }).then(function() {
-    thumbnailSubmitButton.click();
+    imageSubmitButton.click();
   }).then(function() {
     waitFor.invisibilityOf(
-      thumbnailUploadInput,
-      'Photo uploader is taking too long to disappear');
+      imageUploadInput,
+      'Image uploader is taking too long to disappear');
     return waitFor.pageToFullyLoad();
   });
 };
 
-exports.getThumbnailSource = getThumbnailSource;
-exports.submitThumbnail = submitThumbnail;
-exports.uploadThumbnail = uploadThumbnail;
+exports.getImageSource = getImageSource;
+exports.submitImage = submitImage;
+exports.uploadImage = uploadImage;
 
 exports.createExploration = createExploration;
 exports.createExplorationAndStartTutorial = createExplorationAndStartTutorial;

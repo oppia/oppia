@@ -36,8 +36,6 @@ var TopicEditorPage = function() {
 
   var topicNameField = element(
     by.css('.protractor-test-topic-name-field'));
-  var abbreviatedTopicNameField = element(
-    by.css('.protractor-test-abbreviated-topic-name-field'));
   var topicDescriptionField = element(
     by.css('.protractor-test-topic-description-field'));
   var saveTopicButton = element(
@@ -99,6 +97,8 @@ var TopicEditorPage = function() {
     by.css('.thumbnail-editor .protractor-test-custom-photo'));
   var topicThumbnailButton = element(
     by.css('.thumbnail-editor .protractor-test-photo-button'));
+  var thumbnailContainer = element(
+    by.css('.protractor-test-thumbnail-container'));
   var dragAndDrop = function(fromElement, toElement) {
     browser.executeScript(dragAndDropScript, fromElement, toElement);
   };
@@ -109,19 +109,21 @@ var TopicEditorPage = function() {
   };
 
   this.getTopicThumbnailSource = function() {
-    return workflow.getThumbnailSource(topicThumbnailImageElement);
+    return workflow.getImageSource(topicThumbnailImageElement);
   };
 
   this.getSubtopicThumbnailSource = function() {
-    return workflow.getThumbnailSource(subtopicThumbnailImageElement);
+    return workflow.getImageSource(subtopicThumbnailImageElement);
   };
 
   this.submitTopicThumbnail = function(imgPath) {
-    return workflow.submitThumbnail(topicThumbnailButton, imgPath);
+    return workflow.submitImage(
+      topicThumbnailButton, thumbnailContainer, imgPath);
   };
 
   this.submitSubtopicThumbnail = function(imgPath) {
-    return workflow.submitThumbnail(subtopicThumbnailButton, imgPath);
+    return workflow.submitImage(
+      subtopicThumbnailButton, thumbnailContainer, imgPath);
   };
 
   this.publishTopic = function() {
@@ -318,15 +320,6 @@ var TopicEditorPage = function() {
 
   this.expectTopicNameToBe = function(name) {
     expect(topicNameField.getAttribute('value')).toEqual(name);
-  };
-
-  this.changeAbbreviatedTopicName = function(newName) {
-    abbreviatedTopicNameField.clear();
-    abbreviatedTopicNameField.sendKeys(newName);
-  };
-
-  this.expectAbbreviatedTopicNameToBe = function(name) {
-    expect(abbreviatedTopicNameField.getAttribute('value')).toEqual(name);
   };
 
   this.changeTopicDescription = function(newDescription) {

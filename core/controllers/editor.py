@@ -623,6 +623,7 @@ class ImageUploadHandler(EditorHandler):
     # to the end of 'assets/').
     _FILENAME_PREFIX = 'image'
     _decorator = None
+    HUNDRED_KB_IN_BYTES = 102400
 
     @acl_decorators.can_edit_entity
     def post(self, entity_type, entity_id):
@@ -640,6 +641,9 @@ class ImageUploadHandler(EditorHandler):
             list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
         if html_validation_service.is_parsable_as_xml(raw):
             file_format = 'svg'
+            if len(raw) > self.HUNDRED_KB_IN_BYTES:
+                raise self.InvalidInputException(
+                    'Image exceeds file size limit of 100 KB.')
             invalid_tags, invalid_attrs = (
                 html_validation_service.get_invalid_svg_tags_and_attrs(raw))
             if invalid_tags or invalid_attrs:
