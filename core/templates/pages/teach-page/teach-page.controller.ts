@@ -40,21 +40,21 @@ angular.module('oppia').directive('teachPage', [
         function(
             $timeout, SiteAnalyticsService,
             UrlInterpolationService, WindowRef) {
-          var ctrl = this;
-          var activeTabClass = 'oppia-about-tabs-active';
-          var visibleContent = 'oppia-about-visible-content';
-          var activateTab = function(tabName) {
-            $("a[id='" + tabName + "']").parent().addClass(
-              activeTabClass
-            ).siblings().removeClass(activeTabClass);
-            $('.' + tabName).addClass(visibleContent).siblings().removeClass(
-              visibleContent
-            );
-          };
+          const ctrl = this;
+          // Define constant for each tab on the page.
+          ctrl.TAB_ID_TEACH = 'teach';
+          ctrl.TAB_ID_PLAYBOOK = 'playbook';
+          ctrl.TEACH_FORM_URL = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
+
+          const ALLOWED_TABS = [
+            ctrl.TAB_ID_TEACH, ctrl.TAB_ID_PLAYBOOK];
+
+          ctrl.activeTabName = ctrl.TAB_ID_TEACH;
+
           ctrl.onTabClick = function(tabName) {
             // Update hash
             WindowRef.nativeWindow.location.hash = '#' + tabName;
-            activateTab(tabName);
+            ctrl.activeTabName = tabName;
           };
 
           ctrl.getStaticImageUrl = function(imagePath) {
@@ -68,26 +68,17 @@ angular.module('oppia').directive('teachPage', [
             }, 150);
             return false;
           };
+
           ctrl.$onInit = function() {
-            // Define constants
-            ctrl.TAB_ID_TEACH = 'teach';
-            ctrl.TAB_ID_PLAYBOOK = 'playbook';
-            ctrl.TEACH_FORM_URL = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
+            const hash = WindowRef.nativeWindow.location.hash.slice(1);
 
-            var hash = WindowRef.nativeWindow.location.hash.slice(1);
-
-            if (hash === ctrl.TAB_ID_TEACH) {
-              activateTab(ctrl.TAB_ID_TEACH);
-            } else if (hash === ctrl.TAB_ID_PLAYBOOK) {
-              activateTab(ctrl.TAB_ID_PLAYBOOK);
+            if (ALLOWED_TABS.includes(hash)) {
+              ctrl.activeTabName = hash;
             }
-
             WindowRef.nativeWindow.onhashchange = function() {
-              var hashChange = WindowRef.nativeWindow.location.hash.slice(1);
-              if (hashChange === ctrl.TAB_ID_TEACH) {
-                activateTab(ctrl.TAB_ID_TEACH);
-              } else if (hashChange === ctrl.TAB_ID_PLAYBOOK) {
-                activateTab(ctrl.TAB_ID_PLAYBOOK);
+              const hashChange = WindowRef.nativeWindow.location.hash.slice(1);
+              if (ALLOWED_TABS.includes(hashChange)) {
+                ctrl.activeTabName = hashChange;
               }
             };
           };
