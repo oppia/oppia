@@ -221,7 +221,7 @@ describe('Concept card backend API service', () => {
       expect(failHandler).toHaveBeenCalledWith('Error loading skill 1.');
     }));
 
-  it('should not fetch the same concept card', 
+  it('should not fetch the same concept card',
     fakeAsync (() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
