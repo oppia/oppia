@@ -594,6 +594,15 @@ export = {
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 
+  // The following character limit constraints follow from
+  // android_validation_constants.py. Both have to be kept in sync.
+  "MAX_CHARS_IN_TOPIC_NAME": 39,
+  "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
+  "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
+  "MAX_CHARS_IN_SKILL_DESCRIPTION": 64,
+  "MAX_CHARS_IN_STORY_TITLE": 39,
+  "MAX_CHARS_IN_CHAPTER_TITLE": 36,
+
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
     "content": {
@@ -666,6 +675,9 @@ export = {
 
   // Used to disable account removal until it is fully implemented.
   "ENABLE_ACCOUNT_DELETION": false,
+
+  // Used to disable account data export until it is fully implemented.
+  "ENABLE_ACCOUNT_EXPORT": false,
 
   // Used to hide the callout to classroom until it is ready.
   "SHOW_CLASSROOM_CALLOUT": false,
