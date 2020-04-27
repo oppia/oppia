@@ -36,7 +36,7 @@ describe('Improvement Confirmation Modal', function() {
 
   it('should close modal', function() {
     var message = 'closing';
-    $scope.close(message);
+    $scope.confirm(message);
     expect($uibModalInstance.close).toHaveBeenCalledWith(message);
   });
 

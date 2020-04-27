@@ -73,13 +73,8 @@ angular.module('oppia').directive('createActivityButton', [
                   'create-activity-modal.directive.html'),
                 backdrop: true,
                 controller: [
-                  '$controller', '$scope', '$uibModalInstance',
-                  function($controller, $scope, $uibModalInstance) {
-                    $controller('ConfirmOrCancelModalController', {
-                      $scope: $scope,
-                      $uibModalInstance: $uibModalInstance
-                    });
-
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
                     UserService.getUserInfoAsync().then(function(userInfo) {
                       $scope.canCreateCollections = (
                         userInfo.canCreateCollections());
