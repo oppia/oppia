@@ -39,7 +39,7 @@ PYCODESTYLE_VERSION = '2.5.0'
 PYLINT_QUOTES_VERSION = '0.1.8'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
-YARN_VERSION = '1.22.0'
+YARN_VERSION = '1.22.4'
 
 COVERAGE_VERSION = '4.5.4'
 
