@@ -33,6 +33,7 @@ angular.module('oppia').directive('storyNodeEditor', [
       scope: {
         getId: '&nodeId',
         getOutline: '&outline',
+        getDescription: '&description',
         getExplorationId: '&explorationId',
         isOutlineFinalized: '&outlineFinalized',
         getDestinationNodeIds: '&destinationNodeIds',
@@ -46,15 +47,17 @@ angular.module('oppia').directive('storyNodeEditor', [
         'StoryEditorStateService', 'ExplorationIdValidationService',
         'StoryUpdateService', 'UndoRedoService', 'EVENT_STORY_INITIALIZED',
         'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_STORY_NODE_EDITOR',
-        'MAX_CHARS_IN_CHAPTER_TITLE',
+        'MAX_CHARS_IN_CHAPTER_TITLE', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
             StoryEditorStateService, ExplorationIdValidationService,
             StoryUpdateService, UndoRedoService, EVENT_STORY_INITIALIZED,
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
-            MAX_CHARS_IN_CHAPTER_TITLE) {
+            MAX_CHARS_IN_CHAPTER_TITLE, MAX_CHARS_IN_CHAPTER_DESCRIPTION) {
           var ctrl = this;
           $scope.MAX_CHARS_IN_CHAPTER_TITLE = MAX_CHARS_IN_CHAPTER_TITLE;
+          $scope.MAX_CHARS_IN_CHAPTER_DESCRIPTION = (
+            MAX_CHARS_IN_CHAPTER_DESCRIPTION);
           var _recalculateAvailableNodes = function() {
             $scope.newNodeId = null;
             $scope.availableNodes = [];
@@ -87,9 +90,6 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.nodeIdToTitleMap =
               $scope.story.getStoryContents().getNodeIdsToTitleMap(
                 $scope.storyNodeIds);
-            $scope.nodeIdToDescriptionMap =
-                $scope.story.getStoryContents().getNodeIdsToDescriptionMap(
-                  $scope.storyNodeIds);
             _recalculateAvailableNodes();
             $scope.skillIdToSummaryMap = {};
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
@@ -100,8 +100,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
             $scope.editableTitle = $scope.currentTitle;
-            $scope.currentDescription =
-              $scope.nodeIdToDescriptionMap[$scope.getId()];
+            $scope.currentDescription = $scope.getDescription();
             $scope.editableDescription = $scope.currentDescription;
             $scope.oldOutline = $scope.getOutline();
             $scope.editableOutline = $scope.getOutline();

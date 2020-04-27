@@ -82,21 +82,6 @@ describe('Story contents object factory', () => {
     }).toThrow();
   });
 
-  it('should correctly correctly return the id to description map for story ' +
-    'nodes', () => {
-    expect(
-      _sampleStoryContents.getNodeIdsToDescriptionMap(['node_1', 'node_2'])
-    ).toEqual({
-      node_1: 'Description 1',
-      node_2: 'Description 2'
-    });
-
-    expect(() => {
-      _sampleStoryContents.getNodeIdsToDescriptionMap(
-        ['node_1', 'node_2', 'node_3']);
-    }).toThrow();
-  });
-
   it('should correctly correctly validate valid story contents', () => {
     expect(_sampleStoryContents.validate()).toEqual([]);
   });

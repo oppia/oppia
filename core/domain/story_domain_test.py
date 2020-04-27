@@ -436,6 +436,16 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected description to be a string, received 1')
 
+        self.story.story_contents.nodes[0].description = (
+            'Lorem ipsum dolor sit amet, consectetuer '
+            'adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. '
+            'Dum sociis natoque penatibus et magnis dis parturient montes, '
+            'nascetur ridiculus mus. Donec quam felis, ultricies nec, '
+            'pellentesque eu,'
+        )
+        self._assert_validation_error(
+            'Chapter description should be less than 152 chars')
+
     def test_nodes_validation(self):
         self.story.story_contents.initial_node_id = 'node_10'
         self._assert_validation_error('Expected starting node to exist')

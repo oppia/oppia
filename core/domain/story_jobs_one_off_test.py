@@ -157,11 +157,9 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             'A description', 'A note', self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, self.STORY_ID)
-        story = (
+        story_model = (
             story_models.StoryModel.get(self.STORY_ID))
-        self.assertEqual(story.story_contents_schema_version, 1)
-        story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story.story_contents_schema_version, 2)
+        self.assertEqual(story_model.story_contents_schema_version, 1)
 
         # Start migration job.
         job_id = (

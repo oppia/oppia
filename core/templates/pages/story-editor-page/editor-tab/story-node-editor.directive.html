@@ -12,11 +12,15 @@
   </div>
   <div class="story-node-field">
     <label for="storyNodeDescription" class="form-heading">Chapter Description</label>
-    <input id="storyNodeDescription" type="text" class="form-control protractor-test-add-chapter-description"
-           ng-model="editableDescription" ng-blur="updateDescription(editableDescription)"
-           placeholder="Enter the description for the chapter." maxlength="50" ng-trim="false">
-    <span class="form-text" style="font-size: smaller; color: red;" ng-if="editableDescription.length === 50">
-      <em>Please use at most 50 characters for the story description.</em>
+    <textarea id="storyNodeDescription" type="text" class="form-control protractor-test-add-chapter-description"
+              ng-model="editableDescription" ng-blur="updateDescription(editableDescription)"
+              placeholder="Enter the description for the chapter." maxlength="<MAX_CHARS_IN_CHAPTER_DESCRIPTION>" ng-trim="false"
+              style="height: 10vh;">
+    </textarea>
+    <span class="oppia-input-box-subtitle">
+      <i>
+        Chapter description should be at most <[MAX_CHARS_IN_CHAPTER_DESCRIPTION]> characters.
+      </i>
     </span>
   </div>
   <div class="protractor-test-add-chapter-outline">

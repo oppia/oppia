@@ -229,6 +229,10 @@ var StoryEditorPage = function() {
   };
 
   this.changeNodeDescription = function(nodeDescription) {
+    waitFor.visibilityOf(
+      nodeDescriptionInputField,
+      'NodeDescriptionInputField takes too long to be visible'
+    );
     nodeDescriptionInputField.clear();
     nodeDescriptionInputField.sendKeys(nodeDescription);
   };

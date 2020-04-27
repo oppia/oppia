@@ -316,6 +316,13 @@ class StoryNode(python_utils.OBJECT):
                 'Expected description to be a string, received %s' %
                 self.description)
 
+        description_limit = (
+            android_validation_constants.MAX_CHARS_IN_CHAPTER_DESCRIPTION)
+        if len(self.description) > description_limit:
+            raise utils.ValidationError(
+                'Chapter description should be less than %d chars, received %s'
+                % (description_limit, self.description))
+
         title_limit = android_validation_constants.MAX_CHARS_IN_CHAPTER_TITLE
         if len(self.title) > title_limit:
             raise utils.ValidationError(
@@ -821,16 +828,18 @@ class Story(python_utils.OBJECT):
 
     @classmethod
     def _convert_story_contents_v1_dict_to_v2_dict(cls, story_contents_dict):
-        """Converts old Story Contents schema to the modern v2 schema.
-        v2 schema introduces the description field for Story Nodes.
+        """Converts the v1 Story Contents schema to the v2 schema. v2 schema
+        introduces the description field for Story Nodes.
+
         Args:
             story_contents_dict: dict. A dict used to initialize a Story
                 Contents domain object.
+
         Returns:
             dict. The converted story_contents_dict.
         """
-        for index in python_utils.RANGE(len(story_contents_dict['nodes'])):
-            story_contents_dict['nodes'][index]['description'] = ''
+        for node in story_contents_dict['nodes']:
+            node['description'] = ''
         return story_contents_dict
 
     @classmethod
