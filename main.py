@@ -108,7 +108,14 @@ class HomePageRedirectPage(base.BaseHandler):
             else:
                 self.redirect(feconf.LEARNER_DASHBOARD_URL)
         else:
-            self.redirect('/')
+            self.render_template('splash-page.mainpage.html')
+
+
+class SplashRedirectPage(base.BaseHandler):
+    """Redirect the old splash URL, `/splash` to the new one, `/`."""
+    @acl_decorators.open_access
+    def get(self):
+        self.redirect('/')
 
 
 def get_redirect_route(regex_route, handler, defaults=None):
@@ -189,7 +196,7 @@ mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/_ah/warmup', WarmupPage),
     get_redirect_route(r'/', HomePageRedirectPage),
-    get_redirect_route(r'/splash', HomePageRedirectPage),
+    get_redirect_route(r'/splash', SplashRedirectPage),
 
     get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
