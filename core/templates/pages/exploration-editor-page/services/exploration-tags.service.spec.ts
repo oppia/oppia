@@ -27,19 +27,17 @@ require(
 describe('Exploration Tags Service', function() {
   let ets = null;
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-    angular.mock.module(function($provide) {
-      let ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-        $provide.value(key, value);
-      }
-    });
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
-    angular.mock.inject(function($injector) {
-      ets = $injector.get('ExplorationTagsService');
-    });
-  });
+  beforeEach(angular.mock.inject(function($injector) {
+    ets = $injector.get('ExplorationTagsService');
+  }));
 
   it('should test the child object propertiess', function() {
     expect(ets.propertyName).toBe('tags');
