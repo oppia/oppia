@@ -65,7 +65,7 @@ export class ExplorationRecommendationsService {
         params: recommendationsUrlParams
       }).toPromise().then((response: any) => {
       if (successCallback) {
-        successCallback(response.data.summaries);
+        successCallback(response.body.summaries);
       }
     });
   }
