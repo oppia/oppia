@@ -108,10 +108,13 @@ class TopicSummaryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         topic_summary_model = topic_models.TopicSummaryModel.get_by_id(item.id)
         topic_summary = topic_services.get_topic_summary_from_model(topic_summary_model).to_dict()
 
-        if 'description' in topic_summary:
+        if 'description' in topic_summary and topic_summary['description']:
+            print 'present'
             yield (TopicSummaryMigrationOneOffJob._DESCRIPTION_PRESENT, 1)
         else:
+            print 'added'
             topic_summary['description'] = topic.description
+            print topic.description
             yield (TopicSummaryMigrationOneOffJob._DESCRIPTION_ADDED, 1)
 
     @staticmethod

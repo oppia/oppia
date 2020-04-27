@@ -80,6 +80,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
               function(response) {
                 ctrl.totalTopicSummaries = response.data.topic_summary_dicts;
                 ctrl.topicSummaries = response.data.topic_summary_dicts;
+                console.log(ctrl.totalTopicSummaries);
                 ctrl.totalCount = ctrl.topicSummaries.length;
                 ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
                 ctrl.paginationHandler(0);
