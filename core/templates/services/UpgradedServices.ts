@@ -69,6 +69,8 @@ import { ConceptCardObjectFactory } from
 import { ConceptCardBackendApiService } from
   'domain/skill/concept-card-backend-api.service';
 import { ContextService } from 'services/context.service';
+import { UserExplorationPermissionsService } from 
+  'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { ContinueValidationService } from
   'interactions/Continue/directives/continue-validation.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
@@ -548,6 +550,11 @@ export class UpgradedServices {
     upgradedServices['ContextService'] = new ContextService(
       upgradedServices['UrlService'],
       upgradedServices['EntityContextObjectFactory']);
+    upgradedServices['UserExplorationPermissionsService'] =
+      new UserExplorationPermissionsService(
+        upgradedServices['HttpClient'],
+        upgradedServices['ContextService'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['EditorFirstTimeEventsService'] =
       new EditorFirstTimeEventsService(
         upgradedServices['SiteAnalyticsService']);

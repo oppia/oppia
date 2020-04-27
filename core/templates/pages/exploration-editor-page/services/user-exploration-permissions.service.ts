@@ -16,35 +16,45 @@
  * @fileoverview A service that fetches and stores the permissions
  * of a user for a particular exploration.
  */
-require('domain/utilities/url-interpolation.service.ts');
-require('services/context.service.ts');
-require('services/contextual/url.service.ts');
 
-require(
-  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
-angular.module('oppia').factory('UserExplorationPermissionsService', [
-  '$http', 'ContextService', 'UrlInterpolationService',
-  function(
-      $http, ContextService, UrlInterpolationService) {
-    var permissionsPromise = null;
+import { ContextService } from 'services/context.service';
+import { UrlInterpolationService } from 
+  'domain/utilities/url-interpolation.service';
 
-    return {
-      getPermissionsAsync: function() {
-        if (!permissionsPromise) {
-          var explorationPermissionsUrl = UrlInterpolationService
-            .interpolateUrl( '/createhandler/permissions/<exploration_id>', {
-              exploration_id: ContextService.getExplorationId()
-            });
+@Injectable({
+  providedIn: 'root'
+})
 
-          permissionsPromise = $http.get(explorationPermissionsUrl).then(
-            function(response) {
-              return response.data;
-            }
-          );
+export class UserExplorationPermissionsService {
+  permissionsPromise: any = null;
+
+  constructor(
+    private http: HttpClient,
+    private contextService: ContextService,
+    private urlInterpolationService: UrlInterpolationService,
+  ) { }
+
+  getPermissionsAsync(): any {
+    if (!this.permissionsPromise) {
+      let explorationPermissionsUrl = this.urlInterpolationService
+        .interpolateUrl( '/createhandler/permissions/<exploration_id>', {
+          exploration_id: this.contextService.getExplorationId()
+        });
+
+      this.permissionsPromise = this.http.get(explorationPermissionsUrl,
+        {observe: 'response'}).toPromise().then((response: any) => {
+          return response.body;
         }
-        return permissionsPromise;
-      }
-    };
+      );
+    }
+    return this.permissionsPromise;
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'UserExplorationPermissionsService',
+  downgradeInjectable(UserExplorationPermissionsService));
