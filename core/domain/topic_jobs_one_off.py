@@ -94,7 +94,7 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class SubtopicDescriptionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class TopicSummaryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     _DESCRIPTION_ADDED = 'description_added'
     _DESCRIPTION_PRESENT = 'description_present'
 
@@ -109,10 +109,10 @@ class SubtopicDescriptionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         topic_summary = topic_services.get_topic_summary_from_model(topic_summary_model).to_dict()
 
         if 'description' in topic_summary:
-            yield (SubtopicDescriptionMigrationOneOffJob._DESCRIPTION_PRESENT, 1)
+            yield (TopicSummaryMigrationOneOffJob._DESCRIPTION_PRESENT, 1)
         else:
             topic_summary['description'] = topic.description
-            yield (SubtopicDescriptionMigrationOneOffJob._DESCRIPTION_ADDED, 1)
+            yield (TopicSummaryMigrationOneOffJob._DESCRIPTION_ADDED, 1)
 
     @staticmethod
     def reduce(key, values):
