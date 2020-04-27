@@ -48,6 +48,9 @@ angular.module('oppia').directive('topicLandingPage', [
             TOPIC_LANDING_PAGE_DATA) {
           var ctrl = this;
           var pathArray, topic, topicData, landingPageData, assetsPathFormat;
+          const tagLines = {
+            Fractions: 'Add, Subtract, Multiply and Divide'
+          };
           var getImageData = function(index) {
             var imageKey = 'image_' + index;
             if (landingPageData[imageKey]) {
@@ -111,14 +114,12 @@ angular.module('oppia').directive('topicLandingPage', [
             ctrl.topicTitle = topicData.topic_title;
             ctrl.lessons = landingPageData.lessons;
             assetsPathFormat = '/landing/<subject>/<topic>/<file_name>';
-            var tagLines = {
-              Fractions: 'Add, Subtract, Multiply and Divide'
-            };
-            // Removing tagline from array if undefined.
-            ctrl.pageTitle = [ctrl.topicTitle, tagLines[ctrl.topicTitle],
-              'Oppia']
-              .filter(el => el !== undefined)
-              .join(' | ');
+
+            ctrl.pageTitle = (
+              ctrl.topicTitle + ' | ' +
+              (typeof tagLines[ctrl.topicTitle] !== 'undefined' ?
+                tagLines[ctrl.topicTitle] + ' | ' : '') +
+              'Oppia');
             PageTitleService.setPageTitle(ctrl.pageTitle);
             ctrl.bookImageUrl = UrlInterpolationService.getStaticImageUrl(
               '/splash/books.svg');

@@ -41,6 +41,16 @@ class ClassroomPageTests(BaseClassroomControllerTests):
             response = self.get_html_response('/math')
             self.assertIn('<classroom-page></classroom-page>', response)
 
+    def test_classroom_name_varying_case_redirects_correctly(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            response = self.get_html_response('/MaTh', expected_status_int=302)
+            self.assertEqual(
+                'http://localhost/math', response.headers['location'])
+
+    def test_no_user_can_access_invalid_classroom_page(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_html_response('/invalid_subject', expected_status_int=404)
+
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_html_response('/math', expected_status_int=404)

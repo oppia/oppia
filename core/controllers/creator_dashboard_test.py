@@ -75,6 +75,9 @@ class HomePageTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/', expected_status_int=302)
         response_path = response.headers['location']
+        # In the logged out state, the user should be redirected to the splash
+        # page which is at `http://localhost/`. The following asserts ensure
+        # that the the URL ends with `/` and the number of backslashes is 3.
         self.assertEqual(response_path[-1], '/')
         self.assertEqual(len(response_path.split('/')), 4)
 

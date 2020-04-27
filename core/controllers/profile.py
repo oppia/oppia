@@ -470,8 +470,7 @@ class UrlHandler(base.BaseHandler):
         else:
             if self.request and self.request.get('current_url'):
                 target_url = (
-                    '/splash' if self.request.get('current_url').endswith(
-                        feconf.SPLASH_URL)
+                    '/splash' if self.request.get('current_url').endswith('/')
                     else self.request.get('current_url'))
                 login_url = (
                     current_user_services.create_login_url(target_url))

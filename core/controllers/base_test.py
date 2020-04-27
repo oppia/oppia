@@ -181,26 +181,26 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
         self.get_html_response(
-            '/library/extra', expected_status_int=404)
-
-        self.get_html_response(
             '/library/data/extra', expected_status_int=404)
 
         self.post_json(
-            '/library/extra', payload={}, csrf_token=csrf_token,
+            '/library/data/extra', payload={}, csrf_token=csrf_token,
             expected_status_int=404)
 
         self.put_json(
-            '/library/extra', payload={}, csrf_token=csrf_token,
+            '/library/data/extra', payload={}, csrf_token=csrf_token,
             expected_status_int=404)
 
-        self.delete_json('/library/data', expected_status_int=404)
+        self.delete_json('/library/data/extra', expected_status_int=404)
 
     def test_redirect_in_logged_out_states(self):
         """Test for a redirect in logged out state on '/'."""
 
         response = self.get_html_response('/', expected_status_int=302)
         response_path = response.headers['location']
+        # In the logged out state, the user should be redirected to the splash
+        # page which is at `http://localhost/`. The following asserts ensure
+        # that the the URL ends with `/` and the number of backslashes is 3.
         self.assertEqual(response_path[-1], '/')
         self.assertEqual(len(response_path.split('/')), 4)
 
@@ -533,6 +533,9 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/splash', expected_status_int=302)
         response_path = response.headers['location']
+        # The following asserts ensure that the the URL ends with `/` and the
+        # number of backslashes is 3. The structure should be
+        # `http://localhost/`.
         self.assertEqual(response_path[-1], '/')
         self.assertEqual(len(response_path.split('/')), 4)
 

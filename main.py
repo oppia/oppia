@@ -59,7 +59,6 @@ from core.controllers import topic_editor
 from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
 from core.controllers import voice_artist
-from core.domain import config_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -109,7 +108,7 @@ class HomePageRedirectPage(base.BaseHandler):
             else:
                 self.redirect(feconf.LEARNER_DASHBOARD_URL)
         else:
-            self.redirect(feconf.SPLASH_URL)
+            self.redirect('/')
 
 
 def get_redirect_route(regex_route, handler, defaults=None):
@@ -347,8 +346,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
         custom_landing_pages.FractionLandingRedirectPage),
     get_redirect_route(
-        r'/learn/maths%s' % feconf.TOPIC_LANDING_PAGE_URL,
-        custom_landing_pages.TopicRedirectPage),
+        r'/learn/maths/<topic>', custom_landing_pages.TopicRedirectPage),
     get_redirect_route(
         r'%s' % feconf.CUSTOM_PARENTS_LANDING_PAGE_URL,
         custom_landing_pages.StewardsLandingPage),
@@ -735,22 +733,13 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
+
+    get_redirect_route(r'/<classroom_name>', classroom.ClassroomPage),
+    get_redirect_route(
+        r'/<subject>/<topic>', custom_landing_pages.TopicLandingPage),
+
+    get_redirect_route(r'/<:.*>', base.Error404Handler),
 ]
-
-# Adding redirects for classroom pages.
-for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value:
-    classroom_name = classroom_dict['name'].lower()
-    URLS.append(get_redirect_route(r'/%s' % classroom_name,
-                                   classroom.ClassroomPage))
-
-# Adding redirects for topic landing pages.
-for subject in feconf.AVAILABLE_LANDING_PAGES:
-    URLS.append(get_redirect_route(r'/%s%s'
-                                   % (subject, feconf.TOPIC_LANDING_PAGE_URL),
-                                   custom_landing_pages.TopicLandingPage))
-
-# 404 error handler (Needs to be at the end of the URLS list).
-URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 
 URLS_TO_SERVE = []
 

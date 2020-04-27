@@ -46,13 +46,13 @@ class TopicLandingPage(base.BaseHandler):
     """Page showing the topic landing page."""
 
     @acl_decorators.open_access
-    def get(self, topic):
+    def get(self, subject, topic):
         """Handles GET requests."""
-
-        subject = self.request.uri.split('/')[-2]
-
-        if topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
-            self.render_template('topic-landing-page.mainpage.html')
+        if subject in feconf.AVAILABLE_LANDING_PAGES:
+            if topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
+                self.render_template('topic-landing-page.mainpage.html')
+            else:
+                raise self.PageNotFoundException
         else:
             raise self.PageNotFoundException
 

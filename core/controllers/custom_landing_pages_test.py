@@ -51,13 +51,17 @@ class TopicRedirectPageTest(test_utils.GenericTestBase):
 
     def test_old_topic_url_redirect(self):
         response = self.get_html_response(
-            '/learn/math/fractions', expected_status_int=302)
+            '/learn/maths/fractions', expected_status_int=302)
         self.assertEqual(
             'http://localhost/math/fractions', response.headers['location'])
 
 
 class TopicLandingPageTest(test_utils.GenericTestBase):
     """Test for showing landing pages."""
+
+    def test_invalid_subject_landing_page_leads_to_404(self):
+        self.get_html_response(
+            '/learn/invalid_subject/fractions', expected_status_int=404)
 
     def test_invalid_topic_landing_page_leads_to_404(self):
         self.get_html_response(
