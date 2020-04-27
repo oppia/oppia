@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { ContextService } from 'services/context.service';
-import { UrlInterpolationService } from 
+import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 @Injectable({
@@ -47,9 +47,8 @@ export class UserExplorationPermissionsService {
 
       this.permissionsPromise = this.http.get(explorationPermissionsUrl,
         {observe: 'response'}).toPromise().then((response: any) => {
-          return response.body;
-        }
-      );
+        return response.body;
+      });
     }
     return this.permissionsPromise;
   }

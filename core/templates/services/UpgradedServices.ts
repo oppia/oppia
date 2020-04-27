@@ -69,7 +69,7 @@ import { ConceptCardObjectFactory } from
 import { ConceptCardBackendApiService } from
   'domain/skill/concept-card-backend-api.service';
 import { ContextService } from 'services/context.service';
-import { UserExplorationPermissionsService } from 
+import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { ContinueValidationService } from
   'interactions/Continue/directives/continue-validation.service';

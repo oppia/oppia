@@ -31,7 +31,7 @@ describe('User Exploration Permissions Service', () => {
   let contextService: ContextService;
   let urlService: UrlService;
   let httpTestingController: HttpTestingController;
-  
+
   let sampleExplorationId = 'sample-exploration';
   let samplePermissionsData = {
     canEdit: false,
@@ -41,7 +41,7 @@ describe('User Exploration Permissions Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-    })
+    });
     httpTestingController = TestBed.get(HttpTestingController);
     ueps = TestBed.get(UserExplorationPermissionsService);
     contextService = TestBed.get(ContextService);
@@ -57,8 +57,8 @@ describe('User Exploration Permissions Service', () => {
 
     ueps.getPermissionsAsync().then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne('/createhandler/permissions/'
-      + sampleExplorationId);
+    let req = httpTestingController.expectOne('/createhandler/permissions/' +
+      sampleExplorationId);
     expect(req.request.method).toEqual('GET');
     req.flush(samplePermissionsData);
     flushMicrotasks();
@@ -72,7 +72,7 @@ describe('User Exploration Permissions Service', () => {
     let failHandler = jasmine.createSpy('fail');
 
     ueps.getPermissionsAsync().then(successHandler, failHandler);
-    
+
     let req = httpTestingController.expectOne('/createhandler/permissions/'
       + sampleExplorationId);
     expect(req.request.method).toEqual('GET');
