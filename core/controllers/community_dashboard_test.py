@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import story_domain
@@ -419,4 +420,38 @@ class UserCommunityRightsDataHandlerTest(test_utils.GenericTestBase):
                 'can_review_translation_for_language_codes': [],
                 'can_review_voiceover_for_language_codes': [],
                 'can_review_questions': True
+            })
+
+
+class CommunityMessageHandlerUnitTest(test_utils.GenericTestBase):
+    """Unit test for the CommunityMessageHandler."""
+    def test_get_request_returns_correct_response(self):
+        response = self.get_json('/community_message_handler')
+        self.assertEqual(
+            response, {
+                'community_message_enabled': (
+                    config_domain.COMMUNITY_MESSAGE_ENABLED.value),
+                'community_message': (config_domain.COMMUNITY_MESSAGE.value)
+            })
+
+
+class CommunityMessageHandlerIntegrationTest(test_utils.GenericTestBase):
+    """Integration test for the CommunityMessageHandler."""
+    def test_get_request_returns_updated_config_value(self):
+
+        response = self.get_json('/community_message_handler')
+        self.assertEqual(
+            response, {
+                'community_message_enabled': (
+                    config_domain.COMMUNITY_MESSAGE_ENABLED.value),
+                'community_message': (config_domain.COMMUNITY_MESSAGE.value)
+            })
+        self.set_config_property(config_domain.COMMUNITY_MESSAGE_ENABLED, True)
+        self.set_config_property(config_domain.COMMUNITY_MESSAGE, 'New message')
+
+        response = self.get_json('/community_message_handler')
+        self.assertEqual(
+            response, {
+                'community_message_enabled': True,
+                'community_message': 'New message'
             })

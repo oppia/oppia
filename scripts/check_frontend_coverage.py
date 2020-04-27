@@ -87,6 +87,7 @@ FULLY_COVERED_FILENAMES = [
     'CollectionRightsObjectFactory.ts',
     'community-dashboard-page.constants.ajs.ts',
     'community-dashboard-page.constants.ts',
+    'community-message-backend-api.service.ts',
     'compare-versions.service.ts',
     'compute-graph.service.ts',
     'concept-card-backend-api.service.ts',

@@ -38,6 +38,8 @@ require(
 
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require('pages/community-dashboard-page/services/' +
+  'community-message-backend-api.service.ts');
 require('services/local-storage.service.ts');
 require('services/user.service.ts');
 
@@ -56,12 +58,14 @@ angular.module('oppia').directive('communityDashboardPage', [
       'community-dashboard-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$window', 'LanguageUtilService', 'LocalStorageService',
+        '$window', 'CommunityMessageBackendApiService',
+        'LanguageUtilService', 'LocalStorageService',
         'TranslationLanguageService', 'UserService',
         'COMMUNITY_DASHBOARD_TABS_DETAILS',
         'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
         function(
-            $window, LanguageUtilService, LocalStorageService,
+            $window, CommunityMessageBackendApiService,
+            LanguageUtilService, LocalStorageService,
             TranslationLanguageService, UserService,
             COMMUNITY_DASHBOARD_TABS_DETAILS,
             DEFAULT_OPPORTUNITY_LANGUAGE_CODE) {
@@ -105,6 +109,8 @@ angular.module('oppia').directive('communityDashboardPage', [
             ctrl.userCanReviewTranslationSuggestionsInLanguages = [];
             ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
             ctrl.userCanReviewQuestions = false;
+            ctrl.communityMessageEnabled = false;
+            ctrl.communityMessage = '';
 
             UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
               ctrl.profilePictureDataUrl = dataUrl;
@@ -159,6 +165,13 @@ angular.module('oppia').directive('communityDashboardPage', [
 
             TranslationLanguageService.setActiveLanguageCode(
               ctrl.languageCode);
+
+            CommunityMessageBackendApiService.getCommunityMessageData().then(
+              function(communityMessageData) {
+                ctrl.communityMessageEnabled = (
+                  communityMessageData.communityMessageEnabled);
+                ctrl.communityMessage = communityMessageData.communityMessage;
+              });
 
             ctrl.activeTabName = 'myContributionTab';
             ctrl.tabsDetails = COMMUNITY_DASHBOARD_TABS_DETAILS;
