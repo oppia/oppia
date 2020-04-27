@@ -27,19 +27,17 @@ require('pages/exploration-editor-page/' +
 describe('Exploration Param Specs Service', function() {
   var epcs = null;
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-    angular.mock.module(function($provide) {
-      var ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-        $provide.value(key, value);
-      }
-    });
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    let ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
-    angular.mock.inject(function($injector) {
-      epcs = $injector.get('ExplorationParamSpecsService');
-    });
-  });
+  beforeEach(angular.mock.inject(function($injector) {
+    epcs = $injector.get('ExplorationParamSpecsService');
+  }));
 
   it('should test the child object properties', function() {
     expect(epcs.propertyName).toBe('param_specs');
