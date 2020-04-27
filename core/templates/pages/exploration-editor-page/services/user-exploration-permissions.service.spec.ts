@@ -73,8 +73,8 @@ describe('User Exploration Permissions Service', () => {
 
     ueps.getPermissionsAsync().then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne('/createhandler/permissions/'
-      + sampleExplorationId);
+    let req = httpTestingController.expectOne('/createhandler/permissions/' +
+      sampleExplorationId);
     expect(req.request.method).toEqual('GET');
     req.flush(samplePermissionsData);
     flushMicrotasks();
