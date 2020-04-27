@@ -66,6 +66,8 @@ import { CollectionCreationBackendService } from
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
+import { ConceptCardBackendApiService } from
+  'domain/skill/concept-card-backend-api.service';
 import { ContextService } from 'services/context.service';
 import { ContinueValidationService } from
   'interactions/Continue/directives/continue-validation.service';
@@ -539,6 +541,9 @@ export class UpgradedServices {
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['RecordedVoiceoversObjectFactory'],
       upgradedServices['WorkedExampleObjectFactory']);
+    upgradedServices['ConceptCardBackendApiService'] = new ConceptCardBackendApiService(
+      upgradedServices['UrlInterpolationService'],
+      upgradedServices['HttpClient']);
     upgradedServices['ContextService'] = new ContextService(
       upgradedServices['UrlService'],
       upgradedServices['EntityContextObjectFactory']);

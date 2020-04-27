@@ -71,6 +71,7 @@ angular.module('oppia').directive('conceptCard', [
                 ctrl.conceptCards.push(
                   ConceptCardObjectFactory.createFromBackendDict(
                     conceptCardBackendDict));
+                  $rootScope.$apply();
               });
               ctrl.loadingMessage = '';
               ctrl.currentConceptCard = ctrl.conceptCards[ctrl.index];

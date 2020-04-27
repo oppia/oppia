@@ -34,13 +34,14 @@ import { SkillDomainConstants } from
 
 export class ConceptCardBackendApiService {
   // Maps previously loaded concept cards to their IDs.
-  _conceptCardCache: Array<object> = [];
+  _conceptCardCache: Object = {};
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient
   ) { }
 
-  _fetchConceptCards(skillIds: Array<string>,
+  private _fetchConceptCards(skillIds: Array<string>,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
     let conceptCardDataUrl = this.urlInterpolationService.interpolateUrl(
@@ -48,26 +49,27 @@ export class ConceptCardBackendApiService {
         comma_separated_skill_ids: skillIds.join(',')
       });
 
-    this.http.get(conceptCardDataUrl).toPromise().then((response: any) => {
-      let conceptCards = cloneDeep(response.data.concept_card_dicts);
+    this.http.get(conceptCardDataUrl, { observe: 'response' }).toPromise()
+      .then((response: any) => {
+        let conceptCards = cloneDeep(response.body.concept_card_dicts);
 
-      if (successCallback) {
-        successCallback(conceptCards);
-      }
-    }, (error: any) => {
+        if (successCallback) {
+          successCallback(conceptCards);
+        }
+      }, (error) => {
       if (errorCallback) {
-        errorCallback(error);
+        errorCallback(error.statusText);
       }
     });
   }
 
-  _isCached(skillId: string): boolean {
+  private _isCached(skillId: string): boolean {
     return this._conceptCardCache.hasOwnProperty(skillId);
   }
 
-  _getUncachedSkillIds(skillIds: Array<string>): Array<string> {
+  private _getUncachedSkillIds(skillIds: Array<string>): Array<string> {
     let uncachedSkillIds = [];
-    skillIds.forEach(function(skillId) {
+    skillIds.forEach((skillId) => {
       if (!this._isCached(skillId)) {
         uncachedSkillIds.push(skillId);
       }
@@ -83,8 +85,8 @@ export class ConceptCardBackendApiService {
         // Case where only part (or none) of the concept cards are cached
         // locally.
         this._fetchConceptCards(
-          uncachedSkillIds, function(uncachedConceptCards) {
-            skillIds.forEach(function(skillId) {
+          uncachedSkillIds, (uncachedConceptCards) => {
+            skillIds.forEach((skillId) => {
               if (uncachedSkillIds.includes(skillId)) {
                 conceptCards.push(
                   uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
@@ -102,7 +104,7 @@ export class ConceptCardBackendApiService {
           }, reject);
       } else {
         // Case where all of the concept cards are cached locally.
-        skillIds.forEach(function(skillId) {
+        skillIds.forEach((skillId) => {
           conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
         });
         if (resolve) {
