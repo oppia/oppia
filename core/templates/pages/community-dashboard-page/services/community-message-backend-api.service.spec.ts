@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests that the resource service is working as expected.
+ * @fileoverview Unit test for CommunityMessageBackendApiService.
  */
 
 require('pages/community-dashboard-page/services/' +
