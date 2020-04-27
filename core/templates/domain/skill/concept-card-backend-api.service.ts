@@ -77,6 +77,14 @@ export class ConceptCardBackendApiService {
     return uncachedSkillIds;
   }
 
+  /**
+   * This function will fetch concept cards from the backend, as well as
+   * attempt to see whether the given concept cards have already been
+   * loaded. If they have not yet been loaded, it will fetch the concept
+   * cards from the backend. If it successfully retrieves the concept cards
+   * from the backend, it will store them in the cache to avoid requests
+   * from the backend in further function calls.
+   */
   loadConceptCards(skillIds: Array<string>): Promise<Object> {
     return new Promise((resolve, reject) => {
       let uncachedSkillIds = this._getUncachedSkillIds(skillIds);
