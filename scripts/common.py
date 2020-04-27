@@ -30,7 +30,7 @@ import sys
 import python_utils
 import release_constants
 
-PSUTIL_VERSION = '5.6.7'
+PSUTIL_VERSION = '5.7.0'
 
 CURRENT_PYTHON_BIN = sys.executable
 NODE_VERSION = '10.18.0'
@@ -41,7 +41,7 @@ PYLINT_QUOTES_VERSION = '0.1.8'
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = '1.22.4'
 
-COVERAGE_VERSION = '4.5.4'
+COVERAGE_VERSION = '5.1'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
