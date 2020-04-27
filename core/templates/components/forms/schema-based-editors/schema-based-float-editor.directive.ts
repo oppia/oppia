@@ -20,8 +20,9 @@ require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
   'components/forms/custom-forms-directives/require-is-float.directive.ts');
-
 require('components/forms/validators/is-float.filter.ts');
+require(
+  'interactions/NumericInput/directives/numeric-input-validation.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('schemaBasedFloatEditor', [
@@ -40,11 +41,13 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
       template: require('./schema-based-float-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$timeout', 'FocusManagerService',
-        function($scope, $filter, $timeout, FocusManagerService) {
+        '$scope', '$timeout', 'FocusManagerService',
+        'NumericInputValidationService',
+        function($scope, $timeout, FocusManagerService,
+            NumericInputValidationService) {
           var ctrl = this;
           ctrl.validate = function(localValue) {
-            return $filter('isFloat')(localValue) !== undefined;
+            return !NumericInputValidationService.getErrorString(localValue);
           };
 
           ctrl.onFocus = function() {
@@ -78,6 +81,12 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             }
           };
 
+          ctrl.generateErrors = function() {
+            ctrl.errorString = (
+              NumericInputValidationService.getErrorString(
+                ctrl.localValue.toString()));
+          };
+
           ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {
               if (
@@ -95,12 +104,10 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             ctrl.hasLoaded = false;
             ctrl.isUserCurrentlyTyping = false;
             ctrl.hasFocusedAtLeastOnce = false;
-
+            ctrl.errorString = '';
             ctrl.labelForErrorFocusTarget =
               FocusManagerService.generateFocusLabel();
-            if (ctrl.localValue === undefined) {
-              ctrl.localValue = 0.0;
-            }
+            ctrl.localValue = '';
             // This prevents the red 'invalid input' warning message from
             // flashing at the outset.
             $timeout(function() {

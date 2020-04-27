@@ -47,13 +47,10 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
           var ctrl = this;
           ctrl.errorString = '';
           var isAnswerValid = function() {
-            return !!(
-              NumericInputValidationService.getErrorString(ctrl.answer));
+            return (
+              ctrl.answer !== undefined &&
+              ctrl.answer !== null && ctrl.answer !== '');
           };
-          $scope.$watch('$ctrl.answer', function() {
-            ctrl.errorString = (
-              NumericInputValidationService.getErrorString(ctrl.answer));
-          });
 
           ctrl.submitAnswer = function(answer) {
             if (isAnswerValid()) {

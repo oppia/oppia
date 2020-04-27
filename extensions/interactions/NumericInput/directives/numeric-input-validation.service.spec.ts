@@ -148,18 +148,17 @@ describe('NumericInputValidationService', () => {
 
   it('should generate errors in the given input', () => {
     expect(validatorService.getErrorString('3.')).toEqual(
-      'Trailing decimals not allowed.');
+      'Trailing decimals are not allowed.');
     expect(validatorService.getErrorString('.3.4')).toEqual(
-      'At most 1 decimal point should be present');
+      'At most 1 decimal point should be present.');
     expect(validatorService.getErrorString('36a4')).toEqual(
-      'Only use numbers, hyphen, percentage and decimal(.)');
+      'Only use numbers, minus sign(-), and decimal(.)');
     expect(validatorService.getErrorString('3-4')).toEqual(
-      'Hyphen(-) only allowed in beginning');
+      'Minus(-) sign is only allowed in beginning.');
     expect(validatorService.getErrorString('-3-4')).toEqual(
-      'At most 1 Hyphen(-) should be present');
+      'At most 1 minus(-) sign should be present.');
     expect(validatorService.getErrorString('2.2')).toEqual(undefined);
     expect(validatorService.getErrorString('-2.2')).toEqual(undefined);
-    expect(validatorService.getErrorString('-2.2%')).toEqual(undefined);
     expect(validatorService.getErrorString('34.56')).toEqual(undefined);
   });
 
@@ -170,16 +169,8 @@ describe('NumericInputValidationService', () => {
     expect(filter('0')).toEqual(0);
     expect(filter('-1')).toEqual(-1);
     expect(filter('-1.0')).toEqual(-1);
-    expect(filter('1,5')).toEqual(1.5);
-    expect(filter('1%')).toEqual(0.01);
-    expect(filter('1.5%')).toEqual(0.015);
-    expect(filter('-5%')).toEqual(-0.05);
     expect(filter('.35')).toEqual(0.35);
-    expect(filter(',3')).toEqual(0.3);
-    expect(filter('.3%')).toEqual(0.003);
-    expect(filter('2,5%')).toEqual(0.025);
-    expect(filter('3.2% ')).toEqual(0.032);
-    expect(filter(' 3.2% ')).toEqual(0.032);
+    expect(filter('.3')).toEqual(0.3);
     expect(filter('0.')).toEqual(0);
   });
 });
