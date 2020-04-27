@@ -20,6 +20,7 @@ require('components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/skill-selector/skill-selector.directive.ts');
+
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-update.service.ts');
 require('domain/exploration/exploration-id-validation.service.ts');

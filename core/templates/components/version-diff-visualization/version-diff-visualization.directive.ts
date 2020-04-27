@@ -17,6 +17,8 @@
  *   versions of an exploration.
  */
 
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
@@ -154,15 +156,19 @@ angular.module('oppia').directive('versionDiffVisualization', [
               }
             },
             controller: [
-              '$scope', '$http', '$uibModalInstance',
+              '$controller', '$scope', '$http', '$uibModalInstance',
               'newStateName', 'oldStateName', 'newState', 'oldState',
               'headers', 'ContextService',
               'UrlInterpolationService',
               function(
-                  $scope, $http, $uibModalInstance,
+                  $controller, $scope, $http, $uibModalInstance,
                   newStateName, oldStateName, newState, oldState,
                   headers, ContextService,
                   UrlInterpolationService) {
+                $controller('ConfirmOrCancelModalController', {
+                  $scope: $scope,
+                  $uibModalInstance: $uibModalInstance
+                });
                 var STATE_YAML_URL = UrlInterpolationService.interpolateUrl(
                   '/createhandler/state_yaml/<exploration_id>', {
                     exploration_id: (
@@ -211,10 +217,6 @@ angular.module('oppia').directive('versionDiffVisualization', [
                   }, 200);
                 }
 
-                $scope.cancel = function() {
-                  $uibModalInstance.dismiss('cancel');
-                };
-
                 // Options for the codemirror mergeview.
                 $scope.CODEMIRROR_MERGEVIEW_OPTIONS = {
                   lineNumbers: true,
@@ -224,9 +226,6 @@ angular.module('oppia').directive('versionDiffVisualization', [
                 };
               }
             ]
-          }).result.then(function() {}, function() {
-            // This callback is triggered when the Cancel button is
-            // clicked. No further action is needed.
           });
         };
         ctrl.$onInit = function() {

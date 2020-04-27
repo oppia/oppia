@@ -18,6 +18,7 @@
 
 require('components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller');
+
 require('domain/topic/editable-topic-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');

@@ -16,14 +16,14 @@
  * @fileoverview Service for exploration saving & publication functionality.
  */
 
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'sharing-links.directive.ts');
-require('components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
@@ -151,10 +151,6 @@ angular.module('oppia').factory('ExplorationSaveService', [
             };
           }
         ]
-      }).result.then(function() {}, function() {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
       });
     };
 
@@ -579,9 +575,6 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
                 $scope.save = function(commitMessage) {
                   $uibModalInstance.close(commitMessage);
-                };
-                $scope.cancel = function() {
-                  $uibModalInstance.dismiss('cancel');
                 };
               }
             ]

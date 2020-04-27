@@ -16,6 +16,8 @@
  * @fileoverview Directive for the skill misconceptions editor.
  */
 
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require(
   'components/state-directives/answer-group-editor/' +
   'summary-list-header.directive.ts');
@@ -72,17 +74,19 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
                 'delete-misconception-modal.directive.html'),
               backdrop: 'static',
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$controller', '$scope', '$uibModalInstance',
+                function($controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
+
                   $scope.skill = SkillEditorStateService.getSkill();
 
                   $scope.confirm = function() {
                     $uibModalInstance.close({
                       id: $scope.skill.getMisconceptionAtIndex(index).getId()
                     });
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
                   };
                 }]
             }).result.then(function(result) {

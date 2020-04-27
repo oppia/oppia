@@ -17,6 +17,8 @@
  * exploration.
  */
 
+require('components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('services/contextual/url.service.ts');
@@ -37,8 +39,13 @@ angular.module('oppia').factory(
               'refresher-exploration-confirmation-modal.template.html'),
             backdrop: 'static',
             controller: [
-              '$scope', '$uibModalInstance', '$window',
-              function($scope, $uibModalInstance, $window) {
+              '$controller', '$scope', '$uibModalInstance', '$window',
+              function($controller, $scope, $uibModalInstance, $window) {
+                $controller('ConfirmOrCancelModalController', {
+                  $scope: $scope,
+                  $uibModalInstance: $uibModalInstance
+                });
+
                 $scope.confirmRedirect = function() {
                   redirectConfirmationCallback();
 
@@ -73,15 +80,8 @@ angular.module('oppia').factory(
                   // called multiple times.
                   $uibModalInstance.close();
                 };
-                $scope.cancelRedirect = function() {
-                  $uibModalInstance.dismiss('cancel');
-                };
               }
             ]
-          }).result.then(function() {}, function() {
-            // Note to developers:
-            // This callback is triggered when the Cancel button is clicked.
-            // No further action is needed.
           });
         }
       };

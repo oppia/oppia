@@ -198,7 +198,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
                 backdrop: true,
                 resolve: {},
                 controller: [
-                  '$injector', '$controller', '$scope', '$uibModalInstance',
+                  '$controller', '$injector', '$scope', '$uibModalInstance',
                   'EditorFirstTimeEventsService',
                   'InteractionDetailsCacheService',
                   'StateCustomizationArgsService', 'StateEditorService',
@@ -207,7 +207,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
                   'ALLOWED_QUESTION_INTERACTION_CATEGORIES',
                   'INTERACTION_SPECS',
                   function(
-                      $injector, $controller, $scope, $uibModalInstance,
+                      $controller, $injector, $scope, $uibModalInstance,
                       EditorFirstTimeEventsService,
                       InteractionDetailsCacheService,
                       StateCustomizationArgsService, StateEditorService,

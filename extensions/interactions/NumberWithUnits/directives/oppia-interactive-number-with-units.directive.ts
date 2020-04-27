@@ -81,8 +81,6 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
                 './number-with-units-help-modal.directive.html'),
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'
-            }).result.then(function() {}, function() {
-
             });
           };
           ctrl.$onInit = function() {

@@ -395,17 +395,11 @@ angular.module('oppia').directive('settingsTab', [
                         }
                       };
                     }
-
-                    $scope.reallyTakeAction = function() {
-                      $uibModalInstance.close({
-                        emailBody: $scope.emailBody
-                      });
-                    };
                   }
                 ]
-              }).result.then(function(result) {
+              }).result.then(function(emailBody) {
                 ExplorationRightsService.saveModeratorChangeToBackend(
-                  result.emailBody);
+                  emailBody);
               }, function() {
                 AlertsService.clearWarnings();
               });

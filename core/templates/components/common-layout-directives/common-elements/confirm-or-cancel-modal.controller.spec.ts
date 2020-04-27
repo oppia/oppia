@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for ConfirmOrCancelModalController.
  */
 
-describe('Improvement Confirmation Modal', function() {
+describe('Confirm Or Cancel Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
 
