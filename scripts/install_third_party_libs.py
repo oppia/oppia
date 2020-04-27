@@ -178,7 +178,7 @@ def main():
         ('esprima', '4.0.1', common.OPPIA_TOOLS_DIR),
         ('browsermob-proxy', '0.8.0', common.OPPIA_TOOLS_DIR),
         ('selenium', '3.141.0', common.OPPIA_TOOLS_DIR),
-        ('PyGithub', '1.50', common.OPPIA_TOOLS_DIR),
+        ('PyGithub', '1.45', common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
     ]
 
