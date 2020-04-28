@@ -19,6 +19,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import python_utils
+import uuid
+
 from core.platform import models
 import feconf
 
@@ -58,7 +61,7 @@ STATUS_CHOICES = (
 _GENERATE_NEW_ID_MAX_ATTEMPTS = 10
 
 
-class TaskEntryModel(base_models.VersionedModel):
+class TaskEntryModel(base_models.BaseModel):
     """Task entry corresponding to an actionable task in the improvements tab.
 
     Instances of a class have an ID with the form:
@@ -75,9 +78,9 @@ class TaskEntryModel(base_models.VersionedModel):
 
     # The type of sub-entity a task entry focuses on.
     target_type = ndb.StringProperty(
-        default=None, required=True, indexed=True, choices=TARGET_TYPE_CHOICES)
+        default=None, required=False, indexed=True, choices=TARGET_TYPE_CHOICES)
     # Uniquely identifies the sub-entity a task entry focuses on.
-    target_id = ndb.StringProperty(default=None, required=True, indexed=True)
+    target_id = ndb.StringProperty(default=None, required=False, indexed=True)
 
     # Tracks the state/progress of a task entry.
     status = ndb.StringProperty(
@@ -95,6 +98,25 @@ class TaskEntryModel(base_models.VersionedModel):
     # Auto-generated string which provides a one-line summary of the task.
     closed_context = ndb.StringProperty(
         default=None, required=False, indexed=False)
+
+    @classmethod
+    def generate_new_task_id(cls, task_type, entity_type, entity_id):
+        """Generates a new task entry ID.
+
+        Args:
+            task_type: str. The type of task a task entry tracks.
+            entity_type: str. The type of entity a task entry refers to.
+            entity_id: str. The ID of the entity a task entry refers to.
+
+        Returns:
+            str. An ID available for use for a new task entry.
+        """
+        for _ in python_utils.RANGE(_GENERATE_NEW_ID_MAX_ATTEMPTS):
+            task_id = '.'.join(
+                [task_type, entity_type, entity_id, str(uuid.uuid4())])
+            if not cls.get_by_id(task_id):
+                return task_id
+        raise Exception('Task ID strategy is creating too many collisions')
 
     @classmethod
     def create(

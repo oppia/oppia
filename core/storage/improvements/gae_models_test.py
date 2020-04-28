@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import uuid
+
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -40,6 +42,32 @@ class TaskEntryModelTest(test_utils.GenericTestBase):
         self.OWNER_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.EXP_ID = 'expid'
         self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
+        self.EXP_VERSION = 1
+
+    def test_generate_new_task_id(self):
+        task_id = imps_models.TaskEntryModel.generate_new_task_id(
+            'TASK_TYPE', 'ENTITY_TYPE', 'ENTITY_ID')
+        self.assertIn('TASK_TYPE', task_id)
+        self.assertIn('ENTITY_TYPE', task_id)
+        self.assertIn('ENTITY_ID', task_id)
+        second_task_id = imps_models.TaskEntryModel.generate_new_task_id(
+            'TASK_TYPE', 'ENTITY_TYPE', 'ENTITY_ID')
+        self.assertNotEqual(task_id, second_task_id)
+
+    def test_error_reported_if_too_many_collisions(self):
+        # TaskEntryModel uses uuid.uuid4() to randomize task IDs.
+        with self.swap(uuid, 'uuid4', lambda: 'duplicated-value'):
+            task_id = imps_models.TaskEntryModel.generate_new_task_id(
+                feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
+            task = imps_models.TaskEntryModel.create(
+                task_id, feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, self.EXP_VERSION)
+            task.put()
+            with self.assertRaisesRegexp(Exception, 'too many collisions'):
+                imps_models.TaskEntryModel.generate_new_task_id(
+                    feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
+                    feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
 
     def test_can_create_new_hbr_task(self):
         imps_models.TaskEntryModel.create(
