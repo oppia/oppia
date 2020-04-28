@@ -474,7 +474,7 @@ def is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
 
     Returns:
         bool: Whether to exclude the given file from this
-        particular pattern check.
+            particular pattern check.
     """
     return (any(filepath.startswith(bad_pattern)
                 for bad_pattern in BAD_PATTERNS[pattern]['excluded_dirs'])

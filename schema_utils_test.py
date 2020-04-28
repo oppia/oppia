@@ -484,9 +484,9 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         Args:
           schema: the schema to normalize the value against.
           mappings: a list of 2-element tuples. The first element of
-            each item is expected to be normalized to the second.
+              each item is expected to be normalized to the second.
           invalid_items: a list of values. Each of these is expected to raise
-            an AssertionError when normalized.
+              an AssertionError when normalized.
         """
         validate_schema(schema)
 

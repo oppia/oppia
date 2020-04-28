@@ -71,9 +71,9 @@ def _migrate_story_references_to_latest_schema(versioned_story_references):
     Args:
         versioned_story_references: A dict with two keys:
           - schema_version: int. The schema version for the story reference
-                dict.
+              dict.
           - story_references: list(dict). The list of dicts comprising the
-                topic's story references.
+              topic's story references.
 
     Raises:
         Exception: The schema version of story_references is outside of what
@@ -116,6 +116,7 @@ def get_topic_from_model(topic_model):
     Args:
         topic_model: TopicModel. The topic model loaded from the
             datastore.
+
     Returns:
         topic. A Topic domain object corresponding to the given
             topic model.
@@ -174,6 +175,7 @@ def get_topic_by_id(topic_id, strict=True, version=None):
             id exists in the datastore.
         version: int or None. The version number of the topic to be
             retrieved. If it is None, the latest version will be retrieved.
+
     Returns:
         Topic or None. The domain object representing a topic with the
         given id, or None if it does not exist.

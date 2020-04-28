@@ -65,7 +65,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data
-            should be checked.
+                should be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.

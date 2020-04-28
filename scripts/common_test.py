@@ -424,7 +424,7 @@ class CommonTests(test_utils.GenericTestBase):
 
             Args:
                 new_target: TextIOWrapper. The new target to which stdout is
-                redirected.
+                    redirected.
 
             Yields:
                 TextIOWrapper. The new target.

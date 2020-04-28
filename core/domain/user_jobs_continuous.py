@@ -371,7 +371,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                     str. The id of the exploration currently being played.
                     float. The rating given by user to the exploration.
                     float. The old rating of the exploration, before it is
-                        refreshed.
+                    refreshed.
         """
         exp_id = args[0]
 

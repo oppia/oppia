@@ -74,7 +74,7 @@ def get_args_of_function(function_node, args_to_ignore):
     Args:
         function_node: ast.FunctionDef. Represents a function.
         args_to_ignore: list(str). Ignore these arguments in a function
-        definition.
+            definition.
 
     Returns:
         list(str). The args for a function as listed in the function

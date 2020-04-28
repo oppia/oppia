@@ -250,16 +250,16 @@ def get_role_graph_data():
 
     Returns:
         dict. A dict containing data in following format:
-        {
-            links: list(dict(str:str)). List of dicts defing each edge in
-                following format:
-                    {
-                        source: Role Id from which edge is going out.
-                        target: Role Id to which edge is incoming.
-                    }
-            nodes: dict(str:str). Mapping of role ID to its human readable
-                format.
-        }
+            {
+                links: list(dict(str:str)). List of dicts defing each edge in
+                    following format:
+                        {
+                            source: Role Id from which edge is going out.
+                            target: Role Id to which edge is incoming.
+                        }
+                nodes: dict(str:str). Mapping of role ID to its human readable
+                    format.
+            }
     """
     role_graph = {}
     role_graph['links'] = []

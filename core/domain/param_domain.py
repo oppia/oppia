@@ -139,11 +139,11 @@ class ParamChange(python_utils.OBJECT):
 
         Returns:
             dict: A dict specifying the following customization arguments for
-            the parameter. In case of a parameter change to a single value,
-            this dict contains the value of the parameter and a key-value
-            pair specifying whether parsing is done using the Jinja template
-            engine. If the parameter is changed to one amongst several values,
-            this dict contains a list of possible values.
+                the parameter. In case of a parameter change to a single value,
+                this dict contains the value of the parameter and a key-value
+                pair specifying whether parsing is done using the Jinja template
+                engine. If the parameter is changed to one amongst several
+                values, this dict contains a list of possible values.
          """
         return self._customization_args
 
@@ -166,15 +166,15 @@ class ParamChange(python_utils.OBJECT):
         Args:
             param_change_dict: dict. A dict containing data about the
                 following keys: (customization_args(dict), name, generator_id).
-                `customization_args` is a dict with the following keys:
-                (value, parse_with_jinja). `value` specifies the value of the
-                parameter and `parse_with_jinja` indicates whether parsing
-                change be performed using the Jinja template engine. If the
-                parameter changed to one amongst several values, this dict
-                contains a list of possible values.
-                `name` is the name of the parameter.
-                `generator_id` is the type of value generator used to
-                generate the new value for the parameter.
+                    `customization_args` is a dict with the following keys:
+                    (value, parse_with_jinja). `value` specifies the value of
+                    the parameter and `parse_with_jinja` indicates whether
+                    parsing change be performed using the Jinja template engine.
+                    If theparameter changed to one amongst several values, this
+                    dict contains a list of possible values.
+                    `name` is the name of the parameter.
+                    `generator_id` is the type of value generator used to
+                    generate the new value for the parameter.
 
         Returns:
             ParamChange. The ParamChange object created from the

@@ -187,7 +187,7 @@ class QuestionModel(base_models.VersionedModel):
 
         Args:
             questions: list(Question). The list of question objects
-            to put into the datastore.
+                to put into the datastore.
         """
         cls.put_multi(questions)
 
@@ -224,7 +224,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data should
-            be checked.
+                be checked.
 
         Returns:
             bool. Whether any models refer to the given user ID.
@@ -528,7 +528,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         Args:
             question_skill_links: list(QuestionSkillLink). The list of
-            question skill link domain objects to put into the datastore.
+                question skill link domain objects to put into the datastore.
         """
         cls.put_multi(question_skill_links)
 
@@ -539,7 +539,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         Args:
             question_skill_links: list(QuestionSkillLinkModel). The list of
-            question skill link domain objects to delete from the datastore.
+                question skill link domain objects to delete from the datastore.
         """
         cls.delete_multi(question_skill_links)
 
@@ -633,7 +633,7 @@ class QuestionSummaryModel(base_models.BaseModel):
 
         Args:
             unused_user_id: str. The ID of the user whose data should be
-            checked.
+                checked.
 
         Returns:
             bool. Whether any models refer to the given user_id.

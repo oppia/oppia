@@ -36,11 +36,11 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
 
         Args:
           rte_component_class: the class whose validate() method
-            is to be tested.
+              is to be tested.
           valid_items: a list of values. Each of these items is expected to
-            be validated without any Exception.
+              be validated without any Exception.
           invalid_items: a list of values. Each of these is expected to raise
-            a TypeError when validated.
+              a TypeError when validated.
         """
         for item in valid_items:
             rte_component_class.validate(item)

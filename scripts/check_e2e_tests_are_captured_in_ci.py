@@ -45,7 +45,7 @@ def get_e2e_suite_names_from_jobs_travis_yml_file():
 
     Returns:
         list(str): An alphabetically-sorted list of names of test suites
-        from the jobs section in the .travis.yml file.
+            from the jobs section in the .travis.yml file.
     """
     travis_file_content = read_and_parse_travis_yml_file()
     jobs_str = python_utils.convert_to_bytes(travis_file_content['env']['jobs'])
@@ -66,7 +66,7 @@ def get_e2e_suite_names_from_script_travis_yml_file():
 
     Returns:
         list(str): An alphabetically-sorted list of names of test suites
-        from the script section in the .travis.yml file.
+            from the script section in the .travis.yml file.
     """
     travis_file_content = read_and_parse_travis_yml_file()
     script_str = python_utils.convert_to_bytes(travis_file_content['script'])
@@ -84,7 +84,7 @@ def get_e2e_suite_names_from_protractor_file():
 
     Returns:
         list(str): An alphabetically-sorted list of names of test suites
-        from the protractor.conf.js file.
+            from the protractor.conf.js file.
     """
     protractor_config_file_content = read_protractor_conf_file()
     # The following line extracts suite object from protractor.conf.js.
@@ -128,7 +128,8 @@ def get_e2e_test_filenames_from_protractor_dir():
 
     Returns:
         list(str): An alphabetically-sorted list of of the all test files
-        in core/tests/protractor and core/tests/protractor_desktop directory.
+            in core/tests/protractor and core/tests/protractor_desktop
+            directory.
     """
     protractor_test_suite_files = []
     protractor_files = os.path.join(
@@ -149,7 +150,7 @@ def get_e2e_test_filenames_from_protractor_conf_file():
 
     Returns:
         list(str): An alphabetically-sorted list of filenames extracted
-        from the protractor.conf.js file.
+            from the protractor.conf.js file.
     """
     protractor_config_file_content = read_protractor_conf_file()
     # The following line extracts suite object from protractor.conf.js.

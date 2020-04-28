@@ -588,7 +588,7 @@ def _get_filtered_completed_exp_summaries(
     Returns:
         tuple. A 2-tuple whose elements are as follows:
         - list(ExplorationSummary). Filtered list of ExplorationSummary domain
-                objects of the completed explorations.
+            objects of the completed explorations.
         - list(str). The ids of the explorations that are no longer present.
     """
     nonexistent_completed_exp_ids = []

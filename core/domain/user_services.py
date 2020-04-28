@@ -118,7 +118,7 @@ class UserSettings(python_utils.OBJECT):
                 picture as a dataURI string.
             default_dashboard: str|None. The default dashboard of the user.
             creator_dashboard_display_pref: str. The creator dashboard
-            dashboard of the user.
+                dashboard of the user.
             user_bio: str. User-specified biography.
             subject_interests: list(str) or None. Subject interests specified by
                 the user.

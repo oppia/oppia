@@ -1103,10 +1103,10 @@ class AnswerOccurrence(python_utils.OBJECT):
 
         Returns:
             dict. The specific answer dict in the following format:
-            {
-                'answer': *. The answer submitted by the learner.
-                'frequency': int. The number of occurrences of the answer.
-            }
+                {
+                    'answer': *. The answer submitted by the learner.
+                    'frequency': int. The number of occurrences of the answer.
+                }
         """
         return {
             'answer': self.answer,

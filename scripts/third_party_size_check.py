@@ -72,7 +72,7 @@ def _check_size_in_dir(dir_path, skip_files_list):
     Args:
          dir_path: str. The directory which files will be counted.
          skip_files_list: list. The list of files which are to be skipped
-         from the file count.
+            from the file count.
 
     Returns:
         int. The number of files inside the given directory.

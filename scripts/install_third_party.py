@@ -85,9 +85,9 @@ def download_files(source_url_root, target_dir, source_filenames):
       source_url_root: the URL to prepend to all the filenames.
       target_dir: the directory to save the files to.
       source_filenames: a list of filenames. Each filename is appended to the
-        end of the source_url_root in order to give the URL from which to
-        download the file. The downloaded file is then placed in target_dir,
-        and retains the same filename.
+          end of the source_url_root in order to give the URL from which to
+          download the file. The downloaded file is then placed in target_dir,
+          and retains the same filename.
     """
     assert isinstance(source_filenames, list)
     common.ensure_directory_exists(target_dir)
@@ -117,7 +117,7 @@ def download_and_unzip_files(
       target_parent_dir: the directory to save the contents of the zip file to.
       zip_root_name: the name of the top-level folder in the zip directory.
       target_root_name: the name that the top-level folder should be renamed to
-        in the local directory.
+          in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
         python_utils.PRINT('Downloading and unzipping file %s to %s ...' % (
@@ -167,7 +167,7 @@ def download_and_untar_files(
       target_parent_dir: the directory to save the contents of the tar file to.
       tar_root_name: the name of the top-level folder in the tar directory.
       target_root_name: the name that the top-level folder should be renamed to
-        in the local directory.
+          in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
         python_utils.PRINT('Downloading and untarring file %s to %s ...' % (

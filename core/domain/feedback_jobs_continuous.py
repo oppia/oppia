@@ -170,9 +170,9 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             list(dict). Each dict in this list corresponds to an
             exploration ID in the input list, and has two keys:
             - num_open_threads: int. The count of open feedback threads
-              for this exploration.
+                for this exploration.
             - num_total_threads: int. The count of all feedback threads
-              for this exploration.
+                for this exploration.
         """
         realtime_model_ids = cls.get_multi_active_realtime_layer_ids(
             exploration_ids)
@@ -203,9 +203,9 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
         Returns:
             dict with two keys:
             - num_open_threads: int. The count of open feedback threads for
-              this exploration.
+                this exploration.
             - num_total_threads: int. The count of all feedback
-              threads for this exploration.
+                threads for this exploration.
         """
         return FeedbackAnalyticsAggregator.get_thread_analytics_multi(
             [exploration_id])[0]

@@ -184,8 +184,8 @@ def search_explorations(query, limit, sort=None, cursor=None):
         tuple. A 2-tuple consisting of:
             - list(str). A list of exploration ids that match the query.
             - str or None. A cursor if there are more matching explorations to
-              fetch, None otherwise. If a cursor is returned, it will be a
-              web-safe string that can be used in URLs.
+                fetch, None otherwise. If a cursor is returned, it will be a
+                web-safe string that can be used in URLs.
     """
     return search_services.search(
         query, SEARCH_INDEX_EXPLORATIONS, cursor, limit, sort, ids_only=True)
@@ -231,8 +231,8 @@ def search_collections(query, limit, sort=None, cursor=None):
         A 2-tuple with the following elements:
             - A list of collection ids that match the query.
             - A cursor if there are more matching collections to fetch, None
-              otherwise. If a cursor is returned, it will be a web-safe string
-              that can be used in URLs.
+                otherwise. If a cursor is returned, it will be a web-safe string
+                that can be used in URLs.
     """
     return search_services.search(
         query, SEARCH_INDEX_COLLECTIONS, cursor, limit, sort, ids_only=True)

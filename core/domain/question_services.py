@@ -155,7 +155,7 @@ def _update_linked_skill_ids_of_question(
         question_id: str. ID of the question linked to the skill.
         new_linked_skill_ids: list(str). New linked skill IDs of the question.
         old_linked_skill_ids: list(str). Current linked skill IDs of the
-        question.
+            question.
     """
     change_dict = {
         'cmd': 'update_question_property',
