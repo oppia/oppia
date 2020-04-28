@@ -5024,26 +5024,26 @@ class ProdValidationAuditOneOffJobMeta(type):
 
     _MODEL_AUDIT_ONE_OFF_JOB_NAMES = set()
 
-    def __new__(cls, name, bases, dct):
-        cls._MODEL_AUDIT_ONE_OFF_JOB_NAMES.add(name)
-        return super(ProdValidationAuditOneOffJobMeta, cls).__new__(
-            cls, name, bases, dct)
+    def __new__(mcs, name, bases, dct):
+        mcs._MODEL_AUDIT_ONE_OFF_JOB_NAMES.add(name)
+        return super(ProdValidationAuditOneOffJobMeta, mcs).__new__(
+            mcs, name, bases, dct)
 
     @classmethod
-    def get_model_audit_job_names(cls):
+    def get_model_audit_job_names(mcs):
         """Returns list of job names that have inherited from
         ProdValidationAuditOneOffJob.
 
         Returns:
             tuple(str). The names of the one off audit jobs of this class type.
         """
-        return sorted(cls._MODEL_AUDIT_ONE_OFF_JOB_NAMES)
+        return sorted(mcs._MODEL_AUDIT_ONE_OFF_JOB_NAMES)
 
 
 class ProdValidationAuditOneOffJob(
         python_utils.with_metaclass(
             ProdValidationAuditOneOffJobMeta,
-            jobs.BaseMapReduceOneOffJobManager)):
+            jobs.BaseMapReduceOneOffJobManager)): # pylint: disable=inherit-non-class
     """Job that audits and validates production models."""
 
     @classmethod
