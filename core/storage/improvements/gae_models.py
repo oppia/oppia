@@ -171,39 +171,3 @@ class TaskEntryModel(base_models.BaseModel):
             if not cls.get_by_id(task_id):
                 return task_id
         raise Exception('Task ID strategy is creating too many collisions')
-
-    @classmethod
-    def create(
-            cls, task_id, entity_type, entity_id, task_type,
-            entity_version_start, entity_version_end=None, target_type=None,
-            target_id=None, status=STATUS_OPEN):
-        """Creates a new TaskEntryModel.
-
-        Args:
-            task_id: str. String to uniquely identify the new task.
-            entity_type: str. The type of entity a task entry refers to.
-            entity_id: str. The ID of the entity a task entry refers to.
-            task_type: str. The type of task a task entry tracks.
-            entity_version_start: int. Refers to the first (inclusive) entity
-                version a task entry is relevant to.
-            entity_version_end: int or None. Refers to the last (exclusive)
-                entity version a task entry is relevant to.
-            target_type: str or None. The type of sub-entity a task entry
-                focuses on.
-            target_id: str or None. Uniquely identifies the sub-entity a task
-                entry focuses on.
-            status: str. Tracks the state/progress of a task entry.
-
-        Returns:
-            TaskEntryModel. The newly created valid TaskEntryModel instance.
-        """
-        return cls(
-            id=task_id,
-            entity_type=entity_type,
-            entity_id=entity_id,
-            task_type=task_type,
-            target_type=target_type,
-            target_id=target_id,
-            status=status,
-            entity_version_start=entity_version_start,
-            entity_version_end=entity_version_end)

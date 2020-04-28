@@ -438,9 +438,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
         imps_models.TaskEntryModel(
             id=self.GENERIC_MODEL_ID,
-            task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_id=self.GENERIC_MODEL_ID, status='open',
+            entity_id=self.GENERIC_MODEL_ID,
+            task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE, status='open',
             entity_version_start=1, closed_by=self.USER_ID_1
         ).put()
 
