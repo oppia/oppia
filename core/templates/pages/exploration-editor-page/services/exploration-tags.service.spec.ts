@@ -39,7 +39,7 @@ describe('Exploration Tags Service', function() {
     ets = $injector.get('ExplorationTagsService');
   }));
 
-  it('should test the child object propertiess', function() {
+  it('should test the child object properties', function() {
     expect(ets.propertyName).toBe('tags');
     let NotNormalize = ['angularjs ', ' google  cloud  storage   ', ' python'];
     let Normalize = ['angularjs', 'google cloud storage', 'python'];
