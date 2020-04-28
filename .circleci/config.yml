@@ -90,7 +90,7 @@ commands:
             echo $target_branch
 
             rm jq
-            git pull origin $target_branch --no-edit
+            git pull git@github.com:oppia/oppia.git $target_branch --no-edit
             fi
 
 jobs:
