@@ -41,9 +41,7 @@ EXPLORATION_TASK_TYPE_CHOICES = (
 )
 
 EXPLORATION_TARGET_TYPE_CHOICE_STATE = 'state'
-EXPLORATION_TARGET_TYPE_CHOICES = (
-    EXPLORATION_TARGET_TYPE_CHOICE_STATE,
-)
+EXPLORATION_TARGET_TYPE_CHOICES = (EXPLORATION_TARGET_TYPE_CHOICE_STATE,)
 
 STATUS_CHOICE_OPEN = 'open'
 STATUS_CHOICE_DEPRECATED = 'deprecated'
@@ -112,10 +110,10 @@ class TaskEntryModel(base_models.BaseModel):
             str. An ID available for use for a new task entry.
         """
         for _ in python_utils.RANGE(_GENERATE_NEW_ID_MAX_ATTEMPTS):
-            task_id = '.'.join(
-                [task_type, entity_type, entity_id, str(uuid.uuid4())])
+            task_id = u'%s.%s.%s.%s' % (
+                task_type, entity_type, entity_id, uuid.uuid4())
             if not cls.get_by_id(task_id):
-                return task_id
+                return python_utils.UNICODE(task_id)
         raise Exception('Task ID strategy is creating too many collisions')
 
     @classmethod

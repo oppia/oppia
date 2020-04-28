@@ -70,16 +70,33 @@ class TaskEntryModelTest(test_utils.GenericTestBase):
                     feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
 
     def test_can_create_new_hbr_task(self):
+        task_id = imps_models.TaskEntryModel.generate_new_task_id(
+            feconf.TASK_TYPE_HIGH_BOUNCE_RATE, feconf.ENTITY_TYPE_EXPLORATION,
+            self.EXP_ID)
         imps_models.TaskEntryModel.create(
-            'taskid', feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
+            task_id, feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
             feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 1, None, None)
 
     def test_can_create_new_sia_task(self):
+        task_id = imps_models.TaskEntryModel.generate_new_task_id(
+            feconf.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
         imps_models.TaskEntryModel.create(
-            'taskid', feconf.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
+            task_id, feconf.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
             feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 1, None, None)
 
     def test_can_create_new_ngr_task(self):
+        task_id = imps_models.TaskEntryModel.generate_new_task_id(
+            feconf.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
         imps_models.TaskEntryModel.create(
-            'taskid', feconf.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+            task_id, feconf.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
             feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 1, None, None)
+
+    def test_can_generate_task_id_with_unicode_entity_id(self):
+        task_id = imps_models.TaskEntryModel.generate_new_task_id(
+            feconf.TASK_TYPE_HIGH_BOUNCE_RATE, feconf.ENTITY_TYPE_EXPLORATION,
+            u'exp_id\U0001F4C8')
+        imps_models.TaskEntryModel.create(
+            task_id, feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
+            feconf.ENTITY_TYPE_EXPLORATION, u'exp_id\U0001F4C8', 1)
