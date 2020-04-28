@@ -85,7 +85,7 @@ class StorageModelAuditJobsTest(test_utils.GenericTestBase):
                         names_of_ndb_model_subclasses.append(clazz.__name__)
 
         names_of_all_audit_job_classes = (
-            prod_validation_jobs_one_off.ProdValidationAuditOneOffJobMeta
+            prod_validation_jobs_one_off.ProdValidationAuditOneOffJobMetaClass
             .get_model_audit_job_names())
 
         model_class_names_with_missing_audit_jobs = [
