@@ -45,14 +45,14 @@ class TaskEntryModelTest(test_utils.GenericTestBase):
             imps_models.TaskEntryModel.generate_new_task_id(
                 task_type, entity_type, entity_id),
         ]
-        self.assertIn(task_type, task_id[0])
-        self.assertIn(task_type, task_id[1])
-        self.assertIn(entity_type, task_id[0])
-        self.assertIn(entity_type, task_id[1])
-        self.assertIn(entity_id, task_id[0])
-        self.assertIn(entity_id, task_id[1])
+        self.assertIn(task_type, task_ids[0])
+        self.assertIn(task_type, task_ids[1])
+        self.assertIn(entity_type, task_ids[0])
+        self.assertIn(entity_type, task_ids[1])
+        self.assertIn(entity_id, task_ids[0])
+        self.assertIn(entity_id, task_ids[1])
         # Although made of the same components, the IDs shouldn't compare equal.
-        self.assertNotEqual(task_id[0], task_id[1])
+        self.assertNotEqual(task_ids[0], task_ids[1])
 
     def test_error_reported_if_too_many_collisions(self):
         # uuid.uuid4() is the source of randomness for TaskEntryModel task IDs.
