@@ -135,6 +135,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         14) Creates new exploration rights.
         15) Populates user settings.
         16) Creates two reply-to ids for feedback.
+        17) Creates a task closed by the user.
         """
         super(TakeoutServiceUnitTests, self).setUp()
         # Setup for UserStatsModel.
@@ -433,6 +434,12 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
+        task = imps_models.TaskEntryModel(
+            id=self.GENERIC_MODEL_ID, 'exploration', self.GENERIC_MODEL_ID,
+            1)
+        task.closed_by = self.USER_ID_1
+        task.put()
+
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
         super(TakeoutServiceUnitTests, self).setUp()
@@ -512,6 +519,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         topic_rights_data = {
             'managed_topic_ids': []
         }
+        task_entry_data = {
+            'task_ids_closed_by_user': []
+        }
 
         expected_voiceover_application_data = {}
         expected_contrib_score_data = {}
@@ -554,6 +564,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 expected_voiceover_application_data,
             'user_contribution_scoring_data': expected_contrib_score_data,
             'user_community_rights_data': expected_community_rights_data,
+            'task_entry_data': task_entry_data,
             'collection_rights_snapshot_metadata_data':
                 expected_collection_rights_sm,
             'collection_snapshot_metadata_data':
@@ -774,6 +785,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_topic_data = {
             'managed_topic_ids': [self.TOPIC_ID_1, self.TOPIC_ID_2]
         }
+        expected_task_entry_data = {
+            'task_ids_closed_by_user': [self.GENERIC_MODEL_ID]
+        }
 
         expected_voiceover_application_data = {
             'application_1_id': {
@@ -921,6 +935,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'exp_user_last_playthrough_data': expected_last_playthrough_data,
             'learner_playlist_data': expected_learner_playlist_data,
             'topic_rights_data': expected_topic_data,
+            'task_entry_data': expected_task_entry_data,
             'collection_progress_data': expected_collection_progress_data,
             'story_progress_data': expected_story_progress_data,
             'general_feedback_thread_data':
