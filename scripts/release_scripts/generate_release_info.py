@@ -285,7 +285,7 @@ def check_storage_models(current_release):
 
 
 def main(personal_access_token):
-    """Collects necessary info and dumps it to disk.
+    """Collects necessary info and dumps it to the disk.
 
     Args:
         personal_access_token: str. The personal access token for the
