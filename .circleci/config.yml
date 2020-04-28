@@ -89,7 +89,7 @@ commands:
               )
 
               rm jq
-              if [[ -z "$target_branch" ]]
+              if [[ "$target_branch" == null ]]
               then
                 git pull git@github.com:oppia/oppia.git develop --no-edit
               else
