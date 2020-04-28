@@ -30,6 +30,8 @@ import os
 import sys
 import unittest
 
+from scripts import common
+
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
@@ -37,14 +39,16 @@ THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(
         OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine'),
-    os.path.join(OPPIA_TOOLS_DIR, 'webtest-2.0.33'),
+    os.path.join(OPPIA_TOOLS_DIR, 'webtest-%s' % common.WEBTEST_VERSION),
     os.path.join(
         OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine',
         'lib', 'webob_0_9'),
-    os.path.join(OPPIA_TOOLS_DIR, 'browsermob-proxy-0.8.0'),
-    os.path.join(OPPIA_TOOLS_DIR, 'selenium-3.13.0'),
-    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-6.0.0'),
-    os.path.join(OPPIA_TOOLS_DIR, 'psutil-5.6.7'),
+    os.path.join(
+        OPPIA_TOOLS_DIR,
+        'browsermob-proxy-%s' % common.BROWSERMOB_PROXY_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'selenium-%s' % common.SELENIUM_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-%s' % common.PILLOW_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % common.PSUTIL_VERSION,),
     CURR_DIR,
     os.path.join(THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.5'),
     os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
