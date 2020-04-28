@@ -51,13 +51,6 @@ describe('Classroom backend API service', function() {
 
   let sampleDataResultsObjects = null;
 
-  let successCallback = function(x) {
-    return true;
-  };
-  let errorCallback = function(x) {
-    return false;
-  };
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
