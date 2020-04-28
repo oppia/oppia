@@ -34,69 +34,59 @@ base_models, exp_models, imps_models, user_models = (
 class TaskEntryModelTest(test_utils.GenericTestBase):
     """Unit tests for TaskEntryModel instances."""
 
-    def setUp(self):
-        super(TaskEntryModelTest, self).setUp()
-        self.OWNER_EMAIL = 'creator@example.com'
-        self.OWNER_NAME = 'Creator'
-        self.signup(self.OWNER_EMAIL, self.OWNER_NAME)
-        self.OWNER_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.EXP_ID = 'expid'
-        self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
-        self.EXP_VERSION = 1
-
     def test_generate_new_task_id(self):
         task_id = imps_models.TaskEntryModel.generate_new_task_id(
             'TASK_TYPE', 'ENTITY_TYPE', 'ENTITY_ID')
         self.assertIn('TASK_TYPE', task_id)
         self.assertIn('ENTITY_TYPE', task_id)
         self.assertIn('ENTITY_ID', task_id)
-        second_task_id = imps_models.TaskEntryModel.generate_new_task_id(
+        different_task_id = imps_models.TaskEntryModel.generate_new_task_id(
             'TASK_TYPE', 'ENTITY_TYPE', 'ENTITY_ID')
-        self.assertNotEqual(task_id, second_task_id)
+        self.assertNotEqual(task_id, different_task_id)
 
     def test_error_reported_if_too_many_collisions(self):
         # TaskEntryModel uses uuid.uuid4() to randomize task IDs.
-        with self.swap(uuid, 'uuid4', lambda: 'duplicated-value'):
+        with self.swap(uuid, 'uuid4', lambda: 'always-same'):
             task_id = imps_models.TaskEntryModel.generate_new_task_id(
                 feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
+                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
             task = imps_models.TaskEntryModel.create(
                 task_id, feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, self.EXP_VERSION)
+                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 1)
             task.put()
             with self.assertRaisesRegexp(Exception, 'too many collisions'):
                 imps_models.TaskEntryModel.generate_new_task_id(
                     feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-                    feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
+                    feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
 
     def test_can_create_new_hbr_task(self):
         task_id = imps_models.TaskEntryModel.generate_new_task_id(
             feconf.TASK_TYPE_HIGH_BOUNCE_RATE, feconf.ENTITY_TYPE_EXPLORATION,
-            self.EXP_ID)
+            'exp_id')
         imps_models.TaskEntryModel.create(
             task_id, feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 1, None, None)
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 1, None, None)
 
     def test_can_create_new_sia_task(self):
         task_id = imps_models.TaskEntryModel.generate_new_task_id(
             feconf.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
         imps_models.TaskEntryModel.create(
             task_id, feconf.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 1, None, None)
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 1, None, None)
 
     def test_can_create_new_ngr_task(self):
         task_id = imps_models.TaskEntryModel.generate_new_task_id(
             feconf.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
         imps_models.TaskEntryModel.create(
             task_id, feconf.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 1, None, None)
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 1, None, None)
 
     def test_can_generate_task_id_with_unicode_entity_id(self):
         task_id = imps_models.TaskEntryModel.generate_new_task_id(
             feconf.TASK_TYPE_HIGH_BOUNCE_RATE, feconf.ENTITY_TYPE_EXPLORATION,
-            u'exp_id\U0001F4C8')
+            'exp_id\U0001F4C8')
         imps_models.TaskEntryModel.create(
             task_id, feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            feconf.ENTITY_TYPE_EXPLORATION, u'exp_id\U0001F4C8', 1)
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id\U0001F4C8', 1)
