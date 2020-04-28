@@ -5015,7 +5015,7 @@ MODEL_TO_VALIDATOR_MAPPING = {
 }
 
 
-class ProdValidationAuditOneOffJobMeta(type):
+class ProdValidationAuditOneOffJobMetaClass(type):
     """Type class for audit one off jobs. Registers classes inheriting from
     ProdValidationAuditOneOffJob in a list. With this strategy, job writers can
     define them in separate modules while allowing us to assert that each model
@@ -5026,7 +5026,7 @@ class ProdValidationAuditOneOffJobMeta(type):
 
     def __new__(mcs, name, bases, dct):
         mcs._MODEL_AUDIT_ONE_OFF_JOB_NAMES.add(name)
-        return super(ProdValidationAuditOneOffJobMeta, mcs).__new__(
+        return super(ProdValidationAuditOneOffJobMetaClass, mcs).__new__(
             mcs, name, bases, dct)
 
     @classmethod
@@ -5042,7 +5042,7 @@ class ProdValidationAuditOneOffJobMeta(type):
 
 class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
         python_utils.with_metaclass(
-            ProdValidationAuditOneOffJobMeta,
+            ProdValidationAuditOneOffJobMetaClass,
             jobs.BaseMapReduceOneOffJobManager)):
     """Job that audits and validates production models."""
 
