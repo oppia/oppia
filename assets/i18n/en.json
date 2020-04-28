@@ -578,5 +578,10 @@
     "I18N_TOTAL_SUBSCRIBERS_TEXT": "You have a total of <[totalSubscribers]> subscribers.",
     "I18N_UNSUBSCRIBE_BUTTON_TEXT": "Unsubscribe",
     "I18N_WELCOME_GUIDE_TITLE": "Teachers and Parents: A Guide to Oppia",
+    "I18N_WELCOME_GUIDE_HOW_TO_TITLE": "How Can I Find an Explorations and Collections?",
+    "I18N_WELCOME_GUIDE_PARAGRAH_1": "Oppia is an online learning platform that caters specifically to the needs of the world’s underserved youth. As a parent or teacher, we know your involvement is crucial to a child’s education. Here is how you can use Oppia to help your students reach their full potential.", 
+    "I18N_WELCOME_GUIDE_PARAGRAH_4":"You can find different explorations and collections on the <a href=\"/library\">Exploration Library</a> page. You can also find the Exploration Library by clicking the “Library” at the top of this page. ",
+    "I18N_WELCOME_GUIDE_PARAGRAH_5":"You can filter explorations by different categories including Art, Mathematics,  English and more! You can also look for specific explorations using the search bar. Below each collection there is a rating and also the number of students who have completed that exploration. Use these numbers to see how helpful a collection can be. ",
+    "I18N_WELCOME_GUIDE_PARAGRAH_6":"Below is a snapshot of the library. The highlighted parts are different features of the page you can use to find explorations. Read the descriptions below to understand what these features do. ",
     "I18N_WORKED_EXAMPLE": "Worked Example"
 }
