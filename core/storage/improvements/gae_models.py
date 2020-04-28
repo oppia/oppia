@@ -100,6 +100,15 @@ class TaskEntryModel(base_models.BaseModel):
     def get_deletion_policy():
         return base_models.DELETION_POLICY.DELETE
 
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of TaskEntryModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_multi(cls.query(cls.closed_by == user_id))
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
@@ -123,6 +132,28 @@ class TaskEntryModel(base_models.BaseModel):
         return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
 
     @classmethod
+    def get_user_id_migration_field(cls):
+        """Return field that contains user ID."""
+        return cls.closed_by
+
+    @staticmethod
+    def export_data(user_id):
+        """This method should be implemented by subclasses.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Raises:
+            dict. The user-relevant properties of TaskEntryModel in a dict
+            format. In this case, we are returning all the ids of the tasks
+            which were closed by this user.
+        """
+        tasks_closed_by_user = (
+            TaskEntryModel.query(TaskEntryModel.closed_by == user_id))
+        task_ids_closed_by_user = [task.id for task in tasks_closed_by_user]
+        return {'task_ids_closed_by_user': task_ids_closed_by_user}
+
+    @classmethod
     def generate_new_task_id(cls, task_type, entity_type, entity_id):
         """Generates a new task entry ID.
 
@@ -138,7 +169,7 @@ class TaskEntryModel(base_models.BaseModel):
             task_id = '%s.%s.%s.%s' % (
                 task_type, entity_type, entity_id, uuid.uuid4())
             if not cls.get_by_id(task_id):
-                return python_utils.UNICODE(task_id)
+                return task_id
         raise Exception('Task ID strategy is creating too many collisions')
 
     @classmethod

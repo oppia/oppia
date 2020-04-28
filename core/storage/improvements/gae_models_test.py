@@ -66,6 +66,37 @@ class TaskEntryModelTest(test_utils.GenericTestBase):
         self.assertFalse(
             imps_models.TaskEntryModel.has_reference_to_user_id('x_id'))
 
+    def test_apply_deletion_policy(self):
+        task_id = imps_models.TaskEntryModel.generate_new_task_id(
+            feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
+        task = imps_models.TaskEntryModel.create(
+            task_id, feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 1)
+        task.closed_by = 'user_id'
+        task.put()
+        self.assertTrue(
+            imps_models.TaskEntryModel.has_reference_to_user_id('user_id'))
+
+        imps_models.TaskEntryModel.apply_deletion_policy('user_id')
+
+        self.assertFalse(
+            imps_models.TaskEntryModel.has_reference_to_user_id('user_id'))
+
+    def test_export_data(self):
+        task_id = imps_models.TaskEntryModel.generate_new_task_id(
+            feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
+        task = imps_models.TaskEntryModel.create(
+            task_id, feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 1)
+        task.closed_by = 'user_id'
+        task.put()
+
+        self.assertEqual(imps_models.TaskEntryModel.export_data('user_id'), {
+            'task_ids_closed_by_user': [task_id]
+        })
+
     def test_generate_new_task_id(self):
         task_type, entity_type, entity_id = (
             'TASK_TYPE', 'ENTITY_TYPE', 'ENTITY_ID')
