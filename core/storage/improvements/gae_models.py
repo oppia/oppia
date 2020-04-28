@@ -96,6 +96,32 @@ class TaskEntryModel(base_models.BaseModel):
     closed_context = ndb.StringProperty(
         default=None, required=False, indexed=False)
 
+    @staticmethod
+    def get_deletion_policy():
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether any TaskEntryModel references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(cls.closed_by == user_id).iter().has_next()
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """TaskEntryModel has the closed_by field which refers to a user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
+
     @classmethod
     def generate_new_task_id(cls, task_type, entity_type, entity_id):
         """Generates a new task entry ID.

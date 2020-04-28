@@ -25,7 +25,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(imps_models,) = models.Registry.import_models([models.NAMES.improvements])
+base_models, imps_models = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.improvements])
 
 
 def _always_return(value):
@@ -35,6 +36,35 @@ def _always_return(value):
 
 class TaskEntryModelTest(test_utils.GenericTestBase):
     """Unit tests for TaskEntryModel instances."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            imps_models.TaskEntryModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_get_export_policy(self):
+        self.assertEqual(
+            imps_models.TaskEntryModel.get_export_policy(),
+            base_models.EXPORT_POLICY.CONTAINS_USER_DATA)
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            imps_models.TaskEntryModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
+
+    def test_has_reference_to_user_id(self):
+        task_id = imps_models.TaskEntryModel.generate_new_task_id(
+            feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
+        task = imps_models.TaskEntryModel.create(
+            task_id, feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 1)
+        task.closed_by = 'user_id'
+        task.put()
+        self.assertTrue(
+            imps_models.TaskEntryModel.has_reference_to_user_id('user_id'))
+        self.assertFalse(
+            imps_models.TaskEntryModel.has_reference_to_user_id('x_id'))
 
     def test_generate_new_task_id(self):
         task_type, entity_type, entity_id = (
