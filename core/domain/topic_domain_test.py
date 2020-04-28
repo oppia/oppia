@@ -237,15 +237,6 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_topic_id('Topic id should be a string', 10)
         self._assert_valid_topic_id('Topic id abc is invalid', 'abc')
 
-    def test_valid_abbreviated_name(self):
-        self._assert_valid_abbreviated_name(
-            'Abbreviated name should be a string.', 10)
-        self._assert_valid_abbreviated_name(
-            'Abbreviated name field should not be empty.', '')
-        self._assert_valid_abbreviated_name(
-            'Abbreviated name field should not exceed 12 characters.',
-            'this is a lengthy name.')
-
     def test_thumbnail_filename_validation_for_topic(self):
         self._assert_valid_thumbnail_filename_for_topic(
             'Expected thumbnail filename to be a string, received 10', 10)
@@ -324,6 +315,16 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.thumbnail_bg_color = '#FFFFFF'
         self._assert_validation_error(
             'Topic thumbnail background color #FFFFFF is not supported.')
+
+    def test_topic_thumbnail_filename_or_thumbnail_bg_color_is_none(self):
+        self.topic.thumbnail_bg_color = '#C6DCDA'
+        self.topic.thumbnail_filename = None
+        self._assert_validation_error(
+            'Topic thumbnail image is not provided.')
+        self.topic.thumbnail_bg_color = None
+        self.topic.thumbnail_filename = 'test.svg'
+        self._assert_validation_error(
+            'Topic thumbnail background color is not specified.')
 
     def test_subtopic_thumbnail_bg_validation(self):
         self.topic.subtopics[0].thumbnail_bg_color = '#CACACA'
