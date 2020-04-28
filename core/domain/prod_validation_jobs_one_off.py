@@ -5040,18 +5040,20 @@ class ProdValidationAuditOneOffJobMeta(type):
         return sorted(mcs._MODEL_AUDIT_ONE_OFF_JOB_NAMES)
 
 
-class ProdValidationAuditOneOffJob(
+class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
         python_utils.with_metaclass(
             ProdValidationAuditOneOffJobMeta,
-            jobs.BaseMapReduceOneOffJobManager)): # pylint: disable=inherit-non-class
+            jobs.BaseMapReduceOneOffJobManager)):
     """Job that audits and validates production models."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
         raise NotImplementedError
 
     @staticmethod
     def map(model_instance):
+        """Implements a map function which defers to a pre-defined validator."""
         if not model_instance.deleted:
             model_name = model_instance.__class__.__name__
             validator_cls = MODEL_TO_VALIDATOR_MAPPING[type(model_instance)]
@@ -5069,6 +5071,7 @@ class ProdValidationAuditOneOffJob(
 
     @staticmethod
     def reduce(key, values):
+        """Yields number of fully validated models or the failure messages."""
         if 'fully-validated' in key:
             yield (key, len(values))
         else:
