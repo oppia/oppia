@@ -79,10 +79,6 @@ angular.module('oppia').directive('skillEditorNavbar', [
                   'save-pending-changes-modal.directive.html'),
                 backdrop: true,
                 controller: 'ConfirmOrCancelModalController'
-              }).result.then(null, function() {
-                // Note to developers:
-                // This callback is triggered when the Cancel button is clicked.
-                // No further action is needed.
               });
             } else {
               SkillEditorRoutingService.navigateToQuestionsTab();

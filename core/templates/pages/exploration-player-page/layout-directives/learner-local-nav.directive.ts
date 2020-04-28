@@ -18,6 +18,7 @@
 
 require('components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');

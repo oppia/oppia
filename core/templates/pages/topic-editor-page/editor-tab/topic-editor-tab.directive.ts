@@ -16,17 +16,18 @@
  * @fileoverview Controller for the main topic editor.
  */
 
-require(
-  'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
 require('components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-require('components/entity-creation-services/story-creation.service.ts');
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+
+require('components/entity-creation-services/story-creation.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
+require(
+  'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/csrf-token.service.ts');

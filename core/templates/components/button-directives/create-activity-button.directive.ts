@@ -18,6 +18,7 @@
 
 require('components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
+
 require('components/entity-creation-services/collection-creation.service.ts');
 require('components/entity-creation-services/exploration-creation.service.ts');
 require('domain/utilities/browser-checker.service.ts');

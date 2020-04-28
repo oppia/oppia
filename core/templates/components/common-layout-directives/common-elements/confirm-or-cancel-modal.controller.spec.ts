@@ -34,7 +34,7 @@ describe('Confirm Or Cancel Modal Controller', function() {
     });
   }));
 
-  it('should close modal', function() {
+  it('should close modal with the correct value', function() {
     var message = 'closing';
     $scope.confirm(message);
     expect($uibModalInstance.close).toHaveBeenCalledWith(message);
