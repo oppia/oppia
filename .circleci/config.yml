@@ -1,5 +1,6 @@
+version: 2.1
+
 workflows:
-  version: 2
   circleci_tests:
     # The following jobs run in the following stages:
     # - Setup runs first.
@@ -62,12 +63,41 @@ anchor_for_job_defaults: &job_defaults
   docker:
     - image: *docker_image
 
-version: 2
+commands:
+  merge_target_branch:
+    description: "Merge to target branch"
+    steps:
+      - run:
+          name: Merge to target branch
+          command: |
+            if [[ -n ${CIRCLE_PULL_REQUEST} ]]
+            then
+
+            git config --global user.email $( git log --format='%ae' $CIRCLE_SHA1^! )
+            git config --global user.name $( git log --format='%an' $CIRCLE_SHA1^! )
+
+            regexp="[[:digit:]]\+$"
+            PR_NUMBER=`echo $CIRCLE_PULL_REQUEST | grep -o $regexp`
+
+            curl -L "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64" -o jq
+            chmod +x jq
+
+            url="https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls/$PR_NUMBER?access_token=$GITHUB_TOKEN"
+
+            target_branch=$(
+              curl "$url" | ./jq '.base.ref' | tr -d '"'
+            )
+
+            rm jq
+            git pull origin $target_branch --no-edit
+            fi
+
 jobs:
   setup:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - run:
           name: Install dependencies
           command: python -m scripts.install_third_party_libs
@@ -82,6 +112,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -97,6 +128,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -108,6 +140,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -125,6 +158,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -139,6 +173,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -159,6 +194,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -170,6 +206,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -181,6 +218,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -192,6 +230,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -206,6 +245,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -223,6 +263,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
@@ -234,6 +275,7 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - merge_target_branch
       - attach_workspace:
           at: /home/circleci/
       - run:
