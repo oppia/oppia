@@ -184,7 +184,7 @@ def prepare_for_next_release():
         'Please fill in the requests by [Add a deadline which is at least 7 '
         'days before the next release cut]. Thanks!\n'
         'The subject for the message: Deadline for job requests for '
-        'next release\n' % release_constants.JOBS_FORM_URL)
+        'the next release\n' % release_constants.JOBS_FORM_URL)
 
 
 def main():
