@@ -87,6 +87,7 @@ commands:
             target_branch=$(
               curl "$url" | ./jq '.base.ref' | tr -d '"'
             )
+            echo $target_branch
 
             rm jq
             git pull origin $target_branch --no-edit
