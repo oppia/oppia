@@ -39,6 +39,7 @@ from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
+from core.domain import skill_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_fetchers
@@ -987,6 +988,10 @@ class QuestionPlayerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'fetch_by_difficulty must be true or false')
         fetch_by_difficulty = (fetch_by_difficulty_value == 'true')
+
+        if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
+            skill_ids = skill_services.filter_skills_by_mastery(
+                self.user_id, skill_ids)
 
         questions = (
             question_services.get_questions_by_skill_ids(
