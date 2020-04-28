@@ -147,10 +147,11 @@ module.exports = {
       filename: 'about-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'With Oppia, you can access free lessons on math, physics, ' +
-         'statistics, chemistry, music, history and more from anywhere in the ' +
-         'world. Oppia is a nonprofit with the mission of providing high-quality ' +
-         'education to those who lack access to it.'
+        description: 'With Oppia, you can access free lessons on ' + 
+          'math, physics, statistics, chemistry, music, history and ' +
+          'more from anywhere in the world. Oppia is a nonprofit ' +
+          'with the mission of providing high-quality ' +
+          'education to those who lack access to it.'
       },
       template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -161,10 +162,10 @@ module.exports = {
       filename: 'admin-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'With Oppia, you can access free lessons on math, physics, ' +
-         'statistics, chemistry, music, history and more from anywhere in the ' +
-         'world. Learn from our pre-existing explorations, or teach and create ' +
-         'your own.'
+        description: 'With Oppia, you can access free lessons on math, ' +
+          'physics, statistics, chemistry, music, history and more from ' +
+          'anywhere in the world. Learn from our pre-existing ' + 
+          'explorations, or teach and create your own.'
       },
       template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -405,9 +406,10 @@ module.exports = {
       filename: 'library-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'Looking to learn something new? Learn any subject of your choice ' +
-          'created by professors, teachers and Oppia users! Free lessons are always ' +
-          'available for any topic and level you want.' 
+        description: 'Looking to learn something new? Learn any subject ' +
+          'of your choice created by professors, teachers and Oppia ' +
+          'users! Free lessons are always available for any topic and ' +
+          'level you want.' 
       },
       template: commonPrefix + '/pages/library-page/library-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -528,10 +530,10 @@ module.exports = {
       filename: 'splash-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'With Oppia, you can access free lessons on math, physics, ' +
-        'statistics, chemistry, music, history and more from anywhere in the ' +
-        'world. Oppia is a nonprofit with the mission of providing high-quality ' +
-        'education to those who lack access to it.'
+        description: 'With Oppia, you can access free lessons on math, ' +
+        'physics, statistics, chemistry, music, history and more from ' +
+        'anywhere in the world. Oppia is a nonprofit with the mission ' +
+        'of providing high-quality education to those who lack access to it.'
       },
       template: commonPrefix + '/pages/splash-page/splash-page.mainpage.html',
       minify: htmlMinifyConfig,
