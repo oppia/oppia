@@ -25,7 +25,7 @@ require('pages/exploration-editor-page/' +
   'services/exploration-param-specs.service.ts');
 
 describe('Exploration Param Specs Service', function() {
-  var epcs = null;
+  let epcs = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
