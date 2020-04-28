@@ -20,11 +20,11 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { ContextService } from 'services/context.service';
+import { UrlService } from 'services/contextual/url.service';
 import { UserExplorationPermissionsService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { ContextService } from 'services/context.service';
-import { UrlService } from 'services/contextual/url.service';
 
 describe('User Exploration Permissions Service', () => {
   let ueps: UserExplorationPermissionsService;

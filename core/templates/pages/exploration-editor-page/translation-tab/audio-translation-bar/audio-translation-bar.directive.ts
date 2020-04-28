@@ -77,6 +77,7 @@ angular.module('oppia').directive('audioTranslationBar', [
             scope.dropAreaIsAccessible = permissions.can_voiceover;
             scope.userIsGuest = !userIsLoggedIn;
             scope.$digest();
+            return false;
           });
         });
 

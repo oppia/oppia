@@ -38,7 +38,7 @@ export class UserExplorationPermissionsService {
     private urlInterpolationService: UrlInterpolationService,
   ) { }
 
-  getPermissionsAsync(): any {
+  getPermissionsAsync(): Object {
     if (!this.permissionsPromise) {
       let explorationPermissionsUrl = this.urlInterpolationService
         .interpolateUrl( '/createhandler/permissions/<exploration_id>', {

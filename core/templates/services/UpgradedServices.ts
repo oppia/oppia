@@ -69,8 +69,6 @@ import { ConceptCardObjectFactory } from
 import { ConceptCardBackendApiService } from
   'domain/skill/concept-card-backend-api.service';
 import { ContextService } from 'services/context.service';
-import { UserExplorationPermissionsService } from
-  'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { ContinueValidationService } from
   'interactions/Continue/directives/continue-validation.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
@@ -287,6 +285,8 @@ import { TopicSummaryObjectFactory } from
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { UserExplorationPermissionsService } from
+  'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UtilsService } from 'services/utils.service';
@@ -550,11 +550,6 @@ export class UpgradedServices {
     upgradedServices['ContextService'] = new ContextService(
       upgradedServices['UrlService'],
       upgradedServices['EntityContextObjectFactory']);
-    upgradedServices['UserExplorationPermissionsService'] =
-      new UserExplorationPermissionsService(
-        upgradedServices['HttpClient'],
-        upgradedServices['ContextService'],
-        upgradedServices['UrlInterpolationService']);
     upgradedServices['EditorFirstTimeEventsService'] =
       new EditorFirstTimeEventsService(
         upgradedServices['SiteAnalyticsService']);
@@ -616,6 +611,11 @@ export class UpgradedServices {
     upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(
       upgradedServices['AlertsService'], upgradedServices['UrlService'],
       upgradedServices['UtilsService']);
+    upgradedServices['UserExplorationPermissionsService'] =
+      new UserExplorationPermissionsService(
+        upgradedServices['HttpClient'],
+        upgradedServices['ContextService'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['ValidatorsService'] = new ValidatorsService(
       upgradedServices['AlertsService'],
       upgradedServices['NormalizeWhitespacePipe']);
