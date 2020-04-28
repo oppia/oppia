@@ -34,9 +34,6 @@ ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
 POST_COMMIT_STATUS_PUBLIC = 'public'
 POST_COMMIT_STATUS_PRIVATE = 'private'
 
-# Whether to perform a full audit before creating new improvement task entries.
-ALWAYS_AUDIT_TASK_ENTRIES = True
-
 # Whether to unconditionally log info messages.
 DEBUG = False
 

@@ -30,32 +30,31 @@ from google.appengine.ext import ndb
 base_models, exp_models = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.exploration])
 
-ENTITY_TYPE_CHOICES = (
+ENTITY_TYPES = (
     feconf.ENTITY_TYPE_EXPLORATION,
 )
 
-EXPLORATION_TASK_TYPE_CHOICES = (
+STATUS_OPEN = 'open'
+STATUS_DEPRECATED = 'deprecated'
+STATUS_FIXED = 'fixed'
+STATUS_CHOICES = (
+    STATUS_OPEN,
+    STATUS_DEPRECATED,
+    STATUS_FIXED,
+)
+
+TARGET_TYPE_STATE = 'state'
+TARGET_TYPES = (
+    TARGET_TYPE_STATE,
+)
+
+TASK_TYPES = (
     feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
     feconf.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
     feconf.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
 )
 
-EXPLORATION_TARGET_TYPE_CHOICE_STATE = 'state'
-EXPLORATION_TARGET_TYPE_CHOICES = (EXPLORATION_TARGET_TYPE_CHOICE_STATE,)
-
-STATUS_CHOICE_OPEN = 'open'
-STATUS_CHOICE_DEPRECATED = 'deprecated'
-STATUS_CHOICE_FIXED = 'fixed'
-
-TASK_TYPE_CHOICES = EXPLORATION_TASK_TYPE_CHOICES
-TARGET_TYPE_CHOICES = EXPLORATION_TARGET_TYPE_CHOICES
-STATUS_CHOICES = (
-    STATUS_CHOICE_OPEN,
-    STATUS_CHOICE_DEPRECATED,
-    STATUS_CHOICE_FIXED,
-)
-
-# Constants used to generate new IDs.
+# Constant used to generate new IDs.
 _GENERATE_NEW_ID_MAX_ATTEMPTS = 10
 
 
@@ -67,16 +66,16 @@ class TaskEntryModel(base_models.BaseModel):
     """
     # The type of task a task entry tracks.
     task_type = ndb.StringProperty(
-        required=True, indexed=True, choices=TASK_TYPE_CHOICES)
+        required=True, indexed=True, choices=TASK_TYPES)
     # The type of entity a task entry refers to.
     entity_type = ndb.StringProperty(
-        required=True, indexed=True, choices=ENTITY_TYPE_CHOICES)
+        required=True, indexed=True, choices=ENTITY_TYPES)
     # The ID of the entity a task entry refers to.
     entity_id = ndb.StringProperty(required=True, indexed=True)
 
     # The type of sub-entity a task entry focuses on.
     target_type = ndb.StringProperty(
-        default=None, required=False, indexed=True, choices=TARGET_TYPE_CHOICES)
+        default=None, required=False, indexed=True, choices=TARGET_TYPES)
     # Uniquely identifies the sub-entity a task entry focuses on.
     target_id = ndb.StringProperty(default=None, required=False, indexed=True)
 
@@ -120,7 +119,7 @@ class TaskEntryModel(base_models.BaseModel):
     def create(
             cls, task_id, task_type, entity_type, entity_id,
             entity_version_start, entity_version_end=None, target_type=None,
-            target_id=None, status=STATUS_CHOICE_OPEN):
+            target_id=None, status=STATUS_OPEN):
         """Creates a new TaskEntryModel.
 
         Args:
