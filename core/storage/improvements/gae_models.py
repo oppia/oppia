@@ -110,7 +110,7 @@ class TaskEntryModel(base_models.BaseModel):
             str. An ID available for use for a new task entry.
         """
         for _ in python_utils.RANGE(_GENERATE_NEW_ID_MAX_ATTEMPTS):
-            task_id = u'%s.%s.%s.%s' % (
+            task_id = '%s.%s.%s.%s' % (
                 task_type, entity_type, entity_id, uuid.uuid4())
             if not cls.get_by_id(task_id):
                 return python_utils.UNICODE(task_id)
