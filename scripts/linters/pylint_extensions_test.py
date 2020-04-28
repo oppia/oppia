@@ -2285,10 +2285,18 @@ class IndentMultilineDocstringDefinitionCheckerTests(unittest.TestCase):
                             \"\"\" This is a docstring.
 
                             Args:
-                                param: This is the param defintion.
-                                It is not properly indented.
-                                param2: This is the param2 defintion.
-                                    It is properly indented.
+                                schema: the schema to normalize the value.
+                                mappings: a list of 2-element tuples. The first
+                                    each item is expected to be normalized to.
+                                invalid_items: a list of values. Each of these
+                                    an AssertionError when normalized.
+                                param3: This is the param3 defintion.
+                                This is not properly indented.
+
+                            Returns:
+                                An empty string if the URL does not start
+                                except when the string is empty. Otherwise,
+                                URL.
                             \"\"\"
                             Something
                 """)
@@ -2300,7 +2308,7 @@ class IndentMultilineDocstringDefinitionCheckerTests(unittest.TestCase):
 
         message = testutils.Message(
             msg_id='missing-indent-docstring-definition',
-            line=7)
+            line=12)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()

@@ -1502,15 +1502,15 @@ class IndentMultilineDocstringDefinitionChecker(checkers.BaseChecker):
 
             # Check if it is a definition within a docstring.
             if (line.strip().startswith(b'Args:') or
-              line.strip().startswith(b'Returns:')):
+                line.strip().startswith(b'Returns:')):
                 is_docstring_def = True
                 continue
 
             if is_docstring_def:
                 if ((line.lstrip().startswith(b'"""') or
-                  len(line.lstrip()) == 0) or ((len(prev_line) -
-                  len(prev_line.lstrip())) -
-                  (len(line) - len(line.lstrip())) == 4)):
+                     len(line.lstrip()) == 0) or ((len(prev_line) -
+                     len(prev_line.lstrip())) -
+                    (len(line) - len(line.lstrip())) == 4)):
                     is_docstring_def = False
                     is_multiline = False
                     continue
@@ -1521,12 +1521,12 @@ class IndentMultilineDocstringDefinitionChecker(checkers.BaseChecker):
 
             if is_multiline:
                 if (((len(line) - len(line.lstrip())) -
-                  (len(prev_line) - len(prev_line.lstrip())) == 4) and
-                  b':' in line) or b':' in line:
+                     (len(prev_line) - len(prev_line.lstrip())) == 4) and
+                     b':' in line) or b':' in line:
                     prev_line = file_content[line_num]
                     continue
                 elif ((len(line) - len(line.lstrip())) -
-                  (len(prev_line) - len(prev_line.lstrip())) != 4):
+                      (len(prev_line) - len(prev_line.lstrip())) != 4):
                     self.add_message(
                         'missing-indent-docstring-definition', line=line_num)
 
