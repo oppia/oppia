@@ -470,6 +470,9 @@ angular.module('oppia').directive('settingsTab', [
                 ctrl.canModifyRoles = permissions.can_modify_roles;
                 ctrl.canReleaseOwnership = permissions.can_release_ownership;
                 ctrl.canUnpublish = permissions.can_unpublish;
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the controller is migrated to angular.
+                $rootScope.$apply();
               });
 
             ctrl.explorationTitleService = ExplorationTitleService;

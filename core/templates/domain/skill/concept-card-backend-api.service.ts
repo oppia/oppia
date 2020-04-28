@@ -58,7 +58,7 @@ export class ConceptCardBackendApiService {
         }
       }, (error) => {
         if (errorCallback) {
-          errorCallback(error.statusText);
+          errorCallback(error.error);
         }
       });
   }

@@ -71,7 +71,6 @@ angular.module('oppia').directive('conceptCard', [
                 ctrl.conceptCards.push(
                   ConceptCardObjectFactory.createFromBackendDict(
                     conceptCardBackendDict));
-                $rootScope.$apply();
               });
               ctrl.loadingMessage = '';
               ctrl.currentConceptCard = ctrl.conceptCards[ctrl.index];
@@ -79,6 +78,9 @@ angular.module('oppia').directive('conceptCard', [
               if (ctrl.currentConceptCard.getWorkedExamples().length > 0) {
                 ctrl.numberOfWorkedExamplesShown = 1;
               }
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$apply();
             });
           };
         }
