@@ -367,7 +367,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_upload_a_large_svg(self):
-        """Test upload of an invalid SVG image."""
+        """Test upload of an SVG image that exceeds the 100 KB size limit."""
 
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()

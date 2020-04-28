@@ -269,6 +269,9 @@ var StoryEditorPage = function() {
   };
 
   this.navigateToChapterByIndex = function(index) {
+    // scrollToTop is added to prevent chapterTitles from being hidden
+    // by the navbar.
+    general.scrollToTop();
     chapterTitles.then(function(elements) {
       elements[index].click();
     });

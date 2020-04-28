@@ -636,14 +636,13 @@ class ImageUploadHandler(EditorHandler):
             filename_prefix = self._FILENAME_PREFIX
         if not raw:
             raise self.InvalidInputException('No image supplied')
-
+        if len(raw) > self.HUNDRED_KB_IN_BYTES:
+            raise self.InvalidInputException(
+                'Image exceeds file size limit of 100 KB.')
         allowed_formats = ', '.join(
             list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
         if html_validation_service.is_parsable_as_xml(raw):
             file_format = 'svg'
-            if len(raw) > self.HUNDRED_KB_IN_BYTES:
-                raise self.InvalidInputException(
-                    'Image exceeds file size limit of 100 KB.')
             invalid_tags, invalid_attrs = (
                 html_validation_service.get_invalid_svg_tags_and_attrs(raw))
             if invalid_tags or invalid_attrs:
