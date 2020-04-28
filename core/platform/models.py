@@ -28,7 +28,7 @@ import utils
 # Valid model names.
 NAMES = utils.create_enum(
     'activity', 'audit', 'base_model', 'classifier', 'collection', 'config',
-    'email', 'exploration', 'feedback', 'job', 'opportunity',
+    'email', 'exploration', 'improvements', 'feedback', 'job', 'opportunity',
     'question', 'recommendations', 'skill', 'statistics', 'story', 'suggestion',
     'topic', 'user')
 
@@ -97,6 +97,9 @@ class _Gae(Platform):
             elif name == NAMES.feedback:
                 from core.storage.feedback import gae_models as feedback_models
                 returned_models.append(feedback_models)
+            elif name == NAMES.improvements:
+                from core.storage.improvements import gae_models as imps_models
+                returned_models.append(imps_models)
             elif name == NAMES.job:
                 from core.storage.job import gae_models as job_models
                 returned_models.append(job_models)

@@ -34,6 +34,9 @@ ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
 POST_COMMIT_STATUS_PUBLIC = 'public'
 POST_COMMIT_STATUS_PRIVATE = 'private'
 
+# Whether to perform a full audit before creating new improvement task entries.
+ALWAYS_AUDIT_TASK_ENTRIES = True
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 
@@ -132,6 +135,10 @@ ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_SUBTOPIC = 'subtopic'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
+
+TASK_TYPE_HIGH_BOUNCE_RATE = 'high-bounce-rate'
+TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS = 'successive-incorrect-answers'
+TASK_TYPE_NEEDS_GUIDING_RESPONSES = 'needs-guiding-responses'
 
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
