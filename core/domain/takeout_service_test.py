@@ -436,10 +436,13 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
-        task = imps_models.TaskEntryModel(
-            self.GENERIC_MODEL_ID, 'exploration', self.GENERIC_MODEL_ID, 1)
-        task.closed_by = self.USER_ID_1
-        task.put()
+        imps_models.TaskEntryModel(
+            id=self.GENERIC_MODEL_ID,
+            task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id=self.GENERIC_MODEL_ID, status='open',
+            entity_version_start=1, closed_by=self.USER_ID_1
+        ).put()
 
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
