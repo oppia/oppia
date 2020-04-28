@@ -30,7 +30,7 @@ import feconf
 
 def _always_return(value):
     """Creates a function which always returns the input value."""
-    return (lambda: value)
+    return lambda: value
 
 
 class TaskEntryModelTest(test_utils.GenericTestBase):
@@ -55,7 +55,7 @@ class TaskEntryModelTest(test_utils.GenericTestBase):
         self.assertNotEqual(task_ids[0], task_ids[1])
 
     def test_error_reported_if_too_many_collisions(self):
-        # uuid.uuid4() is the source of randomness for TaskEntryModel task IDs.
+        # TaskEntryModel uses uuid.uuid4() as its source of randomness for IDs.
         with self.swap(uuid, 'uuid4', _always_return('duplicate-uuid')):
             task_id = imps_models.TaskEntryModel.generate_new_task_id(
                 feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
