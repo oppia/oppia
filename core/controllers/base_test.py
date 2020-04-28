@@ -180,7 +180,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         user_id = user_services.get_user_id_from_username('learneruser')
         csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
-        self.get_html_response( 
+        self.get_html_response(
             '/library/extra', expected_status_int=404)
 
         self.get_html_response(
@@ -194,7 +194,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             '/library/extra', payload={}, csrf_token=csrf_token,
             expected_status_int=404)
 
-        self.delete_json('/library/extra', expected_status_int=404)
+        self.delete_json('/library/data', expected_status_int=404)
 
     def test_redirect_in_logged_out_states(self):
         """Test for a redirect in logged out state on '/'."""
