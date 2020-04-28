@@ -30,6 +30,7 @@ base_models, exp_models, imps_models, user_models = (
 
 
 class TaskEntryModelTest(test_utils.GenericTestBase):
+    """Unit tests for TaskEntryModel instances."""
 
     def setUp(self):
         super(TaskEntryModelTest, self).setUp()
