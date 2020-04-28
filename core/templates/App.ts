@@ -205,8 +205,8 @@ angular.module('oppia').config(['$provide', function($provide) {
       var _originalError = $delegate.error;
 
       if (!DEV_MODE) {
-        $delegate.log = function() { };
-        $delegate.info = function() { };
+        $delegate.log = function() {};
+        $delegate.info = function() {};
         // TODO(sll): Send errors (and maybe warnings) to the backend.
         $delegate.warn = function() { };
         $delegate.error = function(message) {
