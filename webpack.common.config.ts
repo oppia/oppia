@@ -147,7 +147,7 @@ module.exports = {
       filename: 'about-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'With Oppia, you can access free lessons on ' + 
+        description: 'With Oppia, you can access free lessons on ' +
           'math, physics, statistics, chemistry, music, history and ' +
           'more from anywhere in the world. Oppia is a nonprofit ' +
           'with the mission of providing high-quality ' +
@@ -164,7 +164,7 @@ module.exports = {
         name: defaultMeta.name,
         description: 'With Oppia, you can access free lessons on math, ' +
           'physics, statistics, chemistry, music, history and more from ' +
-          'anywhere in the world. Learn from our pre-existing ' + 
+          'anywhere in the world. Learn from our pre-existing ' +
           'explorations, or teach and create your own.'
       },
       template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
@@ -267,8 +267,8 @@ module.exports = {
       filename: 'donate-page.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'Donate to The Oppia Foundation to enable more students to receive ' +
-        'the quality education they deserve.'
+        description: 'Donate to The Oppia Foundation to enable more ' +
+        'students to receive the quality education they deserve.'
       },
       template: commonPrefix + '/pages/donate-page/donate-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -409,7 +409,7 @@ module.exports = {
         description: 'Looking to learn something new? Learn any subject ' +
           'of your choice created by professors, teachers and Oppia ' +
           'users! Free lessons are always available for any topic and ' +
-          'level you want.' 
+          'level you want.'
       },
       template: commonPrefix + '/pages/library-page/library-page.mainpage.html',
       minify: htmlMinifyConfig,
