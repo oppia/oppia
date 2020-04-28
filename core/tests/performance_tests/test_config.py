@@ -33,7 +33,7 @@ Each page entry includes:
 
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-PAGE_KEY_SPLASH = ''
+PAGE_KEY_SPLASH = 'splash'
 PAGE_KEY_LIBRARY = 'library'
 PAGE_KEY_CREATOR_DASHBOARD = 'dashboard'
 PAGE_KEY_EXPLORATION_PLAYER = 'explore'

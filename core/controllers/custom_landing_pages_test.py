@@ -59,10 +59,6 @@ class TopicRedirectPageTest(test_utils.GenericTestBase):
 class TopicLandingPageTest(test_utils.GenericTestBase):
     """Test for showing landing pages."""
 
-    def test_invalid_subject_landing_page_leads_to_404(self):
-        self.get_html_response(
-            '/learn/invalid_subject/fractions', expected_status_int=404)
-
     def test_invalid_topic_landing_page_leads_to_404(self):
         self.get_html_response(
             '/math/invalid_topic', expected_status_int=404)

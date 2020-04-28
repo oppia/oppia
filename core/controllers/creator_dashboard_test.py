@@ -70,12 +70,6 @@ class MockUserStatsMRJobManager(
 
 class HomePageTests(test_utils.GenericTestBase):
 
-    def test_logged_out_homepage(self):
-        """Test the logged-out version of the home page."""
-
-        response = self.get_html_response('/')
-        self.assertEqual(response.status_int, 200)
-
     def test_notifications_dashboard_redirects_for_logged_out_users(self):
         """Test the logged-out view of the notifications dashboard."""
         response = self.get_html_response(

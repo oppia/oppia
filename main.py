@@ -740,13 +740,21 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
-
-    get_redirect_route(r'/<classroom_name>', classroom.ClassroomPage),
-    get_redirect_route(
-        r'/<subject>/<topic>', custom_landing_pages.TopicLandingPage),
-
-    get_redirect_route(r'/<:.*>', base.Error404Handler),
 ]
+
+# Adding redirects for classroom pages.
+for classroom_name in feconf.CLASSROOM_PAGES:
+    URLS.append(
+        get_redirect_route(r'/%s' % classroom_name, classroom.ClassroomPage))
+
+# Adding redirects for topic landing pages.
+for subject in feconf.AVAILABLE_LANDING_PAGES:
+    URLS.append(
+        get_redirect_route(
+            r'/%s/<topic>' % subject, custom_landing_pages.TopicLandingPage))
+
+# 404 error handler (Needs to be at the end of the URLS list).
+URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 
 URLS_TO_SERVE = []
 

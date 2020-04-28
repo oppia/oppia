@@ -592,9 +592,8 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             csrf_token=csrf_token, expected_status_int=404)
         payload['commit_message'] = 'update question data'
         self.put_json(
-            '%s/%s' % (
-                feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
-                self.question_id), payload, csrf_token=csrf_token)
+            feconf.QUESTION_EDITOR_DATA_URL_PREFIX, payload,
+            csrf_token=csrf_token, expected_status_int=404)
         self.logout()
 
     def test_put_with_topic_manager_email_allows_question_editing(self):

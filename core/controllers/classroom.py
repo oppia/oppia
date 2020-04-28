@@ -29,24 +29,13 @@ class ClassroomPage(base.BaseHandler):
     """Renders the classroom page."""
 
     @acl_decorators.open_access
-    def get(self, classroom_name):
+    def get(self):
         """Handles GET requests."""
 
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        # If classroom name in the URL is /Math or /mAtH, redirect it to /math.
-        # If classroom name is already all lower cased, render the appropriate
-        # classroom page.
-        for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value:
-            if classroom_dict['name'].lower() == classroom_name:
-                self.render_template('classroom-page.mainpage.html')
-                break
-            if classroom_dict['name'].lower() == classroom_name.lower():
-                self.redirect('/%s' % (classroom_name.lower()))
-                break
-        else:
-            raise self.PageNotFoundException
+        self.render_template('classroom-page.mainpage.html')
 
 
 class ClassroomDataHandler(base.BaseHandler):
@@ -64,7 +53,7 @@ class ClassroomDataHandler(base.BaseHandler):
 
         classroom_name_is_valid = False
         for classroom_dict in config_domain.TOPIC_IDS_FOR_CLASSROOM_PAGES.value:
-            if classroom_dict['name'].lower() == classroom_name.lower():
+            if classroom_dict['name'] == classroom_name:
                 classroom_name_is_valid = True
                 topic_ids = classroom_dict['topic_ids']
                 break
