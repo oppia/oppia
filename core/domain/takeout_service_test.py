@@ -435,8 +435,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         ).put()
 
         task = imps_models.TaskEntryModel(
-            id=self.GENERIC_MODEL_ID, 'exploration', self.GENERIC_MODEL_ID,
-            1)
+            self.GENERIC_MODEL_ID, 'exploration', self.GENERIC_MODEL_ID, 1)
         task.closed_by = self.USER_ID_1
         task.put()
 
