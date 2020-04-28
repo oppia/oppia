@@ -62,16 +62,16 @@ class TaskEntryModel(base_models.BaseModel):
     """Task entry corresponding to an actionable task in the improvements tab.
 
     Instances of a class have an ID with the form:
-        [TASK_TYPE].[ENTITY_TYPE].[ENTITY_ID].[UUID]
+        [ENTITY_TYPE].[ENTITY_ID].[TASK_TYPE].[UUID]
     """
-    # The type of task a task entry tracks.
-    task_type = ndb.StringProperty(
-        required=True, indexed=True, choices=TASK_TYPES)
     # The type of entity a task entry refers to.
     entity_type = ndb.StringProperty(
         required=True, indexed=True, choices=ENTITY_TYPES)
     # The ID of the entity a task entry refers to.
     entity_id = ndb.StringProperty(required=True, indexed=True)
+    # The type of task a task entry tracks.
+    task_type = ndb.StringProperty(
+        required=True, indexed=True, choices=TASK_TYPES)
 
     # The type of sub-entity a task entry focuses on.
     target_type = ndb.StringProperty(
@@ -93,12 +93,12 @@ class TaskEntryModel(base_models.BaseModel):
     # ID of the user who closed the task, if any.
     closed_by = ndb.StringProperty(default=None, required=False, indexed=True)
     # Auto-generated string which provides a one-line summary of the task.
-    closed_context = ndb.StringProperty(
+    task_summary = ndb.StringProperty(
         default=None, required=False, indexed=False)
 
     @staticmethod
     def get_deletion_policy():
-        """OK to delete task entries since they're only a historical record."""
+        """OK to delete task entries since they're just a historical record."""
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -112,7 +112,7 @@ class TaskEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """Model contain user ID that acted on a task."""
+        """TaskEntryModel contains the user ID that acted on a task."""
         return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @classmethod
@@ -151,8 +151,7 @@ class TaskEntryModel(base_models.BaseModel):
         """
         tasks_closed_by_user = (
             TaskEntryModel.query(TaskEntryModel.closed_by == user_id))
-        task_ids_closed_by_user = [task.id for task in tasks_closed_by_user]
-        return {'task_ids_closed_by_user': task_ids_closed_by_user}
+        return {'task_ids_closed_by_user': [t.id for t in tasks_closed_by_user]}
 
     @classmethod
     def generate_new_task_id(cls, task_type, entity_type, entity_id):
@@ -168,7 +167,7 @@ class TaskEntryModel(base_models.BaseModel):
         """
         for _ in python_utils.RANGE(_GENERATE_NEW_ID_MAX_ATTEMPTS):
             task_id = '%s.%s.%s.%s' % (
-                task_type, entity_type, entity_id, uuid.uuid4())
+                entity_type, entity_id, task_type, uuid.uuid4())
             if not cls.get_by_id(task_id):
                 return task_id
         raise Exception('Task ID strategy is creating too many collisions')
