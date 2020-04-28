@@ -26,7 +26,8 @@ var htmlMinifyConfig = {
   ignoreCustomFragments: [
     /\{\{[\s\S]*?\}\}/,
     /<\{%[\s\S]*?%\}/,
-    /<\[[\s\S]*?\]>/]
+    /<\[[\s\S]*?\]>/,
+  ]
 };
 var commonPrefix = './core/templates';
 var defaultMeta = {
