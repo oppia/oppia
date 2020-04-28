@@ -7,12 +7,12 @@
     <div class="oppia-page-card oppia-static-content">
       <div class="about-nav oppia-about-teach-tabs">
         <ul class="oppia-about-tabs">
-          <li class="oppia-about-tabs-active">
+          <li ng-class="{'oppia-about-tabs-active': $ctrl.activeTabName === $ctrl.TAB_ID_TEACH}">
             <a ng-click="$ctrl.onTabClick($ctrl.TAB_ID_TEACH)" class="oppia-about-tabs-text" href="" id="teach" translate="I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA">
 
             </a>
           </li>
-          <li>
+          <li ng-class="{'oppia-about-tabs-active': $ctrl.activeTabName === $ctrl.TAB_ID_PLAYBOOK}">
             <a ng-click="$ctrl.onTabClick($ctrl.TAB_ID_PLAYBOOK)" class="oppia-about-tabs-text" href="" id="playbook" translate="I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK">
             </a>
           </li>
@@ -20,7 +20,7 @@
       </div>
 
       <div class="about-tab-container">
-        <div class="teach oppia-about-tab-content oppia-teach-tab-content oppia-about-visible-content">
+        <div class="teach oppia-about-tab-content oppia-teach-tab-content" ng-class="{'oppia-about-visible-content': $ctrl.activeTabName === $ctrl.TAB_ID_TEACH}">
 
           <div class="oppia-static-card-content oppia-static-card-content-narrow">
             <h2>Teach with Oppia</h2>
@@ -43,7 +43,7 @@
           </a>
         </div>
 
-        <div class="playbook oppia-about-tab-content">
+        <div class="playbook oppia-about-tab-content" ng-class="{'oppia-about-visible-content': $ctrl.activeTabName === $ctrl.TAB_ID_PLAYBOOK}">
           <div class="oppia-static-card-content oppia-static-card-content-narrow">
             <h2 translate="I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_HEADING"></h2>
             <ol>
