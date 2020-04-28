@@ -54,11 +54,11 @@ class TaskEntryModelTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         task_id = imps_models.TaskEntryModel.generate_new_task_id(
-            feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
+            feconf.TASK_TYPE_HIGH_BOUNCE_RATE)
         task = imps_models.TaskEntryModel.create(
-            task_id, feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 1)
+            task_id, feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
+            feconf.TASK_TYPE_HIGH_BOUNCE_RATE, 1)
         task.closed_by = 'user_id'
         task.put()
         self.assertTrue(
@@ -68,11 +68,11 @@ class TaskEntryModelTest(test_utils.GenericTestBase):
 
     def test_apply_deletion_policy(self):
         task_id = imps_models.TaskEntryModel.generate_new_task_id(
-            feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
+            feconf.TASK_TYPE_HIGH_BOUNCE_RATE)
         task = imps_models.TaskEntryModel.create(
-            task_id, feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 1)
+            task_id, feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
+            feconf.TASK_TYPE_HIGH_BOUNCE_RATE, 1)
         task.closed_by = 'user_id'
         task.put()
         self.assertTrue(
@@ -85,11 +85,11 @@ class TaskEntryModelTest(test_utils.GenericTestBase):
 
     def test_export_data(self):
         task_id = imps_models.TaskEntryModel.generate_new_task_id(
-            feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
+            feconf.TASK_TYPE_HIGH_BOUNCE_RATE)
         task = imps_models.TaskEntryModel.create(
-            task_id, feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 1)
+            task_id, feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
+            feconf.TASK_TYPE_HIGH_BOUNCE_RATE, 1)
         task.closed_by = 'user_id'
         task.put()
 
@@ -98,20 +98,20 @@ class TaskEntryModelTest(test_utils.GenericTestBase):
         })
 
     def test_generate_new_task_id(self):
-        task_type, entity_type, entity_id = (
+        entity_type, entity_id, task_type = (
             'TASK_TYPE', 'ENTITY_TYPE', 'ENTITY_ID')
         task_ids = [
             imps_models.TaskEntryModel.generate_new_task_id(
-                task_type, entity_type, entity_id),
+                entity_type, entity_id, task_type),
             imps_models.TaskEntryModel.generate_new_task_id(
-                task_type, entity_type, entity_id),
+                entity_type, entity_id, task_type),
         ]
-        self.assertIn(task_type, task_ids[0])
-        self.assertIn(task_type, task_ids[1])
         self.assertIn(entity_type, task_ids[0])
         self.assertIn(entity_type, task_ids[1])
         self.assertIn(entity_id, task_ids[0])
         self.assertIn(entity_id, task_ids[1])
+        self.assertIn(task_type, task_ids[0])
+        self.assertIn(task_type, task_ids[1])
         # Although made of the same components, the IDs shouldn't compare equal.
         self.assertNotEqual(task_ids[0], task_ids[1])
 
@@ -119,45 +119,45 @@ class TaskEntryModelTest(test_utils.GenericTestBase):
         # TaskEntryModel uses uuid.uuid4() as its source of randomness for IDs.
         with self.swap(uuid, 'uuid4', _always_return('duplicate-uuid')):
             task_id = imps_models.TaskEntryModel.generate_new_task_id(
-                feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
+                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
+                feconf.TASK_TYPE_HIGH_BOUNCE_RATE)
             task = imps_models.TaskEntryModel.create(
-                task_id, feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 1)
+                task_id, feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
+                feconf.TASK_TYPE_HIGH_BOUNCE_RATE, 1)
             task.put()
             with self.assertRaisesRegexp(Exception, 'too many collisions'):
                 imps_models.TaskEntryModel.generate_new_task_id(
-                    feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-                    feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
+                    feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
+                    feconf.TASK_TYPE_HIGH_BOUNCE_RATE)
 
     def test_can_create_new_hbr_task(self):
         task_id = imps_models.TaskEntryModel.generate_new_task_id(
-            feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
+            feconf.TASK_TYPE_HIGH_BOUNCE_RATE)
         imps_models.TaskEntryModel.create(
-            task_id, feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 1)
+            task_id, feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
+            feconf.TASK_TYPE_HIGH_BOUNCE_RATE, 1)
 
     def test_can_create_new_sia_task(self):
         task_id = imps_models.TaskEntryModel.generate_new_task_id(
-            feconf.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
+            feconf.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS)
         imps_models.TaskEntryModel.create(
-            task_id, feconf.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 1)
+            task_id, feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
+            feconf.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS, 1)
 
     def test_can_create_new_ngr_task(self):
         task_id = imps_models.TaskEntryModel.generate_new_task_id(
-            feconf.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
+            feconf.TASK_TYPE_NEEDS_GUIDING_RESPONSES)
         imps_models.TaskEntryModel.create(
-            task_id, feconf.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id', 1)
+            task_id, feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
+            feconf.TASK_TYPE_NEEDS_GUIDING_RESPONSES, 1)
 
     def test_can_generate_task_id_with_unicode_entity_id(self):
         task_id = imps_models.TaskEntryModel.generate_new_task_id(
-            feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id\U0001F4C8')
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id\U0001F4C8',
+            feconf.TASK_TYPE_HIGH_BOUNCE_RATE)
         imps_models.TaskEntryModel.create(
-            task_id, feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id\U0001F4C8', 1)
+            task_id, feconf.ENTITY_TYPE_EXPLORATION, 'exp_id\U0001F4C8',
+            feconf.TASK_TYPE_HIGH_BOUNCE_RATE, 1)
