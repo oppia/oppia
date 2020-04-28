@@ -682,6 +682,7 @@ module.exports = {
       loader: 'html-loader',
       options: {
         attributes: false,
+        minimize: htmlMinifyConfig,
       },
     },
     {

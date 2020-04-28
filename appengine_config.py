@@ -24,8 +24,6 @@ import os
 import sys
 import time
 
-from scripts import common
-
 # Whether to calculate costs for RPCs, in addition to time taken.
 appstats_CALC_RPC_COSTS = True
 # The number of lines to record for an RPC stacktrace.
@@ -86,7 +84,7 @@ oppia_tools_path = os.path.join(_PARENT_DIR, 'oppia_tools')
 # Hence the check for oppia_tools instead.
 if os.path.isdir(oppia_tools_path):
     pil_path = os.path.join(
-        oppia_tools_path, 'Pillow-%s' % common.PILLOW_VERSION)
+        oppia_tools_path, 'Pillow-6.2.2')
     if not os.path.isdir(pil_path):
         raise Exception('Invalid path for oppia_tools library: %s' % pil_path)
     sys.path.insert(0, pil_path)
