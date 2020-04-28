@@ -98,6 +98,7 @@ class TaskEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        """OK to delete task entries since they're only a historical record."""
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -111,7 +112,7 @@ class TaskEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model contain user ID that acted on a task."""
         return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @classmethod
@@ -138,12 +139,12 @@ class TaskEntryModel(base_models.BaseModel):
 
     @staticmethod
     def export_data(user_id):
-        """This method should be implemented by subclasses.
+        """Returns the user-relevant properties of TaskEntryModels.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
 
-        Raises:
+        Returns:
             dict. The user-relevant properties of TaskEntryModel in a dict
             format. In this case, we are returning all the ids of the tasks
             which were closed by this user.
