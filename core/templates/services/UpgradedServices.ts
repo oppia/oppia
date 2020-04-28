@@ -54,9 +54,6 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
-import { ChangesInHumanReadableFormService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/services/changes-in-human-readable-form.service';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
@@ -64,6 +61,8 @@ import { CodeReplPredictionService } from
   'interactions/CodeRepl/code-repl-prediction.service';
 import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
+import { CollectionCreationBackendService } from
+  'components/entity-creation-services/collection-creation-backend-api.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
@@ -128,6 +127,8 @@ import { InteractionObjectFactory } from
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
+import { LearnerAnswerDetailsBackendApiService } from
+  'domain/statistics/learner-answer-details-backend-api.service';
 import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerAnswerInfoObjectFactory } from
@@ -138,6 +139,8 @@ import { LearnerParamsService } from
   'pages/exploration-player-page/services/learner-params.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { LoggerService } from 'services/contextual/logger.service';
+import { LostChangeObjectFactory } from
+  'domain/exploration/LostChangeObjectFactory';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { MisconceptionObjectFactory } from
@@ -171,15 +174,21 @@ import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
+import { PlaythroughIssuesBackendApiService } from
+  'services/playthrough-issues-backend-api.service';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
+import { QuestionBackendApiService } from
+  'domain/question/question-backend-api.service.ts';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
 import { ReadOnlyStoryNodeObjectFactory } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
+import { ReadOnlyTopicObjectFactory } from
+  'domain/topic_viewer/read-only-topic-object.factory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RubricObjectFactory } from
@@ -293,9 +302,6 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { PlaythroughIssuesBackendApiService } from
-  'services/playthrough-issues-backend-api.service';
-import { from } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -365,6 +371,8 @@ export class UpgradedServices {
       new LearnerDashboardActivityIdsObjectFactory();
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
     upgradedServices['LoggerService'] = new LoggerService();
+    upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
+      new UtilsService);
     upgradedServices['MisconceptionObjectFactory'] =
       new MisconceptionObjectFactory();
     upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'] =
@@ -429,9 +437,6 @@ export class UpgradedServices {
       upgradedServices['LoggerService']);
     upgradedServices['BrowserCheckerService'] = new BrowserCheckerService(
       upgradedServices['WindowRef']);
-    upgradedServices['ChangesInHumanReadableFormService'] =
-      new ChangesInHumanReadableFormService(
-        upgradedServices['UtilsService'], document);
     // eslint-disable-next-line max-len
     upgradedServices['ContinueValidationService'] = new ContinueValidationService(
       upgradedServices['baseInteractionValidationService']);
@@ -607,6 +612,9 @@ export class UpgradedServices {
       new AudioTranslationLanguageService(
         upgradedServices['BrowserCheckerService'],
         upgradedServices['LanguageUtilService']);
+    upgradedServices['CollectionCreationBackendService'] = (
+      new CollectionCreationBackendService(
+        upgradedServices['HttpClient']));
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['EmailDashboardDataService'] =
@@ -616,6 +624,10 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
+    upgradedServices['LearnerAnswerDetailsBackendApiService'] =
+        new LearnerAnswerDetailsBackendApiService(
+          upgradedServices['HttpClient'],
+          upgradedServices['UrlInterpolationService']);
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
       upgradedServices['ContextService'],
       upgradedServices['PlayerTranscriptService']);
@@ -624,6 +636,14 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['PlaythroughIssuesBackendApiService'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['QuestionBackendApiService'] =
+      new QuestionBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
+    upgradedServices['ReadOnlyTopicObjectFactory'] =
+      new ReadOnlyTopicObjectFactory(
+        upgradedServices['SubtopicObjectFactory'],
+        upgradedServices['SkillSummaryObjectFactory']);
     upgradedServices['SkillObjectFactory'] =
       new SkillObjectFactory(
         upgradedServices['ConceptCardObjectFactory'],
