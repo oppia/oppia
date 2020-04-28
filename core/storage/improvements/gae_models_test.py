@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for Exploration models."""
+"""Tests for Improvements models."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -25,32 +25,38 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-base_models, exp_models, imps_models, user_models = (
-    models.Registry.import_models([
-        models.NAMES.base_model, models.NAMES.exploration,
-        models.NAMES.improvements, models.NAMES.user]))
+(imps_models,) = models.Registry.import_models([models.NAMES.improvements])
+
+
+def _always_return(value):
+    """Creates a function which always returns the input value."""
+    return (lambda: value)
 
 
 class TaskEntryModelTest(test_utils.GenericTestBase):
     """Unit tests for TaskEntryModel instances."""
 
     def test_generate_new_task_id(self):
-        task_id_1 = imps_models.TaskEntryModel.generate_new_task_id(
+        task_type, entity_type, entity_id = (
             'TASK_TYPE', 'ENTITY_TYPE', 'ENTITY_ID')
-        self.assertIn('TASK_TYPE', task_id_1)
-        self.assertIn('ENTITY_TYPE', task_id_1)
-        self.assertIn('ENTITY_ID', task_id_1)
-        task_id_2 = imps_models.TaskEntryModel.generate_new_task_id(
-            'TASK_TYPE', 'ENTITY_TYPE', 'ENTITY_ID')
-        self.assertIn('TASK_TYPE', task_id_2)
-        self.assertIn('ENTITY_TYPE', task_id_2)
-        self.assertIn('ENTITY_ID', task_id_2)
-        # Although their components are equal, they shouldn't compare equal.
-        self.assertNotEqual(task_id_1, task_id_2)
+        task_ids = [
+            imps_models.TaskEntryModel.generate_new_task_id(
+                task_type, entity_type, entity_id),
+            imps_models.TaskEntryModel.generate_new_task_id(
+                task_type, entity_type, entity_id),
+        ]
+        self.assertIn(task_type, task_id[0])
+        self.assertIn(task_type, task_id[1])
+        self.assertIn(entity_type, task_id[0])
+        self.assertIn(entity_type, task_id[1])
+        self.assertIn(entity_id, task_id[0])
+        self.assertIn(entity_id, task_id[1])
+        # Although made of the same components, the IDs shouldn't compare equal.
+        self.assertNotEqual(task_id[0], task_id[1])
 
     def test_error_reported_if_too_many_collisions(self):
-        # TaskEntryModel uses uuid.uuid4() to randomize task IDs.
-        with self.swap(uuid, 'uuid4', lambda: 'always-same'):
+        # uuid.uuid4() is the source of randomness for TaskEntryModel task IDs.
+        with self.swap(uuid, 'uuid4', _always_return('duplicate-uuid')):
             task_id = imps_models.TaskEntryModel.generate_new_task_id(
                 feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
                 feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
@@ -89,8 +95,8 @@ class TaskEntryModelTest(test_utils.GenericTestBase):
 
     def test_can_generate_task_id_with_unicode_entity_id(self):
         task_id = imps_models.TaskEntryModel.generate_new_task_id(
-            feconf.TASK_TYPE_HIGH_BOUNCE_RATE, feconf.ENTITY_TYPE_EXPLORATION,
-            'exp_id\U0001F4C8')
+            feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id\U0001F4C8')
         imps_models.TaskEntryModel.create(
             task_id, feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
             feconf.ENTITY_TYPE_EXPLORATION, 'exp_id\U0001F4C8', 1)
