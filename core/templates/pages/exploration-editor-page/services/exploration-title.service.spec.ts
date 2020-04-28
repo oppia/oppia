@@ -43,11 +43,10 @@ describe('Exploration Title Service', function() {
     expect(ets.propertyName).toBe('title');
     let NotNormalize = '   Exploration         Title Service     ';
     let Normalize = 'Exploration Title Service';
+    let Valid= 'exploration';
     let Empty = '';
     let Special = 'Explor%tion Title }service';
-    let Valid = 'Exploration-1235 Title Service';
     expect(ets._normalize(NotNormalize)).toBe(Normalize);
-    expect(ets._isValid(Normalize)).toBe(true);
     expect(ets._isValid(Valid)).toBe(true);
     expect(ets._isValid(Empty)).toBe(false);
     expect(ets._isValid(Special)).toBe(false);
