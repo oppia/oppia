@@ -154,13 +154,13 @@ class TaskEntryModel(base_models.BaseModel):
         return {'task_ids_closed_by_user': [t.id for t in tasks_closed_by_user]}
 
     @classmethod
-    def generate_new_task_id(cls, task_type, entity_type, entity_id):
+    def generate_new_task_id(cls, entity_type, entity_id, task_type):
         """Generates a new task entry ID.
 
         Args:
-            task_type: str. The type of task a task entry tracks.
             entity_type: str. The type of entity a task entry refers to.
             entity_id: str. The ID of the entity a task entry refers to.
+            task_type: str. The type of task a task entry tracks.
 
         Returns:
             str. An ID available for use for a new task entry.
@@ -174,16 +174,16 @@ class TaskEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, task_id, task_type, entity_type, entity_id,
+            cls, task_id, entity_type, entity_id, task_type,
             entity_version_start, entity_version_end=None, target_type=None,
             target_id=None, status=STATUS_OPEN):
         """Creates a new TaskEntryModel.
 
         Args:
             task_id: str. String to uniquely identify the new task.
-            task_type: str. The type of task a task entry tracks.
             entity_type: str. The type of entity a task entry refers to.
             entity_id: str. The ID of the entity a task entry refers to.
+            task_type: str. The type of task a task entry tracks.
             entity_version_start: int. Refers to the first (inclusive) entity
                 version a task entry is relevant to.
             entity_version_end: int or None. Refers to the last (exclusive)
@@ -199,9 +199,9 @@ class TaskEntryModel(base_models.BaseModel):
         """
         return cls(
             id=task_id,
-            task_type=task_type,
             entity_type=entity_type,
             entity_id=entity_id,
+            task_type=task_type,
             target_type=target_type,
             target_id=target_id,
             status=status,
