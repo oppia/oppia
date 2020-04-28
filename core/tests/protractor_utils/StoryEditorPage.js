@@ -237,6 +237,16 @@ var StoryEditorPage = function() {
     nodeDescriptionInputField.sendKeys(nodeDescription);
   };
 
+  this.expectNodeDescription = function(nodeDescription) {
+    waitFor.visibilityOf(
+      nodeDescriptionInputField,
+      'NodeDescriptionInputField takes too long to be visible'
+    );
+    expect(nodeDescriptionInputField.getAttribute('value')).toMatch(
+      nodeDescription
+    );
+  };
+
   this.changeNodeOutline = function(richTextInstructions) {
     var editor = forms.RichTextEditor(
       nodeOutlineEditor);

@@ -306,6 +306,8 @@ describe('Chapter editor functionality', function() {
     storyEditorPage.setChapterExplorationId(dummyExplorationIds[0]);
     storyEditorPage.changeNodeOutline(forms.toRichText('First outline'));
     storyEditorPage.saveStory('First save');
+    browser.refresh();
+    storyEditorPage.expectNodeDescription('Chapter description 1');
   });
 
   it(
@@ -331,6 +333,8 @@ describe('Chapter editor functionality', function() {
     storyEditorPage.changeNodeOutline(forms.toRichText('Second outline'));
     storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
     storyEditorPage.saveStory('Second save');
+    browser.refresh();
+    storyEditorPage.expectNodeDescription('Chapter description 2');
   });
 
   it('should fail to add one more chapter with existing exploration',
