@@ -81,11 +81,11 @@ angular.module('oppia').directive('audioBar', [
 
           $scope.expandAudioBar = function() {
             $scope.audioBarIsExpanded = true;
-            AudioBarStatusService.expandAudioBar();
+            AudioBarStatusService.markAudioBarExpanded();
           };
 
           $scope.collapseAudioBar = function() {
-            AudioBarStatusService.collapseAudioBar();
+            AudioBarStatusService.markAudioBarCollapsed();
             $scope.audioBarIsExpanded = false;
             AudioPlayerService.stop();
             AudioPlayerService.clear();

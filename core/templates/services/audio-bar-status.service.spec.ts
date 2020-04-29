@@ -32,14 +32,14 @@ describe('AudioBarStatusService', () => {
   });
 
   it('should return true if AudioBar is expanded', () => {
-    audioBarStatusService.expandAudioBar();
+    audioBarStatusService.markAudioBarExpanded();
     expect(audioBarStatusService.isAudioBarExpanded()).toBe(true);
   });
 
   it('should return false if AudioBar is collapsed after expanding', () => {
-    audioBarStatusService.expandAudioBar();
+    audioBarStatusService.markAudioBarExpanded();
     expect(audioBarStatusService.isAudioBarExpanded()).toBe(true);
-    audioBarStatusService.collapseAudioBar();
+    audioBarStatusService.markAudioBarCollapsed();
     expect(audioBarStatusService.isAudioBarExpanded()).toBe(false);
   });
 });

@@ -2,9 +2,11 @@
   <div ng-if="audioBarIsExpanded" class="audio-controls">
     <div class="oppia-audio-header-control-buttons">
       <div class="audio-header-control-icons">
-        <a class="oppia-replay-white-circle" ng-click="onBackwardButtonClicked()" ng-if="progressBarIsShown">
-          <i class="fas fa-undo audio-undo-icon"></i>
-          <span class="oppia-five-icon">5</span>
+        <a ng-click="onBackwardButtonClicked()">
+          <span class="oppia-replay-white-circle"  ng-if="progressBarIsShown">
+            <i class="fas fa-undo audio-undo-icon"></i>
+            <span class="oppia-five-icon">5</span>
+          </span>
         </a>
         <a ng-click="onPlayButtonClicked()"
            uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
@@ -173,7 +175,7 @@
   }
   .oppia-five-icon {
     bottom: 7px;
-    color: white;
+    color: #fff;
     font-size: 10px;
     font-weight: 800;
     left: 3px;
@@ -185,10 +187,6 @@
   .audio-controls-button-image {
     width: 21px;
     height: 21px;
-  }
-
-  .oppia-audio-controls-button-icon:hover, .audio-controls-button-image:hover {
-    cursor: pointer;
   }
 
   .audio-controls-audio-not-available {
