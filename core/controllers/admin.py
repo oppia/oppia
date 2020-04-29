@@ -851,13 +851,18 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
 
 
 class InteractionsByExplorationId(base.BaseHandler):
-    """Handler to show a list of interaction id's for a exploration id."""
+    """Handler to retrive the list of interaction id's for a exploration id."""
 
     @acl_decorators.can_access_admin_page
     def get(self):
         exploration_id = self.request.get('exploration_id')
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        interaction_ids = {
-            state.interaction.id for state in exploration.states.items()
-            }
-        self.render_json({'interactions': interaction_ids})
+        exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id, strict=False
+        )
+        if exploration is None:
+            raise Exception('Exloartion does not exist.')
+        else:
+            interaction_ids = {
+                state.interaction.id for state in exploration.states.values()
+                }
+            self.render_json({'interactions': list(interaction_ids)})

@@ -72,7 +72,12 @@
         <input type="submit" value="submit query">
       </div>
     </form>
-    <p ng-if="$ctrl.explorationInteractionIds"><[$ctrl.explorationInteractionIds]></p>
+    <p ng-if="$ctrl.explorationInteractionIds">
+      <label>Interaction IDs : </label>
+      <ul class="oppia-interaction-ids">
+        <li ng-repeat="interaction in $ctrl.explorationInteractionIds"><[interaction]></li>
+      </ul>
+    </p>
   </div>
 </md-card>
 
