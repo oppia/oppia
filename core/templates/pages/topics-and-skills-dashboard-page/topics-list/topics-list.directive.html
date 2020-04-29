@@ -1,40 +1,34 @@
 <md-card layout="row" class="list-view-item">
   <table class="dashboard-table">
     <colgroup>
-      <col style="width: 8%;">
-      <col style="width: 35%;">
-      <col style="width: 12%;">
-      <col style="width: 12%;">
-      <col style="width: 12%;">
-      <col style="width: 12%;">
+      <col style="width: 25%;">
+      <col style="width: 20%;">
+      <col style="width: 15%;">
+      <col style="width: 20%;">
+      <col style="width: 20%;">
     </colgroup>
     <tr>
       <th ng-repeat="key in TOPIC_HEADINGS"
           class="dashboard-table-headings">
-        <p ng-if="key === 'index'"></p>
-        <p ng-if="key === 'name'" id="dashboard-table-headings-details">Details</p>
-        <p ng-if="key === 'canonical_story_count'">Stories</p>
-        <p ng-if="key === 'subtopic_count'">Subtopics</p>
-        <p ng-if="key === 'skill_count'" class="text-center">Skills</p>
-        <p ng-if="key === 'topic_status'" class="text-center">Topic Status</p>
+        <p ng-if="key === 'name'"> Topic Name </p>
+        <p ng-if="key === 'subtopic_count'"> Subtopics </p>
+        <p ng-if="key === 'skill_count'"> Skills </p>
+        <p ng-if="key === 'canonical_story_count'"> Canonical Stories (published) </p>
+        <p ng-if="key === 'topic_status'"> Topic Status </p>
       </th>
     </tr>
-    <tr ng-repeat="topic in getTopicSummaries() track by $index" class="list-item">
-      <td>
-        <[$index+1]>.
-      </td>
+    <tr ng-repeat="topic in getTopicSummaries()" class="list-item">
       <td>
         <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary protractor-test-topics-list-item">
           <span class="protractor-test-topic-name"> <[topic.name]> </span>
-          <span> <[topic.description]> </span>
         </a>
       </td>
-      <td class="text-center">
+      <td>
         <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary">
           <span> <[topic.subtopic_count]> </span>
         </a>
       </td>
-      <td class="text-center">
+      <td>
         <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary" uib-dropdown>
           <span> <[topic.total_skill_count]> </span>
           <div ng-show="topic.uncategorized_skill_count"
@@ -46,12 +40,12 @@
           </div>
         </a>
       </td>
-      <td class="text-center">
+      <td>
         <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary">
           <span> <[topic.canonical_story_count]> </span>
         </a>
       </td>
-      <td class="text-center">
+      <td>
         <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary">
           <span ng-if="topic.is_published"> Published </span>
           <span ng-if="!topic.is_published"> Not Published </span>
@@ -69,8 +63,9 @@
 <style>
   topics-list .list-view-item {
     background: #fff;
-    box-shadow: none;
-    margin-top: 50px;
+    margin: 20px 7.5px 0 12.5%;
+    padding: 10px 20px;
+    width: 75%;
   }
 
   topics-list .dashboard-table {
@@ -81,16 +76,10 @@
   topics-list .dashboard-table .dashboard-table-headings {
     border-bottom: 2px solid #bbb;
     padding-bottom: 0.7em;
-    text-align: center;
   }
 
   topics-list .dashboard-table .dashboard-table-headings p {
     display: inline;
-  }
-  topics-list .dashboard-table #dashboard-table-headings-details {
-    display: inline-block;
-    width: 100%;
-    text-align: left;
   }
 
   topics-list .list-summary,
@@ -103,13 +92,7 @@
   }
 
   topics-list .list-item {
-    height: 120px;
-    vertical-align: baseline;
-    text-align: left;
-  }
-
-  topics-list .list-item td {
-    padding-top: 15px;
+    height: 2.5em;
   }
 
   topics-list .delete-icon {
