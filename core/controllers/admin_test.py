@@ -1149,7 +1149,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         self.put_json(
             '/updateUsername',
             payload={
-                'current_username': self.ADMIN_USERNAME,
+                'current_username': current_username,
                 'new_username': new_username},
             csrf_token=csrf_token,
             expected_status_int=500)
