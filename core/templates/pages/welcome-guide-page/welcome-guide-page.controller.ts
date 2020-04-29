@@ -37,8 +37,12 @@ angular.module('oppia').directive('welcomeGuidePage', [
         ctrl.$onInit = function() {
           ctrl.headerImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/welcomeguide/header.jpg');
-            ctrl.thanksImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/general/classroom.png');
+          ctrl.thanksImgUrl = UrlInterpolationService.getStaticImageUrl(
+            '/general/classroom.png');
+          ctrl.browserImgUrl = UrlInterpolationService.getStaticImageUrl(
+            '/welcomeguide/browser.png');
+          ctrl.numbersImgUrl = UrlInterpolationService.getStaticImageUrl(
+            '/welcomeguide/numbers.png');
         };
       }]
     };
