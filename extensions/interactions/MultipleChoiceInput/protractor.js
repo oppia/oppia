@@ -22,69 +22,13 @@ var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 // The members of richTextInstructionsArray are functions, one for each option,
 // which will each be passed a 'handler' that they can use to edit the
 // rich-text area of the option, for example by
-// handler.appendUnderlineText('emphasised');
-// The third and fourth arguments are optional and can be used to edit the
-// interaction after its creation. , The third argument editCommand is a
-// string('edit', 'delete', 'add') and the fourth argument
-// itemIndex is the index of the object to be edited or deleted. In the case of
-// 'add' command, the fourth argument itemIndex is not required.
-var customizeInteraction = function(
-    elem, richTextInstructionsArray, editCommand, itemIndex) {
-  if (editCommand === undefined) {
-    forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
-    for (var i = 0; i < richTextInstructionsArray.length; i++) {
-      var richTextEditor = forms.ListEditor(elem).editItem(i, 'RichText');
-      richTextEditor.clear();
-      richTextInstructionsArray[i](richTextEditor);
-    }
-  } else {
-    if (editCommand === 'delete') {
-      if (richTextInstructionsArray === null) {
-        elem.all(by.repeater('item in localValue track by $index')).count().
-          then(
-            function(length) {
-              if (itemIndex < length) {
-                forms.ListEditor(elem).deleteItem(itemIndex);
-              } else {
-                throw Error('The given index is invalid.');
-              }
-            });
-      } else {
-        throw Error('richTextInstructionsArray should be null.');
-      }
-    } else if (editCommand === 'add') {
-      if (richTextInstructionsArray !== null &&
-            richTextInstructionsArray.length === 1) {
-        var richTextEditor = forms.ListEditor(elem).addItem('RichText');
-        richTextEditor.clear();
-        richTextInstructionsArray[0](richTextEditor);
-      } else {
-        throw Error(
-          'richTextInstructionsArray should be non-null and have exactly one' +
-          ' element.');
-      }
-    } else if (editCommand === 'edit') {
-      if (
-        richTextInstructionsArray !== null &&
-          richTextInstructionsArray.length === 1) {
-        elem.all(by.repeater('item in localValue track by $index')).count().
-          then(
-            function(length) {
-              if (itemIndex < length) {
-                var richTextEditor = forms.ListEditor(elem).editItem(
-                  itemIndex, 'RichText');
-                richTextEditor.clear();
-                richTextInstructionsArray[0](richTextEditor);
-              } else {
-                throw Error('The given index is invalid.');
-              }
-            });
-      } else {
-        throw Error(
-          'richTextInstructionsArray should be non-null and have exactly one' +
-          ' element.');
-      }
-    }
+//   handler.appendUnderlineText('emphasised');
+var customizeInteraction = function(elem, richTextInstructionsArray) {
+  forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
+  for (var i = 0; i < richTextInstructionsArray.length; i++) {
+    var richTextEditor = forms.ListEditor(elem).editItem(i, 'RichText');
+    richTextEditor.clear();
+    richTextInstructionsArray[i](richTextEditor);
   }
 };
 
@@ -92,14 +36,20 @@ var customizeInteraction = function(
 // the options.
 var expectInteractionDetailsToMatch = function(
     elem, richTextInstructionsArray) {
-  elem.all(by.repeater('choice in $ctrl.choices track by $index'))
+  elem.all(by.css('.protractor-test-multiple-choice-option-container'))
     .then(function(optionElements) {
       expect(optionElements.length).toEqual(richTextInstructionsArray.length);
+      var promises = [];
       for (var i = 0; i < optionElements.length; i++) {
-        forms.expectRichText(optionElements[i].element(by.css(
-          '.protractor-test-multiple-choice-option'
-        ))).toMatch(richTextInstructionsArray[i]);
+        promises.push(optionElements[i].element(by.css(
+          '.protractor-test-multiple-choice-option')).getText());
       }
+      var rteInstructionArrayCopy = [...richTextInstructionsArray];
+      rteInstructionArrayCopy.sort();
+      protractor.promise.all(promises).then(function(results) {
+        results.sort();
+        expect(rteInstructionArrayCopy).toEqual(results);
+      });
     });
 };
 
@@ -116,15 +66,15 @@ var testSuite = [{
   interactionArguments: [[function(editor) {
     editor.appendBoldText('right');
   }, function(editor) {
-    editor.appendItalicText('wrong');
+    editor.appendItalicText('wrong1');
+  }, function(editor) {
+    editor.appendItalicText('wrong2');
+  }, function(editor) {
+    editor.appendItalicText('wrong3');
   }]],
   ruleArguments: ['Equals', ['right']],
-  expectedInteractionDetails: [[function(checker) {
-    checker.readBoldText('right');
-  }, function(checker) {
-    checker.readItalicText('wrong');
-  }]],
-  wrongAnswers: ['wrong'],
+  expectedInteractionDetails: [['right', 'wrong1', 'wrong2', 'wrong3']],
+  wrongAnswers: ['wrong1', 'wrong2', 'wrong3'],
   correctAnswers: ['right']
 }];
 
