@@ -183,7 +183,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(output), 1)
         self.assertIn('ENTITY_VERSION_ERROR', output[0])
-        self.assertIn('invalid range: [2, 2)', output[0])
+        self.assertIn('empty range: [2, 2)', output[0])
 
     def test_task_with_invalid_version_range(self):
         self.save_new_default_exploration('exp_id', 'owner_id') # v1

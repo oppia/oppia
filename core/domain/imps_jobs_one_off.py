@@ -90,8 +90,12 @@ class TaskEntryModelAuditOneOffJob(
             version_range = list(
                 python_utils.RANGE(task.entity_version_start, version_end))
         else:
-            entity_version_error = 'invalid range: [%s, %s)' % (
-                task.entity_version_start, version_end)
+            if task.entity_version_start == version_end:
+                entity_version_error = 'empty range: [%s, %s)' % (
+                    task.entity_version_start, version_end)
+            else:
+                entity_version_error = 'invalid range: [%s, %s)' % (
+                    task.entity_version_start, version_end)
             for y in _map_each(entity_version_error=[entity_version_error]):
                 yield y
             return
