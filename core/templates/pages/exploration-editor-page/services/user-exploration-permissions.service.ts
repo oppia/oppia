@@ -29,7 +29,7 @@ import { UrlInterpolationService } from
   providedIn: 'root'
 })
 export class UserExplorationPermissionsService {
-  permissionsPromise: any = null;
+  permissionsPromise: Promise<object> = null;
 
   constructor(
     private http: HttpClient,
@@ -37,7 +37,7 @@ export class UserExplorationPermissionsService {
     private urlInterpolationService: UrlInterpolationService,
   ) { }
 
-  getPermissionsAsync(): Object {
+  getPermissionsAsync(): Promise<object> {
     if (!this.permissionsPromise) {
       let explorationPermissionsUrl = this.urlInterpolationService
         .interpolateUrl( '/createhandler/permissions/<exploration_id>', {
