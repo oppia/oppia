@@ -172,6 +172,19 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
         self.assertIn('ENTITY_ID_ERROR', output[0])
         self.assertIn('exp_id is invalid', output[0])
 
+    def test_task_with_empty_version_range(self):
+        self.save_new_default_exploration('exp_id', 'owner_id') # v1
+        exp_services.update_exploration('owner_id', 'exp_id', None, 'noop') # v2
+        exp_services.update_exploration('owner_id', 'exp_id', None, 'noop') # v3
+
+        _create_task('exp_id', entity_version_start=2, entity_version_end=2)
+
+        output = self.run_one_off_job()
+
+        self.assertEqual(len(output), 1)
+        self.assertIn('ENTITY_VERSION_ERROR', output[0])
+        self.assertIn('invalid range: [2, 2)', output[0])
+
     def test_task_with_invalid_version_range(self):
         self.save_new_default_exploration('exp_id', 'owner_id') # v1
         exp_services.update_exploration('owner_id', 'exp_id', None, 'noop') # v2
@@ -184,6 +197,20 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(len(output), 1)
         self.assertIn('ENTITY_VERSION_ERROR', output[0])
         self.assertIn('invalid range: [2, 0)', output[0])
+
+    def test_task_with_untargetable_target(self):
+        self.save_new_default_exploration('exp_id', 'owner_id')
+
+        _create_task(
+            'exp_id', target_type='TEST_ONLY_TARGET_TYPE', target_id='foo')
+
+        output = self.run_one_off_job()
+
+        self.assertEqual(len(output), 1)
+        self.assertIn('TARGET_TYPE_ERROR', output[0])
+        self.assertIn(
+            'TEST_ONLY_TARGET_TYPE is invalid target for exploration entities',
+            output[0])
 
     def test_task_with_missing_target_id(self):
         self.save_new_default_exploration('exp_id', 'owner_id')

@@ -65,23 +65,25 @@ class TaskEntryModelAuditOneOffJob(
             """
             task_key = 'task_id=%s' % task.id
             for group, messages in group_messages.items():
-                if not messages:
-                    continue
                 for message in messages:
+                    if not message:
+                        continue
                     yield (group.upper(), (task_key, message))
 
         entity_cls = _ENTITY_TYPE_MODELS[task.entity_type]
         entity_key = '%s[id=%s]' % (task.entity_type, task.entity_id)
-        if task.entity_version_end is None:
+
+        if task.entity_version_end is not None:
+            version_end = task.entity_version_end
+        else:
             latest_entity = entity_cls.get(task.entity_id, strict=False)
-            if latest_entity is None:
+            if latest_entity is not None:
+                version_end = latest_entity.version + 1
+            else:
                 entity_id_error = '%s does not exist' % entity_key
                 for y in _map_each(entity_id_error=[entity_id_error]):
                     yield y
                 return
-            version_end = latest_entity.version + 1
-        else:
-            version_end = task.entity_version_end
 
         if task.entity_version_start < version_end:
             version_range = list(
@@ -102,20 +104,29 @@ class TaskEntryModelAuditOneOffJob(
                 yield y
             return
 
-        if task.target_type and not task.target_id:
-            target_type_errors = [
-                'target_type is %s, but target_id is empty' % task.target_type]
-        elif task.target_id and not task.target_type:
-            target_type_errors = [
-                'target_type is empty, but target_id is %s' % task.target_id]
+        entity_type_targets = imps_models.ENTITY_TYPE_TARGETS[task.entity_type]
+        if task.target_type and task.target_id:
+            if task.target_type in entity_type_targets:
+                is_target_checkable = True
+                target_type_error = None
+            else:
+                is_target_checkable = False
+                target_type_error = '%s is invalid target for %s entities' % (
+                    task.target_type, task.entity_type)
+        elif not task.target_type and not task.target_id:
+            is_target_checkable = False
+            target_type_error = None
+        elif not task.target_type and task.target_id:
+            is_target_checkable = False
+            target_type_error = 'target_type is empty, but target_id is %s' % (
+                task.target_id)
         else:
-            target_type_errors = []
+            is_target_checkable = False
+            target_type_error = 'target_type is %s, but target_id is empty' % (
+                task.target_type)
 
         target_id_errors = list()
         entity_version_collisions = set()
-
-        is_target_checkable = (
-            task.target_type is not None and task.target_id is not None)
         for entity, version in python_utils.ZIP(
                 versioned_entities, version_range):
             if not is_target_checkable:
@@ -132,7 +143,7 @@ class TaskEntryModelAuditOneOffJob(
         for y in _map_each(
                 entity_version_collision=entity_version_collisions,
                 target_id_error=target_id_errors,
-                target_type_error=target_type_errors):
+                target_type_error=[target_type_error]):
             yield y
 
     @staticmethod
