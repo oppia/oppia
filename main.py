@@ -749,9 +749,11 @@ for classroom_name in feconf.CLASSROOM_PAGES:
 
 # Adding redirects for topic landing pages.
 for subject in feconf.AVAILABLE_LANDING_PAGES:
-    URLS.append(
-        get_redirect_route(
-            r'/%s/<topic>' % subject, custom_landing_pages.TopicLandingPage))
+    for topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
+        URLS.append(
+            get_redirect_route(
+                r'/%s/%s' % (subject, topic),
+                custom_landing_pages.TopicLandingPage))
 
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
