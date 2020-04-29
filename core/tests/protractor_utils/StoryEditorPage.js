@@ -204,6 +204,7 @@ var StoryEditorPage = function() {
   };
 
   this.returnToTopic = function() {
+    general.scrollToTop();
     returnToTopicButton.click();
     waitFor.pageToFullyLoad();
   };

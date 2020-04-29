@@ -183,15 +183,16 @@ describe('Topic editor functionality', function() {
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill 2', 'Concept card explanation', true);
-
+    var TOPIC_NAME = 'TASE2'
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic('Topic 2', false);
+    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+    topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
+      0, TOPIC_NAME);
 
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.editTopic('Topic 2');
+    topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
     topicEditorPage.moveToSubtopicsTab();
     topicEditorPage.addSubtopic('Subtopic 1');
     topicEditorPage.addSubtopic('Subtopic 2');

@@ -84,10 +84,10 @@ describe('Topic editor functionality', function() {
 
   it('should edit subtopic page contents correctly', function() {
     var TOPIC_NAME = 'TASEFUF_2';
-    var DEFAULT_THUMBNAIL_IMAGE_SOURCE = null;
+    var defaultThumbnailImageSrc = null;
     topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
     topicEditorPage.getTopicThumbnailSource().then(function(name) {
-      DEFAULT_THUMBNAIL_IMAGE_SOURCE = name;
+      defaultThumbnailImageSrc = name;
     });
     expect(topicEditorPage.getTopicThumbnailSource())
       .not
@@ -117,14 +117,14 @@ describe('Topic editor functionality', function() {
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
     expect(topicEditorPage.getTopicThumbnailSource()).not.toEqual(
-      DEFAULT_THUMBNAIL_IMAGE_SOURCE);
+      defaultThumbnailImageSrc);
     topicEditorPage.expectTopicDescriptionToBe('Topic Description');
 
     topicEditorPage.moveToSubtopicsTab();
     topicEditorPage.expectTitleOfSubtopicWithIndexToMatch('Modified Title', 0);
     topicEditorPage.editSubtopicWithIndex(0);
     expect(topicEditorPage.getSubtopicThumbnailSource()).not.toEqual(
-      DEFAULT_THUMBNAIL_IMAGE_SOURCE);
+      defaultThumbnailImageSrc);
     topicEditorPage.expectSubtopicPageContentsToMatch('Subtopic Contents');
   });
 
@@ -179,7 +179,11 @@ describe('Chapter editor functionality', function() {
 
   it('should create a basic chapter with a thumbnail.', function() {
     topicsAndSkillsDashboardPage.get();
+    var defaultThumbnailImageSrc = null;
     topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
+    topicEditorPage.getTopicThumbnailSource().then(function(name) {
+      defaultThumbnailImageSrc = name;
+    });
     expect(topicEditorPage.getTopicThumbnailSource())
       .not
       .toEqual(
@@ -215,6 +219,14 @@ describe('Chapter editor functionality', function() {
     storyEditorPage.setChapterExplorationId(dummyExplorationIds[0]);
     storyEditorPage.expectChapterExplorationIdToBe(dummyExplorationIds[0]);
     storyEditorPage.saveStory('First save');
+    // Check if the thumbnail images persist on reload.
+    browser.refresh();
+    general.scrollToTop();
+    expect(storyEditorPage.getStoryThumbnailSource()).not.toEqual(
+      defaultThumbnailImageSrc);
+    general.scrollToTop();
+    expect(storyEditorPage.getChapterThumbnailSource()).not.toEqual(
+      defaultThumbnailImageSrc);
   });
 
   afterAll(function() {
