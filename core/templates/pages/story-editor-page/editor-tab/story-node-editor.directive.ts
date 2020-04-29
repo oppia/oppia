@@ -28,6 +28,8 @@ require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
 const storyNodeConstants = require('constants.ts');
 
 angular.module('oppia').directive('storyNodeEditor', [

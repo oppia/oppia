@@ -48,8 +48,6 @@ class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
-            thumbnail_bg_color=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id, self.skill_id_2],

@@ -70,8 +70,6 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.skill_id_2 = 'skill_id_2'
         self.save_new_topic(
             self.TOPIC_ID, self.albert_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
-            thumbnail_bg_color=None,
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],

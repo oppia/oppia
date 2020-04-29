@@ -623,7 +623,7 @@ class ImageUploadHandler(EditorHandler):
     # to the end of 'assets/').
     _FILENAME_PREFIX = 'image'
     _decorator = None
-    HUNDRED_KB_IN_BYTES = 102400
+    HUNDRED_KB_IN_BYTES = 100 * 1024
 
     @acl_decorators.can_edit_entity
     def post(self, entity_type, entity_id):

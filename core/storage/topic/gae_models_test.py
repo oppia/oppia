@@ -45,8 +45,6 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.save_new_topic(
             'topic_id', 'owner_id', name='name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
-            thumbnail_bg_color=None,
             description='description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)

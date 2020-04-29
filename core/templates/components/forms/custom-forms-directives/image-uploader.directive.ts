@@ -60,7 +60,7 @@ angular.module('oppia').directive('imageUploader', [
             return 'This image format does not match the filename extension.';
           }
 
-          var HUNDRED_KB_IN_BYTES = 1024 * 100;
+          const HUNDRED_KB_IN_BYTES = 100 * 1024;
           if (file.size > HUNDRED_KB_IN_BYTES) {
             var currentSizeInKb = (
               (file.size * 100 / HUNDRED_KB_IN_BYTES).toFixed(1) + '  KB');

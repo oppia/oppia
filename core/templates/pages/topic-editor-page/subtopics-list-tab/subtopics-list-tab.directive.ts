@@ -24,6 +24,8 @@ require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
 const subtopicConstants = require('constants.ts');
 
 angular.module('oppia').directive('subtopicsListTab', [

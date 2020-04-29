@@ -19,9 +19,9 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'alert-message.directive.ts');
+
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
-
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/csrf-token.service.ts');

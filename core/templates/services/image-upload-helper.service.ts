@@ -17,6 +17,9 @@
  */
 
 require('services/assets-backend-api.service.ts');
+
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
 const Constants = require('constants.ts');
 
 angular.module('oppia').factory('ImageUploadHelperService', [

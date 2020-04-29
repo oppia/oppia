@@ -31,6 +31,8 @@ require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/image-upload-helper.service.ts');
 
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
 const topicConstants = require('constants.ts');
 
 angular.module('oppia').directive('topicEditorTab', [

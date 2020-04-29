@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import question_services
@@ -1863,8 +1862,6 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.viewer_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
-            thumbnail_bg_color=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -1934,8 +1931,6 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             self.topic_id)
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
-            thumbnail_bg_color=None,
             description='Description', canonical_story_ids=[self.story_id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -2028,8 +2023,6 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.viewer_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
-            thumbnail_bg_color=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -2125,9 +2118,6 @@ class StoryViewerTests(test_utils.GenericTestBase):
             self.topic_id)
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename='Image.svg',
-            thumbnail_bg_color=(
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
             description='Description', canonical_story_ids=[self.story_id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -2409,8 +2399,6 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name1',
-            abbreviated_name='abbrev', thumbnail_filename=None,
-            thumbnail_bg_color=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -2861,8 +2849,6 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
-            thumbnail_bg_color=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -2903,8 +2889,6 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
             topic_id)
         self.save_new_topic(
             topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
-            thumbnail_bg_color=None,
             description='Description', canonical_story_ids=[story_id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)

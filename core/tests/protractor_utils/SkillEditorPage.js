@@ -99,6 +99,7 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-save-rubric-explanation-button'));
   var rubricExplanations = element.all(
     by.css('.protractor-test-rubric-explanation'));
+
   this.get = function(skillId) {
     browser.get(EDITOR_URL_PREFIX + skillId);
     return waitFor.pageToFullyLoad();

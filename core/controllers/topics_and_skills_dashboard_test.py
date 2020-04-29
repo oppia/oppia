@@ -52,8 +52,6 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             self.linked_skill_id, self.admin_id, description='Description 3')
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
-            thumbnail_bg_color=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.linked_skill_id],
