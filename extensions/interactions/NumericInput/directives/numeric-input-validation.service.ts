@@ -166,7 +166,7 @@ export class NumericInputValidationService {
 
   getErrorString(value: string): string {
     if (!value) {
-      return undefined;
+      return '';
     }
 
     value = value.trim();
@@ -174,23 +174,18 @@ export class NumericInputValidationService {
     const twoDecimals = /.*\..*\./g;
     const extraChars = /[^0-9.+-]/g;
     const trailingMinus = /^-/g;
-    const extraHyphen = /-.*-/g;
+    const extraMinus = /-.*-/g;
 
     if (value.includes('.') && !value.match(trailingDot)) {
       return 'Trailing decimals are not allowed.';
-    } else if (
-      value.match(twoDecimals)) {
+    } else if (value.match(twoDecimals)) {
       return 'At most 1 decimal point should be present.';
-    } else if (
-      value.match(extraChars)) {
-      return 'Only use numbers, minus sign(-), and decimal(.)';
-    } else if (
-      value.includes('-') &&
-          !value.match(trailingMinus)) {
-      return 'Minus(-) sign is only allowed in beginning.';
-    } else if (
-      value.includes('-') && value.match(extraHyphen)) {
-      return 'At most 1 minus(-) sign should be present.';
+    } else if (value.match(extraChars)) {
+      return 'Only use numbers, minus sign (-), and decimal (.).';
+    } else if (value.includes('-') && !value.match(trailingMinus)) {
+      return 'Minus (-) sign is only allowed in beginning.';
+    } else if (value.includes('-') && value.match(extraMinus)) {
+      return 'At most 1 minus (-) sign should be present.';
     }
   }
 

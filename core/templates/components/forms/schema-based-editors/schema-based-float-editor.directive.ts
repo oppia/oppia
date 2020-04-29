@@ -82,9 +82,16 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           };
 
           ctrl.generateErrors = function() {
-            ctrl.errorString = (
-              NumericInputValidationService.getErrorString(
-                ctrl.localValue.toString()));
+            if (!ctrl.localValue) {
+              // If localValue is not undefined, it gets transformed to 0
+              // in the UI when ideally the input should be empty.
+              ctrl.localValue = undefined;
+              ctrl.errorString = '';
+            } else {
+              ctrl.errorString = (
+                NumericInputValidationService.getErrorString(
+                  ctrl.localValue.toString()));
+            }
           };
 
           ctrl.onKeypress = function(evt) {

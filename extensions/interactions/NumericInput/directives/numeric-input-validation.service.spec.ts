@@ -152,11 +152,11 @@ describe('NumericInputValidationService', () => {
     expect(validatorService.getErrorString('.3.4')).toEqual(
       'At most 1 decimal point should be present.');
     expect(validatorService.getErrorString('36a4')).toEqual(
-      'Only use numbers, minus sign(-), and decimal(.)');
+      'Only use numbers, minus sign (-), and decimal (.).');
     expect(validatorService.getErrorString('3-4')).toEqual(
-      'Minus(-) sign is only allowed in beginning.');
+      'Minus (-) sign is only allowed in beginning.');
     expect(validatorService.getErrorString('-3-4')).toEqual(
-      'At most 1 minus(-) sign should be present.');
+      'At most 1 minus (-) sign should be present.');
     expect(validatorService.getErrorString('2.2')).toEqual(undefined);
     expect(validatorService.getErrorString('-2.2')).toEqual(undefined);
     expect(validatorService.getErrorString('34.56')).toEqual(undefined);
