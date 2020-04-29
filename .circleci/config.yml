@@ -73,23 +73,28 @@ commands:
             if [[ -n ${CIRCLE_PULL_REQUEST} ]]
             then
 
-            git config --global user.email $( git log --format='%ae' $CIRCLE_SHA1^! )
-            git config --global user.name $( git log --format='%an' $CIRCLE_SHA1^! )
+              git config --global user.email $( git log --format='%ae' $CIRCLE_SHA1^! )
+              git config --global user.name $( git log --format='%an' $CIRCLE_SHA1^! )
 
-            regexp="[[:digit:]]\+$"
-            PR_NUMBER=`echo $CIRCLE_PULL_REQUEST | grep -o $regexp`
+              regexp="[[:digit:]]\+$"
+              PR_NUMBER=`echo $CIRCLE_PULL_REQUEST | grep -o $regexp`
 
-            curl -L "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64" -o jq
-            chmod +x jq
+              curl -L "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64" -o jq
+              chmod +x jq
 
-            url="https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls/$PR_NUMBER?access_token=$GITHUB_TOKEN"
+              url="https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls/$PR_NUMBER?access_token=$GITHUB_TOKEN"
 
-            target_branch=$(
-              curl "$url" | ./jq '.base.ref' | tr -d '"'
-            )
+              target_branch=$(
+                curl "$url" | ./jq '.base.ref' | tr -d '"'
+              )
 
-            rm jq
-            git pull origin $target_branch --no-edit
+              rm jq
+              if [[ "$target_branch" == null ]]
+              then
+                git pull git@github.com:oppia/oppia.git develop --no-edit
+              else
+                git pull origin $target_branch --no-edit
+              fi
             fi
 
 jobs:
