@@ -855,3 +855,15 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
             self.render_json({})
         else:
             raise self.InvalidInputException('This app cannot send emails.')
+
+
+class UpdateUsernameHandler(base.BaseHandler):
+    """Handler for renaming usernames."""
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        current_username = self.payload.get('current_username', None)
+        new_username = self.payload.get('new_username', None)
+        user_id = user_services.get_user_id_from_username(current_username)
+        user_services.set_username(user_id, new_username)
+        self.render_json({})

@@ -42,6 +42,7 @@ angular.module('oppia').directive('adminMiscTab', [
           '/explorationdataextractionhandler');
         var SEND_DUMMY_MAIL_HANDLER_URL = (
           '/sendDummyMailToAdminHandler');
+        var UPDATE_USERNAME_HANDLER_URL = '/updateUsername';
 
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
@@ -155,6 +156,23 @@ angular.module('oppia').directive('adminMiscTab', [
             });
         };
 
+        ctrl.updateUsername = function() {
+          $http.put(
+            UPDATE_USERNAME_HANDLER_URL, {
+              current_username: ctrl.currentUsername,
+              new_username: ctrl.newUsername
+            }).then(
+            function(response) {
+              ctrl.setStatusMessage(
+                'Successfully renamed ' + ctrl.currentUsername + ' to ' +
+                  ctrl.newUsername + '!');
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            }
+          );
+        };
+
         ctrl.submitQuery = function() {
           var STATUS_PENDING = (
             'Data extraction query has been submitted. Please wait.');
@@ -186,6 +204,8 @@ angular.module('oppia').directive('adminMiscTab', [
         ctrl.$onInit = function() {
           ctrl.topicIdForRegeneratingOpportunities = null;
           ctrl.regenerationMessage = null;
+          ctrl.currentUsername = null;
+          ctrl.newUsername = null;
         };
       }]
     };

@@ -1122,6 +1122,39 @@ class SendDummyMailTest(test_utils.GenericTestBase):
                 generated_response['error'], 'This app cannot send emails.')
 
 
+class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
+    """Tests for updating usernames."""
+
+    def setUp(self):
+        super(UpdateUsernameHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+
+    def test_update_username(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        current_username, new_username = self.ADMIN_USERNAME, 'newUsername'
+        user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        self.put_json(
+            '/updateUsername',
+            payload={
+                'current_username': current_username,
+                'new_username': new_username},
+            csrf_token=csrf_token)
+        self.assertEqual(user_services.get_username(user_id), new_username)
+
+        # The old username would not exist anymore so the same request
+        # should give a server error.
+        self.put_json(
+            '/updateUsername',
+            payload={
+                'current_username': self.ADMIN_USERNAME,
+                'new_username': new_username},
+            csrf_token=csrf_token,
+            expected_status_int=500)
+
+
 class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
     """Tests related to add reviewers for contributor's
     suggestion/application.
