@@ -5015,15 +5015,45 @@ MODEL_TO_VALIDATOR_MAPPING = {
 }
 
 
-class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class ProdValidationAuditOneOffJobMetaClass(type):
+    """Type class for audit one off jobs. Registers classes inheriting from
+    ProdValidationAuditOneOffJob in a list. With this strategy, job writers can
+    define them in separate modules while allowing us to assert that each model
+    has an audit job.
+    """
+
+    _MODEL_AUDIT_ONE_OFF_JOB_NAMES = set()
+
+    def __new__(mcs, name, bases, dct):
+        mcs._MODEL_AUDIT_ONE_OFF_JOB_NAMES.add(name)
+        return super(ProdValidationAuditOneOffJobMetaClass, mcs).__new__(
+            mcs, name, bases, dct)
+
+    @classmethod
+    def get_model_audit_job_names(mcs):
+        """Returns list of job names that have inherited from
+        ProdValidationAuditOneOffJob.
+
+        Returns:
+            tuple(str). The names of the one off audit jobs of this class type.
+        """
+        return sorted(mcs._MODEL_AUDIT_ONE_OFF_JOB_NAMES)
+
+
+class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
+        python_utils.with_metaclass(
+            ProdValidationAuditOneOffJobMetaClass,
+            jobs.BaseMapReduceOneOffJobManager)):
     """Job that audits and validates production models."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
         raise NotImplementedError
 
     @staticmethod
     def map(model_instance):
+        """Implements a map function which defers to a pre-defined validator."""
         if not model_instance.deleted:
             model_name = model_instance.__class__.__name__
             validator_cls = MODEL_TO_VALIDATOR_MAPPING[type(model_instance)]
@@ -5041,6 +5071,7 @@ class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
+        """Yields number of fully validated models or the failure messages."""
         if 'fully-validated' in key:
             yield (key, len(values))
         else:
