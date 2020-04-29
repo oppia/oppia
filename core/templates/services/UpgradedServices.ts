@@ -64,10 +64,10 @@ import { CodeReplRulesService } from
 import { CollectionCreationBackendService } from
   'components/entity-creation-services/collection-creation-backend-api.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
-import { ConceptCardObjectFactory } from
-  'domain/skill/ConceptCardObjectFactory';
 import { ConceptCardBackendApiService } from
   'domain/skill/concept-card-backend-api.service';
+import { ConceptCardObjectFactory } from
+  'domain/skill/ConceptCardObjectFactory';
 import { ContextService } from 'services/context.service';
 import { ContinueValidationService } from
   'interactions/Continue/directives/continue-validation.service';
@@ -285,9 +285,9 @@ import { TopicSummaryObjectFactory } from
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { UrlService } from 'services/contextual/url.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';

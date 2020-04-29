@@ -22,12 +22,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { ContextService } from 'services/context.service';
-import { UrlService } from 'services/contextual/url.service';
 import { ServicesConstants } from 'services/services.constants';
-
-@Injectable({
-  providedIn: 'root'
-})
+import { UrlService } from 'services/contextual/url.service';
 
 export class ExplorationRecommendationsService {
   isIframed: any = this.urlService.isIframed();

@@ -28,13 +28,9 @@ import { UrlInterpolationService } from
 import { SkillDomainConstants } from
   'domain/skill/skill-domain.constants';
 
-@Injectable({
-  providedIn: 'root'
-})
-
 export class ConceptCardBackendApiService {
   // Maps previously loaded concept cards to their IDs.
-  _conceptCardCache: Object = {};
+  private _conceptCardCache: Object = {};
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
