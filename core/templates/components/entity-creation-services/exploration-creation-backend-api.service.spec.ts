@@ -15,74 +15,73 @@
  * @fileoverview Unit test for ExplorationCreationBackendApiService.
  */
 
-// eslint-disable-next-line max-len
-require('components/entity-creation-services/exploration-creation-backend-api.service.ts');
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { ExplorationCreationBackendService } from
+  'components/entity-creation-services/exploration-creation-backend-api.service.ts';
 
-import { UpgradedServices } from 'services/UpgradedServices';
-import { not } from '@angular/compiler/src/output/output_ast';
+describe('Exploration Creation backend service', () => {
+  let explorationCreationBackendService: ExplorationCreationBackendService = null;
+  let httpTestingController: HttpTestingController;
+  let SAMPLE_EXPLORATION_ID = 'id_1';
+  let SUCCESS_STATUS_CODE = 200;
+  let ERROR_STATUS_CODE = 500;
 
-describe('Exploration Creation backend service', function() {
-  var ExplorationCreationBackendService = null;
-  var $httpBackend = null;
-  var $rootScope = null;
-  var SAMPLE_CREATION_ID = 'id_1';
-  var SUCCESS_STATUS_CODE = 200;
-  var ERROR_STATUS_CODE = 500;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    ExplorationCreationBackendService = $injector.get(
-      'ExplorationCreationBackendService');
-    $httpBackend = $injector.get('$httpBackend');
-    $rootScope = $injector.get('$rootScope');
-  }));
-
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+    explorationCreationBackendService = TestBed.get(
+      ExplorationCreationBackendService);
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
+  
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
-  it('should create a new exploration and get the exploration id',
-    (done) => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  fit('should successfully create a new exploration and obtain the exploration ID',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expectPOST('/contributehandler/create_new').respond(
-        SUCCESS_STATUS_CODE, {explorationId: SAMPLE_CREATION_ID});
-      ExplorationCreationBackendService.createExploration().then(
+      explorationCreationBackendService.createExploration().then(
         successHandler, failHandler);
 
-      $httpBackend.flush();
-      $rootScope.$digest();
+      let req = httpTestingController.expectOne(
+        '/contributehandler/create_new');
+      expect(req.request.method).toEqual('POST');
+      req.flush({explorationId: SAMPLE_EXPLORATION_ID});
+
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-      done();
-    });
+    })
+  );
 
-  it('should fail to create a new exploration and call the fail handler',
-    (done) => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  fit('should fail to create a new exploration and call the fail handler',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expectPOST('/contributehandler/create_new').respond(
-        ERROR_STATUS_CODE);
-      ExplorationCreationBackendService.createExploration().then(
+      explorationCreationBackendService.createExploration().then(
         successHandler, failHandler);
 
-      $httpBackend.flush();
-      $rootScope.$digest();
+      let req = httpTestingController.expectOne(
+        '/contributehandler/create_new');
+      expect(req.request.method).toEqual('POST');
+      req.flush('Error creating a new exploration.', {
+        status: ERROR_STATUS_CODE,
+        statusText: 'Error creating a new exploration.'
+      });
+
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
-      done();
-    });
+    })
+  );
 });

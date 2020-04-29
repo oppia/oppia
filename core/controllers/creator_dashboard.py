@@ -339,7 +339,10 @@ class NewExplorationHandler(base.BaseHandler):
     @acl_decorators.can_create_exploration
     def post(self):
         """Handles POST requests."""
-        title = self.payload.get('title', feconf.DEFAULT_EXPLORATION_TITLE)
+        if not self.payload:
+            title = feconf.DEFAULT_EXPLORATION_TITLE
+        else:
+            title = self.payload.get('title', feconf.DEFAULT_EXPLORATION_TITLE)
 
         new_exploration_id = exp_fetchers.get_new_exploration_id()
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -361,7 +364,6 @@ class NewCollectionHandler(base.BaseHandler):
         collection = collection_domain.Collection.create_default_collection(
             new_collection_id)
         collection_services.save_new_collection(self.user_id, collection)
-
         self.render_json({
             COLLECTION_ID_KEY: new_collection_id
         })

@@ -17,8 +17,8 @@
  * modal.
  */
 
-// eslint-disable-next-line max-len
-require('components/entity-creation-services/exploration-creation-backend-api.service.ts');
+require('components/entity-creation-services/' +
+'exploration-creation-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/csrf-token.service.ts');
