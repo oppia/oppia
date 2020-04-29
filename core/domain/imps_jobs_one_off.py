@@ -53,6 +53,8 @@ class TaskEntryModelAuditOneOffJob(
 
     @staticmethod
     def map(task):
+        task_key = 'task[id=%s]' % task.id
+
         def _map_each(**group_messages):
             """Convienience function to build many reduce calls.
 
@@ -63,7 +65,6 @@ class TaskEntryModelAuditOneOffJob(
             Yields:
                 tuple(str, tuple(str, *)).
             """
-            task_key = 'task[id=%s]' % task.id
             for group, messages in group_messages.items():
                 for message in messages:
                     if not message:
