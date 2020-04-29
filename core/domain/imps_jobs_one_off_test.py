@@ -89,7 +89,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(len(output), 1)
         error = output[0]
         self.assertIn('ENTITY_ID_ERROR', error)
-        self.assertIn('exploration[id=invalid_exp_id] does not exist', error)
+        self.assertIn('exploration{id:invalid_exp_id} does not exist', error)
 
     def test_tasks_with_version_collisions(self):
         self.save_new_default_exploration('exp_id', 'owner_id') # v1
@@ -244,7 +244,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(len(output), 1)
         self.assertIn('TARGET_ID_ERROR', output[0])
         self.assertIn(
-            'state[id=bad_state_name] does not exist at version 1', output[0])
+            'state{id:bad_state_name} does not exist at version 1', output[0])
 
     def test_task_with_target_id_that_changes(self):
         self.save_new_linear_exp_with_state_names_and_interactions( # v1
@@ -265,7 +265,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(output), 1)
         self.assertIn('TARGET_ID_ERROR', output[0])
-        self.assertIn('state[id=B] does not exist at version 2', output[0])
+        self.assertIn('state{id:B} does not exist at version 2', output[0])
 
     def test_tasks_correctly_targeting_renamed_state(self):
         self.save_new_linear_exp_with_state_names_and_interactions( # v1
@@ -307,7 +307,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(output), 1)
         self.assertIn('TARGET_ID_ERROR', output[0])
-        self.assertIn('state[id=B] does not exist at version 2', output[0])
+        self.assertIn('state{id:B} does not exist at version 2', output[0])
 
     def test_task_with_target_id_that_gets_deleted_after_version_end(self):
         self.save_new_linear_exp_with_state_names_and_interactions( # v1

@@ -53,7 +53,7 @@ class TaskEntryModelAuditOneOffJob(
 
     @staticmethod
     def map(task):
-        task_key = 'task[id=%s]' % task.id
+        task_key = 'task{id:%s}' % task.id
 
         def _map_each(**group_messages):
             """Convienience function to build many reduce calls.
@@ -72,7 +72,7 @@ class TaskEntryModelAuditOneOffJob(
                     yield (group.upper(), (task_key, message))
 
         entity_cls = _ENTITY_TYPE_MODELS[task.entity_type]
-        entity_key = '%s[id=%s]' % (task.entity_type, task.entity_id)
+        entity_key = '%s{id:%s}' % (task.entity_type, task.entity_id)
 
         if task.entity_version_end is not None:
             version_end = task.entity_version_end
@@ -130,7 +130,7 @@ class TaskEntryModelAuditOneOffJob(
         valid_versions = set()
         for entity in versioned_entities:
             if should_check_target:
-                target_key = '%s[id=%s]' % (task.target_type, task.target_id)
+                target_key = '%s{id:%s}' % (task.target_type, task.target_id)
                 if _target_exists(entity, task.target_type, task.target_id):
                     target_id_error = None
                 else:
