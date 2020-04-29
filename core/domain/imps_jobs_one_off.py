@@ -63,7 +63,7 @@ class TaskEntryModelAuditOneOffJob(
             Yields:
                 tuple(str, tuple(str, *)).
             """
-            task_key = 'task_id=%s' % task.id
+            task_key = 'task[id=%s]' % task.id
             for group, messages in group_messages.items():
                 for message in messages:
                     if not message:
@@ -107,41 +107,44 @@ class TaskEntryModelAuditOneOffJob(
         entity_type_targets = imps_models.ENTITY_TYPE_TARGETS[task.entity_type]
         if task.target_type and task.target_id:
             if task.target_type in entity_type_targets:
-                is_target_checkable = True
+                should_check_target = True
                 target_type_error = None
             else:
-                is_target_checkable = False
+                should_check_target = False
                 target_type_error = '%s is invalid target for %s entities' % (
                     task.target_type, task.entity_type)
         elif not task.target_type and not task.target_id:
-            is_target_checkable = False
+            should_check_target = False
             target_type_error = None
         elif not task.target_type and task.target_id:
-            is_target_checkable = False
+            should_check_target = False
             target_type_error = 'target_type is empty, but target_id is %s' % (
                 task.target_id)
         else:
-            is_target_checkable = False
+            should_check_target = False
             target_type_error = 'target_type is %s, but target_id is empty' % (
                 task.target_type)
 
         target_id_errors = list()
-        entity_version_collisions = set()
-        for entity, version in python_utils.ZIP(
-                versioned_entities, version_range):
-            if not is_target_checkable:
-                entity_version_collisions.add(version)
-                continue
-
-            target_key = '%s[id=%s]' % (task.target_type, task.target_id)
-            if not _target_exists(entity, task.target_type, task.target_id):
-                target_id_errors.append('%s does not exist at version %s' % (
-                    target_key, version))
+        valid_versions = set()
+        for entity in versioned_entities:
+            if should_check_target:
+                target_key = '%s[id=%s]' % (task.target_type, task.target_id)
+                if _target_exists(entity, task.target_type, task.target_id):
+                    target_id_error = None
+                else:
+                    target_id_error = '%s does not exist at version %s' % (
+                        target_key, entity.version)
             else:
-                entity_version_collisions.add(version)
+                target_id_error = None
+
+            if target_id_error:
+                target_id_errors.append(target_id_error)
+            else:
+                valid_versions.add(entity.version)
 
         for y in _map_each(
-                entity_version_collision=entity_version_collisions,
+                entity_version_collision=valid_versions,
                 target_id_error=target_id_errors,
                 target_type_error=[target_type_error]):
             yield y
