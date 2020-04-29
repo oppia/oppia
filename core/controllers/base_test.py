@@ -373,7 +373,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             to a non-existent directory.
             """
             path = ''
-            if args[1] == 'Pillow-6.0.0':
+            if args[1] == 'Pillow-6.2.2':
                 return 'invalid_path'
             else:
                 path = '/'.join(args)
