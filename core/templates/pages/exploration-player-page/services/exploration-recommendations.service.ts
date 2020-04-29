@@ -25,6 +25,9 @@ import { ContextService } from 'services/context.service';
 import { ServicesConstants } from 'services/services.constants';
 import { UrlService } from 'services/contextual/url.service';
 
+@Injectable({
+  providedIn: 'root'
+})
 export class ExplorationRecommendationsService {
   isIframed: any = this.urlService.isIframed();
   isInEditorPage: boolean = (this.contextService.getPageContext() ===

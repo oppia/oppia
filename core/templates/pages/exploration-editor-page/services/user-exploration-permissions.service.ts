@@ -25,6 +25,9 @@ import { ContextService } from 'services/context.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
+@Injectable({
+  providedIn: 'root'
+})
 export class UserExplorationPermissionsService {
   permissionsPromise: any = null;
 
