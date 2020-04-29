@@ -199,7 +199,7 @@ def main(personal_access_token):
         raise Exception(e)
 
     common.ask_user_to_confirm(
-        'Done! Please check feconf.py and constants.ts to ensure that '
+        'Done! Please check feconf.py and assets/constants.ts to ensure that '
         'the changes made are correct. Specifically verify that the '
         'MAILGUN_API_KEY is updated correctly and other config changes '
         'are corresponding to %s and %s.\n' % (
