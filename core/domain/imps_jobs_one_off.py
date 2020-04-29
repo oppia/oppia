@@ -97,7 +97,7 @@ class TaskEntryModelAuditOneOffJob(
             versioned_entities = (
                 entity_cls.get_multi_versions(task.entity_id, version_range))
         except Exception as e:
-            entity_id_error = str(e)
+            entity_id_error = '%s' % e
             for y in _map_each(entity_id_error=[entity_id_error]):
                 yield y
             return

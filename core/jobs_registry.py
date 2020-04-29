@@ -25,6 +25,7 @@ from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_jobs_one_off
+from core.domain import imps_jobs_one_off
 from core.domain import opportunity_jobs_one_off
 from core.domain import prod_validation_jobs_one_off
 from core.domain import question_jobs_one_off
@@ -95,6 +96,7 @@ ONE_OFF_JOB_MANAGERS = [
 # List of all manager classes for prod validation one-off batch jobs for which
 # to show controls on the admin dashboard.
 AUDIT_JOB_MANAGERS = [
+    imps_jobs_one_off.TaskEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob,
     prod_validation_jobs_one_off.RoleQueryAuditModelAuditOneOffJob,
     prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob,
