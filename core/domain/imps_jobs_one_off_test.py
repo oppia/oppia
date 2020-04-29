@@ -19,12 +19,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import ast
-
-from core.domain import imps_jobs_one_off
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import rights_manager
+from core.domain import imps_jobs_one_off
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
@@ -33,6 +30,7 @@ import feconf
 base_models, exp_models, imps_models = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration, models.NAMES.improvements
 ])
+
 
 def _create_task(
         entity_id, task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE, task_id=None,
@@ -54,6 +52,7 @@ def _create_task(
         closed_by=closed_by, task_summary=task_summary)
     task.put()
     return task
+
 
 class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
 
@@ -209,7 +208,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
         self.assertIn('target_type is empty, but target_id is init', output[0])
 
     def test_task_with_target_id_that_never_existed(self):
-        exp = self.save_new_default_exploration('exp_id', 'owner_id')
+        self.save_new_default_exploration('exp_id', 'owner_id')
 
         _create_task('exp_id', target_type='state', target_id='bad_state_name')
 
@@ -221,7 +220,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
             'state[id=bad_state_name] does not exist at version 1', output[0])
 
     def test_task_with_target_id_that_changes(self):
-        exp = self.save_new_linear_exp_with_state_names_and_interactions( # v1
+        self.save_new_linear_exp_with_state_names_and_interactions( # v1
             'exp_id', 'owner_id', ['A', 'B'], ['TextInput'])
         change_list = [
             exp_domain.ExplorationChange({
@@ -242,7 +241,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
         self.assertIn('state[id=B] does not exist at version 2', output[0])
 
     def test_tasks_correctly_targeting_renamed_state(self):
-        exp = self.save_new_linear_exp_with_state_names_and_interactions( # v1
+        self.save_new_linear_exp_with_state_names_and_interactions( # v1
             'exp_id', 'owner_id', ['A', 'B'], ['TextInput'])
         change_list = [
             exp_domain.ExplorationChange({
@@ -266,7 +265,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(output, [])
 
     def test_task_with_target_id_that_gets_deleted(self):
-        exp = self.save_new_linear_exp_with_state_names_and_interactions( # v1
+        self.save_new_linear_exp_with_state_names_and_interactions( # v1
             'exp_id', 'owner_id', ['A', 'B'], ['TextInput'])
         change_list = [
             exp_domain.ExplorationChange({
@@ -284,7 +283,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
         self.assertIn('state[id=B] does not exist at version 2', output[0])
 
     def test_task_with_target_id_that_gets_deleted_after_version_end(self):
-        exp = self.save_new_linear_exp_with_state_names_and_interactions( # v1
+        self.save_new_linear_exp_with_state_names_and_interactions( # v1
             'exp_id', 'owner_id', ['A', 'B'], ['TextInput'])
         change_list = [
             exp_domain.ExplorationChange({

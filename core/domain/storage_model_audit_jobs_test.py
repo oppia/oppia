@@ -19,7 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 
-from core.domain import imps_jobs_one_off  # pylint: disable=import-only-modules
+from core.domain import imps_jobs_one_off  # pylint: disable=unused-import
 from core.domain import prod_validation_jobs_one_off
 from core.platform import models
 from core.tests import test_utils

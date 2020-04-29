@@ -32,7 +32,9 @@ _ENTITY_TYPE_MODELS = {
     feconf.ENTITY_TYPE_EXPLORATION: exp_models.ExplorationModel
 }
 
+
 def _target_exists(entity, target_type, target_id):
+    """Checks whether the given target exists in the entity."""
     if isinstance(entity, exp_models.ExplorationModel):
         # Returning with this style allows us to hit 100% code coverage.
         if target_type == 'state' and target_id in entity.to_dict()['states']:
