@@ -547,6 +547,10 @@ p:last-child {
   margin-bottom: 18px;
 }
 
+.oppia-rte p:last-child {
+  margin: 0px;
+}
+
 .oppia-rte ol, .oppia-rte ul, .oppia-rte-editor ol, .oppia-rte-editor ul {
   line-height: 1.846;
   margin-bottom: 18px;
