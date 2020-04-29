@@ -91,6 +91,7 @@ import { EmailDashboardDataService } from
 import { EntityContextObjectFactory } from
   'domain/utilities/EntityContextObjectFactory';
 import { ExplorationCreationBackendService } from
+  // eslint-disable-next-line max-len
   'components/entity-creation-services/exploration-creation-backend-api.service.ts';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';

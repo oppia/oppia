@@ -19,10 +19,11 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { ExplorationCreationBackendService } from
+  // eslint-disable-next-line max-len
   'components/entity-creation-services/exploration-creation-backend-api.service.ts';
 
 describe('Exploration Creation backend service', () => {
-  let explorationCreationBackendService: ExplorationCreationBackendService = null;
+  let ecbs: ExplorationCreationBackendService = null;
   let httpTestingController: HttpTestingController;
   let SAMPLE_EXPLORATION_ID = 'id_1';
   let SUCCESS_STATUS_CODE = 200;
@@ -33,21 +34,21 @@ describe('Exploration Creation backend service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    explorationCreationBackendService = TestBed.get(
+    ecbs = TestBed.get(
       ExplorationCreationBackendService);
     httpTestingController = TestBed.get(HttpTestingController);
   });
-  
+
   afterEach(() => {
     httpTestingController.verify();
   });
 
-  fit('should successfully create a new exploration and obtain the exploration ID',
+  it('should successfully create an exploration and get the exploration ID',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      explorationCreationBackendService.createExploration().then(
+      ecbs.createExploration().then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -62,12 +63,12 @@ describe('Exploration Creation backend service', () => {
     })
   );
 
-  fit('should fail to create a new exploration and call the fail handler',
+  it('should fail to create a new exploration and call the fail handler',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      explorationCreationBackendService.createExploration().then(
+      ecbs.createExploration().then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
