@@ -195,7 +195,8 @@ class BaseJobManager(python_utils.OBJECT):
         cls._post_start_hook(job_id)
 
     @classmethod
-    def register_completion(cls, job_id, output_list, max_output_len_chars=None):
+    def register_completion(
+            cls, job_id, output_list, max_output_len_chars=None):
         """Marks a job as completed.
 
         Args:
@@ -212,7 +213,8 @@ class BaseJobManager(python_utils.OBJECT):
 
         model.status_code = STATUS_CODE_COMPLETED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
-        model.output = cls._compress_output_list(output_list, max_output_len_chars)
+        model.output = cls._compress_output_list(
+            output_list, test_only_max_output_len_chars=max_output_len_chars)
         model.put()
 
         cls._post_completed_hook(job_id)

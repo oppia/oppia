@@ -439,7 +439,8 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         expected_output = ['1', '2', '3', '<TRUNCATED>']
         MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         MockJobManagerOne.register_start(job_id)
-        MockJobManagerOne.register_completion(job_id, input_list, max_output_len_chars=3)
+        MockJobManagerOne.register_completion(
+            job_id, input_list, max_output_len_chars=3)
         actual_output = MockJobManagerOne.get_output(job_id)
         self.assertEqual(actual_output, expected_output)
 
@@ -449,7 +450,8 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         expected_output = ['abcd', 'efgh', 'ij <TRUNCATED>']
         MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         MockJobManagerOne.register_start(job_id)
-        MockJobManagerOne.register_completion(job_id, input_list, max_output_len_chars=10)
+        MockJobManagerOne.register_completion(
+            job_id, input_list, max_output_len_chars=10)
         actual_output = MockJobManagerOne.get_output(job_id)
         self.assertEqual(actual_output, expected_output)
 
@@ -459,7 +461,8 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         expected_output = ['<TRUNCATED>']
         MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         MockJobManagerOne.register_start(job_id)
-        MockJobManagerOne.register_completion(job_id, input_list, max_output_len_chars=0)
+        MockJobManagerOne.register_completion(
+            job_id, input_list, max_output_len_chars=0)
         actual_output = MockJobManagerOne.get_output(job_id)
         self.assertEqual(actual_output, expected_output)
 
@@ -469,7 +472,8 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         expected_output = ['abc']
         MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         MockJobManagerOne.register_start(job_id)
-        MockJobManagerOne.register_completion(job_id, input_list, max_output_len_chars=3)
+        MockJobManagerOne.register_completion(
+            job_id, input_list, max_output_len_chars=3)
         actual_output = MockJobManagerOne.get_output(job_id)
         self.assertEqual(actual_output, expected_output)
 
@@ -488,11 +492,11 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         input_list = ['bar', 'foo'] * 3
         expected_output = ['(3x) bar', '(3x) foo']
         max_length_for_output = sum(len(s) for s in expected_output)
-        MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        MockJobManagerOne.enqueue(
+            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         MockJobManagerOne.register_start(job_id)
-        MockJobManagerOne.register_completion(job_id,
-                                              input_list,
-                                              max_output_len_chars=max_length_for_output)
+        MockJobManagerOne.register_completion(
+            job_id, input_list, max_output_len_chars=max_length_for_output)
         actual_output = MockJobManagerOne.get_output(job_id)
         self.assertEqual(actual_output, expected_output)
 
@@ -502,7 +506,8 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         expected_output = ['(3x) super <TRUNCATED>']
         MockJobManagerOne.enqueue(job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
         MockJobManagerOne.register_start(job_id)
-        MockJobManagerOne.register_completion(job_id, input_list, max_output_len_chars=10)
+        MockJobManagerOne.register_completion(
+            job_id, input_list, max_output_len_chars=10)
         actual_output = MockJobManagerOne.get_output(job_id)
         self.assertEqual(actual_output, expected_output)
 
