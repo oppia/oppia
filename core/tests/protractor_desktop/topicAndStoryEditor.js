@@ -183,7 +183,7 @@ describe('Topic editor functionality', function() {
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill 2', 'Concept card explanation', true);
-    var TOPIC_NAME = 'TASE2'
+    var TOPIC_NAME = 'TASE2';
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
     topicsAndSkillsDashboardPage.get();
