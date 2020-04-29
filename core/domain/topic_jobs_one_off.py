@@ -69,6 +69,7 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         # Write the new topic into the datastore if it's different from
         # the old version.
+        #
         if (item.subtopic_schema_version <=
                 feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
             commit_cmds = [topic_domain.TopicChange({
@@ -112,8 +113,17 @@ class TopicSummaryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             print 'present'
             yield (TopicSummaryMigrationOneOffJob._DESCRIPTION_PRESENT, 1)
         else:
-            print 'added'
-            topic_summary['description'] = topic.description
+            commit_cmds = [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,  # pylint: disable=line-too-long
+                'property_name': 'description',
+                'old_value': '',
+                'new_value': topic.description
+            })]
+            commit_message = 'Adding description to topics'
+            topic_services.update_topic_and_subtopic_pages(
+                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+                commit_message
+            )
             print topic.description
             yield (TopicSummaryMigrationOneOffJob._DESCRIPTION_ADDED, 1)
 
