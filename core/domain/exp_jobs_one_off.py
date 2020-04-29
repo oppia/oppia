@@ -517,84 +517,83 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'Exploration %s failed non-strict validation: %s' %
                 (item.id, e))
             return
-        if (item.states_schema_version >=
-                AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION
-                and item.states_schema_version <=
-                feconf.CURRENT_STATE_SCHEMA_VERSION):
-            # Go through each exploration state to find voiceover recordings.
-            # For batching them as commits per explorations.
-            commit_cmds = []
-            change_count = 0
-            unchanged_count = 0
-            failed_count = 0
-            for state, state_value in item.states.items():
-                voiceovers_mapping = (state_value['recorded_voiceovers']
-                                      ['voiceovers_mapping'])
-                language_codes_to_audio_metadata = voiceovers_mapping.values()
-                for language_codes in language_codes_to_audio_metadata:
-                    for audio_metadata in language_codes.values():
-                        # Get files using the filename.
-                        filename = audio_metadata['filename']
-                        if audio_metadata['duration_secs'] == 0.0:
-                            try:
-                                fs = (fs_domain.AbstractFileSystem(
-                                    fs_domain.GcsFileSystem(
-                                        AUDIO_ENTITY_TYPE,
-                                        item.id)))
-                                raw = (
-                                    fs.get('%s/%s' % (AUDIO_FILE_PREFIX,
-                                                      filename)))
-                                # Get the audio-duration from file use Mutagen.
-                                tempbuffer = python_utils.string_io()
-                                tempbuffer.write(raw)
-                                tempbuffer.seek(0)
-                                # Loads audio metadata with Mutagen.
-                                audio = mp3.MP3(tempbuffer)
-                                tempbuffer.close()
-                                # Fetch the audio file duration from the Mutagen
-                                # metadata.
-                                audio_metadata['duration_secs'] = (
-                                    audio.info.length)
-                                change_count += 1
-                            except Exception as e:
-                                logging.error(
-                                    'MP3 audio file exception for file %s ,'
-                                    'EXP_ID: %s,'
-                                    'STATE_NAME: %s,'
-                                    'REASON: %s' %
-                                    (filename, item.id, state, e))
-                                failed_count += 1
-                        else:
-                            unchanged_count += 1
-                if change_count > 0:
-                    # Create commits to update the exploration.
-                    commit_cmds.append(exp_domain.ExplorationChange({
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-                        'state_name': state,
-                        'new_value': {
-                            'voiceovers_mapping': voiceovers_mapping
-                        }
-                    }))
-            if change_count > 0:
-                exp_services.update_exploration(
-                    feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
-                    'Update duration_secs for each voiceover recording '
-                    'in the exploration.')
-                yield ('SUCCESS_AUDIO_CHANGED', 'EXP_ID: %s, '
-                       'AUDIO_DURATIONS_CHANGED: %s' %
-                       (item.id, change_count))
-            if unchanged_count > 0:
-                yield ('SUCCESS_NO_CHANGE', 'EXP_ID: %s, '
-                       'NO_DURATIONS_CHANGED: %s' %
-                       (item.id, unchanged_count))
-            if failed_count > 0:
-                yield ('FAILED_NO_CHANGE', 'EXP_ID: %s, '
-                       'FAILED_DURATION_CHANGE: %s' % (item.id, failed_count))
-        else:
+        if (item.states_schema_version <
+                AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION):
             yield ('State schema version is not the '
                    'minimum version expected', item.id)
+            return
+
+        # Go through each exploration state to find voiceover recordings.
+        # For batching them as commits per explorations.
+        commit_cmds = []
+        states_changed_count = 0
+        unchanged_count = 0
+        failed_count = 0
+        for state, state_value in item.states.items():
+            voiceovers_mapping = (state_value['recorded_voiceovers']
+                                  ['voiceovers_mapping'])
+            language_codes_to_audio_metadata = voiceovers_mapping.values()
+            for language_codes in language_codes_to_audio_metadata:
+                for audio_metadata in language_codes.values():
+                    # Get files using the filename.
+                    filename = audio_metadata['filename']
+                    if audio_metadata['duration_secs'] == 0.0:
+                        try:
+                            fs = (fs_domain.AbstractFileSystem(
+                                fs_domain.GcsFileSystem(
+                                    AUDIO_ENTITY_TYPE,
+                                    item.id)))
+                            raw = (
+                                fs.get('%s/%s' % (AUDIO_FILE_PREFIX,
+                                                  filename)))
+                            # Get the audio-duration from file use Mutagen.
+                            tempbuffer = python_utils.string_io()
+                            tempbuffer.write(raw)
+                            tempbuffer.seek(0)
+                            # Loads audio metadata with Mutagen.
+                            audio = mp3.MP3(tempbuffer)
+                            tempbuffer.close()
+                            # Fetch the audio file duration from the Mutagen
+                            # metadata.
+                            audio_metadata['duration_secs'] = (
+                                audio.info.length)
+                            states_changed_count += 1
+                        except Exception as e:
+                            logging.error(
+                                'MP3 audio file exception for file %s ,'
+                                'EXP_ID: %s,'
+                                'STATE_NAME: %s,'
+                                'REASON: %s' %
+                                (filename, item.id, state, e))
+                            failed_count += 1
+                    else:
+                        unchanged_count += 1
+            if states_changed_count > 0:
+                # Create commits to update the exploration.
+                commit_cmds.append(exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+                    'state_name': state,
+                    'new_value': {
+                        'voiceovers_mapping': voiceovers_mapping
+                    }
+                }))
+        if states_changed_count > 0:
+            exp_services.update_exploration(
+                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+                'Update duration in seconds for each voiceover recording '
+                'in the exploration.')
+            yield ('SUCCESS_AUDIO_CHANGED', 'EXP_ID: %s, '
+                   'AUDIO_DURATIONS_CHANGED: %s' %
+                   (item.id, states_changed_count))
+        if unchanged_count > 0:
+            yield ('SUCCESS_NO_CHANGE', 'EXP_ID: %s, '
+                   'NO_DURATIONS_CHANGED: %s' %
+                   (item.id, unchanged_count))
+        if failed_count > 0:
+            yield ('FAILED_NO_CHANGE', 'EXP_ID: %s, '
+                   'FAILED_DURATION_CHANGE: %s' % (item.id, failed_count))
 
     @staticmethod
     def reduce(key, values):

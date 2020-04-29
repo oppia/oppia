@@ -39,8 +39,6 @@ import feconf
 import python_utils
 import utils
 
-from mutagen import mp3
-
 (job_models, exp_models, base_models, classifier_models) = (
     models.Registry.import_models([
         models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
@@ -1897,7 +1895,6 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         state_name = 'State1'
@@ -2025,15 +2022,7 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
             mode='rb', encoding=None) as f:
             raw_audio = f.read()
 
-        tempbuffer = python_utils.string_io()
-        tempbuffer.write(raw_audio)
-        tempbuffer.seek(0)
-
-        audio = mp3.MP3(tempbuffer)
-
-        tempbuffer.close()
-        mimetype = audio.mime[0]
-        del audio
+        mimetype = 'audio/mp3'
 
         # Save the raw audio into the filesystem.
         file_system_class = fs_services.get_entity_file_system_class()
