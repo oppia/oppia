@@ -35,8 +35,9 @@ OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 sys.path.insert(0, os.path.join(CURR_DIR))
 
-from scripts import common
-
+# pylint: disable=wrong-import-position
+from scripts import common # isort:skip
+# pylint: enable=wrong-import-position
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(
