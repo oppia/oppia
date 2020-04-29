@@ -30,11 +30,13 @@ import os
 import sys
 import unittest
 
-from scripts import common
-
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
+sys.path.insert(0, os.path.join(CURR_DIR))
+
+from scripts import common
+
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(
