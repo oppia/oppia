@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime as dt
+
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import imps_jobs_one_off
@@ -26,8 +28,6 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
-
-import datetime as dt
 
 base_models, exp_models, imps_models = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration, models.NAMES.improvements
