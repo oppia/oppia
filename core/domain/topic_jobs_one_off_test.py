@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import datetime
 import logging
 
 from core.domain import topic_domain
@@ -30,12 +29,12 @@ from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 
 class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
+
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
 
@@ -111,7 +110,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             topic_fetchers.get_topic_by_id(self.TOPIC_ID)
 
-        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id)  # pylint: disable=line-too-long
+        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
         expected = [[u'topic_deleted',
                      [u'Encountered 1 deleted topics.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
@@ -178,17 +177,17 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
 
-class SubtopicDescriptionMigrationOneOffJob(test_utils.GenericTestBase):
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
+class TopicDescriptionMigrationOneOffJob(test_utils.GenericTestBase):
+    MICHEAL_EMAIL = 'micheal@example.com'
+    MICHEAL_NAME = 'micheal'
 
     TOPIC_ID = 'topic_id'
 
     def setUp(self):
-        super(SubtopicDescriptionMigrationOneOffJob, self).setUp()
+        super(TopicDescriptionMigrationOneOffJob, self).setUp()
         # Setup user who will own the test topics.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.MICHEAL_EMAIL, self.MICHEAL_NAME)
+        self.albert_id = self.get_user_id_from_email(self.MICHEAL_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_addition_of_description_migration(self):
@@ -203,15 +202,52 @@ class SubtopicDescriptionMigrationOneOffJob(test_utils.GenericTestBase):
         new_topic_id = topic_services.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
             new_topic_id, name, abbreviated_name)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.albert_id = self.get_user_id_from_email(self.MICHEAL_EMAIL)
         topic_services.save_new_topic(self.albert_id, topic)
 
-        job_id = topic_jobs_one_off.SubtopicDescriptionMigrationOneOffJob.create_new()
-        topic_jobs_one_off.SubtopicDescriptionMigrationOneOffJob.enqueue(job_id)
+        job_id = topic_jobs_one_off.TopicDescriptionMigrationOneOffJob.create_new()
+        topic_jobs_one_off.TopicDescriptionMigrationOneOffJob.enqueue(job_id)
 
         self.process_and_flush_pending_tasks()
 
-        output = topic_jobs_one_off.SubtopicDescriptionMigrationOneOffJob.get_output(job_id)
+        output = topic_jobs_one_off.TopicDescriptionMigrationOneOffJob.get_output(job_id)
+        _DESCRIPTION_ADDED = 'description_added'
+        expected = [[_DESCRIPTION_ADDED, ['1']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_description_already_present_migration(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg)
+
+        name = 'topic_1'
+        abbreviated_name = 'topic_1'
+        new_topic_id = topic_services.get_new_topic_id()
+        topic = topic_domain.Topic.create_default_topic(
+            new_topic_id, name, abbreviated_name)
+        self.albert_id = self.get_user_id_from_email(self.MICHEAL_EMAIL)
+        topic_services.save_new_topic(self.albert_id, topic)
+        commit_cmds = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': 'description',
+            'old_value': '',
+            'new_value': 'adding a description'
+        })]
+        commit_message = 'Adding description to topics'
+        topic_services.update_topic_and_subtopic_pages(
+            'migration_username', new_topic_id, commit_cmds,
+            commit_message
+        )
+
+        job_id = topic_jobs_one_off.TopicDescriptionMigrationOneOffJob.create_new()
+        topic_jobs_one_off.TopicDescriptionMigrationOneOffJob.enqueue(job_id)
+
+        self.process_and_flush_pending_tasks()
+
+        output = topic_jobs_one_off.TopicDescriptionMigrationOneOffJob.get_output(job_id)
         _DESCRIPTION_PRESENT = 'description_present'
         expected = [[_DESCRIPTION_PRESENT, ['1']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+

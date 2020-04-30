@@ -69,7 +69,6 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         # Write the new topic into the datastore if it's different from
         # the old version.
-        #
         if (item.subtopic_schema_version <=
                 feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
             commit_cmds = [topic_domain.TopicChange({
@@ -95,7 +94,7 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class TopicSummaryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class TopicDescriptionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     _DESCRIPTION_ADDED = 'description_added'
     _DESCRIPTION_PRESENT = 'description_present'
 
@@ -107,14 +106,15 @@ class TopicSummaryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         topic = topic_fetchers.get_topic_by_id(item.id)
         topic_summary_model = topic_models.TopicSummaryModel.get_by_id(item.id)
-        topic_summary = topic_services.get_topic_summary_from_model(topic_summary_model).to_dict()
+        topic_summary = (
+            topic_services.get_topic_summary_from_model(
+                topic_summary_model).to_dict())
 
         if 'description' in topic_summary and topic_summary['description']:
-            print 'present'
-            yield (TopicSummaryMigrationOneOffJob._DESCRIPTION_PRESENT, 1)
+            yield (TopicDescriptionMigrationOneOffJob._DESCRIPTION_PRESENT, 1)
         else:
             commit_cmds = [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,  # pylint: disable=line-too-long
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
                 'property_name': 'description',
                 'old_value': '',
                 'new_value': topic.description
@@ -124,8 +124,7 @@ class TopicSummaryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 commit_message
             )
-            print topic.description
-            yield (TopicSummaryMigrationOneOffJob._DESCRIPTION_ADDED, 1)
+            yield (TopicDescriptionMigrationOneOffJob._DESCRIPTION_ADDED, 1)
 
     @staticmethod
     def reduce(key, values):
