@@ -30,6 +30,7 @@ exp_models, imps_models = models.Registry.import_models([
 
 
 def _get_task_status_errors(task):
+    """Yields error messages related to status for the task."""
     if task.status == imps_models.STATUS_OPEN:
         if task.closed_by:
             yield 'task is open but closed_by user is %s' % task.closed_by
@@ -53,6 +54,7 @@ def _get_task_status_errors(task):
 
 
 def _get_target_type_errors(task):
+    """Yields error messages related to target_type for the task."""
     entity_type_targets = imps_models.ENTITY_TYPE_TARGETS[task.entity_type]
     if task.target_type and task.target_type not in entity_type_targets:
         yield 'invalid target_type for %s entity: %s' % (
@@ -73,6 +75,7 @@ def _target_exists(entity, target_type, target_id):
 
 
 def _get_target_id_errors(task, versioned_entities):
+    """Yields error messages related to target_id for the task."""
     entity_type_targets = imps_models.ENTITY_TYPE_TARGETS[task.entity_type]
     if task.target_id is None or task.target_type not in entity_type_targets:
         return
@@ -124,7 +127,7 @@ class TaskEntryModelAuditOneOffJob(
             try:
                 versioned_entities = entity_cls.get_multi_versions(
                     task.entity_id, version_range)
-            except Exception as e:
+            except Exception:
                 entity_version_error = (
                     '%s is not valid in the version range: [%s, %s)' % (
                         entity_key, task.entity_version_start, version_end))
