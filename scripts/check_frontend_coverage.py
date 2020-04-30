@@ -138,6 +138,7 @@ FULLY_COVERED_FILENAMES = [
     'exploration-property.service.ts',
     'exploration-rights.service.ts',
     'exploration-summary-backend-api.service.ts',
+    'exploration-tags.service.ts',
     'exploration-title.service.ts',
     'exploration-warnings.service.ts',
     'ExplorationDraftObjectFactory.ts',
