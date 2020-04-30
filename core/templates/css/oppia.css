@@ -1188,6 +1188,11 @@ textarea {
   width: 100vw;
 }
 
+.oppia-input-box-subtitle {
+  color: #595959;
+  font-size: 0.79em;
+}
+
 .oppia-fractions-landing-page-generic-title {
   color: inherit;
   font-weight: 500;
@@ -2012,7 +2017,6 @@ pre.oppia-pre-wrapped-text {
   border-radius: 2px;
   padding-top: 20px;
   text-align: left;
-  margin-left: 87px;
 }
 
 .oppia-learner-view-card-top-content {

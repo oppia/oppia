@@ -237,9 +237,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_COLLECTION_URL,
         creator_dashboard.NewCollectionHandler),
     get_redirect_route(
-        r'%s' % feconf.COMMUNITY_DASHBOARD_URL,
-        community_dashboard.CommunityDashboardPage),
-    get_redirect_route(
         r'%s/<opportunity_type>' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
         community_dashboard.ContributionOpportunitiesHandler),
     get_redirect_route(
@@ -411,6 +408,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(feconf.DELETE_ACCOUNT_URL, profile.DeleteAccountPage),
     get_redirect_route(
         feconf.DELETE_ACCOUNT_HANDLER_URL, profile.DeleteAccountHandler),
+    get_redirect_route(
+        feconf.EXPORT_ACCOUNT_HANDLER_URL, profile.ExportAccountHandler),
     get_redirect_route(
         feconf.PENDING_ACCOUNT_DELETION_URL,
         profile.PendingAccountDeletionPage),

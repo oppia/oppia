@@ -174,7 +174,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 32
+CURRENT_STATE_SCHEMA_VERSION = 33
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -412,9 +412,6 @@ AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
 
-# Whether community dashboard is ready to use for contributors.
-COMMUNITY_DASHBOARD_ENABLED = False
-
 # The interactions permissible for a question.
 ALLOWED_QUESTION_INTERACTION_IDS = [
     'TextInput', 'MultipleChoiceInput', 'NumericInput']
@@ -643,7 +640,6 @@ COLLECTION_PUBLISH_PREFIX = '/collection_editor_handler/publish'
 COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
-COMMUNITY_DASHBOARD_URL = '/community_dashboard'
 COMMUNITY_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
@@ -715,6 +711,7 @@ RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 DELETE_ACCOUNT_URL = '/delete-account'
 DELETE_ACCOUNT_HANDLER_URL = '/delete-account-handler'
+EXPORT_ACCOUNT_HANDLER_URL = '/export-account-handler'
 PENDING_ACCOUNT_DELETION_URL = '/pending-account-deletion'
 REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
 REVIEW_TEST_URL_PREFIX = '/review_test'

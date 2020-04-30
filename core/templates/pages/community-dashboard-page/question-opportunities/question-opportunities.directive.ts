@@ -61,15 +61,17 @@ angular.module('oppia').directive('questionOpportunities', [
       'question-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$uibModal', 'QuestionSuggestionService', 'AlertsService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService',
         'ContributionOpportunitiesService', 'MisconceptionObjectFactory',
-        'QuestionObjectFactory', 'QuestionUndoRedoService',
-        'SkillBackendApiService', 'SkillObjectFactory',
+        'QuestionObjectFactory', 'QuestionSuggestionService',
+        'QuestionUndoRedoService', 'SkillBackendApiService',
+        'SkillObjectFactory',
         function(
-            $scope, $uibModal, QuestionSuggestionService, AlertsService,
+            $rootScope, $scope, $uibModal, AlertsService,
             ContributionOpportunitiesService, MisconceptionObjectFactory,
-            QuestionObjectFactory, QuestionUndoRedoService,
-            SkillBackendApiService, SkillObjectFactory) {
+            QuestionObjectFactory, QuestionSuggestionService,
+            QuestionUndoRedoService, SkillBackendApiService,
+            SkillObjectFactory) {
           const ctrl = this;
 
           const updateWithNewOpportunities = function(opportunities, more) {
@@ -90,10 +92,12 @@ angular.module('oppia').directive('questionOpportunities', [
             }
             ctrl.moreOpportunitiesAvailable = more;
             ctrl.opportunitiesAreLoading = false;
+            // TODO(#8521): Remove the use of $rootScope.$apply().
+            $rootScope.$apply();
           };
 
           const onSubmitSuggestionSuccess = function() {
-            AlertsService.addSuccessMessage('Submitted question suggestion.');
+            AlertsService.addSuccessMessage('Submitted question for review.');
           };
 
           ctrl.onLoadMoreOpportunities = function() {
@@ -120,14 +124,16 @@ angular.module('oppia').directive('questionOpportunities', [
                     $scope.instructionMessage = (
                       'Select the skill(s) to link the question to:');
                     $scope.currentMode = MODE_SELECT_DIFFICULTY;
-                    $scope.linkedSkillsWithDifficulty =
-                      [SkillDifficultyObjectFactory.create(
-                        skillId, '', DEFAULT_SKILL_DIFFICULTY)];
                     SkillBackendApiService.fetchSkill(skillId)
                       .then(function(backendSkillObject) {
                         $scope.skill =
                           SkillObjectFactory.createFromBackendDict(
                             backendSkillObject.skill);
+                        $scope.linkedSkillsWithDifficulty = [
+                          SkillDifficultyObjectFactory.create(
+                            skillId, $scope.skill.getDescription(),
+                            DEFAULT_SKILL_DIFFICULTY)
+                        ];
                         $scope.skillIdToRubricsObject = {};
                         $scope.skillIdToRubricsObject[skillId] =
                           $scope.skill.getRubrics();
@@ -164,6 +170,10 @@ angular.module('oppia').directive('questionOpportunities', [
               if (AlertsService.warnings.length === 0) {
                 ctrl.createQuestion(result.skill, result.skillDifficulty);
               }
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -177,8 +187,9 @@ angular.module('oppia').directive('questionOpportunities', [
             QuestionUndoRedoService.clearChanges();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/question-directives/modal-templates/' +
-                'question-editor-modal.directive.html'),
+                '/pages/community-dashboard-page/modal-templates/' +
+                'question-suggestion-editor-modal.directive.html'),
+              size: 'lg',
               backdrop: 'static',
               keyboard: false,
               controller: [
@@ -267,6 +278,7 @@ angular.module('oppia').directive('questionOpportunities', [
             ctrl.opportunitiesAreLoading = true;
             ctrl.moreOpportunitiesAvailable = true;
             ctrl.progressBarRequired = true;
+            ctrl.opportunityHeadingTruncationLength = 45;
             ContributionOpportunitiesService.getSkillOpportunities(
               updateWithNewOpportunities);
           };

@@ -485,6 +485,16 @@ class SetupTests(test_utils.GenericTestBase):
                     setup.main(args=[])
         self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/chromium-browser')
 
+    def test_chrome_bin_setup_with_chromium_browser_arch(self):
+        def mock_isfile(path):
+            return path == '/usr/bin/chromium'
+        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
+        with self.test_py_swap, self.create_swap, self.uname_swap:
+            with self.exists_swap, self.chown_swap, self.chmod_swap:
+                with self.get_swap, isfile_swap:
+                    setup.main(args=[])
+        self.assertEqual(os.environ['CHROME_BIN'], '/usr/bin/chromium')
+
     def test_chrome_bin_setup_with_chrome_exe_c_files(self):
         def mock_isfile(path):
             return (

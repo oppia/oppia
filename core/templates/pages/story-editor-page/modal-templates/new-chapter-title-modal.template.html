@@ -10,13 +10,18 @@
     </p>
     <input class="form-control protractor-test-new-chapter-title-field" style="font-size: 12px;"
            placeholder="Enter the title for this chapter to be displayed to learners in the story viewer page (can be edited later)"
-           ng-model="nodeTitle" ng-change="resetErrorMsg()" autofocus>
+           ng-model="nodeTitle" ng-change="resetErrorMsg()" maxlength="<[MAX_CHARS_IN_CHAPTER_TITLE]>" autofocus>
+    <span class="oppia-input-box-subtitle">
+      <i>
+        Chapter title should be at most <[MAX_CHARS_IN_CHAPTER_TITLE]> characters.
+      </i>
+    </span>
     <span class="form-text" style="font-size: smaller; color: red;" ng-if="errorMsg">
       <em><[errorMsg]></em>
     </span>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
     <button class="btn btn-success protractor-test-confirm-chapter-creation-button" type="submit" ng-disabled="isNodeTitleEmpty(nodeTitle)">
       <span>Create Chapter</span>
     </button>

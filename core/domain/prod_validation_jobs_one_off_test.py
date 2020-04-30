@@ -6915,14 +6915,24 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
                 rubrics=rubrics)
             skill_services.save_new_skill(self.owner_id, skill)
 
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
@@ -7127,14 +7137,24 @@ class SkillSnapshotMetadataModelValidatorTests(
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
@@ -7315,14 +7335,24 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
@@ -7453,14 +7483,24 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
@@ -7679,14 +7719,24 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
@@ -7788,8 +7838,10 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'count check of SkillSummaryModel\', '
                 '[u"Entity id 0: Worked examples count: 10 does not '
                 'match the number of worked examples in skill_contents '
-                'in skill model: [{u\'content_id\': u\'2\', u\'html\': '
-                'u\'<p>Example 1</p>\'}]"]]'
+                'in skill model: [{u\'explanation\': {u\'content_id\': u\'3\', '
+                'u\'html\': u\'<p>Example Explanation 1</p>\'}, u\'question\': '
+                '{u\'content_id\': u\'2\', u\'html\': u\'<p>Example Question '
+                '1</p>\'}}]"]]'
             ), u'[u\'fully-validated SkillSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -9243,40 +9295,6 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 'ids check of TopicModel\', '
                 '[u\'Entity id 0: uncategorized skill id 0 is present '
                 'in subtopic for entity with id 1\']]'
-            ), u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_abbreviated_name_is_empty(self):
-        self.model_instance_0.abbreviated_name = None
-        self.model_instance_0.commit(self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for abbreviated name check '
-                'of TopicModel\', '
-                '[u\'Entity id 0 : Topic name Topic0: Expected nonempty '
-                'abbreviated name, but received None.\']]'
-            ), (
-                u'[u\'failed validation check for domain object check '
-                'of TopicModel\', [u\'Entity id 0: Entity fails domain '
-                'validation with the error Abbreviated name should be a '
-                'string.\']]'
-            ), u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_abbreviated_name_is_empty_string(self):
-        self.model_instance_0.abbreviated_name = ''
-        self.model_instance_0.commit(self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for abbreviated name check '
-                'of TopicModel\', '
-                '[u\'Entity id 0 : Topic name Topic0: Expected nonempty '
-                'abbreviated name, but received .\']]'
-            ), (
-                u'[u\'failed validation check for domain object check '
-                'of TopicModel\', [u\'Entity id 0: Entity fails domain '
-                'validation with the error Abbreviated name field should '
-                'not be empty.\']]'
             ), u'[u\'fully-validated TopicModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
