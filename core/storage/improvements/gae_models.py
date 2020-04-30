@@ -161,7 +161,8 @@ class TaskEntryModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.closed_by == user_id).iter().has_next()
+        return cls.query(
+            cls.get_user_id_migration_field() == user_id).iter().has_next()
 
     @classmethod
     def generate_new_task_id(cls, entity_type, entity_id, task_type):
