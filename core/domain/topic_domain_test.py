@@ -849,6 +849,13 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Name field should not be empty'):
             self.topic_summary.validate()
 
+    def test_validation_fails_with_invalid_description(self):
+        self.topic_summary.description = 3
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected description to be a string, received 3'):
+            self.topic_summary.validate()
+
     def test_validation_fails_with_invalid_canonical_name(self):
         self.topic_summary.canonical_name = 0
         with self.assertRaisesRegexp(
