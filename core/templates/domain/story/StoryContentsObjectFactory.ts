@@ -311,7 +311,8 @@ export class StoryContents {
         for (var i = 0; i < this._nodes.length; i++) {
           if ((this._nodes[i].getExplorationId() === explorationId) && (
             i !== index)) {
-            throw new Error('The given exploration already exists in the story.');
+            throw new Error(
+              'The given exploration already exists in the story.');
           }
         }
       }

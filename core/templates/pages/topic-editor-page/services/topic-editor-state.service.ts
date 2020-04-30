@@ -327,6 +327,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
         if (index === null) {
           if (newIndex === -1) {
             return;
+          }
         }
         _cachedSubtopicPages.splice(index, 1);
         // If the deleted subtopic page corresponded to a newly created
