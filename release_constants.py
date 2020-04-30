@@ -68,3 +68,13 @@ RELEASE_NOTES_EXAMPLE_URL = (
 JOBS_FORM_URL = 'https://goo.gl/forms/XIj00RJ2h5L55XzU2'
 
 OPPIA_DEV_GROUP_URL = 'https://groups.google.com/forum/#!forum/oppia-dev'
+
+INVALID_EMAIL_SUFFIX = 'users.noreply.github.com'
+
+NEW_AUTHORS_HEADER = '### New Authors:\n'
+EXISTING_AUTHORS_HEADER = '### Existing Authors:\n'
+NEW_CONTRIBUTORS_HEADER = '### New Contributors:\n'
+EMAIL_HEADER = '### Email C&P Blurbs about authors:\n'
+CHANGELOG_HEADER = '### Changelog:\n'
+COMMIT_HISTORY_HEADER = '### Commit History:\n'
+ISSUES_HEADER = '### Issues mentioned in commits:\n'
