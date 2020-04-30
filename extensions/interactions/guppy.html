@@ -1,4 +1,9 @@
 <link rel="stylesheet" href="/third_party/static/guppy-b5055b/build/guppy-default.min.css">
+<script>
+  // Use the normal default browser eventlistener without passive set to false.
+  EventTarget.prototype.addEventListener = (
+    EventTarget.prototype.addEventListener._original);
+</script>
 <script type="text/javascript" src="/third_party/static/guppy-b5055b/build/guppy.min.js"></script>
 
 <script type="text/javascript">
