@@ -202,7 +202,8 @@ class BaseJobManager(python_utils.OBJECT):
         Args:
             job_id: str. The ID of the job to complete.
             output_list: list(object). The output produced by the job.
-            max_output_len_chars: int. Max length of output_list.
+            max_output_len_chars: int or None. Max length of output_list.
+                If None, the default maximum output length is used.
         """
         _default_max_len_chars = 900000
         _max_output_len_chars = (
