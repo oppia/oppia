@@ -117,8 +117,6 @@ _PATHS_TO_INSERT = [
         _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-2.0.33'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.8.0'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-3.13.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'Pillow-6.0.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'psutil-5.6.7'),
