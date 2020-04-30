@@ -37,6 +37,32 @@ def _always_returns(value):
 class TaskEntryModelTests(test_utils.GenericTestBase):
     """Unit tests for TaskEntryModel instances."""
 
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            imps_models.TaskEntryModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
+
+    def test_get_user_id_migration_field(self):
+        self.assertEqual(
+            imps_models.TaskEntryModel.get_user_id_migration_field(),
+            'closed_by')
+
+    def test_has_reference_to_user_id(self):
+        imps_models.TaskEntryModel(
+            id='task_id',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='expid',
+            task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
+            entity_version_start=1,
+            status='open',
+            closed_by='user_id'
+        ).put()
+
+        self.assertTrue(
+            imps_models.TaskEntryModel.has_reference_to_user_id('user_id'))
+        self.assertFalse(
+            imps_models.TaskEntryModel.has_reference_to_user_id('x_id'))
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             imps_models.TaskEntryModel.get_deletion_policy(),
@@ -85,32 +111,6 @@ class TaskEntryModelTests(test_utils.GenericTestBase):
         self.assertEqual(imps_models.TaskEntryModel.export_data('user_id'), {
             'task_ids_closed_by_user': ['task_id']
         })
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            imps_models.TaskEntryModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
-
-    def test_get_user_id_migration_field(self):
-        self.assertEqual(
-            imps_models.TaskEntryModel.get_user_id_migration_field(),
-            'closed_by')
-
-    def test_has_reference_to_user_id(self):
-        imps_models.TaskEntryModel(
-            id='task_id',
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_id='expid',
-            task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            entity_version_start=1,
-            status='open',
-            closed_by='user_id'
-        ).put()
-
-        self.assertTrue(
-            imps_models.TaskEntryModel.has_reference_to_user_id('user_id'))
-        self.assertFalse(
-            imps_models.TaskEntryModel.has_reference_to_user_id('x_id'))
 
     def test_generate_new_task_id(self):
         entity_type, entity_id, task_type = (

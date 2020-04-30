@@ -29,7 +29,7 @@ from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
-TEST_ONLY_ENTITY_TYPE = 'TEST_ONLY_ENTITY_TYPE' # Used by unit tests.
+TEST_ONLY_ENTITY_TYPE = 'TEST_ONLY_ENTITY_TYPE'
 ENTITY_TYPE_EXPLORATION = feconf.ENTITY_TYPE_EXPLORATION
 ENTITY_TYPES = (
     TEST_ONLY_ENTITY_TYPE,
@@ -45,7 +45,7 @@ STATUS_CHOICES = (
     STATUS_RESOLVED,
 )
 
-TEST_ONLY_TARGET_TYPE = 'TEST_ONLY_TARGET_TYPE' # Used by unit tests.
+TEST_ONLY_TARGET_TYPE = 'TEST_ONLY_TARGET_TYPE'
 TARGET_TYPE_STATE = 'state'
 TARGET_TYPES = (
     TEST_ONLY_TARGET_TYPE,
@@ -67,6 +67,9 @@ ENTITY_TYPE_TARGETS = {
 # Constant used to generate new IDs.
 _GENERATE_NEW_TASK_ID_MAX_ATTEMPTS = 10
 
+# Delimiter used to separate the components of a task's ID.
+_TASK_ID_PIECE_DELIMITER = '.'
+
 
 class TaskEntryModel(base_models.BaseModel):
     """Task entry corresponding to an actionable task in the improvements tab.
@@ -78,7 +81,8 @@ class TaskEntryModel(base_models.BaseModel):
     entity_type = ndb.StringProperty(
         required=True, indexed=True, choices=ENTITY_TYPES)
     # The ID of the entity a task entry refers to.
-    entity_id = ndb.StringProperty(required=True, indexed=True)
+    entity_id = ndb.StringProperty(
+        required=True, indexed=True)
     # The type of task a task entry tracks.
     task_type = ndb.StringProperty(
         required=True, indexed=True, choices=TASK_TYPES)
@@ -87,59 +91,28 @@ class TaskEntryModel(base_models.BaseModel):
     target_type = ndb.StringProperty(
         default=None, required=False, indexed=True, choices=TARGET_TYPES)
     # Uniquely identifies the sub-entity a task entry focuses on.
-    target_id = ndb.StringProperty(default=None, required=False, indexed=True)
+    target_id = ndb.StringProperty(
+        default=None, required=False, indexed=True)
 
     # Tracks the state/progress of a task entry.
     status = ndb.StringProperty(
         required=True, indexed=True, choices=STATUS_CHOICES)
     # Refers to the first entity version (inclusive) a task entry is relevant
     # to.
-    entity_version_start = ndb.IntegerProperty(required=True, indexed=True)
+    entity_version_start = ndb.IntegerProperty(
+        required=True, indexed=True)
     # Refers to the last entity version (exclusive) a task entry is relevant to.
     entity_version_end = ndb.IntegerProperty(
         default=None, required=False, indexed=True)
     # ID of the user who closed the task, if any.
-    closed_by = ndb.StringProperty(default=None, required=False, indexed=True)
+    closed_by = ndb.StringProperty(
+        default=None, required=False, indexed=True)
     # The date and time at which a task was closed or deprecated.
-    closed_on = ndb.DateTimeProperty(default=None, required=False, indexed=True)
+    closed_on = ndb.DateTimeProperty(
+        default=None, required=False, indexed=True)
     # Auto-generated string which provides a one-line summary of the task.
     task_summary = ndb.StringProperty(
         default=None, required=False, indexed=False)
-
-    @staticmethod
-    def get_deletion_policy():
-        """OK to delete task entries since they're just a historical record."""
-        return base_models.DELETION_POLICY.DELETE
-
-    @classmethod
-    def apply_deletion_policy(cls, user_id):
-        """Delete instances of TaskEntryModel for the user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be deleted.
-        """
-        cls.delete_multi(cls.query(cls.closed_by == user_id))
-
-    @staticmethod
-    def get_export_policy():
-        """TaskEntryModel contains the user ID that acted on a task."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
-
-    @staticmethod
-    def export_data(user_id):
-        """Returns the user-relevant properties of TaskEntryModels.
-
-        Args:
-            user_id: str. The ID of the user whose data should be exported.
-
-        Returns:
-            dict. The user-relevant properties of TaskEntryModel in a dict
-            format. In this case, we are returning all the ids of the tasks
-            which were closed by this user.
-        """
-        tasks_closed_by_user = (
-            TaskEntryModel.query(TaskEntryModel.closed_by == user_id))
-        return {'task_ids_closed_by_user': [t.id for t in tasks_closed_by_user]}
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -164,6 +137,42 @@ class TaskEntryModel(base_models.BaseModel):
         return cls.query(
             cls.get_user_id_migration_field() == user_id).iter().has_next()
 
+    @staticmethod
+    def get_deletion_policy():
+        """OK to delete task entries since they're just a historical record."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of TaskEntryModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_multi(
+            cls.query(cls.get_user_id_migration_field() == user_id))
+
+    @staticmethod
+    def get_export_policy():
+        """TaskEntryModel contains the user ID that acted on a task."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
+    @staticmethod
+    def export_data(user_id):
+        """Returns the user-relevant properties of TaskEntryModels.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. The user-relevant properties of TaskEntryModel in a dict
+            format. In this case, we are returning all the ids of the tasks
+            which were closed by this user.
+        """
+        tasks_closed_by_user = TaskEntryModel.query(
+            TaskEntryModel.get_user_id_migration_field() == user_id)
+        return {'task_ids_closed_by_user': [t.id for t in tasks_closed_by_user]}
+
     @classmethod
     def generate_new_task_id(cls, entity_type, entity_id, task_type):
         """Generates a new task entry ID.
@@ -177,8 +186,9 @@ class TaskEntryModel(base_models.BaseModel):
             str. An ID available for use for a new task entry.
         """
         for _ in python_utils.RANGE(_GENERATE_NEW_TASK_ID_MAX_ATTEMPTS):
-            task_id = '%s.%s.%s.%s' % (
-                entity_type, entity_id, task_type, uuid.uuid4())
-            if not cls.get_by_id(task_id):
-                return task_id
+            new_task_id = _TASK_ID_PIECE_DELIMITER.join(
+                python_utils.UNICODE(piece) for piece in
+                (entity_type, entity_id, task_type, uuid.uuid4()))
+            if not cls.get_by_id(new_task_id):
+                return new_task_id
         raise Exception('Task ID strategy is creating too many collisions')
