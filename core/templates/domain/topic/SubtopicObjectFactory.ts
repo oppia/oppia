@@ -108,7 +108,7 @@ export class Subtopic {
     if (index > -1) {
       this._skillSummaries.splice(index, 1);
     } else {
-      throw Error('The given skill doesn\'t exist in the subtopic');
+      throw new Error('The given skill doesn\'t exist in the subtopic');
     }
   }
 }

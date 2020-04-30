@@ -263,7 +263,7 @@ export class Topic {
       }
     }
     if (!subtopicDeleted) {
-      throw Error('Subtopic to delete does not exist');
+      throw new Error('Subtopic to delete does not exist');
     }
     if (isNewlyCreated) {
       for (let i = 0; i < this._subtopics.length; i++) {
@@ -296,7 +296,7 @@ export class Topic {
   addCanonicalStory(storyId: string): void {
     let canonicalStoryIds = this.getCanonicalStoryIds();
     if (canonicalStoryIds.indexOf(storyId) !== -1) {
-      throw Error(
+      throw new Error(
         'Given story id already present in canonical story ids.');
     }
     this._canonicalStoryReferences.push(
@@ -307,7 +307,7 @@ export class Topic {
     let canonicalStoryIds = this.getCanonicalStoryIds();
     let index = canonicalStoryIds.indexOf(storyId);
     if (index === -1) {
-      throw Error(
+      throw new Error(
         'Given story id not present in canonical story ids.');
     }
     this._canonicalStoryReferences.splice(index, 1);
@@ -330,7 +330,7 @@ export class Topic {
   addAdditionalStory(storyId: string): void {
     let additionalStoryIds = this.getAdditionalStoryIds();
     if (additionalStoryIds.indexOf(storyId) !== -1) {
-      throw Error(
+      throw new Error(
         'Given story id already present in additional story ids.');
     }
     this._additionalStoryReferences.push(
@@ -341,7 +341,7 @@ export class Topic {
     let additionalStoryIds = this.getAdditionalStoryIds();
     let index = additionalStoryIds.indexOf(storyId);
     if (index === -1) {
-      throw Error(
+      throw new Error(
         'Given story id not present in additional story ids.');
     }
     this._additionalStoryReferences.splice(index, 1);
@@ -368,10 +368,10 @@ export class Topic {
       }
     }
     if (skillIsPresentInSomeSubtopic) {
-      throw Error('Given skillId is already present in a subtopic.');
+      throw new Error('Given skillId is already present in a subtopic.');
     }
     if (this.hasUncategorizedSkill(skillId)) {
-      throw Error('Given skillId is already an uncategorized skill.');
+      throw new Error('Given skillId is already an uncategorized skill.');
     }
     this._uncategorizedSkillSummaries.push(
       this.skillSummaryObjectFactory.create(skillId, skillDescription));
@@ -383,7 +383,7 @@ export class Topic {
         return skillSummary.getId();
       }).indexOf(skillId);
     if (index === -1) {
-      throw Error('Given skillId is not an uncategorized skill.');
+      throw new Error('Given skillId is not an uncategorized skill.');
     }
     this._uncategorizedSkillSummaries.splice(index, 1);
   }
