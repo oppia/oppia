@@ -39,7 +39,7 @@ describe('Collections', function() {
   var fourthExplorationId = null;
   var libraryPage = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
@@ -47,94 +47,84 @@ describe('Collections', function() {
     var EDITOR_USERNAME = 'aliceCollections';
     var PLAYER_USERNAME = 'playerCollections';
     var CREATOR_USERNAME = 'creatorExplorations';
-    users.createUser('creator@explorations.com', CREATOR_USERNAME);
-    users.createUser('player@collections.com', PLAYER_USERNAME);
-    users.createUser('alice@collections.com', EDITOR_USERNAME);
-    users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
+    await users.createUser('creator@explorations.com', CREATOR_USERNAME);
+    await users.createUser('player@collections.com', PLAYER_USERNAME);
+    await users.createUser('alice@collections.com', EDITOR_USERNAME);
+    await users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
     adminPage.get();
     adminPage.updateRole(EDITOR_USERNAME, 'collection editor');
     adminPage.updateRole(PLAYER_USERNAME, 'collection editor');
-    users.logout();
+    await users.logout();
 
-    users.login('creator@explorations.com');
+    await users.login('creator@explorations.com');
     // Create four test explorations.
     workflow.createAndPublishExploration(
       'First Exploration',
       'Languages',
       'First Test Exploration.'
     );
-    general.getExplorationIdFromEditor().then(function(expId) {
-      firstExplorationId = expId;
-      workflow.createAndPublishExploration(
-        'Second Exploration',
-        'Languages',
-        'Second Test Exploration.'
-      );
-      general.getExplorationIdFromEditor().then(function(expId) {
-        secondExplorationId = expId;
-      });
-      workflow.createAndPublishExploration(
-        'Third Exploration',
-        'Languages',
-        'Third Test Exploration.'
-      );
-      general.getExplorationIdFromEditor().then(function(expId) {
-        thirdExplorationId = expId;
-      });
-      workflow.createAndPublishExploration(
-        'Fourth Exploration',
-        'Languages',
-        'Fourth Test Exploration.'
-      );
-      general.getExplorationIdFromEditor().then(function(expId) {
-        fourthExplorationId = expId;
-      });
-      // Create searchable explorations.
-      workflow.createAndPublishExploration(
-        'The Lazy Magician',
-        'Algorithms',
-        'discover the binary search algorithm'
-      );
-      workflow.createAndPublishExploration(
-        'Root Linear Coefficient Theorem',
-        'Algebra',
-        'discover the Root Linear Coefficient Theorem'
-      );
-      workflow.createAndPublishExploration(
-        'Test Exploration',
-        'Languages',
-        'discover the Protractor Testing'
-      );
-      users.logout();
+    firstExplorationId = await general.getExplorationIdFromEditor();
 
-      users.login('player@collections.com');
-      creatorDashboardPage.get();
-      creatorDashboardPage.clickCreateActivityButton();
-      creatorDashboardPage.clickCreateCollectionButton();
-      browser.getCurrentUrl().then(function(url) {
-        var pathname = url.split('/');
-        // in the url a # is added at the end that is not part of collection ID
-        collectionId = pathname[5].slice(0, -1);
-      }, function() {
-        // Note to developers:
-        // Promise is returned by getCurrentUrl which is handled here.
-        // No further action is needed.
-      });
-      // Add existing explorations.
-      collectionEditorPage.addExistingExploration(firstExplorationId);
-      collectionEditorPage.saveDraft();
-      collectionEditorPage.closeSaveModal();
-      collectionEditorPage.publishCollection();
-      collectionEditorPage.setTitle('Test Collection 2');
-      collectionEditorPage.setObjective('This is the second test collection.');
-      collectionEditorPage.setCategory('Algebra');
-      collectionEditorPage.saveChanges();
-      users.logout();
-    });
+    workflow.createAndPublishExploration(
+      'Second Exploration',
+      'Languages',
+      'Second Test Exploration.'
+    );
+    secondExplorationId = await general.getExplorationIdFromEditor();
+
+    workflow.createAndPublishExploration(
+      'Third Exploration',
+      'Languages',
+      'Third Test Exploration.'
+    );
+    thirdExplorationId = await general.getExplorationIdFromEditor();
+
+    workflow.createAndPublishExploration(
+      'Fourth Exploration',
+      'Languages',
+      'Fourth Test Exploration.'
+    );
+    fourthExplorationId = await general.getExplorationIdFromEditor();
+    // Create searchable explorations.
+    workflow.createAndPublishExploration(
+      'The Lazy Magician',
+      'Algorithms',
+      'discover the binary search algorithm'
+    );
+    workflow.createAndPublishExploration(
+      'Root Linear Coefficient Theorem',
+      'Algebra',
+      'discover the Root Linear Coefficient Theorem'
+    );
+    workflow.createAndPublishExploration(
+      'Test Exploration',
+      'Languages',
+      'discover the Protractor Testing'
+    );
+    await users.logout();
+
+    await users.login('player@collections.com');
+    creatorDashboardPage.get();
+    creatorDashboardPage.clickCreateActivityButton();
+    creatorDashboardPage.clickCreateCollectionButton();
+    var url = await browser.getCurrentUrl();
+    var pathname = url.split('/');
+    // In the url a # is added at the end that is not part of collection ID.
+    collectionId = pathname[5].slice(0, -1);
+    // Add existing explorations.
+    collectionEditorPage.addExistingExploration(firstExplorationId);
+    collectionEditorPage.saveDraft();
+    collectionEditorPage.closeSaveModal();
+    collectionEditorPage.publishCollection();
+    collectionEditorPage.setTitle('Test Collection 2');
+    collectionEditorPage.setObjective('This is the second test collection.');
+    collectionEditorPage.setCategory('Algebra');
+    collectionEditorPage.saveChanges();
+    await users.logout();
   });
 
-  it('visits the collection editor', function() {
-    users.login('alice@collections.com');
+  it('visits the collection editor', async function() {
+    await users.login('alice@collections.com');
     creatorDashboardPage.get();
     creatorDashboardPage.clickCreateActivityButton();
     creatorDashboardPage.clickCreateCollectionButton();
@@ -159,58 +149,59 @@ describe('Collections', function() {
     collectionEditorPage.setObjective('This is a test collection.');
     collectionEditorPage.setCategory('Algebra');
     collectionEditorPage.saveChanges();
-    users.logout();
+    await users.logout();
   });
 
-  it('visits the collection player', function() {
-    users.login('alice@collections.com');
+  it('visits the collection player', async function() {
+    await users.login('alice@collections.com');
     libraryPage.get();
     libraryPage.findCollection('Test Collection');
     libraryPage.playCollection('Test Collection');
-    users.logout();
+    await users.logout();
   });
 
-  it('checks for errors in a collection with varying node count', function() {
+  it('checks for errors in a collection with varying node count',
+    async function() {
     // Checking in a collection with one node.
-    users.login('player@collections.com');
-    browser.get('/collection/' + collectionId);
-    waitFor.pageToFullyLoad();
-    general.checkForConsoleErrors([]);
+      await users.login('player@collections.com');
+      await browser.get('/collection/' + collectionId);
+      waitFor.pageToFullyLoad();
+      general.checkForConsoleErrors([]);
 
-    // Checking in a collection with two nodes.
-    browser.get('/collection_editor/create/' + collectionId);
-    waitFor.pageToFullyLoad();
-    collectionEditorPage.addExistingExploration(secondExplorationId);
-    collectionEditorPage.saveDraft();
-    collectionEditorPage.setCommitMessage('Add Exploration');
-    collectionEditorPage.closeSaveModal();
-    browser.get('/collection/' + collectionId);
-    waitFor.pageToFullyLoad();
-    general.checkForConsoleErrors([]);
+      // Checking in a collection with two nodes.
+      await browser.get('/collection_editor/create/' + collectionId);
+      waitFor.pageToFullyLoad();
+      collectionEditorPage.addExistingExploration(secondExplorationId);
+      collectionEditorPage.saveDraft();
+      collectionEditorPage.setCommitMessage('Add Exploration');
+      collectionEditorPage.closeSaveModal();
+      await browser.get('/collection/' + collectionId);
+      waitFor.pageToFullyLoad();
+      general.checkForConsoleErrors([]);
 
-    // Checking in a collection with three nodes.
-    browser.get('/collection_editor/create/' + collectionId);
-    waitFor.pageToFullyLoad();
-    collectionEditorPage.addExistingExploration(thirdExplorationId);
-    collectionEditorPage.saveDraft();
-    collectionEditorPage.setCommitMessage('Add Exploration');
-    collectionEditorPage.closeSaveModal();
-    browser.get('/collection/' + collectionId);
-    waitFor.pageToFullyLoad();
-    general.checkForConsoleErrors([]);
+      // Checking in a collection with three nodes.
+      await browser.get('/collection_editor/create/' + collectionId);
+      waitFor.pageToFullyLoad();
+      collectionEditorPage.addExistingExploration(thirdExplorationId);
+      collectionEditorPage.saveDraft();
+      collectionEditorPage.setCommitMessage('Add Exploration');
+      collectionEditorPage.closeSaveModal();
+      await browser.get('/collection/' + collectionId);
+      waitFor.pageToFullyLoad();
+      general.checkForConsoleErrors([]);
 
-    // Checking in a collection with four nodes.
-    browser.get('/collection_editor/create/' + collectionId);
-    waitFor.pageToFullyLoad();
-    collectionEditorPage.addExistingExploration(fourthExplorationId);
-    collectionEditorPage.saveDraft();
-    collectionEditorPage.setCommitMessage('Add Exploration');
-    collectionEditorPage.closeSaveModal();
-    browser.get('/collection/' + collectionId);
-    waitFor.pageToFullyLoad();
-    general.checkForConsoleErrors([]);
-    users.logout();
-  });
+      // Checking in a collection with four nodes.
+      await browser.get('/collection_editor/create/' + collectionId);
+      waitFor.pageToFullyLoad();
+      collectionEditorPage.addExistingExploration(fourthExplorationId);
+      collectionEditorPage.saveDraft();
+      collectionEditorPage.setCommitMessage('Add Exploration');
+      collectionEditorPage.closeSaveModal();
+      await browser.get('/collection/' + collectionId);
+      waitFor.pageToFullyLoad();
+      general.checkForConsoleErrors([]);
+      await users.logout();
+    });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);

@@ -75,33 +75,24 @@ var EXPLORATION_ID_LENGTH = 12;
 
 var FIRST_STATE_DEFAULT_NAME = 'Introduction';
 
-var _getExplorationId = function(currentUrlPrefix) {
-  return {
-    then: function(callbackFunction) {
-      browser.getCurrentUrl().then(function(url) {
-        expect(url.slice(0, currentUrlPrefix.length)).toBe(currentUrlPrefix);
-        var explorationId = url.slice(
-          currentUrlPrefix.length,
-          currentUrlPrefix.length + EXPLORATION_ID_LENGTH);
-        return callbackFunction(explorationId);
-      }, function() {
-        // Note to developers:
-        // Promise is returned by getCurrentUrl which is handled here.
-        // No further action is needed.
-      });
-    }
-  };
+var _getExplorationId = async function(currentUrlPrefix) {
+  var url = await browser.getCurrentUrl();
+  expect(url.slice(0, currentUrlPrefix.length)).toBe(currentUrlPrefix);
+  var explorationId = url.slice(
+    currentUrlPrefix.length,
+    currentUrlPrefix.length + EXPLORATION_ID_LENGTH);
+  return explorationId;
 };
 
 // If we are currently in the editor, this will return a promise with the
 // exploration ID.
-var getExplorationIdFromEditor = function() {
-  return _getExplorationId(SERVER_URL_PREFIX + EDITOR_URL_SLICE);
+var getExplorationIdFromEditor = async function() {
+  return await _getExplorationId(SERVER_URL_PREFIX + EDITOR_URL_SLICE);
 };
 
 // Likewise for the player
-var getExplorationIdFromPlayer = function() {
-  return _getExplorationId(SERVER_URL_PREFIX + PLAYER_URL_SLICE);
+var getExplorationIdFromPlayer = async function() {
+  return await _getExplorationId(SERVER_URL_PREFIX + PLAYER_URL_SLICE);
 };
 
 // The explorationId here should be a string, not a promise.

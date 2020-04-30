@@ -93,7 +93,7 @@ var createCollectionAsAdmin = function() {
 };
 
 /**
- * Creating exploration for Admin users.
+ * Creating exploration for Admin await users.
  */
 var createExplorationAsAdmin = function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;

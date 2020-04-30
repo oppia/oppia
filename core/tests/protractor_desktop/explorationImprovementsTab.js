@@ -50,7 +50,7 @@ describe('Answer Details Improvements', function() {
   var explorationPlayerPage = null;
   var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
 
-  beforeAll(function() {
+  beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -61,8 +61,9 @@ describe('Answer Details Improvements', function() {
 
     improvementsTab = explorationEditorPage.getImprovementsTab();
 
-    users.createUser('learner@ExplorationAnswerDetails.com', 'learnerUser');
-    users.createAndLoginAdminUser(
+    await users.createUser(
+      'learner@ExplorationAnswerDetails.com', 'learnerUser');
+    await users.createAndLoginAdminUser(
       'creator@ExplorationAnswerDetails.com', 'creatorUser');
 
     adminPage.editConfigProperty(
@@ -75,7 +76,7 @@ describe('Answer Details Improvements', function() {
 
     // Creator creates and publishes an exploration.
     workflow.createExplorationAsAdmin();
-    general.getExplorationIdFromEditor().then(expId => this.expId = expId);
+    this.expId = await general.getExplorationIdFromEditor();
     explorationEditorMainTab.exitTutorial();
 
     explorationEditorPage.navigateToSettingsTab();
@@ -99,12 +100,12 @@ describe('Answer Details Improvements', function() {
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorPage.saveChanges();
     workflow.publishExploration();
-    users.logout();
+    await users.logout();
   });
 
   describe('Solicit answer details', function() {
-    beforeAll(function() {
-      users.login('learner@ExplorationAnswerDetails.com');
+    beforeAll(async function() {
+      await users.login('learner@ExplorationAnswerDetails.com');
       libraryPage.get();
       libraryPage.findExploration(EXPLORATION_TITLE);
       libraryPage.playExploration(EXPLORATION_TITLE);
@@ -112,13 +113,13 @@ describe('Answer Details Improvements', function() {
       explorationPlayerPage.submitAnswerDetails(
         'I liked this choice of answer');
       explorationPlayerPage.expectExplorationToNotBeOver();
-      oppiaLogo.click();
+      await oppiaLogo.click();
       general.acceptAlert();
-      users.logout();
+      await users.logout();
     });
 
-    it('is visible for creators', function() {
-      users.login('creator@ExplorationAnswerDetails.com');
+    it('is visible for creators', async function() {
+      await users.login('creator@ExplorationAnswerDetails.com');
       creatorDashboardPage.get();
       creatorDashboardPage.navigateToExplorationEditor();
       explorationEditorPage.navigateToImprovementsTab();
@@ -128,7 +129,7 @@ describe('Answer Details Improvements', function() {
       improvementsTab.clickTaskActionButton(task, 'Review Answer Details');
       improvementsTab.verifyAnswerDetails('I liked this choi...', 1);
       improvementsTab.closeModal();
-      users.logout();
+      await users.logout();
     });
 
     it('is visible for guests as read-only', function() {
@@ -162,7 +163,7 @@ describe('Feedback Improvements', function() {
 
   var improvementsTab = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -171,7 +172,7 @@ describe('Feedback Improvements', function() {
 
     improvementsTab = explorationEditorPage.getImprovementsTab();
 
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       'superUser@ExplorationFeedback.com',
       'superUserExplorationFeedback');
     // TODO(#7569): Remove redundant set after feedback tab is phased out.
@@ -180,36 +181,36 @@ describe('Feedback Improvements', function() {
       'Boolean', (element) => element.setValue(true));
   });
 
-  it('should add feedback to an exploration', function() {
+  it('should add feedback to an exploration', async function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
 
-    users.createUser(
+    await users.createUser(
       'creator@ExplorationFeedback.com',
       'creatorExplorationFeedback');
-    users.createUser(
+    await users.createUser(
       'learner@ExplorationFeedback.com',
       'learnerExplorationFeedback');
 
     // Creator creates and publishes an exploration.
-    users.login('creator@ExplorationFeedback.com');
+    await users.login('creator@ExplorationFeedback.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE_1,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
-    users.logout();
+    await users.logout();
 
     // Learner plays the exploration and submits a feedback.
-    users.login('learner@ExplorationFeedback.com');
+    await users.login('learner@ExplorationFeedback.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE_1);
     libraryPage.playExploration(EXPLORATION_TITLE_1);
     explorationPlayerPage.submitFeedback(feedback);
-    users.logout();
+    await users.logout();
 
     // Creator reads the feedback and responds.
-    users.login('creator@ExplorationFeedback.com');
+    await users.login('creator@ExplorationFeedback.com');
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
@@ -226,39 +227,39 @@ describe('Feedback Improvements', function() {
       [feedback, feedbackResponse]);
     improvementsTab.closeModal();
 
-    users.logout();
+    await users.logout();
   });
 
-  it('should change status of feedback thread', function() {
+  it('should change status of feedback thread', async function() {
     var feedback = 'Hey! This exploration looks awesome';
     var feedbackResponse = 'Thanks for the feedback!';
 
-    users.createUser(
+    await users.createUser(
       'creator@ExplorationFeedbackStatusChange.com',
       'creatorExplorationFeedbackStatusChange');
-    users.createUser(
+    await users.createUser(
       'learner@ExplorationFeedbackStatusChange.com',
       'learnerExplorationFeedbackStatusChange');
 
     // Creator creates and publishes an exploration.
-    users.login('creator@ExplorationFeedbackStatusChange.com');
+    await users.login('creator@ExplorationFeedbackStatusChange.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE_2,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
-    users.logout();
+    await users.logout();
 
     // Learner plays the exploration and submits a feedback.
-    users.login('learner@ExplorationFeedbackStatusChange.com');
+    await users.login('learner@ExplorationFeedbackStatusChange.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE_2);
     libraryPage.playExploration(EXPLORATION_TITLE_2);
     explorationPlayerPage.submitFeedback(feedback);
-    users.logout();
+    await users.logout();
 
     // Creator reads the feedback and responds.
-    users.login('creator@ExplorationFeedbackStatusChange.com');
+    await users.login('creator@ExplorationFeedbackStatusChange.com');
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
@@ -289,7 +290,7 @@ describe('Feedback Improvements', function() {
     browser.driver.navigate().refresh();
     improvementsTab.verifyOutstandingTaskCount(1);
 
-    users.logout();
+    await users.logout();
   });
 
   afterEach(function() {
@@ -311,7 +312,7 @@ describe('Suggestions Improvements', function() {
 
   var improvementsTab = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
@@ -320,16 +321,16 @@ describe('Suggestions Improvements', function() {
 
     improvementsTab = explorationEditorPage.getImprovementsTab();
 
-    users.createUser(
+    await users.createUser(
       'user1@ExplorationSuggestions.com',
       'authorExplorationSuggestions');
-    users.createUser(
+    await users.createUser(
       'user2@ExplorationSuggestions.com',
       'suggesterExplorationSuggestions');
-    users.createUser(
+    await users.createUser(
       'user3@ExplorationSuggestions.com',
       'studentExplorationSuggestions');
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       'user4@ExplorationSuggestions.com',
       'configExplorationSuggestions');
     // TODO(#7569): Remove redundant set after feedback tab is phased out.
@@ -338,73 +339,74 @@ describe('Suggestions Improvements', function() {
       'Boolean', (element) => element.setValue(true));
   });
 
-  it('accepts & rejects a suggestion on a published exploration', function() {
-    users.login('user1@ExplorationSuggestions.com');
-    workflow.createAndPublishExploration(
-      EXPLORATION_TITLE,
-      EXPLORATION_CATEGORY,
-      EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
-    users.logout();
+  it('accepts & rejects a suggestion on a published exploration',
+    async function() {
+      await users.login('user1@ExplorationSuggestions.com');
+      workflow.createAndPublishExploration(
+        EXPLORATION_TITLE,
+        EXPLORATION_CATEGORY,
+        EXPLORATION_OBJECTIVE,
+        EXPLORATION_LANGUAGE);
+      await users.logout();
 
-    // Suggester plays the exploration and suggests a change.
-    users.login('user2@ExplorationSuggestions.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE);
-    libraryPage.playExploration(EXPLORATION_TITLE);
+      // Suggester plays the exploration and suggests a change.
+      await users.login('user2@ExplorationSuggestions.com');
+      libraryPage.get();
+      libraryPage.findExploration(EXPLORATION_TITLE);
+      libraryPage.playExploration(EXPLORATION_TITLE);
 
-    var suggestion1 = 'New Exploration';
-    var suggestionDescription1 = 'Uppercased the first letter';
-    var suggestion2 = 'New exploration';
-    var suggestionDescription2 = 'Changed';
+      var suggestion1 = 'New Exploration';
+      var suggestionDescription1 = 'Uppercased the first letter';
+      var suggestion2 = 'New exploration';
+      var suggestionDescription2 = 'Changed';
 
-    explorationPlayerPage.submitSuggestion(
-      suggestion1, suggestionDescription1);
-    explorationPlayerPage.clickOnCloseSuggestionModalButton();
-    explorationPlayerPage.submitSuggestion(
-      suggestion2, suggestionDescription2);
-    users.logout();
+      explorationPlayerPage.submitSuggestion(
+        suggestion1, suggestionDescription1);
+      explorationPlayerPage.clickOnCloseSuggestionModalButton();
+      explorationPlayerPage.submitSuggestion(
+        suggestion2, suggestionDescription2);
+      await users.logout();
 
-    // Exploration author reviews the suggestion and accepts it.
-    users.login('user1@ExplorationSuggestions.com');
-    creatorDashboardPage.get();
-    creatorDashboardPage.navigateToExplorationEditor();
-    explorationEditorPage.navigateToImprovementsTab();
-    improvementsTab.verifyOutstandingTaskCount(2);
+      // Exploration author reviews the suggestion and accepts it.
+      await users.login('user1@ExplorationSuggestions.com');
+      creatorDashboardPage.get();
+      creatorDashboardPage.navigateToExplorationEditor();
+      explorationEditorPage.navigateToImprovementsTab();
+      improvementsTab.verifyOutstandingTaskCount(2);
 
-    var taskToAccept = improvementsTab.getSuggestionTask(
-      suggestionDescription1);
-    improvementsTab.clickTaskActionButton(taskToAccept, 'Review Thread');
-    expect(improvementsTab.getThreadMessages()).toEqual(
-      [suggestionDescription1]);
-    improvementsTab.acceptSuggestion();
-    waitFor.pageToFullyLoad();
+      var taskToAccept = improvementsTab.getSuggestionTask(
+        suggestionDescription1);
+      improvementsTab.clickTaskActionButton(taskToAccept, 'Review Thread');
+      expect(improvementsTab.getThreadMessages()).toEqual(
+        [suggestionDescription1]);
+      improvementsTab.acceptSuggestion();
+      waitFor.pageToFullyLoad();
 
-    var taskToReject = improvementsTab.getSuggestionTask(
-      suggestionDescription2);
-    improvementsTab.clickTaskActionButton(taskToReject, 'Review Thread');
-    expect(improvementsTab.getThreadMessages()).toEqual(
-      [suggestionDescription2]);
-    improvementsTab.rejectSuggestion();
-    waitFor.pageToFullyLoad();
+      var taskToReject = improvementsTab.getSuggestionTask(
+        suggestionDescription2);
+      improvementsTab.clickTaskActionButton(taskToReject, 'Review Thread');
+      expect(improvementsTab.getThreadMessages()).toEqual(
+        [suggestionDescription2]);
+      improvementsTab.rejectSuggestion();
+      waitFor.pageToFullyLoad();
 
-    improvementsTab.setShowOnlyOpenTasks(false);
-    expect(improvementsTab.getTaskByStatus('Fixed').isPresent()).toBe(true);
-    expect(improvementsTab.getTaskByStatus('Ignored').isPresent()).toBe(true);
+      improvementsTab.setShowOnlyOpenTasks(false);
+      expect(improvementsTab.getTaskByStatus('Fixed').isPresent()).toBe(true);
+      expect(improvementsTab.getTaskByStatus('Ignored').isPresent()).toBe(true);
 
-    explorationEditorPage.navigateToPreviewTab();
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
+      explorationEditorPage.navigateToPreviewTab();
+      explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
 
-    users.logout();
+      await users.logout();
 
-    // Student logs in and plays the exploration, finds the updated content.
-    users.login('user3@ExplorationSuggestions.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE);
-    libraryPage.playExploration(EXPLORATION_TITLE);
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
-    users.logout();
-  });
+      // Student logs in and plays the exploration, finds the updated content.
+      await users.login('user3@ExplorationSuggestions.com');
+      libraryPage.get();
+      libraryPage.findExploration(EXPLORATION_TITLE);
+      libraryPage.playExploration(EXPLORATION_TITLE);
+      explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
+      await users.logout();
+    });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
@@ -430,7 +432,7 @@ describe('Playthrough Improvements', function() {
 
   var improvementsTab = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -441,8 +443,8 @@ describe('Playthrough Improvements', function() {
 
     improvementsTab = explorationEditorPage.getImprovementsTab();
 
-    users.createUser(LEARNER_EMAIL, 'learnerEarlyQuit');
-    users.createAndLoginAdminUser(CREATOR_EMAIL, 'creatorEarlyQuit');
+    await users.createUser(LEARNER_EMAIL, 'learnerEarlyQuit');
+    await users.createAndLoginAdminUser(CREATOR_EMAIL, 'creatorEarlyQuit');
 
     workflow.createExplorationAsAdmin();
     explorationEditorMainTab.exitTutorial();
@@ -491,7 +493,7 @@ describe('Playthrough Improvements', function() {
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorPage.saveChanges();
     workflow.publishExploration();
-    general.getExplorationIdFromEditor().then(expId => this.expId = expId);
+    this.expId = await general.getExplorationIdFromEditor();
 
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor.',
@@ -506,8 +508,8 @@ describe('Playthrough Improvements', function() {
 
   describe('Early Quit playthroughs', function() {
     describe('resolving the task', function() {
-      it('disappears from the improvements tab', function() {
-        users.login(LEARNER_EMAIL);
+      it('disappears from the improvements tab', async function() {
+        await users.login(LEARNER_EMAIL);
         libraryPage.get();
         libraryPage.findExploration(EXPLORATION_TITLE);
         libraryPage.playExploration(EXPLORATION_TITLE);
@@ -515,11 +517,11 @@ describe('Playthrough Improvements', function() {
         explorationPlayerPage.submitAnswer('TextInput', 'One');
         explorationPlayerPage.clickThroughToNextCard();
         explorationPlayerPage.expectExplorationToNotBeOver();
-        oppiaLogo.click();
+        await oppiaLogo.click();
         general.acceptAlert();
-        users.logout();
+        await users.logout();
 
-        users.login(CREATOR_EMAIL);
+        await users.login(CREATOR_EMAIL);
         creatorDashboardPage.get();
         creatorDashboardPage.navigateToExplorationEditor();
         explorationEditorPage.navigateToImprovementsTab();
@@ -535,8 +537,8 @@ describe('Playthrough Improvements', function() {
     });
 
     describe('viewing the task', function() {
-      beforeAll(function() {
-        users.login(LEARNER_EMAIL);
+      beforeAll(async function() {
+        await users.login(LEARNER_EMAIL);
         libraryPage.get();
         libraryPage.findExploration(EXPLORATION_TITLE);
         libraryPage.playExploration(EXPLORATION_TITLE);
@@ -544,13 +546,13 @@ describe('Playthrough Improvements', function() {
         explorationPlayerPage.submitAnswer('TextInput', 'One');
         explorationPlayerPage.clickThroughToNextCard();
         explorationPlayerPage.expectExplorationToNotBeOver();
-        oppiaLogo.click();
+        await oppiaLogo.click();
         general.acceptAlert();
-        users.logout();
+        await users.logout();
       });
 
-      it('hides the mark as resolve button from guests', function() {
-        users.logout();
+      it('hides the mark as resolve button from guests', async function() {
+        await users.logout();
         general.openEditor(this.expId);
         explorationEditorPage.navigateToImprovementsTab();
         var task = improvementsTab.getPlaythroughTask(

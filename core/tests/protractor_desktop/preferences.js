@@ -26,9 +26,9 @@ describe('Preferences', function() {
     preferencesPage = new PreferencesPage.PreferencesPage();
   });
 
-  it('should let a user upload a profile photo', function() {
-    users.createUser('eve@preferences.com', 'evePreferences');
-    users.login('eve@preferences.com');
+  it('should let a user upload a profile photo', async function() {
+    await users.createUser('eve@preferences.com', 'evePreferences');
+    await users.login('eve@preferences.com');
     preferencesPage.get();
     expect(preferencesPage.getProfilePhotoSource())
       .not
@@ -40,9 +40,9 @@ describe('Preferences', function() {
       );
   });
 
-  it('should show an error if uploaded photo is too large', function() {
-    users.createUser('lou@preferences.com', 'louPreferences');
-    users.login('lou@preferences.com');
+  it('should show an error if uploaded photo is too large', async function() {
+    await users.createUser('lou@preferences.com', 'louPreferences');
+    await users.login('lou@preferences.com');
     preferencesPage.get();
     preferencesPage.uploadProfilePhoto(
       '../data/dummyLargeImage.jpg')
@@ -51,9 +51,9 @@ describe('Preferences', function() {
       });
   });
 
-  it('should change editor role email checkbox value', function() {
-    users.createUser('alice@preferences.com', 'alicePreferences');
-    users.login('alice@preferences.com');
+  it('should change editor role email checkbox value', async function() {
+    await users.createUser('alice@preferences.com', 'alicePreferences');
+    await users.login('alice@preferences.com');
     preferencesPage.get();
     expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(true);
     preferencesPage.toggleEditorRoleEmailsCheckbox();
@@ -62,9 +62,9 @@ describe('Preferences', function() {
     expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(false);
   });
 
-  it('should change feedback message email checkbox value', function() {
-    users.createUser('bob@preferences.com', 'bobPreferences');
-    users.login('bob@preferences.com');
+  it('should change feedback message email checkbox value', async function() {
+    await users.createUser('bob@preferences.com', 'bobPreferences');
+    await users.login('bob@preferences.com');
     preferencesPage.get();
     expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(true);
     preferencesPage.toggleFeedbackEmailsCheckbox();
@@ -73,9 +73,9 @@ describe('Preferences', function() {
     expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
   });
 
-  it('should set and edit bio in user profile', function() {
-    users.createUser('lisa@preferences.com', 'lisaPreferences');
-    users.login('lisa@preferences.com');
+  it('should set and edit bio in user profile', async function() {
+    await users.createUser('lisa@preferences.com', 'lisaPreferences');
+    await users.login('lisa@preferences.com');
     preferencesPage.get();
     preferencesPage.setUserBio('I am Lisa');
     browser.refresh();
@@ -89,9 +89,9 @@ describe('Preferences', function() {
     preferencesPage.expectUserBioToBe('Junior student from USA studying CS!');
   });
 
-  it('should change prefered audio language of the learner', function() {
-    users.createUser('paul@preferences.com', 'paulPreferences');
-    users.login('paul@preferences.com');
+  it('should change prefered audio language of the learner', async function() {
+    await users.createUser('paul@preferences.com', 'paulPreferences');
+    await users.login('paul@preferences.com');
     preferencesPage.get();
     expect(preferencesPage.preferredAudioLanguageSelector).toBeUndefined();
     preferencesPage.selectPreferredAudioLanguage('Hindi');
@@ -104,9 +104,9 @@ describe('Preferences', function() {
     preferencesPage.expectPreferredAudioLanguageToBe('Arabic');
   });
 
-  it('should change prefered site language of the learner', function() {
-    users.createUser('john@preferences.com', 'johnPreferences');
-    users.login('john@preferences.com');
+  it('should change prefered site language of the learner', async function() {
+    await users.createUser('john@preferences.com', 'johnPreferences');
+    await users.login('john@preferences.com');
     preferencesPage.get();
     expect(preferencesPage.systemLanguageSelector).toBeUndefined();
     preferencesPage.selectSystemLanguage('Español');
@@ -119,23 +119,24 @@ describe('Preferences', function() {
     preferencesPage.expectPreferredSiteLanguageToBe('English');
   });
 
-  it('should load the correct dashboard according to selection', function() {
-    users.createUser('lorem@preferences.com', 'loremPreferences');
-    users.login('lorem@preferences.com');
-    preferencesPage.get();
-    preferencesPage.selectCreatorDashboard();
-    general.goToHomePage();
-    expect(browser.getCurrentUrl()).toEqual(
-      'http://localhost:9001/creator_dashboard');
-    preferencesPage.get();
-    preferencesPage.selectLearnerDashboard();
-    general.goToHomePage();
-    expect(browser.getCurrentUrl()).toEqual(
-      'http://localhost:9001/learner_dashboard');
-  });
+  it('should load the correct dashboard according to selection',
+    async function() {
+      await users.createUser('lorem@preferences.com', 'loremPreferences');
+      await users.login('lorem@preferences.com');
+      preferencesPage.get();
+      preferencesPage.selectCreatorDashboard();
+      general.goToHomePage();
+      expect(await browser.getCurrentUrl()).toEqual(
+        'http://localhost:9001/creator_dashboard');
+      preferencesPage.get();
+      preferencesPage.selectLearnerDashboard();
+      general.goToHomePage();
+      expect(await browser.getCurrentUrl()).toEqual(
+        'http://localhost:9001/learner_dashboard');
+    });
 
-  afterEach(function() {
+  afterEach(async function() {
     general.checkForConsoleErrors([]);
-    users.logout();
+    await users.logout();
   });
 });

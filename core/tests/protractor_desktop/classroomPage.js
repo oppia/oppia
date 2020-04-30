@@ -29,19 +29,19 @@ describe('Classroom page functionality', function() {
   var classroomPage = null;
   var libraryPage = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     classroomPage = new ClassroomPage.ClassroomPage();
     libraryPage = new LibraryPage.LibraryPage();
 
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
   });
 
-  beforeEach(function() {
-    users.login('creator@classroomPage.com');
+  beforeEach(async function() {
+    await users.login('creator@classroomPage.com');
   });
 
-  it('should search for explorations from classroom page', function() {
+  it('should search for explorations from classroom page', async function() {
     workflow.createAndPublishExploration(
       'Exploration Title',
       'Algorithms',
@@ -56,7 +56,7 @@ describe('Classroom page functionality', function() {
 
     libraryPage.selectCategories(['Algorithms']);
     libraryPage.expectCurrentCategorySelectionToBe(['Algorithms']);
-    users.logout();
+    await users.logout();
   });
 
   afterEach(function() {
