@@ -16,39 +16,29 @@
  * exploration_id.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+angular.module('oppia').factory('ExplorationCreationBackendService', [
+  '$http', '$q',
+  function(
+      $http, $q) {
+    var _createExploration = function(successCallback, errorCallback) {
+      $http.post('/contributehandler/create_new', {})
+        .then(function(response) {
+          if (successCallback) {
+            successCallback(response.data);
+          }
+        }, function() {
+          if (errorCallback) {
+            errorCallback();
+          }
+        });
+    };
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ExplorationCreationBackendService {
-  constructor(private http: HttpClient) {}
-
-  private _createExploration(
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
-    this.http.post('/contributehandler/create_new', {}).toPromise()
-      .then((response) => {
-        if (successCallback) {
-          successCallback(response);
-        }
-      }, () => {
-        if (errorCallback) {
-          errorCallback();
-        }
-      });
+    return {
+      createExploration: function() {
+        return $q(function(resolve, reject) {
+          _createExploration(resolve, reject);
+        });
+      }
+    };
   }
-
-
-  createExploration(): Promise<object> {
-    return new Promise((resolve, reject) => {
-      this._createExploration(resolve, reject);
-    });
-  }
-}
-
-angular.module('oppia').factory(
-  'ExplorationCreationBackendService',
-  downgradeInjectable(ExplorationCreationBackendService));
+]);
