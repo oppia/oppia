@@ -1110,13 +1110,13 @@ class SendDummyMailTest(test_utils.GenericTestBase):
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             generated_response = self.post_json(
-                '/sendDummyMailToAdminHandler', payload={},
+                '/senddummymailtoadmin', payload={},
                 csrf_token=csrf_token, expected_status_int=200)
             self.assertEqual(generated_response, {})
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', False):
             generated_response = self.post_json(
-                '/sendDummyMailToAdminHandler', payload={},
+                '/senddummymailtoadmin', payload={},
                 csrf_token=csrf_token, expected_status_int=400)
             self.assertEqual(
                 generated_response['error'], 'This app cannot send emails.')
@@ -1134,25 +1134,43 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         current_username, new_username = self.ADMIN_USERNAME, 'newUsername'
+        non_existent_username, long_username = 'invalid', 'a' * 31
         user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
+        # The new username must not be longer than 30 characters.
         self.put_json(
-            '/updateUsername',
+            '/updateusername',
+            payload={
+                'current_username': current_username,
+                'new_username': long_username},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+
+        # If current username does not exist.
+        self.put_json(
+            '/updateusername',
+            payload={
+                'current_username': non_existent_username,
+                'new_username': new_username},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+
+        # If new username is already taken.
+        self.put_json(
+            '/updateusername',
+            payload={
+                'current_username': current_username,
+                'new_username': current_username},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+
+        self.put_json(
+            '/updateusername',
             payload={
                 'current_username': current_username,
                 'new_username': new_username},
             csrf_token=csrf_token)
         self.assertEqual(user_services.get_username(user_id), new_username)
-
-        # The old username would not exist anymore so the same request
-        # should give a server error.
-        self.put_json(
-            '/updateUsername',
-            payload={
-                'current_username': current_username,
-                'new_username': new_username},
-            csrf_token=csrf_token,
-            expected_status_int=500)
 
 
 class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):

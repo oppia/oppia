@@ -41,8 +41,8 @@ angular.module('oppia').directive('adminMiscTab', [
         var DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
         var SEND_DUMMY_MAIL_HANDLER_URL = (
-          '/sendDummyMailToAdminHandler');
-        var UPDATE_USERNAME_HANDLER_URL = '/updateUsername';
+          '/senddummymailtoadmin');
+        var UPDATE_USERNAME_HANDLER_URL = '/updateusername';
 
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
@@ -157,6 +157,7 @@ angular.module('oppia').directive('adminMiscTab', [
         };
 
         ctrl.updateUsername = function() {
+          ctrl.setStatusMessage('Updating username...');
           $http.put(
             UPDATE_USERNAME_HANDLER_URL, {
               current_username: ctrl.currentUsername,

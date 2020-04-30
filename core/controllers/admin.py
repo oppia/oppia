@@ -864,6 +864,15 @@ class UpdateUsernameHandler(base.BaseHandler):
     def put(self):
         current_username = self.payload.get('current_username', None)
         new_username = self.payload.get('new_username', None)
+        if new_username is not None:
+            if len(new_username) > 30:
+                raise self.InvalidInputException(
+                    'Please make sure that the new username is not longer '
+                    'than 30 characters.')
+            if user_services.is_username_taken(new_username):
+                raise self.InvalidInputException('Username already taken.')
         user_id = user_services.get_user_id_from_username(current_username)
+        if user_id is None:
+            raise self.InvalidInputException('User does not exist.')
         user_services.set_username(user_id, new_username)
         self.render_json({})
