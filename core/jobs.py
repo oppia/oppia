@@ -202,9 +202,12 @@ class BaseJobManager(python_utils.OBJECT):
         Args:
             job_id: str. The ID of the job to complete.
             output_list: list(object). The output produced by the job.
-            max_output_len_chars: int or None. Overrides the intended max
-                output len limit for _compress_output_list when not None.
+            max_output_len_chars: Max length of output_list.
         """
+        _default_max_len_chars = 900000
+        _max_output_len_chars = (
+            _default_max_len_chars if max_output_len_chars is None else
+            max_output_len_chars)
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
@@ -214,14 +217,14 @@ class BaseJobManager(python_utils.OBJECT):
         model.status_code = STATUS_CODE_COMPLETED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
         model.output = cls._compress_output_list(
-            output_list, test_only_max_output_len_chars=max_output_len_chars)
+            output_list, _max_output_len_chars)
         model.put()
 
         cls._post_completed_hook(job_id)
 
     @classmethod
     def _compress_output_list(
-            cls, output_list, test_only_max_output_len_chars=None):
+            cls, output_list, max_output_len_chars):
         """Returns compressed list of strings within a max length of chars.
 
         Ensures that the payload (i.e.,
@@ -230,13 +233,11 @@ class BaseJobManager(python_utils.OBJECT):
 
         Args:
             output_list: list(*). Collection of objects to be stringified.
-            test_only_max_output_len_chars: int or None. Overrides the intended
-                max output len limit when not None.
+            max_output_len_chars: Maximum length of output_list.
 
         Returns:
             list(str). The compressed stringified output values.
         """
-        _max_output_len_chars = 900000
 
         class _OrderedCounter(collections.Counter, collections.OrderedDict):
             """Counter that remembers the order elements are first encountered.
@@ -256,9 +257,7 @@ class BaseJobManager(python_utils.OBJECT):
         ]
 
         # Truncate outputs to fit within given max length.
-        remaining_len = (
-            _max_output_len_chars if test_only_max_output_len_chars is None else
-            test_only_max_output_len_chars)
+        remaining_len = max_output_len_chars
         for idx, output_str in enumerate(output_str_list):
             remaining_len -= len(output_str)
             if remaining_len < 0:
