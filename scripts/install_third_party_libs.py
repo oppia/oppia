@@ -176,10 +176,6 @@ def main():
         ('isort', common.ISORT_VERSION, common.OPPIA_TOOLS_DIR),
         ('pycodestyle', common.PYCODESTYLE_VERSION, common.OPPIA_TOOLS_DIR),
         ('esprima', common.ESPRIMA_VERSION, common.OPPIA_TOOLS_DIR),
-        ('browsermob-proxy',
-         common.BROWSERMOB_PROXY_VERSION,
-         common.OPPIA_TOOLS_DIR),
-        ('selenium', common.SELENIUM_VERSION, common.OPPIA_TOOLS_DIR),
         ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
     ]

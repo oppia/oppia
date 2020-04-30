@@ -34,7 +34,6 @@ import release_constants
 CURRENT_PYTHON_BIN = sys.executable
 
 # Versions of libraries used in devflow.
-BROWSERMOB_PROXY_VERSION = '0.8.0'
 COVERAGE_VERSION = '5.1'
 ESPRIMA_VERSION = '4.0.1'
 ISORT_VERSION = '4.3.21'
@@ -43,7 +42,6 @@ PSUTIL_VERSION = '5.7.0'
 PYLINT_VERSION = '1.9.5'
 PYLINT_QUOTES_VERSION = '0.1.8'
 PYGITHUB_VERSION = '1.45'
-SELENIUM_VERSION = '3.141.0'
 WEBTEST_VERSION = '2.0.35'
 
 # Node version.

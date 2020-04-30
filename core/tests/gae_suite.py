@@ -42,8 +42,6 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(
         OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine',
         'lib', 'webob_0_9'),
-    os.path.join(OPPIA_TOOLS_DIR, 'browsermob-proxy-0.8.0'),
-    os.path.join(OPPIA_TOOLS_DIR, 'selenium-3.141.0'),
     os.path.join(OPPIA_TOOLS_DIR, 'Pillow-6.2.2'),
     os.path.join(OPPIA_TOOLS_DIR, 'psutil-5.7.0'),
     CURR_DIR,

@@ -120,12 +120,6 @@ _PATHS_TO_INSERT = [
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'webtest-%s' % common.WEBTEST_VERSION),
     os.path.join(
-        _PARENT_DIR,
-        'oppia_tools',
-        'browsermob-proxy-%s' % common.BROWSERMOB_PROXY_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'selenium-%s' % common.SELENIUM_VERSION),
-    os.path.join(
         _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION),
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'Pillow-%s' % common.PILLOW_VERSION),
