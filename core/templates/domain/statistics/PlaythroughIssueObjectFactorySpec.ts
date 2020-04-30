@@ -27,7 +27,8 @@ describe('Playthrough Issue Object Factory', () => {
   });
 
   it('should create a new exploration issue', () => {
-    playthroughIssueObject = new PlaythroughIssue('EarlyQuit', {}, [], 1, true);
+    playthroughIssueObject = new PlaythroughIssue(
+      'EarlyQuit', {}, [], 1, true);
 
     expect(playthroughIssueObject.issueType).toEqual('EarlyQuit');
     expect(playthroughIssueObject.issueCustomizationArgs).toEqual({});
@@ -37,7 +38,7 @@ describe('Playthrough Issue Object Factory', () => {
   });
 
   it('should create a new exploration issue from a backend dict', () => {
-    var playthroughIssueObject = piof.createFromBackendDict({
+    const playthroughIssueObject = piof.createFromBackendDict({
       issue_type: 'EarlyQuit',
       issue_customization_args: {},
       playthrough_ids: [],
@@ -50,5 +51,18 @@ describe('Playthrough Issue Object Factory', () => {
     expect(playthroughIssueObject.playthroughIds).toEqual([]);
     expect(playthroughIssueObject.schemaVersion).toEqual(1);
     expect(playthroughIssueObject.isValid).toEqual(true);
+  });
+
+  it('should convert exploration issue to backend dict', () => {
+    const playthroughDict = {
+      issue_type: 'EarlyQuit',
+      issue_customization_args: {},
+      playthrough_ids: [],
+      schema_version: 1,
+      is_valid: true
+    };
+    const playthroughIssueObject = piof.createFromBackendDict(playthroughDict);
+
+    expect(playthroughIssueObject.toBackendDict()).toEqual(playthroughDict);
   });
 });
