@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Valid syntax .ts file, used by scripts/pre_commit_linter_test.
+ * @fileoverview invalid syntax .ts file.
  */
 
 import { CollectionNodeObjectFactory } from

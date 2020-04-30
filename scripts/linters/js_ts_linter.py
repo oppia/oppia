@@ -252,8 +252,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 if filepath.startswith(('core/templates', 'extensions')) and (
                         filepath not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
                             not filepath.endswith('protractor.js')):
-                    python_utils.PRINT(
+                    summary_message = (
                         '%s  --> Found extra .js file\n' % filepath)
+                    summary_messages.append(summary_message)
+                    python_utils.PRINT(summary_message)
                     failed = True
 
             if failed:
@@ -261,6 +263,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     'If you want the above files to be present as js files, '
                     'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
                     'build.py. Otherwise, rename them to .ts\n')
+                summary_messages.append(err_msg)
                 python_utils.PRINT(err_msg)
 
             if failed:
@@ -306,10 +309,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         # Check if the number of components in each file exceeds
                         # one.
                         if component_num > 1:
-                            python_utils.PRINT(
+                            summary_message = (
                                 '%s -> Please ensure that there is exactly one '
                                 'component in the file.' % (filepath))
                             failed = True
+                            python_utils.PRINT(summary_message)
+                            summary_messages.append(summary_message)
                             break
 
         with linter_utils.redirect_stdout(stdout):
@@ -423,12 +428,16 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                                     and (
                                                         scope_value.value)):
                                                 failed = True
-                                                python_utils.PRINT(
+                                                summary_message = (
                                                     'Please ensure that %s '
                                                     'directive in %s file '
                                                     'does not have scope set '
                                                     'to true.' %
                                                     (directive_name, filepath))
+                                                python_utils.PRINT(
+                                                    summary_message)
+                                                summary_messages.append(
+                                                    summary_message)
                                                 python_utils.PRINT('')
                                             elif scope_value.type != (
                                                     'ObjectExpression'):
@@ -436,12 +445,16 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                                 # has scope: {} else report
                                                 # the error message.
                                                 failed = True
-                                                python_utils.PRINT(
+                                                summary_message = (
                                                     'Please ensure that %s '
                                                     'directive in %s file has '
                                                     'a scope: {}.' % (
                                                         directive_name, filepath
                                                         ))
+                                                python_utils.PRINT(
+                                                    summary_message)
+                                                summary_messages.append(
+                                                    summary_message)
                                                 python_utils.PRINT('')
 
         with linter_utils.redirect_stdout(stdout):
@@ -523,22 +536,26 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     constant_imports))
                             if sorted_imports != function_args:
                                 failed = True
-                                python_utils.PRINT(
+                                summary_message = (
                                     'Please ensure that in %s in file %s, the '
                                     'injected dependencies should be in the '
                                     'following manner: dollar imports, regular '
                                     'imports and constant imports, all in '
                                     'sorted order.'
                                     % (property_value, filepath))
+                                python_utils.PRINT(summary_message)
+                                summary_messages.append(summary_message)
                             if sorted_imports != literal_args:
                                 failed = True
-                                python_utils.PRINT(
+                                summary_message = (
                                     'Please ensure that in %s in file %s, the '
                                     'stringfied dependencies should be in the '
                                     'following manner: dollar imports, regular '
                                     'imports and constant imports, all in '
                                     'sorted order.'
                                     % (property_value, filepath))
+                                python_utils.PRINT(summary_message)
+                                summary_messages.append(summary_message)
         with linter_utils.redirect_stdout(stdout):
             if failed:
                 summary_message = (
@@ -677,7 +694,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     if angularjs_constants_value != (
                                             angularjs_constants_name):
                                         failed = True
-                                        python_utils.PRINT(
+                                        summary_message = (
                                             '%s --> Please ensure that the '
                                             'constant %s is initialized '
                                             'from the value from the '
@@ -688,6 +705,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                             'does not exist there.' % (
                                                 filepath,
                                                 angularjs_constants_name))
+                                        summary_messages.append(summary_message)
+                                        python_utils.PRINT(summary_message)
                                     angularjs_constants_list.append(
                                         angularjs_constants_name)
                             angularjs_constants_set = set(
@@ -695,18 +714,22 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             if len(angularjs_constants_set) != len(
                                     angularjs_constants_list):
                                 failed = True
-                                python_utils.PRINT(
+                                summary_message = (
                                     '%s --> Duplicate constant declaration '
                                     'found.' % (
                                         corresponding_angularjs_filepath))
+                                summary_messages.append(summary_message)
+                                python_utils.PRINT(summary_message)
                             angularjs_source_filepaths_to_constants_dict[
                                 corresponding_angularjs_filepath] = (
                                     angularjs_constants_set)
                         else:
                             failed = True
-                            python_utils.PRINT(
+                            summary_message = (
                                 '%s --> Corresponding AngularJS constants '
                                 'file not found.' % filepath)
+                            summary_messages.append(summary_message)
+                            python_utils.PRINT(summary_message)
 
                     finally:
                         shutil.rmtree(compiled_js_dir)
@@ -717,11 +740,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             filepath)):
                         if 'oppia.constant(' in line:
                             failed = True
-                            python_utils.PRINT(
+                            summary_message = (
                                 '%s --> Constant declaration found at line '
                                 '%s. Please declare the constants in a '
                                 'separate constants file.' % (
                                     filepath, line_num))
+                            summary_messages.append(summary_message)
+                            python_utils.PRINT(summary_message)
 
                 # Check if the constant has multiple declarations which is
                 # prohibited.
@@ -738,7 +763,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         constant_name = expression.arguments[0].raw
                         if constant_name in constants_to_source_filepaths_dict:
                             failed = True
-                            python_utils.PRINT(
+                            summary_message = (
                                 '%s --> The constant %s is already declared '
                                 'in %s. Please import the file where the '
                                 'constant is declared or rename the constant'
@@ -746,6 +771,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     filepath, constant_name,
                                     constants_to_source_filepaths_dict[
                                         constant_name]))
+                            summary_messages.append(summary_message)
+                            python_utils.PRINT(summary_message)
                         else:
                             constants_to_source_filepaths_dict[
                                 constant_name] = filepath
@@ -766,9 +793,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     if len(angular_constants_set) != len(
                             angular_constants_list):
                         failed = True
-                        python_utils.PRINT(
+                        summary_message = (
                             '%s --> Duplicate constant declaration found.'
                             % filepath)
+                        summary_messages.append(summary_message)
+                        python_utils.PRINT(summary_message)
                     if corresponding_angularjs_filepath in (
                             angularjs_source_filepaths_to_constants_dict):
                         angular_minus_angularjs_constants = (
@@ -777,10 +806,12 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     corresponding_angularjs_filepath]))
                         for constant in angular_minus_angularjs_constants:
                             failed = True
-                            python_utils.PRINT(
+                            summary_message = (
                                 '%s --> The constant %s is not declared '
                                 'in the corresponding angularjs '
                                 'constants file.' % (filepath, constant))
+                            summary_messages.append(summary_message)
+                            python_utils.PRINT(summary_message)
 
             if failed:
                 summary_message = (
@@ -820,11 +851,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         sorted_dependencies_messages = self._check_sorted_dependencies()
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
+        constant_declaration_messages = self._check_constants_declaration()
 
         all_messages = (
             extra_js_files_messages +
             js_and_ts_component_messages + directive_scope_messages +
-            sorted_dependencies_messages + controller_dependency_messages)
+            sorted_dependencies_messages + controller_dependency_messages +
+            constant_declaration_messages)
         return all_messages
 
 

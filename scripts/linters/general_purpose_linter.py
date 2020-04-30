@@ -605,6 +605,7 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         # This boolean list keeps track of the regex matches
         # found in the file.
         pattern_found_list = []
+        summary_messages = []
         file_content = self.file_cache.readlines(filepath)
         for index, regexp_to_check in enumerate(
                 pattern_list):
@@ -626,11 +627,13 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         if pattern_found_list:
             failed = True
             for pattern_found in pattern_found_list:
-                python_utils.PRINT('%s --> %s' % (
+                summary_message = ('%s --> %s' % (
                     filepath,
                     pattern_list[pattern_found]['message']))
+                summary_messages.append(summary_message)
+                python_utils.PRINT(summary_message)
 
-        return failed
+        return failed, summary_messages
 
     def _check_mandatory_patterns(self):
         """This function checks that all files contain the mandatory
@@ -648,8 +651,10 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                 MANDATORY_PATTERNS_REGEXP, MANDATORY_PATTERNS_JS_REGEXP]
             for filepath in self.all_filepaths:
                 for pattern_list in sets_of_patterns_to_match:
-                    failed = self._check_for_mandatory_pattern_in_file(
-                        pattern_list, filepath, failed)
+                    failed, mandatory_summary_messages = (
+                        self._check_for_mandatory_pattern_in_file(
+                            pattern_list, filepath, failed))
+                    summary_messages.extend(mandatory_summary_messages)
 
             if failed:
                 summary_message = (
@@ -697,18 +702,19 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                         total_error_count += 1
 
                 for regexp in BAD_PATTERNS_REGEXP:
-                    tmp_failed, summary_message = check_bad_pattern_in_file(
-                        filepath, file_content, regexp)
+                    tmp_failed, bad_pattern_summary_messages = (
+                        check_bad_pattern_in_file(
+                            filepath, file_content, regexp))
                     if tmp_failed:
-                        summary_messages.extend(summary_message)
+                        summary_messages.extend(bad_pattern_summary_messages)
                         total_error_count += 1
 
-                temp_failed, temp_count, summary_message = (
+                temp_failed, temp_count, bad_pattern_summary_messages = (
                     check_file_type_specific_bad_pattern(
                         filepath, file_content))
                 failed = failed or temp_failed or tmp_failed
                 total_error_count += temp_count
-                summary_messages.extend(summary_message)
+                summary_messages.extend(bad_pattern_summary_messages)
 
                 if filepath == 'constants.ts':
                     for pattern in REQUIRED_STRINGS_CONSTANTS:

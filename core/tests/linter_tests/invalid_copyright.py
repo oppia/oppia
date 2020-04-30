@@ -1,7 +1,5 @@
 # coding: utf-8
 #
-# Copyright 2020 The Oppia Authors. All Rights Reserved.
-#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -19,8 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-
 import python_utils
 
 
@@ -30,10 +26,11 @@ class FakeClass(python_utils.OBJECT):
     def __init__(self, fake_arg):
         self.fake_arg = fake_arg
 
-    def fake_method(self):
+    def fake_method(self, name):
         """This doesn't do anything.
+        Args:
+            name: str. Means nothing.
         Yields:
-            yields curr_time.
+            tuple. The argument passed in but twice in a tuple.
         """
-        curr_time = datetime.datetime.now()
-        yield curr_time
+        yield (name, name)

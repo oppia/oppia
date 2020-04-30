@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Valid syntax .js file, used by scripts/pre_commit_linter_test.
+ * @fileoverview Invalid syntax .ts file,
+ used by scripts/pre_commit_linter_test.
  */
 
 var ParentCtrl = function($scope) {

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Valid syntax .ts file, used by scripts/pre_commit_linter_test.
+ * @fileoverview Invalid syntax .ts file.
  */
 
 import { Component } from '@angular/core';

@@ -30,6 +30,7 @@ from . import pre_commit_linter
 
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'linter_tests')
 
+# HTML filepaths.
 VALID_HTML_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.html')
 INVALID_INDENTATION_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_indentation.html')
@@ -39,10 +40,14 @@ INVALID_TRAILING_WHITESPACE_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_trailing_whitespace.html')
 INVALID_PARENT_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_parent.html')
+INVALID_GLYPHICON_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_glyphicon.html')
 
+# CSS filepaths.
 VALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.css')
 INVALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.css')
 
+# Js and Ts filepaths.
 VALID_JS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.js')
 VALID_TS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.ts')
 INVALID_EXPLORE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_explore.js')
@@ -61,8 +66,23 @@ INVALID_RELATIVE_IMPORT_FILEPATH = os.path.join(
 INVALID_PARENT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_parent.ts')
 INVALID_TEMPLATE_URL_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_templateurl.ts')
+INVALID_WITHOUT_AJS_CONSTANT_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_without_ajs.constants.ts')
+INVALID_CONSTANT_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid.constants.ts')
+INVALID_LINE_BREAK_IN_CONTROLLER_DEPENDENCIES_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_line_breaks_in_controller_dependencies.ts')
+INVALID_SCOPE_TRUE_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_scope_true.ts')
+INVALID_SCOPE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_scope.ts')
+INVALID_COMPONENT_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_component.ts')
+INVALID_SORTED_DEPENDENCIES_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_sorted_dependencies.ts')
+INVALID_FILEOVERVIEW_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_fileoverview.ts')
 
-
+# PY filepaths.
 VALID_PY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.py')
 INVALID_IMPORT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_import_order.py')
@@ -114,13 +134,14 @@ INVALID_UNQUOTE_PLUS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_urlunquote_plus.py')
 INVALID_URLENCODE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_urlencode.py')
-
 INVALID_TABS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_tabs.py')
 INVALID_MERGE_CONFLICT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_merge_conflict.py')
-INVALID_GLYPHICON_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_glyphicon.html')
 INVALID_TODO_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_todo.py')
+INVALID_COPYRIGHT_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_copyright.py')
+INVALID_UNICODE_LITERAL_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_unicode_literal.py')
 
 
 def mock_exit(unused_status):
@@ -396,7 +417,7 @@ class JsTsLintTests(LintTests):
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
-                ['Line 24: Please do not access parent properties using '
+                ['Line 25: Please do not access parent properties using '
                  '$parent. Use the scope objectfor this purpose.'],
                 self.linter_stdout))
 
@@ -418,6 +439,94 @@ class JsTsLintTests(LintTests):
         self.assertTrue(
             appears_in_linter_stdout(
                 ['Line 26: Please do not use innerHTML property.'],
+                self.linter_stdout))
+
+    def test_invalid_constant_file_without_ajs_file(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_WITHOUT_AJS_CONSTANT_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Corresponding AngularJS constants file not found.'],
+                self.linter_stdout))
+
+    def test_invalid_constant_file(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_CONSTANT_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Duplicate constant declaration found.'],
+                self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['The constant PROFILE_URL_TEMPLATE is not declared in the '
+                 'corresponding angularjs constants file.'],
+                self.linter_stdout))
+
+    def test_invalid_line_break_in_controller_dependencies(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % (
+                    INVALID_LINE_BREAK_IN_CONTROLLER_DEPENDENCIES_FILEPATH)])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Please ensure that in file',
+                 'the line breaks pattern between the dependencies mentioned as'
+                 ' strings:\n[$rootScope,$window,BackgroundMaskService,\n'
+                 'SidebarStatusService,UrlService]\nand the dependencies '
+                 'mentioned as function parameters: \n($rootScope,$window,\n'
+                 'BackgroundMaskService,\nSidebarStatusService,UrlService)\n'
+                 'for the corresponding controller should exactly match.'],
+                self.linter_stdout))
+
+    def test_invalid_scope_is_set_to_true(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_SCOPE_TRUE_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Please ensure that baseContent directive in ',
+                 ' file does not have scope set to true.'],
+                self.linter_stdout))
+
+    def test_invalid_scope(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_SCOPE_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Please ensure that baseContent directive in ',
+                 ' file has a scope: {}.'],
+                self.linter_stdout))
+
+    def test_invalid_component(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_COMPONENT_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Please ensure that there is exactly one component '
+                 'in the file.'],
+                self.linter_stdout))
+
+    def test_invalid_sorted_dependencies(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_SORTED_DEPENDENCIES_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Please ensure that in SuggestionModalForCreatorViewController'
+                 ' in file ', 'the stringfied dependencies should be in the '
+                 'following manner: dollar imports, regular imports and '
+                 'constant imports, all in sorted order.'],
                 self.linter_stdout))
 
 
@@ -816,4 +925,37 @@ class GeneralLintTests(LintTests):
             appears_in_linter_stdout(
                 ['Line 31: Please assign TODO comments to a user in the format'
                  ' TODO(username): XXX.'],
+                self.linter_stdout))
+
+    def test_invalid_copyright(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_COPYRIGHT_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Please ensure this file should contain a proper copyright '
+                 'notice.'],
+                self.linter_stdout))
+
+    def test_invalid_unicode_literal(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_UNICODE_LITERAL_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Please ensure this file should contain unicode_literals '
+                 'future import.'],
+                self.linter_stdout))
+
+    def test_invalid_fileoverview(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_FILEOVERVIEW_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Please ensure this file should contain a file overview i.e. '
+                 'a short description of the file.'],
                 self.linter_stdout))

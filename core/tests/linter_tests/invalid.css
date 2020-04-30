@@ -12,7 +12,7 @@
 */
 
 /*
-  CSS file with invalid syntax, used for testing in scripts/pre_commit_linter_test.
+  CSS file with invalid syntax.
 */
 @-webkit-keyframes dot {
   0% { opacity : 0; }

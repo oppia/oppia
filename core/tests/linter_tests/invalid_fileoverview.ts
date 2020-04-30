@@ -12,18 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * @fileoverview invalid syntax .ts file.
- */
+const CodeMirror = require('static/code-mirror-5.17.0/lib/codemirror.js');
+Object.defineProperty(window, 'CodeMirror', {
+  value: CodeMirror,
+  writable: false
+});
 
-describe('Mark All Audio And Translations AsNeeding Update Controller',
-  function() {
-    var $scope, $uibModalInstance;
-
-    beforeEach(angular.mock.module('oppia'));
-    beforeEach(inject(function($controller, $rootScope) {
-        $scope = $rootScope.$new();
-        $uibModalInstance = jasmine.createSpyObj(
-          '$uibModalInstance', ['close', 'dismiss']);
-      }));
-  });
+require('static/code-mirror-5.17.0/mode/javascript/javascript.js');
+require('static/code-mirror-5.17.0/mode/python/python.js');
+require('static/code-mirror-5.17.0/mode/yaml/yaml.js');
+require('static/ui-codemirror-5d04fa/src/ui-codemirror.js');
+require('static/diff-match-patch-1.0.0/diff_match_patch.js');

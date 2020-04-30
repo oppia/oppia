@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Valid syntax .js file, used by scripts/pre_commit_linter_test.
+ * @fileoverview Invalid syntax .js file.
  */
 
 var forms = require('../protractor_utils/forms.js');
