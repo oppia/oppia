@@ -32,17 +32,18 @@ import feconf
 import utils
 
 (
-    base_models, collection_models, email_models,
-    exploration_models, feedback_models, imps_models,
-    skill_models, topic_models, suggestion_models,
-    user_models, story_models, question_models,
-    config_models
+    base_models, collection_models, config_models,
+    email_models, exploration_models, feedback_models,
+    imps_models, question_models, skill_models,
+    story_models, suggestion_models, topic_models,
+    user_models,
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
-    models.NAMES.skill, models.NAMES.topic, models.NAMES.suggestion,
-    models.NAMES.user, models.NAMES.story, models.NAMES.question,
-    models.NAMES.config])
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
+    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+    models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
+    models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
+    models.NAMES.user
+])
 
 
 class TakeoutServiceUnitTests(test_utils.GenericTestBase):
@@ -520,11 +521,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_feedback_thread_ids': [],
             'last_checked': None
         }
-        topic_rights_data = {
-            'managed_topic_ids': []
-        }
         task_entry_data = {
             'task_ids_closed_by_user': []
+        }
+        topic_rights_data = {
+            'managed_topic_ids': []
         }
 
         expected_voiceover_application_data = {}
@@ -553,6 +554,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'incomplete_activities_data': incomplete_activities_data,
             'exp_user_last_playthrough_data': last_playthrough_data,
             'learner_playlist_data': learner_playlist_data,
+            'task_entry_data': task_entry_data,
             'topic_rights_data': topic_rights_data,
             'collection_progress_data': collection_progress_data,
             'story_progress_data': story_progress_data,
@@ -568,7 +570,6 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 expected_voiceover_application_data,
             'user_contribution_scoring_data': expected_contrib_score_data,
             'user_community_rights_data': expected_community_rights_data,
-            'task_entry_data': task_entry_data,
             'collection_rights_snapshot_metadata_data':
                 expected_collection_rights_sm,
             'collection_snapshot_metadata_data':
@@ -786,11 +787,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'last_checked': None
         }
 
-        expected_topic_data = {
-            'managed_topic_ids': [self.TOPIC_ID_1, self.TOPIC_ID_2]
-        }
         expected_task_entry_data = {
             'task_ids_closed_by_user': [self.GENERIC_MODEL_ID]
+        }
+        expected_topic_data = {
+            'managed_topic_ids': [self.TOPIC_ID_1, self.TOPIC_ID_2]
         }
 
         expected_voiceover_application_data = {
@@ -938,8 +939,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'incomplete_activities_data': expected_incomplete_activities_data,
             'exp_user_last_playthrough_data': expected_last_playthrough_data,
             'learner_playlist_data': expected_learner_playlist_data,
-            'topic_rights_data': expected_topic_data,
             'task_entry_data': expected_task_entry_data,
+            'topic_rights_data': expected_topic_data,
             'collection_progress_data': expected_collection_progress_data,
             'story_progress_data': expected_story_progress_data,
             'general_feedback_thread_data':
