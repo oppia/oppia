@@ -114,7 +114,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             ctrl.errorString = '';
             ctrl.labelForErrorFocusTarget =
               FocusManagerService.generateFocusLabel();
-            ctrl.localValue = '';
+            ctrl.localValue = 0.0;
             // This prevents the red 'invalid input' warning message from
             // flashing at the outset.
             $timeout(function() {
