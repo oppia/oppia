@@ -12,7 +12,7 @@
 #   can be optimized further.
 
 # Android team
-/core/domain/android_validation_constants.py @BenHenning
+/core/domain/android_validation_constants*.py @BenHenning
 
 # Angular Migration team
 /core/templates/services/contextual/logger.service.ts @bansalnitish
@@ -459,7 +459,9 @@
 
 
 # QA team.
-/core/tests/ @U8NWXD
+/core/tests/ @nithusha21
+/core/tests/protractor_utils @U8NWXD
+/core/tests/protractor_desktop @U8NWXD
 /assets/ @nithusha21
 /data/ @nithusha21
 
