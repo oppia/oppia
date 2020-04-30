@@ -41,8 +41,16 @@ angular.module('oppia').directive('welcomeGuidePage', [
             '/general/classroom.png');
           ctrl.browserImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/welcomeguide/browser.png');
-          ctrl.numbersImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/welcomeguide/numbers.png');
+          ctrl.number1ImgUrl = UrlInterpolationService.getStaticImageUrl(
+            '/welcomeguide/number1.png');
+          ctrl.number2ImgUrl = UrlInterpolationService.getStaticImageUrl(
+            '/welcomeguide/number2.png');
+          ctrl.number3ImgUrl = UrlInterpolationService.getStaticImageUrl(
+            '/welcomeguide/number3.png');
+          ctrl.number4ImgUrl = UrlInterpolationService.getStaticImageUrl(
+            '/welcomeguide/number4.png');
+          ctrl.number5ImgUrl = UrlInterpolationService.getStaticImageUrl(
+            '/welcomeguide/number5.png');
         };
       }]
     };
