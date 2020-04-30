@@ -4517,3 +4517,24 @@ div.oppia-issues-learner-action {
 .oppia-rule-preview {
   word-wrap: break-word;
 }
+
+
+.oppia-welcome-guide-header{
+ padding-left: 70px;
+ padding-top: 70px;
+ max-height: 500px;
+}
+
+@media (max-width: 768px) {
+  .oppia-welcome-guide-header{
+   padding-left: 20px;
+   padding-top: 20px;
+ 
+  }
+}
+
+.oppia-welcome-guide-h1{
+  color: #005c5e;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  padding-bottom: 20px;
+}
