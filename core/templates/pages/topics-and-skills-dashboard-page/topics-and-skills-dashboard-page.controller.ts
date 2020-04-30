@@ -63,7 +63,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
         'EVENT_TYPE_SKILL_CREATION_ENABLED',
         'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         'FATAL_ERROR_CODES', 'SKILL_DIFFICULTIES',
-        'MAX_CHARS_IN_SKILL_DESCRIPTION',
+        'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
         function(
             $http, $rootScope, $scope, $uibModal, $window,
             AlertsService, RubricObjectFactory, SkillCreationService,
@@ -73,7 +73,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             EVENT_TYPE_SKILL_CREATION_ENABLED,
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
             FATAL_ERROR_CODES, SKILL_DIFFICULTIES,
-            MAX_CHARS_IN_SKILL_DESCRIPTION) {
+            MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES) {
           var ctrl = this;
           var _initDashboard = function(stayInSameTab) {
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
@@ -154,7 +154,9 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   var newExplanationObject = null;
 
                   $scope.$watch('newSkillDescription', function() {
-                    if (SkillCreationService.getSkillDescriptionStatus()) {
+                    if (
+                      SkillCreationService.getSkillDescriptionStatus() !==
+                      SKILL_DESCRIPTION_STATUS_VALUES.STATUS_DISABLED) {
                       var initParagraph = document.createElement('p');
                       var explanations = $scope.rubrics[1].getExplanations();
                       var newExplanation = document.createTextNode(
@@ -189,7 +191,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   };
 
                   $scope.cancel = function() {
-                    SkillCreationService.enableSkillDescriptionStatusMarker();
+                    SkillCreationService.resetSkillDescriptionStatusMarker();
                     $uibModalInstance.dismiss('cancel');
                   };
                 }

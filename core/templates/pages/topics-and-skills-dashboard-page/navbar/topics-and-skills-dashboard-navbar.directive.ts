@@ -42,13 +42,15 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
         'EVENT_TYPE_SKILL_CREATION_ENABLED', 'EditableTopicBackendApiService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         'SKILL_DIFFICULTIES', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
+        'SKILL_DESCRIPTION_STATUS_VALUES',
         function(
             $scope, $rootScope, $uibModal, TopicCreationService,
             RubricObjectFactory, SkillCreationService,
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
             EVENT_TYPE_SKILL_CREATION_ENABLED, EditableTopicBackendApiService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-            SKILL_DIFFICULTIES, MAX_CHARS_IN_SKILL_DESCRIPTION) {
+            SKILL_DIFFICULTIES, MAX_CHARS_IN_SKILL_DESCRIPTION,
+            SKILL_DESCRIPTION_STATUS_VALUES) {
           var ctrl = this;
           $scope.createTopic = function() {
             TopicCreationService.createNewTopic();
@@ -76,7 +78,9 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                   var newExplanationObject = null;
 
                   $scope.$watch('newSkillDescription', function() {
-                    if (SkillCreationService.getSkillDescriptionStatus()) {
+                    if (
+                      SkillCreationService.getSkillDescriptionStatus() !==
+                      SKILL_DESCRIPTION_STATUS_VALUES.STATUS_DISABLED) {
                       var initParagraph = document.createElement('p');
                       var explanations = $scope.rubrics[1].getExplanations();
                       var newExplanation = document.createTextNode(
@@ -111,7 +115,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                   };
 
                   $scope.cancel = function() {
-                    SkillCreationService.enableSkillDescriptionStatusMarker();
+                    SkillCreationService.resetSkillDescriptionStatusMarker();
                     $uibModalInstance.dismiss('cancel');
                   };
                 }

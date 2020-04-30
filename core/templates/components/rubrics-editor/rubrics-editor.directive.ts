@@ -52,11 +52,13 @@ angular.module('oppia').directive('rubricsEditor', [
       controller: [
         '$scope', '$filter', '$uibModal', '$rootScope', 'ContextService',
         'RubricObjectFactory', 'SkillCreationService',
-        'EVENT_SKILL_REINITIALIZED', 'PAGE_CONTEXT', 'SKILL_DIFFICULTIES',
+        'EVENT_SKILL_REINITIALIZED', 'PAGE_CONTEXT', 'SKILL_DIFFICULTY_MEDIUM',
+        'SKILL_DESCRIPTION_STATUS_VALUES',
         function(
             $scope, $filter, $uibModal, $rootScope, ContextService,
             RubricObjectFactory, SkillCreationService,
-            EVENT_SKILL_REINITIALIZED, PAGE_CONTEXT, SKILL_DIFFICULTIES) {
+            EVENT_SKILL_REINITIALIZED, PAGE_CONTEXT, SKILL_DIFFICULTY_MEDIUM,
+            SKILL_DESCRIPTION_STATUS_VALUES) {
           var ctrl = this;
           var explanationsMemento = {};
 
@@ -73,7 +75,7 @@ angular.module('oppia').directive('rubricsEditor', [
           };
 
           ctrl.saveExplanation = function(difficulty, index) {
-            if (difficulty === SKILL_DIFFICULTIES[1] && index === 0) {
+            if (difficulty === SKILL_DIFFICULTY_MEDIUM && index === 0) {
               SkillCreationService.disableSkillDescriptionStatusMarker();
             }
             ctrl.explanationEditorIsOpen[difficulty][index] = false;
@@ -107,7 +109,7 @@ angular.module('oppia').directive('rubricsEditor', [
           };
 
           ctrl.deleteExplanation = function(difficulty, index) {
-            if (difficulty === SKILL_DIFFICULTIES[1] && index === 0) {
+            if (difficulty === SKILL_DIFFICULTY_MEDIUM && index === 0) {
               SkillCreationService.disableSkillDescriptionStatusMarker();
             }
             ctrl.explanationEditorIsOpen[difficulty][index] = false;
@@ -150,12 +152,15 @@ angular.module('oppia').directive('rubricsEditor', [
           if (ContextService.getPageContext() !== 'skill_editor') {
             $scope.$watch(function() {
               return SkillCreationService.getSkillDescriptionStatus();
-            }, function() {
-              var explanations = ctrl.getRubrics()[1].getExplanations();
-              var difficulty = ctrl.getRubrics()[1].getDifficulty();
-              explanationsMemento[difficulty] = angular.copy(explanations);
-              ctrl.editableExplanations[difficulty] = (
-                angular.copy(explanations));
+            }, function(newValue, oldValue) {
+              if (newValue === SKILL_DESCRIPTION_STATUS_VALUES.STATUS_CHANGED) {
+                var explanations = ctrl.getRubrics()[1].getExplanations();
+                var difficulty = ctrl.getRubrics()[1].getDifficulty();
+                explanationsMemento[difficulty] = angular.copy(explanations);
+                ctrl.editableExplanations[difficulty] = (
+                  angular.copy(explanations));
+                SkillCreationService.resetSkillDescriptionStatusMarker();
+              }
             });
           }
         }
