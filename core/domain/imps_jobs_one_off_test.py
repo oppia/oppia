@@ -296,17 +296,6 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
         self.assertIn(
             'invalid exploration target_type: TEST_ONLY_TARGET_TYPE', output[0])
 
-    def test_task_with_missing_target_id(self):
-        self.save_new_default_exploration('exp_id', 'owner_id')
-
-        _create_task('exp_id', target_type='state', target_id=None)
-
-        output = self._run_one_off_job()
-
-        self.assertEqual(len(output), 1)
-        self.assertIn('TARGET_TYPE_ERROR', output[0])
-        self.assertIn('target_type is state, but target_id is empty', output[0])
-
     def test_task_with_missing_target_type(self):
         self.save_new_default_exploration('exp_id', 'owner_id')
 
@@ -317,6 +306,28 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(len(output), 1)
         self.assertIn('TARGET_TYPE_ERROR', output[0])
         self.assertIn('target_type is empty, but target_id is init', output[0])
+
+    def test_task_with_valid_target_id(self):
+        self.save_new_default_exploration('exp_id', 'owner_id')
+
+        _create_task(
+            'exp_id', target_type='state',
+            target_id=feconf.DEFAULT_INIT_STATE_NAME)
+
+        output = self._run_one_off_job()
+
+        self.assertEqual(output, [])
+
+    def test_task_with_missing_target_id(self):
+        self.save_new_default_exploration('exp_id', 'owner_id')
+
+        _create_task('exp_id', target_type='state', target_id=None)
+
+        output = self._run_one_off_job()
+
+        self.assertEqual(len(output), 1)
+        self.assertIn('TARGET_TYPE_ERROR', output[0])
+        self.assertIn('target_type is state, but target_id is empty', output[0])
 
     def test_task_with_target_id_that_never_existed(self):
         self.save_new_default_exploration('exp_id', 'owner_id')
