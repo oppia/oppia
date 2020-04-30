@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for Improvements models."""
+"""Unit tests for models related to Oppia improvements task."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -34,7 +34,7 @@ def _always_returns(value):
     return lambda: value
 
 
-class TaskEntryModelTest(test_utils.GenericTestBase):
+class TaskEntryModelTests(test_utils.GenericTestBase):
     """Unit tests for TaskEntryModel instances."""
 
     def test_get_deletion_policy(self):
@@ -42,10 +42,49 @@ class TaskEntryModelTest(test_utils.GenericTestBase):
             imps_models.TaskEntryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
+    def test_apply_deletion_policy(self):
+        imps_models.TaskEntryModel(
+            id='task_id',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='expid',
+            task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
+            entity_version_start=1,
+            status='open',
+            closed_by='user_id'
+        ).put()
+
+        self.assertTrue(
+            imps_models.TaskEntryModel.has_reference_to_user_id('user_id'))
+
+        imps_models.TaskEntryModel.apply_deletion_policy('user_id')
+
+        self.assertFalse(
+            imps_models.TaskEntryModel.has_reference_to_user_id('user_id'))
+
     def test_get_export_policy(self):
         self.assertEqual(
             imps_models.TaskEntryModel.get_export_policy(),
             base_models.EXPORT_POLICY.CONTAINS_USER_DATA)
+
+    def test_export_data_without_any_tasks(self):
+        self.assertEqual(imps_models.TaskEntryModel.export_data('user_id'), {
+            'task_ids_closed_by_user': []
+        })
+
+    def test_export_data_with_task(self):
+        imps_models.TaskEntryModel(
+            id='task_id',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_id='expid',
+            task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
+            entity_version_start=1,
+            status='open',
+            closed_by='user_id'
+        ).put()
+
+        self.assertEqual(imps_models.TaskEntryModel.export_data('user_id'), {
+            'task_ids_closed_by_user': ['task_id']
+        })
 
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
@@ -72,45 +111,6 @@ class TaskEntryModelTest(test_utils.GenericTestBase):
             imps_models.TaskEntryModel.has_reference_to_user_id('user_id'))
         self.assertFalse(
             imps_models.TaskEntryModel.has_reference_to_user_id('x_id'))
-
-    def test_apply_deletion_policy(self):
-        imps_models.TaskEntryModel(
-            id='task_id',
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_id='expid',
-            task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            entity_version_start=1,
-            status='open',
-            closed_by='user_id'
-        ).put()
-
-        self.assertTrue(
-            imps_models.TaskEntryModel.has_reference_to_user_id('user_id'))
-
-        imps_models.TaskEntryModel.apply_deletion_policy('user_id')
-
-        self.assertFalse(
-            imps_models.TaskEntryModel.has_reference_to_user_id('user_id'))
-
-    def test_export_data_without_any_tasks(self):
-        self.assertEqual(imps_models.TaskEntryModel.export_data('user_id'), {
-            'task_ids_closed_by_user': []
-        })
-
-    def test_export_data_with_task(self):
-        imps_models.TaskEntryModel(
-            id='task_id',
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
-            entity_id='expid',
-            task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE,
-            entity_version_start=1,
-            status='open',
-            closed_by='user_id'
-        ).put()
-
-        self.assertEqual(imps_models.TaskEntryModel.export_data('user_id'), {
-            'task_ids_closed_by_user': ['task_id']
-        })
 
     def test_generate_new_task_id(self):
         entity_type, entity_id, task_type = (

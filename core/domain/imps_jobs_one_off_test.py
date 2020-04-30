@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for Skill-related one-off jobs."""
+"""Unit tests for one off jobs related to Oppia improvement tasks."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -27,19 +27,21 @@ from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
+import datetime as dt
+
 base_models, exp_models, imps_models = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration, models.NAMES.improvements
 ])
 
 
 def _create_task(
-        entity_id, task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE, task_id=None,
-        entity_type=feconf.ENTITY_TYPE_EXPLORATION, target_type=None,
-        target_id=None, entity_version_start=1, entity_version_end=None,
+        entity_id, entity_type=feconf.ENTITY_TYPE_EXPLORATION, task_id=None,
+        task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE, target_id=None,
+        target_type=None, entity_version_start=1, entity_version_end=None,
         status=imps_models.STATUS_OPEN, closed_on=None, closed_by=None,
         task_summary=None):
-    """Helper method to create a simple task. The default values assume the task
-    is a high bounce-rate type, intended for an exploration.
+    """Helper method to create a task. The default values create an exploration
+    high bounce-rate task.
     """
     if task_id is None:
         task_id = imps_models.TaskEntryModel.generate_new_task_id(
@@ -56,12 +58,12 @@ def _create_task(
 
 class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
 
-    def count_one_off_jobs_in_queue(self):
-        """Counts one off jobs in the taskqueue."""
+    def _count_one_off_jobs_in_queue(self):
+        """Returns the number of one off jobs in the taskqueue."""
         return self.count_jobs_in_taskqueue(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
 
-    def run_one_off_job(self):
+    def _run_one_off_job(self):
         """Begins the one off job and asserts it completes as expected.
 
         Assumes the existence of a class constant ONE_OFF_JOB_CLASS, pointing
@@ -71,20 +73,30 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
             *. The output of the one off job.
         """
         job_id = imps_jobs_one_off.TaskEntryModelAuditOneOffJob.create_new()
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
+        self.assertEqual(self._count_one_off_jobs_in_queue(), 0)
         imps_jobs_one_off.TaskEntryModelAuditOneOffJob.enqueue(job_id)
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
+        self.assertEqual(self._count_one_off_jobs_in_queue(), 1)
         self.process_and_flush_pending_tasks()
-        self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
+        self.assertEqual(self._count_one_off_jobs_in_queue(), 0)
         return imps_jobs_one_off.TaskEntryModelAuditOneOffJob.get_output(job_id)
 
-    def test_job_when_no_models_exist(self):
-        self.assertEqual(self.run_one_off_job(), [])
+    def test_empty_output_when_no_models_exist(self):
+        self.assertEqual(self._run_one_off_job(), [])
+
+    def test_task_with_invalid_entity_type(self):
+        _create_task('entity_id', entity_type=imps_models.TEST_ONLY_ENTITY_TYPE)
+
+        output = self._run_one_off_job()
+
+        self.assertEqual(len(output), 1)
+        self.assertIn('ENTITY_TYPE_ERROR', output[0])
+        self.assertIn(
+            'unsupported entity_type: TEST_ONLY_ENTITY_TYPE', output[0])
 
     def test_task_with_invalid_entity_id(self):
         _create_task('invalid_exp_id')
 
-        output = self.run_one_off_job()
+        output = self._run_one_off_job()
 
         self.assertEqual(len(output), 1)
         error = output[0]
@@ -99,7 +111,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
         _create_task('exp_id', entity_version_start=1, entity_version_end=3)
         _create_task('exp_id', entity_version_start=2, entity_version_end=4)
 
-        output = self.run_one_off_job()
+        output = self._run_one_off_job()
 
         self.assertEqual(len(output), 2)
         self.assertIn('ENTITY_VERSION_COLLISION', output[0])
@@ -115,7 +127,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
         _create_task('exp_id', entity_version_start=1, entity_version_end=3)
         _create_task('exp_id', entity_version_start=3, entity_version_end=None)
 
-        output = self.run_one_off_job()
+        output = self._run_one_off_job()
 
         self.assertEqual(output, [])
 
@@ -131,7 +143,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
             'exp_id', entity_version_start=2, entity_version_end=4,
             target_type='state', target_id=feconf.DEFAULT_INIT_STATE_NAME)
 
-        output = self.run_one_off_job()
+        output = self._run_one_off_job()
 
         self.assertEqual(len(output), 2)
         self.assertIn('ENTITY_VERSION_COLLISION', output[0])
@@ -151,7 +163,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
             'exp_id', entity_version_start=3, entity_version_end=None,
             target_type='state', target_id=feconf.DEFAULT_INIT_STATE_NAME)
 
-        output = self.run_one_off_job()
+        output = self._run_one_off_job()
 
         self.assertEqual(output, [])
 
@@ -166,7 +178,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
 
         _create_task('exp_id', entity_version_start=1, entity_version_end=4)
 
-        output = self.run_one_off_job()
+        output = self._run_one_off_job()
 
         self.assertEqual(len(output), 1)
         self.assertIn('ENTITY_ID_ERROR', output[0])
@@ -179,7 +191,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
 
         _create_task('exp_id', entity_version_start=2, entity_version_end=2)
 
-        output = self.run_one_off_job()
+        output = self._run_one_off_job()
 
         self.assertEqual(len(output), 1)
         self.assertIn('ENTITY_VERSION_ERROR', output[0])
@@ -192,32 +204,104 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
 
         _create_task('exp_id', entity_version_start=2, entity_version_end=0)
 
-        output = self.run_one_off_job()
+        output = self._run_one_off_job()
 
         self.assertEqual(len(output), 1)
         self.assertIn('ENTITY_VERSION_ERROR', output[0])
         self.assertIn('invalid range: [2, 0)', output[0])
 
-    def test_task_with_untargetable_target(self):
+    def test_open_task_with_closed_by_user(self):
+        self.save_new_default_exploration('exp_id', 'owner_id')
+        _create_task(
+            'exp_id', status=imps_models.STATUS_OPEN, closed_by='owner_id',
+            closed_on=None)
+
+        output = self._run_one_off_job()
+
+        self.assertEqual(len(output), 1)
+        self.assertIn('TASK_STATUS_ERROR', output[0])
+        self.assertIn('task is open but closed_by user is owner_id', output[0])
+
+    def test_open_task_with_closed_on_date(self):
+        self.save_new_default_exploration('exp_id', 'owner_id')
+        _create_task(
+            'exp_id', status=imps_models.STATUS_OPEN,
+            closed_on=dt.datetime(2020, 4, 29), closed_by=None)
+
+        output = self._run_one_off_job()
+
+        self.assertEqual(len(output), 1)
+        self.assertIn('TASK_STATUS_ERROR', output[0])
+        self.assertIn(
+            'task is open but closed_on date is 2020-04-29', output[0])
+
+    def test_resolved_task_without_closed_by_user(self):
+        self.save_new_default_exploration('exp_id', 'owner_id')
+        _create_task(
+            'exp_id', status=imps_models.STATUS_RESOLVED, closed_by=None,
+            closed_on=dt.datetime(2020, 4, 29))
+
+        output = self._run_one_off_job()
+
+        self.assertEqual(len(output), 1)
+        self.assertIn('TASK_STATUS_ERROR', output[0])
+        self.assertIn('task is resolved but closed_by user is empty', output[0])
+
+    def test_resolved_task_without_closed_on_date(self):
+        self.save_new_default_exploration('exp_id', 'owner_id')
+        _create_task(
+            'exp_id', status=imps_models.STATUS_RESOLVED, closed_on=None,
+            closed_by='owner_id')
+
+        output = self._run_one_off_job()
+
+        self.assertEqual(len(output), 1)
+        self.assertIn('TASK_STATUS_ERROR', output[0])
+        self.assertIn('task is resolved but closed_on date is empty', output[0])
+
+    def test_deprecated_task_without_closed_on_date(self):
+        self.save_new_default_exploration('exp_id', 'owner_id')
+        _create_task(
+            'exp_id', status=imps_models.STATUS_DEPRECATED, closed_on=None,
+            closed_by='owner_id')
+
+        output = self._run_one_off_job()
+
+        self.assertEqual(len(output), 1)
+        self.assertIn('TASK_STATUS_ERROR', output[0])
+        self.assertIn(
+            'task is deprecated but closed_on date is empty', output[0])
+
+    def test_deprecated_task_without_closed_by_user(self):
+        self.save_new_default_exploration('exp_id', 'owner_id')
+        _create_task(
+            'exp_id', status=imps_models.STATUS_DEPRECATED, closed_by=None,
+            closed_on=dt.datetime(2020, 4, 29))
+
+        output = self._run_one_off_job()
+
+        self.assertEqual(output, [])
+
+    def test_task_with_invalid_target_type(self):
         self.save_new_default_exploration('exp_id', 'owner_id')
 
         _create_task(
-            'exp_id', target_type='TEST_ONLY_TARGET_TYPE', target_id='foo')
+            'exp_id',
+            target_type=imps_models.TEST_ONLY_TARGET_TYPE, target_id='foo')
 
-        output = self.run_one_off_job()
+        output = self._run_one_off_job()
 
         self.assertEqual(len(output), 1)
         self.assertIn('TARGET_TYPE_ERROR', output[0])
         self.assertIn(
-            'TEST_ONLY_TARGET_TYPE is invalid target for exploration entities',
-            output[0])
+            'invalid exploration target_type: TEST_ONLY_TARGET_TYPE', output[0])
 
     def test_task_with_missing_target_id(self):
         self.save_new_default_exploration('exp_id', 'owner_id')
 
         _create_task('exp_id', target_type='state', target_id=None)
 
-        output = self.run_one_off_job()
+        output = self._run_one_off_job()
 
         self.assertEqual(len(output), 1)
         self.assertIn('TARGET_TYPE_ERROR', output[0])
@@ -228,7 +312,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
 
         _create_task('exp_id', target_type=None, target_id='init')
 
-        output = self.run_one_off_job()
+        output = self._run_one_off_job()
 
         self.assertEqual(len(output), 1)
         self.assertIn('TARGET_TYPE_ERROR', output[0])
@@ -239,7 +323,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
 
         _create_task('exp_id', target_type='state', target_id='bad_state_name')
 
-        output = self.run_one_off_job()
+        output = self._run_one_off_job()
 
         self.assertEqual(len(output), 1)
         self.assertIn('TARGET_ID_ERROR', output[0])
@@ -261,7 +345,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
 
         _create_task('exp_id', target_type='state', target_id='B')
 
-        output = self.run_one_off_job()
+        output = self._run_one_off_job()
 
         self.assertEqual(len(output), 1)
         self.assertIn('TARGET_ID_ERROR', output[0])
@@ -287,7 +371,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
             'exp_id', target_type='state', target_id='C',
             entity_version_start=2, entity_version_end=None)
 
-        output = self.run_one_off_job()
+        output = self._run_one_off_job()
 
         self.assertEqual(output, [])
 
@@ -303,7 +387,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
 
         _create_task('exp_id', target_type='state', target_id='B')
 
-        output = self.run_one_off_job()
+        output = self._run_one_off_job()
 
         self.assertEqual(len(output), 1)
         self.assertIn('TARGET_ID_ERROR', output[0])
@@ -322,6 +406,6 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
         _create_task(
             'exp_id', target_type='state', target_id='B', entity_version_end=2)
 
-        output = self.run_one_off_job()
+        output = self._run_one_off_job()
 
         self.assertEqual(output, [])

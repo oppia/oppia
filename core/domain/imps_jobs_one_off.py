@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""One off jobs for Oppia improvements."""
+"""One off jobs related to Oppia improvement tasks."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -27,10 +27,6 @@ import python_utils
 
 exp_models, imps_models = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.improvements])
-
-_ENTITY_TYPE_MODELS = {
-    feconf.ENTITY_TYPE_EXPLORATION: exp_models.ExplorationModel
-}
 
 
 def _target_exists(entity, target_type, target_id):
@@ -71,7 +67,14 @@ class TaskEntryModelAuditOneOffJob(
                         continue
                     yield (group.upper(), (task_key, message))
 
-        entity_cls = _ENTITY_TYPE_MODELS[task.entity_type]
+        if task.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            entity_cls = exp_models.ExplorationModel
+        else:
+            entity_type_error = 'unsupported entity_type: %s' % task.entity_type
+            for y in _map_each(entity_type_error=[entity_type_error]):
+                yield y
+            return
+
         entity_key = '%s{id:%s}' % (task.entity_type, task.entity_id)
 
         if task.entity_version_end is not None:
@@ -109,6 +112,28 @@ class TaskEntryModelAuditOneOffJob(
                 yield y
             return
 
+        task_status_errors = []
+        if task.status == imps_models.STATUS_OPEN:
+            if task.closed_by:
+                task_status_errors.append(
+                    'task is open but closed_by user is %s' % task.closed_by)
+            if task.closed_on:
+                task_status_errors.append(
+                    'task is open but closed_on date is %s' % task.closed_on)
+        elif task.status == imps_models.STATUS_RESOLVED:
+            if not task.closed_by:
+                task_status_errors.append(
+                    'task is resolved but closed_by user is empty')
+            if not task.closed_on:
+                task_status_errors.append(
+                    'task is resolved but closed_on date is empty')
+        elif task.status == imps_models.STATUS_DEPRECATED:
+            if not task.closed_on:
+                task_status_errors.append(
+                    'task is deprecated but closed_on date is empty')
+        for y in _map_each(task_status_error=task_status_errors):
+            yield y
+
         entity_type_targets = imps_models.ENTITY_TYPE_TARGETS[task.entity_type]
         if task.target_type and task.target_id:
             if task.target_type in entity_type_targets:
@@ -116,8 +141,8 @@ class TaskEntryModelAuditOneOffJob(
                 target_type_error = None
             else:
                 should_check_target = False
-                target_type_error = '%s is invalid target for %s entities' % (
-                    task.target_type, task.entity_type)
+                target_type_error = 'invalid %s target_type: %s' % (
+                    task.entity_type, task.target_type)
         elif not task.target_type and not task.target_id:
             should_check_target = False
             target_type_error = None

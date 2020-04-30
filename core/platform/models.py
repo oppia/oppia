@@ -28,7 +28,7 @@ import utils
 # Valid model names.
 NAMES = utils.create_enum(
     'activity', 'audit', 'base_model', 'classifier', 'collection', 'config',
-    'email', 'exploration', 'improvements', 'feedback', 'job', 'opportunity',
+    'email', 'exploration', 'feedback', 'improvements', 'job', 'opportunity',
     'question', 'recommendations', 'skill', 'statistics', 'story', 'suggestion',
     'topic', 'user')
 

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Models for Oppia improvement tasks."""
+"""Models related to Oppia improvements task."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -27,26 +27,29 @@ import python_utils
 
 from google.appengine.ext import ndb
 
-base_models, exp_models = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.exploration])
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
+TEST_ONLY_ENTITY_TYPE = 'TEST_ONLY_ENTITY_TYPE' # Used by unit tests.
+ENTITY_TYPE_EXPLORATION = feconf.ENTITY_TYPE_EXPLORATION
 ENTITY_TYPES = (
-    feconf.ENTITY_TYPE_EXPLORATION,
+    TEST_ONLY_ENTITY_TYPE,
+    ENTITY_TYPE_EXPLORATION,
 )
 
 STATUS_OPEN = 'open'
 STATUS_DEPRECATED = 'deprecated'
-STATUS_FIXED = 'fixed'
+STATUS_RESOLVED = 'resolved'
 STATUS_CHOICES = (
     STATUS_OPEN,
     STATUS_DEPRECATED,
-    STATUS_FIXED,
+    STATUS_RESOLVED,
 )
 
+TEST_ONLY_TARGET_TYPE = 'TEST_ONLY_TARGET_TYPE' # Used by unit tests.
 TARGET_TYPE_STATE = 'state'
 TARGET_TYPES = (
+    TEST_ONLY_TARGET_TYPE,
     TARGET_TYPE_STATE,
-    'TEST_ONLY_TARGET_TYPE', # Needed for unit tests.
 )
 
 TASK_TYPES = (
@@ -56,11 +59,13 @@ TASK_TYPES = (
 )
 
 ENTITY_TYPE_TARGETS = {
-    feconf.ENTITY_TYPE_EXPLORATION: {TARGET_TYPE_STATE}
+    ENTITY_TYPE_EXPLORATION: {
+        TARGET_TYPE_STATE,
+    }
 }
 
 # Constant used to generate new IDs.
-_GENERATE_NEW_ID_MAX_ATTEMPTS = 10
+_GENERATE_NEW_TASK_ID_MAX_ATTEMPTS = 10
 
 
 class TaskEntryModel(base_models.BaseModel):
@@ -93,10 +98,10 @@ class TaskEntryModel(base_models.BaseModel):
     # Refers to the last entity version (exclusive) a task entry is relevant to.
     entity_version_end = ndb.IntegerProperty(
         default=None, required=False, indexed=True)
-    # The date and time at which a task was closed or deprecated.
-    closed_on = ndb.DateTimeProperty(default=None, required=False, indexed=True)
     # ID of the user who closed the task, if any.
     closed_by = ndb.StringProperty(default=None, required=False, indexed=True)
+    # The date and time at which a task was closed or deprecated.
+    closed_on = ndb.DateTimeProperty(default=None, required=False, indexed=True)
     # Auto-generated string which provides a one-line summary of the task.
     task_summary = ndb.StringProperty(
         default=None, required=False, indexed=False)
@@ -120,28 +125,6 @@ class TaskEntryModel(base_models.BaseModel):
         """TaskEntryModel contains the user ID that acted on a task."""
         return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
-    @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        """Check whether any TaskEntryModel references the given user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return cls.query(cls.closed_by == user_id).iter().has_next()
-
-    @staticmethod
-    def get_user_id_migration_policy():
-        """TaskEntryModel has the closed_by field which refers to a user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.closed_by
-
     @staticmethod
     def export_data(user_id):
         """Returns the user-relevant properties of TaskEntryModels.
@@ -158,6 +141,28 @@ class TaskEntryModel(base_models.BaseModel):
             TaskEntryModel.query(TaskEntryModel.closed_by == user_id))
         return {'task_ids_closed_by_user': [t.id for t in tasks_closed_by_user]}
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """TaskEntryModel has the closed_by field which refers to a user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
+
+    @classmethod
+    def get_user_id_migration_field(cls):
+        """Return field that contains user ID."""
+        return cls.closed_by
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether any TaskEntryModel references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(cls.closed_by == user_id).iter().has_next()
+
     @classmethod
     def generate_new_task_id(cls, entity_type, entity_id, task_type):
         """Generates a new task entry ID.
@@ -170,7 +175,7 @@ class TaskEntryModel(base_models.BaseModel):
         Returns:
             str. An ID available for use for a new task entry.
         """
-        for _ in python_utils.RANGE(_GENERATE_NEW_ID_MAX_ATTEMPTS):
+        for _ in python_utils.RANGE(_GENERATE_NEW_TASK_ID_MAX_ATTEMPTS):
             task_id = '%s.%s.%s.%s' % (
                 entity_type, entity_id, task_type, uuid.uuid4())
             if not cls.get_by_id(task_id):
