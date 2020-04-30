@@ -497,11 +497,17 @@ def main(args=None):
 
     all_messages = []
 
+    lock = threading.Lock()
+
     for task in tasks_custom:
+        lock.acquire()
         all_messages += task.output
+        lock.release()
 
     for task in tasks_third_party:
+        lock.acquire()
         all_messages += task.output
+        lock.release()
 
     all_messages += codeowner_linter.check_codeowner_file(
         verbose_mode_enabled)
