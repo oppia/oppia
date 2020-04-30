@@ -202,7 +202,7 @@ class BaseJobManager(python_utils.OBJECT):
         Args:
             job_id: str. The ID of the job to complete.
             output_list: list(object). The output produced by the job.
-            max_output_len_chars: Max length of output_list.
+            max_output_len_chars: int. Max length of output_list.
         """
         _default_max_len_chars = 900000
         _max_output_len_chars = (
@@ -233,7 +233,7 @@ class BaseJobManager(python_utils.OBJECT):
 
         Args:
             output_list: list(*). Collection of objects to be stringified.
-            max_output_len_chars: Maximum length of output_list.
+            max_output_len_chars: int. Maximum length of output_list.
 
         Returns:
             list(str). The compressed stringified output values.
