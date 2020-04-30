@@ -50,6 +50,7 @@ FULLY_COVERED_FILENAMES = [
     'app.constants.ts',
     'apply-validation.directive.ts',
     'assets-backend-api.service.ts',
+    'audio-bar-status.service.ts',
     'audio-translation-language.service.ts',
     'AudioFileObjectFactory.ts',
     'AudioLanguageObjectFactory.ts',
