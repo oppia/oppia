@@ -94,7 +94,9 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class TopicDescriptionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class TopicSummaryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """An one-time job that adds the missing description field in the topics."""
+
     _DESCRIPTION_ADDED = 'description_added'
     _DESCRIPTION_PRESENT = 'description_present'
 
@@ -111,7 +113,7 @@ class TopicDescriptionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 topic_summary_model).to_dict())
 
         if 'description' in topic_summary and topic_summary['description']:
-            yield (TopicDescriptionMigrationOneOffJob._DESCRIPTION_PRESENT, 1)
+            yield (TopicSummaryMigrationOneOffJob._DESCRIPTION_PRESENT, 1)
         else:
             commit_cmds = [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
@@ -124,7 +126,7 @@ class TopicDescriptionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 commit_message
             )
-            yield (TopicDescriptionMigrationOneOffJob._DESCRIPTION_ADDED, 1)
+            yield (TopicSummaryMigrationOneOffJob._DESCRIPTION_ADDED, 1)
 
     @staticmethod
     def reduce(key, values):

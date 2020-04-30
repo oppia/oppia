@@ -827,8 +827,8 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         }
 
         self.topic_summary = topic_domain.TopicSummary(
-            'topic_id', 'name', 'name', 'en', 'topic description', 1, 1, 1, 1, 1, 1,
-            current_time, current_time)
+            'topic_id', 'name', 'name', 'en', 'topic description', 1, 1, 1, 1,
+            1, 1, current_time, current_time)
 
     def test_topic_summary_gets_created(self):
         self.assertEqual(

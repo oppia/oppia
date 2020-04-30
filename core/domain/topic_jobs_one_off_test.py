@@ -110,7 +110,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             topic_fetchers.get_topic_by_id(self.TOPIC_ID)
 
-        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id)
         expected = [[u'topic_deleted',
                      [u'Encountered 1 deleted topics.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
@@ -141,7 +141,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
             updated_topic.subtopic_schema_version,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
 
-        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id)
         expected = [[u'topic_migrated',
                      [u'1 topics successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
@@ -177,26 +177,21 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
 
-class TopicDescriptionMigrationOneOffJob(test_utils.GenericTestBase):
+class TopicSummaryMigrationOneOffJob(test_utils.GenericTestBase):
+    """Tests for TopicSummaryMigrationOneOffJob."""
     MICHEAL_EMAIL = 'micheal@example.com'
     MICHEAL_NAME = 'micheal'
 
     TOPIC_ID = 'topic_id'
 
     def setUp(self):
-        super(TopicDescriptionMigrationOneOffJob, self).setUp()
+        super(TopicSummaryMigrationOneOffJob, self).setUp()
         # Setup user who will own the test topics.
         self.signup(self.MICHEAL_EMAIL, self.MICHEAL_NAME)
         self.albert_id = self.get_user_id_from_email(self.MICHEAL_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_addition_of_description_migration(self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg)
-
         name = 'topic_1'
         abbreviated_name = 'topic_1'
         new_topic_id = topic_services.get_new_topic_id()
@@ -205,23 +200,18 @@ class TopicDescriptionMigrationOneOffJob(test_utils.GenericTestBase):
         self.albert_id = self.get_user_id_from_email(self.MICHEAL_EMAIL)
         topic_services.save_new_topic(self.albert_id, topic)
 
-        job_id = topic_jobs_one_off.TopicDescriptionMigrationOneOffJob.create_new()
-        topic_jobs_one_off.TopicDescriptionMigrationOneOffJob.enqueue(job_id)
+        job_id = (
+            topic_jobs_one_off.TopicSummaryMigrationOneOffJob.create_new())
+        topic_jobs_one_off.TopicSummaryMigrationOneOffJob.enqueue(job_id)
 
         self.process_and_flush_pending_tasks()
 
-        output = topic_jobs_one_off.TopicDescriptionMigrationOneOffJob.get_output(job_id)
-        _DESCRIPTION_ADDED = 'description_added'
-        expected = [[_DESCRIPTION_ADDED, ['1']]]
+        output = (topic_jobs_one_off.TopicSummaryMigrationOneOffJob.get_output(job_id))  # pylint: disable=line-too-long
+
+        expected = [['description_added', ['1']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_description_already_present_migration(self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg)
-
         name = 'topic_1'
         abbreviated_name = 'topic_1'
         new_topic_id = topic_services.get_new_topic_id()
@@ -241,13 +231,13 @@ class TopicDescriptionMigrationOneOffJob(test_utils.GenericTestBase):
             commit_message
         )
 
-        job_id = topic_jobs_one_off.TopicDescriptionMigrationOneOffJob.create_new()
-        topic_jobs_one_off.TopicDescriptionMigrationOneOffJob.enqueue(job_id)
+        job_id = (
+            topic_jobs_one_off.TopicSummaryMigrationOneOffJob.create_new())
+        topic_jobs_one_off.TopicSummaryMigrationOneOffJob.enqueue(job_id)
 
         self.process_and_flush_pending_tasks()
 
-        output = topic_jobs_one_off.TopicDescriptionMigrationOneOffJob.get_output(job_id)
-        _DESCRIPTION_PRESENT = 'description_present'
-        expected = [[_DESCRIPTION_PRESENT, ['1']]]
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+        output = topic_jobs_one_off.TopicSummaryMigrationOneOffJob.get_output(job_id)  # pylint: disable=line-too-long
 
+        expected = [['description_present', ['1']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
