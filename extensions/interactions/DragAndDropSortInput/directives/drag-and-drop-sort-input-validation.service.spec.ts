@@ -76,7 +76,7 @@ describe('DragAndDropSortInputValidationService', () => {
         value: ['Item 1', 'Item 2', 'Item 3']
       },
       allowMultipleItemsInSamePosition: {
-        value: false
+        value: true
       }
     };
 
@@ -128,6 +128,17 @@ describe('DragAndDropSortInputValidationService', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
+  });
+
+  it('should not allow multiple items in same position', () => {
+    customizationArgs.allowMultipleItemsInSamePosition = false;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Multiple items in a single position are not allowed.'
+    }]);
+    customizationArgs.allowMultipleItemsInSamePosition = true;
   });
 
   it('should expect all items to be nonempty', () => {
