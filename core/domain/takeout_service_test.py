@@ -42,7 +42,7 @@ import utils
     models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
     models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
     models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
-    models.NAMES.user
+    models.NAMES.user,
 ])
 
 
