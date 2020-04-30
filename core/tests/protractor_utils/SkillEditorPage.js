@@ -93,8 +93,6 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-question-list-item'));
   var questionItem = element(by.css('.protractor-test-question-list-item'));
 
-  var addRubricExplanationButton = element.all(
-    by.css('.protractor-test-add-explanation-button'));
   var saveRubricExplanationButton = element(
     by.css('.protractor-test-save-rubric-explanation-button'));
   var deleteRubricExplanationButton = element(
@@ -105,25 +103,31 @@ var SkillEditorPage = function() {
     return waitFor.pageToFullyLoad();
   };
 
-  this.addRubricExplanationToDifficultyWithIndex = function(index, explanation) {
-    addRubricExplanationButton.then(function(buttons) {
-      buttons[index].click();
-      var editor = element(
-        by.css('.protractor-test-rubric-explanation-text'));
-      waitFor.visibilityOf(
-        editor, 'Rubric explanation editor takes too long to appear');
-      browser.switchTo().activeElement().sendKeys(explanation);
-      waitFor.elementToBeClickable(
-        saveRubricExplanationButton,
-        'Save Rubric Explanation button takes too long to be clickable');
-      saveRubricExplanationButton.click();
-    });
+  this.addRubricExplanationForDifficulty = function(difficulty, explanation) {
+    var addRubricExplanationButton = element(
+      by.css('.protractor-test-add-explanation-button-' + difficulty));
+    waitFor.elementToBeClickable(
+      addRubricExplanationButton,
+      'Add Rubric Explanation button takes too long to be clickable');
+    addRubricExplanationButton.click();
+    var editor = element(
+      by.css('.protractor-test-rubric-explanation-text'));
+    waitFor.visibilityOf(
+      editor, 'Rubric explanation editor takes too long to appear');
+    browser.switchTo().activeElement().sendKeys(explanation);
+    waitFor.elementToBeClickable(
+      saveRubricExplanationButton,
+      'Save Rubric Explanation button takes too long to be clickable');
+    saveRubricExplanationButton.click();
   };
 
-  this.deleteRubricExplanationWithIndex = function(diffIndex, explIndex) {
+  this.deleteRubricExplanationWithIndex = function(difficulty, explIndex) {
     var editRubricExplanationButtons = element.all(
-      by.css('.protractor-test-edit-rubric-explanation-' + diffIndex));
+      by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
     editRubricExplanationButtons.then(function(buttons) {
+      waitFor.elementToBeClickable(
+        buttons[explIndex],
+        'Edit Rubric Explanation button takes too long to be clickable');
       buttons[explIndex].click();
       var editor = element(
         by.css('.protractor-test-rubric-explanation-text'));
@@ -134,10 +138,13 @@ var SkillEditorPage = function() {
   };
 
   this.editRubricExplanationWithIndex = function(
-    diffIndex, explIndex, explanation) {
+      difficulty, explIndex, explanation) {
     var editRubricExplanationButtons = element.all(
-      by.css('.protractor-test-edit-rubric-explanation-' + diffIndex));
+      by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
     editRubricExplanationButtons.then(function(buttons) {
+      waitFor.elementToBeClickable(
+        buttons[explIndex],
+        'Edit Rubric Explanation button takes too long to be clickable');
       buttons[explIndex].click();
       var editor = element(
         by.css('.protractor-test-rubric-explanation-text'));
@@ -151,9 +158,9 @@ var SkillEditorPage = function() {
     });
   };
 
-  this.expectRubricExplanationsToMatch = function(index, explanations) {
+  this.expectRubricExplanationsToMatch = function(difficulty, explanations) {
     var rubricExplanationsForDifficulty = element.all(
-      by.css('.protractor-test-rubric-explanation-' + index));
+      by.css('.protractor-test-rubric-explanation-' + difficulty));
     var explanationCounter = 0;
     rubricExplanationsForDifficulty.then(function(explanationElements) {
       for (var idx in explanationElements) {

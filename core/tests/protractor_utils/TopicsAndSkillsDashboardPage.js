@@ -227,10 +227,12 @@ var TopicsAndSkillsDashboardPage = function() {
       waitFor.invisibilityOf(
         editor, 'Explanation Editor takes too long to close');
 
-      for (var i = 0; i < 3; i++) {
-        skillEditorPage.addRubricExplanationToDifficultyWithIndex(
-          i, 'Explanation ' + i);
-      }
+      skillEditorPage.addRubricExplanationForDifficulty(
+        'Easy', 'Explanation for easy difficulty.');
+      skillEditorPage.addRubricExplanationForDifficulty(
+        'Medium', 'Explanation for medium difficulty.');
+      skillEditorPage.addRubricExplanationForDifficulty(
+        'Hard', 'Explanation for hard difficulty.');
 
       waitFor.elementToBeClickable(
         confirmSkillCreationButton,
