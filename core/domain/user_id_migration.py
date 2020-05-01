@@ -88,10 +88,7 @@ class CreateNewUsersMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, old_new_user_id_tuples):
         """Implements the reduce function for this job."""
-        if key == 'ALREADY MIGRATED':
-            yield (key, len(old_new_user_id_tuples))
-        else:
-            yield (key, old_new_user_id_tuples)
+        yield (key, len(old_new_user_id_tuples))
 
 
 class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
@@ -245,7 +242,7 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, old_new_user_id_tuples):
         """Implements the reduce function for this job."""
-        yield (key, old_new_user_id_tuples)
+        yield (key, len(old_new_user_id_tuples))
 
 
 class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
@@ -455,9 +452,12 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
             yield ('SUCCESS', (gae_id, user_model.id))
 
     @staticmethod
-    def reduce(key, status):
+    def reduce(key, old_new_user_id_tuples):
         """Implements the reduce function for this job."""
-        yield (key, status)
+        if key.startswith('SUCCESS'):
+            yield (key, len(old_new_user_id_tuples))
+        else:
+            yield (key, old_new_user_id_tuples)
 
 
 class BaseModelsUserIdsHaveUserSettingsVerificationJob(
@@ -759,11 +759,10 @@ class AddAllUserIdsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
         else:
             yield ('SUCCESS-SUBSET-%s' % class_name, rights_model.id)
 
-
     @staticmethod
     def reduce(key, ids):
         """Implements the reduce function for this job."""
-        if key.startswith('SUCCESS-SUBSET'):
+        if key.startswith('SUCCESS'):
             yield (key, len(ids))
         else:
             yield (key, ids)
