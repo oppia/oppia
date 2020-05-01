@@ -1740,3 +1740,31 @@ class CommunityReviewerRightsDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(response['error'], 'Missing username param')
         self.logout()
+
+
+class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
+    """Tests for interaction by exploration handler."""
+
+    EXP_ID = 'exp'
+
+    def setUp(self):
+        """Complete the signup process for self.ADMIN_EMAIL."""
+        super(IntereactionByExplorationIdHandlerTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.editor_id, end_state_name='End')
+
+    def test_interaction_by_exploration_id_handler(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        # Test that it returns all interaction ids.
+        payload = {
+            'exploration_id': self.EXP_ID
+        }
+
+        response = self.get_json(
+            '/interactionsByExplorationId', params=payload)
+        interactions_list = response['interactions']
+        self.assertEqual(len(interactions_list), 1)
