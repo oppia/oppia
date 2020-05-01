@@ -42,7 +42,7 @@ angular.module('oppia').directive('adminMiscTab', [
           '/explorationdataextractionhandler');
         var SEND_DUMMY_MAIL_HANDLER_URL = (
           '/sendDummyMailToAdminHandler');
-        var INTERACTIONS_BY_ID_HANDLER_URL = ('/interactionsByExplorationId');
+        var INTERACTIONS_BY_ID_HANDLER_URL = '/interactionsByExplorationId';
 
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
@@ -157,11 +157,14 @@ angular.module('oppia').directive('adminMiscTab', [
         };
 
         ctrl.retrieveExplorationInteractionIds = function() {
+          ctrl.setStatusMessage('Retrieving interactions in exploration ...');
           $http.get(INTERACTIONS_BY_ID_HANDLER_URL, {
             params: {
               exploration_id: ctrl.explorationId
             }
           }).then(function(response) {
+            ctrl.setStatusMessage(
+              'Successfully fetched interactions in exploration.');
             ctrl.explorationInteractionIds = response.data.interactions;
           }, function(errorResponse) {
             ctrl.setStatusMessage(

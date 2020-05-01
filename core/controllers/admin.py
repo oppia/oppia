@@ -856,13 +856,14 @@ class InteractionsByExplorationId(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         exploration_id = self.request.get('exploration_id')
+        if isinstance(exploration_id, str):
+            raise self.InvalidInputException('Exploration id must be a string.')
         exploration = exp_fetchers.get_exploration_by_id(
-            exploration_id, strict=False
-        )
+            exploration_id, strict=False)
         if exploration is None:
-            raise Exception('Exloartion does not exist.')
-        else:
-            interaction_ids = {
-                state.interaction.id for state in exploration.states.values()
-                }
-            self.render_json({'interactions': list(interaction_ids)})
+            raise self.InvalidInputException('Exploration does not exist.')
+        interaction_ids = {
+            state.interaction.id for state in
+            exploration.states.values() if state.interaction.id is not None
+            }
+        self.render_json({'interactions': list(interaction_ids)})
