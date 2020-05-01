@@ -245,7 +245,7 @@ angular.module('oppia').directive('questionPlayer', [
                   $scope.skillIds = skillIds;
                   $scope.skills = skills;
                   $scope.index = 0;
-                  $scope.currentSkill = $scope.skills[$scope.index];
+                  $scope.modalHeader = $scope.skills[$scope.index];
                   $scope.isInTestMode = true;
 
                   $scope.isLastConceptCard = function() {
@@ -258,7 +258,7 @@ angular.module('oppia').directive('questionPlayer', [
 
                   $scope.goToNextConceptCard = function() {
                     $scope.index++;
-                    $scope.currentSkill = $scope.skills[$scope.index];
+                    $scope.modalHeader = $scope.skills[$scope.index];
                   };
 
                   $scope.retryTest = function() {

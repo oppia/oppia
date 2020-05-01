@@ -21,7 +21,7 @@ require(
   'loading-dots.directive.ts');
 require('domain/editor/undo_redo/base-undo-redo.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/summary/exploration-summary-backend-api.service.ts');
+require('domain/story/editable-story-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/alerts.service.ts');
@@ -37,17 +37,19 @@ angular.module('oppia').directive('storyEditorNavbar', [
         '/pages/story-editor-page/navbar/story-editor-navbar.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', 'AlertsService',
-        'ExplorationSummaryBackendApiService', 'UndoRedoService',
+        'EditableStoryBackendApiService', 'UndoRedoService',
         'StoryEditorStateService', 'UrlService',
         'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
-            ExplorationSummaryBackendApiService, UndoRedoService,
+            EditableStoryBackendApiService, UndoRedoService,
             StoryEditorStateService, UrlService,
             EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           var ctrl = this;
+          $scope.explorationValidationIssues = [];
+
           $scope.getChangeListLength = function() {
             return UndoRedoService.getChangeCount();
           };
@@ -56,7 +58,18 @@ angular.module('oppia').directive('storyEditorNavbar', [
             return $scope.validationIssues.length;
           };
 
+          $scope.getTotalWarningsCount = function() {
+            return (
+              $scope.validationIssues.length +
+              $scope.explorationValidationIssues.length);
+          };
+
           $scope.isStorySaveable = function() {
+            if (StoryEditorStateService.isStoryPublished()) {
+              return (
+                $scope.getChangeListLength() > 0 &&
+                $scope.getTotalWarningsCount() === 0);
+            }
             return (
               $scope.getChangeListLength() > 0 &&
               $scope.getWarningsCount() === 0);
@@ -64,53 +77,39 @@ angular.module('oppia').directive('storyEditorNavbar', [
 
           $scope.discardChanges = function() {
             UndoRedoService.clearChanges();
+            $scope.validationIssues = [];
+            $scope.explorationValidationIssues = [];
             StoryEditorStateService.loadStory($scope.story.getId());
           };
 
           var _validateStory = function() {
             $scope.validationIssues = $scope.story.validate();
-            _validateExplorations();
-          };
-
-          var _validateExplorations = function() {
             var nodes = $scope.story.getStoryContents().getNodes();
             var explorationIds = [];
-            for (var i = 0; i < nodes.length; i++) {
-              if (
-                nodes[i].getExplorationId() !== null &&
-                nodes[i].getExplorationId() !== '') {
-                explorationIds.push(nodes[i].getExplorationId());
-              } else {
-                $scope.validationIssues.push(
-                  'Some chapters don\'t have exploration IDs provided.');
-              }
-            }
 
-            ExplorationSummaryBackendApiService.loadPublicExplorationSummaries(
-              explorationIds).then(function(summaries) {
-              if (summaries.length !== explorationIds.length) {
-                $scope.validationIssues.push(
-                  'Some explorations in story are not published.');
-              } else if (summaries.length > 0) {
-                var commonExpCategory = summaries[0].category;
-                for (var idx in summaries) {
-                  if (summaries[idx].category !== commonExpCategory) {
-                    $scope.validationIssues.push(
-                      'The explorations with IDs ' + summaries[0].id + ' and ' +
-                      summaries[idx].id + ' have different categories.'
-                    );
-                    break;
-                  }
-                  if (summaries[idx].language_code !== 'en') {
-                    $scope.validationIssues.push(
-                      'The explorations with ID ' + summaries[idx].id +
-                      ' is not in English.'
-                    );
-                    break;
-                  }
+            if (
+              StoryEditorStateService.areAnyExpIdsChanged() ||
+              $scope.forceValidateExplorations) {
+              $scope.explorationValidationIssues = [];
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].getExplorationId() !== null) {
+                  explorationIds.push(nodes[i].getExplorationId());
+                } else {
+                  $scope.explorationValidationIssues.push(
+                    'Some chapters don\'t have exploration IDs provided.');
                 }
               }
-            });
+              $scope.forceValidateExplorations = false;
+              if (explorationIds.length > 0) {
+                EditableStoryBackendApiService.validateExplorations(
+                  $scope.story.getId(), explorationIds
+                ).then(function(validationIssues) {
+                  $scope.explorationValidationIssues =
+                    $scope.explorationValidationIssues.concat(validationIssues);
+                });
+              }
+            }
+            StoryEditorStateService.resetExpIdsChanged();
           };
 
           $scope.saveChanges = function() {
@@ -154,10 +153,13 @@ angular.module('oppia').directive('storyEditorNavbar', [
               false, function() {
                 $scope.storyIsPublished =
                   StoryEditorStateService.isStoryPublished();
+                $scope.forceValidateExplorations = true;
+                _validateStory();
               });
           };
 
           ctrl.$onInit = function() {
+            $scope.forceValidateExplorations = true;
             $scope.story = StoryEditorStateService.getStory();
             $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;

@@ -226,7 +226,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID
         )
         self.story.add_node(self.NODE_ID_1, 'Node title')
-        self.story.add_node(self.NODE_ID_2, 'Node title')
+        self.story.add_node(self.NODE_ID_2, 'Node title 2')
         self.story.update_node_destination_node_ids(
             self.NODE_ID_1, [self.NODE_ID_2])
         self.signup('user@example.com', 'user')
@@ -264,7 +264,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         expected_dict = {
             'id': self.STORY_ID,
             'title': 'Title',
-            'description': 'Description'
+            'description': 'Description',
+            'node_count': 0
         }
 
         self.assertEqual(expected_dict, story_summary.to_human_readable_dict())
@@ -356,6 +357,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Title should be a string')
 
+        self.story.title = (
+            'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
+        self._assert_validation_error(
+            'Story title should be less than 39 chars')
+
     def test_description_validation(self):
         self.story.description = 1
         self._assert_validation_error(
@@ -420,6 +426,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].title = 1
         self._assert_validation_error(
             'Expected title to be a string, received 1')
+
+        self.story.story_contents.nodes[0].title = (
+            'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
+        self._assert_validation_error(
+            'Chapter title should be less than 36 chars')
 
     def test_nodes_validation(self):
         self.story.story_contents.initial_node_id = 'node_10'
@@ -787,8 +798,47 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         ]
         self._assert_validation_error('Expected all node ids to be distinct')
 
+        # Case 5: Graph with duplicate titles.
+        node_1 = {
+            'id': 'node_1',
+            'title': 'Title 1',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'title': 'Title 2',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': ['skill_3'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_3',
+            'title': 'Title 2',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_4'],
+            'prerequisite_skill_ids': ['skill_3'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+        self._assert_validation_error(
+            'Expected all chapter titles to be distinct.')
+
         self.story.story_contents.next_node_id = 'node_5'
-        # Case 5: A valid graph.
+        # Case 6: A valid graph.
         node_1 = {
             'id': 'node_1',
             'title': 'Title 1',
@@ -857,6 +907,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].exploration_id = 1
         self._assert_validation_error(
             'Expected exploration ID to be a string')
+
+    def test_validate_empty_exploration_id(self):
+        self.story.story_contents.nodes[0].exploration_id = ''
+        self._assert_validation_error(
+            'Expected exploration ID to not be an empty string')
 
     def test_validate_non_str_outline(self):
         self.story.story_contents.nodes[0].outline = 0

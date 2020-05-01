@@ -186,7 +186,7 @@ export = {
     "description": "فارسی (Persian)"
   }, {
     "code": "pl",
-    "description": "polski (Polish)"
+    "description": "polszczyzna (Polish)"
   }, {
     "code": "pt",
     "description": "português (Portuguese)"
@@ -195,10 +195,10 @@ export = {
     "description": "română (Romanian)"
   }, {
     "code": "ru",
-    "description": "русский (Russian)"
+    "description": "pусский (Russian)"
   }, {
     "code": "sr",
-    "description": "српски (Serbian)"
+    "description": "cрпски (Serbian)"
   }, {
     "code": "sk",
     "description": "slovenčina (Slovak)"
@@ -219,7 +219,7 @@ export = {
     "description": "Türkçe (Turkish)"
   }, {
     "code": "uk",
-    "description": "українська (Ukrainian)"
+    "description": "yкраїнська (Ukrainian)"
   }, {
     "code": "vi",
     "description": "Tiếng Việt (Vietnamese)"
@@ -453,7 +453,7 @@ export = {
     "id": "en-auto",
     "description": "English (auto)",
     "explorationLanguage": "en",
-    "speechSynthesisCode": "en-GB",
+    "speechSynthesisCode": "en-US",
     "speechSynthesisCodeMobile": "en_US"
   }],
 
@@ -522,6 +522,15 @@ export = {
     ]
   }],
 
+  "REVIEW_CATEGORY_TRANSLATION": "translation",
+  "REVIEW_CATEGORY_VOICEOVER": "voiceover",
+  "REVIEW_CATEGORY_QUESTION": "question",
+
+  "ACTION_REMOVE_ALL_REVIEW_RIGHTS": "all",
+  "ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS": "specific",
+  "USER_FILTER_CRITERION_USERNAME": "username",
+  "USER_FILTER_CRITERION_ROLE": "role",
+
   // Interaction IDs for which answer details cannot be solicited.
   "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],
 
@@ -556,6 +565,14 @@ export = {
 
   "SKILL_DIFFICULTIES": ["Easy", "Medium", "Hard"],
 
+  // The skill difficulty values here should correspond to the SKILL_DIFFICULTY
+  // constant values in feconf.py.
+  "SKILL_DIFFICULTY_LABEL_TO_FLOAT": {
+    "Easy": 0.3,
+    "Medium": 0.6,
+    "Hard": 0.9
+  },
+
   "ENABLE_PREREQUISITE_SKILLS": false,
 
   // For the full new structures viewer features, both
@@ -576,6 +593,15 @@ export = {
   "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
 
   "NUM_QUESTIONS_PER_PAGE": 10,
+
+  // The following character limit constraints follow from
+  // android_validation_constants.py. Both have to be kept in sync.
+  "MAX_CHARS_IN_TOPIC_NAME": 39,
+  "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
+  "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
+  "MAX_CHARS_IN_SKILL_DESCRIPTION": 64,
+  "MAX_CHARS_IN_STORY_TITLE": 39,
+  "MAX_CHARS_IN_CHAPTER_TITLE": 36,
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
@@ -649,6 +675,9 @@ export = {
 
   // Used to disable account removal until it is fully implemented.
   "ENABLE_ACCOUNT_DELETION": false,
+
+  // Used to disable account data export until it is fully implemented.
+  "ENABLE_ACCOUNT_EXPORT": false,
 
   // Used to hide the callout to classroom until it is ready.
   "SHOW_CLASSROOM_CALLOUT": false,

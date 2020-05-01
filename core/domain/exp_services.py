@@ -222,6 +222,24 @@ def get_recently_published_exp_summaries(limit):
         exp_models.ExpSummaryModel.get_recently_published(limit))
 
 
+def get_story_id_linked_to_exploration(exp_id):
+    """Returns the ID of the story that the exploration is a part of, or None if
+    the exploration is not part of a story.
+
+    Args:
+        exp_id: str. The ID of the exploration.
+
+    Returns:
+        str|None. The ID of the story if the exploration is linked to some
+            story, otherwise None.
+    """
+    exploration_context_model = exp_models.ExplorationContextModel.get_by_id(
+        exp_id)
+    if exploration_context_model is not None:
+        return exploration_context_model.story_id
+    return None
+
+
 def get_all_exploration_summaries():
     """Returns a dict with all exploration summary domain objects,
     keyed by their id.
@@ -255,8 +273,10 @@ def export_to_zip_file(exploration_id, version=None):
     memfile = python_utils.string_io()
     with zipfile.ZipFile(
         memfile, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
-
-        zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
+        if not exploration.title:
+            zfile.writestr('Unpublished_exploration.yaml', yaml_repr)
+        else:
+            zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
 
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
@@ -971,34 +991,25 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
         old_exp_summary = exp_fetchers.get_exploration_summary_from_model(
             exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
-        scaled_average_rating = get_scaled_average_rating(
-            old_exp_summary.ratings)
-        contributor_ids = old_exp_summary.contributor_ids or []
+        scaled_average_rating = get_scaled_average_rating(ratings)
         contributors_summary = old_exp_summary.contributors_summary or {}
     else:
         ratings = feconf.get_empty_ratings()
         scaled_average_rating = feconf.EMPTY_SCALED_AVERAGE_RATING
-        contributor_ids = []
         contributors_summary = {}
 
     # Update the contributor id list if necessary (contributors
     # defined as humans who have made a positive (i.e. not just
     # a revert) change to an exploration's content).
-    if (contributor_id_to_add is not None and
-            contributor_id_to_add not in constants.SYSTEM_USER_IDS):
-        if contributor_id_to_add not in contributor_ids:
-            contributor_ids.append(contributor_id_to_add)
 
-    if contributor_id_to_add not in constants.SYSTEM_USER_IDS:
-        if contributor_id_to_add is None:
-            # Revert commit or other non-positive commit.
-            contributors_summary = compute_exploration_contributors_summary(
-                exploration.id)
-        else:
-            if contributor_id_to_add in contributors_summary:
-                contributors_summary[contributor_id_to_add] += 1
-            else:
-                contributors_summary[contributor_id_to_add] = 1
+    if contributor_id_to_add is None:
+        # Recalculate the contributors because revert was done.
+        contributors_summary = compute_exploration_contributors_summary(
+            exploration.id)
+    elif contributor_id_to_add not in constants.SYSTEM_USER_IDS:
+        contributors_summary[contributor_id_to_add] = (
+            contributors_summary.get(contributor_id_to_add, 0) + 1)
+    contributor_ids = list(contributors_summary.keys())
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
         python_utils.divide(

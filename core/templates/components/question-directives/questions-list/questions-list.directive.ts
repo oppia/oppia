@@ -30,8 +30,8 @@ require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
-require('domain/skill/editable-skill-backend-api.service.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/SkillDifficultyObjectFactory.ts');
 require('domain/skill/SkillSummaryObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -69,7 +69,7 @@ angular.module('oppia').directive('questionsList', [
         '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
         '$location', 'AlertsService', 'QuestionCreationService', 'UrlService',
         'NUM_QUESTIONS_PER_PAGE', 'EditableQuestionBackendApiService',
-        'EditableSkillBackendApiService', 'MisconceptionObjectFactory',
+        'SkillBackendApiService', 'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'SkillDifficultyObjectFactory',
         'SkillSummaryObjectFactory', 'DEFAULT_SKILL_DIFFICULTY',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'MODE_SELECT_DIFFICULTY',
@@ -79,7 +79,7 @@ angular.module('oppia').directive('questionsList', [
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
             $location, AlertsService, QuestionCreationService, UrlService,
             NUM_QUESTIONS_PER_PAGE, EditableQuestionBackendApiService,
-            EditableSkillBackendApiService, MisconceptionObjectFactory,
+            SkillBackendApiService, MisconceptionObjectFactory,
             QuestionObjectFactory, SkillDifficultyObjectFactory,
             SkillSummaryObjectFactory, DEFAULT_SKILL_DIFFICULTY,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, MODE_SELECT_DIFFICULTY,
@@ -320,7 +320,7 @@ angular.module('oppia').directive('questionsList', [
 
           ctrl.populateMisconceptions = function(skillIds) {
             ctrl.misconceptionsBySkill = {};
-            EditableSkillBackendApiService.fetchMultiSkills(
+            SkillBackendApiService.fetchMultiSkills(
               skillIds).then(
               function(skillDicts) {
                 skillDicts.forEach(function(skillDict) {
@@ -357,9 +357,7 @@ angular.module('oppia').directive('questionsList', [
                         skillDict.id, skillDict.description));
                   });
                 }
-                ctrl.question =
-                  QuestionObjectFactory.createFromBackendDict(
-                    response.question_dict);
+                ctrl.question = angular.copy(response.questionObject);
                 ctrl.questionId = ctrl.question.getId();
                 ctrl.questionStateData = ctrl.question.getStateData();
                 ctrl.questionIsBeingUpdated = true;
@@ -498,6 +496,10 @@ angular.module('oppia').directive('questionsList', [
                     });
                 }
               }
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -675,6 +677,10 @@ angular.module('oppia').directive('questionsList', [
                       modalInstance.result.then(function(commitMessage) {
                         returnModalObject.commitMessage = commitMessage;
                         $uibModalInstance.close(returnModalObject);
+                      }, function() {
+                        // Note to developers:
+                        // This callback is triggered when the Cancel button is
+                        // clicked. No further action is needed.
                       });
                     } else {
                       $uibModalInstance.close(returnModalObject);
@@ -731,6 +737,10 @@ angular.module('oppia').directive('questionsList', [
                       });
                       modalInstance.result.then(function() {
                         $uibModalInstance.dismiss('cancel');
+                      }, function() {
+                        // Note to developers:
+                        // This callback is triggered when the Cancel button is
+                        // clicked. No further action is needed.
                       });
                     } else {
                       $uibModalInstance.dismiss('cancel');

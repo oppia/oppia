@@ -23,17 +23,16 @@ require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/debug-info-tracker.service.ts');
 require('services/exploration-features.service.ts');
 
 angular.module('oppia').factory('RouterService', [
   '$interval', '$location', '$rootScope', '$timeout', '$window',
-  'DebugInfoTrackerService', 'ExplorationFeaturesService',
+  'ExplorationFeaturesService',
   'ExplorationInitStateNameService', 'ExplorationStatesService',
   'StateEditorService',
   function(
       $interval, $location, $rootScope, $timeout, $window,
-      DebugInfoTrackerService, ExplorationFeaturesService,
+      ExplorationFeaturesService,
       ExplorationInitStateNameService, ExplorationStatesService,
       StateEditorService) {
     var TABS = {
@@ -166,11 +165,15 @@ angular.module('oppia').factory('RouterService', [
     };
 
     var _savePendingChanges = function() {
-      // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
-      // null" error. To get around this we must use $timeout().
-      $timeout(function() {
+      try {
         $rootScope.$broadcast('externalSave');
-      });
+      } catch (e) {
+        // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
+        // null" error. To get around this we must use $apply().
+        $rootScope.$apply(function() {
+          $rootScope.$broadcast('externalSave');
+        });
+      }
     };
 
     var _getCurrentStateFromLocationPath = function() {
@@ -213,7 +216,6 @@ angular.module('oppia').factory('RouterService', [
         return _getCurrentStateFromLocationPath();
       },
       navigateToMainTab: function(stateName) {
-        DebugInfoTrackerService.reset();
         _savePendingChanges();
         if (_getCurrentStateFromLocationPath() === stateName) {
           return;

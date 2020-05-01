@@ -35,9 +35,6 @@ angular.module('oppia').directive('aboutPage', [
         'UrlInterpolationService', 'WindowRef',
         function(UrlInterpolationService, WindowRef) {
           const ctrl = this;
-          const activeTabClass = 'oppia-about-tabs-active';
-          const hash = window.location.hash.slice(1);
-          const visibleContent = 'oppia-about-visible-content';
           const listOfNamesToThank = [
             'Alex Kauffmann', 'Allison Barros',
             'Amy Latten', 'Brett Barros',
@@ -53,42 +50,32 @@ angular.module('oppia').directive('aboutPage', [
             'Robyn Choo', 'Tricia Ngoon',
             'Vikrant Nanda', 'Vinamrata Singal',
             'Yarin Feigenbaum'];
+          // Define constant for each tab on the page.
+          ctrl.TAB_ID_ABOUT = 'about';
+          ctrl.TAB_ID_FOUNDATION = 'foundation';
+          ctrl.TAB_ID_CREDITS = 'credits';
 
-          const activateTab = function(tabName: string) {
-            $("a[id='" + tabName + "']").parent().addClass(
-              activeTabClass
-            ).siblings().removeClass(activeTabClass);
-            $('.' + tabName).addClass(visibleContent).siblings().removeClass(
-              visibleContent
-            );
-          };
+          const ALLOWED_TABS = [
+            ctrl.TAB_ID_ABOUT, ctrl.TAB_ID_FOUNDATION, ctrl.TAB_ID_CREDITS];
+
+          ctrl.activeTabName = ctrl.TAB_ID_ABOUT;
 
           ctrl.onTabClick = function(tabName: string) {
             // Update hash
             WindowRef.nativeWindow.location.hash = '#' + tabName;
-            activateTab(tabName);
+            ctrl.activeTabName = tabName;
           };
           ctrl.getStaticImageUrl = function(imagePath: string) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
           ctrl.$onInit = function() {
-            // Define constants
-            ctrl.TAB_ID_ABOUT = 'about';
-            ctrl.TAB_ID_FOUNDATION = 'foundation';
-            ctrl.TAB_ID_CREDITS = 'credits';
-
-            var hash = WindowRef.nativeWindow.location.hash.slice(1);
-            if (hash === ctrl.TAB_ID_FOUNDATION || hash === 'license') {
-              activateTab(ctrl.TAB_ID_FOUNDATION);
+            const hash = WindowRef.nativeWindow.location.hash.slice(1);
+            if (hash === 'license') {
+              ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;
+            } else if (ALLOWED_TABS.includes(hash)) {
+              ctrl.activeTabName = hash;
             }
 
-            if (hash === ctrl.TAB_ID_CREDITS) {
-              activateTab(ctrl.TAB_ID_CREDITS);
-            }
-
-            if (hash === ctrl.TAB_ID_ABOUT) {
-              activateTab(ctrl.TAB_ID_ABOUT);
-            }
             ctrl.listOfNames = listOfNamesToThank
               .slice(0, listOfNamesToThank.length - 1).join(', ') +
               ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
@@ -97,17 +84,11 @@ angular.module('oppia').directive('aboutPage', [
 
             WindowRef.nativeWindow.onhashchange = function() {
               const hashChange = window.location.hash.slice(1);
-              if (hashChange === ctrl.TAB_ID_FOUNDATION || (
-                hashChange === 'license')) {
-                activateTab(ctrl.TAB_ID_FOUNDATION);
-                // Ensure page goes to the license section
-                if (hashChange === 'license') {
-                  WindowRef.nativeWindow.location.reload(true);
-                }
-              } else if (hashChange === ctrl.TAB_ID_CREDITS) {
-                activateTab(ctrl.TAB_ID_CREDITS);
-              } else if (hashChange === ctrl.TAB_ID_ABOUT) {
-                activateTab(ctrl.TAB_ID_ABOUT);
+              if (hashChange === 'license') {
+                ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;
+                WindowRef.nativeWindow.location.reload(true);
+              } else if (ALLOWED_TABS.includes(hashChange)) {
+                ctrl.activeTabName = hashChange;
               }
             };
           };

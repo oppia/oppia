@@ -9,7 +9,12 @@
     </div>
     <input type="text" class="form-control protractor-test-new-skill-description-field"
            placeholder="eg: Adding Fractions" ng-model="newSkillDescription"
-           autofocus maxlength="100">
+           autofocus maxlength="<[MAX_CHARS_IN_SKILL_DESCRIPTION]>">
+    <span class="oppia-input-box-subtitle">
+      <i>
+        Skill description should be at most <[MAX_CHARS_IN_SKILL_DESCRIPTION]> characters.
+      </i>
+    </span>
     <div class="oppia-rule-details-header" style="margin-bottom: 0.5em; margin-top: 1em;">
       <strong>Review Material</strong>
     </div>
@@ -26,7 +31,7 @@
   </div>
 
   <div class="modal-footer">
-    <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-secondary" ng-click="cancel()" type="button">Cancel</button>
     <button class="btn btn-success protractor-test-confirm-skill-creation-button"
             type="submit"
             ng-disabled="bindableDict.displayedConceptCardExplanation.length === 0 || newSkillDescription.length === 0">

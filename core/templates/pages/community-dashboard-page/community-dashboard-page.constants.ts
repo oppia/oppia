@@ -20,37 +20,23 @@ export class CommunityDashboardConstants {
   public static COMMUNITY_DASHBOARD_TABS_DETAILS = {
     myContributionTab: {
       ariaLabel: 'Check your contributions.',
-      tabName: 'My contribution',
+      tabName: 'My Contributions',
       description: '',
       customizationOptions: []
     },
     submitQuestionTab: {
       ariaLabel: 'See opportunities for adding new questions.',
       tabName: 'Submit Question',
-      description: 'Provide question in a topic of your choice for ' +
-        'students to answer.',
+      description: 'Submit a question for students to answer while ' +
+        'practicing that skill.',
       customizationOptions: ['sort']
     },
     translateTextTab: {
       ariaLabel: 'See opportunities for translation.',
       tabName: 'Translate Text',
-      description: 'Translate the text in the lessons to break the ' +
-        'language barrier for non-English speaker.',
+      description: 'Translate the lesson text to help non-English speakers ' +
+        'follow the lessons.',
       customizationOptions: ['language', 'sort']
-    },
-    voiceoverTab: {
-      ariaLabel: 'See opportunities for voiceover.',
-      tabName: 'Voiceover',
-      description: 'Create voiceover in a language of your own choice ' +
-        'to give user a full experience.',
-      customizationOptions: ['language', 'sort']
-    },
-    artTab: {
-      ariaLabel: 'See opportunities for art.',
-      tabName: 'Submit art',
-      description: 'Design digital art that makes the lessons even ' +
-        'more engaging.',
-      customizationOptions: ['sort']
     }
   };
 

@@ -16,19 +16,21 @@
  * @fileoverview Directive for CK Editor.
  */
 
+require('third-party-imports/ckeditor.import.ts');
 require('services/context.service.ts');
 require('services/rte-helper.service.ts');
 
 angular.module('oppia').directive('ckEditor4Rte', [
-  'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
-  function(ContextService, RteHelperService, PAGE_CONTEXT) {
+  'ContextService', 'RteHelperService',
+  function(ContextService, RteHelperService) {
     return {
       restrict: 'E',
       scope: {
         uiConfig: '&'
       },
       template: '<div><div></div>' +
-                '<div contenteditable="true" class="oppia-rte">' +
+                '<div contenteditable="true" ' +
+                'class="oppia-rte-resizer oppia-rte">' +
                 '</div></div>',
       require: '?ngModel',
 
@@ -36,19 +38,33 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
         var names = [];
         var icons = [];
-        var contextIsLessonRelated = (
-          ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
-          ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
+        var canReferToSkills = ContextService.canEntityReferToSkills();
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           if (!((scope.uiConfig() &&
             scope.uiConfig().hide_complex_extensions &&
             componentDefn.isComplex) ||
-            (!contextIsLessonRelated && componentDefn.isLessonRelated))) {
+            (!canReferToSkills && componentDefn.isLessonRelated))) {
             names.push(componentDefn.id);
             icons.push(componentDefn.iconDataUrl);
           }
         });
+
+        var editable = document.querySelectorAll('.oppia-rte-resizer');
+        var resize = function() {
+          var modalWidth = $('.modal-header').width() - 15;
+          $('.oppia-rte-resizer').css({
+            width: (modalWidth.toString() + 'px')
+          });
+        };
+        for (var i in editable) {
+          (<HTMLElement>editable[i]).onchange = function() {
+            resize();
+          };
+          (<HTMLElement>editable[i]).onclick = function() {
+            resize();
+          };
+        }
 
         /**
          * Create rules to whitelist all the rich text components and

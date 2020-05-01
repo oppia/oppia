@@ -2236,6 +2236,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
+            self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
@@ -5834,6 +5835,109 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
 
+class ExplorationContextModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ExplorationContextModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        stories = [story_domain.Story.create_default_story(
+            '%s' % i,
+            title='title %d' % i,
+            corresponding_topic_id='0'
+        ) for i in python_utils.RANGE(2)]
+
+        for story in stories:
+            story_services.save_new_story(self.owner_id, story)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in python_utils.RANGE(3)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        self.model_instance_0 = (
+            exp_models.ExplorationContextModel(id='0', story_id='0'))
+        self.model_instance_0.put()
+        self.model_instance_1 = (
+            exp_models.ExplorationContextModel(id='1', story_id='0'))
+        self.model_instance_1.put()
+        self.model_instance_2 = (
+            exp_models.ExplorationContextModel(id='2', story_id='1'))
+        self.model_instance_2.put()
+
+        self.job_class = (
+            prod_validation_jobs_one_off.ExplorationContextModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated ExplorationContextModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of ExplorationContextModel\', '
+                '[u\'Entity id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance_0.id,
+                    self.model_instance_0.created_on,
+                    self.model_instance_0.last_updated
+                ),
+            u'[u\'fully-validated ExplorationContextModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'ExplorationContextModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_story_model_failure(self):
+        story_models.StoryModel.get_by_id('1').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for story_ids field '
+                'check of ExplorationContextModel\', '
+                '[u"Entity id 2: based on field story_ids '
+                'having value 1, expect model StoryModel with id 1 but it '
+                'doesn\'t exist"]]'),
+            u'[u\'fully-validated ExplorationContextModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_exp_model_failure(self):
+        exp_models.ExplorationModel.get_by_id('2').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for '
+                'exp_ids field check of ExplorationContextModel\', '
+                '[u"Entity id 2: based on field '
+                'exp_ids having value 2, expect model ExplorationModel '
+                'with id 2 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated ExplorationContextModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
 class QuestionSnapshotMetadataModelValidatorTests(
         test_utils.GenericTestBase):
 
@@ -6811,14 +6915,24 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
                 rubrics=rubrics)
             skill_services.save_new_skill(self.owner_id, skill)
 
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
@@ -7023,14 +7137,24 @@ class SkillSnapshotMetadataModelValidatorTests(
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
@@ -7211,14 +7335,24 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
@@ -7349,14 +7483,24 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
@@ -7575,14 +7719,24 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
 
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
             'feedback': '<p>default_feedback</p>',
@@ -7684,8 +7838,10 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'count check of SkillSummaryModel\', '
                 '[u"Entity id 0: Worked examples count: 10 does not '
                 'match the number of worked examples in skill_contents '
-                'in skill model: [{u\'content_id\': u\'2\', u\'html\': '
-                'u\'<p>Example 1</p>\'}]"]]'
+                'in skill model: [{u\'explanation\': {u\'content_id\': u\'3\', '
+                'u\'html\': u\'<p>Example Explanation 1</p>\'}, u\'question\': '
+                '{u\'content_id\': u\'2\', u\'html\': u\'<p>Example Question '
+                '1</p>\'}}]"]]'
             ), u'[u\'fully-validated SkillSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -7721,6 +7877,7 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
+            self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id='0', name='topic', abbreviated_name='abbrev')
@@ -9138,40 +9295,6 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 'ids check of TopicModel\', '
                 '[u\'Entity id 0: uncategorized skill id 0 is present '
                 'in subtopic for entity with id 1\']]'
-            ), u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_abbreviated_name_is_empty(self):
-        self.model_instance_0.abbreviated_name = None
-        self.model_instance_0.commit(self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for abbreviated name check '
-                'of TopicModel\', '
-                '[u\'Entity id 0 : Topic name Topic0: Expected nonempty '
-                'abbreviated name, but received None.\']]'
-            ), (
-                u'[u\'failed validation check for domain object check '
-                'of TopicModel\', [u\'Entity id 0: Entity fails domain '
-                'validation with the error Abbreviated name should be a '
-                'string.\']]'
-            ), u'[u\'fully-validated TopicModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_abbreviated_name_is_empty_string(self):
-        self.model_instance_0.abbreviated_name = ''
-        self.model_instance_0.commit(self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for abbreviated name check '
-                'of TopicModel\', '
-                '[u\'Entity id 0 : Topic name Topic0: Expected nonempty '
-                'abbreviated name, but received .\']]'
-            ), (
-                u'[u\'failed validation check for domain object check '
-                'of TopicModel\', [u\'Entity id 0: Entity fails domain '
-                'validation with the error Abbreviated name field should '
-                'not be empty.\']]'
             ), u'[u\'fully-validated TopicModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -13952,6 +14075,73 @@ class UserContributionScoringModelValidatorTests(test_utils.GenericTestBase):
             'Expected score to be non-negative, received -1.0\']]') % (
                 self.model_instance.id)]
         run_job_and_check_output(self, expected_output)
+
+
+class UserCommunityRightsModelValidatorTests(test_utils.GenericTestBase):
+
+    TRANSLATOR_EMAIL = 'translator@community.org'
+    TRANSLATOR_USERNAME = 'translator'
+
+    VOICE_ARTIST_EMAIL = 'voiceartist@community.org'
+    VOICE_ARTIST_USERNAME = 'voiceartist'
+
+    def setUp(self):
+        super(UserCommunityRightsModelValidatorTests, self).setUp()
+
+        self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
+        self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
+
+        user_services.allow_user_to_review_voiceover_in_language(
+            self.translator_id, 'hi')
+        user_services.allow_user_to_review_voiceover_in_language(
+            self.voice_artist_id, 'hi')
+
+        self.translator_model_instance = (
+            user_models.UserCommunityRightsModel.get_by_id(self.translator_id))
+        self.voice_artist_model_instance = (
+            user_models.UserCommunityRightsModel.get_by_id(
+                self.voice_artist_id))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.UserCommunityRightsModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated UserCommunityRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_get_external_id_relationship_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.translator_id).delete()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for user_settings_ids field '
+                'check of UserCommunityRightsModel\', [u"Entity id %s: based '
+                'on field user_settings_ids having value %s, expect model '
+                'UserSettingsModel with id %s but it doesn\'t exist"]]'
+            ) % (self.translator_id, self.translator_id, self.translator_id),
+            u'[u\'fully-validated UserCommunityRightsModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_object_validation_failure(self):
+        (
+            self.translator_model_instance
+            .can_review_voiceover_for_language_codes.append('invalid_lang_code')
+        )
+        self.translator_model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check of '
+                'UserCommunityRightsModel\', [u\'Entity id %s: Entity fails '
+                'domain validation with the error Invalid language_code: '
+                'invalid_lang_code\']]'
+            ) % self.translator_id,
+            u'[u\'fully-validated UserCommunityRightsModel\', 1]']
+
+        run_job_and_check_output(self, expected_output, sort=True)
 
 
 class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):

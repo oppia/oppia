@@ -17,33 +17,43 @@
  * concept card. In the backend, this is referred to as SkillContents.
  */
 
+export interface IConceptCardBackendDict {
+  explanation: ISubtitledHtmlBackendDict,
+  'worked_examples': Array<IWorkedExampleBackendDict>,
+  'recorded_voiceovers': IRecordedVoiceOverBackendDict
+}
+
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-
 import { AppConstants } from 'app.constants';
-import { RecordedVoiceovers, RecordedVoiceoversObjectFactory } from
+import { RecordedVoiceovers, RecordedVoiceoversObjectFactory,
+  IRecordedVoiceOverBackendDict } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SubtitledHtml, SubtitledHtmlObjectFactory } from
+import {
+  SubtitledHtml, SubtitledHtmlObjectFactory, ISubtitledHtmlBackendDict } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import {
+  WorkedExample, WorkedExampleObjectFactory, IWorkedExampleBackendDict } from
+  'domain/skill/WorkedExampleObjectFactory';
 
 export class ConceptCard {
   _explanation: SubtitledHtml;
-  _workedExamples: Array<SubtitledHtml>;
+  _workedExamples: Array<WorkedExample>;
   _recordedVoiceovers: RecordedVoiceovers;
 
   constructor(
-      explanation: SubtitledHtml, workedExamples: Array<SubtitledHtml>,
+      explanation: SubtitledHtml, workedExamples: Array<WorkedExample>,
       recordedVoiceovers: RecordedVoiceovers) {
     this._explanation = explanation;
     this._workedExamples = workedExamples;
     this._recordedVoiceovers = recordedVoiceovers;
   }
-  // TODO(#7165): Replace 'any' with the exact type.
-  toBackendDict(): any {
+
+  toBackendDict(): IConceptCardBackendDict {
     return {
       explanation: this._explanation.toBackendDict(),
       worked_examples: this._workedExamples.map(
-        (workedExample: SubtitledHtml) => {
+        (workedExample: WorkedExample) => {
           return workedExample.toBackendDict();
         }),
       recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
@@ -59,10 +69,11 @@ export class ConceptCard {
   }
 
   _extractAvailableContentIdsFromWorkedExamples(
-      workedExamples: Array<SubtitledHtml>): Set<string> {
+      workedExamples: Array<WorkedExample>): Set<string> {
     let contentIds: Set<string> = new Set();
-    workedExamples.forEach((workedExample: SubtitledHtml) => {
-      contentIds.add(workedExample.getContentId());
+    workedExamples.forEach((workedExample: WorkedExample) => {
+      contentIds.add(workedExample.getQuestion().getContentId());
+      contentIds.add(workedExample.getExplanation().getContentId());
     });
     return contentIds;
   }
@@ -75,11 +86,11 @@ export class ConceptCard {
     this._explanation = explanation;
   }
 
-  getWorkedExamples(): Array<SubtitledHtml> {
+  getWorkedExamples(): Array<WorkedExample> {
     return this._workedExamples.slice();
   }
 
-  setWorkedExamples(workedExamples: Array<SubtitledHtml>): void {
+  setWorkedExamples(workedExamples: Array<WorkedExample>): void {
     let oldContentIds = this._extractAvailableContentIdsFromWorkedExamples(
       this._workedExamples);
 
@@ -113,16 +124,16 @@ export class ConceptCardObjectFactory {
   constructor(
       private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
       private recordedVoiceoversObjectFactory:
-          RecordedVoiceoversObjectFactory) {}
+          RecordedVoiceoversObjectFactory,
+      private workedExampleObjectFactory: WorkedExampleObjectFactory) {}
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'workedExampleDicts' is a dict having underscore keys.
   _generateWorkedExamplesFromBackendDict(
-      workedExampleDicts: any): Array<SubtitledHtml> {
-    return workedExampleDicts.map((workedExampleDict: any) => {
-      return this.subtitledHtmlObjectFactory.createFromBackendDict(
-        workedExampleDict);
-    });
+      workedExampleDicts): Array<WorkedExample> {
+    return workedExampleDicts.map(
+      (workedExampleDict: IWorkedExampleBackendDict) => {
+        return this.workedExampleObjectFactory.createFromBackendDict(
+          workedExampleDict);
+      });
   }
 
   // Create an interstitial concept card that would be displayed in the
@@ -135,15 +146,15 @@ export class ConceptCardObjectFactory {
     };
     return new ConceptCard(
       this.subtitledHtmlObjectFactory.createDefault(
-        'Loading review material', AppConstants.COMPONENT_NAME_EXPLANATION), [],
+        'Loading review material',
+        AppConstants.COMPONENT_NAME_EXPLANATION), [],
       this.recordedVoiceoversObjectFactory.createFromBackendDict(
         recordedVoiceoversDict)
     );
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been typed
-  // as 'any' since 'conceptCardBackendDict' is a dict having underscore keys.
-  createFromBackendDict(conceptCardBackendDict: any): ConceptCard {
+  createFromBackendDict(
+      conceptCardBackendDict: IConceptCardBackendDict): ConceptCard {
     return new ConceptCard(
       this.subtitledHtmlObjectFactory.createFromBackendDict(
         conceptCardBackendDict.explanation),

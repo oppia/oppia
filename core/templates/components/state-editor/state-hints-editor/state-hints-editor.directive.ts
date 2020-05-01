@@ -37,6 +37,7 @@ require(
   'state-solution.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('services/alerts.service.ts');
+require('services/context.service.ts');
 require('services/editability.service.ts');
 require('services/generate-content-id.service.ts');
 
@@ -134,11 +135,14 @@ angular.module('oppia').directive('stateHintsEditor', [
                 'modal-templates/add-hint-modal.template.html'),
               backdrop: 'static',
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$scope', '$uibModalInstance', 'ContextService',
+                function($scope, $uibModalInstance, ContextService) {
                   $scope.HINT_FORM_SCHEMA = {
                     type: 'html',
-                    ui_config: {}
+                    ui_config: {
+                      hide_complex_extensions: (
+                        ContextService.getEntityType() === 'question')
+                    }
                   };
 
                   $scope.tmpHint = '';

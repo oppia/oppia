@@ -158,8 +158,15 @@ describe('Rte Helper Service', function() {
     }, {
       backendId: 'skillreview',
       customizationArgSpecs: [{
-        name: 'skill_summary',
-        description: 'Click on skill to view concept card.',
+        name: 'text',
+        description: 'The text to be displayed',
+        schema: {
+          type: 'unicode'
+        },
+        default_value: 'concept card'
+      }, {
+        name: 'skill_id',
+        description: 'The skill that this link refers to',
         schema: {
           type: 'custom',
           obj_type: 'SkillSelector'
@@ -264,7 +271,7 @@ describe('Rte Helper Service', function() {
     expect(RteHelperService.isInlineComponent('image')).toBe(false);
   });
 
-  it('should create customization arg dic from attributes', function() {
+  it('should create customization arg dict from attributes', function() {
     var logSpy = spyOn($log, 'error').and.callThrough();
     var attrs = [{
       name: 'class'

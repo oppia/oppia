@@ -8,6 +8,22 @@
 <div class="modal-body">
   <section class="oppia-suggestion-review-container">
     <div class="oppia-question-suggestion">
+      <div>
+        <div class="oppia-question-suggestion-rubric">
+          <span>
+            <strong>Skill Difficulty: </strong><[skillDifficultyLabel]>
+          </span>
+        </div>
+        <div>
+          <strong>Skill Difficulty Explanation:</strong>
+          <angular-html-bind html-data="skillRubricExplanation">
+          </angular-html-bind>
+          <span ng-if="!skillRubricExplanation"
+                class="oppia-placeholder">
+            This rubric has not yet been specified
+          </span>
+        </div>
+      </div>
       <question-editor question-id="questionId"
                        misconceptions-by-skill="misconceptionsBySkill"
                        question-state-data="questionStateData"
@@ -17,14 +33,12 @@
       </question-editor>
     </div>
   </section>
-  <div ng-show="reviewable" class="oppia-suggestion-review-message">
-    Review message (required if rejecting):
-    <input class="protractor-test-suggestion-review-message" type="text" ng-model="reviewMessage" style="width: 100%">
-  </div>
-  <div ng-show="reviewable" class="oppia-suggestion-review-message">
-    Brief Description of Changes (required if accepting):
-    <input class="protractor-test-suggestion-commit-message" type="text" ng-model="commitMessage" style="width: 100%">
-  </div>
+  <section ng-show="reviewable" class="oppia-reviewer-actions">
+    <div class="oppia-suggestion-review-message">
+      Review message (required if rejecting):
+      <input class="protractor-test-suggestion-review-message" type="text" ng-model="reviewMessage" style="width: 100%">
+    </div>
+  </section>
 </div>
 
 <div class="modal-footer">
@@ -32,8 +46,8 @@
   <span uib-tooltip="Enter review message before rejecting" tooltip-placement="bottom" tooltip-enable="reviewMessage.length == 0">
     <button class="btn btn-danger" ng-if="reviewable" ng-disabled="reviewMessage.length == 0" ng-click="reject()">Reject</button>
   </span>
-  <span uib-tooltip="Enter commit message before accepting" tooltip-placement="bottom" tooltip-enable="commitMessage.length == 0">
-    <button class="btn btn-success" ng-if="reviewable" ng-disabled="commitMessage.length == 0" ng-click="accept()">Accept</button>
+  <span tooltip-placement="bottom">
+    <button class="btn btn-success" ng-if="reviewable" ng-click="accept()">Accept</button>
   </span>
 </div>
 
@@ -41,9 +55,22 @@
   .author-header {
     margin-top: -12px;
   }
+  .oppia-question-suggestion-rubric {
+    display: flex;
+    flex-direction: column;
+  }
   .oppia-question-suggestion {
     height: 100%;
     overflow: scroll;
+  }
+  .oppia-reviewer-actions {
+    border-top: 1px solid #e5e5e5;
+    margin-left: -15px;
+    margin-right: -15px;
+    padding: 0 15px;
+  }
+  .oppia-difficulty-message {
+    margin-bottom: 0.5em;
   }
   .oppia-suggestion-review-message {
     margin-left: 10px;

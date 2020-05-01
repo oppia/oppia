@@ -131,7 +131,6 @@ md-input-group.md-default-theme label {
 }
 
 .oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled]:hover {
-  background-color: #115fd4;
   text-decoration: none;
 }
 
@@ -542,6 +541,12 @@ p:last-child {
   font-size: 1em !important;
 }
 
+.oppia-rte p {
+  line-height: 1.2;
+  margin-top: 0px;
+  margin-bottom: 18px;
+}
+
 .oppia-rte ol, .oppia-rte ul, .oppia-rte-editor ol, .oppia-rte-editor ul {
   line-height: 1.846;
   margin-bottom: 18px;
@@ -904,8 +909,10 @@ textarea {
   color: white;
   text-align: center;
 }
-.navbar-light .navbar-nav .nav-link:hover,
 .navbar-light .navbar-nav .nav-link:focus {
+  color: white;
+}
+.navbar-light .navbar-nav .nav-link:hover {
   background-color: white;
   color: #06b9ac;
 }
@@ -1185,6 +1192,11 @@ textarea {
   max-width: 900px;
   min-height: 300px;
   width: 100vw;
+}
+
+.oppia-input-box-subtitle {
+  color: #595959;
+  font-size: 0.79em;
 }
 
 .oppia-fractions-landing-page-generic-title {
@@ -1853,6 +1865,10 @@ pre.oppia-pre-wrapped-text {
   margin-bottom: 0;
 }
 
+.oppia-rte p:last-child {
+  margin: 0px;
+}
+
 .oppia-shadow-preview-card .oppia-rte-viewer > p:first-child {
   margin-top: 0;
 }
@@ -2011,7 +2027,6 @@ pre.oppia-pre-wrapped-text {
   border-radius: 2px;
   padding-top: 20px;
   text-align: left;
-  margin-left: 87px;
 }
 
 .oppia-learner-view-card-top-content {

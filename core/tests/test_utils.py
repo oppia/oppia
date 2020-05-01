@@ -387,7 +387,7 @@ class TestBase(unittest.TestCase):
     }
 
     VERSION_1_SUBTOPIC_DICT = {
-        'skill_ids': [],
+        'skill_ids': ['skill_1'],
         'id': 1,
         'title': 'A subtitle'
     }
@@ -1355,6 +1355,10 @@ tags: []
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Story and saves it.
 
+        NOTE: Callers are responsible for ensuring that the
+        'corresponding_topic_id' provided is valid, unless a test explicitly
+        requires it to be invalid.
+
         Args:
             story_id: str. ID for the story to be created.
             owner_id: str. The user_id of the creator of the story.
@@ -1477,7 +1481,7 @@ tags: []
 
     def save_new_topic_with_subtopic_schema_v1(
             self, topic_id, owner_id, name, abbreviated_name,
-            canonical_name, description,
+            canonical_name, description, thumbnail_filename,
             canonical_story_references, additional_story_references,
             uncategorized_skill_ids, next_subtopic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
@@ -1500,6 +1504,7 @@ tags: []
             abbreviated_name: str. The abbreviated name of the topic.
             canonical_name: str. The canonical name (lowercase) of the topic.
             description: str. The desscription of the topic.
+            thumbnail_filename: str. The thumbnail file name of the topic.
             canonical_story_references: list(StoryReference). A set of story
                 reference objects representing the canonical stories that are
                 part of this topic.
@@ -1521,6 +1526,7 @@ tags: []
             id=topic_id,
             name=name,
             abbreviated_name=abbreviated_name,
+            thumbnail_filename=thumbnail_filename,
             canonical_name=canonical_name,
             description=description,
             language_code=language_code,
