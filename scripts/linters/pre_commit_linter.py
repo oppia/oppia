@@ -497,17 +497,15 @@ def main(args=None):
 
     all_messages = []
 
-    lock = threading.Lock()
-
     for task in tasks_custom:
-        lock.acquire()
+        custom_semaphore.acquire()
         all_messages += task.output
-        lock.release()
+        custom_semaphore.release()
 
     for task in tasks_third_party:
-        lock.acquire()
+        third_party_semaphore.acquire()
         all_messages += task.output
-        lock.release()
+        third_party_semaphore.release()
 
     all_messages += codeowner_linter.check_codeowner_file(
         verbose_mode_enabled)
