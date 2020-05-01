@@ -18,13 +18,13 @@
 
 require('services/alerts.service.ts');
 
-angular.module('oppia').directive('warningAndAlerts', [
+angular.module('oppia').directive('warningsAndAlerts', [
   function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      template: require('./warning-and-alerts.directive.html'),
+      template: require('./warnings-and-alerts.directive.html'),
       controllerAs: '$ctrl',
       controller: ['AlertsService',
         function(AlertsService) {
