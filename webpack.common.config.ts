@@ -673,12 +673,12 @@ module.exports = {
     {
       test: {
         include: /.html$/,
-        exclude: /directive\.html$/
+        exclude: /(directive|component)\.html$/
       },
       loader: 'underscore-template-loader'
     },
     {
-      test: /directive\.html$/,
+      test: /(directive|component)\.html$/,
       loader: 'html-loader'
     },
     {

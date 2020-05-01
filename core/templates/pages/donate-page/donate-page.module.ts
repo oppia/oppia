@@ -33,7 +33,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-import { DonatePageComponent } from './donate-page.controller';
+import { DonatePageComponent } from './donate-page.component';
 
 // This component is needed to force-bootstrap Angular at the beginning of the
 // app.
