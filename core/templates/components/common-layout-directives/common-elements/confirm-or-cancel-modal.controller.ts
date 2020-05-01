@@ -24,8 +24,9 @@ angular.module('oppia').controller('ConfirmOrCancelModalController', [
       $uibModalInstance.close(value);
     };
 
-    $scope.cancel = function() {
-      $uibModalInstance.dismiss('cancel');
+    $scope.cancel = function(value) {
+      var dismissValue = value || 'cancel';
+      $uibModalInstance.dismiss(dismissValue);
     };
   }
 ]);

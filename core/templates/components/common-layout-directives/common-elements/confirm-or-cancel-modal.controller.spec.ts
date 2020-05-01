@@ -44,4 +44,10 @@ describe('Confirm Or Cancel Modal Controller', function() {
     $scope.cancel();
     expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
   });
+
+  it('should dismiss modal with the correct value', function() {
+    var message = 'canceling';
+    $scope.cancel(message);
+    expect($uibModalInstance.dismiss).toHaveBeenCalledWith(message);
+  });
 });
