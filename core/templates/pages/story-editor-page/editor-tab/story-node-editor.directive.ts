@@ -152,7 +152,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             }
             StoryUpdateService.setStoryNodeDescription(
               $scope.story, $scope.getId(), newDescription);
-            $scope.currentTitle = newDescription;
+            $scope.currentDescription = newDescription;
           };
 
           $scope.viewNodeEditor = function(nodeId) {

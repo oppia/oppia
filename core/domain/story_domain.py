@@ -316,12 +316,12 @@ class StoryNode(python_utils.OBJECT):
                 'Expected description to be a string, received %s' %
                 self.description)
 
-        description_limit = (
+        description_length_limit = (
             android_validation_constants.MAX_CHARS_IN_CHAPTER_DESCRIPTION)
-        if len(self.description) > description_limit:
+        if len(self.description) > description_length_limit:
             raise utils.ValidationError(
                 'Chapter description should be less than %d chars, received %s'
-                % (description_limit, self.description))
+                % (description_length_limit, self.description))
 
         title_limit = android_validation_constants.MAX_CHARS_IN_CHAPTER_TITLE
         if len(self.title) > title_limit:
