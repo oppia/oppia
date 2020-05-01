@@ -15,7 +15,8 @@
  * @fileoverview Unit test for ExplorationCreationBackendApiService.
  */
 
-require('components/entity-creation-services/exploration-creation-backend-api.service.ts');
+require('components/entity-creation-services/' +
+'exploration-creation-backend-api.service.ts');
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
