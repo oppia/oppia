@@ -1,6 +1,7 @@
 <audio-bar ng-if="showAudioBar()"></audio-bar>
 <div class="oppia-learner-view-card"
-     ng-class="{'animate-card-width': startCardChangeAnimation}">
+     ng-class="{'animate-card-width': startCardChangeAnimation}"
+     ng-style="isAudioBarExpandedOnMobileDevice() ? {'margin-top': '60px'} : {'margin-top': '30px'}">
   <div class="oppia-learner-view-card-content conversation-skin-animate-tutor-card-content"
        ng-class="{'animate-card-change': startCardChangeAnimation}">
     <div class="oppia-learner-view-card-top-section">
@@ -238,6 +239,11 @@
     .oppia-learner-view-card button.md-button.md-default-theme.instructions-button:focus,
     .oppia-learner-view-card button.md-button.md-default-theme.instructions-button:hover {
       background-color: #115FD4;
+    }
+    @media screen and (max-width: 768px) {
+      .oppia-learner-view-card {
+        margin-top: 30px;
+      }
     }
   }
 </style>
