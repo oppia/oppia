@@ -1,4 +1,18 @@
 <div class="node-field">
+  <div class="story-node-thumbnail">
+    <label class="form-heading">Chapter Thumbnail</label>
+    <thumbnail-uploader filename="getThumbnailFilename()"
+                        update-filename="updateThumbnailFilename"
+                        bg-color="getThumbnailBgColor()"
+                        update-bg-color="updateThumbnailBgColor"
+                        allowed-bg-colors="allowedBgColors"
+                        aspect-ratio="'16:9'"
+                        preview-title="editableTitle"
+                        preview-description=""
+                        preview-description-bg-color=""
+                        preview-footer="">
+    </thumbnail-uploader>
+  </div>
   <div class="story-node-title">
     <label for="storyNodeTitle" class="form-heading">Chapter Title</label>
     <input id="storyNodeTitle" type="text" class="form-control"

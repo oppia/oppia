@@ -42,6 +42,7 @@ export class Topic {
   _version: number;
   _subtopics: Array<Subtopic>;
   _thumbnailFilename: string;
+  _thumbnailBgColor: string;
   skillSummaryObjectFactory: SkillSummaryObjectFactory;
   subtopicObjectFactory: SubtopicObjectFactory;
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
@@ -52,6 +53,7 @@ export class Topic {
       uncategorizedSkillIds: Array<string>,
       nextSubtopicId: number, version: number, subtopics: Array<Subtopic>,
       thumbnailFilename: string,
+      thumbnailBgColor: string,
       // TODO(#7165): Replace any with exact type.
       skillIdToDescriptionMap: any,
       skillSummaryObjectFactory: SkillSummaryObjectFactory,
@@ -74,6 +76,7 @@ export class Topic {
     this._version = version;
     this._subtopics = cloneDeep(subtopics);
     this._thumbnailFilename = thumbnailFilename;
+    this._thumbnailBgColor = thumbnailBgColor;
     this.subtopicObjectFactory = subtopicObjectFactory;
     this.storyReferenceObjectFactory = storyReferenceObjectFactory;
   }
@@ -105,6 +108,14 @@ export class Topic {
 
   getThumbnailFilename(): string {
     return this._thumbnailFilename;
+  }
+
+  setThumbnailBgColor(thumbnailBgColor: string): void {
+    this._thumbnailBgColor = thumbnailBgColor;
+  }
+
+  getThumbnailBgColor(): string {
+    return this._thumbnailBgColor;
   }
 
   getDescription(): string {
@@ -404,6 +415,7 @@ export class Topic {
     this.setName(otherTopic.getName());
     this.setAbbreviatedName(otherTopic.getAbbreviatedName());
     this.setThumbnailFilename(otherTopic.getThumbnailFilename());
+    this.setThumbnailBgColor(otherTopic.getThumbnailBgColor());
     this.setDescription(otherTopic.getDescription());
     this.setLanguageCode(otherTopic.getLanguageCode());
     this._version = otherTopic.getVersion();
@@ -463,6 +475,7 @@ export class TopicObjectFactory {
       topicBackendDict.uncategorized_skill_ids,
       topicBackendDict.next_subtopic_id, topicBackendDict.version,
       subtopics, topicBackendDict.thumbnail_filename,
+      topicBackendDict.thumbnail_bg_color,
       skillIdToDescriptionDict, this.skillSummaryObjectFactory,
       this.subtopicObjectFactory, this.storyReferenceObjectFactory
     );
@@ -473,7 +486,7 @@ export class TopicObjectFactory {
   createInterstitialTopic(): Topic {
     return new Topic(
       null, 'Topic name loading', 'Topic abbreviated name loading',
-      'Topic description loading', 'en', [], [], [], 1, 1, [], '', {},
+      'Topic description loading', 'en', [], [], [], 1, 1, [], '', '', {},
       this.skillSummaryObjectFactory, this.subtopicObjectFactory,
       this.storyReferenceObjectFactory
     );

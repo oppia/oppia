@@ -13,16 +13,11 @@
 
     <div ng-show="uploadedImage">
       <span translate="I18N_PREFERENCES_PROFILE_PICTURE_DRAG"></span>
-      <div class="oppia-profile-picture-crop-area" ng-show="uploadedImage">
+      <div class="oppia-profile-picture-crop-area protractor-test-photo-crop" ng-show="uploadedImage">
         <button class="btn btn-secondary oppia-profile-picture-reset-button" ng-click="reset()">
           <i class="material-icons oppia-vcenter">&#xE14C;</i>
         </button>
-        <img-crop image="uploadedImage" result-image="croppedImageDataUrl"
-                  area-type="square" result-image-size="150"
-                  on-load-error="onInvalidImageLoaded()"
-                  result-image-format="image/png"
-                  class="protractor-test-photo-crop">
-        </img-crop>
+        <img ng-if="uploadedImage" id="croppable-image" ng-src="<[uploadedImage]>">
       </div>
     </div>
   </div>
@@ -30,13 +25,8 @@
 
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()" translate="I18N_PREFERENCES_CANCEL_BUTTON"></button>
-  <!--
-    The two checks for ng-disabled are necessary. The former is needed because
-    img-crop loads a default white image even when nothing is uploaded. The latter
-    is needed to prevent the saving of invalid files.
-  -->
   <button class="btn btn-success protractor-test-photo-upload-submit" ng-click="confirm()"
-          ng-disabled="!uploadedImage || !croppedImageDataUrl" translate="I18N_PREFERENCES_PROFILE_PICTURE_ADD">
+          ng-disabled="!uploadedImage" translate="I18N_PREFERENCES_PROFILE_PICTURE_ADD">
   </button>
 </div>
 <style>
@@ -46,6 +36,7 @@
     margin-top: 20px;
     position: relative;
     width: 500px;
+    max-width: 100%;
   }
   .oppia-profile-picture-reset-button {
     position: absolute;

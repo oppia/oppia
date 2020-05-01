@@ -79,8 +79,14 @@ angular.module('oppia').directive('topicEditorNavbar', [
 
           var _validateTopic = function() {
             $scope.validationIssues = $scope.topic.validate();
-            $scope.prepublishValidationIssues = (
+            var prepublishTopicValidationIssues = (
               $scope.topic.prepublishValidate());
+            var subtopicPrepublishValidationIssues = (
+              [].concat.apply([], $scope.topic.getSubtopics().map(
+                (subtopic) => subtopic.prepublishValidate())));
+            $scope.prepublishValidationIssues = (
+              prepublishTopicValidationIssues.concat(
+                subtopicPrepublishValidationIssues));
           };
 
           $scope.publishTopic = function() {

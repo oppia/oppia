@@ -404,17 +404,6 @@
           "js": ["ng-joyride.js"]
         }
       },
-      "ngImageCrop": {
-        "version": "0.3.2",
-        "downloadFormat": "zip",
-        "url": "https://github.com/alexk111/ngImgCrop/archive/v0.3.2.zip",
-        "rootDirPrefix": "ngImgCrop-",
-        "targetDirPrefix": "ng-img-crop-",
-        "bundle": {
-          "css": ["compile/minified/ng-img-crop.css"],
-          "js": ["compile/minified/ng-img-crop.js"]
-        }
-      },
       "ngInfiniteScroll": {
         "version": "1.0.0",
         "downloadFormat": "files",

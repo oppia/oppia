@@ -64,9 +64,12 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
             self.topic_id, 'public_topic_name', 'abbrev')
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.subtopics.append(topic_domain.Subtopic(
-            1, 'subtopic_name', [self.skill_id_2]))
+            1, 'subtopic_name', [self.skill_id_2], 'image.svg',
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]))
         self.topic.next_subtopic_id = 2
-        self.topic.thumbnail_filename = 'Image.png'
+        self.topic.thumbnail_filename = 'Image.svg'
+        self.topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.canonical_story_references.append(
             topic_domain.StoryReference.create_default_story_reference(
                 self.story_id_1))
@@ -80,7 +83,9 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id_1, 'private_topic_name', 'abbrev')
-        self.topic.thumbnail_filename = 'Image.png'
+        self.topic.thumbnail_filename = 'Image.svg'
+        self.topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
@@ -152,6 +157,8 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                 }],
                 'uncategorized_skill_ids': [self.skill_id_1],
                 'subtopics': [{
+                    u'thumbnail_filename': u'image.svg',
+                    u'thumbnail_bg_color': u'#FFFFFF',
                     u'skill_ids': [self.skill_id_2],
                     u'id': 1,
                     u'title': u'subtopic_name'}],
@@ -206,6 +213,8 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                     }],
                     'uncategorized_skill_ids': [self.skill_id_1],
                     'subtopics': [{
+                        u'thumbnail_filename': u'image.svg',
+                        u'thumbnail_bg_color': u'#FFFFFF',
                         u'skill_ids': [self.skill_id_2],
                         u'id': 1,
                         u'title': u'subtopic_name'}],
@@ -257,7 +266,9 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'new_topic', 'abbrev')
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
-        self.topic.thumbnail_filename = 'Image.png'
+        self.topic.thumbnail_filename = 'Image.svg'
+        self.topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_skill(

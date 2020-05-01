@@ -71,7 +71,9 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         topic_services.save_new_topic(admin_id, private_topic)
         public_topic = topic_domain.Topic.create_default_topic(
             topic_id_2, 'public_topic_name', 'abbrev')
-        public_topic.thumbnail_filename = 'Topic.png'
+        public_topic.thumbnail_filename = 'Topic.svg'
+        public_topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         topic_services.save_new_topic(admin_id, public_topic)
         topic_services.publish_topic(topic_id_2, admin_id)
 

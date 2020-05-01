@@ -15,12 +15,18 @@
 /**
  * @fileoverview Controller for the subtopics list editor.
  */
+require(
+  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
+
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+const subtopicConstants = require('constants.ts');
 
 angular.module('oppia').directive('subtopicsListTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -58,6 +64,8 @@ angular.module('oppia').directive('subtopicsListTab', [
 
           $scope.editSubtopic = function(subtopic) {
             var editableTitle = subtopic.getTitle();
+            var editableThumbnailFilename = subtopic.getThumbnailFilename();
+            var editableThumbnailBgColor = subtopic.getThumbnailBgColor();
             TopicEditorStateService.loadSubtopicPage(
               $scope.topic.getId(), subtopic.getId());
             var subtopicTitles = $scope.subtopicTitles;
@@ -74,8 +82,12 @@ angular.module('oppia').directive('subtopicsListTab', [
                   $scope.subtopicId = subtopic.getId();
                   $scope.subtopicTitles = subtopicTitles;
                   $scope.editableTitle = editableTitle;
-                  $scope.subtopicPage =
-                    TopicEditorStateService.getSubtopicPage();
+                  $scope.editableThumbnailFilename = editableThumbnailFilename;
+                  $scope.editableThumbnailBgColor = editableThumbnailBgColor;
+                  $scope.subtopicPage = (
+                    TopicEditorStateService.getSubtopicPage());
+                  $scope.allowedBgColors = (
+                    subtopicConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic);
                   var pageContents = $scope.subtopicPage.getPageContents();
                   if (pageContents) {
                     $scope.htmlData = pageContents.getHtml();
@@ -92,6 +104,24 @@ angular.module('oppia').directive('subtopicsListTab', [
                     ui_config: {
                       rows: 100
                     }
+                  };
+
+                  $scope.updateSubtopicThumbnailFilename = function(
+                      newThumbnailFilename) {
+                    var oldThumbnailFilename = subtopic.getThumbnailFilename();
+                    if (newThumbnailFilename === oldThumbnailFilename) {
+                      return;
+                    }
+                    $scope.editableThumbnailFilename = newThumbnailFilename;
+                  };
+
+                  $scope.updateSubtopicThumbnailBgColor = function(
+                      newThumbnailBgColor) {
+                    var oldThumbnailBgColor = subtopic.getThumbnailBgColor();
+                    if (newThumbnailBgColor === oldThumbnailBgColor) {
+                      return;
+                    }
+                    $scope.editableThumbnailBgColor = newThumbnailBgColor;
                   };
 
                   $scope.updateSubtopicTitle = function(title) {
@@ -118,7 +148,9 @@ angular.module('oppia').directive('subtopicsListTab', [
                   $scope.save = function() {
                     $uibModalInstance.close({
                       newTitle: $scope.editableTitle,
-                      newHtmlData: $scope.htmlData
+                      newHtmlData: $scope.htmlData,
+                      newThumbnailFilename: $scope.editableThumbnailFilename,
+                      newThumbnailBgColor: $scope.editableThumbnailBgColor
                     });
                   };
 
@@ -133,6 +165,8 @@ angular.module('oppia').directive('subtopicsListTab', [
               $scope.subtopicPage = TopicEditorStateService.getSubtopicPage();
               var newTitle = newValues.newTitle;
               var newHtmlData = newValues.newHtmlData;
+              var newThumbnailFilename = newValues.newThumbnailFilename;
+              var newThumbnailBgColor = newValues.newThumbnailBgColor;
 
               if (newTitle !== subtopic.getTitle()) {
                 TopicUpdateService.setSubtopicTitle(
@@ -146,6 +180,14 @@ angular.module('oppia').directive('subtopicsListTab', [
                 TopicUpdateService.setSubtopicPageContentsHtml(
                   $scope.subtopicPage, subtopic.getId(), subtitledHtml);
                 TopicEditorStateService.setSubtopicPage($scope.subtopicPage);
+              }
+              if (newThumbnailFilename !== subtopic.getThumbnailFilename()) {
+                TopicUpdateService.setSubtopicThumbnailFilename(
+                  $scope.topic, subtopic.getId(), newThumbnailFilename);
+              }
+              if (newThumbnailBgColor !== subtopic.getThumbnailBgColor()) {
+                TopicUpdateService.setSubtopicThumbnailBgColor(
+                  $scope.topic, subtopic.getId(), newThumbnailBgColor);
               }
             }, function() {
               // Note to developers:

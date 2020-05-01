@@ -1,5 +1,19 @@
 <div role="form" class="form-horizontal">
   <md-card class="oppia-page-card oppia-long-text">
+    <div class="story-thumbnail">
+      <label class="form-heading">Story Thumbnail</label>
+      <thumbnail-uploader filename="story.getThumbnailFilename()"
+                          update-filename="updateStoryThumbnailFilename"
+                          bg-color="story.getThumbnailBgColor()"
+                          update-bg-color="updateStoryThumbnailBgColor"
+                          allowed-bg-colors="allowedBgColors"
+                          aspect-ratio="'4:3'"
+                          preview-title="editableTitle"
+                          preview-description="editableDescription"
+                          preview-description-bg-color=""
+                          preview-footer="">
+      </thumbnail-uploader>
+    </div>
     <div class="story-title">
       <label for="storyTitle" class="form-heading">Story Title</label>
       <input id="storyTitle" type="text" class="form-control protractor-test-story-title-field"
@@ -121,6 +135,8 @@
         <div ng-repeat="node in nodes">
           <story-node-editor ng-if="node.getId() === idOfNodeToEdit"
                              node-id="node.getId()"
+                             thumbnail-filename="node.getThumbnailFilename()"
+                             thumbnail-bg-color="node.getThumbnailBgColor()"
                              outline="node.getOutline()"
                              exploration-id="node.getExplorationId()"
                              outline-finalized="node.getOutlineStatus()"

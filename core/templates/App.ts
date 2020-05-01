@@ -77,10 +77,10 @@ const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
 angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
-  '$interpolateProvider', '$locationProvider', '$provide',
+  '$interpolateProvider', '$locationProvider', '$provide', '$sanitizeProvider',
   function(
       $compileProvider, $cookiesProvider, $httpProvider,
-      $interpolateProvider, $locationProvider, $provide) {
+      $interpolateProvider, $locationProvider, $provide, $sanitizeProvider) {
     var ugs = new UpgradedServices();
     // We need to provide these services and pipes separately since they are
     // used in the directives imported in this file and cannot be
@@ -129,6 +129,8 @@ angular.module('oppia').config([
     if (window.location.pathname === '/search/find') {
       $locationProvider.html5Mode(true);
     }
+
+    $sanitizeProvider.enableSvg(true);
 
     // Prevent storing duplicate cookies for translation language.
     $cookiesProvider.defaults.path = '/';

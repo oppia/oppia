@@ -89,9 +89,11 @@ class AssetDevHandler(base.BaseHandler):
 
             # If the following is not cast to str, an error occurs in the wsgi
             # library because unicode gets used.
-            self.response.headers[
-                b'Content-Type'] = python_utils.convert_to_bytes(
-                    '%s/%s' % (asset_type, file_format))
+            content_type = (
+                'image/svg+xml' if file_format == 'svg' else '%s/%s' % (
+                    asset_type, file_format))
+            self.response.headers[b'Content-Type'] = (
+                python_utils.convert_to_bytes(content_type))
 
             if page_context not in self._SUPPORTED_PAGE_CONTEXTS:
                 raise self.InvalidInputException

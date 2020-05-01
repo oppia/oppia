@@ -183,7 +183,7 @@ CURRENT_STATE_SCHEMA_VERSION = 33
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of story contents dict in the story schema.
-CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 1
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 2
 
 # The current version of skill contents dict in the skill schema.
 CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
@@ -195,7 +195,7 @@ CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 2
 CURRENT_RUBRIC_SCHEMA_VERSION = 1
 
 # The current version of subtopics dict in the topic schema.
-CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
+CURRENT_SUBTOPIC_SCHEMA_VERSION = 2
 
 # The current version of story reference dict in the topic schema.
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
@@ -312,6 +312,7 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
     'jpeg': ['jpg', 'jpeg'],
     'png': ['png'],
     'gif': ['gif'],
+    'svg': ['svg']
 }
 
 # An array containing the accepted audio extensions for uploaded files and

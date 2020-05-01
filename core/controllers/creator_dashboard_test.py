@@ -711,7 +711,6 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(len(response['topic_summary_dicts']), 0)
             self.save_new_topic(
                 'topic_id', self.owner_id, name='Name',
-                abbreviated_name='abbrev', thumbnail_filename=None,
                 description='Description',
                 canonical_story_ids=['story_id_1', 'story_id_2'],
                 additional_story_ids=['story_id_3'],

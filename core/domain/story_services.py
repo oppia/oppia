@@ -66,6 +66,8 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         id=story.id,
         description=story.description,
         title=story.title,
+        thumbnail_bg_color=story.thumbnail_bg_color,
+        thumbnail_filename=story.thumbnail_filename,
         language_code=story.language_code,
         story_contents_schema_version=story.story_contents_schema_version,
         notes=story.notes,
@@ -132,6 +134,14 @@ def apply_change_list(story_id, change_list):
                       story_domain.STORY_NODE_PROPERTY_TITLE):
                     story.update_node_title(change.node_id, change.new_value)
                 elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME):
+                    story.update_node_thumbnail_filename(
+                        change.node_id, change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR):
+                    story.update_node_thumbnail_bg_color(
+                        change.node_id, change.new_value)
+                elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):
                     story.update_node_acquired_skill_ids(
                         change.node_id, change.new_value)
@@ -151,6 +161,12 @@ def apply_change_list(story_id, change_list):
                 if (change.property_name ==
                         story_domain.STORY_PROPERTY_TITLE):
                     story.update_title(change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME):
+                    story.update_thumbnail_filename(change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR):
+                    story.update_thumbnail_bg_color(change.new_value)
                 elif (change.property_name ==
                       story_domain.STORY_PROPERTY_DESCRIPTION):
                     story.update_description(change.new_value)
@@ -392,6 +408,8 @@ def _save_story(committer_id, story, commit_message, change_list):
 
     story_model.description = story.description
     story_model.title = story.title
+    story_model.thumbnail_bg_color = story.thumbnail_bg_color
+    story_model.thumbnail_filename = story.thumbnail_filename
     story_model.notes = story.notes
     story_model.language_code = story.language_code
     story_model.story_contents_schema_version = (

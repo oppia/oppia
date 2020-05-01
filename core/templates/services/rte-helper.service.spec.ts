@@ -75,7 +75,7 @@ describe('Rte Helper Service', function() {
       backendId: 'Image',
       customizationArgSpecs: [{
         name: 'filepath',
-        description: 'The image (Allowed extensions: gif, jpeg, jpg, png)',
+        description: 'The image (Allowed extensions: gif, jpeg, jpg, png, svg)',
         schema: {
           type: 'custom',
           obj_type: 'Filepath'

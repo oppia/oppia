@@ -18,8 +18,13 @@
 
 require('services/assets-backend-api.service.ts');
 
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+const Constants = require('constants.ts');
+
 angular.module('oppia').factory('ImageUploadHelperService', [
-  '$sce', 'AssetsBackendApiService', function($sce, AssetsBackendApiService) {
+  '$sce', 'AssetsBackendApiService',
+  function($sce, AssetsBackendApiService) {
     return {
       convertImageDataToImageFile: function(dataURI) {
         // Convert base64/URLEncoded data component to raw binary data
@@ -42,6 +47,33 @@ angular.module('oppia').factory('ImageUploadHelperService', [
         } else {
           return null;
         }
+      },
+
+      getInvalidSvgTagsAndAttrs: function(dataURI) {
+        // Convert base64/URLEncoded data component to raw binary data
+        // held in a string.
+        var svgString = atob(dataURI.split(',')[1]);
+        var domParser = new DOMParser();
+        var doc = domParser.parseFromString(svgString, 'image/svg+xml');
+        var invalidTags = [];
+        var invalidAttrs = [];
+        var allowedTags = Object.keys(Constants.SVG_ATTRS_WHITELIST);
+        var nodeTagName = null;
+        doc.querySelectorAll('*').forEach((node) => {
+          nodeTagName = node.tagName.toLowerCase();
+          if (allowedTags.indexOf(nodeTagName) !== -1) {
+            for (var i = 0; i < node.attributes.length; i++) {
+              if (Constants.SVG_ATTRS_WHITELIST[nodeTagName].indexOf(
+                node.attributes[i].name.toLowerCase()) === -1) {
+                invalidAttrs.push(
+                  node.tagName + ':' + node.attributes[i].name);
+              }
+            }
+          } else {
+            invalidTags.push(node.tagName);
+          }
+        });
+        return { tags: invalidTags, attrs: invalidAttrs };
       },
 
       getTrustedResourceUrlForThumbnailFilename: function(

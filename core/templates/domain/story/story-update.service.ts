@@ -32,9 +32,11 @@ angular.module('oppia').factory('StoryUpdateService', [
   'STORY_NODE_PROPERTY_DESTINATION_NODE_IDS',
   'STORY_NODE_PROPERTY_EXPLORATION_ID',
   'STORY_NODE_PROPERTY_OUTLINE', 'STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS',
-  'STORY_NODE_PROPERTY_TITLE', 'STORY_PROPERTY_DESCRIPTION',
-  'STORY_PROPERTY_LANGUAGE_CODE', 'STORY_PROPERTY_NOTES',
-  'STORY_PROPERTY_TITLE', function(
+  'STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR',
+  'STORY_NODE_PROPERTY_THUMBNAIL_FILENAME', 'STORY_NODE_PROPERTY_TITLE',
+  'STORY_PROPERTY_DESCRIPTION', 'STORY_PROPERTY_LANGUAGE_CODE',
+  'STORY_PROPERTY_NOTES', 'STORY_PROPERTY_THUMBNAIL_BG_COLOR',
+  'STORY_PROPERTY_THUMBNAIL_FILENAME', 'STORY_PROPERTY_TITLE', function(
       AlertsService, ChangeObjectFactory, StoryEditorStateService,
       UndoRedoService, CMD_ADD_STORY_NODE, CMD_DELETE_STORY_NODE,
       CMD_UPDATE_STORY_CONTENTS_PROPERTY, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
@@ -43,9 +45,11 @@ angular.module('oppia').factory('StoryUpdateService', [
       STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
       STORY_NODE_PROPERTY_EXPLORATION_ID,
       STORY_NODE_PROPERTY_OUTLINE, STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
-      STORY_NODE_PROPERTY_TITLE, STORY_PROPERTY_DESCRIPTION,
-      STORY_PROPERTY_LANGUAGE_CODE, STORY_PROPERTY_NOTES,
-      STORY_PROPERTY_TITLE) {
+      STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
+      STORY_NODE_PROPERTY_THUMBNAIL_FILENAME, STORY_NODE_PROPERTY_TITLE,
+      STORY_PROPERTY_DESCRIPTION, STORY_PROPERTY_LANGUAGE_CODE,
+      STORY_PROPERTY_NOTES, STORY_PROPERTY_THUMBNAIL_BG_COLOR,
+      STORY_PROPERTY_THUMBNAIL_FILENAME, STORY_PROPERTY_TITLE) {
     // Creates a change using an apply function, reverse function, a change
     // command and related parameters. The change is applied to a given
     // story.
@@ -129,6 +133,44 @@ angular.module('oppia').factory('StoryUpdateService', [
           }, function(changeDict, story) {
             // Undo.
             story.setTitle(oldTitle);
+          });
+      },
+
+      /**
+       * Changes the thumbnail filename of a story and records the change
+       * in the undo/redo service.
+       */
+      setThumbnailFilename: function(story, newThumbnailFilename) {
+        var oldThumbnailFilename = angular.copy(story.getThumbnailFilename());
+        _applyStoryPropertyChange(
+          story, STORY_PROPERTY_THUMBNAIL_FILENAME, oldThumbnailFilename,
+          newThumbnailFilename, function(changeDict, story) {
+            // Apply
+            var thumbnailFilename = (
+              _getNewPropertyValueFromChangeDict(changeDict));
+            story.setThumbnailFilename(thumbnailFilename);
+          }, function(changeDict, story) {
+            // Undo.
+            story.setThumbnailFilename(oldThumbnailFilename);
+          });
+      },
+
+      /**
+       * Changes the thumbnail background color of a story and records the
+       * change in the undo/redo service.
+       */
+      setThumbnailBgColor: function(story, newThumbnailBgColor) {
+        var oldThumbnailBgColor = angular.copy(story.getThumbnailBgColor());
+        _applyStoryPropertyChange(
+          story, STORY_PROPERTY_THUMBNAIL_BG_COLOR, oldThumbnailBgColor,
+          newThumbnailBgColor, function(changeDict, story) {
+            // Apply
+            var thumbnailBgColor = (
+              _getNewPropertyValueFromChangeDict(changeDict));
+            story.setThumbnailBgColor(thumbnailBgColor);
+          }, function(changeDict, story) {
+            // Undo.
+            story.setThumbnailBgColor(oldThumbnailBgColor);
           });
       },
 
@@ -325,6 +367,48 @@ angular.module('oppia').factory('StoryUpdateService', [
           }, function(changeDict, story) {
             // Undo.
             story.getStoryContents().setNodeTitle(nodeId, oldTitle);
+          });
+      },
+
+      /**
+       * Sets the thumbnail filename of a node of the story and records the
+       * change in the undo/redo service.
+       */
+      setStoryNodeThumbnailFilename: function(
+          story, nodeId, newThumbnailFilename) {
+        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
+        var oldThumbnailFilename = storyNode.getThumbnailFilename();
+
+        _applyStoryNodePropertyChange(
+          story, STORY_NODE_PROPERTY_THUMBNAIL_FILENAME, nodeId,
+          oldThumbnailFilename, newThumbnailFilename,
+          function(changeDict, story) {
+            // Apply.
+            storyNode.setThumbnailFilename(newThumbnailFilename);
+          }, function(changeDict, story) {
+            // Undo.
+            storyNode.setThumbnailFilename(oldThumbnailFilename);
+          });
+      },
+
+      /**
+       * Sets the thumbnail background color of a node of the story and records
+       * the change in the undo/redo service.
+       */
+      setStoryNodeThumbnailBgColor: function(
+          story, nodeId, newThumbnailBgColor) {
+        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
+        var oldThumbnailBgColor = storyNode.getThumbnailBgColor();
+
+        _applyStoryNodePropertyChange(
+          story, STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR, nodeId,
+          oldThumbnailBgColor, newThumbnailBgColor,
+          function(changeDict, story) {
+            // Apply.
+            storyNode.setThumbnailBgColor(newThumbnailBgColor);
+          }, function(changeDict, story) {
+            // Undo.
+            storyNode.setThumbnailBgColor(oldThumbnailBgColor);
           });
       },
 

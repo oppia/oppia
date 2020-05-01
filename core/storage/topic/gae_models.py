@@ -57,6 +57,8 @@ class TopicModel(base_models.VersionedModel):
     abbreviated_name = ndb.StringProperty(indexed=True, default='')
     # The thumbnail filename of the topic.
     thumbnail_filename = ndb.StringProperty(indexed=True)
+    # The thumbnail background color of the topic.
+    thumbnail_bg_color = ndb.StringProperty(indexed=True)
     # The description of the topic.
     description = ndb.TextProperty(indexed=False)
     # This consists of the list of objects referencing canonical stories that
