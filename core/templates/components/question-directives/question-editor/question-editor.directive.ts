@@ -68,9 +68,9 @@ angular.module('oppia').directive('questionEditor', [
             $scope, $rootScope, $uibModal,
             AlertsService, QuestionCreationService,
             EditabilityService, EditableQuestionBackendApiService,
-            QuestionObjectFactory,
-            INTERACTION_SPECS, StateEditorService, ResponsesService,
-            SolutionValidityService, QuestionUpdateService, LoaderService) {
+            LoaderService, INTERACTION_SPECS, StateEditorService,
+            ResponsesService, SolutionValidityService, QuestionUpdateService,
+            QuestionObjectFactory) {
           var ctrl = this;
           ctrl.getStateContentPlaceholder = function() {
             return (
