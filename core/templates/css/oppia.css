@@ -4598,3 +4598,9 @@ div.oppia-issues-learner-action {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   padding-bottom: 20px;
 }
+
+.oppia-welcome-guide-p{
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 1.17em;
+  text-align: left;
+}
