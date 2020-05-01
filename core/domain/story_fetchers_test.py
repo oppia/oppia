@@ -49,8 +49,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
         self.save_new_story(
-            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID)
+            self.STORY_ID, self.USER_ID, corresponding_topic_id=self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID)
         changelist = [

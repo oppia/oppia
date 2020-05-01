@@ -524,8 +524,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             exp_services.get_story_id_linked_to_exploration('2'))
 
         self.save_new_story(
-            'story_id_2', self.USER_ID, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID)
+            'story_id_2', self.USER_ID, corresponding_topic_id=self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, 'story_id_2')
 
@@ -630,8 +629,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
     def test_exploration_story_link_collision(self):
         self.save_new_story(
-            'story_id_2', self.USER_ID, 'Title', 'Description', 'Notes',
-            self.TOPIC_ID)
+            'story_id_2', self.USER_ID, corresponding_topic_id=self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, 'story_id_2')
         self.save_new_valid_exploration(

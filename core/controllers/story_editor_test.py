@@ -350,8 +350,9 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.login(self.ADMIN_EMAIL)
         new_story_id = story_services.get_new_story_id()
         self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
-            'invalid_topic_id')
+            new_story_id,
+            self.admin_id,
+            corresponding_topic_id='invalid_topic_id')
         self.delete_json(
             '%s/%s' % (
                 feconf.STORY_EDITOR_DATA_URL_PREFIX,

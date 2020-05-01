@@ -99,6 +99,7 @@ class VerifyUserDeletionOneOffJobTests(test_utils.GenericTestBase):
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
+        self.process_and_flush_pending_tasks()
         job_id = wipeout_jobs_one_off.VerifyUserDeletionOneOffJob.create_new()
         wipeout_jobs_one_off.VerifyUserDeletionOneOffJob.enqueue(job_id)
         self.assertEqual(

@@ -147,8 +147,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         skill_id = skill_services.get_new_skill_id()
         self.save_new_story(
-            story_id, admin_id, 'Title', 'Description', 'Notes',
-            topic_id)
+            story_id, admin_id, corresponding_topic_id=topic_id)
         self.save_new_topic(
             topic_id, admin_id, name='Name',
             abbreviated_name='abbrev', thumbnail_filename=None,

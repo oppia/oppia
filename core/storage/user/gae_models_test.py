@@ -2233,7 +2233,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.PendingDeletionRequestModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
