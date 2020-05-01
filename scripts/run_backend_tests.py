@@ -72,6 +72,8 @@ DIRS_TO_ADD_TO_SYS_PATH = [
         'lib', 'webob_0_9'),
     os.path.join(common.OPPIA_TOOLS_DIR, 'Pillow-%s' % common.PILLOW_VERSION),
     os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-%s' % common.PSUTIL_VERSION),
+    os.path.join(
+        common.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common.PYGITHUB_VERSION),
     common.CURR_DIR,
     os.path.join(common.THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.5'),
     os.path.join(common.THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
