@@ -16,54 +16,50 @@
  * @fileoverview Directive for the donate page.
  */
 
+import { Component, OnInit } from '@angular/core';
+
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service.ts';
+import { SiteAnalyticsService } from 'services/site-analytics.service.ts';
+import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service.ts';
+
 require('base-components/base-content.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/site-analytics.service.ts');
-require('services/contextual/window-dimensions.service.ts');
+@Component({
+  selector: 'donate-page',
+  template: require('./donate-page.directive.html'),
+  styleUrls: []
+})
+export class DonatePageComponent implements OnInit {
+  windowIsNarrow: boolean = false;
+  donateImgUrl: string = '';
+  constructor(
+    private siteAnalyticsService: SiteAnalyticsService,
+    private urlInterpolationService: UrlInterpolationService,
+    private windowDimensionService: WindowDimensionsService
+  ) {}
+  ngOnInit() {
+    this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+    this.donateImgUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/general/opp_donate_text.svg');
+  }
 
-angular.module('oppia').directive('donatePage', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/donate-page/donate-page.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$http', '$timeout', '$window', 'SiteAnalyticsService',
-        'UrlInterpolationService', 'WindowDimensionsService',
-        function(
-            $http, $timeout, $window, SiteAnalyticsService,
-            UrlInterpolationService, WindowDimensionsService) {
-          var ctrl = this;
-          ctrl.onDonateThroughAmazon = function() {
-            SiteAnalyticsService.registerGoToDonationSiteEvent('Amazon');
-            $timeout(function() {
-              $window.location = 'https://smile.amazon.com/ch/81-1740068';
-            }, 150);
-            return false;
-          };
+  onDonateThroughAmazon() {
+    this.siteAnalyticsService.registerGoToDonationSiteEvent('Amazon');
+    window.location.href = 'https://smile.amazon.com/ch/81-1740068';
+    return false;
+  }
 
-          ctrl.onDonateThroughPayPal = function() {
-            // Redirection to PayPal will be initiated at the same time as this
-            // function is run, but should be slow enough to allow this function
-            // time to complete. It is not possible to do $http.post() in
-            // javascript after a delay because cross-site POSTing is not
-            // permitted in scripts; see
-            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control
-            // _CORS
-            // for more information.
-            SiteAnalyticsService.registerGoToDonationSiteEvent('PayPal');
-          };
-          ctrl.$onInit = function() {
-            ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
-            ctrl.donateImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/general/opp_donate_text.svg');
-          };
-        }
-      ]
-    };
-  }]);
+  onDonateThroughPayPal() {
+    // Redirection to PayPal will be initiated at the same time as this
+    // function is run, but should be slow enough to allow this function
+    // time to complete. It is not possible to do $http.post() in
+    // javascript after a delay because cross-site POSTing is not
+    // permitted in scripts; see
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control
+    // _CORS
+    // for more information.
+    this.siteAnalyticsService.registerGoToDonationSiteEvent('PayPal');
+  }
+}
