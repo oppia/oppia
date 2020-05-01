@@ -36,19 +36,19 @@
           </div>
         </div>
       </div>
-      <div class="oppia-thumbnail-container protractor-test-thumbnail-container" ng-show="uploadedImage" ng-style="{background: getPreviewDescriptionBgColor(), color: getPreviewDescriptionBgColor() ? '#FFFFFF' : ''}">
+      <div class="oppia-thumbnail-container protractor-test-thumbnail-container" ng-show="uploadedImage" ng-style="{background: getPreviewDescriptionBgColor(), color: getPreviewDescriptionBgColor() ? '#FFFFFF' : '', width: aspectRatio === '4:3' ? '248px' : '320px' }">
         <button class="btn btn-secondary oppia-thumbnail-reset-button" ng-click="reset()">
           <i class="material-icons oppia-vcenter">&#xE14C;</i>
         </button>
         <div>
-          <img ng-if="uploadedImage" class="oppia-thumbnail-image" ng-src="<[uploadedImage]>">
+          <img ng-if="uploadedImage" class="oppia-thumbnail-image" ng-src="<[uploadedImage]>" height="<[aspectRatio === '4:3' ? '186px' : '180px']>" width="<[aspectRatio === '4:3' ? '248px' : '320px']>">
           <div class="oppia-thumbnail-preview-title">
             <[getPreviewTitle()]>
           </div>
           <div class="oppia-thumbnail-preview-description">
             <[getPreviewDescription()]>
           </div>
-          <div class="oppia-thumbnail-preview-footer">
+          <div ng-if="getPreviewFooter()" class="oppia-thumbnail-preview-footer">
             <[getPreviewFooter()]>
           </div>
         </div>
@@ -67,8 +67,7 @@
 </div>
 <style>
   .oppia-thumbnail-container {
-    height: 328px;
-    width: 304px;
+    height: 260px;
     max-width: 100%;
     margin: 0 auto 15px auto;
     position: relative;
@@ -76,8 +75,6 @@
     box-shadow: 0 4.5px 10px rgba(0, 0, 0, 0.25);
   }
   .oppia-thumbnail-container img {
-    width: 304px;
-    height: 172px;
     border-radius: 4px 4px 0 0;
   }
   .oppia-thumbnail-reset-button {

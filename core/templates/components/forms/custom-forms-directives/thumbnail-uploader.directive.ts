@@ -299,6 +299,7 @@ angular.module('oppia').directive('thumbnailUploader', [
                 });
               } else {
                 saveThumbnailBgColor(data.newBgColor);
+                $scope.thumbnailIsLoading = false;
               }
             }, function() {
               // Note to developers:
