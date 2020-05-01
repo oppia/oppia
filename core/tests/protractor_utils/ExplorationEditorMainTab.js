@@ -929,9 +929,10 @@ var ExplorationEditorMainTab = function() {
           ruleDescription = ruleDescription.replace(placeholderElement, '...');
         } else {
           if (providedText.length !== placeholders.length) {
-            throw new Error('# of feedback text(' + textArray.length +
-            ') is expected to match # of placeholders(' +
-            (placeholders.length) + ')');
+            throw new Error(
+              '# of feedback text(' + textArray.length +
+              ') is expected to match # of placeholders(' +
+              (placeholders.length) + ')');
           }
           ruleDescription = ruleDescription.replace(
             placeholderElement, providedText[index].toString());

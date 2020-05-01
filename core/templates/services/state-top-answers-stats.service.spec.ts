@@ -279,7 +279,7 @@ describe('StateTopAnswersStatsService', function() {
     it('throws when fetching stats about non-existent states', function() {
       expect(function() {
         StateTopAnswersStatsService.getStateStats('Me Llamo');
-      }).toThrowError( 'Me Llamo does not exist.');
+      }).toThrowError('Me Llamo does not exist.');
     });
 
     it('registers handlers to ExplorationStatesService', function() {

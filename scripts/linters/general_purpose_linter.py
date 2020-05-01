@@ -181,8 +181,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_files': (
             # Note to developers: In the excluded_files below,
             # we use custom errors which cannot be caught by regex.
-            # These custom errors will be deprecated soon since
-            # they are challenging to maintain.
+            # The Logic Proof interaction which uses these custom errors
+            # will be deprecated soon (see #9198).
             'extensions/interactions/LogicProof/static/js/student.spec.ts',
             'extensions/interactions/LogicProof/static/js/complete.spec.ts',
             'extensions/interactions/LogicProof/static/js/teacher.spec.ts'),

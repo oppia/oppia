@@ -619,7 +619,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       } else {
         for (var lineNumber in compareDict) {
           if (compareDict[lineNumber].checked !== true) {
-            throw new Error('Expected line ' + lineNumber + ': \'' +
+            throw new Error(
+              'Expected line ' + lineNumber + ': \'' +
               compareDict[lineNumber].text + '\' to be found in CodeMirror');
           }
         }
@@ -676,7 +677,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       } else {
         for (var dictLineNumber in compareDict) {
           if (compareDict[dictLineNumber].checked !== true) {
-            throw new Error('Expected line ' + lineNumber + ': \'' +
+            throw new Error(
+              'Expected line ' + lineNumber + ': \'' +
               compareDict[dictLineNumber].text + '\' to be found in CodeMirror'
             );
           }

@@ -91,7 +91,8 @@ angular.module('oppia').directive('answerGroupEditor', [
                   }
                 }
               } else {
-                throw new Error('Expected skillMisconceptionId to be ' +
+                throw new Error(
+                  'Expected skillMisconceptionId to be ' +
                   '<skillId>-<misconceptionId>.');
               }
             }

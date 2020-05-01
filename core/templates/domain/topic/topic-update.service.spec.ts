@@ -203,7 +203,7 @@ describe('Topic update service', function() {
   function() {
     expect(function() {
       TopicUpdateService.removeAdditionalStory(_sampleTopic, 'story_5');
-    }).toThrowError( 'Given story id not present in additional story ids.');
+    }).toThrowError('Given story id not present in additional story ids.');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
