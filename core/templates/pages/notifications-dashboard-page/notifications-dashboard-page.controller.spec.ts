@@ -20,6 +20,7 @@ describe('Notifications Dashboard Page', function() {
   var $httpBackend = null;
   var LoaderService = null;
   var loadingMessage = null;
+  var subscriptions = [];
   var windowRefMock = {
     nativeWindow: {
       location: {
@@ -37,14 +38,20 @@ describe('Notifications Dashboard Page', function() {
     $scope = $rootScope.$new();
     loadingMessage = '';
     LoaderService = $injector.get('LoaderService');
-    LoaderService.getLoadingMessageSubject().subscribe(
+    subscriptions.push(LoaderService.getLoadingMessageSubject().subscribe(
       (message: string) => loadingMessage = message
-    );
+    ));
     var directive = $injector.get('notificationsDashboardPageDirective')[0];
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope
     });
   }));
+
+  afterEach(function() {
+    for (let subscription of subscriptions) {
+      subscription.unsubscribe();
+    }
+  });
 
   it('should get item url', function() {
     expect(ctrl.getItemUrl('0', 'feedback_thread')).toBe(

@@ -28,6 +28,7 @@ describe('Email Dashboard Page', function() {
   var UserService = null;
   var LoaderService = null;
   var loadingMessage = null;
+  var subscriptions = [];
   var firstPageQueries = [
     {id: 1, status: 'completed'},
     {id: 2, status: 'completed'}
@@ -49,9 +50,9 @@ describe('Email Dashboard Page', function() {
     UserService = $injector.get('UserService');
     loadingMessage = '';
     LoaderService = $injector.get('LoaderService');
-    LoaderService.getLoadingMessageSubject().subscribe(
+    subscriptions.push(LoaderService.getLoadingMessageSubject().subscribe(
       (message: string) => loadingMessage = message
-    );
+    ));
     $q = $injector.get('$q');
 
     var $rootScope = $injector.get('$rootScope');
@@ -76,6 +77,12 @@ describe('Email Dashboard Page', function() {
       return deferred.promise;
     });
   }));
+
+  afterEach(function() {
+    for (let subscription of subscriptions) {
+      subscription.unsubscribe();
+    }
+  });
 
   it('should reset form', function() {
     // Mock some values.

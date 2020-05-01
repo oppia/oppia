@@ -26,6 +26,7 @@ describe('Splash Page', function() {
   var LoaderService = null;
   var loadingMessage = null;
   var SiteAnalyticsService = null;
+  var subscriptions = [];
   var windowRefMock = {
     nativeWindow: {
       location: ''
@@ -42,9 +43,9 @@ describe('Splash Page', function() {
     UserService = $injector.get('UserService');
     LoaderService = $injector.get('LoaderService');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
-    LoaderService.getLoadingMessageSubject().subscribe(
+    subscriptions.push(LoaderService.getLoadingMessageSubject().subscribe(
       (message: string) => loadingMessage = message
-    );
+    ));
     loadingMessage = '';
     var $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -53,6 +54,12 @@ describe('Splash Page', function() {
       $rootScope: $scope
     });
   }));
+
+  afterEach(function() {
+    for (let subscription of subscriptions) {
+      subscription.unsubscribe();
+    }
+  });
 
   it('should get static image url', function() {
     expect(ctrl.getStaticImageUrl('/path/to/image')).toBe(

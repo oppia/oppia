@@ -30,6 +30,7 @@ describe('Moderator Page', function() {
   var AlertsService = null;
   var CsrfService = null;
   var LoaderService = null;
+  var subscriptions = [];
 
   var activityReferences = [
     { type: 'exploration', id: 1 },
@@ -66,9 +67,9 @@ describe('Moderator Page', function() {
     CsrfService = $injector.get('CsrfTokenService');
     loadingMessage = '';
     LoaderService = $injector.get('LoaderService');
-    LoaderService.getLoadingMessageSubject().subscribe(
+    subscriptions.push(LoaderService.getLoadingMessageSubject().subscribe(
       (message: string) => loadingMessage = message
-    );
+    ));
     spyOn(CsrfService, 'getTokenAsync')
       .and.returnValue($q.resolve('sample-csrf-token'));
 
@@ -76,6 +77,12 @@ describe('Moderator Page', function() {
     var directive = $injector.get('moderatorPageDirective')[0];
     ctrl = $injector.instantiate(directive.controller, { $scope });
   }));
+
+  afterEach(function() {
+    for (let subscription of subscriptions) {
+      subscription.unsubscribe();
+    }
+  });
 
   it('should get date time as string', function() {
     // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.

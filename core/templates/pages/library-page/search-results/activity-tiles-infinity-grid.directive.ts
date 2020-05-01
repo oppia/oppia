@@ -37,6 +37,7 @@ angular.module('oppia').directive('activityTilesInfinityGrid', [
             WindowDimensionsService) {
           var ctrl = this;
           ctrl.loadingMessage = '';
+          ctrl.subscriptions = [];
           ctrl.showMoreActivities = function() {
             if (!ctrl.loadingMessage && !ctrl.endOfPageIsReached) {
               ctrl.searchResultsAreLoading = true;
@@ -53,9 +54,8 @@ angular.module('oppia').directive('activityTilesInfinityGrid', [
             }
           };
           ctrl.$onInit = function() {
-            LoaderService.getLoadingMessageSubject().subscribe(
-              (message: string) => this.loadingMessage = message
-            );
+            ctrl.subscriptions.push(LoaderService.getLoadingMessageSubject()
+              .subscribe((message: string) => this.loadingMessage = message));
             // Called when the first batch of search results is retrieved from
             // the server.
             $scope.$on(
@@ -76,6 +76,11 @@ angular.module('oppia').directive('activityTilesInfinityGrid', [
               $scope.$apply();
             });
           };
+          $scope.$on('$destroy', function() {
+            for (let subscription of ctrl.subscriptions) {
+              subscription.unsubscribe();
+            }
+          });
         }
       ]
     };

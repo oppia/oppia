@@ -31,7 +31,7 @@ describe('Signup controller', function() {
     var ctrl, $httpBackend, rootScope, mockAlertsService, urlParams;
     var $componentController, CsrfService, LoaderService;
     var loadingMessage;
-
+    var subscriptions = [];
     beforeEach(
       angular.mock.module('oppia', TranslatorProviderForTests));
     beforeEach(angular.mock.module('oppia', function($provide) {
@@ -54,9 +54,9 @@ describe('Signup controller', function() {
       CsrfService = $injector.get('CsrfTokenService');
       loadingMessage = '';
       LoaderService = $injector.get('LoaderService');
-      LoaderService.getLoadingMessageSubject().subscribe(
+      subscriptions.push(LoaderService.getLoadingMessageSubject().subscribe(
         (message: string) => loadingMessage = message
-      );
+      ));
       spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
         var deferred = $q.defer();
         deferred.resolve('sample-csrf-token');
@@ -84,6 +84,12 @@ describe('Signup controller', function() {
       // $onInit lifecycle hook, so we need to call it explicitly.
       ctrl.$onInit();
     }));
+
+    afterEach(function() {
+      for (let subscription of subscriptions) {
+        subscription.unsubscribe();
+      }
+    });
 
     it('should show warning if user has not agreed to terms', function() {
       ctrl.submitPrerequisitesForm(false, null);
