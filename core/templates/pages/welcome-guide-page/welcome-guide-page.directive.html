@@ -1,78 +1,70 @@
-
- <div style="height: auto; background-color: #FFFFFF;" class="row content">
-    <div class="col-sm-6">
-      
-      <div class = "oppia-welcome-guide-header">
-      <h1 class = "oppia-welcome-guide-h1" translate = "I18N_WELCOME_GUIDE_TITLE">  </h1>
-      <div style = "width:100%; " class = "oppia-splash-bullet-block">
-        <p style = "line-height: 1.7" translate="I18N_WELCOME_GUIDE_PARAGRAH_1">
+<div style="height: auto; background-color: #FFFFFF;" class="row content">
+  <div class="col-sm-6">
+    <div class="oppia-welcome-guide-header">
+      <h1 class="oppia-welcome-guide-h1" translate="I18N_WELCOME_GUIDE_TITLE"> </h1>
+      <div style="width:100%; " class="oppia-splash-bullet-block">
+        <p style="line-height: 1.7" translate="I18N_WELCOME_GUIDE_PARAGRAH_1">
         </p>
       </div>
     </div>
-
-    </div>
-    <div class="col-sm-6">
-      <img ng-src="<[$ctrl.headerImgUrl]>" alt="Learning with Oppia" style="width:100%; height: 500px; object-fit: cover;">
-
-    </div>
   </div>
+  <div class="col-sm-6">
+    <img ng-src="<[$ctrl.headerImgUrl]>" alt="Learning with Oppia"
+      style="width:100%; height: 500px; object-fit: cover;">
 
-
-
-
-
-
-
-
-  <div style=" background-color: #E5E5E5" class="row content">
-    <div class="col-sm-8">
-      <div style = "margin-left: 120px;">
-        <div style = "background-color: transparent;" class="oppia-splash-section-one">
-      <h2 class = "oppia-splash-h1" translate = "I18N_WELCOME_PAGE_COLLECTIONS_TITLE">  </h2>
-      <div style = "width:100%" class = "oppia-splash-bullet-block">
-        A Collection in Oppia is a library of lessons.  Oppia has several collections, including the “Fractions” collection. Within the “Fractions” collections there are different explorations that help a student strengthen their fraction skills.       </div>
-    </div>
-    <div style = "background-color: transparent;" class="oppia-splash-section-one">
-      <h2 class = "oppia-splash-h1" translate = "I18N_WELCOME_PAGE_EXPLORATION_TITLE">  </h2>
-      <div style = "width:100%" class = "oppia-splash-bullet-block">
-        At Oppia, the lessons we provide for students are called explorations. All Explorations are comprised of images, videos, and questions that help students explore and strengthen their knowledge on various topics in a fun and interactive way. The first exploration in the Fraction collection is called “What is a Fraction”. It lays the necessary groundwork and introduces the topic to students first learning about fractions.        </div>
-    </div>
-    </div>
-    </div>
-    <div class="col-sm-4">
-      <img ng-src="<[$ctrl.fractionImgUrl]>" alt="fraction pic" style="height: 250px;">
-    </div>
   </div>
+</div>
 
-
-  <div style="height: 900px; background-color: #FFFFFF" class="row content">
+<div style=" background-color: #E5E5E5" class="row content">
+  <div class="col-sm-8">
     <div class="oppia-welcome-guide-header">
-      <h1 class="oppia-welcome-guide-h1" translate="I18N_WELCOME_GUIDE_HOW_TO_TITLE"> </h1>
-      <div class = "oppia-welcome-guide-block">
-        <p translate="I18N_WELCOME_GUIDE_PARAGRAH_4"></p>
-        <p translate="I18N_WELCOME_GUIDE_PARAGRAH_5"></p>
-        <p translate="I18N_WELCOME_GUIDE_PARAGRAH_6"></p>
-     </div>
+      <h1 class="oppia-welcome-guide-h1" translate="I18N_WELCOME_PAGE_COLLECTIONS_TITLE"> </h2>
+      <div style="width:100%" class="oppia-splash-bullet-block">
+        A Collection in Oppia is a library of lessons. Oppia has several collections, including the “Fractions”
+        collection. Within the “Fractions” collections there are different explorations that help a student strengthen
+        their fraction skills.
+      </div>
+      <h1 class="oppia-welcome-guide-h1" translate="I18N_WELCOME_PAGE_EXPLORATION_TITLE"> </h2>
+      <div style="width:100%" class="oppia-splash-bullet-block">
+        At Oppia, the lessons we provide for students are called explorations. All Explorations are comprised of
+        images, videos, and questions that help students explore and strengthen their knowledge on various topics in a
+        fun and interactive way. The first exploration in the Fraction collection is called “What is a Fraction”. It
+        lays the necessary groundwork and introduces the topic to students first learning about fractions. </div>
     </div>
-  <div class="oppia-welcome-guide-browser-image col-sm-7" >
+  </div>
+  <div class="col-sm-4 oppia-welcome-guide-fractions-image">
+    <img ng-src="<[$ctrl.fractionImgUrl]>" alt="fraction pic">
+  </div>
+</div>
+
+<div style="background-color: #FFFFFF" class="row content">
+  <div class="oppia-welcome-guide-header">
+    <h1 class="oppia-welcome-guide-h1" translate="I18N_WELCOME_GUIDE_HOW_TO_TITLE"> </h1>
+    <div class="oppia-welcome-guide-block">
+      <p translate="I18N_WELCOME_GUIDE_PARAGRAH_4"></p>
+      <p translate="I18N_WELCOME_GUIDE_PARAGRAH_5"></p>
+      <p translate="I18N_WELCOME_GUIDE_PARAGRAH_6"></p>
+    </div>
+  </div>
+  <div class="oppia-welcome-guide-browser-image col-sm-7">
     <img ng-src="<[$ctrl.browserImgUrl]>" alt="Screenshot of Oppia explorations page" style="width: 625px;">
   </div>
-  <div class="oppia-welcome-guide-browser-image col-sm-5" >
+  <div class="oppia-welcome-guide-browser-image col-sm-5">
     <br><br>
-    <img ng-src="<[$ctrl.number1ImgUrl]>" alt="Number 1"  style="height: 35px;">
-    <p class = "oppia-welcome-guide-numbers" translate = "I18N_WELCOME_GUIDE_BROWSER-BULLET_1"> </p>
+    <img ng-src="<[$ctrl.number1ImgUrl]>" alt="Number 1" style="height: 35px;">
+    <p class="oppia-welcome-guide-numbers" translate="I18N_WELCOME_GUIDE_BROWSER-BULLET_1"> </p>
     <br><br>
     <img ng-src="<[$ctrl.number2ImgUrl]>" alt="Number 2" style="height: 35px;">
-    <p class = "oppia-welcome-guide-numbers" translate = "I18N_WELCOME_GUIDE_BROWSER-BULLET_2"></p>
-    <br ><br>
-    <img ng-src="<[$ctrl.number3ImgUrl]>" alt="Number 3"  style="height: 35px;">
-    <p class = "oppia-welcome-guide-numbers" translate = "I18N_WELCOME_GUIDE_BROWSER-BULLET_3"></p>
+    <p class="oppia-welcome-guide-numbers" translate="I18N_WELCOME_GUIDE_BROWSER-BULLET_2"></p>
+    <br><br>
+    <img ng-src="<[$ctrl.number3ImgUrl]>" alt="Number 3" style="height: 35px;">
+    <p class="oppia-welcome-guide-numbers" translate="I18N_WELCOME_GUIDE_BROWSER-BULLET_3"></p>
     <br><br>
     <img ng-src="<[$ctrl.number4ImgUrl]>" alt="Number 4" style="height: 35px;">
-    <p class = "oppia-welcome-guide-numbers" translate = "I18N_WELCOME_GUIDE_BROWSER-BULLET_4"></p>
-    <br ><br>
+    <p class="oppia-welcome-guide-numbers" translate="I18N_WELCOME_GUIDE_BROWSER-BULLET_4"></p>
+    <br><br>
     <img ng-src="<[$ctrl.number5ImgUrl]>" alt="Number 5" style="height: 35px;">
-    <p class = "oppia-welcome-guide-numbers" translate = "I18N_WELCOME_GUIDE_BROWSER-BULLET_5"></p>
+    <p class="oppia-welcome-guide-numbers" translate="I18N_WELCOME_GUIDE_BROWSER-BULLET_5"></p>
 
   </div>
 </div>
