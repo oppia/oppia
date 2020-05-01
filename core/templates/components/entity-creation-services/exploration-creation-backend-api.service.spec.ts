@@ -49,7 +49,7 @@ describe('Exploration Creation backend service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  fit('should create a new exploration and get the exploration id',
+  it('should create a new exploration and get the exploration id',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
@@ -66,7 +66,7 @@ describe('Exploration Creation backend service', function() {
       expect(failHandler).not.toHaveBeenCalled();
     });
 
-  fit('should fail to create a new exploration and call the fail handler',
+  it('should fail to create a new exploration and call the fail handler',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
