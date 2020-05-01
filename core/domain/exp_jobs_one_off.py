@@ -579,7 +579,7 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         'voiceovers_mapping': voiceovers_mapping
                     }
                 }))
-        if states_changed_count > 0:
+        if len(commit_cmds) > 0:
             exp_services.update_exploration(
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update duration in seconds for each voiceover recording '
