@@ -4531,6 +4531,15 @@ div.oppia-issues-learner-action {
  width: 100%;
 }
 
+.oppia-welcome-guide-fractions-image{
+  display: block;
+  height: 365px;
+  padding-left: 70px;
+  padding-right: 70px;
+  padding-top: 100px;
+  width: 100%;
+ }
+
 .oppia-welcome-guide-block {
   font-family: "Roboto", Arial, sans-serif;
   font-size: 1.17em;
@@ -4548,6 +4557,7 @@ div.oppia-issues-learner-action {
  padding-left: 70px;
  padding-right: 70px;
  padding-top: 70px;
+ margin-bottom: 10px;
  max-height: 500px;
 }
 

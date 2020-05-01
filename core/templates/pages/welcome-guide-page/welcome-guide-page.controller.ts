@@ -36,7 +36,7 @@ angular.module('oppia').directive('welcomeGuidePage', [
         var ctrl = this;
         ctrl.$onInit = function() {
           ctrl.fractionImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/welcomeguide/fraction.jpg');
+            '/welcomeguide/fractions.png');
           ctrl.headerImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/welcomeguide/header.jpg');
           ctrl.thanksImgUrl = UrlInterpolationService.getStaticImageUrl(
