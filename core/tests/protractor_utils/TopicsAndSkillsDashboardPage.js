@@ -87,6 +87,39 @@ var TopicsAndSkillsDashboardPage = function() {
     });
   };
 
+  var getAssignSkillToTopicButtons = async function(
+      skillDescription, topicName) {
+    return new Promise(function(resolve, reject) {
+      assignSkillToTopicButtons.then(function(elems) {
+        resolve(elems);
+      });
+    });
+  };
+
+  var getSkillDescriptions = async function() {
+    return new Promise(function(resolve, reject) {
+      skillDescriptions.then(function(elems) {
+        resolve(elems);
+      });
+    });
+  };
+
+  var getTopicsListItems = async function(topicName) {
+    return new Promise(function(resolve, reject) {
+      topicsListItems.then(function(topics) {
+        resolve(topics);
+      });
+    });
+  };
+
+  var getTopicNamesInTopicSelectModal = async function() {
+    return new Promise(function(resolve, reject) {
+      topicNamesInTopicSelectModal.then(function(topics) {
+        resolve(topics);
+      });
+    });
+  };
+
   this.get = function() {
     browser.get(DASHBOARD_URL);
     waitFor.pageToFullyLoad();
@@ -113,9 +146,33 @@ var TopicsAndSkillsDashboardPage = function() {
     assignSkillToTopicButtons.then(function(elems) {
       elems[index].click();
       topicsListItems.then(function(topics) {
-        topics[index].click();
+        topics[topicIndex].click();
         confirmMoveButton.click();
       });
+    });
+  };
+
+  this.assignSkillWithDescriptionToTopicByTopicName = async function(
+      skillDescription, topicName) {
+    var elems = await getAssignSkillToTopicButtons();
+    var skills = await getSkillDescriptions();
+    for (var i = 0 ;i < skills.length;i++) {
+      var skillText = await skills[i].getText();
+      if (skillText === skillDescription) {
+        await elems[i].click();
+        var topics = await getTopicsListItems();
+        var topicNames = await getTopicNamesInTopicSelectModal();
+        for (var j = 0; j < topicNames.length; j++) {
+          var topicText = await topicNames[j].getText();
+          if (topicText === topicName) {
+            await topics[j].click();
+            await confirmMoveButton.click();
+          }
+        }
+      }
+    }
+    return new Promise(function(resolve, reject) {
+      resolve('done');
     });
   };
 

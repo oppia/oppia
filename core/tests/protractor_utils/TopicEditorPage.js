@@ -22,6 +22,8 @@ var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 var path = require('path');
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 
 var TopicEditorPage = function() {
   var EDITOR_URL_PREFIX = '/topic_editor/';
@@ -78,6 +80,10 @@ var TopicEditorPage = function() {
   var createQuestionButton = element(
     by.css('.protractor-test-create-question-button'));
   var skillItems = element.all(by.css('.protractor-test-skill-item'));
+  var skillListItems = element.all(
+    by.css('.protractor-test-skills-list-item'));
+  var skillSaveButton = element(
+    by.css('.protractor-test-confirm-skill-selection-button'));
   var confirmSkillButton = element(
     by.css('.protractor-test-confirm-skill-button'));
   var confirmSkillDifficultyButton = element(
@@ -99,8 +105,34 @@ var TopicEditorPage = function() {
     by.css('.thumbnail-editor .protractor-test-photo-button'));
   var thumbnailContainer = element(
     by.css('.protractor-test-thumbnail-container'));
+  var linkAnotherSkillButton = element(
+    by.css('.protractor-test-link-skill'));
+
   var dragAndDrop = function(fromElement, toElement) {
     browser.executeScript(dragAndDropScript, fromElement, toElement);
+  };
+  var getQuestionItems = async function() {
+    return new Promise(function(resolve, reject) {
+      questionItems.then(function(items) {
+        resolve(items);
+      });
+    });
+  };
+
+  var getSkillItems = async function() {
+    return new Promise(function(resolve, reject) {
+      skillItems.then(function(elem) {
+        resolve(elem);
+      });
+    });
+  };
+
+  var getSkillListItems = async function() {
+    return new Promise(function(resolve, reject) {
+      skillListItems.then(function(elem) {
+        resolve(elem);
+      });
+    });
   };
 
   this.get = function(topicId) {
@@ -143,20 +175,96 @@ var TopicEditorPage = function() {
     });
   };
 
+  this.selectSkillWithDescriptionFromDropDown = function(skillDescription) {
+    waitFor.elementToBeClickable(
+      selectSkillDropdown, 'Skills dropdown taking too long to appear.');
+    selectSkillDropdown.click();
+    waitFor.elementToBeClickable(
+      element(by.css('option[label="' + skillDescription + '"]'))
+      , 'Skill from dropdown taking too long to be clickable'
+    );
+    element(by.css('option[label="' + skillDescription + '"]')).click();
+  };
+
+  this.openQuestionEditor = function(index) {
+    waitFor.visibilityOf(
+      questionItem, 'Question takes too long to appear');
+    questionItems.then(function(questions) {
+      waitFor.elementToBeClickable(
+        questions[index], 'Question takes too long to be clickable');
+      questions[index].click();
+      waitFor.visibilityOf(
+        saveQuestionButton, 'Question editor takes too long to open');
+    });
+  };
+
   this.saveQuestion = function() {
+    waitFor.elementToBeClickable(
+      saveQuestionButton,
+      'Save Question button takes too long to be clickable');
     saveQuestionButton.click();
   };
 
-  this.createQuestionForSkillWithIndex = function(index) {
+  this.createQuestionForSkillWithDescription = async function(
+      skillDescription) {
     createQuestionButton.click();
-    skillItems.then(function(elem) {
-      elem[index].click();
-      waitFor.elementToBeClickable(
-        confirmSkillButton,
-        'Confirm Skill button takes too long to be clickable');
-      confirmSkillButton.click();
-      confirmSkillDifficultyButton.click();
+    var skills = await getSkillItems();
+    for (var i = 0; i < skills.length; i++) {
+      var skillText = await skills[i].getText();
+      if (skillText === skillDescription) {
+        await skills[i].click();
+        waitFor.elementToBeClickable(
+          confirmSkillButton,
+          'Confirm Skill button takes too long to be clickable');
+        await confirmSkillButton.click();
+        await confirmSkillDifficultyButton.click();
+      }
+    }
+    return new Promise(function(resolve, reject) {
+      resolve('done');
     });
+  };
+
+  this.linkSkillWithDescriptionToQuestion = async function(skillDescription) {
+    var questions = await getQuestionItems();
+    await questions[0].click();
+    await linkAnotherSkillButton.click();
+    var skills = await getSkillListItems();
+    for (var i = 0; i < skills.length; i++) {
+      var skillText = await skills[i].getText();
+      if (skillText === skillDescription) {
+        await skills[i].click();
+        await skillSaveButton.click();
+        waitFor.elementToBeClickable(
+          saveQuestionButton,
+          'Save Question button takes too long to be clickable');
+        await saveQuestionButton.click();
+      }
+    }
+    return new Promise(function(resolve, reject) {
+      resolve('done');
+    });
+  };
+
+  this.editQuestionContents = function(index, newContent, commitMessage) {
+    var explorationEditorPage =
+                     new ExplorationEditorPage.ExplorationEditorPage();
+    var explorationEditorMainTab = explorationEditorPage.getMainTab();
+    questionItems.then(
+      function(questions) {
+        questions[index].click();
+        explorationEditorMainTab.setContent(forms.toRichText(newContent));
+        waitFor.elementToBeClickable(
+          saveQuestionButton,
+          'Save Question button takes too long to be clickable');
+        saveQuestionButton.click();
+        // Confirm the edit by adding a commit message.
+        commitMessageField.sendKeys(commitMessage);
+        waitFor.elementToBeClickable(
+          closeSaveModalButton,
+          'Save commit button taking to long to be clickable');
+        closeSaveModalButton.click();
+      });
   };
 
   this.moveToQuestionsTab = function() {

@@ -101,6 +101,13 @@ var newTabToBeCreated = function(errorMessage) {
   });
 };
 
+/**
+* Wait for a promise to resolve
+*/
+var promiseToResolve = function(promise, errorMessage) {
+  return browser.wait(promise, DEFAULT_WAIT_TIME_MSECS, errorMessage);
+};
+
 exports.alertToBePresent = alertToBePresent;
 exports.elementToBeClickable = elementToBeClickable;
 exports.invisibilityOf = invisibilityOf;
@@ -108,3 +115,4 @@ exports.pageToFullyLoad = pageToFullyLoad;
 exports.textToBePresentInElement = textToBePresentInElement;
 exports.visibilityOf = visibilityOf;
 exports.newTabToBeCreated = newTabToBeCreated;
+exports.promiseToResolve = promiseToResolve;

@@ -95,11 +95,17 @@ describe('Topic editor functionality', function() {
         general.closeCurrentTabAndSwitchTo(handle);
         topicsAndSkillsDashboardPage.get();
         topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-        topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
-
-        topicEditorPage.get(topicId);
+        waitFor.promiseToResolve(
+          topicsAndSkillsDashboardPage.
+            assignSkillWithDescriptionToTopicByTopicName(
+              'Skill 1', 'Topic 1')
+          , 'Assigning skill to topic taking too long.');
+        topicsAndSkillsDashboardPage.get();
+        topicsAndSkillsDashboardPage.editTopic('Topic 1');
         topicEditorPage.moveToQuestionsTab();
-        topicEditorPage.createQuestionForSkillWithIndex(0);
+        waitFor.promiseToResolve(
+          topicEditorPage.createQuestionForSkillWithDescription('Skill 1')
+          , 'Creating the question takes too long.');
         explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
         explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
         explorationEditorMainTab.addResponse(
@@ -112,11 +118,20 @@ describe('Topic editor functionality', function() {
           explanation: 'It is correct'
         });
         topicEditorPage.saveQuestion();
-
-        topicEditorPage.get(topicId);
+        topicsAndSkillsDashboardPage.get();
+        topicsAndSkillsDashboardPage.editTopic('Topic 1');
         topicEditorPage.moveToQuestionsTab();
         topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
           1, 'Skill 1');
+        topicEditorPage.editQuestionContents(
+          0, 'Question 2', 'Edited the question content.');
+        topicEditorPage.get(topicId);
+        topicEditorPage.moveToQuestionsTab();
+        // Confirm that the content of the question has changed.
+        topicEditorPage.selectSkillWithDescriptionFromDropDown('Skill 1');
+        topicEditorPage.openQuestionEditor(0);
+        explorationEditorMainTab.expectContentToMatch(
+          forms.toRichText('Question 2'));
 
         skillEditorPage.get(skillId);
         skillEditorPage.moveToQuestionsTab();
@@ -128,6 +143,32 @@ describe('Topic editor functionality', function() {
       });
     });
   });
+
+  it(
+    'should create an additional skill in the topic and edit the skill' +
+    'linkages for the existing question', function() {
+      topicsAndSkillsDashboardPage.get();
+      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+        'Skill 2', 'Concept card explanation');
+      topicsAndSkillsDashboardPage.get();
+      topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+      waitFor.promiseToResolve(
+        topicsAndSkillsDashboardPage.
+          assignSkillWithDescriptionToTopicByTopicName(
+            'Skill 2', 'Topic 1')
+        , 'Assigning skill to topic taking too long.');
+      topicsAndSkillsDashboardPage.get();
+      topicsAndSkillsDashboardPage.editTopic('Topic 1');
+      topicEditorPage.moveToQuestionsTab();
+      topicEditorPage.selectSkillWithDescriptionFromDropDown('Skill 1');
+      waitFor.promiseToResolve(
+        topicEditorPage.linkSkillWithDescriptionToQuestion('Skill 2')
+        , 'Linking the skill to the question takes too long.');
+      topicEditorPage.moveToQuestionsTab();
+      topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
+        1, 'Skill 2');
+    });
+
 
   it('should add a canonical story to topic correctly', function() {
     topicEditorPage.expectNumberOfStoriesToBe(0);
