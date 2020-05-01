@@ -21,7 +21,7 @@ angular.module('oppia').factory('ExplorationCreationBackendService', [
   function(
       $http, $q) {
     var _createExploration = function(successCallback, errorCallback) {
-      $http.post('/contributehandler/create_new', {})
+      $http.post('/contributehandler/create_new', null)
         .then(function(response) {
           if (successCallback) {
             successCallback(response.data);
