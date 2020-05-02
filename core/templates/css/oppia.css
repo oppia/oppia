@@ -1853,7 +1853,7 @@ pre.oppia-pre-wrapped-text {
 
 .improvements-tab-wrapper {
   background-color: #EEEEEE;
-  font-family: "Roboto";
+  font-family: Roboto, Arial, sans-serif;
   margin: 0;
   padding: 0;
   width: 100%;
