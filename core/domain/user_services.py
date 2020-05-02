@@ -877,8 +877,6 @@ def get_usernames(user_ids):
     return usernames
 
 
-# NB: If we ever allow usernames to change, update the
-# config_domain.BANNED_USERNAMES property.
 def set_username(user_id, new_username):
     """Updates the username of the user with the given user_id.
 
