@@ -296,11 +296,10 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
     def check_image_png_or_webp(self, image_string):
         """Returns Boolean
-        
-        Checks if the image is in png or webp format only
+        Checks if the image is in png or webp format only.
         """
-        if(image_string.startswith('data:image/png') or 
-           image_string.startswith('data:image/webp')):
+        if(image_string.startswith('data:image/png') or
+        image_string.startswith('data:image/webp')):
             return True
         return False
 
@@ -410,7 +409,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             messages_summary['author_username'], self.EDITOR_USERNAME)
         self.assertTrue(self.check_image_png_or_webp(
-            messages_summary['author_picture_data_url']))      
+            messages_summary['author_picture_data_url']))
         self.assertFalse(messages_summary.get('suggestion_html'))
         self.assertFalse(messages_summary.get('current_content_html'))
         self.assertFalse(messages_summary.get('description'))
