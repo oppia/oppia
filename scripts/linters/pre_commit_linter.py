@@ -431,13 +431,12 @@ def _get_task_output(task, semaphore):
             can run at any time.
 
     Returns:
-        all_messages: list(str). List of linter messages.
+        messages: list(str). List of linter messages.
     """
-    all_messages = []
     semaphore.acquire()
-    all_messages += task.output
+    messages = task.output
     semaphore.release()
-    return all_messages
+    return messages
 
 
 def main(args=None):
