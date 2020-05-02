@@ -172,10 +172,13 @@ class StoryNode(python_utils.OBJECT):
             title: str. The title of the story node.
             description: str. The description for the story node.
             thumbnail_filename: str|None. The thumbnail filename of the story
+                node.
             thumbnail_bg_color: str|None. The thumbnail background color of
+                the story node.
             destination_node_ids: list(str). The list of destination node ids
                 that this node points to in the story graph.
             acquired_skill_ids: list(str). The list of skill ids acquired by
+                the user on completion of the node.
             prerequisite_skill_ids: list(str). The list of skill ids required
                 before starting a node.
             outline: str. Free-form annotations that a lesson implementer
@@ -945,7 +948,7 @@ class Story(python_utils.OBJECT):
 
     @classmethod
     def _convert_story_contents_v2_dict_to_v3_dict(cls, story_contents_dict):
-        """Converts old Story Contents schema to the modern v3 schema.
+        """Converts v2 Story Contents schema to the v3 schema.
         v3 schema introduces the description field for Story Nodes.
 
         Args:
@@ -1152,6 +1155,9 @@ class Story(python_utils.OBJECT):
         Args:
             node_id: str. The id of the node.
             new_thumbnail_filename: str|None. The new thumbnail filename of the
+                given node.
+
+        Raises:
             ValueError: The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
@@ -1169,6 +1175,7 @@ class Story(python_utils.OBJECT):
             new_thumbnail_bg_color: str|None. The new thumbnail background
                 color of the given node.
 
+        Raises:
             ValueError: The node is not part of the story.
         """
         node_index = self.story_contents.get_node_index(node_id)
