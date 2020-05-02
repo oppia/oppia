@@ -75,7 +75,7 @@ describe('Written Translations Object Factory', () => {
         'content_1', 'content_2']);
       expect(() => {
         writtenTranslationsBackendDict.addContentId('content_2');
-      }).toThrow(Error('Trying to add duplicate content id.'));
+      }).toThrowError('Trying to add duplicate content id.');
       expect(writtenTranslationsBackendDict.getAllContentId()).toEqual([
         'content_1', 'content_2']);
 
@@ -84,7 +84,7 @@ describe('Written Translations Object Factory', () => {
         'content_1']);
       expect(() => {
         writtenTranslationsBackendDict.deleteContentId('content_2');
-      }).toThrow(Error('Unable to find the given content id.'));
+      }).toThrowError('Unable to find the given content id.');
       expect(writtenTranslationsBackendDict.getAllContentId()).toEqual([
         'content_1']);
     });
@@ -93,7 +93,7 @@ describe('Written Translations Object Factory', () => {
     expect(() => {
       writtenTranslationsBackendDict.addWrittenTranslation(
         'content_1', 'hi-en', 'This is a HTML text');
-    }).toThrow(Error('Trying to add duplicate language code.'));
+    }).toThrowError('Trying to add duplicate language code.');
 
     writtenTranslationsBackendDict.addWrittenTranslation(
       'content_1', 'en', 'English HTML');
@@ -129,7 +129,7 @@ describe('Written Translations Object Factory', () => {
       expect(() => {
         writtenTranslationsBackendDict.updateWrittenTranslationHtml(
           'content_1', 'en', 'This is the new HTML');
-      }).toThrow(Error('Unable to find the given language code.'));
+      }).toThrowError('Unable to find the given language code.');
       expect(writtenTranslationsBackendDict.hasWrittenTranslation('en'))
         .toBe(false);
     });

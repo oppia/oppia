@@ -271,7 +271,7 @@ var TopicsAndSkillsDashboardPage = function() {
       topicsTabButton, 'Unable to click on topics tab.');
     _getTopicElements(topicName).then(function(topicElements) {
       if (topicElements.length === 0) {
-        throw 'Could not find topic tile with name ' + topicName;
+        throw new Error('Could not find topic tile with name ' + topicName);
       }
       waitFor.elementToBeClickable(
         topicElements[0], 'Unable to click on topic: ' + topicName);
