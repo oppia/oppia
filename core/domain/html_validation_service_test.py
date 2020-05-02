@@ -1470,3 +1470,57 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             html_validation_service.regenerate_image_filename_using_dimensions(
                 'abc.png', 45, 45))
         self.assertEqual(regenerated_name, 'abc_height_45_width_45.png')
+
+    def test_svg_string_validation(self):
+        # A Valid SVG string.
+        valid_svg_string = (
+            '<svg version="1.0" xmlns="http://www.w3.org/2000/svg"  width="'
+            '100pt" height="100pt" viewBox="0 0 100 100"><g><path d="M5455 '
+            '2632 9z"/> </g> </svg>')
+        self.assertEqual(
+            html_validation_service.get_invalid_svg_tags_and_attrs(
+                valid_svg_string), ([], []))
+        # SVG containing an invalid tag.
+        invalid_svg_string = '<svg><testtag /></svg>'
+        self.assertEqual(
+            html_validation_service.get_invalid_svg_tags_and_attrs(
+                invalid_svg_string), (['testtag'], []))
+        # SVG containing an invalid attribute for a valid tag.
+        invalid_svg_string = '<svg><path d="M5455" danger="h4cK3D!" /></svg>'
+        self.assertEqual(
+            html_validation_service.get_invalid_svg_tags_and_attrs(
+                invalid_svg_string), ([], ['path:danger']))
+        # SVG containing an invalid attribute in an invalid tag.
+        invalid_svg_string = '<svg><hack d="M5 1z" danger="XYZ!"></svg>'
+        self.assertEqual(
+            html_validation_service.get_invalid_svg_tags_and_attrs(
+                invalid_svg_string), (['hack'], []))
+        # SVG containing a valid tag masquerading as an attribute.
+        invalid_svg_string = '<svg><g fill="#FFFFFF" path="YZ!" /></svg>'
+        self.assertEqual(
+            html_validation_service.get_invalid_svg_tags_and_attrs(
+                invalid_svg_string), ([], ['g:path']))
+        # SVG containing a invalid attribute for the parent tag but valid for
+        # a different tag.
+        invalid_svg_string = '<svg><path d="M5455" keytimes="h4cK3D!"></svg>'
+        self.assertEqual(
+            html_validation_service.get_invalid_svg_tags_and_attrs(
+                invalid_svg_string), ([], ['path:keytimes']))
+
+    def test_parsable_as_xml(self):
+        invalid_xml = 'aDRjSzNS'
+        self.assertEqual(
+            html_validation_service.is_parsable_as_xml(invalid_xml),
+            False)
+        invalid_xml = '123'
+        self.assertEqual(
+            html_validation_service.is_parsable_as_xml(invalid_xml),
+            False)
+        invalid_xml = False
+        self.assertEqual(
+            html_validation_service.is_parsable_as_xml(invalid_xml),
+            False)
+        valid_xml = '<svg><path d="0" /></svg>'
+        self.assertEqual(
+            html_validation_service.is_parsable_as_xml(valid_xml),
+            True)
