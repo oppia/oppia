@@ -422,6 +422,24 @@ def _print_complete_summary_of_errors(all_messages):
             python_utils.PRINT(message)
 
 
+def _get_task_output(task, semaphore):
+    """Returns output of running tasks.
+
+    Args:
+        task: object(TestingTaskSpec). The task object to get output of linter.
+        semaphore: threading.Semaphore. The object that controls how many tasks
+            can run at any time.
+
+    Returns:
+        all_messages: list(str). List of linter messages.
+    """
+    all_messages = []
+    semaphore.acquire()
+    all_messages += task.output
+    semaphore.release()
+    return all_messages
+
+
 def main(args=None):
     """Main method for pre commit linter script that lints Python, JavaScript,
     HTML, and CSS files.
@@ -498,20 +516,13 @@ def main(args=None):
     all_messages = []
 
     # Prepare semaphore for locking mechanism.
-    semaphore_max_concurrent_runs = 1
-    semaphore_concurrent_count = min(
-        multiprocessing.cpu_count(), semaphore_max_concurrent_runs)
-    semaphore = threading.Semaphore(semaphore_concurrent_count)
+    semaphore = threading.Semaphore(1)
 
     for task in tasks_custom:
-        semaphore.acquire()
-        all_messages += task.output
-        semaphore.release()
+        all_messages += _get_task_output(task, semaphore)
 
     for task in tasks_third_party:
-        semaphore.acquire()
-        all_messages += task.output
-        semaphore.release()
+        all_messages += _get_task_output(task, semaphore)
 
     all_messages += codeowner_linter.check_codeowner_file(
         verbose_mode_enabled)
