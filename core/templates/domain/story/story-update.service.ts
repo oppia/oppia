@@ -395,20 +395,20 @@ angular.module('oppia').factory('StoryUpdateService', [
        * change in the undo/redo service.
        */
       setStoryNodeThumbnailFilename: function(
-        story, nodeId, newThumbnailFilename) {
-      var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
-      var oldThumbnailFilename = storyNode.getThumbnailFilename();
+          story, nodeId, newThumbnailFilename) {
+        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
+        var oldThumbnailFilename = storyNode.getThumbnailFilename();
 
-      _applyStoryNodePropertyChange(
-        story, STORY_NODE_PROPERTY_THUMBNAIL_FILENAME, nodeId,
-        oldThumbnailFilename, newThumbnailFilename,
-        function(changeDict, story) {
-          // Apply.
-          storyNode.setThumbnailFilename(newThumbnailFilename);
-        }, function(changeDict, story) {
-          // Undo.
-          storyNode.setThumbnailFilename(oldThumbnailFilename);
-        });
+        _applyStoryNodePropertyChange(
+          story, STORY_NODE_PROPERTY_THUMBNAIL_FILENAME, nodeId,
+          oldThumbnailFilename, newThumbnailFilename,
+          function(changeDict, story) {
+            // Apply.
+            storyNode.setThumbnailFilename(newThumbnailFilename);
+          }, function(changeDict, story) {
+            // Undo.
+            storyNode.setThumbnailFilename(oldThumbnailFilename);
+          });
       },
 
       /**

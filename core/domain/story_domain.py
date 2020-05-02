@@ -945,7 +945,7 @@ class Story(python_utils.OBJECT):
 
     @classmethod
     def _convert_story_contents_v2_dict_to_v3_dict(cls, story_contents_dict):
-        """Converts old Story Contents schema to the modern v3 schema. 
+        """Converts old Story Contents schema to the modern v3 schema.
         v3 schema introduces the description field for Story Nodes.
 
         Args:
@@ -1135,7 +1135,7 @@ class Story(python_utils.OBJECT):
         Args:
             node_id: str. The id of the node.
             new_description: str. The new description of the given node.
-        
+
         Raises:
             ValueError: The node is not part of the story.
         """
@@ -1143,7 +1143,7 @@ class Story(python_utils.OBJECT):
         if node_index is None:
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
-        
+
         self.story_contents.nodes[node_index].description = new_description
 
     def update_node_thumbnail_filename(self, node_id, new_thumbnail_filename):
