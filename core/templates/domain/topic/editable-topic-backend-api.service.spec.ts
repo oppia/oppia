@@ -334,7 +334,7 @@ describe('Editable topic backend API service', () => {
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error deleting topic 1.');
     }
     ));
 });
