@@ -488,7 +488,7 @@ describe('Assets Backend API Service', function() {
         expect(function() {
           var service = $injector.get(
             'AssetsBackendApiService');
-        }).toThrow(Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.'));
+        }).toThrowError('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
       }));
   });
 
