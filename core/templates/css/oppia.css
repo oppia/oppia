@@ -4553,24 +4553,90 @@ div.oppia-issues-learner-action {
  padding-right: 70px;
  width: 100%;
 }
-.oppia-welcome-guide-header{
- padding-left: 70px;
- padding-right: 70px;
- padding-top: 70px;
- margin-bottom: 10px;
- max-height: 500px;
-}
 
 @media (max-width: 768px) {
   .oppia-welcome-guide-body{
    padding-left: 20px;
    padding-top: 20px;
   }
-   .oppia-welcome-guide-header{
-   padding-left: 20px;
-   padding-top: 20px;
+  
+}
+
+
+@media (min-width: 992px){
+  .oppia-welcome-guide-img {
+    text-align: right;
+    height: 460px;
+   
+  }
+  .oppia-welcome-guide-header{
+   padding-left:70px;
+ padding-right: 20px;
+ padding-top: 80px;
+ height: 460px;
+
+  }
+
+  .oppia-welcome-guide-img img {
+    width: auto;
+    height: 460px;
   }
 }
+
+
+@media (max-width: 992px) {
+.oppia-welcome-guide-img {
+    text-align: center;
+    padding-bottom: 30px;
+    height: auto;
+    padding-top: 20px;
+  
+  }
+
+   .oppia-welcome-guide-header{
+   padding-left:70px;
+ padding-right: 70px;
+ padding-top: 70px;
+ height: 300px;
+
+
+  }
+
+  .oppia-welcome-guide-img img {
+    width: 80%;
+    height: auto;
+    padding-top: 0px;
+  }
+}
+
+
+@media (max-width: 700px){
+  .oppia-welcome-guide-img {
+    text-align: center;
+    padding-bottom: 30px;
+    height: auto;
+  /*  padding-top: 20px;*/
+  
+  }
+
+   .oppia-welcome-guide-header{
+   padding-left:70px;
+ padding-right: 70px;
+ padding-top: 40px;
+ height: 400px;
+
+  }
+
+  .oppia-welcome-guide-img img {
+    width: auto;
+    height: auto;
+    padding-right: 50px;
+    padding-left: 50px;
+    padding-top: 15px;
+  }
+}
+
+
 .oppia-welcome-guide-numbers {
   display: inline;
   font-family: "Roboto", Arial, sans-serif;
@@ -4603,4 +4669,5 @@ div.oppia-issues-learner-action {
   font-family: "Roboto", Arial, sans-serif;
   font-size: 1.17em;
   text-align: left;
+  line-height: 200%;
 }
