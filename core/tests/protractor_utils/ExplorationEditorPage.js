@@ -21,9 +21,6 @@ var ExplorationEditorFeedbackTab = require(
   '../protractor_utils/ExplorationEditorFeedbackTab.js');
 var ExplorationEditorHistoryTab = require(
   '../protractor_utils/ExplorationEditorHistoryTab.js');
-var ExplorationEditorImprovementsTab = require(
-  '../protractor_utils/ExplorationEditorImprovementsTab.js'
-);
 var ExplorationEditorMainTab = require(
   '../protractor_utils/ExplorationEditorMainTab.js');
 var ExplorationEditorSettingsTab = require(
@@ -44,10 +41,6 @@ var ExplorationEditorPage = function() {
   };
   this.getHistoryTab = function() {
     return new ExplorationEditorHistoryTab.ExplorationEditorHistoryTab();
-  };
-  this.getImprovementsTab = function() {
-    return new ExplorationEditorImprovementsTab
-      .ExplorationEditorImprovementsTab();
   };
   this.getMainTab = function() {
     return new ExplorationEditorMainTab.ExplorationEditorMainTab();
