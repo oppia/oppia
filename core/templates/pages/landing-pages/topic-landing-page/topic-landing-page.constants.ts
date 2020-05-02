@@ -27,13 +27,11 @@ export class TopicLandingPageConstants {
         collection_id: '4UgTQUc1tala',
         page_data: {
           image_1: {
-            file_name_webp: 'matthew_paper.webp',
-            file_name_png: 'matthew_paper.png',
+            file_name: 'matthew_paper',
             alt: 'Matthew showing parts of fractions written on a card.'
           },
           image_2: {
-            file_name_webp: 'matthew_fractions.webp',
-            file_name_png: 'matthew_fractions.png',
+            file_name: 'matthew_fractions',
             alt: 'Matthew solving problems on Oppia.'
           },
           video: 'fractions_video.mp4',
@@ -50,13 +48,11 @@ export class TopicLandingPageConstants {
         collection_id: 'GdYIgsfRZwG7',
         page_data: {
           image_1: {
-            file_name_webp: 'negative_1.webp',
-            file_name_png: 'negative_1.png',
+            file_name: 'negative_1',
             alt: 'A boy showing 3 + -24 written on a slate.'
           },
           image_2: {
-            file_name_webp: 'negative_2.webp',
-            file_name_png: 'negative_2.png',
+            file_name: 'negative_2',
             alt: 'A boy smiling and solving negative-number problems on Oppia.'
           },
           video: 'negative-numbers_video.mp4',
@@ -73,13 +69,11 @@ export class TopicLandingPageConstants {
         collection_id: '53gXGLIR044l',
         page_data: {
           image_1: {
-            file_name_webp: 'ratios_James.webp',
-            file_name_png: 'ratios_James.png',
+            file_name: 'ratios_James',
             alt: 'A boy showing 2 is to 3 ratio on a card.'
           },
           image_2: {
-            file_name_webp: 'ratios_question.webp',
-            file_name_png: 'ratios_question.png',
+            file_name: 'ratios_question',
             alt: 'A smoothie shop and a card having question "What does a' +
               ' ratio tell us?" with options.'
           },

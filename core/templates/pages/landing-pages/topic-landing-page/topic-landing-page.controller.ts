@@ -51,24 +51,18 @@ angular.module('oppia').directive('topicLandingPage', [
           var getImageData = function(index) {
             var imageKey = 'image_' + index;
             if (landingPageData[imageKey]) {
-              var imagePathPng = UrlInterpolationService.interpolateUrl(
+              var imagePath = UrlInterpolationService.interpolateUrl(
                 angular.copy(assetsPathFormat), {
                   subject: ctrl.subject,
                   topic: topic,
                   file_name: landingPageData[imageKey].file_name_png
                 });
-              var imagePathWebp = UrlInterpolationService.interpolateUrl(
-                angular.copy(assetsPathFormat), {
-                  subject: ctrl.subject,
-                  topic: topic,
-                  file_name: landingPageData[imageKey].file_name_webp
-                });
               return {
                 src_png: UrlInterpolationService.getStaticImageUrl(
-                  imagePathPng
+                  imagePath + '.png'
                 ),
                 src_webp: UrlInterpolationService.getStaticImageUrl(
-                  imagePathWebp
+                  imagePath + '.webp'
                 ),
                 alt: landingPageData[imageKey].alt
               };
