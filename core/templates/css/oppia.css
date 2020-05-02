@@ -541,6 +541,12 @@ p:last-child {
   font-size: 1em !important;
 }
 
+.oppia-rte p {
+  line-height: 1.2;
+  margin-top: 0px;
+  margin-bottom: 18px;
+}
+
 .oppia-rte ol, .oppia-rte ul, .oppia-rte-editor ol, .oppia-rte-editor ul {
   line-height: 1.846;
   margin-bottom: 18px;
@@ -1857,6 +1863,10 @@ pre.oppia-pre-wrapped-text {
 }
 .oppia-rte-viewer > p:last-child {
   margin-bottom: 0;
+}
+
+.oppia-rte p:last-child {
+  margin: 0px;
 }
 
 .oppia-shadow-preview-card .oppia-rte-viewer > p:first-child {
