@@ -636,7 +636,7 @@ describe('Topic editor state service', function() {
     function() {
       expect(function() {
         TopicEditorStateService.saveTopic('Commit message');
-      }).toThrow();
+      }).toThrowError('Cannot save a topic before one is loaded.');
     }
   );
 

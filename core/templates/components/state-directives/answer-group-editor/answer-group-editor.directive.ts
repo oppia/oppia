@@ -91,7 +91,8 @@ angular.module('oppia').directive('answerGroupEditor', [
                   }
                 }
               } else {
-                throw Error('Expected skillMisconceptionId to be ' +
+                throw new Error(
+                  'Expected skillMisconceptionId to be ' +
                   '<skillId>-<misconceptionId>.');
               }
             }
@@ -348,18 +349,10 @@ angular.module('oppia').directive('answerGroupEditor', [
 
           ctrl.isCurrentInteractionTrainable = function() {
             var interactionId = ctrl.getCurrentInteractionId();
-            try {
-              return INTERACTION_SPECS[interactionId].is_trainable;
-            } catch (e) {
-              var additionalInfo = (
-                '\nUndefined interaction spec error debug logs:' +
-                '\nInteraction ID: ' + interactionId +
-                '\nExploration ID: ' + ContextService.getExplorationId() +
-                '\nState Name: ' + StateEditorService.getActiveStateName()
-              );
-              e.message += additionalInfo;
-              throw e;
+            if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
+              throw new Error('Invalid interaction id');
             }
+            return INTERACTION_SPECS[interactionId].is_trainable;
           };
 
           ctrl.openTrainingDataEditor = function() {
