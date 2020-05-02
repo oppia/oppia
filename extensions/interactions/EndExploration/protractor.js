@@ -26,7 +26,7 @@ var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 var customizeInteraction = function(elem, recommendedExplorationIdArray) {
   if (recommendedExplorationIdArray) {
     if (Array.isArray(recommendedExplorationIdArray) === false) {
-      throw Error ('Please use array to add recommendation Ids');
+      throw new Error ('Please use array to add recommendation Ids');
     }
     recommendedExplorationIdArray.forEach(function(explorationId) {
       var addExplorationIdButton = element(

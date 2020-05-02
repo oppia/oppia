@@ -226,7 +226,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
                           $scope.data.explanationContentId)
                       });
                     } else {
-                      throw Error('Cannot save invalid solution');
+                      throw new Error('Cannot save invalid solution');
                     }
                   };
                 }

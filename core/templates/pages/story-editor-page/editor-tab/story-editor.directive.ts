@@ -19,6 +19,8 @@
 require('components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
+  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
 
@@ -28,6 +30,10 @@ require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
+
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+const storyConstants = require('constants.ts');
 
 angular.module('oppia').directive('storyEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -63,6 +69,8 @@ angular.module('oppia').directive('storyEditor', [
             $scope.disconnectedNodes = [];
             $scope.linearNodesList = [];
             $scope.nodes = [];
+            $scope.allowedBgColors = (
+              storyConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
             if ($scope.storyContents &&
                 $scope.storyContents.getNodes().length > 0) {
               $scope.nodes = $scope.storyContents.getNodes();
@@ -209,6 +217,24 @@ angular.module('oppia').directive('storyEditor', [
               return;
             }
             StoryUpdateService.setStoryTitle($scope.story, newTitle);
+          };
+
+          $scope.updateStoryThumbnailFilename = function(
+              newThumbnailFilename) {
+            if (newThumbnailFilename === $scope.story.getThumbnailFilename()) {
+              return;
+            }
+            StoryUpdateService.setThumbnailFilename(
+              $scope.story, newThumbnailFilename);
+          };
+
+          $scope.updateStoryThumbnailBgColor = function(
+              newThumbnailBgColor) {
+            if (newThumbnailBgColor === $scope.story.getThumbnailBgColor()) {
+              return;
+            }
+            StoryUpdateService.setThumbnailBgColor(
+              $scope.story, newThumbnailBgColor);
           };
 
           $scope.updateStoryDescription = function(newDescription) {

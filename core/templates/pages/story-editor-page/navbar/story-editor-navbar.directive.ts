@@ -62,7 +62,8 @@ angular.module('oppia').directive('storyEditorNavbar', [
           $scope.getTotalWarningsCount = function() {
             return (
               $scope.validationIssues.length +
-              $scope.explorationValidationIssues.length);
+              $scope.explorationValidationIssues.length +
+              $scope.prepublishValidationIssues.length);
           };
 
           $scope.isStorySaveable = function() {
@@ -85,6 +86,19 @@ angular.module('oppia').directive('storyEditorNavbar', [
 
           var _validateStory = function() {
             $scope.validationIssues = $scope.story.validate();
+            _validateExplorations();
+            var nodes = $scope.story.getStoryContents().getNodes();
+            var storyPrepublishValidationIssues = (
+              $scope.story.prepublishValidate());
+            var nodePrepublishValidationIssues = (
+              [].concat.apply([], nodes.map(
+                (node) => node.prepublishValidate())));
+            $scope.prepublishValidationIssues = (
+              storyPrepublishValidationIssues.concat(
+                nodePrepublishValidationIssues));
+          };
+
+          var _validateExplorations = function() {
             var nodes = $scope.story.getStoryContents().getNodes();
             var explorationIds = [];
 
@@ -155,6 +169,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
             $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
             $scope.validationIssues = [];
+            $scope.prepublishValidationIssues = [];
             $scope.$on(EVENT_STORY_INITIALIZED, _validateStory);
             $scope.$on(EVENT_STORY_REINITIALIZED, _validateStory);
             $scope.$on(
