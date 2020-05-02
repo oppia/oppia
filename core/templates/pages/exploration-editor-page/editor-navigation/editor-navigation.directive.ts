@@ -43,13 +43,13 @@ angular.module('oppia').directive('editorNavigation', [
       controller: [
         '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
         'ExplorationFeaturesService', 'ExplorationRightsService',
-        'ExplorationWarningsService', 'ImprovementTaskService', 'RouterService',
+        'ExplorationWarningsService', 'RouterService',
         'SiteAnalyticsService', 'StateTutorialFirstTimeService',
         'ThreadDataService', 'UserService', 'WindowDimensionsService',
         function(
             $rootScope, $scope, $timeout, $uibModal, ContextService,
             ExplorationFeaturesService, ExplorationRightsService,
-            ExplorationWarningsService, ImprovementTaskService, RouterService,
+            ExplorationWarningsService, RouterService,
             SiteAnalyticsService, StateTutorialFirstTimeService,
             ThreadDataService, UserService, WindowDimensionsService) {
           var ctrl = this;
@@ -161,10 +161,6 @@ angular.module('oppia').directive('editorNavigation', [
           };
 
           ctrl.$onInit = function() {
-            ImprovementTaskService.fetchOpenTaskCount().then(
-              countOfOpenTasks => {
-                taskCount = countOfOpenTasks;
-              });
             $scope.popoverControlObject = {
               postTutorialHelpPopoverIsShown: false
             };
