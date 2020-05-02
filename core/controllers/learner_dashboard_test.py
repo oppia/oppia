@@ -401,7 +401,9 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
             messages_summary['author_username'], self.EDITOR_USERNAME)
         self.assertTrue(
             messages_summary['author_picture_data_url'].startswith(
-                'data:image/png;'))
+                'data:image/png;')||
+            messages_summary['author_picture_data_url'].startswith(
+                'data:image/webp;'))
         self.assertFalse(messages_summary.get('suggestion_html'))
         self.assertFalse(messages_summary.get('current_content_html'))
         self.assertFalse(messages_summary.get('description'))
