@@ -50,6 +50,12 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
             LOADING_INDICATOR_URL);
           ctrl.isLoadingIndicatorShown = false;
           ctrl.isTryAgainShown = false;
+          ctrl.dimensions = (
+            ImagePreloaderService.getDimensionsOfImage(ctrl.filepath));
+          ctrl.imageContainerStyle = {
+            height: ctrl.dimensions.height + 'px',
+            width: ctrl.dimensions.width + 'px'
+          };
 
           // If viewing a concept card in the exploration player, don't use the
           // preloader service. Since, in that service, the image file names are
@@ -62,14 +68,9 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
             ImagePreloaderService.inExplorationPlayer() &&
             !ContextService.getEntityType() === ENTITY_TYPE.SKILL) {
             ctrl.isLoadingIndicatorShown = true;
-            ctrl.dimensions = (
-              ImagePreloaderService.getDimensionsOfImage(ctrl.filepath));
             // For aligning the gif to the center of it's container
             var loadingIndicatorSize = (
               (ctrl.dimensions.height < 124) ? 24 : 120);
-            ctrl.imageContainerStyle = {
-              height: ctrl.dimensions.height + 'px'
-            };
             ctrl.loadingIndicatorStyle = {
               height: loadingIndicatorSize + 'px',
               width: loadingIndicatorSize + 'px'
