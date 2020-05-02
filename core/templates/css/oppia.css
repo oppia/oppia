@@ -4516,3 +4516,262 @@ div.oppia-issues-learner-action {
 .oppia-rule-preview {
   word-wrap: break-word;
 }
+
+.improvements-tab-wrapper {
+  background-color: #EEEEEE;
+  font-family: Roboto;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.improvements-tab-header {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.improvements-tab-completion-rate {
+  margin: 0 78px 0 78px;
+  width: 242px;
+}
+
+.improvements-tab-overview {
+  padding: 39px 0 50px 0;
+  width: 774px;
+}
+
+.improvements-tab-overview-header {
+  display: flex;
+  margin-bottom: 16px;
+}
+
+.improvements-tab-overview-header h1.header-title {
+  color: rgba(0,0,0,0.87);
+  flex-grow: 1;
+  font-size: 20px;
+  font-weight: bold;
+  height: 24px;
+  letter-spacing: 0.33px;
+  line-height: 24px;
+  margin: 0;
+  padding: 0;
+  text-transform: uppercase;
+}
+
+.improvements-tab-overview-header a.view-resolved-tasks {
+  color: #00829B;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: bold;
+  height: 18px;
+  letter-spacing: 0;
+  line-height: 16px;
+  margin: 4px 0 2px 0;
+  text-decoration: none;
+}
+
+.improvements-tab-overview-header a.view-resolved-tasks :hover {
+  text-decoration: none;
+}
+
+.improvements-tab-overview-header a.view-resolved-tasks img.time-machine {
+  display: inline-block;
+  height: 18px;
+  line-height: 18px;
+  margin-right: 10px;
+}
+
+.improvements-tab-overview-header a.view-resolved-tasks span.text {
+  color: #00829B;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 0;
+  line-height: 16px;
+  padding: 1px 0;
+  text-transform: uppercase;
+}
+
+.improvements-tab-overview-header a.view-resolved-tasks i.chevron-right {
+  display: inline-block;
+  font-size: 24px;
+  height: 18px;
+  line-height: 16px;
+  padding: 1px 0;
+  width: 16px;
+}
+
+.improvements-tab-overview-body {
+  background-color: #F5F5F5;
+  border-radius: 2px;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-sizing: border-box;
+  display: flex;
+  height: 121px;
+  margin: 0 6px 0 65px;
+  width: 703px;
+}
+
+.improvements-tab-overview-summary {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 25px 17px 15px 17px;
+}
+
+.improvements-tab-overview-summary div.improvements-count {
+  color: rgba(25,24,24,0.7);
+  display: inline-flex;
+  flex-grow: 1;
+  vertical-align: bottom;
+}
+
+.improvements-tab-overview-summary div.improvements-count strong {
+  display: inline-block;
+  font-size: 24px;
+  font-weight: bold;
+  height: 32px;
+  letter-spacing: 0.37px;
+  line-height: 28px;
+  text-align: center;
+  width: 24px;
+}
+
+.improvements-tab-overview-summary div.improvements-count p {
+  display: inline-block;
+  flex-grow: 1;
+  font-size: 16px;
+  letter-spacing: 0.47px;
+  line-height: 19px;
+  margin: 6px 7px 7px 7px;
+}
+
+.improvements-tab-overview-summary div.improvements-health {
+  display: inline-flex;
+  flex-grow: 0;
+  height: 21px;
+  line-height: 16px;
+  vertical-align: bottom;
+}
+
+.improvements-tab-overview-summary div.improvements-health span.outer-dot {
+  background-color: rgba(209,11,35,0.28);
+  border-radius: 50%;
+  display: inline-block;
+  height: 16px;
+  margin: 3px 14px 3px 10px;
+  padding: 3px;
+  width: 16px;
+}
+
+.improvements-tab-overview-summary div.improvements-health span.outer-dot span.inner-dot {
+  background-color: #D10B23;
+  border-radius: 50%;
+  display: inline-block;
+  height: 10px;
+  width: 10px;
+}
+
+.improvements-tab-overview-summary div.improvements-health p {
+  color: #D0021B;
+  display: inline-block;
+  flex-grow: 1;
+  font-size: 14px;
+  font-weight: bold;
+  height: 16px;
+  letter-spacing: 0.23px;
+  line-height: 16px;
+  margin: 3px 0 3px 0;
+}
+
+.improvements-tab-overview-navigation {
+  align-items: stretch;
+  border-left: 2px solid rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0;
+  height: 100%;
+  justify-content: stretch;
+  margin: 0;
+  padding: 0;
+  width: 212px;
+}
+
+.improvements-tab-overview-navigation-item {
+  align-items: center;
+  background-color: #F5F5F5;
+  display: flex;
+  flex: 1 1 auto;
+  list-style: none;
+}
+
+.improvements-tab-overview-navigation-item + .improvements-tab-overview-navigation-item {
+  border-top: 2px solid rgba(0,0,0,0.06);
+}
+
+.improvements-tab-overview-navigation-item a.task-scope {
+  color: #00829B;
+  display: inline-flex;
+  font-size: 14px;
+  letter-spacing: 0.23px;
+  line-height: 16px;
+}
+
+.improvements-tab-overview-navigation-item a.task-scope:hover {
+  text-decoration: none;
+}
+
+.improvements-tab-overview-navigation-item span.dot-healthy {
+  background-color: #419848;
+  border-radius: 50%;
+  display: inline-block;
+  height: 8px;
+  margin: 4px 6px 4px 12px;
+  width: 8px;
+}
+
+.improvements-tab-overview-navigation-item span.dot-warning {
+  background-color: #F2A900;
+  border-radius: 50%;
+  display: inline-block;
+  height: 8px;
+  margin: 4px 6px 4px 12px;
+  width: 8px;
+}
+
+.improvements-tab-overview-navigation-item span.dot-critical {
+  background-color: #D10B23;
+  border-radius: 50%;
+  display: inline-block;
+  height: 8px;
+  margin: 4px 6px 4px 12px;
+  width: 8px;
+}
+
+.improvements-tab-overview-navigation-item a.task-scope strong.number {
+  display: inline-block;
+  font-weight: bold;
+  width: 25px;
+}
+
+.improvements-tab-overview-navigation-item a.task-scope span.content {
+  display: inline-block;
+  width: 129px;
+}
+
+.improvements-tab-overview-navigation-item a.task-scope i.chevron-right {
+  display: inline-block;
+  font-size: 14px;
+  height: 9px;
+  width: 6px;
+}
+
+.improvements-tab-body {
+  background-color: #EEEEEE;
+  border-top: 1px solid rgba(0,0,0,0.12);
+  font-family: Roboto;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}

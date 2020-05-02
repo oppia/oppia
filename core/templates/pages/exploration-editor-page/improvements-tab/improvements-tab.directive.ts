@@ -50,9 +50,16 @@ angular.module('oppia').directive('improvementsTab', [
         'improvements-tab.directive.html'),
       controller: [
         '$scope', 'ImprovementTaskService', 'ImprovementsDisplayService',
-        function($scope, ImprovementTaskService, ImprovementsDisplayService) {
+        'UrlInterpolationService',
+        function(
+            $scope, ImprovementTaskService, ImprovementsDisplayService,
+            UrlInterpolationService) {
           var ctrl = this;
           var fetchedTasks = [];
+
+          $scope.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
 
           $scope.getStatusCssClass = function(status) {
             return ImprovementsDisplayService.getStatusCssClass(status);
