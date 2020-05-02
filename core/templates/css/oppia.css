@@ -4531,13 +4531,18 @@ div.oppia-issues-learner-action {
  width: 100%;
 }
 
-.oppia-welcome-guide-fractions-image{
-  display: block;
-  height: 365px;
+.oppia-welcome-guide-second-section{
+  padding-top:40px;
+  padding-bottom: 40px;
   padding-left: 70px;
-  padding-right: 70px;
-  padding-top: 100px;
-  width: 100%;
+}
+
+.oppia-welcome-guide-fractions-image{
+  margin:auto;
+  text-align: center;
+
+  padding-bottom: 40px;
+
  }
 
 .oppia-welcome-guide-block {
@@ -4634,6 +4639,18 @@ div.oppia-issues-learner-action {
     padding-left: 50px;
     padding-top: 15px;
   }
+
+  .oppia-welcome-guide-fractions-image{
+  width: 80%;
+ }
+
+ .oppia-welcome-guide-second-section{
+
+  padding-left: 70px;
+  padding-right: 70px;
+}
+
+
 }
 
 
@@ -4662,7 +4679,7 @@ div.oppia-issues-learner-action {
 .oppia-welcome-guide-h1{
   color: #005c5e;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  padding-bottom: 20px;
+  padding-bottom: 15px;
 }
 
 .oppia-welcome-guide-p{
