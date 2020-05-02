@@ -71,6 +71,9 @@ angular.module('oppia').directive('skillsList', [
             return '/skill_editor/' + skillId;
           };
 
+          $scope.mergeSkillImageUrl = UrlInterpolationService.getStaticImageUrl(
+            '/general/merge_skill.svg');
+
           $scope.deleteSkill = function(skillId) {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
