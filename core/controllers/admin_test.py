@@ -1767,4 +1767,4 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(
             '/interactionsByExplorationId', params=payload)
         interactions_list = response['interactions']
-        self.assertEqual(len(interactions_list), 1)
+        self.assertEqual(len(interactions_list), 2)
