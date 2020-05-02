@@ -1,6 +1,9 @@
 <figure>
   <div ng-if="!$ctrl.isLoadingIndicatorShown && !$ctrl.isTryAgainShown">
-    <img ng-src="<[$ctrl.imageUrl]>" alt="<[$ctrl.imageAltText]>" class="center-element-horizontally">
+    <img ng-src="<[$ctrl.imageUrl]>"
+         alt="<[$ctrl.imageAltText]>"
+         class="center-element-horizontally"
+         ng-style="$ctrl.imageContainerStyle">
     <figcaption style="text-align:center;"><[$ctrl.imageCaption]></figcaption>
   </div>
   <div ng-if="$ctrl.isLoadingIndicatorShown" class="oppia-image-container" ng-style="$ctrl.imageContainerStyle">
