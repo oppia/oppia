@@ -183,7 +183,7 @@ CURRENT_STATE_SCHEMA_VERSION = 33
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of story contents dict in the story schema.
-CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 2
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 3
 
 # The current version of skill contents dict in the skill schema.
 CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
@@ -195,7 +195,7 @@ CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 2
 CURRENT_RUBRIC_SCHEMA_VERSION = 1
 
 # The current version of subtopics dict in the topic schema.
-CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
+CURRENT_SUBTOPIC_SCHEMA_VERSION = 2
 
 # The current version of story reference dict in the topic schema.
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
@@ -312,6 +312,7 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
     'jpeg': ['jpg', 'jpeg'],
     'png': ['png'],
     'gif': ['gif'],
+    'svg': ['svg']
 }
 
 # An array containing the accepted audio extensions for uploaded files and
@@ -711,6 +712,7 @@ RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 DELETE_ACCOUNT_URL = '/delete-account'
 DELETE_ACCOUNT_HANDLER_URL = '/delete-account-handler'
+EXPORT_ACCOUNT_HANDLER_URL = '/export-account-handler'
 PENDING_ACCOUNT_DELETION_URL = '/pending-account-deletion'
 REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
 REVIEW_TEST_URL_PREFIX = '/review_test'

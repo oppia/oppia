@@ -73,6 +73,9 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'id': self.NODE_ID_1,
             'title': 'Title 1',
             'description': 'Description 1',
+            'thumbnail_filename': 'image_1.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -86,6 +89,9 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'id': self.NODE_ID_2,
             'title': 'Title 2',
             'description': 'Description 2',
+            'thumbnail_filename': 'image_2.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -99,6 +105,9 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'id': self.NODE_ID_3,
             'title': 'Title 3',
             'description': 'Description 3',
+            'thumbnail_filename': 'image_3.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -119,7 +128,6 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, story)
         self.save_new_topic(
             self.TOPIC_ID, 'user', name='Topic',
-            abbreviated_name='abbrev', thumbnail_filename='Topic.png',
             description='A new topic', canonical_story_ids=[story.id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
@@ -185,7 +193,6 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
         new_story_id = 'new_story_id'
         self.save_new_topic(
             'topic_id_1', 'user', name='Topic 2',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='A new topic', canonical_story_ids=[new_story_id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)

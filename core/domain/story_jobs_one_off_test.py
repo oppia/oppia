@@ -50,8 +50,10 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             'outline': '',
             'outline_is_finalized': False,
             'prerequisite_skill_ids': [],
-            'title': 'Chapter 1',
-            'description': ''
+            'description': '',
+            'thumbnail_bg_color': None,
+            'thumbnail_filename': None,
+            'title': 'Chapter 1'
         }]
     }
 
@@ -69,7 +71,6 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.skill_id_2 = 'skill_id_2'
         self.save_new_topic(
             self.TOPIC_ID, self.albert_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
@@ -153,13 +154,34 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         """
         # Generate story with old(v1) story contents data.
         self.save_new_story_with_story_contents_schema_v1(
-            self.STORY_ID, self.albert_id, 'A title',
+            self.STORY_ID, 'image.svg', '#F8BF74', self.albert_id, 'A title',
             'A description', 'A note', self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, self.STORY_ID)
         story_model = (
             story_models.StoryModel.get(self.STORY_ID))
         self.assertEqual(story_model.story_contents_schema_version, 1)
+        self.assertEqual(
+            story_model.story_contents,
+            {
+                'initial_node_id': 'node_1',
+                'next_node_id': 'node_2',
+                'nodes': [{
+                    'acquired_skill_ids': [],
+                    'destination_node_ids': [],
+                    'exploration_id': None,
+                    'id': 'node_1',
+                    'outline': '',
+                    'outline_is_finalized': False,
+                    'prerequisite_skill_ids': [],
+                    'title': 'Chapter 1'
+                }]
+            })
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        self.assertEqual(story.story_contents_schema_version, 3)
+        self.assertEqual(
+            story.story_contents.to_dict(),
+            self.MIGRATED_STORY_CONTENTS_DICT)
 
         # Start migration job.
         job_id = (
@@ -178,7 +200,6 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             updated_story.story_contents_schema_version,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
-
         self.assertEqual(
             updated_story.story_contents.to_dict(),
             self.MIGRATED_STORY_CONTENTS_DICT)

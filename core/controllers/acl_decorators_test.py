@@ -1862,7 +1862,6 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.viewer_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -1932,7 +1931,6 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             self.topic_id)
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[self.story_id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -2025,7 +2023,6 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.viewer_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -2121,7 +2118,6 @@ class StoryViewerTests(test_utils.GenericTestBase):
             self.topic_id)
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename='Image.png',
             description='Description', canonical_story_ids=[self.story_id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -2403,7 +2399,6 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name1',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -2854,7 +2849,6 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
@@ -2895,7 +2889,6 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
             topic_id)
         self.save_new_topic(
             topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[story_id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)

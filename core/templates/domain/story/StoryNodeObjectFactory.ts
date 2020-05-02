@@ -33,11 +33,14 @@ export class StoryNode {
   _outline: string;
   _outlineIsFinalized: boolean;
   _explorationId: string;
+  _thumbnailBgColor: string;
+  _thumbnailFilename: string;
   constructor(
       id: string, title: string, description: string,
       destinationNodeIds: string[], prerequisiteSkillIds: string[],
-      acquiredSkillIds: string[], outline: string, outlineIsFinalized: boolean,
-      explorationId: string) {
+      acquiredSkillIds: string[], outline: string,
+      outlineIsFinalized: boolean, explorationId: string,
+      thumbnailBgColor: string, thumbnailFilename: string) {
     this._id = id;
     this._title = title;
     this._description = description;
@@ -47,6 +50,8 @@ export class StoryNode {
     this._outline = outline;
     this._outlineIsFinalized = outlineIsFinalized;
     this._explorationId = explorationId;
+    this._thumbnailBgColor = thumbnailBgColor;
+    this._thumbnailFilename = thumbnailFilename;
   }
 
   _checkValidNodeId(nodeId: string): boolean {
@@ -107,6 +112,30 @@ export class StoryNode {
 
   markOutlineAsNotFinalized(): void {
     this._outlineIsFinalized = false;
+  }
+
+  getThumbnailFilename(): string {
+    return this._thumbnailFilename;
+  }
+
+  setThumbnailFilename(thumbnailFilename: string): void {
+    this._thumbnailFilename = thumbnailFilename;
+  }
+
+  getThumbnailBgColor(): string {
+    return this._thumbnailBgColor;
+  }
+
+  setThumbnailBgColor(thumbnailBgColor: string): void {
+    this._thumbnailBgColor = thumbnailBgColor;
+  }
+
+  prepublishValidate(): Array<string> {
+    let issues = [];
+    if (!this._thumbnailFilename) {
+      issues.push('Chapter ' + this._title + ' should have a thumbnail.');
+    }
+    return issues;
   }
 
   validate(): string[] {
@@ -249,12 +278,16 @@ export class StoryNodeObjectFactory {
       storyNodeBackendObject.acquired_skill_ids,
       storyNodeBackendObject.outline,
       storyNodeBackendObject.outline_is_finalized,
-      storyNodeBackendObject.exploration_id
+      storyNodeBackendObject.exploration_id,
+      storyNodeBackendObject.thumbnail_bg_color,
+      storyNodeBackendObject.thumbnail_filename
     );
   }
 
   createFromIdAndTitle(nodeId: string, title: string): StoryNode {
-    return new StoryNode(nodeId, title, '', [], [], [], '', false, null);
+    return new StoryNode(
+      nodeId, title, '', [], [], [], '', false, null,
+      null, null);
   }
 }
 

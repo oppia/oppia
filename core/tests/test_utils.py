@@ -395,8 +395,26 @@ class TestBase(unittest.TestCase):
             'acquired_skill_ids': [],
             'id': 'node_1',
             'title': 'Chapter 1',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None}],
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2'
+    }
+
+    VERSION_3_STORY_CONTENTS_DICT = {
+        'nodes': [{
+            'outline': u'',
+            'exploration_id': None,
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
             'description': '',
-            'prerequisite_skill_ids': []}],
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None}],
         'initial_node_id': 'node_1',
         'next_node_id': 'node_2'
     }
@@ -1399,8 +1417,9 @@ tags: []
         return story
 
     def save_new_story_with_story_contents_schema_v1(
-            self, story_id, owner_id, title, description, notes,
-            corresponding_topic_id,
+            self, story_id, thumbnail_filename, thumbnail_bg_color,
+            owner_id, title, description,
+            notes, corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new story with a default version 1 story contents
         data dictionary.
@@ -1416,6 +1435,9 @@ tags: []
 
         Args:
             story_id: str. ID for the story to be created.
+            thumbnail_filename: str|None. Thumbnail filename for the story.
+            thumbnail_bg_color: str|None. Thumbnail background color for the
+                story.
             owner_id: str. The user_id of the creator of the story.
             title: str. The title of the story.
             description: str. The high level description of the story.
@@ -1428,6 +1450,8 @@ tags: []
         """
         story_model = story_models.StoryModel(
             id=story_id,
+            thumbnail_filename=thumbnail_filename,
+            thumbnail_bg_color=thumbnail_bg_color,
             description=description,
             title=title,
             language_code=language_code,
@@ -1446,9 +1470,12 @@ tags: []
 
     def save_new_topic(
             self, topic_id, owner_id, name='topic', abbreviated_name='topic',
-            thumbnail_filename='topic.png', description='description',
-            canonical_story_ids=None, additional_story_ids=None,
-            uncategorized_skill_ids=None, subtopics=None, next_subtopic_id=0,
+            thumbnail_filename='topic.svg',
+            thumbnail_bg_color=(
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
+            description='description', canonical_story_ids=None,
+            additional_story_ids=None, uncategorized_skill_ids=None,
+            subtopics=None, next_subtopic_id=0,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Topic and saves it.
 
@@ -1458,6 +1485,8 @@ tags: []
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated name of the topic.
             thumbnail_filename: str|None. The thumbnail filename of the topic.
+            thumbnail_bg_color: str|None. The thumbnail background color of the
+                topic.
             description: str. The desscription of the topic.
             canonical_story_ids: list(str). The list of ids of canonical stories
                 that are part of the topic.
@@ -1485,7 +1514,8 @@ tags: []
         uncategorized_skill_ids = (uncategorized_skill_ids or [])
         subtopics = (subtopics or [])
         topic = topic_domain.Topic(
-            topic_id, name, abbreviated_name, thumbnail_filename,
+            topic_id, name, abbreviated_name,
+            thumbnail_filename, thumbnail_bg_color,
             description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
@@ -1497,7 +1527,8 @@ tags: []
     def save_new_topic_with_subtopic_schema_v1(
             self, topic_id, owner_id, name, abbreviated_name,
             canonical_name, description, thumbnail_filename,
-            canonical_story_references, additional_story_references,
+            thumbnail_bg_color, canonical_story_references,
+            additional_story_references,
             uncategorized_skill_ids, next_subtopic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new topic with a default version 1 subtopic
@@ -1520,6 +1551,8 @@ tags: []
             canonical_name: str. The canonical name (lowercase) of the topic.
             description: str. The desscription of the topic.
             thumbnail_filename: str. The thumbnail file name of the topic.
+            thumbnail_bg_color: str. The thumbnail background color of the
+                topic.
             canonical_story_references: list(StoryReference). A set of story
                 reference objects representing the canonical stories that are
                 part of this topic.
@@ -1542,6 +1575,7 @@ tags: []
             name=name,
             abbreviated_name=abbreviated_name,
             thumbnail_filename=thumbnail_filename,
+            thumbnail_bg_color=thumbnail_bg_color,
             canonical_name=canonical_name,
             description=description,
             language_code=language_code,
