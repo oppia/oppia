@@ -18,6 +18,7 @@
  */
 
 var waitFor = require('./waitFor.js');
+var workflow = require('../protractor_utils/workflow.js');
 var path = require('path');
 
 var PreferencesPage = function() {
@@ -48,14 +49,10 @@ var PreferencesPage = function() {
     by.css('.protractor-test-learner-dashboard-radio'));
   var profilePhotoClickable = element(
     by.css('.protractor-test-photo-clickable'));
-  var profilePhotoUploadInput = element(
-    by.css('.protractor-test-photo-upload-input'));
-  var profilePhotoSubmitButton = element(
-    by.css('.protractor-test-photo-upload-submit'));
   var customProfilePhoto = element(
     by.css('.protractor-test-custom-photo'));
   var profilePhotoCropper = element(
-    by.css('.protractor-test-photo-crop'));
+    by.css('.protractor-test-photo-crop .cropper-container'));
   var profilePhotoUploadError = element(
     by.css('.protractor-test-upload-error'));
 
@@ -64,26 +61,16 @@ var PreferencesPage = function() {
   };
 
   this.uploadProfilePhoto = function(imgPath) {
-    profilePhotoClickable.click();
-    absPath = path.resolve(__dirname, imgPath);
-    return profilePhotoUploadInput.sendKeys(absPath);
+    return workflow.uploadImage(profilePhotoClickable, imgPath);
   };
 
   this.submitProfilePhoto = function(imgPath) {
-    return this.uploadProfilePhoto(imgPath).then(function() {
-      waitFor.visibilityOf(
-        profilePhotoCropper, 'Photo cropper is taking too long to appear');
-    }).then(function() {
-      profilePhotoSubmitButton.click();
-    }).then(function() {
-      return waitFor.invisibilityOf(
-        profilePhotoUploadInput,
-        'Photo uploader is taking too long to disappear');
-    });
+    return workflow.submitImage(
+      profilePhotoClickable, profilePhotoCropper, imgPath);
   };
 
   this.getProfilePhotoSource = function() {
-    return customProfilePhoto.getAttribute('src');
+    return workflow.getImageSource(customProfilePhoto);
   };
 
   this.editUserBio = function(bio) {

@@ -321,7 +321,7 @@ angular.module('oppia').factory('SkillUpdateService', [
 
       updateRubricForDifficulty: function(skill, difficulty, explanations) {
         if (SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
-          throw Error('Invalid difficulty value passed');
+          throw new Error('Invalid difficulty value passed');
         }
         var oldExplanations = skill.getRubricExplanations(difficulty);
         _applyRubricPropertyChange(

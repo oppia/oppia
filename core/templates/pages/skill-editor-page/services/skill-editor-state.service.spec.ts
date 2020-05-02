@@ -307,7 +307,7 @@ describe('Skill editor state service', function() {
     function() {
       expect(function() {
         SkillEditorStateService.saveSkill('commit message');
-      }).toThrow();
+      }).toThrowError('Cannot save a skill before one is loaded.');
     });
 
   it('should not save the skill if there are no pending changes',

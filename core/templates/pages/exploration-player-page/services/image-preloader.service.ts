@@ -239,7 +239,7 @@ angular.module('oppia').factory('ImagePreloaderService', [
     */
     var getDimensionsOfImage = function(filename) {
       var dimensionsRegex = RegExp(
-        '[^/]+_height_([0-9]+)_width_([0-9]+)\.(png|jpeg|jpg|gif)$', 'g');
+        '[^/]+_height_([0-9]+)_width_([0-9]+)\.(png|jpeg|jpg|gif|svg)$', 'g');
       var imageDimensions = dimensionsRegex.exec(filename);
       if (imageDimensions) {
         var dimensions = {
