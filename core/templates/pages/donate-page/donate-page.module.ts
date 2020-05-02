@@ -98,9 +98,4 @@ angular.module('oppia')
     'serviceBootstrap',
     downgradeComponent({
       component: ServiceBootstrapComponent
-    }) as angular.IDirectiveFactory).directive(
-    'donatePage',
-      downgradeComponent({
-        component: DonatePageComponent
-      }) as angular.IDirectiveFactory
-  );
+    }) as angular.IDirectiveFactory);
