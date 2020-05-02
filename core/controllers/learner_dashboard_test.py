@@ -297,7 +297,8 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
     def check_image_png_or_webp(self, image_string):
         """Returns Boolean
         
-        Checks if the image is in png or webp format only"""
+        Checks if the image is in png or webp format only
+        """
         if(image_string.startswith('data:image/png') or 
            image_string.startswith('data:image/webp')):
             return True
