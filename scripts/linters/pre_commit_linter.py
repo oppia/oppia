@@ -497,15 +497,21 @@ def main(args=None):
 
     all_messages = []
 
+    # Prepare semaphore for locking mechanism.
+    semaphore_max_concurrent_runs = 1
+    semaphore_concurrent_count = min(
+        multiprocessing.cpu_count(), semaphore_max_concurrent_runs)
+    semaphore = threading.Semaphore(semaphore_concurrent_count)
+
     for task in tasks_custom:
-        custom_semaphore.acquire()
+        semaphore.acquire()
         all_messages += task.output
-        custom_semaphore.release()
+        semaphore.release()
 
     for task in tasks_third_party:
-        third_party_semaphore.acquire()
+        semaphore.acquire()
         all_messages += task.output
-        third_party_semaphore.release()
+        semaphore.release()
 
     all_messages += codeowner_linter.check_codeowner_file(
         verbose_mode_enabled)
