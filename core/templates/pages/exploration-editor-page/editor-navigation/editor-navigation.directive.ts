@@ -62,10 +62,6 @@ angular.module('oppia').directive('editorNavigation', [
             return ExplorationFeaturesService.isInitialized() &&
               ExplorationFeaturesService.isImprovementsTabEnabled();
           };
-          $scope.isFeedbackTabEnabled = function() {
-            return ExplorationFeaturesService.isInitialized() &&
-              !ExplorationFeaturesService.isImprovementsTabEnabled();
-          };
 
           $scope.showUserHelpModal = function() {
             var explorationId = ContextService.getExplorationId();

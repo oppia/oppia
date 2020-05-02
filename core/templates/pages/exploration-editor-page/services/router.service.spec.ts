@@ -362,8 +362,6 @@ describe('Router Service', function() {
   });
 
   it('should navigate to feedback tab ', function() {
-    spyOn(ExplorationFeaturesService, 'isImprovementsTabEnabled')
-      .and.returnValue(true);
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
 
     RouterService.navigateToFeedbackTab();
@@ -372,14 +370,7 @@ describe('Router Service', function() {
     // $watch is called
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
     expect(RouterService.getActiveTabName()).toBe('feedback');
-    $interval.flush(300);
 
-    // navigateToMainTab is called
-    $rootScope.$apply();
-    expect(RouterService.getCurrentStateFromLocationPath()).toBe(null);
-    $rootScope.$apply();
-
-    expect(RouterService.getActiveTabName()).toBe('feedback');
     expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
     $rootScope.$apply();
   });
