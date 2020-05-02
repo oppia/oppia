@@ -1853,7 +1853,7 @@ pre.oppia-pre-wrapped-text {
 
 .improvements-tab-wrapper {
   background-color: #EEEEEE;
-  font-family: Roboto;
+  font-family: "Roboto";
   margin: 0;
   padding: 0;
   width: 100%;
@@ -1961,7 +1961,7 @@ pre.oppia-pre-wrapped-text {
   vertical-align: bottom;
 }
 
-.improvements-tab-overview-summary div.improvements-count strong {
+.improvements-tab-overview-summary div.improvements-count strong.count {
   display: inline-block;
   font-size: 24px;
   font-weight: bold;
@@ -1972,7 +1972,7 @@ pre.oppia-pre-wrapped-text {
   width: 24px;
 }
 
-.improvements-tab-overview-summary div.improvements-count p {
+.improvements-tab-overview-summary div.improvements-count p.units {
   display: inline-block;
   flex-grow: 1;
   font-size: 16px;
@@ -2007,7 +2007,7 @@ pre.oppia-pre-wrapped-text {
   width: 10px;
 }
 
-.improvements-tab-overview-summary div.improvements-health p {
+.improvements-tab-overview-summary div.improvements-health p.exploration-health {
   color: #D0021B;
   display: inline-block;
   flex-grow: 1;
@@ -2104,12 +2104,10 @@ pre.oppia-pre-wrapped-text {
 .improvements-tab-body {
   background-color: #EEEEEE;
   border-top: 1px solid rgba(0,0,0,0.12);
-  font-family: Roboto;
   margin: 0;
   padding: 0;
   width: 100%;
 }
-
 
 /* The eight rules below should be in sync. */
 .oppia-rte-editor > p:first-child {
