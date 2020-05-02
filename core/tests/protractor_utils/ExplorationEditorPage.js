@@ -79,8 +79,6 @@ var ExplorationEditorPage = function() {
   var navigateToHistoryTabButton = element(
     by.css('.protractor-test-history-tab'));
   var navigateToMainTabButton = element(by.css('.protractor-test-main-tab'));
-  var navigateToImprovementsTabButton = element(
-    by.css('.protractor-test-improvements-tab'));
   var navigateToPreviewTabButton = element(
     by.css('.protractor-test-preview-tab'));
   var navigateToSettingsTabButton = element(
@@ -232,13 +230,6 @@ var ExplorationEditorPage = function() {
     waitFor.elementToBeClickable(
       navigateToFeedbackTabButton, 'Feedback tab is not clickable');
     navigateToFeedbackTabButton.click();
-    waitFor.pageToFullyLoad();
-  };
-
-  this.navigateToImprovementsTab = function() {
-    waitFor.elementToBeClickable(
-      navigateToImprovementsTabButton, 'Improvements tab is not clickable');
-    navigateToImprovementsTabButton.click();
     waitFor.pageToFullyLoad();
   };
 
