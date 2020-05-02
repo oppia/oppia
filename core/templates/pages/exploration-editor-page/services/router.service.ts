@@ -109,7 +109,9 @@ angular.module('oppia').factory('RouterService', [
       } else if (newPath === TABS.IMPROVEMENTS.path) {
         activeTabName = TABS.IMPROVEMENTS.name;
         var waitToCheckThatImprovementsTabIsEnabled = $interval(() => {
-          if (!ExplorationFeaturesService.isInitialized()) return;
+          if (!ExplorationFeaturesService.isInitialized()) {
+            return;
+          }
           $interval.cancel(waitToCheckThatImprovementsTabIsEnabled);
           if (!ExplorationFeaturesService.isImprovementsTabEnabled()) {
             RouterService.navigateToMainTab(null);
