@@ -428,7 +428,7 @@ describe('Router Service', function() {
           broadcastCallsCounter++;
           if (broadcastCallsCounter === 1) {
             // First call throws an error so the catch block will be executed.
-            throw Error('Cannot read property $$nextSibling of null');
+            throw new Error('Cannot read property $$nextSibling of null');
           }
         }
       });
