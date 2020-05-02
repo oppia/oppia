@@ -256,7 +256,7 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
     EXP_TITLE = 'Exploration title'
 
     def check_image_png_or_webp(self, image_string):
-        #Checks if the image is in png or webp format only
+        # Checks if the image is in png or webp format only
         if(image_string.startswith('data:image/png') or 
            image_string.startswith('data:image/webp')):
             return True
