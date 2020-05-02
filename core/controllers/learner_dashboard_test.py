@@ -299,7 +299,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         Checks if the image is in png or webp format only.
         """
         if(image_string.startswith('data:image/png') or
-        image_string.startswith('data:image/webp')):
+           image_string.startswith('data:image/webp')):
             return True
         return False
 
