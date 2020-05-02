@@ -62,7 +62,7 @@ describe('Param Spec Object Factory', () => {
       psof.createFromBackendDict({
         obj_type: 'Invalid'
       });
-    }).toThrow(new Error('Invalid is not a registered parameter type.'));
+    }).toThrowError('Invalid is not a registered parameter type.');
   });
 
   it('should create a default param spec object', () => {

@@ -209,14 +209,14 @@ describe('UnitsObjectFactory', () => {
   it('should throw errors for invalid units', () => {
     expect(() => {
       units.fromRawInputString('NK*kg');
-    }).toThrow(new Error('SyntaxError: Unit "NK" not found.'));
+    }).toThrowError('SyntaxError: Unit "NK" not found.');
     expect(() => {
       units.fromRawInputString('per &kg$');
-    }).toThrow(new Error(
-      'SyntaxError: Unexpected "&" in "dollar/ &kg" at index 8'));
+    }).toThrowError(
+      'SyntaxError: Unexpected "&" in "dollar/ &kg" at index 8');
     expect(() => {
       units.fromRawInputString('cent %mol$');
-    }).toThrow(new Error(
-      'SyntaxError: Unit "dollarcent" not found.'));
+    }).toThrowError(
+      'SyntaxError: Unit "dollarcent" not found.');
   });
 });

@@ -459,7 +459,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
               '/avatar/user_black_72px.png');
             $scope.$on('stateEditorInitialized', function(evt, stateData) {
               if (stateData === undefined || $.isEmptyObject(stateData)) {
-                throw new Error('Expected stateData to be defined but ' +
+                throw new Error(
+                  'Expected stateData to be defined but ' +
                   'received ' + stateData);
               }
               $scope.hasLoaded = false;

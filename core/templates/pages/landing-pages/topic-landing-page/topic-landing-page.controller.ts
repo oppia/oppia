@@ -74,7 +74,7 @@ angular.module('oppia').directive('topicLandingPage', [
                 });
               return UrlInterpolationService.getStaticVideoUrl(videoPath);
             } else {
-              throw Error(
+              throw new Error(
                 'There is no video data available for this landing page.');
             }
           };

@@ -51,7 +51,7 @@ angular.module('oppia').controller('Base', [
       var mainContentElement = document.getElementById('oppia-main-content');
 
       if (!mainContentElement) {
-        throw Error('Variable mainContentElement is undefined.');
+        throw new Error('Variable mainContentElement is undefined.');
       }
       mainContentElement.tabIndex = -1;
       mainContentElement.scrollIntoView();

@@ -36,7 +36,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       UrlInterpolationService, DEV_MODE, ENTITY_TYPE,
       GCS_RESOURCE_BUCKET_NAME) {
     if (!DEV_MODE && !GCS_RESOURCE_BUCKET_NAME) {
-      throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
+      throw new Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
 
     // List of filenames that have been requested for but have
@@ -99,19 +99,9 @@ angular.module('oppia').factory('AssetsBackendApiService', [
                          window.MozBlobBuilder ||
                          window.MSBlobBuilder;
           if (exception.name === 'TypeError' && window.BlobBuilder) {
-            try {
-              var blobBuilder = new BlobBuilder();
-              blobBuilder.append(data);
-              assetBlob = blobBuilder.getBlob(assetType.concat('/*'));
-            } catch (e) {
-              var additionalInfo = (
-                '\nBlobBuilder construction error debug logs:' +
-                '\nAsset type: ' + assetType +
-                '\nData: ' + data
-              );
-              e.message += additionalInfo;
-              throw e;
-            }
+            var blobBuilder = new BlobBuilder();
+            blobBuilder.append(data);
+            assetBlob = blobBuilder.getBlob(assetType.concat('/*'));
           } else {
             var additionalInfo = (
               '\nBlob construction error debug logs:' +

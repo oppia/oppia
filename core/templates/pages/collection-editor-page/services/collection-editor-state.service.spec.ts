@@ -409,7 +409,7 @@ describe('Collection editor state service', function() {
     function() {
       expect(function() {
         CollectionEditorStateService.saveCollection('Commit message');
-      }).toThrow();
+      }).toThrowError('Cannot save a collection before one is loaded.');
     }
   );
 

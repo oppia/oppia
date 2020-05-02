@@ -97,7 +97,7 @@ angular.module('oppia').factory('ThreadDataService', [
     let setFeedbackThreadFromBackendDict = function(
         threadBackendDict: any): FeedbackThread {
       if (!threadBackendDict) {
-        throw Error('Missing input backend dict');
+        throw new Error('Missing input backend dict');
       }
       let thread = FeedbackThreadObjectFactory.createFromBackendDict(
         threadBackendDict);
@@ -109,7 +109,7 @@ angular.module('oppia').factory('ThreadDataService', [
     let setSuggestionThreadFromBackendDicts = function(
         threadBackendDict: any, suggestionBackendDict: any): SuggestionThread {
       if (!threadBackendDict || !suggestionBackendDict) {
-        throw Error('Missing input backend dicts');
+        throw new Error('Missing input backend dicts');
       }
       let thread = SuggestionThreadObjectFactory.createFromBackendDicts(
         threadBackendDict, suggestionBackendDict);
@@ -161,7 +161,7 @@ angular.module('oppia').factory('ThreadDataService', [
 
       getMessagesAsync: function(thread: AnyThread): Promise<ThreadMessage[]> {
         if (!thread) {
-          throw Error('Trying to update a non-existent thread');
+          throw new Error('Trying to update a non-existent thread');
         }
         let threadId = thread.threadId;
         // TODO(#8016): Move this $http call to a backend-api.service with unit
@@ -205,7 +205,7 @@ angular.module('oppia').factory('ThreadDataService', [
 
       markThreadAsSeenAsync: function(thread: AnyThread): Promise<void> {
         if (!thread) {
-          throw Error('Trying to update a non-existent thread');
+          throw new Error('Trying to update a non-existent thread');
         }
         let threadId = thread.threadId;
         // TODO(#8016): Move this $http call to a backend-api.service with unit
@@ -219,7 +219,7 @@ angular.module('oppia').factory('ThreadDataService', [
           thread: AnyThread, newMessage: string,
           newStatus: string): Promise<ThreadMessage[]> {
         if (!thread) {
-          throw Error('Trying to update a non-existent thread');
+          throw new Error('Trying to update a non-existent thread');
         }
         let threadId = thread.threadId;
         let oldStatus = thread.status;
@@ -243,7 +243,7 @@ angular.module('oppia').factory('ThreadDataService', [
           thread: AnyThread, action: string, commitMsg: string,
           reviewMsg: string): Promise<ThreadMessage[]> {
         if (!thread) {
-          throw Error('Trying to update a non-existent thread');
+          throw new Error('Trying to update a non-existent thread');
         }
         let threadId = thread.threadId;
         // TODO(#8016): Move this $http call to a backend-api.service with unit

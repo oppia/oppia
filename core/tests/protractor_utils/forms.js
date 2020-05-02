@@ -35,7 +35,7 @@ var DictionaryEditor = function(elem) {
 
 var GraphEditor = function(graphInputContainer) {
   if (!graphInputContainer) {
-    throw Error('Please provide Graph Input Container element');
+    throw new Error('Please provide Graph Input Container element');
   }
   var vertexElement = function(index) {
     // Would throw incorrect element error if provided incorrect index number.
@@ -598,7 +598,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
             return lineNumber;
           }
           if (!compareDict.hasOwnProperty(lineNumber)) {
-            throw Error('Line ' + lineNumber + ' not found in CodeMirror');
+            throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
           }
           expect(lineElement.element(by.xpath('./pre')).getText())
             .toEqual(compareDict[lineNumber].text);
@@ -619,7 +619,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       } else {
         for (var lineNumber in compareDict) {
           if (compareDict[lineNumber].checked !== true) {
-            throw Error('Expected line ' + lineNumber + ': \'' +
+            throw new Error(
+              'Expected line ' + lineNumber + ': \'' +
               compareDict[lineNumber].text + '\' to be found in CodeMirror');
           }
         }
@@ -662,7 +663,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         var lineNumber = textArray[i];
         var lineText = textArray[i + 1];
         if (!compareDict.hasOwnProperty(lineNumber)) {
-          throw Error('Line ' + lineNumber + ' not found in CodeMirror');
+          throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
         }
         expect(lineText).toEqual(compareDict[lineNumber].text);
         compareDict[lineNumber].checked = true;
@@ -676,7 +677,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       } else {
         for (var dictLineNumber in compareDict) {
           if (compareDict[dictLineNumber].checked !== true) {
-            throw Error('Expected line ' + lineNumber + ': \'' +
+            throw new Error(
+              'Expected line ' + lineNumber + ': \'' +
               compareDict[dictLineNumber].text + '\' to be found in CodeMirror'
             );
           }
@@ -748,7 +750,7 @@ var getEditor = function(formName) {
   } else if (objects.OBJECT_EDITORS.hasOwnProperty(formName)) {
     return objects.OBJECT_EDITORS[formName];
   } else {
-    throw Error('Unknown form / object requested: ' + formName);
+    throw new Error('Unknown form / object requested: ' + formName);
   }
 };
 

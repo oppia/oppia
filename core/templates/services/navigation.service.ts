@@ -79,7 +79,7 @@ angular.module('oppia').factory('NavigationService', [function() {
           navigation.ACTION_CLOSE) {
           navigation.closeSubmenu(evt);
         } else {
-          throw Error('Invalid action type.');
+          throw new Error('Invalid action type.');
         }
       }
     }

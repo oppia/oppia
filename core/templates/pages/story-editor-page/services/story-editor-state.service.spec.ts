@@ -277,7 +277,7 @@ describe('Story editor state service', function() {
     function() {
       expect(function() {
         StoryEditorStateService.saveStory('Commit message');
-      }).toThrow();
+      }).toThrowError('Cannot save a story before one is loaded.');
     }
   );
 

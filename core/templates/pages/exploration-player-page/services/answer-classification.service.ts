@@ -108,7 +108,7 @@ angular.module('oppia').factory('AnswerClassificationService', [
           AlertsService.addWarning(
             'Something went wrong with the exploration: no ' +
             'interactionRulesService was available.');
-          throw Error(
+          throw new Error(
             'No interactionRulesService was available to classify the answer.');
         }
 

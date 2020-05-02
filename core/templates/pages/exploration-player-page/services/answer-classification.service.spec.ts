@@ -233,7 +233,8 @@ describe('Answer classification service with string classifier disabled',
     it('should fail if no frontend rules are provided', function() {
       expect(function() {
         acs.getMatchingClassificationResult(stateName, state.interaction, 0);
-      }).toThrow();
+      }).toThrowError(
+        'No interactionRulesService was available to classify the answer.');
     });
 
     it('should return the first matching answer group and first matching rule' +
@@ -335,7 +336,8 @@ describe('Answer classification service with string classifier disabled',
       expect(function() {
         acs.getMatchingClassificationResult(
           stateName, state.interaction, 0);
-      }).toThrow();
+      }).toThrowError(
+        'No interactionRulesService was available to classify the answer.');
     });
   });
 

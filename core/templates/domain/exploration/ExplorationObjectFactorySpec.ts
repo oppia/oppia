@@ -348,9 +348,9 @@ describe('Exploration object factory', () => {
     expect(exploration.isStateTerminal('first state')).toBe(false);
     expect(() => {
       exploration.getAuthorRecommendedExpIds('first state');
-    }).toThrow(Error(
+    }).toThrowError(
       'Tried to get recommendations for a non-terminal state: ' +
-      'first state'));
+      'first state');
 
     expect(exploration.isStateTerminal('second state')).toBe(true);
     expect(exploration.getAuthorRecommendedExpIds('second state'))

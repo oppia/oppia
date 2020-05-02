@@ -49,7 +49,7 @@ angular.module('oppia').factory('StateTopAnswersStatsService', [
      */
     var refreshAddressedInfo = function(stateName) {
       if (!workingStateTopAnswersStats.hasOwnProperty(stateName)) {
-        throw Error(stateName + ' does not exist.');
+        throw new Error(stateName + ' does not exist.');
       }
 
       var state = ExplorationStatesService.getState(stateName);
@@ -148,7 +148,7 @@ angular.module('oppia').factory('StateTopAnswersStatsService', [
        */
       getStateStats: function(stateName) {
         if (!this.hasStateStats(stateName)) {
-          throw Error(stateName + ' does not exist.');
+          throw new Error(stateName + ' does not exist.');
         }
         return workingStateTopAnswersStats[stateName].answers;
       },

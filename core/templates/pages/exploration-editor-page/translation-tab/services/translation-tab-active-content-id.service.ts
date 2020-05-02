@@ -35,7 +35,7 @@ angular.module('oppia').factory('TranslationTabActiveContentIdService', [
         var allContentIds = (
           StateRecordedVoiceoversService.displayed.getAllContentId());
         if (allContentIds.indexOf(contentId) === -1) {
-          throw Error('Invalid active content id: ' + contentId);
+          throw new Error('Invalid active content id: ' + contentId);
         }
         activeContentId = contentId;
         $rootScope.$broadcast('activeContentIdChanged');

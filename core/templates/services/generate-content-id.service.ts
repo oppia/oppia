@@ -53,7 +53,7 @@ export class GenerateContentIdService {
         AppConstants.COMPONENT_NAME_WORKED_EXAMPLE.EXPLANATION) {
       return this.generateIdForComponent(existingComponentIds, componentName);
     } else {
-      throw Error('Unknown component name provided.');
+      throw new Error('Unknown component name provided.');
     }
   }
 

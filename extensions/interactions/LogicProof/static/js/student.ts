@@ -1100,7 +1100,8 @@ var logicProofStudent = (function() {
         // Evaluate arguments (spec requires that the expression has no
         // dummies).
         if (expression.dummies.length > 0) {
-          throw new Error('evaluate() received ' +
+          throw new Error(
+            'evaluate() received ' +
             expression.top_operator_name +
             ' to be evaluated via a definition but it has dummies');
         }
@@ -1109,7 +1110,8 @@ var logicProofStudent = (function() {
       } else if (evaluationRule.format === 'bottom_up') {
         // Evaluate arguments (spec requires that there are no dummies).
         if (expression.dummies.length > 0) {
-          throw new Error('evaluate() received ' +
+          throw new Error(
+            'evaluate() received ' +
             expression.top_operator_name +
             ' to be evaluated bottom-up but it has dummies');
         }
@@ -1127,7 +1129,8 @@ var logicProofStudent = (function() {
         var answer = evaluationRule.evaluateExpression(
           argumentsList, types, evaluationRuleParameters);
       } else {
-        throw Error('Unknown evaluation rule format (' +
+        throw new Error(
+          'Unknown evaluation rule format (' +
           evaluationRule.format + ') sent to evaluate().');
       }
     }

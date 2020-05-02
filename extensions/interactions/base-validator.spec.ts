@@ -203,7 +203,9 @@ describe('Interaction validator', function() {
     it('should throw a warning for a missing top-level field', function() {
       expect(function() {
         bivs.requireCustomizationArguments({}, ['levelone']);
-      }).toThrow('Expected customization arguments to have property: levelone');
+      }).toThrowError(
+        'Expected customization arguments to have property: levelone'
+      );
     });
 
     it('should throw warnings for multiple missing top-level fields',
@@ -211,8 +213,9 @@ describe('Interaction validator', function() {
         var expectedArgs = ['first', 'second'];
         expect(function() {
           bivs.requireCustomizationArguments({}, expectedArgs);
-        }).toThrow(
-          'Expected customization arguments to have properties: first, second');
+        }).toThrowError(
+          'Expected customization arguments to have properties: first, second'
+        );
       }
     );
   });

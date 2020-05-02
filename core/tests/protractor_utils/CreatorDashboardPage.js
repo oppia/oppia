@@ -134,7 +134,8 @@ var CreatorDashboardPage = function() {
   this.editExploration = function(explorationTitle) {
     _getExplorationElements(explorationTitle).then(function(elems) {
       if (elems.length === 0) {
-        throw 'Could not find exploration tile with name ' + explorationTitle;
+        throw new Error(
+          'Could not find exploration tile with name ' + explorationTitle);
       }
       var explorationElement = elems[0].element(
         by.css('.protractor-test-title-mask'));
@@ -257,7 +258,8 @@ var CreatorDashboardPage = function() {
   this.expectToHaveExplorationCard = function(explorationName) {
     _getExplorationElements(explorationName).then(function(elems) {
       if (elems.length === 0) {
-        throw 'Could not find exploration title with name ' + explorationTitle;
+        throw new Error(
+          'Could not find exploration title with name ' + explorationTitle);
       }
       expect(elems.length).toBeGreaterThanOrEqual(1);
     });
