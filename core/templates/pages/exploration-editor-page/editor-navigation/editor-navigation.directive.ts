@@ -43,15 +43,15 @@ angular.module('oppia').directive('editorNavigation', [
       controller: [
         '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
         'ExplorationFeaturesService', 'ExplorationRightsService',
-        'ExplorationWarningsService', 'RouterService',
-        'SiteAnalyticsService', 'StateTutorialFirstTimeService',
-        'ThreadDataService', 'UserService', 'WindowDimensionsService',
+        'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
+        'StateTutorialFirstTimeService', 'ThreadDataService', 'UserService',
+        'WindowDimensionsService',
         function(
             $rootScope, $scope, $timeout, $uibModal, ContextService,
             ExplorationFeaturesService, ExplorationRightsService,
-            ExplorationWarningsService, RouterService,
-            SiteAnalyticsService, StateTutorialFirstTimeService,
-            ThreadDataService, UserService, WindowDimensionsService) {
+            ExplorationWarningsService, RouterService, SiteAnalyticsService,
+            StateTutorialFirstTimeService, ThreadDataService, UserService,
+            WindowDimensionsService) {
           var ctrl = this;
           var taskCount = 0;
           $scope.getOpenTaskCount = function() {

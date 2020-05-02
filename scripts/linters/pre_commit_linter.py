@@ -431,7 +431,8 @@ def _get_task_output(all_messages, task, semaphore):
         semaphore: threading.Semaphore. The object that controls how many tasks
             can run at any time.
     """
-    all_messages += task.output
+    if task.output:
+        all_messages += task.output
     semaphore.release()
 
 
