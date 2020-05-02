@@ -16,6 +16,13 @@
  * @fileoverview Constants for the topics and skills dashboard.
  */
 
+enum ESortOptions {
+  InCreasingCreatedOn = 'Newly Created',
+      DescresingCreatedOn = 'Oldest Created',
+      IncreasingUpdatedOn = 'Recently Updated',
+      DecresingUpdatedOn = 'Least Updated',
+}
+
 export class TopicsAndSkillsDashboardPageConstants {
   public static EVENT_TYPE_TOPIC_CREATION_ENABLED = 'topicCreationEnabled';
 
@@ -23,4 +30,6 @@ export class TopicsAndSkillsDashboardPageConstants {
 
   public static EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED =
     'topicsAndSkillsDashboardReinitialized';
+
+  public static ESortOptions = ESortOptions;
 }

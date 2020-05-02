@@ -1,6 +1,7 @@
 <background-banner></background-banner>
 <div class="oppia-topics-and-skills-dashboard" style="position: relative;">
   <div>
+    <h2 class="dashboard-title" translate="I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD"></h2>
     <div class="create-buttons" ng-if="!($ctrl.topicSummaries.length === 0 && $ctrl.untriagedSkillSummaries.length === 0)">
       <button ng-click="$ctrl.createTopic()" ng-if="$ctrl.userCanCreateTopic"
               class="btn oppia-navbar-button oppia-transition-200">
@@ -101,31 +102,45 @@
           <div class="topic-skill-filter-content">
             <div class="topic-skill-filter-header">
               <span class="topic-skill-filter-heading">Filter</span>
-              <span class="topic-skill-filter-reset">Reset</span>
+              <span class="topic-skill-filter-reset" ng-click="$ctrl.resetFilters()">Reset</span>
             </div>
             <div class="topic-skill-filter-row">
               <div class="topic-skill-filter-key">
                 <span>keywords</span>
               </div>
-              <input type="text">
+              <input type="text" ng-change="$ctrl.applyFilters()" ng-model="$ctrl.filterOptions.keywords">
             </div>
             <div class="topic-skill-filter-row">
               <div class="topic-skill-filter-key">
                 <span>Status</span>
               </div>
-              <input type="text">
+              <div>
+                <select class="form-control protractor-test-select-skill-dropdown"
+                        ng-model="$ctrl.filterOptions.status"
+                        ng-options="item for item in $ctrl.statusOptions"
+                        ng-change="$ctrl.applyFilters()"
+                        style="width: 300px; margin-bottom: 10px;">
+                </select>
+              </div>
             </div>
             <div class="topic-skill-filter-row">
               <div class="topic-skill-filter-key">
                 <span>Category</span>
               </div>
-              <input type="text">
+              <input type="text" ng-change="$ctrl.applyFilters()" ng-model="$ctrl.filterOptions.category">
             </div>
             <div class="topic-skill-filter-row">
               <div class="topic-skill-filter-key">
                 <span>Sort</span>
               </div>
-              <input type="text">
+              <div>
+                <select class="form-control protractor-test-select-skill-dropdown"
+                        ng-model="$ctrl.filterOptions.sort"
+                        ng-options="item for item in $ctrl.statusOptions"
+                        ng-change="$ctrl.applyFilters()"
+                        style="width: 300px; margin-bottom: 10px;">
+                </select>
+              </div>
             </div>
           </div>
         </div>

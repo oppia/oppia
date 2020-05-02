@@ -26,7 +26,11 @@ require(
 require(
   'pages/topics-and-skills-dashboard-page/topics-list/' +
   'topics-list.directive.ts');
-
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'topics-and-skills-dashboard-page.service');
+import { TopicsAndSkillsDashboardPageConstants } from
+      'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 require('components/entity-creation-services/skill-creation.service.ts');
 require('components/entity-creation-services/topic-creation.service.ts');
 require('components/rubrics-editor/rubrics-editor.directive.ts');
@@ -58,6 +62,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
         '$http', '$rootScope', '$scope', '$uibModal', '$window',
         'AlertsService', 'RubricObjectFactory', 'SkillCreationService',
         'TopicCreationService', 'TopicsAndSkillsDashboardBackendApiService',
+        'TopicsAndSkillsDashboardPageService',
         'UrlInterpolationService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         'EVENT_TYPE_SKILL_CREATION_ENABLED',
@@ -68,6 +73,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             $http, $rootScope, $scope, $uibModal, $window,
             AlertsService, RubricObjectFactory, SkillCreationService,
             TopicCreationService, TopicsAndSkillsDashboardBackendApiService,
+            TopicsAndSkillsDashboardPageService,
             UrlInterpolationService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
             EVENT_TYPE_SKILL_CREATION_ENABLED,
@@ -80,7 +86,58 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
               function(response) {
                 ctrl.totalTopicSummaries = response.data.topic_summary_dicts;
                 ctrl.topicSummaries = response.data.topic_summary_dicts;
+
+                var populateDummyTopics = function() {
+                  for (var i = 0;i < 50;i++) {
+                    var languageCode, version, totalSkillCount;
+                    if (i % 3 === 0) {
+                      languageCode = 'en';
+                      version = 3;
+                    } else if (i % 5 === 0) {
+                      languageCode = 'pr';
+                      version = 3;
+                    } else {
+                      languageCode = 'mi';
+                      version = 3;
+                    }
+                    totalSkillCount = parseInt(String(Math.random() * 100));
+                    ctrl.topicSummaries.push({
+                      topic_model_created_on: 1581839432987.596,
+                      uncategorized_skill_count: 0,
+                      canonical_story_count: 0,
+                      id: `wbL5aAyTWfOH${i}`,
+                      is_published: true,
+                      total_skill_count: totalSkillCount,
+                      can_edit_topic: true,
+                      topic_model_last_updated: 1581839492500.852,
+                      additional_story_count: 0,
+                      name: `flash${i + 1}`,
+                      version,
+                      // eslint-disable-next-line max-len
+                      description: "Well this is the first topic of mathematics that we are going to learn. It's gonna be so much fun.",
+                      subtopic_count: 0,
+                      language_code: languageCode,
+                      $$hashKey: 'object:63',
+                    });
+                  }
+                };
+                var populateDummySkills = function() {
+                  for (var i = 0;i < 22;i++) {
+                    ctrl.untriagedSkillSummaries.push({
+                      id: `n8ZbHsn1Ryll${i}`,
+                      misconception_count: 0,
+                      worked_examples_count: 1,
+                      skill_model_last_updated: 1581965661742.42,
+                      skill_model_created_on: 1581965618760.169,
+                      description: `Jumbo addition${i}`,
+                      language_code: 'en',
+                      version: i,
+                      $$hashKey: `object:191${i}`
+                    });
+                  }
+                };
                 console.log(ctrl.totalTopicSummaries);
+                populateDummyTopics();
                 ctrl.totalCount = ctrl.topicSummaries.length;
                 ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
                 ctrl.paginationHandler(0);
@@ -239,6 +296,22 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   ctrl.totalUntriagedSkillSummaries.slice(e * 10, (e + 1) * 10);
             }
           };
+          ctrl.applyFilters = function() {
+            console.log(ctrl.filterOptions);
+            ctrl.topicSummaries = (
+              TopicsAndSkillsDashboardPageService.getFilteredTopics(
+                ctrl.totalTopicSummaries, ctrl.filterOptions));
+          };
+          ctrl.resetFilters = function() {
+            console.log('Reset called');
+            ctrl.topicSummaries = ctrl.totalTopicSummaries;
+            ctrl.filterOptions = {
+              sort: '',
+              keywords: '',
+              category: '',
+              status: '',
+            };
+          };
           ctrl.$onInit = function() {
             ctrl.TAB_NAME_TOPICS = 'topics';
             ctrl.TAB_NAME_UNTRIAGED_SKILLS = 'untriagedSkills';
@@ -246,6 +319,16 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             ctrl.pageNumber = 0;
             ctrl.topicPageNumber = 0;
             ctrl.skillPageNumber = 0;
+            ctrl.filterOptions = {
+              sort: '',
+              keywords: '',
+              category: '',
+              status: '',
+            };
+            // ctrl.statusOptions = ['option1', 'option2', 'option3'];
+            console.log(TopicsAndSkillsDashboardPageConstants.ESortOptions);
+            ctrl.statusOptions = (
+              TopicsAndSkillsDashboardPageConstants.ESortOptions);
             ctrl.repeater = function(range) {
               var arr = [];
               for (var i = 0; i < range; i++) {
