@@ -422,21 +422,17 @@ def _print_complete_summary_of_errors(all_messages):
             python_utils.PRINT(message)
 
 
-def _get_task_output(task, semaphore):
+def _get_task_output(all_messages, task, semaphore):
     """Returns output of running tasks.
 
     Args:
+        all_messages: list(str). List of summary messages of linter output.
         task: object(TestingTaskSpec). The task object to get output of linter.
         semaphore: threading.Semaphore. The object that controls how many tasks
             can run at any time.
-
-    Returns:
-        messages: list(str). List of linter messages.
     """
-    semaphore.acquire()
-    messages = task.output
+    all_messages += task.output
     semaphore.release()
-    return messages
 
 
 def main(args=None):
@@ -518,10 +514,12 @@ def main(args=None):
     semaphore = threading.Semaphore(1)
 
     for task in tasks_custom:
-        all_messages += _get_task_output(task, semaphore)
+        semaphore.acquire()
+        _get_task_output(all_messages, task, semaphore)
 
     for task in tasks_third_party:
-        all_messages += _get_task_output(task, semaphore)
+        semaphore.acquire()
+        _get_task_output(all_messages, task, semaphore)
 
     all_messages += codeowner_linter.check_codeowner_file(
         verbose_mode_enabled)
