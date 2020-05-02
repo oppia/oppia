@@ -81,6 +81,9 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
                 './number-with-units-help-modal.directive.html'),
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'
+            }).result.then(function() {}, function() {
+              // This callback is triggered when the Cancel button is
+              // clicked. No further action is needed.
             });
           };
           ctrl.$onInit = function() {

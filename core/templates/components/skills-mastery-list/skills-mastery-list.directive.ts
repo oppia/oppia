@@ -85,6 +85,9 @@ angular.module('oppia').directive('skillsMasteryList', [
                   $scope.modalHeader = skillDescription;
                 }
               ]
+            }).result.then(function() {}, function() {
+              // This callback is triggered when the Cancel button is
+              // clicked. No further action is needed.
             });
           };
           ctrl.$onInit = function() {

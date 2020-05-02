@@ -96,6 +96,9 @@ angular.module('oppia').directive('topicEditorTab', [
                   'topic-save-pending-changes-modal.template.html'),
                 backdrop: true,
                 controller: 'ConfirmOrCancelModalController'
+              }).result.then(function() {}, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
               });
             } else {
               StoryCreationService.createNewCanonicalStory(
