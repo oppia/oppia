@@ -20,16 +20,13 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 angular.module('oppia', [
-  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', require('angular-cookies'), 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
+  'headroom', require('angular-cookies'), 'ngTouch', 'ngSanitize',
+  'pascalprecht.translate', 'toastr', 'ui.bootstrap'
 ]);
 
 import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
@@ -52,8 +49,7 @@ import { ObjectsDomainConstants } from
 @NgModule({
   imports: [
     BrowserModule,
-    HttpClientModule,
-    FormsModule,
+    HttpClientModule
   ],
   declarations: [
     ServiceBootstrapComponent,
