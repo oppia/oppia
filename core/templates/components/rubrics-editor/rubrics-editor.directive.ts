@@ -149,6 +149,12 @@ angular.module('oppia').directive('rubricsEditor', [
             };
           };
 
+          // The section below is only called in the topics and skills
+          // dashboard, when a skill is being created. The dashboard controller
+          // autofills the first explanation for the 'Medium' difficulty with
+          // the skill description until it is deleted/edited.
+          // The $watch section below copies these rubrics to the local
+          // variables.
           if (ContextService.getPageContext() !== 'skill_editor') {
             $scope.$watch(function() {
               return SkillCreationService.getSkillDescriptionStatus();

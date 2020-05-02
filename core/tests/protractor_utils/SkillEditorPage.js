@@ -122,6 +122,9 @@ var SkillEditorPage = function() {
   };
 
   this.deleteRubricExplanationWithIndex = function(difficulty, explIndex) {
+    // The edit explanation buttons for all explanations of a difficulty have
+    // the same class name and each explanation in it are identified by its
+    // index.
     var editRubricExplanationButtons = element.all(
       by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
     editRubricExplanationButtons.then(function(buttons) {
@@ -139,6 +142,9 @@ var SkillEditorPage = function() {
 
   this.editRubricExplanationWithIndex = function(
       difficulty, explIndex, explanation) {
+    // The edit explanation buttons for all explanations of a difficulty have
+    // the same class name and each explanation in it are identified by its
+    // index.
     var editRubricExplanationButtons = element.all(
       by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
     editRubricExplanationButtons.then(function(buttons) {
