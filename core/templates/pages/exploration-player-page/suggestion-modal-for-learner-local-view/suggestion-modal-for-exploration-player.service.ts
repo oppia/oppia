@@ -107,8 +107,9 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
           resolve: {},
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {}, function() {
-          // This callback is triggered when the Cancel button is
-          // clicked. No further action is needed.
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
         });
       }, function() {
         // Note to developers:

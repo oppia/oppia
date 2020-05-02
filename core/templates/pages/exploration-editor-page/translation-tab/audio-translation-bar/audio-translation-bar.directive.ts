@@ -346,6 +346,10 @@ angular.module('oppia').directive('audioTranslationBar', [
                   $scope.busyMessage = message;
                 }
               ]
+            }).result.then(function() {}, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
