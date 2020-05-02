@@ -434,7 +434,7 @@ angular.module('oppia').factory('TopicUpdateService', [
           topic, subtopicId, thumbnailFilename) {
         var subtopic = topic.getSubtopicById(subtopicId);
         if (!subtopic) {
-          throw Error('Subtopic doesn\'t exist');
+          throw new Error('Subtopic doesn\'t exist');
         }
         var oldThumbnailFilename = angular.copy(
           subtopic.getThumbnailFilename());
@@ -460,7 +460,7 @@ angular.module('oppia').factory('TopicUpdateService', [
           topic, subtopicId, thumbnailBgColor) {
         var subtopic = topic.getSubtopicById(subtopicId);
         if (!subtopic) {
-          throw Error('Subtopic doesn\'t exist');
+          throw new Error('Subtopic doesn\'t exist');
         }
         var oldThumbnailBgColor = angular.copy(
           subtopic.getThumbnailBgColor());
