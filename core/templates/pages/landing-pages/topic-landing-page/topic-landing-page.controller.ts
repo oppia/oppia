@@ -55,7 +55,7 @@ angular.module('oppia').directive('topicLandingPage', [
                 angular.copy(assetsPathFormat), {
                   subject: ctrl.subject,
                   topic: topic,
-                  file_name: landingPageData[imageKey].file_name_png
+                  file_name: landingPageData[imageKey].file_name
                 });
               return {
                 src_png: UrlInterpolationService.getStaticImageUrl(
