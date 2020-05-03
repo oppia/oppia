@@ -305,15 +305,24 @@ DEFAULT_VM_ID = 'vm_default'
 # Shared secret key for default VM.
 DEFAULT_VM_SHARED_SECRET = '1a2b3c4e'
 
+IMAGE_FORMAT_JPEG = 'jpeg'
+IMAGE_FORMAT_PNG = 'png'
+IMAGE_FORMAT_GIF = 'gif'
+IMAGE_FORMAT_SVG = 'svg'
+
 # An array containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
 # images.
 ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
-    'jpeg': ['jpg', 'jpeg'],
-    'png': ['png'],
-    'gif': ['gif'],
-    'svg': ['svg']
+    IMAGE_FORMAT_JPEG: ['jpg', 'jpeg'],
+    IMAGE_FORMAT_PNG: ['png'],
+    IMAGE_FORMAT_GIF: ['gif'],
+    IMAGE_FORMAT_SVG: ['svg']
 }
+
+# An array containing the image formats that can be compressed.
+COMPRESSIBLE_IMAGE_FORMATS = [
+    IMAGE_FORMAT_JPEG, IMAGE_FORMAT_PNG, IMAGE_FORMAT_GIF]
 
 # An array containing the accepted audio extensions for uploaded files and
 # the corresponding MIME types.
