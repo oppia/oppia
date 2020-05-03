@@ -119,8 +119,11 @@ describe('Contribution Opportunities backend API service', function() {
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        sampleSkillOpportunitiesResponse);
+      expect(successHandler).toHaveBeenCalledWith({
+        opportunities: sampleSkillOpportunitiesResponse,
+        nextCursor: skillOpportunity.next_cursor,
+        more: skillOpportunity.more
+      });
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
@@ -145,8 +148,11 @@ describe('Contribution Opportunities backend API service', function() {
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        sampleTranslationOpportunitiesResponse);
+      expect(successHandler).toHaveBeenCalledWith(({
+        opportunities: sampleTranslationOpportunitiesResponse,
+        nextCursor: skillOpportunity.next_cursor,
+        more: skillOpportunity.more
+      });
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
@@ -171,8 +177,11 @@ describe('Contribution Opportunities backend API service', function() {
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        sampleVoiceoverOpportunitiesResponse);
+      expect(successHandler).toHaveBeenCalledWith({
+        opportunities: sampleVoiceoverOpportunitiesResponse,
+        nextCursor: skillOpportunity.next_cursor,
+        more: skillOpportunity.more
+      });
       expect(failHandler).not.toHaveBeenCalled();
     })
   );

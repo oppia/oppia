@@ -69,6 +69,12 @@ import { ConceptCardObjectFactory } from
 import { ContextService } from 'services/context.service';
 import { ContinueValidationService } from
   'interactions/Continue/directives/continue-validation.service';
+import { ContributionOpportunitiesService }
+// eslint-disable-next-line max-len
+  from 'pages/community-dashboard-page/services/contribution-opportunities.service';
+import { ContributionOpportunitiesBackendApiService }
+// eslint-disable-next-line max-len
+  from 'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CreatorDashboardBackendApiService } from
   'domain/creator_dashboard/creator-dashboard-backend-api.service';
@@ -542,6 +548,10 @@ export class UpgradedServices {
     upgradedServices['ContextService'] = new ContextService(
       upgradedServices['UrlService'],
       upgradedServices['EntityContextObjectFactory']);
+    upgradedServices['ContributionOpportunitiesBackendApiService'] =
+      new ContributionOpportunitiesBackendApiService(
+        upgradedServices['UrlInterpolationService'],
+        upgradedServices['HttpClient']);
     upgradedServices['EditorFirstTimeEventsService'] =
       new EditorFirstTimeEventsService(
         upgradedServices['SiteAnalyticsService']);
@@ -615,6 +625,9 @@ export class UpgradedServices {
     upgradedServices['CollectionCreationBackendService'] = (
       new CollectionCreationBackendService(
         upgradedServices['HttpClient']));
+    upgradedServices['ContributionOpportunitiesService'] =
+      new ContributionOpportunitiesService(
+        upgradedServices['ContributionOpportunitiesBackendApiService']);
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['EmailDashboardDataService'] =

@@ -39,6 +39,12 @@ type ContributionOpportunityParams = {
   language_code?: string;
 };
 
+export interface IFetchOpportunitySuccessCallbackParams {
+  opportunities?: SkillOpportunity[],
+  nextCursor?: string,
+  more?: boolean
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -72,11 +78,8 @@ export class ContributionOpportunitiesBackendApiService {
   private _fetchOpportunities(
       opportunityType: ContributionOpportunityCategoryType,
       params: ContributionOpportunityParams,
-      successCallback: (
-        opportunities?: Array<any>, nextCursor?: string, more?: boolean
-        ) => void,
-      errorCallback: (reason?: any) => void
-  ): void {
+      successCallback: (value: IFetchOpportunitySuccessCallbackParams) => void,
+      errorCallback: (reason?: any) => void): void {
     this.http.get(this.urlInterpolationService.interpolateUrl(
       this.urlTemplate, { opportunityType }
     ), { params }).toPromise().then((data: any) => {
@@ -86,7 +89,12 @@ export class ContributionOpportunitiesBackendApiService {
           opportunityType, data.opportunities[index]));
       }
       if (successCallback) {
-        successCallback(opportunities, data.next_cursor, data.more);
+        const result = {
+          opportunities: opportunities,
+          nextCursor: data.next_cursor,
+          more: data.more
+        };
+        successCallback(result);
       }
     }, (error) => {
       if (errorCallback) {
@@ -105,8 +113,8 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
-  fetchTranslationOpportunities(
-      languageCode: string, cursor: string): Promise<Object> {
+  fetchTranslationOpportunities(languageCode: string, cursor: string):
+    Promise<Object> {
     const params: ContributionOpportunityParams = {
       language_code: languageCode,
       cursor: cursor
