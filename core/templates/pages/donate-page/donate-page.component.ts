@@ -19,9 +19,9 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { SiteAnalyticsService } from 'services/site-analytics.service.ts';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
-import { SiteAnalyticsService } from 'services/site-analytics.service.ts';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service.ts';
 
