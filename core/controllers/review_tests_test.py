@@ -60,6 +60,9 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.node_1 = {
             'id': self.node_id,
             'title': 'Title 1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_id_1', 'skill_id_2'],
             'prerequisite_skill_ids': [],
@@ -85,7 +88,6 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, self.story_2)
         self.save_new_topic(
             self.topic_id, 'user', name='Topic',
-            abbreviated_name='abbrev', thumbnail_filename='Topic.png',
             description='A new topic',
             canonical_story_ids=[self.story_id_1, self.story_id_3],
             additional_story_ids=[], uncategorized_skill_ids=[],
@@ -168,6 +170,9 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
         node = {
             'id': node_id,
             'title': 'Title 1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_id_3'],
             'prerequisite_skill_ids': [],
