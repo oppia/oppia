@@ -67,11 +67,11 @@ angular.module('oppia').factory('RouterService', [
     var activeTabName = TABS.MAIN.name;
 
     // Makes final changes to the location after trying to navigate to the
-    // improvements tab. Requires for ExplorationFeaturesService to have been
+    // improvements tab. Requires ExplorationFeaturesService to have been
     // initialized, and will defer making any changes until that happens.
-    var finalizeNavigatingNavigateToImprovementsTab = function() {
+    var finalizeNavigationToImprovementsTab = function() {
       if (!ExplorationFeaturesService.isInitialized()) {
-        $timeout(() => finalizeNavigatingNavigateToImprovementsTab(), 300);
+        $timeout(() => finalizeNavigationToImprovementsTab(), 300);
         return;
       }
       if (activeTabName === TABS.IMPROVEMENTS.name &&
@@ -121,7 +121,7 @@ angular.module('oppia').factory('RouterService', [
         $rootScope.$broadcast('refreshStatisticsTab');
       } else if (newPath === TABS.IMPROVEMENTS.path) {
         activeTabName = TABS.IMPROVEMENTS.name;
-        finalizeNavigatingNavigateToImprovementsTab();
+        finalizeNavigationToImprovementsTab();
       } else if (newPath === TABS.HISTORY.path) {
         // TODO(sll): Do this on-hover rather than on-click.
         $rootScope.$broadcast('refreshVersionHistory', {
