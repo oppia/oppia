@@ -35,3 +35,7 @@ angular.module('oppia').constant(
   'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
   TopicsAndSkillsDashboardPageConstants
     .EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+
+angular.module('oppia').constant(
+  'SKILL_DESCRIPTION_STATUS_VALUES',
+  TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES);

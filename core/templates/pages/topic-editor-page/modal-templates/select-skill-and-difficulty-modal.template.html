@@ -65,34 +65,9 @@
     <div class="list-group">
       <div class="list-group-item"  ng-repeat="skillWithDifficulty in linkedSkillsWithDifficulty track by $index">
         <label class="list-group-item-heading" style="font-size: 1em;"><[skillWithDifficulty.getDescription()]></label>
-        <md-radio-group ng-model="skillWithDifficulty._difficulty">
-          <md-radio-button value="0.3">
-            <strong> Easy </strong>
-            <angular-html-bind html-data="skillIdToRubricsObject[skillWithDifficulty.getId()][0].getExplanation()">
-            </angular-html-bind>
-            <div ng-if="skillIdToRubricsObject[skillWithDifficulty.getId()][0].getExplanation() === ''">
-              <span class="oppia-placeholder"> This rubric has not yet been specified </span>
-            </div>
-          </md-radio-button>
-
-          <md-radio-button value="0.6">
-            <strong> Medium </strong>
-            <angular-html-bind html-data="skillIdToRubricsObject[skillWithDifficulty.getId()][1].getExplanation()">
-            </angular-html-bind>
-            <div ng-if="skillIdToRubricsObject[skillWithDifficulty.getId()][1].getExplanation() === ''">
-              <span class="oppia-placeholder"> This rubric has not yet been specified </span>
-            </div>
-          </md-radio-button>
-
-          <md-radio-button value="0.9">
-            <strong> Hard </strong>
-            <angular-html-bind html-data="skillIdToRubricsObject[skillWithDifficulty.getId()][2].getExplanation()">
-            </angular-html-bind>
-            <div ng-if="skillIdToRubricsObject[skillWithDifficulty.getId()][2].getExplanation() === ''">
-              <span class="oppia-placeholder"> This rubric has not yet been specified </span>
-            </div>
-          </md-radio-button>
-        </md-radio-group>
+        <question-difficulty-selector skill-id-to-rubrics-object="skillIdToRubricsObject"
+                                      skill-with-difficulty="skillWithDifficulty">
+        </question-difficulty-selector>
       </div>
     </div>
   </div>

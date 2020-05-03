@@ -195,13 +195,13 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         rubrics = [{
             'difficulty': constants.SKILL_DIFFICULTIES[0],
-            'explanation': 'Explanation 1'
+            'explanations': ['Explanation 1']
         }, {
             'difficulty': constants.SKILL_DIFFICULTIES[1],
-            'explanation': 'Explanation 2'
+            'explanations': ['Explanation 2']
         }, {
             'difficulty': constants.SKILL_DIFFICULTIES[2],
-            'explanation': 'Explanation 3'
+            'explanations': ['Explanation 3']
         }]
         json_response = self.post_json(
             self.url, {
@@ -293,13 +293,13 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         rubrics = [{
             'difficulty': constants.SKILL_DIFFICULTIES[0],
-            'explanation': 'Explanation 1'
+            'explanations': ['Explanation 1']
         }, {
             'difficulty': constants.SKILL_DIFFICULTIES[1],
-            'explanation': 'Explanation 2'
+            'explanations': ['Explanation 2']
         }, {
             'difficulty': constants.SKILL_DIFFICULTIES[2],
-            'explanation': 'Explanation 3'
+            'explanations': ['Explanation 3']
         }]
         payload = {
             'description': 'Skill Description',

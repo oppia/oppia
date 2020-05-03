@@ -518,7 +518,7 @@ def apply_change_list(skill_id, change_list, committer_id):
                 skill.delete_prerequisite_skill(change.skill_id)
             elif change.cmd == skill_domain.CMD_UPDATE_RUBRICS:
                 skill.update_rubric(
-                    change.difficulty, change.explanation)
+                    change.difficulty, change.explanations)
             elif (change.cmd ==
                   skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
                 if (change.property_name ==

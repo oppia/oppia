@@ -40,9 +40,9 @@ angular.module('oppia').directive('skillRubricsEditor', [
             $scope, $filter, $uibModal, $rootScope,
             RubricObjectFactory, EVENT_SKILL_REINITIALIZED) {
           var ctrl = this;
-          $scope.onSaveRubric = function(difficulty, explanation) {
+          $scope.onSaveRubric = function(difficulty, explanations) {
             SkillUpdateService.updateRubricForDifficulty(
-              $scope.skill, difficulty, explanation);
+              $scope.skill, difficulty, explanations);
           };
 
           ctrl.$onInit = function() {

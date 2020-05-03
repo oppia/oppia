@@ -45,11 +45,11 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test skills.
         self.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
@@ -156,9 +156,19 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
                 }
             }
         }
+        rubrics = [{
+            'difficulty': 'Easy',
+            'explanation': 'easy explanation'
+        }, {
+            'difficulty': 'Medium',
+            'explanation': 'medium explanation'
+        }, {
+            'difficulty': 'Hard',
+            'explanation': 'hard explanation'
+        }]
         self.save_new_skill_with_defined_schema_versions(
             self.SKILL_ID, self.albert_id, 'A description', 0,
-            misconceptions=[], skill_contents=skill_contents,
+            misconceptions=[], rubrics=rubrics, skill_contents=skill_contents,
             misconceptions_schema_version=1, skill_contents_schema_version=1,
             rubric_schema_version=1)
 

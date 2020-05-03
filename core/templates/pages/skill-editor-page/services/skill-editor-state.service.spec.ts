@@ -189,7 +189,7 @@ describe('Skill editor state service', function() {
 
     var rubricDict = {
       difficulty: skillDifficulties[0],
-      explanation: 'explanation'
+      explanation: ['explanation']
     };
 
     var example1 = {
