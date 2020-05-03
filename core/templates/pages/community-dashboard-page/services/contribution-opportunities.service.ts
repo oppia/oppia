@@ -69,11 +69,12 @@ export class ContributionOpportunitiesService {
       successCallback: (opportunities: SkillOpportunity[],
       more: boolean) => void) {
     this.contributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
-      languageCode, cursor).then((value: IFetchOpportunitySuccessCallbackParams) => {
-      this.voiceoverOpportunitiesCursor = value.nextCursor;
-      this.moreVoiceoverOpportunitiesAvailable = value.more;
-      successCallback(value.opportunities, value.more);
-    });
+      languageCode, cursor).then(
+      (value: IFetchOpportunitySuccessCallbackParams) => {
+        this.voiceoverOpportunitiesCursor = value.nextCursor;
+        this.moreVoiceoverOpportunitiesAvailable = value.more;
+        successCallback(value.opportunities, value.more);
+      });
   }
 
   public getSkillOpportunities(successCallback:
@@ -118,73 +119,6 @@ export class ContributionOpportunitiesService {
     }
   }
 }
-
-// angular.module('oppia').factory('ContributionOpportunitiesService', [
-//   'ContributionOpportunitiesBackendApiService',
-//   function(ContributionOpportunitiesBackendApiService) {
-//     var skillOpportunitiesCursor = null;
-//     var translationOpportunitiesCursor = null;
-//     var voiceoverOpportunitiesCursor = null;
-//     var moreSkillOpportunitiesAvailable = true;
-//     var moreTranslationOpportunitiesAvailable = true;
-//     var moreVoiceoverOpportunitiesAvailable = true;
-
-//     var _getSkillOpportunities = function(cursor, successCallback) {
-//       ContributionOpportunitiesBackendApiService.fetchSkillOpportunities(
-//         cursor).then((opportunities, nextCursor, more) => {
-//         skillOpportunitiesCursor = nextCursor;
-//         moreSkillOpportunitiesAvailable = more;
-//         successCallback(opportunities, more);
-//       });
-//     };
-//     var _getTranslationOpportunities = function(
-//         languageCode, cursor, successCallback) {
-//       ContributionOpportunitiesBackendApiService.fetchTranslationOpportunities(
-//         languageCode, cursor).then((opportunities, nextCursor, more) => {
-//         translationOpportunitiesCursor = nextCursor;
-//         moreTranslationOpportunitiesAvailable = more;
-//         successCallback(opportunities, more);
-//       });
-//     };
-//     var _getVoiceoverOpportunities = function(
-//         languageCode, cursor, successCallback) {
-//       ContributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
-//         languageCode, cursor).then(function(opportunities, nextCursor, more) {
-//         voiceoverOpportunitiesCursor = nextCursor;
-//         moreVoiceoverOpportunitiesAvailable = more;
-//         successCallback(opportunities, more);
-//       });
-//     };
-
-//     return {
-//       getSkillOpportunities: function(successCallback) {
-//         _getSkillOpportunities('', successCallback);
-//       },
-//       getTranslationOpportunities: function(languageCode, successCallback) {
-//         _getTranslationOpportunities(languageCode, '', successCallback);
-//       },
-//       getVoiceoverOpportunities: function(languageCode, successCallback) {
-//         _getVoiceoverOpportunities(languageCode, '', successCallback);
-//       },
-//       getMoreSkillOpportunities: function(successCallback) {
-//         if (moreSkillOpportunitiesAvailable) {
-//           _getSkillOpportunities(skillOpportunitiesCursor, successCallback);
-//         }
-//       },
-//       getMoreTranslationOpportunities: function(languageCode, successCallback) {
-//         if (moreTranslationOpportunitiesAvailable) {
-//           _getTranslationOpportunities(
-//             languageCode, translationOpportunitiesCursor, successCallback);
-//         }
-//       },
-//       getMoreVoiceoverOpportunities: function(languageCode, successCallback) {
-//         if (moreVoiceoverOpportunitiesAvailable) {
-//           _getVoiceoverOpportunities(
-//             languageCode, voiceoverOpportunitiesCursor, successCallback);
-//         }
-//       }
-//     };
-//   }]);
 
 angular.module('oppia').factory('ContributionOpportunitiesService',
   downgradeInjectable(ContributionOpportunitiesService));
