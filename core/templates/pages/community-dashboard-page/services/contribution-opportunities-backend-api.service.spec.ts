@@ -148,7 +148,7 @@ describe('Contribution Opportunities backend API service', function() {
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(({
+      expect(successHandler).toHaveBeenCalledWith({
         opportunities: sampleTranslationOpportunitiesResponse,
         nextCursor: skillOpportunity.next_cursor,
         more: skillOpportunity.more
