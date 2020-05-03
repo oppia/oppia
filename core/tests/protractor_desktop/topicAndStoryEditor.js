@@ -322,6 +322,7 @@ describe('Chapter editor functionality', function() {
     storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
     storyEditorPage.saveStory('Second save');
     browser.refresh();
+    storyEditorPage.navigateToChapterByIndex(1);
     storyEditorPage.expectNodeDescription('Chapter description 2');
   });
 
