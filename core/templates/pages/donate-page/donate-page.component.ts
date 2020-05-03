@@ -48,7 +48,9 @@ export class DonatePageComponent implements OnInit {
 
   onDonateThroughAmazon() {
     this.siteAnalyticsService.registerGoToDonationSiteEvent('Amazon');
-    window.location.href = 'https://smile.amazon.com/ch/81-1740068';
+    setTimeout(() => {
+      window.location.href = 'https://smile.amazon.com/ch/81-1740068';
+    }, 150);
     return false;
   }
 
