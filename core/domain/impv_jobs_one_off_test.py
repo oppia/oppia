@@ -23,13 +23,13 @@ import datetime as dt
 
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import imps_jobs_one_off
+from core.domain import impv_jobs_one_off
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
-base_models, exp_models, imps_models = models.Registry.import_models([
+base_models, exp_models, impv_models = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration, models.NAMES.improvements
 ])
 
@@ -40,15 +40,15 @@ def _create_task(
         entity_id, entity_type=feconf.ENTITY_TYPE_EXPLORATION, task_id=None,
         task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE, target_id=None,
         target_type=None, entity_version_start=1, entity_version_end=None,
-        status=imps_models.STATUS_OPEN, closed_on=None, closed_by=None,
+        status=impv_models.STATUS_OPEN, closed_on=None, closed_by=None,
         task_summary=None):
     """Helper method to create a task. The default values create an exploration
     high bounce-rate task.
     """
     if task_id is None:
-        task_id = imps_models.TaskEntryModel.generate_new_task_id(
+        task_id = impv_models.TaskEntryModel.generate_new_task_id(
             entity_type, entity_id, task_type)
-    task = imps_models.TaskEntryModel(
+    task = impv_models.TaskEntryModel(
         id=task_id, entity_type=entity_type, entity_id=entity_id,
         task_type=task_type, entity_version_start=entity_version_start,
         entity_version_end=entity_version_end, target_type=target_type,
@@ -62,15 +62,15 @@ def _create_deprecated_task(
         entity_id, entity_type=feconf.ENTITY_TYPE_EXPLORATION, task_id=None,
         task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE, target_id=None,
         target_type=None, entity_version_start=1, entity_version_end=None,
-        status=imps_models.STATUS_DEPRECATED, closed_on=_MOCK_DATE,
+        status=impv_models.STATUS_DEPRECATED, closed_on=_MOCK_DATE,
         closed_by=None, task_summary=None):
     """Helper method to create a deprecated task. The default values create an
     exploration high bounce-rate task.
     """
     if task_id is None:
-        task_id = imps_models.TaskEntryModel.generate_new_task_id(
+        task_id = impv_models.TaskEntryModel.generate_new_task_id(
             entity_type, entity_id, task_type)
-    task = imps_models.TaskEntryModel(
+    task = impv_models.TaskEntryModel(
         id=task_id, entity_type=entity_type, entity_id=entity_id,
         task_type=task_type, entity_version_start=entity_version_start,
         entity_version_end=entity_version_end, target_type=target_type,
@@ -84,15 +84,15 @@ def _create_resolved_task(
         entity_id, entity_type=feconf.ENTITY_TYPE_EXPLORATION, task_id=None,
         task_type=feconf.TASK_TYPE_HIGH_BOUNCE_RATE, target_id=None,
         target_type=None, entity_version_start=1, entity_version_end=None,
-        status=imps_models.STATUS_RESOLVED, closed_on=_MOCK_DATE,
+        status=impv_models.STATUS_RESOLVED, closed_on=_MOCK_DATE,
         closed_by='owner_id', task_summary=None):
     """Helper method to create a resolved task. The default values create an
     exploration high bounce-rate task.
     """
     if task_id is None:
-        task_id = imps_models.TaskEntryModel.generate_new_task_id(
+        task_id = impv_models.TaskEntryModel.generate_new_task_id(
             entity_type, entity_id, task_type)
-    task = imps_models.TaskEntryModel(
+    task = impv_models.TaskEntryModel(
         id=task_id, entity_type=entity_type, entity_id=entity_id,
         task_type=task_type, entity_version_start=entity_version_start,
         entity_version_end=entity_version_end, target_type=target_type,
@@ -118,19 +118,19 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
         Returns:
             *. The output of the one off job.
         """
-        job_id = imps_jobs_one_off.TaskEntryModelAuditOneOffJob.create_new()
+        job_id = impv_jobs_one_off.TaskEntryModelAuditOneOffJob.create_new()
         self.assertEqual(self._count_one_off_jobs_in_queue(), 0)
-        imps_jobs_one_off.TaskEntryModelAuditOneOffJob.enqueue(job_id)
+        impv_jobs_one_off.TaskEntryModelAuditOneOffJob.enqueue(job_id)
         self.assertEqual(self._count_one_off_jobs_in_queue(), 1)
         self.process_and_flush_pending_tasks()
         self.assertEqual(self._count_one_off_jobs_in_queue(), 0)
-        return imps_jobs_one_off.TaskEntryModelAuditOneOffJob.get_output(job_id)
+        return impv_jobs_one_off.TaskEntryModelAuditOneOffJob.get_output(job_id)
 
     def test_empty_output_when_no_models_exist(self):
         self.assertEqual(self._run_one_off_job(), [])
 
     def test_task_with_invalid_entity_type(self):
-        _create_task('entity_id', entity_type=imps_models.TEST_ONLY_ENTITY_TYPE)
+        _create_task('entity_id', entity_type=impv_models.TEST_ONLY_ENTITY_TYPE)
 
         output = self._run_one_off_job()
 
@@ -264,7 +264,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
     def test_open_task_with_closed_by_user(self):
         self.save_new_default_exploration('exp_id', 'owner_id')
         _create_task(
-            'exp_id', status=imps_models.STATUS_OPEN,
+            'exp_id', status=impv_models.STATUS_OPEN,
             closed_on=None, entity_version_end=None, closed_by='owner_id')
 
         output = self._run_one_off_job()
@@ -276,7 +276,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
     def test_open_task_with_closed_on_date(self):
         self.save_new_default_exploration('exp_id', 'owner_id')
         _create_task(
-            'exp_id', status=imps_models.STATUS_OPEN,
+            'exp_id', status=impv_models.STATUS_OPEN,
             closed_by=None, entity_version_end=None, closed_on=_MOCK_DATE)
 
         output = self._run_one_off_job()
@@ -289,7 +289,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
     def test_open_task_with_entity_version_end(self):
         self.save_new_default_exploration('exp_id', 'owner_id')
         _create_task(
-            'exp_id', status=imps_models.STATUS_OPEN,
+            'exp_id', status=impv_models.STATUS_OPEN,
             closed_on=None, closed_by=None, entity_version_end=2)
 
         output = self._run_one_off_job()
@@ -301,7 +301,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
     def test_resolved_task_without_closed_by_user(self):
         self.save_new_default_exploration('exp_id', 'owner_id')
         _create_task(
-            'exp_id', status=imps_models.STATUS_RESOLVED,
+            'exp_id', status=impv_models.STATUS_RESOLVED,
             closed_on=_MOCK_DATE, entity_version_end=2, closed_by=None)
 
         output = self._run_one_off_job()
@@ -313,7 +313,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
     def test_resolved_task_without_closed_on_date(self):
         self.save_new_default_exploration('exp_id', 'owner_id')
         _create_task(
-            'exp_id', status=imps_models.STATUS_RESOLVED,
+            'exp_id', status=impv_models.STATUS_RESOLVED,
             closed_by='owner_id', entity_version_end=2, closed_on=None)
 
         output = self._run_one_off_job()
@@ -325,7 +325,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
     def test_resolved_task_without_entity_version_end(self):
         self.save_new_default_exploration('exp_id', 'owner_id')
         _create_task(
-            'exp_id', status=imps_models.STATUS_RESOLVED,
+            'exp_id', status=impv_models.STATUS_RESOLVED,
             closed_on=_MOCK_DATE, closed_by='owner_id', entity_version_end=None)
 
         output = self._run_one_off_job()
@@ -338,7 +338,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
     def test_deprecated_task_without_closed_on_date(self):
         self.save_new_default_exploration('exp_id', 'owner_id')
         _create_task(
-            'exp_id', status=imps_models.STATUS_DEPRECATED,
+            'exp_id', status=impv_models.STATUS_DEPRECATED,
             closed_by='owner_id', entity_version_end=2, closed_on=None)
 
         output = self._run_one_off_job()
@@ -351,7 +351,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
     def test_deprecated_task_without_closed_by_user(self):
         self.save_new_default_exploration('exp_id', 'owner_id')
         _create_task(
-            'exp_id', status=imps_models.STATUS_DEPRECATED,
+            'exp_id', status=impv_models.STATUS_DEPRECATED,
             closed_on=_MOCK_DATE, entity_version_end=2, closed_by=None)
 
         output = self._run_one_off_job()
@@ -361,7 +361,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
     def test_deprecated_task_without_entity_version_end(self):
         self.save_new_default_exploration('exp_id', 'owner_id')
         _create_task(
-            'exp_id', status=imps_models.STATUS_DEPRECATED,
+            'exp_id', status=impv_models.STATUS_DEPRECATED,
             closed_by='owner_id', closed_on=_MOCK_DATE, entity_version_end=None)
 
         output = self._run_one_off_job()
@@ -376,7 +376,7 @@ class TaskEntryModelAuditOneOffJobTests(test_utils.GenericTestBase):
 
         _create_task(
             'exp_id',
-            target_type=imps_models.TEST_ONLY_TARGET_TYPE, target_id='foo')
+            target_type=impv_models.TEST_ONLY_TARGET_TYPE, target_id='foo')
 
         output = self._run_one_off_job()
 

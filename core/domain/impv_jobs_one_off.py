@@ -25,13 +25,13 @@ from core.platform import models
 import feconf
 import python_utils
 
-exp_models, imps_models = models.Registry.import_models([
+exp_models, impv_models = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.improvements])
 
 
 def _get_task_status_errors(task):
     """Yields error messages related to status for the task."""
-    if task.status == imps_models.STATUS_OPEN:
+    if task.status == impv_models.STATUS_OPEN:
         if task.closed_by:
             yield 'task is open but closed_by user is %s' % task.closed_by
         if task.closed_on:
@@ -39,14 +39,14 @@ def _get_task_status_errors(task):
         if task.entity_version_end:
             yield 'task is open but entity_version_end is %s' % (
                 task.entity_version_end)
-    elif task.status == imps_models.STATUS_RESOLVED:
+    elif task.status == impv_models.STATUS_RESOLVED:
         if not task.closed_by:
             yield 'task is resolved but closed_by user is empty'
         if not task.closed_on:
             yield 'task is resolved but closed_on date is empty'
         if not task.entity_version_end:
             yield 'task is resolved but entity_version_end is unbounded'
-    elif task.status == imps_models.STATUS_DEPRECATED:
+    elif task.status == impv_models.STATUS_DEPRECATED:
         if not task.closed_on:
             yield 'task is deprecated but closed_on date is empty'
         if not task.entity_version_end:
@@ -55,7 +55,7 @@ def _get_task_status_errors(task):
 
 def _get_target_type_errors(task):
     """Yields error messages related to target_type for the task."""
-    entity_type_targets = imps_models.ENTITY_TYPE_TARGETS[task.entity_type]
+    entity_type_targets = impv_models.ENTITY_TYPE_TARGETS[task.entity_type]
     if task.target_type and task.target_type not in entity_type_targets:
         yield 'invalid target_type for %s entity: %s' % (
             task.entity_type, task.target_type)
@@ -76,7 +76,7 @@ def _target_exists(entity, target_type, target_id):
 
 def _get_target_id_errors(task, versioned_entities):
     """Yields error messages related to target_id for the task."""
-    entity_type_targets = imps_models.ENTITY_TYPE_TARGETS[task.entity_type]
+    entity_type_targets = impv_models.ENTITY_TYPE_TARGETS[task.entity_type]
     if task.target_id is None or task.target_type not in entity_type_targets:
         return
 
@@ -93,7 +93,7 @@ class TaskEntryModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         """This job validates TaskEntryModel instances."""
-        return [imps_models.TaskEntryModel]
+        return [impv_models.TaskEntryModel]
 
     @staticmethod
     def map(task):

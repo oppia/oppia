@@ -34,7 +34,7 @@ import utils
 (
     base_models, collection_models, config_models,
     email_models, exploration_models, feedback_models,
-    imps_models, question_models, skill_models,
+    impv_models, question_models, skill_models,
     story_models, suggestion_models, topic_models,
     user_models,
 ) = models.Registry.import_models([
@@ -437,7 +437,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
-        imps_models.TaskEntryModel(
+        impv_models.TaskEntryModel(
             id=self.GENERIC_MODEL_ID,
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id=self.GENERIC_MODEL_ID,
