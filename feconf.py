@@ -315,6 +315,9 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
     'svg': ['svg']
 }
 
+# An array containing the image formats that can be compressed.
+COMPRESSIBLE_IMAGE_FORMATS = ['jpeg', 'png', 'gif']
+
 # An array containing the accepted audio extensions for uploaded files and
 # the corresponding MIME types.
 ACCEPTED_AUDIO_EXTENSIONS = {

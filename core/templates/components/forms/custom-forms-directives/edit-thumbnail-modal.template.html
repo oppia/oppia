@@ -28,7 +28,8 @@
     </div>
     <div ng-show="uploadedImage">
       <div ng-if="allowedBgColors">
-        <div>Choose background color:</div>
+        <div ng-if="allowedBgColors.length > 1">Choose background color:</div>
+        <div ng-if="allowedBgColors.length === 1">This thumbnail will have a default background color:</div>
         <div class="oppia-thumbnail-colour-select">
           <div ng-repeat="color in allowedBgColors"
                ng-style="{background: color}"
