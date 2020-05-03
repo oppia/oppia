@@ -50,7 +50,9 @@
       <td class="merge-skill" ng-if="getMergeableSkillSummaries().length > 0">
         <div class="protractor-test-merge-skills-button merge-skill-icon"
              ng-click="mergeSkill(skill)">
-          <img ng-src="<[mergeSkillImageUrl]>">
+          <span class="material-icons">
+            merge_type
+          </span>
         </div>
       </td>
       <td class="delete-icon">
