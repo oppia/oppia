@@ -52,7 +52,7 @@ describe('Learner Action Object Factory', () => {
     expect(() => {
       return LearnerActionObjectFactoryLocalReference.createNew(
         'AnswerSubmit', {}, -1);
-    }).toThrow(new Error('given invalid schema version'));
+    }).toThrowError('given invalid schema version');
   });
 
   it('should use a specific schema version if provided', () => {

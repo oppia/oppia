@@ -68,6 +68,7 @@ FULLY_COVERED_FILENAMES = [
     'ckeditor.import.ts',
     'ClassifierObjectFactory.ts',
     'classifiers-extension.constants.ts',
+    'classroom-backend-api.service.ts',
     'classroom-domain.constants.ajs.ts',
     'classroom-domain.constants.ts',
     'code-normalizer.service.ts',
