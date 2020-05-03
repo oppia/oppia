@@ -24,6 +24,7 @@ require('components/summary-tile/topic-summary-tile.directive.ts');
 
 require('domain/classroom/classroom-backend-api.service.ts');
 require('domain/topic/TopicSummaryObjectFactory.ts');
+require('filters/string-utility-filters/capitalize.filter.ts');
 require('services/alerts.service.ts');
 require('services/page-title.service.ts');
 require('services/contextual/url.service.ts');
@@ -41,24 +42,29 @@ angular.module('oppia').directive('classroomPage', [
         '/pages/classroom-page/classroom-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$window', 'AlertsService', 'ClassroomBackendApiService',
-        'PageTitleService', 'TopicSummaryObjectFactory', 'UrlService',
+        '$filter', '$rootScope', '$window', 'AlertsService',
+        'ClassroomBackendApiService', 'PageTitleService',
+        'TopicSummaryObjectFactory', 'UrlService',
         'WindowDimensionsService', 'FATAL_ERROR_CODES',
         function(
-            $rootScope, $window, AlertsService, ClassroomBackendApiService,
-            PageTitleService, TopicSummaryObjectFactory, UrlService,
+            $filter, $rootScope, $window, AlertsService,
+            ClassroomBackendApiService, PageTitleService,
+            TopicSummaryObjectFactory, UrlService,
             WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
           ctrl.$onInit = function() {
-            ctrl.classroomName = UrlService.getClassroomNameFromUrl();
+            var classroomName = UrlService.getClassroomNameFromUrl();
             ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
               '/splash/books.svg');
 
-            PageTitleService.setPageTitle(ctrl.classroomName + ' - Oppia');
+            ctrl.classroomDisplayName = $filter('capitalize')(classroomName);
+
+            PageTitleService.setPageTitle(
+              ctrl.classroomDisplayName + ' Classroom | Oppia');
 
             $rootScope.loadingMessage = 'Loading';
             ClassroomBackendApiService.fetchClassroomData(
-              ctrl.classroomName).then(function(topicSummaryObjects) {
+              classroomName).then(function(topicSummaryObjects) {
               ctrl.topicSummaries = topicSummaryObjects;
               $rootScope.loadingMessage = '';
               $rootScope.$broadcast('initializeTranslation');
