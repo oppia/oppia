@@ -168,7 +168,7 @@ export class AppConstants {
     QUESTION: 'question'
   };
 
-  public static MISCONCEPTION_NAME_CHAR_LIMIT = 100;
+  public static MISCONCEPTION_NAME_CHAR_LIMIT = 50;
 }
 
 const constants = require('constants.ts');
