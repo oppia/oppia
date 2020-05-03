@@ -22,7 +22,13 @@ const path = require('path');
 const webpack = require('webpack');
 const macros = require('./webpack.common.macros.ts');
 
-var htmlMinifyConfig = {ignoreCustomFragments: [/<\[[\s\S]*?\]>/]};
+var htmlMinifyConfig = {
+  ignoreCustomFragments: [/<\[[\s\S]*?\]>/],
+  removeAttributeQuotes: false,
+  caseSensitive: true,
+  customAttrSurround: [[/#/, /(?:)/], [/\*/, /(?:)/], [/\[?\(?/, /(?:)/]],
+  customAttrAssign: [/\)?\]?=/]
+};
 var commonPrefix = './core/templates';
 var defaultMeta = {
   name: 'Personalized Online Learning from Oppia',
