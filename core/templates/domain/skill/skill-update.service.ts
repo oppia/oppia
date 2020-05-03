@@ -77,10 +77,10 @@ angular.module('oppia').factory('SkillUpdateService', [
     };
 
     var _applyRubricPropertyChange = function(
-        skill, difficulty, explanation, apply, reverse) {
+        skill, difficulty, explanations, apply, reverse) {
       _applyChange(skill, CMD_UPDATE_RUBRICS, {
         difficulty: angular.copy(difficulty),
-        explanation: angular.copy(explanation)
+        explanations: angular.copy(explanations)
       }, apply, reverse);
     };
 
@@ -319,17 +319,17 @@ angular.module('oppia').factory('SkillUpdateService', [
         }
       },
 
-      updateRubricForDifficulty: function(skill, difficulty, explanation) {
+      updateRubricForDifficulty: function(skill, difficulty, explanations) {
         if (SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
-          throw Error('Invalid difficulty value passed');
+          throw new Error('Invalid difficulty value passed');
         }
-        var oldExplanation = skill.getRubricExplanation(difficulty);
+        var oldExplanations = skill.getRubricExplanations(difficulty);
         _applyRubricPropertyChange(
-          skill, difficulty, explanation,
+          skill, difficulty, explanations,
           function(changeDict, skill) {
-            skill.updateRubricForDifficulty(difficulty, explanation);
+            skill.updateRubricForDifficulty(difficulty, explanations);
           }, function(changeDict, skill) {
-            skill.updateRubricForDifficulty(difficulty, oldExplanation);
+            skill.updateRubricForDifficulty(difficulty, oldExplanations);
           });
       }
     };
