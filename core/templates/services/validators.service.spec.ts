@@ -26,8 +26,8 @@ describe('Validators service', () => {
   let vs: ValidatorsService = null;
   const INVALID_NAME_CHARS_COPY = (
     Array.from(AppConstants['INVALID_NAME_CHARS']));
-  
-    beforeEach(() => {
+
+  beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [AlertsService, NormalizeWhitespacePipe]
     });
@@ -37,10 +37,10 @@ describe('Validators service', () => {
     /* eslint-enable dot-notation */
   });
 
-  
+
   afterAll(() => {
     AppConstants['INVALID_NAME_CHARS'] = INVALID_NAME_CHARS_COPY;
-});
+  });
 
   it('should correctly validate entity names', () => {
     expect(vs.isValidEntityName('b', null, null)).toBe(true);
