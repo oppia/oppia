@@ -140,8 +140,9 @@ module.exports = {
     ),
     topic_viewer:
       commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.scripts.ts',
-    welcome_guide: commonPrefix + '/pages/welcome-guide-page/welcome-guide-page.scripts.ts',
-    },
+    welcome_guide: commonPrefix +
+    '/pages/welcome-guide-page/welcome-guide-page.scripts.ts',
+  },
   plugins: [
     new HtmlWebpackPlugin({
       chunks: ['about'],
