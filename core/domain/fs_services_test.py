@@ -188,7 +188,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), mode='rb',
             encoding=None) as f:
-            original_image_content = f.read()
+            image_content = f.read()
 
         with self.swap(constants, 'DEV_MODE', False):
             fs = fs_domain.AbstractFileSystem(
@@ -202,12 +202,23 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
 
             fs_services.save_original_and_compressed_versions_of_image(
                 self.FILENAME, 'exploration', self.EXPLORATION_ID,
-                original_image_content, 'image', False)
+                image_content, 'image', False)
 
             self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
             self.assertTrue(
                 fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
             self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
+
+            original_image_content = fs.get(
+                'image/%s' % self.FILENAME)
+            compressed_image_content = fs.get(
+                'image/%s' % self.COMPRESSED_IMAGE_FILENAME)
+            micro_image_content = fs.get(
+                'image/%s' % self.MICRO_IMAGE_FILENAME)
+
+            self.assertEqual(original_image_content, image_content)
+            self.assertEqual(compressed_image_content, image_content)
+            self.assertEqual(micro_image_content, image_content)
 
 
 class FileSystemClassifierDataTests(test_utils.GenericTestBase):
