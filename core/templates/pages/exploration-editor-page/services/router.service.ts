@@ -66,11 +66,24 @@ angular.module('oppia').factory('RouterService', [
 
     var activeTabName = TABS.MAIN.name;
 
+    // Makes final changes to the location after trying to navigate to the
+    // improvements tab. Requires for ExplorationFeaturesService to have been
+    // initialized, and will defer making any changes until that happens.
+    var finalizeNavigatingNavigateToImprovementsTab = function() {
+      if (!ExplorationFeaturesService.isInitialized()) {
+        $timeout(() => finalizeNavigatingNavigateToImprovementsTab(), 300);
+        return;
+      }
+      if (activeTabName === TABS.IMPROVEMENTS.name &&
+          !ExplorationFeaturesService.isImprovementsTabEnabled()) {
+        // Redirect to the main tab.
+        _actuallyNavigate(SLUG_GUI, null);
+      }
+    };
+
     // When the URL path changes, reroute to the appropriate tab in the
     // exploration editor page.
-    $rootScope.$watch(function() {
-      return $location.path();
-    }, function(newPath, oldPath) {
+    $rootScope.$watch(() => $location.path(), (newPath, oldPath) => {
       if (newPath === '') {
         $location.path(oldPath);
         return;
@@ -108,15 +121,7 @@ angular.module('oppia').factory('RouterService', [
         $rootScope.$broadcast('refreshStatisticsTab');
       } else if (newPath === TABS.IMPROVEMENTS.path) {
         activeTabName = TABS.IMPROVEMENTS.name;
-        var waitToCheckThatImprovementsTabIsEnabled = $interval(() => {
-          if (!ExplorationFeaturesService.isInitialized()) {
-            return;
-          }
-          $interval.cancel(waitToCheckThatImprovementsTabIsEnabled);
-          if (!ExplorationFeaturesService.isImprovementsTabEnabled()) {
-            RouterService.navigateToMainTab(null);
-          }
-        }, 1);
+        finalizeNavigatingNavigateToImprovementsTab();
       } else if (newPath === TABS.HISTORY.path) {
         // TODO(sll): Do this on-hover rather than on-click.
         $rootScope.$broadcast('refreshVersionHistory', {
