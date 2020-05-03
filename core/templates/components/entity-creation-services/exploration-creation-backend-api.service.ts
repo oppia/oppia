@@ -29,6 +29,7 @@ export class ExplorationCreationBackendService {
   private _createExploration(
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
+    
     this.http.post('/contributehandler/create_new', {}).toPromise()
       .then((response) => {
         if (successCallback) {
@@ -41,8 +42,7 @@ export class ExplorationCreationBackendService {
       });
   }
 
-
-  createExploration(): Promise<object> {
+  createExploration(): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._createExploration(resolve, reject);
     });
