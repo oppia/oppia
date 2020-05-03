@@ -28,8 +28,8 @@ describe('Validators service', () => {
   const INVALID_NAME_CHARS_COPY = (
     Array.from(AppConstants['INVALID_NAME_CHARS']));
   /* eslint-enable dot-notation */
- 
-beforeEach(() => {
+
+  beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [AlertsService, NormalizeWhitespacePipe]
     });
