@@ -80,7 +80,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), False)
         fs_services.save_original_and_compressed_versions_of_image(
             self.FILENAME, 'exploration', self.EXPLORATION_ID,
-            original_image_content, 'image')
+            original_image_content, 'image', True)
         self.assertEqual(fs.isfile('image/%s' % self.FILENAME), True)
         self.assertEqual(
             fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), True)
@@ -112,7 +112,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
 
             fs_services.save_original_and_compressed_versions_of_image(
                 self.FILENAME, 'exploration', self.EXPLORATION_ID,
-                original_image_content, 'image')
+                original_image_content, 'image', True)
 
             self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
             self.assertTrue(
@@ -157,7 +157,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
 
             fs_services.save_original_and_compressed_versions_of_image(
                 self.FILENAME, 'exploration', self.EXPLORATION_ID,
-                original_image_content, 'image')
+                original_image_content, 'image', True)
 
             self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
             self.assertTrue(
@@ -183,6 +183,42 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
                 gae_image_services.get_image_dimensions(
                     micro_image_content),
                 (22, 22))
+
+    def test_save_original_and_compressed_versions_of_svg_image(self):
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), mode='rb',
+            encoding=None) as f:
+            image_content = f.read()
+
+        with self.swap(constants, 'DEV_MODE', False):
+            fs = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(
+                    feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
+
+            self.assertFalse(fs.isfile('image/%s' % self.FILENAME))
+            self.assertFalse(
+                fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
+            self.assertFalse(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
+
+            fs_services.save_original_and_compressed_versions_of_image(
+                self.FILENAME, 'exploration', self.EXPLORATION_ID,
+                image_content, 'image', False)
+
+            self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
+            self.assertTrue(
+                fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
+            self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
+
+            original_image_content = fs.get(
+                'image/%s' % self.FILENAME)
+            compressed_image_content = fs.get(
+                'image/%s' % self.COMPRESSED_IMAGE_FILENAME)
+            micro_image_content = fs.get(
+                'image/%s' % self.MICRO_IMAGE_FILENAME)
+
+            self.assertEqual(original_image_content, image_content)
+            self.assertEqual(compressed_image_content, image_content)
+            self.assertEqual(micro_image_content, image_content)
 
 
 class FileSystemClassifierDataTests(test_utils.GenericTestBase):

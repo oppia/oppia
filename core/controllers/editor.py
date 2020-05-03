@@ -690,9 +690,11 @@ class ImageUploadHandler(EditorHandler):
             raise self.InvalidInputException(
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename)
-
+        image_is_compressible = (
+            file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
         fs_services.save_original_and_compressed_versions_of_image(
-            filename, entity_type, entity_id, raw, filename_prefix)
+            filename, entity_type, entity_id, raw, filename_prefix,
+            image_is_compressible)
 
         self.render_json({'filename': filename})
 
