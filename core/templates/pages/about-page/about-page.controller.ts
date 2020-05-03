@@ -22,6 +22,8 @@ require(
 
 require('domain/utilities/url-interpolation.service.ts');
 
+require('pages/about-page/about-page.constants.ajs.ts');
+
 angular.module('oppia').directive('aboutPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -32,8 +34,8 @@ angular.module('oppia').directive('aboutPage', [
         '/pages/about-page/about-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'UrlInterpolationService', 'WindowRef',
-        function(UrlInterpolationService, WindowRef) {
+        'CREDITS', 'UrlInterpolationService', 'WindowRef',
+        function(CREDITS, UrlInterpolationService, WindowRef) {
           const ctrl = this;
           const listOfNamesToThank = [
             'Alex Kauffmann', 'Allison Barros',
@@ -54,6 +56,9 @@ angular.module('oppia').directive('aboutPage', [
           ctrl.TAB_ID_ABOUT = 'about';
           ctrl.TAB_ID_FOUNDATION = 'foundation';
           ctrl.TAB_ID_CREDITS = 'credits';
+          ctrl.ALPHABETS = [
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
           const ALLOWED_TABS = [
             ctrl.TAB_ID_ABOUT, ctrl.TAB_ID_FOUNDATION, ctrl.TAB_ID_CREDITS];
@@ -67,6 +72,16 @@ angular.module('oppia').directive('aboutPage', [
           };
           ctrl.getStaticImageUrl = function(imagePath: string) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
+          ctrl.hasCredits = function(startLetter: string) {
+            const results = CREDITS.filter(
+              (credit) => credit.startsWith(startLetter));
+            return results.length > 0;
+          };
+          ctrl.getCredits = function(startLetter: string) {
+            const results = CREDITS.filter(
+              (credit) => credit.startsWith(startLetter)).sort();
+            return results;
           };
           ctrl.$onInit = function() {
             const hash = WindowRef.nativeWindow.location.hash.slice(1);

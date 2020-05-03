@@ -39,6 +39,7 @@ import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
+import { AboutPageConstants } from 'pages/about-page/about-page.constants';
 
 @NgModule({
   imports: [
@@ -55,6 +56,7 @@ import { ObjectsDomainConstants } from
     AppConstants,
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,
+    AboutPageConstants,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
