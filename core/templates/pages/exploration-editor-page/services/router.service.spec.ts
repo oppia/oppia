@@ -177,7 +177,7 @@ describe('Router Service', () => {
       }, 20);
       $timeout.flush(150);
     }, 400);
-    });
+  });
 
   it('should not navigate to main tab when already there', done => {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
@@ -252,7 +252,7 @@ describe('Router Service', () => {
 
     expect(broadcastSpy).toHaveBeenCalledWith('refreshStateEditor');
     expect(broadcastSpy).toHaveBeenCalledWith('centerGraph');
-    });
+  });
 
   it('should navigate to translation tab', () => {
     var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
