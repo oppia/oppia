@@ -90,6 +90,9 @@ import { EmailDashboardDataService } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
 import { EntityContextObjectFactory } from
   'domain/utilities/EntityContextObjectFactory';
+import { ExplorationCreationBackendService } from
+  // eslint-disable-next-line max-len
+  'components/entity-creation-services/exploration-creation-backend-api.service.ts';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
 import { ExplorationDraftObjectFactory } from
@@ -617,6 +620,9 @@ export class UpgradedServices {
         upgradedServices['HttpClient']));
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(upgradedServices['HttpClient']);
+    upgradedServices['ExplorationCreationBackendService'] = (
+      new ExplorationCreationBackendService(
+        upgradedServices['HttpClient']));
     upgradedServices['EmailDashboardDataService'] =
       new EmailDashboardDataService(upgradedServices['HttpClient']);
     upgradedServices['ExplorationHtmlFormatterService'] =
