@@ -217,13 +217,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_rubrics, {
                 'skill_id_1': [
                     skill_domain.Rubric(
-                        constants.SKILL_DIFFICULTIES[0], 'Explanation 1'
+                        constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
                     ).to_dict(),
                     skill_domain.Rubric(
-                        constants.SKILL_DIFFICULTIES[1], 'Explanation 2'
+                        constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
                     ).to_dict(),
                     skill_domain.Rubric(
-                        constants.SKILL_DIFFICULTIES[2], 'Explanation 3'
+                        constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
                     ).to_dict()],
                 'skill_id_2': None
             }
@@ -314,12 +314,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_RUBRICS,
                 'difficulty': constants.SKILL_DIFFICULTIES[0],
-                'explanation': '<p>New Explanation</p>'
+                'explanations': [
+                    '<p>New Explanation 1</p>', '<p>New Explanation 2</p>']
             }),
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_RUBRICS,
                 'difficulty': constants.SKILL_DIFFICULTIES[1],
-                'explanation': '<p>Explanation</p>'
+                'explanations': ['<p>Explanation</p>']
             })
         ]
         skill_services.update_skill(
@@ -334,8 +335,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill.prerequisite_skill_ids, ['skill_id_2', 'skill_id_3'])
         self.assertEqual(skill.misconceptions[1].name, 'Name')
         self.assertEqual(skill.misconceptions[1].must_be_addressed, False)
-        self.assertEqual(skill.rubrics[0].explanation, '<p>New Explanation</p>')
-        self.assertEqual(skill.rubrics[1].explanation, '<p>Explanation</p>')
+        self.assertEqual(
+            skill.rubrics[0].explanations, [
+                '<p>New Explanation 1</p>', '<p>New Explanation 2</p>'])
+        self.assertEqual(skill.rubrics[1].explanations, ['<p>Explanation</p>'])
 
     def test_merge_skill(self):
         changelist = [
@@ -855,7 +858,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         changelist = [skill_domain.SkillChange({
             'cmd': skill_domain.CMD_UPDATE_RUBRICS,
             'difficulty': 'invalid_difficulty',
-            'explanation': '<p>Explanation</p>'
+            'explanations': ['<p>Explanation</p>']
         })]
 
         with self.assertRaisesRegexp(
@@ -1018,11 +1021,6 @@ class MockSkillObject(skill_domain.Skill):
         """Converts v1 skill_contents dict to v2."""
         return skill_contents
 
-    @classmethod
-    def _convert_rubric_v1_dict_to_v2_dict(cls, rubrics):
-        """Converts v1 rubrics dict to v2."""
-        return rubrics
-
 
 class SkillMigrationTests(test_utils.GenericTestBase):
 
@@ -1137,14 +1135,22 @@ class SkillMigrationTests(test_utils.GenericTestBase):
                     explanation_content_id: {}
                 }
             }))
-        rubric = skill_domain.Rubric(
-            constants.SKILL_DIFFICULTIES[0], '<p>Explanation</p>')
+
         model = skill_models.SkillModel(
             id='skill_id',
             description='description',
             language_code='en',
             misconceptions=[],
-            rubrics=[rubric.to_dict()],
+            rubrics=[{
+                'difficulty': 'Easy',
+                'explanation': 'Easy explanation'
+            }, {
+                'difficulty': 'Medium',
+                'explanation': 'Medium explanation'
+            }, {
+                'difficulty': 'Hard',
+                'explanation': 'Hard explanation'
+            }],
             skill_contents=skill_contents.to_dict(),
             next_misconception_id=1,
             misconceptions_schema_version=1,
@@ -1164,3 +1170,9 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             skill = skill_services.get_skill_from_model(model)
 
         self.assertEqual(skill.rubric_schema_version, 2)
+        self.assertEqual(skill.rubrics[0].difficulty, 'Easy')
+        self.assertEqual(skill.rubrics[0].explanations, ['Easy explanation'])
+        self.assertEqual(skill.rubrics[1].difficulty, 'Medium')
+        self.assertEqual(skill.rubrics[1].explanations, ['Medium explanation'])
+        self.assertEqual(skill.rubrics[2].difficulty, 'Hard')
+        self.assertEqual(skill.rubrics[2].explanations, ['Hard explanation'])
