@@ -17,6 +17,11 @@
  */
 
 export class AboutPageConstants {
+  // These credits should not be changed directly. If any change is
+  // made to structure/formatting, the respective constants
+  // CREDITS_START_LINE, CREDITS_END_LINE and CREDITS_INDENT should be
+  // updated in update_changelog_and_credits.py file. If the patterns do
+  // not match, update_changelog_and_credits_test will fail.
   public static CREDITS = [
     'Aadya Mishra',
     'Aaron Zuspan',
