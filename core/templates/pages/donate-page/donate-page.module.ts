@@ -32,14 +32,6 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { DonatePageComponent } from './donate-page.component';
 
-// This component is needed to force-bootstrap Angular at the beginning of the
-// app.
-@Component({
-  selector: 'service-bootstrap',
-  template: ''
-})
-export class ServiceBootstrapComponent {}
-
 import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
@@ -52,11 +44,9 @@ import { ObjectsDomainConstants } from
     HttpClientModule
   ],
   declarations: [
-    ServiceBootstrapComponent,
     DonatePageComponent
   ],
   entryComponents: [
-    ServiceBootstrapComponent,
     DonatePageComponent
   ],
   providers: [
@@ -84,14 +74,4 @@ const bootstrapFn = (extraProviders: StaticProvider[]) => {
 };
 const downgradedModule = downgradeModule(bootstrapFn);
 
-declare var angular: ng.IAngularStatic;
-
 angular.module('oppia').requires.push(downgradedModule);
-angular.module('oppia')
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  .directive(
-    'serviceBootstrap',
-    downgradeComponent({
-      component: ServiceBootstrapComponent
-    }) as angular.IDirectiveFactory);
