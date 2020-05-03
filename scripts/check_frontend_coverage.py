@@ -33,6 +33,8 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # from this list.
 FULLY_COVERED_FILENAMES = [
     'about-page.controller.ts',
+    'about-page.constants.ajs.ts',
+    'about-page.constants.ts',
     'admin-config-tab-backend-api.service.ts',
     'admin-data.service.ts',
     'admin-page.constants.ajs.ts',
