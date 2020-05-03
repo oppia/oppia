@@ -112,12 +112,12 @@ angular.module('oppia').directive('topicLandingPage', [
             ctrl.lessons = landingPageData.lessons;
             assetsPathFormat = '/landing/<subject>/<topic>/<file_name>';
 
-            ctrl.pageTitle = (
+            var pageTitle = (
               ctrl.topicTitle + ' | ' +
-              (typeof topicData.topic_tagline !== 'undefined' ?
+              (topicData.topic_tagline.length !== 0 ?
                 topicData.topic_tagline + ' | ' : '') +
               'Oppia');
-            PageTitleService.setPageTitle(ctrl.pageTitle);
+            PageTitleService.setPageTitle(pageTitle);
             ctrl.bookImageUrl = UrlInterpolationService.getStaticImageUrl(
               '/splash/books.svg');
             ctrl.image1 = getImageData(1);

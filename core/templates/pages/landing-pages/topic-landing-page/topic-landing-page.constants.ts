@@ -46,6 +46,7 @@ export class TopicLandingPageConstants {
       },
       'negative-numbers': {
         topic_title: 'Negative Numbers',
+        topic_tagline: '',
         collection_id: 'GdYIgsfRZwG7',
         page_data: {
           image_1: {
@@ -67,6 +68,7 @@ export class TopicLandingPageConstants {
       },
       ratios: {
         topic_title: 'Ratios',
+        topic_tagline: '',
         collection_id: '53gXGLIR044l',
         page_data: {
           image_1: {

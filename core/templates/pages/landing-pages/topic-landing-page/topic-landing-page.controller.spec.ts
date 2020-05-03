@@ -20,7 +20,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Topic Landing Page', function() {
   var $scope = null, ctrl = null;
-  var $timeout = null;
+  var $timeout = null, $window = null;
   var SiteAnalyticsService = null;
   var windowRef = new WindowRef();
 
@@ -33,6 +33,7 @@ describe('Topic Landing Page', function() {
   }));
   beforeEach(angular.mock.inject(function($injector) {
     $timeout = $injector.get('$timeout');
+    $window = $injector.get('$window');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
 
     var $rootScope = $injector.get('$rootScope');
@@ -143,8 +144,9 @@ describe('Topic Landing Page', function() {
       }
     });
     ctrl.$onInit();
-
-    expect(ctrl.pageTitle).toBe('Fractions | ' +
-      'Add, Subtract, Multiply and Divide | Oppia');
+    $timeout(() => {
+      expect($window.document.title).toBe('Fractions | ' +
+        'Add, Subtract, Multiply and Divide | Oppia');
+    }, 150, false);
   });
 });
