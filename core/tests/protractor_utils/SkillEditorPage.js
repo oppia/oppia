@@ -93,21 +93,65 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-question-list-item'));
   var questionItem = element(by.css('.protractor-test-question-list-item'));
 
-  var editRubricExplanationButtons = element.all(
-    by.css('.protractor-test-edit-rubric-explanation'));
   var saveRubricExplanationButton = element(
     by.css('.protractor-test-save-rubric-explanation-button'));
-  var rubricExplanations = element.all(
-    by.css('.protractor-test-rubric-explanation'));
+  var deleteRubricExplanationButton = element(
+    by.css('.protractor-test-delete-rubric-explanation-button'));
 
   this.get = function(skillId) {
     browser.get(EDITOR_URL_PREFIX + skillId);
     return waitFor.pageToFullyLoad();
   };
 
-  this.editRubricExplanationWithIndex = function(index, explanation) {
+  this.addRubricExplanationForDifficulty = function(difficulty, explanation) {
+    var addRubricExplanationButton = element(
+      by.css('.protractor-test-add-explanation-button-' + difficulty));
+    waitFor.elementToBeClickable(
+      addRubricExplanationButton,
+      'Add Rubric Explanation button takes too long to be clickable');
+    addRubricExplanationButton.click();
+    var editor = element(
+      by.css('.protractor-test-rubric-explanation-text'));
+    waitFor.visibilityOf(
+      editor, 'Rubric explanation editor takes too long to appear');
+    browser.switchTo().activeElement().sendKeys(explanation);
+    waitFor.elementToBeClickable(
+      saveRubricExplanationButton,
+      'Save Rubric Explanation button takes too long to be clickable');
+    saveRubricExplanationButton.click();
+  };
+
+  this.deleteRubricExplanationWithIndex = function(difficulty, explIndex) {
+    // The edit explanation buttons for all explanations of a difficulty have
+    // the same class name and each explanation in it are identified by its
+    // index.
+    var editRubricExplanationButtons = element.all(
+      by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
     editRubricExplanationButtons.then(function(buttons) {
-      buttons[index].click();
+      waitFor.elementToBeClickable(
+        buttons[explIndex],
+        'Edit Rubric Explanation button takes too long to be clickable');
+      buttons[explIndex].click();
+      var editor = element(
+        by.css('.protractor-test-rubric-explanation-text'));
+      waitFor.visibilityOf(
+        editor, 'Rubric explanation editor takes too long to appear');
+      deleteRubricExplanationButton.click();
+    });
+  };
+
+  this.editRubricExplanationWithIndex = function(
+      difficulty, explIndex, explanation) {
+    // The edit explanation buttons for all explanations of a difficulty have
+    // the same class name and each explanation in it are identified by its
+    // index.
+    var editRubricExplanationButtons = element.all(
+      by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
+    editRubricExplanationButtons.then(function(buttons) {
+      waitFor.elementToBeClickable(
+        buttons[explIndex],
+        'Edit Rubric Explanation button takes too long to be clickable');
+      buttons[explIndex].click();
       var editor = element(
         by.css('.protractor-test-rubric-explanation-text'));
       waitFor.visibilityOf(
@@ -120,11 +164,17 @@ var SkillEditorPage = function() {
     });
   };
 
-  this.expectRubricExplanationToMatch = function(index, explanation) {
-    rubricExplanations.then(function(explanations) {
-      explanations[index].getText().then(function(text) {
-        expect(text).toMatch(explanation);
-      });
+  this.expectRubricExplanationsToMatch = function(difficulty, explanations) {
+    var rubricExplanationsForDifficulty = element.all(
+      by.css('.protractor-test-rubric-explanation-' + difficulty));
+    var explanationCounter = 0;
+    rubricExplanationsForDifficulty.then(function(explanationElements) {
+      for (var idx in explanationElements) {
+        explanationElements[idx].getText().then(function(text) {
+          expect(text).toMatch(explanations[explanationCounter]);
+          explanationCounter++;
+        });
+      }
     });
   };
 

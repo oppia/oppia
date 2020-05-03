@@ -313,6 +313,7 @@
 /core/domain/skill*.py @aks681
 /core/storage/skill/ @aks681
 /core/templates/components/entity-creation-services/skill-creation.service.ts @kevintab95
+/core/templates/components/question-difficulty-selector/ @aks681
 /core/templates/components/review-material-editor/ @kevintab95
 /core/templates/components/rubrics-editor/ @kevintab95
 /core/templates/components/skill-selector/ @kevintab95
