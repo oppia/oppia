@@ -1,6 +1,7 @@
 <link rel="stylesheet" href="/third_party/static/guppy-b5055b/build/guppy-default.min.css">
 <script>
   // Use the normal default browser eventlistener without passive set to false.
+  // TODO(jameesjohn): use passive listeners when guppy supports it.
   EventTarget.prototype.addEventListener = (
     EventTarget.prototype.addEventListener._original);
 </script>
@@ -30,10 +31,14 @@
   }
 
   @keyframes guppy-blink-animation {
-    to { visibility: hidden; }
+    to {
+      visibility: hidden;
+    }
   }
 
   @-webkit-keyframes guppy-blink-animation {
-    to { visibility: hidden; }
+    to {
+      visibility: hidden;
+    }
   }
 </style>
