@@ -67,6 +67,7 @@ from . import general_purpose_linter
 from . import html_linter
 from . import js_ts_linter
 from . import python_linter
+from .. import common
 from .. import concurrent_task_utils
 from .. import install_third_party_libs
 
@@ -116,10 +117,14 @@ _PATHS_TO_INSERT = [
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-2.0.33'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'Pillow-6.0.0'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'psutil-5.6.7'),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools', 'webtest-%s' % common.WEBTEST_VERSION),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools', 'Pillow-%s' % common.PILLOW_VERSION),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools', 'psutil-%s' % common.PSUTIL_VERSION),
     os.path.join('third_party', 'backports.functools_lru_cache-1.5'),
     os.path.join('third_party', 'beautifulsoup4-4.7.1'),
     os.path.join('third_party', 'bleach-3.1.0'),
@@ -422,6 +427,19 @@ def _print_complete_summary_of_errors(all_messages):
             python_utils.PRINT(message)
 
 
+def _get_task_output(all_messages, task, semaphore):
+    """Returns output of running tasks.
+
+    Args:
+        all_messages: list(str). List of summary messages of linter output.
+        task: object(TestingTaskSpec). The task object to get output of linter.
+        semaphore: threading.Semaphore. The object that controls how many tasks
+            can run at any time.
+    """
+    all_messages += task.output
+    semaphore.release()
+
+
 def main(args=None):
     """Main method for pre commit linter script that lints Python, JavaScript,
     HTML, and CSS files.
@@ -497,11 +515,16 @@ def main(args=None):
 
     all_messages = []
 
+    # Prepare semaphore for locking mechanism.
+    semaphore = threading.Semaphore(1)
+
     for task in tasks_custom:
-        all_messages += task.output
+        semaphore.acquire()
+        _get_task_output(all_messages, task, semaphore)
 
     for task in tasks_third_party:
-        all_messages += task.output
+        semaphore.acquire()
+        _get_task_output(all_messages, task, semaphore)
 
     all_messages += codeowner_linter.check_codeowner_file(
         verbose_mode_enabled)
