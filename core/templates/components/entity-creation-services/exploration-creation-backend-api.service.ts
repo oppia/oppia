@@ -21,15 +21,15 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
  @Injectable({
-  providedIn: 'root'
-})
+   providedIn: 'root'
+ })
 export class ExplorationCreationBackendService {
   constructor(private http: HttpClient) {}
 
   private _createExploration(
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
-    
+    successCallback: (value?: Object | PromiseLike<Object>) => void,
+    errorCallback: (reason?: any) => void): void {
+
     this.http.post('/contributehandler/create_new', {}).toPromise()
       .then((response) => {
         if (successCallback) {
