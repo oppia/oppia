@@ -108,10 +108,10 @@
   .oppia-thumbnail-preview-description {
     font-size: 16px;
     line-height: 1.2;
-    max-height: 92px;
     overflow: hidden;
     padding: 0 16px 0 16px;
-    word-break: break-word;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .oppia-thumbnail-preview-footer {
     bottom: 10px;
@@ -124,7 +124,10 @@
   .oppia-thumbnail-preview-title {
     font-size: 18px;
     font-weight: bold;
+    overflow: hidden;
     padding: 10px 16px 10px 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
 </style>
