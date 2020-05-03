@@ -176,10 +176,10 @@ export class Skill {
     return this._misconceptions[idx];
   }
 
-  getRubricExplanation(difficulty: string) {
+  getRubricExplanations(difficulty: string) {
     for (var idx in this._rubrics) {
       if (this._rubrics[idx].getDifficulty() === difficulty) {
-        return this._rubrics[idx].getExplanation();
+        return this._rubrics[idx].getExplanations();
       }
     }
     return null;
@@ -189,18 +189,18 @@ export class Skill {
     return this._misconceptions[index].getId();
   }
 
-  updateRubricForDifficulty(difficulty: string, explanation: string) {
+  updateRubricForDifficulty(difficulty: string, explanations: Array<string>) {
     if (this.SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
       throw new Error('Invalid difficulty value passed');
     }
     for (var idx in this._rubrics) {
       if (this._rubrics[idx].getDifficulty() === difficulty) {
-        this._rubrics[idx].setExplanation(explanation);
+        this._rubrics[idx].setExplanations(explanations);
         return;
       }
     }
     const rubricObjectFactory = new RubricObjectFactory();
-    this._rubrics.push(rubricObjectFactory.create(difficulty, explanation));
+    this._rubrics.push(rubricObjectFactory.create(difficulty, explanations));
   }
 
   toBackendDict(): ISkillBackendDict {

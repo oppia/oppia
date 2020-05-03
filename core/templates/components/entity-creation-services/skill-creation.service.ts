@@ -20,19 +20,46 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('domain/skill/skill-creation-backend-api.service.ts');
 
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'topics-and-skills-dashboard-page.constants.ajs.ts');
+
 angular.module('oppia').factory('SkillCreationService', [
   '$rootScope', '$timeout', '$window', 'AlertsService',
   'SkillCreationBackendApiService', 'UrlInterpolationService',
   'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+  'SKILL_DESCRIPTION_STATUS_VALUES',
   function(
       $rootScope, $timeout, $window, AlertsService,
       SkillCreationBackendApiService, UrlInterpolationService,
-      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
+      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
+      SKILL_DESCRIPTION_STATUS_VALUES) {
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
       '/skill_editor/<skill_id>');
     var skillCreationInProgress = false;
+    var skillDescriptionStatusMarker = (
+      SKILL_DESCRIPTION_STATUS_VALUES.STATUS_UNCHANGED);
 
     return {
+      markChangeInSkillDescription: function() {
+        skillDescriptionStatusMarker = (
+          SKILL_DESCRIPTION_STATUS_VALUES.STATUS_CHANGED);
+      },
+
+      getSkillDescriptionStatus: function() {
+        return skillDescriptionStatusMarker;
+      },
+
+      disableSkillDescriptionStatusMarker: function() {
+        skillDescriptionStatusMarker = (
+          SKILL_DESCRIPTION_STATUS_VALUES.STATUS_DISABLED);
+      },
+
+      resetSkillDescriptionStatusMarker: function() {
+        skillDescriptionStatusMarker = (
+          SKILL_DESCRIPTION_STATUS_VALUES.STATUS_UNCHANGED);
+      },
+
       createNewSkill: function(
           description, rubrics, explanation, linkedTopicIds) {
         if (skillCreationInProgress) {
