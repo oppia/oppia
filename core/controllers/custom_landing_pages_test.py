@@ -46,7 +46,7 @@ class FractionLandingRedirectPageTest(test_utils.GenericTestBase):
             response.headers['location'])
 
 
-class TopicRedirectPageTest(test_utils.GenericTestBase):
+class TopicLandingRedirectPageTest(test_utils.GenericTestBase):
     """Test for redirecting the old landing page URL to the new one."""
 
     def test_old_topic_url_redirect(self):

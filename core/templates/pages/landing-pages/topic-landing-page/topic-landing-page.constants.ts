@@ -24,6 +24,7 @@ export class TopicLandingPageConstants {
     math: {
       fractions: {
         topic_title: 'Fractions',
+        topic_tagline: 'Add, Subtract, Multiply and Divide',
         collection_id: '4UgTQUc1tala',
         page_data: {
           image_1: {

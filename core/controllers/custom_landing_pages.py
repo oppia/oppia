@@ -32,7 +32,7 @@ class FractionLandingRedirectPage(base.BaseHandler):
         self.redirect('/math/fractions')
 
 
-class TopicRedirectPage(base.BaseHandler):
+class TopicLandingRedirectPage(base.BaseHandler):
     """The handler redirecting the old landing page URL to the new one."""
 
     @acl_decorators.open_access

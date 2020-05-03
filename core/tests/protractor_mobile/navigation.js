@@ -135,7 +135,7 @@ describe('Navigation features on mobile', function() {
       expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/library');
     });
 
-  it('should navigate to Splash page by clicking on the Oppia logo',
+  it('should navigate to Home page by clicking on the Oppia logo',
     function() {
       var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
       waitFor.elementToBeClickable(

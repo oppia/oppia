@@ -196,13 +196,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         self.delete_json('/library/data', expected_status_int=404)
 
-    def test_redirect_in_logged_out_states(self):
-        """Test for a redirect in logged out state on '/'."""
-
-        response = self.get_html_response('/')
-        self.assertEqual(response.status_int, 200)
-        self.assertIn('</splash-page>', response)
-
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
 
@@ -529,14 +522,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
     def test_splash_redirect(self):
         # Tests that the old '/splash' URL is redirected to '/'.
-
         response = self.get_html_response('/splash', expected_status_int=302)
-        response_path = response.headers['location']
-        # The following asserts ensure that the the URL ends with `/` and the
-        # number of backslashes is 3. The structure should be
-        # `http://localhost/`.
-        self.assertEqual(response_path[-1], '/')
-        self.assertEqual(len(response_path.split('/')), 4)
+        self.assertEqual('http://localhost/', response.headers['location'])
 
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):

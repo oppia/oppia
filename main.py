@@ -112,7 +112,7 @@ class HomePageRedirectPage(base.BaseHandler):
 
 
 class SplashRedirectPage(base.BaseHandler):
-    """Redirect the old splash URL, `/splash` to the new one, `/`."""
+    """Redirect the old splash URL, '/splash' to the new one, '/'."""
     @acl_decorators.open_access
     def get(self):
         self.redirect('/')
@@ -353,7 +353,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
         custom_landing_pages.FractionLandingRedirectPage),
     get_redirect_route(
-        r'/learn/maths/<topic>', custom_landing_pages.TopicRedirectPage),
+        r'/learn/maths/<topic>', custom_landing_pages.TopicLandingRedirectPage),
     get_redirect_route(
         r'%s' % feconf.CUSTOM_PARENTS_LANDING_PAGE_URL,
         custom_landing_pages.StewardsLandingPage),

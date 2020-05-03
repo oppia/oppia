@@ -165,7 +165,7 @@ describe('Static Pages Tour', function() {
       by.css('.protractor-test-teach-page')).isPresent()).toBe(true);
   });
 
-  it('visits the Splash page', function() {
+  it('visits the Home page', function() {
     browser.get('/');
     waitFor.pageToFullyLoad();
     expect(element(
