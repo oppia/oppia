@@ -187,7 +187,7 @@ CURRENT_STATE_SCHEMA_VERSION = 33
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of story contents dict in the story schema.
-CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 1
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 2
 
 # The current version of skill contents dict in the skill schema.
 CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
@@ -196,10 +196,10 @@ CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
 CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 2
 
 # The current version of rubric dict in the skill schema.
-CURRENT_RUBRIC_SCHEMA_VERSION = 1
+CURRENT_RUBRIC_SCHEMA_VERSION = 2
 
 # The current version of subtopics dict in the topic schema.
-CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
+CURRENT_SUBTOPIC_SCHEMA_VERSION = 2
 
 # The current version of story reference dict in the topic schema.
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
@@ -309,14 +309,24 @@ DEFAULT_VM_ID = 'vm_default'
 # Shared secret key for default VM.
 DEFAULT_VM_SHARED_SECRET = '1a2b3c4e'
 
+IMAGE_FORMAT_JPEG = 'jpeg'
+IMAGE_FORMAT_PNG = 'png'
+IMAGE_FORMAT_GIF = 'gif'
+IMAGE_FORMAT_SVG = 'svg'
+
 # An array containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
 # images.
 ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
-    'jpeg': ['jpg', 'jpeg'],
-    'png': ['png'],
-    'gif': ['gif'],
+    IMAGE_FORMAT_JPEG: ['jpg', 'jpeg'],
+    IMAGE_FORMAT_PNG: ['png'],
+    IMAGE_FORMAT_GIF: ['gif'],
+    IMAGE_FORMAT_SVG: ['svg']
 }
+
+# An array containing the image formats that can be compressed.
+COMPRESSIBLE_IMAGE_FORMATS = [
+    IMAGE_FORMAT_JPEG, IMAGE_FORMAT_PNG, IMAGE_FORMAT_GIF]
 
 # An array containing the accepted audio extensions for uploaded files and
 # the corresponding MIME types.
@@ -501,13 +511,6 @@ MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
 # The minimum score required for a user to review suggestions of a particular
 # category.
 MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
-
-# The difficulty value of an easy question.
-EASY_SKILL_DIFFICULTY = 0.3
-# The difficulty value of a medium question.
-MEDIUM_SKILL_DIFFICULTY = 0.6
-# The difficulty value of a hard question.
-HARD_SKILL_DIFFICULTY = 0.9
 
 # The maximum number of skills to be requested at one time when fetching
 # questions.

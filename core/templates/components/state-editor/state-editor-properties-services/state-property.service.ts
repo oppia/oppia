@@ -54,7 +54,7 @@ export class StatePropertyService {
   // various properties and decide type of value according to that.
   init(stateName: string, value: any): void {
     if (this.setterMethodKey === null) {
-      throw 'State property setter method key cannot be null.';
+      throw new Error('State property setter method key cannot be null.');
     }
     // The name of the state.
     this.stateName = stateName;
@@ -95,7 +95,7 @@ export class StatePropertyService {
 
   saveDisplayedValue(): void {
     if (this.setterMethodKey === null) {
-      throw 'State property setter method key cannot be null.';
+      throw new Error('State property setter method key cannot be null.');
     }
 
     this.displayed = this._normalize(this.displayed);
