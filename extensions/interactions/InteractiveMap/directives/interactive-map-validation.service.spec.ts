@@ -101,7 +101,8 @@ describe('InteractiveMapValidationService', () => {
       expect(() => {
         validatorService.getAllWarnings(
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-      }).toThrow('Expected customization arguments to have properties: ' +
+      }).toThrowError(
+        'Expected customization arguments to have properties: ' +
         'latitude, longitude');
     }
   );

@@ -54,7 +54,7 @@ describe('Classroom page functionality', function() {
     browser.getWindowHandle().then(function(handle) {
       topicsAndSkillsDashboardPage.get();
       topicsAndSkillsDashboardPage.createTopic('Topic 1', false);
-      topicEditorPage.submitTopicThumbnail('../data/img.png');
+      topicEditorPage.submitTopicThumbnail('../data/test_svg.svg');
       topicEditorPage.saveTopic('Added thumbnail.');
       browser.getCurrentUrl().then(function(url) {
         var topicId = url.split('/')[4].slice(0, -1);

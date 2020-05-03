@@ -5,7 +5,7 @@
         <div class="oppia-contributions-navbar-item" ng-repeat="tab in $ctrl.reviewTabs">
           <button class="oppia-contributions-navbar-button"
                   ng-click="$ctrl.switchToReviewTab(tab.suggestionType)"
-                  ng-class="$ctrl.activeReviewTab == tab.suggestionType ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
+                  ng-class="$ctrl.activeReviewTab == tab.suggestionType ? 'oppia-contributions-active-navbar' : ''"><[tab.text]>
           </button>
         </div>
       </div>
@@ -15,7 +15,7 @@
         <div class="oppia-contributions-navbar-item" ng-repeat="tab in $ctrl.contributionTabs">
           <button class="oppia-contributions-navbar-button"
                   ng-click="$ctrl.switchToContributionsTab(tab.suggestionType)"
-                  ng-class="$ctrl.activeContributionTab == tab.suggestionType ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
+                  ng-class="$ctrl.activeContributionTab == tab.suggestionType ? 'oppia-contributions-active-navbar' : ''"><[tab.text]>
           </button>
         </div>
       </div>

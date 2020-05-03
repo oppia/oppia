@@ -6911,7 +6911,8 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
 
         for i in python_utils.RANGE(2):
             skill = skill_domain.Skill.create_default_skill(
-                '%s' % (i + 3), description='description %d' % (i + 3),
+                '%s' % (i + 3),
+                description='description %d' % (i + 3),
                 rubrics=rubrics)
             skill_services.save_new_skill(self.owner_id, skill)
 
@@ -9033,7 +9034,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+                skill_id='%s' % i,
+                description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -9327,7 +9329,8 @@ class TopicSnapshotMetadataModelValidatorTests(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
+                skill_id='%s' % i,
+                description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -10673,12 +10676,12 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance_0.put()
         expected_output = [
             (
-                u'[u\'failed validation check for subtopic count check '
-                'of TopicSummaryModel\', '
-                '[u"Entity id 0: Subtopic count: 10 does not match '
-                'the total number of subtopics in topic model: '
-                '[{u\'skill_ids\': [u\'0\', u\'1\'], u\'id\': 1, '
-                'u\'title\': u\'subtopic1\'}] "]]'
+                u'[u\'failed validation check for subtopic count check of Topi'
+                'cSummaryModel\', [u"Entity id 0: Subtopic count: 10 does not '
+                'match the total number of subtopics in topic model: [{u\'thum'
+                'bnail_bg_color\': None, u\'skill_ids\': [u\'0\', '
+                'u\'1\'], u\'id\': 1, u\'thumbnail_filename\': None, u\'title'
+                '\': u\'subtopic1\'}] "]]'
             ), u'[u\'fully-validated TopicSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
