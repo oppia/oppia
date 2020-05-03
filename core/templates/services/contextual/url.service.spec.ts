@@ -143,11 +143,11 @@ describe('Url Service', () => {
   });
 
   it('should correctly retrieve classroom name from url', () => {
-    mockLocation.pathname = '/classroom/abcdefgijklm';
+    mockLocation.pathname = '/abcdefgijklm';
     expect(
       urlService.getClassroomNameFromUrl()
     ).toBe('abcdefgijklm');
-    mockLocation.pathname = '/classroom/class%20name';
+    mockLocation.pathname = '/class%20name';
     expect(
       urlService.getClassroomNameFromUrl()
     ).toBe('class name');

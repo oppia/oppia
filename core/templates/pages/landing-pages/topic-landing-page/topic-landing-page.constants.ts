@@ -21,9 +21,10 @@
 
 export class TopicLandingPageConstants {
   public static TOPIC_LANDING_PAGE_DATA = {
-    maths: {
+    math: {
       fractions: {
         topic_title: 'Fractions',
+        topic_tagline: 'Add, Subtract, Multiply and Divide',
         collection_id: '4UgTQUc1tala',
         page_data: {
           image_1: {
@@ -45,6 +46,7 @@ export class TopicLandingPageConstants {
       },
       'negative-numbers': {
         topic_title: 'Negative Numbers',
+        topic_tagline: '',
         collection_id: 'GdYIgsfRZwG7',
         page_data: {
           image_1: {
@@ -66,6 +68,7 @@ export class TopicLandingPageConstants {
       },
       ratios: {
         topic_title: 'Ratios',
+        topic_tagline: '',
         collection_id: '53gXGLIR044l',
         page_data: {
           image_1: {

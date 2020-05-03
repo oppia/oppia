@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
-import feconf
 
 
 class FractionLandingRedirectPage(base.BaseHandler):
@@ -30,22 +29,26 @@ class FractionLandingRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect('/learn/maths/fractions')
+        self.redirect('/math/fractions')
+
+
+class TopicLandingRedirectPage(base.BaseHandler):
+    """The handler redirecting the old landing page URL to the new one."""
+
+    @acl_decorators.open_access
+    def get(self, topic):
+        """Handles GET requests."""
+        self.redirect('/math/%s' % topic)
 
 
 class TopicLandingPage(base.BaseHandler):
     """Page showing the topic landing page."""
 
     @acl_decorators.open_access
-    def get(self, subject, topic):
+    def get(self):
         """Handles GET requests."""
-        if subject in feconf.AVAILABLE_LANDING_PAGES:
-            if topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
-                self.render_template('topic-landing-page.mainpage.html')
-            else:
-                raise self.PageNotFoundException
-        else:
-            raise self.PageNotFoundException
+
+        self.render_template('topic-landing-page.mainpage.html')
 
 
 class StewardsLandingPage(base.BaseHandler):

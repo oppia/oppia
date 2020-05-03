@@ -47,7 +47,7 @@ describe('Classroom page functionality', function() {
       'Algorithms',
       'This is the objective.',
       'English');
-    classroomPage.get('Math');
+    classroomPage.get('math');
     libraryPage.findExploration('Title');
     libraryPage.expectExplorationToBeVisible('Exploration Title');
 
