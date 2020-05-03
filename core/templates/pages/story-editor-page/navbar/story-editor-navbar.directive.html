@@ -68,6 +68,11 @@
         <hr class="oppia-editor-warnings-separator">
         <[issue]>
       </li>
+      <li class="oppia-editor-warnings-text"
+          ng-repeat="issue in prepublishValidationIssues track by $index">
+        <hr class="oppia-editor-warnings-separator">
+        <[issue]>
+      </li>
     </ul>
   </li>
 </ul>

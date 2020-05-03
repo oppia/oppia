@@ -151,7 +151,6 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             topic_id)
         self.save_new_topic(
             topic_id, admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[story_id],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[subtopic], next_subtopic_id=2)
@@ -340,6 +339,52 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         )
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(response_dict['error'], 'Image not recognized')
+
+        self.logout()
+
+    def test_upload_an_invalid_svg_image(self):
+        """Test upload of an invalid SVG image."""
+
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Upload an invalid SVG image.
+        response_dict = self.post_json(
+            '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            {'filename': 'test.svg'},
+            csrf_token=csrf_token,
+            expected_status_int=400,
+            upload_files=(('image', 'unused_filename', '<badsvg></badsvg>'),)
+        )
+        self.assertEqual(response_dict['status_code'], 400)
+        self.assertEqual(
+            response_dict['error'],
+            'Unsupported tags/attributes found in the SVG:\ntags: '
+            '[u\'badsvg\']\n')
+
+        self.logout()
+
+    def test_upload_a_large_svg(self):
+        """Test upload of an SVG image that exceeds the 100 KB size limit."""
+
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Upload an SVG image that exceeds the file size limit of 100 KB.
+        response_dict = self.post_json(
+            '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            {'filename': 'test.svg'},
+            csrf_token=csrf_token,
+            expected_status_int=400,
+            upload_files=((
+                'image',
+                'unused_filename',
+                '<svg><path d="%s" /></svg>' % (
+                    'M150 0 L75 200 L225 200 Z ' * 4000)),)
+        )
+        self.assertEqual(response_dict['status_code'], 400)
+        self.assertEqual(
+            response_dict['error'], 'Image exceeds file size limit of 100 KB.')
 
         self.logout()
 
