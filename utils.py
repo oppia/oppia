@@ -515,7 +515,7 @@ def require_valid_name(name, name_type, allow_empty=False):
     Raises:
         Exception: Name isn't a string.
         Exception: The length of the name_type isn't between
-            1 and constants.GENERIC_NAME_FIELD_CHAR_LIMIT.
+            1 and 50.
         Exception: Name starts or ends with whitespace.
         Exception: Adjacent whitespace in name_type isn't collapsed.
         Exception: Invalid character is present in name.
@@ -528,11 +528,10 @@ def require_valid_name(name, name_type, allow_empty=False):
 
     # This check is needed because state names are used in URLs and as ids
     # for statistics, so the name length should be bounded above.
-    if len(name) > constants.GENERIC_NAME_FIELD_CHAR_LIMIT or len(name) < 1:
+    if len(name) > 50 or len(name) < 1:
         raise ValidationError(
-            'The length of %s should be between 1 and %d '
-            'characters; received %s' % (
-                name_type, constants.GENERIC_NAME_FIELD_CHAR_LIMIT, name))
+            'The length of %s should be between 1 and 50 '
+            'characters; received %s' % (name_type, name))
 
     if name[0] in string.whitespace or name[-1] in string.whitespace:
         raise ValidationError(
