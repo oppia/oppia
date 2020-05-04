@@ -43,11 +43,11 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
       controller: [
         '$scope', '$filter', '$uibModal', '$rootScope',
         'MisconceptionObjectFactory', 'EVENT_SKILL_REINITIALIZED',
-        'MISCONCEPTION_NAME_CHAR_LIMIT',
+        'GENERIC_NAME_FIELD_CHAR_LIMIT',
         function(
             $scope, $filter, $uibModal, $rootScope,
             MisconceptionObjectFactory, EVENT_SKILL_REINITIALIZED,
-            MISCONCEPTION_NAME_CHAR_LIMIT) {
+            GENERIC_NAME_FIELD_CHAR_LIMIT) {
           var ctrl = this;
           $scope.isEditable = function() {
             return true;
@@ -103,12 +103,12 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
                 'add-misconception-modal.directive.html'),
               backdrop: 'static',
               controller: [
-                '$scope', '$uibModalInstance', 'MISCONCEPTION_NAME_CHAR_LIMIT',
+                '$scope', '$uibModalInstance', 'GENERIC_NAME_FIELD_CHAR_LIMIT',
                 function(
-                    $scope, $uibModalInstance, MISCONCEPTION_NAME_CHAR_LIMIT) {
+                    $scope, $uibModalInstance, GENERIC_NAME_FIELD_CHAR_LIMIT) {
                   $scope.skill = SkillEditorStateService.getSkill();
-                  $scope.MISCONCEPTION_NAME_CHAR_LIMIT =
-                    MISCONCEPTION_NAME_CHAR_LIMIT;
+                  $scope.GENERIC_NAME_FIELD_CHAR_LIMIT =
+                    GENERIC_NAME_FIELD_CHAR_LIMIT;
                   $scope.MISCONCEPTION_PROPERTY_FORM_SCHEMA = {
                     type: 'html',
                     ui_config: {

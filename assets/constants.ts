@@ -5196,6 +5196,8 @@ export = {
   "MAX_CHARS_IN_STORY_TITLE": 39,
   "MAX_CHARS_IN_CHAPTER_TITLE": 36,
 
+  "GENERIC_NAME_FIELD_CHAR_LIMIT": 50,
+
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
     "content": {
