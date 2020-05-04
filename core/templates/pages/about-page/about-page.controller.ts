@@ -56,7 +56,7 @@ angular.module('oppia').directive('aboutPage', [
           ctrl.TAB_ID_ABOUT = 'about';
           ctrl.TAB_ID_FOUNDATION = 'foundation';
           ctrl.TAB_ID_CREDITS = 'credits';
-          ctrl.ALPHABETS = [
+          ctrl.ALPHABET_LIST = [
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
             'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
