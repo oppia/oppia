@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
+import random
 
 from constants import constants
 from core.domain import skill_domain
@@ -216,13 +217,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_rubrics, {
                 'skill_id_1': [
                     skill_domain.Rubric(
-                        constants.SKILL_DIFFICULTIES[0], 'Explanation 1'
+                        constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
                     ).to_dict(),
                     skill_domain.Rubric(
-                        constants.SKILL_DIFFICULTIES[1], 'Explanation 2'
+                        constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
                     ).to_dict(),
                     skill_domain.Rubric(
-                        constants.SKILL_DIFFICULTIES[2], 'Explanation 3'
+                        constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
                     ).to_dict()],
                 'skill_id_2': None
             }
@@ -313,12 +314,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_RUBRICS,
                 'difficulty': constants.SKILL_DIFFICULTIES[0],
-                'explanation': '<p>New Explanation</p>'
+                'explanations': [
+                    '<p>New Explanation 1</p>', '<p>New Explanation 2</p>']
             }),
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_RUBRICS,
                 'difficulty': constants.SKILL_DIFFICULTIES[1],
-                'explanation': '<p>Explanation</p>'
+                'explanations': ['<p>Explanation</p>']
             })
         ]
         skill_services.update_skill(
@@ -333,8 +335,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill.prerequisite_skill_ids, ['skill_id_2', 'skill_id_3'])
         self.assertEqual(skill.misconceptions[1].name, 'Name')
         self.assertEqual(skill.misconceptions[1].must_be_addressed, False)
-        self.assertEqual(skill.rubrics[0].explanation, '<p>New Explanation</p>')
-        self.assertEqual(skill.rubrics[1].explanation, '<p>Explanation</p>')
+        self.assertEqual(
+            skill.rubrics[0].explanations, [
+                '<p>New Explanation 1</p>', '<p>New Explanation 2</p>'])
+        self.assertEqual(skill.rubrics[1].explanations, ['<p>Explanation</p>'])
 
     def test_merge_skill(self):
         changelist = [
@@ -854,7 +858,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         changelist = [skill_domain.SkillChange({
             'cmd': skill_domain.CMD_UPDATE_RUBRICS,
             'difficulty': 'invalid_difficulty',
-            'explanation': '<p>Explanation</p>'
+            'explanations': ['<p>Explanation</p>']
         })]
 
         with self.assertRaisesRegexp(
@@ -960,6 +964,51 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             degrees_of_mastery, {skill_id_4: 0.3, skill_id_5: 0.5})
 
+    def test_filter_skills_by_mastery(self):
+        # Create feconf.MAX_NUMBER_OF_SKILL_IDS + 3 skill_ids
+        # to test two things:
+        #   1. The skill_ids should be sorted.
+        #   2. The filtered skill_ids should be feconf.MAX_NUMBER_OF_SKILL_IDS
+        # in number.
+
+        # List of mastery values (float values between 0.0 and 1.0)
+        masteries = [self.DEGREE_OF_MASTERY_1, self.DEGREE_OF_MASTERY_2, None]
+
+        # Creating feconf.MAX_NUMBER_OF_SKILL_IDS additional user skill
+        # masteries.
+        for _ in python_utils.RANGE(feconf.MAX_NUMBER_OF_SKILL_IDS):
+            skill_id = skill_services.get_new_skill_id()
+            mastery = random.random()
+            masteries.append(mastery)
+            skill_services.create_user_skill_mastery(
+                self.USER_ID, skill_id, mastery)
+            self.SKILL_IDS.append(skill_id)
+
+        # Sorting the masteries, which should represent the masteries of the
+        # skill_ids that are finally returned.
+        masteries.sort()
+        degrees_of_masteries = skill_services.get_multi_user_skill_mastery(
+            self.USER_ID, self.SKILL_IDS)
+        arranged_filtered_skill_ids = skill_services.filter_skills_by_mastery(
+            self.USER_ID, self.SKILL_IDS)
+
+        self.assertEqual(
+            len(arranged_filtered_skill_ids), feconf.MAX_NUMBER_OF_SKILL_IDS)
+
+        # Assert that all the returned skill_ids are a part of the first
+        # feconf.MAX_NUMBER_OF_SKILL_IDS sorted skill_ids.
+        for i in python_utils.RANGE(feconf.MAX_NUMBER_OF_SKILL_IDS):
+            self.assertIn(
+                degrees_of_masteries[arranged_filtered_skill_ids[i]],
+                masteries[:feconf.MAX_NUMBER_OF_SKILL_IDS])
+
+        # Testing the arrangement.
+        excluded_skill_ids = list(set(self.SKILL_IDS) - set(
+            arranged_filtered_skill_ids))
+        for skill_id in excluded_skill_ids:
+            self.SKILL_IDS.remove(skill_id)
+        self.assertEqual(arranged_filtered_skill_ids, self.SKILL_IDS)
+
 
 # TODO(lilithxxx): Remove this mock class and tests for the mock skill
 # migrations once the actual functions are implemented.
@@ -971,11 +1020,6 @@ class MockSkillObject(skill_domain.Skill):
     def _convert_skill_contents_v1_dict_to_v2_dict(cls, skill_contents):
         """Converts v1 skill_contents dict to v2."""
         return skill_contents
-
-    @classmethod
-    def _convert_rubric_v1_dict_to_v2_dict(cls, rubrics):
-        """Converts v1 rubrics dict to v2."""
-        return rubrics
 
 
 class SkillMigrationTests(test_utils.GenericTestBase):
@@ -1091,14 +1135,22 @@ class SkillMigrationTests(test_utils.GenericTestBase):
                     explanation_content_id: {}
                 }
             }))
-        rubric = skill_domain.Rubric(
-            constants.SKILL_DIFFICULTIES[0], '<p>Explanation</p>')
+
         model = skill_models.SkillModel(
             id='skill_id',
             description='description',
             language_code='en',
             misconceptions=[],
-            rubrics=[rubric.to_dict()],
+            rubrics=[{
+                'difficulty': 'Easy',
+                'explanation': 'Easy explanation'
+            }, {
+                'difficulty': 'Medium',
+                'explanation': 'Medium explanation'
+            }, {
+                'difficulty': 'Hard',
+                'explanation': 'Hard explanation'
+            }],
             skill_contents=skill_contents.to_dict(),
             next_misconception_id=1,
             misconceptions_schema_version=1,
@@ -1118,3 +1170,9 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             skill = skill_services.get_skill_from_model(model)
 
         self.assertEqual(skill.rubric_schema_version, 2)
+        self.assertEqual(skill.rubrics[0].difficulty, 'Easy')
+        self.assertEqual(skill.rubrics[0].explanations, ['Easy explanation'])
+        self.assertEqual(skill.rubrics[1].difficulty, 'Medium')
+        self.assertEqual(skill.rubrics[1].explanations, ['Medium explanation'])
+        self.assertEqual(skill.rubrics[2].difficulty, 'Hard')
+        self.assertEqual(skill.rubrics[2].explanations, ['Hard explanation'])

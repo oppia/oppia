@@ -97,8 +97,9 @@ angular.module('oppia').factory('CurrentInteractionService', [
             '\nState Name: ' + displayedCard.getStateName() +
             '\nContext: ' + ContextService.getPageContext() +
             '\nErrored at index: ' + index);
-          throw Error('The current interaction did not ' +
-                      'register a _submitAnswerFn.' + additionalInfo);
+          throw new Error(
+            'The current interaction did not ' +
+            'register a _submitAnswerFn.' + additionalInfo);
         } else {
           _submitAnswerFn();
         }
