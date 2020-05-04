@@ -124,7 +124,7 @@ export class ReadOnlyCollectionBackendApiService {
     if (this._collectionDetailsCache[collectionId]) {
       return this._collectionDetailsCache[collectionId];
     } else {
-      throw Error('collection has not been fetched');
+      throw new Error('collection has not been fetched');
     }
   }
 

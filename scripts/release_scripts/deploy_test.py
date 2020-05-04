@@ -33,12 +33,8 @@ from scripts.release_scripts import deploy
 from scripts.release_scripts import gcloud_adapter
 from scripts.release_scripts import update_configs
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
-sys.path.insert(0, _PY_GITHUB_PATH)
-
 # pylint: disable=wrong-import-position
-import github # isort:skip
+import github  # isort:skip
 # pylint: enable=wrong-import-position
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
@@ -202,6 +198,18 @@ class DeployTests(test_utils.GenericTestBase):
             with hyphen_swap, self.assertRaisesRegexp(
                 Exception,
                 'Current release version has \'.\' character.'):
+                deploy.execute_deployment()
+
+    def test_invalid_release_version_length(self):
+        args_swap = self.swap(
+            sys, 'argv', [
+                'deploy.py', '--app_name=oppiatestserver',
+                '--version=release-1.2.3-invalid-too-long'])
+        with self.get_branch_swap, args_swap, self.install_swap:
+            with self.assertRaisesRegexp(
+                AssertionError,
+                'The length of the "version" arg should be less than or '
+                'equal to 25 characters.'):
                 deploy.execute_deployment()
 
     def test_invalid_last_commit_msg(self):
