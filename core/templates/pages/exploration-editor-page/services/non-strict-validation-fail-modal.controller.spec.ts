@@ -18,19 +18,18 @@
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-describe('Non Strict Validation Fail Modal Controller', function() {
-  var $scope = null;
-  var $uibModalInstance = null;
-  var $timeout = null;
-  var windowRef = new WindowRef();
+describe('Non Strict Validation Fail Modal Controller', () => {
+  let $scope = null;
+  let $uibModalInstance = null;
+  let $timeout = null;
+  const windowRef = new WindowRef();
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', ($provide) => {
     $provide.value('WindowRef', windowRef);
   }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(($injector, $controller) => {
     $timeout = $injector.get('$timeout');
-    var $rootScope = $injector.get('$rootScope');
+    const $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
@@ -43,8 +42,8 @@ describe('Non Strict Validation Fail Modal Controller', function() {
       });
   }));
 
-  it('should refresh page when modal is closed', function() {
-    var reloadSpy = jasmine.createSpy('reload');
+  it('should refresh page when modal is closed', () => {
+    const reloadSpy = jasmine.createSpy('reload');
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
         reload: reloadSpy

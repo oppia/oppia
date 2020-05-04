@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,21 +21,21 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-describe('AutosaveInfoModalsService', function() {
-  var AutosaveInfoModalsService = null;
-  var $uibModal = null;
-  var $q = null;
-  var $rootScope = null;
-  var explorationId = '0';
-  var lostChanges = [];
+describe('AutosaveInfoModalsService', () => {
+  let AutosaveInfoModalsService = null;
+  let $uibModal = null;
+  let $q = null;
+  let $rootScope = null;
+  const explorationId = '0';
+  const lostChanges = [];
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
+  beforeEach(angular.mock.module('oppia', ($provide) => {
+    const ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(($injector) => {
     AutosaveInfoModalsService = $injector.get('AutosaveInfoModalsService');
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
@@ -43,14 +43,14 @@ describe('AutosaveInfoModalsService', function() {
   }));
 
   it('should call $uibModal open when opening non strict validation fail' +
-    ' modal', function() {
-    var modalOpenSpy = spyOn($uibModal, 'open').and.callThrough();
+    ' modal', () => {
+    const modalOpenSpy = spyOn($uibModal, 'open').and.callThrough();
     AutosaveInfoModalsService.showNonStrictValidationFailModal();
     expect(modalOpenSpy).toHaveBeenCalled();
   });
 
   it('should close non strict validation fail modal with no errors',
-    function() {
+    () => {
       AutosaveInfoModalsService.isModalOpen(false);
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
@@ -63,7 +63,7 @@ describe('AutosaveInfoModalsService', function() {
     });
 
   it('should handle rejects when closing non strict validation fail modal',
-    function() {
+    () => {
       AutosaveInfoModalsService.isModalOpen(false);
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
@@ -76,13 +76,13 @@ describe('AutosaveInfoModalsService', function() {
     });
 
   it('should call $uibModal open when opening version mismatch' +
-    ' modal', function() {
-    var modalOpenSpy = spyOn($uibModal, 'open').and.callThrough();
+    ' modal', () => {
+    const modalOpenSpy = spyOn($uibModal, 'open').and.callThrough();
     AutosaveInfoModalsService.showVersionMismatchModal(lostChanges);
     expect(modalOpenSpy).toHaveBeenCalled();
   });
 
-  it('should close version mismatch modal with no errors', function() {
+  it('should close version mismatch modal with no errors', () => {
     AutosaveInfoModalsService.isModalOpen(false);
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
@@ -95,7 +95,7 @@ describe('AutosaveInfoModalsService', function() {
   });
 
   it('should handle rejects when closing version mismatch modal and throw' +
-    ' error', function() {
+    ' error', () => {
     AutosaveInfoModalsService.isModalOpen(false);
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
@@ -108,14 +108,14 @@ describe('AutosaveInfoModalsService', function() {
   });
 
   it('should call $uibModal open when opening show lost changes modal',
-    function() {
-      var modalOpenSpy = spyOn($uibModal, 'open').and.callThrough();
+    () => {
+      const modalOpenSpy = spyOn($uibModal, 'open').and.callThrough();
       AutosaveInfoModalsService.showLostChangesModal(
         lostChanges, explorationId);
       expect(modalOpenSpy).toHaveBeenCalled();
     });
 
-  it('should close show lost changes modal with no errors', function() {
+  it('should close show lost changes modal with no errors', () => {
     AutosaveInfoModalsService.isModalOpen(false);
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve()
@@ -128,7 +128,7 @@ describe('AutosaveInfoModalsService', function() {
   });
 
   it('should handler reject when closing show lost changes modal throw' +
-    ' error', function() {
+    ' error', () => {
     AutosaveInfoModalsService.isModalOpen(false);
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()

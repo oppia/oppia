@@ -1,4 +1,3 @@
-
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,30 +25,29 @@ import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
 import { UtilsService } from 'services/utils.service';
 
-describe('Lost Changes Modal Controller', function() {
-  var $scope = null;
-  var $uibModalInstance = null;
-  var $log = null;
-  var logSpy = null;
-  var LocalStorageService = null;
-  var explorationId = '0';
-  var lostChanges = [{
+describe('Lost Changes Modal Controller', () => {
+  let $scope = null;
+  let $uibModalInstance = null;
+  let $log = null;
+  let logSpy = null;
+  let LocalStorageService = null;
+  const explorationId = '0';
+  const lostChanges = [{
     cmd: 'add_state',
     state_name: 'State name',
   }];
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
+  beforeEach(angular.mock.module('oppia', ($provide) => {
+    const ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', ($provide) => {
     $provide.value('LostChangeObjectFactory', (
       new LostChangeObjectFactory(new UtilsService)));
   }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(($injector, $controller) => {
     $log = $injector.get('$log');
     LocalStorageService = $injector.get('LocalStorageService');
 
@@ -58,7 +56,7 @@ describe('Lost Changes Modal Controller', function() {
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
 
-    var $rootScope = $injector.get('$rootScope');
+    const $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $controller(
       'LostChangesModalController', {
@@ -70,7 +68,7 @@ describe('Lost Changes Modal Controller', function() {
   }));
 
   it('should evaluates lostChanges when controller is initialized',
-    function() {
+    () => {
       expect($scope.lostChanges[0].cmd).toBe('add_state');
       expect($scope.lostChanges[0].stateName).toBe('State name');
       expect(logSpy).toHaveBeenCalledWith(
@@ -78,7 +76,7 @@ describe('Lost Changes Modal Controller', function() {
     });
 
   it('should remove exploration draft from local storage when modal is closed',
-    function() {
+    () => {
       LocalStorageService.saveExplorationDraft(explorationId, [], 1);
       $scope.close();
       expect(LocalStorageService.getExplorationDraft(explorationId)).toBeNull();

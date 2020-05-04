@@ -26,42 +26,39 @@ import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
 import { UtilsService } from 'services/utils.service';
 
-describe('Version Mismatch Modal Controller', function() {
-  var $scope = null;
-  var $log = null;
-  var logSpy = null;
-  var $timeout = null;
-  var windowRef = new WindowRef();
-  var mockExplorationData = {
-    discardDraft: function(callback) {
-      callback();
-    }
+describe('Version Mismatch Modal Controller', () => {
+  let $scope = null;
+  let $log = null;
+  let logSpy = null;
+  let $timeout = null;
+  const windowRef = new WindowRef();
+  const mockExplorationData = {
+    discardDraft: (callback) => callback()
   };
-  var lostChanges = [{
+  const lostChanges = [{
     cmd: 'add_state',
     state_name: 'State name',
   }];
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
+  beforeEach(angular.mock.module('oppia', ($provide) => {
+    const ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', ($provide) => {
     $provide.value('ExplorationDataService', mockExplorationData);
     $provide.value('LostChangeObjectFactory', (
       new LostChangeObjectFactory(new UtilsService)));
     $provide.value('WindowRef', windowRef);
   }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
+  beforeEach(angular.mock.inject(($injector, $controller) => {
     $log = $injector.get('$log');
     $timeout = $injector.get('$timeout');
 
     logSpy = spyOn($log, 'error').and.callThrough();
 
-    var $rootScope = $injector.get('$rootScope');
+    const $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $controller(
       'VersionMismatchModalController', {
@@ -71,7 +68,7 @@ describe('Version Mismatch Modal Controller', function() {
   }));
 
   it('should evaluates lostChanges when controller is initialized',
-    function() {
+    () => {
       expect($scope.lostChanges[0].cmd).toBe('add_state');
       expect($scope.lostChanges[0].stateName).toBe('State name');
       expect(logSpy).toHaveBeenCalledWith(
@@ -79,14 +76,14 @@ describe('Version Mismatch Modal Controller', function() {
     });
 
   it('should remove exploration draft from local storage when modal is closed',
-    function() {
-      var reloadSpy = jasmine.createSpy('reload');
+    () => {
+      const reloadSpy = jasmine.createSpy('reload');
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
         location: {
           reload: reloadSpy
         }
       });
-      var discardDraftSpy = spyOn(mockExplorationData, 'discardDraft').and
+      const discardDraftSpy = spyOn(mockExplorationData, 'discardDraft').and
         .callThrough();
 
       $scope.discardChanges();
