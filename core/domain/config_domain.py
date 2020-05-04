@@ -323,7 +323,7 @@ WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
 TOPIC_IDS_FOR_CLASSROOM_PAGES = ConfigProperty(
     'topic_ids_for_classroom_pages', SET_OF_CLASSROOM_DICTS_SCHEMA,
     'The set of topic IDs for each classroom page.', [{
-        'name': 'Math',
+        'name': 'math',
         'topic_ids': []
     }]
 )
