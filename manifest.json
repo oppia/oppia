@@ -55,6 +55,14 @@
         "rootDirPrefix": "html5lib-python-",
         "targetDirPrefix": "html5lib-python-"
       },
+      "packaging": {
+        "version": "20.3",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/65/37/83e3f492eb52d771e2820e88105f605335553fe10422cba9d256faeb1702/packaging-20.3.tar.gz#md5=19e0d1f82a9007b448650ccfeffd0a26",
+        "tarRootDirPrefix": "packaging-",
+        "rootDirPrefix": "packaging-",
+        "targetDirPrefix": "packaging-"
+      },
       "simpleJson": {
         "version": "3.17.0",
         "downloadFormat": "tar",
