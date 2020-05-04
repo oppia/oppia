@@ -196,6 +196,7 @@
 /core/templates/directives/angular-html-bind.directive*.ts @ankita240796
 /core/templates/directives/focus-on.directive*.ts @ankita240796
 /core/templates/filters/ @ankita240796
+/core/template/components/shared-components.module.ts @bansalnitish
 
 
 # Global frontend services
