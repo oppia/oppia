@@ -163,15 +163,13 @@ angular.module('oppia').factory('ExplorationSaveService', [
       // This is resolved when modal is closed.
       var whenModalClosed = $q.defer();
 
-      var publishModalInstance = $uibModal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration-editor-page/modal-templates/' +
           'exploration-publish-modal.template.html'),
         backdrop: 'static',
         controller: 'ConfirmOrCancelModalController'
-      });
-
-      publishModalInstance.result.then(function() {
+      }).result.then(function() {
         if (onStartSaveCallback) {
           onStartSaveCallback();
         }
@@ -292,6 +290,10 @@ angular.module('oppia').factory('ExplorationSaveService', [
           // exploration-with-draft-changes will be reloaded
           // (since it is already cached in ExplorationDataService).
           $window.location.reload();
+        }, function() {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
         });
       },
 

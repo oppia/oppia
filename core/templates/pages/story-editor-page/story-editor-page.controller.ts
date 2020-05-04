@@ -61,12 +61,16 @@ angular.module('oppia').directive('storyEditorPage', [
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
           ctrl.returnToTopicEditorPage = function() {
             if (UndoRedoService.getChangeCount() > 0) {
-              var modalInstance = $uibModal.open({
+              $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/story-editor-page/modal-templates/' +
                   'story-save-pending-changes-modal.template.html'),
                 backdrop: true,
                 controller: 'ConfirmOrCancelModalController'
+              }).result.then(function() {}, function() {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
             } else {
               $window.open(

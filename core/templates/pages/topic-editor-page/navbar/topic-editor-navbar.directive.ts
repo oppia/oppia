@@ -164,7 +164,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
 
           $scope.saveChanges = function() {
             var topicIsPublished = $scope.topicRights.isPublished();
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
                 'topic-editor-save-modal.template.html'),
@@ -179,11 +179,9 @@ angular.module('oppia').directive('topicEditorNavbar', [
                   $scope.isTopicPublished = topicIsPublished;
                 }
               ]
-            });
-
-            modalInstance.result.then(function(commitMessage) {
+            }).result.then(function(commitMessage) {
               TopicEditorStateService.saveTopic(commitMessage);
-            }).then(function() {
+            }, function() {}).then(function() {
               var successToast = 'Changes saved.';
               AlertsService.addSuccessMessage(
                 successToast, 1000);

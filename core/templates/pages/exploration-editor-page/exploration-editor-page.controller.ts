@@ -441,7 +441,7 @@ angular.module('oppia').directive('explorationEditorPage', [
           };
 
           ctrl.showWelcomeExplorationModal = function() {
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/modal-templates/' +
                 'welcome-modal.template.html'),
@@ -466,9 +466,7 @@ angular.module('oppia').directive('explorationEditorPage', [
                 }
               ],
               windowClass: 'oppia-welcome-modal'
-            });
-
-            modalInstance.result.then(function(explorationId) {
+            }).result.then(function(explorationId) {
               SiteAnalyticsService.registerAcceptTutorialModalEvent(
                 explorationId);
               ctrl.startTutorial();

@@ -49,6 +49,10 @@ angular.module('oppia').directive('deleteAccountPage', [
                 $window.location = (
                   '/logout?redirect_url=pending-account-deletion');
               });
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
         }

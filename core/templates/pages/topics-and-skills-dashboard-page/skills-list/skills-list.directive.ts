@@ -74,15 +74,13 @@ angular.module('oppia').directive('skillsList', [
           };
 
           $scope.deleteSkill = function(skillId) {
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'delete-skill-modal.template.html'),
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'
-            });
-
-            modalInstance.result.then(function() {
+            }).result.then(function() {
               SkillBackendApiService.deleteSkill(skillId).then(
                 function(status) {
                   $timeout(function() {

@@ -116,7 +116,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
 
           ctrl.saveChanges = function() {
             var isPrivate = ctrl.collectionRights.isPrivate();
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/collection-editor-page/templates/' +
                 'collection-editor-save-modal.directive.html'),
@@ -131,9 +131,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                   $scope.isCollectionPrivate = isPrivate;
                 }
               ]
-            });
-
-            modalInstance.result.then(function(commitMessage) {
+            }).result.then(function(commitMessage) {
               CollectionEditorStateService.saveCollection(commitMessage);
             }, function() {
               // Note to developers:
