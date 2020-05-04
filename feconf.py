@@ -633,7 +633,6 @@ TASK_URL_SUGGESTION_EMAILS = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
-CLASSROOM_URL_PREFIX = '/classroom'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
@@ -676,7 +675,6 @@ FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FETCH_SKILLS_URL_PREFIX = '/fetch_skills'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
-TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
 LEARNER_ANSWER_INFO_HANDLER_URL = (
     '/learneranswerinfohandler/learner_answer_details')
 LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
@@ -728,7 +726,6 @@ SKILL_EDITOR_URL_PREFIX = '/skill_editor'
 SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
-SPLASH_URL = '/splash'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
@@ -991,5 +988,9 @@ RTE_CONTENT_SPEC = {
 # oppia constant defined in
 # core/templates/pages/landing-pages/TopicLandingPage.js file.
 AVAILABLE_LANDING_PAGES = {
-    'maths': ['fractions', 'negative-numbers', 'ratios']
+    'math': ['fractions', 'negative-numbers', 'ratios']
 }
+
+# Classroom page names for generating URLs. These need to be kept in sync with
+# TOPIC_IDS_FOR_CLASSROOM_PAGES property in config_domain.
+CLASSROOM_PAGES = ['math']
