@@ -79,3 +79,50 @@ class RoleQueryAuditModel(base_models.BaseModel):
     def get_user_id_migration_field(cls):
         """Return field that contains user ID."""
         return cls.user_id
+
+
+class UsernameChangeAuditModel(base_models.BaseModel):
+    """Records the changes made to usernames via the admin panel.
+
+    Instances of this class are keyed by a custom Id.
+    [user_id].[timestamp_in_sec]
+    """
+
+    # The user_id of the user making the change.
+    user_id = ndb.StringProperty(required=True, indexed=True)
+    # The current username.
+    current_username = ndb.StringProperty(required=True, indexed=True)
+    # The new username.
+    new_username = ndb.StringProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Audit logs are kept for investigation purposes."""
+        return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UsernameChangeAuditModel exist for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UsernameChangeAuditModel has one field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
+
+    @classmethod
+    def get_user_id_migration_field(cls):
+        """Return field that contains user ID."""
+        return cls.user_id

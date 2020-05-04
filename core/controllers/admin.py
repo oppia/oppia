@@ -874,4 +874,6 @@ class UpdateUsernameHandler(base.BaseHandler):
         if user_id is None:
             raise self.InvalidInputException('User does not exist.')
         user_services.set_username(user_id, new_username)
+        user_services.log_username_change(
+            self.user_id, current_username, new_username)
         self.render_json({})

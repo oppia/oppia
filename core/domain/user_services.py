@@ -23,7 +23,9 @@ import datetime
 import hashlib
 import imghdr
 import logging
+import math
 import re
+import time
 
 from constants import constants
 from core.domain import role_services
@@ -36,7 +38,8 @@ import utils
 from google.appengine.api import urlfetch
 
 current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models, audit_models) = models.Registry.import_models(
+    [models.NAMES.user, models.NAMES.audit])
 
 MAX_USERNAME_LENGTH = 50
 # Size (in px) of the gravatar being retrieved.
@@ -2000,3 +2003,12 @@ def get_community_reviewer_usernames(review_category, language_code=None):
         raise Exception('Invalid review category: %s' % review_category)
 
     return get_usernames(reviewer_ids)
+
+
+def log_username_change(user_id, current_username, new_username):
+    """Stores the query to role structure in UsernameChangeAuditModel."""
+    model_id = '%s.%s' % (user_id, int(math.floor(time.time())))
+
+    audit_models.UsernameChangeAuditModel(
+        id=model_id, user_id=user_id, current_username=current_username,
+        new_username=new_username).put()
