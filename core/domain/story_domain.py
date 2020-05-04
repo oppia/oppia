@@ -217,7 +217,7 @@ class StoryNode(python_utils.OBJECT):
         """Increments the next node id of the story.
 
         Args:
-            node_id: str. The id of the node.
+            node_id: str. The node id to be incremented.
 
         Returns:
             str. The new next node id.
