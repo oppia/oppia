@@ -50,15 +50,6 @@ class CreateNewUsersMigrationJobTests(test_utils.GenericTestBase):
     USER_C_ID = 'user_3_id'
     USER_C_EMAIL = 'c@example.com'
 
-    def _get_migrated_model_ids(self, job_output):
-        """Get successfully migrated model IDs."""
-        for item in job_output:
-            if item[0] == 'SUCCESS':
-                migrated_model_ids = (
-                    sorted(list(set(item[1])), key=lambda id_set: id_set[0]))
-                migrated_model_ids = [model[1] for model in migrated_model_ids]
-                return migrated_model_ids
-
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = user_id_migration.CreateNewUsersMigrationJob.create_new()
@@ -69,15 +60,7 @@ class CreateNewUsersMigrationJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         stringified_output = (
             user_id_migration.CreateNewUsersMigrationJob.get_output(job_id))
-        eval_output = []
-        for stringified_item in stringified_output:
-            items = ast.literal_eval(stringified_item)
-            if isinstance(items[1], int):
-                eval_output.append([items[0], items[1]])
-            else:
-                user_ids = [ast.literal_eval(item) for item in items[1]]
-                eval_output.append([items[0], user_ids])
-        return eval_output
+        return [ast.literal_eval(item) for item in stringified_output]
 
     def setUp(self):
         def empty(*_):
@@ -97,10 +80,10 @@ class CreateNewUsersMigrationJobTests(test_utils.GenericTestBase):
         )
         original_model.put()
 
-        migrated_model_ids = self._get_migrated_model_ids(
-            self._run_one_off_job())
-        migrated_model = user_models.UserSettingsModel.get_by_id(
-            migrated_model_ids[0])
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS', 1]])
+        migrated_model = user_models.UserSettingsModel.query(
+            user_models.UserSettingsModel.gae_id == self.USER_A_ID).get()
 
         self.assertNotEqual(original_model.id, migrated_model.id)
         self.assertEqual(original_model.gae_user_id, migrated_model.gae_user_id)
@@ -133,11 +116,12 @@ class CreateNewUsersMigrationJobTests(test_utils.GenericTestBase):
         )
         original_models[self.USER_C_ID].put()
 
-        migrated_model_ids = self._get_migrated_model_ids(
-            self._run_one_off_job())
-        for user_id in migrated_model_ids:
-            migrated_model = user_models.UserSettingsModel.get_by_id(user_id)
-            original_model = original_models[migrated_model.gae_id]
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 3], [u'ALREADY MIGRATED', 2]])
+        for user_id, original_model in original_models.items():
+            migrated_model = user_models.UserSettingsModel.query(
+                user_models.UserSettingsModel.gae_id == user_id).get()
 
             self.assertNotEqual(original_model.id, migrated_model.id)
             self.assertEqual(
@@ -160,10 +144,11 @@ class CreateNewUsersMigrationJobTests(test_utils.GenericTestBase):
         )
         original_model.put()
 
-        migrated_model_ids = self._get_migrated_model_ids(
-            self._run_one_off_job())
-        migrated_model = user_models.UserSettingsModel.get_by_id(
-            migrated_model_ids[0])
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS', 1]])
+
+        migrated_model = user_models.UserSettingsModel.query(
+            user_models.UserSettingsModel.gae_id == self.USER_A_ID).get()
 
         self.assertNotEqual(original_model.id, migrated_model.id)
         self.assertEqual(original_model.gae_user_id, migrated_model.gae_user_id)
@@ -199,15 +184,6 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
     USER_D_EMAIL = 'd@example.com'
     USER_D_USERNAME = 'd'
 
-    def _get_migrated_model_ids(self, job_output):
-        """Get successfully migrated model IDs."""
-        for item in job_output:
-            if item[0] == 'SUCCESS':
-                migrated_model_ids = (
-                    sorted(list(set(item[1])), key=lambda id_set: id_set[0]))
-                migrated_model_ids = [model[1] for model in migrated_model_ids]
-                return migrated_model_ids
-
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = user_id_migration.UserIdMigrationJob.create_new()
@@ -218,12 +194,7 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         stringified_output = (
             user_id_migration.UserIdMigrationJob.get_output(job_id))
-        eval_output = []
-        for stringified_item in stringified_output:
-            items = ast.literal_eval(stringified_item)
-            user_ids = [ast.literal_eval(item) for item in items[1]]
-            eval_output.append([items[0], user_ids])
-        return eval_output
+        return [ast.literal_eval(item) for item in stringified_output]
 
     def setUp(self):
         def empty(*_):
@@ -252,12 +223,12 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             average_ratings=1.1)
         original_model_2.put()
 
-        migrated_model_ids = self._get_migrated_model_ids(
-            self._run_one_off_job())
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 10]])
 
         migrated_model_1 = (
-            user_models.CompletedActivitiesModel.get_by_id(
-                migrated_model_ids[0]))
+            user_models.CompletedActivitiesModel.get_by_id(self.USER_A_ID))
         self.assertNotEqual(original_model_1.id, migrated_model_1.id)
         self.assertEqual(
             original_model_1.exploration_ids, migrated_model_1.exploration_ids)
@@ -271,7 +242,7 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             user_models.CompletedActivitiesModel.get_by_id(self.USER_A_GAE_ID))
 
         migrated_model_2 = (
-            user_models.UserStatsModel.get_by_id(migrated_model_ids[0]))
+            user_models.UserStatsModel.get_by_id(self.USER_A_ID))
         self.assertNotEqual(original_model_2.id, migrated_model_2.id)
         self.assertEqual(
             original_model_2.impact_score, migrated_model_2.impact_score)
@@ -314,13 +285,14 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         original_models[-1].put()
         original_models.sort(key=lambda model: model.id)
 
-        migrated_model_ids = self._get_migrated_model_ids(
-            self._run_one_off_job())
-        for i, model_id in enumerate(migrated_model_ids):
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 3], ['MISSING OLD MODEL', 33]])
+        for i, user_id in enumerate(
+                (self.USER_A_ID, self.USER_B_ID, self.USER_C_ID)):
             migrated_model = (
-                user_models.CompletedActivitiesModel.get_by_id(model_id))
+                user_models.CompletedActivitiesModel.get_by_id(user_id))
             self.assertNotEqual(
-
                 original_models[i].id, migrated_model.id)
             self.assertEqual(
                 original_models[i].exploration_ids,
@@ -349,12 +321,13 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             last_played_state_name='start')
         original_model.put()
 
-        migrated_model_ids = self._get_migrated_model_ids(
-            self._run_one_off_job())
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 12]])
 
         migrated_model = (
             user_models.ExpUserLastPlaythroughModel.get_by_id(
-                '%s.%s' % (migrated_model_ids[0], 'exp_id')))
+                '%s.%s' % (self.USER_A_ID, 'exp_id')))
         self.assertNotEqual(
             original_model.id, migrated_model.id)
         self.assertNotEqual(
@@ -386,12 +359,13 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         )
         original_model.put()
 
-        migrated_model_ids = self._get_migrated_model_ids(
-            self._run_one_off_job())
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 12]])
 
         migrated_model = (
             user_models.UserContributionScoringModel.get_by_id(
-                '%s.%s' % ('category', migrated_model_ids[0])))
+                '%s.%s' % ('category', self.USER_A_ID)))
         self.assertNotEqual(
             original_model.id, migrated_model.id)
         self.assertNotEqual(
@@ -445,13 +419,15 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         original_models[-1].put()
         original_models.sort(key=lambda model: model.user_id)
 
-        migrated_model_ids = self._get_migrated_model_ids(
-            self._run_one_off_job())
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 3], ['MISSING OLD MODEL', 36]])
 
-        for i, model_id in enumerate(migrated_model_ids):
+        for i, user_id in enumerate(
+                (self.USER_A_ID, self.USER_B_ID, self.USER_C_ID)):
             migrated_model = (
                 user_models.ExpUserLastPlaythroughModel.get_by_id(
-                    '%s.%s' % (model_id, 'exp_id')))
+                    '%s.%s' % (user_id, 'exp_id')))
             self.assertNotEqual(
                 original_models[i].id, migrated_model.id)
             self.assertNotEqual(
@@ -516,12 +492,15 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         original_models[-1].put()
         original_models.sort(key=lambda model: model.user_id)
 
-        migrated_model_ids = self._get_migrated_model_ids(
-            self._run_one_off_job())
-        for i, model_id in enumerate(migrated_model_ids):
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 3], ['MISSING OLD MODEL', 36]])
+
+        for i, user_id in enumerate(
+                (self.USER_A_ID, self.USER_B_ID, self.USER_C_ID)):
             migrated_model = (
                 user_models.UserContributionScoringModel.get_by_id(
-                    '%s.%s' % ('score_category', model_id)))
+                    '%s.%s' % ('score_category', user_id)))
             self.assertNotEqual(
                 original_models[i].id, migrated_model.id)
             self.assertNotEqual(
@@ -554,13 +533,14 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             commit_cmds=[{'cmd': 'some_command'}])
         original_model.put()
 
-        migrated_model_ids = self._get_migrated_model_ids(
-            self._run_one_off_job())
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 12]])
 
         migrated_model = (
             exp_models.ExplorationSnapshotMetadataModel.query(
                 exp_models.ExplorationSnapshotMetadataModel.committer_id ==
-                migrated_model_ids[0]
+                self.USER_A_ID
             ).get())
 
         self.assertNotEqual(
@@ -613,13 +593,16 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         original_models[-1].put()
         original_models.sort(key=lambda model: model.committer_id)
 
-        migrated_model_ids = self._get_migrated_model_ids(
-            self._run_one_off_job())
-        for i, model_id in enumerate(migrated_model_ids):
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 3], ['MISSING OLD MODEL', 36]])
+
+        for i, user_id in enumerate(
+                (self.USER_A_ID, self.USER_B_ID, self.USER_C_ID)):
             migrated_model = (
                 exp_models.ExplorationSnapshotMetadataModel.query(
                     exp_models.ExplorationSnapshotMetadataModel.committer_id ==
-                    model_id
+                    user_id
                 ).get())
 
             self.assertNotEqual(
@@ -638,7 +621,9 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
                 original_models[i].last_updated, migrated_model.last_updated)
 
     def test_idempotent_copy_model_with_new_id_not_migrated(self):
-        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 12]])
 
         user_models.IncompleteActivitiesModel(
             id=self.USER_A_GAE_ID,
@@ -650,18 +635,19 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             exploration_ids=['1', '2'],
             collection_ids=['1', '2']
         ).put()
+
         output = self._run_one_off_job()
-        id_set = (self.USER_A_GAE_ID, new_user_id)
-        self.assertIn(['SUCCESS', [id_set]], output)
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 10]])
 
         self.assertIsNone(
             user_models.CompletedActivitiesModel.get_by_id(self.USER_A_GAE_ID))
         self.assertIsNone(
             user_models.IncompleteActivitiesModel.get_by_id(self.USER_A_GAE_ID))
         self.assertIsNotNone(
-            user_models.CompletedActivitiesModel.get_by_id(new_user_id))
+            user_models.CompletedActivitiesModel.get_by_id(self.USER_A_ID))
         self.assertIsNotNone(
-            user_models.IncompleteActivitiesModel.get_by_id(new_user_id))
+            user_models.IncompleteActivitiesModel.get_by_id(self.USER_A_ID))
 
     def test_idempotent_copy_model_with_new_id_half_migrated(self):
         user_models.IncompleteActivitiesModel(
@@ -669,7 +655,9 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             exploration_ids=['1', '2'],
             collection_ids=['1', '2']
         ).put()
-        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 11]])
 
         user_models.CompletedActivitiesModel(
             id=self.USER_A_GAE_ID,
@@ -677,17 +665,21 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             collection_ids=['1', '2']
         ).put()
         output = self._run_one_off_job()
-        id_set = (self.USER_A_GAE_ID, new_user_id)
-        self.assertIn(['SUCCESS', [id_set]], output)
+        self.assertItemsEqual(
+            output, [
+                ['SUCCESS', 1],
+                ['ALREADY MIGRATED', 1],
+                ['MISSING OLD MODEL', 10]
+            ])
 
         self.assertIsNone(
             user_models.CompletedActivitiesModel.get_by_id(self.USER_A_GAE_ID))
         self.assertIsNone(
             user_models.IncompleteActivitiesModel.get_by_id(self.USER_A_GAE_ID))
         self.assertIsNotNone(
-            user_models.CompletedActivitiesModel.get_by_id(new_user_id))
+            user_models.CompletedActivitiesModel.get_by_id(self.USER_A_ID))
         self.assertIsNotNone(
-            user_models.IncompleteActivitiesModel.get_by_id(new_user_id))
+            user_models.IncompleteActivitiesModel.get_by_id(self.USER_A_ID))
 
     def test_idempotent_copy_model_with_new_id_all_migrated(self):
         user_models.IncompleteActivitiesModel(
@@ -700,23 +692,31 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             exploration_ids=['1', '2'],
             collection_ids=['1', '2']
         ).put()
-        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 10]])
 
         output = self._run_one_off_job()
-        id_set = (self.USER_A_GAE_ID, new_user_id)
-        self.assertIn(['SUCCESS', [id_set]], output)
+        self.assertItemsEqual(
+            output, [
+                ['SUCCESS', 1],
+                ['ALREADY MIGRATED', 2],
+                ['MISSING OLD MODEL', 10]
+            ])
 
         self.assertIsNone(
             user_models.CompletedActivitiesModel.get_by_id(self.USER_A_GAE_ID))
         self.assertIsNone(
             user_models.IncompleteActivitiesModel.get_by_id(self.USER_A_GAE_ID))
         self.assertIsNotNone(
-            user_models.CompletedActivitiesModel.get_by_id(new_user_id))
+            user_models.CompletedActivitiesModel.get_by_id(self.USER_A_ID))
         self.assertIsNotNone(
-            user_models.IncompleteActivitiesModel.get_by_id(new_user_id))
+            user_models.IncompleteActivitiesModel.get_by_id(self.USER_A_ID))
 
     def test_idempotent_copy_model_with_new_id_and_user_id_not_migrated(self):
-        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 12]])
 
         exp_play_model_id_1 = '%s.%s' % (self.USER_A_GAE_ID, 'exp_1_id')
         user_models.ExpUserLastPlaythroughModel(
@@ -735,8 +735,8 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             last_played_state_name='start'
         ).put()
         output = self._run_one_off_job()
-        id_set = (self.USER_A_GAE_ID, new_user_id)
-        self.assertIn(['SUCCESS', [id_set]], output)
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 12]])
 
         self.assertIsNone(
             user_models.ExpUserLastPlaythroughModel.get_by_id(
@@ -746,10 +746,12 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
                 exp_play_model_id_2))
         self.assertIsNotNone(
             user_models.ExpUserLastPlaythroughModel.get_by_id(
-                exp_play_model_id_1.replace(self.USER_A_GAE_ID, new_user_id)))
+                exp_play_model_id_1.replace(
+                    self.USER_A_GAE_ID, self.USER_A_ID)))
         self.assertIsNotNone(
             user_models.ExpUserLastPlaythroughModel.get_by_id(
-                exp_play_model_id_2.replace(self.USER_A_GAE_ID, new_user_id)))
+                exp_play_model_id_2.replace(
+                    self.USER_A_GAE_ID, self.USER_A_ID)))
 
     def test_idempotent_copy_model_with_new_id_and_user_id_half_migrated(self):
         exp_play_model_id_1 = '%s.%s' % (self.USER_A_GAE_ID, 'exp_1_id')
@@ -760,7 +762,9 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             last_played_exp_version=2,
             last_played_state_name='start'
         ).put()
-        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 12]])
 
         exp_play_model_id_2 = '%s.%s' % (self.USER_A_GAE_ID, 'exp_2_id')
         user_models.ExpUserLastPlaythroughModel(
@@ -771,8 +775,8 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             last_played_state_name='start'
         ).put()
         output = self._run_one_off_job()
-        id_set = (self.USER_A_GAE_ID, new_user_id)
-        self.assertIn(['SUCCESS', [id_set]], output)
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 12]])
 
         self.assertIsNone(
             user_models.ExpUserLastPlaythroughModel.get_by_id(
@@ -782,10 +786,12 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
                 exp_play_model_id_2))
         self.assertIsNotNone(
             user_models.ExpUserLastPlaythroughModel.get_by_id(
-                exp_play_model_id_1.replace(self.USER_A_GAE_ID, new_user_id)))
+                exp_play_model_id_1.replace(
+                    self.USER_A_GAE_ID, self.USER_A_ID)))
         self.assertIsNotNone(
             user_models.ExpUserLastPlaythroughModel.get_by_id(
-                exp_play_model_id_2.replace(self.USER_A_GAE_ID, new_user_id)))
+                exp_play_model_id_2.replace(
+                    self.USER_A_GAE_ID, self.USER_A_ID)))
 
     def test_idempotent_copy_model_with_new_id_and_user_id_all_migrated(self):
         exp_play_model_id_1 = '%s.%s' % (self.USER_A_GAE_ID, 'exp_1_id')
@@ -804,11 +810,13 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             last_played_exp_version=2,
             last_played_state_name='start'
         ).put()
-        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 12]])
 
         output = self._run_one_off_job()
-        id_set = (self.USER_A_GAE_ID, new_user_id)
-        self.assertIn(['SUCCESS', [id_set]], output)
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 12]])
 
         self.assertIsNone(
             user_models.ExpUserLastPlaythroughModel.get_by_id(
@@ -818,13 +826,17 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
                 exp_play_model_id_2))
         self.assertIsNotNone(
             user_models.ExpUserLastPlaythroughModel.get_by_id(
-                exp_play_model_id_1.replace(self.USER_A_GAE_ID, new_user_id)))
+                exp_play_model_id_1.replace(
+                    self.USER_A_GAE_ID, self.USER_A_ID)))
         self.assertIsNotNone(
             user_models.ExpUserLastPlaythroughModel.get_by_id(
-                exp_play_model_id_2.replace(self.USER_A_GAE_ID, new_user_id)))
+                exp_play_model_id_2.replace(
+                    self.USER_A_GAE_ID, self.USER_A_ID)))
 
     def test_idempotent_change_model_with_one_user_id_field_not_migrated(self):
-        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 12]])
 
         exp_models.ExplorationSnapshotMetadataModel(
             id='instance_1_id',
@@ -841,15 +853,15 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             commit_cmds=[{'cmd': 'some_command'}]
         ).put()
         output = self._run_one_off_job()
-        id_set = (self.USER_A_GAE_ID, new_user_id)
-        self.assertIn(['SUCCESS', [id_set]], output)
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 12]])
 
         self.assertEqual(
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-                'instance_1_id').committer_id, new_user_id)
+                'instance_1_id').committer_id, self.USER_A_ID)
         self.assertEqual(
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-                'instance_2_id').committer_id, new_user_id)
+                'instance_2_id').committer_id, self.USER_A_ID)
 
     def test_idempotent_change_model_with_one_user_id_field_half_migrated(self):
         exp_models.ExplorationSnapshotMetadataModel(
@@ -859,7 +871,9 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}]
         ).put()
-        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 12]])
 
         exp_models.ExplorationSnapshotMetadataModel(
             id='instance_2_id',
@@ -869,15 +883,15 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             commit_cmds=[{'cmd': 'some_command'}]
         ).put()
         output = self._run_one_off_job()
-        id_set = (self.USER_A_GAE_ID, new_user_id)
-        self.assertIn(['SUCCESS', [id_set]], output)
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 12]])
 
         self.assertEqual(
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-                'instance_1_id').committer_id, new_user_id)
+                'instance_1_id').committer_id, self.USER_A_ID)
         self.assertEqual(
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-                'instance_2_id').committer_id, new_user_id)
+                'instance_2_id').committer_id, self.USER_A_ID)
 
     def test_idempotent_change_model_with_one_user_id_field_all_migrated(self):
         exp_models.ExplorationSnapshotMetadataModel(
@@ -894,18 +908,20 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}]
         ).put()
-        new_user_id = self._get_migrated_model_ids(self._run_one_off_job())[0]
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 12]])
 
         output = self._run_one_off_job()
-        id_set = (self.USER_A_GAE_ID, new_user_id)
-        self.assertIn(['SUCCESS', [id_set]], output)
+        self.assertItemsEqual(
+            output, [['SUCCESS', 1], ['MISSING OLD MODEL', 12]])
 
         self.assertEqual(
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-                'instance_1_id').committer_id, new_user_id)
+                'instance_1_id').committer_id, self.USER_A_ID)
         self.assertEqual(
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-                'instance_2_id').committer_id, new_user_id)
+                'instance_2_id').committer_id, self.USER_A_ID)
 
 
 class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
@@ -1258,9 +1274,12 @@ class GaeIdNotInModelsVerificationJobTests(test_utils.GenericTestBase):
                 job_id))
         eval_output = []
         for stringified_item in stringified_output:
-            item = ast.literal_eval(stringified_item)
-            item[1] = [ast.literal_eval(ids) for ids in item[1]]
-            eval_output.append(item)
+            items = ast.literal_eval(stringified_item)
+            if isinstance(items[1], int):
+                eval_output.append([items[0], items[1]])
+            else:
+                user_ids = [ast.literal_eval(item) for item in items[1]]
+                eval_output.append([items[0], user_ids])
         return eval_output
 
     def setUp(self):
@@ -1347,12 +1366,7 @@ class GaeIdNotInModelsVerificationJobTests(test_utils.GenericTestBase):
 
     def test_success(self):
         output = self._run_one_off_job()
-        output = [key[1] for key in output if key[0] == 'SUCCESS'][0]
-
-        self.assertEqual(len(output), 3)
-        self.assertIn((self.USER_1_GAE_ID, self.USER_1_USER_ID), output)
-        self.assertIn((self.USER_2_GAE_ID, self.USER_2_USER_ID), output)
-        self.assertIn((self.USER_3_GAE_ID, self.USER_3_USER_ID), output)
+        self.assertEqual(output, [['SUCCESS', 3]])
 
 
 class BaseModelsUserIdsHaveUserSettingsVerificationJobTests(
@@ -1482,7 +1496,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
              ['%s.%s' % ('category', self.USER_2_GAE_ID)]],
             output)
         self.assertIn(
-            ['SUCCESS_NONE - GeneralFeedbackThreadModel', 1], output)
+            ['SUCCESS - GeneralFeedbackThreadModel', 1], output)
         self.assertIn(
             ['SUCCESS_NONE - GeneralFeedbackThreadUserModel', 1], output)
         self.assertIn(
@@ -1637,18 +1651,7 @@ class AddAllUserIdsVerificationJobTests(test_utils.GenericTestBase):
             user_id_migration.AddAllUserIdsVerificationJob.get_output(job_id))
         eval_output = [ast.literal_eval(stringified_item) for
                        stringified_item in stringified_output]
-        output = []
-        for key, values in eval_output:
-            if key.startswith('SUCCESS-NOT_SUBSET'):
-                eval_values = [ast.literal_eval(value) for value in values]
-                eval_values = [
-                    (model_id, sorted(user_ids))
-                    for model_id, user_ids in eval_values]
-                output.append(
-                    [key, eval_values])
-            else:
-                output.append([key, values])
-        return output
+        return eval_output
 
     def test_one_collection_rights_subset(self):
         collection_models.CollectionRightsAllUsersModel(
@@ -1735,8 +1738,7 @@ class AddAllUserIdsVerificationJobTests(test_utils.GenericTestBase):
         output = self._run_one_off_job()
         self.assertEqual(
             output,
-            [['SUCCESS-NOT_SUBSET-CollectionRightsModel',
-              [(self.COL_1_ID, [self.USER_4_ID])]]])
+            [['SUCCESS-NOT_SUBSET-CollectionRightsModel', 1]])
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID, self.USER_4_ID],
             collection_models.CollectionRightsAllUsersModel
@@ -1761,9 +1763,7 @@ class AddAllUserIdsVerificationJobTests(test_utils.GenericTestBase):
 
         output = self._run_one_off_job()
         self.assertEqual(
-            output,
-            [['SUCCESS-NOT_SUBSET-ExplorationRightsModel',
-              [(self.EXP_1_ID, [self.USER_3_ID])]]])
+            output, [['SUCCESS-NOT_SUBSET-ExplorationRightsModel', 1]])
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID, self.USER_4_ID],
             exp_models.ExplorationRightsAllUsersModel.get_by_id(self.EXP_1_ID)
@@ -1780,10 +1780,7 @@ class AddAllUserIdsVerificationJobTests(test_utils.GenericTestBase):
                 manager_ids=[self.USER_1_ID, self.USER_2_ID])])
 
         output = self._run_one_off_job()
-        self.assertEqual(
-            output,
-            [['SUCCESS-NOT_SUBSET-TopicRightsModel',
-              [(self.TOP_1_ID, [self.USER_3_ID])]]])
+        self.assertEqual(output, [['SUCCESS-NOT_SUBSET-TopicRightsModel', 1]])
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID],
             topic_models.TopicRightsAllUsersModel.get_by_id(self.TOP_1_ID)
@@ -1911,14 +1908,10 @@ class AddAllUserIdsVerificationJobTests(test_utils.GenericTestBase):
         output = self._run_one_off_job()
         self.assertIn(['SUCCESS-SUBSET-CollectionRightsModel', 1], output)
         self.assertIn(
-            ['SUCCESS-NOT_SUBSET-CollectionRightsModel',
-             [(self.COL_2_ID, [self.USER_2_ID, self.USER_3_ID])]],
-            output)
+            ['SUCCESS-NOT_SUBSET-CollectionRightsModel', 1], output)
         self.assertIn(['SUCCESS-SUBSET-ExplorationRightsModel', 1], output)
         self.assertIn(
-            ['SUCCESS-NOT_SUBSET-ExplorationRightsModel',
-             [(self.EXP_2_ID, [self.USER_2_ID, self.USER_4_ID])]],
-            output)
+            ['SUCCESS-NOT_SUBSET-ExplorationRightsModel', 1], output)
         self.assertIn(['SUCCESS-SUBSET-TopicRightsModel', 2], output)
 
         self.assertItemsEqual(
