@@ -144,8 +144,11 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         """Check if UserSettingsModel exists for all the IDs in
         original_author_id and last_nonempty_message_author_id.
         """
-        user_ids = [
-            self.original_author_id, self.last_nonempty_message_author_id]
+        user_ids = []
+        if self.original_author_id is not None:
+            user_ids.append(self.original_author_id)
+        if self.last_nonempty_message_author_id is not None:
+            user_ids.append(self.last_nonempty_message_author_id)
         user_ids = [user_id for user_id in user_ids
                     if user_id not in feconf.SYSTEM_USERS]
         user_settings_models = user_models.UserSettingsModel.get_multi(
