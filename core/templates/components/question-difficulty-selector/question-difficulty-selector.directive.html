@@ -1,0 +1,14 @@
+<md-radio-group ng-model="skillWithDifficulty._difficulty">
+  <md-radio-button ng-repeat="rubric in getSkillIdToRubricsObject()[skillWithDifficulty.getId()]" value="<[availableDifficultyValues[$index]]>">
+    <strong> <[rubric.getDifficulty()]> </strong>
+    <md-list>
+      <md-list-item ng-repeat="explanation in rubric.getExplanations()">
+        <angular-html-bind html-data="explanation">
+        </angular-html-bind>
+        <div ng-if="explanation === '' || explanation === '<p></p>'">
+          <span class="oppia-placeholder"> This rubric has not yet been specified </span>
+        </div>
+      </md-list-item>
+    </md-list>
+  </md-radio-button>
+</md-radio-group>
