@@ -229,6 +229,8 @@ class TopicSummaryModel(base_models.BaseModel):
     canonical_name = ndb.StringProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
+    # The description of the topic.
+    description = ndb.TextProperty(indexed=False)
 
     # Time when the topic model was last updated (not to be
     # confused with last_updated, which is the time when the

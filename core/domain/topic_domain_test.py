@@ -928,6 +928,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         self.topic_summary_dict = {
             'id': 'topic_id',
             'name': 'name',
+            'description': 'topic description',
             'language_code': 'en',
             'version': 1,
             'canonical_story_count': 1,
@@ -940,8 +941,8 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         }
 
         self.topic_summary = topic_domain.TopicSummary(
-            'topic_id', 'name', 'name', 'en', 1, 1, 1, 1, 1, 1,
-            current_time, current_time)
+            'topic_id', 'name', 'name', 'en', 'topic description', 1, 1, 1, 1,
+            1, 1, current_time, current_time)
 
     def test_topic_summary_gets_created(self):
         self.assertEqual(
@@ -960,6 +961,13 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         self.topic_summary.name = ''
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Name field should not be empty'):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_invalid_description(self):
+        self.topic_summary.description = 3
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected description to be a string, received 3'):
             self.topic_summary.validate()
 
     def test_validation_fails_with_invalid_canonical_name(self):
