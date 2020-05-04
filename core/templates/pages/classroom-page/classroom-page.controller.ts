@@ -43,12 +43,12 @@ angular.module('oppia').directive('classroomPage', [
       controllerAs: '$ctrl',
       controller: [
         '$filter', '$rootScope', '$window', 'AlertsService',
-        'ClassroomBackendApiService', 'PageTitleService',
+        'ClassroomBackendApiService', 'LoaderService', 'PageTitleService',
         'TopicSummaryObjectFactory', 'UrlService',
         'WindowDimensionsService', 'FATAL_ERROR_CODES',
         function(
             $filter, $rootScope, $window, AlertsService,
-            LoaderService, ClassroomBackendApiService, PageTitleService,
+            ClassroomBackendApiService, LoaderService, PageTitleService,
             TopicSummaryObjectFactory, UrlService,
             WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
