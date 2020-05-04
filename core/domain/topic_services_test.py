@@ -94,6 +94,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
         self.assertEqual(topic_summary.name, 'Name')
+        self.assertEqual(topic_summary.description, 'Description')
         self.assertEqual(topic_summary.canonical_story_count, 0)
         self.assertEqual(topic_summary.additional_story_count, 0)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
@@ -206,6 +207,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
         self.assertEqual(topic_summary.name, 'Name')
+        self.assertEqual(topic_summary.description, 'Description')
         self.assertEqual(topic_summary.canonical_story_count, 0)
         self.assertEqual(topic_summary.additional_story_count, 0)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
@@ -217,6 +219,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
         self.assertEqual(topic_summary.name, 'Name')
+        self.assertEqual(topic_summary.description, 'Description')
         self.assertEqual(topic_summary.canonical_story_count, 0)
         self.assertEqual(topic_summary.additional_story_count, 0)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
@@ -719,7 +722,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             self.TOPIC_ID, 2, strict=False)
         self.assertIsNotNone(subtopic_page)
-
 
     def test_add_uncategorized_skill(self):
         topic_services.add_uncategorized_skill(
