@@ -88,6 +88,22 @@ describe('Navigation features on mobile', function() {
       expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/teach');
     });
 
+    it('should navigate to Welcome Guide Page with Oppia page using the sidebar menu',
+    function() {
+      var navbarButton = element(
+        by.css('.protractor-mobile-test-navbar-button'));
+      waitFor.elementToBeClickable(
+        navbarButton, 'Could not click navbar button');
+      navbarButton.click();
+      var welcomeGuideLink = element(
+        by.css('.protractor-mobile-test-welcome-guide-page'));
+      waitFor.elementToBeClickable(
+        welcomeGuideLink, 'Could not click Welcome Guide link');
+      welcomeGuideLink.click();
+      waitFor.pageToFullyLoad();
+      expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/welcomeguidepage');
+    });
+
   it('should navigate to Donate page using the sidebar menu',
     function() {
       var navbarButton = element(
