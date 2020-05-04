@@ -71,7 +71,7 @@ angular.module('oppia').factory('RouterService', [
     // initialized, and will defer making any changes until that happens.
     var finalizeNavigationToImprovementsTab = function() {
       if (!ExplorationFeaturesService.isInitialized()) {
-        $timeout(() => finalizeNavigationToImprovementsTab(), 300);
+        $timeout(finalizeNavigationToImprovementsTab, 300);
         return;
       }
       if (activeTabName === TABS.IMPROVEMENTS.name &&
