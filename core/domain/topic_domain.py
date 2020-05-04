@@ -1281,8 +1281,8 @@ class TopicSummary(python_utils.OBJECT):
     """Domain object for Topic Summary."""
 
     def __init__(
-            self, topic_id, name, canonical_name, language_code, version,
-            canonical_story_count, additional_story_count,
+            self, topic_id, name, canonical_name, language_code, description,
+            version, canonical_story_count, additional_story_count,
             uncategorized_skill_count, subtopic_count, total_skill_count,
             topic_model_created_on, topic_model_last_updated):
         """Constructs a TopicSummary domain object.
@@ -1292,6 +1292,7 @@ class TopicSummary(python_utils.OBJECT):
             name: str. The name of the topic.
             canonical_name: str. The canonical name (lowercase) of the topic.
             language_code: str. The language code of the topic.
+            description: str. The description of the topic.
             version: int. The version of the topic.
             canonical_story_count: int. The number of canonical stories present
                 in the topic.
@@ -1309,6 +1310,7 @@ class TopicSummary(python_utils.OBJECT):
         """
         self.id = topic_id
         self.name = name
+        self.description = description
         self.canonical_name = canonical_name
         self.language_code = language_code
         self.version = version
@@ -1331,6 +1333,11 @@ class TopicSummary(python_utils.OBJECT):
             raise utils.ValidationError('Name should be a string.')
         if self.name == '':
             raise utils.ValidationError('Name field should not be empty')
+
+        if not isinstance(self.description, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected description to be a string, received %s'
+                % self.description)
 
         if not isinstance(self.canonical_name, python_utils.BASESTRING):
             raise utils.ValidationError('Canonical name should be a string.')
@@ -1412,6 +1419,7 @@ class TopicSummary(python_utils.OBJECT):
             'id': self.id,
             'name': self.name,
             'language_code': self.language_code,
+            'description': self.description,
             'version': self.version,
             'canonical_story_count': self.canonical_story_count,
             'additional_story_count': self.additional_story_count,
