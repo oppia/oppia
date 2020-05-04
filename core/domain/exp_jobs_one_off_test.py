@@ -1866,7 +1866,6 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         exp_services.save_new_exploration(self.user_a_id, exploration)
@@ -1953,7 +1952,7 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='Exploration Title 1', category='category')
         exploration.add_states(['State1'])
-        # Test with the unaccpted state_schema_version
+        # Test with the unaccepted state_schema_version
         # for duration_secs which is less than 31.
         exploration.states_schema_version = 30
         state1 = exploration.states['State1']
@@ -1974,7 +1973,6 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
         state1.update_recorded_voiceovers(
             state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict))
 
-
         exp_services.save_new_exploration(self.user_a_id, exploration)
 
         job_id = (
@@ -1987,8 +1985,9 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
                 job_id)
             )
         expected_output = [('[u\'State schema version is '
-                            'not the minimum version expected\', '
-                            '[u\'exp_id0\']]')]
+                            'not the minimum version expected, 31\', '
+                            '[u\'EXP_ID: exp_id0, '
+                            'STATE_SCHEMA_VERSION: 30\']]')]
         self.assertEqual(actual_output, expected_output)
 
     def test_duration_secs_is_updated_when_job_is_complete(self):

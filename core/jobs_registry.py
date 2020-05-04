@@ -48,15 +48,18 @@ ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.ReplaceAdminIdOneOffJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
+    exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationValidityJobManager,
     exp_jobs_one_off.HintsAuditOneOffJob,
-    exp_jobs_one_off.ItemSelectionInteractionOneOffJob,
-    exp_jobs_one_off.ViewableExplorationsAuditJob,
-    exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
+    exp_jobs_one_off.ItemSelectionInteractionOneOffJob,
+    exp_jobs_one_off.MathExpressionInputInteractionOneOffJob,
+    exp_jobs_one_off.MultipleChoiceInteractionOneOffJob,
+    exp_jobs_one_off.ViewableExplorationsAuditJob,
     exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob,
+    exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
     feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
@@ -87,10 +90,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
     user_jobs_one_off.UserProfilePictureOneOffJob,
     user_jobs_one_off.UsernameLengthAuditOneOffJob,
-    user_jobs_one_off.UsernameLengthDistributionOneOffJob,
-    exp_jobs_one_off.MathExpressionInputInteractionOneOffJob,
-    exp_jobs_one_off.MultipleChoiceInteractionOneOffJob,
-    exp_jobs_one_off.VoiceoverDurationSecondsOneOffJob
+    user_jobs_one_off.UsernameLengthDistributionOneOffJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which

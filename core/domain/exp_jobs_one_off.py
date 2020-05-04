@@ -520,7 +520,9 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if (item.states_schema_version <
                 AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION):
             yield ('State schema version is not the '
-                   'minimum version expected', item.id)
+                   'minimum version expected, 31', 'EXP_ID: %s, '
+                   'STATE_SCHEMA_VERSION: %s' %
+                   (item.id, item.states_schema_version))
             return
 
         # Go through each exploration state to find voiceover recordings.
@@ -546,7 +548,7 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             raw = (
                                 fs.get('%s/%s' % (AUDIO_FILE_PREFIX,
                                                   filename)))
-                            # Get the audio-duration from file use Mutagen.
+                            # Get the audio-duration from file with Mutagen.
                             tempbuffer = python_utils.string_io()
                             tempbuffer.write(raw)
                             tempbuffer.seek(0)
