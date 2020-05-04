@@ -134,6 +134,7 @@ FULLY_COVERED_FILENAMES = [
     'exploration-id-validation.service.ts',
     'exploration-init-state-name.service.ts',
     'exploration-param-changes.service.ts',
+    'exploration-param-specs.service.ts',
     'exploration-player-page.constants.ajs.ts',
     'exploration-player-page.constants.ts',
     'exploration-property.service.ts',
