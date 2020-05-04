@@ -23,73 +23,80 @@ require(
 require('services/context.service.ts');
 require('services/editability.service.ts');
 
-angular.module('oppia').directive('solutionExplanationEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        onSaveSolution: '=',
-        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/solution-editor/' +
-        'solution-explanation-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$scope', 'ContextService', 'EditabilityService',
-        'StateSolutionService',
-        function(
-            $scope, ContextService, EditabilityService,
-            StateSolutionService) {
-          var ctrl = this;
-          ctrl.openExplanationEditor = function() {
-            if (ctrl.isEditable) {
-              ctrl.explanationEditorIsOpen = true;
-            }
-          };
+angular.module('oppia').directive('solutionExplanationEditor', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {
+      onSaveSolution: '=',
+      showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
+    },
+    template: require('./solution-explanation-editor.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      '$scope', 'ContextService', 'EditabilityService',
+      'StateSolutionService',
+      function(
+          $scope, ContextService, EditabilityService,
+          StateSolutionService) {
+        var ctrl = this;
+        ctrl.openExplanationEditor = function() {
+          if (ctrl.isEditable) {
+            ctrl.explanationEditorIsOpen = true;
+          }
+        };
 
-          ctrl.saveThisExplanation = function() {
-            var contentHasChanged = (
-              StateSolutionService.displayed.explanation.getHtml() !==
+        ctrl.saveThisExplanation = function() {
+          var contentHasChanged = (
+            StateSolutionService.displayed.explanation.getHtml() !==
               StateSolutionService.savedMemento.explanation.getHtml());
-            if (contentHasChanged) {
-              var solutionContentId = StateSolutionService.displayed.explanation
-                .getContentId();
-              ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
-                solutionContentId);
-            }
-            StateSolutionService.saveDisplayedValue();
-            ctrl.onSaveSolution(StateSolutionService.displayed);
-            ctrl.explanationEditorIsOpen = false;
-          };
+          if (contentHasChanged) {
+            var solutionContentId = StateSolutionService.displayed.explanation
+              .getContentId();
+            ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+              solutionContentId);
+          }
+          StateSolutionService.saveDisplayedValue();
+          ctrl.onSaveSolution(StateSolutionService.displayed);
+          ctrl.explanationEditorIsOpen = false;
+        };
 
-          ctrl.cancelThisExplanationEdit = function() {
-            ctrl.explanationEditorIsOpen = false;
-          };
+        ctrl.cancelThisExplanationEdit = function() {
+          ctrl.explanationEditorIsOpen = false;
+        };
 
-          ctrl.$onInit = function() {
-            $scope.$on('externalSave', function() {
-              if (ctrl.explanationEditorIsOpen &&
+        ctrl.$onInit = function() {
+          $scope.$on('externalSave', function() {
+            if (ctrl.explanationEditorIsOpen &&
                 ctrl.editSolutionForm.$valid) {
-                ctrl.saveThisExplanation();
-              }
-            });
-            ctrl.isEditable = EditabilityService.isEditable();
-            ctrl.editSolutionForm = {};
-            ctrl.explanationEditorIsOpen = false;
+              ctrl.saveThisExplanation();
+            }
+          });
+          ctrl.isEditable = EditabilityService.isEditable();
+          ctrl.editSolutionForm = {};
+          ctrl.explanationEditorIsOpen = false;
 
-            ctrl.StateSolutionService = StateSolutionService;
-            ctrl.EXPLANATION_FORM_SCHEMA = {
-              type: 'html',
-              ui_config: {
-                hide_complex_extensions: (
-                  ContextService.getEntityType() === 'question')
-              }
-            };
+          ctrl.StateSolutionService = StateSolutionService;
+          ctrl.EXPLANATION_FORM_SCHEMA = {
+            type: 'html',
+            ui_config: {
+              hide_complex_extensions: (
+                ContextService.getEntityType() === 'question')
+            }
           };
-        }
-      ]
-    };
-  }]);
+        };
+      }
+    ]
+  };
+}]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'solution-explanation-editor'
+})
+export class SolutionExplanationEditorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('solutionExplanationEditor', elementRef, injector);
+  }
+}

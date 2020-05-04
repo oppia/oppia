@@ -234,3 +234,14 @@ angular.module('oppia').directive('schemaBasedListEditor', [
     };
   }
 ]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'schema-based-list-editor'
+})
+export class SchemaBasedListEditorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('schemaBasedListEditor', elementRef, injector);
+  }
+}

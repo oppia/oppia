@@ -58,3 +58,14 @@ angular.module('oppia').directive('schemaBasedDictEditor', [
     };
   }
 ]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'schema-based-dict-editor'
+})
+export class SchemaBasedDictEditorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('schemaBasedDictEditor', elementRef, injector);
+  }
+}

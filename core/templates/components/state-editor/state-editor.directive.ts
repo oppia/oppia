@@ -69,8 +69,7 @@ angular.module('oppia').directive('stateEditor', [
         refreshWarnings: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-editor/state-editor.directive.html'),
+      template: require('./state-editor.directive.html'),
       controller: [
         '$rootScope', '$scope', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
@@ -144,3 +143,14 @@ angular.module('oppia').directive('stateEditor', [
       ]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'state-editor'
+})
+export class StateEditorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('stateEditor', elementRef, injector);
+  }
+}

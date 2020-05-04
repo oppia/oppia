@@ -19,23 +19,31 @@
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('schemaBasedUnicodeViewer', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      scope: {
-        localValue: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/' +
-        'schema-based-unicode-viewer.directive.html'),
-      restrict: 'E',
-      controller: [
-        '$scope', '$filter', '$sce',
-        function($scope, $filter, $sce) {
-          $scope.getDisplayedValue = function() {
-            return $sce.trustAsHtml($filter('convertUnicodeWithParamsToHtml')(
-              $scope.localValue));
-          };
-        }]
-    };
-  }]);
+angular.module('oppia').directive('schemaBasedUnicodeViewer', [function() {
+  return {
+    scope: {
+      localValue: '='
+    },
+    template: require('./schema-based-unicode-viewer.directive.html'),
+    restrict: 'E',
+    controller: [
+      '$scope', '$filter', '$sce',
+      function($scope, $filter, $sce) {
+        $scope.getDisplayedValue = function() {
+          return $sce.trustAsHtml($filter('convertUnicodeWithParamsToHtml')(
+            $scope.localValue));
+        };
+      }]
+  };
+}]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'schema-based-unicode-viewer'
+})
+export class SchemaBasedUnicodeViewerDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('schemaBasedUnicodeViewer', elementRef, injector);
+  }
+}

@@ -101,3 +101,14 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
     ]
   };
 }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'rule-type-selector'
+})
+export class RuleTypeSelectorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('ruleTypeSelector', elementRef, injector);
+  }
+}

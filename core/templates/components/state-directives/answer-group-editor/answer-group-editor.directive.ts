@@ -59,9 +59,7 @@ angular.module('oppia').directive('answerGroupEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',
         suppressWarnings: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/answer-group-editor/' +
-        'answer-group-editor.directive.html'),
+      template: require('./answer-group-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',
@@ -398,3 +396,14 @@ angular.module('oppia').directive('answerGroupEditor', [
       ]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'answer-group-editor'
+})
+export class AnswerGroupEditorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('answerGroupEditor', elementRef, injector);
+  }
+}

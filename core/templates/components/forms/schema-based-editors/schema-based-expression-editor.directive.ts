@@ -31,3 +31,14 @@ angular.module('oppia').directive('schemaBasedExpressionEditor', [
       restrict: 'E'
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'schema-based-expression-editor'
+})
+export class SchemaBasedExpressionEditorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('schemaBasedExpressionEditor', elementRef, injector);
+  }
+}

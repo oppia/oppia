@@ -16,60 +16,69 @@
  * @fileoverview Directive for the animated score ring.
  */
 
-angular.module('oppia').directive('scoreRing', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        getScore: '&score',
-        testIsPassed: '&testIsPassed'
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/score-ring/score-ring.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$scope', '$window', 'COLORS_FOR_PASS_FAIL_MODE',
-        function($scope, $window, COLORS_FOR_PASS_FAIL_MODE) {
-          var ctrl = this;
-          const circle = <SVGCircleElement>(
+angular.module('oppia').directive('scoreRing', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {
+      getScore: '&score',
+      testIsPassed: '&testIsPassed'
+    },
+    template: require('./score-ring.directive.html'),
+    controllerAs: '$ctrl',
+    controller: ['$scope', '$window', 'COLORS_FOR_PASS_FAIL_MODE',
+      function($scope, $window, COLORS_FOR_PASS_FAIL_MODE) {
+        var ctrl = this;
+        const circle = <SVGCircleElement>(
             document.querySelector('.score-ring-circle'));
-          const radius = circle.r.baseVal.value;
-          const circumference = (radius * 2 * Math.PI);
+        const radius = circle.r.baseVal.value;
+        const circumference = (radius * 2 * Math.PI);
 
-          var setScore = function(percent) {
-            const offset = circumference - percent / 100 * circumference;
-            circle.style.strokeDashoffset = offset.toString();
-          };
+        var setScore = function(percent) {
+          const offset = circumference - percent / 100 * circumference;
+          circle.style.strokeDashoffset = offset.toString();
+        };
 
-          ctrl.getScoreRingColor = function() {
-            if (ctrl.testIsPassed()) {
-              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
-            } else {
-              return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
+        ctrl.getScoreRingColor = function() {
+          if (ctrl.testIsPassed()) {
+            return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
+          } else {
+            return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
+          }
+        };
+
+        ctrl.getScoreOuterRingColor = function() {
+          if (ctrl.testIsPassed()) {
+            // return color green when passed.
+            return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER;
+          } else {
+            // return color orange when failed.
+            return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER;
+          }
+        };
+        ctrl.$onInit = function() {
+          circle.style.strokeDasharray = `${circumference} ${circumference}`;
+          circle.style.strokeDashoffset = circumference.toString();
+          $scope.$watch(function() {
+            return ctrl.getScore();
+          }, function(newScore) {
+            if (newScore && newScore > 0) {
+              setScore(newScore);
             }
-          };
+          });
+        };
+      }
+    ]
+  };
+}]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
 
-          ctrl.getScoreOuterRingColor = function() {
-            if (ctrl.testIsPassed()) {
-              // return color green when passed.
-              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER;
-            } else {
-              // return color orange when failed.
-              return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER;
-            }
-          };
-          ctrl.$onInit = function() {
-            circle.style.strokeDasharray = `${circumference} ${circumference}`;
-            circle.style.strokeDashoffset = circumference.toString();
-            $scope.$watch(function() {
-              return ctrl.getScore();
-            }, function(newScore) {
-              if (newScore && newScore > 0) {
-                setScore(newScore);
-              }
-            });
-          };
-        }
-      ]
-    };
-  }]);
+@Directive({
+  selector: 'score-ring'
+})
+export class ScoreRingDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('scoreRing', elementRef, injector);
+  }
+}

@@ -27,9 +27,7 @@ angular.module('oppia').directive('profileLinkImage', [
       bindToController: {
         username: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/profile-link-directives/' +
-        'profile-link-image.directive.html'),
+      template: require('./profile-link-image.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http',
@@ -60,3 +58,14 @@ angular.module('oppia').directive('profileLinkImage', [
       ]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'profile-link-image'
+})
+export class ProfileLinkImageDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('profileLinkImage', elementRef, injector);
+  }
+}

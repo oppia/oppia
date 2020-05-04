@@ -23,21 +23,27 @@ require('services/nested-directives-recursion-timeout-prevention.service.ts');
 
 angular.module('oppia').directive('schemaBasedListViewer', [
   'NestedDirectivesRecursionTimeoutPreventionService',
-  'UrlInterpolationService',
-  function(
-      NestedDirectivesRecursionTimeoutPreventionService,
-      UrlInterpolationService) {
+  function(NestedDirectivesRecursionTimeoutPreventionService) {
     return {
       scope: {
         localValue: '=',
         // Read-only property. The schema definition for each item in the list.
         itemSchema: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/' +
-        'schema-based-list-viewer.directive.html'),
+      template: require('./schema-based-list-viewer.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile
     };
   }
 ]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'schema-based-list-viewer'
+})
+export class SchemaBasedListViewerDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('schemaBasedListViewer', elementRef, injector);
+  }
+}

@@ -121,9 +121,7 @@ angular.module('oppia').directive('questionPlayer', [
       bindToController: {
         getQuestionPlayerConfig: '&playerConfig',
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/question-directives/question-player/' +
-        'question-player.directive.html'),
+      template: require('./question-player.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
@@ -596,3 +594,14 @@ angular.module('oppia').directive('questionPlayer', [
       ]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'question-player'
+})
+export class QuestionPlayerDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('questionPlayer', elementRef, injector);
+  }
+}

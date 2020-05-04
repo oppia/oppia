@@ -39,3 +39,14 @@ angular.module('oppia').directive('profileLinkText', [
       }]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'profile-link-text'
+})
+export class ProfileLinkTextDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('profileLinkText', elementRef, injector);
+  }
+}

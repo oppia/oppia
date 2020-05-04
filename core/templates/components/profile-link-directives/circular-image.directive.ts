@@ -18,23 +18,32 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('circularImage', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        src: '&',
-        link: '&?'
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/profile-link-directives/circular-image.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {
-        var ctrl = this;
-        ctrl.isLinkAvailable = function() {
-          return ctrl.link() ? true : false;
-        };
-      }]
-    };
-  }]);
+angular.module('oppia').directive('circularImage', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {
+      src: '&',
+      link: '&?'
+    },
+    template: require('./circular-image.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [function() {
+      var ctrl = this;
+      ctrl.isLinkAvailable = function() {
+        return ctrl.link() ? true : false;
+      };
+    }]
+  };
+}]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'circular-image'
+})
+export class CircularImageDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('circularImage', elementRef, injector);
+  }
+}

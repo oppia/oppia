@@ -18,15 +18,23 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('schemaBasedHtmlViewer', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      scope: {
-        localValue: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/' +
-        'schema-based-html-viewer.directive.html'),
-      restrict: 'E'
-    };
-  }]);
+angular.module('oppia').directive('schemaBasedHtmlViewer', [function() {
+  return {
+    scope: {
+      localValue: '='
+    },
+    template: require('./schema-based-html-viewer.directive.html'),
+    restrict: 'E'
+  };
+}]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'schema-based-html-viewer'
+})
+export class SchemaBasedHtmlViewerDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('schemaBasedHtmlViewer', elementRef, injector);
+  }
+}

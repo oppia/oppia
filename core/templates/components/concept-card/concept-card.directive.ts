@@ -21,66 +21,75 @@ require('domain/skill/ConceptCardObjectFactory.ts');
 require('directives/angular-html-bind.directive.ts');
 require('filters/format-rte-preview.filter.ts');
 
-angular.module('oppia').directive('conceptCard', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        getSkillIds: '&skillIds',
-        index: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/concept-card/concept-card.template.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$scope', '$filter', '$rootScope',
-        'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
-        function(
-            $scope, $filter, $rootScope,
-            ConceptCardBackendApiService, ConceptCardObjectFactory) {
-          var ctrl = this;
-          ctrl.isLastWorkedExample = function() {
-            return ctrl.numberOfWorkedExamplesShown ===
+angular.module('oppia').directive('conceptCard', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {
+      getSkillIds: '&skillIds',
+      index: '='
+    },
+    template: require('./concept-card.template.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      '$scope', '$filter', '$rootScope',
+      'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
+      function(
+          $scope, $filter, $rootScope,
+          ConceptCardBackendApiService, ConceptCardObjectFactory) {
+        var ctrl = this;
+        ctrl.isLastWorkedExample = function() {
+          return ctrl.numberOfWorkedExamplesShown ===
               ctrl.currentConceptCard.getWorkedExamples().length;
-          };
+        };
 
-          ctrl.showMoreWorkedExamples = function() {
-            ctrl.explanationIsShown = false;
-            ctrl.numberOfWorkedExamplesShown++;
-          };
+        ctrl.showMoreWorkedExamples = function() {
+          ctrl.explanationIsShown = false;
+          ctrl.numberOfWorkedExamplesShown++;
+        };
 
-          ctrl.$onInit = function() {
-            ctrl.conceptCards = [];
-            ctrl.currentConceptCard = null;
-            ctrl.numberOfWorkedExamplesShown = 0;
-            ctrl.loadingMessage = 'Loading';
-            $scope.$watch('$ctrl.index', function(newIndex) {
-              ctrl.currentConceptCard = ctrl.conceptCards[newIndex];
-              if (ctrl.currentConceptCard) {
-                ctrl.numberOfWorkedExamplesShown = 0;
-                if (ctrl.currentConceptCard.getWorkedExamples().length > 0) {
-                  ctrl.numberOfWorkedExamplesShown = 1;
-                }
-              }
-            });
-            ConceptCardBackendApiService.loadConceptCards(
-              ctrl.getSkillIds()
-            ).then(function(conceptCardBackendDicts) {
-              conceptCardBackendDicts.forEach(function(conceptCardBackendDict) {
-                ctrl.conceptCards.push(
-                  ConceptCardObjectFactory.createFromBackendDict(
-                    conceptCardBackendDict));
-              });
-              ctrl.loadingMessage = '';
-              ctrl.currentConceptCard = ctrl.conceptCards[ctrl.index];
+        ctrl.$onInit = function() {
+          ctrl.conceptCards = [];
+          ctrl.currentConceptCard = null;
+          ctrl.numberOfWorkedExamplesShown = 0;
+          ctrl.loadingMessage = 'Loading';
+          $scope.$watch('$ctrl.index', function(newIndex) {
+            ctrl.currentConceptCard = ctrl.conceptCards[newIndex];
+            if (ctrl.currentConceptCard) {
               ctrl.numberOfWorkedExamplesShown = 0;
               if (ctrl.currentConceptCard.getWorkedExamples().length > 0) {
                 ctrl.numberOfWorkedExamplesShown = 1;
               }
+            }
+          });
+          ConceptCardBackendApiService.loadConceptCards(
+            ctrl.getSkillIds()
+          ).then(function(conceptCardBackendDicts) {
+            conceptCardBackendDicts.forEach(function(conceptCardBackendDict) {
+              ctrl.conceptCards.push(
+                ConceptCardObjectFactory.createFromBackendDict(
+                  conceptCardBackendDict));
             });
-          };
-        }
-      ]
-    };
-  }]);
+            ctrl.loadingMessage = '';
+            ctrl.currentConceptCard = ctrl.conceptCards[ctrl.index];
+            ctrl.numberOfWorkedExamplesShown = 0;
+            if (ctrl.currentConceptCard.getWorkedExamples().length > 0) {
+              ctrl.numberOfWorkedExamplesShown = 1;
+            }
+          });
+        };
+      }
+    ]
+  };
+}]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'concept-card'
+})
+export class ConceptCardDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('conceptCard', elementRef, injector);
+  }
+}

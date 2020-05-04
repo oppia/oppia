@@ -53,3 +53,14 @@ angular.module('oppia').directive('alertMessage', [function() {
     }
   };
 }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'alert-message'
+})
+export class AlertMessageDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('alertMessage', elementRef, injector);
+  }
+}

@@ -18,20 +18,28 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('schemaBasedPrimitiveViewer', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      scope: {
-        localValue: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/' +
-        'schema-based-primitive-viewer.directive.html'),
-      restrict: 'E',
-      controller: ['$scope', function($scope) {
-        $scope.isExpression = function(value) {
-          return angular.isString(value);
-        };
-      }]
-    };
-  }]);
+angular.module('oppia').directive('schemaBasedPrimitiveViewer', [function() {
+  return {
+    scope: {
+      localValue: '='
+    },
+    template: require('./schema-based-primitive-viewer.directive.html'),
+    restrict: 'E',
+    controller: ['$scope', function($scope) {
+      $scope.isExpression = function(value) {
+        return angular.isString(value);
+      };
+    }]
+  };
+}]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'schema-based-primitive-viewer'
+})
+export class SchemaBasedPrimitiveViewerDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('schemaBasedPrimitiveViewer', elementRef, injector);
+  }
+}

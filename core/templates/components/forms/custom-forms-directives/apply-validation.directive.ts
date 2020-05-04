@@ -68,3 +68,14 @@ angular.module('oppia').directive('applyValidation', [
     };
   }]);
 /* eslint-enable angular/directive-restrict */
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'apply-validation'
+})
+export class ApplyValidationDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('applyValidation', elementRef, injector);
+  }
+}

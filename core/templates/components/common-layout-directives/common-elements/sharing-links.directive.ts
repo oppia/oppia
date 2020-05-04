@@ -33,9 +33,7 @@ angular.module('oppia').directive('sharingLinks', [
         getExplorationId: '&explorationId',
         getCollectionId: '&collectionId'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/common-elements/' +
-        'sharing-links.directive.html'),
+      templateUrl: require('./sharing-links.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$window', 'HtmlEscaperService',
@@ -91,3 +89,14 @@ angular.module('oppia').directive('sharingLinks', [
       ]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'sharing-links'
+})
+export class SharingLinksDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('sharingLinks', elementRef, injector);
+  }
+}

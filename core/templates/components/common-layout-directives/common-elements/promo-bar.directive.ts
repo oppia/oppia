@@ -74,3 +74,14 @@ angular.module('oppia').directive('promoBar', [
     };
   }
 ]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'promo-bar'
+})
+export class PromoBarDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('promoBar', elementRef, injector);
+  }
+}

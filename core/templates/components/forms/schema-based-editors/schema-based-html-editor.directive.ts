@@ -35,3 +35,14 @@ angular.module('oppia').directive('schemaBasedHtmlEditor', [
       controller: [function() {}]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'schema-based-html-editor'
+})
+export class SchemaBasedHtmlEditorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('schemaBasedHtmlEditor', elementRef, injector);
+  }
+}

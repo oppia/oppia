@@ -34,3 +34,14 @@ angular.module('oppia').directive('socialButtons', [
       }]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'social-buttons'
+})
+export class SocialButtonsDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('socialButtons', elementRef, injector);
+  }
+}

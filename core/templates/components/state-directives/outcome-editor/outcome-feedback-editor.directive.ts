@@ -20,30 +20,37 @@ require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/context.service.ts');
 
-angular.module('oppia').directive('outcomeFeedbackEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        outcome: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/outcome-editor/' +
-        'outcome-feedback-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['ContextService', function(ContextService) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.OUTCOME_FEEDBACK_SCHEMA = {
-            type: 'html',
-            ui_config: {
-              hide_complex_extensions: (
-                ContextService.getEntityType() === 'question')
-            }
-          };
+angular.module('oppia').directive('outcomeFeedbackEditor', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {
+      outcome: '='
+    },
+    template: require('./outcome-feedback-editor.directive.html'),
+    controllerAs: '$ctrl',
+    controller: ['ContextService', function(ContextService) {
+      var ctrl = this;
+      ctrl.$onInit = function() {
+        ctrl.OUTCOME_FEEDBACK_SCHEMA = {
+          type: 'html',
+          ui_config: {
+            hide_complex_extensions: (
+              ContextService.getEntityType() === 'question')
+          }
         };
-      }]
-    };
-  }]);
+      };
+    }]
+  };
+}]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'outcome-feedback-editor'
+})
+export class OutcomeFeedbackEditorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('outcomeFeedbackEditor', elementRef, injector);
+  }
+}

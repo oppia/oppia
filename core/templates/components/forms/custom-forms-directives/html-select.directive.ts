@@ -24,29 +24,38 @@ require('domain/utilities/url-interpolation.service.ts');
 // Attribute 'val' is presented to the user. After user selection, the
 // corresponding attribute 'id' is assigned to 'selection'
 
-angular.module('oppia').directive('htmlSelect', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {
-        options: '=',
-        selection: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/custom-forms-directives/html-select.directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.select = function(id) {
-          $scope.selection = id;
-        };
+angular.module('oppia').directive('htmlSelect', [function() {
+  return {
+    restrict: 'E',
+    scope: {
+      options: '=',
+      selection: '='
+    },
+    template: require('./html-select.directive.html'),
+    controller: ['$scope', function($scope) {
+      $scope.select = function(id) {
+        $scope.selection = id;
+      };
 
-        $scope.getSelectionIndex = function() {
-          for (var index = 0; index < $scope.options.length; index++) {
-            if ($scope.options[index].id === $scope.selection) {
-              return index;
-            }
+      $scope.getSelectionIndex = function() {
+        for (var index = 0; index < $scope.options.length; index++) {
+          if ($scope.options[index].id === $scope.selection) {
+            return index;
           }
-        };
-      }]
-    };
-  }
+        }
+      };
+    }]
+  };
+}
 ]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'html-select'
+})
+export class HtmlSelectDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('htmlSelect', elementRef, injector);
+  }
+}

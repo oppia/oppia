@@ -30,8 +30,7 @@ angular.module('oppia').directive('subtopicSummaryTile', [
         getSubtopicTitle: '&subtopicTitle',
         getTopicName: '&topicName'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary-tile/subtopic-summary-tile.directive.html'),
+      template: require('./subtopic-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: ['SUBTOPIC_VIEWER_URL_TEMPLATE',
         function(SUBTOPIC_VIEWER_URL_TEMPLATE) {
@@ -51,3 +50,14 @@ angular.module('oppia').directive('subtopicSummaryTile', [
       ]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'subtopic-summary-tile'
+})
+export class SubtopicSummaryTileDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('subtopicSummaryTile', elementRef, injector);
+  }
+}

@@ -264,3 +264,14 @@ angular.module('oppia').directive('ckEditor4Rte', [
     };
   }
 ]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'ck-editor4-rte'
+})
+export class CkEditor4RteDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('ckEditor4Rte', elementRef, injector);
+  }
+}

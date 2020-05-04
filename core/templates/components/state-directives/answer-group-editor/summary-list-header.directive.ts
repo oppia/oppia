@@ -18,33 +18,41 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('summaryListHeader', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        isSortingDisabled: '&disableSorting',
-        getIndex: '&index',
-        getSummary: '&summary',
-        getShortSummary: '&shortSummary',
-        isActive: '&isActive',
-        getOnDeleteFn: '&onDeleteFn',
-        isDeleteAvailable: '&isDeleteAvailable',
-        getNumItems: '&numItems',
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/answer-group-editor/' +
-        'summary-list-header.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        function() {
-          var ctrl = this;
-          ctrl.deleteItem = function(evt) {
-            ctrl.getOnDeleteFn()(ctrl.getIndex(), evt);
-          };
-        }
-      ]
-    };
-  }
+angular.module('oppia').directive('summaryListHeader', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {
+      isSortingDisabled: '&disableSorting',
+      getIndex: '&index',
+      getSummary: '&summary',
+      getShortSummary: '&shortSummary',
+      isActive: '&isActive',
+      getOnDeleteFn: '&onDeleteFn',
+      isDeleteAvailable: '&isDeleteAvailable',
+      getNumItems: '&numItems',
+    },
+    template: require('./summary-list-header.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      function() {
+        var ctrl = this;
+        ctrl.deleteItem = function(evt) {
+          ctrl.getOnDeleteFn()(ctrl.getIndex(), evt);
+        };
+      }
+    ]
+  };
+}
 ]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'summary-list-header'
+})
+export class SummaryListHeaderDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('summaryListHeader', elementRef, injector);
+  }
+}

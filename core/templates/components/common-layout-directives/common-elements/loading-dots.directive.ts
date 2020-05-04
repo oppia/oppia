@@ -18,16 +18,24 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('loadingDots', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/common-elements/' +
-        'loading-dots.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }]);
+angular.module('oppia').directive('loadingDots', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    template: require('./loading-dots.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [function() {}]
+  };
+}]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'loading-dots'
+})
+export class LoadingDotsDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('loadingDots', elementRef, injector);
+  }
+}

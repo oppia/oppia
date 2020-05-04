@@ -53,9 +53,7 @@ angular.module('oppia').directive('questionEditor', [
         questionStateData: '=',
         questionChanged: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/question-directives/question-editor/' +
-        'question-editor.directive.html'),
+      template: require('./question-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$uibModal',
@@ -233,3 +231,14 @@ angular.module('oppia').directive('questionEditor', [
       ]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'question-editor'
+})
+export class QuestionEditorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('questionEditor', elementRef, injector);
+  }
+}

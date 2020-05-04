@@ -31,53 +31,61 @@ require('objects/objectComponentsRequires.ts');
 
 require('directives/angular-html-bind.directive.ts');
 
-angular.module('oppia').directive('reviewMaterialEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        getBindableDict: '&bindableDict',
-        onSaveExplanation: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/review-material-editor/' +
-        'review-material-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['SubtitledHtmlObjectFactory', 'COMPONENT_NAME_EXPLANATION',
-        function(
-            SubtitledHtmlObjectFactory, COMPONENT_NAME_EXPLANATION) {
-          var ctrl = this;
-          var explanationMemento = null;
+angular.module('oppia').directive('reviewMaterialEditor', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {
+      getBindableDict: '&bindableDict',
+      onSaveExplanation: '='
+    },
+    template: require('./review-material-editor.directive.html'),
+    controllerAs: '$ctrl',
+    controller: ['SubtitledHtmlObjectFactory', 'COMPONENT_NAME_EXPLANATION',
+      function(
+          SubtitledHtmlObjectFactory, COMPONENT_NAME_EXPLANATION) {
+        var ctrl = this;
+        var explanationMemento = null;
 
-          ctrl.openConceptCardExplanationEditor = function() {
-            ctrl.editableExplanation =
+        ctrl.openConceptCardExplanationEditor = function() {
+          ctrl.editableExplanation =
               ctrl.getBindableDict().displayedConceptCardExplanation;
-            explanationMemento = ctrl.editableExplanation;
-            ctrl.conceptCardExplanationEditorIsShown = true;
-          };
+          explanationMemento = ctrl.editableExplanation;
+          ctrl.conceptCardExplanationEditorIsShown = true;
+        };
 
-          ctrl.closeConceptCardExplanationEditor = function() {
-            ctrl.editableExplanation = explanationMemento;
-            ctrl.conceptCardExplanationEditorIsShown = false;
-          };
+        ctrl.closeConceptCardExplanationEditor = function() {
+          ctrl.editableExplanation = explanationMemento;
+          ctrl.conceptCardExplanationEditorIsShown = false;
+        };
 
-          ctrl.saveConceptCardExplanation = function() {
-            ctrl.conceptCardExplanationEditorIsShown = false;
-            var explanationObject = SubtitledHtmlObjectFactory.createDefault(
-              ctrl.editableExplanation, COMPONENT_NAME_EXPLANATION);
-            ctrl.onSaveExplanation(explanationObject);
+        ctrl.saveConceptCardExplanation = function() {
+          ctrl.conceptCardExplanationEditorIsShown = false;
+          var explanationObject = SubtitledHtmlObjectFactory.createDefault(
+            ctrl.editableExplanation, COMPONENT_NAME_EXPLANATION);
+          ctrl.onSaveExplanation(explanationObject);
+        };
+        ctrl.$onInit = function() {
+          ctrl.HTML_SCHEMA = {
+            type: 'html'
           };
-          ctrl.$onInit = function() {
-            ctrl.HTML_SCHEMA = {
-              type: 'html'
-            };
-            ctrl.editableExplanation =
+          ctrl.editableExplanation =
               ctrl.getBindableDict().displayedConceptCardExplanation;
-            ctrl.conceptCardExplanationEditorIsShown = false;
-          };
-        }
-      ]
-    };
-  }
+          ctrl.conceptCardExplanationEditorIsShown = false;
+        };
+      }
+    ]
+  };
+}
 ]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'review-material-editor'
+})
+export class ReviewMaterialEditorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('reviewMaterialEditor', elementRef, injector);
+  }
+}

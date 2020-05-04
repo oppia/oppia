@@ -27,76 +27,85 @@ require(
 require('services/context.service.ts');
 require('services/editability.service.ts');
 
-angular.module('oppia').directive('hintEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        hint: '=',
-        getIndexPlusOne: '&indexPlusOne',
-        getOnSaveFn: '&onSave',
-        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/hint-editor/hint-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$scope', 'ContextService', 'EditabilityService', 'StateHintsService',
-        function(
-            $scope, ContextService, EditabilityService, StateHintsService) {
-          var ctrl = this;
-          ctrl.openHintEditor = function() {
-            if (ctrl.isEditable) {
-              ctrl.hintMemento = angular.copy(ctrl.hint);
-              ctrl.hintEditorIsOpen = true;
-            }
-          };
+angular.module('oppia').directive('hintEditor', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {
+      hint: '=',
+      getIndexPlusOne: '&indexPlusOne',
+      getOnSaveFn: '&onSave',
+      showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
+    },
+    template: require('./hint-editor.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      '$scope', 'ContextService', 'EditabilityService', 'StateHintsService',
+      function(
+          $scope, ContextService, EditabilityService, StateHintsService) {
+        var ctrl = this;
+        ctrl.openHintEditor = function() {
+          if (ctrl.isEditable) {
+            ctrl.hintMemento = angular.copy(ctrl.hint);
+            ctrl.hintEditorIsOpen = true;
+          }
+        };
 
-          ctrl.saveThisHint = function() {
-            ctrl.hintEditorIsOpen = false;
-            var contentHasChanged = (
-              ctrl.hintMemento.hintContent.getHtml() !==
+        ctrl.saveThisHint = function() {
+          ctrl.hintEditorIsOpen = false;
+          var contentHasChanged = (
+            ctrl.hintMemento.hintContent.getHtml() !==
               ctrl.hint.hintContent.getHtml());
-            ctrl.hintMemento = null;
-            if (contentHasChanged) {
-              var hintContentId = ctrl.hint.hintContent.getContentId();
-              ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
-                hintContentId);
-            }
-            ctrl.getOnSaveFn()();
-          };
+          ctrl.hintMemento = null;
+          if (contentHasChanged) {
+            var hintContentId = ctrl.hint.hintContent.getContentId();
+            ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+              hintContentId);
+          }
+          ctrl.getOnSaveFn()();
+        };
 
-          ctrl.cancelThisHintEdit = function() {
-            ctrl.hint.hintContent =
+        ctrl.cancelThisHintEdit = function() {
+          ctrl.hint.hintContent =
               angular.copy(ctrl.hintMemento.hintContent);
-            ctrl.hintMemento = null;
-            ctrl.hintEditorIsOpen = false;
-          };
+          ctrl.hintMemento = null;
+          ctrl.hintEditorIsOpen = false;
+        };
 
-          ctrl.$onInit = function() {
-            $scope.$on('externalSave', function() {
-              if (ctrl.hintEditorIsOpen &&
+        ctrl.$onInit = function() {
+          $scope.$on('externalSave', function() {
+            if (ctrl.hintEditorIsOpen &&
                   ctrl.editHintForm.$valid) {
-                ctrl.saveThisHint();
-              }
-            });
-            ctrl.isEditable = EditabilityService.isEditable();
-            ctrl.StateHintsService = StateHintsService;
-            ctrl.editHintForm = {};
-            ctrl.hintEditorIsOpen = false;
+              ctrl.saveThisHint();
+            }
+          });
+          ctrl.isEditable = EditabilityService.isEditable();
+          ctrl.StateHintsService = StateHintsService;
+          ctrl.editHintForm = {};
+          ctrl.hintEditorIsOpen = false;
 
-            ctrl.HINT_FORM_SCHEMA = {
-              type: 'html',
-              ui_config: {
-                hide_complex_extensions: (
-                  ContextService.getEntityType() === 'question')
-              }
-            };
-
-            ctrl.hintMemento = null;
+          ctrl.HINT_FORM_SCHEMA = {
+            type: 'html',
+            ui_config: {
+              hide_complex_extensions: (
+                ContextService.getEntityType() === 'question')
+            }
           };
-        }
-      ]
-    };
-  }]);
+
+          ctrl.hintMemento = null;
+        };
+      }
+    ]
+  };
+}]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'hint-editor'
+})
+export class HintEditorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('hintEditor', elementRef, injector);
+  }
+}

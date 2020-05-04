@@ -18,17 +18,25 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('lazyLoading', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/common-elements/' +
-        'lazy-loading.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }
+angular.module('oppia').directive('lazyLoading', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: require('./lazy-loading.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [function() {}]
+  };
+}
 ]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'lazy-loading'
+})
+export class LazyLoadingDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('lazyLoading', elementRef, injector);
+  }
+}

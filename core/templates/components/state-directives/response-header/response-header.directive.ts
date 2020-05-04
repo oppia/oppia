@@ -25,75 +25,83 @@ require(
   'state-property.service.ts');
 require('services/editability.service.ts');
 
-angular.module('oppia').directive('responseHeader', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        getIndex: '&index',
-        getOutcome: '&outcome',
-        getSummary: '&summary',
-        getShortSummary: '&shortSummary',
-        isActive: '&isActive',
-        getOnDeleteFn: '&onDeleteFn',
-        getNumRules: '&numRules',
-        isResponse: '&isResponse',
-        showWarning: '&showWarning',
-        navigateToState: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/response-header/' +
-        'response-header.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        'EditabilityService', 'StateEditorService',
-        'PLACEHOLDER_OUTCOME_DEST',
-        'StateInteractionIdService', 'INTERACTION_SPECS',
-        function(
-            EditabilityService, StateEditorService,
-            PLACEHOLDER_OUTCOME_DEST,
-            StateInteractionIdService, INTERACTION_SPECS) {
-          var ctrl = this;
-          ctrl.isInQuestionMode = function() {
-            return StateEditorService.isInQuestionMode();
-          };
+angular.module('oppia').directive('responseHeader', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {
+      getIndex: '&index',
+      getOutcome: '&outcome',
+      getSummary: '&summary',
+      getShortSummary: '&shortSummary',
+      isActive: '&isActive',
+      getOnDeleteFn: '&onDeleteFn',
+      getNumRules: '&numRules',
+      isResponse: '&isResponse',
+      showWarning: '&showWarning',
+      navigateToState: '='
+    },
+    template: require('./response-header.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      'EditabilityService', 'StateEditorService',
+      'PLACEHOLDER_OUTCOME_DEST',
+      'StateInteractionIdService', 'INTERACTION_SPECS',
+      function(
+          EditabilityService, StateEditorService,
+          PLACEHOLDER_OUTCOME_DEST,
+          StateInteractionIdService, INTERACTION_SPECS) {
+        var ctrl = this;
+        ctrl.isInQuestionMode = function() {
+          return StateEditorService.isInQuestionMode();
+        };
 
-          ctrl.getCurrentInteractionId = function() {
-            return StateInteractionIdService.savedMemento;
-          };
+        ctrl.getCurrentInteractionId = function() {
+          return StateInteractionIdService.savedMemento;
+        };
 
-          ctrl.isCorrectnessFeedbackEnabled = function() {
-            return StateEditorService.getCorrectnessFeedbackEnabled();
-          };
-          // This returns false if the current interaction ID is null.
-          ctrl.isCurrentInteractionLinear = function() {
-            var interactionId = ctrl.getCurrentInteractionId();
-            return interactionId && INTERACTION_SPECS[interactionId].is_linear;
-          };
+        ctrl.isCorrectnessFeedbackEnabled = function() {
+          return StateEditorService.getCorrectnessFeedbackEnabled();
+        };
+        // This returns false if the current interaction ID is null.
+        ctrl.isCurrentInteractionLinear = function() {
+          var interactionId = ctrl.getCurrentInteractionId();
+          return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+        };
 
-          ctrl.isCorrect = function() {
-            return ctrl.getOutcome() && ctrl.getOutcome().labelledAsCorrect;
-          };
+        ctrl.isCorrect = function() {
+          return ctrl.getOutcome() && ctrl.getOutcome().labelledAsCorrect;
+        };
 
-          ctrl.isOutcomeLooping = function() {
-            var outcome = ctrl.getOutcome();
-            var activeStateName = StateEditorService.getActiveStateName();
-            return outcome && (outcome.dest === activeStateName);
-          };
+        ctrl.isOutcomeLooping = function() {
+          var outcome = ctrl.getOutcome();
+          var activeStateName = StateEditorService.getActiveStateName();
+          return outcome && (outcome.dest === activeStateName);
+        };
 
-          ctrl.isCreatingNewState = function() {
-            var outcome = ctrl.getOutcome();
-            return outcome && outcome.dest === PLACEHOLDER_OUTCOME_DEST;
-          };
+        ctrl.isCreatingNewState = function() {
+          var outcome = ctrl.getOutcome();
+          return outcome && outcome.dest === PLACEHOLDER_OUTCOME_DEST;
+        };
 
-          ctrl.deleteResponse = function(evt) {
-            ctrl.getOnDeleteFn()(ctrl.getIndex(), evt);
-          };
-          ctrl.$onInit = function() {
-            ctrl.EditabilityService = EditabilityService;
-          };
-        }
-      ]
-    };
-  }]);
+        ctrl.deleteResponse = function(evt) {
+          ctrl.getOnDeleteFn()(ctrl.getIndex(), evt);
+        };
+        ctrl.$onInit = function() {
+          ctrl.EditabilityService = EditabilityService;
+        };
+      }
+    ]
+  };
+}]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'response-header'
+})
+export class ResponseHeaderDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('responseHeader', elementRef, injector);
+  }
+}

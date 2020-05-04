@@ -27,8 +27,7 @@ angular.module('oppia').directive('topicSummaryTile', [
       bindToController: {
         getTopicSummary: '&topicSummary'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary-tile/topic-summary-tile.directive.html'),
+      template: require('./topic-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: ['TOPIC_VIEWER_URL_TEMPLATE',
         function(TOPIC_VIEWER_URL_TEMPLATE) {
@@ -47,3 +46,14 @@ angular.module('oppia').directive('topicSummaryTile', [
       ]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'topic-summary-tile'
+})
+export class TopicSummaryTileDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('topicSummaryTile', elementRef, injector);
+  }
+}

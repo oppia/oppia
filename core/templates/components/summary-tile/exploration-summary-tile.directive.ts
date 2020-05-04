@@ -65,8 +65,7 @@ angular.module('oppia').directive('explorationSummaryTile', [
         isContainerNarrow: '&containerIsNarrow',
         isOwnedByCurrentUser: '&activityIsOwnedByCurrentUser',
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary-tile/exploration-summary-tile.directive.html'),
+      template: require('./exploration-summary-tile.directive.html'),
       link: function(scope, element) {
         element.find('.exploration-summary-avatars').on('mouseenter',
           function() {
@@ -220,3 +219,14 @@ angular.module('oppia').directive('explorationSummaryTile', [
       ]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'exploration-summary-tile'
+})
+export class ExplorationSummaryTileDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('explorationSummaryTile', elementRef, injector);
+  }
+}

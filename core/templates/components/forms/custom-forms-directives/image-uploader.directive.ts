@@ -20,8 +20,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/id-generation.service.ts');
 
 angular.module('oppia').directive('imageUploader', [
-  'IdGenerationService', 'UrlInterpolationService',
-  function(IdGenerationService, UrlInterpolationService) {
+  'IdGenerationService', function(IdGenerationService) {
     return {
       restrict: 'E',
       scope: {
@@ -30,9 +29,7 @@ angular.module('oppia').directive('imageUploader', [
         errorMessage: '@',
         width: '@'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/custom-forms-directives/' +
-        'image-uploader.directive.html'),
+      template: require('./image-uploader.directive.html'),
       link: function(scope: ICustomScope, elt) {
         var onDragEnd = function(e) {
           e.preventDefault();
@@ -121,3 +118,14 @@ angular.module('oppia').directive('imageUploader', [
     };
   }
 ]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'image-uploader'
+})
+export class ImageUploaderDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('imageUploader', elementRef, injector);
+  }
+}

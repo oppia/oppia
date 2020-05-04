@@ -30,8 +30,7 @@ angular.module('oppia').directive('skillsMasteryList', [
         getDegreesOfMastery: '&degreesOfMastery',
         getSkillDescriptions: '&skillDescriptions'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/skills-mastery-list/skills-mastery-list.directive.html'),
+      template: require('./skills-mastery-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$uibModal', 'UserService',
@@ -108,3 +107,14 @@ angular.module('oppia').directive('skillsMasteryList', [
       ]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'skills-mastery-list'
+})
+export class SkillsMasteryListDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('skillsMasteryList', elementRef, injector);
+  }
+}

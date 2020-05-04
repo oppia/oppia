@@ -20,8 +20,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/id-generation.service.ts');
 
 angular.module('oppia').directive('audioFileUploader', [
-  'IdGenerationService', 'UrlInterpolationService',
-  function(IdGenerationService, UrlInterpolationService) {
+  'IdGenerationService', function(IdGenerationService) {
     return {
       restrict: 'E',
       scope: {
@@ -29,9 +28,7 @@ angular.module('oppia').directive('audioFileUploader', [
         onFileChanged: '=',
         onFileCleared: '=',
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/custom-forms-directives/' +
-        'audio-file-uploader.directive.html'),
+      template: require('./audio-file-uploader.directive.html'),
       link: function(scope: ICustomScope, elt) {
         var ALLOWED_AUDIO_FILE_TYPES = ['audio/mp3', 'audio/mpeg'];
 
@@ -101,3 +98,14 @@ angular.module('oppia').directive('audioFileUploader', [
     };
   }
 ]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'audio-file-uploader'
+})
+export class AudioFileUploaderDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('audioFileUploader', elementRef, injector);
+  }
+}

@@ -19,25 +19,33 @@
 require('domain/utilities/browser-checker.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('attributionGuide', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/common-elements/' +
-        'attribution-guide.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        'BrowserCheckerService', 'UrlService', function(
-            BrowserCheckerService, UrlService) {
-          var ctrl = this;
-          ctrl.$onInit = function() {
-            ctrl.deviceUsedIsMobile = BrowserCheckerService.isMobileDevice();
-            ctrl.iframed = UrlService.isIframed();
-          };
-        }
-      ]
-    };
-  }]);
+angular.module('oppia').directive('attributionGuide', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    template: require('./attribution-guide.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      'BrowserCheckerService', 'UrlService', function(
+          BrowserCheckerService, UrlService) {
+        var ctrl = this;
+        ctrl.$onInit = function() {
+          ctrl.deviceUsedIsMobile = BrowserCheckerService.isMobileDevice();
+          ctrl.iframed = UrlService.isIframed();
+        };
+      }
+    ]
+  };
+}]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'attribution-guide'
+})
+export class AttributionGuideDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('attributionGuide', elementRef, injector);
+  }
+}

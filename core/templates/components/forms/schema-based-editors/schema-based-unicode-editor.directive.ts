@@ -140,3 +140,14 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
     };
   }
 ]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'schema-based-unicode-editor'
+})
+export class SchemaBasedUnicodeEditorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('schemaBasedUnicodeEditor', elementRef, injector);
+  }
+}

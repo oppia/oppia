@@ -18,31 +18,39 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('questionDifficultySelector', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {
-        getSkillIdToRubricsObject: '&skillIdToRubricsObject',
-        skillWithDifficulty: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/question-difficulty-selector/' +
-        'question-difficulty-selector.directive.html'),
-      controller: [
-        '$scope', '$uibModal', '$rootScope', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
-        function(
-            $scope, $uibModal, $rootScope, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
-          var ctrl = this;
+angular.module('oppia').directive('questionDifficultySelector', [function() {
+  return {
+    restrict: 'E',
+    scope: {
+      getSkillIdToRubricsObject: '&skillIdToRubricsObject',
+      skillWithDifficulty: '='
+    },
+    template: require('./question-difficulty-selector.directive.html'),
+    controller: [
+      '$scope', '$uibModal', '$rootScope', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
+      function(
+          $scope, $uibModal, $rootScope, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+        var ctrl = this;
 
-          ctrl.$onInit = function() {
-            $scope.availableDifficultyValues = [];
-            for (var difficulty in SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
-              $scope.availableDifficultyValues.push(
-                SKILL_DIFFICULTY_LABEL_TO_FLOAT[difficulty]);
-            }
-          };
-        }
-      ]
-    };
-  }]);
+        ctrl.$onInit = function() {
+          $scope.availableDifficultyValues = [];
+          for (var difficulty in SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+            $scope.availableDifficultyValues.push(
+              SKILL_DIFFICULTY_LABEL_TO_FLOAT[difficulty]);
+          }
+        };
+      }
+    ]
+  };
+}]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'question-difficulty-selector'
+})
+export class QuestionDifficultySelectorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('questionDifficultySelector', elementRef, injector);
+  }
+}

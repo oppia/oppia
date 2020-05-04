@@ -18,44 +18,53 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('selectSkill', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {
-        // If countOfSkillsToPrioritize > 0, then sortedSkillSummaries should
-        // have the initial 'countOfSkillsToPrioritize' entries of skills with
-        // the same priority.
-        getSortedSkillSummaries: '&sortedSkillSummaries',
-        selectedSkillId: '=',
-        getCountOfSkillsToPrioritize: '&countOfSkillsToPrioritize'
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/skill-selector/skill-selector.directive.html'),
-      controller: [
-        '$scope', '$uibModal', '$rootScope',
-        function(
-            $scope, $uibModal, $rootScope) {
-          var ctrl = this;
-          $scope.selectSkill = function(skillId) {
-            $scope.selectedSkillId = skillId;
-          };
-          ctrl.$onInit = function() {
-            $scope.sortedSkillSummaries = $scope.getSortedSkillSummaries();
-            $scope.skillSummariesInitial = [];
-            $scope.skillSummariesFinal = [];
+angular.module('oppia').directive('selectSkill', [function() {
+  return {
+    restrict: 'E',
+    scope: {
+      // If countOfSkillsToPrioritize > 0, then sortedSkillSummaries should
+      // have the initial 'countOfSkillsToPrioritize' entries of skills with
+      // the same priority.
+      getSortedSkillSummaries: '&sortedSkillSummaries',
+      selectedSkillId: '=',
+      getCountOfSkillsToPrioritize: '&countOfSkillsToPrioritize'
+    },
+    template: require('./skill-selector.directive.html'),
+    controller: [
+      '$scope', '$uibModal', '$rootScope',
+      function(
+          $scope, $uibModal, $rootScope) {
+        var ctrl = this;
+        $scope.selectSkill = function(skillId) {
+          $scope.selectedSkillId = skillId;
+        };
+        ctrl.$onInit = function() {
+          $scope.sortedSkillSummaries = $scope.getSortedSkillSummaries();
+          $scope.skillSummariesInitial = [];
+          $scope.skillSummariesFinal = [];
 
-            for (var idx in $scope.sortedSkillSummaries) {
-              if (idx < $scope.getCountOfSkillsToPrioritize()) {
-                $scope.skillSummariesInitial.push(
-                  $scope.sortedSkillSummaries[idx]);
-              } else {
-                $scope.skillSummariesFinal.push(
-                  $scope.sortedSkillSummaries[idx]);
-              }
+          for (var idx in $scope.sortedSkillSummaries) {
+            if (idx < $scope.getCountOfSkillsToPrioritize()) {
+              $scope.skillSummariesInitial.push(
+                $scope.sortedSkillSummaries[idx]);
+            } else {
+              $scope.skillSummariesFinal.push(
+                $scope.sortedSkillSummaries[idx]);
             }
-          };
-        }
-      ]
-    };
-  }]);
+          }
+        };
+      }
+    ]
+  };
+}]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'select-skill'
+})
+export class SelectSkillDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('selectSkill', elementRef, injector);
+  }
+}

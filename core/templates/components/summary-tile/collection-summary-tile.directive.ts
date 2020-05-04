@@ -46,8 +46,7 @@ angular.module('oppia').directive('collectionSummaryTile', [
         isContainerNarrow: '&containerIsNarrow',
         isOwnedByCurrentUser: '&activityIsOwnedByCurrentUser',
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary-tile/collection-summary-tile.directive.html'),
+      template: require('./collection-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'DateTimeFormatService', 'UserService',
@@ -97,3 +96,14 @@ angular.module('oppia').directive('collectionSummaryTile', [
       ]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'collection-summary-tile'
+})
+export class CollectionSummaryTileDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('collectionSummaryTile', elementRef, injector);
+  }
+}

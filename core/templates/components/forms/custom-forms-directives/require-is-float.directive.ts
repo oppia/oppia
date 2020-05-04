@@ -40,3 +40,14 @@ angular.module('oppia').directive('requireIsFloat', [
     };
   }]);
 /* eslint-enable angular/directive-restrict */
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'require-is-float'
+})
+export class RequireIsFloatDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('requireIsFloat', elementRef, injector);
+  }
+}

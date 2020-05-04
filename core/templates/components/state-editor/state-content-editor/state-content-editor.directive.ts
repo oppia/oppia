@@ -29,102 +29,110 @@ require(
 require('services/context.service.ts');
 require('services/editability.service.ts');
 
-angular.module('oppia').directive('stateContentEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      link: function(scope, element) {
-        // This allows the scope to be retrievable during Karma unit testing.
-        // See http://stackoverflow.com/a/29833832 for more details.
-        element[0].getControllerScope = function() {
-          return scope;
+angular.module('oppia').directive('stateContentEditor', [function() {
+  return {
+    restrict: 'E',
+    link: function(scope, element) {
+      // This allows the scope to be retrievable during Karma unit testing.
+      // See http://stackoverflow.com/a/29833832 for more details.
+      element[0].getControllerScope = function() {
+        return scope;
+      };
+    },
+    scope: {
+      getStateContentPlaceholder: '&stateContentPlaceholder',
+      onSaveStateContent: '=',
+      showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
+    },
+    template: require('./state-content-editor.directive.html'),
+    controller: [
+      '$scope', 'ContextService', 'EditabilityService',
+      'EditorFirstTimeEventsService', 'StateContentService',
+      'StateEditorService',
+      function(
+          $scope, ContextService, EditabilityService,
+          EditorFirstTimeEventsService, StateContentService,
+          StateEditorService) {
+        var ctrl = this;
+        $scope.isCardHeightLimitReached = function() {
+          var shadowPreviewCard = $(
+            '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'
+          );
+          var height = shadowPreviewCard.height();
+          return (height > 630);
         };
-      },
-      scope: {
-        getStateContentPlaceholder: '&stateContentPlaceholder',
-        onSaveStateContent: '=',
-        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-editor/state-content-editor/' +
-        'state-content-editor.directive.html'),
-      controller: [
-        '$scope', 'ContextService', 'EditabilityService',
-        'EditorFirstTimeEventsService', 'StateContentService',
-        'StateEditorService',
-        function(
-            $scope, ContextService, EditabilityService,
-            EditorFirstTimeEventsService, StateContentService,
-            StateEditorService) {
-          var ctrl = this;
-          $scope.isCardHeightLimitReached = function() {
-            var shadowPreviewCard = $(
-              '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'
-            );
-            var height = shadowPreviewCard.height();
-            return (height > 630);
-          };
 
-          $scope.hideCardHeightLimitWarning = function() {
-            $scope.cardHeightLimitWarningIsShown = false;
-          };
+        $scope.hideCardHeightLimitWarning = function() {
+          $scope.cardHeightLimitWarningIsShown = false;
+        };
 
-          var saveContent = function() {
-            StateContentService.saveDisplayedValue();
-            $scope.onSaveStateContent(StateContentService.displayed);
-            $scope.contentEditorIsOpen = false;
-          };
+        var saveContent = function() {
+          StateContentService.saveDisplayedValue();
+          $scope.onSaveStateContent(StateContentService.displayed);
+          $scope.contentEditorIsOpen = false;
+        };
 
-          $scope.openStateContentEditor = function() {
-            if ($scope.isEditable()) {
-              EditorFirstTimeEventsService.registerFirstOpenContentBoxEvent();
-              $scope.contentEditorIsOpen = true;
-            }
-          };
+        $scope.openStateContentEditor = function() {
+          if ($scope.isEditable()) {
+            EditorFirstTimeEventsService.registerFirstOpenContentBoxEvent();
+            $scope.contentEditorIsOpen = true;
+          }
+        };
 
-          $scope.onSaveContentButtonClicked = function() {
-            EditorFirstTimeEventsService.registerFirstSaveContentEvent();
-            var savedContent = StateContentService.savedMemento;
-            var contentHasChanged = (
-              savedContent.getHtml() !==
+        $scope.onSaveContentButtonClicked = function() {
+          EditorFirstTimeEventsService.registerFirstSaveContentEvent();
+          var savedContent = StateContentService.savedMemento;
+          var contentHasChanged = (
+            savedContent.getHtml() !==
               StateContentService.displayed.getHtml());
-            if (contentHasChanged) {
-              var contentId = StateContentService.displayed.getContentId();
-              $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(contentId);
-            }
-            saveContent();
-          };
+          if (contentHasChanged) {
+            var contentId = StateContentService.displayed.getContentId();
+            $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(contentId);
+          }
+          saveContent();
+        };
 
-          $scope.cancelEdit = function() {
-            StateContentService.restoreFromMemento();
-            $scope.contentEditorIsOpen = false;
-          };
-          ctrl.$onInit = function() {
-            $scope.HTML_SCHEMA = {
-              type: 'html',
-              ui_config: {
-                hide_complex_extensions: (
-                  ContextService.getEntityType() === 'question')
-              }
-            };
-            $scope.contentId = null;
-            $scope.StateContentService = StateContentService;
-            if (StateContentService.displayed) {
-              $scope.contentId = StateContentService.displayed.getContentId();
+        $scope.cancelEdit = function() {
+          StateContentService.restoreFromMemento();
+          $scope.contentEditorIsOpen = false;
+        };
+        ctrl.$onInit = function() {
+          $scope.HTML_SCHEMA = {
+            type: 'html',
+            ui_config: {
+              hide_complex_extensions: (
+                ContextService.getEntityType() === 'question')
             }
-
-            $scope.contentEditorIsOpen = false;
-            $scope.isEditable = EditabilityService.isEditable;
-            $scope.cardHeightLimitWarningIsShown = true;
-            $scope.$on('externalSave', function() {
-              if ($scope.contentEditorIsOpen) {
-                saveContent();
-              }
-            });
-            StateEditorService.updateStateContentEditorInitialised();
           };
-        }
-      ]
-    };
-  }
+          $scope.contentId = null;
+          $scope.StateContentService = StateContentService;
+          if (StateContentService.displayed) {
+            $scope.contentId = StateContentService.displayed.getContentId();
+          }
+
+          $scope.contentEditorIsOpen = false;
+          $scope.isEditable = EditabilityService.isEditable;
+          $scope.cardHeightLimitWarningIsShown = true;
+          $scope.$on('externalSave', function() {
+            if ($scope.contentEditorIsOpen) {
+              saveContent();
+            }
+          });
+          StateEditorService.updateStateContentEditorInitialised();
+        };
+      }
+    ]
+  };
+}
 ]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'state-content-editor'
+})
+export class StateContentEditorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('stateContentEditor', elementRef, injector);
+  }
+}

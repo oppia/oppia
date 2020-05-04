@@ -21,21 +21,28 @@ require('services/nested-directives-recursion-timeout-prevention.service.ts');
 
 angular.module('oppia').directive('schemaBasedCustomViewer', [
   'NestedDirectivesRecursionTimeoutPreventionService',
-  'UrlInterpolationService',
   function(
-      NestedDirectivesRecursionTimeoutPreventionService,
-      UrlInterpolationService) {
+      NestedDirectivesRecursionTimeoutPreventionService) {
     return {
       scope: {
         localValue: '=',
         // The class of the object being edited.
         objType: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/' +
-        'schema-based-custom-viewer.directive.html'),
+      template: require('./schema-based-custom-viewer.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile
     };
   }
 ]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'schema-based-custom-viewer'
+})
+export class SchemaBasedCustomViewerDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('schemaBasedCustomViewer', elementRef, injector);
+  }
+}

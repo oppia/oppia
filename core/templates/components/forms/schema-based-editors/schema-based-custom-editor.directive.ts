@@ -38,3 +38,14 @@ angular.module('oppia').directive('schemaBasedCustomEditor', [
     };
   }
 ]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'schema-based-custom-editor'
+})
+export class SchemaBasedCustomEditorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('schemaBasedCustomEditor', elementRef, injector);
+  }
+}

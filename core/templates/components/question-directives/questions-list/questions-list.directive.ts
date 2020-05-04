@@ -64,9 +64,7 @@ angular.module('oppia').directive('questionsList', [
         getSelectedSkillId: '&selectedSkillId',
         getGroupedSkillSummaries: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/question-directives/questions-list/' +
-        'questions-list.directive.html'),
+      template: require('./questions-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
@@ -803,3 +801,14 @@ angular.module('oppia').directive('questionsList', [
       ]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'questions-list'
+})
+export class QuestionsListDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('questionsList', elementRef, injector);
+  }
+}

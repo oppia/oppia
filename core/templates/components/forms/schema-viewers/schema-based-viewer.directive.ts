@@ -31,18 +31,27 @@ require(
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('schemaBasedViewer', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        schema: '&',
-        localValue: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/schema-based-viewer.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }]);
+angular.module('oppia').directive('schemaBasedViewer', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {
+      schema: '&',
+      localValue: '='
+    },
+    template: require('./schema-based-viewer.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [function() {}]
+  };
+}]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'schema-based-viewer'
+})
+export class SchemaBasedViewerDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('schemaBasedViewer', elementRef, injector);
+  }
+}

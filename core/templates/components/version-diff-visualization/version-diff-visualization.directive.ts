@@ -58,9 +58,7 @@ angular.module('oppia').directive('versionDiffVisualization', [
         // to the later version of the exploration.
         getLaterVersionHeader: '&laterVersionHeader',
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/version-diff-visualization/' +
-        'version-diff-visualization.directive.html'),
+      template: require('./version-diff-visualization.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$uibModal', function($uibModal) {
         var ctrl = this;
@@ -340,3 +338,14 @@ angular.module('oppia').directive('versionDiffVisualization', [
       }]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'version-diff-visualization'
+})
+export class VersionDiffVisualizationDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('versionDiffVisualization', elementRef, injector);
+  }
+}

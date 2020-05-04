@@ -29,8 +29,7 @@ angular.module('oppia').directive('storySummaryTile', [
         getStoryTitle: '&title',
         getStoryDescription: '&description',
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary-tile/story-summary-tile.directive.html'),
+      template: require('./story-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: ['STORY_VIEWER_URL_TEMPLATE',
         function(STORY_VIEWER_URL_TEMPLATE) {
@@ -49,3 +48,14 @@ angular.module('oppia').directive('storySummaryTile', [
       ]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'story-summary-tile'
+})
+export class StorySummaryTileDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('storySummaryTile', elementRef, injector);
+  }
+}

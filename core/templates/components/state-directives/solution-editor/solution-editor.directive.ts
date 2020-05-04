@@ -40,12 +40,10 @@ angular.module('oppia').directive('solutionEditor', [
   'ExplorationHtmlFormatterService',
   'StateCustomizationArgsService',
   'StateInteractionIdService',
-  'UrlInterpolationService',
   function(
       ExplorationHtmlFormatterService,
       StateCustomizationArgsService,
-      StateInteractionIdService,
-      UrlInterpolationService) {
+      StateInteractionIdService) {
     return {
       restrict: 'E',
       scope: {},
@@ -56,9 +54,7 @@ angular.module('oppia').directive('solutionEditor', [
         onOpenSolutionEditor: '&',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/solution-editor/' +
-        'solution-editor.directive.html'),
+      template: require('./solution-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'StateSolutionService',
@@ -83,3 +79,14 @@ angular.module('oppia').directive('solutionEditor', [
     };
   }
 ]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'solution-editor'
+})
+export class SolutionEditorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('solutionEditor', elementRef, injector);
+  }
+}

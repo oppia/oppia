@@ -44,9 +44,7 @@ angular.module('oppia').directive('thumbnailUploader', [
         updateBgColor: '=',
         updateFilename: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/custom-forms-directives/' +
-        'thumbnail-uploader.directive.html'),
+      template: require('./thumbnail-uploader.directive.html'),
       controller: ['$rootScope', '$scope', '$uibModal',
         'AlertsService', 'ContextService', 'CsrfTokenService',
         'ImageUploadHelperService',
@@ -311,3 +309,14 @@ angular.module('oppia').directive('thumbnailUploader', [
     };
   }
 ]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'thumbnail-uploader'
+})
+export class ThumbnailUploaderDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('thumbnailUploader', elementRef, injector);
+  }
+}

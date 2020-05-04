@@ -31,3 +31,14 @@ angular.module('oppia').directive('schemaBasedBoolEditor', [
       controller: [function() {}]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'schema-based-bool-editor'
+})
+export class SchemaBasedBoolEditorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('schemaBasedBoolEditor', elementRef, injector);
+  }
+}

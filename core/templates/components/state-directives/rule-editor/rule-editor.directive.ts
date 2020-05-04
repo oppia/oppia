@@ -40,7 +40,7 @@ var DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 // respective 'onCancelRuleEdit' and 'onSaveRule' callbacks when called. These
 // buttons only show up if 'isEditingRuleInline' is true.
 angular.module('oppia').directive('ruleEditor', [
-  '$log', 'UrlInterpolationService', function($log, UrlInterpolationService) {
+  '$log', function($log) {
     return {
       restrict: 'E',
       scope: {},
@@ -51,8 +51,7 @@ angular.module('oppia').directive('ruleEditor', [
         onSaveRule: '&',
         rule: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/rule-editor/rule-editor.directive.html'),
+      template: require('./rule-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$timeout', 'StateEditorService',
@@ -274,3 +273,14 @@ angular.module('oppia').directive('ruleEditor', [
       ]
     };
   }]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'rule-editor'
+})
+export class RuleEditorDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('ruleEditor', elementRef, injector);
+  }
+}

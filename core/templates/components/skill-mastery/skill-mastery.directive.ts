@@ -19,61 +19,70 @@
 require('components/skills-mastery-list/skills-mastery-list.constants.ajs.ts');
 require('domain/skill/skill-mastery-backend-api.service.ts');
 
-angular.module('oppia').directive('skillMasteryViewer', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        skillId: '=',
-        masteryChange: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/skill-mastery/skill-mastery.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$scope', 'SkillMasteryBackendApiService',
-        'MASTERY_CUTOFF',
-        function(
-            $scope, SkillMasteryBackendApiService,
-            MASTERY_CUTOFF) {
-          var ctrl = this;
-          ctrl.getSkillMasteryPercentage = function() {
-            return Math.round(ctrl.skillMasteryDegree * 100);
-          };
+angular.module('oppia').directive('skillMasteryViewer', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {
+      skillId: '=',
+      masteryChange: '='
+    },
+    template: require('./skill-mastery.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      '$scope', 'SkillMasteryBackendApiService',
+      'MASTERY_CUTOFF',
+      function(
+          $scope, SkillMasteryBackendApiService,
+          MASTERY_CUTOFF) {
+        var ctrl = this;
+        ctrl.getSkillMasteryPercentage = function() {
+          return Math.round(ctrl.skillMasteryDegree * 100);
+        };
 
-          ctrl.getMasteryChangePercentage = function() {
-            if (ctrl.masteryChange >= 0) {
-              return '+' + Math.round(ctrl.masteryChange * 100);
-            } else {
-              return Math.round(ctrl.masteryChange * 100);
-            }
-          };
+        ctrl.getMasteryChangePercentage = function() {
+          if (ctrl.masteryChange >= 0) {
+            return '+' + Math.round(ctrl.masteryChange * 100);
+          } else {
+            return Math.round(ctrl.masteryChange * 100);
+          }
+        };
 
-          ctrl.getLearningTips = function() {
-            if (ctrl.masteryChange > 0) {
-              if (ctrl.skillMasteryDegree >= MASTERY_CUTOFF.GOOD_CUTOFF) {
-                return 'You have mastered this skill very well! ' +
+        ctrl.getLearningTips = function() {
+          if (ctrl.masteryChange > 0) {
+            if (ctrl.skillMasteryDegree >= MASTERY_CUTOFF.GOOD_CUTOFF) {
+              return 'You have mastered this skill very well! ' +
                   'You can work on other skills or learn new skills.';
-              } else {
-                return 'You have made progress! You can increase your ' +
-                  'mastery level by doing more practice sessions.';
-              }
             } else {
-              return 'Looks like your mastery of this skill has dropped. ' +
+              return 'You have made progress! You can increase your ' +
+                  'mastery level by doing more practice sessions.';
+            }
+          } else {
+            return 'Looks like your mastery of this skill has dropped. ' +
                   'To improve it, try reviewing the concept card below and ' +
                   'then practicing more questions for the skill.';
-            }
-          };
-          ctrl.$onInit = function() {
-            ctrl.skillMasteryDegree = 0.0;
+          }
+        };
+        ctrl.$onInit = function() {
+          ctrl.skillMasteryDegree = 0.0;
 
-            SkillMasteryBackendApiService.fetchSkillMasteryDegrees(
-              [ctrl.skillId]).then(function(degreesOfMastery) {
-              ctrl.skillMasteryDegree = degreesOfMastery[ctrl.skillId];
-            });
-          };
-        }
-      ]
-    };
-  }]);
+          SkillMasteryBackendApiService.fetchSkillMasteryDegrees(
+            [ctrl.skillId]).then(function(degreesOfMastery) {
+            ctrl.skillMasteryDegree = degreesOfMastery[ctrl.skillId];
+          });
+        };
+      }
+    ]
+  };
+}]);
+import { Directive, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'skill-mastery-viewer'
+})
+export class SkillMasteryViewerDirective extends UpgradeComponent {
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('skillMasteryViewer', elementRef, injector);
+  }
+}
