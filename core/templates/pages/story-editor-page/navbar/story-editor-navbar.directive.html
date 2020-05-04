@@ -46,7 +46,7 @@
     <button type="button" ng-click="unpublishStory()"
             ng-if="isStoryPublished()"
             class="btn btn-secondary protractor-test-unpublish-story-button"
-            ng-disabled="isStorySaveable() || getWarningsCount() > 0 || validationIssues.length > 0 || explorationValidationIssues.length > 0 || prepublishValidationIssues.length > 0">
+            ng-disabled="isStorySaveable()">
       Unpublish Story
     </button>
   </li>
