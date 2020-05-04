@@ -683,7 +683,7 @@ export class UpgradedServices {
 
     // Topological level: 7.
     upgradedServices['QuestionObjectFactory'] = new QuestionObjectFactory(
-      upgradedServices['StatesObjectFactory']);
+      upgradedServices['StateObjectFactory']);
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
       upgradedServices['StateObjectFactory']);
 
