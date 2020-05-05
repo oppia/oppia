@@ -81,7 +81,8 @@ var ProfilePage = function() {
   this.expectToHaveExplorationCards = function() {
     allExplorationCardElements.then(function(cards) {
       if (cards.length === 0) {
-        throw 'There is no exploration card on this profile';
+        throw new Error(
+          'There is no exploration card on this profile');
       }
       expect(cards.length).toBeGreaterThan(0);
     });
@@ -98,7 +99,8 @@ var ProfilePage = function() {
       });
 
     if (explorationsCardByName.length === 0) {
-      throw 'There is no exploration card with name ' + explorationName;
+      throw new Error(
+        'There is no exploration card with name ' + explorationName);
     }
     expect(explorationsCardByName.count()).toBeGreaterThanOrEqual(1);
   };
