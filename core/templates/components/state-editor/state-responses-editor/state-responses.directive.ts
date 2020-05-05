@@ -127,6 +127,10 @@ angular.module('oppia').directive('stateResponses', [function() {
           return existingContentIds;
         };
 
+        $scope.isInQuestionMode = function() {
+          return StateEditorService.isInQuestionMode();
+        };
+
         $scope.suppressDefaultAnswerGroupWarnings = function() {
           var interactionId = $scope.getCurrentInteractionId();
           var answerGroups = ResponsesService.getAnswerGroups();
@@ -674,14 +678,3 @@ angular.module('oppia').directive('stateResponses', [function() {
     ]
   };
 }]);
-import { Directive, ElementRef, Injector } from '@angular/core';
-import { UpgradeComponent } from '@angular/upgrade/static';
-
-@Directive({
-  selector: 'state-responses'
-})
-export class StateResponsesDirective extends UpgradeComponent {
-  constructor(elementRef: ElementRef, injector: Injector) {
-    super('stateResponses', elementRef, injector);
-  }
-}
