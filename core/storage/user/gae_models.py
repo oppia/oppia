@@ -108,6 +108,10 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_audio_language_code = ndb.StringProperty(
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
+    # When the user was created.
+    created_on = ndb.DateTimeProperty(default=None)
+    # When the user settings were last updated.
+    last_updated_on = ndb.DateTimeProperty(default=None)
 
     @staticmethod
     def get_deletion_policy():
