@@ -122,10 +122,9 @@ describe('Player transcript service', () => {
     pts.addNewInput('first answer', false);
     expect(() => {
       pts.addNewInput('invalid answer');
-    }).toThrow(
-      new Error(
-        'Trying to add an input before the response for the previous ' +
-        'input has been received.'));
+    }).toThrowError(
+      'Trying to add an input before the response for the previous ' +
+      'input has been received.');
 
     pts.addNewResponse('feedback');
     pts.addNewInput('second answer', true);

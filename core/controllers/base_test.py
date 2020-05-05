@@ -196,12 +196,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         self.delete_json('/library/data', expected_status_int=404)
 
-    def test_redirect_in_logged_out_states(self):
-        """Test for a redirect in logged out state on '/'."""
-
-        response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('splash', response.headers['location'])
-
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
 
@@ -373,7 +367,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             to a non-existent directory.
             """
             path = ''
-            if args[1] == 'Pillow-6.0.0':
+            if args[1] == 'Pillow-6.2.2':
                 return 'invalid_path'
             else:
                 path = '/'.join(args)
@@ -525,6 +519,11 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'https://oppiaserver.appspot.com/splash', expected_status_int=301)
         self.assertEqual(
             response.headers['Location'], 'https://oppiatestserver.appspot.com')
+
+    def test_splash_redirect(self):
+        # Tests that the old '/splash' URL is redirected to '/'.
+        response = self.get_html_response('/splash', expected_status_int=302)
+        self.assertEqual('http://localhost/', response.headers['location'])
 
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):

@@ -76,7 +76,7 @@ describe('Skill object factory', () => {
 
     rubricDict = {
       difficulty: skillDifficulties[0],
-      explanation: 'explanation'
+      explanations: ['explanation']
     };
 
     example1 = {
@@ -177,19 +177,21 @@ describe('Skill object factory', () => {
 
   it('should add/update a rubric given difficulty', () => {
     let skill = skillObjectFactory.createFromBackendDict(skillDict);
-    expect(skill.getRubrics()[0].getExplanation()).toEqual('explanation');
+    expect(skill.getRubrics()[0].getExplanations()).toEqual(['explanation']);
     expect(skill.getRubrics().length).toEqual(1);
 
-    skill.updateRubricForDifficulty(skillDifficulties[0], 'new explanation');
-    expect(skill.getRubrics()[0].getExplanation()).toEqual('new explanation');
+    skill.updateRubricForDifficulty(
+      skillDifficulties[0], ['new explanation 1', 'new explanation 2']);
+    expect(skill.getRubrics()[0].getExplanations()).toEqual([
+      'new explanation 1', 'new explanation 2']);
 
-    skill.updateRubricForDifficulty(skillDifficulties[1], 'explanation 2');
+    skill.updateRubricForDifficulty(skillDifficulties[1], ['explanation 2']);
     expect(skill.getRubrics().length).toEqual(2);
-    expect(skill.getRubrics()[1].getExplanation()).toEqual('explanation 2');
+    expect(skill.getRubrics()[1].getExplanations()).toEqual(['explanation 2']);
 
     expect(() => {
-      skill.updateRubricForDifficulty('invalid difficulty', 'explanation 2');
-    }).toThrow();
+      skill.updateRubricForDifficulty('invalid difficulty', ['explanation 2']);
+    }).toThrowError('Invalid difficulty value passed');
   });
 
   it('should get the correct next misconception id', () => {
