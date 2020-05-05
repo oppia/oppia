@@ -2,7 +2,7 @@ name: Lighthouse CI tests
 on: [push]
 
 jobs:
-  lint:
+  lighthouse:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
