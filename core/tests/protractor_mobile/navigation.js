@@ -88,7 +88,7 @@ describe('Navigation features on mobile', function() {
       expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/teach');
     });
 
-    it('should navigate to Welcome Guide Page with Oppia page using the sidebar menu',
+  it('should navigate to Welcome Guide with Oppia page using the sidebar menu',
     function() {
       var navbarButton = element(
         by.css('.protractor-mobile-test-navbar-button'));
