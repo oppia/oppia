@@ -18,6 +18,9 @@
 
 require('directives/angular-html-bind.directive.ts');
 require(
+  'components/question-difficulty-selector/' +
+  'question-difficulty-selector.directive.ts');
+require(
   'components/question-directives/question-editor/' +
   'question-editor.directive.ts');
 require(
@@ -496,6 +499,10 @@ angular.module('oppia').directive('questionsList', [
                     });
                 }
               }
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -673,6 +680,10 @@ angular.module('oppia').directive('questionsList', [
                       modalInstance.result.then(function(commitMessage) {
                         returnModalObject.commitMessage = commitMessage;
                         $uibModalInstance.close(returnModalObject);
+                      }, function() {
+                        // Note to developers:
+                        // This callback is triggered when the Cancel button is
+                        // clicked. No further action is needed.
                       });
                     } else {
                       $uibModalInstance.close(returnModalObject);
@@ -729,6 +740,10 @@ angular.module('oppia').directive('questionsList', [
                       });
                       modalInstance.result.then(function() {
                         $uibModalInstance.dismiss('cancel');
+                      }, function() {
+                        // Note to developers:
+                        // This callback is triggered when the Cancel button is
+                        // clicked. No further action is needed.
                       });
                     } else {
                       $uibModalInstance.dismiss('cancel');

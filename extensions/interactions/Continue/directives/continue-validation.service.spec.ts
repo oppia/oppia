@@ -85,7 +85,7 @@ describe('ContinueValidationService', () => {
       expect(() => {
         validatorService.getAllWarnings(
           currentState, {}, [], goodDefaultOutcome);
-      }).toThrow(
+      }).toThrowError(
         'Expected customization arguments to have property: buttonText');
     });
 

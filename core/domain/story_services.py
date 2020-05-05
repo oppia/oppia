@@ -66,6 +66,8 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         id=story.id,
         description=story.description,
         title=story.title,
+        thumbnail_bg_color=story.thumbnail_bg_color,
+        thumbnail_filename=story.thumbnail_filename,
         language_code=story.language_code,
         story_contents_schema_version=story.story_contents_schema_version,
         notes=story.notes,
@@ -132,6 +134,14 @@ def apply_change_list(story_id, change_list):
                       story_domain.STORY_NODE_PROPERTY_TITLE):
                     story.update_node_title(change.node_id, change.new_value)
                 elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME):
+                    story.update_node_thumbnail_filename(
+                        change.node_id, change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR):
+                    story.update_node_thumbnail_bg_color(
+                        change.node_id, change.new_value)
+                elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):
                     story.update_node_acquired_skill_ids(
                         change.node_id, change.new_value)
@@ -151,6 +161,12 @@ def apply_change_list(story_id, change_list):
                 if (change.property_name ==
                         story_domain.STORY_PROPERTY_TITLE):
                     story.update_title(change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME):
+                    story.update_thumbnail_filename(change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR):
+                    story.update_thumbnail_bg_color(change.new_value)
                 elif (change.property_name ==
                       story_domain.STORY_PROPERTY_DESCRIPTION):
                     story.update_description(change.new_value)
@@ -342,11 +358,37 @@ def _save_story(committer_id, story, commit_message, change_list):
             'Unexpected error: received an invalid change list when trying to '
             'save story %s: %s' % (story.id, change_list))
 
+    topic = topic_fetchers.get_topic_by_id(
+        story.corresponding_topic_id, strict=False)
+    if topic is None:
+        raise utils.ValidationError(
+            'Expected story to only belong to a valid topic, but found no '
+            'topic with ID: %s' % story.corresponding_topic_id)
+
+    story_is_published = False
+    story_is_present_in_topic = False
+    for story_reference in topic.get_all_story_references():
+        if story_reference.story_id == story.id:
+            story_is_present_in_topic = True
+            story_is_published = story_reference.story_is_published
+    if not story_is_present_in_topic:
+        raise Exception(
+            'Expected story to belong to the topic %s, but it is '
+            'neither a part of the canonical stories or the additional '
+            'stories of the topic.' % story.corresponding_topic_id)
+
     story.validate()
-    exp_ids = [
-        node.exploration_id for node in story.story_contents.nodes
-        if node.exploration_id is not None]
-    validate_explorations_for_story(exp_ids, True)
+
+    if story_is_published:
+        exp_ids = []
+        for node in story.story_contents.nodes:
+            if not node.exploration_id:
+                raise Exception(
+                    'Story node with id %s does not contain an '
+                    'exploration id.' % node.id)
+            exp_ids.append(node.exploration_id)
+
+        validate_explorations_for_story(exp_ids, True)
 
     # Story model cannot be None as story is passed as parameter here and that
     # is only possible if a story model with that story id exists. Also this is
@@ -364,23 +406,10 @@ def _save_story(committer_id, story, commit_message, change_list):
             'which is too old. Please reload the page and try again.'
             % (story_model.version, story.version))
 
-    topic = topic_fetchers.get_topic_by_id(
-        story.corresponding_topic_id, strict=False)
-    if topic is None:
-        raise utils.ValidationError(
-            'Expected story to only belong to a valid topic, but found an '
-            'topic with ID: %s' % story.corresponding_topic_id)
-
-    canonical_story_ids = topic.get_canonical_story_ids()
-    additional_story_ids = topic.get_additional_story_ids()
-    if story.id not in canonical_story_ids + additional_story_ids:
-        raise Exception(
-            'Expected story to belong to the topic %s, but it is '
-            'neither a part of the canonical stories or the additional stories '
-            'of the topic.' % story.corresponding_topic_id)
-
     story_model.description = story.description
     story_model.title = story.title
+    story_model.thumbnail_bg_color = story.thumbnail_bg_color
+    story_model.thumbnail_filename = story.thumbnail_filename
     story_model.notes = story.notes
     story_model.language_code = story.language_code
     story_model.story_contents_schema_version = (

@@ -41,25 +41,25 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
         'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         'EVENT_TYPE_SKILL_CREATION_ENABLED', 'EditableTopicBackendApiService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
-        'SKILL_DIFFICULTIES',
+        'SKILL_DIFFICULTIES', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
+        'SKILL_DESCRIPTION_STATUS_VALUES',
         function(
             $scope, $rootScope, $uibModal, TopicCreationService,
             RubricObjectFactory, SkillCreationService,
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
             EVENT_TYPE_SKILL_CREATION_ENABLED, EditableTopicBackendApiService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-            SKILL_DIFFICULTIES) {
+            SKILL_DIFFICULTIES, MAX_CHARS_IN_SKILL_DESCRIPTION,
+            SKILL_DESCRIPTION_STATUS_VALUES) {
           var ctrl = this;
           $scope.createTopic = function() {
             TopicCreationService.createNewTopic();
           };
           $scope.createSkill = function() {
-            var rubrics = [];
-            for (var idx in SKILL_DIFFICULTIES) {
-              rubrics.push(
-                RubricObjectFactory.create(SKILL_DIFFICULTIES[idx], '')
-              );
-            }
+            var rubrics = [
+              RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
+              RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
+              RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
@@ -68,6 +68,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
+                  $scope.MAX_CHARS_IN_SKILL_DESCRIPTION = (
+                    MAX_CHARS_IN_SKILL_DESCRIPTION);
                   $scope.newSkillDescription = '';
                   $scope.rubrics = rubrics;
                   $scope.bindableDict = {
@@ -76,8 +78,18 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                   var newExplanationObject = null;
 
                   $scope.$watch('newSkillDescription', function() {
-                    $scope.rubrics[1].setExplanation(
-                      '<p>' + $scope.newSkillDescription + '</p>');
+                    if (
+                      SkillCreationService.getSkillDescriptionStatus() !==
+                      SKILL_DESCRIPTION_STATUS_VALUES.STATUS_DISABLED) {
+                      var initParagraph = document.createElement('p');
+                      var explanations = $scope.rubrics[1].getExplanations();
+                      var newExplanation = document.createTextNode(
+                        $scope.newSkillDescription);
+                      initParagraph.appendChild(newExplanation);
+                      explanations[0] = initParagraph.outerHTML;
+                      $scope.rubrics[1].setExplanations(explanations);
+                      SkillCreationService.markChangeInSkillDescription();
+                    }
                   });
 
                   $scope.onSaveExplanation = function(explanationObject) {
@@ -86,10 +98,10 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                       explanationObject.getHtml();
                   };
 
-                  $scope.onSaveRubric = function(difficulty, explanation) {
+                  $scope.onSaveRubric = function(difficulty, explanations) {
                     for (var idx in $scope.rubrics) {
                       if ($scope.rubrics[idx].getDifficulty() === difficulty) {
-                        $scope.rubrics[idx].setExplanation(explanation);
+                        $scope.rubrics[idx].setExplanations(explanations);
                       }
                     }
                   };
@@ -103,6 +115,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                   };
 
                   $scope.cancel = function() {
+                    SkillCreationService.resetSkillDescriptionStatusMarker();
                     $uibModalInstance.dismiss('cancel');
                   };
                 }

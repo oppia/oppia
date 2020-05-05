@@ -48,6 +48,7 @@ describe('Classroom backend API service', function() {
       uncategorized_skill_count: 3
     }]
   };
+
   let sampleDataResultsObjects = null;
 
   beforeEach(() => {
@@ -88,6 +89,47 @@ describe('Classroom backend API service', function() {
 
       flushMicrotasks();
 
+      expect(successHandler).toHaveBeenCalledWith(
+        sampleDataResultsObjects.topic_summary_objects);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should use the fail handler for requests that cannot be processed',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      classroomBackendApiService.fetchClassroomData('0').then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/classroom_data_handler/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Invalid request', {
+        status: 400,
+        statusText: 'Invalid request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
+
+  it('should work with successCallback set to a function',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      classroomBackendApiService.fetchClassroomData('0').then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/classroom_data_handler/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(responseDictionaries);
+      flushMicrotasks();
       expect(successHandler).toHaveBeenCalledWith(
         sampleDataResultsObjects.topic_summary_objects);
       expect(failHandler).not.toHaveBeenCalled();

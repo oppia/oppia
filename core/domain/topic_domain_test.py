@@ -40,7 +40,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'Name', 'abbrev')
         self.topic.subtopics = [
-            topic_domain.Subtopic(1, 'Title', ['skill_id_1'])]
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])]
         self.topic.next_subtopic_id = 2
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
@@ -58,6 +60,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'name': 'Name',
             'abbreviated_name': 'abbrev',
             'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
             'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
             'canonical_story_references': [],
             'additional_story_references': [],
@@ -86,12 +89,15 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_subtopics(self):
         self.topic.subtopics = [topic_domain.Subtopic(
-            1, 'Title', ['skill_id_1'])]
+            1, 'Title', ['skill_id_1'], 'image.svg',
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])]
         subtopics = self.topic.get_all_subtopics()
         self.assertEqual(
             subtopics, [{
                 'skill_ids': ['skill_id_1'],
                 'id': 1,
+                'thumbnail_filename': 'image.svg',
+                'thumbnail_bg_color': '#FFFFFF',
                 'title': 'Title'}])
 
     def test_delete_canonical_story(self):
@@ -211,29 +217,46 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             topic_domain.Topic.require_valid_abbreviated_name(name)
 
+    def _assert_valid_thumbnail_filename_for_topic(
+            self, expected_error_substring, thumbnail_filename):
+        """Checks that topic passes validation for thumbnail filename."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            topic_domain.Topic.require_valid_thumbnail_filename(
+                thumbnail_filename)
+
+    def _assert_valid_thumbnail_filename_for_subtopic(
+            self, expected_error_substring, thumbnail_filename):
+        """Checks that subtopic passes validation for thumbnail filename."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            topic_domain.Subtopic.require_valid_thumbnail_filename(
+                thumbnail_filename)
+
     def test_valid_topic_id(self):
         self._assert_valid_topic_id('Topic id should be a string', 10)
         self._assert_valid_topic_id('Topic id abc is invalid', 'abc')
 
-    def test_valid_abbreviated_name(self):
-        self._assert_valid_abbreviated_name(
-            'Abbreviated name should be a string.', 10)
-        self._assert_valid_abbreviated_name(
-            'Abbreviated name field should not be empty.', '')
-        self._assert_valid_abbreviated_name(
-            'Abbreviated name field should not exceed 12 characters.',
-            'this is a lengthy name.')
-
-    def test_thumbnail_filename_validation(self):
-        self.topic.thumbnail_filename = 1
-        self._assert_validation_error(
-            'Expected thumbnail filename to be a string, received 1')
-        self.topic.thumbnail_filename = None
-        self._assert_strict_validation_error(
-            'Expected thumbnail filename to be a string, received None')
+    def test_thumbnail_filename_validation_for_topic(self):
+        self._assert_valid_thumbnail_filename_for_topic(
+            'Expected thumbnail filename to be a string, received 10', 10)
+        self._assert_valid_thumbnail_filename_for_topic(
+            'Thumbnail filename should not start with a dot.', '.name')
+        self._assert_valid_thumbnail_filename_for_topic(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file/name')
+        self._assert_valid_thumbnail_filename_for_topic(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file..name')
+        self._assert_valid_thumbnail_filename_for_topic(
+            'Thumbnail filename should include an extension.', 'name')
+        self._assert_valid_thumbnail_filename_for_topic(
+            'Expected a filename ending in svg, received name.jpg', 'name.jpg')
 
     def test_subtopic_strict_validation(self):
-        self.topic.thumbnail_filename = 'filename'
+        self.topic.thumbnail_filename = 'filename.svg'
+        self.topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.subtopics[0].skill_ids = []
         self._assert_strict_validation_error(
             'Subtopic with title Title does not have any skills linked')
@@ -241,6 +264,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_subtopic_title_validation(self):
         self.topic.subtopics[0].title = 1
         self._assert_validation_error('Expected subtopic title to be a string')
+
+        self.topic.subtopics[0].title = (
+            'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefgh'
+            'ijklmnopqrstuvwxyz')
+        self._assert_validation_error(
+            'Expected subtopic title to be less than 64 characters')
 
     def test_story_id_validation(self):
         self.topic.canonical_story_references = [
@@ -258,6 +287,59 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_subtopic_id_validation(self):
         self.topic.subtopics[0].id = 'invalid_id'
         self._assert_validation_error('Expected subtopic id to be an int')
+
+    def test_thumbnail_filename_validation_for_subtopic(self):
+        self._assert_valid_thumbnail_filename_for_subtopic(
+            'Expected thumbnail filename to be a string, received 10', 10)
+        self._assert_valid_thumbnail_filename_for_subtopic(
+            'Thumbnail filename should not start with a dot.', '.name')
+        self._assert_valid_thumbnail_filename_for_subtopic(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file/name')
+        self._assert_valid_thumbnail_filename_for_subtopic(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file..name')
+        self._assert_valid_thumbnail_filename_for_subtopic(
+            'Thumbnail filename should include an extension.', 'name')
+        self._assert_valid_thumbnail_filename_for_subtopic(
+            'Expected a filename ending in svg, received name.jpg', 'name.jpg')
+
+    def test_topic_thumbnail_filename_in_strict_mode(self):
+        self.topic.thumbnail_bg_color = None
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected thumbnail filename to be a string, received None.'):
+            self.topic.validate(strict=True)
+
+    def test_topic_thumbnail_bg_validation(self):
+        self.topic.thumbnail_bg_color = '#FFFFFF'
+        self._assert_validation_error(
+            'Topic thumbnail background color #FFFFFF is not supported.')
+
+    def test_topic_thumbnail_filename_or_thumbnail_bg_color_is_none(self):
+        self.topic.thumbnail_bg_color = '#C6DCDA'
+        self.topic.thumbnail_filename = None
+        self._assert_validation_error(
+            'Topic thumbnail image is not provided.')
+        self.topic.thumbnail_bg_color = None
+        self.topic.thumbnail_filename = 'test.svg'
+        self._assert_validation_error(
+            'Topic thumbnail background color is not specified.')
+
+    def test_subtopic_thumbnail_bg_validation(self):
+        self.topic.subtopics[0].thumbnail_bg_color = '#CACACA'
+        self._assert_validation_error(
+            'Subtopic thumbnail background color #CACACA is not supported.')
+
+    def test_subtopic_thumbnail_filename_or_thumbnail_bg_color_is_none(self):
+        self.topic.subtopics[0].thumbnail_bg_color = '#FFFFFF'
+        self.topic.subtopics[0].thumbnail_filename = None
+        self._assert_validation_error(
+            'Subtopic thumbnail image is not provided.')
+        self.topic.subtopics[0].thumbnail_bg_color = None
+        self.topic.subtopics[0].thumbnail_filename = 'test.svg'
+        self._assert_validation_error(
+            'Subtopic thumbnail background color is not specified.')
 
     def test_subtopic_skill_ids_validation(self):
         self.topic.subtopics[0].skill_ids = 'abc'
@@ -279,7 +361,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Name field should not be empty')
         self.topic.name = 'Very long and therefore invalid topic name'
         self._assert_validation_error(
-            'Topic name should be at most 35 characters')
+            'Topic name should be at most 39 characters')
 
     def test_subtopic_schema_version_type_validation(self):
         self.topic.subtopic_schema_version = 'invalid_version'
@@ -384,7 +466,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_add_uncategorized_skill_id(self):
         self.topic.subtopics.append(
-            topic_domain.Subtopic('id_2', 'Title2', ['skill_id_2']))
+            topic_domain.Subtopic(
+                'id_2', 'Title2', ['skill_id_2'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]))
         with self.assertRaisesRegexp(
             Exception,
             'The skill id skill_id_1 already exists in subtopic with id 1'):
@@ -470,8 +554,13 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_thumbnail_filename(self):
         self.assertEqual(self.topic.thumbnail_filename, None)
-        self.topic.update_thumbnail_filename('img.png')
-        self.assertEqual(self.topic.thumbnail_filename, 'img.png')
+        self.topic.update_thumbnail_filename('img.svg')
+        self.assertEqual(self.topic.thumbnail_filename, 'img.svg')
+
+    def test_update_thumbnail_bg_color(self):
+        self.assertEqual(self.topic.thumbnail_bg_color, None)
+        self.topic.update_thumbnail_bg_color('#C6DCDA')
+        self.assertEqual(self.topic.thumbnail_bg_color, '#C6DCDA')
 
     def test_cannot_add_uncategorized_skill_with_existing_uncategorized_skill(
             self):
@@ -499,6 +588,33 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.update_subtopic_title(1, 'new title')
         self.assertEqual(self.topic.subtopics[0].title, 'new title')
 
+    def test_update_subtopic_thumbnail_filename(self):
+        self.assertEqual(len(self.topic.subtopics), 1)
+        self.assertEqual(
+            self.topic.subtopics[0].thumbnail_filename, 'image.svg')
+        self.topic.update_subtopic_thumbnail_filename(1, 'new_image.svg')
+        self.assertEqual(
+            self.topic.subtopics[0].thumbnail_filename, 'new_image.svg')
+
+        with self.assertRaisesRegexp(
+            Exception, 'The subtopic with id invalid_id does not exist.'):
+            self.topic.update_subtopic_thumbnail_filename(
+                'invalid_id', 'new title')
+
+    def test_update_subtopic_thumbnail_bg_color(self):
+        self.assertEqual(len(self.topic.subtopics), 1)
+        self.topic.subtopics[0].thumbnail_bg_color = None
+        self.assertEqual(
+            self.topic.subtopics[0].thumbnail_bg_color, None)
+        self.topic.update_subtopic_thumbnail_bg_color(1, '#FFFFFF')
+        self.assertEqual(
+            self.topic.subtopics[0].thumbnail_bg_color, '#FFFFFF')
+
+        with self.assertRaisesRegexp(
+            Exception, 'The subtopic with id invalid_id does not exist.'):
+            self.topic.update_subtopic_thumbnail_bg_color(
+                'invalid_id', '#FFFFFF')
+
     def test_cannot_remove_skill_id_from_subtopic_with_invalid_subtopic_id(
             self):
         with self.assertRaisesRegexp(
@@ -513,8 +629,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_move_existing_skill_to_subtopic(self):
         self.topic.subtopics = [
-            topic_domain.Subtopic(1, 'Title', ['skill_id_1']),
-            topic_domain.Subtopic(2, 'Another title', ['skill_id_1'])]
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]),
+            topic_domain.Subtopic(
+                2, 'Another title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])]
         with self.assertRaisesRegexp(
             Exception,
             'Skill id skill_id_1 is already present in the target subtopic'):
@@ -808,6 +928,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         self.topic_summary_dict = {
             'id': 'topic_id',
             'name': 'name',
+            'description': 'topic description',
             'language_code': 'en',
             'version': 1,
             'canonical_story_count': 1,
@@ -820,8 +941,8 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         }
 
         self.topic_summary = topic_domain.TopicSummary(
-            'topic_id', 'name', 'name', 'en', 1, 1, 1, 1, 1, 1,
-            current_time, current_time)
+            'topic_id', 'name', 'name', 'en', 'topic description', 1, 1, 1, 1,
+            1, 1, current_time, current_time)
 
     def test_topic_summary_gets_created(self):
         self.assertEqual(
@@ -840,6 +961,13 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         self.topic_summary.name = ''
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Name field should not be empty'):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_invalid_description(self):
+        self.topic_summary.description = 3
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected description to be a string, received 3'):
             self.topic_summary.validate()
 
     def test_validation_fails_with_invalid_canonical_name(self):

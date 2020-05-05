@@ -42,6 +42,7 @@ export class Topic {
   _version: number;
   _subtopics: Array<Subtopic>;
   _thumbnailFilename: string;
+  _thumbnailBgColor: string;
   skillSummaryObjectFactory: SkillSummaryObjectFactory;
   subtopicObjectFactory: SubtopicObjectFactory;
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
@@ -52,6 +53,7 @@ export class Topic {
       uncategorizedSkillIds: Array<string>,
       nextSubtopicId: number, version: number, subtopics: Array<Subtopic>,
       thumbnailFilename: string,
+      thumbnailBgColor: string,
       // TODO(#7165): Replace any with exact type.
       skillIdToDescriptionMap: any,
       skillSummaryObjectFactory: SkillSummaryObjectFactory,
@@ -74,6 +76,7 @@ export class Topic {
     this._version = version;
     this._subtopics = cloneDeep(subtopics);
     this._thumbnailFilename = thumbnailFilename;
+    this._thumbnailBgColor = thumbnailBgColor;
     this.subtopicObjectFactory = subtopicObjectFactory;
     this.storyReferenceObjectFactory = storyReferenceObjectFactory;
   }
@@ -107,6 +110,14 @@ export class Topic {
     return this._thumbnailFilename;
   }
 
+  setThumbnailBgColor(thumbnailBgColor: string): void {
+    this._thumbnailBgColor = thumbnailBgColor;
+  }
+
+  getThumbnailBgColor(): string {
+    return this._thumbnailBgColor;
+  }
+
   getDescription(): string {
     return this._description;
   }
@@ -135,10 +146,6 @@ export class Topic {
     let issues = [];
     if (this._name === '') {
       issues.push('Topic name should not be empty.');
-    }
-
-    if (!this._abbreviatedName) {
-      issues.push('Abbreviated name should not be empty.');
     }
 
     let subtopics = this._subtopics;
@@ -267,7 +274,7 @@ export class Topic {
       }
     }
     if (!subtopicDeleted) {
-      throw Error('Subtopic to delete does not exist');
+      throw new Error('Subtopic to delete does not exist');
     }
     if (isNewlyCreated) {
       for (let i = 0; i < this._subtopics.length; i++) {
@@ -300,7 +307,7 @@ export class Topic {
   addCanonicalStory(storyId: string): void {
     let canonicalStoryIds = this.getCanonicalStoryIds();
     if (canonicalStoryIds.indexOf(storyId) !== -1) {
-      throw Error(
+      throw new Error(
         'Given story id already present in canonical story ids.');
     }
     this._canonicalStoryReferences.push(
@@ -311,7 +318,7 @@ export class Topic {
     let canonicalStoryIds = this.getCanonicalStoryIds();
     let index = canonicalStoryIds.indexOf(storyId);
     if (index === -1) {
-      throw Error(
+      throw new Error(
         'Given story id not present in canonical story ids.');
     }
     this._canonicalStoryReferences.splice(index, 1);
@@ -334,7 +341,7 @@ export class Topic {
   addAdditionalStory(storyId: string): void {
     let additionalStoryIds = this.getAdditionalStoryIds();
     if (additionalStoryIds.indexOf(storyId) !== -1) {
-      throw Error(
+      throw new Error(
         'Given story id already present in additional story ids.');
     }
     this._additionalStoryReferences.push(
@@ -345,7 +352,7 @@ export class Topic {
     let additionalStoryIds = this.getAdditionalStoryIds();
     let index = additionalStoryIds.indexOf(storyId);
     if (index === -1) {
-      throw Error(
+      throw new Error(
         'Given story id not present in additional story ids.');
     }
     this._additionalStoryReferences.splice(index, 1);
@@ -372,10 +379,10 @@ export class Topic {
       }
     }
     if (skillIsPresentInSomeSubtopic) {
-      throw Error('Given skillId is already present in a subtopic.');
+      throw new Error('Given skillId is already present in a subtopic.');
     }
     if (this.hasUncategorizedSkill(skillId)) {
-      throw Error('Given skillId is already an uncategorized skill.');
+      throw new Error('Given skillId is already an uncategorized skill.');
     }
     this._uncategorizedSkillSummaries.push(
       this.skillSummaryObjectFactory.create(skillId, skillDescription));
@@ -387,7 +394,7 @@ export class Topic {
         return skillSummary.getId();
       }).indexOf(skillId);
     if (index === -1) {
-      throw Error('Given skillId is not an uncategorized skill.');
+      throw new Error('Given skillId is not an uncategorized skill.');
     }
     this._uncategorizedSkillSummaries.splice(index, 1);
   }
@@ -408,6 +415,7 @@ export class Topic {
     this.setName(otherTopic.getName());
     this.setAbbreviatedName(otherTopic.getAbbreviatedName());
     this.setThumbnailFilename(otherTopic.getThumbnailFilename());
+    this.setThumbnailBgColor(otherTopic.getThumbnailBgColor());
     this.setDescription(otherTopic.getDescription());
     this.setLanguageCode(otherTopic.getLanguageCode());
     this._version = otherTopic.getVersion();
@@ -467,6 +475,7 @@ export class TopicObjectFactory {
       topicBackendDict.uncategorized_skill_ids,
       topicBackendDict.next_subtopic_id, topicBackendDict.version,
       subtopics, topicBackendDict.thumbnail_filename,
+      topicBackendDict.thumbnail_bg_color,
       skillIdToDescriptionDict, this.skillSummaryObjectFactory,
       this.subtopicObjectFactory, this.storyReferenceObjectFactory
     );
@@ -477,7 +486,7 @@ export class TopicObjectFactory {
   createInterstitialTopic(): Topic {
     return new Topic(
       null, 'Topic name loading', 'Topic abbreviated name loading',
-      'Topic description loading', 'en', [], [], [], 1, 1, [], '', {},
+      'Topic description loading', 'en', [], [], [], 1, 1, [], '', '', {},
       this.skillSummaryObjectFactory, this.subtopicObjectFactory,
       this.storyReferenceObjectFactory
     );

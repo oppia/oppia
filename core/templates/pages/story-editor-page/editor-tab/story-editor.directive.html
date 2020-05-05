@@ -1,12 +1,28 @@
 <div role="form" class="form-horizontal">
   <md-card class="oppia-page-card oppia-long-text">
+    <div class="story-thumbnail">
+      <label class="form-heading">Story Thumbnail</label>
+      <thumbnail-uploader filename="story.getThumbnailFilename()"
+                          update-filename="updateStoryThumbnailFilename"
+                          bg-color="story.getThumbnailBgColor()"
+                          update-bg-color="updateStoryThumbnailBgColor"
+                          allowed-bg-colors="allowedBgColors"
+                          aspect-ratio="'4:3'"
+                          preview-title="editableTitle"
+                          preview-description="editableDescription"
+                          preview-description-bg-color=""
+                          preview-footer="">
+      </thumbnail-uploader>
+    </div>
     <div class="story-title">
       <label for="storyTitle" class="form-heading">Story Title</label>
       <input id="storyTitle" type="text" class="form-control protractor-test-story-title-field"
              ng-model="editableTitle" ng-blur="updateStoryTitle(editableTitle)"
-             placeholder="Enter a title for the story." maxlength="20" ng-trim="false">
-      <span class="form-text" style="font-size: smaller; color: red;" ng-if="editableTitle.length === 20">
-        <em>Please use at most 20 characters for the story title.</em>
+             placeholder="Enter a title for the story." maxlength="<[MAX_CHARS_IN_STORY_TITLE]>" ng-trim="false">
+      <span class="oppia-input-box-subtitle">
+        <i>
+          Story title should be at most <[MAX_CHARS_IN_STORY_TITLE]> characters.
+        </i>
       </span>
     </div>
 
@@ -119,6 +135,8 @@
         <div ng-repeat="node in nodes">
           <story-node-editor ng-if="node.getId() === idOfNodeToEdit"
                              node-id="node.getId()"
+                             thumbnail-filename="node.getThumbnailFilename()"
+                             thumbnail-bg-color="node.getThumbnailBgColor()"
                              outline="node.getOutline()"
                              exploration-id="node.getExplorationId()"
                              outline-finalized="node.getOutlineStatus()"
@@ -189,7 +207,9 @@
 
   story-editor .story-editor-node-title {
     color: blue;
+    max-height: 5em;
     padding: 16px 16px 20px 16px;
+    overflow-wrap: break-word;
   }
 
   story-editor .story-nodes-container {

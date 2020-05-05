@@ -62,11 +62,11 @@ describe('Topic rights object factory', () => {
 
     expect(() => {
       exampleTopicRights.markTopicAsPublished();
-    }).toThrow(new Error('User is not allowed to publish this topic.'));
+    }).toThrowError('User is not allowed to publish this topic.');
 
     expect(() => {
       exampleTopicRights.markTopicAsUnpublished();
-    }).toThrow(new Error('User is not allowed to unpublish this topic.'));
+    }).toThrowError('User is not allowed to unpublish this topic.');
   });
 
   it('should create an empty topic rights object', () => {

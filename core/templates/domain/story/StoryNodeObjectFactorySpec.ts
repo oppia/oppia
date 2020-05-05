@@ -29,6 +29,7 @@ describe('Story node object factory', () => {
 
     var sampleStoryNodeBackendDict = {
       id: 'node_1',
+      thumbnail_filename: 'image.png',
       title: 'Title 1',
       prerequisite_skill_ids: ['skill_1'],
       acquired_skill_ids: ['skill_2'],
@@ -45,6 +46,7 @@ describe('Story node object factory', () => {
     var storyNode = storyNodeObjectFactory.createFromIdAndTitle(
       'node_1', 'Title 1');
     expect(storyNode.getId()).toEqual('node_1');
+    expect(storyNode.getThumbnailFilename()).toEqual(null);
     expect(storyNode.getTitle()).toEqual('Title 1');
     expect(storyNode.getDestinationNodeIds()).toEqual([]);
     expect(storyNode.getPrerequisiteSkillIds()).toEqual([]);
@@ -58,13 +60,19 @@ describe('Story node object factory', () => {
     expect(_sampleStoryNode.validate()).toEqual([]);
   });
 
+  it('should correctly perform prepublish validation for a story node', () => {
+    expect(_sampleStoryNode.prepublishValidate()).toEqual([]);
+    _sampleStoryNode.setThumbnailFilename('');
+    expect(_sampleStoryNode.prepublishValidate()).toEqual([
+      'Chapter Title 1 should have a thumbnail.']);
+  });
+
   it('should correctly validate story nodes', () => {
     _sampleStoryNode.addPrerequisiteSkillId('skill_2');
     _sampleStoryNode.addDestinationNodeId('node_1');
     _sampleStoryNode.setExplorationId('');
 
     expect(_sampleStoryNode.validate()).toEqual([
-      'Exploration ID fields should not be empty, once edited.',
       'The skill with id skill_2 is common to both the acquired and' +
       ' prerequisite skill id list in node with id node_1',
       'The destination node id of node with id node_1 points to itself.'
@@ -75,25 +83,25 @@ describe('Story node object factory', () => {
     () => {
       expect(() => {
         _sampleStoryNode.addDestinationNodeId('node_2');
-      }).toThrow();
+      }).toThrowError('The given node is already a destination node.');
       expect(() => {
         _sampleStoryNode.addPrerequisiteSkillId('skill_1');
-      }).toThrow();
+      }).toThrowError('The given skill id is already a prerequisite skill.');
       expect(() => {
         _sampleStoryNode.addAcquiredSkillId('skill_2');
-      }).toThrow();
+      }).toThrowError('The given skill is already an acquired skill.');
     });
 
   it('should correctly throw error when invalid values are deleted from arrays',
     () => {
       expect(() => {
         _sampleStoryNode.removeDestinationNodeId('node_5');
-      }).toThrow();
+      }).toThrowError('The given node is not a destination node.');
       expect(() => {
         _sampleStoryNode.removePrerequisiteSkillId('skill_4');
-      }).toThrow();
+      }).toThrowError('The given skill id is not a prerequisite skill.');
       expect(() => {
         _sampleStoryNode.removeAcquiredSkillId('skill_4');
-      }).toThrow();
+      }).toThrowError('The given skill is not an acquired skill.');
     });
 });

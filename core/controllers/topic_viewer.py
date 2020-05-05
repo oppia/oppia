@@ -71,21 +71,25 @@ class TopicPageDataHandler(base.BaseHandler):
                 additional_story_id) for additional_story_id
             in additional_story_ids]
 
-        canonical_story_dicts = [
-            summary.to_human_readable_dict() for summary
-            in canonical_story_summaries]
+        canonical_story_dicts = []
+        for story_summary in canonical_story_summaries:
+            story_summary_dict = story_summary.to_human_readable_dict()
+            story_summary_dict['published'] = True
+            canonical_story_dicts.append(story_summary_dict)
 
-        additional_story_dicts = [
-            summary.to_human_readable_dict() for summary
-            in additional_story_summaries]
+        additional_story_dicts = []
+        for story_summary in additional_story_summaries:
+            story_summary_dict = story_summary.to_human_readable_dict()
+            story_summary_dict['published'] = True
+            additional_story_dicts.append(story_summary_dict)
 
         uncategorized_skill_ids = topic.get_all_uncategorized_skill_ids()
         subtopics = topic.get_all_subtopics()
 
-        assigned_skill_ids = topic.get_all_skill_ids()
+        all_skill_ids = topic.get_all_skill_ids()
         skill_descriptions, deleted_skill_ids = (
             skill_services.get_descriptions_of_skills(
-                assigned_skill_ids))
+                all_skill_ids))
 
         if deleted_skill_ids:
             deleted_skills_string = ', '.join(deleted_skill_ids)
@@ -101,16 +105,16 @@ class TopicPageDataHandler(base.BaseHandler):
 
         if self.user_id:
             degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
-                self.user_id, assigned_skill_ids)
+                self.user_id, all_skill_ids)
         else:
             degrees_of_mastery = {}
-            for skill_id in assigned_skill_ids:
+            for skill_id in all_skill_ids:
                 degrees_of_mastery[skill_id] = None
 
         train_tab_should_be_displayed = False
-        if assigned_skill_ids:
+        if all_skill_ids:
             questions = question_services.get_questions_by_skill_ids(
-                5, assigned_skill_ids, False)
+                5, all_skill_ids, False)
             if len(questions) == 5:
                 train_tab_should_be_displayed = True
 

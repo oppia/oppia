@@ -185,7 +185,7 @@ var AdminPage = function() {
         success = success || results[i];
       }
       if (!success) {
-        throw Error('Could not find config property: ' + propertyName);
+        throw new Error('Could not find config property: ' + propertyName);
       }
     });
   };
@@ -255,10 +255,10 @@ var AdminPage = function() {
       by.cssContainingText('option', newRole));
     roleOption.click();
     updateFormSubmit.click();
+    waitFor.visibilityOf(statusMessage, 'Confirmation message not visible');
     waitFor.textToBePresentInElement(
       statusMessage, 'successfully updated to',
       'Could not set role successfully');
-    waitFor.visibilityOf(statusMessage, 'Confirmation message not visible');
   };
 
   this.getUsersAsssignedToRole = function(role) {

@@ -68,6 +68,9 @@ require('I18nFooter.ts');
 
 require('Polyfills.ts');
 
+// Default to passive event listeners.
+require('default-passive-events');
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -77,17 +80,18 @@ const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
 angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
-  '$interpolateProvider', '$locationProvider', '$provide',
+  '$interpolateProvider', '$locationProvider', '$provide', '$sanitizeProvider',
   function(
       $compileProvider, $cookiesProvider, $httpProvider,
-      $interpolateProvider, $locationProvider, $provide) {
+      $interpolateProvider, $locationProvider, $provide, $sanitizeProvider) {
     var ugs = new UpgradedServices();
     // We need to provide these services and pipes separately since they are
     // used in the directives imported in this file and cannot be
     // injected before bootstrapping of oppia module.
     var servicesToProvide = [
       'AlertsService', 'BackgroundMaskService', 'BrowserCheckerService',
-      'CodeReplRulesService', 'ContextService', 'CsrfTokenService',
+      'CodeReplRulesService', 'CollectionCreationBackendService',
+      'ContextService', 'CsrfTokenService',
       'DateTimeFormatService', 'DebouncerService', 'DeviceInfoService',
       'DocumentAttributeCustomizationService',
       'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
@@ -128,6 +132,8 @@ angular.module('oppia').config([
     if (window.location.pathname === '/search/find') {
       $locationProvider.html5Mode(true);
     }
+
+    $sanitizeProvider.enableSvg(true);
 
     // Prevent storing duplicate cookies for translation language.
     $cookiesProvider.defaults.path = '/';
@@ -264,14 +270,6 @@ angular.module('oppia').factory('$exceptionHandler', [
       // because -1 is the status code for aborted requests.
       if (UNHANDLED_REJECTION_STATUS_CODE_REGEX.test(exception)) {
         return;
-      }
-      // Exceptions are expected to be of Error type. If an error is thrown
-      // with a primitive data type, it must be converted to an Error object
-      // so that the error gets logged correctly.
-      // This check can be removed once all the manually thrown exceptions
-      // are converted to Error objects (see #8456).
-      if (!(exception instanceof Error)) {
-        exception = new Error(exception);
       }
       var tploadStatusCode = exception.message.match(TPLOAD_STATUS_CODE_REGEX);
       // Suppress tpload errors which occur with p1 of -1 in the error URL

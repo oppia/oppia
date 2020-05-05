@@ -22,10 +22,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import os
 import re
-import shutil
 import subprocess
 import sys
-import tempfile
 import time
 
 import python_utils
@@ -33,11 +31,11 @@ import python_utils
 from . import linter_utils
 from .. import common
 
-ESPRIMA_VERSION = '4.0.1'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 
-ESPRIMA_PATH = os.path.join(OPPIA_TOOLS_DIR, 'esprima-%s' % ESPRIMA_VERSION)
+ESPRIMA_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'esprima-%s' % common.ESPRIMA_VERSION)
 
 sys.path.insert(1, ESPRIMA_PATH)
 
@@ -156,8 +154,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         parsed_js_and_ts_files = dict()
         if not files_to_check:
             return parsed_js_and_ts_files
-        compiled_js_dir = tempfile.mkdtemp(
-            dir=os.getcwd(), prefix='tmpcompiledjs')
         if not self.verbose_mode_enabled:
             python_utils.PRINT('Validating and parsing JS and TS files ...')
         for filepath in files_to_check:
@@ -170,23 +166,17 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 # Use esprima to parse a JS or TS file.
                 parsed_js_and_ts_files[filepath] = esprima.parseScript(
                     file_content, comment=True)
-            except Exception as e:
-                # Compile typescript file which has syntax not valid for JS
-                # file.
+            except Exception:
                 if filepath.endswith('.js'):
-                    shutil.rmtree(compiled_js_dir)
-                    raise Exception(e)
-                try:
+                    raise
+                # Compile typescript file which has syntax invalid for JS file.
+                with linter_utils.temp_dir(prefix='tmpcompiledjs',
+                                           parent=os.getcwd()) as temp_dir:
                     compiled_js_filepath = self._compile_ts_file(
-                        filepath, compiled_js_dir)
+                        filepath, temp_dir)
                     file_content = FILE_CACHE.read(compiled_js_filepath)
                     parsed_js_and_ts_files[filepath] = esprima.parseScript(
                         file_content)
-                except Exception as e:
-                    shutil.rmtree(compiled_js_dir)
-                    raise Exception(e)
-
-        shutil.rmtree(compiled_js_dir)
 
         return parsed_js_and_ts_files
 
@@ -644,12 +634,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     filename_without_extension = filepath[:-3]
                     corresponding_angularjs_filepath = (
                         filename_without_extension + '.ajs.ts')
-                    compiled_js_dir = tempfile.mkdtemp(dir=os.getcwd())
-                    try:
+                    with linter_utils.temp_dir(parent=os.getcwd()) as temp_dir:
                         if os.path.isfile(corresponding_angularjs_filepath):
                             compiled_js_filepath = self._compile_ts_file(
-                                corresponding_angularjs_filepath,
-                                compiled_js_dir)
+                                corresponding_angularjs_filepath, temp_dir)
                             file_content = FILE_CACHE.read(
                                 compiled_js_filepath).decode('utf-8')
 
@@ -705,8 +693,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                 '%s --> Corresponding AngularJS constants '
                                 'file not found.' % filepath)
 
-                    finally:
-                        shutil.rmtree(compiled_js_dir)
                 # Check that the constants are declared only in a
                 # *.constants.ajs.ts file.
                 if not filepath.endswith('.constants.ajs.ts'):
