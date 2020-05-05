@@ -73,19 +73,23 @@ angular.module('oppia').factory('TopicCreationService', [
           }
           topicCreationInProgress = true;
           AlertsService.clearWarnings();
+          // $window.open has to be initialized separately since if the 'open
+          // new tab' action does not directly result from a user input (which
+          // is not the case, if we wait for result from the backend before
+          // opening a new tab), some browsers block it as a popup. Here, the
+          // new tab is created as soon as the user clicks the 'Create' button
+          // and filled with URL once the details are fetched from the backend.
+          var newTab = $window.open();
           TopicCreationBackendApiService.createTopic(
             topic.topicName, topic.abbreviatedTopicName).then(
             function(response) {
               $rootScope.$broadcast(
                 EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
               topicCreationInProgress = false;
-              $window.open(
-                UrlInterpolationService.interpolateUrl(
-                  TOPIC_EDITOR_URL_TEMPLATE, {
-                    topic_id: response.topicId
-                  }
-                ), '_blank'
-              );
+              newTab.location.href = UrlInterpolationService.interpolateUrl(
+                TOPIC_EDITOR_URL_TEMPLATE, {
+                  topic_id: response.topicId
+                });
             });
         });
       }
