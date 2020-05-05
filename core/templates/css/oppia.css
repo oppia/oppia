@@ -1813,6 +1813,10 @@ pre.oppia-pre-wrapped-text {
   line-height: 1.846;
 }
 
+.oppia-welcome-guide-browser-image p {
+  text-align: left;
+}
+
 .oppia-rte-content > div > p {
   line-height: 1.846;
 }
@@ -4640,9 +4644,7 @@ div.oppia-issues-learner-action {
     padding-top: 30px;
     text-align: center;
     width: 100%;
-  
-  } 
-
+  }
 }
 
 .oppia-welcome-guide-browser-image {
@@ -4651,9 +4653,6 @@ div.oppia-issues-learner-action {
   padding-bottom: 30px;
 }
 
-.oppia-welcome-guide-browser-image p {
-  text-align: left;
-}
 
 @media (max-width: 700px) {
   .oppia-welcome-guide-img {
@@ -4735,7 +4734,7 @@ span.oppia-welcome-guide-purple {
   line-height: 2em;
   margin-right: 15px;
   text-align: center;
-  width: 2em;  
+  width: 2em;
 
 }
 
@@ -4766,7 +4765,7 @@ span.oppia-welcome-guide-orange {
   line-height: 2em;
   margin-right: 15px;
   text-align: center;
-  width: 2em; 
+  width: 2em;
 
 }
 
