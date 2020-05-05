@@ -55,8 +55,8 @@ export class UtilsService {
   // not empty or not. So, we cannot have any specific type defined for the
   // arguments and the arguments are given a generic type of Object.
   /**
-   * @param {Object} a - the object to be checked.
-   * @param {Object} b - the object to be checked.
+   * @param {Object} a - the first object to be compared.
+   * @param {Object} b - the second object to be compared.
    * @return {boolean} - true if a is equivalent to b, false otherwise.
    */
   isEquivalent(a: Object, b: Object): boolean {
