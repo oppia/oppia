@@ -4645,13 +4645,15 @@ div.oppia-issues-learner-action {
     text-align: center;
     width: 100%;
   }
+
+  .oppia-welcome-guide-browser-image {
+    padding-left: 15%;
+    padding-right: 15%;
+    padding-bottom: 30px;
+  }
 }
 
-.oppia-welcome-guide-browser-image {
-  padding-left: 15%;
-  padding-right: 15%;
-  padding-bottom: 30px;
-}
+
 
 
 @media (max-width: 700px) {
