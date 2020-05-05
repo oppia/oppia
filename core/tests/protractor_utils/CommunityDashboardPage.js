@@ -23,6 +23,30 @@ var CommunityDashboardTranslateTextTab = require(
 var CommunityDashboardPage = function() {
   var navigateToTranslateTextTabButton = element(
     by.css('.protractor-test-translateTextTab'));
+  var submitQuestionTabButton = element(
+    by.css('.protractor-test-submitQuestionTab'));
+  var opportunityLoadingPlaceholder = element(
+    by.css('.protractor-test-opportunity-loading-placeholder'));
+  var opportunityListEmptyAvailabilityMessage = element(
+    by.css('.protractor-test-opportunity-list-empty-availability-message'));
+  var opportunityListItems = element.all(
+    by.css('.protractor-test-opportunity-list-item'));
+  var opportunityListItemHeadings = element.all(
+    by.css('.protractor-test-opportunity-list-item-heading'));
+  var opportunityListItemSubheadings = element.all(
+    by.css('.protractor-test-opportunity-list-item-subheading'));
+  var opportunityListItemButtons = element.all(
+    by.css('.protractor-test-opportunity-list-item-button'));
+  var opportunityListItemLabels = element.all(
+    by.css('.protractor-test-opportunity-list-item-label'));
+  var opportunityListItemProgressPercentages = element.all(
+    by.css('.protractor-test-opportunity-list-item-progress-percentage'));
+  var acceptQuestionSuggestionButton = element(
+    by.css('.protractor-test-question-suggestion-review-accept-button'));
+  var rejectQuestionSuggestionButton = element(
+    by.css('.protractor-test-question-suggestion-review-reject-button'));
+  var questionSuggestionReviewMessageInput = element(
+    by.css('.protractor-test-suggestion-review-message'));
 
   var reviewRightsDiv = element(by.css('.protractor-test-review-rights'));
 
@@ -36,7 +60,25 @@ var CommunityDashboardPage = function() {
       .CommunityDashboardTranslateTextTab();
   };
 
-  var _expectUserToBeReviewer = function(
+  this.waitForOpportunitiesToLoad = function() {
+    waitFor.invisibilityOf(
+      opportunityLoadingPlaceholder,
+      'Opportunity placeholders take too long to become invisible.');
+  };
+
+  this.expectUserToBeTranslationReviewer = function(language) {
+    waitFor.visibilityOf(
+      reviewRightsDiv, 'User does not have rights to review translation');
+
+    var translationReviewRightsElement = element(by.css(
+      '.protractor-test-translation-' + language + '-reviewer'));
+    waitFor.visibilityOf(
+      translationReviewRightsElement,
+      'User does not have rights to review translation in language: ' + language
+    );
+  };
+
+  var _expecteUserToBeReviewer = function(
       reviewCategory, langaugeDescription = null) {
     waitFor.visibilityOf(
       reviewRightsDiv,
@@ -67,10 +109,76 @@ var CommunityDashboardPage = function() {
     _expectUserToBeReviewer('question');
   };
 
+  this.expectNumberOfOpportunitiesToBe = function(number) {
+    opportunityListItems.then(function(items) {
+      expect(items.length).toBe(number);
+    });
+  };
+
+  this.expectEmptyOpportunityAvailabilityMessage = function() {
+    waitFor.visibilityOf(
+      opportunityListEmptyAvailabilityMessage,
+      'Opportunity list is not empty');
+  };
+
+  this.expectOpportunityListItemHeadingToBe = function(heading, index) {
+    opportunityListItemHeadings.then(function(headings) {
+      expect(headings[index].getText()).toEqual(heading);
+    });
+  };
+
+  this.expectOpportunityListItemSubheadingToBe = function(subheading, index) {
+    opportunityListItemSubheadings.then(function(subheadings) {
+      expect(subheadings[index].getText()).toEqual(subheading);
+    });
+  };
+
+  this.expectOpportunityListItemLabelToBe = function(label, index) {
+    opportunityListItemLabels.then(function(labels) {
+      expect(labels[index].getText()).toEqual(label);
+    });
+  };
+
+  this.expectOpportunityListItemProgressPercentageToBe = function(
+      percentage, index) {
+    opportunityListItemProgressPercentages.then(function(percentages) {
+      expect(percentages[index].getText()).toEqual(percentage);
+    });
+  };
+
+  this.clickOpportunityListItemButton = function(index) {
+    opportunityListItemButtons.then(function(buttons) {
+      buttons[index].click();
+    });
+  };
+
+  this.clickAcceptQuestionSuggestionButton = function() {
+    acceptQuestionSuggestionButton.click();
+  };
+
+  this.clickRejectQuestionSuggestionButton = function() {
+    rejectQuestionSuggestionButton.click();
+  };
+
+  this.setQuestionSuggestionReviewMessage = function(message) {
+    waitFor.elementToBeClickable(
+      questionSuggestionReviewMessageInput,
+      'Question suggestion review message input field not visible');
+    questionSuggestionReviewMessageInput.click();
+    questionSuggestionReviewMessageInput.sendKeys(message);
+  };
+
   this.navigateToTranslateTextTab = function() {
     waitFor.elementToBeClickable(
       navigateToTranslateTextTabButton, 'Translate text tab is not clickable');
     navigateToTranslateTextTabButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.navigateToSubmitQuestionTab = function() {
+    waitFor.elementToBeClickable(
+      submitQuestionTabButton, 'Submit Question tab is not clickable');
+    submitQuestionTabButton.click();
     waitFor.pageToFullyLoad();
   };
 };

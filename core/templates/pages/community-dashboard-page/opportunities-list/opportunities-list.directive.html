@@ -11,13 +11,13 @@
       </opportunities-list-item>
     </div>
   </div>
-  <div ng-show="opportunityDataIsLoading">
+  <div ng-show="opportunityDataIsLoading" class="protractor-test-opportunity-loading-placeholder">
     <opportunities-list-item></opportunities-list-item>
     <opportunities-list-item></opportunities-list-item>
   </div>
   <div class="oppia-end-availability" ng-if="!opportunityDataIsLoading && !isMoreOpportunitiesAvailable()">
     <div class="oppia-end-availability-line"></div>
-    <div class="oppia-opportunity-availablity-message" ng-if="getOpportunities().length === 0">No opportunity available!</div>
+    <div class="oppia-opportunity-availablity-message protractor-test-opportunity-list-empty-availability-message" ng-if="getOpportunities().length === 0">No opportunity available!</div>
     <div class="oppia-opportunity-availablity-message" ng-if="getOpportunities().length !== 0">End of results.</div>
     <div class="oppia-end-availability-line"></div>
   </div>
