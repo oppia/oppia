@@ -533,6 +533,10 @@ p:last-child {
    CSS class, but we do not know what JS code is causing it to be inlined in the
    span tag. There is as such no way to remove !important as of now, it's a
    CKEditor bug (issue #6206 on Oppia). */
+.oppia-welcome-guide-browser-image span {
+  text-align: left;
+}
+
 .oppia-rte p span {
   font-size: 1em !important;
 }
@@ -4580,31 +4584,27 @@ div.oppia-issues-learner-action {
     height: 460px;
   }
 
-  .oppia-welcome-guide-fractions-image img{
+  .oppia-welcome-guide-fractions-image img {
     width: 80%;
     padding-top: 20px;
-    }
+  }
 
-     .oppia-welcome-guide-browser-image {
+  .oppia-welcome-guide-browser-image {
+    margin: auto;
     padding-right: 70px;
     padding-top: 55px;
     padding-bottom: 30px;
     text-align: left;
-    margin: auto;
     width: 100%;
   }
 
-
   .oppia-welcome-guide-exploration-image {
-  padding-left: 70px;
-  padding-top: 30px;
-  padding-bottom: 30px;
-  width: 100%;
-  text-align: center;
-
-}
-
-
+    padding-left: 70px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    width: 100%;
+    text-align: center;
+  }
 }
 
 
@@ -4629,57 +4629,44 @@ div.oppia-issues-learner-action {
     padding-top: 0px;
   }
 
-  .oppia-welcome-guide-fractions-image img{
-  width: 90%;
-    }
+  .oppia-welcome-guide-fractions-image img {
+    width: 90%;
+  }
 
- .oppia-welcome-guide-exploration-image {
-  text-align: center;
-  padding-top: 30px;
-  padding-bottom: 40px;
-  width: 100%;
-  padding-left:15%;
-   padding-right: 15%;
-
+  .oppia-welcome-guide-exploration-image {
+    padding-bottom: 40px;
+    padding-left: 15%;
+    padding-right: 15%;
+    padding-top: 30px;
+    text-align: center;
+    width: 100%;
+  
+  } 
 
 }
 
+.oppia-welcome-guide-browser-image {
+  padding-left: 15%;
+  padding-right: 15%;
+  padding-bottom: 30px;
+}
 
-
- .oppia-welcome-guide-browser-image{
-   /* text-align: center;*/
-   padding-left:15%;
-   padding-right: 15%;
-    padding-bottom: 30px;
-  }
-
-  .oppia-welcome-guide-browser-image span{
-    text-align: left;
-
-  }
-  .oppia-welcome-guide-browser-image p{
-    text-align: left;
-
-  }
-/*
-  .oppia-welcome-guide-exploration-numbers{
-    text-align: left;
-  }*/
-
+.oppia-welcome-guide-browser-image p {
+  text-align: left;
 }
 
 @media (max-width: 700px) {
   .oppia-welcome-guide-img {
-    text-align: center;
-    padding-bottom: 30px;
     height: auto;
+    padding-bottom: 30px;
+    text-align: center;
   }
 
   .oppia-welcome-guide-header {
+    height: 400px;
     padding-left: 70px;
     padding-right: 70px;
     padding-top: 40px;
-    height: 400px;
   }
 
   .oppia-welcome-guide-img img {
@@ -4701,7 +4688,6 @@ div.oppia-issues-learner-action {
   display: inline;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 1.17em;
-/*  line-height: 128%;*/
   padding-top: 0px;
   padding-bottom: 0px;
   text-align: left;
@@ -4724,17 +4710,17 @@ div.oppia-issues-learner-action {
 
 span.oppia-welcome-guide-blue {
   background: rgb(13,61,245);
-   border-radius: 1em;
+  border-radius: 1em;
   -moz-border-radius: 1em;
   -webkit-border-radius: 1em;
   color: #ffffff;
   display: inline-block;
+  font-size: 1.5em;
   font-weight: bold;
   line-height: 2em;
   margin-right: 15px;
   text-align: center;
   width: 2em;
-  font-size:1.5em;
 }
 
 span.oppia-welcome-guide-purple {
@@ -4744,12 +4730,13 @@ span.oppia-welcome-guide-purple {
   -webkit-border-radius: 1em;
   color: #ffffff;
   display: inline-block;
+  font-size: 1.5em;
   font-weight: bold;
   line-height: 2em;
   margin-right: 15px;
   text-align: center;
-  width: 2em;
-  font-size:1.5em;
+  width: 2em;  
+
 }
 
 span.oppia-welcome-guide-red {
@@ -4759,27 +4746,28 @@ span.oppia-welcome-guide-red {
   -webkit-border-radius: 1em;
   color: #ffffff;
   display: inline-block;
+  font-size: 1.5em;
   font-weight: bold;
   line-height: 2em;
   margin-right: 15px;
   text-align: center;
   width: 2em;
-  font-size:1.5em;
 }
 
 span.oppia-welcome-guide-orange {
   background: rgb(236,147,69);
   border-radius: 1em;
   -moz-border-radius: 1em;
-  -webkit-border-radius:1em;
+  -webkit-border-radius: 1em;
   color: #ffffff;
   display: inline-block;
+  font-size: 1.5em;
   font-weight: bold;
   line-height: 2em;
   margin-right: 15px;
   text-align: center;
-  width: 2em;
-  font-size:1.5em;
+  width: 2em; 
+
 }
 
 span.oppia-welcome-guide-green {
@@ -4789,12 +4777,12 @@ span.oppia-welcome-guide-green {
   -webkit-border-radius: 1em;
   color: #ffffff;
   display: inline-block;
+  font-size: 1.5em;
   font-weight: bold;
   line-height: 2em;
   margin-right: 15px;
   text-align: center;
   width: 2em;
-  font-size:1.5em;
 }
 
 
