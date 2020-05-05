@@ -25,7 +25,8 @@ angular.module('oppia').factory('ExplorationTagsService', [
     var child = Object.create(ExplorationPropertyService);
     child.propertyName = 'tags';
     /**
-      *@param {string} value - tag array to be normalized(white spaces removed and '+' replaced with ' ')
+      *@param {string} value - tag array to be normalized
+      *(white spaces removed and '+' replaced with ' ')
     */
     child._normalize = function(value) {
       for (var i = 0; i < value.length; i++) {
