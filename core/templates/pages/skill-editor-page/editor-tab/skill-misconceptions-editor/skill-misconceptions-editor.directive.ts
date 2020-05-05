@@ -107,9 +107,15 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
                 'add-misconception-modal.directive.html'),
               backdrop: 'static',
               controller: [
-                '$scope', '$uibModalInstance', 'MISCONCEPTION_NAME_CHAR_LIMIT',
+                '$controller', '$scope', '$uibModalInstance',
+                'MISCONCEPTION_NAME_CHAR_LIMIT',
                 function(
-                    $scope, $uibModalInstance, MISCONCEPTION_NAME_CHAR_LIMIT) {
+                    $controller, $scope, $uibModalInstance,
+                    MISCONCEPTION_NAME_CHAR_LIMIT) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
                   $scope.skill = SkillEditorStateService.getSkill();
                   $scope.MISCONCEPTION_NAME_CHAR_LIMIT =
                     MISCONCEPTION_NAME_CHAR_LIMIT;
@@ -144,10 +150,6 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
                         $scope.misconceptionFeedback,
                         $scope.misconceptionMustBeAddressed)
                     });
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
                   };
                 }]
             }).result.then(function(result) {

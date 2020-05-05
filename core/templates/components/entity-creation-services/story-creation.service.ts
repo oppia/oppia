@@ -39,7 +39,7 @@ angular.module('oppia').factory('StoryCreationService', [
         if (storyCreationInProgress) {
           return;
         }
-        var modalInstance = $uibModal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topic-editor-page/modal-templates/' +
             'new-story-title-editor.template.html'),
@@ -58,9 +58,7 @@ angular.module('oppia').factory('StoryCreationService', [
               };
             }
           ]
-        });
-
-        modalInstance.result.then(function(storyTitle) {
+        }).result.then(function(storyTitle) {
           if (storyTitle === '') {
             throw new Error('Story title cannot be empty');
           }

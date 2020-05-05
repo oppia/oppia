@@ -89,6 +89,10 @@ angular.module('oppia').directive('skillsList', [
                   }, 100);
                 }
               );
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             }).then(function() {
               var successToast = 'The skill has been deleted.';
               AlertsService.addSuccessMessage(successToast, 1000);
@@ -97,7 +101,7 @@ angular.module('oppia').directive('skillsList', [
 
           $scope.assignSkillToTopic = function(skillId) {
             var topicSummaries = $scope.getEditableTopicSummaries();
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'assign-skill-to-topic-modal.template.html'),
@@ -113,9 +117,7 @@ angular.module('oppia').directive('skillsList', [
                   $scope.selectedTopicIds = [];
                 }
               ]
-            });
-
-            modalInstance.result.then(function(topicIds) {
+            }).result.then(function(topicIds) {
               var changeList = [{
                 cmd: 'add_uncategorized_skill_id',
                 new_uncategorized_skill_id: skillId
@@ -152,7 +154,7 @@ angular.module('oppia').directive('skillsList', [
 
           $scope.mergeSkill = function(skill) {
             var skillSummaries = $scope.getMergeableSkillSummaries();
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
               backdrop: true,
@@ -174,9 +176,7 @@ angular.module('oppia').directive('skillsList', [
                   };
                 }
               ]
-            });
-
-            modalInstance.result.then(function(result) {
+            }).result.then(function(result) {
               var skill = result.skill;
               var supersedingSkillId = result.supersedingSkillId;
               // Transfer questions from the old skill to the new skill.

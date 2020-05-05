@@ -226,7 +226,7 @@ angular.module('oppia').directive('questionsList', [
                 summary.isSelected = false;
                 return summary;
               });
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
                 'select-skill-and-difficulty-modal.template.html'),
@@ -295,9 +295,7 @@ angular.module('oppia').directive('questionsList', [
                   init();
                 }
               ]
-            });
-
-            modalInstance.result.then(function(linkedSkillsWithDifficulty) {
+            }).result.then(function(linkedSkillsWithDifficulty) {
               ctrl.newQuestionSkillIds = [];
               ctrl.newQuestionSkillDifficulties = [];
               linkedSkillsWithDifficulty.forEach(
@@ -439,7 +437,7 @@ angular.module('oppia').directive('questionsList', [
             var oldLinkedSkillWithDifficulty = angular.copy(
               linkedSkillsWithDifficulty);
             var skillIdToRubricsObject = ctrl.getSkillIdToRubricsObject();
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/question-directives/modal-templates/' +
                 'change-question-difficulty-modal.template.html'),
@@ -460,9 +458,7 @@ angular.module('oppia').directive('questionsList', [
                   init();
                 }
               ]
-            });
-
-            modalInstance.result.then(function(linkedSkillsWithDifficulty) {
+            }).result.then(function(linkedSkillsWithDifficulty) {
               var changedDifficultyCount = 0, count = 0;
               _reInitializeSelectedSkillIds();
               for (var idx in linkedSkillsWithDifficulty) {
@@ -607,9 +603,7 @@ angular.module('oppia').directive('questionsList', [
                           };
                         }
                       ]
-                    });
-
-                    modalInstance.result.then(function(summary) {
+                    }).result.then(function(summary) {
                       for (var idx in $scope.associatedSkillSummaries) {
                         if (
                           $scope.associatedSkillSummaries[idx].getId() ===
@@ -654,7 +648,7 @@ angular.module('oppia').directive('questionsList', [
                     }
 
                     if (QuestionUndoRedoService.hasChanges()) {
-                      var modalInstance = $uibModal.open({
+                      $uibModal.open({
                         templateUrl:
                                UrlInterpolationService.getDirectiveTemplateUrl(
                                  '/components/question-directives' +
@@ -662,8 +656,7 @@ angular.module('oppia').directive('questionsList', [
                                  'question-editor-save-modal.template.html'),
                         backdrop: true,
                         controller: 'ConfirmOrCancelModalController'
-                      });
-                      modalInstance.result.then(function(commitMessage) {
+                      }).result.then(function(commitMessage) {
                         returnModalObject.commitMessage = commitMessage;
                         $uibModalInstance.close(returnModalObject);
                       }, function() {

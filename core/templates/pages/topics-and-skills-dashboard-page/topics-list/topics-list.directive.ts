@@ -59,15 +59,13 @@ angular.module('oppia').directive('topicsList', [
           };
 
           $scope.deleteTopic = function(topicId) {
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'delete-topic-modal.template.html'),
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'
-            });
-
-            modalInstance.result.then(function() {
+            }).result.then(function() {
               EditableTopicBackendApiService.deleteTopic(topicId).then(
                 function(status) {
                   $rootScope.$broadcast(

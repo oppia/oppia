@@ -64,7 +64,7 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
             var sortedSkillSummaries = groupedSkillSummaries.current.concat(
               groupedSkillSummaries.others);
 
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
               backdrop: true,
@@ -81,9 +81,7 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
                   $scope.countOfSkillsToPrioritize = skillsInSameTopicCount;
                 }
               ]
-            });
-
-            modalInstance.result.then(function(skillId) {
+            }).result.then(function(skillId) {
               if (skillId === $scope.skill.getId()) {
                 AlertsService.addInfoMessage(
                   'A skill cannot be a prerequisite of itself', 5000);

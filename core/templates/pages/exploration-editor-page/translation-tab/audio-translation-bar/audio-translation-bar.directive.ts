@@ -526,7 +526,7 @@ angular.module('oppia').directive('audioTranslationBar', [
                     uploadedFile = null;
                   };
 
-                  $scope.save = function() {
+                  $scope.confirm = function() {
                     if ($scope.isAudioTranslationValid()) {
                       $scope.saveButtonText = BUTTON_TEXT_SAVING;
                       $scope.saveInProgress = true;
