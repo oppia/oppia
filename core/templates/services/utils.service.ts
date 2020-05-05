@@ -28,8 +28,8 @@ export class UtilsService {
   // cannot have any specific type defined for the argument and the argument
   // is given a generic type of Object.
   /**
-   * @param {Object} obj - the object to be checked
-   * @return {boolean} - true if object is empty, false otherwise
+   * @param {Object} obj - the object to be checked.
+   * @return {boolean} - true if object is empty, false otherwise.
    */
   isEmpty(obj: Object): boolean {
     for (var property in obj) {
@@ -44,8 +44,8 @@ export class UtilsService {
   // cannot have any specific type defined for the argument and the argument
   // is given a generic type of Object.
   /**
-   * @param {Object} input - the object to be checked
-   * @return {boolean} - true if input is string, false otherwise
+   * @param {Object} input - the object to be checked.
+   * @return {boolean} - true if input is string, false otherwise.
    */
   isString(input: Object): boolean {
     return (typeof input === 'string' || input instanceof String);
@@ -55,9 +55,9 @@ export class UtilsService {
   // not empty or not. So, we cannot have any specific type defined for the
   // arguments and the arguments are given a generic type of Object.
   /**
-   * @param {Object} a - the object to be checked
-   * @param {Object} b - the object to be checked
-   * @return {boolean} - true if a is equivalent to b, false otherwise
+   * @param {Object} a - the object to be checked.
+   * @param {Object} b - the object to be checked.
+   * @return {boolean} - true if a is equivalent to b, false otherwise.
    */
   isEquivalent(a: Object, b: Object): boolean {
     if (a === null || b === null) {
