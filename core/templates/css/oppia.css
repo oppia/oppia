@@ -4544,27 +4544,26 @@ div.oppia-issues-learner-action {
 
 .oppia-welcome-guide-fractions-image {
   margin: auto;
-  text-align: center;
   padding-bottom: 40px;
+  text-align: center;
   width: auto;
 }
 
 @media (max-width: 768px) {
   .oppia-welcome-guide-body {
-    padding-left: 20px;
-    padding-top: 20px;
+    padding: 20px 0 0 20px;
   }
 }
 
 @media (min-width: 992px) {
   .oppia-welcome-guide-img {
-    text-align: right;
     height: 460px;
+    text-align: right;
   }
 
   .oppia-welcome-guide-header {
-    padding: 80px 20px 0 70px;
     height: 460px;
+    padding: 80px 20px 0 70px;
   }
 
   .oppia-welcome-guide-img img {
@@ -4593,20 +4592,20 @@ div.oppia-issues-learner-action {
 
 @media (max-width: 992px) {
   .oppia-welcome-guide-img {
-    text-align: center;
-    padding: 20px 0 30px 0;
     height: auto;
+    padding: 20px 0 30px 0;
+    text-align: center;
   }
 
   .oppia-welcome-guide-header {
-    padding: 70px 70px 0 70px;
     height: 300px;
+    padding: 70px 70px 0 70px;
   }
 
   .oppia-welcome-guide-img img {
-    width: 80%;
     height: auto;
     padding-top: 0px;
+    width: 80%;
   }
 
   .oppia-welcome-guide-fractions-image img {
@@ -4637,9 +4636,9 @@ div.oppia-issues-learner-action {
   }
 
   .oppia-welcome-guide-img img {
-    width: auto;
     height: auto;
     padding: 15px 50px 0 50px;
+    width: auto;
   }
 
   .oppia-welcome-guide-second-section {
@@ -4651,8 +4650,8 @@ div.oppia-issues-learner-action {
   display: inline;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 1.17em;
-  padding-top: 0px;
   padding-bottom: 0px;
+  padding-top: 0px;
   text-align: left;
 }
 
@@ -4665,15 +4664,13 @@ div.oppia-issues-learner-action {
 .oppia-welcome-guide-p {
   font-family: "Roboto", Arial, sans-serif;
   font-size: 1.17em;
-  text-align: left;
   line-height: 200%;
+  text-align: left;
 }
 
 span.oppia-welcome-guide-blue {
   background: rgb(13,61,245);
   border-radius: 1em;
-  -moz-border-radius: 1em;
-  -webkit-border-radius: 1em;
   color: #ffffff;
   display: inline-block;
   font-size: 1.5em;
@@ -4682,13 +4679,13 @@ span.oppia-welcome-guide-blue {
   margin-right: 15px;
   text-align: center;
   width: 2em;
+  -moz-border-radius: 1em;
+  -webkit-border-radius: 1em;
 }
 
 span.oppia-welcome-guide-purple {
   background: rgb(116,39,245);
   border-radius: 1em;
-  -moz-border-radius: 1em;
-  -webkit-border-radius: 1em;
   color: #ffffff;
   display: inline-block;
   font-size: 1.5em;
@@ -4697,7 +4694,8 @@ span.oppia-welcome-guide-purple {
   margin-right: 15px;
   text-align: center;
   width: 2em;
-
+  -moz-border-radius: 1em;
+  -webkit-border-radius: 1em;
 }
 
 span.oppia-welcome-guide-red {
