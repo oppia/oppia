@@ -249,8 +249,13 @@ class Misconception(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected misconception name to be a string, received %s' %
                 self.name)
-        utils.require_valid_name(
-            self.name, 'misconception_name', allow_empty=False)
+
+        misconception_name_length_limit = (
+            android_validation_constants.MAX_CHARS_IN_MISCONCEPTION_NAME)
+        if len(self.name) > misconception_name_length_limit:
+            raise utils.ValidationError(
+                'Misconception name should be less than %d chars, received %s'
+                % (misconception_name_length_limit, self.name))
 
         if not isinstance(self.notes, python_utils.BASESTRING):
             raise utils.ValidationError(

@@ -152,7 +152,8 @@ var TopicsAndSkillsDashboardPage = function() {
       topicNameField.sendKeys(topicName);
       confirmTopicCreationButton.click();
 
-      waitFor.newTabToBeCreated('Creating topic takes too long');
+      waitFor.newTabToBeCreated(
+        'Creating topic takes too long', '/topic_editor/');
       return browser.getAllWindowHandles().then(function(handles) {
         var newHandle = handles.filter(
           handle => initialHandles.indexOf(handle) === -1)[0];
@@ -239,7 +240,8 @@ var TopicsAndSkillsDashboardPage = function() {
         'Create skill button takes too long to be clickable');
       confirmSkillCreationButton.click();
 
-      waitFor.newTabToBeCreated('Creating skill takes too long');
+      waitFor.newTabToBeCreated(
+        'Creating skill takes too long', '/skill_editor/');
       return browser.getAllWindowHandles().then(function(handles) {
         var newHandle = handles.filter(
           handle => initialHandles.indexOf(handle) === -1)[0];
