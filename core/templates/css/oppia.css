@@ -4650,8 +4650,8 @@ div.oppia-issues-learner-action {
   display: inline;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 1.17em;
-  padding-bottom: 0px;
-  padding-top: 0px;
+  padding-bottom: 0;
+  padding-top: 0;
   text-align: left;
 }
 
@@ -4726,7 +4726,6 @@ span.oppia-welcome-guide-orange {
   margin-right: 15px;
   text-align: center;
   width: 2em;
-
 }
 
 span.oppia-welcome-guide-green {
