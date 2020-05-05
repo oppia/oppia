@@ -408,6 +408,21 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     chars long strings.
     """
 
+    @staticmethod
+    def verify_user_id_correct(user_id):
+        """Verify that the user ID is in a correct format.
+
+        Args:
+            user_id: str. The user ID to be checked.
+
+        Returns:
+            bool. True when the ID is in a correct format, False otherwise.
+        """
+        return all((
+            user_id.islower(),
+            user_id.startswith('uid_'),
+            len(user_id) == user_models.USER_ID_LENGTH))
+
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         # We can raise the number of shards for this job, since it goes only
@@ -424,9 +439,8 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     def map(user_model):
         """Implements the map function for this job."""
         gae_id = user_model.gae_id
-        if (not user_model.id.startswith('uid_') or
-                len(user_model.id) != user_models.USER_ID_LENGTH or
-                not user_model.id.islower()):
+        if not (GaeIdNotInModelsVerificationJob
+                .verify_user_id_correct(user_model.id)):
             yield ('FAILURE - WRONG ID FORMAT', (gae_id, user_model.id))
         success = True
         for model_class in models.Registry.get_all_storage_model_classes():

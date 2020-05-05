@@ -1309,6 +1309,24 @@ class GaeIdNotInModelsVerificationJobTests(test_utils.GenericTestBase):
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
 
+    def test_verify_user_id_correct(self):
+        self.assertTrue(
+            user_id_migration.GaeIdNotInModelsVerificationJob
+            .verify_user_id_correct('uid_' + 'a' * 32)
+        )
+        self.assertFalse(
+            user_id_migration.GaeIdNotInModelsVerificationJob
+            .verify_user_id_correct('uid_' + 'a' * 31 + 'A')
+        )
+        self.assertFalse(
+            user_id_migration.GaeIdNotInModelsVerificationJob
+            .verify_user_id_correct('uid_' + 'a' * 31)
+        )
+        self.assertFalse(
+            user_id_migration.GaeIdNotInModelsVerificationJob
+            .verify_user_id_correct('a' * 36)
+        )
+
     def test_wrong_user_ids(self):
         user_models.UserSettingsModel(
             id='aa',

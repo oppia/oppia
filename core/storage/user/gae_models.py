@@ -245,7 +245,7 @@ class UserSettingsModel(base_models.BaseModel):
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             new_id = 'uid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
-                for _ in python_utils.RANGE(USER_ID_LENGTH))
+                for _ in python_utils.RANGE(USER_ID_RANDOM_PART_LENGTH))
             if not cls.get_by_id(new_id):
                 return new_id
 
