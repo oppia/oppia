@@ -133,6 +133,8 @@ FULLY_COVERED_FILENAMES = [
     'exploration-html-formatter.service.ts',
     'exploration-id-validation.service.ts',
     'exploration-init-state-name.service.ts',
+    'exploration-language-code.service.ts',
+    'exploration-objective.service.ts',
     'exploration-param-changes.service.ts',
     'exploration-param-specs.service.ts',
     'exploration-player-page.constants.ajs.ts',
