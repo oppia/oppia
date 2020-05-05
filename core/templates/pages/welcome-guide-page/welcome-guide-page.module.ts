@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,9 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { Component, NgModule, StaticProvider } from '@angular/core';
+
 import { BrowserModule } from '@angular/platform-browser';
+import { Component, NgModule, StaticProvider } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';

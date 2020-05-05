@@ -213,7 +213,7 @@ describe('Static Pages Tour', function() {
     expect(element(
       by.css('.protractor-test-thanks-page')).isPresent()).toBe(true);
   });
-  it('visits the Welcome Guide Page page', function() {
+  it('visits the Welcome Guide Page', function() {
     browser.get('/welcomeguidepage');
     waitFor.pageToFullyLoad();
     expect(element(
