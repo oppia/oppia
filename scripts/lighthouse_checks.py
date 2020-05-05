@@ -104,7 +104,7 @@ def start_proxy_server():
     """Start compy proxy server to serve gzipped assets."""
     ssl_options = '-cert cert.crt -key cert.key -ca ca.crt -cakey ca.key'
     p = subprocess.Popen([COMPY_BINARY, '-host', ':%s' % COMPY_SERVER_PORT,
-        '-gzip', '9'] + ssl_options.split(' '))
+        '-gzip', '9'])
     RUNNING_PROCESSES.append(p)
 
 
@@ -126,6 +126,10 @@ def wait_for_port_to_be_open(port_number):
             'Failed to start server on port %s, exiting ...' % port_number)
         sys.exit(1)
 
+
+def run_lighthouse_checks():
+    """Run lighthouse checks."""
+    pass
 
 
 def main():
@@ -150,15 +154,18 @@ def main():
         download_and_install_compy()
 
 
-    # atexit.register(cleanup)
+    atexit.register(cleanup)
 
 
-    python_utils.PRINT('  Generating files for production mode...')
+    python_utils.PRINT('Generating files for production mode...')
     build.main(args=['--prod_env'])
 
     start_google_app_engine_server()
     wait_for_port_to_be_open(OPPIA_SERVER_PORT)
     start_proxy_server()
+
+    # Action to run lighthouse checks.
+    run_lighthouse_checks()
 
 
 if __name__ == "__main__":
