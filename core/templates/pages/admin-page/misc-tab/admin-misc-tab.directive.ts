@@ -41,8 +41,8 @@ angular.module('oppia').directive('adminMiscTab', [
         var DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
         var SEND_DUMMY_MAIL_HANDLER_URL = (
-          '/senddummymailtoadmin');
-        var UPDATE_USERNAME_HANDLER_URL = '/updateusername';
+          '/senddummymailtoadminhandler');
+        var UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
 
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');

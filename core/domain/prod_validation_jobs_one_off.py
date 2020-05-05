@@ -793,6 +793,7 @@ class UsernameChangeAuditModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [user_id].[timestamp_in_sec]
+        # user_id refers to the user that is making the change.
         regex_string = '^%s\\.\\d+$' % item.user_id
         return regex_string
 
@@ -5109,7 +5110,7 @@ class RoleQueryAuditModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [audit_models.RoleQueryAuditModel]
 
 
-class UsernameChangeAuditModelOneOffJob(ProdValidationAuditOneOffJob):
+class UsernameChangeAuditModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates UsernameChangeAuditModel."""
 
     @classmethod

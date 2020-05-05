@@ -500,7 +500,7 @@ class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance.put()
 
         self.job_class = (
-            prod_validation_jobs_one_off.UsernameChangeAuditOneOffJob)
+            prod_validation_jobs_one_off.UsernameChangeAuditModelAuditOneOffJob)
 
     def test_standard_model(self):
         expected_output = [

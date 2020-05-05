@@ -2006,7 +2006,14 @@ def get_community_reviewer_usernames(review_category, language_code=None):
 
 
 def log_username_change(user_id, current_username, new_username):
-    """Stores the query to role structure in UsernameChangeAuditModel."""
+    """Stores the query to role structure in UsernameChangeAuditModel.
+
+    Args:
+        user_id: str. The unique ID of the user that is making the change.
+        current_username: str. The current username that is being changed.
+        new_username: str. The new username that the current one is being
+            changed to.
+    """
     model_id = '%s.%s' % (user_id, int(math.floor(time.time())))
 
     audit_models.UsernameChangeAuditModel(

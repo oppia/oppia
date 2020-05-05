@@ -88,11 +88,11 @@ class UsernameChangeAuditModel(base_models.BaseModel):
     [user_id].[timestamp_in_sec]
     """
 
-    # The user_id of the user making the change.
+    # The user_id of the user that is making the change.
     user_id = ndb.StringProperty(required=True, indexed=True)
-    # The current username.
+    # The current username that is being changed.
     current_username = ndb.StringProperty(required=True, indexed=True)
-    # The new username.
+    # The new username that the current one is being changed to.
     new_username = ndb.StringProperty(required=True, indexed=True)
 
     @staticmethod

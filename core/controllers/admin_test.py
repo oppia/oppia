@@ -52,6 +52,7 @@ import feconf
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
+MAX_USERNAME_LENGTH = 30
 
 
 class SampleMapReduceJobManager(jobs.BaseMapReduceOneOffJobManager):
@@ -1109,13 +1110,13 @@ class SendDummyMailTest(test_utils.GenericTestBase):
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             generated_response = self.post_json(
-                '/senddummymailtoadmin', payload={},
+                '/senddummymailtoadminhandler', payload={},
                 csrf_token=csrf_token, expected_status_int=200)
             self.assertEqual(generated_response, {})
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', False):
             generated_response = self.post_json(
-                '/senddummymailtoadmin', payload={},
+                '/senddummymailtoadminhandler', payload={},
                 csrf_token=csrf_token, expected_status_int=400)
             self.assertEqual(
                 generated_response['error'], 'This app cannot send emails.')
@@ -1137,34 +1138,39 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
         # The new username must not be longer than 30 characters.
-        self.put_json(
-            '/updateusername',
+        response = self.put_json(
+            '/updateusernamehandler',
             payload={
                 'current_username': current_username,
                 'new_username': long_username},
             csrf_token=csrf_token,
             expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Please make sure that the new '
+            'username is not longer than %s characters.' % MAX_USERNAME_LENGTH)
 
         # If current username does not exist.
-        self.put_json(
-            '/updateusername',
+        response = self.put_json(
+            '/updateusernamehandler',
             payload={
                 'current_username': non_existent_username,
                 'new_username': new_username},
             csrf_token=csrf_token,
             expected_status_int=400)
+        self.assertEqual(response['error'], 'User does not exist.')
 
         # If new username is already taken.
-        self.put_json(
-            '/updateusername',
+        response = self.put_json(
+            '/updateusernamehandler',
             payload={
                 'current_username': current_username,
                 'new_username': current_username},
             csrf_token=csrf_token,
             expected_status_int=400)
+        self.assertEqual(response['error'], 'Username already taken.')
 
         self.put_json(
-            '/updateusername',
+            '/updateusernamehandler',
             payload={
                 'current_username': current_username,
                 'new_username': new_username},
