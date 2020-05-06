@@ -50,7 +50,7 @@ from .. import build  # isort:skip
 FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH = os.path.join(
     CURR_DIR, 'scripts', 'linters', 'excluded_any_type_files.json')
 
-FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(open(
+FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(python_utils.open_file(
     FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH, 'r'))
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
