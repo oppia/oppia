@@ -247,7 +247,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         with linter_utils.redirect_stdout(sys.stdout):
             failed = False
-            summary_messages = []
 
             for file_path in self.all_filepaths:
                 if file_path in FILES_EXCLUDED_FROM_ANY_TYPE_CHECK:
@@ -282,11 +281,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 summary_message = (
                     '%s ANY type check passed' % _MESSAGE_TYPE_SUCCESS)
 
-            summary_messages.append(summary_message)
             python_utils.PRINT(summary_message)
             python_utils.PRINT('')
 
-        return summary_messages
+        return [summary_message]
 
     def _check_extra_js_files(self):
         """Checks if the changes made include extra js files in core
