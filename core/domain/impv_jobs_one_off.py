@@ -82,7 +82,7 @@ def _get_target_id_errors(task, versioned_entities):
 
     for entity in versioned_entities:
         if not _target_exists(entity, task.target_type, task.target_id):
-            yield '%s{id:%s} does not exist at version %s' % (
+            yield '%s{id: %s} does not exist at version %s' % (
                 task.target_type, task.target_id, entity.version)
 
 
@@ -97,8 +97,8 @@ class TaskEntryModelAuditOneOffJob(
 
     @staticmethod
     def map(task):
-        task_key = 'task{id:%s}' % task.id
-        entity_key = '%s{id:%s}' % (task.entity_type, task.entity_id)
+        task_key = 'task{id: %s}' % task.id
+        entity_key = '%s{id: %s}' % (task.entity_type, task.entity_id)
 
         # ENTITY_TYPE_ERROR check: unrecoverable.
         if task.entity_type == feconf.ENTITY_TYPE_EXPLORATION:

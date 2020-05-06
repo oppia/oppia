@@ -75,7 +75,7 @@ class TaskEntryModel(base_models.BaseModel):
     """Task entry corresponding to an actionable task in the improvements tab.
 
     Instances of a class have an ID with the form:
-        [ENTITY_TYPE].[ENTITY_ID].[TASK_TYPE].[UUID]
+        [entity_type].[entity_id].[task_type].[uuid]
     """
     # The type of entity a task entry refers to.
     entity_type = ndb.StringProperty(
@@ -134,8 +134,7 @@ class TaskEntryModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(
-            cls.get_user_id_migration_field() == user_id).iter().has_next()
+        return cls.query(cls.closed_by == user_id).get() is not None
 
     @staticmethod
     def get_deletion_policy():
@@ -149,8 +148,7 @@ class TaskEntryModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        cls.delete_multi(
-            cls.query(cls.get_user_id_migration_field() == user_id))
+        cls.delete_multi(cls.query(cls.closed_by == user_id))
 
     @staticmethod
     def get_export_policy():
@@ -169,8 +167,8 @@ class TaskEntryModel(base_models.BaseModel):
             format. In this case, we are returning all the ids of the tasks
             which were closed by this user.
         """
-        tasks_closed_by_user = TaskEntryModel.query(
-            TaskEntryModel.get_user_id_migration_field() == user_id)
+        tasks_closed_by_user = (
+            TaskEntryModel.query(TaskEntryModel.closed_by == user_id))
         return {'task_ids_closed_by_user': [t.id for t in tasks_closed_by_user]}
 
     @classmethod
