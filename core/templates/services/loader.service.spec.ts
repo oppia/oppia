@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { LoaderService } from 'services/loader.service';
-import { Subscription } from 'rxjs';
-
 /**
  * @fileoverview Unit tests for loader service.
  */
+
+import { LoaderService } from 'services/loader.service';
+import { Subscription } from 'rxjs';
 
 describe('Loader Service', () => {
   const loaderService = new LoaderService();
