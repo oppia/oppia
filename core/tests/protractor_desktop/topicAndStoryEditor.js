@@ -165,20 +165,6 @@ describe('Topic editor functionality', function() {
     storyEditorPage.expectNumberOfChaptersToBe(1);
   });
 
-  it('should publish and unpublish a story correctly', function() {
-    topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
-    topicEditorPage.navigateToStoryWithIndex(0);
-    storyEditorPage.publishStory();
-    storyEditorPage.returnToTopic();
-
-    topicEditorPage.expectStoryPublicationStatusToBe('Yes', 0);
-    topicEditorPage.navigateToStoryWithIndex(0);
-    storyEditorPage.unpublishStory();
-    storyEditorPage.returnToTopic();
-
-    topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
-  });
-
   it('should assign a skill to, between, and from subtopics', function() {
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
