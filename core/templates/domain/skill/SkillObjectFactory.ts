@@ -255,9 +255,8 @@ export class SkillObjectFactory {
 
   hasValidDescription(description: string) {
     var allowDescriptionToBeBlank = false;
-    var showWarnings = true;
     return this.validatorService.isValidEntityName(
-      description, showWarnings, allowDescriptionToBeBlank);
+      description, false, allowDescriptionToBeBlank);
   }
 
   createFromBackendDict(skillBackendDict: ISkillBackendDict): Skill {
