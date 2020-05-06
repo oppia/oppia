@@ -1549,10 +1549,9 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             self.translator_id, 'hi')
 
         all_reviewers = user_services.get_all_community_reviewers()
-        self.assertEqual(len(all_reviewers), 2)
-
-        self.assertEqual(all_reviewers[0].id, self.voice_artist_id)
-        self.assertEqual(all_reviewers[1].id, self.translator_id)
+        self.assertItemsEqual(
+            [reviewer.id for reviewer in all_reviewers],
+            [self.voice_artist_id, self.translator_id])
 
     def test_remove_translation_review_rights_in_language(self):
         user_services.allow_user_to_review_translation_in_language(
