@@ -44,7 +44,7 @@ describe('Exploration Automatic Text To Speech Service', function() {
     expect(eattss._isValid(true)).toBe(true);
     eattss.savedMemento = true;
     expect(eattss.isAutomaticTextToSpeechEnabled()).toBe(true);
-    spyOn(eattss,'saveDisplayedValue');
+    spyOn(eattss, 'saveDisplayedValue');
     eattss.toggleAutomaticTextToSpeech();
     expect(eattss.saveDisplayedValue).toHaveBeenCalled();
   });

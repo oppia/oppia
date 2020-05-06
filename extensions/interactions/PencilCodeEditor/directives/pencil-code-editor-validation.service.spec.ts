@@ -18,8 +18,10 @@
 
 import { TestBed } from '@angular/core/testing';
 
+/* eslint-disable max-len */
 import { PencilCodeEditorValidationService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service.ts';
+  /* eslint-enable max-len */
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
@@ -39,11 +41,14 @@ describe('Pencil Code Editor Validation Service', () => {
     let array = [];
     let stateName = 'Introduction';
     let customizationArgs = {
-      'initial_code': "# Add the initial code snippet here.↵",
+      "initial_code": "# Add the initial code snippet here.↵",
     };
     let answerGroups = [];
     let defaultOutcome: Outcome;
-    expect(pcevs.getCustomizationArgsWarnings(customizationArgs)).toEqual(array);
-    expect(pcevs.getAllWarnings(stateName, customizationArgs, answerGroups, defaultOutcome)).toEqual(array);
+    expect(pcevs.getCustomizationArgsWarnings(customizationArgs))
+    .toEqual(array);
+    expect(pcevs.getAllWarnings(
+      stateName, customizationArgs, answerGroups, 
+      defaultOutcome)).toEqual(array);
   });
 });
