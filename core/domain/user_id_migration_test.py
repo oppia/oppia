@@ -2139,3 +2139,87 @@ class AddAllUserIdsSnapshotsVerificationJobTests(test_utils.GenericTestBase):
             [self.USER_1_ID, self.USER_4_ID],
             topic_models.TopicRightsAllUsersModel.get_by_id(self.TOP_2_ID)
             .all_user_ids)
+
+
+class DeleteAllUserIdsVerificationJobTests(test_utils.GenericTestBase):
+
+    COL_ID = 'col_id'
+    EXP_ID = 'exp_id'
+    TOP_ID = 'top_id'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = user_id_migration.DeleteAllUserIdsVerificationJob.create_new()
+        user_id_migration.DeleteAllUserIdsVerificationJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            user_id_migration.DeleteAllUserIdsVerificationJob.get_output(
+                job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def test_one_collection_rights(self):
+        collection_models.CollectionRightsAllUsersModel(
+            id=self.COL_ID,
+            all_user_ids=['some_id']
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS', 1]])
+
+        self.assertIsNone(
+            collection_models.CollectionRightsAllUsersModel.get_by_id(
+                self.COL_ID))
+
+    def test_one_exploration_rights(self):
+        exp_models.ExplorationRightsAllUsersModel(
+            id=self.EXP_ID,
+            all_user_ids=['some_id']
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS', 1]])
+
+        self.assertIsNone(
+            exp_models.ExplorationRightsAllUsersModel.get_by_id(self.EXP_ID))
+
+    def test_one_topic_rights(self):
+        topic_models.TopicRightsAllUsersModel(
+            id=self.EXP_ID,
+            all_user_ids=['some_id']
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS', 1]])
+
+        self.assertIsNone(
+            topic_models.TopicRightsAllUsersModel.get_by_id(self.TOP_ID))
+
+    def test_multiple_rights(self):
+        collection_models.CollectionRightsAllUsersModel(
+            id=self.COL_ID,
+            all_user_ids=[]
+        ).put()
+        exp_models.ExplorationRightsAllUsersModel(
+            id=self.EXP_ID,
+            all_user_ids=['some_id']
+        ).put()
+        topic_models.TopicRightsAllUsersModel(
+            id=self.EXP_ID,
+            all_user_ids=['some_id', 'some_other_id']
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS', 3]])
+
+        self.assertIsNone(
+            collection_models.CollectionRightsAllUsersModel.get_by_id(
+                self.COL_ID))
+        self.assertIsNone(
+            exp_models.ExplorationRightsAllUsersModel.get_by_id(self.EXP_ID))
+        self.assertIsNone(
+            topic_models.TopicRightsAllUsersModel.get_by_id(self.TOP_ID))

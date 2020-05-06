@@ -76,6 +76,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_id_migration.AddAllUserIdsSnapshotsVerificationJob,
     user_id_migration.AddAllUserIdsVerificationJob,
     user_id_migration.CreateNewUsersMigrationJob,
+    user_id_migration.DeleteAllUserIdsVerificationJob,
     user_id_migration.GaeIdNotInModelsVerificationJob,
     user_id_migration.ModelsUserIdsHaveUserSettingsExplorationsVerificationJob,
     user_id_migration.ModelsUserIdsHaveUserSettingsVerificationJob,

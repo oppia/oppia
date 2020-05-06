@@ -897,3 +897,35 @@ class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, ids):
         """Implements the reduce function for this job."""
         yield (key, len(ids))
+
+
+class DeleteAllUserIdsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
+    """Delete all RightsAllUsersModels from the datastore This needs to be done
+    so that the next testing run works correctly..
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over three types of entity class.
+        super(DeleteAllUserIdsVerificationJob, cls).enqueue(
+            job_id, shard_count=32)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [collection_models.CollectionRightsAllUsersModel,
+                exp_models.ExplorationRightsAllUsersModel,
+                topic_models.TopicRightsAllUsersModel]
+
+    @staticmethod
+    def map(rights_snapshot_model):
+        """Implements the map function for this job."""
+        deleted_model_id = rights_snapshot_model.id
+        rights_snapshot_model.delete()
+        yield ('SUCCESS', deleted_model_id)
+
+    @staticmethod
+    def reduce(key, ids):
+        """Implements the reduce function for this job."""
+        yield (key, len(ids))
