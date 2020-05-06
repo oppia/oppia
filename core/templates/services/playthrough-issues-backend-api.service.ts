@@ -84,7 +84,7 @@ export class PlaythroughIssuesBackendApiService {
             return;
           }
         }
-        throw Error(
+        throw new Error(
           'An issue which was not fetched from the backend has been resolved');
       });
   }

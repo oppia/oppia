@@ -77,14 +77,14 @@ export class WrittenTranslations {
 
   addContentId(contentId: string): void {
     if (this.translationsMapping.hasOwnProperty(contentId)) {
-      throw Error('Trying to add duplicate content id.');
+      throw new Error('Trying to add duplicate content id.');
     }
     this.translationsMapping[contentId] = {};
   }
 
   deleteContentId(contentId: string): void {
     if (!this.translationsMapping.hasOwnProperty(contentId)) {
-      throw Error('Unable to find the given content id.');
+      throw new Error('Unable to find the given content id.');
     }
     delete this.translationsMapping[contentId];
   }
@@ -92,7 +92,7 @@ export class WrittenTranslations {
   addWrittenTranslation(contentId: string, languageCode: string, html: string) {
     var writtenTranslations = this.translationsMapping[contentId];
     if (writtenTranslations.hasOwnProperty(languageCode)) {
-      throw Error('Trying to add duplicate language code.');
+      throw new Error('Trying to add duplicate language code.');
     }
     writtenTranslations[languageCode] = (
       this._writtenTranslationObjectFactory.createNew(html));
@@ -102,7 +102,7 @@ export class WrittenTranslations {
       contentId: string, languageCode: string, html: string) {
     var writtenTranslations = this.translationsMapping[contentId];
     if (!writtenTranslations.hasOwnProperty(languageCode)) {
-      throw Error('Unable to find the given language code.');
+      throw new Error('Unable to find the given language code.');
     }
     writtenTranslations[languageCode].setHtml(html);
     // Marking translation updated.
