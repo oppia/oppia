@@ -17,8 +17,8 @@
  */
 
 import { from, Observable } from 'rxjs';
-import { HttpClient, HttpParams, HttpRequest,
-  HttpInterceptor, HttpEvent, HttpHandler } from '@angular/common/http';
+import { HttpRequest, HttpInterceptor,
+  HttpEvent, HttpHandler } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { switchMap } from 'rxjs/operators';
 
@@ -80,11 +80,11 @@ export class RequestInterceptor implements HttpInterceptor {
         .pipe(
           switchMap(token => {
             if (request.method === 'POST' || request.method === 'PUT') {
-              var body = new HttpParams()
-                // @ts-ignore
-                .set('csrf_token', token)
-                .set('source', document.URL)
-                .set('payload', JSON.stringify(request.body));
+              var body = new FormData();
+              // @ts-ignore
+              body.append('csrf_token', token);
+              body.append('source', document.URL);
+              body.append('payload', JSON.stringify(request.body));
               // @ts-ignore
               request.body = body;
             } else {
