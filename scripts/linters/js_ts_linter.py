@@ -47,11 +47,11 @@ from .. import build  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
-EXCLUDE_ANY_TYPE_FILES_PATH = os.path.join(
+FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH = os.path.join(
     CURR_DIR, 'scripts', 'linters', 'excluded_any_type_files.json')
 
-with python_utils.open_file(EXCLUDE_ANY_TYPE_FILES_PATH, 'r') as f:
-    EXCLUDED_FILES_ANY_TYPE_CHECK = json.loads(f.read())
+FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(open(
+    FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH, 'r'))
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
@@ -237,16 +237,17 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('Starting any type check')
             python_utils.PRINT('----------------------------------------')
 
-        files_to_check = self.all_filepaths
+        # First pattern is used to match cases like these : any
+        # Second pattern is used when the character of last line was :
+        # So, we know that this line begins with a type of variable
         patterns_to_match = [r':\ *any', r'^\ *any']
-        stdout = sys.stdout
 
-        with linter_utils.redirect_stdout(stdout):
+        with linter_utils.redirect_stdout(sys.stdout):
             failed = False
             summary_messages = []
 
-            for file_path in files_to_check:
-                if file_path in EXCLUDED_FILES_ANY_TYPE_CHECK:
+            for file_path in self.all_filepaths:
+                if file_path in FILES_EXCLUDED_FROM_ANY_TYPE_CHECK:
                     continue
 
                 file_content = FILE_CACHE.read(file_path)
@@ -259,8 +260,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         failed = True
                         python_utils.PRINT(
                             '%s --> ANY type found in this file. Line no.'
-                            ' %s' % (
-                                file_path, line_number + 1))
+                            ' %s' % (file_path, line_number + 1))
                         python_utils.PRINT('')
 
                     if line:
