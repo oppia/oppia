@@ -39,7 +39,7 @@ export class NumericInputValidationService {
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'customizationArgs' is a dict with possible underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.dsa
+  // camelCasing.
   getCustomizationArgsWarnings(customizationArgs: any): any[] {
     return [];
   }
