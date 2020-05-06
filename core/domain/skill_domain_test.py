@@ -96,12 +96,13 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         misconception_name = 'This string is smaller than 50'
         self.skill.update_misconception_name(0, misconception_name)
         self.skill.validate()
-        misconception_name = ('This string is a larger string'
-                              'and it is greater than 50 chars.')
+        misconception_name = (
+            'etiam non quam lacus suspendisse faucibus interdum posuere lorem '
+            'ipsum dolor sit amet consectetur adipiscing elit duis tristique '
+            'sollicitudin nibh sit amet commodo nulla facilisi')
         self.skill.update_misconception_name(0, misconception_name)
         self._assert_validation_error(
-            'The length of misconception_name should '
-            'be between 1 and 50 characters'
+            'Misconception name should be less than 100 chars'
         )
 
     def test_valid_misconception_must_be_addressed(self):
@@ -178,10 +179,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Description should be a string')
 
         self.skill.description = (
-            'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyza'
-            'bcdefghijklmnopqrstuvwxyz')
+            'etiam non quam lacus suspendisse faucibus interdum posuere lorem '
+            'ipsum dolor sit amet consectetur adipiscing elit duis tristique '
+            'sollicitudin nibh sit amet commodo nulla facilisi')
         self._assert_validation_error(
-            'Skill description should be less than 64 chars')
+            'Skill description should be less than 100 chars')
 
     def test_prerequisite_skill_ids_validation(self):
         self.skill.prerequisite_skill_ids = 0

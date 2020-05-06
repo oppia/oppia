@@ -130,6 +130,10 @@ angular.module('oppia').directive('stateResponses', [
             return existingContentIds;
           };
 
+          $scope.isInQuestionMode = function() {
+            return StateEditorService.isInQuestionMode();
+          };
+
           $scope.suppressDefaultAnswerGroupWarnings = function() {
             var interactionId = $scope.getCurrentInteractionId();
             var answerGroups = ResponsesService.getAnswerGroups();
