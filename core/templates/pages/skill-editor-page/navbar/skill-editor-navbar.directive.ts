@@ -35,18 +35,15 @@ angular.module('oppia').directive('skillEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill-editor-page/navbar/skill-editor-navbar.directive.html'),
       controller: [
-        '$scope', '$uibModal', '$window', 'AlertsService',
-        'UndoRedoService', 'SkillEditorStateService',
-        'SkillEditorRoutingService',
-        'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
-        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
+        '$scope', '$uibModal', 'AlertsService', 'UndoRedoService',
+        'SkillEditorStateService', 'SkillEditorRoutingService',
+        'EVENT_SKILL_REINITIALIZED', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
-            $scope, $uibModal, $window, AlertsService,
-            UndoRedoService, SkillEditorStateService,
-            SkillEditorRoutingService,
-            EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
-            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+            $scope, $uibModal, AlertsService, UndoRedoService,
+            SkillEditorStateService, SkillEditorRoutingService,
+            EVENT_SKILL_REINITIALIZED, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           var ctrl = this;
+          ctrl.subscriptions = [];
           $scope.getActiveTabName = function() {
             return SkillEditorRoutingService.getActiveTabName();
           };
@@ -145,13 +142,21 @@ angular.module('oppia').directive('skillEditorNavbar', [
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.validationIssues = [];
-            SkillEditorStateService.getEventSkillInitializedSubject().subscribe(
-              () => _validateSkill()
+            ctrl.subscriptions.push(
+              SkillEditorStateService.getEventSkillInitializedSubject()
+                .subscribe(
+                  () => _validateSkill())
             );
             $scope.$on(EVENT_SKILL_REINITIALIZED, _validateSkill);
             $scope.$on(
               EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateSkill);
           };
+
+          $scope.$on('$destroy',function() {
+            for (let subscription of ctrl.subscriptions) {
+              subscription.unsubscribe();
+            }
+          });
         }]
     };
   }

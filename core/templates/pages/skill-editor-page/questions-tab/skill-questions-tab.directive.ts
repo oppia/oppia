@@ -44,23 +44,12 @@ angular.module('oppia').directive('questionsTab', [
         '/pages/skill-editor-page/questions-tab/' +
         'skill-questions-tab.directive.html'),
       controller: [
-        '$scope', '$http', '$q', '$uibModal', '$window', 'AlertsService',
-        'SkillEditorStateService', 'QuestionCreationService', 'UrlService',
-        'EditableQuestionBackendApiService', 'SkillBackendApiService',
-        'MisconceptionObjectFactory', 'QuestionObjectFactory',
-        'QuestionsListService',
-        'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
-        'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
-        'NUM_QUESTIONS_PER_PAGE', function(
-            $scope, $http, $q, $uibModal, $window, AlertsService,
-            SkillEditorStateService, QuestionCreationService, UrlService,
-            EditableQuestionBackendApiService, SkillBackendApiService,
-            MisconceptionObjectFactory, QuestionObjectFactory,
-            QuestionsListService,
-            StateEditorService, QuestionUndoRedoService, UndoRedoService,
-            EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
-            NUM_QUESTIONS_PER_PAGE) {
+        '$scope', 'SkillEditorStateService', 'QuestionsListService',
+        'EVENT_SKILL_REINITIALIZED', function(
+            $scope, SkillEditorStateService, QuestionsListService,
+            EVENT_SKILL_REINITIALIZED) {
           var ctrl = this;
+          ctrl.subscriptions = [];
           var _init = function() {
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.getQuestionSummariesAsync =
@@ -75,11 +64,20 @@ angular.module('oppia').directive('questionsTab', [
           };
           ctrl.$onInit = function() {
             _init();
-            SkillEditorStateService.getEventSkillInitializedSubject().subscribe(
-              () => _init()
+            ctrl.subscriptions.push(
+              SkillEditorStateService.getEventSkillInitializedSubject()
+                .subscribe(
+                  () => _init()
+                )
             );
             $scope.$on(EVENT_SKILL_REINITIALIZED, _init);
           };
+
+          $scope.$on('$destroy',function() {
+            for (let subscription of ctrl.subscriptions) {
+              subscription.unsubscribe();
+            }
+          });
         }
       ]
     };
