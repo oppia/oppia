@@ -229,8 +229,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         return compiled_js_filepath
 
     def _check_any_type(self):
-        """Checks if the type of any variable is declared as any
-        in typescript files.
+        """Checks if the type of any variable is declared as 'any'
+        in TypeScript files.
         """
 
         if self.verbose_mode_enabled:
@@ -238,11 +238,11 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('----------------------------------------')
 
         # pylint: disable=invalid-punctuation-used
-        # This pattern is used to match cases like these ': any'
+        # This pattern is used to match cases like ': any'.
         any_type_pattern = r':\ *any'
 
-        # This pattern is used to match cases where the last line ended
-        # with a ':', So we know this line begins with a type
+        # This pattern is used to match cases where the previous line ended
+        # with a ':', so we know this line begins with a type.
         starts_with_any_pattern = r'^\ *any'
 
         with linter_utils.redirect_stdout(sys.stdout):
