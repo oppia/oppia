@@ -52,7 +52,7 @@ angular.module('oppia').directive('notificationsDashboardPage', [
               millisSinceEpoch);
           };
           ctrl.$onInit = function() {
-            LoaderService.setLoadingMessage('Loading');
+            LoaderService.showLoadingScreen('Loading');
             $http.get('/notificationsdashboardhandler/data').then(function(
                 response) {
               var data = response.data;
@@ -60,7 +60,7 @@ angular.module('oppia').directive('notificationsDashboardPage', [
               ctrl.jobQueuedMsec = data.job_queued_msec;
               ctrl.lastSeenMsec = data.last_seen_msec || 0.0;
               ctrl.currentUsername = data.username;
-              LoaderService.setLoadingMessage('');
+              LoaderService.hideLoadingScreen();
             });
           };
         }

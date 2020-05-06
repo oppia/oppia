@@ -31,7 +31,7 @@ angular.module('oppia').controller('Base', [
 
     $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
     // If this is nonempty, the whole page goes into 'Loading...' mode.
-    LoaderService.setLoadingMessage('');
+    LoaderService.hideLoadingScreen();
 
     $scope.isSidebarShown = SidebarStatusService.isSidebarShown;
     $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;

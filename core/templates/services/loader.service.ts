@@ -37,9 +37,14 @@ export class LoaderService {
   static loadingMessageSubject: Subject<string> = new Subject<string>();
   constructor() {}
 
-  setLoadingMessage(message: string): void {
+  showLoadingScreen(message: string): void {
     // TODO(#9154): Change LoaderService to "this".
     LoaderService.loadingMessageSubject.next(message);
+  }
+
+  hideLoadingScreen(): void {
+    // TODO(#9154): Change LoaderService to "this".
+    LoaderService.loadingMessageSubject.next('');
   }
 
   getLoadingMessageSubject(): Subject<string> {

@@ -42,7 +42,7 @@ angular.module('oppia').factory('ExplorationCreationService', [
 
         explorationCreationInProgress = true;
         AlertsService.clearWarnings();
-        LoaderService.setLoadingMessage('Creating exploration');
+        LoaderService.showLoadingScreen('Creating exploration');
 
         $http.post('/contributehandler/create_new', {
         }).then(function(response) {
@@ -57,7 +57,7 @@ angular.module('oppia').factory('ExplorationCreationService', [
           }, 150);
           return false;
         }, function() {
-          LoaderService.setLoadingMessage('');
+          LoaderService.hideLoadingScreen();
           explorationCreationInProgress = false;
         });
       },
@@ -96,7 +96,7 @@ angular.module('oppia').factory('ExplorationCreationService', [
         }).result.then(function(result) {
           var yamlFile = result.yamlFile;
 
-          LoaderService.setLoadingMessage('Creating exploration');
+          LoaderService.showLoadingScreen('Creating exploration');
 
           var form = new FormData();
           form.append('yaml_file', yamlFile);
@@ -125,7 +125,7 @@ angular.module('oppia').factory('ExplorationCreationService', [
               var parsedResponse = JSON.parse(transformedData);
               AlertsService.addWarning(
                 parsedResponse.error || 'Error communicating with server.');
-              LoaderService.setLoadingMessage('');
+              LoaderService.hideLoadingScreen();
               $rootScope.$apply();
             });
           });

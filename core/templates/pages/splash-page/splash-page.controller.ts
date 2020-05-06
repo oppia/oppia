@@ -69,10 +69,10 @@ angular.module('oppia').directive('splashPage', [function() {
         };
         ctrl.$onInit = function() {
           ctrl.userIsLoggedIn = null;
-          LoaderService.setLoadingMessage('Loading');
+          LoaderService.showLoadingScreen('Loading');
           UserService.getUserInfoAsync().then(function(userInfo) {
             ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-            LoaderService.setLoadingMessage('');
+            LoaderService.hideLoadingScreen();
           });
         };
       }

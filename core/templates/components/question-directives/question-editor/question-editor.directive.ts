@@ -107,7 +107,7 @@ angular.module('oppia').directive('questionEditor', [
                 ctrl.interactionIsShown = true;
               }
 
-              LoaderService.setLoadingMessage('');
+              LoaderService.hideLoadingScreen();
             }
             ctrl.stateEditorInitialized = true;
           };

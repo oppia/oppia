@@ -255,7 +255,7 @@ angular.module('oppia').directive('storyViewerPage', [
 
           ctrl.$onInit = function() {
             ctrl.storyIsLoaded = false;
-            LoaderService.setLoadingMessage('Loading');
+            LoaderService.showLoadingScreen('Loading');
             var storyId = UrlService.getStoryIdFromViewerUrl();
             StoryViewerBackendApiService.fetchStoryData(storyId).then(
               function(storyDataDict) {
@@ -277,7 +277,7 @@ angular.module('oppia').directive('storyViewerPage', [
                     getExplorationSummaryObject();
                 ctrl.thumbnailBgColor = firstChapterSummary.thumbnail_bg_color;
                 ctrl.thumbnailIconUrl = firstChapterSummary.thumbnail_icon_url;
-                LoaderService.setLoadingMessage('');
+                LoaderService.hideLoadingScreen();
                 ctrl.generatePathParameters();
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the directive is migrated to angular

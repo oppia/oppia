@@ -263,7 +263,7 @@ angular.module('oppia').directive('creatorDashboardPage', [
               DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
 
             ctrl.canCreateCollections = null;
-            LoaderService.setLoadingMessage('Loading');
+            LoaderService.showLoadingScreen('Loading');
             var userInfoPromise = UserService.getUserInfoAsync();
             userInfoPromise.then(function(userInfo) {
               ctrl.canCreateCollections = userInfo.canCreateCollections();
@@ -369,7 +369,7 @@ angular.module('oppia').directive('creatorDashboardPage', [
             );
 
             $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
-              LoaderService.setLoadingMessage('');
+              LoaderService.hideLoadingScreen();
             });
 
             ctrl.getAverageRating = RatingComputationService

@@ -54,10 +54,10 @@ angular.module('oppia').directive('profilePage', [
             return DateTimeFormatService.getLocaleDateString(millisSinceEpoch);
           };
           ctrl.$onInit = function() {
-            LoaderService.setLoadingMessage('Loading');
+            LoaderService.showLoadingScreen('Loading');
             $http.get(profileDataUrl).then(function(response) {
               var data = response.data;
-              LoaderService.setLoadingMessage('');
+              LoaderService.hideLoadingScreen();
               ctrl.username = {
                 title: 'Username',
                 value: data.profile_username,
@@ -213,7 +213,7 @@ angular.module('oppia').directive('profilePage', [
               ctrl.firstContributionMsec = data.first_contribution_msec;
               ctrl.profilePictureDataUrl = (
                 data.profile_picture_data_url || DEFAULT_PROFILE_PICTURE_URL);
-              LoaderService.setLoadingMessage('');
+              LoaderService.hideLoadingScreen();
             });
           };
         }

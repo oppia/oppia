@@ -64,7 +64,7 @@ angular.module('oppia').directive('topicViewerPage', [
 
             PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
 
-            LoaderService.setLoadingMessage('Loading');
+            LoaderService.showLoadingScreen('Loading');
             TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
               function(readOnlyTopic) {
                 ctrl.topicId = readOnlyTopic.getTopicId();
@@ -73,7 +73,7 @@ angular.module('oppia').directive('topicViewerPage', [
                 ctrl.degreesOfMastery = readOnlyTopic.getDegreesOfMastery();
                 ctrl.subtopics = readOnlyTopic.getSubtopics();
                 ctrl.skillDescriptions = readOnlyTopic.getSkillDescriptions();
-                LoaderService.setLoadingMessage('');
+                LoaderService.hideLoadingScreen();
                 ctrl.trainTabShouldBeDisplayed = (
                   readOnlyTopic.getTrainTabShouldBeDisplayed());
                 // TODO(#8521): Remove the use of $rootScope.$apply()

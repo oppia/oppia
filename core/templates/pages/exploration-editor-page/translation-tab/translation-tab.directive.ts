@@ -97,7 +97,7 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
                 stateName));
             $scope.showTranslationTabSubDirectives = true;
             TranslationTabActiveModeService.activateVoiceoverMode();
-            LoaderService.setLoadingMessage('');
+            LoaderService.hideLoadingScreen();
           };
 
           $scope.leaveTutorial = function() {
@@ -170,7 +170,7 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
           };
 
           ctrl.$onInit = function() {
-            LoaderService.setLoadingMessage('Loading');
+            LoaderService.showLoadingScreen('Loading');
             $scope.isTranslationTabBusy = false;
             $scope.showTranslationTabSubDirectives = false;
             $scope.$on('refreshTranslationTab', function() {

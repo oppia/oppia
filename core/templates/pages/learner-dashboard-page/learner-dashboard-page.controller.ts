@@ -491,7 +491,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
               ctrl.profilePictureDataUrl = dataUrl;
             });
 
-            LoaderService.setLoadingMessage('Loading');
+            LoaderService.showLoadingScreen('Loading');
             ctrl.username = '';
             var userInfoPromise = UserService.getUserInfoAsync();
             userInfoPromise.then(function(userInfo) {
@@ -595,7 +595,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
             );
 
             $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
-              LoaderService.setLoadingMessage('');
+              LoaderService.hideLoadingScreen();
             });
 
             ctrl.loadingFeedbacks = false;

@@ -232,7 +232,7 @@ angular.module('oppia').directive('preferencesPage', [
             ctrl.DASHBOARD_TYPE_LEARNER = DASHBOARD_TYPE_LEARNER;
 
             ctrl.username = '';
-            LoaderService.setLoadingMessage('Loading');
+            LoaderService.showLoadingScreen('Loading');
             var userInfoPromise = UserService.getUserInfoAsync();
             userInfoPromise.then(function(userInfo) {
               ctrl.username = userInfo.getUsername();
@@ -275,7 +275,7 @@ angular.module('oppia').directive('preferencesPage', [
             });
 
             $q.all([userInfoPromise, preferencesPromise]).then(function() {
-              LoaderService.setLoadingMessage('');
+              LoaderService.hideLoadingScreen();
             });
             ctrl.userCanDeleteAccount = ENABLE_ACCOUNT_DELETION;
             ctrl.subjectInterestsChangedAtLeastOnce = false;

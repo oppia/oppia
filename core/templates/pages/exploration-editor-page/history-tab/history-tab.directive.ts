@@ -102,7 +102,7 @@ angular.module('oppia').directive('historyTab', [
 
           // Refreshes the displayed version history log.
           ctrl.refreshVersionHistory = function() {
-            LoaderService.setLoadingMessage('Loading');
+            LoaderService.showLoadingScreen('Loading');
             ExplorationDataService.getData().then(function(data) {
               var currentVersion = data.version;
               ctrl.currentVersion = currentVersion;
@@ -156,7 +156,7 @@ angular.module('oppia').directive('historyTab', [
                       selected: false
                     });
                   }
-                  LoaderService.setLoadingMessage('');
+                  LoaderService.hideLoadingScreen();
                   ctrl.computeVersionsToDisplay();
                 });
             });

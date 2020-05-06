@@ -215,14 +215,14 @@ angular.module('oppia').directive('signupPage', [
             });
           };
           ctrl.$onInit = function() {
-            LoaderService.setLoadingMessage('I18N_SIGNUP_LOADING');
+            LoaderService.showLoadingScreen('I18N_SIGNUP_LOADING');
             ctrl.warningI18nCode = '';
             ctrl.siteName = SITE_NAME;
             ctrl.submissionInProcess = false;
 
             $http.get(_SIGNUP_DATA_URL).then(function(response) {
               var data = response.data;
-              LoaderService.setLoadingMessage('');
+              LoaderService.hideLoadingScreen();
               ctrl.username = data.username;
               ctrl.hasEverRegistered = data.has_ever_registered;
               ctrl.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;

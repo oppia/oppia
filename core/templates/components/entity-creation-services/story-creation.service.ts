@@ -67,7 +67,7 @@ angular.module('oppia').factory('StoryCreationService', [
           storyCreationInProgress = true;
           AlertsService.clearWarnings();
           var topic = TopicEditorStateService.getTopic();
-          LoaderService.setLoadingMessage('Creating story');
+          LoaderService.showLoadingScreen('Creating story');
           var createStoryUrl = UrlInterpolationService.interpolateUrl(
             STORY_CREATOR_URL_TEMPLATE, {
               topic_id: topic.getId()
@@ -81,7 +81,7 @@ angular.module('oppia').factory('StoryCreationService', [
                 }
               );
             }, function() {
-              LoaderService.setLoadingMessage('');
+              LoaderService.hideLoadingScreen();
             });
         }, function() {
           // Note to developers:

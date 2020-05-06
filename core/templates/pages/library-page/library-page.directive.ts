@@ -208,7 +208,7 @@ angular.module('oppia').directive('libraryPage', [
           };
           ctrl.$onInit = function() {
             $scope.SHOW_CLASSROOM_CALLOUT = (SHOW_CLASSROOM_CALLOUT);
-            LoaderService.setLoadingMessage('I18N_LIBRARY_LOADING');
+            LoaderService.showLoadingScreen('I18N_LIBRARY_LOADING');
             ctrl.bannerImageFilename = possibleBannerFilenames[
               Math.floor(Math.random() * possibleBannerFilenames.length)];
 
@@ -253,7 +253,7 @@ angular.module('oppia').directive('libraryPage', [
                     'preferredLanguageCodesLoaded',
                     response.data.preferred_language_codes);
 
-                  LoaderService.setLoadingMessage('');
+                  LoaderService.hideLoadingScreen();
                 }, function() {
                   // This callback is triggered when the Cancel button is
                   // clicked. No further action is needed.
@@ -307,10 +307,10 @@ angular.module('oppia').directive('libraryPage', [
                                 ownedCollections.id] = true;
                             });
                         });
-                        LoaderService.setLoadingMessage('');
+                        LoaderService.hideLoadingScreen();
                       });
                   } else {
-                    LoaderService.setLoadingMessage('');
+                    LoaderService.hideLoadingScreen();
                   }
                 });
 

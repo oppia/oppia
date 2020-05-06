@@ -78,7 +78,7 @@ angular.module('oppia').directive('moderatorPage', [
           };
 
           ctrl.$onInit = function() {
-            LoaderService.setLoadingMessage('Loading');
+            LoaderService.showLoadingScreen('Loading');
             ctrl.allCommits = [];
             ctrl.allFeedbackMessages = [];
             // Map of exploration ids to objects containing a single key: title.
@@ -121,7 +121,7 @@ angular.module('oppia').directive('moderatorPage', [
                 }
               }
               ctrl.allCommits = data.results;
-              LoaderService.setLoadingMessage('');
+              LoaderService.hideLoadingScreen();
             });
 
             $http.get('/recent_feedback_messages').then(function(response) {

@@ -47,7 +47,7 @@ angular.module('oppia').factory('CollectionCreationService', [
         collectionCreationInProgress = true;
         AlertsService.clearWarnings();
 
-        LoaderService.setLoadingMessage('Creating collection');
+        LoaderService.showLoadingScreen('Creating collection');
 
         CollectionCreationBackendService.createCollection().then(
           function(response) {
@@ -61,7 +61,7 @@ angular.module('oppia').factory('CollectionCreationService', [
               );
             }, 150);
           }, function() {
-            LoaderService.setLoadingMessage('');
+            LoaderService.hideLoadingScreen();
           }
         );
       }

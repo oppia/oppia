@@ -134,7 +134,7 @@ angular.module('oppia').directive('explorationEditorTab', [
                 ctrl.interactionIsShown = true;
               }
 
-              LoaderService.setLoadingMessage('');
+              LoaderService.hideLoadingScreen();
             }
           };
 

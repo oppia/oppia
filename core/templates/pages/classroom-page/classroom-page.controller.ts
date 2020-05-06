@@ -62,11 +62,11 @@ angular.module('oppia').directive('classroomPage', [
             PageTitleService.setPageTitle(
               ctrl.classroomDisplayName + ' Classroom | Oppia');
 
-            LoaderService.setLoadingMessage('Loading');
+            LoaderService.showLoadingScreen('Loading');
             ClassroomBackendApiService.fetchClassroomData(
               classroomName).then(function(topicSummaryObjects) {
               ctrl.topicSummaries = topicSummaryObjects;
-              LoaderService.setLoadingMessage('');
+              LoaderService.hideLoadingScreen();
               $rootScope.$broadcast('initializeTranslation');
             },
             function(errorResponse) {

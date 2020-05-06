@@ -784,7 +784,7 @@ angular.module('oppia').directive('conversationSkin', [
             $rootScope.$broadcast(
               'playerStateChange', $scope.nextCard.getStateName());
             FocusManagerService.setFocusIfOnDesktop(focusLabel);
-            LoaderService.setLoadingMessage('');
+            LoaderService.hideLoadingScreen();
             $scope.hasFullyLoaded = true;
 
             // If the exploration is embedded, use the exploration language
@@ -1249,7 +1249,7 @@ angular.module('oppia').directive('conversationSkin', [
             $scope.explorationId = ExplorationEngineService.getExplorationId();
             $scope.isInPreviewMode = ExplorationEngineService.isInPreviewMode();
             $scope.isIframed = UrlService.isIframed();
-            LoaderService.setLoadingMessage('Loading');
+            LoaderService.showLoadingScreen('Loading');
             $scope.hasFullyLoaded = false;
             $scope.recommendedExplorationSummaries = null;
             $scope.answerIsCorrect = false;

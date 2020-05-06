@@ -240,7 +240,7 @@ angular.module('oppia').directive('feedbackTab', [
             ctrl.activeThread = null;
             ctrl.userIsLoggedIn = null;
             ctrl.threadIsStale = false;
-            LoaderService.setLoadingMessage('Loading');
+            LoaderService.showLoadingScreen('Loading');
 
             // Initial load of the thread list on page load.
             ctrl.tmpMessage = {
@@ -253,7 +253,7 @@ angular.module('oppia').directive('feedbackTab', [
               UserService.getUserInfoAsync().then(
                 userInfo => ctrl.userIsLoggedIn = userInfo.isLoggedIn()),
               ctrl.fetchUpdatedThreads()
-            ]).then(() => LoaderService.setLoadingMessage(''));
+            ]).then(() => LoaderService.hideLoadingScreen());
           };
         }
       ]

@@ -502,7 +502,7 @@ angular.module('oppia').directive('explorationEditorPage', [
             /** ********************************************************
              * Called on initial load of the exploration editor page.
              *********************************************************/
-            LoaderService.setLoadingMessage('Loading');
+            LoaderService.showLoadingScreen('Loading');
 
             ctrl.explorationId = ContextService.getExplorationId();
             ctrl.explorationUrl = '/create/' + ctrl.explorationId;

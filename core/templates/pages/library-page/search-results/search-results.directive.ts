@@ -50,7 +50,7 @@ angular.module('oppia').directive('searchResults', [
             ctrl.someResultsExist = true;
 
             ctrl.userIsLoggedIn = null;
-            LoaderService.setLoadingMessage('Loading');
+            LoaderService.showLoadingScreen('Loading');
             var userInfoPromise = UserService.getUserInfoAsync();
             userInfoPromise.then(function(userInfo) {
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
@@ -65,7 +65,7 @@ angular.module('oppia').directive('searchResults', [
             );
 
             $q.all([userInfoPromise, searchResultsPromise]).then(function() {
-              LoaderService.setLoadingMessage('');
+              LoaderService.hideLoadingScreen();
             });
 
             ctrl.noExplorationsImgUrl =

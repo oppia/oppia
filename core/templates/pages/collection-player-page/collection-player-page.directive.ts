@@ -247,7 +247,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
                 ctrl.generatePathParameters();
               }
             }, true);
-            LoaderService.setLoadingMessage('Loading');
+            LoaderService.showLoadingScreen('Loading');
             ctrl.collection = null;
             ctrl.collectionPlaythrough = null;
             ctrl.collectionId = UrlService.getCollectionIdFromUrl();
@@ -324,7 +324,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
                   ctrl.whitelistedCollectionIdsForGuestProgress.indexOf(
                     ctrl.collectionId) !== -1);
                 UserService.getUserInfoAsync().then(function(userInfo) {
-                  LoaderService.setLoadingMessage('');
+                  LoaderService.hideLoadingScreen();
                   ctrl.isLoggedIn = userInfo.isLoggedIn();
                   if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
                       GuestCollectionProgressService

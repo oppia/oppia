@@ -113,10 +113,10 @@ angular.module('oppia').directive('emailDashboardPage', [
 
           ctrl.$onInit = function() {
             ctrl.username = '';
-            LoaderService.setLoadingMessage('Loading');
+            LoaderService.showLoadingScreen('Loading');
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.username = userInfo.getUsername();
-              LoaderService.setLoadingMessage('');
+              LoaderService.hideLoadingScreen();
             });
 
             ctrl.currentPageOfQueries = [];
