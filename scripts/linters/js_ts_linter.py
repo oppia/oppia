@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
+import json
 import os
 import re
 import subprocess
@@ -45,6 +46,12 @@ import esprima  # isort:skip
 from .. import build  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
+
+EXCLUDE_ANY_TYPE_FILES_PATH = os.path.join(
+    CURR_DIR, 'scripts', 'linters', 'excluded_any_type_files.json')
+
+with python_utils.open_file(EXCLUDE_ANY_TYPE_FILES_PATH, 'r') as f:
+    EXCLUDED_FILES_ANY_TYPE_CHECK = json.loads(f.read())
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
@@ -109,6 +116,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             validating and parsing the files.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(self, js_files, ts_files, verbose_mode_enabled):
         """Constructs a JsTsLintChecksManager object.
 
@@ -219,6 +227,58 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         compiled_js_filepath = os.path.join(
             dir_path, os.path.basename(filepath).replace('.ts', '.js'))
         return compiled_js_filepath
+
+    def _check_any_type(self):
+        """Checks if the type of any variable is declared as any
+        in typescript files.
+        """
+
+        if self.verbose_mode_enabled:
+            python_utils.PRINT('Starting any type check')
+            python_utils.PRINT('----------------------------------------')
+
+        files_to_check = self.all_filepaths
+        patterns_to_match = [r':\ *any', r'^\ *any']
+        stdout = sys.stdout
+
+        with linter_utils.redirect_stdout(stdout):
+            failed = False
+            summary_messages = []
+
+            for file_path in files_to_check:
+                if file_path in EXCLUDED_FILES_ANY_TYPE_CHECK:
+                    continue
+
+                file_content = FILE_CACHE.read(file_path)
+                starts_with_type = False
+
+
+                for line_number, line in enumerate(file_content.split('\n')):
+                    if ((starts_with_type and re.findall(
+                            patterns_to_match[1], line)) or re.findall(
+                                patterns_to_match[0], line)):
+                        failed = True
+                        python_utils.PRINT(
+                            '%s --> ANY type found in this file. Line no.'
+                            ' %s' % (
+                                file_path, line_number + 1))
+                        python_utils.PRINT('')
+
+                    if line:
+                        starts_with_type = line[len(line) - 1] == ':'
+
+            if failed:
+                summary_message = (
+                    '%s ANY type check failed' % _MESSAGE_TYPE_FAILED)
+            else:
+                summary_message = (
+                    '%s ANY type check passed' % _MESSAGE_TYPE_SUCCESS)
+
+            summary_messages.append(summary_message)
+            python_utils.PRINT(summary_message)
+            python_utils.PRINT('')
+
+        return summary_messages
 
     def _check_extra_js_files(self):
         """Checks if the changes made include extra js files in core
@@ -796,6 +856,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         self.parsed_expressions_in_files = (
             self._get_expressions_from_parsed_script())
 
+        any_type_messages = self._check_any_type()
         extra_js_files_messages = self._check_extra_js_files()
         js_and_ts_component_messages = (
             self._check_js_and_ts_component_name_and_count())
@@ -805,7 +866,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             self._match_line_breaks_in_controller_dependencies())
 
         all_messages = (
-            extra_js_files_messages +
+            any_type_messages + extra_js_files_messages +
             js_and_ts_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages)
         return all_messages
