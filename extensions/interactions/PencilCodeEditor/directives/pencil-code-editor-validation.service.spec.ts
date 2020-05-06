@@ -48,7 +48,7 @@ describe('Pencil Code Editor Validation Service', () => {
     expect(pcevs.getCustomizationArgsWarnings(customizationArgs))
       .toEqual(array);
     expect(pcevs.getAllWarnings(
-    stateName, customizationArgs, answerGroups,
-    defaultOutcome)).toEqual(array);
+      stateName, customizationArgs, answerGroups,
+      defaultOutcome)).toEqual(array);
   });
 });
