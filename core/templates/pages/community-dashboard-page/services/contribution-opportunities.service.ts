@@ -21,9 +21,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { ContributionOpportunitiesBackendApiService,
-  IFetchOpportunitySuccessCallbackParams }
-// eslint-disable-next-line max-len
-  from 'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
+  IFetchedOpportunitiesSuccessCallbackParams } from
+  // eslint-disable-next-line max-len
+  'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { SkillOpportunity } from
   'domain/opportunity/SkillOpportunityObjectFactory';
 
@@ -46,7 +46,7 @@ export class ContributionOpportunitiesService {
       successCallback: (opportunities: SkillOpportunity[],
       more: boolean) => void): void {
     this.contributionOpportunitiesBackendApiService.fetchSkillOpportunities(
-      cursor).then((value: IFetchOpportunitySuccessCallbackParams) => {
+      cursor).then((value: IFetchedOpportunitiesSuccessCallbackParams) => {
       this.skillOpportunitiesCursor = value.nextCursor;
       this.moreSkillOpportunitiesAvailable = value.more;
       successCallback(value.opportunities, value.more);
@@ -58,7 +58,7 @@ export class ContributionOpportunitiesService {
       more: boolean) => void): void {
     this.contributionOpportunitiesBackendApiService
       .fetchTranslationOpportunities(languageCode, cursor)
-      .then((value: IFetchOpportunitySuccessCallbackParams) => {
+      .then((value: IFetchedOpportunitiesSuccessCallbackParams) => {
         this.translationOpportunitiesCursor = value.nextCursor;
         this.moreTranslationOpportunitiesAvailable = value.more;
         successCallback(value.opportunities, value.more);
@@ -70,7 +70,7 @@ export class ContributionOpportunitiesService {
       more: boolean) => void) {
     this.contributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
       languageCode, cursor).then(
-      (value: IFetchOpportunitySuccessCallbackParams) => {
+      (value: IFetchedOpportunitiesSuccessCallbackParams) => {
         this.voiceoverOpportunitiesCursor = value.nextCursor;
         this.moreVoiceoverOpportunitiesAvailable = value.more;
         successCallback(value.opportunities, value.more);

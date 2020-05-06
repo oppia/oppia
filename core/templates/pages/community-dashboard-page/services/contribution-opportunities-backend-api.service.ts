@@ -39,7 +39,7 @@ type ContributionOpportunityParams = {
   language_code?: string;
 };
 
-export interface IFetchOpportunitySuccessCallbackParams {
+export interface IFetchedOpportunitiesSuccessCallbackParams {
   opportunities?: SkillOpportunity[],
   nextCursor?: string,
   more?: boolean
@@ -78,7 +78,8 @@ export class ContributionOpportunitiesBackendApiService {
   private _fetchOpportunities(
       opportunityType: ContributionOpportunityCategoryType,
       params: ContributionOpportunityParams,
-      successCallback: (value: IFetchOpportunitySuccessCallbackParams) => void,
+      successCallback:
+      (value: IFetchedOpportunitiesSuccessCallbackParams) => void,
       errorCallback: (reason?: any) => void): void {
     this.http.get(this.urlInterpolationService.interpolateUrl(
       this.urlTemplate, { opportunityType }

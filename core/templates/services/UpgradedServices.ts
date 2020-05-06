@@ -69,12 +69,11 @@ import { ConceptCardObjectFactory } from
 import { ContextService } from 'services/context.service';
 import { ContinueValidationService } from
   'interactions/Continue/directives/continue-validation.service';
-import { ContributionOpportunitiesService }
-// eslint-disable-next-line max-len
-  from 'pages/community-dashboard-page/services/contribution-opportunities.service';
 import { ContributionOpportunitiesBackendApiService }
 // eslint-disable-next-line max-len
   from 'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
+import { ContributionOpportunitiesService } from
+  'pages/community-dashboard-page/services/contribution-opportunities.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CreatorDashboardBackendApiService } from
   'domain/creator_dashboard/creator-dashboard-backend-api.service';
