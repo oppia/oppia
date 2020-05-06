@@ -857,8 +857,7 @@ class BaseContinuousComputationManagerTests(test_utils.GenericTestBase):
                 'Subclasses of BaseContinuousComputationManager must implement '
                 '_get_realtime_datastore_class(). This method should return '
                 'the datastore class to be used by the realtime layer.')):
-          jobs.BaseContinuousComputationManager.
-          get_active_realtime_layer_id(self.EXP_ID)
+            jobs.BaseContinuousComputationManager.get_active_realtime_layer_id(self.EXP_ID)
 
     def test_raise_error_with_get_multi_active_realtime_layer_ids(self):
         with self.assertRaisesRegexp(
@@ -867,8 +866,7 @@ class BaseContinuousComputationManagerTests(test_utils.GenericTestBase):
                 'Subclasses of BaseContinuousComputationManager must implement '
                 '_get_realtime_datastore_class(). This method should return '
                 'the datastore class to be used by the realtime layer.')):
-	jobs.BaseContinuousComputationManager.
-        get_active_realtime_layer_id([self.EXP_ID])
+	    jobs.BaseContinuousComputationManager.get_active_realtime_layer_id([self.EXP_ID])
 
     def test_raise_error_with_get_batch_job_manager_class(self):
         with self.assertRaisesRegexp(
@@ -877,8 +875,7 @@ class BaseContinuousComputationManagerTests(test_utils.GenericTestBase):
                 'Subclasses of BaseContinuousComputationManager must implement '
                 '_get_batch_job_manager_class(). This method should return the'
                 'manager class for the continuously-running batch job.')):
-            jobs.BaseContinuousComputationManager.
-            stop_computation('admin_user_id')
+            jobs.BaseContinuousComputationManager.stop_computation('admin_user_id')
 
     def test_raise_error_with_handle_incoming_event(self):
         with self.assertRaisesRegexp(
@@ -888,8 +885,7 @@ class BaseContinuousComputationManagerTests(test_utils.GenericTestBase):
                 '_handle_incoming_event(...). Please check the docstring of '
                 'this method in jobs.BaseContinuousComputationManager for '
                 'important developer information.')):
-            jobs.BaseContinuousComputationManager.
-            on_incoming_event(1, 'event_type')
+            jobs.BaseContinuousComputationManager.on_incoming_event(1, 'event_type')
 
 
 class JobQueriesTests(test_utils.GenericTestBase):
