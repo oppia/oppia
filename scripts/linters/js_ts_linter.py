@@ -252,7 +252,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 file_content = FILE_CACHE.read(file_path)
                 starts_with_type = False
 
-
                 for line_number, line in enumerate(file_content.split('\n')):
                     if ((starts_with_type and re.findall(
                             patterns_to_match[1], line)) or re.findall(
