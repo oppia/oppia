@@ -73,8 +73,8 @@ angular.module('oppia').directive('questionsTab', [
             $scope.$on(EVENT_SKILL_REINITIALIZED, _init);
           };
 
-          $scope.$on('$destroy',function() {
-            for (let subscription of ctrl.subscriptions) {
+          $scope.$on('$destroy', function() {
+            for (const subscription of ctrl.subscriptions) {
               subscription.unsubscribe();
             }
           });

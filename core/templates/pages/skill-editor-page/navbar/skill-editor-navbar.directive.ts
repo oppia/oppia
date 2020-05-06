@@ -152,8 +152,8 @@ angular.module('oppia').directive('skillEditorNavbar', [
               EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateSkill);
           };
 
-          $scope.$on('$destroy',function() {
-            for (let subscription of ctrl.subscriptions) {
+          $scope.$on('$destroy', function() {
+            for (const subscription of ctrl.subscriptions) {
               subscription.unsubscribe();
             }
           });
