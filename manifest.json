@@ -2,17 +2,17 @@
   "dependencies": {
     "backend": {
       "backports.functools_lru_cache ": {
-        "version": "1.5",
+        "version": "1.6.1",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/57/d4/156eb5fbb08d2e85ab0a632e2bebdad355798dece07d4752f66a8d02d1ea/backports.functools_lru_cache-1.5.tar.gz#md5=2e271cab23c4c4d1de2f7ee80a1736bb",
+        "url": "https://files.pythonhosted.org/packages/ad/2e/aa84668861c3de458c5bcbfb9813f0e26434e2232d3e294469e96efac884/backports.functools_lru_cache-1.6.1.tar.gz#md5=103000b21a8e683647e2ce41929f2a9d",
         "tarRootDirPrefix": "backports.functools_lru_cache-",
         "rootDirPrefix": "backports.functools_lru_cache-",
         "targetDirPrefix": "backports.functools_lru_cache-"
       },
       "bleach": {
-        "version": "3.1.0",
+        "version": "3.1.5",
         "downloadFormat": "zip",
-        "url": "https://github.com/jsocol/bleach/archive/v3.1.0.zip",
+        "url": "https://github.com/jsocol/bleach/archive/v3.1.5.zip",
         "rootDirPrefix": "bleach-",
         "targetDirPrefix": "bleach-"
       },
@@ -55,10 +55,18 @@
         "rootDirPrefix": "html5lib-python-",
         "targetDirPrefix": "html5lib-python-"
       },
-      "simpleJson": {
-        "version": "3.16.0",
+      "packaging": {
+        "version": "20.3",
         "downloadFormat": "tar",
-        "url": "https://files.pythonhosted.org/packages/e3/24/c35fb1c1c315fc0fffe61ea00d3f88e85469004713dab488dee4f35b0aff/simplejson-3.16.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/65/37/83e3f492eb52d771e2820e88105f605335553fe10422cba9d256faeb1702/packaging-20.3.tar.gz#md5=19e0d1f82a9007b448650ccfeffd0a26",
+        "tarRootDirPrefix": "packaging-",
+        "rootDirPrefix": "packaging-",
+        "targetDirPrefix": "packaging-"
+      },
+      "simpleJson": {
+        "version": "3.17.0",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/98/87/a7b98aa9256c8843f92878966dc3d8d914c14aad97e2c5ce4798d5743e07/simplejson-3.17.0.tar.gz",
         "tarRootDirPrefix": "simplejson-",
         "rootDirPrefix": "simplejson-",
         "targetDirPrefix": "simplejson-"
@@ -88,25 +96,25 @@
         "targetDirPrefix": "callbacks-"
       },
       "beautifulSoup": {
-        "version": "4.7.1",
+        "version": "4.9.0",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/80/f2/f6aca7f1b209bb9a7ef069d68813b091c8c3620642b568dac4eb0e507748/beautifulsoup4-4.7.1.tar.gz#md5=321d73746d06bd9a8fcc3787b3fb7598",
+        "url": "https://files.pythonhosted.org/packages/3b/e4/7cfc641f11e0eef60123912611a5c9ee7d4638da7325878b695b9ae4bb6f/beautifulsoup4-4.9.0.tar.gz#md5=54e86045e37b578036f34b0e4927c85f",
         "tarRootDirPrefix": "beautifulsoup4-",
         "rootDirPrefix": "beautifulsoup4-",
         "targetDirPrefix": "beautifulsoup4-"
       },
       "mutagen": {
-        "version": "1.42.0",
+        "version": "1.43.0",
         "downloadFormat": "tar",
-        "url": "https://files.pythonhosted.org/packages/30/4c/5ad1a6e1ccbcfaf6462db727989c302d9d721beedd9b09c11e6f0c7065b0/mutagen-1.42.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/aa/fd/ed738775442e3614849fefdf41417d7bff3ccb010d49c8f729432cc3c1e5/mutagen-1.43.0.tar.gz#md5=3154511015860685b3882c068258ae65",
         "tarRootDirPrefix": "mutagen-",
         "rootDirPrefix": "mutagen-",
         "targetDirPrefix": "mutagen-"
       },
       "soupsieve": {
-        "version": "1.9.1",
+        "version": "1.9.5",
         "downloadFormat": "tar",
-        "url": "https://files.pythonhosted.org/packages/fb/9e/2e236603b058daa6820193d4d95f4dcfbbbd0d3c709bec8c6ef1b1902501/soupsieve-1.9.1.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/92/cf/57dfed8a00f4ba33af3a6615d693bb65a19a11e26ab13293f62359216417/soupsieve-1.9.5.tar.gz#md5=9b6c71b20fb1a73d2594f9e609464132",
         "tarRootDirPrefix": "soupsieve-",
         "rootDirPrefix": "soupsieve-",
         "targetDirPrefix": "soupsieve-"
