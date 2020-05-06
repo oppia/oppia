@@ -13155,10 +13155,11 @@ class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for general_feedback_thread_ids '
                 'field check of UserSubscriptionsModel\', '
-                '[u"Entity id 110211048197157141232: based on '
+                '[u"Entity id %s: based on '
                 'field general_feedback_thread_ids having value '
                 'nonexist_thread_id, expect model GeneralFeedbackThreadModel '
-                'with id nonexist_thread_id but it doesn\'t exist"]]'),
+                'with id nonexist_thread_id but it doesn\'t exist"]]') %
+                self.user_id,
             u'[u\'fully-validated UserSubscriptionsModel\', 1]']
         run_job_and_check_output(self, expected_output, sort=True)
 

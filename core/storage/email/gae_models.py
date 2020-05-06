@@ -404,7 +404,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     This unique_id is used in reply-to email address in outgoing feedback and
     suggestion emails. The id/key of instances of this model has form of
-    [USER_ID].[THREAD_ID]
+    [user_id].[thread_id]
     """
 
     user_id = ndb.StringProperty(required=True, indexed=True)

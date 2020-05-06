@@ -106,7 +106,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         # Return None for usernames that don't exists.
         self.assertEqual(
             [None, 'name1'],
-            user_services.get_usernames(['fakeUser', 'test1']))
+            user_services.get_usernames(['fakeUser', user_ids[0]]))
 
     def test_get_usernames_empty_list(self):
         # Return empty list when no user id passed.
@@ -1235,11 +1235,6 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings = user_services.get_user_settings(self.owner_id)
         self.user_settings.validate()
         self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
-
-    def test_gae_id_is_user_id(self):
-        self.assertEqual(
-            self.user_settings.user_id, self.user_settings.gae_id
-        )
 
     def test_validate_non_str_user_id(self):
         self.user_settings.user_id = 0

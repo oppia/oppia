@@ -90,6 +90,7 @@ IMAGE_PATH_REGEX = (
 AUDIO_PATH_REGEX = (
     '%saudio/[A-Za-z0-9-_]{1,}\\.(%s)' % (
         ASSETS_PATH_REGEX, ('|').join(ALLOWED_AUDIO_EXTENSIONS)))
+USER_ID_REGEX = 'uid_[a-z]{32}'
 ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES = [
     'FeedbackAnalyticsAggregator',
     'InteractionAnswerSummariesAggregator',
@@ -609,7 +610,7 @@ class BaseUserModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^\\d+$'
+        return r'^%s$' % USER_ID_REGEX
 
     @classmethod
     def _get_exp_ids(cls, unused_item):
@@ -1705,8 +1706,9 @@ class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         return (
-            '^\\d+\\.(%s)\\.[A-Za-z0-9-_]{1,%s}\\.'
+            '^%s\\.(%s)\\.[A-Za-z0-9-_]{1,%s}\\.'
             '[A-Za-z0-9=+/]{1,}') % (
+                USER_ID_REGEX,
                 ('|').join(suggestion_models.TARGET_TYPE_CHOICES),
                 base_models.ID_LENGTH)
 
@@ -2212,7 +2214,7 @@ class GeneralFeedbackThreadUserModelValidator(BaseModelValidator):
         thread_id_string = '%s\\.[A-Za-z0-9-_]{1,%s}\\.[A-Za-z0-9-_=]{1,}' % (
             ('|').join(suggestion_models.TARGET_TYPE_CHOICES),
             base_models.ID_LENGTH)
-        regex_string = '^\\d*\\.%s$' % thread_id_string
+        regex_string = '^%s\\.%s$' % (USER_ID_REGEX, thread_id_string)
         return regex_string
 
     @classmethod
@@ -2247,7 +2249,7 @@ class UnsentFeedbackEmailModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^\\d*$'
+        return '^%s$' % USER_ID_REGEX
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2297,7 +2299,7 @@ class JobModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        # Valid id: [job_type].[current time].[random int]
+        # Valid id: [job_type]-[current time]-[random int]
         regex_string = '^%s-\\d*-\\d*$' % item.job_type
         return regex_string
 
