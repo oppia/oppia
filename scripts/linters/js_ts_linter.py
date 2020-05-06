@@ -237,10 +237,13 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('Starting any type check')
             python_utils.PRINT('----------------------------------------')
 
-        # First pattern is used to match cases like these : any
-        # Second pattern is used when the character of last line was :
-        # So, we know that this line begins with a type of variable
-        patterns_to_match = [r':\ *any', r'^\ *any']
+        # pylint: disable=invalid-punctuation-used
+        # This pattern is used to match cases like these ': any'
+        any_type_pattern = r':\ *any'
+
+        # This pattern is used to match cases where the last line ended
+        # with a ':', So we know this line begins with a type
+        starts_with_any_pattern = r'^\ *any'
 
         with linter_utils.redirect_stdout(sys.stdout):
             failed = False
@@ -254,9 +257,15 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 starts_with_type = False
 
                 for line_number, line in enumerate(file_content.split('\n')):
-                    if ((starts_with_type and re.findall(
-                            patterns_to_match[1], line)) or re.findall(
-                                patterns_to_match[0], line)):
+                    if starts_with_type and re.findall(
+                            starts_with_any_pattern, line):
+                        failed = True
+                        python_utils.PRINT(
+                            '%s --> ANY type found in this file. Line no.'
+                            ' %s' % (file_path, line_number + 1))
+                        python_utils.PRINT('')
+
+                    if re.findall(any_type_pattern, line):
                         failed = True
                         python_utils.PRINT(
                             '%s --> ANY type found in this file. Line no.'

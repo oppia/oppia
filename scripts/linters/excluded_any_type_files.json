@@ -152,7 +152,7 @@
     "extensions/interactions/MusicNotesInput/directives/music-notes-input-validation.service.ts",
     "extensions/interactions/NumberWithUnits/directives/number-with-units-rules.service.ts",
     "extensions/interactions/NumberWithUnits/directives/number-with-units-validation.service.ts",
-    "extensions/interactions/NumericInput/directives/numeric-input-validation.service.s",
+    "extensions/interactions/NumericInput/directives/numeric-input-validation.service.ts",
     "extensions/interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service.ts",
     "extensions/interactions/SetInput/directives/set-input-validation.service.ts",
     "extensions/interactions/TextInput/directives/text-input-validation.service.ts",
