@@ -22,9 +22,9 @@
           <span class="oppia-editor-description">Use a name that will be easy for question creators to understand.</span>
         </div>
         <div>
-          <input class="form-control protractor-test-misconception-name-field" type="text" ng-model="misconceptionName" maxlength="<[MISCONCEPTION_NAME_CHAR_LIMIT]>" autofocus>
-          <span ng-if="misconceptionName.length === MISCONCEPTION_NAME_CHAR_LIMIT" class="form-text" style="color: red; font-size: smaller">
-            <em>Please use at most <[MISCONCEPTION_NAME_CHAR_LIMIT]> characters.</em>
+          <input class="form-control protractor-test-misconception-name-field" type="text" ng-model="misconceptionName" maxlength="<[MAX_CHARS_IN_MISCONCEPTION_NAME]>" autofocus>
+          <span ng-if="misconceptionName.length === MAX_CHARS_IN_MISCONCEPTION_NAME" class="form-text" style="color: red; font-size: smaller">
+            <em>Please use at most <[MAX_CHARS_IN_MISCONCEPTION_NAME]> characters.</em>
           </span>
         </div>
       </div>

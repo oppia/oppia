@@ -214,9 +214,13 @@ angular.module('oppia').directive('thumbnailUploader', [
 
                   $scope.onFileChanged = function(file) {
                     uploadedImageMimeType = file.type;
+                    $scope.invalidImageWarningIsShown = false;
+                    $scope.invalidTagsAndAttributes = {
+                      tags: [],
+                      attrs: []
+                    };
                     if (isUploadedImageSvg()) {
                       $('.oppia-thumbnail-uploader').fadeOut(function() {
-                        $scope.invalidImageWarningIsShown = false;
                         var reader = new FileReader();
                         reader.onload = function(e) {
                           var imgSrc = <string>((<FileReader>e.target).result);

@@ -126,7 +126,7 @@ describe('Versions tree service', () => {
       vts.init(snapshots);
       expect(() => {
         vts.getChangeList(1);
-      }).toThrow(new Error('Tried to retrieve change list of version 1'));
+      }).toThrowError('Tried to retrieve change list of version 1');
       expect(vts.getChangeList(2)).toEqual([{
         cmd: 'add_state',
         state_name: 'B'
