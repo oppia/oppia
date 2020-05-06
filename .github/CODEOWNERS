@@ -18,7 +18,7 @@
 /core/templates/services/contextual/logger.service.ts @bansalnitish
 /core/templates/services/contextual/logger.service.spec.ts @bansalnitish
 /core/templates/services/UpgradedServices.ts @bansalnitish
-/core/templates/services/request-interceptor.service.ts @bansalnitish
+/core/templates/services/request-interceptor.service*.ts @bansalnitish
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
 

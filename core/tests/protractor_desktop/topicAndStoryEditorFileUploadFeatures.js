@@ -128,6 +128,43 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectSubtopicPageContentsToMatch('Subtopic Contents');
   });
 
+  it('should publish and unpublish a story correctly', function() {
+    var TOPIC_NAME = 'TASEFUF_3';
+    var defaultThumbnailImageSrc = null;
+    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
+
+    topicEditorPage.expectNumberOfStoriesToBe(0);
+    topicEditorPage.createStory('Story Title');
+    storyEditorPage.returnToTopic();
+
+    topicEditorPage.expectNumberOfStoriesToBe(1);
+    topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
+    topicEditorPage.navigateToStoryWithIndex(0);
+    storyEditorPage.getStoryThumbnailSource().then(function(name) {
+      defaultThumbnailImageSrc = name;
+    });
+    expect(storyEditorPage.getStoryThumbnailSource())
+      .not
+      .toEqual(
+        storyEditorPage.submitStoryThumbnail('../data/test_svg.svg')
+          .then(function() {
+            return storyEditorPage.getStoryThumbnailSource();
+          })
+      );
+    storyEditorPage.saveStory('Added thumbnail.');
+    storyEditorPage.publishStory();
+    storyEditorPage.returnToTopic();
+
+    topicEditorPage.expectStoryPublicationStatusToBe('Yes', 0);
+    topicEditorPage.navigateToStoryWithIndex(0);
+    expect(storyEditorPage.getStoryThumbnailSource()).not.toEqual(
+      defaultThumbnailImageSrc);
+    storyEditorPage.unpublishStory();
+    storyEditorPage.returnToTopic();
+
+    topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
     users.logout();
@@ -142,7 +179,7 @@ describe('Chapter editor functionality', function() {
   var dummyExplorationIds = [];
   var dummyExplorationInfo = [
     'Dummy exploration', 'Algorithm', 'Learn more about oppia', 'English'];
-  var TOPIC_NAME = 'TASEFUF_3';
+  var TOPIC_NAME = 'TASEFUF_4';
   var USER_EMAIL = 'creator@chapterTest.com';
 
   var createDummyExplorations = function(numExplorations) {

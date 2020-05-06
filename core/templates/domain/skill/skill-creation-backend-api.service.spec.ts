@@ -26,7 +26,7 @@ import { SkillCreationBackendApiService, IRubricBackend,
   ISkillCreationBackend } from
   'domain/skill/skill-creation-backend-api.service';
 
-describe('Topic creation backend api service', () => {
+describe('Skill creation backend api service', () => {
   let csrfService: CsrfTokenService = null;
   let httpTestingController: HttpTestingController = null;
   let skillCreationBackendApiService: SkillCreationBackendApiService = null;
