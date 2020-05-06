@@ -1,0 +1,143 @@
+<div class="modal-header">
+  <h3>Upload Thumbnail</h3>
+</div>
+
+<div class="modal-body" style="min-height: 300px;">
+  <div class="oppia-thumbnail-uploader">
+    <div ng-hide="uploadedImage">
+      <strong>Please upload an SVG image.</strong>
+      <div class="alert alert-warning">
+        <span>Here are some guidelines to follow:</span>
+        <ul>
+          <li>Uploaded image should have an aspect ratio of <[aspectRatio]>.</li>
+          <li>Uploaded image should have a transparent background.</li>
+          <li>Please ensure that the uploaded image is less than 100 KB.</li>
+        </ul>
+      </div>
+      <image-uploader on-file-changed="onFileChanged">
+      </image-uploader>
+    </div>
+    <div class="oppia-form-error" ng-if="invalidImageWarningIsShown" style="margin-top: 15px;">
+      Please upload a valid SVG image.
+    </div>
+    <div class="oppia-form-error" ng-if="invalidTagsAndAttributes.tags.length" style="margin-top: 15px;">
+      Unsupported SVG tags found: <[invalidTagsAndAttributes.tags]>
+    </div>
+    <div class="oppia-form-error" ng-if="invalidTagsAndAttributes.attrs.length" style="margin-top: 15px;">
+      Unsupported SVG attributes found: <[invalidTagsAndAttributes.attrs]>
+    </div>
+    <div ng-show="uploadedImage">
+      <div ng-show="allowedBgColors">
+        <div ng-show="allowedBgColors.length > 1">Choose background color:</div>
+        <div ng-show="allowedBgColors.length > 1" class="oppia-thumbnail-colour-select">
+          <div ng-repeat="color in allowedBgColors"
+               ng-style="{background: color}"
+               ng-click="updateBackgroundColor(color)">
+          </div>
+        </div>
+        <div ng-show="allowedBgColors.length === 1" class="alert alert-warning">
+          <span>
+            Please check that your thumbnail has the following background color:
+            <i class="fa fa-square" ng-style="{color: allowedBgColors[0]}"></i>.
+            If not, please ensure that you are uploading an image with transparent background. Thanks!
+          </span>
+        </div>
+      </div>
+      <div class="oppia-thumbnail-container protractor-test-thumbnail-container" ng-show="uploadedImage" ng-style="{background: getPreviewDescriptionBgColor(), color: getPreviewDescriptionBgColor() ? '#FFFFFF' : '', width: aspectRatio === '4:3' ? '248px' : '320px' }">
+        <button class="btn btn-secondary oppia-thumbnail-reset-button" ng-click="reset()">
+          <i class="material-icons oppia-vcenter">&#xE14C;</i>
+        </button>
+        <div>
+          <img ng-if="uploadedImage" class="oppia-thumbnail-image" ng-src="<[uploadedImage]>" height="<[aspectRatio === '4:3' ? '186px' : '180px']>" width="<[aspectRatio === '4:3' ? '248px' : '320px']>">
+          <div class="oppia-thumbnail-preview-title">
+            <[getPreviewTitle()]>
+          </div>
+          <div class="oppia-thumbnail-preview-description">
+            <[getPreviewDescription()]>
+          </div>
+          <div ng-if="getPreviewFooter()" class="oppia-thumbnail-preview-footer">
+            <[getPreviewFooter()]>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" ng-click="cancel()" translate="I18N_MODAL_CANCEL_BUTTON"></button>
+  <button class="btn btn-success protractor-test-photo-upload-submit"
+          ng-click="confirm()"
+          ng-disabled="!uploadedImage">
+    Add Thumbnail
+  </button>
+</div>
+<style>
+  .oppia-thumbnail-container {
+    height: 260px;
+    max-width: 100%;
+    margin: 0 auto 15px auto;
+    position: relative;
+    border-radius: 4px 4px 4px 4px;
+    box-shadow: 0 4.5px 10px rgba(0, 0, 0, 0.25);
+  }
+  .oppia-thumbnail-container img {
+    border-radius: 4px 4px 0 0;
+  }
+  .oppia-thumbnail-reset-button {
+    position: absolute;
+    right: -50px;
+    top: 0;
+  }
+  .oppia-thumbnail-uploader .oppia-form-error {
+    word-break: break-word;
+  }
+  .oppia-thumbnail-confirm-button {
+    position: absolute;
+    right: -50px;
+    top: 40px;
+  }
+  .oppia-thumbnail-colour-select {
+    display: grid;
+    grid-template-columns: 25px 25px 25px 25px;
+    grid-template-rows: 20px;
+    grid-gap: 5px;
+    margin-bottom: 7px;
+  }
+
+  .oppia-thumbnail-colour-select > * {
+    border: 1px solid;
+    border-radius: 10%
+  }
+
+  .oppia-thumbnail-colour-select > *:hover,
+  .oppia-thumbnail-colour-select > *:focus {
+    border: 2px solid;
+    cursor: pointer;
+  }
+  .oppia-thumbnail-preview-description {
+    font-size: 16px;
+    line-height: 1.2;
+    overflow: hidden;
+    padding: 0 16px 0 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .oppia-thumbnail-preview-footer {
+    bottom: 10px;
+    font-size: 16px;
+    font-style: italic;
+    line-height: 1.2;
+    padding: 0 16px 0 16px;
+    position: absolute;
+  }
+  .oppia-thumbnail-preview-title {
+    font-size: 18px;
+    font-weight: bold;
+    overflow: hidden;
+    padding: 10px 16px 10px 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+</style>

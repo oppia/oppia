@@ -99,6 +99,37 @@ def remove_blocking_bugs_milestone_from_issues(repo):
         issue.edit(milestone=None)
 
 
+def ask_user_to_remove_protection_rule():
+    """Asks the release co-ordinator to perform the steps for deletion of
+    github protection rule for release branch.
+    """
+    common.ask_user_to_confirm(
+        'Ask Sean to delete '
+        'the github protection rule by:\n'
+        '1. Going to this page: '
+        'https://github.com/oppia/oppia/settings/branches. '
+        '(Note, this link will give a 404 since access is limited to Sean.)\n'
+        '2. Delete the github protection rule for %s branch but leave the '
+        'existing release-* rule as-is. This will cause the branch to fall '
+        'under the general protection rule for release branches\n' % (
+            common.get_current_branch_name()))
+
+
+def ask_user_to_update_jobs_tracker():
+    """Asks the release co-ordinator to update the status of jobs run
+    in the release.
+    """
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.JOBS_SPREADSHEETS_URL)
+    common.ask_user_to_confirm(
+        'Move all the jobs which are run (both successful & failed ones) to '
+        'the past jobs tab in the jobs tracker.\n')
+    common.ask_user_to_confirm(
+        'Send updates regarding each job to the job author '
+        '(just the success/failure status, don\'t include any data or '
+        'job output).\n')
+
+
 def main():
     """Performs task to wrap up the release."""
     if not common.is_current_branch_a_release_branch():
@@ -114,6 +145,8 @@ def main():
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
 
+    ask_user_to_remove_protection_rule()
+    ask_user_to_update_jobs_tracker()
     remove_blocking_bugs_milestone_from_issues(repo)
     remove_release_labels(repo)
 

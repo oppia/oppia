@@ -5,12 +5,38 @@
     </h3>
   </div>
   <div class="modal-body">
+    <div class="subtopic-thumbnail">
+      <p>
+        <strong style="font-size: 1.2em;">Subtopic Thumbnail</strong>
+      </p>
+      <thumbnail-uploader filename="editableThumbnailFilename"
+                          update-filename="updateSubtopicThumbnailFilename"
+                          bg-color="editableThumbnailBgColor"
+                          update-bg-color="updateSubtopicThumbnailBgColor"
+                          allowed-bg-colors="allowedBgColors"
+                          aspect-ratio="'4:3'"
+                          preview-title="editableTitle"
+                          preview-description=""
+                          preview-description-bg-color="'#BE563C'"
+                          preview-footer="">
+      </thumbnail-uploader>
+    </div>
     <div class="subtopic-title">
       <p>
         <strong style="font-size: 1.2em;">Subtopic Title</strong>
       </p>
       <form class="form-horizontal" role="form">
-        <input class="form-control protractor-test-subtopic-title-field" type="text" ng-blur="updateSubtopicTitle(editableTitle)" ng-model="editableTitle" maxlength="80" ng-change="resetErrorMsg()">
+        <input class="form-control protractor-test-subtopic-title-field"
+               type="text"
+               ng-blur="updateSubtopicTitle(editableTitle)"
+               ng-model="editableTitle"
+               maxlength="<[MAX_CHARS_IN_SUBTOPIC_TITLE]>"
+               ng-change="resetErrorMsg()">
+        <span class="oppia-input-box-subtitle">
+          <i>
+            Subtopic title should be at most <[MAX_CHARS_IN_SUBTOPIC_TITLE]> characters.
+          </i>
+        </span>
       </form>
       <span class="form-text" style="font-size: smaller; color: red;" ng-if="errorMsg">
         <em><[errorMsg]></em>
@@ -32,8 +58,8 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-secondary" ng-click="cancel()"> Cancel </button>
-    <button class="btn btn-success protractor-test-save-subtopic-button" ng-disabled="editableTitle === ''" ng-click="save()"> Save & Exit </button>
+    <button class="btn btn-secondary" ng-click="cancel()" type="button"> Cancel </button>
+    <button class="btn btn-success protractor-test-save-subtopic-button" ng-disabled="editableTitle === '' || !editableThumbnailFilename" ng-click="save()"> Save & Exit </button>
   </div>
 </div>
 
@@ -44,6 +70,10 @@
 
   .subtopic-editor .modal-body .subtopic-title {
     margin-bottom: 3%;
+  }
+
+  .subtopic-editor .modal-body .subtopic-thumbnail {
+    height: 150px;
   }
 
   .subtopic-editor .modal-footer {

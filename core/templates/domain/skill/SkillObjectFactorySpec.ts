@@ -36,6 +36,8 @@ describe('Skill object factory', () => {
   let conceptCardObjectFactory: ConceptCardObjectFactory = null;
   let rubricObjectFactory: RubricObjectFactory = null;
   let misconceptionObjectFactory: MisconceptionObjectFactory = null;
+  let example1 = null;
+  let example2 = null;
   let misconceptionDict1 = null;
   let misconceptionDict2 = null;
   let rubricDict = null;
@@ -74,24 +76,37 @@ describe('Skill object factory', () => {
 
     rubricDict = {
       difficulty: skillDifficulties[0],
-      explanation: 'explanation'
+      explanations: ['explanation']
     };
+
+    example1 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1'
+      },
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
+      }
+    };
+    example2 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1'
+      },
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
+      }
+    };
+
 
     skillContentsDict = {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
       },
-      worked_examples: [
-        {
-          html: 'test worked example 1',
-          content_id: 'worked_example_1',
-        },
-        {
-          html: 'test worked example 2',
-          content_id: 'worked_example_2'
-        }
-      ],
+      worked_examples: [example1, example2],
       recorded_voiceovers: {
         voiceovers_mapping: {
           explanation: {},
@@ -162,19 +177,21 @@ describe('Skill object factory', () => {
 
   it('should add/update a rubric given difficulty', () => {
     let skill = skillObjectFactory.createFromBackendDict(skillDict);
-    expect(skill.getRubrics()[0].getExplanation()).toEqual('explanation');
+    expect(skill.getRubrics()[0].getExplanations()).toEqual(['explanation']);
     expect(skill.getRubrics().length).toEqual(1);
 
-    skill.updateRubricForDifficulty(skillDifficulties[0], 'new explanation');
-    expect(skill.getRubrics()[0].getExplanation()).toEqual('new explanation');
+    skill.updateRubricForDifficulty(
+      skillDifficulties[0], ['new explanation 1', 'new explanation 2']);
+    expect(skill.getRubrics()[0].getExplanations()).toEqual([
+      'new explanation 1', 'new explanation 2']);
 
-    skill.updateRubricForDifficulty(skillDifficulties[1], 'explanation 2');
+    skill.updateRubricForDifficulty(skillDifficulties[1], ['explanation 2']);
     expect(skill.getRubrics().length).toEqual(2);
-    expect(skill.getRubrics()[1].getExplanation()).toEqual('explanation 2');
+    expect(skill.getRubrics()[1].getExplanations()).toEqual(['explanation 2']);
 
     expect(() => {
-      skill.updateRubricForDifficulty('invalid difficulty', 'explanation 2');
-    }).toThrow();
+      skill.updateRubricForDifficulty('invalid difficulty', ['explanation 2']);
+    }).toThrowError('Invalid difficulty value passed');
   });
 
   it('should get the correct next misconception id', () => {

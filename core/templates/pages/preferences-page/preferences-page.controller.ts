@@ -16,6 +16,10 @@
  * @fileoverview Data and controllers for the Oppia 'edit preferences' page.
  */
 
+import Cropper from 'cropperjs';
+
+require('cropperjs/dist/cropper.min.css');
+
 require('base-components/base-content.directive.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
@@ -87,40 +91,10 @@ angular.module('oppia').directive('preferencesPage', [
             _saveDataItem('user_bio', userBio);
           };
 
-          ctrl.updateSubjectInterestsWarning = function(subjectInterests) {
-            var TAG_REGEX = new RegExp(ctrl.TAG_REGEX_STRING);
-
-            if (subjectInterests instanceof Array) {
-              for (var i = 0; i < subjectInterests.length; i++) {
-                if (UtilsService.isString(subjectInterests[i])) {
-                  if (!TAG_REGEX.test(subjectInterests[i])) {
-                    ctrl.subjectInterestsWarningText = (
-                      'Subject interests should use only lowercase letters.');
-                  }
-                } else {
-                  console.error(
-                    'Error: received bad value for a subject interest.' +
-                    ' Expected a string, got ', subjectInterests[i]);
-                  throw Error(
-                    'Error: received bad value for a subject interest.');
-                }
-              }
-            } else {
-              console.error(
-                'Error: received bad value for subject interests. Expected' +
-                ' list of strings, got ', subjectInterests);
-              throw Error('Error: received bad value for subject interests.');
-            }
-          };
-
           ctrl.onSubjectInterestsSelectionChange = function(subjectInterests) {
             AlertsService.clearWarnings();
             ctrl.subjectInterestsChangedAtLeastOnce = true;
-            ctrl.subjectInterestsWarningText = null;
-            ctrl.updateSubjectInterestsWarning(subjectInterests);
-            if (ctrl.subjectInterestsWarningText === null) {
-              _saveDataItem('subject_interests', subjectInterests);
-            }
+            _saveDataItem('subject_interests', subjectInterests);
           };
 
           ctrl.savePreferredSiteLanguageCodes = function(
@@ -181,6 +155,18 @@ angular.module('oppia').directive('preferencesPage', [
                   $scope.uploadedImage = null;
                   $scope.croppedImageDataUrl = '';
                   $scope.invalidImageWarningIsShown = false;
+                  let cropper = null;
+
+                  $scope.initialiseCropper = function() {
+                    let profilePicture = (
+                      <HTMLImageElement>document.getElementById(
+                        'croppable-image'));
+                    cropper = new Cropper(profilePicture, {
+                      minContainerWidth: 500,
+                      minContainerHeight: 350,
+                      aspectRatio: 1
+                    });
+                  };
 
                   $scope.onFileChanged = function(file) {
                     $('.oppia-profile-image-uploader').fadeOut(function() {
@@ -191,6 +177,7 @@ angular.module('oppia').directive('preferencesPage', [
                         $scope.$apply(function() {
                           $scope.uploadedImage = (<FileReader>e.target).result;
                         });
+                        $scope.initialiseCropper();
                       };
                       reader.readAsDataURL(file);
 
@@ -212,6 +199,11 @@ angular.module('oppia').directive('preferencesPage', [
                   };
 
                   $scope.confirm = function() {
+                    $scope.croppedImageDataUrl = (
+                      cropper.getCroppedCanvas({
+                        height: 150,
+                        width: 150
+                      }).toDataURL());
                     $uibModalInstance.close($scope.croppedImageDataUrl);
                   };
 
@@ -287,7 +279,6 @@ angular.module('oppia').directive('preferencesPage', [
             });
             ctrl.userCanDeleteAccount = ENABLE_ACCOUNT_DELETION;
             ctrl.subjectInterestsChangedAtLeastOnce = false;
-            ctrl.subjectInterestsWarningText = null;
             ctrl.TAG_REGEX_STRING = '^[a-z ]+$';
             ctrl.LANGUAGE_CHOICES =
             LanguageUtilService.getLanguageIdsAndTexts();

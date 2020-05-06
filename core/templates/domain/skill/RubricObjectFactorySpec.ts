@@ -19,29 +19,42 @@
 import { RubricObjectFactory } from 'domain/skill/RubricObjectFactory';
 
 describe('Rubric object factory', () => {
-  describe('RubricObjectFactory', () => {
-    let rubricObjectFactory: RubricObjectFactory;
-    let rubricDict: {
-      difficulty: string; explanation: string;
+  let rubricObjectFactory: RubricObjectFactory;
+  let rubricDict: {
+    difficulty: string; explanations: Array<string>;
+  };
+
+  beforeEach(() => {
+    rubricObjectFactory = new RubricObjectFactory();
+    rubricDict = {
+      difficulty: 'easy',
+      explanations: ['test explanation']
     };
+  });
 
-    beforeEach(() => {
-      rubricObjectFactory = new RubricObjectFactory();
-      rubricDict = {
-        difficulty: 'easy',
-        explanation: 'test explanation'
-      };
-    });
+  it('should create a new rubric from backend dict', () => {
+    const rubric = rubricObjectFactory.createFromBackendDict(rubricDict);
+    expect(rubric.getDifficulty()).toEqual('easy');
+    expect(rubric.getExplanations()).toEqual(['test explanation']);
+  });
 
-    it('should create a new rubric', () => {
-      var rubric = rubricObjectFactory.createFromBackendDict(rubricDict);
-      expect(rubric.getDifficulty()).toEqual('easy');
-      expect(rubric.getExplanation()).toEqual('test explanation');
-    });
+  it('should convert to a backend dictionary', () => {
+    const rubric = rubricObjectFactory.createFromBackendDict(rubricDict);
+    expect(rubric.toBackendDict()).toEqual(rubricDict);
+  });
 
-    it('should convert to a backend dictionary', () => {
-      var rubric = rubricObjectFactory.createFromBackendDict(rubricDict);
-      expect(rubric.toBackendDict()).toEqual(rubricDict);
-    });
+  it('should create a new rubric', () => {
+    const rubric = rubricObjectFactory.create(
+      'medium', ['This is an explanation']);
+    expect(rubric.getDifficulty()).toEqual('medium');
+    expect(rubric.getExplanations()).toEqual(['This is an explanation']);
+  });
+
+  it('should change explanation in a rubric', () => {
+    const rubric = rubricObjectFactory.create('easy', ['test explanation']);
+    expect(rubric.getExplanations()).toEqual(['test explanation']);
+
+    rubric.setExplanations(['new explanation']);
+    expect(rubric.getExplanations()).toEqual(['new explanation']);
   });
 });

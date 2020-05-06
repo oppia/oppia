@@ -267,11 +267,10 @@ def flush_memcache(app_name):
         app_name: str. The name of the app to deploy.
     """
     memcache_url = (
-        'https://pantheon.corp.google.com/appengine/memcache?'
-        'project=%s') % app_name
-    if not gcloud_adapter.flush_memcache(app_name):
-        python_utils.PRINT('Memcache flushing failed. Please do it manually.')
-        common.open_new_tab_in_browser_if_possible(memcache_url)
+        'https://console.cloud.google.com/appengine/memcache?'
+        'src=ac&project=%s') % app_name
+    common.open_new_tab_in_browser_if_possible(memcache_url)
+    common.ask_user_to_confirm('Please flush the memcache.')
 
 
 def switch_version(app_name, current_release_version):
@@ -479,6 +478,10 @@ def execute_deployment():
     # (defined in switch_version function) correctly.
     if '.' in current_release_version:
         raise Exception('Current release version has \'.\' character.')
+
+    assert len(current_release_version) <= 25, (
+        'The length of the "version" arg should be less than or '
+        'equal to 25 characters.')
 
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()

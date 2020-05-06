@@ -32,10 +32,13 @@ export class StoryNode {
   _outline: string;
   _outlineIsFinalized: boolean;
   _explorationId: string;
+  _thumbnailBgColor: string;
+  _thumbnailFilename: string;
   constructor(
       id: string, title: string, destinationNodeIds: string[],
       prerequisiteSkillIds: string[], acquiredSkillIds: string[],
-      outline: string, outlineIsFinalized: boolean, explorationId: string) {
+      outline: string, outlineIsFinalized: boolean, explorationId: string,
+      thumbnailBgColor: string, thumbnailFilename: string) {
     this._id = id;
     this._title = title;
     this._destinationNodeIds = destinationNodeIds;
@@ -44,6 +47,8 @@ export class StoryNode {
     this._outline = outline;
     this._outlineIsFinalized = outlineIsFinalized;
     this._explorationId = explorationId;
+    this._thumbnailBgColor = thumbnailBgColor;
+    this._thumbnailFilename = thumbnailFilename;
   }
 
   _checkValidNodeId(nodeId: string): boolean {
@@ -98,19 +103,40 @@ export class StoryNode {
     this._outlineIsFinalized = false;
   }
 
+  getThumbnailFilename(): string {
+    return this._thumbnailFilename;
+  }
+
+  setThumbnailFilename(thumbnailFilename: string): void {
+    this._thumbnailFilename = thumbnailFilename;
+  }
+
+  getThumbnailBgColor(): string {
+    return this._thumbnailBgColor;
+  }
+
+  setThumbnailBgColor(thumbnailBgColor: string): void {
+    this._thumbnailBgColor = thumbnailBgColor;
+  }
+
+  prepublishValidate(): Array<string> {
+    let issues = [];
+    if (!this._thumbnailFilename) {
+      issues.push('Chapter ' + this._title + ' should have a thumbnail.');
+    }
+    return issues;
+  }
+
   validate(): string[] {
     var issues = [];
 
     if (!this._checkValidNodeId(this._id)) {
-      throw Error('The node id ' + this._id + ' is invalid.');
+      throw new Error('The node id ' + this._id + ' is invalid.');
     }
     var prerequisiteSkillIds = this._prerequisiteSkillIds;
     var acquiredSkillIds = this._acquiredSkillIds;
     var destinationNodeIds = this._destinationNodeIds;
 
-    if (this._explorationId === '') {
-      issues.push('Exploration ID fields should not be empty, once edited.');
-    }
     for (var i = 0; i < prerequisiteSkillIds.length; i++) {
       var skillId = prerequisiteSkillIds[i];
       if (prerequisiteSkillIds.indexOf(skillId) <
@@ -139,7 +165,7 @@ export class StoryNode {
     }
     for (var i = 0; i < destinationNodeIds.length; i++) {
       if (!this._checkValidNodeId(destinationNodeIds[i])) {
-        throw Error(
+        throw new Error(
           'The destination node id ' + destinationNodeIds[i] + ' is ' +
           'invalid in node with id ' + this._id);
       }
@@ -172,7 +198,7 @@ export class StoryNode {
 
   addDestinationNodeId(destinationNodeid: string): void {
     if (this._destinationNodeIds.indexOf(destinationNodeid) !== -1) {
-      throw Error('The given node is already a destination node.');
+      throw new Error('The given node is already a destination node.');
     }
     this._destinationNodeIds.push(destinationNodeid);
   }
@@ -180,7 +206,7 @@ export class StoryNode {
   removeDestinationNodeId(destinationNodeid: string): void {
     var index = this._destinationNodeIds.indexOf(destinationNodeid);
     if (index === -1) {
-      throw Error('The given node is not a destination node.');
+      throw new Error('The given node is not a destination node.');
     }
     this._destinationNodeIds.splice(index, 1);
   }
@@ -191,7 +217,7 @@ export class StoryNode {
 
   addAcquiredSkillId(acquiredSkillid): void {
     if (this._acquiredSkillIds.indexOf(acquiredSkillid) !== -1) {
-      throw Error('The given skill is already an acquired skill.');
+      throw new Error('The given skill is already an acquired skill.');
     }
     this._acquiredSkillIds.push(acquiredSkillid);
   }
@@ -199,7 +225,7 @@ export class StoryNode {
   removeAcquiredSkillId(skillId: string): void {
     var index = this._acquiredSkillIds.indexOf(skillId);
     if (index === -1) {
-      throw Error('The given skill is not an acquired skill.');
+      throw new Error('The given skill is not an acquired skill.');
     }
     this._acquiredSkillIds.splice(index, 1);
   }
@@ -210,7 +236,7 @@ export class StoryNode {
 
   addPrerequisiteSkillId(skillId: string): void {
     if (this._prerequisiteSkillIds.indexOf(skillId) !== -1) {
-      throw Error('The given skill id is already a prerequisite skill.');
+      throw new Error('The given skill id is already a prerequisite skill.');
     }
     this._prerequisiteSkillIds.push(skillId);
   }
@@ -218,7 +244,7 @@ export class StoryNode {
   removePrerequisiteSkillId(skillId: string): void {
     var index = this._prerequisiteSkillIds.indexOf(skillId);
     if (index === -1) {
-      throw Error('The given skill id is not a prerequisite skill.');
+      throw new Error('The given skill id is not a prerequisite skill.');
     }
     this._prerequisiteSkillIds.splice(index, 1);
   }
@@ -240,12 +266,16 @@ export class StoryNodeObjectFactory {
       storyNodeBackendObject.acquired_skill_ids,
       storyNodeBackendObject.outline,
       storyNodeBackendObject.outline_is_finalized,
-      storyNodeBackendObject.exploration_id
+      storyNodeBackendObject.exploration_id,
+      storyNodeBackendObject.thumbnail_bg_color,
+      storyNodeBackendObject.thumbnail_filename
     );
   }
 
   createFromIdAndTitle(nodeId: string, title: string): StoryNode {
-    return new StoryNode(nodeId, title, [], [], [], '', false, null);
+    return new StoryNode(
+      nodeId, title, [], [], [], '', false, null,
+      null, null);
   }
 }
 

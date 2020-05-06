@@ -29,7 +29,8 @@ export class AppConstants {
     I18N_LIBRARY_LANGUAGES_EN: 'English',
     I18N_LIBRARY_ALL_CATEGORIES: 'All Categories',
     I18N_TOPNAV_SIGN_IN: 'Sign in',
-    I18N_SPLASH_PAGE_TITLE: 'Oppia: Teach, Learn, Explore',
+    I18N_SPLASH_PAGE_TITLE: 'Oppia | Free, Online and Interactive Lessons for' +
+      ' Anyone',
     I18N_SIGNUP_REGISTRATION: 'Registration',
     I18N_SIGNUP_LOADING: 'Loading'
   };
@@ -116,7 +117,10 @@ export class AppConstants {
   public static COMPONENT_NAME_SOLUTION = 'solution';
   public static COMPONENT_NAME_FEEDBACK = 'feedback';
   public static COMPONENT_NAME_EXPLANATION = 'explanation';
-  public static COMPONENT_NAME_WORKED_EXAMPLE = 'worked_example';
+  public static COMPONENT_NAME_WORKED_EXAMPLE = {
+    QUESTION: 'worked_example_question',
+    EXPLANATION: 'worked_example_explanation'
+  };
 
   public static ACTION_TYPE_EXPLORATION_START = 'ExplorationStart';
   public static ACTION_TYPE_ANSWER_SUBMIT = 'AnswerSubmit';
@@ -164,8 +168,6 @@ export class AppConstants {
     SUBTOPIC: 'subtopic',
     QUESTION: 'question'
   };
-
-  public static MISCONCEPTION_NAME_CHAR_LIMIT = 100;
 }
 
 const constants = require('constants.ts');

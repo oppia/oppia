@@ -288,6 +288,16 @@ angular.module('oppia').directive('stateInteractionEditor', [
                       return warningsList;
                     };
 
+                    $scope.getCustomizationArgsWarningMessage = function() {
+                      var warningsList = (
+                        $scope.getCustomizationArgsWarningsList());
+                      var warningMessage = '';
+                      if (warningsList.length !== 0) {
+                        warningMessage = warningsList[0].message;
+                      }
+                      return warningMessage;
+                    };
+
                     $scope.onChangeInteractionId = function(newInteractionId) {
                       EditorFirstTimeEventsService
                         .registerFirstSelectInteractionTypeEvent();
@@ -449,7 +459,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
               '/avatar/user_black_72px.png');
             $scope.$on('stateEditorInitialized', function(evt, stateData) {
               if (stateData === undefined || $.isEmptyObject(stateData)) {
-                throw new Error('Expected stateData to be defined but ' +
+                throw new Error(
+                  'Expected stateData to be defined but ' +
                   'received ' + stateData);
               }
               $scope.hasLoaded = false;

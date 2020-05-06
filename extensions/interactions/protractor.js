@@ -47,6 +47,7 @@ var INTERACTIONS = {
   EndExploration: require('./EndExploration/protractor.js'),
   FractionInput: require('./FractionInput/protractor.js'),
   GraphInput: require('./GraphInput/protractor.js'),
+  ItemSelectionInput: require('./ItemSelectionInput/protractor.js'),
   LogicProof: require('./LogicProof/protractor.js'),
   MathExpressionInput: require('./MathExpressionInput/protractor.js'),
   MultipleChoiceInput: require('./MultipleChoiceInput/protractor.js'),
@@ -60,7 +61,7 @@ var getInteraction = function(interactionName) {
   if (INTERACTIONS.hasOwnProperty(interactionName)) {
     return INTERACTIONS[interactionName];
   } else {
-    throw Error('Unknown interaction: ' + interactionName);
+    throw new Error('Unknown interaction: ' + interactionName);
   }
 };
 

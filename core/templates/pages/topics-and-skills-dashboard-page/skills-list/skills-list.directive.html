@@ -41,20 +41,24 @@
           <span> <[skill.misconception_count]> </span>
         </a>
       </td>
-      <td ng-if="getMergeableSkillSummaries().length > 0">
-        <button class="btn btn-secondary protractor-test-merge-skills-button skills-list-action-button"
-                ng-click="mergeSkill(skill)">
-          <span> Merge Skill </span>
-        </button>
-      </td>
       <td ng-if="getEditableTopicSummaries().length > 0 && !isUnpublishedSkill()">
         <button class="btn btn-secondary skills-list-action-button
         protractor-test-assign-skill-to-topic-button" ng-click="assignSkillToTopic(skill.id)">
           <span> Assign to Topic </span>
         </button>
       </td>
+      <td class="merge-skill" ng-if="getMergeableSkillSummaries().length > 0">
+        <div class="protractor-test-merge-skills-button merge-skill-icon"
+             ng-click="mergeSkill(skill)">
+          <span class="material-icons" title="Merge Skill">
+            merge_type
+          </span>
+        </div>
+      </td>
       <td class="delete-icon">
-        <span ng-if="canDeleteSkill()" ng-click="deleteSkill(skill.id)" class="fas fa-trash-alt list-summary protractor-test-delete-skill-button"> </span>
+        <a ng-if="canDeleteSkill()" ng-click="deleteSkill(skill.id)" class="protractor-test-delete-skill-button">
+          <span class="fas fa-trash-alt list-summary"></span>
+        </a>
       </td>
     </tr>
   </table>
@@ -74,7 +78,7 @@
   skills-list .dashboard-table {
     display: block;
     font-size: 15px;
-    max-height: 250px;
+    max-height: 700px;
     overflow-y: auto;
     width: 100%;
   }
@@ -110,6 +114,15 @@
 
   skills-list .delete-icon {
     padding-left: 0.8vw;
+  }
+
+  skills-list .merge-skill {
+    padding-left: 0.8vw;
+  }
+
+  skills-list .merge-skill .merge-skill-icon {
+    width: 20px;
+    cursor: pointer;
   }
 
   skills-list tr td:nth-child(4) {

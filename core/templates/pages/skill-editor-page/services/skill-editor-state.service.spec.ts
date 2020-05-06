@@ -189,7 +189,29 @@ describe('Skill editor state service', function() {
 
     var rubricDict = {
       difficulty: skillDifficulties[0],
-      explanation: 'explanation'
+      explanation: ['explanation']
+    };
+
+    var example1 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1'
+      },
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1'
+      }
+    };
+
+    var example2 = {
+      question: {
+        html: 'worked example question 2',
+        content_id: 'worked_example_q_2'
+      },
+      explanation: {
+        html: 'worked example explanation 2',
+        content_id: 'worked_example_e_2'
+      }
     };
 
     var skillContentsDict = {
@@ -197,16 +219,7 @@ describe('Skill editor state service', function() {
         html: 'test explanation',
         content_id: 'explanation',
       },
-      worked_examples: [
-        {
-          html: 'worked example 1',
-          content_id: 'worked_example_1'
-        },
-        {
-          html: 'worked example 2',
-          content_id: 'worked_example_2'
-        }
-      ],
+      worked_examples: [example1, example2],
       recorded_voiceovers: {
         voiceovers_mapping: {
           explanation: {},
@@ -294,7 +307,7 @@ describe('Skill editor state service', function() {
     function() {
       expect(function() {
         SkillEditorStateService.saveSkill('commit message');
-      }).toThrow();
+      }).toThrowError('Cannot save a skill before one is loaded.');
     });
 
   it('should not save the skill if there are no pending changes',

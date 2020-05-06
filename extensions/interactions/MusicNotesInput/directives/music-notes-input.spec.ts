@@ -241,7 +241,7 @@ describe('Music phrase player service', function() {
       // to include MIDI in the future, we will remember to swap
       // it out with a dummy MIDI and back again after the test.
       if ($window.MIDI) {
-        throw 'Expected MIDI library not to show up in tests.';
+        throw new Error('Expected MIDI library not to show up in tests.');
       }
 
       $window.MIDI = {

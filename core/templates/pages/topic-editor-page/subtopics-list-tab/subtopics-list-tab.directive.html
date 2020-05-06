@@ -1,3 +1,4 @@
+
 <div class="subtopics-tab">
   <md-card class="subtopics">
     <h3> Subtopics </h3>
@@ -21,21 +22,23 @@
             </span>
           </div>
         </div>
-        <div style="min-height: 30vh; max-height: 30vh; overflow-y: auto;">
+        <div class="subtopic-container">
           <md-card class="skill-id"
                    ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index"
                    dnd-draggable="skillSummary"
                    dnd-dragstart="startMoveSkill(subtopic.getId(), skillSummary)"
                    dnd-effect-allowed="move"
                    dnd-disable-if="isSkillDeleted(skillSummary)">
-            <a class="protractor-test-assigned-skill-card-text"
-               ng-if="!isSkillDeleted(skillSummary)"
-               ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
-              <[skillSummary.getDescription()]>
-            </a>
-            <span ng-if="isSkillDeleted(skillSummary)" style="color: red;">
-              Skill Deleted
-            </span>
+            <div class="skill-card">
+              <a class="protractor-test-assigned-skill-card-text"
+                 ng-if="!isSkillDeleted(skillSummary)"
+                 ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
+                <[skillSummary.getDescription()]>
+              </a>
+              <span ng-if="isSkillDeleted(skillSummary)" style="color: red;">
+                Skill Deleted
+              </span>
+            </div>
           </md-card>
         </div>
       </md-card>
@@ -51,7 +54,7 @@
            dnd-list="uncategorizedSkillSummaries"
            dnd-drop="endMoveSkill(null)">
     <h3> Uncategorized Skills </h3>
-    <div style="max-height: 45vh; overflow-y: auto;">
+    <div class="uncategorized-skills-container">
       <md-card class="skill-id protractor-test-uncategorized-skill-item"
                ng-repeat="skillSummary in uncategorizedSkillSummaries track by $index"
                dnd-draggable="skillSummary"
@@ -79,9 +82,22 @@
 </div>
 <style>
   subtopics-list-tab .skill-card {
-    height: 2.5em;
+    max-height: 10em;
+    overflow-wrap: break-word;
+    padding-bottom: 10px;
     padding-right: 10px;
     padding-top: 10px;
+    white-space: normal;
+  }
+
+  subtopics-list-tab .subtopic-container {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  subtopics-list-tab .uncategorized-skills-container {
+    max-height: 60vh;
+    overflow-y: auto;
   }
 
   subtopics-list-tab .uncategorized-skill-ids .delete-icon {
@@ -89,6 +105,7 @@
   }
   subtopics-list-tab .subtopics-tab {
     display: flex;
+    height: auto;
     margin: 6vh 10vh 0 10vh;
   }
   subtopics-list-tab h4 {
@@ -125,7 +142,7 @@
     align-content: center;
     background-color: #fafafa;
     width: 15vw;
-    height: 40vh;
+    height: 64vh;
     float: left;
     flex: 0 0 auto;
     position: relative;
@@ -141,6 +158,7 @@
     border-width: 3px;
     border-style: dotted;
     border-color: #c3c3c3;
+    height: 64vh;
   }
   subtopics-list-tab .new:hover {
     background-color: #f1f1f1;

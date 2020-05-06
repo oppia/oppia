@@ -380,6 +380,12 @@ describe('Exploration data service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('UrlService', {
       getPathname: function() {
         return pathname;
@@ -400,6 +406,6 @@ describe('Exploration data service', function() {
     var errorCallback = jasmine.createSpy('error');
     expect(function() {
       eds.getData(errorCallback);
-    }).toThrow(TypeError('eds.getData is not a function'));
+    }).toThrowError('eds.getData is not a function');
   });
 });

@@ -35,7 +35,7 @@ var DictionaryEditor = function(elem) {
 
 var GraphEditor = function(graphInputContainer) {
   if (!graphInputContainer) {
-    throw Error('Please provide Graph Input Container element');
+    throw new Error('Please provide Graph Input Container element');
   }
   var vertexElement = function(index) {
     // Would throw incorrect element error if provided incorrect index number.
@@ -256,6 +256,19 @@ var RichTextEditor = function(elem) {
       // Ensure that the cursor is at the end of the RTE.
       elem.all(by.css('.oppia-rte')).first().sendKeys(
         protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
+    }
+  };
+};
+
+// Used to edit entries of a set of HTML strings, specifically used in the item
+// selection interaction test to customize interaction details
+var SetOfHtmlStringEditor = function(elem) {
+  return {
+    editEntry: function(index, objectType) {
+      var entry = elem.element(by.repeater('property in propertySchemas()').
+        row(index));
+      var editor = getEditor(objectType);
+      return editor(entry);
     }
   };
 };
@@ -585,7 +598,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
             return lineNumber;
           }
           if (!compareDict.hasOwnProperty(lineNumber)) {
-            throw Error('Line ' + lineNumber + ' not found in CodeMirror');
+            throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
           }
           expect(lineElement.element(by.xpath('./pre')).getText())
             .toEqual(compareDict[lineNumber].text);
@@ -606,7 +619,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       } else {
         for (var lineNumber in compareDict) {
           if (compareDict[lineNumber].checked !== true) {
-            throw Error('Expected line ' + lineNumber + ': \'' +
+            throw new Error(
+              'Expected line ' + lineNumber + ': \'' +
               compareDict[lineNumber].text + '\' to be found in CodeMirror');
           }
         }
@@ -649,7 +663,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         var lineNumber = textArray[i];
         var lineText = textArray[i + 1];
         if (!compareDict.hasOwnProperty(lineNumber)) {
-          throw Error('Line ' + lineNumber + ' not found in CodeMirror');
+          throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
         }
         expect(lineText).toEqual(compareDict[lineNumber].text);
         compareDict[lineNumber].checked = true;
@@ -663,7 +677,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       } else {
         for (var dictLineNumber in compareDict) {
           if (compareDict[dictLineNumber].checked !== true) {
-            throw Error('Expected line ' + lineNumber + ': \'' +
+            throw new Error(
+              'Expected line ' + lineNumber + ': \'' +
               compareDict[dictLineNumber].text + '\' to be found in CodeMirror'
             );
           }
@@ -725,6 +740,7 @@ var FORM_EDITORS = {
   List: ListEditor,
   Real: RealEditor,
   RichText: RichTextEditor,
+  SetOfHtmlString: SetOfHtmlStringEditor,
   Unicode: UnicodeEditor
 };
 
@@ -734,7 +750,7 @@ var getEditor = function(formName) {
   } else if (objects.OBJECT_EDITORS.hasOwnProperty(formName)) {
     return objects.OBJECT_EDITORS[formName];
   } else {
-    throw Error('Unknown form / object requested: ' + formName);
+    throw new Error('Unknown form / object requested: ' + formName);
   }
 };
 
@@ -743,6 +759,7 @@ exports.DictionaryEditor = DictionaryEditor;
 exports.ListEditor = ListEditor;
 exports.RealEditor = RealEditor;
 exports.RichTextEditor = RichTextEditor;
+exports.SetOfHtmlStringEditor = SetOfHtmlStringEditor;
 exports.UnicodeEditor = UnicodeEditor;
 exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
 exports.AutocompleteMultiDropdownEditor = AutocompleteMultiDropdownEditor;

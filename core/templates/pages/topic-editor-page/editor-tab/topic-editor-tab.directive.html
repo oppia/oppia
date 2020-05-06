@@ -1,9 +1,17 @@
 <div role="form" class="form-horizontal topic-editor">
   <md-card class="oppia-page-card oppia-long-text">
-    <!-- Move this form into a separate directive -->
+    <label class="form-heading">Topic Thumbnail</label>
     <thumbnail-uploader disabled="!topicRights.canEditTopic()"
-                        editable-thumbnail-data-url="editableThumbnailDataUrl"
-                        update-filename="updateTopicThumbnailFilename">
+                        filename="topic.getThumbnailFilename()"
+                        update-filename="updateTopicThumbnailFilename"
+                        bg-color="topic.getThumbnailBgColor()"
+                        update-bg-color="updateTopicThumbnailBgColor"
+                        allowed-bg-colors="allowedBgColors"
+                        aspect-ratio="'4:3'"
+                        preview-title="editableName"
+                        preview-description=""
+                        preview-description-bg-color="'#2F6687'"
+                        preview-footer="topic.getCanonicalStoryIds().length + ' Lessons'">
     </thumbnail-uploader>
 
     <div class="topic-name">
@@ -11,33 +19,27 @@
       <input id="topicName" type="text" class="form-control protractor-test-topic-name-field"
              ng-disabled="!topicRights.canEditTopic()"
              ng-model="editableName" ng-blur="updateTopicName(editableName)"
-             placeholder="Enter a name for the topic." maxlength="35" ng-trim="false">
-      <span class="form-text" style="font-size: smaller; color: red;" ng-if="editableName.length === 35">
-        <em>Please use at most 35 characters for the topic name.</em>
-      </span>
-    </div>
-
-    <div class="abbreviated-name">
-      <label for="abbreviatedName" class="form-heading">Abbreviated Topic Name</label>
-      <input id="abbreviatedName" type="text" class="form-control protractor-test-abbreviated-topic-name-field"
-             ng-disabled="!topicRights.canEditTopic()"
-             ng-model="editableAbbreviatedName" ng-blur="updateAbbreviatedName(editableAbbreviatedName)"
-             placeholder="Enter an abbreviated topic name." maxlength="12" ng-trim="false">
-      <span class="form-text" style="font-size: smaller; color: red;" ng-if="editableAbbreviatedName.length === 12">
-        <em>Please use at most 12 characters for the abbreviated topic name.</em>
+             placeholder="Enter a name for the topic." maxlength="<[MAX_CHARS_IN_TOPIC_NAME]>" ng-trim="false">
+      <span class="oppia-input-box-subtitle">
+        <i>
+          Topic name should be at most <[MAX_CHARS_IN_TOPIC_NAME]> characters.
+        </i>
       </span>
     </div>
 
     <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
       <label for="topicDescription" class="form-heading">Description</label>
       <textarea type="text" class="form-control protractor-test-topic-description-field"
-                ng-model="editableDescription" maxlength="240"
+                ng-model="editableDescription" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
                 ng-change="updateTopicDescriptionStatus(editableDescription)"
                 ng-blur="updateTopicDescription(editableDescription)"
-                placeholder="Enter the description of the topic">
+                placeholder="Enter the description of the topic"
+                style="height: 10vh;">
       </textarea>
-      <span class="form-text" style="font-size: smaller; color: red;" ng-if="editableDescription.length === 240">
-        <em>Please use at most 240 characters for the topic description.</em>
+      <span class="oppia-input-box-subtitle">
+        <i>
+          Topic description should be at most <[MAX_CHARS_IN_TOPIC_DESCRIPTION]> characters.
+        </i>
       </span>
       <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="form-text" style="font-size: smaller">
         What does this topic contain?
