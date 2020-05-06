@@ -31,7 +31,7 @@ var ExplorationEditorTranslationTab = function() {
   this.exitTutorial = function() {
     // If the translation welcome modal shows up, exit it.
     translationWelcomeModal.isPresent().then(function(isVisible) {
-      waitFor.visibilityOf(dismissWelcomeModalButton, 2000,
+      waitFor.visibilityOf(dismissWelcomeModalButton,
         'Welcome modal not becoming visible').then(
         () => {
           waitFor.elementToBeClickable(
@@ -40,10 +40,13 @@ var ExplorationEditorTranslationTab = function() {
           dismissWelcomeModalButton.click();
         },
         (err) => {
-          // This is just an empty error function to catch when the
-          // the welcome modal has been dismissed once. If this is not present
-          // then protractor uses the default error function which is not
-          // as this is not an error.
+          // Since the welcome modal appears only once, the wait for its
+          // visibilty will only resolve once and timeout the other times.
+          // This is just an empty error function to catch the timeouts that
+          // happen when the the welcome modal has been dismissed once. If
+          // this is not present then protractor uses the default error
+          // function which is not appropriate in this case as this is not an
+          // error.
         }
       );
     });
