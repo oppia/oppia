@@ -900,8 +900,8 @@ class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class DeleteAllUserIdsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
-    """Delete all RightsAllUsersModels from the datastore This needs to be done
-    so that the next testing run works correctly..
+    """Delete all RightsAllUsersModels from the datastore. This needs to be done
+    so that the next testing run works correctly.
     """
 
     @classmethod
