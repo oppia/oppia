@@ -7,6 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/oppiabot
+      - uses: ./.github/actions/oppiabot/dist/index.js
       - with:
           repo-token: ${{secrets.GITHUB_TOKEN}}
