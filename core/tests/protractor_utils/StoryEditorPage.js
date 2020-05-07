@@ -147,6 +147,7 @@ var StoryEditorPage = function() {
   };
 
   this.deleteChapterWithIndex = function(index) {
+    general.scrollToTop();
     deleteChapterButtons.then(function(elems) {
       elems[index].click();
     });
