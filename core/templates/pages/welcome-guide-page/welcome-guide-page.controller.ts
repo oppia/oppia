@@ -33,10 +33,16 @@ angular.module('oppia').directive('welcomeGuidePage', [
         ctrl.$onInit = function() {
           ctrl.fractionImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/welcomeguide/fractions.png');
+          ctrl.fractionImgUrlWebp = UrlInterpolationService.getStaticImageUrl(
+            '/welcomeguide/fractions.webp');
           ctrl.headerImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/welcomeguide/header.jpg');
+          ctrl.headerImgUrlWebp = UrlInterpolationService.getStaticImageUrl(
+            '/welcomeguide/header.webp');
           ctrl.browserImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/welcomeguide/browser.png');
+          ctrl.browserImgUrlWebp = UrlInterpolationService.getStaticImageUrl(
+            '/welcomeguide/browser.webp');
         };
       }]
     };

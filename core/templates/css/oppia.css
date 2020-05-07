@@ -4578,7 +4578,7 @@ div.oppia-issues-learner-action {
 
   .oppia-welcome-guide-browser-image {
     margin: auto;
-    padding: 55px 70px 30px 0;
+    padding: 55px 70px 30px 15px;
     text-align: left;
     width: 100%;
   }
