@@ -75,11 +75,6 @@ describe('ExplorationFeedback', function() {
     users.createAndLoginAdminUser(
       'user7@ExplorationFeedback.com',
       'superUserExplorationFeedback');
-    adminPage.editConfigProperty(
-      'Exposes the Improvements Tab for creators in the exploration editor.',
-      'Boolean', function(elem) {
-        elem.setValue(false);
-      });
   });
 
   it('should add feedback to an exploration', function() {
@@ -279,11 +274,6 @@ describe('Suggestions on Explorations', function() {
     users.createAndLoginAdminUser(
       'user4@ExplorationSuggestions.com',
       'configExplorationSuggestions');
-    adminPage.editConfigProperty(
-      'Exposes the Improvements Tab for creators in the exploration editor.',
-      'Boolean', function(elem) {
-        elem.setValue(false);
-      });
   });
 
   it('accepts & rejects a suggestion on a published exploration', function() {

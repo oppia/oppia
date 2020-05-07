@@ -140,8 +140,8 @@
           <span class="oppia-exploration-editor-tabs-dropdown-inner">Statistics</span>
         </a>
       </li>
-      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-if="isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-click="selectImprovementsTab()">
-        <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom"
+      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-if="isImprovementsTabEnabled()">
+        <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom" ng-click="selectImprovementsTab()"
            class="oppia-exploration-editor-tabs-dropdown-element">
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">trending_up</i>
           <span class="oppia-exploration-editor-tabs-dropdown-inner">Improvements</span>
@@ -160,8 +160,8 @@
           <span class="oppia-exploration-editor-tabs-dropdown-inner">History</span>
         </a>
       </li>
-      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-if="isFeedbackTabEnabled()" ng-class="{'active': getActiveTabName() === 'feedback'}" ng-click="selectFeedbackTab()">
-        <a href="#" uib-tooltip="Feedback" tooltip-placement="bottom"
+      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'feedback'}">
+        <a href="#" uib-tooltip="Feedback" tooltip-placement="bottom" ng-click="selectFeedbackTab()"
            class="oppia-exploration-editor-tabs-dropdown-element">
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE87F;</i>
           <span class="oppia-exploration-editor-tabs-dropdown-inner">Feedback</span>
@@ -232,9 +232,9 @@
     </a>
   </li>
 
-  <li ng-if="isLargeScreen && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}" ng-click="selectImprovementsTab()"
+  <li ng-if="isLargeScreen && isImprovementsTabEnabled()" ng-class="{'active': getActiveTabName() === 'improvements'}"
       class="nav-item d-none d-lg-block">
-    <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom"
+    <a href="#" uib-tooltip="Improvements" tooltip-placement="bottom" ng-click="selectImprovementsTab()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-improvements-tab">
       <i class="material-icons">trending_up</i>
     </a>
@@ -253,9 +253,8 @@
     </a>
   </li>
 
-  <li ng-if="isLargeScreen && isFeedbackTabEnabled()" ng-class="{'active': getActiveTabName() === 'feedback'}"
-      ng-click="selectFeedbackTab()" class="nav-item d-none d-lg-block">
-    <a href="#" uib-tooltip="Feedback" tooltip-placement="bottom"
+  <li ng-if="isLargeScreen" ng-class="{'active': getActiveTabName() === 'feedback'}" class="nav-item d-none d-lg-block">
+    <a href="#" uib-tooltip="Feedback" tooltip-placement="bottom" ng-click="selectFeedbackTab()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-feedback-tab">
       <i class="material-icons">&#xE87F;</i>
     </a>
