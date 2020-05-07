@@ -186,7 +186,6 @@ FULLY_COVERED_FILENAMES = [
     'improvement-playthrough-modal.controller.ts',
     'improvement-suggestion-thread-modal.controller.ts',
     'ImprovementActionButtonObjectFactory.ts',
-    'improvements-display.service.ts',
     'improvements.service.ts',
     'interaction-details-cache.service.ts',
     'interaction-specs.constants.ajs.ts',
