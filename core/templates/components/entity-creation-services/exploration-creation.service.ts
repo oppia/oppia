@@ -24,12 +24,12 @@ require('services/site-analytics.service.ts');
 
 angular.module('oppia').factory('ExplorationCreationService', [
   '$http', '$rootScope', '$timeout', '$uibModal', '$window',
-  'AlertsService', 'CsrfTokenService', 'SiteAnalyticsService',
-  'UrlInterpolationService',
+  'AlertsService', 'CsrfTokenService', 'LoaderService',
+  'SiteAnalyticsService', 'UrlInterpolationService',
   function(
       $http, $rootScope, $timeout, $uibModal, $window,
-      AlertsService, CsrfTokenService, SiteAnalyticsService,
-      UrlInterpolationService) {
+      AlertsService, CsrfTokenService, LoaderService,
+      SiteAnalyticsService, UrlInterpolationService) {
     var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
 
     var explorationCreationInProgress = false;
@@ -42,7 +42,7 @@ angular.module('oppia').factory('ExplorationCreationService', [
 
         explorationCreationInProgress = true;
         AlertsService.clearWarnings();
-        $rootScope.loadingMessage = 'Creating exploration';
+        LoaderService.showLoadingScreen('Creating exploration');
 
         $http.post('/contributehandler/create_new', {
         }).then(function(response) {
@@ -57,7 +57,7 @@ angular.module('oppia').factory('ExplorationCreationService', [
           }, 150);
           return false;
         }, function() {
-          $rootScope.loadingMessage = '';
+          LoaderService.hideLoadingScreen();
           explorationCreationInProgress = false;
         });
       },
@@ -96,7 +96,7 @@ angular.module('oppia').factory('ExplorationCreationService', [
         }).result.then(function(result) {
           var yamlFile = result.yamlFile;
 
-          $rootScope.loadingMessage = 'Creating exploration';
+          LoaderService.showLoadingScreen('Creating exploration');
 
           var form = new FormData();
           form.append('yaml_file', yamlFile);
@@ -125,7 +125,7 @@ angular.module('oppia').factory('ExplorationCreationService', [
               var parsedResponse = JSON.parse(transformedData);
               AlertsService.addWarning(
                 parsedResponse.error || 'Error communicating with server.');
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
               $rootScope.$apply();
             });
           });

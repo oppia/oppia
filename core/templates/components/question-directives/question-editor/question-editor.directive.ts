@@ -61,16 +61,16 @@ angular.module('oppia').directive('questionEditor', [
         '$scope', '$rootScope', '$uibModal',
         'AlertsService', 'QuestionCreationService',
         'EditabilityService', 'EditableQuestionBackendApiService',
+        'LoaderService', 'INTERACTION_SPECS', 'StateEditorService',
+        'ResponsesService', 'SolutionValidityService', 'QuestionUpdateService',
         'QuestionObjectFactory',
-        'INTERACTION_SPECS', 'StateEditorService', 'ResponsesService',
-        'SolutionValidityService', 'QuestionUpdateService',
         function(
             $scope, $rootScope, $uibModal,
             AlertsService, QuestionCreationService,
             EditabilityService, EditableQuestionBackendApiService,
-            QuestionObjectFactory,
-            INTERACTION_SPECS, StateEditorService, ResponsesService,
-            SolutionValidityService, QuestionUpdateService) {
+            LoaderService, INTERACTION_SPECS, StateEditorService,
+            ResponsesService, SolutionValidityService, QuestionUpdateService,
+            QuestionObjectFactory) {
           var ctrl = this;
           ctrl.getStateContentPlaceholder = function() {
             return (
@@ -107,7 +107,7 @@ angular.module('oppia').directive('questionEditor', [
                 ctrl.interactionIsShown = true;
               }
 
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
             }
             ctrl.stateEditorInitialized = true;
           };

@@ -46,14 +46,14 @@ angular.module('oppia').directive('feedbackTab', [
         'feedback-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$q', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
-        'DateTimeFormatService', 'EditabilityService',
+        '$q', '$uibModal', 'AlertsService', 'ChangeListService',
+        'DateTimeFormatService', 'EditabilityService', 'LoaderService',
         'ExplorationStatesService',
         'SuggestionModalForExplorationEditorService', 'ThreadDataService',
         'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
         function(
-            $q, $rootScope, $uibModal, AlertsService, ChangeListService,
-            DateTimeFormatService, EditabilityService,
+            $q, $uibModal, AlertsService, ChangeListService,
+            DateTimeFormatService, EditabilityService, LoaderService,
             ExplorationStatesService,
             SuggestionModalForExplorationEditorService, ThreadDataService,
             ThreadStatusDisplayService, UrlInterpolationService, UserService) {
@@ -240,7 +240,7 @@ angular.module('oppia').directive('feedbackTab', [
             ctrl.activeThread = null;
             ctrl.userIsLoggedIn = null;
             ctrl.threadIsStale = false;
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
 
             // Initial load of the thread list on page load.
             ctrl.tmpMessage = {
@@ -253,7 +253,7 @@ angular.module('oppia').directive('feedbackTab', [
               UserService.getUserInfoAsync().then(
                 userInfo => ctrl.userIsLoggedIn = userInfo.isLoggedIn()),
               ctrl.fetchUpdatedThreads()
-            ]).then(() => $rootScope.loadingMessage = '');
+            ]).then(() => LoaderService.hideLoadingScreen());
           };
         }
       ]
