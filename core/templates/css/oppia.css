@@ -4679,8 +4679,6 @@ span.oppia-welcome-guide-blue {
   margin-right: 15px;
   text-align: center;
   width: 2em;
-  -moz-border-radius: 1em;
-  -webkit-border-radius: 1em;
 }
 
 span.oppia-welcome-guide-purple {
@@ -4694,15 +4692,11 @@ span.oppia-welcome-guide-purple {
   margin-right: 15px;
   text-align: center;
   width: 2em;
-  -moz-border-radius: 1em;
-  -webkit-border-radius: 1em;
 }
 
 span.oppia-welcome-guide-red {
   background: rgb(231,67,57);
   border-radius: 1em;
-  -moz-border-radius: 1em;
-  -webkit-border-radius: 1em;
   color: #ffffff;
   display: inline-block;
   font-size: 1.5em;
@@ -4716,8 +4710,6 @@ span.oppia-welcome-guide-red {
 span.oppia-welcome-guide-orange {
   background: rgb(236,147,69);
   border-radius: 1em;
-  -moz-border-radius: 1em;
-  -webkit-border-radius: 1em;
   color: #ffffff;
   display: inline-block;
   font-size: 1.5em;
@@ -4731,8 +4723,6 @@ span.oppia-welcome-guide-orange {
 span.oppia-welcome-guide-green {
   background: rgb(69,148,136);
   border-radius: 1em;
-  -moz-border-radius: 1em;
-  -webkit-border-radius: 1em;
   color: #ffffff;
   display: inline-block;
   font-size: 1.5em;
