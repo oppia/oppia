@@ -237,7 +237,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             python_utils.PRINT('Starting any type check')
             python_utils.PRINT('----------------------------------------')
 
-        # pylint: disable=invalid-punctuation-used
         # This pattern is used to match cases like ': any'.
         any_type_pattern = r':\ *any'
 
