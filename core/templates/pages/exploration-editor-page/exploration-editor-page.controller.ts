@@ -433,11 +433,6 @@ angular.module('oppia').directive('explorationEditorPage', [
               ExplorationFeaturesService.isImprovementsTabEnabled();
           };
 
-          ctrl.isFeedbackTabEnabled = function() {
-            return ExplorationFeaturesService.isInitialized() &&
-              !ExplorationFeaturesService.isImprovementsTabEnabled();
-          };
-
           ctrl.showWelcomeExplorationModal = function() {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

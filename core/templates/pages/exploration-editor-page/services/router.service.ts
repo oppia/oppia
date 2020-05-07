@@ -66,11 +66,24 @@ angular.module('oppia').factory('RouterService', [
 
     var activeTabName = TABS.MAIN.name;
 
+    // Makes final changes to the location after trying to navigate to the
+    // improvements tab. Requires ExplorationFeaturesService to have been
+    // initialized, and will defer making any changes until that happens.
+    var finalizeNavigationToImprovementsTab = function() {
+      if (!ExplorationFeaturesService.isInitialized()) {
+        $timeout(finalizeNavigationToImprovementsTab, 300);
+        return;
+      }
+      if (activeTabName === TABS.IMPROVEMENTS.name &&
+          !ExplorationFeaturesService.isImprovementsTabEnabled()) {
+        // Redirect to the main tab.
+        _actuallyNavigate(SLUG_GUI, null);
+      }
+    };
+
     // When the URL path changes, reroute to the appropriate tab in the
     // exploration editor page.
-    $rootScope.$watch(function() {
-      return $location.path();
-    }, function(newPath, oldPath) {
+    $rootScope.$watch(() => $location.path(), (newPath, oldPath) => {
       if (newPath === '') {
         $location.path(oldPath);
         return;
@@ -108,14 +121,7 @@ angular.module('oppia').factory('RouterService', [
         $rootScope.$broadcast('refreshStatisticsTab');
       } else if (newPath === TABS.IMPROVEMENTS.path) {
         activeTabName = TABS.IMPROVEMENTS.name;
-        var waitToCheckThatImprovementsTabIsEnabled = $interval(function() {
-          if (ExplorationFeaturesService.isInitialized()) {
-            $interval.cancel(waitToCheckThatImprovementsTabIsEnabled);
-            if (!ExplorationFeaturesService.isImprovementsTabEnabled()) {
-              RouterService.navigateToMainTab(null);
-            }
-          }
-        }, 5);
+        finalizeNavigationToImprovementsTab();
       } else if (newPath === TABS.HISTORY.path) {
         // TODO(sll): Do this on-hover rather than on-click.
         $rootScope.$broadcast('refreshVersionHistory', {
@@ -124,14 +130,6 @@ angular.module('oppia').factory('RouterService', [
         activeTabName = TABS.HISTORY.name;
       } else if (newPath === TABS.FEEDBACK.path) {
         activeTabName = TABS.FEEDBACK.name;
-        var waitToCheckThatFeedbackTabIsEnabled = $interval(function() {
-          if (ExplorationFeaturesService.isInitialized()) {
-            $interval.cancel(waitToCheckThatFeedbackTabIsEnabled);
-            if (ExplorationFeaturesService.isImprovementsTabEnabled()) {
-              RouterService.navigateToMainTab(null);
-            }
-          }
-        }, 5);
       } else if (newPath.indexOf('/gui/') === 0) {
         activeTabName = TABS.MAIN.name;
         _doNavigationWithState(newPath, SLUG_GUI);
