@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.platform import models
 import feconf
 import python_utils
@@ -33,7 +34,8 @@ CHANGE_LIST_SAVE = [{'cmd': 'save'}]
 ALLOWED_ENTITY_NAMES = [
     feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_TOPIC,
     feconf.ENTITY_TYPE_SKILL, feconf.ENTITY_TYPE_STORY,
-    feconf.ENTITY_TYPE_QUESTION, feconf.ENTITY_TYPE_VOICEOVER_APPLICATION]
+    feconf.ENTITY_TYPE_QUESTION, feconf.ENTITY_TYPE_VOICEOVER_APPLICATION,
+    constants.TEMP_SKILL_ENTITY]
 
 
 class FileStream(python_utils.OBJECT):
