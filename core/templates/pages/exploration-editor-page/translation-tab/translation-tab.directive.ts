@@ -63,15 +63,15 @@ angular.module('oppia').directive('translationTab', [
         '/pages/exploration-editor-page/translation-tab/' +
         'translation-tab.directive.html'),
 
-      controller: ['$scope', '$rootScope', '$templateCache', '$uibModal',
+      controller: ['$scope', '$templateCache', '$uibModal',
         'ContextService', 'EditabilityService', 'ExplorationStatesService',
-        'SiteAnalyticsService', 'StateEditorService',
+        'LoaderService', 'SiteAnalyticsService', 'StateEditorService',
         'StateRecordedVoiceoversService', 'StateTutorialFirstTimeService',
         'StateWrittenTranslationsService', 'TranslationTabActiveModeService',
         'UserExplorationPermissionsService',
-        function($scope, $rootScope, $templateCache, $uibModal,
+        function($scope, $templateCache, $uibModal,
             ContextService, EditabilityService, ExplorationStatesService,
-            SiteAnalyticsService, StateEditorService,
+            LoaderService, SiteAnalyticsService, StateEditorService,
             StateRecordedVoiceoversService, StateTutorialFirstTimeService,
             StateWrittenTranslationsService, TranslationTabActiveModeService,
             UserExplorationPermissionsService) {
@@ -100,7 +100,7 @@ angular.module('oppia').directive('translationTab', [
                 stateName));
             $scope.showTranslationTabSubDirectives = true;
             TranslationTabActiveModeService.activateVoiceoverMode();
-            $rootScope.loadingMessage = '';
+            LoaderService.hideLoadingScreen();
           };
 
           $scope.leaveTutorial = function() {
@@ -168,7 +168,7 @@ angular.module('oppia').directive('translationTab', [
           };
 
           ctrl.$onInit = function() {
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             $scope.isTranslationTabBusy = false;
             $scope.showTranslationTabSubDirectives = false;
             $scope.$on('refreshTranslationTab', function() {

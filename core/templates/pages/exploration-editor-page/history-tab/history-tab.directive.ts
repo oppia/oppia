@@ -45,12 +45,12 @@ angular.module('oppia').directive('historyTab', [
         'history-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$log', '$rootScope', '$scope',
+        '$http', '$log', '$scope', 'LoaderService',
         '$uibModal', '$window', 'CompareVersionsService',
         'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
         'UrlInterpolationService', 'VersionTreeService',
         function(
-            $http, $log, $rootScope, $scope,
+            $http, $log, $scope, LoaderService,
             $uibModal, $window, CompareVersionsService,
             DateTimeFormatService, EditabilityService, ExplorationDataService,
             UrlInterpolationService, VersionTreeService) {
@@ -104,7 +104,7 @@ angular.module('oppia').directive('historyTab', [
 
           // Refreshes the displayed version history log.
           ctrl.refreshVersionHistory = function() {
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             ExplorationDataService.getData().then(function(data) {
               var currentVersion = data.version;
               ctrl.currentVersion = currentVersion;
@@ -158,7 +158,7 @@ angular.module('oppia').directive('historyTab', [
                       selected: false
                     });
                   }
-                  $rootScope.loadingMessage = '';
+                  LoaderService.hideLoadingScreen();
                   ctrl.computeVersionsToDisplay();
                 });
             });

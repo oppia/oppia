@@ -29,13 +29,13 @@ require('app.constants.ajs.ts');
 
 angular.module('oppia').controller('Base', [
   '$document', '$rootScope', '$scope', 'AlertsService', 'BackgroundMaskService',
-  'CsrfTokenService', 'DocumentAttributeCustomizationService',
+  'CsrfTokenService', 'DocumentAttributeCustomizationService', 'LoaderService',
   'MetaTagCustomizationService', 'SidebarStatusService',
   'UrlInterpolationService', 'UrlService', 'DEV_MODE',
   'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
   function(
       $document, $rootScope, $scope, AlertsService, BackgroundMaskService,
-      CsrfTokenService, DocumentAttributeCustomizationService,
+      CsrfTokenService, DocumentAttributeCustomizationService, LoaderService,
       MetaTagCustomizationService, SidebarStatusService,
       UrlInterpolationService, UrlService, DEV_MODE,
       SITE_FEEDBACK_FORM_URL, SITE_NAME) {
@@ -67,7 +67,7 @@ angular.module('oppia').controller('Base', [
       $scope.AlertsService = AlertsService;
       $rootScope.DEV_MODE = DEV_MODE;
       // If this is nonempty, the whole page goes into 'Loading...' mode.
-      $rootScope.loadingMessage = '';
+      LoaderService.hideLoadingScreen();
 
       CsrfTokenService.initializeToken();
       MetaTagCustomizationService.addMetaTags([

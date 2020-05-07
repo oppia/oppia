@@ -18,9 +18,11 @@
 
 angular.module('oppia').controller('Base', [
   '$scope', '$rootScope', '$document', 'AlertsService', 'BackgroundMaskService',
-  'SidebarStatusService', 'UrlService', 'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
+  'LoaderService', 'SidebarStatusService', 'UrlService',
+  'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
   function($scope, $rootScope, $document, AlertsService, BackgroundMaskService,
-      SidebarStatusService, UrlService, SITE_FEEDBACK_FORM_URL, SITE_NAME) {
+      LoaderService, SidebarStatusService, UrlService,
+      SITE_FEEDBACK_FORM_URL, SITE_NAME) {
     $scope.siteName = SITE_NAME;
     $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
@@ -29,7 +31,7 @@ angular.module('oppia').controller('Base', [
 
     $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
     // If this is nonempty, the whole page goes into 'Loading...' mode.
-    $rootScope.loadingMessage = '';
+    LoaderService.hideLoadingScreen();
 
     $scope.isSidebarShown = SidebarStatusService.isSidebarShown;
     $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;

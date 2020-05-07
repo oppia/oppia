@@ -64,13 +64,13 @@ angular.module('oppia').directive('explorationEditorTab', [
         'exploration-editor-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$scope', '$uibModal',
+        '$rootScope', '$scope', '$uibModal', 'LoaderService',
         'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
         'ExplorationInitStateNameService', 'ExplorationStatesService',
         'ExplorationWarningsService', 'GraphDataService', 'RouterService',
         'StateEditorService', 'UrlInterpolationService',
         function(
-            $rootScope, $scope, $uibModal,
+            $rootScope, $scope, $uibModal, LoaderService,
             ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
             ExplorationInitStateNameService, ExplorationStatesService,
             ExplorationWarningsService, GraphDataService, RouterService,
@@ -134,7 +134,7 @@ angular.module('oppia').directive('explorationEditorTab', [
                 ctrl.interactionIsShown = true;
               }
 
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
             }
           };
 
