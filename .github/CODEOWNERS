@@ -15,6 +15,7 @@
 /core/domain/android_validation_constants*.py @BenHenning
 
 # Angular Migration team
+/core/templates/services/loader.service*.ts @bansalnitish
 /core/templates/services/contextual/logger.service.ts @bansalnitish
 /core/templates/services/contextual/logger.service.spec.ts @bansalnitish
 /core/templates/services/UpgradedServices.ts @bansalnitish
