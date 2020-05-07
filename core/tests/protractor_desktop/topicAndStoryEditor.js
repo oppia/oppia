@@ -294,7 +294,11 @@ describe('Chapter editor functionality', function() {
     storyEditorPage.setChapterExplorationId(dummyExplorationIds[0]);
     storyEditorPage.changeNodeOutline(forms.toRichText('First outline'));
     storyEditorPage.saveStory('First save');
-    browser.refresh();
+    users.logout();
+    users.login(userEmail);
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    topicEditorPage.navigateToStoryWithIndex(0);
     storyEditorPage.expectNodeDescription('Chapter description 1');
   });
 
@@ -321,7 +325,11 @@ describe('Chapter editor functionality', function() {
     storyEditorPage.changeNodeOutline(forms.toRichText('Second outline'));
     storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
     storyEditorPage.saveStory('Second save');
-    browser.refresh();
+    users.logout();
+    users.login(userEmail);
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    topicEditorPage.navigateToStoryWithIndex(0);
     storyEditorPage.navigateToChapterByIndex(1);
     storyEditorPage.expectNodeDescription('Chapter description 2');
   });
