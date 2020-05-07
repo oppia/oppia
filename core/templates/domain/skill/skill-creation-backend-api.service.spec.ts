@@ -56,7 +56,8 @@ describe('Skill creation backend api service', () => {
       description: 'test-description',
       linked_topic_ids: ['test_id'],
       explanation_dict: 'test_dictionary',
-      rubrics: rubricDict
+      rubrics: rubricDict,
+      temp_id: '123456'
     };
   });
 
@@ -69,8 +70,8 @@ describe('Skill creation backend api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       skillCreationBackendApiService.createSkill(
-        'test-description', rubricDict, 'test_dictionary', ['test_id']).then(
-        successHandler);
+        'test-description', rubricDict, 'test_dictionary', ['test_id'], '123456'
+      ).then(successHandler);
       let req = httpTestingController.expectOne(
         '/skill_editor_handler/create_new');
       expect(req.request.method).toEqual('POST');
@@ -86,8 +87,8 @@ describe('Skill creation backend api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       skillCreationBackendApiService.createSkill(
-        'test-description', rubricDict, 'test_dictionary', ['test_id']).then(
-        successHandler, failHandler);
+        'test-description', rubricDict, 'test_dictionary', ['test_id'], '123456'
+      ).then(successHandler, failHandler);
       let errorResponse = new HttpErrorResponse({
         error: 'test 404 error',
         status: 404,
