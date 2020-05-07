@@ -40,6 +40,14 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     TOPIC_ID = 'topic_id'
 
+    MIGRATED_SUBTOPIC_DICT = {
+        'id': 1,
+        'skill_ids': ['skill_1'],
+        'thumbnail_bg_color': None,
+        'thumbnail_filename': None,
+        'title': 'A subtitle'
+    }
+
     def setUp(self):
         super(TopicMigrationOneOffJobTests, self).setUp()
         # Setup user who will own the test topics.
@@ -110,7 +118,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             topic_fetchers.get_topic_by_id(self.TOPIC_ID)
 
-        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id)
         expected = [[u'topic_deleted',
                      [u'Encountered 1 deleted topics.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
@@ -123,10 +131,22 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Generate topic with old(v1) subtopic data.
         self.save_new_topic_with_subtopic_schema_v1(
             self.TOPIC_ID, self.albert_id, 'A name', 'abbrev',
-            'a name', '', 'Image.png', [], [], [], 2)
-        topic = (
-            topic_fetchers.get_topic_by_id(self.TOPIC_ID))
-        self.assertEqual(topic.subtopic_schema_version, 1)
+            'a name', '', 'Image.svg', '#C6DCDA', [], [], [], 2)
+        topic_model = (
+            topic_models.TopicModel.get(self.TOPIC_ID))
+        self.assertEqual(topic_model.subtopic_schema_version, 1)
+        self.assertEqual(
+            topic_model.subtopics[0],
+            {
+                'id': 1,
+                'skill_ids': ['skill_1'],
+                'title': 'A subtitle'
+            })
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(topic.subtopic_schema_version, 2)
+        self.assertEqual(
+            topic.subtopics[0].to_dict(),
+            self.MIGRATED_SUBTOPIC_DICT)
 
         # Start migration job.
         job_id = (
@@ -136,12 +156,19 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Verify the topic migrates correctly.
         updated_topic = (
-            topic_fetchers.get_topic_by_id(self.TOPIC_ID))
+            topic_models.TopicModel.get(self.TOPIC_ID))
         self.assertEqual(
             updated_topic.subtopic_schema_version,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
+        updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(
+            updated_topic.subtopic_schema_version,
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
+        self.assertEqual(
+            updated_topic.subtopics[0].to_dict(),
+            self.MIGRATED_SUBTOPIC_DICT)
 
-        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id)
         expected = [[u'topic_migrated',
                      [u'1 topics successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
@@ -156,7 +183,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         # The topic model created will be invalid due to invalid language code.
         self.save_new_topic_with_subtopic_schema_v1(
             self.TOPIC_ID, self.albert_id, 'A name', 'abbrev',
-            'a name', '', 'Image.png', [], [], [], 2,
+            'a name', '', 'Image.svg', '#C6DCDA', [], [], [], 2,
             language_code='invalid_language_code')
 
         job_id = (

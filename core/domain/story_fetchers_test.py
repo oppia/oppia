@@ -44,7 +44,6 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.TOPIC_ID = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.TOPIC_ID, self.USER_ID, name='Topic',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)

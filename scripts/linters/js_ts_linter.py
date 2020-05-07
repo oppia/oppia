@@ -31,11 +31,11 @@ import python_utils
 from . import linter_utils
 from .. import common
 
-ESPRIMA_VERSION = '4.0.1'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 
-ESPRIMA_PATH = os.path.join(OPPIA_TOOLS_DIR, 'esprima-%s' % ESPRIMA_VERSION)
+ESPRIMA_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'esprima-%s' % common.ESPRIMA_VERSION)
 
 sys.path.insert(1, ESPRIMA_PATH)
 

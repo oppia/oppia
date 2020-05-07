@@ -32,6 +32,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
+from core.domain import html_validation_service
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import search_services
@@ -622,6 +623,7 @@ class ImageUploadHandler(EditorHandler):
     # to the end of 'assets/').
     _FILENAME_PREFIX = 'image'
     _decorator = None
+    HUNDRED_KB_IN_BYTES = 100 * 1024
 
     @acl_decorators.can_edit_entity
     def post(self, entity_type, entity_id):
@@ -634,14 +636,28 @@ class ImageUploadHandler(EditorHandler):
             filename_prefix = self._FILENAME_PREFIX
         if not raw:
             raise self.InvalidInputException('No image supplied')
-
+        if len(raw) > self.HUNDRED_KB_IN_BYTES:
+            raise self.InvalidInputException(
+                'Image exceeds file size limit of 100 KB.')
         allowed_formats = ', '.join(
             list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
-
-        # Verify that the data is recognized as an image.
-        file_format = imghdr.what(None, h=raw)
-        if file_format not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
-            raise self.InvalidInputException('Image not recognized')
+        if html_validation_service.is_parsable_as_xml(raw):
+            file_format = 'svg'
+            invalid_tags, invalid_attrs = (
+                html_validation_service.get_invalid_svg_tags_and_attrs(raw))
+            if invalid_tags or invalid_attrs:
+                invalid_tags_message = (
+                    'tags: %s' % invalid_tags if invalid_tags else '')
+                invalid_attrs_message = (
+                    'attributes: %s' % invalid_attrs if invalid_attrs else '')
+                raise self.InvalidInputException(
+                    'Unsupported tags/attributes found in the SVG:\n%s\n%s' % (
+                        invalid_tags_message, invalid_attrs_message))
+        else:
+            # Verify that the data is recognized as an image.
+            file_format = imghdr.what(None, h=raw)
+            if file_format not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
+                raise self.InvalidInputException('Image not recognized')
 
         # Verify that the file type matches the supplied extension.
         if not filename:
@@ -674,9 +690,11 @@ class ImageUploadHandler(EditorHandler):
             raise self.InvalidInputException(
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename)
-
+        image_is_compressible = (
+            file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
         fs_services.save_original_and_compressed_versions_of_image(
-            filename, entity_type, entity_id, raw, filename_prefix)
+            filename, entity_type, entity_id, raw, filename_prefix,
+            image_is_compressible)
 
         self.render_json({'filename': filename})
 

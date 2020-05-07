@@ -42,7 +42,7 @@
     <div class="oppia-profile-user-stat-container-large-screen">
       <div ng-repeat="stat in $ctrl.userDisplayedStatistics" class="oppia-profile-user-stat">
         <div popover-placement="right" ng-attr-uib-popover="<[stat.helpText]>" popover-append-to-body popover-trigger="mouseenter">
-          <span style="font-size: 16px" class="protractor-test-profile-{{stat.title | lowercase}}-stat"><strong><[stat.value || 0]></strong></span>
+          <span style="font-size: 16px" class="protractor-test-profile-<[stat.title | lowercase]>-stat"><strong><[stat.value || 0]></strong></span>
           <span><[stat.title]></span>
         </div>
       </div>
