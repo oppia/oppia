@@ -251,7 +251,6 @@
 /core/templates/domain/statistics/ @brianrodri
 /core/templates/pages/exploration-editor-page/improvements-tab/ @brianrodri
 /core/templates/pages/exploration-editor-page/statistics-tab/ @brianrodri
-/core/templates/services/improvement-task.service*.ts @brianrodri
 /core/templates/services/improvements.service*.ts @brianrodri
 /core/templates/services/messenger.service.ts @brianrodri
 /core/templates/services/playthrough*.ts @brianrodri
