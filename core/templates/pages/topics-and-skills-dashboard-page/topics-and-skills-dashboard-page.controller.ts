@@ -32,6 +32,7 @@ require('components/entity-creation-services/topic-creation.service.ts');
 require('components/rubrics-editor/rubrics-editor.directive.ts');
 
 require('domain/skill/RubricObjectFactory.ts');
+require('domain/skill/SkillObjectFactory.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-backend-api.service.ts'
@@ -57,8 +58,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
       controller: [
         '$http', '$rootScope', '$scope', '$uibModal', '$window',
         'AlertsService', 'RubricObjectFactory', 'SkillCreationService',
-        'TopicCreationService', 'TopicsAndSkillsDashboardBackendApiService',
-        'UrlInterpolationService',
+        'SkillObjectFactory', 'TopicCreationService',
+        'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         'EVENT_TYPE_SKILL_CREATION_ENABLED',
         'EVENT_TYPE_TOPIC_CREATION_ENABLED',
@@ -67,8 +68,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
         function(
             $http, $rootScope, $scope, $uibModal, $window,
             AlertsService, RubricObjectFactory, SkillCreationService,
-            TopicCreationService, TopicsAndSkillsDashboardBackendApiService,
-            UrlInterpolationService,
+            SkillObjectFactory, TopicCreationService,
+            TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
             EVENT_TYPE_SKILL_CREATION_ENABLED,
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
@@ -146,6 +147,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 function($scope, $uibModalInstance) {
                   $scope.newSkillDescription = '';
                   $scope.rubrics = rubrics;
+                  $scope.errorMsg = '';
                   $scope.bindableDict = {
                     displayedConceptCardExplanation: ''
                   };
@@ -182,7 +184,19 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                     }
                   };
 
+                  $scope.resetErrorMsg = function() {
+                    $scope.errorMsg = '';
+                  };
+
                   $scope.createNewSkill = function() {
+                    if (
+                      !SkillObjectFactory.hasValidDescription(
+                        $scope.newSkillDescription)) {
+                      $scope.errorMsg = (
+                        'Please use a non-empty description consisting of ' +
+                        'alphanumeric characters, spaces and/or hyphens.');
+                      return;
+                    }
                     $uibModalInstance.close({
                       description: $scope.newSkillDescription,
                       rubrics: $scope.rubrics,
