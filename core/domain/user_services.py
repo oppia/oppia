@@ -81,8 +81,6 @@ class UserSettings(python_utils.OBJECT):
         preferred_site_language_code: str or None. System language preference.
         preferred_audio_language_code: str or None. Audio language preference.
         created_on: datetime.datetime or None. When the user was created.
-        last_updated_on: datetime.datetime or None. When the user settings
-            were last updated.
     """
 
     def __init__(
@@ -95,8 +93,7 @@ class UserSettings(python_utils.OBJECT):
                 constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
             user_bio='', subject_interests=None, first_contribution_msec=None,
             preferred_language_codes=None, preferred_site_language_code=None,
-            preferred_audio_language_code=None, deleted=False,
-            created_on=None, last_updated_on=None):
+            preferred_audio_language_code=None, deleted=False, created_on=None):
         """Constructs a UserSettings domain object.
 
         Args:
@@ -137,8 +134,6 @@ class UserSettings(python_utils.OBJECT):
             deleted: bool. Whether the user has requested removal of their
                 account.
             created_on: datetime.datetime or None. When the user was created.
-            last_updated_on: datetime.datetime or None. When the user settings
-                were last updated.
         """
         self.user_id = user_id
         self.gae_id = gae_id
@@ -166,7 +161,6 @@ class UserSettings(python_utils.OBJECT):
         self.preferred_audio_language_code = preferred_audio_language_code
         self.deleted = deleted
         self.created_on = created_on
-        self.last_updated_on = last_updated_on
 
     def validate(self):
         """Checks that user_id and email fields of this UserSettings domain
@@ -718,8 +712,7 @@ def _save_user_settings(user_settings):
         preferred_audio_language_code=(
             user_settings.preferred_audio_language_code),
         deleted=user_settings.deleted,
-        created_on=user_settings.created_on,
-        last_updated_on=user_settings.last_updated_on
+        created_on=user_settings.created_on
     ).put()
 
 
@@ -765,8 +758,7 @@ def _transform_user_settings(user_settings_model):
             preferred_audio_language_code=(
                 user_settings_model.preferred_audio_language_code),
             deleted=user_settings_model.deleted,
-            created_on=user_settings_model.created_on,
-            last_updated_on=user_settings_model.last_updated_on
+            created_on=user_settings_model.created_on
         )
     else:
         return None
