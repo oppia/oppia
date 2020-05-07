@@ -21,11 +21,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { ContributionOpportunitiesBackendApiService,
-  IFetchedOpportunitiesSuccessCallbackParams } from
+  IFetchedOpportunitiesSuccessCallbackParams, IOpportunityDict } from
   // eslint-disable-next-line max-len
   'pages/community-dashboard-page/services/contribution-opportunities-backend-api.service';
-import { SkillOpportunity } from
-  'domain/opportunity/SkillOpportunityObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +41,7 @@ export class ContributionOpportunitiesService {
       ContributionOpportunitiesBackendApiService) { }
 
   private _getSkillOpportunities(cursor: string,
-      successCallback: (opportunities: SkillOpportunity[],
+      successCallback: (opportunities: IOpportunityDict[],
       more: boolean) => void): void {
     this.contributionOpportunitiesBackendApiService.fetchSkillOpportunities(
       cursor).then((value: IFetchedOpportunitiesSuccessCallbackParams) => {
@@ -54,7 +52,7 @@ export class ContributionOpportunitiesService {
   }
 
   private _getTranslationOpportunities(languageCode: string, cursor: string,
-      successCallback: (opportunities: SkillOpportunity[],
+      successCallback: (opportunities: IOpportunityDict[],
       more: boolean) => void): void {
     this.contributionOpportunitiesBackendApiService
       .fetchTranslationOpportunities(languageCode, cursor)
@@ -66,7 +64,7 @@ export class ContributionOpportunitiesService {
   }
 
   private _getVoiceoverOpportunities(languageCode: string, cursor: string,
-      successCallback: (opportunities: SkillOpportunity[],
+      successCallback: (opportunities: IOpportunityDict[],
       more: boolean) => void) {
     this.contributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
       languageCode, cursor).then(
@@ -78,24 +76,24 @@ export class ContributionOpportunitiesService {
   }
 
   public getSkillOpportunities(successCallback:
-    (opportunities: SkillOpportunity[], more: boolean) => void): void {
+    (opportunities: IOpportunityDict[], more: boolean) => void): void {
     this._getSkillOpportunities('', successCallback);
   }
 
   public getTranslationOpportunities(languageCode: string,
-      successCallback: (opportunities: SkillOpportunity[],
+      successCallback: (opportunities: IOpportunityDict[],
       more: boolean) => void): void {
     this._getTranslationOpportunities(languageCode, '', successCallback);
   }
 
   public getVoiceoverOpportunities(languageCode: string,
-      successCallback: (opportunities: SkillOpportunity[],
+      successCallback: (opportunities: IOpportunityDict[],
       more: boolean) => void): void {
     this._getVoiceoverOpportunities(languageCode, '', successCallback);
   }
 
   public getMoreSkillOpportunities(successCallback:
-    (opportunities: SkillOpportunity[], more: boolean) => void): void {
+    (opportunities: IOpportunityDict[], more: boolean) => void): void {
     if (this.moreSkillOpportunitiesAvailable) {
       this._getSkillOpportunities(this.skillOpportunitiesCursor,
         successCallback);
@@ -103,7 +101,7 @@ export class ContributionOpportunitiesService {
   }
 
   public getMoreTranslationOpportunities(languageCode: string,
-      successCallback: (opportunities: SkillOpportunity[],
+      successCallback: (opportunities: IOpportunityDict[],
       more: boolean) => void): void {
     if (this.moreTranslationOpportunitiesAvailable) {
       this._getTranslationOpportunities(languageCode,
@@ -112,7 +110,7 @@ export class ContributionOpportunitiesService {
   }
 
   public getMoreVoiceoverOpportunities(languageCode: string, successCallback:
-    (opportunities: SkillOpportunity[], more: boolean) => void): void {
+    (opportunities: IOpportunityDict[], more: boolean) => void): void {
     if (this.moreVoiceoverOpportunitiesAvailable) {
       this._getVoiceoverOpportunities(languageCode,
         this.voiceoverOpportunitiesCursor, successCallback);

@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { ExplorationOpportunitySummary } from
+import { ExplorationOpportunitySummary, ITranslationCountsDict } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 import { SkillOpportunity } from
   'domain/opportunity/SkillOpportunityObjectFactory';
@@ -40,9 +40,27 @@ type ContributionOpportunityParams = {
 };
 
 export interface IFetchedOpportunitiesSuccessCallbackParams {
-  opportunities?: SkillOpportunity[],
+  opportunities?: IOpportunityDict[],
   nextCursor?: string,
   more?: boolean
+}
+
+export interface IOpportunityDict {
+  id: string
+  // eslint-disable-next-line camelcase
+  topic_name: string
+  // eslint-disable-next-line camelcase
+  story_title: string
+  // eslint-disable-next-line camelcase
+  chapter_title: string
+  // eslint-disable-next-line camelcase
+  skill_description?: string
+  // eslint-disable-next-line camelcase
+  content_count: number
+  // eslint-disable-next-line camelcase
+  translation_counts?: ITranslationCountsDict
+  // eslint-disable-next-line camelcase
+  question_count?: number
 }
 
 @Injectable({
@@ -50,15 +68,13 @@ export interface IFetchedOpportunitiesSuccessCallbackParams {
 })
 export class ContributionOpportunitiesBackendApiService {
   urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
-  constructor(
-    private urlInterpolationService: UrlInterpolationService,
-    private http: HttpClient
-  ) {}
+  constructor(private urlInterpolationService: UrlInterpolationService,
+              private http: HttpClient) {}
 
   // TODO(#7165): Replace any with exact type.
   private _getOpportunityFromDict(
       opportunityType: ContributionOpportunityCategoryType,
-      opportunityDict: any
+      opportunityDict: IOpportunityDict
   ): ExplorationOpportunitySummary | SkillOpportunity {
     if (
       opportunityType === constants.OPPORTUNITY_TYPE_VOICEOVER ||
@@ -127,8 +143,8 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
-  fetchVoiceoverOpportunities(
-      languageCode: string, cursor: string): Promise<Object> {
+  fetchVoiceoverOpportunities(languageCode: string,
+      cursor: string): Promise<Object> {
     const params: ContributionOpportunityParams = {
       language_code: languageCode,
       cursor: cursor
