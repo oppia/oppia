@@ -16,10 +16,6 @@
  * @fileoverview Controllers for the Welcome Guide page.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
-
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('welcomeGuidePage', [
@@ -39,20 +35,8 @@ angular.module('oppia').directive('welcomeGuidePage', [
             '/welcomeguide/fractions.png');
           ctrl.headerImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/welcomeguide/header.jpg');
-          ctrl.thanksImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/classroom.png');
           ctrl.browserImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/welcomeguide/browser.png');
-          ctrl.number1ImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/welcomeguide/number1.png');
-          ctrl.number2ImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/welcomeguide/number2.png');
-          ctrl.number3ImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/welcomeguide/number3.png');
-          ctrl.number4ImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/welcomeguide/number4.png');
-          ctrl.number5ImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/welcomeguide/number5.png');
         };
       }]
     };
