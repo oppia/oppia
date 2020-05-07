@@ -158,7 +158,7 @@ angular.module('oppia').directive('explorationEditorPage', [
         'exploration-editor-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$log', '$q', '$rootScope', '$scope', '$templateCache',
+        '$http', '$log', '$q', '$scope', '$templateCache',
         '$timeout', '$uibModal', '$window', 'AutosaveInfoModalsService',
         'ChangeListService', 'ContextService', 'EditabilityService',
         'ExplorationAutomaticTextToSpeechService', 'ExplorationCategoryService',
@@ -169,16 +169,17 @@ angular.module('oppia').directive('explorationEditorPage', [
         'ExplorationParamSpecsService', 'ExplorationRightsService',
         'ExplorationStatesService', 'ExplorationTagsService',
         'ExplorationTitleService', 'ExplorationWarningsService',
-        'GraphDataService', 'PageTitleService', 'ParamChangesObjectFactory',
-        'ParamSpecsObjectFactory', 'PlaythroughIssuesService', 'RouterService',
-        'SiteAnalyticsService', 'StateClassifierMappingService',
-        'StateEditorService', 'StateTopAnswersStatsBackendApiService',
-        'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
-        'ThreadDataService', 'UrlInterpolationService',
-        'UserEmailPreferencesService', 'UserExplorationPermissionsService',
+        'GraphDataService', 'PageTitleService', 'LoaderService',
+        'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
+        'PlaythroughIssuesService', 'RouterService', 'SiteAnalyticsService',
+        'StateClassifierMappingService', 'StateEditorService',
+        'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
+        'StateTutorialFirstTimeService', 'ThreadDataService',
+        'UrlInterpolationService', 'UserEmailPreferencesService',
+        'UserExplorationPermissionsService',
         'EVENT_EXPLORATION_PROPERTY_CHANGED',
         function(
-            $http, $log, $q, $rootScope, $scope, $templateCache,
+            $http, $log, $q, $scope, $templateCache,
             $timeout, $uibModal, $window, AutosaveInfoModalsService,
             ChangeListService, ContextService, EditabilityService,
             ExplorationAutomaticTextToSpeechService, ExplorationCategoryService,
@@ -189,13 +190,14 @@ angular.module('oppia').directive('explorationEditorPage', [
             ExplorationParamSpecsService, ExplorationRightsService,
             ExplorationStatesService, ExplorationTagsService,
             ExplorationTitleService, ExplorationWarningsService,
-            GraphDataService, PageTitleService, ParamChangesObjectFactory,
-            ParamSpecsObjectFactory, PlaythroughIssuesService, RouterService,
-            SiteAnalyticsService, StateClassifierMappingService,
-            StateEditorService, StateTopAnswersStatsBackendApiService,
-            StateTopAnswersStatsService, StateTutorialFirstTimeService,
-            ThreadDataService, UrlInterpolationService,
-            UserEmailPreferencesService, UserExplorationPermissionsService,
+            GraphDataService, PageTitleService, LoaderService,
+            ParamChangesObjectFactory, ParamSpecsObjectFactory,
+            PlaythroughIssuesService, RouterService, SiteAnalyticsService,
+            StateClassifierMappingService, StateEditorService,
+            StateTopAnswersStatsBackendApiService, StateTopAnswersStatsService,
+            StateTutorialFirstTimeService, ThreadDataService,
+            UrlInterpolationService, UserEmailPreferencesService,
+            UserExplorationPermissionsService,
             EVENT_EXPLORATION_PROPERTY_CHANGED) {
           var ctrl = this;
           var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
@@ -495,7 +497,7 @@ angular.module('oppia').directive('explorationEditorPage', [
             /** ********************************************************
              * Called on initial load of the exploration editor page.
              *********************************************************/
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
 
             ctrl.explorationId = ContextService.getExplorationId();
             ctrl.explorationUrl = '/create/' + ctrl.explorationId;
