@@ -11,7 +11,7 @@ const checkLabels = async () => {
   const user = context.payload.sender.login
 
   if (label.name === GOOD_FIRST_LABEL &&
-      whitelist.goodFirstIssue.includes(user)) {
+      !whitelist.goodFirstIssue.includes(user)) {
     await handleGoodFirstIssue(octokit, user);
   } else if(prLabels.includes(label.name) || label.name.startsWith('PR')) {
     await handlePRLabel(octokit, label.name, user);
