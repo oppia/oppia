@@ -95,7 +95,7 @@ export class QuestionBackendApiService {
    * Does basic validation on input.
    */
   private validateRequestParameters(
-      skillIds, questionCount: any,
+      skillIds: any, questionCount: any,
       errorCallback: (reason?: any) => void): boolean {
     if (!this.isListOfStrings(skillIds)) {
       errorCallback('Skill ids should be a list of strings');

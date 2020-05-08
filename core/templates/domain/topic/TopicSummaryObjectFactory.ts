@@ -28,8 +28,10 @@ class TopicSummary {
   _totalSkillCount: number;
   _uncategorizedSkillCount: number;
 
-  constructor(id, name, canonicalStoryCount, subtopicCount, totalSkillCount,
-      uncategorizedSkillCount) {
+  constructor(
+      id: string, name: string, canonicalStoryCount: number,
+      subtopicCount: number, totalSkillCount: number,
+      uncategorizedSkillCount: number) {
     this._id = id;
     this._name = name;
     this._canonicalStoryCount = canonicalStoryCount;

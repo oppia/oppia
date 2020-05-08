@@ -65,14 +65,14 @@ export class ReadOnlyCollectionBackendApiService {
   }
 
   // TODO(#7165): Replace 'any' with the exact type.
-  private _cacheCollectionDetails(details: any) {
+  private _cacheCollectionDetails(details: any): void {
     this._collectionDetailsCache[details.collection.id] = {
       canEdit: details.can_edit,
       title: details.collection.title,
     };
   }
 
-  private _isCached(collectionId: string) {
+  private _isCached(collectionId: string): boolean {
     return this._collectionCache.hasOwnProperty(collectionId);
   }
 
@@ -87,7 +87,7 @@ export class ReadOnlyCollectionBackendApiService {
    * rejection callback function is passed the error that occurred and the
    * collection ID.
    */
-  fetchCollection(collectionId: string) {
+  fetchCollection(collectionId: string): Promise<object> {
     return new Promise((resolve, reject) => {
       this._fetchCollection(collectionId, resolve, reject);
     });
@@ -102,7 +102,7 @@ export class ReadOnlyCollectionBackendApiService {
    * it will store it in the cache to avoid requests from the backend in
    * further function calls.
    */
-  loadCollection(collectionId: string) {
+  loadCollection(collectionId: string): Promise<object> {
     return new Promise((resolve, reject) => {
       if (this._isCached(collectionId)) {
         if (resolve) {
@@ -120,7 +120,8 @@ export class ReadOnlyCollectionBackendApiService {
     });
   }
 
-  getCollectionDetails(collectionId: string) {
+  getCollectionDetails(
+      collectionId: string): {canEdit: boolean, title: string} {
     if (this._collectionDetailsCache[collectionId]) {
       return this._collectionDetailsCache[collectionId];
     } else {
@@ -132,7 +133,7 @@ export class ReadOnlyCollectionBackendApiService {
    * Returns whether the given collection is stored within the local data
    * cache or if it needs to be retrieved from the backend upon a laod.
    */
-  isCached(collectionId: string) {
+  isCached(collectionId: string): boolean {
     return this._isCached(collectionId);
   }
 
@@ -141,7 +142,7 @@ export class ReadOnlyCollectionBackendApiService {
    * collection ID with a new collection object.
    */
   // TODO(#7165): Replace 'any' with the exact type.
-  cacheCollection(collectionId: string, collection: any) {
+  cacheCollection(collectionId: string, collection: any): void {
     this._collectionCache[collectionId] = cloneDeep(collection);
   }
 
@@ -149,7 +150,7 @@ export class ReadOnlyCollectionBackendApiService {
    * Clears the local collection data cache, forcing all future loads to
    * re-request the previously loaded collections from the backend.
    */
-  clearCollectionCache() {
+  clearCollectionCache(): void {
     this._collectionCache = [];
   }
 }

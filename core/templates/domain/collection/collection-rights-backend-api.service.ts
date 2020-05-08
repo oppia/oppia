@@ -98,7 +98,7 @@ export class CollectionRightsBackendApiService {
     });
   }
 
-  private _isCached(collectionId: string): Boolean {
+  private _isCached(collectionId: string): boolean {
     return this.collectionRightsCache.hasOwnProperty(collectionId);
   }
 
@@ -143,7 +143,7 @@ export class CollectionRightsBackendApiService {
    * local data cache or if it needs to be retrieved from the backend
    * upon a laod.
    */
-  isCached(collectionId: string): Boolean {
+  isCached(collectionId: string): boolean {
     return this._isCached(collectionId);
   }
 

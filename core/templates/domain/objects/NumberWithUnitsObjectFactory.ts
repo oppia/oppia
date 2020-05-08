@@ -20,7 +20,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory.ts';
+import { Fraction, FractionObjectFactory } from
+  'domain/objects/FractionObjectFactory.ts';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
@@ -42,7 +43,8 @@ export class NumberWithUnits {
   fraction;
   units;
 
-  constructor(type, real, fractionObj, unitsObj) {
+  constructor(
+      type: string, real: number, fractionObj: Fraction, unitsObj: string) {
     this.type = type;
     this.real = real;
     this.fraction = fractionObj;

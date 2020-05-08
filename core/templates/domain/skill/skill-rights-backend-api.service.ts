@@ -44,7 +44,10 @@ export class SkillRightsBackendApiService {
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  _fetchSkillRights(skillId:string, successCallback, errorCallback): void {
+  _fetchSkillRights(
+      skillId:string,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
     let skillRightsUrl = this.urlInterpolationService.interpolateUrl(
       SkillEditorPageConstants.SKILL_RIGHTS_URL_TEMPLATE, {
         skill_id: skillId

@@ -36,7 +36,8 @@ export class ExplorationMetadata {
   providedIn: 'root'
 })
 export class ExplorationMetadataObjectFactory {
-  static createFromBackendDict(explorationMetadataBackendDict: any) {
+  static createFromBackendDict(
+      explorationMetadataBackendDict: any): ExplorationMetadata {
     return new ExplorationMetadata(
       explorationMetadataBackendDict.collection_node_metadata_list
     );

@@ -25,7 +25,7 @@ import { Injectable } from '@angular/core';
 import { LoggerService } from 'services/contextual/logger.service';
 
 export class Stopwatch {
-  startTime;
+  startTime: number;
   constructor(private log:LoggerService) {
     this.startTime = null;
   }

@@ -49,7 +49,7 @@ export class MusicNotesInputRulesService {
     }
   }
 
-  static _convertSequenceToMidi(sequence): number[] {
+  static _convertSequenceToMidi(sequence: Note[]): number[] {
     return sequence.map((note) => {
       return MusicNotesInputRulesService._getMidiNoteValue(note);
     });
@@ -111,7 +111,7 @@ export class MusicNotesInputRulesService {
     }
 
     var numWrongNotes: number = 0;
-    userSequence.map((noteValue, index) => {
+    userSequence.map((noteValue: number, index: number) => {
       if (targetSequence[index] + inputs.y !== noteValue) {
         numWrongNotes++;
       }

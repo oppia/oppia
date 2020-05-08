@@ -44,8 +44,7 @@ export class TopicViewerBackendApiService {
   private _fetchTopicData(
       topicName: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void
-  ): void {
+      errorCallback: (reason?: any) => void): void {
     const topicDataUrl = this.urlInterpolation.interpolateUrl(
       TopicViewerDomainConstants.TOPIC_DATA_URL_TEMPLATE, {
         topic_name: topicName

@@ -57,11 +57,11 @@ export class LostChange {
       statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
   }
 
-  isEndingExploration() {
+  isEndingExploration(): boolean {
     return this.oldValue === null && this.newValue === 'EndExploration';
   }
 
-  isAddingInteraction() {
+  isAddingInteraction(): boolean {
     return this.oldValue === null && this.newValue !== 'EndExploration';
   }
 
@@ -73,7 +73,7 @@ export class LostChange {
     return this.utilsService.isEmpty(this.newValue);
   }
 
-  isOutcomeFeedbackEqual() {
+  isOutcomeFeedbackEqual(): boolean {
     if (this.newValue.outcome && this.newValue.outcome.feedback &&
       this.oldValue.outcome && this.oldValue.outcome.feedback) {
       return (
@@ -83,7 +83,7 @@ export class LostChange {
     return false;
   }
 
-  isOutcomeDestEqual() {
+  isOutcomeDestEqual(): boolean {
     if (this.newValue.outcome && this.oldValue.outcome) {
       return (
         this.oldValue.outcome.dest === this.newValue.outcome.dest);
@@ -91,11 +91,11 @@ export class LostChange {
     return false;
   }
 
-  isDestEqual() {
+  isDestEqual(): boolean {
     return this.oldValue.dest === this.newValue.dest;
   }
 
-  isFeedbackEqual() {
+  isFeedbackEqual(): boolean {
     if (this.newValue.feedback && this.oldValue.feedback) {
       return (
         this.newValue.feedback.getHtml() ===
@@ -104,7 +104,7 @@ export class LostChange {
     return false;
   }
 
-  isRulesEqual() {
+  isRulesEqual(): boolean {
     return isEqual(this.newValue.rules, this.oldValue.rules);
   }
 
@@ -147,7 +147,8 @@ export class LostChangeObjectFactory {
    * @param {String} lostChangeDict - the name of the type to fetch.
    * @returns {LostChange} - The associated type, if any.
    */
-  createNew(lostChangeDict) {
+  // TODO(#7165): Remove the any type here and replace it with the correct type.
+  createNew(lostChangeDict: any): LostChange {
     return new LostChange(
       this.utilsService,
       lostChangeDict.cmd,

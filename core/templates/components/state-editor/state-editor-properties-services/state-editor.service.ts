@@ -26,6 +26,8 @@ import { Injectable } from '@angular/core';
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Hint } from 'domain/exploration/HintObjectFactory';
+import { Interaction } from
+  'domain/exploration/InteractionObjectFactory';
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { SolutionValidityService } from
@@ -119,7 +121,7 @@ export class StateEditorService {
     return this.misconceptionsBySkill;
   }
 
-  setInteraction(newInteraction): void {
+  setInteraction(newInteraction: Interaction): void {
     this.interaction = newInteraction;
   }
 

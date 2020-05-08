@@ -52,7 +52,7 @@ export class CsrfTokenService {
     });
   }
 
-  getTokenAsync() {
+  getTokenAsync(): Promise<object> {
     if (this.tokenPromise === null) {
       throw new Error('Token needs to be initialized');
     }

@@ -141,7 +141,7 @@ export class InteractionObjectFactory {
     });
   }
   // TODO(#7165): Replace any with exact type.
-  generateHintsFromBackend(hintBackendDicts: any) {
+  generateHintsFromBackend(hintBackendDicts: any): Array<Interaction> {
     return hintBackendDicts.map((hintBackendDict) => {
       return this.hintFactory.createFromBackendDict(hintBackendDict);
     });

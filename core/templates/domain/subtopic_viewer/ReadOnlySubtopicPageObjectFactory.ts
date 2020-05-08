@@ -20,23 +20,23 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { SubtopicPageContentsObjectFactory } from
+import { SubtopicPageContents, SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory';
 
 export class ReadOnlySubtopicPageData {
   subtopicTitle;
   pageContents;
 
-  constructor(subtopicTitle, pageContents) {
+  constructor(subtopicTitle: string, pageContents: SubtopicPageContents) {
     this.subtopicTitle = subtopicTitle;
     this.pageContents = pageContents;
   }
 
-  getSubtopicTitle() {
+  getSubtopicTitle(): string {
     return this.subtopicTitle;
   }
 
-  getPageContents() {
+  getPageContents(): SubtopicPageContents {
     return this.pageContents;
   }
 }

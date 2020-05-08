@@ -128,7 +128,8 @@ export class ConceptCardObjectFactory {
       private workedExampleObjectFactory: WorkedExampleObjectFactory) {}
 
   _generateWorkedExamplesFromBackendDict(
-      workedExampleDicts): Array<WorkedExample> {
+      workedExampleDicts: Array<IWorkedExampleBackendDict>)
+      : Array<WorkedExample> {
     return workedExampleDicts.map(
       (workedExampleDict: IWorkedExampleBackendDict) => {
         return this.workedExampleObjectFactory.createFromBackendDict(
