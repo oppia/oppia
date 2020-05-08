@@ -15,10 +15,11 @@
 /core/domain/android_validation_constants*.py @BenHenning
 
 # Angular Migration team
+/core/templates/services/loader.service*.ts @bansalnitish
 /core/templates/services/contextual/logger.service.ts @bansalnitish
 /core/templates/services/contextual/logger.service.spec.ts @bansalnitish
 /core/templates/services/UpgradedServices.ts @bansalnitish
-/core/templates/services/request-interceptor.service.ts @bansalnitish
+/core/templates/services/request-interceptor.service*.ts @bansalnitish
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
 
@@ -251,7 +252,6 @@
 /core/templates/domain/statistics/ @brianrodri
 /core/templates/pages/exploration-editor-page/improvements-tab/ @brianrodri
 /core/templates/pages/exploration-editor-page/statistics-tab/ @brianrodri
-/core/templates/services/improvement-task.service*.ts @brianrodri
 /core/templates/services/improvements.service*.ts @brianrodri
 /core/templates/services/messenger.service.ts @brianrodri
 /core/templates/services/playthrough*.ts @brianrodri

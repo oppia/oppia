@@ -302,6 +302,14 @@ export class StoryContents {
     this._nodes[index].setTitle(title);
   }
 
+  setNodeDescription(nodeId: string, description: string): void {
+    var index = this.getNodeIndex(nodeId);
+    if (index === -1) {
+      throw new Error('The node with given id doesn\'t exist');
+    }
+    this._nodes[index].setDescription(description);
+  }
+
   setNodeExplorationId(nodeId: string, explorationId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
