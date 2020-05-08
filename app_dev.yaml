@@ -253,7 +253,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
-- url: /welcomeguide
+- url: /welcome_guide
   static_files: webpack_bundles/welcome-guide-page.mainpage.html
   upload: webpack_bundles/welcome-guide-page.mainpage.html
   http_headers:

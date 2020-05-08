@@ -101,7 +101,7 @@ describe('Navigation features on mobile', function() {
         welcomeGuideLink, 'Could not click Welcome Guide link');
       welcomeGuideLink.click();
       waitFor.pageToFullyLoad();
-      expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/welcomeguide');
+      expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/welcome_guide');
     });
 
   it('should navigate to Donate page using the sidebar menu',
