@@ -202,11 +202,11 @@ angular.module('oppia').factory('SkillEditorStateService', [
         return true;
       },
 
-      getskillInitializedSubject: function() {
+      getSkillInitializedSubject: function() {
         return skillInitializedSubject;
       },
 
-      getskillReinitializedSubject: function() {
+      getSkillReinitializedSubject: function() {
         return skillReinitializedSubject;
       },
 
