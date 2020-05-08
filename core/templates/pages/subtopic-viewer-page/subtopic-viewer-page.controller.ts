@@ -42,11 +42,11 @@ angular.module('oppia').directive('subtopicViewerPage', [
         '/pages/subtopic-viewer-page/subtopic-viewer-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$window', 'AlertsService',
+        '$window', 'AlertsService', 'LoaderService',
         'PageTitleService', 'SubtopicViewerBackendApiService', 'UrlService',
         'WindowDimensionsService', 'FATAL_ERROR_CODES',
         function(
-            $rootScope, $window, AlertsService,
+            $window, AlertsService, LoaderService,
             PageTitleService, SubtopicViewerBackendApiService, UrlService,
             WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
@@ -58,7 +58,7 @@ angular.module('oppia').directive('subtopicViewerPage', [
             ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
             ctrl.subtopicId = UrlService.getSubtopicIdFromUrl();
 
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             SubtopicViewerBackendApiService.fetchSubtopicData(
               ctrl.topicName, ctrl.subtopicId).then(
               function(subtopicDataObject) {
@@ -66,7 +66,7 @@ angular.module('oppia').directive('subtopicViewerPage', [
                   subtopicDataObject.getPageContents().getSubtitledHtml());
                 ctrl.subtopicTitle = subtopicDataObject.getSubtopicTitle();
                 PageTitleService.setPageTitle(ctrl.subtopicTitle + ' - Oppia');
-                $rootScope.loadingMessage = '';
+                LoaderService.hideLoadingScreen();
               },
               function(errorResponse) {
                 if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
