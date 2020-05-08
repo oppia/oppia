@@ -4521,21 +4521,12 @@ div.oppia-issues-learner-action {
   word-wrap: break-word;
 }
 
-.oppia-welcome-guide-block {
-  font-family: "Roboto", Arial, sans-serif;
-  font-size: 1.17em;
-  line-height: 128%;
-  margin-bottom: 10px;
-  text-align: left;
-  width: 100%;
-}
-
 .oppia-welcome-guide-second-section {
   padding: 40px 0 40px 70px;
 }
 
 .oppia-welcome-guide-third-section {
-  padding: 40px 70px 0px 70px;
+  padding: 40px 70px 0 70px;
 }
 
 .oppia-welcome-guide-fractions-image {
@@ -4563,13 +4554,13 @@ div.oppia-issues-learner-action {
   }
 
   .oppia-welcome-guide-img img {
-    width: auto;
     height: 460px;
+    width: auto;
   }
 
   .oppia-welcome-guide-fractions-image img {
-    width: 80%;
     padding-top: 20px;
+    width: 80%;
   }
 
   .oppia-welcome-guide-browser-image {
@@ -4580,9 +4571,9 @@ div.oppia-issues-learner-action {
   }
 
   .oppia-welcome-guide-exploration-image {
-    padding: 30px 0px 30px 70px;
-    width: 100%;
+    padding: 30px 0 30px 70px;
     text-align: center;
+    width: 100%;
   }
 }
 
@@ -4600,7 +4591,7 @@ div.oppia-issues-learner-action {
 
   .oppia-welcome-guide-img img {
     height: auto;
-    padding-top: 0px;
+    padding-top: 0;
     width: 80%;
   }
 
@@ -4638,7 +4629,7 @@ div.oppia-issues-learner-action {
   }
 
   .oppia-welcome-guide-second-section {
-    padding: 0 70px 0 70px;
+    padding: 15px 70px 0 70px;
   }
 }
 
