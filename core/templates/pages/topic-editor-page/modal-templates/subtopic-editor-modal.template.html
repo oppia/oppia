@@ -5,6 +5,22 @@
     </h3>
   </div>
   <div class="modal-body">
+    <div class="subtopic-thumbnail">
+      <p>
+        <strong style="font-size: 1.2em;">Subtopic Thumbnail</strong>
+      </p>
+      <thumbnail-uploader filename="editableThumbnailFilename"
+                          update-filename="updateSubtopicThumbnailFilename"
+                          bg-color="editableThumbnailBgColor"
+                          update-bg-color="updateSubtopicThumbnailBgColor"
+                          allowed-bg-colors="allowedBgColors"
+                          aspect-ratio="'4:3'"
+                          preview-title="editableTitle"
+                          preview-description=""
+                          preview-description-bg-color="'#BE563C'"
+                          preview-footer="">
+      </thumbnail-uploader>
+    </div>
     <div class="subtopic-title">
       <p>
         <strong style="font-size: 1.2em;">Subtopic Title</strong>
@@ -43,7 +59,7 @@
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" ng-click="cancel()" type="button"> Cancel </button>
-    <button class="btn btn-success protractor-test-save-subtopic-button" ng-disabled="editableTitle === ''" ng-click="save()"> Save & Exit </button>
+    <button class="btn btn-success protractor-test-save-subtopic-button" ng-disabled="editableTitle === '' || !editableThumbnailFilename" ng-click="save()"> Save & Exit </button>
   </div>
 </div>
 
@@ -54,6 +70,10 @@
 
   .subtopic-editor .modal-body .subtopic-title {
     margin-bottom: 3%;
+  }
+
+  .subtopic-editor .modal-body .subtopic-thumbnail {
+    height: 150px;
   }
 
   .subtopic-editor .modal-footer {

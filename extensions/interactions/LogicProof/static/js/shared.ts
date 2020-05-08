@@ -75,7 +75,7 @@ var logicProofShared = (function() {
             message += displayExpression(parameter, language.operators);
             break;
           default:
-            throw Error(
+            throw new Error(
               'Unknown format ' + parameterFormat +
               ' sent to renderGeneralMessage().');
         }
@@ -193,7 +193,7 @@ var logicProofShared = (function() {
       expression.top_kind_name === 'variable') {
       return symbol;
     } else {
-      throw Error(
+      throw new Error(
         'Unknown kind ' + expression.top_kind_name +
         ' sent to displayExpression()');
     }

@@ -34,7 +34,7 @@ var GetStartedPage = function() {
     } else if (type === 'name') {
       var tag = element(by.css('meta[name="' + name + '"]'));
     } else {
-      throw Error('Unsupported tag type specified: ' + type);
+      throw new Error('Unsupported tag type specified: ' + type);
     }
 
     return tag.getAttribute('content');

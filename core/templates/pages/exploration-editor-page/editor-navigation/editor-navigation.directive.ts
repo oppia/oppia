@@ -43,15 +43,15 @@ angular.module('oppia').directive('editorNavigation', [
       controller: [
         '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
         'ExplorationFeaturesService', 'ExplorationRightsService',
-        'ExplorationWarningsService', 'ImprovementTaskService', 'RouterService',
-        'SiteAnalyticsService', 'StateTutorialFirstTimeService',
-        'ThreadDataService', 'UserService', 'WindowDimensionsService',
+        'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
+        'StateTutorialFirstTimeService', 'ThreadDataService', 'UserService',
+        'WindowDimensionsService',
         function(
             $rootScope, $scope, $timeout, $uibModal, ContextService,
             ExplorationFeaturesService, ExplorationRightsService,
-            ExplorationWarningsService, ImprovementTaskService, RouterService,
-            SiteAnalyticsService, StateTutorialFirstTimeService,
-            ThreadDataService, UserService, WindowDimensionsService) {
+            ExplorationWarningsService, RouterService, SiteAnalyticsService,
+            StateTutorialFirstTimeService, ThreadDataService, UserService,
+            WindowDimensionsService) {
           var ctrl = this;
           var taskCount = 0;
           $scope.getOpenTaskCount = function() {
@@ -61,10 +61,6 @@ angular.module('oppia').directive('editorNavigation', [
           $scope.isImprovementsTabEnabled = function() {
             return ExplorationFeaturesService.isInitialized() &&
               ExplorationFeaturesService.isImprovementsTabEnabled();
-          };
-          $scope.isFeedbackTabEnabled = function() {
-            return ExplorationFeaturesService.isInitialized() &&
-              !ExplorationFeaturesService.isImprovementsTabEnabled();
           };
 
           $scope.showUserHelpModal = function() {
@@ -165,10 +161,6 @@ angular.module('oppia').directive('editorNavigation', [
           };
 
           ctrl.$onInit = function() {
-            ImprovementTaskService.fetchOpenTaskCount().then(
-              countOfOpenTasks => {
-                taskCount = countOfOpenTasks;
-              });
             $scope.popoverControlObject = {
               postTutorialHelpPopoverIsShown: false
             };

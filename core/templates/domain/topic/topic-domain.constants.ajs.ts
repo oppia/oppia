@@ -74,6 +74,9 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'TOPIC_PROPERTY_THUMBNAIL_FILENAME',
   TopicDomainConstants.TOPIC_PROPERTY_THUMBNAIL_FILENAME);
+angular.module('oppia').constant(
+  'TOPIC_PROPERTY_THUMBNAIL_BG_COLOR',
+  TopicDomainConstants.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR);
 
 angular.module('oppia').constant(
   'TOPIC_PROPERTY_DESCRIPTION',
@@ -82,6 +85,12 @@ angular.module('oppia').constant(
   'TOPIC_PROPERTY_LANGUAGE_CODE',
   TopicDomainConstants.TOPIC_PROPERTY_LANGUAGE_CODE);
 
+angular.module('oppia').constant(
+  'SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME',
+  TopicDomainConstants.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME);
+angular.module('oppia').constant(
+  'SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR',
+  TopicDomainConstants.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR);
 angular.module('oppia').constant(
   'SUBTOPIC_PROPERTY_TITLE', TopicDomainConstants.SUBTOPIC_PROPERTY_TITLE);
 

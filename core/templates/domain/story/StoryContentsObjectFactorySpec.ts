@@ -38,6 +38,7 @@ describe('Story contents object factory', () => {
         {
           id: 'node_1',
           title: 'Title 1',
+          description: 'Description 1',
           prerequisite_skill_ids: ['skill_1'],
           acquired_skill_ids: ['skill_2'],
           destination_node_ids: ['node_2'],
@@ -47,6 +48,7 @@ describe('Story contents object factory', () => {
         }, {
           id: 'node_2',
           title: 'Title 2',
+          description: 'Description 2',
           prerequisite_skill_ids: ['skill_2'],
           acquired_skill_ids: ['skill_3', 'skill_4'],
           destination_node_ids: [],
@@ -77,7 +79,7 @@ describe('Story contents object factory', () => {
 
     expect(() => {
       _sampleStoryContents.getNodeIdsToTitleMap(['node_1', 'node_2', 'node_3']);
-    }).toThrow();
+    }).toThrowError('The node with id node_3 is invalid');
   });
 
   it('should correctly correctly validate valid story contents', () => {
@@ -132,44 +134,47 @@ describe('Story contents object factory', () => {
     () => {
       expect(() => {
         _sampleStoryContents.setInitialNodeId('node_5');
-      }).toThrow();
+      }).toThrowError('The node with given id doesn\'t exist');
       expect(() => {
         _sampleStoryContents.deleteNode('node_5');
-      }).toThrow();
+      }).toThrowError('The node does not exist');
       expect(() => {
         _sampleStoryContents.setNodeExplorationId('node_5', 'id');
-      }).toThrow();
+      }).toThrowError('The node with given id doesn\'t exist');
       expect(() => {
         _sampleStoryContents.setNodeOutline('node_5', 'Outline');
+      }).toThrowError('The node with given id doesn\'t exist');
+      expect(() => {
+        _sampleStoryContents.setNodeDescription('node_5', 'Description');
       }).toThrow();
       expect(() => {
         _sampleStoryContents.markNodeOutlineAsFinalized('node_5');
-      }).toThrow();
+      }).toThrowError('The node with given id doesn\'t exist');
       expect(() => {
         _sampleStoryContents.markNodeOutlineAsNotFinalized('node_5');
-      }).toThrow();
+      }).toThrowError('The node with given id doesn\'t exist');
       expect(() => {
         _sampleStoryContents.setNodeTitle('node_5', 'Title 3');
-      }).toThrow();
+      }).toThrowError('The node with given id doesn\'t exist');
       expect(() => {
         _sampleStoryContents.addPrerequisiteSkillIdToNode('node_5', 'skill_1');
-      }).toThrow();
+      }).toThrowError('The node with given id doesn\'t exist');
       expect(() => {
         _sampleStoryContents.removePrerequisiteSkillIdFromNode(
           'node_5', 'skill_1');
-      }).toThrow();
+      }).toThrowError('The node with given id doesn\'t exist');
       expect(() => {
         _sampleStoryContents.addAcquiredSkillIdToNode('node_5', 'skill_1');
-      }).toThrow();
+      }).toThrowError('The node with given id doesn\'t exist');
       expect(() => {
         _sampleStoryContents.removeAcquiredSkillIdFromNode('node_5', 'skill_1');
-      }).toThrow();
+      }).toThrowError('The node with given id doesn\'t exist');
       expect(() => {
         _sampleStoryContents.addDestinationNodeIdToNode('node_5', 'node_1');
-      }).toThrow();
+      }).toThrowError('The node with given id doesn\'t exist');
       expect(() => {
         _sampleStoryContents.removeDestinationNodeIdFromNode(
           'node_5', 'node_1');
-      }).toThrow();
+      }).toThrowError('The node with given id doesn\'t exist');
     });
 });

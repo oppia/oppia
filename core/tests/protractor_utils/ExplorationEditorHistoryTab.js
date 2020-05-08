@@ -70,7 +70,7 @@ var ExplorationEditorHistoryTab = function() {
             }
           }
           if (!matched) {
-            throw Error(
+            throw new Error(
               'State ' + stateName + ' not found by getHistoryGraph.');
           }
         });
