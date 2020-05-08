@@ -56,14 +56,17 @@ angular.module('oppia').directive('aboutPage', [
           ctrl.TAB_ID_ABOUT = 'about';
           ctrl.TAB_ID_FOUNDATION = 'foundation';
           ctrl.TAB_ID_CREDITS = 'credits';
-          ctrl.ALPHABET_LIST = [
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
           const ALLOWED_TABS = [
             ctrl.TAB_ID_ABOUT, ctrl.TAB_ID_FOUNDATION, ctrl.TAB_ID_CREDITS];
 
           ctrl.activeTabName = ctrl.TAB_ID_ABOUT;
+
+          ctrl.getCredits = function(startLetter: string) {
+            const results = CREDITS.filter(
+              (credit) => credit.startsWith(startLetter)).sort();
+            return results;
+          };
 
           ctrl.onTabClick = function(tabName: string) {
             // Update hash
@@ -73,17 +76,16 @@ angular.module('oppia').directive('aboutPage', [
           ctrl.getStaticImageUrl = function(imagePath: string) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
-          ctrl.hasCredits = function(startLetter: string) {
-            const results = CREDITS.filter(
-              (credit) => credit.startsWith(startLetter));
-            return results.length > 0;
-          };
-          ctrl.getCredits = function(startLetter: string) {
-            const results = CREDITS.filter(
-              (credit) => credit.startsWith(startLetter)).sort();
-            return results;
-          };
           ctrl.$onInit = function() {
+            ctrl.allCredits = [];
+            var alphabetList = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+            for (var i = 0; i < 26; i++) {
+              var letter = String.fromCharCode(i + 65);
+              var credits = ctrl.getCredits(letter);
+              if (credits.length > 0) {
+                ctrl.allCredits.push({letter: letter, credits: credits});
+              }
+            }
             const hash = WindowRef.nativeWindow.location.hash.slice(1);
             if (hash === 'license') {
               ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;

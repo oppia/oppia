@@ -103,9 +103,9 @@
             <p translate="I18N_ABOUT_PAGE_CREDITS_TAB_TEXT">
             </p>
             <div class="oppia-about-credits-letter-groups three-col">
-              <span ng-repeat-start="alphabet in $ctrl.ALPHABET_LIST" ng-if="$ctrl.hasCredits(alphabet)"><[alphabet]></span>
+              <span ng-repeat-start="item in $ctrl.allCredits"><[item.letter]></span>
               <ul ng-repeat-end>
-                <li ng-repeat="credit in $ctrl.getCredits(alphabet)"><[credit]></li>
+                <li ng-repeat="credit in item.credits"><[credit]></li>
               </ul>
             </div>
             <p translate="I18N_ABOUT_PAGE_CREDITS_TAB_TEXT_BOTTOM" translate-values="{listOfNames: $ctrl.listOfNames}">

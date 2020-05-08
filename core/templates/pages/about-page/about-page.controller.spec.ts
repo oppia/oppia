@@ -184,10 +184,6 @@ describe('About Page', function() {
     var namesWithV = credits.filter(
       (credit) => credit.startsWith('V')).sort();
     expect(ctrl.getCredits('V')).toEqual(namesWithV);
-  });
-
-  it('should check if developer names exist with a letter', function() {
-    expect(ctrl.hasCredits('A')).toEqual(true);
-    expect(ctrl.hasCredits('8')).toEqual(false);
+    expect(ctrl.getCredits('8')).toEqual([]);
   });
 });
