@@ -525,10 +525,6 @@ p:last-child {
   vertical-align: middle;
 }
 
-.oppia-welcome-guide-browser-image span {
-  text-align: left;
-}
-
 /* This will prevent the enlargement of the text in the RTE. A span tag gets
    introduced when a user selects the text from the end of first line, goes to the
    second one and then writes some text to replace that. The span tag carries
