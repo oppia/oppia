@@ -17,10 +17,10 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
+/* eslint-disable max-len */
 import { StateWrittenTranslationsService } from
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
-
+/* eslint-enable max-len */
 
 describe('State Written Translations Service', () => {
   let swts: StateWrittenTranslationsService = null;

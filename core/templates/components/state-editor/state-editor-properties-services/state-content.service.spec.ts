@@ -17,10 +17,10 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
+/* eslint-disable max-len */
 import { StateContentService } from
   'components/state-editor/state-editor-properties-services/state-content.service';
-
+/* eslint-enable max-len */
 
 describe('State Content Service', () => {
   let scs: StateContentService = null;

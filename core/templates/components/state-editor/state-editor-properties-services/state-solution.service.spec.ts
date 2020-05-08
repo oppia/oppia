@@ -17,10 +17,10 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
+/* eslint-disable max-len */
 import { StateSolutionService } from
   'components/state-editor/state-editor-properties-services/state-solution.service';
-
+/* eslint-enable max-len */
 
 fdescribe('State Solution Service', () => {
   let sss: StateSolutionService = null;

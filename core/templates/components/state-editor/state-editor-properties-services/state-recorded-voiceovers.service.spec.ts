@@ -17,10 +17,10 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
+/* eslint-disable max-len */
 import { StateRecordedVoiceoversService } from
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-
+/* eslint-enable max-len */
 
 describe('State Recorded Voiceovers Service', () => {
   let srvs: StateRecordedVoiceoversService = null;

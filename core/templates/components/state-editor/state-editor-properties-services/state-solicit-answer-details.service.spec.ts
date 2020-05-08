@@ -17,10 +17,10 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
+/* eslint-disable max-len */
 import { StateSolicitAnswerDetailsService } from
   'components/state-editor/state-editor-properties-services/state-solicit-answer-details.service';
-
+/* eslint-enable max-len */
 
 describe('State Solicit Answer Details Service', () => {
   let ssads: StateSolicitAnswerDetailsService = null;

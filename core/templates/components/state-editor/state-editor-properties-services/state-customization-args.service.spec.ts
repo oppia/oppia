@@ -17,10 +17,10 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
+/* eslint-disable max-len */
 import { StateCustomizationArgsService } from
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
-
+/* eslint-enable max-len */
 
 describe('State Customization Args Service', () => {
   let scas: StateCustomizationArgsService = null;
