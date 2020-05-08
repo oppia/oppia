@@ -73,6 +73,7 @@ describe('Story update service', function() {
           {
             id: 'node_1',
             title: 'Title 1',
+            description: 'Description 1',
             prerequisite_skill_ids: ['skill_1'],
             acquired_skill_ids: ['skill_2'],
             destination_node_ids: [],
@@ -82,6 +83,7 @@ describe('Story update service', function() {
           }, {
             id: 'node_2',
             title: 'Title 2',
+            description: 'Description 2',
             prerequisite_skill_ids: ['skill_3'],
             acquired_skill_ids: ['skill_4'],
             destination_node_ids: ['node_1'],
@@ -460,6 +462,36 @@ describe('Story update service', function() {
         property_name: 'title',
         new_value: 'new title',
         old_value: 'Title 1',
+        node_id: 'node_1'
+      }]);
+    }
+  );
+
+  it('should set a story node description', function() {
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getDescription()
+    ).toBe('Description 1');
+    StoryUpdateService.setStoryNodeDescription(
+      _sampleStory, 'node_1', 'new description');
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getDescription()
+    ).toBe('new description');
+
+    UndoRedoService.undoChange(_sampleStory);
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getDescription()
+    ).toBe('Description 1');
+  });
+
+  it('should create a backend change dict for setting a node description',
+    function() {
+      StoryUpdateService.setStoryNodeDescription(
+        _sampleStory, 'node_1', 'new description');
+      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: 'update_story_node_property',
+        property_name: 'description',
+        new_value: 'new description',
+        old_value: 'Description 1',
         node_id: 'node_1'
       }]);
     }

@@ -134,6 +134,10 @@ def apply_change_list(story_id, change_list):
                       story_domain.STORY_NODE_PROPERTY_TITLE):
                     story.update_node_title(change.node_id, change.new_value)
                 elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_DESCRIPTION):
+                    story.update_node_description(
+                        change.node_id, change.new_value)
+                elif (change.property_name ==
                       story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME):
                     story.update_node_thumbnail_filename(
                         change.node_id, change.new_value)

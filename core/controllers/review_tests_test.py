@@ -60,6 +60,7 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.node_1 = {
             'id': self.node_id,
             'title': 'Title 1',
+            'description': 'Description 1',
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
@@ -170,6 +171,7 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
         node = {
             'id': node_id,
             'title': 'Title 1',
+            'description': 'Description 1',
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
