@@ -55,6 +55,13 @@ angular.module('oppia').directive('topicsList', [
             }
           };
 
+          $scope.enableEditOptions = function() {
+            console.log('Setting to true');
+            console.log($scope.showEditOptions);
+            $scope.showEditOptions = true;
+            console.log($scope.showEditOptions);
+          };
+
           $scope.deleteTopic = function(topicId) {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -93,6 +100,7 @@ angular.module('oppia').directive('topicsList', [
           };
 
           ctrl.$onInit = function() {
+            $scope.showEditOptions = false;
             // As additional stories are not supported initially, it's not
             // being shown, for now.
             $scope.TOPIC_HEADINGS = [

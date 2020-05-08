@@ -80,6 +80,7 @@ angular.module('oppia').directive('topicEditorTab', [
           var _initStorySummaries = function() {
             $scope.canonicalStorySummaries =
               TopicEditorStateService.getCanonicalStorySummaries();
+            console.log($scope.canonicalStorySummaries);
           };
 
           $scope.getStaticImageUrl = function(imagePath) {

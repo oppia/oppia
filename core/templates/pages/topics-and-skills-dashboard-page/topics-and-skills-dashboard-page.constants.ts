@@ -17,10 +17,15 @@
  */
 
 enum ESortOptions {
-  InCreasingCreatedOn = 'Newly Created',
+  IncreasingCreatedOn = 'Newly Created',
       DescresingCreatedOn = 'Oldest Created',
       IncreasingUpdatedOn = 'Recently Updated',
       DecresingUpdatedOn = 'Least Updated',
+}
+
+enum EPublishedOptions {
+    Published = 'Published',
+    NotPublished = 'NotPublished'
 }
 
 export class TopicsAndSkillsDashboardPageConstants {
@@ -38,4 +43,5 @@ export class TopicsAndSkillsDashboardPageConstants {
   };
 
   public static ESortOptions = ESortOptions;
+  public static EPublishedOptions = EPublishedOptions;
 }

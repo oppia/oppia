@@ -54,6 +54,7 @@ angular.module('oppia').directive('subtopicsListTab', [
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.subtopics = $scope.topic.getSubtopics();
             $scope.subtopicTitles = [];
+            console.log($scope.subtopics);
             $scope.subtopics.forEach(
               function(subtopic) {
                 return $scope.subtopicTitles.push(subtopic.getTitle());

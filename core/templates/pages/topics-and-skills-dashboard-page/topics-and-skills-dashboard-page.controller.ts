@@ -30,7 +30,7 @@ require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page.service');
 import { TopicsAndSkillsDashboardPageConstants } from
-      'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 require('components/entity-creation-services/skill-creation.service.ts');
 require('components/entity-creation-services/topic-creation.service.ts');
 require('components/rubrics-editor/rubrics-editor.directive.ts');
@@ -106,7 +106,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                       uncategorized_skill_count: 0,
                       canonical_story_count: 0,
                       id: `wbL5aAyTWfOH${i}`,
-                      is_published: true,
+                      is_published: (i % 2 === 0),
                       total_skill_count: totalSkillCount,
                       can_edit_topic: true,
                       topic_model_last_updated: 1581839492500.852,
@@ -137,7 +137,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   }
                 };
                 console.log(ctrl.totalTopicSummaries);
-                populateDummyTopics();
+                // populateDummyTopics();
                 ctrl.totalCount = ctrl.topicSummaries.length;
                 ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
                 ctrl.paginationHandler(0);
@@ -334,10 +334,12 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
               category: '',
               status: '',
             };
-            // ctrl.statusOptions = ['option1', 'option2', 'option3'];
-            console.log(TopicsAndSkillsDashboardPageConstants.ESortOptions);
-            ctrl.statusOptions = (
+
+
+            ctrl.sortOptions = (
               TopicsAndSkillsDashboardPageConstants.ESortOptions);
+            ctrl.statusOptions = (
+              TopicsAndSkillsDashboardPageConstants.EPublishedOptions);
             ctrl.repeater = function(range) {
               var arr = [];
               for (var i = 0; i < range; i++) {

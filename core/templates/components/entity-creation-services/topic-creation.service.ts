@@ -18,7 +18,14 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/topic/topic-creation-backend-api.service.ts');
+require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
+require(
+  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+const topicConstants = require('constants.ts');
 
 angular.module('oppia').factory('TopicCreationService', [
   '$rootScope', '$uibModal', '$window', 'AlertsService',
@@ -43,8 +50,21 @@ angular.module('oppia').factory('TopicCreationService', [
             'new-topic-name-editor.template.html'),
           backdrop: true,
           controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
+            '$scope', '$uibModalInstance', 'TopicEditorStateService',
+            function($scope, $uibModalInstance, TopicEditorStateService) {
+              $scope.topic = TopicEditorStateService.getTopic();
+              $scope.topicRights = TopicEditorStateService.getTopicRights();
+              $scope.topicNameEditorIsShown = false;
+              $scope.editableName = $scope.topic.getName();
+              $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
+              $scope.editableDescription = $scope.topic.getDescription();
+              $scope.allowedBgColors = (
+                topicConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
+
+              $scope.editableDescriptionIsEmpty = (
+                $scope.editableDescription === '');
+              $scope.topicDescriptionChanged = false;
+
               $scope.topicName = '';
               $scope.abbreviatedTopicName = '';
               $scope.MAX_CHARS_IN_TOPIC_NAME = MAX_CHARS_IN_TOPIC_NAME;

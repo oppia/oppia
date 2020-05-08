@@ -1,8 +1,39 @@
 <div class="modal-header">
   <h3>
-    Enter Topic Name
+    New Topic
   </h3>
 </div>
+<div>
+  <div>
+    <div><span>Category</span></div>
+    <select>Hello</select>
+  </div>
+  <div>
+    <div><span>Name</span></div>
+    <input type="text" placeholder="Enter topic name">
+  </div>
+  <div>
+    <div><span>Description</span></div>
+    <textarea rows="3" cols="50" type="text" placeholder="Enter description">
+    </textarea>
+  </div>
+  <div>
+    <label class="form-heading-1">Topic Thumbnail</label>
+    <thumbnail-uploader disabled="!topicRights.canEditTopic()"
+                        filename="topic.getThumbnailFilename()"
+                        update-filename="updateTopicThumbnailFilename"
+                        bg-color="topic.getThumbnailBgColor()"
+                        update-bg-color="updateTopicThumbnailBgColor"
+                        allowed-bg-colors="allowedBgColors"
+                        aspect-ratio="'4:3'"
+                        preview-title="editableName"
+                        preview-description=""
+                        preview-description-bg-color="'#2F6687'"
+                        preview-footer="topic.getCanonicalStoryIds().length + ' Lessons'">
+    </thumbnail-uploader>
+  </div>
+</div>
+
 <form ng-submit="save(topicName, abbreviatedTopicName)">
   <div class="modal-body new-topic-name-editor">
     <div class="form-group row" ng-class="{'has-error': !isTopicNameValid()}">

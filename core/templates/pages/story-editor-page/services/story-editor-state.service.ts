@@ -130,6 +130,7 @@ angular.module('oppia').factory('StoryEditorStateService', [
        * loaded for this editor instance.
        */
       getStory: function() {
+        console.log(_story);
         return _story;
       },
 
