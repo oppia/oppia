@@ -36,13 +36,13 @@ angular.module('oppia').directive('signupPage', [
         '/pages/signup-page/signup-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$rootScope', '$timeout', '$uibModal', 'AlertsService',
-        'FocusManagerService', 'SiteAnalyticsService',
+        '$http', '$timeout', '$uibModal', 'AlertsService',
+        'FocusManagerService', 'LoaderService', 'SiteAnalyticsService',
         'UrlInterpolationService', 'UrlService', 'DASHBOARD_TYPE_CREATOR',
         'DASHBOARD_TYPE_LEARNER', 'SITE_NAME',
         function(
-            $http, $rootScope, $timeout, $uibModal, AlertsService,
-            FocusManagerService, SiteAnalyticsService,
+            $http, $timeout, $uibModal, AlertsService,
+            FocusManagerService, LoaderService, SiteAnalyticsService,
             UrlInterpolationService, UrlService, DASHBOARD_TYPE_CREATOR,
             DASHBOARD_TYPE_LEARNER, SITE_NAME) {
           var ctrl = this;
@@ -215,14 +215,14 @@ angular.module('oppia').directive('signupPage', [
             });
           };
           ctrl.$onInit = function() {
-            $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
+            LoaderService.showLoadingScreen('I18N_SIGNUP_LOADING');
             ctrl.warningI18nCode = '';
             ctrl.siteName = SITE_NAME;
             ctrl.submissionInProcess = false;
 
             $http.get(_SIGNUP_DATA_URL).then(function(response) {
               var data = response.data;
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
               ctrl.username = data.username;
               ctrl.hasEverRegistered = data.has_ever_registered;
               ctrl.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;

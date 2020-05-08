@@ -40,9 +40,9 @@ angular.module('oppia').directive('profilePage', [
         '/pages/profile-page/profile-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$log', '$rootScope', '$window', 'DateTimeFormatService',
+        '$http', '$log', '$window', 'DateTimeFormatService', 'LoaderService',
         'UrlInterpolationService', 'UrlService', 'UserService',
-        function($http, $log, $rootScope, $window, DateTimeFormatService,
+        function($http, $log, $window, DateTimeFormatService, LoaderService,
             UrlInterpolationService, UrlService, UserService) {
           var ctrl = this;
           var profileDataUrl = (
@@ -54,10 +54,10 @@ angular.module('oppia').directive('profilePage', [
             return DateTimeFormatService.getLocaleDateString(millisSinceEpoch);
           };
           ctrl.$onInit = function() {
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             $http.get(profileDataUrl).then(function(response) {
               var data = response.data;
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
               ctrl.username = {
                 title: 'Username',
                 value: data.profile_username,
@@ -213,7 +213,7 @@ angular.module('oppia').directive('profilePage', [
               ctrl.firstContributionMsec = data.first_contribution_msec;
               ctrl.profilePictureDataUrl = (
                 data.profile_picture_data_url || DEFAULT_PROFILE_PICTURE_URL);
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
             });
           };
         }
