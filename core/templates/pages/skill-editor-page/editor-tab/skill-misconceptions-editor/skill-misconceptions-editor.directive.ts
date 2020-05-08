@@ -43,15 +43,14 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
         '/pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
         'skill-misconceptions-editor.directive.html'),
       controller: [
-        '$scope', '$uibModal',
+        '$scope', '$filter', '$uibModal', '$rootScope',
         'MisconceptionObjectFactory',
-        'MISCONCEPTION_NAME_CHAR_LIMIT',
-        function(
-            $scope, $uibModal,
+        'MAX_CHARS_IN_MISCONCEPTION_NAME',
+        function( $scope, $filter, $uibModal, $rootScope,
             MisconceptionObjectFactory,
-            MISCONCEPTION_NAME_CHAR_LIMIT) {
+            MAX_CHARS_IN_MISCONCEPTION_NAME) {
           var ctrl = this;
-          ctrl.subscriptions = new Subscription();
+          ctrl.parentSubscription = new Subscription();
           $scope.isEditable = function() {
             return true;
           };
@@ -164,7 +163,7 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.misconceptions = $scope.skill.getMisconceptions();
-            ctrl.subscriptions.add(
+            ctrl.parentSubscription.add(
               SkillEditorStateService.getEventSkillReinitializedSubject()
                 .subscribe(
                   () => $scope.misconceptions = $scope.skill.getMisconceptions()
@@ -173,7 +172,7 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
           };
 
           $scope.$on('$destroy', function() {
-            ctrl.subscriptions.unsubscribe();
+            ctrl.parentSubscription.unsubscribe();
           });
         }]
     };

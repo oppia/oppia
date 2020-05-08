@@ -45,11 +45,22 @@ angular.module('oppia').directive('questionsTab', [
         '/pages/skill-editor-page/questions-tab/' +
         'skill-questions-tab.directive.html'),
       controller: [
-        '$scope', 'SkillEditorStateService', 'QuestionsListService',
-        function(
-            $scope, SkillEditorStateService, QuestionsListService) {
+        '$scope', '$http', '$q', '$uibModal', '$window', 'AlertsService',
+        'SkillEditorStateService', 'QuestionCreationService', 'UrlService',
+        'EditableQuestionBackendApiService', 'SkillBackendApiService',
+        'MisconceptionObjectFactory', 'QuestionObjectFactory',
+        'QuestionsListService',
+        'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
+        'NUM_QUESTIONS_PER_PAGE', function(
+            $scope, $http, $q, $uibModal, $window, AlertsService,
+            SkillEditorStateService, QuestionCreationService, UrlService,
+            EditableQuestionBackendApiService, SkillBackendApiService,
+            MisconceptionObjectFactory, QuestionObjectFactory,
+            QuestionsListService,
+            StateEditorService, QuestionUndoRedoService, UndoRedoService,
+            NUM_QUESTIONS_PER_PAGE) {
           var ctrl = this;
-          ctrl.subscriptions = new Subscription();
+          ctrl.parentSubscription = new Subscription();
           var _init = function() {
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.getQuestionSummariesAsync =
@@ -64,13 +75,13 @@ angular.module('oppia').directive('questionsTab', [
           };
           ctrl.$onInit = function() {
             _init();
-            ctrl.subscriptions.add(
+            ctrl.parentSubscription.add(
               SkillEditorStateService.getEventSkillInitializedSubject()
                 .subscribe(
                   () => _init()
                 )
             );
-            ctrl.subscriptions.add(
+            ctrl.parentSubscription.add(
               SkillEditorStateService.getEventSkillReinitializedSubject()
                 .subscribe(
                   () => _init()
@@ -79,7 +90,7 @@ angular.module('oppia').directive('questionsTab', [
           };
 
           $scope.$on('$destroy', function() {
-            ctrl.subscriptions.unsubscribe();
+            ctrl.parentSubscription.unsubscribe();
           });
         }
       ]

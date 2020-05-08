@@ -36,10 +36,13 @@ angular.module('oppia').directive('skillRubricsEditor', [
         '/pages/skill-editor-page/editor-tab/skill-rubrics-editor/' +
         'skill-rubrics-editor.directive.html'),
       controller: [
-        '$scope',
-        function($scope) {
+        '$scope', '$filter', '$uibModal', '$rootScope',
+        'RubricObjectFactory',
+        function(
+            $scope, $filter, $uibModal, $rootScope,
+            RubricObjectFactory) {
           var ctrl = this;
-          ctrl.subscriptions = new Subscription();
+          ctrl.parentSubscription = new Subscription();
           $scope.onSaveRubric = function(difficulty, explanations) {
             SkillUpdateService.updateRubricForDifficulty(
               $scope.skill, difficulty, explanations);
@@ -47,7 +50,7 @@ angular.module('oppia').directive('skillRubricsEditor', [
 
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
-            ctrl.subscriptions.add(
+            ctrl.parentSubscription.add(
               SkillEditorStateService.getEventSkillReinitializedSubject()
                 .subscribe(
                   () => $scope.rubrics = $scope.skill.getRubrics()
@@ -56,7 +59,7 @@ angular.module('oppia').directive('skillRubricsEditor', [
           };
 
           $scope.$on('$destroy', function() {
-            ctrl.subscriptions.unsubscribe();
+            ctrl.parentSubscription.unsubscribe();
           });
         }]
     };

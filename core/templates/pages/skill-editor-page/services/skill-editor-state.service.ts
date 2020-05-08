@@ -46,14 +46,14 @@ angular.module('oppia').factory('SkillEditorStateService', [
       current: [],
       others: []
     };
-    var eventSkillInitialized = new Subject();
-    var eventSkillReinitialized = new Subject();
+    var skillInitializedSubject = new Subject();
+    var skillReinitializedSubject = new Subject();
     var _setSkill = function(skill) {
       _skill.copyFromSkill(skill);
       if (_skillIsInitialized) {
-        eventSkillReinitialized.next();
+        skillReinitializedSubject.next();
       } else {
-        eventSkillInitialized.next();
+        skillInitializedSubject.next();
       }
       _skillIsInitialized = true;
     };
@@ -202,12 +202,12 @@ angular.module('oppia').factory('SkillEditorStateService', [
         return true;
       },
 
-      getEventSkillInitializedSubject: function() {
-        return eventSkillInitialized;
+      getskillInitializedSubjectSubject: function() {
+        return skillInitializedSubject;
       },
 
-      getEventSkillReinitializedSubject: function() {
-        return eventSkillReinitialized;
+      getskillReinitializedSubjectSubject: function() {
+        return skillReinitializedSubject;
       },
 
       getSkillRights: function() {

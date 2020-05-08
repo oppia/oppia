@@ -38,10 +38,10 @@ angular.module('oppia').directive('skillDescriptionEditor', [
         '/pages/skill-editor-page/editor-tab/skill-description-editor/' +
         'skill-description-editor.directive.html'),
       controller: [
-        '$scope', 'EVENT_SKILL_REINITIALIZED',
-        function($scope, EVENT_SKILL_REINITIALIZED) {
+        '$scope',
+        function($scope) {
           var ctrl = this;
-          ctrl.subscriptions = new Subscription();
+          ctrl.parentSubscription = new Subscription();
           $scope.MAX_CHARS_IN_SKILL_DESCRIPTION =
             MAX_CHARS_IN_SKILL_DESCRIPTION;
           $scope.canEditSkillDescription = function() {
@@ -74,7 +74,7 @@ angular.module('oppia').directive('skillDescriptionEditor', [
             $scope.tmpSkillDescription = $scope.skill.getDescription();
             $scope.skillRights = SkillEditorStateService.getSkillRights();
             $scope.errorMsg = '';
-            ctrl.subscriptions.add(
+            ctrl.parentSubscription.add(
               SkillEditorStateService.getEventSkillReinitializedSubject()
                 .subscribe(
                   () => {
@@ -85,7 +85,7 @@ angular.module('oppia').directive('skillDescriptionEditor', [
           };
 
           $scope.$on('$destroy', function() {
-            ctrl.subscriptions.unsubscribe();
+            ctrl.parentSubscription.unsubscribe();
           });
         }
       ]
