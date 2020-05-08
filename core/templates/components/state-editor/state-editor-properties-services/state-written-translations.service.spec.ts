@@ -22,7 +22,7 @@ import { StateWrittenTranslationsService } from
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
 
 
-fdescribe('State Written Translations Service', () => {
+describe('State Written Translations Service', () => {
   let swts: StateWrittenTranslationsService = null;
 
   beforeEach(() => {
@@ -33,7 +33,7 @@ fdescribe('State Written Translations Service', () => {
     swts = TestBed.get(StateWrittenTranslationsService);
   });
 
-  it('tests the setterMethodKey', () =>{
+  it('should test the setterMethodKey property.', () => {
     expect(swts.setterMethodKey).toBe('saveWrittenTranslations');
   });
 });

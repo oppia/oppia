@@ -22,7 +22,7 @@ import { StateCustomizationArgsService } from
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
 
 
-fdescribe('State Customization Args Service', () => {
+describe('State Customization Args Service', () => {
   let scas: StateCustomizationArgsService = null;
 
   beforeEach(() => {
@@ -33,7 +33,7 @@ fdescribe('State Customization Args Service', () => {
     scas = TestBed.get(StateCustomizationArgsService);
   });
 
-  it('tests the setterMethodKey', () =>{
+  it('should test the setterMethodKey property.', () => {
     expect(scas.setterMethodKey).toBe('saveInteractionCustomizationArgs');
   });
 });

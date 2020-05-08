@@ -22,7 +22,7 @@ import { StateContentService } from
   'components/state-editor/state-editor-properties-services/state-content.service';
 
 
-fdescribe('State Content Service', () => {
+describe('State Content Service', () => {
   let scs: StateContentService = null;
 
   beforeEach(() => {
@@ -33,7 +33,7 @@ fdescribe('State Content Service', () => {
     scs = TestBed.get(StateContentService);
   });
 
-  it('tests the setterMethodKey', () =>{
+  it('should test the setterMethodKey property.', () => {
     expect(scs.setterMethodKey).toBe('saveStateContent');
   });
 });

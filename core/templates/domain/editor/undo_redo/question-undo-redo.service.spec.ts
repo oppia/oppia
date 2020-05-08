@@ -23,7 +23,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 
-fdescribe('Question Undo Redo Service', function() {
+describe('Question Undo Redo Service', function() {
   let qurs = null;
 
   beforeEach(angular.mock.module('oppia'));

@@ -22,7 +22,7 @@ import { StateSolicitAnswerDetailsService } from
   'components/state-editor/state-editor-properties-services/state-solicit-answer-details.service';
 
 
-fdescribe('State Solicit Answer Details Service', () => {
+describe('State Solicit Answer Details Service', () => {
   let ssads: StateSolicitAnswerDetailsService = null;
 
   beforeEach(() => {
@@ -33,7 +33,7 @@ fdescribe('State Solicit Answer Details Service', () => {
     ssads = TestBed.get(StateSolicitAnswerDetailsService);
   });
 
-  it('tests the setterMethodKey', () =>{
+  it('should test the setterMethodKey property.', () => {
     expect(ssads.setterMethodKey).toBe('saveSolicitAnswerDetails');
   });
 });

@@ -33,7 +33,7 @@ fdescribe('State Solution Service', () => {
     sss = TestBed.get(StateSolutionService);
   });
 
-  it('tests the setterMethodKey', () =>{
+  it('should test the setterMethodKey property.', () => {
     expect(sss.setterMethodKey).toBe('saveSolution');
   });
 });

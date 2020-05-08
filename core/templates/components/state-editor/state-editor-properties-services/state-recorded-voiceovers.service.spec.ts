@@ -22,7 +22,7 @@ import { StateRecordedVoiceoversService } from
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 
 
-fdescribe('State Recorded Voiceovers Service', () => {
+describe('State Recorded Voiceovers Service', () => {
   let srvs: StateRecordedVoiceoversService = null;
 
   beforeEach(() => {
@@ -33,7 +33,7 @@ fdescribe('State Recorded Voiceovers Service', () => {
     srvs = TestBed.get(StateRecordedVoiceoversService);
   });
 
-  it('tests the setterMethodKey', () =>{
+  it('should test the setterMethodKey property.', () => {
     expect(srvs.setterMethodKey).toBe('saveRecordedVoiceovers');
   });
 });
