@@ -48,6 +48,7 @@ export class StoryDomainConstants {
   public static INITIAL_NODE_ID = 'initial_node_id';
 
   public static STORY_NODE_PROPERTY_TITLE = 'title';
+  public static STORY_NODE_PROPERTY_DESCRIPTION = 'description';
   public static STORY_NODE_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename';
   public static STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color';
   public static STORY_NODE_PROPERTY_OUTLINE = 'outline';

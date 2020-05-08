@@ -172,6 +172,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_DESCRIPTION),
+                'node_id': self.NODE_ID_2,
+                'old_value': '',
+                'new_value': 'Description 2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
                     story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
                 'node_id': self.NODE_ID_2,
                 'old_value': [],
@@ -222,6 +230,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story.story_contents.nodes[1].outline_is_finalized, True)
         self.assertEqual(story.story_contents.nodes[1].title, 'Title 2')
+        self.assertEqual(
+            story.story_contents.nodes[1].description, 'Description 2')
         self.assertEqual(story.story_contents.initial_node_id, self.NODE_ID_2)
         self.assertEqual(story.story_contents.next_node_id, 'node_3')
         self.assertEqual(story.version, 3)
@@ -248,6 +258,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'old_value': 'Title 2',
                 'new_value': 'Modified title 2'
             }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_DESCRIPTION),
+                'node_id': self.NODE_ID_2,
+                'old_value': 'Description 2',
+                'new_value': 'Modified description 2'
+            }),
         ]
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist,
@@ -257,6 +275,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.node_count, 1)
         self.assertEqual(
             story.story_contents.nodes[0].title, 'Modified title 2')
+        self.assertEqual(
+            story.story_contents.nodes[0].description, 'Modified description 2')
         self.assertEqual(story.story_contents.nodes[0].destination_node_ids, [])
         self.assertEqual(
             story.story_contents.nodes[0].outline_is_finalized, False)
@@ -1357,6 +1377,22 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Update node title.')
 
+    def test_cannot_update_node_description_with_invalid_node_id(self):
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': story_domain.STORY_NODE_PROPERTY_DESCRIPTION,
+            'node_id': 'invalid_node',
+            'old_value': '',
+            'new_value': 'new_description'
+        })]
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The node with id invalid_node is not part of this story'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list,
+                'Update node description.')
+
     def test_cannot_update_node_thumbnail_filename_with_invalid_node_id(self):
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -1511,6 +1547,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 1',
+            'description': 'Description 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -1524,6 +1561,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 2',
+            'description': 'Description 2',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -1537,6 +1575,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 3',
+            'description': 'Description 3',
             'destination_node_ids': ['node_4'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -1550,6 +1589,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
             'title': 'Title 4',
+            'description': 'Description 4',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -1746,11 +1786,11 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
         )
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 2)
+            feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 3)
 
         with current_schema_version_swap:
             story = story_fetchers.get_story_from_model(story_model)
 
-        self.assertEqual(story.story_contents_schema_version, 2)
+        self.assertEqual(story.story_contents_schema_version, 3)
         self.assertEqual(
-            story.story_contents.to_dict(), self.VERSION_2_STORY_CONTENTS_DICT)
+            story.story_contents.to_dict(), self.VERSION_3_STORY_CONTENTS_DICT)
