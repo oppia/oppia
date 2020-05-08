@@ -36,7 +36,8 @@ import utils
 from google.appengine.api import urlfetch
 
 current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models, base_models) = models.Registry.import_models([
+    models.NAMES.user, models.NAMES.base_model])
 
 MAX_USERNAME_LENGTH = 50
 # Size (in px) of the gravatar being retrieved.
@@ -80,7 +81,6 @@ class UserSettings(python_utils.OBJECT):
             preferences specified by the user.
         preferred_site_language_code: str or None. System language preference.
         preferred_audio_language_code: str or None. Audio language preference.
-        created_on: datetime.datetime or None. When the user was created.
     """
 
     def __init__(
@@ -93,7 +93,7 @@ class UserSettings(python_utils.OBJECT):
                 constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
             user_bio='', subject_interests=None, first_contribution_msec=None,
             preferred_language_codes=None, preferred_site_language_code=None,
-            preferred_audio_language_code=None, deleted=False, created_on=None):
+            preferred_audio_language_code=None, deleted=False):
         """Constructs a UserSettings domain object.
 
         Args:
@@ -133,7 +133,6 @@ class UserSettings(python_utils.OBJECT):
                 for audio translations preference.
             deleted: bool. Whether the user has requested removal of their
                 account.
-            created_on: datetime.datetime or None. When the user was created.
         """
         self.user_id = user_id
         self.gae_id = gae_id
@@ -160,7 +159,6 @@ class UserSettings(python_utils.OBJECT):
         self.preferred_site_language_code = preferred_site_language_code
         self.preferred_audio_language_code = preferred_audio_language_code
         self.deleted = deleted
-        self.created_on = created_on
 
     def validate(self):
         """Checks that user_id and email fields of this UserSettings domain
@@ -683,37 +681,72 @@ def _save_user_settings(user_settings):
         user_settings: UserSettings domain object.
     """
     user_settings.validate()
-    user_models.UserSettingsModel(
-        id=user_settings.user_id,
-        gae_id=user_settings.gae_id,
-        email=user_settings.email,
-        role=user_settings.role,
-        username=user_settings.username,
-        normalized_username=user_settings.normalized_username,
-        last_agreed_to_terms=user_settings.last_agreed_to_terms,
-        last_started_state_editor_tutorial=(
-            user_settings.last_started_state_editor_tutorial),
-        last_started_state_translation_tutorial=(
-            user_settings.last_started_state_translation_tutorial),
-        last_logged_in=user_settings.last_logged_in,
-        last_edited_an_exploration=user_settings.last_edited_an_exploration,
-        last_created_an_exploration=(
-            user_settings.last_created_an_exploration),
-        profile_picture_data_url=user_settings.profile_picture_data_url,
-        default_dashboard=user_settings.default_dashboard,
-        creator_dashboard_display_pref=(
-            user_settings.creator_dashboard_display_pref),
-        user_bio=user_settings.user_bio,
-        subject_interests=user_settings.subject_interests,
-        first_contribution_msec=user_settings.first_contribution_msec,
-        preferred_language_codes=user_settings.preferred_language_codes,
-        preferred_site_language_code=(
-            user_settings.preferred_site_language_code),
-        preferred_audio_language_code=(
-            user_settings.preferred_audio_language_code),
-        deleted=user_settings.deleted,
-        created_on=user_settings.created_on
-    ).put()
+    # If user with the given user_id already exists, update that model
+    # with the given user settings, otherwise, create a new one.
+    try:
+        user_model = user_models.UserSettingsModel().get(user_settings.user_id)
+
+        user_model.email = user_settings.email
+        user_model.role = user_settings.role
+        user_model.username = user_settings.username
+        user_model.normalized_username = user_settings.normalized_username
+        user_model.last_agreed_to_terms = user_settings.last_agreed_to_terms
+        user_model.last_started_state_editor_tutorial = (
+            user_settings.last_started_state_editor_tutorial)
+        user_model.last_started_state_translation_tutorial = (
+            user_settings.last_started_state_translation_tutorial)
+        user_model.last_logged_in = user_settings.last_logged_in
+        user_model.last_edited_an_exploration = (
+            user_settings.last_edited_an_exploration)
+        user_model.profile_picture_data_url = (
+            user_settings.profile_picture_data_url)
+        user_model.default_dashboard = user_settings.default_dashboard
+        user_model.creator_dashboard_display_pref = (
+            user_settings.creator_dashboard_display_pref)
+        user_model.user_bio = user_settings.user_bio
+        user_model.subject_interests = user_settings.subject_interests
+        user_model.first_contribution_msec = (
+            user_settings.first_contribution_msec)
+        user_model.preferred_language_codes = (
+            user_settings.preferred_language_codes)
+        user_model.preferred_site_language_code = (
+            user_settings.preferred_site_language_code)
+        user_model.preferred_audio_language_code = (
+            user_settings.preferred_audio_language_code)
+        user_model.deleted = user_settings.deleted
+
+        user_model.put()
+    except base_models.BaseModel.EntityNotFoundError:
+        user_models.UserSettingsModel(
+            id=user_settings.user_id,
+            gae_id=user_settings.gae_id,
+            email=user_settings.email,
+            role=user_settings.role,
+            username=user_settings.username,
+            normalized_username=user_settings.normalized_username,
+            last_agreed_to_terms=user_settings.last_agreed_to_terms,
+            last_started_state_editor_tutorial=(
+                user_settings.last_started_state_editor_tutorial),
+            last_started_state_translation_tutorial=(
+                user_settings.last_started_state_translation_tutorial),
+            last_logged_in=user_settings.last_logged_in,
+            last_edited_an_exploration=user_settings.last_edited_an_exploration,
+            last_created_an_exploration=(
+                user_settings.last_created_an_exploration),
+            profile_picture_data_url=user_settings.profile_picture_data_url,
+            default_dashboard=user_settings.default_dashboard,
+            creator_dashboard_display_pref=(
+                user_settings.creator_dashboard_display_pref),
+            user_bio=user_settings.user_bio,
+            subject_interests=user_settings.subject_interests,
+            first_contribution_msec=user_settings.first_contribution_msec,
+            preferred_language_codes=user_settings.preferred_language_codes,
+            preferred_site_language_code=(
+                user_settings.preferred_site_language_code),
+            preferred_audio_language_code=(
+                user_settings.preferred_audio_language_code),
+            deleted=user_settings.deleted
+        ).put()
 
 
 def _transform_user_settings(user_settings_model):
@@ -757,8 +790,7 @@ def _transform_user_settings(user_settings_model):
                 user_settings_model.preferred_site_language_code),
             preferred_audio_language_code=(
                 user_settings_model.preferred_audio_language_code),
-            deleted=user_settings_model.deleted,
-            created_on=user_settings_model.created_on
+            deleted=user_settings_model.deleted
         )
     else:
         return None
