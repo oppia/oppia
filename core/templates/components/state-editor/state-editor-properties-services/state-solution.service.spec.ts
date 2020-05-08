@@ -22,7 +22,7 @@ import { StateSolutionService } from
   'components/state-editor/state-editor-properties-services/state-solution.service';
 /* eslint-enable max-len */
 
-fdescribe('State Solution Service', () => {
+describe('State Solution Service', () => {
   let sss: StateSolutionService = null;
 
   beforeEach(() => {
