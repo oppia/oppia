@@ -60,11 +60,10 @@ angular.module('oppia').directive('creatorDashboardPage', [
         '/pages/creator-dashboard-page/creator-dashboard-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$log', '$q', '$rootScope', '$window',
-        'AlertsService', 'CreatorDashboardBackendApiService',
-        'DateTimeFormatService',
-        'ExplorationCreationService', 'RatingComputationService',
-        'SuggestionModalForCreatorDashboardService',
+        '$http', '$log', '$q', '$window', 'AlertsService',
+        'CreatorDashboardBackendApiService', 'DateTimeFormatService',
+        'ExplorationCreationService', 'LoaderService',
+        'RatingComputationService', 'SuggestionModalForCreatorDashboardService',
         'SuggestionThreadObjectFactory', 'SuggestionsService',
         'ThreadMessageObjectFactory', 'ThreadStatusDisplayService',
         'UrlInterpolationService', 'UserService',
@@ -75,11 +74,10 @@ angular.module('oppia').directive('creatorDashboardPage', [
         'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
         'SUBSCRIPTION_SORT_BY_KEYS',
         function(
-            $http, $log, $q, $rootScope, $window,
-            AlertsService, CreatorDashboardBackendApiService,
-            DateTimeFormatService,
-            ExplorationCreationService, RatingComputationService,
-            SuggestionModalForCreatorDashboardService,
+            $http, $log, $q, $window, AlertsService,
+            CreatorDashboardBackendApiService, DateTimeFormatService,
+            ExplorationCreationService, LoaderService,
+            RatingComputationService, SuggestionModalForCreatorDashboardService,
             SuggestionThreadObjectFactory, SuggestionsService,
             ThreadMessageObjectFactory, ThreadStatusDisplayService,
             UrlInterpolationService, UserService,
@@ -265,7 +263,7 @@ angular.module('oppia').directive('creatorDashboardPage', [
               DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
 
             ctrl.canCreateCollections = null;
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             var userInfoPromise = UserService.getUserInfoAsync();
             userInfoPromise.then(function(userInfo) {
               ctrl.canCreateCollections = userInfo.canCreateCollections();
@@ -371,7 +369,7 @@ angular.module('oppia').directive('creatorDashboardPage', [
             );
 
             $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
             });
 
             ctrl.getAverageRating = RatingComputationService

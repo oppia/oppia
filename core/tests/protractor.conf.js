@@ -65,10 +65,6 @@ var suites = {
       'protractor_desktop/explorationHistoryTab.js'
     ],
 
-    explorationImprovementsTab: [
-      'protractor_desktop/explorationImprovementsTab.js'
-    ],
-
     explorationStatisticsTab: [
       'protractor_desktop/explorationStatisticsTab.js'
     ],
