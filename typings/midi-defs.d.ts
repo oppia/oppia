@@ -89,13 +89,21 @@ interface WebMidi {
   stopAllNotes: () => void;
 }
 
+interface MidiKeyToNote {
+  [key: string]: number;
+}
+
+interface MidiNoteToKey {
+  [note: number]: string;
+}
+
 interface MIDI {
   audioBuffers: Object;
   AudioTag: MidiAudioTag;
   channels: Array<Object>;
   GM: Object;
-  keyToNote: Object;
-  noteToKey: Object;
+  keyToNote: MidiKeyToNote;
+  noteToKey: MidiNoteToKey;
   Player: MidiPlayer;
   supports: Object;
   util: Object;
