@@ -50,7 +50,7 @@ angular.module('oppia').directive('libraryPage', [
         '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal',
         '$window', 'AlertsService', 'LearnerDashboardActivityIdsObjectFactory',
         'LearnerDashboardIdsBackendApiService', 'LearnerPlaylistService',
-        'PageTitleService', 'SearchService',
+        'LoaderService', 'PageTitleService', 'SearchService',
         'UrlInterpolationService', 'UrlService', 'UserService',
         'WindowDimensionsService', 'ALL_CATEGORIES',
         'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES',
@@ -59,7 +59,7 @@ angular.module('oppia').directive('libraryPage', [
             $http, $log, $rootScope, $scope, $timeout, $uibModal,
             $window, AlertsService, LearnerDashboardActivityIdsObjectFactory,
             LearnerDashboardIdsBackendApiService, LearnerPlaylistService,
-            PageTitleService, SearchService,
+            LoaderService, PageTitleService, SearchService,
             UrlInterpolationService, UrlService, UserService,
             WindowDimensionsService, ALL_CATEGORIES,
             LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES,
@@ -208,7 +208,7 @@ angular.module('oppia').directive('libraryPage', [
           };
           ctrl.$onInit = function() {
             $scope.SHOW_CLASSROOM_CALLOUT = (SHOW_CLASSROOM_CALLOUT);
-            $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
+            LoaderService.showLoadingScreen('I18N_LIBRARY_LOADING');
             ctrl.bannerImageFilename = possibleBannerFilenames[
               Math.floor(Math.random() * possibleBannerFilenames.length)];
 
@@ -253,7 +253,7 @@ angular.module('oppia').directive('libraryPage', [
                     'preferredLanguageCodesLoaded',
                     response.data.preferred_language_codes);
 
-                  $rootScope.loadingMessage = '';
+                  LoaderService.hideLoadingScreen();
                 }, function() {
                   // This callback is triggered when the Cancel button is
                   // clicked. No further action is needed.
@@ -307,10 +307,10 @@ angular.module('oppia').directive('libraryPage', [
                                 ownedCollections.id] = true;
                             });
                         });
-                        $rootScope.loadingMessage = '';
+                        LoaderService.hideLoadingScreen();
                       });
                   } else {
-                    $rootScope.loadingMessage = '';
+                    LoaderService.hideLoadingScreen();
                   }
                 });
 

@@ -65,10 +65,6 @@ var suites = {
       'protractor_desktop/explorationHistoryTab.js'
     ],
 
-    explorationImprovementsTab: [
-      'protractor_desktop/explorationImprovementsTab.js'
-    ],
-
     explorationStatisticsTab: [
       'protractor_desktop/explorationStatisticsTab.js'
     ],
@@ -192,7 +188,7 @@ exports.config = {
           } else {
             errorMessage = pattern + ' does not exist.';
           }
-          throw Error(errorMessage)
+          throw new Error(errorMessage)
         }
       }
     });

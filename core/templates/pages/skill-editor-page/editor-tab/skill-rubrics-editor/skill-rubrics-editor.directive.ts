@@ -40,9 +40,9 @@ angular.module('oppia').directive('skillRubricsEditor', [
         function($scope) {
           var ctrl = this;
           ctrl.subscriptions = new Subscription();
-          $scope.onSaveRubric = function(difficulty, explanation) {
+          $scope.onSaveRubric = function(difficulty, explanations) {
             SkillUpdateService.updateRubricForDifficulty(
-              $scope.skill, difficulty, explanation);
+              $scope.skill, difficulty, explanations);
           };
 
           ctrl.$onInit = function() {

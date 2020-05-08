@@ -348,7 +348,7 @@ angular.module('oppia').directive('conversationSkin', [
         'ExplorationRecommendationsService',
         'FatigueDetectionService', 'FocusManagerService',
         'GuestCollectionProgressService', 'HintsAndSolutionManagerService',
-        'ImagePreloaderService', 'LearnerAnswerInfoService',
+        'ImagePreloaderService', 'LearnerAnswerInfoService', 'LoaderService',
         'LearnerParamsService', 'LearnerViewRatingService', 'MessengerService',
         'NumberAttemptsService', 'PlayerCorrectnessFeedbackEnabledService',
         'PlayerPositionService', 'PlayerTranscriptService',
@@ -385,7 +385,7 @@ angular.module('oppia').directive('conversationSkin', [
             ExplorationRecommendationsService,
             FatigueDetectionService, FocusManagerService,
             GuestCollectionProgressService, HintsAndSolutionManagerService,
-            ImagePreloaderService, LearnerAnswerInfoService,
+            ImagePreloaderService, LearnerAnswerInfoService, LoaderService,
             LearnerParamsService, LearnerViewRatingService, MessengerService,
             NumberAttemptsService, PlayerCorrectnessFeedbackEnabledService,
             PlayerPositionService, PlayerTranscriptService,
@@ -518,6 +518,61 @@ angular.module('oppia').directive('conversationSkin', [
                 callback();
               }
             }, 100);
+          };
+
+          $scope.getExplorationLink = function() {
+            if ($scope.recommendedExplorationSummaries &&
+                $scope.recommendedExplorationSummaries[0]) {
+              if (!$scope.recommendedExplorationSummaries[0].id) {
+                return '#';
+              } else {
+                var result = '/explore/' +
+                    $scope.recommendedExplorationSummaries[0].id;
+                var urlParams = UrlService.getUrlParams();
+                var parentExplorationIds = (
+                  $scope.recommendedExplorationSummaries[0]
+                    .parentExplorationIds);
+
+                var collectionIdToAdd = $scope.collectionId;
+                var storyIdToAdd = null;
+                var storyNodeIdToAdd = null;
+                // Replace the collection ID with the one in the URL if it
+                // exists in urlParams.
+                if (parentExplorationIds &&
+                    urlParams.hasOwnProperty('collection_id')) {
+                  collectionIdToAdd = urlParams.collection_id;
+                } else if (
+                  UrlService.getPathname().match(/\/story\/(\w|-){12}/g) &&
+                    $scope.recommendedExplorationSummaries[0].nextNodeId) {
+                  storyIdToAdd = UrlService.getStoryIdFromViewerUrl();
+                  storyNodeIdToAdd = $scope.storyNodeIdToAdd;
+                } else if (
+                  urlParams.hasOwnProperty('story_id') &&
+                    urlParams.hasOwnProperty('node_id')) {
+                  storyIdToAdd = urlParams.story_id;
+                  storyNodeIdToAdd = (
+                    $scope.recommendedExplorationSummaries[0].des);
+                }
+
+                if (collectionIdToAdd) {
+                  result = UrlService.addField(
+                    result, 'collection_id', collectionIdToAdd);
+                }
+                if (parentExplorationIds) {
+                  for (var i = 0; i < parentExplorationIds.length - 1; i++) {
+                    result = UrlService.addField(
+                      result, 'parent', parentExplorationIds[i]);
+                  }
+                }
+                if (storyIdToAdd && $scope.storyNodeIdToAdd) {
+                  result = UrlService.addField(
+                    result, 'story_id', storyIdToAdd);
+                  result = UrlService.addField(
+                    result, 'node_id', $scope.storyNodeIdToAdd);
+                }
+                return result;
+              }
+            }
           };
 
           $scope.reloadExploration = function() {
@@ -681,11 +736,23 @@ angular.module('oppia').directive('conversationSkin', [
                   STORY_VIEWER_URL_TEMPLATE, {
                     story_id: storyId
                   });
+                StoryViewerBackendApiService.fetchStoryData(storyId).then(
+                  function(res) {
+                    var nextStoryNode = [];
+                    for (var i = 0; i < res.story_nodes.length; i++) {
+                      if (res.story_nodes[i].id === nodeId &&
+                          (i + 1) < res.story_nodes.length) {
+                        $scope.storyNodeIdToAdd = (
+                          res.story_nodes[i].destination_node_ids[0]);
+                        nextStoryNode.push(
+                          res.story_nodes[i + 1].exp_summary_dict);
+                        break;
+                      }
+                    }
+                    $scope.recommendedExplorationSummaries = nextStoryNode;
+                  });
                 StoryViewerBackendApiService.recordChapterCompletion(
                   storyId, nodeId).then(function(returnObject) {
-                  $scope.recommendedExplorationSummaries =
-                    returnObject.summaries;
-                  $scope.nextNodeId = returnObject.nextNodeId;
                   if (returnObject.readyForReviewTest) {
                     var REVIEW_TEST_URL_TEMPLATE = (
                       '/review_test/<story_id>');
@@ -717,7 +784,7 @@ angular.module('oppia').directive('conversationSkin', [
             $rootScope.$broadcast(
               'playerStateChange', $scope.nextCard.getStateName());
             FocusManagerService.setFocusIfOnDesktop(focusLabel);
-            $rootScope.loadingMessage = '';
+            LoaderService.hideLoadingScreen();
             $scope.hasFullyLoaded = true;
 
             // If the exploration is embedded, use the exploration language
@@ -1161,6 +1228,7 @@ angular.module('oppia').directive('conversationSkin', [
           ctrl.$onInit = function() {
             $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
             $scope.isLoggedIn = null;
+            $scope.storyNodeIdToAdd = null;
             $scope.inStoryMode = false;
             UserService.getUserInfoAsync().then(function(userInfo) {
               $scope.isLoggedIn = userInfo.isLoggedIn();
@@ -1181,7 +1249,7 @@ angular.module('oppia').directive('conversationSkin', [
             $scope.explorationId = ExplorationEngineService.getExplorationId();
             $scope.isInPreviewMode = ExplorationEngineService.isInPreviewMode();
             $scope.isIframed = UrlService.isIframed();
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             $scope.hasFullyLoaded = false;
             $scope.recommendedExplorationSummaries = null;
             $scope.answerIsCorrect = false;

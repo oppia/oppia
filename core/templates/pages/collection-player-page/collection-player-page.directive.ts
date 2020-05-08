@@ -59,15 +59,17 @@ angular.module('oppia').directive('collectionPlayerPage', [
         '$anchorScroll', '$http', '$location', '$rootScope', '$scope',
         'AlertsService', 'CollectionObjectFactory',
         'CollectionPlaythroughObjectFactory', 'GuestCollectionProgressService',
-        'PageTitleService', 'ReadOnlyCollectionBackendApiService',
-        'UrlInterpolationService', 'UrlService', 'UserService',
+        'LoaderService', 'PageTitleService',
+        'ReadOnlyCollectionBackendApiService', 'UrlInterpolationService',
+        'UrlService', 'UserService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         function(
             $anchorScroll, $http, $location, $rootScope, $scope,
             AlertsService, CollectionObjectFactory,
             CollectionPlaythroughObjectFactory, GuestCollectionProgressService,
-            PageTitleService, ReadOnlyCollectionBackendApiService,
-            UrlInterpolationService, UrlService, UserService,
+            LoaderService, PageTitleService,
+            ReadOnlyCollectionBackendApiService, UrlInterpolationService,
+            UrlService, UserService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
           ctrl.getStaticImageUrl = function(imagePath) {
@@ -245,7 +247,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
                 ctrl.generatePathParameters();
               }
             }, true);
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             ctrl.collection = null;
             ctrl.collectionPlaythrough = null;
             ctrl.collectionId = UrlService.getCollectionIdFromUrl();
@@ -322,7 +324,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
                   ctrl.whitelistedCollectionIdsForGuestProgress.indexOf(
                     ctrl.collectionId) !== -1);
                 UserService.getUserInfoAsync().then(function(userInfo) {
-                  $rootScope.loadingMessage = '';
+                  LoaderService.hideLoadingScreen();
                   ctrl.isLoggedIn = userInfo.isLoggedIn();
                   if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
                       GuestCollectionProgressService

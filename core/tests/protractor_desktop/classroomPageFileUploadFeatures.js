@@ -54,7 +54,7 @@ describe('Classroom page functionality', function() {
     browser.getWindowHandle().then(function(handle) {
       topicsAndSkillsDashboardPage.get();
       topicsAndSkillsDashboardPage.createTopic('Topic 1', false);
-      topicEditorPage.submitTopicThumbnail('../data/img.png');
+      topicEditorPage.submitTopicThumbnail('../data/test_svg.svg');
       topicEditorPage.saveTopic('Added thumbnail.');
       browser.getCurrentUrl().then(function(url) {
         var topicId = url.split('/')[4].slice(0, -1);
@@ -66,12 +66,12 @@ describe('Classroom page functionality', function() {
             elem.editItem(0, 'Dictionary').editEntry(1, 'List').addItem(
               'Unicode').setValue(topicId);
           });
-        classroomPage.get('Math');
+        classroomPage.get('math');
         classroomPage.expectNumberOfTopicsToBe(0);
         topicsAndSkillsDashboardPage.get();
         topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
         topicEditorPage.publishTopic();
-        classroomPage.get('Math');
+        classroomPage.get('math');
         classroomPage.expectNumberOfTopicsToBe(1);
         users.logout();
       });

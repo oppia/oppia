@@ -30,9 +30,9 @@ angular.module('oppia').directive('splashPage', [function() {
     template: require('./splash-page.directive.html'),
     controllerAs: '$ctrl',
     controller: [
-      '$rootScope', '$timeout', 'SiteAnalyticsService',
+      '$timeout', 'SiteAnalyticsService', 'LoaderService',
       'UrlInterpolationService', 'UserService', 'WindowRef',
-      function($rootScope, $timeout, SiteAnalyticsService,
+      function($timeout, SiteAnalyticsService, LoaderService,
           UrlInterpolationService, UserService, WindowRef) {
         var ctrl = this;
         ctrl.getStaticImageUrl = function(imagePath) {
@@ -69,10 +69,10 @@ angular.module('oppia').directive('splashPage', [function() {
         };
         ctrl.$onInit = function() {
           ctrl.userIsLoggedIn = null;
-          $rootScope.loadingMessage = 'Loading';
+          LoaderService.showLoadingScreen('Loading');
           UserService.getUserInfoAsync().then(function(userInfo) {
             ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-            $rootScope.loadingMessage = '';
+            LoaderService.hideLoadingScreen();
           });
         };
       }

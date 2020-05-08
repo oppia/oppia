@@ -33,11 +33,9 @@ export class LearnerAnswerDetailsBackendApiService {
     private httpClient: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  private _recordLearnerAnswerDetails(
-      explorationId:string, stateName: string, interactionId: string,
-      answer: string, answerDetails: string,
-      successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+  recordLearnerAnswerDetails(
+      explorationId: string, stateName: string, interactionId: string,
+      answer: string, answerDetails: string): Promise<object> {
     let recordLearnerAnswerDetailsUrl = (
       this.urlInterpolationService.interpolateUrl(
         StatisticsDomainConstants.SUBMIT_LEARNER_ANSWER_DETAILS_URL, {
@@ -52,25 +50,8 @@ export class LearnerAnswerDetailsBackendApiService {
       answer_details: answerDetails
     };
 
-    // TODO(#7165): Change `any` to a type describing the dict.
-    this.httpClient.put(recordLearnerAnswerDetailsUrl, payload).toPromise()
-      .then((response: HttpResponse<any>) => {
-        if (response) {
-          successCallback();
-        }
-      }, (errorResponse) => {
-        errorCallback(errorResponse);
-      });
-  }
-
-  recordLearnerAnswerDetails(
-      explorationId: string, stateName: string, interactionId: string,
-      answer: string, answerDetails: string): Promise<object> {
-    return new Promise((resolve, reject) => {
-      this._recordLearnerAnswerDetails(
-        explorationId, stateName, interactionId, answer, answerDetails,
-        resolve, reject);
-    });
+    return this.httpClient.put(
+      recordLearnerAnswerDetailsUrl, payload).toPromise();
   }
 }
 

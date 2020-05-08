@@ -48,6 +48,10 @@ angular.module('oppia').directive('skillDescriptionEditor', [
             return $scope.skillRights.canEditSkillDescription();
           };
 
+          $scope.resetErrorMsg = function() {
+            $scope.errorMsg = '';
+          };
+
           $scope.saveSkillDescription = function(newSkillDescription) {
             if (newSkillDescription === $scope.skill.getDescription()) {
               return;
@@ -58,6 +62,10 @@ angular.module('oppia').directive('skillDescriptionEditor', [
               SkillUpdateService.setSkillDescription(
                 $scope.skill,
                 newSkillDescription);
+            } else {
+              $scope.errorMsg = (
+                'Please use a non-empty description consisting of ' +
+                'alphanumeric characters, spaces and/or hyphens.');
             }
           };
 
@@ -65,6 +73,7 @@ angular.module('oppia').directive('skillDescriptionEditor', [
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.tmpSkillDescription = $scope.skill.getDescription();
             $scope.skillRights = SkillEditorStateService.getSkillRights();
+            $scope.errorMsg = '';
             ctrl.subscriptions.add(
               SkillEditorStateService.getEventSkillReinitializedSubject()
                 .subscribe(

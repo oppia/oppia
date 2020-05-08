@@ -21,9 +21,6 @@ var ExplorationEditorFeedbackTab = require(
   '../protractor_utils/ExplorationEditorFeedbackTab.js');
 var ExplorationEditorHistoryTab = require(
   '../protractor_utils/ExplorationEditorHistoryTab.js');
-var ExplorationEditorImprovementsTab = require(
-  '../protractor_utils/ExplorationEditorImprovementsTab.js'
-);
 var ExplorationEditorMainTab = require(
   '../protractor_utils/ExplorationEditorMainTab.js');
 var ExplorationEditorSettingsTab = require(
@@ -44,10 +41,6 @@ var ExplorationEditorPage = function() {
   };
   this.getHistoryTab = function() {
     return new ExplorationEditorHistoryTab.ExplorationEditorHistoryTab();
-  };
-  this.getImprovementsTab = function() {
-    return new ExplorationEditorImprovementsTab
-      .ExplorationEditorImprovementsTab();
   };
   this.getMainTab = function() {
     return new ExplorationEditorMainTab.ExplorationEditorMainTab();
@@ -86,8 +79,6 @@ var ExplorationEditorPage = function() {
   var navigateToHistoryTabButton = element(
     by.css('.protractor-test-history-tab'));
   var navigateToMainTabButton = element(by.css('.protractor-test-main-tab'));
-  var navigateToImprovementsTabButton = element(
-    by.css('.protractor-test-improvements-tab'));
   var navigateToPreviewTabButton = element(
     by.css('.protractor-test-preview-tab'));
   var navigateToSettingsTabButton = element(
@@ -239,13 +230,6 @@ var ExplorationEditorPage = function() {
     waitFor.elementToBeClickable(
       navigateToFeedbackTabButton, 'Feedback tab is not clickable');
     navigateToFeedbackTabButton.click();
-    waitFor.pageToFullyLoad();
-  };
-
-  this.navigateToImprovementsTab = function() {
-    waitFor.elementToBeClickable(
-      navigateToImprovementsTabButton, 'Improvements tab is not clickable');
-    navigateToImprovementsTabButton.click();
     waitFor.pageToFullyLoad();
   };
 

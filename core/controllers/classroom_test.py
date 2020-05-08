@@ -38,22 +38,12 @@ class ClassroomPageTests(BaseClassroomControllerTests):
 
     def test_any_user_can_access_classroom_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            response = self.get_html_response(
-                '%s/%s' % (feconf.CLASSROOM_URL_PREFIX, 'Math'))
+            response = self.get_html_response('/math')
             self.assertIn('<classroom-page></classroom-page>', response)
-
-    def test_no_user_can_access_invalid_classroom_page(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            self.get_html_response(
-                '%s/%s' % (
-                    feconf.CLASSROOM_URL_PREFIX, 'invalid_subject'),
-                expected_status_int=404)
 
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            self.get_html_response(
-                '%s/%s' % (feconf.CLASSROOM_URL_PREFIX, 'Math'),
-                expected_status_int=404)
+            self.get_html_response('/math', expected_status_int=404)
 
 
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):
@@ -71,13 +61,15 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         topic_services.save_new_topic(admin_id, private_topic)
         public_topic = topic_domain.Topic.create_default_topic(
             topic_id_2, 'public_topic_name', 'abbrev')
-        public_topic.thumbnail_filename = 'Topic.png'
+        public_topic.thumbnail_filename = 'Topic.svg'
+        public_topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         topic_services.save_new_topic(admin_id, public_topic)
         topic_services.publish_topic(topic_id_2, admin_id)
 
         csrf_token = self.get_new_csrf_token()
         new_config_value = [{
-            'name': 'Math',
+            'name': 'math',
             'topic_ids': [topic_id_1, topic_id_2]
         }]
 
@@ -93,7 +85,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(
-                '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'Math'))
+                '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
             topic_summary_dict = (
                 topic_services.get_topic_summary_by_id(topic_id_2).to_dict())
 
@@ -112,5 +104,5 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_json(
-                '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'Math'),
+                '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'),
                 expected_status_int=404)

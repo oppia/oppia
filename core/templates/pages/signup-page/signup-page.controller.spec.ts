@@ -29,8 +29,9 @@ require('services/csrf-token.service.ts');
 describe('Signup controller', function() {
   describe('SignupCtrl', function() {
     var ctrl, $httpBackend, rootScope, mockAlertsService, urlParams;
-    var $componentController, CsrfService;
-
+    var $componentController, CsrfService, LoaderService;
+    var loadingMessage;
+    var subscriptions = [];
     beforeEach(
       angular.mock.module('oppia', TranslatorProviderForTests));
     beforeEach(angular.mock.module('oppia', function($provide) {
@@ -51,7 +52,11 @@ describe('Signup controller', function() {
       });
       rootScope = $rootScope;
       CsrfService = $injector.get('CsrfTokenService');
-
+      loadingMessage = '';
+      LoaderService = $injector.get('LoaderService');
+      subscriptions.push(LoaderService.getLoadingMessageSubject().subscribe(
+        (message: string) => loadingMessage = message
+      ));
       spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
         var deferred = $q.defer();
         deferred.resolve('sample-csrf-token');
@@ -80,6 +85,12 @@ describe('Signup controller', function() {
       ctrl.$onInit();
     }));
 
+    afterEach(function() {
+      for (let subscription of subscriptions) {
+        subscription.unsubscribe();
+      }
+    });
+
     it('should show warning if user has not agreed to terms', function() {
       ctrl.submitPrerequisitesForm(false, null);
       expect(mockAlertsService.addWarning).toHaveBeenCalledWith(
@@ -93,9 +104,9 @@ describe('Signup controller', function() {
     });
 
     it('should show a loading message until the data is retrieved', function() {
-      expect(rootScope.loadingMessage).toBe('I18N_SIGNUP_LOADING');
+      expect(loadingMessage).toBe('I18N_SIGNUP_LOADING');
       $httpBackend.flush();
-      expect(rootScope.loadingMessage).toBeFalsy();
+      expect(loadingMessage).toBeFalsy();
     });
 
     it('should show warning if terms are not agreed to', function() {
