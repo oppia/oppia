@@ -140,15 +140,14 @@ describe('Navigation features on mobile', function() {
       expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/library');
     });
 
-  it('should navigate to Splash page by clicking on the Oppia logo',
+  it('should navigate to Home page by clicking on the Oppia logo',
     async function() {
       var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
       waitFor.elementToBeClickable(
         oppiaLogo, 'Could not click oppia logo');
       await oppiaLogo.click();
       waitFor.pageToFullyLoad();
-      expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/splash');
+      expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/');
     });
 
   it('should navigate to the login page by clicking on the sign in button',

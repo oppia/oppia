@@ -1,62 +1,82 @@
-<div ng-repeat="rubric in $ctrl.getRubrics()" class="rubric-editor">
+<div ng-repeat="(rubricIndex, rubric) in $ctrl.getRubrics()" class="rubric-editor">
   <label> <[rubric.getDifficulty()]> </label>
-  <div ng-if="!$ctrl.explanationEditorIsOpen[$index]"
-       style="height: 100%; padding-top: 1vh;">
-    <div class="oppia-readonly-rule-title"
-         ng-class="{'oppia-editable-section': $ctrl.isEditable()}">
-      <div class="oppia-rule-preview">
-        <div class="oppia-click-to-start-editing" ng-click="$ctrl.openExplanationEditor($index)">
-          <i ng-if="$ctrl.isEditable()"
-             class="material-icons oppia-editor-edit-icon float-right protractor-test-edit-rubric-explanation"
-             title="Edit Rubric Explanation">&#xE254;
-          </i>
+  <div ng-repeat="explanation in rubric.getExplanations()">
+    <div ng-if="!$ctrl.explanationEditorIsOpen[rubric.getDifficulty()][$index]"
+         style="height: 100%; padding-top: 1vh;">
+      <div class="oppia-readonly-rule-title"
+           ng-class="{'oppia-editable-section': $ctrl.isEditable()}">
+        <div class="oppia-rule-preview">
+          <div class="oppia-click-to-start-editing" ng-click="$ctrl.openExplanationEditor(rubric.getDifficulty(), $index)">
+            <i ng-if="$ctrl.isEditable()"
+               class="material-icons oppia-editor-edit-icon float-right protractor-test-edit-rubric-explanation-<[rubric.getDifficulty()]>"
+               title="Edit Rubric Explanation">&#xE254;
+            </i>
+          </div>
+          <span ng-if="$ctrl.isExplanationEmpty(explanation) && rubricIndex === 1 && $index === 0 && $ctrl.newSkillBeingCreated()"
+                class="oppia-placeholder">
+            The skill description will be autofilled here
+          </span>
+          <span ng-if="$ctrl.isExplanationEmpty(explanation) && (rubricIndex !== 1 || (rubricIndex === 1 && $index !== 0) || !$ctrl.newSkillBeingCreated())"
+                class="oppia-placeholder">
+            This rubric has not yet been specified
+          </span>
+          <div class="protractor-test-rubric-explanation-<[rubric.getDifficulty()]>">
+            <angular-html-bind html-data="explanation">
+            </angular-html-bind>
+          </div>
         </div>
-        <span ng-if="$ctrl.isExplanationEmpty($ctrl.getRubrics()[$index].getExplanation()) && $index === 1 && $ctrl.newSkillBeingCreated()"
-              class="oppia-placeholder">
-          The skill description will be autofilled here
-        </span>
-        <span ng-if="$ctrl.isExplanationEmpty($ctrl.getRubrics()[$index].getExplanation()) && ($index !== 1 || !$ctrl.newSkillBeingCreated())"
-              class="oppia-placeholder">
-          This rubric has not yet been specified
-        </span>
-        <div class="protractor-test-rubric-explanation">
-          <angular-html-bind html-data="$ctrl.getRubrics()[$index].getExplanation()">
-          </angular-html-bind>
+      </div>
+    </div>
+    <div ng-if="$ctrl.explanationEditorIsOpen[rubric.getDifficulty()][$index]">
+      <div class="oppia-rule-details-header">
+        <schema-based-editor class="protractor-test-rubric-explanation-text"
+                             schema="$ctrl.EXPLANATION_FORM_SCHEMA"
+                             local-value="$ctrl.editableExplanations[rubric.getDifficulty()][$index]">
+        </schema-based-editor>
+      </div>
+
+      <div class="oppia-rule-save-cancel-buttons">
+        <div class="float-right">
+          <button type="button"
+                  class="btn btn-danger protractor-test-delete-rubric-explanation-button"
+                  ng-click="$ctrl.deleteExplanation(rubric.getDifficulty(), $index)">
+            Delete
+          </button>
+          <button type="button"
+                  class="btn btn-default"
+                  ng-click="$ctrl.cancelEditExplanation(rubric.getDifficulty(), $index)">
+            Cancel
+          </button>
+          <button type="button"
+                  class="btn btn-success protractor-test-save-rubric-explanation-button"
+                  ng-click="$ctrl.saveExplanation(rubric.getDifficulty(), $index)">
+            Save
+          </button>
         </div>
+        <div style="clear: both;"></div>
       </div>
     </div>
   </div>
-  <div ng-if="$ctrl.explanationEditorIsOpen[$index]">
-    <div class="oppia-rule-details-header">
-      <schema-based-editor class="protractor-test-rubric-explanation-text"
-                           schema="$ctrl.EXPLANATION_FORM_SCHEMA"
-                           local-value="$ctrl.editableExplanation[$index]">
-      </schema-based-editor>
-    </div>
-
-    <div class="oppia-rule-save-cancel-buttons">
-      <div class="float-right">
-        <button type="button"
-                class="btn btn-default"
-                ng-click="$ctrl.cancelEditExplanation($index)">
-          Cancel
-        </button>
-        <button type="button"
-                class="btn btn-success protractor-test-save-rubric-explanation-button"
-                ng-click="$ctrl.saveExplanation($index)">
-          Save
-        </button>
-      </div>
-      <div style="clear: both;"></div>
-    </div>
+  <div>
+    <button class="btn btn-success add-explanation-button protractor-test-add-explanation-button-<[rubric.getDifficulty()]>"
+            type="button"
+            ng-click="$ctrl.addExplanationForDifficulty(rubric.getDifficulty())"
+            ng-disabled="$ctrl.isAnyExplanationEmptyForDifficulty(rubric.getDifficulty())">
+      + Add explanation for difficulty
+    </button>
   </div>
 </div>
 <style>
   rubrics-editor .dropdown-option {
     padding: 10px;
   }
+
   rubrics-editor .dropdown {
     display: inline-block;
+  }
+
+  rubrics-editor .add-explanation-button {
+    margin-top: 1vh;
   }
 
   rubrics-editor .rubric-editor {

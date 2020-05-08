@@ -142,7 +142,7 @@ describe('Meta Tags', function() {
 
 describe('DEV MODE Test', function() {
   it('should not show Dev Mode label in prod', async function() {
-    await browser.get('/splash');
+    await browser.get('/');
     waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-dev-mode')).isPresent())
@@ -166,8 +166,8 @@ describe('Static Pages Tour', function() {
       by.css('.protractor-test-teach-page')).isPresent()).toBe(true);
   });
 
-  it('visits the Splash page', async function() {
-    await browser.get('/splash');
+  it('visits the Home page', async function() {
+    await browser.get('/');
     waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-splash-page')).isPresent()).toBe(true);

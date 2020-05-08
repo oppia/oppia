@@ -78,22 +78,6 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectNumberOfSubtopicsToBe(0);
   });
 
-  it('should edit subtopic page contents correctly', async function() {
-    topicEditorPage.moveToSubtopicsTab();
-    topicEditorPage.editSubtopicWithIndex(0);
-    topicEditorPage.changeSubtopicTitle('Modified Title');
-    topicEditorPage.changeSubtopicPageContents(
-      forms.toRichText('Subtopic Contents'));
-    topicEditorPage.saveSubtopic();
-    topicEditorPage.saveTopic('Edited subtopic.');
-
-    topicEditorPage.get(topicId);
-    topicEditorPage.moveToSubtopicsTab();
-    topicEditorPage.expectTitleOfSubtopicWithIndexToMatch('Modified Title', 0);
-    topicEditorPage.editSubtopicWithIndex(0);
-    topicEditorPage.expectSubtopicPageContentsToMatch('Subtopic Contents');
-  });
-
   it('should create a question for a skill in the topic', async function() {
     var skillId = null;
     var handle = await browser.getWindowHandle();
@@ -188,12 +172,16 @@ describe('Topic editor functionality', function() {
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill 2', 'Concept card explanation', true);
-
+    var TOPIC_NAME = 'TASE2';
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+    topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
+      0, TOPIC_NAME);
 
-    topicEditorPage.get(topicId);
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
     topicEditorPage.moveToSubtopicsTab();
     topicEditorPage.addSubtopic('Subtopic 1');
     topicEditorPage.addSubtopic('Subtopic 2');
@@ -202,7 +190,7 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectSubtopicToHaveSkills(0, []);
     topicEditorPage.expectSubtopicToHaveSkills(1, []);
 
-    topicEditorPage.dragSkillToSubtopic(1, 0);
+    topicEditorPage.dragSkillToSubtopic(0, 0);
     topicEditorPage.expectSubtopicToHaveSkills(0, ['Skill 2']);
     topicEditorPage.expectSubtopicToHaveSkills(1, []);
 

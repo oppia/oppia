@@ -173,7 +173,7 @@ describe('Story update service', function() {
       expect(function() {
         StoryUpdateService.addDestinationNodeIdToNode(
           _sampleStory, 'node_1', 'node_5');
-      }).toThrow();
+      }).toThrowError('The destination node with given id doesn\'t exist');
 
       expect(
         _sampleStory.getStoryContents().getNodes()[0].getDestinationNodeIds()
@@ -326,7 +326,7 @@ describe('Story update service', function() {
   it('should remove/add a story node', function() {
     expect(function() {
       StoryUpdateService.deleteStoryNode(_sampleStory, 'node_2');
-    }).toThrow();
+    }).toThrowError('Cannot delete initial story node');
     expect(_sampleStory.getStoryContents().getNodes().length).toEqual(2);
     expect(
       _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
@@ -339,7 +339,7 @@ describe('Story update service', function() {
 
     expect(function() {
       UndoRedoService.undoChange(_sampleStory);
-    }).toThrow();
+    }).toThrowError('A deleted story node cannot be restored.');
   });
 
   it('should create a proper backend change dict for removing a story node',
@@ -480,7 +480,7 @@ describe('Story update service', function() {
     expect(function() {
       StoryUpdateService.setStoryNodeExplorationId(
         _sampleStory, 'node_1', 'exp_1');
-    }).toThrow();
+    }).toThrowError('The given exploration already exists in the story.');
 
     UndoRedoService.undoChange(_sampleStory);
     expect(

@@ -58,11 +58,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             '<p>default_feedback</p>', True)]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], '<p>Explanation 1</p>'),
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], '<p>Explanation 2</p>'),
+                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], '<p>Explanation 3</p>')]
+                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 3</p>'])]
         self.skill = skill_domain.Skill(
             self.SKILL_ID, 'Description', misconceptions, rubrics,
             skill_contents, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
@@ -96,12 +96,13 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         misconception_name = 'This string is smaller than 50'
         self.skill.update_misconception_name(0, misconception_name)
         self.skill.validate()
-        misconception_name = ('This string is a larger string'
-                              'and it is greater than 50 chars.')
+        misconception_name = (
+            'etiam non quam lacus suspendisse faucibus interdum posuere lorem '
+            'ipsum dolor sit amet consectetur adipiscing elit duis tristique '
+            'sollicitudin nibh sit amet commodo nulla facilisi')
         self.skill.update_misconception_name(0, misconception_name)
         self._assert_validation_error(
-            'The length of misconception_name should '
-            'be between 1 and 50 characters'
+            'Misconception name should be less than 100 chars'
         )
 
     def test_valid_misconception_must_be_addressed(self):
@@ -127,31 +128,36 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         self.skill.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], '<p>Explanation</p>'),
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation</p>']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], '<p>Another Explanation</p>')]
+                constants.SKILL_DIFFICULTIES[0], ['<p>Another Explanation</p>'])
+        ]
         self._assert_validation_error('Duplicate rubric found')
 
     def test_valid_rubric_difficulty(self):
         self.skill.rubrics = [skill_domain.Rubric(
-            'invalid_difficulty', '<p>Explanation</p>')]
+            'invalid_difficulty', ['<p>Explanation</p>'])]
         self._assert_validation_error('Invalid difficulty received for rubric')
 
     def test_valid_rubric_difficulty_type(self):
-        self.skill.rubrics = [skill_domain.Rubric(10, '<p>Explanation</p>')]
+        self.skill.rubrics = [skill_domain.Rubric(10, ['<p>Explanation</p>'])]
         self._assert_validation_error('Expected difficulty to be a string')
 
     def test_valid_rubric_explanation(self):
-        self.skill.rubrics[0].explanation = 0
-        self._assert_validation_error('Expected explanation to be a string')
+        self.skill.rubrics[0].explanations = 0
+        self._assert_validation_error('Expected explanations to be a list')
+
+        self.skill.rubrics[0].explanations = [0]
+        self._assert_validation_error(
+            'Expected each explanation to be a string')
 
     def test_rubric_present_for_all_difficulties(self):
         self.skill.validate()
         self.skill.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], '<p>Explanation 1</p>'),
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], '<p>Explanation 2</p>')
+                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>'])
         ]
         self._assert_validation_error(
             'All 3 difficulties should be addressed in rubrics')
@@ -159,11 +165,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_order_of_rubrics(self):
         self.skill.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], '<p>Explanation 1</p>'),
+                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 1</p>']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], '<p>Explanation 2</p>'),
+                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 2</p>']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], '<p>Explanation 3</p>')
+                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 3</p>'])
         ]
         self._assert_validation_error(
             'The difficulties should be ordered as follows')
@@ -173,10 +179,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Description should be a string')
 
         self.skill.description = (
-            'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyza'
-            'bcdefghijklmnopqrstuvwxyz')
+            'etiam non quam lacus suspendisse faucibus interdum posuere lorem '
+            'ipsum dolor sit amet consectetur adipiscing elit duis tristique '
+            'sollicitudin nibh sit amet commodo nulla facilisi')
         self._assert_validation_error(
-            'Skill description should be less than 64 chars')
+            'Skill description should be less than 100 chars')
 
     def test_prerequisite_skill_ids_validation(self):
         self.skill.prerequisite_skill_ids = 0
@@ -311,13 +318,13 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0],
-                '<p>[NOTE: Creator should fill this in]</p>'),
+                ['<p>[NOTE: Creator should fill this in]</p>']),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[1],
-                '<p>[NOTE: Creator should fill this in]</p>'),
+                ['<p>[NOTE: Creator should fill this in]</p>']),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2],
-                '<p>[NOTE: Creator should fill this in]</p>')]
+                ['<p>[NOTE: Creator should fill this in]</p>'])]
         skill = skill_domain.Skill.create_default_skill(
             self.SKILL_ID, 'Description', rubrics)
         expected_skill_dict = {
@@ -393,7 +400,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             misconceptions_dict)
 
         rubric = skill_domain.Rubric(
-            constants.SKILL_DIFFICULTIES[0], '<p>Explanation</p>')
+            constants.SKILL_DIFFICULTIES[0], ['<p>Explanation</p>'])
         rubric_dict = rubric.to_dict()
         rubric_from_dict = skill_domain.Rubric.from_dict(rubric_dict)
         self.assertEqual(
@@ -556,13 +563,14 @@ class SkillChangeTests(test_utils.GenericTestBase):
         skill_change_object = skill_domain.SkillChange({
             'cmd': 'update_rubrics',
             'difficulty': constants.SKILL_DIFFICULTIES[0],
-            'explanation': '<p>Explanation</p>'
+            'explanations': ['<p>Explanation</p>']
         })
 
         self.assertEqual(skill_change_object.cmd, 'update_rubrics')
         self.assertEqual(
             skill_change_object.difficulty, constants.SKILL_DIFFICULTIES[0])
-        self.assertEqual(skill_change_object.explanation, '<p>Explanation</p>')
+        self.assertEqual(
+            skill_change_object.explanations, ['<p>Explanation</p>'])
 
     def test_skill_change_object_with_delete_skill_misconception(self):
         skill_change_object = skill_domain.SkillChange({
