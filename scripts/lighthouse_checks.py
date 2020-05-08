@@ -15,7 +15,7 @@ from . import build
 OPPIA_SERVER_PORT = 8181
 COMPY_SERVER_PORT = 9999
 RUNNING_PROCESSES = []
-GO_VERSION = "1.12.9"
+GO_VERSION = "1.14.1"
 GO_PATH = os.path.join(common.OPPIA_TOOLS_DIR, 'go-%s' % GO_VERSION)
 GO_BINARY = os.path.join(GO_PATH, 'bin', 'go')
 GO_HOME_PATH = os.path.join(os.path.expanduser('~'), 'go')
