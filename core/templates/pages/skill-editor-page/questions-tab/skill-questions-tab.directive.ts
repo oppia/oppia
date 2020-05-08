@@ -76,13 +76,13 @@ angular.module('oppia').directive('questionsTab', [
           ctrl.$onInit = function() {
             _init();
             ctrl.parentSubscription.add(
-              SkillEditorStateService.getEventSkillInitializedSubject()
+              SkillEditorStateService.getSkillInitializedSubject()
                 .subscribe(
                   () => _init()
                 )
             );
             ctrl.parentSubscription.add(
-              SkillEditorStateService.getEventSkillReinitializedSubject()
+              SkillEditorStateService.getSkillReinitializedSubject()
                 .subscribe(
                   () => _init()
                 )

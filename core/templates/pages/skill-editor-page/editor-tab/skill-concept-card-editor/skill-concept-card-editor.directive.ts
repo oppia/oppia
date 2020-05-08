@@ -187,7 +187,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
               '/general/drag_dots.png');
             initBindableFieldsDict();
             ctrl.parentSubscription.add(
-              SkillEditorStateService.getEventSkillReinitializedSubject()
+              SkillEditorStateService.getSkillReinitializedSubject()
                 .subscribe(
                   () => initBindableFieldsDict()
                 )
