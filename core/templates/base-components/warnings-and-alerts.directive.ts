@@ -13,18 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for warning_loader.
+ * @fileoverview Directive for warning and alerts.
  */
 
 require('services/alerts.service.ts');
 
-angular.module('oppia').directive('warningLoader', [
+angular.module('oppia').directive('warningsAndAlerts', [
   function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      template: require('./warning-loader.directive.html'),
+      template: require('./warnings-and-alerts.directive.html'),
       controllerAs: '$ctrl',
       controller: ['AlertsService',
         function(AlertsService) {

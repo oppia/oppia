@@ -21,6 +21,7 @@ require('components/entity-creation-services/topic-creation.service.ts');
 require(
   'components/review-material-editor/review-material-editor.directive.ts');
 require('domain/skill/RubricObjectFactory.ts');
+require('domain/skill/SkillObjectFactory.ts');
 require('domain/topic/editable-topic-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
@@ -37,7 +38,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
         'topics-and-skills-dashboard-navbar.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', 'TopicCreationService',
-        'RubricObjectFactory', 'SkillCreationService',
+        'RubricObjectFactory', 'SkillCreationService', 'SkillObjectFactory',
         'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         'EVENT_TYPE_SKILL_CREATION_ENABLED', 'EditableTopicBackendApiService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
@@ -45,7 +46,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
         'SKILL_DESCRIPTION_STATUS_VALUES',
         function(
             $scope, $rootScope, $uibModal, TopicCreationService,
-            RubricObjectFactory, SkillCreationService,
+            RubricObjectFactory, SkillCreationService, SkillObjectFactory,
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
             EVENT_TYPE_SKILL_CREATION_ENABLED, EditableTopicBackendApiService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
@@ -72,6 +73,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                     MAX_CHARS_IN_SKILL_DESCRIPTION);
                   $scope.newSkillDescription = '';
                   $scope.rubrics = rubrics;
+                  $scope.errorMsg = '';
                   $scope.bindableDict = {
                     displayedConceptCardExplanation: ''
                   };
@@ -106,7 +108,19 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                     }
                   };
 
+                  $scope.resetErrorMsg = function() {
+                    $scope.errorMsg = '';
+                  };
+
                   $scope.createNewSkill = function() {
+                    if (
+                      !SkillObjectFactory.hasValidDescription(
+                        $scope.newSkillDescription)) {
+                      $scope.errorMsg = (
+                        'Please use a non-empty description consisting of ' +
+                        'alphanumeric characters, spaces and/or hyphens.');
+                      return;
+                    }
                     $uibModalInstance.close({
                       description: $scope.newSkillDescription,
                       rubrics: $scope.rubrics,

@@ -33,8 +33,8 @@ angular.module('oppia').directive('notificationsDashboardPage', [
         'notifications-dashboard-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$rootScope', 'DateTimeFormatService', 'WindowRef',
-        function($http, $rootScope, DateTimeFormatService, WindowRef) {
+        '$http', 'LoaderService', 'DateTimeFormatService', 'WindowRef',
+        function($http, LoaderService, DateTimeFormatService, WindowRef) {
           var ctrl = this;
           ctrl.getItemUrl = function(activityId, notificationType) {
             return (
@@ -52,7 +52,7 @@ angular.module('oppia').directive('notificationsDashboardPage', [
               millisSinceEpoch);
           };
           ctrl.$onInit = function() {
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             $http.get('/notificationsdashboardhandler/data').then(function(
                 response) {
               var data = response.data;
@@ -60,7 +60,7 @@ angular.module('oppia').directive('notificationsDashboardPage', [
               ctrl.jobQueuedMsec = data.job_queued_msec;
               ctrl.lastSeenMsec = data.last_seen_msec || 0.0;
               ctrl.currentUsername = data.username;
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
             });
           };
         }

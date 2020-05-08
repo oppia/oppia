@@ -50,6 +50,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             'outline': '',
             'outline_is_finalized': False,
             'prerequisite_skill_ids': [],
+            'description': '',
             'thumbnail_bg_color': None,
             'thumbnail_filename': None,
             'title': 'Chapter 1'
@@ -177,7 +178,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
                 }]
             })
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story.story_contents_schema_version, 2)
+        self.assertEqual(story.story_contents_schema_version, 3)
         self.assertEqual(
             story.story_contents.to_dict(),
             self.MIGRATED_STORY_CONTENTS_DICT)

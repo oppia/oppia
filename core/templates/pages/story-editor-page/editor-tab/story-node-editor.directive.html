@@ -8,12 +8,12 @@
                         allowed-bg-colors="allowedBgColors"
                         aspect-ratio="'16:9'"
                         preview-title="editableTitle"
-                        preview-description=""
+                        preview-description="editableDescription"
                         preview-description-bg-color=""
                         preview-footer="">
     </thumbnail-uploader>
   </div>
-  <div class="story-node-title">
+  <div class="story-node-field">
     <label for="storyNodeTitle" class="form-heading">Chapter Title</label>
     <input id="storyNodeTitle" type="text" class="form-control"
            ng-model="editableTitle" ng-blur="updateTitle(editableTitle)"
@@ -21,6 +21,19 @@
     <span class="oppia-input-box-subtitle">
       <i>
         Chapter title should be at most <[MAX_CHARS_IN_CHAPTER_TITLE]> characters.
+      </i>
+    </span>
+  </div>
+  <div class="story-node-field">
+    <label for="storyNodeDescription" class="form-heading">Chapter Description</label>
+    <textarea id="storyNodeDescription" type="text" class="form-control protractor-test-add-chapter-description"
+              ng-model="editableDescription" ng-blur="updateDescription(editableDescription)"
+              placeholder="Enter the description for the chapter." maxlength="<[MAX_CHARS_IN_CHAPTER_DESCRIPTION]>" ng-trim="false"
+              style="height: 10vh;">
+    </textarea>
+    <span class="oppia-input-box-subtitle">
+      <i>
+        Chapter description should be at most <[MAX_CHARS_IN_CHAPTER_DESCRIPTION]> characters.
       </i>
     </span>
   </div>
@@ -125,7 +138,7 @@
     margin-bottom: 1vh;
   }
 
-  story-editor .story-node-title {
+  story-editor .story-node-field {
     margin-bottom: 3%;
   }
 
