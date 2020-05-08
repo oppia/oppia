@@ -34,6 +34,7 @@ require(
 require('services/alerts.service.ts');
 require('services/questions-list.service.ts');
 require('services/contextual/url.service.ts');
+import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -45,11 +46,10 @@ angular.module('oppia').directive('questionsTab', [
         'skill-questions-tab.directive.html'),
       controller: [
         '$scope', 'SkillEditorStateService', 'QuestionsListService',
-        'EVENT_SKILL_REINITIALIZED', function(
-            $scope, SkillEditorStateService, QuestionsListService,
-            EVENT_SKILL_REINITIALIZED) {
+        function(
+            $scope, SkillEditorStateService, QuestionsListService) {
           var ctrl = this;
-          ctrl.subscriptions = [];
+          ctrl.subscriptions = new Subscription();
           var _init = function() {
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.getQuestionSummariesAsync =
@@ -64,19 +64,22 @@ angular.module('oppia').directive('questionsTab', [
           };
           ctrl.$onInit = function() {
             _init();
-            ctrl.subscriptions.push(
+            ctrl.subscriptions.add(
               SkillEditorStateService.getEventSkillInitializedSubject()
                 .subscribe(
                   () => _init()
                 )
             );
-            $scope.$on(EVENT_SKILL_REINITIALIZED, _init);
+            ctrl.subscriptions.add(
+              SkillEditorStateService.getEventSkillReinitializedSubject()
+                .subscribe(
+                  () => _init()
+                )
+            );
           };
 
           $scope.$on('$destroy', function() {
-            for (const subscription of ctrl.subscriptions) {
-              subscription.unsubscribe();
-            }
+            ctrl.subscriptions.unsubscribe();
           });
         }
       ]

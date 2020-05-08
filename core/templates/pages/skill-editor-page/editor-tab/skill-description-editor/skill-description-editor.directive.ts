@@ -23,6 +23,8 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('skillDescriptionEditor', [
   'SkillEditorStateService', 'SkillObjectFactory', 'SkillUpdateService',
   'UrlInterpolationService', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
@@ -39,6 +41,7 @@ angular.module('oppia').directive('skillDescriptionEditor', [
         '$scope', 'EVENT_SKILL_REINITIALIZED',
         function($scope, EVENT_SKILL_REINITIALIZED) {
           var ctrl = this;
+          ctrl.subscriptions = new Subscription();
           $scope.MAX_CHARS_IN_SKILL_DESCRIPTION =
             MAX_CHARS_IN_SKILL_DESCRIPTION;
           $scope.canEditSkillDescription = function() {
@@ -62,10 +65,19 @@ angular.module('oppia').directive('skillDescriptionEditor', [
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.tmpSkillDescription = $scope.skill.getDescription();
             $scope.skillRights = SkillEditorStateService.getSkillRights();
-            $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
-              $scope.tmpSkillDescription = $scope.skill.getDescription();
-            });
+            ctrl.subscriptions.add(
+              SkillEditorStateService.getEventSkillReinitializedSubject()
+                .subscribe(
+                  () => {
+                    $scope.tmpSkillDescription = $scope.skill.getDescription();
+                  }
+                )
+            );
           };
+
+          $scope.$on('$destroy', function() {
+            ctrl.subscriptions.unsubscribe();
+          });
         }
       ]
     };

@@ -29,15 +29,13 @@ require('services/questions-list.service.ts');
 import { Subject } from 'rxjs';
 
 angular.module('oppia').factory('SkillEditorStateService', [
-  '$rootScope', 'AlertsService', 'QuestionsListService',
+  'AlertsService', 'QuestionsListService',
   'SkillBackendApiService', 'SkillObjectFactory',
   'SkillRightsBackendApiService', 'SkillRightsObjectFactory', 'UndoRedoService',
-  'EVENT_SKILL_REINITIALIZED',
   function(
-      $rootScope, AlertsService, QuestionsListService,
+      AlertsService, QuestionsListService,
       SkillBackendApiService, SkillObjectFactory,
-      SkillRightsBackendApiService, SkillRightsObjectFactory, UndoRedoService,
-      EVENT_SKILL_REINITIALIZED) {
+      SkillRightsBackendApiService, SkillRightsObjectFactory, UndoRedoService) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
     var _skillRights = (
       SkillRightsObjectFactory.createInterstitialSkillRights());
@@ -49,10 +47,11 @@ angular.module('oppia').factory('SkillEditorStateService', [
       others: []
     };
     var eventSkillInitialized = new Subject();
+    var eventSkillReinitialized = new Subject();
     var _setSkill = function(skill) {
       _skill.copyFromSkill(skill);
       if (_skillIsInitialized) {
-        $rootScope.$broadcast(EVENT_SKILL_REINITIALIZED);
+        eventSkillReinitialized.next();
       } else {
         eventSkillInitialized.next();
       }
@@ -205,6 +204,10 @@ angular.module('oppia').factory('SkillEditorStateService', [
 
       getEventSkillInitializedSubject: function() {
         return eventSkillInitialized;
+      },
+
+      getEventSkillReinitializedSubject: function() {
+        return eventSkillReinitialized;
       },
 
       getSkillRights: function() {

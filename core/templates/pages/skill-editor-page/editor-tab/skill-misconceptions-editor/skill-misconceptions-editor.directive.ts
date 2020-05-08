@@ -30,6 +30,8 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('skillMisconceptionsEditor', [
   'SkillEditorStateService', 'SkillUpdateService', 'UrlInterpolationService',
   function(
@@ -41,14 +43,15 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
         '/pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
         'skill-misconceptions-editor.directive.html'),
       controller: [
-        '$scope', '$filter', '$uibModal', '$rootScope',
-        'MisconceptionObjectFactory', 'EVENT_SKILL_REINITIALIZED',
+        '$scope', '$uibModal',
+        'MisconceptionObjectFactory',
         'MISCONCEPTION_NAME_CHAR_LIMIT',
         function(
-            $scope, $filter, $uibModal, $rootScope,
-            MisconceptionObjectFactory, EVENT_SKILL_REINITIALIZED,
+            $scope, $uibModal,
+            MisconceptionObjectFactory,
             MISCONCEPTION_NAME_CHAR_LIMIT) {
           var ctrl = this;
+          ctrl.subscriptions = new Subscription();
           $scope.isEditable = function() {
             return true;
           };
@@ -159,10 +162,17 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.misconceptions = $scope.skill.getMisconceptions();
-            $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
-              $scope.misconceptions = $scope.skill.getMisconceptions();
-            });
+            ctrl.subscriptions.add(
+              SkillEditorStateService.getEventSkillReinitializedSubject()
+                .subscribe(
+                  () => $scope.misconceptions = $scope.skill.getMisconceptions()
+                )
+            );
           };
+
+          $scope.$on('$destroy', function() {
+            ctrl.subscriptions.unsubscribe();
+          });
         }]
     };
   }

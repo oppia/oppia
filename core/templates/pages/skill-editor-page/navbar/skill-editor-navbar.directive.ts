@@ -37,11 +37,9 @@ angular.module('oppia').directive('skillEditorNavbar', [
       controller: [
         '$scope', '$uibModal', 'AlertsService', 'UndoRedoService',
         'SkillEditorStateService', 'SkillEditorRoutingService',
-        'EVENT_SKILL_REINITIALIZED', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $uibModal, AlertsService, UndoRedoService,
-            SkillEditorStateService, SkillEditorRoutingService,
-            EVENT_SKILL_REINITIALIZED, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+            SkillEditorStateService, SkillEditorRoutingService) {
           var ctrl = this;
           ctrl.subscriptions = [];
           $scope.getActiveTabName = function() {
@@ -91,23 +89,19 @@ angular.module('oppia').directive('skillEditorNavbar', [
             }
           };
 
-          var _validateSkill = function() {
-            $scope.validationIssues = $scope.skill.getValidationIssues();
-          };
-
           $scope.discardChanges = function() {
             UndoRedoService.clearChanges();
-            SkillEditorStateService.loadSkill($scope.skill.getId());
+            SkillEditorStateService.loadSkill(ctrl.skill.getId());
           };
 
           $scope.getWarningsCount = function() {
-            return $scope.validationIssues.length;
+            return ctrl.skill.getValidationIssues().length;
           };
 
           $scope.isSkillSaveable = function() {
             return (
               $scope.getChangeListCount() > 0 &&
-              $scope.validationIssues.length === 0);
+              ctrl.skill.getValidationIssues().length === 0);
           };
 
           $scope.saveChanges = function() {
@@ -140,23 +134,8 @@ angular.module('oppia').directive('skillEditorNavbar', [
           };
 
           ctrl.$onInit = function() {
-            $scope.skill = SkillEditorStateService.getSkill();
-            $scope.validationIssues = [];
-            ctrl.subscriptions.push(
-              SkillEditorStateService.getEventSkillInitializedSubject()
-                .subscribe(
-                  () => _validateSkill())
-            );
-            $scope.$on(EVENT_SKILL_REINITIALIZED, _validateSkill);
-            $scope.$on(
-              EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateSkill);
+            ctrl.skill = SkillEditorStateService.getSkill();
           };
-
-          $scope.$on('$destroy', function() {
-            for (const subscription of ctrl.subscriptions) {
-              subscription.unsubscribe();
-            }
-          });
         }]
     };
   }

@@ -23,6 +23,8 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('skillRubricsEditor', [
   'SkillEditorStateService', 'SkillUpdateService', 'UrlInterpolationService',
   function(
@@ -34,12 +36,10 @@ angular.module('oppia').directive('skillRubricsEditor', [
         '/pages/skill-editor-page/editor-tab/skill-rubrics-editor/' +
         'skill-rubrics-editor.directive.html'),
       controller: [
-        '$scope', '$filter', '$uibModal', '$rootScope',
-        'RubricObjectFactory', 'EVENT_SKILL_REINITIALIZED',
-        function(
-            $scope, $filter, $uibModal, $rootScope,
-            RubricObjectFactory, EVENT_SKILL_REINITIALIZED) {
+        '$scope',
+        function($scope) {
           var ctrl = this;
+          ctrl.subscriptions = new Subscription();
           $scope.onSaveRubric = function(difficulty, explanation) {
             SkillUpdateService.updateRubricForDifficulty(
               $scope.skill, difficulty, explanation);
@@ -47,10 +47,17 @@ angular.module('oppia').directive('skillRubricsEditor', [
 
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
-            $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
-              $scope.rubrics = $scope.skill.getRubrics();
-            });
+            ctrl.subscriptions.add(
+              SkillEditorStateService.getEventSkillReinitializedSubject()
+                .subscribe(
+                  () => $scope.rubrics = $scope.skill.getRubrics()
+                )
+            );
           };
+
+          $scope.$on('$destroy', function() {
+            ctrl.subscriptions.unsubscribe();
+          });
         }]
     };
   }
