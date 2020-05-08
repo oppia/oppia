@@ -52,7 +52,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
             DebouncerService, DeviceInfoService, WindowDimensionsService,
             CurrentInteractionService) {
           var ctrl = this;
-          var guppyDivElt, guppyDivId, guppyInstance;
+          var guppyDivElt, guppyDivId, guppyInstance: Guppy;
           var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
             '/overrides/guppy/oppia_symbols.json');
           var labelForFocusTarget = $attrs.labelForFocusTarget || null;
@@ -206,7 +206,15 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
                 }
               }
             });
+            // @ts-ignore
+            // Ts Ignore is used here because actually Guppy is a class
+            // constructor having some properties. Ts doesn't support these
+            // kind of objects.
             if (angular.equals(Guppy.Symbols.symbols, {})) {
+              // @ts-ignore
+              // Ts Ignore is used here because actually Guppy is a class
+              // constructor having some properties. Ts doesn't support these
+              // kind of objects.
               Guppy.init({
                 symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
                   oppiaSymbolsUrl]});

@@ -152,6 +152,10 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         var explorationData = combinedData[0];
         var featuresData = combinedData[1];
         if (doesMathExpressionInputInteractionExist(explorationData.states)) {
+          // @ts-ignore
+          // Ts Ignore is used here because actually Guppy is a class
+          // constructor having some properties. Ts doesn't support these
+          // kind of objects.
           Guppy.init({
             symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
               oppiaSymbolsUrl]});
@@ -196,6 +200,10 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         if (
           doesMathExpressionInputInteractionExist(
             explorationData.exploration.states)) {
+          // @ts-ignore
+          // Ts Ignore is used here because actually Guppy is a class
+          // constructor having some properties. Ts doesn't support these
+          // kind of objects.
           Guppy.init({
             symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
               oppiaSymbolsUrl]});
