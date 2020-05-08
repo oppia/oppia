@@ -214,7 +214,7 @@ describe('Static Pages Tour', function() {
       by.css('.protractor-test-thanks-page')).isPresent()).toBe(true);
   });
   it('visits the Welcome Guide Page', function() {
-    browser.get('/welcomeguidepage');
+    browser.get('/welcomeguide');
     waitFor.pageToFullyLoad();
     expect(element(
       by.css('.protractor-test-welcome-guide-page')).isPresent()).toBe(true);
