@@ -32,7 +32,6 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # NOTE TO REVIEWERS: Please be circumspect about any PRs which delete elements
 # from this list.
 FULLY_COVERED_FILENAMES = [
-    'about-page.controller.ts',
     'admin-config-tab-backend-api.service.ts',
     'admin-data.service.ts',
     'admin-page.constants.ajs.ts',
@@ -316,6 +315,7 @@ FULLY_COVERED_FILENAMES = [
     'set-input-rules.service.ts',
     'set-input-validation.service.ts',
     'SetInput.ts',
+    'shared-components.module.ts',
     'sidebar-status.service.ts',
     'site-analytics.service.ts',
     'skill-backend-api.service.ts',

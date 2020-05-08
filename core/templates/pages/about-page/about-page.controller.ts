@@ -16,83 +16,88 @@
  * @fileoverview Controllers for the about page.
  */
 
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service.ts';
+import { WindowRef } from
+  'services/contextual/window-ref.service.ts';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
+@Component({
+  selector: 'about-page',
+  template: require('./about-page.directive.html'),
+  styleUrls: []
+})
+export class AboutPageComponent implements OnInit {
+  listOfNames: string;
+  aboutPageMascotImgUrl: string;
+  activeTabName: string;
+  listOfNamesToThank = [
+    'Alex Kauffmann', 'Allison Barros',
+    'Amy Latten', 'Brett Barros',
+    'Crystal Kwok', 'Daniel Hernandez',
+    'Divya Siddarth', 'Ilwon Yoon',
+    'Jennifer Chen', 'John Cox',
+    'John Orr', 'Katie Berlent',
+    'Michael Wawszczak', 'Mike Gainer',
+    'Neil Fraser', 'Noah Falstein',
+    'Nupur Jain', 'Peter Norvig',
+    'Philip Guo', 'Piotr Mitros',
+    'Rachel Chen', 'Rahim Nathwani',
+    'Robyn Choo', 'Tricia Ngoon',
+    'Vikrant Nanda', 'Vinamrata Singal',
+    'Yarin Feigenbaum'];
+  // Define constant for each tab on the page.
+  TAB_ID_ABOUT: string = 'about';
+  TAB_ID_FOUNDATION: string = 'foundation';
+  TAB_ID_CREDITS: string = 'credits';
+  ALLOWED_TABS: Array<string>;
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef) {
+    this.activeTabName = this.TAB_ID_ABOUT;
+    this.ALLOWED_TABS = [
+      this.TAB_ID_ABOUT, this.TAB_ID_FOUNDATION, this.TAB_ID_CREDITS];
+  }
 
-angular.module('oppia').directive('aboutPage', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/about-page/about-page.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        'UrlInterpolationService', 'WindowRef',
-        function(UrlInterpolationService, WindowRef) {
-          const ctrl = this;
-          const listOfNamesToThank = [
-            'Alex Kauffmann', 'Allison Barros',
-            'Amy Latten', 'Brett Barros',
-            'Crystal Kwok', 'Daniel Hernandez',
-            'Divya Siddarth', 'Ilwon Yoon',
-            'Jennifer Chen', 'John Cox',
-            'John Orr', 'Katie Berlent',
-            'Michael Wawszczak', 'Mike Gainer',
-            'Neil Fraser', 'Noah Falstein',
-            'Nupur Jain', 'Peter Norvig',
-            'Philip Guo', 'Piotr Mitros',
-            'Rachel Chen', 'Rahim Nathwani',
-            'Robyn Choo', 'Tricia Ngoon',
-            'Vikrant Nanda', 'Vinamrata Singal',
-            'Yarin Feigenbaum'];
-          // Define constant for each tab on the page.
-          ctrl.TAB_ID_ABOUT = 'about';
-          ctrl.TAB_ID_FOUNDATION = 'foundation';
-          ctrl.TAB_ID_CREDITS = 'credits';
+  onTabClick(tabName: string) {
+    this.windowRef.nativeWindow.location.hash = '#' + tabName;
+    this.activeTabName = tabName;
+  }
 
-          const ALLOWED_TABS = [
-            ctrl.TAB_ID_ABOUT, ctrl.TAB_ID_FOUNDATION, ctrl.TAB_ID_CREDITS];
+  getStaticImageUrl(imagePath: string) {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
 
-          ctrl.activeTabName = ctrl.TAB_ID_ABOUT;
+  ngOnInit() {
+    const hash = this.windowRef.nativeWindow.location.hash.slice(1);
+    if (hash === 'license') {
+      this.activeTabName = this.TAB_ID_FOUNDATION;
+    } else if (this.ALLOWED_TABS.includes(hash)) {
+      this.activeTabName = hash;
+    }
 
-          ctrl.onTabClick = function(tabName: string) {
-            // Update hash
-            WindowRef.nativeWindow.location.hash = '#' + tabName;
-            ctrl.activeTabName = tabName;
-          };
-          ctrl.getStaticImageUrl = function(imagePath: string) {
-            return UrlInterpolationService.getStaticImageUrl(imagePath);
-          };
-          ctrl.$onInit = function() {
-            const hash = WindowRef.nativeWindow.location.hash.slice(1);
-            if (hash === 'license') {
-              ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;
-            } else if (ALLOWED_TABS.includes(hash)) {
-              ctrl.activeTabName = hash;
-            }
+    this.listOfNames = this.listOfNamesToThank
+      .slice(0, this.listOfNamesToThank.length - 1).join(', ') +
+      ' & ' + this.listOfNamesToThank[this.listOfNamesToThank.length - 1];
+    this.aboutPageMascotImgUrl = this.urlInterpolationService
+      .getStaticImageUrl('/general/about_page_mascot.png');
 
-            ctrl.listOfNames = listOfNamesToThank
-              .slice(0, listOfNamesToThank.length - 1).join(', ') +
-              ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
-            ctrl.aboutPageMascotImgUrl = UrlInterpolationService
-              .getStaticImageUrl('/general/about_page_mascot.png');
-
-            WindowRef.nativeWindow.onhashchange = function() {
-              const hashChange = window.location.hash.slice(1);
-              if (hashChange === 'license') {
-                ctrl.activeTabName = ctrl.TAB_ID_FOUNDATION;
-                WindowRef.nativeWindow.location.reload(true);
-              } else if (ALLOWED_TABS.includes(hashChange)) {
-                ctrl.activeTabName = hashChange;
-              }
-            };
-          };
-        }
-      ]
+    this.windowRef.nativeWindow.onhashchange = () => {
+      const hashChange = this.windowRef.nativeWindow.location.hash.slice(1);
+      if (hashChange === 'license') {
+        this.activeTabName = this.TAB_ID_FOUNDATION;
+        this.windowRef.nativeWindow.location.reload(true);
+      } else if (this.ALLOWED_TABS.includes(hashChange)) {
+        this.activeTabName = hashChange;
+      }
     };
-  }]);
+  }
+}
+angular.module('oppia').directive(
+  'aboutPage', downgradeComponent({component: AboutPageComponent}));
