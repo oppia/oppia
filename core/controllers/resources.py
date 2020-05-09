@@ -57,9 +57,7 @@ class AssetDevHandler(base.BaseHandler):
     _SUPPORTED_PAGE_CONTEXTS = [
         feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_SKILL,
         feconf.ENTITY_TYPE_TOPIC, feconf.ENTITY_TYPE_STORY,
-        feconf.ENTITY_TYPE_QUESTION, feconf.ENTITY_TYPE_SUBTOPIC,
-        constants.TEMP_SKILL_ENTITY
-    ]
+        feconf.ENTITY_TYPE_QUESTION, feconf.ENTITY_TYPE_SUBTOPIC]
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

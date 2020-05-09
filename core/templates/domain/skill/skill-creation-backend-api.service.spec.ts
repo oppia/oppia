@@ -57,7 +57,7 @@ describe('Skill creation backend api service', () => {
       linked_topic_ids: ['test_id'],
       explanation_dict: 'test_dictionary',
       rubrics: rubricDict,
-      temp_id: '123456'
+      temp_skill_id: '123456'
     };
   });
 

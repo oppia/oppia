@@ -38,20 +38,22 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
         'topics-and-skills-dashboard-navbar.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', 'ContextService',
-        'TopicCreationService', 'RubricObjectFactory', 'SkillCreationService',
-        'SkillObjectFactory', 'EVENT_TYPE_TOPIC_CREATION_ENABLED',
-        'EVENT_TYPE_SKILL_CREATION_ENABLED', 'EditableTopicBackendApiService',
+        'EditableTopicBackendApiService', 'RubricObjectFactory',
+        'SkillCreationService', 'SkillObjectFactory', 'TopicCreationService',
+        'ENTITY_TYPE', 'EVENT_TYPE_SKILL_CREATION_ENABLED',
+        'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
-        'SKILL_DIFFICULTIES', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
-        'SKILL_DESCRIPTION_STATUS_VALUES', 'TEMP_SKILL_ENTITY',
+        'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DIFFICULTIES',
+        'SKILL_DESCRIPTION_STATUS_VALUES',
         function(
             $scope, $rootScope, $uibModal, ContextService,
-            TopicCreationService, RubricObjectFactory, SkillCreationService,
-            SkillObjectFactory, EVENT_TYPE_TOPIC_CREATION_ENABLED,
-            EVENT_TYPE_SKILL_CREATION_ENABLED, EditableTopicBackendApiService,
+            EditableTopicBackendApiService, RubricObjectFactory,
+            SkillCreationService, SkillObjectFactory, TopicCreationService,
+            ENTITY_TYPE, EVENT_TYPE_SKILL_CREATION_ENABLED,
+            EVENT_TYPE_TOPIC_CREATION_ENABLED,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
-            SKILL_DIFFICULTIES, MAX_CHARS_IN_SKILL_DESCRIPTION,
-            SKILL_DESCRIPTION_STATUS_VALUES, TEMP_SKILL_ENTITY) {
+            MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DIFFICULTIES,
+            SKILL_DESCRIPTION_STATUS_VALUES) {
           var ctrl = this;
           $scope.createTopic = function() {
             TopicCreationService.createNewTopic();
@@ -61,10 +63,10 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
               RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
               RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
               RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
-            // Create a 6-digit random int as the temporary ID for the skill.
-            var randomId = Math.floor(Math.random() * 1000000).toString();
+            // Create an 8-digit random int as the temporary ID for the skill.
+            var randomId = Math.floor(Math.random() * 100000000).toString();
             ContextService.setCustomEntityContext(
-              TEMP_SKILL_ENTITY, randomId);
+              ENTITY_TYPE.SKILL, randomId);
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +

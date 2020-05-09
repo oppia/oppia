@@ -5187,8 +5187,6 @@ export = {
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 
-  "TEMP_SKILL_ENTITY": "tmp_skills",
-
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
   "MAX_CHARS_IN_TOPIC_NAME": 39,

@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
 
-from constants import constants
 from core.controllers import base
 from core.domain import feedback_services
 from core.domain import question_services
@@ -2639,8 +2638,6 @@ def can_edit_entity(handler):
             return can_edit_skill(reduced_handler)(self, entity_id, **kwargs)
         elif entity_type == feconf.ENTITY_TYPE_STORY:
             return can_edit_story(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == constants.TEMP_SKILL_ENTITY:
-            return handler(self, entity_type, entity_id, **kwargs)
         else:
             raise self.PageNotFoundException
 

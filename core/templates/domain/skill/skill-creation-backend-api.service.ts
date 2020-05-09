@@ -30,7 +30,7 @@ export interface ISkillCreationBackend {
   'explanation_dict': string,
   'linked_topic_ids': string[],
   rubrics: IRubricBackend,
-  'temp_id': string
+  'temp_skill_id': string
 }
 
 @Injectable({
@@ -49,7 +49,7 @@ export class SkillCreationBackendApiService {
       linked_topic_ids: linkedTopicIds,
       explanation_dict: explanation,
       rubrics: rubrics,
-      temp_id: tempId
+      temp_skill_id: tempId
     };
     this.http.post(
       '/skill_editor_handler/create_new', postData).toPromise()

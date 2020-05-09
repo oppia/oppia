@@ -19,7 +19,6 @@ are created.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_services
@@ -142,7 +141,7 @@ class NewSkillHandler(base.BaseHandler):
         description = self.payload.get('description')
         linked_topic_ids = self.payload.get('linked_topic_ids')
         explanation_dict = self.payload.get('explanation_dict')
-        temp_id = self.payload.get('temp_id')
+        temp_skill_id = self.payload.get('temp_skill_id')
         rubrics = self.payload.get('rubrics')
 
         if not isinstance(rubrics, list):
@@ -177,8 +176,8 @@ class NewSkillHandler(base.BaseHandler):
             state_domain.SubtitledHtml.from_dict(explanation_dict))
         skill_services.save_new_skill(self.user_id, skill)
         fs_services.move_images_between_directories(
-            constants.TEMP_SKILL_ENTITY, temp_id, feconf.ENTITY_TYPE_SKILL,
-            skill.id)
+            feconf.ENTITY_TYPE_SKILL, temp_skill_id,
+            feconf.ENTITY_TYPE_SKILL, skill.id)
 
         self.render_json({
             'skillId': new_skill_id

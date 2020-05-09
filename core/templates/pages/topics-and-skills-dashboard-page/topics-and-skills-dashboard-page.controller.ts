@@ -57,20 +57,22 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$rootScope', '$scope', '$uibModal', '$window',
-        'AlertsService', 'RubricObjectFactory', 'SkillCreationService',
+        'AlertsService', 'ContextService',
+        'RubricObjectFactory', 'SkillCreationService',
         'SkillObjectFactory', 'TopicCreationService',
         'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
-        'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+        'ENTITY_TYPE', 'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         'EVENT_TYPE_SKILL_CREATION_ENABLED',
         'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         'FATAL_ERROR_CODES', 'SKILL_DIFFICULTIES',
         'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
         function(
             $http, $rootScope, $scope, $uibModal, $window,
-            AlertsService, RubricObjectFactory, SkillCreationService,
+            AlertsService, ContextService,
+            RubricObjectFactory, SkillCreationService,
             SkillObjectFactory, TopicCreationService,
             TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService,
-            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
+            ENTITY_TYPE, EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
             EVENT_TYPE_SKILL_CREATION_ENABLED,
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
             FATAL_ERROR_CODES, SKILL_DIFFICULTIES,
@@ -137,6 +139,10 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
               RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
               RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
               RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
+            // Create an 8-digit random int as the temporary ID for the skill.
+            var randomId = Math.floor(Math.random() * 100000000).toString();
+            ContextService.setCustomEntityContext(
+              ENTITY_TYPE.SKILL, randomId);
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
@@ -211,8 +217,10 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 }
               ]
             }).result.then(function(result) {
+              ContextService.removeCustomEntityContext();
               SkillCreationService.createNewSkill(
-                result.description, result.rubrics, result.explanation, []);
+                result.description, result.rubrics, result.explanation, [],
+                randomId);
             });
           };
           ctrl.$onInit = function() {
