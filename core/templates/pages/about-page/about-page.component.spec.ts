@@ -25,10 +25,10 @@
 // import {HttpClient} from '@angular/common/http';
 // import {HttpClientTestingModule, HttpTestingController} from
 //   '@angular/common/http/testing';
-// const TRANSLATIONS_EN = require('../../../../assets/i18n/en.json');
-// const TRANSLATIONS_PT_BR = require('../../../../assets/i18n/pt-br.json');
+// const TRANSLATIONS_EN = require('/assets/i18n/en.json');
+// const TRANSLATIONS_PT_BR = require('/assets/i18n/pt-br.json');
 
-// fdescribe('AboutPageComponent', () => {
+// describe('AboutPageComponent', () => {
 //   let translate: TranslateService;
 //   let http: HttpTestingController;
 
@@ -53,13 +53,13 @@
 //     http = TestBed.get(HttpTestingController);
 //   }));
 
-//   fit('should create the app', async(() => {
+//   it('should create the app', async(() => {
 //     const fixture = TestBed.createComponent(AboutPageComponent);
 //     const app = fixture.debugElement.componentInstance;
 //     expect(app).toBeTruthy();
 //   }));
 
-//   fit('should load translations', async(() => {
+//   it('should load translations', async(() => {
 //     spyOn(translate, 'getBrowserLang').and.returnValue('en');
 //     const fixture = TestBed.createComponent(AboutPageComponent);
 //     const compiled = fixture.debugElement.nativeElement;
