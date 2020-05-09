@@ -126,7 +126,6 @@ describe('Topics and skills dashboard functionality', function() {
   it('should remove a topic from list once deleted', function() {
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
     topicsAndSkillsDashboardPage.deleteTopicWithIndex(0);
-
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
   });
