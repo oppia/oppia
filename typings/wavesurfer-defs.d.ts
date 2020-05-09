@@ -1,4 +1,4 @@
-// Code - https://raw.githubusercontent.com/katspaugh/wavesurfer.js/master/src/wavesurfer.js
+// Code (Release 3.3) - https://github.com/katspaugh/wavesurfer.js/blob/4421b44e205c76359407ae995dcb8b8453f903a1/src/wavesurfer.js
 
 interface WaveSurfer {
   addPlugin: (plugin: Object) => WaveSurfer;
