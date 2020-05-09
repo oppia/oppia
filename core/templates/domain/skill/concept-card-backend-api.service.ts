@@ -19,7 +19,8 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpResponse, HttpErrorResponse }
+  from '@angular/common/http';
 
 import cloneDeep from 'lodash/cloneDeep';
 
