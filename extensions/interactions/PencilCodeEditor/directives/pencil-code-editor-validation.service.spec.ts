@@ -25,7 +25,7 @@ import { PencilCodeEditorValidationService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service.ts';
 /* eslint-enable max-len */
 
-fdescribe('Pencil Code Editor Validation Service', () => {
+describe('Pencil Code Editor Validation Service', () => {
   let pcevs: PencilCodeEditorValidationService = null;
 
   beforeEach(() => {
