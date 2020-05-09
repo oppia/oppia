@@ -40,7 +40,7 @@
     </md-card>
     <div ng-if="allowSkillsFromOtherTopics" style="max-height: 25vh; overflow-y: auto;">
       <md-card class="list-view-item ">
-        <md-checkbox style="margin-left:10px" ng-repeat="topic in topicFilterList" ng-model="topic.checked" ng-change="updateOnTopic()"><[topic.topicName]></md-checkbox>
+        <md-checkbox style="margin-left:10px" ng-repeat="topic in topicFilterList" ng-model="topic.checked" ng-change="updateSkillsListOnTopicFilterChange()"><[topic.topicName]></md-checkbox>
       </md-card>
     </div>
     <br>
@@ -52,7 +52,7 @@
         <div ng-repeat="(topicName, subtopics) in subTopicFilterDict">
           <h3><label class="list-group-item-heading" style="padding-left:10px"><[topicName]></label></h3>
           <md-card class="list-view-item">
-            <md-checkbox style="margin-left:10px" ng-repeat="subtopic in subtopics" ng-model="subtopic.checked" ng-change="updateOnSubTopic()"><[subtopic.subTopicName]></md-checkbox>
+            <md-checkbox style="margin-left:10px" ng-repeat="subtopic in subtopics" ng-model="subtopic.checked" ng-change="updateSkillsListOnSubtopicFilterChange()"><[subtopic.subTopicName]></md-checkbox>
           </md-card>
         </div>
       </md-card>

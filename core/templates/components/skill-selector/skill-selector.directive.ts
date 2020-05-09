@@ -77,7 +77,9 @@ angular.module('oppia').directive('selectSkill', [
             var intialSubTopicFilterDict = angular.copy(
               $scope.subTopicFilterDict);
 
-            $scope.updateOnSubTopic = function() {
+            // The folowing function is called when the subtopic filter changes.
+            // This updates the list of Skills displayed in the selector.
+            $scope.updateSkillsListOnSubtopicFilterChange = function() {
               var skills = $scope.getSortedSkillSummaries();
               var updatedSkillsDict = {};
               var isAnySubTopicChecked = false;
@@ -97,6 +99,8 @@ angular.module('oppia').directive('selectSkill', [
                 }
               }
               if (!isAnySubTopicChecked) {
+                // If no subtopics are checked in the subtop filter, we have
+                // to display all the skills from checked topics.
                 var isAnyTopicChecked = false;
                 for (var i = 0; i < $scope.topicFilterList.length; i++) {
                   if ($scope.topicFilterList[i].checked) {
@@ -110,6 +114,8 @@ angular.module('oppia').directive('selectSkill', [
                 if (isAnyTopicChecked) {
                   $scope.categorizedSkills = angular.copy(updatedSkillsDict);
                 } else {
+                  // If no filter is applied on both subtopics and topics, we
+                  // need to display all the skills (the original list).
                   $scope.categorizedSkills = $scope.getCategorizedSkills();
                 }
               } else {
@@ -117,7 +123,10 @@ angular.module('oppia').directive('selectSkill', [
               }
             };
 
-            $scope.updateOnTopic = function() {
+            // The folowing function is called when the topic filter changes.
+            // First, the subtopic filter is updated according to the changed
+            // topic filter list. Then the main Skills list is updated.
+            $scope.updateSkillsListOnTopicFilterChange = function() {
               var updatedSubTopicFilterList = {};
               var isAnyTopicChecked = false;
               for (var i = 0; i < $scope.topicFilterList.length; i++) {
@@ -129,6 +138,8 @@ angular.module('oppia').directive('selectSkill', [
                 }
               }
               if (!isAnyTopicChecked) {
+                // If there are no topics checked on topic filter, we have to
+                // display subtopics from all the topics in the subtopic filter.
                 for (var topic in intialSubTopicFilterDict) {
                   if (!$scope.subTopicFilterDict.hasOwnProperty(topic)) {
                     $scope.subTopicFilterDict[topic] =
@@ -139,7 +150,9 @@ angular.module('oppia').directive('selectSkill', [
                 $scope.subTopicFilterDict =
                    angular.copy(updatedSubTopicFilterList);
               }
-              $scope.updateOnSubTopic();
+              // After we update the subtopic filter list, we need to update
+              // the main skills list.
+              $scope.updateSkillsListOnSubtopicFilterChange();
             };
           };
         }
