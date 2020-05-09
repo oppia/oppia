@@ -72,6 +72,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.node_1 = {
             'id': self.NODE_ID_1,
             'title': 'Title 1',
+            'description': 'Description 1',
             'thumbnail_filename': 'image_1.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
@@ -87,6 +88,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.node_2 = {
             'id': self.NODE_ID_2,
             'title': 'Title 2',
+            'description': 'Description 2',
             'thumbnail_filename': 'image_2.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
@@ -102,6 +104,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.node_3 = {
             'id': self.NODE_ID_3,
             'title': 'Title 3',
+            'description': 'Description 3',
             'thumbnail_filename': 'image_3.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
