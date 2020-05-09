@@ -34,8 +34,8 @@ angular.module('oppia').directive('aboutPage', [
         '/pages/about-page/about-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'CREDITS', 'UrlInterpolationService', 'WindowRef',
-        function(CREDITS, UrlInterpolationService, WindowRef) {
+        'CREDITS_CONSTANTS', 'UrlInterpolationService', 'WindowRef',
+        function(CREDITS_CONSTANTS, UrlInterpolationService, WindowRef) {
           const ctrl = this;
           const listOfNamesToThank = [
             'Alex Kauffmann', 'Allison Barros',
@@ -63,7 +63,7 @@ angular.module('oppia').directive('aboutPage', [
           ctrl.activeTabName = ctrl.TAB_ID_ABOUT;
 
           ctrl.getCredits = function(startLetter: string) {
-            const results = CREDITS.filter(
+            const results = CREDITS_CONSTANTS.filter(
               (credit) => credit.startsWith(startLetter)).sort();
             return results;
           };
@@ -80,7 +80,7 @@ angular.module('oppia').directive('aboutPage', [
             ctrl.allCredits = [];
             var alphabetList = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
             for (var i = 0; i < 26; i++) {
-              var letter = String.fromCharCode(i + 65);
+              var letter = alphabetList[i];
               var credits = ctrl.getCredits(letter);
               if (credits.length > 0) {
                 ctrl.allCredits.push({letter: letter, credits: credits});

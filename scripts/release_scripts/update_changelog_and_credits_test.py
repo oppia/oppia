@@ -44,7 +44,7 @@ MOCK_RELEASE_SUMMARY_FILEPATH = os.path.join(
 MOCK_CHANGELOG_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'CHANGELOG')
 MOCK_AUTHORS_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'AUTHORS')
 MOCK_CONTRIBUTORS_FILEPATH = os.path.join(RELEASE_TEST_DIR, 'CONTRIBUTORS')
-MOCK_ABOUT_PAGE_FILEPATH = 'about_temp_file.ts'
+MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH = 'about_temp_file.ts'
 
 MOCK_UPDATED_CHANGELOG_FILEPATH = os.path.join(
     RELEASE_TEST_DIR, 'UPDATED_CHANGELOG')
@@ -258,7 +258,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
 
     def test_update_developer_names(self):
         with python_utils.open_file(
-            update_changelog_and_credits.ABOUT_PAGE_FILEPATH, 'r') as f:
+            update_changelog_and_credits.ABOUT_PAGE_CONSTANTS_FILEPATH,
+            'r') as f:
             about_page_lines = f.readlines()
             start_index = about_page_lines.index(
                 update_changelog_and_credits.CREDITS_START_LINE) + 1
@@ -267,8 +268,9 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             existing_developer_names = about_page_lines[start_index:end_index]
 
         tmp_file = tempfile.NamedTemporaryFile()
-        tmp_file.name = MOCK_ABOUT_PAGE_FILEPATH
-        with python_utils.open_file(MOCK_ABOUT_PAGE_FILEPATH, 'w') as f:
+        tmp_file.name = MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH
+        with python_utils.open_file(
+            MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH, 'w') as f:
             for line in about_page_lines:
                 f.write(python_utils.UNICODE(line))
 
@@ -285,8 +287,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             list(set(expected_developer_names)), key=lambda s: s.lower())
 
         with self.swap(
-            update_changelog_and_credits, 'ABOUT_PAGE_FILEPATH',
-            MOCK_ABOUT_PAGE_FILEPATH):
+            update_changelog_and_credits, 'ABOUT_PAGE_CONSTANTS_FILEPATH',
+            MOCK_ABOUT_PAGE_CONSTANTS_FILEPATH):
             update_changelog_and_credits.update_developer_names(
                 release_summary_lines)
 

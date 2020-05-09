@@ -22,7 +22,7 @@ export class AboutPageConstants {
   // CREDITS_START_LINE, CREDITS_END_LINE and CREDITS_INDENT should be
   // updated in update_changelog_and_credits.py file. If the patterns do
   // not match, update_changelog_and_credits_test will fail.
-  public static CREDITS = [
+  public static CREDITS_CONSTANTS = [
     'Aadya Mishra',
     'Aaron Zuspan',
     'Aashish Gaba',

@@ -32,7 +32,7 @@ describe('About Page', function() {
     var $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     var directive = $injector.get('aboutPageDirective')[0];
-    credits = $injector.get('CREDITS');
+    credits = $injector.get('CREDITS_CONSTANTS');
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope
     });

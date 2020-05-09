@@ -20,4 +20,5 @@
 // equivalents of the Angular constants are no longer needed.
 import { AboutPageConstants } from 'pages/about-page/about-page.constants';
 
-angular.module('oppia').constant('CREDITS', AboutPageConstants.CREDITS);
+angular.module('oppia').constant(
+  'CREDITS_CONSTANTS', AboutPageConstants.CREDITS_CONSTANTS);

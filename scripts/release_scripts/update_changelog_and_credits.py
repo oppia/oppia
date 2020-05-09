@@ -40,7 +40,7 @@ sys.path.insert(0, _PY_GITHUB_PATH)
 import github # isort:skip
 # pylint: enable=wrong-import-position
 
-ABOUT_PAGE_FILEPATH = os.path.join(
+ABOUT_PAGE_CONSTANTS_FILEPATH = os.path.join(
     'core', 'templates', 'pages', 'about-page',
     'about-page.constants.ts')
 AUTHORS_FILEPATH = os.path.join('', 'AUTHORS')
@@ -48,12 +48,12 @@ CHANGELOG_FILEPATH = os.path.join('', 'CHANGELOG')
 CONTRIBUTORS_FILEPATH = os.path.join('', 'CONTRIBUTORS')
 GIT_CMD_CHECKOUT = 'git checkout -- %s %s %s %s' % (
     CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
-    ABOUT_PAGE_FILEPATH)
+    ABOUT_PAGE_CONSTANTS_FILEPATH)
 
 # These constants should match the format defined in
 # about-page.constants.ts. If the patterns do not match,
 # update_changelog_and_credits_test will fail.
-CREDITS_START_LINE = '  public static CREDITS = [\n'
+CREDITS_START_LINE = '  public static CREDITS_CONSTANTS = [\n'
 CREDITS_END_LINE = '  ];\n'
 CREDITS_INDENT = '    '
 
@@ -328,7 +328,8 @@ def update_developer_names(release_summary_lines):
     new_developer_names = get_new_contributors(
         release_summary_lines, return_only_names=True)
 
-    with python_utils.open_file(ABOUT_PAGE_FILEPATH, 'r') as about_page_file:
+    with python_utils.open_file(
+        ABOUT_PAGE_CONSTANTS_FILEPATH, 'r') as about_page_file:
         about_page_lines = about_page_file.readlines()
         start_index = about_page_lines.index(CREDITS_START_LINE) + 1
         end_index = about_page_lines[start_index:].index(CREDITS_END_LINE) + 1
@@ -339,7 +340,8 @@ def update_developer_names(release_summary_lines):
             list(set(all_developer_names)), key=lambda s: s.lower())
         about_page_lines[start_index:end_index] = all_developer_names
 
-    with python_utils.open_file(ABOUT_PAGE_FILEPATH, 'w') as about_page_file:
+    with python_utils.open_file(
+        ABOUT_PAGE_CONSTANTS_FILEPATH, 'w') as about_page_file:
         for line in about_page_lines:
             about_page_file.write(python_utils.UNICODE(line))
     python_utils.PRINT('Updated about-page file!')
@@ -390,7 +392,7 @@ def create_branch(
 
     for filepath in [
             CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
-            ABOUT_PAGE_FILEPATH]:
+            ABOUT_PAGE_CONSTANTS_FILEPATH]:
         contents = repo_fork.get_contents(filepath, ref=target_branch)
         with python_utils.open_file(filepath, 'r') as f:
             repo_fork.update_file(
@@ -559,7 +561,7 @@ def main():
         'Please check the changes and make updates if required in the '
         'following files:\n1. %s\n2. %s\n3. %s\n4. %s\n' % (
             CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
-            ABOUT_PAGE_FILEPATH))
+            ABOUT_PAGE_CONSTANTS_FILEPATH))
     common.ask_user_to_confirm(message)
 
     create_branch(
