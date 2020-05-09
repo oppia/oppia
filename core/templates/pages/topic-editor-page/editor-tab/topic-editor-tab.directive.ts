@@ -31,6 +31,10 @@ require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/image-upload-helper.service.ts');
 
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+const topicConstants = require('constants.ts');
+
 angular.module('oppia').directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -65,19 +69,8 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.editableName = $scope.topic.getName();
             $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
             $scope.editableDescription = $scope.topic.getDescription();
-            var placeholderImageUrl = '/icons/story-image-icon.png';
-            if (!$scope.topic.getThumbnailFilename()) {
-              $scope.editableThumbnailDataUrl = (
-                UrlInterpolationService.getStaticImageUrl(
-                  placeholderImageUrl));
-            } else {
-              $scope.editableThumbnailDataUrl = (
-                ImageUploadHelperService
-                  .getTrustedResourceUrlForThumbnailFilename(
-                    $scope.topic.getThumbnailFilename(),
-                    ContextService.getEntityType(),
-                    ContextService.getEntityId()));
-            }
+            $scope.allowedBgColors = (
+              topicConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
 
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
@@ -144,8 +137,16 @@ angular.module('oppia').directive('topicEditorTab', [
             if (newThumbnailFilename === $scope.topic.getThumbnailFilename()) {
               return;
             }
-            TopicUpdateService.setThumbnailFilename(
+            TopicUpdateService.setTopicThumbnailFilename(
               $scope.topic, newThumbnailFilename);
+          };
+
+          $scope.updateTopicThumbnailBgColor = function(newThumbnailBgColor) {
+            if (newThumbnailBgColor === $scope.topic.getThumbnailBgColor()) {
+              return;
+            }
+            TopicUpdateService.setTopicThumbnailBgColor(
+              $scope.topic, newThumbnailBgColor);
           };
 
           $scope.updateTopicDescription = function(newDescription) {

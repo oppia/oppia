@@ -60,15 +60,15 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
         '/pages/exploration-editor-page/translation-tab/' +
         'translation-tab.directive.html'),
 
-      controller: ['$scope', '$rootScope', '$templateCache', '$uibModal',
+      controller: ['$scope', '$templateCache', '$uibModal',
         'ContextService', 'EditabilityService', 'ExplorationStatesService',
-        'StateEditorService', 'StateRecordedVoiceoversService',
+        'LoaderService', 'StateEditorService', 'StateRecordedVoiceoversService',
         'StateTutorialFirstTimeService', 'StateWrittenTranslationsService',
         'TranslationTabActiveModeService',
         'UserExplorationPermissionsService',
-        function($scope, $rootScope, $templateCache, $uibModal,
+        function($scope, $templateCache, $uibModal,
             ContextService, EditabilityService, ExplorationStatesService,
-            StateEditorService, StateRecordedVoiceoversService,
+            LoaderService, StateEditorService, StateRecordedVoiceoversService,
             StateTutorialFirstTimeService, StateWrittenTranslationsService,
             TranslationTabActiveModeService,
             UserExplorationPermissionsService) {
@@ -97,7 +97,7 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
                 stateName));
             $scope.showTranslationTabSubDirectives = true;
             TranslationTabActiveModeService.activateVoiceoverMode();
-            $rootScope.loadingMessage = '';
+            LoaderService.hideLoadingScreen();
           };
 
           $scope.leaveTutorial = function() {
@@ -170,7 +170,7 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
           };
 
           ctrl.$onInit = function() {
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             $scope.isTranslationTabBusy = false;
             $scope.showTranslationTabSubDirectives = false;
             $scope.$on('refreshTranslationTab', function() {

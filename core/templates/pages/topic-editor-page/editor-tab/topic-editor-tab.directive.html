@@ -1,9 +1,17 @@
 <div role="form" class="form-horizontal topic-editor">
   <md-card class="oppia-page-card oppia-long-text">
-    <!-- Move this form into a separate directive -->
+    <label class="form-heading">Topic Thumbnail</label>
     <thumbnail-uploader disabled="!topicRights.canEditTopic()"
-                        editable-thumbnail-data-url="editableThumbnailDataUrl"
-                        update-filename="updateTopicThumbnailFilename">
+                        filename="topic.getThumbnailFilename()"
+                        update-filename="updateTopicThumbnailFilename"
+                        bg-color="topic.getThumbnailBgColor()"
+                        update-bg-color="updateTopicThumbnailBgColor"
+                        allowed-bg-colors="allowedBgColors"
+                        aspect-ratio="'4:3'"
+                        preview-title="editableName"
+                        preview-description=""
+                        preview-description-bg-color="'#2F6687'"
+                        preview-footer="topic.getCanonicalStoryIds().length + ' Lessons'">
     </thumbnail-uploader>
 
     <div class="topic-name">
