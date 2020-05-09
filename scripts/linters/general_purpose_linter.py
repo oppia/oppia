@@ -175,6 +175,35 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'extensions/visualizations/')
     },
     {
+        'regexp': re.compile(r'tothrow[(]'),
+        'message': 'Please use \'toThrowError\' instead of '
+                   '\'toThrow\'',
+        'excluded_files': (
+            # Note to developers: In the excluded_files below,
+            # we use custom errors which cannot be caught by regex.
+            # The Logic Proof interaction which uses these custom errors
+            # will be deprecated soon (see #9198).
+            'extensions/interactions/LogicProof/static/js/student.spec.ts',
+            'extensions/interactions/LogicProof/static/js/complete.spec.ts',
+            'extensions/interactions/LogicProof/static/js/teacher.spec.ts'),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'(?!catch\s(\n|.)*throw\s\w;\n.*})'
+                             r'throw\s\b(\bError|\bTypeError|\bRangeError'
+                             r'\bSyntaxError|\bDimensionError)\('),
+        'message': 'Please use \'throw new\' instead of \'throw\'',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'(?!catch\s(\n|.)*throw\s\w;\n.*})throw\s*\''),
+        'message': 'Please use '
+                   '\'throw new Error\' instead of \'throw\'',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': re.compile(r'\$parent'),
         'message': 'Please do not access parent properties ' +
                    'using $parent. Use the scope object' +

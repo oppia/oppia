@@ -84,6 +84,24 @@ var visibilityOf = function(element, errorMessage) {
     until.visibilityOf(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
+/**
+* Wait for new tab is opened
+*/
+var newTabToBeCreated = function(errorMessage, urlToMatch) {
+  var currentHandles = [];
+
+  return browser.wait(function() {
+    return browser.driver.getAllWindowHandles().then(function(handles) {
+      browser.waitForAngularEnabled(false);
+      return browser.switchTo().window(handles.pop()).then(function() {
+        return browser.getCurrentUrl().then(function(url) {
+          browser.waitForAngularEnabled(true);
+          return url.match(urlToMatch);
+        });
+      });
+    });
+  }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
+};
 
 exports.alertToBePresent = alertToBePresent;
 exports.elementToBeClickable = elementToBeClickable;
@@ -91,3 +109,4 @@ exports.invisibilityOf = invisibilityOf;
 exports.pageToFullyLoad = pageToFullyLoad;
 exports.textToBePresentInElement = textToBePresentInElement;
 exports.visibilityOf = visibilityOf;
+exports.newTabToBeCreated = newTabToBeCreated;

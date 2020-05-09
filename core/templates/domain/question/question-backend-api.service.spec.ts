@@ -15,36 +15,26 @@
  * @fileoverview Unit tests for QuestionBackendApiService.
  */
 
-require('domain/question/question-backend-api.service.ts');
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
+import { QuestionBackendApiService } from
+  'domain/question/question-backend-api.service.ts';
 
-describe('Question backend Api service', function() {
-  var QuestionBackendApiService = null;
-  var sampleDataResults = null;
-  var sampleResponse = null;
-  var $httpBackend = null;
-  var $rootScope = null;
+describe('Question backend Api service', () => {
+  let questionBackendApiService = null;
+  let sampleDataResults = null;
+  let sampleResponse = null;
+  let httpTestingController: HttpTestingController;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(
-    angular.mock.module('oppia', TranslatorProviderForTests));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    QuestionBackendApiService = $injector.get(
-      'QuestionBackendApiService');
-    $httpBackend = $injector.get('$httpBackend');
-    $rootScope = $injector.get('$rootScope');
+    questionBackendApiService = TestBed.get(QuestionBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
 
     // Sample question object returnable from the backend
     sampleDataResults = {
@@ -104,252 +94,275 @@ describe('Question backend Api service', function() {
       }],
       next_start_cursor: null
     };
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+
+  it('should successfully fetch questions from the backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let questionPlayerHandlerUrl =
+      '/question_player_handler?skill_ids=1&question_count=1' +
+      '&fetch_by_difficulty=true';
+
+    questionBackendApiService.fetchQuestions(
+      ['1'], 1, true).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(questionPlayerHandlerUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      sampleDataResults.question_dicts);
+    expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
-  });
-
-  it('should successfully fetch questions from the backend', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    var questionPlayerHandlerUrl =
-      '/question_player_handler?skill_ids=1&question_count=1' +
-      '&fetch_by_difficulty=true';
-    $httpBackend.expect('GET', questionPlayerHandlerUrl).respond(
-      sampleDataResults);
-    QuestionBackendApiService.fetchQuestions(
-      ['1'], 1, true).then(successHandler, failHandler);
-    $httpBackend.flush();
-
-    expect(successHandler).toHaveBeenCalledWith(
-      sampleDataResults.question_dicts);
-    expect(failHandler).not.toHaveBeenCalled();
-  });
-
   it('should successfully fetch questions from the backend when' +
-      'sortedByDifficulty is false', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+      'sortedByDifficulty is false', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-    var questionPlayerHandlerUrl =
+    let questionPlayerHandlerUrl =
       '/question_player_handler?skill_ids=1&question_count=1' +
       '&fetch_by_difficulty=false';
-    $httpBackend.expect('GET', questionPlayerHandlerUrl).respond(
-      sampleDataResults);
-    QuestionBackendApiService.fetchQuestions(
+
+    questionBackendApiService.fetchQuestions(
       ['1'], 1, false).then(successHandler, failHandler);
-    $httpBackend.flush();
+
+    let req = httpTestingController.expectOne(questionPlayerHandlerUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(
       sampleDataResults.question_dicts);
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
-  it('should use the fail handler if the backend request failed', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+  it('should use the fail handler if the backend request failed',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-    var questionPlayerHandlerUrl =
-      '/question_player_handler?skill_ids=1&question_count=1' +
-      '&fetch_by_difficulty=true';
-    $httpBackend.expect('GET', questionPlayerHandlerUrl).respond(
-      500, 'Error loading questions.');
-    QuestionBackendApiService.fetchQuestions(
-      ['1'], 1, true).then(successHandler, failHandler);
-    $httpBackend.flush();
+      let questionPlayerHandlerUrl =
+        '/question_player_handler?skill_ids=1&question_count=1' +
+        '&fetch_by_difficulty=true';
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'Error loading questions.');
-  });
+      questionBackendApiService.fetchQuestions(
+        ['1'], 1, true).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(questionPlayerHandlerUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error loading questions.', {
+        status: 500, statusText: 'Invaid request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'Error loading questions.');
+    })
+  );
 
   it('should use the fail handler if question count is in invalid format',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      QuestionBackendApiService.fetchQuestions(
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      questionBackendApiService.fetchQuestions(
         ['1'], 'abc', true).then(successHandler, failHandler);
-      $rootScope.$digest();
+      flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Question count has to be a ' +
         'positive integer');
-    }
+    })
   );
 
   it('should use the fail handler if question count is negative',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      QuestionBackendApiService.fetchQuestions(
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      questionBackendApiService.fetchQuestions(
         ['1'], -1, true).then(successHandler, failHandler);
-      $rootScope.$digest();
+      flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Question count has to be a ' +
         'positive integer');
-    }
+    })
   );
 
   it('should use the fail handler if question count is not an integer',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      QuestionBackendApiService.fetchQuestions(
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      questionBackendApiService.fetchQuestions(
         ['1'], 1.5, true).then(successHandler, failHandler);
-      $rootScope.$digest();
+      flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Question count has to be a ' +
         'positive integer');
-    }
+    })
   );
 
   it('should use the fail handler if skill ids is not a list',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      QuestionBackendApiService.fetchQuestions(
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      questionBackendApiService.fetchQuestions(
         'x', 1, true).then(successHandler, failHandler);
-      $rootScope.$digest();
+      flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
       ' strings');
-    }
+    })
   );
 
   it('should use the fail handler if skill ids is not a list of strings',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      QuestionBackendApiService.fetchQuestions(
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      questionBackendApiService.fetchQuestions(
         [1, 2], 1, true).then(successHandler, failHandler);
-      $rootScope.$digest();
+      flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
       ' strings');
-    }
+    })
   );
 
   it('should use the fail handler if skill ids is sent as null',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      QuestionBackendApiService.fetchQuestions(
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      questionBackendApiService.fetchQuestions(
         null, 1, true).then(successHandler, failHandler);
-      $rootScope.$digest();
+      flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
       ' strings');
-    }
+    })
   );
 
   it('should use the fail handler if question count is sent as null',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      QuestionBackendApiService.fetchQuestions(
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      questionBackendApiService.fetchQuestions(
         ['1'], null, true).then(successHandler, failHandler);
-      $rootScope.$digest();
+      flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Question count has to be a ' +
         'positive integer');
-    }
+    })
   );
 
   it('should successfully fetch questions for editors from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect(
-        'GET', '/questions_list_handler/1?cursor=').respond(
-        sampleResponse);
-      QuestionBackendApiService.fetchQuestionSummaries(
+      questionBackendApiService.fetchQuestionSummaries(
         ['1']).then(successHandler, failHandler);
-      $httpBackend.flush();
+      let req = httpTestingController.expectOne(
+        '/questions_list_handler/1?cursor=');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleResponse);
+
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith({
         questionSummaries: sampleResponse.question_summary_dicts,
         nextCursor: null
       });
       expect(failHandler).not.toHaveBeenCalled();
-    }
+    })
   );
 
   it('should use the rejection handler if the backend request failed',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect(
-        'GET', '/questions_list_handler/1?cursor=').respond(
-        500, 'Error loading questions.');
-      QuestionBackendApiService.fetchQuestionSummaries(
+      questionBackendApiService.fetchQuestionSummaries(
         ['1']).then(successHandler, failHandler);
-      $httpBackend.flush();
+      let req = httpTestingController.expectOne(
+        '/questions_list_handler/1?cursor=');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error loading questions.', {
+        status: 500, statusText: 'Invaid request'
+      });
+
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Error loading questions.');
-    }
+    })
   );
 
   it('should successfully fetch questions from the backend with cursor',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect(
-        'GET', '/questions_list_handler/1?cursor=1').respond(
-        sampleResponse);
-
-      QuestionBackendApiService.fetchQuestionSummaries(
+      questionBackendApiService.fetchQuestionSummaries(
         ['1'], '1').then(successHandler, failHandler);
-      $httpBackend.flush();
+      let req = httpTestingController.expectOne(
+        '/questions_list_handler/1?cursor=1');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleResponse);
+
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith({
         questionSummaries: sampleResponse.question_summary_dicts,
         nextCursor: null
       });
       expect(failHandler).not.toHaveBeenCalled();
-    });
+    })
+  );
 
   it('should use the fail handler if skill ids is not a list',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      QuestionBackendApiService.fetchQuestionSummaries(
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      questionBackendApiService.fetchQuestionSummaries(
         'x', 1, true).then(successHandler, failHandler);
-      $rootScope.$digest();
+      flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
       ' strings');
-    }
+    })
   );
 
   it('should use the fail handler if skill ids is not a list of strings',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      QuestionBackendApiService.fetchQuestionSummaries(
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      questionBackendApiService.fetchQuestionSummaries(
         [1, 2], 2, true).then(successHandler, failHandler);
-      $rootScope.$digest();
+      flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
       ' strings');
-    }
+    })
   );
 
   it('should use the fail handler if skill ids is sent as null',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      QuestionBackendApiService.fetchQuestionSummaries(
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      questionBackendApiService.fetchQuestionSummaries(
         null, 1, true).then(successHandler, failHandler);
-      $rootScope.$digest();
+      flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
       ' strings');
-    }
+    })
   );
 });

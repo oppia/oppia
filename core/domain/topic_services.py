@@ -22,9 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import logging
 
-from core.domain import exp_fetchers
 from core.domain import opportunity_services
-from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import state_domain
 from core.domain import story_fetchers
@@ -104,6 +102,7 @@ def get_topic_summary_from_model(topic_summary_model):
         topic_summary_model.id, topic_summary_model.name,
         topic_summary_model.canonical_name,
         topic_summary_model.language_code,
+        topic_summary_model.description,
         topic_summary_model.version,
         topic_summary_model.canonical_story_count,
         topic_summary_model.additional_story_count,
@@ -162,6 +161,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         id=topic.id,
         name=topic.name,
         abbreviated_name=topic.abbreviated_name,
+        thumbnail_bg_color=topic.thumbnail_bg_color,
         thumbnail_filename=topic.thumbnail_filename,
         canonical_name=topic.canonical_name,
         description=topic.description,
@@ -314,6 +314,9 @@ def apply_change_list(topic_id, change_list):
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
                     topic.update_thumbnail_filename(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
+                    topic.update_thumbnail_bg_color(change.new_value)
             elif (change.cmd ==
                   subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
                 subtopic_page_id = (
@@ -345,6 +348,15 @@ def apply_change_list(topic_id, change_list):
                         topic_domain.SUBTOPIC_PROPERTY_TITLE):
                     topic.update_subtopic_title(
                         change.subtopic_id, change.new_value)
+                if (change.property_name ==
+                        topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME):
+                    topic.update_subtopic_thumbnail_filename(
+                        change.subtopic_id, change.new_value)
+                if (change.property_name ==
+                        topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
+                    topic.update_subtopic_thumbnail_bg_color(
+                        change.subtopic_id, change.new_value)
+
             elif (
                     change.cmd ==
                     topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION):
@@ -409,6 +421,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.name = topic.name
     topic_model.canonical_name = topic.canonical_name
     topic_model.abbreviated_name = topic.abbreviated_name
+    topic_model.thumbnail_bg_color = topic.thumbnail_bg_color
     topic_model.thumbnail_filename = topic.thumbnail_filename
     topic_model.canonical_story_references = [
         reference.to_dict() for reference in topic.canonical_story_references
@@ -550,20 +563,8 @@ def publish_story(topic_id, story_id, committer_id):
                     'Story node with id %s does not contain an '
                     'exploration id.' % node.id)
             exploration_id_list.append(node.exploration_id)
-        explorations = exp_fetchers.get_multiple_explorations_by_id(
-            exploration_id_list, strict=False)
-        for node in story_nodes:
-            if not node.exploration_id in explorations:
-                raise Exception(
-                    'Exploration id %s doesn\'t exist.' % node.exploration_id)
-        multiple_exploration_rights = (
-            rights_manager.get_multiple_exploration_rights_by_ids(
-                exploration_id_list))
-        for exploration_rights in multiple_exploration_rights:
-            if exploration_rights.is_private():
-                raise Exception(
-                    'Exploration with id %s isn\'t published.'
-                    % exploration_rights.id)
+        story_services.validate_explorations_for_story(
+            exploration_id_list, True)
 
     topic = topic_fetchers.get_topic_by_id(topic_id, strict=None)
     if topic is None:
@@ -798,7 +799,7 @@ def compute_summary_of_topic(topic):
 
     topic_summary = topic_domain.TopicSummary(
         topic.id, topic.name, topic.canonical_name, topic.language_code,
-        topic.version, topic_model_canonical_story_count,
+        topic.description, topic.version, topic_model_canonical_story_count,
         topic_model_additional_story_count,
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
         total_skill_count, topic.created_on, topic.last_updated
@@ -818,6 +819,7 @@ def save_topic_summary(topic_summary):
     topic_summary_model = topic_models.TopicSummaryModel(
         id=topic_summary.id,
         name=topic_summary.name,
+        description=topic_summary.description,
         canonical_name=topic_summary.canonical_name,
         language_code=topic_summary.language_code,
         version=topic_summary.version,

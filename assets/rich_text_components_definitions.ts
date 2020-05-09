@@ -56,7 +56,7 @@ export = {
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "filepath",
-      "description": "The image (Allowed extensions: gif, jpeg, jpg, png)",
+      "description": "The image (Allowed extensions: gif, jpeg, jpg, png, svg)",
       "schema": {
         "type": "custom",
         "obj_type": "Filepath"
@@ -146,11 +146,11 @@ export = {
     "is_block_element": false,
     "customization_arg_specs": [{
       "name": "text",
-      "description": "The link to be displayed",
+      "description": "The text to be displayed",
       "schema": {
         "type": "unicode"
       },
-      "default_value": ""
+      "default_value": "concept card"
     }, {
       "name": "skill_id",
       "description": "The skill that this link refers to",

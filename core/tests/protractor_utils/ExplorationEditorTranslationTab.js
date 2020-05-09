@@ -31,12 +31,24 @@ var ExplorationEditorTranslationTab = function() {
   this.exitTutorial = function() {
     // If the translation welcome modal shows up, exit it.
     translationWelcomeModal.isPresent().then(function(isVisible) {
-      if (isVisible) {
-        waitFor.elementToBeClickable(
-          dismissWelcomeModalButton,
-          'Welcome modal is taking too long to appear');
-        dismissWelcomeModalButton.click();
-      }
+      waitFor.visibilityOf(dismissWelcomeModalButton,
+        'Welcome modal not becoming visible').then(
+        () => {
+          waitFor.elementToBeClickable(
+            dismissWelcomeModalButton,
+            'Welcome modal is taking too long to appear');
+          dismissWelcomeModalButton.click();
+        },
+        (err) => {
+          // Since the welcome modal appears only once, the wait for its
+          // visibilty will only resolve once and timeout the other times.
+          // This is just an empty error function to catch the timeouts that
+          // happen when the the welcome modal has been dismissed once. If
+          // this is not present then protractor uses the default error
+          // function which is not appropriate in this case as this is not an
+          // error.
+        }
+      );
     });
 
     waitFor.invisibilityOf(
@@ -48,7 +60,8 @@ var ExplorationEditorTranslationTab = function() {
       if (buttons.length === 1) {
         buttons[0].click();
       } else if (buttons.length !== 0) {
-        throw 'Expected to find at most one \'exit tutorial\' button';
+        throw new Error(
+          'Expected to find at most one \'exit tutorial\' button');
       }
     });
   };
@@ -63,7 +76,7 @@ var ExplorationEditorTranslationTab = function() {
       if (buttons.length === 1) {
         buttons[0].click();
       } else {
-        throw Error('There is more than 1 Finish button!');
+        throw new Error('There is more than 1 Finish button!');
       }
     });
   };
@@ -94,7 +107,7 @@ var ExplorationEditorTranslationTab = function() {
             tutorialTabHeadingElement,
             'Tutorial stage takes too long to disappear');
         } else {
-          throw Error('There is more than one Next button!');
+          throw new Error('There is more than one Next button!');
         }
       });
     });
@@ -530,7 +543,7 @@ var ExplorationEditorTranslationTab = function() {
         }
       }
       if (!matched) {
-        throw Error(
+        throw new Error(
           'State ' + targetName + ' not found by editorTranslationTab.' +
           'moveToState.');
       }
@@ -550,7 +563,7 @@ var ExplorationEditorTranslationTab = function() {
         }
       }
       if (!matched) {
-        throw Error(
+        throw new Error(
           'State ' + targetName +
           ' not found by editorTranslationTab.expectCorrectStatusColor.');
       }

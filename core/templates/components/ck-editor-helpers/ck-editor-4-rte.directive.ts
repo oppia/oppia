@@ -29,7 +29,8 @@ angular.module('oppia').directive('ckEditor4Rte', [
         uiConfig: '&'
       },
       template: '<div><div></div>' +
-                '<div contenteditable="true" class="oppia-rte">' +
+                '<div contenteditable="true" ' +
+                'class="oppia-rte-resizer oppia-rte">' +
                 '</div></div>',
       require: '?ngModel',
 
@@ -48,6 +49,21 @@ angular.module('oppia').directive('ckEditor4Rte', [
             icons.push(componentDefn.iconDataUrl);
           }
         });
+
+        var editable = document.querySelectorAll('.oppia-rte-resizer');
+        var resize = function() {
+          $('.oppia-rte-resizer').css({
+            width: '100%'
+          });
+        };
+        for (var i in editable) {
+          (<HTMLElement>editable[i]).onchange = function() {
+            resize();
+          };
+          (<HTMLElement>editable[i]).onclick = function() {
+            resize();
+          };
+        }
 
         /**
          * Create rules to whitelist all the rich text components and

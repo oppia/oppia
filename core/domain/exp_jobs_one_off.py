@@ -29,15 +29,12 @@ from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.platform import models
 import feconf
 import python_utils
 import utils
-
-from mutagen import mp3
 
 (exp_models,) = models.Registry.import_models([
     models.NAMES.exploration])
@@ -269,33 +266,6 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
         yield (key, len(values))
 
 
-class InteractionAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that produces a list of (exploration, state) pairs, grouped by the
-    interaction they use.
-
-    This job is for demonstration purposes. It is not enabled by default in the
-    jobs registry.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        exploration = exp_fetchers.get_exploration_from_model(item)
-        for state_name, state in exploration.states.items():
-            exp_and_state_key = '%s %s' % (item.id, state_name)
-            yield (state.interaction.id, exp_and_state_key)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
-
-
 class ItemSelectionInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of (exploration, state) pairs that use the item
     selection interaction and that have rules that do not match the answer
@@ -513,91 +483,6 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 item.translator_ids = []
                 item.commit('Admin', commit_message, commit_cmds)
                 yield ('SUCCESS', item.id)
-
-    @staticmethod
-    def reduce(key, values):
-        if key == 'SUCCESS':
-            yield (key, len(values))
-        else:
-            yield (key, values)
-
-
-class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-Off Job to set every voiceover's duration to duration_secs with
-    the correct value.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        exploration = exp_fetchers.get_exploration_by_id(item.id)
-        try:
-            exploration.validate()
-        except Exception as e:
-            logging.error(
-                'Exploration %s failed non-strict validation: %s' %
-                (item.id, e))
-            return
-        if (item.states_schema_version >=
-                AUDIO_DURATION_SECS_MIN_STATE_SCHEMA_VERSION
-                and item.states_schema_version <=
-                feconf.CURRENT_STATE_SCHEMA_VERSION):
-            # Go through each exploration state to find voiceover recordings.
-            for state, state_value in item.states.items():
-                voiceovers_mapping = (state_value['recorded_voiceovers']
-                                      ['voiceovers_mapping'])
-                language_codes_to_audio_metadata = voiceovers_mapping.values()
-                for language_codes in language_codes_to_audio_metadata:
-                    for audio_metadata in language_codes.values():
-                        # Get files using the filename.
-                        filename = audio_metadata['filename']
-                        try:
-
-                            fs = (fs_domain.AbstractFileSystem(
-                                fs_domain.GcsFileSystem(
-                                    AUDIO_ENTITY_TYPE,
-                                    item.id)))
-                            raw = fs.get('%s/%s' % (AUDIO_FILE_PREFIX,
-                                                    filename))
-                            # Get the audio-duration from file use Mutagen.
-                            tempbuffer = python_utils.string_io()
-                            tempbuffer.write(raw)
-                            tempbuffer.seek(0)
-                            # Loads audio metadata with Mutagen.
-                            audio = mp3.MP3(tempbuffer)
-                            tempbuffer.close()
-                            # Fetch the audio file duration from the Mutagen
-                            # metadata.
-                            audio_metadata['duration_secs'] = audio.info.length
-                        except Exception as e:
-                            logging.error(
-                                'Mp3 audio file not found for %s '
-                                ', caused by: %s' %
-                                (filename, e))
-                # Create commits to update the exploration.
-                commit_cmds = [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-                    'state_name': state,
-                    'new_value': {
-                        'voiceovers_mapping': voiceovers_mapping
-                    }
-                })]
-                exp_services.update_exploration(
-                    feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
-                    'Update duration_secs for each voiceover recording '
-                    'in the exploration.')
-                yield ('SUCCESS', item.id)
-        else:
-            yield ('State schema version is not the '
-                   'minimum version expected', item.id)
 
     @staticmethod
     def reduce(key, values):
