@@ -16,6 +16,8 @@
  * @fileoverview Controller for the story node editor.
  */
 require(
+  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+require(
   'components/skill-selector/skill-selector.directive.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
@@ -26,6 +28,10 @@ require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+const storyNodeConstants = require('constants.ts');
+
 angular.module('oppia').directive('storyNodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -33,7 +39,10 @@ angular.module('oppia').directive('storyNodeEditor', [
       scope: {
         getId: '&nodeId',
         getOutline: '&outline',
+        getDescription: '&description',
         getExplorationId: '&explorationId',
+        getThumbnailFilename: '&thumbnailFilename',
+        getThumbnailBgColor: '&thumbnailBgColor',
         isOutlineFinalized: '&outlineFinalized',
         getDestinationNodeIds: '&destinationNodeIds',
         getPrerequisiteSkillIds: '&prerequisiteSkillIds',
@@ -46,15 +55,17 @@ angular.module('oppia').directive('storyNodeEditor', [
         'StoryEditorStateService', 'ExplorationIdValidationService',
         'StoryUpdateService', 'UndoRedoService', 'EVENT_STORY_INITIALIZED',
         'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_STORY_NODE_EDITOR',
-        'MAX_CHARS_IN_CHAPTER_TITLE',
+        'MAX_CHARS_IN_CHAPTER_TITLE', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
             StoryEditorStateService, ExplorationIdValidationService,
             StoryUpdateService, UndoRedoService, EVENT_STORY_INITIALIZED,
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
-            MAX_CHARS_IN_CHAPTER_TITLE) {
+            MAX_CHARS_IN_CHAPTER_TITLE, MAX_CHARS_IN_CHAPTER_DESCRIPTION) {
           var ctrl = this;
           $scope.MAX_CHARS_IN_CHAPTER_TITLE = MAX_CHARS_IN_CHAPTER_TITLE;
+          $scope.MAX_CHARS_IN_CHAPTER_DESCRIPTION = (
+            MAX_CHARS_IN_CHAPTER_DESCRIPTION);
           var _recalculateAvailableNodes = function() {
             $scope.newNodeId = null;
             $scope.availableNodes = [];
@@ -89,6 +100,8 @@ angular.module('oppia').directive('storyNodeEditor', [
                 $scope.storyNodeIds);
             _recalculateAvailableNodes();
             $scope.skillIdToSummaryMap = {};
+            $scope.allowedBgColors = (
+              storyNodeConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
             for (var idx in skillSummaries) {
               $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
@@ -97,6 +110,10 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
             $scope.editableTitle = $scope.currentTitle;
+            $scope.currentDescription = $scope.getDescription();
+            $scope.editableDescription = $scope.currentDescription;
+            $scope.editableThumbnailFilename = $scope.getThumbnailFilename();
+            $scope.editableThumbnailBgColor = $scope.getThumbnailBgColor();
             $scope.oldOutline = $scope.getOutline();
             $scope.editableOutline = $scope.getOutline();
             $scope.explorationId = $scope.getExplorationId();
@@ -139,6 +156,33 @@ angular.module('oppia').directive('storyNodeEditor', [
                 $scope.story, $scope.getId(), newTitle);
               $scope.currentTitle = newTitle;
             }
+          };
+
+          $scope.updateDescription = function(newDescription) {
+            if (newDescription === $scope.currentDescription) {
+              return;
+            }
+            StoryUpdateService.setStoryNodeDescription(
+              $scope.story, $scope.getId(), newDescription);
+            $scope.currentDescription = newDescription;
+          };
+
+          $scope.updateThumbnailFilename = function(newThumbnailFilename) {
+            if (newThumbnailFilename === $scope.editableThumbnailFilename) {
+              return;
+            }
+            StoryUpdateService.setStoryNodeThumbnailFilename(
+              $scope.story, $scope.getId(), newThumbnailFilename);
+            $scope.editableThumbnailFilename = newThumbnailFilename;
+          };
+
+          $scope.updateThumbnailBgColor = function(newThumbnailBgColor) {
+            if (newThumbnailBgColor === $scope.editableThumbnailBgColor) {
+              return;
+            }
+            StoryUpdateService.setStoryNodeThumbnailBgColor(
+              $scope.story, $scope.getId(), newThumbnailBgColor);
+            $scope.editableThumbnailBgColor = newThumbnailBgColor;
           };
 
           $scope.viewNodeEditor = function(nodeId) {

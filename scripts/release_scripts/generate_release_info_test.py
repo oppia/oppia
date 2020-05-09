@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import getpass
 import os
-import sys
 import tempfile
 
 from core.tests import test_utils
@@ -31,12 +30,8 @@ from scripts import common
 from scripts.release_scripts import generate_release_info
 from scripts.release_scripts import update_changelog_and_credits
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
-sys.path.insert(0, _PY_GITHUB_PATH)
-
 # pylint: disable=wrong-import-position
-import github # isort:skip
+import github  # isort:skip
 # pylint: enable=wrong-import-position
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
@@ -405,5 +400,5 @@ class GenerateReleaseInfoTests(test_utils.GenericTestBase):
             expected_lines = f.readlines()
         with python_utils.open_file(tmp_file.name, 'r') as f:
             actual_lines = f.readlines()
-        update_changelog_and_credits.check_ordering_of_sections(actual_lines)
+        update_changelog_and_credits.is_order_of_sections_valid(actual_lines)
         self.assertEqual(actual_lines, expected_lines)

@@ -31,6 +31,8 @@ import utils
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
 STORY_PROPERTY_TITLE = 'title'
+STORY_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color'
+STORY_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
 STORY_PROPERTY_DESCRIPTION = 'description'
 STORY_PROPERTY_NOTES = 'notes'
 STORY_PROPERTY_LANGUAGE_CODE = 'language_code'
@@ -40,6 +42,9 @@ STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS = 'acquired_skill_ids'
 STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS = 'prerequisite_skill_ids'
 STORY_NODE_PROPERTY_OUTLINE = 'outline'
 STORY_NODE_PROPERTY_TITLE = 'title'
+STORY_NODE_PROPERTY_DESCRIPTION = 'description'
+STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR = 'thumbnail_bg_color'
+STORY_NODE_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
 STORY_NODE_PROPERTY_EXPLORATION_ID = 'exploration_id'
 
 
@@ -91,8 +96,10 @@ class StoryChange(change_domain.BaseChange):
     # The allowed list of story properties which can be used in
     # update_story_property command.
     STORY_PROPERTIES = (
-        STORY_PROPERTY_TITLE, STORY_PROPERTY_DESCRIPTION,
-        STORY_PROPERTY_NOTES, STORY_PROPERTY_LANGUAGE_CODE)
+        STORY_PROPERTY_TITLE, STORY_PROPERTY_THUMBNAIL_BG_COLOR,
+        STORY_PROPERTY_THUMBNAIL_FILENAME,
+        STORY_PROPERTY_DESCRIPTION, STORY_PROPERTY_NOTES,
+        STORY_PROPERTY_LANGUAGE_CODE)
 
     # The allowed list of story node properties which can be used in
     # update_story_node_property command.
@@ -100,7 +107,10 @@ class StoryChange(change_domain.BaseChange):
         STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
         STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
         STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS, STORY_NODE_PROPERTY_OUTLINE,
-        STORY_NODE_PROPERTY_EXPLORATION_ID, STORY_NODE_PROPERTY_TITLE)
+        STORY_NODE_PROPERTY_EXPLORATION_ID, STORY_NODE_PROPERTY_TITLE,
+        STORY_NODE_PROPERTY_DESCRIPTION,
+        STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
+        STORY_NODE_PROPERTY_THUMBNAIL_FILENAME)
 
     # The allowed list of story contente properties which can be used in
     # update_story_contents_property command.
@@ -151,7 +161,8 @@ class StoryNode(python_utils.OBJECT):
     """
 
     def __init__(
-            self, node_id, title, destination_node_ids,
+            self, node_id, title, description, thumbnail_filename,
+            thumbnail_bg_color, destination_node_ids,
             acquired_skill_ids, prerequisite_skill_ids,
             outline, outline_is_finalized, exploration_id):
         """Initializes a StoryNode domain object.
@@ -159,6 +170,11 @@ class StoryNode(python_utils.OBJECT):
         Args:
             node_id: str. The unique id for each node.
             title: str. The title of the story node.
+            description: str. The description for the story node.
+            thumbnail_filename: str|None. The thumbnail filename of the story
+                node.
+            thumbnail_bg_color: str|None. The thumbnail background color of
+                the story node.
             destination_node_ids: list(str). The list of destination node ids
                 that this node points to in the story graph.
             acquired_skill_ids: list(str). The list of skill ids acquired by
@@ -178,6 +194,9 @@ class StoryNode(python_utils.OBJECT):
         """
         self.id = node_id
         self.title = title
+        self.description = description
+        self.thumbnail_filename = thumbnail_filename
+        self.thumbnail_bg_color = thumbnail_bg_color
         self.destination_node_ids = destination_node_ids
         self.acquired_skill_ids = acquired_skill_ids
         self.prerequisite_skill_ids = prerequisite_skill_ids
@@ -202,7 +221,7 @@ class StoryNode(python_utils.OBJECT):
         """Increments the next node id of the story.
 
         Args:
-            node_id: str. The id of the node.
+            node_id: str. The node id to be incremented.
 
         Returns:
             str. The new next node id.
@@ -228,6 +247,31 @@ class StoryNode(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid node_id: %s' % node_id)
 
+    @classmethod
+    def require_valid_thumbnail_filename(cls, thumbnail_filename):
+        """Checks whether the thumbnail filename of the node is a valid
+            one.
+
+        Args:
+            thumbnail_filename: str. The thumbnail filename to validate.
+        """
+        utils.require_valid_thumbnail_filename(thumbnail_filename)
+
+    @classmethod
+    def require_valid_thumbnail_bg_color(cls, thumbnail_bg_color):
+        """Checks whether the thumbnail background color of the story node is a
+            valid one.
+
+        Args:
+            thumbnail_bg_color: str. The thumbnail background color to
+            validate.
+
+        Returns:
+            bool. Whether the thumbnail background color is valid or not.
+        """
+        return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'chapter']
+
     def to_dict(self):
         """Returns a dict representing this StoryNode domain object.
 
@@ -237,6 +281,9 @@ class StoryNode(python_utils.OBJECT):
         return {
             'id': self.id,
             'title': self.title,
+            'description': self.description,
+            'thumbnail_filename': self.thumbnail_filename,
+            'thumbnail_bg_color': self.thumbnail_bg_color,
             'destination_node_ids': self.destination_node_ids,
             'acquired_skill_ids': self.acquired_skill_ids,
             'prerequisite_skill_ids': self.prerequisite_skill_ids,
@@ -256,7 +303,9 @@ class StoryNode(python_utils.OBJECT):
             StoryNode. The corresponding StoryNode domain object.
         """
         node = cls(
-            node_dict['id'], node_dict['title'],
+            node_dict['id'], node_dict['title'], node_dict['description'],
+            node_dict['thumbnail_filename'],
+            node_dict['thumbnail_bg_color'],
             node_dict['destination_node_ids'],
             node_dict['acquired_skill_ids'],
             node_dict['prerequisite_skill_ids'], node_dict['outline'],
@@ -276,7 +325,9 @@ class StoryNode(python_utils.OBJECT):
             StoryNode. The StoryNode domain object with default
             value.
         """
-        return cls(node_id, title, [], [], [], '', False, None)
+        return cls(
+            node_id, title, '', None, None,
+            [], [], [], '', False, None)
 
     def validate(self):
         """Validates various properties of the story node.
@@ -290,7 +341,18 @@ class StoryNode(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Expected exploration ID to be a string, received %s' %
                     self.exploration_id)
-
+        self.require_valid_thumbnail_filename(self.thumbnail_filename)
+        if self.thumbnail_bg_color is not None and not (
+                self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
+            raise utils.ValidationError(
+                'Chapter thumbnail background color %s is not supported.' % (
+                    self.thumbnail_bg_color))
+        if self.thumbnail_bg_color and self.thumbnail_filename is None:
+            raise utils.ValidationError(
+                'Chapter thumbnail image is not provided.')
+        if self.thumbnail_filename and self.thumbnail_bg_color is None:
+            raise utils.ValidationError(
+                'Chapter thumbnail background color is not specified.')
         if self.exploration_id == '':
             raise utils.ValidationError(
                 'Expected exploration ID to not be an empty string, '
@@ -305,6 +367,18 @@ class StoryNode(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' %
                 self.title)
+
+        if not isinstance(self.description, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected description to be a string, received %s' %
+                self.description)
+
+        description_length_limit = (
+            android_validation_constants.MAX_CHARS_IN_CHAPTER_DESCRIPTION)
+        if len(self.description) > description_length_limit:
+            raise utils.ValidationError(
+                'Chapter description should be less than %d chars, received %s'
+                % (description_length_limit, self.description))
 
         title_limit = android_validation_constants.MAX_CHARS_IN_CHAPTER_TITLE
         if len(self.title) > title_limit:
@@ -598,7 +672,8 @@ class Story(python_utils.OBJECT):
     """Domain object for an Oppia Story."""
 
     def __init__(
-            self, story_id, title, description, notes,
+            self, story_id, title, thumbnail_filename,
+            thumbnail_bg_color, description, notes,
             story_contents, story_contents_schema_version, language_code,
             corresponding_topic_id, version, created_on=None,
             last_updated=None):
@@ -624,9 +699,14 @@ class Story(python_utils.OBJECT):
                 created.
             last_updated: datetime.datetime. Date and time when the
                 story was last updated.
+            thumbnail_filename: str|None. The thumbnail filename of the story.
+            thumbnail_bg_color: str|None. The thumbnail background color of
+                the story.
         """
         self.id = story_id
         self.title = title
+        self.thumbnail_filename = thumbnail_filename
+        self.thumbnail_bg_color = thumbnail_bg_color
         self.description = description
         self.notes = html_cleaner.clean(notes)
         self.story_contents = story_contents
@@ -636,6 +716,31 @@ class Story(python_utils.OBJECT):
         self.created_on = created_on
         self.last_updated = last_updated
         self.version = version
+
+    @classmethod
+    def require_valid_thumbnail_filename(cls, thumbnail_filename):
+        """Checks whether the thumbnail filename of the story is a valid
+            one.
+
+        Args:
+            thumbnail_filename: str. The thumbnail filename to validate.
+        """
+        utils.require_valid_thumbnail_filename(thumbnail_filename)
+
+    @classmethod
+    def require_valid_thumbnail_bg_color(cls, thumbnail_bg_color):
+        """Checks whether the thumbnail background color of the story is a
+            valid one.
+
+        Args:
+            thumbnail_bg_color: str. The thumbnail background color to
+            validate.
+
+        Returns:
+            bool. Whether the thumbnail background color is valid or not.
+        """
+        return thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'story']
 
     def validate(self):
         """Validates various properties of the story object.
@@ -650,6 +755,18 @@ class Story(python_utils.OBJECT):
                 'Expected description to be a string, received %s'
                 % self.description)
 
+        self.require_valid_thumbnail_filename(self.thumbnail_filename)
+        if self.thumbnail_bg_color is not None and not (
+                self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
+            raise utils.ValidationError(
+                'Story thumbnail background color %s is not supported.' % (
+                    self.thumbnail_bg_color))
+        if self.thumbnail_bg_color and self.thumbnail_filename is None:
+            raise utils.ValidationError(
+                'Story thumbnail image is not provided.')
+        if self.thumbnail_filename and self.thumbnail_bg_color is None:
+            raise utils.ValidationError(
+                'Story thumbnail background color is not specified.')
         if not isinstance(self.notes, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected notes to be a string, received %s' % self.notes)
@@ -782,7 +899,9 @@ class Story(python_utils.OBJECT):
             'story_contents_schema_version': self.story_contents_schema_version,
             'corresponding_topic_id': self.corresponding_topic_id,
             'version': self.version,
-            'story_contents': self.story_contents.to_dict()
+            'story_contents': self.story_contents.to_dict(),
+            'thumbnail_filename': self.thumbnail_filename,
+            'thumbnail_bg_color': self.thumbnail_bg_color
         }
 
     @classmethod
@@ -804,10 +923,44 @@ class Story(python_utils.OBJECT):
         initial_node_id = '%s1' % NODE_ID_PREFIX
         story_contents = StoryContents([], None, initial_node_id)
         return cls(
-            story_id, title,
+            story_id, title, None, None,
             feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
             story_contents, feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0)
+
+    @classmethod
+    def _convert_story_contents_v1_dict_to_v2_dict(cls, story_contents_dict):
+        """Converts old Story Contents schema to the modern v2 schema.
+        v2 schema introduces the thumbnail_filename and thumbnail_bg_color
+        fields for Story Nodes.
+
+        Args:
+            story_contents_dict: dict. A dict used to initialize a Story
+                Contents domain object.
+
+        Returns:
+            dict. The converted story_contents_dict.
+        """
+        for index in python_utils.RANGE(len(story_contents_dict['nodes'])):
+            story_contents_dict['nodes'][index]['thumbnail_filename'] = None
+            story_contents_dict['nodes'][index]['thumbnail_bg_color'] = None
+        return story_contents_dict
+
+    @classmethod
+    def _convert_story_contents_v2_dict_to_v3_dict(cls, story_contents_dict):
+        """Converts v2 Story Contents schema to the v3 schema.
+        v3 schema introduces the description field for Story Nodes.
+
+        Args:
+            story_contents_dict: dict. A dict used to initialize a Story
+                Contents domain object.
+
+        Returns:
+            dict. The converted story_contents_dict.
+        """
+        for node in story_contents_dict['nodes']:
+            node['description'] = ''
+        return story_contents_dict
 
     @classmethod
     def update_story_contents_from_model(
@@ -840,6 +993,24 @@ class Story(python_utils.OBJECT):
             title: str. The new title of the story.
         """
         self.title = title
+
+    def update_thumbnail_filename(self, thumbnail_filename):
+        """Updates the thumbnail filename of the story.
+
+        Args:
+            thumbnail_filename: str|None. The new thumbnail filename of the
+                story.
+        """
+        self.thumbnail_filename = thumbnail_filename
+
+    def update_thumbnail_bg_color(self, thumbnail_bg_color):
+        """Updates the thumbnail background color of the story.
+
+        Args:
+            thumbnail_bg_color: str|None. The new thumbnail background color of
+                the story.
+        """
+        self.thumbnail_bg_color = thumbnail_bg_color
 
     def update_description(self, description):
         """Updates the description of the story.
@@ -960,6 +1131,59 @@ class Story(python_utils.OBJECT):
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
         self.story_contents.nodes[node_index].title = new_title
+
+    def update_node_description(self, node_id, new_description):
+        """Updates the description field of a given node.
+
+        Args:
+            node_id: str. The id of the node.
+            new_description: str. The new description of the given node.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self.story_contents.get_node_index(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+
+        self.story_contents.nodes[node_index].description = new_description
+
+    def update_node_thumbnail_filename(self, node_id, new_thumbnail_filename):
+        """Updates the thumbnail filename field of a given node.
+
+        Args:
+            node_id: str. The id of the node.
+            new_thumbnail_filename: str|None. The new thumbnail filename of the
+                given node.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self.story_contents.get_node_index(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+        self.story_contents.nodes[node_index].thumbnail_filename = (
+            new_thumbnail_filename)
+
+    def update_node_thumbnail_bg_color(self, node_id, new_thumbnail_bg_color):
+        """Updates the thumbnail background color field of a given node.
+
+        Args:
+            node_id: str. The id of the node.
+            new_thumbnail_bg_color: str|None. The new thumbnail background
+                color of the given node.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self.story_contents.get_node_index(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+        self.story_contents.nodes[node_index].thumbnail_bg_color = (
+            new_thumbnail_bg_color)
 
     def mark_node_outline_as_finalized(self, node_id):
         """Updates the outline_is_finalized field of the node with the given
@@ -1192,5 +1416,6 @@ class StorySummary(python_utils.OBJECT):
         return {
             'id': self.id,
             'title': self.title,
-            'description': self.description
+            'description': self.description,
+            'node_count': self.node_count
         }
