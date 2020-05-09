@@ -265,7 +265,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                     $uibModalInstance.dismiss('cancel');
                   };
                 }
-              ], windowClass: 'app-modal-window'
+              ], windowClass: 'skill-select-modal'
             });
 
             modalInstance.result.then(function(skillId) {
@@ -309,7 +309,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                     $uibModalInstance.dismiss('cancel');
                   };
                 }
-              ], windowClass: 'app-modal-window'
+              ], windowClass: 'skill-select-modal'
             });
 
             modalInstance.result.then(function(skillId) {

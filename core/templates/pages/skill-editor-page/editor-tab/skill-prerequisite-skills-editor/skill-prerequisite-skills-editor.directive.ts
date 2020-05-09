@@ -90,7 +90,7 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
                     $uibModalInstance.dismiss('cancel');
                   };
                 }
-              ], windowClass: 'app-modal-window'
+              ], windowClass: 'skill-select-modal'
             });
 
             modalInstance.result.then(function(skillId) {
