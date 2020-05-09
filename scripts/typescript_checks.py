@@ -24,6 +24,7 @@ import subprocess
 import sys
 
 import python_utils
+from . import common
 
 COMPILED_JS_DIR = os.path.join('local_compiled_js_for_test', '')
 TSCONFIG_FILEPATH = 'tsconfig.json'
@@ -42,7 +43,7 @@ def validate_compiled_js_dir():
 
 def compile_and_check_typescript():
     """Compiles typescript files and checks the compilation errors."""
-    node_path = os.path.join(os.pardir, 'oppia_tools/node-10.18.0')
+    node_path = common.NODE_PATH
     os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
 
     validate_compiled_js_dir()
