@@ -36,8 +36,7 @@ import utils
 from google.appengine.api import urlfetch
 
 current_user_services = models.Registry.import_current_user_services()
-(user_models, base_models) = models.Registry.import_models([
-    models.NAMES.user, models.NAMES.base_model])
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 MAX_USERNAME_LENGTH = 50
 # Size (in px) of the gravatar being retrieved.
@@ -681,42 +680,42 @@ def _save_user_settings(user_settings):
         user_settings: UserSettings domain object.
     """
     user_settings.validate()
+    user_model = user_models.UserSettingsModel.get_by_id(user_settings.user_id)
+
     # If user with the given user_id already exists, update that model
     # with the given user settings, otherwise, create a new one.
-    try:
-        user_model = user_models.UserSettingsModel().get(user_settings.user_id)
-
-        user_model.email = user_settings.email
-        user_model.role = user_settings.role
-        user_model.username = user_settings.username
-        user_model.normalized_username = user_settings.normalized_username
-        user_model.last_agreed_to_terms = user_settings.last_agreed_to_terms
-        user_model.last_started_state_editor_tutorial = (
-            user_settings.last_started_state_editor_tutorial)
-        user_model.last_started_state_translation_tutorial = (
-            user_settings.last_started_state_translation_tutorial)
-        user_model.last_logged_in = user_settings.last_logged_in
-        user_model.last_edited_an_exploration = (
-            user_settings.last_edited_an_exploration)
-        user_model.profile_picture_data_url = (
-            user_settings.profile_picture_data_url)
-        user_model.default_dashboard = user_settings.default_dashboard
-        user_model.creator_dashboard_display_pref = (
-            user_settings.creator_dashboard_display_pref)
-        user_model.user_bio = user_settings.user_bio
-        user_model.subject_interests = user_settings.subject_interests
-        user_model.first_contribution_msec = (
-            user_settings.first_contribution_msec)
-        user_model.preferred_language_codes = (
-            user_settings.preferred_language_codes)
-        user_model.preferred_site_language_code = (
-            user_settings.preferred_site_language_code)
-        user_model.preferred_audio_language_code = (
-            user_settings.preferred_audio_language_code)
-        user_model.deleted = user_settings.deleted
+    if user_model is not None:
+        user_model.populate(
+            email=user_settings.email,
+            role=user_settings.role,
+            username=user_settings.username,
+            normalized_username=user_settings.normalized_username,
+            last_agreed_to_terms=user_settings.last_agreed_to_terms,
+            last_started_state_editor_tutorial=(
+                user_settings.last_started_state_editor_tutorial),
+            last_started_state_translation_tutorial=(
+                user_settings.last_started_state_translation_tutorial),
+            last_logged_in=user_settings.last_logged_in,
+            last_edited_an_exploration=user_settings.last_edited_an_exploration,
+            last_created_an_exploration=(
+                user_settings.last_created_an_exploration),
+            profile_picture_data_url=user_settings.profile_picture_data_url,
+            default_dashboard=user_settings.default_dashboard,
+            creator_dashboard_display_pref=(
+                user_settings.creator_dashboard_display_pref),
+            user_bio=user_settings.user_bio,
+            subject_interests=user_settings.subject_interests,
+            first_contribution_msec=user_settings.first_contribution_msec,
+            preferred_language_codes=user_settings.preferred_language_codes,
+            preferred_site_language_code=(
+                user_settings.preferred_site_language_code),
+            preferred_audio_language_code=(
+                user_settings.preferred_audio_language_code),
+            deleted=user_settings.deleted
+        )
 
         user_model.put()
-    except base_models.BaseModel.EntityNotFoundError:
+    else:
         user_models.UserSettingsModel(
             id=user_settings.user_id,
             gae_id=user_settings.gae_id,

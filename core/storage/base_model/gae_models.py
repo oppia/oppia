@@ -247,7 +247,10 @@ class BaseModel(ndb.Model):
         Returns:
             Model. The entity that was stored.
         """
-        if update_last_updated_time:
+        if self.created_on is None:
+            self.created_on = datetime.datetime.utcnow()
+
+        if update_last_updated_time or self.last_updated is None:
             self.last_updated = datetime.datetime.utcnow()
 
         return super(BaseModel, self).put()
@@ -262,7 +265,10 @@ class BaseModel(ndb.Model):
                 last_updated_field of the entities.
         """
         for entity in entities:
-            if update_last_updated_time:
+            if entity.created_on is None:
+                entity.created_on = datetime.datetime.utcnow()
+
+            if update_last_updated_time or entity.last_updated is None:
                 entity.last_updated = datetime.datetime.utcnow()
 
         ndb.put_multi(entities)
