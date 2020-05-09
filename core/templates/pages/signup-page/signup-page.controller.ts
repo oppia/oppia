@@ -25,6 +25,7 @@ require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 require('services/contextual/url.service.ts');
 require('services/stateful/focus-manager.service.ts');
+require('constants.ts');
 
 angular.module('oppia').directive('signupPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -39,12 +40,12 @@ angular.module('oppia').directive('signupPage', [
         '$http', '$timeout', '$uibModal', 'AlertsService',
         'FocusManagerService', 'LoaderService', 'SiteAnalyticsService',
         'UrlInterpolationService', 'UrlService', 'DASHBOARD_TYPE_CREATOR',
-        'DASHBOARD_TYPE_LEARNER', 'SITE_NAME',
+        'DASHBOARD_TYPE_LEARNER', 'SITE_NAME', 'MAX_USERNAME_LENGTH'
         function(
             $http, $timeout, $uibModal, AlertsService,
             FocusManagerService, LoaderService, SiteAnalyticsService,
             UrlInterpolationService, UrlService, DASHBOARD_TYPE_CREATOR,
-            DASHBOARD_TYPE_LEARNER, SITE_NAME) {
+            DASHBOARD_TYPE_LEARNER, SITE_NAME, MAX_USERNAME_LENGTH) {
           var ctrl = this;
           var _SIGNUP_DATA_URL = '/signuphandler/data';
           ctrl.isFormValid = function() {
@@ -102,8 +103,8 @@ angular.module('oppia').directive('signupPage', [
               ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_NO_USERNAME';
             } else if (username.indexOf(' ') !== -1) {
               ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES';
-            } else if (username.length > 50) {
-              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_MORE_50_CHARS';
+            } else if (username.length > MAX_USERNAME_LENGTH) {
+              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_MORE_30_CHARS';
             } else if (!alphanumeric.test(username)) {
               ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM';
             } else if (admin.test(username)) {

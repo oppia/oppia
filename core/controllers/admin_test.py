@@ -52,7 +52,6 @@ import feconf
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
-MAX_USERNAME_LENGTH = 30
 
 
 class SampleMapReduceJobManager(jobs.BaseMapReduceOneOffJobManager):
@@ -1124,58 +1123,95 @@ class SendDummyMailTest(test_utils.GenericTestBase):
 
 class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
     """Tests for updating usernames."""
+    CURRENT_USERNAME = 'currentUsername'
+    NEW_USERNAME = 'newUsername'
 
     def setUp(self):
         super(UpdateUsernameHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-
-    def test_update_username(self):
+        self.signup(self.ADMIN_EMAIL, self.CURRENT_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+    def test_update_username_with_none_input(self):
+        # The given usernames(current/new) must not be None.
         csrf_token = self.get_new_csrf_token()
 
-        current_username, new_username = self.ADMIN_USERNAME, 'newUsername'
-        non_existent_username, long_username = 'invalid', 'a' * 31
-        user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-
-        # The new username must not be longer than 30 characters.
         response = self.put_json(
             '/updateusernamehandler',
             payload={
-                'current_username': current_username,
+                'current_username': None,
+                'new_username': 'new'},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Please ensure that the usernames are '
+            'not empty.')
+        
+        response = self.put_json(
+            '/updateusernamehandler',
+            payload={
+                'current_username': self.CURRENT_USERNAME,
+                'new_username': None},
+            csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Please ensure that the usernames are '
+            'not empty.')
+
+    def test_update_username_with_long_new_username(self):
+        # The new username must not be longer than 30 characters.
+        long_username = 'a' * 31
+        csrf_token = self.get_new_csrf_token()
+   
+        response = self.put_json(
+            '/updateusernamehandler',
+            payload={
+                'current_username': self.CURRENT_USERNAME,
                 'new_username': long_username},
             csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
             response['error'], 'Please make sure that the new '
-            'username is not longer than %s characters.' % MAX_USERNAME_LENGTH)
+            'username is not longer than %s characters.' %
+            constants.MAX_USERNAME_LENGTH)
 
+    def test_update_username_with_nonexistent_current_username(self):
         # If current username does not exist.
+        non_existent_username = 'invalid'
+        csrf_token = self.get_new_csrf_token()
+
         response = self.put_json(
             '/updateusernamehandler',
             payload={
                 'current_username': non_existent_username,
-                'new_username': new_username},
+                'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(response['error'], 'User does not exist.')
 
+    def test_update_username_with_new_username_already_taken(self):
         # If new username is already taken.
+        csrf_token = self.get_new_csrf_token()
+
         response = self.put_json(
             '/updateusernamehandler',
             payload={
-                'current_username': current_username,
-                'new_username': current_username},
+                'current_username': self.CURRENT_USERNAME,
+                'new_username': self.CURRENT_USERNAME},
             csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(response['error'], 'Username already taken.')
 
+    def test_update_username(self):
+        user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
         self.put_json(
             '/updateusernamehandler',
             payload={
-                'current_username': current_username,
-                'new_username': new_username},
+                'current_username': self.CURRENT_USERNAME,
+                'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token)
-        self.assertEqual(user_services.get_username(user_id), new_username)
+        self.assertEqual(user_services.get_username(user_id), self.NEW_USERNAME)
 
 
 class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):

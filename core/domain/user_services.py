@@ -41,7 +41,6 @@ current_user_services = models.Registry.import_current_user_services()
 (user_models, audit_models) = models.Registry.import_models(
     [models.NAMES.user, models.NAMES.audit])
 
-MAX_USERNAME_LENGTH = 50
 # Size (in px) of the gravatar being retrieved.
 GRAVATAR_SIZE_PX = 150
 # Data url for images/avatar/user_blue_72px.png.
@@ -278,10 +277,10 @@ class UserSettings(python_utils.OBJECT):
         """
         if not username:
             raise utils.ValidationError('Empty username supplied.')
-        elif len(username) > MAX_USERNAME_LENGTH:
+        elif len(username) > constants.MAX_USERNAME_LENGTH:
             raise utils.ValidationError(
                 'A username can have at most %s characters.'
-                % MAX_USERNAME_LENGTH)
+                % constants.MAX_USERNAME_LENGTH)
         elif not re.match(feconf.ALPHANUMERIC_REGEX, username):
             raise utils.ValidationError(
                 'Usernames can only have alphanumeric characters.')

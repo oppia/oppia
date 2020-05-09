@@ -89,6 +89,8 @@ class UsernameChangeAuditModel(base_models.BaseModel):
     """
 
     # The user_id of the user that is making the change.
+    # (Note that this is typically an admin user, who would be a different user
+    # from the one whose username is being changed.)
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The current username that is being changed.
     current_username = ndb.StringProperty(required=True, indexed=True)

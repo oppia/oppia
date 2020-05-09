@@ -5277,5 +5277,8 @@ export = {
   // Used to hide the callout to classroom until it is ready.
   "SHOW_CLASSROOM_CALLOUT": false,
 
-  "DEV_MODE": true
+  "DEV_MODE": true,
+
+  // Maximum allowed length of a username.
+  "MAX_USERNAME_LENGTH": 30
 };
