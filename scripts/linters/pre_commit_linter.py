@@ -428,17 +428,38 @@ def _print_complete_summary_of_errors(all_messages):
             python_utils.PRINT(message)
 
 
-def _get_task_output(all_messages, task, semaphore):
+def _get_task_output(all_messages, err_messages, task, semaphore):
     """Returns output of running tasks.
 
     Args:
         all_messages: list(str). List of summary messages of linter output.
+        err_messages: list(str). List of error messages during linter execution.
         task: object(TestingTaskSpec). The task object to get output of linter.
         semaphore: threading.Semaphore. The object that controls how many tasks
             can run at any time.
     """
-    all_messages += task.output
+    try:
+        all_messages += task.output
+    except Exception:
+        err_messages.append(
+            python_utils.convert_to_bytes(task.exception.args[0]))
     semaphore.release()
+
+
+def _print_error_messages(error_messages):
+    """Print error messages (if any) during linter execution.
+    Args:
+        error_messages: list(str). List of summary messages of linter output.
+    """
+    python_utils.PRINT('')
+    python_utils.PRINT('Please fix the errors below:')
+    python_utils.PRINT('+--------------------------+')
+    for message in error_messages:
+        python_utils.PRINT(message)
+        python_utils.PRINT('')
+    python_utils.PRINT('--------------------------------------------------')
+    python_utils.PRINT('Some of the linting functions may not run until the'
+                       ' above errors gets fixed')
 
 
 def main(args=None):
@@ -508,11 +529,22 @@ def main(args=None):
     # third party libraries have their own ways to lint at their fastest
     # (ie. might parallelize on their own)
 
+    err_messages = []
+
     # Concurrency limit: 25.
-    concurrent_task_utils.execute_tasks(tasks_custom, custom_semaphore)
+    custom_task_execution_failed = False
+    try:
+        concurrent_task_utils.execute_tasks(tasks_custom, custom_semaphore)
+    except Exception:
+        custom_task_execution_failed = True
+
     # Concurrency limit: 2.
-    concurrent_task_utils.execute_tasks(
-        tasks_third_party, third_party_semaphore)
+    third_party_task_execution_failed = False
+    try:
+        concurrent_task_utils.execute_tasks(
+            tasks_third_party, third_party_semaphore)
+    except Exception:
+        third_party_task_execution_failed = True
 
     all_messages = []
 
@@ -521,19 +553,25 @@ def main(args=None):
 
     for task in tasks_custom:
         semaphore.acquire()
-        _get_task_output(all_messages, task, semaphore)
+        _get_task_output(all_messages, err_messages, task, semaphore)
 
     for task in tasks_third_party:
         semaphore.acquire()
-        _get_task_output(all_messages, task, semaphore)
+        _get_task_output(all_messages, err_messages, task, semaphore)
 
     all_messages += codeowner_linter.check_codeowner_file(
         verbose_mode_enabled)
 
     _print_complete_summary_of_errors(all_messages)
 
+    if custom_task_execution_failed or third_party_task_execution_failed:
+        raise Exception('Task execution failed.')
+
+    if len(err_messages) != 0:
+        _print_error_messages(err_messages)
+
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
-            all_messages]):
+            all_messages]) or len(err_messages) != 0:
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('Checks Not Passed.')
         python_utils.PRINT('---------------------------')
