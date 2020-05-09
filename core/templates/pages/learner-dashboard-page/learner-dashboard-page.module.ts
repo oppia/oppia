@@ -35,6 +35,8 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 export class ServiceBootstrapComponent {}
 
 import { AppConstants } from 'app.constants';
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { CollectionSummaryTileConstants } from
   'components/summary-tile/collection-summary-tile.constants';
 import { InteractionsExtensionsConstants } from
@@ -58,6 +60,7 @@ import { LearnerDashboardPageConstants } from
   ],
   providers: [
     AppConstants,
+    CamelCaseToHyphensPipe,
     CollectionSummaryTileConstants,
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,

@@ -33,6 +33,8 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 export class ServiceBootstrapComponent {}
 
 import { AppConstants } from 'app.constants';
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
@@ -61,6 +63,7 @@ import { TopicsAndSkillsDashboardPageConstants } from
   ],
   providers: [
     AppConstants,
+    CamelCaseToHyphensPipe,
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,
     ServicesConstants,
