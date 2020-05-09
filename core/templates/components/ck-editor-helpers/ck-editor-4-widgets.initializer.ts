@@ -136,10 +136,10 @@ angular.module('oppia').run([
                   // The below check is required, since without this, even a
                   // valid RTE component was getting removed from the editor
                   // when 'Cancel' was clicked in the customization modal.
-                  if (
-                    editor.editable().findOne(newWidgetSelector).getText() ===
-                    '') {
-                    editor.editable().findOne(newWidgetSelector).remove();
+                  var widgetElement = editor.editable().findOne(
+                    newWidgetSelector);
+                  if (widgetElement.getText() === '') {
+                    widgetElement.remove();
                   }
                 });
             },
