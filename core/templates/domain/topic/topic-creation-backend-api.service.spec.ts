@@ -21,12 +21,10 @@ import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { TopicCreationBackendApiService, ITopicCreationBackend } from
   'domain/topic/topic-creation-backend-api.service.ts';
 
 describe('Topic creation backend api service', () => {
-  let csrfService: CsrfTokenService = null;
   let httpTestingController: HttpTestingController = null;
   let topicCreationBackendApiService: TopicCreationBackendApiService = null;
   let postData: ITopicCreationBackend = {
@@ -40,15 +38,9 @@ describe('Topic creation backend api service', () => {
       providers: [TopicCreationBackendApiService]
     });
 
-    csrfService = TestBed.get(CsrfTokenService);
     httpTestingController = TestBed.get(HttpTestingController);
     topicCreationBackendApiService = TestBed.get(
       TopicCreationBackendApiService);
-    spyOn(csrfService, 'getTokenAsync').and.returnValue(() => {
-      return new Promise((resolve) => {
-        resolve('sample-csrf-token');
-      });
-    });
   });
 
   afterEach(()=> {

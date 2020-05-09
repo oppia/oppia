@@ -27,6 +27,7 @@ import { CollectionEditorPageConstants } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -37,7 +38,10 @@ export class CollectionRightsBackendApiService {
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) { }
 
-  private collectionRightsDict = null;
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'topicDataDict' is a dict with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
+  private collectionRightsDict: any = null;
 
   private _fetchCollectionRights(collectionId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,

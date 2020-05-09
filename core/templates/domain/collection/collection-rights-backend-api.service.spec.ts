@@ -41,11 +41,11 @@ describe('Collection rights backend API service', function() {
       TestBed.get(CollectionRightsBackendApiService);
     csrfService = TestBed.get(CsrfTokenService);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
-      return new Promise((resolve) => {
-        resolve('sample-csrf-token');
-      });
-    });
+    // spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    //   return new Promise((resolve) => {
+    //     resolve('sample-csrf-token');
+    //   });
+    // });
   });
 
   beforeEach(() => {

@@ -34,15 +34,15 @@ import { WrittenTranslationsObjectFactory } from
 const constants = require('constants.ts');
 
 export class State {
-  name;
-  classifierModelId;
-  content;
-  interaction;
-  paramChanges;
-  recordedVoiceovers;
-  solicitAnswerDetails;
-  writtenTranslations;
   // TODO(#7165): Replace any with exact type.
+  name: string;
+  classifierModelId: any;
+  content: any;
+  interaction: any;
+  paramChanges: any;
+  recordedVoiceovers: any;
+  solicitAnswerDetails: any;
+  writtenTranslations: any;
   constructor(
       name: string, classifierModelId: any, content: any, interaction: any,
       paramChanges: any, recordedVoiceovers: any, solicitAnswerDetails: any,

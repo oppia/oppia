@@ -20,13 +20,11 @@ import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
 
 describe('Skill mastery backend API service', () => {
   let skillMasteryBackendApiService: SkillMasteryBackendApiService = null;
-  let csrfService: CsrfTokenService = null;
   let masteryPerSkillMapping: {[key: string]: number} = null;
   let sampleResponse = null;
   let httpTestingController: HttpTestingController;
@@ -38,12 +36,7 @@ describe('Skill mastery backend API service', () => {
     });
 
     skillMasteryBackendApiService = TestBed.get(SkillMasteryBackendApiService);
-    csrfService = TestBed.get(CsrfTokenService);
     httpTestingController = TestBed.get(HttpTestingController);
-
-    spyOn(csrfService, 'getTokenAsync').and.callFake(function() {
-      return Promise.resolve('sample-csrf-token');
-    });
 
     let masteryPerSkillMapping = {
       skillId1: 0.3,

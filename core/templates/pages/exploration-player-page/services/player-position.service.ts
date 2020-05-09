@@ -31,9 +31,9 @@ export class PlayerPositionService {
   constructor(private contextService: ContextService,
               private playerTranscriptService: PlayerTranscriptService) {}
 
-  displayedCardIndex = null;
-  onChangeCallback = null;
-  learnerJustSubmittedAnAnswer = false;
+  displayedCardIndex: number = null;
+  onChangeCallback: Function = null;
+  learnerJustSubmittedAnAnswer: boolean = false;
 
   init(callback: Function): void {
     this.displayedCardIndex = null;

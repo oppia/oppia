@@ -35,15 +35,15 @@ import { UrlInterpolationService } from
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 export class Exploration {
-  initStateName;
-  paramChanges;
-  paramSpecs;
-  states;
-  title;
-  languageCode;
+  // TODO(#7165): Replace any with exact type.
+  initStateName: string;
+  paramChanges: any;
+  paramSpecs: any;
+  states: any;
+  title: string;
+  languageCode: string;
   logger: LoggerService;
   urlInterpolationService: UrlInterpolationService;
-  // TODO(#7165): Replace any with exact type.
   constructor(
       initStateName: string, paramChanges: any, paramSpecs: any, states: any,
       title: string, languageCode: string, loggerService: LoggerService,

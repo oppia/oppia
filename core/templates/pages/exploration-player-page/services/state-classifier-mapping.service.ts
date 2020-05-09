@@ -27,7 +27,7 @@ import { Classifier, ClassifierObjectFactory } from
 })
 export class StateClassifierMappingService {
   constructor(private classifierObjectFactory: ClassifierObjectFactory) {}
-  stateClassifierMapping = null;
+  stateClassifierMapping: {[id: string]: Classifier} = null;
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'backendStateClassifierMapping' is a dict with

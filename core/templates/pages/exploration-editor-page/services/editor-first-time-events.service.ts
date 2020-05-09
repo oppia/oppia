@@ -29,8 +29,8 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 export class EditorFirstTimeEventsService {
   constructor(private siteAnalyticsService: SiteAnalyticsService) {}
 
-    explorationId = null;
-    shouldRegisterEvents = false;
+    explorationId: string = null;
+    shouldRegisterEvents: boolean = false;
     alreadyRegisteredEvents = {
       EditorFirstEntryEvent: null,
       FirstOpenContentBoxEvent: null,

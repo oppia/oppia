@@ -20,14 +20,11 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { CsrfTokenService } from
-  'services/csrf-token.service';
 import { EmailDashboardDataService, Query } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
 
 describe('Email Dashboard Services', () => {
   describe('Email Dashboard Services', () => {
-    let csrfService: CsrfTokenService = null;
     let emailDashboardDataService: EmailDashboardDataService = null;
     let httpTestingController: HttpTestingController;
 
@@ -36,15 +33,8 @@ describe('Email Dashboard Services', () => {
         imports: [HttpClientTestingModule],
         providers: [EmailDashboardDataService]
       });
-      csrfService = TestBed.get(CsrfTokenService);
       emailDashboardDataService = TestBed.get(EmailDashboardDataService);
       httpTestingController = TestBed.get(HttpTestingController);
-
-      spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
-        return new Promise((resolve) => {
-          resolve('sample-csrf-token');
-        });
-      });
     });
 
     it('should fetch correct data from backend',

@@ -30,7 +30,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class CountVectorizerService {
-  vectorize(tokens: Array<string>, vocabulary: Array<{string: number}>) {
+  vectorize(tokens: Array<string>, vocabulary: Object) {
     var vectorLength = Object.keys(vocabulary).length;
     var vector = [];
     for (var i = 0; i < vectorLength; i++) {

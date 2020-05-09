@@ -24,8 +24,9 @@ import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 export class States {
-  _stateObject;
-  _states;
+  // TODO(#7165): Replace any with exact type.
+  _stateObject: StateObjectFactory;
+  _states: any;
   constructor(stateObject: StateObjectFactory, states: any) {
     this._stateObject = stateObject;
     this._states = states;

@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { ReadOnlyTopicObjectFactory } from
+import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
@@ -38,9 +38,12 @@ export class TopicViewerBackendApiService {
     private http: HttpClient,
     private urlInterpolation: UrlInterpolationService) {}
 
-  private readOnlyTopicObjectFactory = null;
-  private readOnlyTopic = null;
-  private topicDataDict = null;
+  private readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory = null;
+  private readOnlyTopic: ReadOnlyTopic = null;
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'topicDataDict' is a dict with underscore_cased keys
+  // which give tslint errors against underscore_casing in favor of camelCasing.
+  private topicDataDict: any = null;
   private _fetchTopicData(
       topicName: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,

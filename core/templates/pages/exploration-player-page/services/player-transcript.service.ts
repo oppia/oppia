@@ -40,8 +40,9 @@ export class PlayerTranscriptService {
   // there is a card 'in reserve', but the learner has not yet navigated to it
   // -- this happens if the current card offers feedback to the learner before
   // they carry on.
-  transcript = [];
-  numAnswersSubmitted = 0;
+  // TODO(#7165): Replace 'any' with the exact type.
+  transcript: any = [];
+  numAnswersSubmitted: number = 0;
   // TODO(#7165): Replace 'any' with the exact type.
   restore(oldTranscript: any): void {
     this.transcript = cloneDeep(oldTranscript);

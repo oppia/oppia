@@ -28,7 +28,7 @@ import { UrlInterpolationService } from
 
 @Injectable({ providedIn: 'root' })
 export class PlaythroughIssuesBackendApiService {
-  private cachedIssues = null;
+  private cachedIssues: Array<PlaythroughIssue> = null;
 
   constructor(
       private httpClient: HttpClient,

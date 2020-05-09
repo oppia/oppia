@@ -24,7 +24,8 @@ import { Fraction, FractionObjectFactory } from
   'domain/objects/FractionObjectFactory.ts';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
+import { Units, UnitsObjectFactory } from
+  'domain/objects/UnitsObjectFactory.ts';
 
 /* Guidelines for adding new custom currency units in Number with Units
   interaction:
@@ -44,7 +45,7 @@ export class NumberWithUnits {
   units;
 
   constructor(
-      type: string, real: number, fractionObj: Fraction, unitsObj: string) {
+      type: string, real: number, fractionObj: Fraction, unitsObj: Units) {
     this.type = type;
     this.real = real;
     this.fraction = fractionObj;

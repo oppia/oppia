@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
-import { EntityContextObjectFactory } from
+import { EntityContext, EntityContextObjectFactory } from
   'domain/utilities/EntityContextObjectFactory.ts';
 import { ServicesConstants } from 'services/services.constants';
 import { UrlService } from 'services/contextual/url.service';
@@ -34,12 +34,12 @@ export class ContextService {
     private urlService: UrlService,
     private entityContextObjectFactory: EntityContextObjectFactory) {}
 
-  pageContext = null;
-  explorationIsLinkedToStory = false;
-  explorationId = null;
-  questionId = null;
-  editorContext = null;
-  customEntityContext = null;
+  pageContext: string = null;
+  explorationIsLinkedToStory: boolean = false;
+  explorationId: string = null;
+  questionId: string = null;
+  editorContext: string = null;
+  customEntityContext: EntityContext = null;
 
   init(editorName: string): void {
     this.editorContext = editorName;

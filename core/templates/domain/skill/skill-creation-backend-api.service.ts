@@ -65,7 +65,7 @@ export class SkillCreationBackendApiService {
   }
 
   createSkill(description: string, rubrics: IRubricBackend,
-      explanation: string, linkedTopicIds: string[]): PromiseLike<Object> {
+      explanation: string, linkedTopicIds: string[]): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._createSkill(resolve, reject,
         description, rubrics, explanation, linkedTopicIds);
