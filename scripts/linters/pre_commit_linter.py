@@ -442,7 +442,7 @@ def _get_task_output(all_messages, err_messages, task, semaphore):
         all_messages += task.output
     except Exception:
         err_messages.append(
-            python_utils.convert_to_bytes(task.exception.args[0]))
+            python_utils.convert_to_bytes(task.stacktrace))
     semaphore.release()
 
 
@@ -456,6 +456,7 @@ def _print_error_messages(error_messages):
     python_utils.PRINT('+--------------------------+')
     for message in error_messages:
         python_utils.PRINT(message)
+        python_utils.PRINT('--------------------------------------------------')
         python_utils.PRINT('')
     python_utils.PRINT('--------------------------------------------------')
     python_utils.PRINT('Some of the linting functions may not run until the'
@@ -559,8 +560,8 @@ def main(args=None):
         semaphore.acquire()
         _get_task_output(all_messages, err_messages, task, semaphore)
 
-    all_messages += codeowner_linter.check_codeowner_file(
-        verbose_mode_enabled)
+    # all_messages += codeowner_linter.check_codeowner_file(
+    #     verbose_mode_enabled)
 
     _print_complete_summary_of_errors(all_messages)
 
