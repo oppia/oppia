@@ -1765,6 +1765,18 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
         }
 
         response = self.get_json(
-            '/interactionsByExplorationId', params=payload)
+            '/interactionsbyexplorationid', params=payload)
         interactions_list = response['interactions']
         self.assertEqual(len(interactions_list), 2)
+
+    def test_interaction_id_handler_with_invalid_id(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        payload = {
+            'exploration_id': None
+        }
+
+        response = self.get_json(
+            '/interactionsbyexplorationid', params=payload,
+            expected_status_int=400)
+        self.assertEqual(response['error'], 'Exploration does not exist.')

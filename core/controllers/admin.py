@@ -852,11 +852,12 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
 
 class InteractionsByExplorationId(base.BaseHandler):
     """Handler to retrive the list of interaction id's for a exploration id."""
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        exploration_id = self.request.get('exploration_id')
-        if isinstance(exploration_id, str):
+        exploration_id = self.request.get('exploration_id', None)
+        if exploration_id is None:
             raise self.InvalidInputException('Exploration id must be a string.')
         exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False)

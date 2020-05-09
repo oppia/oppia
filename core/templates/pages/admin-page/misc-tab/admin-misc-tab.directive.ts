@@ -42,7 +42,7 @@ angular.module('oppia').directive('adminMiscTab', [
           '/explorationdataextractionhandler');
         var SEND_DUMMY_MAIL_HANDLER_URL = (
           '/sendDummyMailToAdminHandler');
-        var INTERACTIONS_BY_ID_HANDLER_URL = '/interactionsByExplorationId';
+        var INTERACTIONS_BY_ID_HANDLER_URL = '/interactionsbyexplorationid';
 
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
@@ -203,6 +203,7 @@ angular.module('oppia').directive('adminMiscTab', [
         ctrl.$onInit = function() {
           ctrl.topicIdForRegeneratingOpportunities = null;
           ctrl.regenerationMessage = null;
+          ctrl.explorationInteractionIds = [];
         };
       }]
     };
