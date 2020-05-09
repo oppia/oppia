@@ -17,16 +17,15 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { Outcome } from
+  'domain/exploration/OutcomeObjectFactory';
 
 /* eslint-disable max-len */
 import { PencilCodeEditorValidationService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service.ts';
 /* eslint-enable max-len */
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
 
-
-describe('Pencil Code Editor Validation Service', () => {
+fdescribe('Pencil Code Editor Validation Service', () => {
   let pcevs: PencilCodeEditorValidationService = null;
 
   beforeEach(() => {
@@ -37,16 +36,24 @@ describe('Pencil Code Editor Validation Service', () => {
     pcevs = TestBed.get(PencilCodeEditorValidationService);
   });
 
-  it('should tests the warning properties.', () => {
+  it('should tests the getCustomizationArgsWarnings function', () => {
+    let array = [];
+    let customizationArgs = {
+      initial_code: '# Add the initial code snippet here.↵',
+    };
+
+    expect(pcevs.getCustomizationArgsWarnings(customizationArgs))
+      .toEqual(array);
+  });
+
+  it('should tests the getAllWarnings function', () => {
     let array = [];
     let stateName = 'Introduction';
     let customizationArgs = {
       initial_code: '# Add the initial code snippet here.↵',
     };
-    let answerGroups = [];
     let defaultOutcome: Outcome;
-    expect(pcevs.getCustomizationArgsWarnings(customizationArgs))
-      .toEqual(array);
+    let answerGroups = [];
     expect(pcevs.getAllWarnings(
       stateName, customizationArgs, answerGroups,
       defaultOutcome)).toEqual(array);

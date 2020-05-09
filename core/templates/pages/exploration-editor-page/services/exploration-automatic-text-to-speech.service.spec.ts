@@ -42,8 +42,11 @@ describe('Exploration Automatic Text To Speech Service', function() {
   it('should test the child object properties', function() {
     expect(eattss.propertyName).toBe('auto_tts_enabled');
     expect(eattss._isValid(true)).toBe(true);
+    expect(eattss._isValid(false)).toBe(true);
     eattss.savedMemento = true;
     expect(eattss.isAutomaticTextToSpeechEnabled()).toBe(true);
+    eattss.savedMemento = false;
+    expect(eattss.isAutomaticTextToSpeechEnabled()).toBe(false);
     spyOn(eattss, 'saveDisplayedValue');
     eattss.toggleAutomaticTextToSpeech();
     expect(eattss.saveDisplayedValue).toHaveBeenCalled();
