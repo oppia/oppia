@@ -28,8 +28,7 @@ import { WindowRef } from
 
 @Component({
   selector: 'about-page',
-  templateUrl: './about-page.component.html',
-  styleUrls: []
+  templateUrl: './about-page.component.html'
 })
 export class AboutPageComponent implements OnInit {
   listOfNames: string;

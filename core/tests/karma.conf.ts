@@ -5,6 +5,13 @@ if (argv.prodEnv) {
   generatedJs = (
     'third_party/generated/js/third_party.min.js');
 }
+var htmlMinifyConfig = {
+  ignoreCustomFragments: [/<\[[\s\S]*?\]>/],
+  removeAttributeQuotes: false,
+  caseSensitive: true,
+  customAttrSurround: [[/#/, /(?:)/], [/\*/, /(?:)/], [/\[?\(?/, /(?:)/]],
+  customAttrAssign: [/\)?\]?=/]
+};
 
 module.exports = function(config) {
   config.set({
@@ -168,12 +175,26 @@ module.exports = function(config) {
                   // this is needed for thread-loader to work correctly
                   happyPackMode: true
                 }
+              },
+              {
+                loader: 'angular2-template-loader'
               }
             ]
           },
           {
-            test: /\.html$/,
+            test: {
+              include: /.html$/,
+              exclude: /(directive|component)\.html$/
+            },
             loader: 'underscore-template-loader'
+          },
+          {
+            test: /(directive|component)\.html$/,
+            loader: 'html-loader',
+            options: {
+              attributes: false,
+              minimize: htmlMinifyConfig,
+            },
           },
           {
             // Exclude all the spec files from the report.
