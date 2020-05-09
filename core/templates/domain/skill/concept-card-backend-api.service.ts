@@ -19,7 +19,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse, HttpErrorResponse } from '@angular/common/http';
 
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -42,14 +42,14 @@ export class ConceptCardBackendApiService {
 
   private _fetchConceptCards(skillIds: Array<string>,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+      errorCallback: (reason?: HttpErrorResponse) => void): void {
     let conceptCardDataUrl = this.urlInterpolationService.interpolateUrl(
       SkillDomainConstants.CONCEPT_CARD_DATA_URL_TEMPLATE, {
         comma_separated_skill_ids: skillIds.join(',')
       });
 
     this.http.get(conceptCardDataUrl, { observe: 'response' }).toPromise()
-      .then((response: any) => {
+      .then((response: HttpResponse<any>) => {
         let conceptCards = cloneDeep(response.body.concept_card_dicts);
 
         if (successCallback) {

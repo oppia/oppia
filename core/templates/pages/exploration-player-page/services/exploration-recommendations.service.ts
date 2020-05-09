@@ -19,7 +19,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 
 import { ContextService } from 'services/context.service';
 import { ServicesConstants } from 'services/services.constants';
@@ -29,13 +29,13 @@ import { UrlService } from 'services/contextual/url.service';
   providedIn: 'root'
 })
 export class ExplorationRecommendationsService {
-  isIframed: any = this.urlService.isIframed();
+  isIframed: boolean = this.urlService.isIframed();
   isInEditorPage: boolean = (this.contextService.getPageContext() ===
     ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR);
   isInEditorPreviewMode: boolean = this.isInEditorPage && (
     this.contextService.getEditorTabContext() ===
     ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW);
-  explorationId: any = this.contextService.getExplorationId();
+  explorationId: string = this.contextService.getExplorationId();
 
   constructor(
     private http: HttpClient,
@@ -63,7 +63,7 @@ export class ExplorationRecommendationsService {
       {
         observe: 'response',
         params: recommendationsUrlParams
-      }).toPromise().then((response: any) => {
+      }).toPromise().then((response: HttpResponse<any>) => {
       if (successCallback) {
         successCallback(response.body.summaries);
       }

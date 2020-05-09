@@ -19,7 +19,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 
 import { ContextService } from 'services/context.service';
 import { UrlInterpolationService } from
@@ -45,7 +45,7 @@ export class UserExplorationPermissionsService {
         });
 
       this.permissionsPromise = this.http.get(explorationPermissionsUrl,
-        {observe: 'response'}).toPromise().then((response: any) => {
+        {observe: 'response'}).toPromise().then((response: HttpResponse<any>) => {
         return response.body;
       });
     }
