@@ -1766,7 +1766,7 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(
             '/interactionsbyexplorationid', params=payload)
         interactions_list = response['interactions']
-        self.assertEqual(len(interactions_list), 2)
+        self.assertEqual(interactions_list, ['EndExploration', 'TextInput'])
 
     def test_interaction_id_handler_with_invalid_id(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
