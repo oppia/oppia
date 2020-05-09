@@ -19,16 +19,12 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { TranslateService } from '@ngx-translate/core';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
 import { WindowRef } from
   'services/contextual/window-ref.service.ts';
-
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
-import { TranslateService } from '@ngx-translate/core';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'about-page',
@@ -65,9 +61,6 @@ export class AboutPageComponent implements OnInit {
     private translate: TranslateService,
     private windowRef: WindowRef) {
     translate.setDefaultLang('en');
-    this.activeTabName = this.TAB_ID_ABOUT;
-    this.ALLOWED_TABS = [
-      this.TAB_ID_ABOUT, this.TAB_ID_FOUNDATION, this.TAB_ID_CREDITS];
   }
 
   onTabClick(tabName: string) {
@@ -80,11 +73,14 @@ export class AboutPageComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.activeTabName = this.TAB_ID_ABOUT;
     this.translate.use(
       this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
     this.i18nLanguageCodeService.getI18nLanguageCodeSubject().subscribe(
       (code) => this.translate.use(code)
     );
+    this.ALLOWED_TABS = [
+      this.TAB_ID_ABOUT, this.TAB_ID_FOUNDATION, this.TAB_ID_CREDITS];
     const hash = this.windowRef.nativeWindow.location.hash.slice(1);
     if (hash === 'license') {
       this.activeTabName = this.TAB_ID_FOUNDATION;
