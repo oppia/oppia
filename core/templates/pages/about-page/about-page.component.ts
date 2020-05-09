@@ -28,7 +28,7 @@ import { WindowRef } from
 
 @Component({
   selector: 'about-page',
-  template: require('./about-page.component.html'),
+  templateUrl: './about-page.component.html',
   styleUrls: []
 })
 export class AboutPageComponent implements OnInit {
