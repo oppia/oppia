@@ -70,6 +70,13 @@ angular.module('oppia').factory('SkillCreationService', [
         }
         skillCreationInProgress = true;
         AlertsService.clearWarnings();
+        // $window.open has to be initialized separately since if the 'open new
+        // tab' action does not directly result from a user input (which is not
+        // the case, if we wait for result from the backend before opening a new
+        // tab), some browsers block it as a popup. Here, the new tab is created
+        // as soon as the user clicks the 'Create' button and filled with URL
+        // once the details are fetched from the backend.
+        var newTab = $window.open();
         SkillCreationBackendApiService.createSkill(
           description, rubrics, explanation, linkedTopicIds)
           .then(function(response) {
@@ -77,12 +84,10 @@ angular.module('oppia').factory('SkillCreationService', [
               $rootScope.$broadcast(
                 EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, true);
               skillCreationInProgress = false;
-              $window.open(
-                UrlInterpolationService.interpolateUrl(
-                  CREATE_NEW_SKILL_URL_TEMPLATE, {
-                    skill_id: response.skillId
-                  }), '_blank'
-              );
+              newTab.location.href = UrlInterpolationService.interpolateUrl(
+                CREATE_NEW_SKILL_URL_TEMPLATE, {
+                  skill_id: response.skillId
+                });
             }, 150);
           });
       }

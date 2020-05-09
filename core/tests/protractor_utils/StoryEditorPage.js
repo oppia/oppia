@@ -74,6 +74,8 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-exploration-id-input'));
   var explorationIdSaveButton = element(
     by.css('.protractor-test-exploration-id-save-button'));
+  var nodeDescriptionInputField = element(
+    by.css('.protractor-test-add-chapter-description'));
   var nodeOutlineEditor = element(
     by.css('.protractor-test-add-chapter-outline'));
   var nodeOutlineEditorRteContent = element.all(by.css('.oppia-rte'));
@@ -145,6 +147,7 @@ var StoryEditorPage = function() {
   };
 
   this.deleteChapterWithIndex = function(index) {
+    general.scrollToTop();
     deleteChapterButtons.then(function(elems) {
       elems[index].click();
     });
@@ -255,6 +258,25 @@ var StoryEditorPage = function() {
       'ExplorationIdSaveButton takes too long to be clickable'
     );
     explorationIdSaveButton.click();
+  };
+
+  this.changeNodeDescription = function(nodeDescription) {
+    waitFor.visibilityOf(
+      nodeDescriptionInputField,
+      'NodeDescriptionInputField takes too long to be visible'
+    );
+    nodeDescriptionInputField.clear();
+    nodeDescriptionInputField.sendKeys(nodeDescription);
+  };
+
+  this.expectNodeDescription = function(nodeDescription) {
+    waitFor.visibilityOf(
+      nodeDescriptionInputField,
+      'NodeDescriptionInputField takes too long to be visible'
+    );
+    expect(nodeDescriptionInputField.getAttribute('value')).toMatch(
+      nodeDescription
+    );
   };
 
   this.expectChapterExplorationIdToBe = function(id) {

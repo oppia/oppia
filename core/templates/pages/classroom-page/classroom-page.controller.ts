@@ -43,12 +43,12 @@ angular.module('oppia').directive('classroomPage', [
       controllerAs: '$ctrl',
       controller: [
         '$filter', '$rootScope', '$window', 'AlertsService',
-        'ClassroomBackendApiService', 'PageTitleService',
+        'ClassroomBackendApiService', 'LoaderService', 'PageTitleService',
         'TopicSummaryObjectFactory', 'UrlService',
         'WindowDimensionsService', 'FATAL_ERROR_CODES',
         function(
             $filter, $rootScope, $window, AlertsService,
-            ClassroomBackendApiService, PageTitleService,
+            ClassroomBackendApiService, LoaderService, PageTitleService,
             TopicSummaryObjectFactory, UrlService,
             WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
@@ -62,11 +62,11 @@ angular.module('oppia').directive('classroomPage', [
             PageTitleService.setPageTitle(
               ctrl.classroomDisplayName + ' Classroom | Oppia');
 
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             ClassroomBackendApiService.fetchClassroomData(
               classroomName).then(function(topicSummaryObjects) {
               ctrl.topicSummaries = topicSummaryObjects;
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
               $rootScope.$broadcast('initializeTranslation');
             },
             function(errorResponse) {
