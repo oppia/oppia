@@ -23,20 +23,9 @@ from core.controllers import base
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import topic_fetchers
+from core.domain import user_services
 import feconf
 import utils
-
-
-class CommunityDashboardPage(base.BaseHandler):
-    """Page showing the community dashboard."""
-
-    @acl_decorators.open_access
-    def get(self):
-        # TODO(#7402): Serve this page statically through app.yaml once
-        # the COMMUNITY_DASHBOARD_ENABLED flag is removed.
-        if not feconf.COMMUNITY_DASHBOARD_ENABLED:
-            raise self.PageNotFoundException
-        self.render_template('community-dashboard-page.mainpage.html')
 
 
 class ContributionOpportunitiesHandler(base.BaseHandler):
@@ -47,8 +36,6 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, opportunity_type):
         """Handles GET requests."""
-        if not feconf.COMMUNITY_DASHBOARD_ENABLED:
-            raise self.PageNotFoundException
         search_cursor = self.request.get('cursor', None)
 
         if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
@@ -205,3 +192,30 @@ class TranslatableTextHandler(base.BaseHandler):
         }
 
         self.render_json(self.values)
+
+
+class UserCommunityRightsDataHandler(base.BaseHandler):
+    """Provides review rights of the logged in user in translation, voiceover
+    and question category on the community dashboard.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        community_rights = None
+        if self.username:
+            community_rights = user_services.get_user_community_rights(
+                self.user_id)
+        self.render_json({
+            'can_review_translation_for_language_codes': (
+                community_rights.can_review_translation_for_language_codes
+                if community_rights else []),
+            'can_review_voiceover_for_language_codes': (
+                community_rights.can_review_voiceover_for_language_codes
+                if community_rights else []),
+            'can_review_questions': (
+                community_rights.can_review_questions
+                if community_rights else False)
+        })

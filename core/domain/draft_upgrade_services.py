@@ -89,6 +89,88 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
+    def _convert_states_v32_dict_to_v33_dict(cls, draft_change_list):
+        """Converts draft change list from state version 32 to 33. State
+        version 33 adds showChoicesInShuffledOrder boolean variable to the
+        MultipleChoiceInput interaction.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        for i, change in enumerate(draft_change_list):
+            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                    change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                if change.new_value.keys() == ['choices']:
+                    change.new_value['showChoicesInShuffledOrder'] = {
+                        'value': False
+                    }
+                    draft_change_list[i] = exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': (
+                            exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                        'state_name': change.state_name,
+                        'new_value': change.new_value
+                    })
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v31_dict_to_v32_dict(cls, draft_change_list):
+        """Converts draft change list from state version 31 to 32. State
+        version 32 adds a customization arg for the "Add" button text
+        in SetInput interaction, for which there should be no changes
+        to drafts.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v30_dict_to_v31_dict(cls, draft_change_list):
+        """Converts draft change list from state version 30 to 31. State
+        Version 31 adds the duration_secs float for the Voiceover
+        section of state.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        for i, change in enumerate(draft_change_list):
+            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                    change.property_name ==
+                    exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                # Get the language code to access the language code correctly.
+                new_voiceovers_mapping = change.new_value['voiceovers_mapping']
+                # Initialize the value to migrate draft state to v31.
+                language_codes_to_audio_metadata = (
+                    new_voiceovers_mapping.values())
+                for language_codes in language_codes_to_audio_metadata:
+                    for audio_metadata in language_codes.values():
+                        audio_metadata['duration_secs'] = 0.0
+                draft_change_list[i] = exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+                    'state_name': change.state_name,
+                    'new_value': {
+                        'voiceovers_mapping': new_voiceovers_mapping
+                    }
+                })
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v29_dict_to_v30_dict(cls, draft_change_list):
         """Converts draft change list from state version 29 to 30. State
         version 30 replaces tagged_misconception_id with

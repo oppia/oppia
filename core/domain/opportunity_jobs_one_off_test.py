@@ -67,6 +67,7 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
+            self.publish_exploration(self.owner_id, exp.id)
 
         topic_1 = topic_domain.Topic.create_default_topic(
             topic_id=self.topic_id_1, name='topic1', abbreviated_name='abbrev')

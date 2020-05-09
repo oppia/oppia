@@ -29,13 +29,14 @@ import utils
 # One is extra (ie. (full: [*.js])) and three other test suites are
 # are being run by CircleCI.
 TEST_SUITES_NOT_RUN_ON_TRAVIS = [
-    'full', 'classroomPageFileUploadFeatures', 'fileUploadFeatures',
+    'full', 'adminPage', 'accessibility', 'classroomPageFileUploadFeatures',
+    'embedding', 'fileUploadFeatures', 'library', 'navigation',
     'topicAndStoryEditorFileUploadFeatures']
 
 TRAVIS_CI_FILE_PATH = os.path.join(os.getcwd(), '.travis.yml')
 PROTRACTOR_CONF_FILE_PATH = os.path.join(
     os.getcwd(), 'core', 'tests', 'protractor.conf.js')
-SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST = 'explorationImprovementsTab'
+SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST = 'coreEditorAndPlayerFeatures'
 
 
 def get_e2e_suite_names_from_jobs_travis_yml_file():
@@ -70,7 +71,7 @@ def get_e2e_suite_names_from_script_travis_yml_file():
     travis_file_content = read_and_parse_travis_yml_file()
     script_str = python_utils.convert_to_bytes(travis_file_content['script'])
     # The following line extracts the test suites from patterns like
-    # python -m scripts.run_e2e_tests --suite="accessibility"
+    # python -m scripts.run_e2e_tests --suite="accessibility".
     e2e_test_suite_regex = re.compile(
         r'python -m scripts.run_e2e_tests --suite="([a-zA-Z_-]*)"')
     suites_list = e2e_test_suite_regex.findall(script_str)

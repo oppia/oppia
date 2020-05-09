@@ -17,7 +17,7 @@
  * interaction.
  */
 
-var objects = require('../../objects/protractor.js');
+var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 /**
  * Add recommended exploration Id to End Exploration interaction.
  * @param {Object} elem - The Customize Exploration modal for End Exploration.
@@ -26,7 +26,7 @@ var objects = require('../../objects/protractor.js');
 var customizeInteraction = function(elem, recommendedExplorationIdArray) {
   if (recommendedExplorationIdArray) {
     if (Array.isArray(recommendedExplorationIdArray) === false) {
-      throw Error ('Please use array to add recommendation Ids');
+      throw new Error ('Please use array to add recommendation Ids');
     }
     recommendedExplorationIdArray.forEach(function(explorationId) {
       var addExplorationIdButton = element(

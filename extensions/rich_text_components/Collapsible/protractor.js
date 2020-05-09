@@ -17,8 +17,7 @@
  * end-to-end testing with Protractor.js
  */
 
-var forms = require('../../../core/tests/protractor_utils/forms.js');
-var general = require('../../../core/tests/protractor_utils/general.js');
+var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 
 var customizeComponent = function(modal, heading, contentInstructions) {
   forms.UnicodeEditor(

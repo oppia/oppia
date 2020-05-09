@@ -53,7 +53,6 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[self.skill_id],
             subtopics=[], next_subtopic_id=1)
@@ -162,7 +161,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
     def test_editable_skill_handler_get_succeeds(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.NEW_USER_EMAIL)
         # Check that admins can access the editable skill data.
         json_response = self.get_json(self.url)
         self.assertEqual(self.skill_id, json_response['skill']['id'])
@@ -171,7 +170,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
     def test_editable_skill_handler_get_fails(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.NEW_USER_EMAIL)
         # Check GET returns 404 when cannot get skill by id.
         self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.get_json(self.url, expected_status_int=404)

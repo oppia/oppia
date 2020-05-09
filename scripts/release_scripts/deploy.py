@@ -29,7 +29,7 @@ IMPORTANT NOTES:
 
 2.  This script should be run from the oppia root folder:
 
-        python -m scripts.deploy --app_name=[app_name]
+        python -m scripts.release_scripts.deploy --app_name=[app_name]
 
     where [app_name] is the name of your app. Note that the root folder MUST be
     named 'oppia'.
@@ -267,11 +267,10 @@ def flush_memcache(app_name):
         app_name: str. The name of the app to deploy.
     """
     memcache_url = (
-        'https://pantheon.corp.google.com/appengine/memcache?'
-        'project=%s') % app_name
-    if not gcloud_adapter.flush_memcache(app_name):
-        python_utils.PRINT('Memcache flushing failed. Please do it manually.')
-        common.open_new_tab_in_browser_if_possible(memcache_url)
+        'https://console.cloud.google.com/appengine/memcache?'
+        'src=ac&project=%s') % app_name
+    common.open_new_tab_in_browser_if_possible(memcache_url)
+    common.ask_user_to_confirm('Please flush the memcache.')
 
 
 def switch_version(app_name, current_release_version):
@@ -465,8 +464,8 @@ def execute_deployment():
         raise Exception(
             'The deployment script must be run from a release or test branch.')
     if common.is_current_branch_a_test_branch() and (
-            app_name == APP_NAME_OPPIASERVER):
-        raise Exception('Test branch cannot be deployed to prod.')
+            app_name in [APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER]):
+        raise Exception('Test branch can only be deployed to backup server.')
     if custom_version is not None:
         current_release_version = custom_version.replace(
             DOT_CHAR, HYPHEN_CHAR)
@@ -479,6 +478,10 @@ def execute_deployment():
     # (defined in switch_version function) correctly.
     if '.' in current_release_version:
         raise Exception('Current release version has \'.\' character.')
+
+    assert len(current_release_version) <= 25, (
+        'The length of the "version" arg should be less than or '
+        'equal to 25 characters.')
 
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()

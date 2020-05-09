@@ -17,16 +17,25 @@
  * end-to-end testing with Protractor.js
  */
 
-var objects = require('../../objects/protractor.js');
+var objects = require(process.cwd() + '/extensions/objects/protractor.js');
+var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 
-var customizeComponent = function(modal, index) {
+var customizeComponent = function(modal, text, skillDescription) {
+  objects.UnicodeStringEditor(
+    modal.element(by.tagName('schema-based-unicode-editor'))
+  ).setValue(text);
   objects.SkillSelector(
     modal.element(by.tagName('skill-selector-editor'))
-  ).setValue(index);
+  ).setValue(skillDescription);
 };
 
-var expectComponentDetailsToMatch = function(elem, description) {
-  expect(elem.element(by.tagName('a'))).toBe('description');
+var expectComponentDetailsToMatch = function(elem, text, reviewMaterial) {
+  var link = elem.element(by.tagName('a')).getText();
+  expect(link).toBe(text);
+  link.click();
+  forms.expectRichText(
+    element(by.css('.protractor-test-concept-card-explanation'))
+  ).toMatch(reviewMaterial);
 };
 
 exports.customizeComponent = customizeComponent;

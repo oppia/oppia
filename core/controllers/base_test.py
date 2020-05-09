@@ -55,7 +55,7 @@ PADDING = 1
 
 class UniqueTemplateNamesTests(test_utils.GenericTestBase):
     """Tests to ensure that all template filenames in
-    core/templates/dev/head/pages have unique filenames. This is required
+    core/templates/pages have unique filenames. This is required
     for the backend tests to work correctly since they fetch templates
     from this directory based on name of the template. For details, refer
     get_filepath_from_filename function in test_utils.py.
@@ -63,7 +63,7 @@ class UniqueTemplateNamesTests(test_utils.GenericTestBase):
 
     def test_template_filenames_are_unique(self):
         templates_dir = os.path.join(
-            'core', 'templates', 'dev', 'head', 'pages')
+            'core', 'templates', 'pages')
         all_template_names = []
         for root, _, filenames in os.walk(templates_dir):
             template_filenames = [
@@ -149,10 +149,10 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
             # This url is ignored since it is only needed for a protractor test.
             # The backend tests fetch templates from
-            # core/templates/dev/head/pages instead of webpack_bundles since we
+            # core/templates/pages instead of webpack_bundles since we
             # skip webpack compilation for backend tests.
             # The console_errors.html template is present in
-            # core/templates/dev/head/tests and we want one canonical
+            # core/templates/tests and we want one canonical
             # directory for retrieving templates so we ignore this url.
             if url == '/console_errors':
                 continue
@@ -195,12 +195,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             expected_status_int=404)
 
         self.delete_json('/library/data', expected_status_int=404)
-
-    def test_redirect_in_logged_out_states(self):
-        """Test for a redirect in logged out state on '/'."""
-
-        response = self.get_html_response('/', expected_status_int=302)
-        self.assertIn('splash', response.headers['location'])
 
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
@@ -373,7 +367,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             to a non-existent directory.
             """
             path = ''
-            if args[1] == 'Pillow-6.0.0':
+            if args[1] == 'Pillow-6.2.2':
                 return 'invalid_path'
             else:
                 path = '/'.join(args)
@@ -525,6 +519,11 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'https://oppiaserver.appspot.com/splash', expected_status_int=301)
         self.assertEqual(
             response.headers['Location'], 'https://oppiatestserver.appspot.com')
+
+    def test_splash_redirect(self):
+        # Tests that the old '/splash' URL is redirected to '/'.
+        response = self.get_html_response('/splash', expected_status_int=302)
+        self.assertEqual('http://localhost/', response.headers['location'])
 
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
@@ -798,7 +797,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
         """Tests that keys in HTML files are present in en.json."""
         en_key_list = self._extract_keys_from_json_file('en.json')
         dirs_to_search = [
-            os.path.join('core', 'templates', 'dev', 'head'),
+            os.path.join('core', 'templates', ''),
             'extensions']
         files_checked = 0
         missing_keys_count = 0

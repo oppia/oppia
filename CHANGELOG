@@ -1,5 +1,359 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.9.2 (21 Apr 2020)
+------------------------
+Learner/Creator Pages
+* Change character limits for the new editors and allowed saving of invalid exps in draft stories (#9087)
+* Fix #9045: Add customization arg warnings (#9073)
+* Fix #8951: Fix solution preview uniqueness indicator (#9067)
+* Add a pre-publish validation for topics (#9056)
+* Fix #9005: Cursor changes to a pointer for the delete icon (#9054)
+* Fix #8926: Drag and drop response order (#8960)
+* Add frontend validation for explorations in the story editor (#8899)
+* Fix #8743: Add Classroom option to top navbar and hide it under SHOW_CLASSROOM_CALLOUT flag (#8832)
+* Fix #8808: Disable collapsible block and tabs RTEs for questions (#8810)
+* Fix part of #8746: Centralize the story view icons (#8795)
+* Fix part of #6351: Add custom typing for PencilCodeEmbed (#8712)
+* Fix part of #6271: Improvise update_explanation method (#8699)
+* Fix part of #8038: HTTPS calls in frontend should only happen through topic-creation-backend-api.services (#8685)
+* Fix part of #5296: Add an audit job to find explorations with MathExpressionInput (#8669)
+* Add backend validation checks for explorations in a story (#8651)
+* Add the skillreview RTE element to explorations in stories (#8617)
+
+Contributor Pages
+* Fix #9018: Capitalize the tab name in community dashboard page (#9089)
+* Fix #9003, #9013: Display fully un-truncated text for skill description in Submit Question tab and show placeholder for empty rubric explanation (#9058)
+* Fix #7402, #8166: Enable community dashboard page (#8957)
+* Reviewer assignment functionality for community contribution (#8862)
+* Fix #8249: Surface skill difficulty/rubrics in question suggestion flow (#8353)
+* Fix not loading opportunities in the community dashboard. (#8948)
+
+Lesson analytics
+* Fix #7335: Use cached thread message summary to render improvement tasks (#8658)
+
+Speed improvement
+* Remove angular-drag-and-drop-lists.min.js from header js imports (#8929)
+* Import wave-surfer using webpack instead of including it in third_party.js file (#8922)
+* Fix #7643: Replace templateUrl with template in /extensions  (#8860)
+
+Bug fixes
+* Fix #9006 and #9009: Disallow same chapter titles in stories and fixed empty names for downloaded yaml files (#9077)
+* Fix #9040: Preferences page width in mobile devices (#9055)
+* Fix InteractionAnswerSummariesMRJobManager handling of UTF-8 strings (#8963)
+* Fix #8955: Only fetch the summaries of threads referring to explorations (#8956)
+* Fix #8802: Google Chrome on Chromebook not displaying the Speech Synthesised Voiceover (#8892)
+* Fix #8817: Fix progress bar issue in Firefox (#8881)
+* Fix #8826: Correct Continue Button Display Style to Fix Highlight Outline (#8878)
+* Fix #8815: Initialise Guppy symbols during exploration init (#8850)
+* Fix #8789: Inconsistent Capitalization in Preferred Languages Dropdown (#8796)
+* Fix #8132: Fix the category and language bar selection divs (#8723)
+* Fix #8385: Add a error message if the exploration id entered is invalid (#8431)
+
+Server Errors
+* Fix #6757: Reload page when login_url is None (#8834)
+
+Miscellaneous
+* Fix #8877: Remove DebugInfoTrackerService from the codebase (#8879)
+* Fix #8709: Load dummy skill with questions (#8724)
+* Fix part of #8038: HTTPS calls in frontend should only happen through skill-creation-backend-api.services (#8674)
+* Fix #8614: Move the site-feedback icon to the footer (#8640)
+
+Release team
+* Fix issues with release wrap up (#8952)
+* Fix path in restore backup script (#8913)
+* Updates for sending reminder to submit jobs (#8809)
+
+Angular Migration
+* Add HTTP interceptor in all the modules (#8965)
+* Migration of ExpressionSyntaxTreeService to Angular 8 (#8886)
+* Remove any from url-interpolation.service.ts, url.service.ts and some other files (#8823)
+* Update to provide only required services in App.ts (#8807)
+* Remove any from angular in all modules (#8785)
+* Remove any from numeric-input-validation.service.spec.ts (#8770)
+* Migrate CollectionRightsBackendApiService to Angular 8 (#8748)
+* Fix part of #8472: Migrate AngularJS files to Angular 8 for SkillRightBackendApiService file (#8721)
+* Fix part of #8472: Migrate EditableCollectionBackendApiService and ReadOnlyCollectionBackendApiService to Angular (#8657)
+* Fix part of #8472: Migrate AngularJS files to Angular 8 for SkillObjectFactory file (#8587)
+
+Data handling
+* Add contributors audit job (#8925)
+* Fix part of #5914: Export data for BaseSnapshotMetadataModel (#8749)
+
+QA Team
+* Fix part of #4057: Add frontend test cases to QuestionObjectFactory (#8934)
+* Fix part of #4057: Add test cases for question-backend-api.service.ts (#8916)
+* Fix #4057: Add front-end tests for UnitsObjectFactory.ts (#8915)
+* Topic viewer backend api (#8905)
+* Fix #8888: Await Visible Confirmation Message on Role Update (#8889)
+* Fix part of #4057: Add a test file for StateParamChangesService.ts (#8825)
+* Fix test file for debouncer.service.ts (#8806)
+* Increase coverage for training-data-editor-panel.service.ts (#8805)
+* Increase coverage for improvement-modal.service.ts (#8799)
+* Increase coverage for suggestion-modal-for-creator-view.service.ts (#8791)
+* Increase coverage for autosave-info-modals.service.ts (#8776)
+* Increase coverage for rte-helper.service.ts (#8775)
+* Increase coverage for training-modal.service.ts (#8771)
+* Fix part of #4057, #8472: Migrate contribution opportunities backend api to Angular 8 and creates a spec file for it (#8763)
+* Increase frontend test controllers from Milestone 4 (2nd PR) (#8736)
+* Fix part of #4057: Increase frontend test services from Milestone 3.3 (3st PR) (#8696)
+* Fix part of #4057: Increase frontend test services from Milestone 3.3 (4th PR) (#8729)
+* Fix #6240: E2e Tests for Code Editor Interaction (#8639)
+* Milestone 3.3 (1st PR) - Increase coverage for speech-synthesis-chunker.service.ts (#8636)
+* Fix part of #4057: Frontend test for ExplorationFeatureService (#8588)
+* Fix part of #4057: RuleObjectFactory test (#8558)
+
+Developer experience
+* Upgrade major versions of libraries (#8953)
+* Fix #8920: Add check frontend coverage feature on pre push hook (#8923)
+* Fix #8882: Fix collections suite flakiness (#8900)
+* Fix #8869: Add innerHTML lint check (#8870)
+* Speed up frontend tests (#8864)
+* Reorganize CircleCI tests run order (#8851)
+* Add wording to not trigger issue closure (#8837)
+* Fix #8668: Document the service file with jsdoc and fix the unused-import bug (#8773)
+* Fix #8625: Split linters to run for a specific file extension (#8656)
+
+
+v2.9.1 (29 Mar 2020)
+------------------------
+QA Team
+* Increase coverage for rte-helper.service.ts (#8775)
+* Fix topic_id null in e2e test issue  (#8756)
+* Increase coverage for learner-playlist.service.ts (#8753)
+* Increase frontend test controllers from Milestone 4 (1st PR) (#8732)
+* Fix part of #4057: Increase frontend test services from Milestone 3.3 (2nd PR) (#8675)
+* Fix part of #6240: Fix Flaky Exploration Card Finding (#8659)
+* Fix part of #4057: Increase frontend test services from Milestone 3.2 (5th PR)  (#8616)
+* Fix part of #4057: Increase frontend test services from Milestone 3.2 (4th PR) (#8615)
+* Get id-generation.service.ts up to 100% coverage in order to fix CircleCI frontend job fails (#8605)
+* Fix part of #4057: Increase frontend test services from Milestone 2.2 (5th PR) - fix (#8575)
+* Milestone 3.2 (3th PR) - Increase coverage for three services (#8569)
+* Fix part of #4057: Increase frontend test services from Milestone 3.2 (2nd PR) (#8560)
+* Fix part of #4057: Increase frontend test services from Milestone 3.2 (1st PR) (#8530)
+* Increase coverage for notifications-dashboard-page.controller.ts and mark-all-audio-and-translations-as-needing-update.controller.ts (#8528)
+* Milestone 3.1 (3rd PR) - Increase coverage for hints-and-solution-manager.service.ts (#8525)
+* Milestone 3.1 (2nd PR) - Increase coverage for three services (#8524)
+* Fix part of #4057: Adds test for UserEmailPreferencesService (#8513)
+* Milestone 3.1 (1st PR) - Increase coverage for three services (#8477)
+* Fix part of #4057: Increase frontend test services from Milestone 2.2 (6th PR) (#8469)
+* Fix part of #4057: Increase frontend test services from Milestone 2.2 (4th PR)  (#8443)
+* Fix part of #4057: Increase frontend test services from Milestone 2.2 (3rd PR) (#8440)
+* Fix part of #6240: Add audio translations for the state content (#8571)
+
+Lesson analytics
+* Turn improvements tab off by default (#8797)
+* Fix #8660: Add tests for task count notif icon (#8737)
+* Only expose thread data through fetchThreads (#8496)
+* Fix #6242, #7334: Change style of Playthrough buttons and made clickable area intuitive (#8480)
+
+Server Errors
+* Fix #7637: Set hoveredRegion inside onMouseMoveRegion if null (#8733)
+* Fix #8702: Adds a cancel callback that removes the cancelled RTE element (#8703)
+
+Translations
+* Milestone 1 (1st PR) - Adding Audio Duration  (#8203)
+
+Miscellaneous
+* Fix #8761: Prevents logging of unhandled rejection errors with status code -1 (#8762)
+* Fix part of #8296: fixed rtl text on splash and about pages (#8726)
+* Fix #7847: Send dummy mail button in the admin page. (#8686)
+* Fix #8368: Migrate to ndb.TextProperty (#8664)
+* Routine update of translations. (#8655)
+* Fix #8645: Fixes reloading issue with roles tab (#8647)
+* Fix #8550: Contact link added (#8551)
+* Fix part of #8016: add backend service for http requests in admin-config-tab directive (#8447)
+* Fix part of #7176: Refactor dicts in frontend to have only camelCase keys for AutogeneratedAudioLanguageObjectFactory (#8441)
+
+Release team
+* Fix typo in app_dev.yaml. (#8735)
+* Fix issues in release automation (#8690)
+* Fix issues with release automation (#8577)
+* Fix comment in build script (#8568)
+
+Learner/Creator Pages
+* Fix part of #8746: Story editor, viewer, practice session bug fixes (#8774)
+* Fix part of #8746: Move done/success buttons to the right (#8747)
+* Fix part of #1189 Added validation for numeric-input rule type IsInclusivelyBetween. (#8742)
+* Fix #8601: Added label to the topbox. (#8708)
+* Fix #8157: Added a validator for long fractions. (#8671)
+* Fix #8578: Story chapters don't play without prerequisite skills  (#8654)
+* Fix part of #5296: Changed the default math input exploration. (#8648)
+* Fix #8450: Customizing "Add Item" button text. (#8638)
+* Fix #8604: Topic Name Outlined in Red Until Abbreviated Name Entered  (#8621)
+* Add the skillreview RTE element to explorations in stories (#8617)
+* Fix #2967: Allow pasting of the complete Youtube video URL in RTE components (#8611)
+* Fix part of #6271: Refactor update_interaction_hints method to accept a list of Hint objects, instead of a list of dictionaries. (#8591)
+* Fix part of #6271: Refactor Outcome update method to accept domain object instead of dict. (#8582)
+* Modify the story viewer UI (#8581)
+* Fix #7870: Corrrected the margin cutoff in translated content. (#8572)
+* Fix #8450: Customizing "Add Item" button text. (#8556)
+* Fix #8541: Fixing shape of footer elements (#8542)
+* Fix #5690. Added modal to allow user to add commit message when saving an edit to a question.  (#8538)
+* Fix #8193: Added callout to classroom page. (#8511)
+* Fix part of #4057: Add tests for ParamChangesObjectFactory.ts (#8495)
+* Fix #8487: Fixing wrong placement of checkbox (#8491)
+* Revert "Fix #8450: Customizing "Add Item" button text." (#8583)
+
+Speed improvement
+* Reduce bundle size and tidy up manifest (#8663)
+* Fix part of #7643: Replace templateUrl with template (#8632)
+* Fix #7643: Replace Template url to template in the objects directory (#8590)
+
+Data handling
+* Fix part of #5914: Export data for GeneralVoiceoverApplicationModel and UserContributionsScoringModel (#8626)
+* Fix part of #5914: Takeout Enforcement (#8210)
+
+Bug fixes
+* Fix #8911:  Fix issues with exploration state graph (#8936)
+* Fix #8827, #8904 and #8903: Fixed highlight reset of feedback icon, visibility of dest state name in outcome editor and behavior of dropdown in 'Add Answer Group' modal (#8918)
+* Fix #8820: Fix margin for the exploration feedback so that it can be reached. (#8898)
+* Fix #8819: Remove highlight on hovering on disabled button (#8894)
+* Fix #8817: Fixes progress bar issue in firefox (#8881)
+* Fix #8694: Places CSS for the loading message in the correct place. (#8695)
+* Add try/catch for debugging production job (#8661)
+* Fix #8600: Adds new placeholder message for feedback. (#8634)
+* Fix #8610: Makes backdrop static for profile image upload/edit modal. (#8620)
+* Fix #8534: wrong date string format from date-time-format.service.ts (#8576)
+* Fix stats regeneration job (#8490)
+
+Angular Migration
+* Fix part of #8472: Migrate SubtopicBackendService to Angular (#8643)
+* Upgrade SearchExplorationBackendApiService to Angular (#8563)
+* Upgrade ExpressionParserService to Angular (#8557)
+* Angular8 Migration: Migrating SkillMasteryApiService (#8501)
+* Migrate ClassroomBackendApiService to angular (#8462)
+* Migrate PretestQuestionBackendApiService to angular (#8452)
+* Migrate TopicViewerBackendApiService to Angular (#8427)
+* Migrate email-dashboard-data-service to Angular (#8426)
+* Migrate AdminDataService to angular (#8295)
+
+Developer experience
+* Fixes #8754: Yarn execution changes (#8757)
+* Fix signup issues in e2e tests (#8727)
+* Update yarn lock file (#8716)
+* Fix #8714: fixing stylelint (#8715)
+* Fix #6369: Simplify directory structure (#8693)
+* Fix #5676: Remove gulp from project (#8691)
+* Remove frontend tests for debouncer service (#8649)
+* Update actions/checkout version in Actions workflows (#8629)
+* Upgrade test script from bash to python (#8613)
+* Attempt to fix flaky e2e tests (#8607)
+* Increase efficiency of SingleLineCommentChecker (#8378)
+* Fix #8269: adding check for travis.yml and protractor.conf.js (#8334)
+
+
+v2.9.0 (22 Feb 2020)
+------------------------
+Bug fixes
+* Fix #8694: Places CSS for the loading message in the correct place. (#8695)
+* Fix #8603: fixing the invalid date in suggestion thread (#8673)
+* Fix #8600: Adds new placeholder message for feedback. (#8634)
+* Fix #8596: Removes unexpected div focus from interaction preview bar. (#8633)
+* Fix #8610: Makes backdrop static for profile image upload/edit modal. (#8620)
+* Fix #8608: Adds controllerAs for the map interaction (#8619)
+* Fix #8439. Buggy interaction with the author profiles element (#8460)
+* Fix #8209. Fixed fraction input errors. (#8454)
+* Fixes #8434: fixing one off jobs in prod_env (#8435)
+* Fix #8375: Add check for _submitAnswerFn (#8413)
+* Fixes #8371 Removing End interaction text.  (#8376)
+* Fix #8330: Add min selection message for interactions with radio buttons (#8365)
+* Learner Dahsboard fix UI detail (#8358)
+* Fix #8049 Changed display of oppia-icon-accessibility-label (#8328)
+* Fix #8215: Grammatical correctness while displaying date & time (#8357)
+
+Server Errors
+* Fix #6757: Add response headers to prevent caching of /userinfohandler (#8526)
+* Fix #8181: Change $apply to $applyAsync in Base.ts and library-page.directive.ts (#8466)
+* Fix #8464: Add a check for Error object in $exceptionHandler (#8465)
+
+Translations
+* Fix #8598: Console Error when Recording Voiceover (#8641)
+* Adds Malay language to the supported audio languages (#8585)
+
+Miscellaneous
+* Add swap to Google Fonts link (#8554)
+* Fix #8518: Add Security.txt (#8533)
+* Adds codeowner for community dashboard and translation project (#8494)
+* Update installation section of README (#8486)
+* Removed obsolete todo from PromoBar (#8457)
+* Tidy up feedback services (#8282)
+* Fix part of #7450: Make private global function public (#8255)
+* Fix part of #8038: Creates a backend service for collection-creation.service.ts (#8407)
+* Fix #7372: Added a cassifierTrainingJob.to_player_dict() function (#7931)
+
+Release team
+* Fix app.yaml generation (#8562)
+* Updates for maintenance mode (#8516)
+* Updates for renaming Changelog label (#8515)
+* Fixes issue with the update_changelog release script (#8478)
+* Modify release info generation for release summary to be generated independently  (#8474)
+* Fix instructions in changelog updation (#8473)
+* Updates to automation scripts to resolve issues faced in previous releases (#8425)
+
+Learner/Creator Pages
+* Fix #8602: Fetch the messages after updating the suggestion (#8624)
+* Fix part of #7643: Use webpack for more directives (#8540)
+* Fix #8449: Learn again button was surfaced incorrectly (#8536)
+* Fix delete card icon shown even when not editable (#8535)
+* Fix #8398: Use webpack to load HTML in interactions (#8503)
+* Fix #8403. Added shadow for nodes in collection view. (#8428)
+* Fix #8400. Changed 'audio' text and added an icon. (#8420)
+* Fix #8331: Add submit button for multiple choice interaction (mobile only) (#8374)
+* Fix #6433: Refactor open playthrough modal (#8117)
+* Fix #7336: add getLastUpdateTime() methods to Improvement Tasks  (#8101)
+* Fix #7661: Improvement icon notification in the navigation bar (#7865)
+
+Speed improvement
+* Fix #7605: Remove GLOBALS.TRANSLATOR_PROVIDER_FOR_TEST from karma-globals.ts (#8344)
+
+Data handling
+* Replace 'Admin' user_id with 'admin' (#8483)
+* Fix #8202: Delete GeneralFeedbackThreadUserModel that have user_id equal to None (#8481)
+* Wipeout 3.6: User ID migration changes (#8361)
+* Wipeout 4.4: Add account to be deleted page and send email (#8341)
+* Fix #8301: Implement delete_multi for exploration and collection right models (#8319)
+
+QA Team
+* Fix part of #6240: Admin one off jobs (#8455)
+* Fix part of #4057: Increase frontend test services from Milestone 2.2 (2nd PR) (#8433)
+* Fix part of #4057: Increase frontend test services from Milestone 2.2 (1st PR) (#8432)
+* Milestone 2.1 (5th PR) - Increase coverage for three services  (#8387)
+* Milestone 2.1 (4th PR) - Increase coverage for three services  (#8379)
+* Milestone 2.1 (3rd PR) - Increase coverage for three services (#8373)
+* Milestone 2.1 (2nd PR) - Increase coverage for three services (#8345)
+* Milestone 2.1 (1st PR) - Increase coverage for collection-rights-backend-api.service.ts and validators.service.ts (#8281)
+
+Angular Migration
+* Adds interceptor for Angular (#8507)
+* Fix #7403. Changed mathjs imports to partial imports. (#8467)
+* Migrate StoryViewerBackendApiService to angular (#8438)
+* Migrate ReviewTestBackendApiService to angular (#8302)
+* Upgrades StateImprovement Service to Angular (#8116)
+
+Developer experience
+* Fix #7957: Convert e2e bash script to a Python script (#8543)
+* Fix #8534: Revert commit related to failing test (#8537)
+* Increase angular timeout (#8509)
+* Increase the frontend tests timeout to 1 minute (#8502)
+* Remove unused file from FE coverage (#8459)
+* Fix frontend test timeout (#8453)
+* Updates Angular version in package.json & yarn.lock (#8430)
+* Fix pylint linter decoding error. (#8418)
+* Fix #7601: Remove separate typescript compilation (#8412)
+* Fix part of #7450: Tests private method through public interface (#8411)
+* Fix #7830, Added a custom lint check to ensure that there is an empty line between imports and fileoverview. (#8409)
+* Fix #8125. Changed setup.py to rename yarn folder (#8405)
+* Revert commits from frontend test configuration changes. (#8388)
+* Fix #7427: Added args in the docstring of core/jobs_registry.py (#8386)
+* Fix #8380: Move non-file-upload tests back to Travis (#8381)
+* Fix #7427: Adds args in docstring of core/domain/story_domain.py (#8377)
+* Adds readme to various folders (#8329)
+* Fix #8077: Upgrades Angular JS to version 1.7.9 (#8254)
+* Add new CircleCI job in order to check if any fully covered frontend file has decreased after PR changes (#8130)
+* Changes popper.js name to popper-core in manifest.json (#8442)
+* Fixes part of #5939: Custom pylint extension to ensure that docstring follow correct format. (#8410)
+
+
 v2.8.9 (01 Feb 2020)
 ------------------------
 Speed improvements

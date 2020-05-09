@@ -102,7 +102,7 @@ angular.module('oppia').directive('oppiaInteractiveEndExploration', [
                   var listOfIds = missingExpIds.join('", "');
                   ctrl.errorMessage = (
                     'Warning: exploration(s) with the IDs "' + listOfIds +
-                    '" will ' + 'not be shown as recommendations because' +
+                    '" will not be shown as recommendations because ' +
                     'they either do not exist, or are not publicly viewable.');
                 }
               });

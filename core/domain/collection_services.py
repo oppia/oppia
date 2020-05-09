@@ -992,28 +992,18 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
     # Update the contributor id list if necessary (contributors
     # defined as humans who have made a positive (i.e. not just
     # a revert) change to an collection's content).
-    if collection_summary_model:
-        contributor_ids = collection_summary_model.contributor_ids
-        contributors_summary = collection_summary_model.contributors_summary
-    else:
-        contributor_ids = []
-        contributors_summary = {}
+    contributors_summary = (
+        collection_summary_model.contributors_summary
+        if collection_summary_model else {})
 
-    if (contributor_id_to_add is not None and
-            contributor_id_to_add not in constants.SYSTEM_USER_IDS and
-            contributor_id_to_add not in contributor_ids):
-        contributor_ids.append(contributor_id_to_add)
-
-    if contributor_id_to_add not in constants.SYSTEM_USER_IDS:
-        if contributor_id_to_add is None:
-            # Revert commit or other non-positive commit.
-            contributors_summary = compute_collection_contributors_summary(
-                collection.id)
-        else:
-            if contributor_id_to_add in contributors_summary:
-                contributors_summary[contributor_id_to_add] += 1
-            else:
-                contributors_summary[contributor_id_to_add] = 1
+    if contributor_id_to_add is None:
+        # Recalculate the contributors because revert was done.
+        contributors_summary = compute_collection_contributors_summary(
+            collection.id)
+    elif contributor_id_to_add not in constants.SYSTEM_USER_IDS:
+        contributors_summary[contributor_id_to_add] = (
+            contributors_summary.get(contributor_id_to_add, 0) + 1)
+    contributor_ids = list(contributors_summary.keys())
 
     collection_model_last_updated = collection.last_updated
     collection_model_created_on = collection.created_on

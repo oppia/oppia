@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import logging
 
+from constants import constants
 from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_fetchers
@@ -165,7 +166,7 @@ def _update_linked_skill_ids_of_question(
     }
     change_list = [question_domain.QuestionChange(change_dict)]
     update_question(
-        user_id, question_id, change_list, 'updated linked skill ids')
+        user_id, question_id, change_list, 'Updated linked skill ids')
     (opportunity_services
      .update_skill_opportunities_on_question_linked_skills_change(
          old_linked_skill_ids, new_linked_skill_ids))
@@ -233,7 +234,8 @@ def get_questions_by_skill_ids(
         question_skill_link_models = (
             question_models.QuestionSkillLinkModel.get_question_skill_links_based_on_difficulty_equidistributed_by_skill( #pylint: disable=line-too-long
                 total_question_count, skill_ids,
-                feconf.MEDIUM_SKILL_DIFFICULTY))
+                constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
+                    constants.SKILL_DIFFICULTY_MEDIUM]))
     else:
         question_skill_link_models = (
             question_models.QuestionSkillLinkModel.get_question_skill_links_equidistributed_by_skill( #pylint: disable=line-too-long

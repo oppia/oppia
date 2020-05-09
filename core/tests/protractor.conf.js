@@ -65,10 +65,6 @@ var suites = {
       'protractor_desktop/explorationHistoryTab.js'
     ],
 
-    explorationImprovementsTab: [
-      'protractor_desktop/explorationImprovementsTab.js'
-    ],
-
     explorationStatisticsTab: [
       'protractor_desktop/explorationStatisticsTab.js'
     ],
@@ -192,7 +188,7 @@ exports.config = {
           } else {
             errorMessage = pattern + ' does not exist.';
           }
-          throw Error(errorMessage)
+          throw new Error(errorMessage)
         }
       }
     });
@@ -291,8 +287,8 @@ exports.config = {
         // Directory for screenshots
         dest: '../protractor-screenshots',
         // Function to build filenames of screenshots
-        filename: function(spec, descriptions, results, capabilities) {
-          return descriptions[1] + ' ' + descriptions[0];
+        pathBuilder: function(currentSpec) {
+          return currentSpec.fullName;
         },
         captureOnlyFailedSpecs: true
       }));
@@ -300,7 +296,7 @@ exports.config = {
 
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
     jasmine.getEnv().addReporter(new SpecReporter({
-      displayStacktrace: 'all',
+      displayStacktrace: 'pretty',
       displaySpecDuration: true
     }));
 

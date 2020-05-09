@@ -31,12 +31,24 @@ var ExplorationEditorTranslationTab = function() {
   this.exitTutorial = function() {
     // If the translation welcome modal shows up, exit it.
     translationWelcomeModal.isPresent().then(function(isVisible) {
-      if (isVisible) {
-        waitFor.elementToBeClickable(
-          dismissWelcomeModalButton,
-          'Welcome modal is taking too long to appear');
-        dismissWelcomeModalButton.click();
-      }
+      waitFor.visibilityOf(dismissWelcomeModalButton,
+        'Welcome modal not becoming visible').then(
+        () => {
+          waitFor.elementToBeClickable(
+            dismissWelcomeModalButton,
+            'Welcome modal is taking too long to appear');
+          dismissWelcomeModalButton.click();
+        },
+        (err) => {
+          // Since the welcome modal appears only once, the wait for its
+          // visibilty will only resolve once and timeout the other times.
+          // This is just an empty error function to catch the timeouts that
+          // happen when the the welcome modal has been dismissed once. If
+          // this is not present then protractor uses the default error
+          // function which is not appropriate in this case as this is not an
+          // error.
+        }
+      );
     });
 
     waitFor.invisibilityOf(
@@ -48,7 +60,8 @@ var ExplorationEditorTranslationTab = function() {
       if (buttons.length === 1) {
         buttons[0].click();
       } else if (buttons.length !== 0) {
-        throw 'Expected to find at most one \'exit tutorial\' button';
+        throw new Error(
+          'Expected to find at most one \'exit tutorial\' button');
       }
     });
   };
@@ -63,7 +76,7 @@ var ExplorationEditorTranslationTab = function() {
       if (buttons.length === 1) {
         buttons[0].click();
       } else {
-        throw Error('There is more than 1 Finish button!');
+        throw new Error('There is more than 1 Finish button!');
       }
     });
   };
@@ -94,7 +107,7 @@ var ExplorationEditorTranslationTab = function() {
             tutorialTabHeadingElement,
             'Tutorial stage takes too long to disappear');
         } else {
-          throw Error('There is more than one Next button!');
+          throw new Error('There is more than one Next button!');
         }
       });
     });
@@ -113,17 +126,18 @@ var ExplorationEditorTranslationTab = function() {
   var startRecordButton = element(
     by.css('.protractor-test-accessibility-translation-start-record'));
   var stopRecordButton = element(
-    by.css('.protractor-test-stop-record'));
+    by.css('.protractor-test-stop-record-button'));
   var confirmRecordButton = element(
     by.css('.protractor-test-confirm-record'));
   var playRecordButton = element(
     by.css('.protractor-test-play-pause-audio-button'));
-  var uploadAudioButton = element(
-    by.css('.protractor-test-upload-audio'));
+  // Two such elements are in the DOM, but only the second is visible
+  var uploadAudioButton = element.all(
+    by.css('.protractor-test-upload-audio-button')).last();
   var audioUploadInput = element(
-    by.css('.protractor-test-upload-audio'));
+    by.css('.protractor-test-upload-audio-input'));
   var saveUploadedAudioButton = element(
-    by.css('.protractor-test-save-uploaded-audio'));
+    by.css('.protractor-test-save-uploaded-audio-button'));
   var deleteRecordButton = element(
     by.css('.protractor-test-delete-record'));
   var confirmDeleteRecordButton = element(
@@ -180,14 +194,8 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-node-background'));
   var stateNodes = stateGraph.all(
     by.css('.protractor-test-node'));
-  var audioUploadInputElement = element(
-    by.css('.protractor-test-upload-audio'));
   var audioOverFiveMinutesErrorMessageElement = element(
     by.css('.protractor-test-audio-file-upload-field-error-message'));
-  var uploadAudioButton = element.all(
-    by.css('.protractor-test-upload-audio')).last();
-  var saveUploadedAudioButton = element(
-    by.css('.protractor-test-save-uploaded-audio'));
   var playPauseAudioButton = element(
     by.css('.protractor-test-play-pause-audio-button'));
   var audioMaterialSliderDiv = element(by.css('.md-slider-wrapper'));
@@ -234,6 +242,9 @@ var ExplorationEditorTranslationTab = function() {
       'Audio Record button is not clickable');
     uploadAudioButton.click();
     absPath = path.resolve(__dirname, audioPath);
+    waitFor.visibilityOf(
+      audioUploadInput,
+      'Audio upload input field is not visible');
     return audioUploadInput.sendKeys(absPath);
   };
 
@@ -306,7 +317,7 @@ var ExplorationEditorTranslationTab = function() {
   this.uploadAudio = function(relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
-    audioUploadInputElement.sendKeys(audioAbsolutePath);
+    audioUploadInput.sendKeys(audioAbsolutePath);
     waitFor.elementToBeClickable(
       saveUploadedAudioButton, 'Save button is not clickable');
     saveUploadedAudioButton.click();
@@ -317,7 +328,7 @@ var ExplorationEditorTranslationTab = function() {
   this.expectWrongFileType = function(relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
-    audioUploadInputElement.sendKeys(audioAbsolutePath);
+    audioUploadInput.sendKeys(audioAbsolutePath);
     expect(element(by.css('div.error-message')).getText())
       .toContain('This file is not recognized as an audio file.');
   };
@@ -325,7 +336,7 @@ var ExplorationEditorTranslationTab = function() {
   this.expectAudioOverFiveMinutes = function(relativePathOfAudioToUpload) {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
-    audioUploadInputElement.sendKeys(audioAbsolutePath);
+    audioUploadInput.sendKeys(audioAbsolutePath);
     waitFor.elementToBeClickable(
       saveUploadedAudioButton, 'Save button is not clickable');
     saveUploadedAudioButton.click();
@@ -532,7 +543,7 @@ var ExplorationEditorTranslationTab = function() {
         }
       }
       if (!matched) {
-        throw Error(
+        throw new Error(
           'State ' + targetName + ' not found by editorTranslationTab.' +
           'moveToState.');
       }
@@ -552,7 +563,7 @@ var ExplorationEditorTranslationTab = function() {
         }
       }
       if (!matched) {
-        throw Error(
+        throw new Error(
           'State ' + targetName +
           ' not found by editorTranslationTab.expectCorrectStatusColor.');
       }

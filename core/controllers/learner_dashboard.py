@@ -79,7 +79,7 @@ class LearnerDashboardHandler(base.BaseHandler):
             self.user_id)
         if len(full_thread_ids) > 0:
             thread_summaries, number_of_unread_threads = (
-                feedback_services.get_thread_summaries(
+                feedback_services.get_exp_thread_summaries(
                     self.user_id, full_thread_ids))
         else:
             thread_summaries, number_of_unread_threads = [], 0
@@ -175,7 +175,9 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
                 'description': suggestion_thread.subject,
                 'author_username': authors_settings[0].username,
                 'author_picture_data_url': (
-                    authors_settings[0].profile_picture_data_url)
+                    authors_settings[0].profile_picture_data_url),
+                'created_on_msecs': utils.get_time_in_millisecs(
+                    messages[0].created_on)
             }
             message_summary_list.append(suggestion_summary)
             messages.pop(0)
@@ -197,7 +199,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
                 'updated_status': m.updated_status,
                 'author_username': author_username,
                 'author_picture_data_url': author_picture_data_url,
-                'created_on': utils.get_time_in_millisecs(m.created_on)
+                'created_on_msecs': utils.get_time_in_millisecs(m.created_on)
             }
             message_summary_list.append(message_summary)
 

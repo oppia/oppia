@@ -37,6 +37,16 @@ var SkillEditorPage = function() {
   var workedExampleSummary = function(index) {
     return element(by.css('.protractor-test-worked-example-' + index));
   };
+  var workedExampleQuestion = element(
+    by.css('.protractor-test-worked-example-question')
+  ).all(by.tagName('p')).last();
+  var workedExampleExplanation = element(
+    by.css('.protractor-test-worked-example-explanation')
+  ).all(by.tagName('p')).last();
+  var workedExampleQuestionField = element(
+    by.css('.protractor-test-worked-example-question-field'));
+  var workedExampleExplanationField = element(
+    by.css('.protractor-test-worked-example-explanation-field'));
   var deleteWorkedExampleButton = function(index) {
     return element(
       by.css('.protractor-test-worked-example-' + index))
@@ -83,21 +93,65 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-question-list-item'));
   var questionItem = element(by.css('.protractor-test-question-list-item'));
 
-  var editRubricExplanationButtons = element.all(
-    by.css('.protractor-test-edit-rubric-explanation'));
   var saveRubricExplanationButton = element(
     by.css('.protractor-test-save-rubric-explanation-button'));
-  var rubricExplanations = element.all(
-    by.css('.protractor-test-rubric-explanation'));
+  var deleteRubricExplanationButton = element(
+    by.css('.protractor-test-delete-rubric-explanation-button'));
 
   this.get = function(skillId) {
     browser.get(EDITOR_URL_PREFIX + skillId);
     return waitFor.pageToFullyLoad();
   };
 
-  this.editRubricExplanationWithIndex = function(index, explanation) {
+  this.addRubricExplanationForDifficulty = function(difficulty, explanation) {
+    var addRubricExplanationButton = element(
+      by.css('.protractor-test-add-explanation-button-' + difficulty));
+    waitFor.elementToBeClickable(
+      addRubricExplanationButton,
+      'Add Rubric Explanation button takes too long to be clickable');
+    addRubricExplanationButton.click();
+    var editor = element(
+      by.css('.protractor-test-rubric-explanation-text'));
+    waitFor.visibilityOf(
+      editor, 'Rubric explanation editor takes too long to appear');
+    browser.switchTo().activeElement().sendKeys(explanation);
+    waitFor.elementToBeClickable(
+      saveRubricExplanationButton,
+      'Save Rubric Explanation button takes too long to be clickable');
+    saveRubricExplanationButton.click();
+  };
+
+  this.deleteRubricExplanationWithIndex = function(difficulty, explIndex) {
+    // The edit explanation buttons for all explanations of a difficulty have
+    // the same class name and each explanation in it are identified by its
+    // index.
+    var editRubricExplanationButtons = element.all(
+      by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
     editRubricExplanationButtons.then(function(buttons) {
-      buttons[index].click();
+      waitFor.elementToBeClickable(
+        buttons[explIndex],
+        'Edit Rubric Explanation button takes too long to be clickable');
+      buttons[explIndex].click();
+      var editor = element(
+        by.css('.protractor-test-rubric-explanation-text'));
+      waitFor.visibilityOf(
+        editor, 'Rubric explanation editor takes too long to appear');
+      deleteRubricExplanationButton.click();
+    });
+  };
+
+  this.editRubricExplanationWithIndex = function(
+      difficulty, explIndex, explanation) {
+    // The edit explanation buttons for all explanations of a difficulty have
+    // the same class name and each explanation in it are identified by its
+    // index.
+    var editRubricExplanationButtons = element.all(
+      by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
+    editRubricExplanationButtons.then(function(buttons) {
+      waitFor.elementToBeClickable(
+        buttons[explIndex],
+        'Edit Rubric Explanation button takes too long to be clickable');
+      buttons[explIndex].click();
       var editor = element(
         by.css('.protractor-test-rubric-explanation-text'));
       waitFor.visibilityOf(
@@ -110,11 +164,17 @@ var SkillEditorPage = function() {
     });
   };
 
-  this.expectRubricExplanationToMatch = function(index, explanation) {
-    rubricExplanations.then(function(explanations) {
-      explanations[index].getText().then(function(text) {
-        expect(text).toMatch(explanation);
-      });
+  this.expectRubricExplanationsToMatch = function(difficulty, explanations) {
+    var rubricExplanationsForDifficulty = element.all(
+      by.css('.protractor-test-rubric-explanation-' + difficulty));
+    var explanationCounter = 0;
+    rubricExplanationsForDifficulty.then(function(explanationElements) {
+      for (var idx in explanationElements) {
+        explanationElements[idx].getText().then(function(text) {
+          expect(text).toMatch(explanations[explanationCounter]);
+          explanationCounter++;
+        });
+      }
     });
   };
 
@@ -189,7 +249,7 @@ var SkillEditorPage = function() {
     });
   };
 
-  this.addWorkedExample = function(example) {
+  this.addWorkedExample = function(question, explanation) {
     addWorkedExampleButton.click();
 
     var addWorkedExampleModal =
@@ -198,7 +258,11 @@ var SkillEditorPage = function() {
       addWorkedExampleModal,
       'Add Worked Example Modal takes too long to appear');
 
-    browser.switchTo().activeElement().sendKeys(example);
+    workedExampleQuestion.click();
+    browser.switchTo().activeElement().sendKeys(question);
+
+    workedExampleExplanation.click();
+    browser.switchTo().activeElement().sendKeys(explanation);
 
     waitFor.elementToBeClickable(
       saveWorkedExampleButton,
@@ -225,9 +289,23 @@ var SkillEditorPage = function() {
       'Delete Worked Example Modal takes too long to close');
   };
 
-  this.expectWorkedExampleSummariesToMatch = function(examples) {
-    for (var index in examples) {
-      expect(workedExampleSummary(index).getText()).toMatch(examples[index]);
+  this.expectWorkedExampleSummariesToMatch = function(questions, explanations) {
+    // This is declared separately since the expect() statements are in an async
+    // callback and so 'index' gets incremented before the check is done. So, we
+    // need another variable to track the correct index to check.
+    var questionIndexToCheck = 0;
+    var explanationIndexToCheck = 0;
+    for (var index in questions) {
+      workedExampleSummary(index).click();
+      workedExampleQuestionField.getText().then(function(text) {
+        expect(text).toMatch(questions[questionIndexToCheck]);
+        questionIndexToCheck++;
+      });
+      workedExampleExplanationField.getText().then(function(text) {
+        expect(text).toMatch(explanations[explanationIndexToCheck]);
+        explanationIndexToCheck++;
+      });
+      workedExampleSummary(index).click();
     }
   };
 

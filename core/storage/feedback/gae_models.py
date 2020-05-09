@@ -234,10 +234,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     # rest of the thread, should exist only when the subject changes.
     updated_subject = ndb.StringProperty(indexed=False)
     # Message text. Allowed not to exist (e.g. post only to update the status).
-    # TODO(#8368): String properties have a size limit of 1500 bytes according
-    # to the GAE API. We should investigate the effort required to use
-    # ndb.TextProperty instead.
-    text = ndb.StringProperty(indexed=False)
+    text = ndb.TextProperty(indexed=False)
     # Whether the incoming message is received by email (as opposed to via
     # the web).
     received_via_email = (

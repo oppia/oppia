@@ -16,7 +16,7 @@
  * @fileoverview End-to-end testing utilities for the Fraction interaction.
  */
 
-var objects = require('../../objects/protractor.js');
+var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
 var customizeInteraction = function(elem, requireSimplestForm) {
   objects.BooleanEditor(elem.element(by.tagName('schema-based-bool-editor')))

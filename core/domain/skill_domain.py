@@ -17,7 +17,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
+
 from constants import constants
+from core.domain import android_validation_constants
 from core.domain import change_domain
 from core.domain import html_cleaner
 from core.domain import state_domain
@@ -129,7 +132,7 @@ class SkillChange(change_domain.BaseChange):
         'optional_attribute_names': []
     }, {
         'name': CMD_UPDATE_RUBRICS,
-        'required_attribute_names': ['difficulty', 'explanation'],
+        'required_attribute_names': ['difficulty', 'explanations'],
         'optional_attribute_names': []
     }, {
         'name': CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
@@ -246,8 +249,13 @@ class Misconception(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected misconception name to be a string, received %s' %
                 self.name)
-        utils.require_valid_name(
-            self.name, 'misconception_name', allow_empty=False)
+
+        misconception_name_length_limit = (
+            android_validation_constants.MAX_CHARS_IN_MISCONCEPTION_NAME)
+        if len(self.name) > misconception_name_length_limit:
+            raise utils.ValidationError(
+                'Misconception name should be less than %d chars, received %s'
+                % (misconception_name_length_limit, self.name))
 
         if not isinstance(self.notes, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -268,15 +276,17 @@ class Misconception(python_utils.OBJECT):
 class Rubric(python_utils.OBJECT):
     """Domain object describing a skill rubric."""
 
-    def __init__(self, difficulty, explanation):
+    def __init__(self, difficulty, explanations):
         """Initializes a Rubric domain object.
 
         Args:
             difficulty: str. The question difficulty that this rubric addresses.
-            explanation: str. The explanation for the corresponding difficulty.
+            explanations: list(str). The different explanations for the
+                corresponding difficulty.
         """
         self.difficulty = difficulty
-        self.explanation = html_cleaner.clean(explanation)
+        self.explanations = [
+            html_cleaner.clean(explanation) for explanation in explanations]
 
     def to_dict(self):
         """Returns a dict representing this Rubric domain object.
@@ -286,7 +296,7 @@ class Rubric(python_utils.OBJECT):
         """
         return {
             'difficulty': self.difficulty,
-            'explanation': self.explanation
+            'explanations': self.explanations
         }
 
     @classmethod
@@ -300,7 +310,7 @@ class Rubric(python_utils.OBJECT):
             Rubric. The corresponding Rubric domain object.
         """
         rubric = cls(
-            rubric_dict['difficulty'], rubric_dict['explanation'])
+            rubric_dict['difficulty'], rubric_dict['explanations'])
 
         return rubric
 
@@ -319,10 +329,82 @@ class Rubric(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid difficulty received for rubric: %s' % self.difficulty)
 
-        if not isinstance(self.explanation, python_utils.BASESTRING):
+        if not isinstance(self.explanations, list):
             raise utils.ValidationError(
-                'Expected explanation to be a string, received %s' %
-                self.explanation)
+                'Expected explanations to be a list, received %s' %
+                self.explanations)
+
+        for explanation in self.explanations:
+            if not isinstance(explanation, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected each explanation to be a string, received %s' %
+                    explanation)
+
+
+class WorkedExample(python_utils.OBJECT):
+    """Domain object for representing the worked_example dict."""
+
+    def __init__(self, question, explanation):
+        """Constructs a WorkedExample domain object.
+
+        Args:
+            question: SubtitledHtml. The example question.
+            explanation: SubtitledHtml. The explanation for the above example
+                question.
+        """
+        self.question = question
+        self.explanation = explanation
+
+    def validate(self):
+        """Validates various properties of the WorkedExample object.
+
+        Raises:
+            ValidationError: One or more attributes of the worked example are
+            invalid.
+        """
+        if not isinstance(self.question, state_domain.SubtitledHtml):
+            raise utils.ValidationError(
+                'Expected example question to be a SubtitledHtml object, '
+                'received %s' % self.question)
+        self.question.validate()
+        if not isinstance(self.explanation, state_domain.SubtitledHtml):
+            raise utils.ValidationError(
+                'Expected example explanation to be a SubtitledHtml object, '
+                'received %s' % self.question)
+        self.explanation.validate()
+
+    def to_dict(self):
+        """Returns a dict representing this WorkedExample domain object.
+
+        Returns:
+            A dict, mapping all fields of WorkedExample instance.
+        """
+        return {
+            'question': self.question.to_dict(),
+            'explanation': self.explanation.to_dict()
+        }
+
+    @classmethod
+    def from_dict(cls, worked_example_dict):
+        """Return a WorkedExample domain object from a dict.
+
+        Args:
+            worked_example_dict: dict. The dict representation of
+                WorkedExample object.
+
+        Returns:
+            WorkedExample. The corresponding WorkedExample domain object.
+        """
+        worked_example = cls(
+            state_domain.SubtitledHtml(
+                worked_example_dict['question']['content_id'],
+                worked_example_dict['question']['html']),
+            state_domain.SubtitledHtml(
+                worked_example_dict['explanation']['content_id'],
+                worked_example_dict['explanation']['html'])
+        )
+
+        return worked_example
 
 
 class SkillContents(python_utils.OBJECT):
@@ -336,8 +418,8 @@ class SkillContents(python_utils.OBJECT):
         Args:
             explanation: SubtitledHtml. An explanation on how to apply the
                 skill.
-            worked_examples: list(SubtitledHtml). A list of worked examples
-                for the skill. Each element should be a SubtitledHtml object.
+            worked_examples: list(WorkedExample). A list of worked examples
+                for the skill. Each element should be a WorkedExample object.
             recorded_voiceovers: RecordedVoiceovers. The recorded voiceovers for
                 the skill contents and their translations in different
                 languages.
@@ -368,15 +450,21 @@ class SkillContents(python_utils.OBJECT):
                 'Expected worked examples to be a list, received %s' %
                 self.worked_examples)
         for example in self.worked_examples:
-            if not isinstance(example, state_domain.SubtitledHtml):
+            if not isinstance(example, WorkedExample):
                 raise utils.ValidationError(
-                    'Expected worked example to be a SubtitledHtml object, '
+                    'Expected worked example to be a WorkedExample object, '
                     'received %s' % example)
-            if example.content_id in available_content_ids:
-                raise utils.ValidationError(
-                    'Found a duplicate content id %s' % example.content_id)
-            available_content_ids.add(example.content_id)
             example.validate()
+            if example.question.content_id in available_content_ids:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s'
+                    % example.question.content_id)
+            if example.explanation.content_id in available_content_ids:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s'
+                    % example.explanation.content_id)
+            available_content_ids.add(example.question.content_id)
+            available_content_ids.add(example.explanation.content_id)
 
         self.recorded_voiceovers.validate(available_content_ids)
         self.written_translations.validate(available_content_ids)
@@ -410,10 +498,8 @@ class SkillContents(python_utils.OBJECT):
             state_domain.SubtitledHtml(
                 skill_contents_dict['explanation']['content_id'],
                 skill_contents_dict['explanation']['html']),
-            [state_domain.SubtitledHtml(
-                worked_example['content_id'],
-                worked_example['html'])
-             for worked_example in skill_contents_dict['worked_examples']],
+            [WorkedExample.from_dict(example)
+             for example in skill_contents_dict['worked_examples']],
             state_domain.RecordedVoiceovers.from_dict(skill_contents_dict[
                 'recorded_voiceovers']),
             state_domain.WrittenTranslations.from_dict(skill_contents_dict[
@@ -510,6 +596,13 @@ class Skill(python_utils.OBJECT):
 
         if description == '':
             raise utils.ValidationError('Description field should not be empty')
+
+        description_length_limit = (
+            android_validation_constants.MAX_CHARS_IN_SKILL_DESCRIPTION)
+        if len(description) > description_length_limit:
+            raise utils.ValidationError(
+                'Skill description should be less than %d chars, received %s'
+                % (description_length_limit, description))
 
     def validate(self):
         """Validates various properties of the Skill object.
@@ -775,6 +868,22 @@ class Skill(python_utils.OBJECT):
         return misconception_dict
 
     @classmethod
+    def _convert_rubric_v1_dict_to_v2_dict(cls, rubric_dict):
+        """Converts v1 rubric schema to the v2 schema. In the v2 schema,
+        multiple explanations have been added for each difficulty.
+
+        Args:
+            rubric_dict: dict. The v1 rubric dict.
+
+        Returns:
+            dict. The converted rubric_dict.
+        """
+        explanation = rubric_dict['explanation']
+        del rubric_dict['explanation']
+        rubric_dict['explanations'] = [explanation]
+        return rubric_dict
+
+    @classmethod
     def update_rubrics_from_model(cls, versioned_rubrics, current_version):
         """Converts the rubrics blob contained in the given
         versioned_rubrics dict from current_version to
@@ -838,14 +947,13 @@ class Skill(python_utils.OBJECT):
         """Updates the explanation of the skill.
 
         Args:
-            explanation: dict. The new explanation of the skill.
+            explanation: SubtitledHtml. The new explanation of the skill.
         """
         old_content_ids = []
         if self.skill_contents.explanation:
             old_content_ids = [self.skill_contents.explanation.content_id]
 
-        self.skill_contents.explanation = (
-            state_domain.SubtitledHtml.from_dict(explanation))
+        self.skill_contents.explanation = explanation
 
         new_content_ids = [self.skill_contents.explanation.content_id]
         self._update_content_ids_in_assets(old_content_ids, new_content_ids)
@@ -855,16 +963,20 @@ class Skill(python_utils.OBJECT):
         of the provided list.
 
         Args:
-            worked_examples: list(SubtitledHtml). The new worked examples of
+            worked_examples: list(WorkedExample). The new worked examples of
                 the skill.
         """
-        old_content_ids = [worked_example.content_id for worked_example in (
-            self.skill_contents.worked_examples)]
+        old_content_ids = [
+            example_field.content_id
+            for example in self.skill_contents.worked_examples
+            for example_field in (example.question, example.explanation)]
 
         self.skill_contents.worked_examples = list(worked_examples)
 
-        new_content_ids = [worked_example.content_id for worked_example in (
-            self.skill_contents.worked_examples)]
+        new_content_ids = [
+            example_field.content_id
+            for example in self.skill_contents.worked_examples
+            for example_field in (example.question, example.explanation)]
 
         self._update_content_ids_in_assets(old_content_ids, new_content_ids)
 
@@ -967,16 +1079,16 @@ class Skill(python_utils.OBJECT):
             raise ValueError('The skill to remove is not a prerequisite skill.')
         del self.prerequisite_skill_ids[index]
 
-    def update_rubric(self, difficulty, explanation):
+    def update_rubric(self, difficulty, explanations):
         """Adds or updates the rubric of the given difficulty.
 
         Args:
             difficulty: str. The difficulty of the rubric.
-            explanation: str. The explanation for the rubric.
+            explanations: list(str). The explanations for the rubric.
         """
         for rubric in self.rubrics:
             if rubric.difficulty == difficulty:
-                rubric.explanation = explanation
+                rubric.explanations = copy.deepcopy(explanations)
                 return
         raise ValueError(
             'There is no rubric for the given difficulty.')

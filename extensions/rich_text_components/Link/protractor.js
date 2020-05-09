@@ -17,7 +17,7 @@
  * end-to-end testing with Protractor.js
  */
 
-var objects = require('../../objects/protractor.js');
+var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
 var customizeComponent = function(modal, url) {
   objects.SanitizedUrlEditor(

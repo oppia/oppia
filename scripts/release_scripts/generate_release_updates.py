@@ -102,7 +102,9 @@ def get_new_authors_and_contributors_mail_ids():
         release_summary_lines = f.readlines()
 
     new_authors_and_contributors_mail_ids = []
-    for line_text in ['### New Authors:\n', '### New Contributors:\n']:
+    for line_text in [
+            release_constants.NEW_AUTHORS_HEADER,
+            release_constants.NEW_CONTRIBUTORS_HEADER]:
         start_index = release_summary_lines.index(line_text)
         end_index = start_index
         for index, line in enumerate(release_summary_lines[start_index + 1:]):
@@ -124,6 +126,8 @@ def prompt_user_to_send_announcement_email():
     """
     new_contributors_mail_ids = (', ').join(
         get_new_authors_and_contributors_mail_ids())
+    release_version = common.get_current_release_version_number(
+        common.get_current_branch_name())
     common.open_new_tab_in_browser_if_possible(
         'https://www.gmail.com')
     common.ask_user_to_confirm(
@@ -131,36 +135,56 @@ def prompt_user_to_send_announcement_email():
         '   TO: oppia-dev@googlegroups.com\n'
         '   BCC: oppia@googlegroups.com, '
         'oppia-announce@googlegroups.com, %s\n'
+        'with the following subject: "Announcing release v%s of Oppia!"'
         'Please make sure to check that the mail ids of new authors '
         'and contributors are correct.\n' % (
-            RELEASE_MAIL_MESSAGE_FILEPATH, new_contributors_mail_ids))
-
+            RELEASE_MAIL_MESSAGE_FILEPATH, new_contributors_mail_ids,
+            release_version))
     common.open_new_tab_in_browser_if_possible(
         'https://groups.google.com/forum/#!categories/oppia/announcements')
+    common.ask_user_to_confirm('Add announcements label to the email sent.\n')
     common.ask_user_to_confirm(
         'Ensure the email sent to oppia@ is in the Announcements category')
 
 
-def create_group_for_next_release():
-    """Asks the release co-ordinator to create a new chat group for
-    the next release.
+def prepare_for_next_release():
+    """Asks the release co-ordinator:
+        1. To create a new chat group for the next release and send a message
+        to make the release & QA co-ordinators aware.
+        2. Send message to oppia-dev to inform about next release cut.
+        3. Send message to oppia-dev as a reminder for job submissions.
     """
     common.open_new_tab_in_browser_if_possible(
         release_constants.RELEASE_ROTA_URL)
     common.ask_user_to_confirm(
-        'Please do the following two things:\n\n'
-        '1. Create a new chat group for the next release, '
+        'Create a new chat group for the next release, '
         'and add the release coordinator, QA lead, Ankita '
         'and Nithesh to that group. You can find the release schedule '
-        'and coordinators here: %s\n\n'
-        '2. Please send the following message to the newly created group:\n\n'
+        'and coordinators here: %s\n' % release_constants.RELEASE_ROTA_URL)
+    common.ask_user_to_confirm(
+        'Please send the following message to the newly created group:\n\n'
         'Hi all, This is the group chat for the next release. '
         '[Release co-ordinator\'s name] and [QA Lead\'s name] will be '
         'the release co-ordinator & QA Lead for next release. '
         'Please follow the release process doc: '
         '[Add link to release process doc] to ensure the release '
-        'follows the schedule. Thanks!\n' % (
-            release_constants.RELEASE_ROTA_URL))
+        'follows the schedule. Thanks!\n')
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.OPPIA_DEV_GROUP_URL)
+    common.ask_user_to_confirm(
+        'Send the following message to oppia-dev:\n\n'
+        'Hi all, This is an update for the next month\'s release. '
+        'The next month release cut is [Add release cut date for next month]. '
+        'Make sure you plan your tasks accordingly. Thanks!\n'
+        'The subject for the message: Updates for next release\n')
+    common.ask_user_to_confirm(
+        'Send the following message to oppia-dev:\n\n'
+        'Hi all, This is a reminder to fill in the job requests '
+        'here: %s if you are planning to run your job in the next release. '
+        'Please fill in the requests by [Add a deadline which is at least 7 '
+        'days before the next release cut]. Thanks!\n'
+        'The subject for the message: Deadline for job requests for '
+        'the next release\n' % release_constants.JOBS_FORM_URL)
 
 
 def main():
@@ -183,7 +207,7 @@ def main():
     finally:
         if os.path.exists(RELEASE_MAIL_MESSAGE_FILEPATH):
             os.remove(RELEASE_MAIL_MESSAGE_FILEPATH)
-    create_group_for_next_release()
+    prepare_for_next_release()
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

@@ -25,6 +25,7 @@ var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 
 describe('Collections', function() {
@@ -36,11 +37,13 @@ describe('Collections', function() {
   var secondExplorationId = null;
   var thirdExplorationId = null;
   var fourthExplorationId = null;
+  var libraryPage = null;
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
+    libraryPage = new LibraryPage.LibraryPage();
     var EDITOR_USERNAME = 'aliceCollections';
     var PLAYER_USERNAME = 'playerCollections';
     var CREATOR_USERNAME = 'creatorExplorations';
@@ -161,8 +164,9 @@ describe('Collections', function() {
 
   it('visits the collection player', function() {
     users.login('alice@collections.com');
-    browser.get('/collection/' + collectionId);
-    waitFor.pageToFullyLoad();
+    libraryPage.get();
+    libraryPage.findCollection('Test Collection');
+    libraryPage.playCollection('Test Collection');
     users.logout();
   });
 

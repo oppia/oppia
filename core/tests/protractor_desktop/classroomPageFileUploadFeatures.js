@@ -51,28 +51,31 @@ describe('Classroom page functionality', function() {
   });
 
   it('should add a new published topic to the Math classroom', function() {
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
-    topicEditorPage.submitTopicThumbnail('../data/img.png');
-    topicEditorPage.saveTopic('Added thumbnail.');
-    browser.getCurrentUrl().then(function(url) {
-      var topicId = url.split('/')[4].slice(0, -1);
-      adminPage.editConfigProperty(
-        'The set of topic IDs for each classroom page.',
-        'List',
-        function(elem) {
-          elem.editItem(0, 'Dictionary').editEntry(1, 'List').addItem(
-            'Unicode').setValue(topicId);
-        });
-      classroomPage.get('Math');
-      classroomPage.expectNumberOfTopicsToBe(0);
+    browser.getWindowHandle().then(function(handle) {
       topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
-      topicEditorPage.publishTopic();
-      classroomPage.get('Math');
-      classroomPage.expectNumberOfTopicsToBe(1);
+      topicsAndSkillsDashboardPage.createTopic('Topic 1', false);
+      topicEditorPage.submitTopicThumbnail('../data/test_svg.svg');
+      topicEditorPage.saveTopic('Added thumbnail.');
+      browser.getCurrentUrl().then(function(url) {
+        var topicId = url.split('/')[4].slice(0, -1);
+        general.closeCurrentTabAndSwitchTo(handle);
+        adminPage.editConfigProperty(
+          'The set of topic IDs for each classroom page.',
+          'List',
+          function(elem) {
+            elem.editItem(0, 'Dictionary').editEntry(1, 'List').addItem(
+              'Unicode').setValue(topicId);
+          });
+        classroomPage.get('math');
+        classroomPage.expectNumberOfTopicsToBe(0);
+        topicsAndSkillsDashboardPage.get();
+        topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+        topicEditorPage.publishTopic();
+        classroomPage.get('math');
+        classroomPage.expectNumberOfTopicsToBe(1);
+        users.logout();
+      });
     });
-    users.logout();
   });
 
   afterEach(function() {

@@ -46,16 +46,20 @@ var CreatorDashboardPage = function() {
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = function(explorationTitle) {
+    waitFor.visibilityOf(
+      element(by.css('.protractor-test-exploration-dashboard-card')));
     var allExplorationDashboardCard = element.all(
       by.css('.protractor-test-exploration-dashboard-card'));
-    return allExplorationDashboardCard.filter(function(tile) {
-      return tile.element(
-        by.css('.protractor-test-exp-summary-tile-title')
-      ).element(by.tagName('span')).getText().then(
-        function(tileTitle) {
-          return (tileTitle === explorationTitle);
-        }
-      );
+    return allExplorationDashboardCard.then(function(tiles) {
+      return tiles.filter(function(tile) {
+        return tile.getText().then(function(text) {
+          // Tile text contains title, possibly followed by newline and text
+          return (
+            text.startsWith(explorationTitle + '\n') ||
+            text === explorationTitle
+          );
+        });
+      });
     });
   };
 
@@ -130,7 +134,8 @@ var CreatorDashboardPage = function() {
   this.editExploration = function(explorationTitle) {
     _getExplorationElements(explorationTitle).then(function(elems) {
       if (elems.length === 0) {
-        throw 'Could not find exploration tile with name ' + explorationTitle;
+        throw new Error(
+          'Could not find exploration tile with name ' + explorationTitle);
       }
       var explorationElement = elems[0].element(
         by.css('.protractor-test-title-mask'));
@@ -253,7 +258,8 @@ var CreatorDashboardPage = function() {
   this.expectToHaveExplorationCard = function(explorationName) {
     _getExplorationElements(explorationName).then(function(elems) {
       if (elems.length === 0) {
-        throw 'Could not find exploration title with name ' + explorationTitle;
+        throw new Error(
+          'Could not find exploration title with name ' + explorationTitle);
       }
       expect(elems.length).toBeGreaterThanOrEqual(1);
     });

@@ -16,17 +16,18 @@
 
 This script should be run from the oppia root folder:
 
-    python -m scripts.restore_backup --project_name={{name_of_project}}
+    python -m scripts.release_scripts.restore_backup
+    --project_name={{name_of_project}}
 
 The name of the project should match the project name on App Engine.
 
 If the status of a backup restoration is to be checked, run the script as:
 
-    python -m scripts.restore_backup --check_status
+    python -m scripts.release_scripts.restore_backup --check_status
 
 If you want to cancel a backup restoration operation, run the script as:
 
-    python -m scripts.restore_backup --cancel_operation
+    python -m scripts.release_scripts.restore_backup --cancel_operation
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -78,9 +79,10 @@ def initiate_backup_restoration_process():
         'Navigate into the newest backup folder. \n'
         'There should be a file here of the form '
         '<date_time>.overall_export_metadata. \n'
-        'For example, "20181122-090002.overall_export_metadata". '
+        'For example, "<folder-name>/20200213-090001/'
+        '20200213-090001.overall_export_metadata". '
         'This is the file you want to import.\n'
-        'Please copy and enter the path of this file\n')
+        'Please copy and enter the full path of this file\n')
     export_metadata_filepath = python_utils.INPUT()
     if not re.match(
             r'^oppia-export-backups/(\d{8}-\d{6})/\1\.overall_export_metadata$',
@@ -147,7 +149,8 @@ def main(args=None):
         python_utils.PRINT(
             'Backup restoration process initiated!\n'
             'To check the status of the project please run: '
-            'python -m scripts.restore_backup --check_status')
+            'python -m scripts.release_scripts.restore_backup '
+            '--check_status')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

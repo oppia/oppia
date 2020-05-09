@@ -73,6 +73,31 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(saved_exploration.objective, 'An Objective')
 
 
+class ExplorationContextModelUnitTests(test_utils.GenericTestBase):
+    """Tests the ExplorationContextModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            exp_models.ExplorationContextModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_has_reference_to_user_id(self):
+        self.assertFalse(
+            exp_models.ExplorationContextModel
+            .has_reference_to_user_id('any_id'))
+
+    def test_get_export_policy(self):
+        self.assertEqual(
+            exp_models.ExplorationModel.get_export_policy(),
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            exp_models.ExplorationContextModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
+
+
 class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationRightsModel class."""
     EXPLORATION_ID_1 = '1'

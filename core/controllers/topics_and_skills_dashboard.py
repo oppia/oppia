@@ -117,8 +117,11 @@ class NewTopicHandler(base.BaseHandler):
         """Handles POST requests."""
         name = self.payload.get('name')
         abbreviated_name = self.payload.get('abbreviated_name')
-        topic_domain.Topic.require_valid_name(name)
-        topic_domain.Topic.require_valid_abbreviated_name(abbreviated_name)
+        try:
+            topic_domain.Topic.require_valid_name(name)
+        except:
+            raise self.InvalidInputException(
+                'Invalid topic name, received %s.' % name)
         new_topic_id = topic_services.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
             new_topic_id, name, abbreviated_name)
@@ -138,6 +141,7 @@ class NewSkillHandler(base.BaseHandler):
         linked_topic_ids = self.payload.get('linked_topic_ids')
         explanation_dict = self.payload.get('explanation_dict')
         rubrics = self.payload.get('rubrics')
+
         if not isinstance(rubrics, list):
             raise self.InvalidInputException('Rubrics should be a list.')
 
@@ -165,7 +169,9 @@ class NewSkillHandler(base.BaseHandler):
 
         skill = skill_domain.Skill.create_default_skill(
             new_skill_id, description, rubrics)
-        skill.update_explanation(explanation_dict)
+
+        skill.update_explanation(
+            state_domain.SubtitledHtml.from_dict(explanation_dict))
         skill_services.save_new_skill(self.user_id, skill)
 
         self.render_json({

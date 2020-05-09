@@ -46,7 +46,6 @@ class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
             self.topic_id)
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[self.story_id],
             additional_story_ids=[], uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=1)
@@ -129,6 +128,42 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
             expected_status_int=401)
 
 
+class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
+
+    def test_validation_error_messages(self):
+        # Check that admins can publish a story.
+        self.login(self.ADMIN_EMAIL)
+        self.save_new_valid_exploration(
+            '0', self.admin_id, title='Title 1',
+            category='Mathematics', language_code='en')
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX, self.story_id),
+            params={
+                'comma_separated_exp_ids': '15,0'
+            })
+
+        error_messages = json_response['validation_error_messages']
+        message_1 = (
+            'Expected story to only reference valid explorations, but found '
+            'a reference to an invalid exploration with ID: 15')
+        message_2 = (
+            'Exploration with ID 0 is not public. Please publish '
+            'explorations before adding them to a story.'
+        )
+        self.assertEqual(error_messages, [message_1, message_2])
+        self.logout()
+
+    def test_invalid_input_exception_when_no_exp_ids_passed(self):
+        # Check that admins can publish a story.
+        self.login(self.ADMIN_EMAIL)
+        self.get_json(
+            '%s/%s' % (
+                feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX, self.story_id),
+            expected_status_int=400)
+        self.logout()
+
+
 class StoryEditorTests(BaseStoryEditorControllerTests):
 
     def test_can_not_access_story_editor_page_with_invalid_story_id(self):
@@ -191,7 +226,6 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         self.save_new_topic(
             'topic_id_new', self.admin_id, name='Name 2',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=1)
@@ -268,7 +302,6 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         # associated with the new topic.
         self.save_new_topic(
             'topic_id_new', self.admin_id, name='Name 2',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=1)
@@ -319,11 +352,14 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
     def test_delete_can_not_access_story_handler_with_invalid_topic_id(self):
         self.login(self.ADMIN_EMAIL)
-        topic_services.delete_topic(self.admin_id, self.topic_id)
+        new_story_id = story_services.get_new_story_id()
+        self.save_new_story(
+            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
+            'invalid_topic_id')
         self.delete_json(
             '%s/%s' % (
                 feconf.STORY_EDITOR_DATA_URL_PREFIX,
-                self.story_id),
+                new_story_id),
             expected_status_int=404)
         self.logout()
 

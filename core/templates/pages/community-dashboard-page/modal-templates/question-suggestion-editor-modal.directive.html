@@ -1,0 +1,49 @@
+<div class="oppia-question-suggestion-editor-modal">
+  <div class="modal-header">
+    <h3><[skill.getDescription()]></h3>
+  </div>
+
+  <div class="modal-body">
+    <div class="oppia-question-editor-section">
+      <h3>Question Editor</h3>
+      <question-editor question-id="questionId"
+                       misconceptions-by-skill="misconceptionsBySkill"
+                       question-state-data="questionStateData"
+                       question="question"
+                       can-edit-question="canEditQuestion"
+                       question-changed="questionChanged">
+      </question-editor>
+    </div>
+    <div class="alert alert-danger" ng-if="validationError">
+      <[validationError]>
+      <span class="oppia-transition-200"
+            ng-click="removeErrors()"
+            style="float: right;">
+        <i class="material-icons md-18">&#xE5CD;</i>
+      </span>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
+    <button ng-if="newQuestionIsBeingCreated"
+            title="To Save please add: interaction, hint, solution and address all misconceptions"
+            class="btn btn-success protractor-test-save-question-button"
+            ng-click="done()"
+            ng-disabled="isSaveButtonDisabled()">
+      Submit Question
+    </button>
+  </div>
+</div>
+
+<style>
+  .oppia-question-editor-section {
+    padding: 0 100px;
+  }
+  .oppia-question-suggestion-editor-modal {
+    padding: 0 25px;
+  }
+  .oppia-question-suggestion-editor-modal>.modal-header {
+    padding-bottom: 0;
+  }
+</style>

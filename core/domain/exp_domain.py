@@ -80,7 +80,7 @@ CMD_ADD_STATE = 'add_state'
 CMD_RENAME_STATE = 'rename_state'
 # This takes an additional 'state_name' parameter.
 CMD_DELETE_STATE = 'delete_state'
-# This takes addition 'state_name', 'content_id', 'language_code' and
+# This takes additional 'state_name', 'content_id', 'language_code' and
 # 'content_html' and 'translation_html' parameters.
 CMD_ADD_TRANSLATION = 'add_translation'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -596,7 +596,7 @@ class Exploration(python_utils.OBJECT):
         return exploration
 
     @classmethod
-    def _require_valid_state_name(cls, name):
+    def _validate_state_name(cls, name):
         """Validates name string.
 
         Args:
@@ -686,7 +686,7 @@ class Exploration(python_utils.OBJECT):
         if not self.states:
             raise utils.ValidationError('This exploration has no states.')
         for state_name in self.states:
-            self._require_valid_state_name(state_name)
+            self._validate_state_name(state_name)
             state = self.states[state_name]
             state.validate(
                 self.param_specs,
@@ -1208,7 +1208,7 @@ class Exploration(python_utils.OBJECT):
         if old_state_name == new_state_name:
             return
 
-        self._require_valid_state_name(new_state_name)
+        self._validate_state_name(new_state_name)
 
         self.states[new_state_name] = copy.deepcopy(
             self.states[old_state_name])
@@ -2333,6 +2333,88 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v30_dict_to_v31_dict(cls, states_dict):
+        """Converts from version 30 to 31. Version 31 updates the
+        Voiceover model to have an initialized duration_secs attribute
+        of 0.0. This will be updated when a new mp3 audio file is uploaded
+        for the exploration.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            # Get the voiceovers_mapping metadata.
+            voiceovers_mapping = (state_dict['recorded_voiceovers']
+                                  ['voiceovers_mapping'])
+            language_codes_to_audio_metadata = voiceovers_mapping.values()
+            for language_codes in language_codes_to_audio_metadata:
+                for audio_metadata in language_codes.values():
+                    # Initialize duration_secs with 0.0 for every voiceover
+                    # recording under Content, Feedback, Hints, and Solutions.
+                    # This is necessary to keep the state functional
+                    # when migrating to v31.
+                    audio_metadata['duration_secs'] = 0.0
+        return states_dict
+
+    @classmethod
+    def _convert_states_v31_dict_to_v32_dict(cls, states_dict):
+        """Converts from version 31 to 32. Version 32 adds a new
+        customization arg to SetInput interaction which allows
+        creators to add custom text to the "Add" button.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'SetInput':
+                customization_args = state_dict[
+                    'interaction']['customization_args']
+                customization_args.update({
+                    'buttonText': {
+                        'value': 'Add item'
+                    }
+                })
+
+        return states_dict
+
+    @classmethod
+    def _convert_states_v32_dict_to_v33_dict(cls, states_dict):
+        """Converts from version 32 to 33. Version 33 adds a new
+        customization arg to MultipleChoiceInput which allows
+        answer choices to be shuffled.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'MultipleChoiceInput':
+                customization_args = state_dict[
+                    'interaction']['customization_args']
+                customization_args.update({
+                    'showChoicesInShuffledOrder': {
+                        'value': False
+                    }
+                })
+
+        return states_dict
+
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -2367,7 +2449,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 35
+    CURRENT_EXP_SCHEMA_VERSION = 38
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3197,6 +3279,73 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v35_dict_to_v36_dict(cls, exploration_dict):
+        """Converts a v35 exploration dict into a v36 exploration dict.
+        Updates existing explorations to match the Voiceover class to have
+        the duration attribute initalised to 0.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v35.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v36.
+        """
+        exploration_dict['schema_version'] = 36
+
+        exploration_dict['states'] = cls._convert_states_v30_dict_to_v31_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 31
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v36_dict_to_v37_dict(cls, exploration_dict):
+        """Converts a v36 exploration dict into a v37 exploration dict.
+        Adds a new customization arg to SetInput interactions
+        which allows creators to customize the "Add item" button.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v36.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v37.
+        """
+        exploration_dict['schema_version'] = 37
+
+        exploration_dict['states'] = cls._convert_states_v31_dict_to_v32_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 32
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v37_dict_to_v38_dict(cls, exploration_dict):
+        """Converts a v37 exploration dict into a v38 exploration dict.
+        adds a new customization arg to MultipleChoiceInput which allows
+        answer choices to be shuffled.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v37.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v38.
+        """
+        exploration_dict['schema_version'] = 38
+
+        exploration_dict['states'] = cls._convert_states_v32_dict_to_v33_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 33
+
+        return exploration_dict
+
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3403,6 +3552,21 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v34_dict_to_v35_dict(
                 exploration_dict)
             exploration_schema_version = 35
+
+        if exploration_schema_version == 35:
+            exploration_dict = cls._convert_v35_dict_to_v36_dict(
+                exploration_dict)
+            exploration_schema_version = 36
+
+        if exploration_schema_version == 36:
+            exploration_dict = cls._convert_v36_dict_to_v37_dict(
+                exploration_dict)
+            exploration_schema_version = 37
+
+        if exploration_schema_version == 37:
+            exploration_dict = cls._convert_v37_dict_to_v38_dict(
+                exploration_dict)
+            exploration_schema_version = 38
 
         return (exploration_dict, initial_schema_version)
 
