@@ -24,9 +24,7 @@ angular.module('oppia').directive('backgroundBanner', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/common-elements/' +
-        'background-banner.directive.html'),
+      template: require('./background-banner.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         function() {

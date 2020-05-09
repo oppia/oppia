@@ -97,15 +97,16 @@ angular.module('oppia').config([
       'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
       'ExpressionParserService', 'ExtensionTagAssemblerService',
       'ExtractImageFilenamesFromStateService',
-      'HtmlEscaperService', 'IdGenerationService', 'InteractionObjectFactory',
-      'LoaderService', 'LoggerService', 'MetaTagCustomizationService',
-      'NormalizeWhitespacePipe', 'PencilCodeEditorRulesService',
-      'SidebarStatusService', 'SiteAnalyticsService', 'SkillObjectFactory',
-      'SolutionObjectFactory', 'StateCardObjectFactory',
-      'StateImprovementSuggestionService', 'StateObjectFactory',
-      'StatesObjectFactory', 'TextInputRulesService', 'UrlInterpolationService',
-      'UrlService', 'UserInfoObjectFactory', 'UtilsService',
-      'ValidatorsService', 'WindowDimensionsService', 'WindowRef'];
+      'HtmlEscaperService', 'I18nLanguageCodeService', 'IdGenerationService',
+      'InteractionObjectFactory', 'LoaderService', 'LoggerService',
+      'MetaTagCustomizationService', 'NormalizeWhitespacePipe',
+      'PencilCodeEditorRulesService', 'SidebarStatusService',
+      'SiteAnalyticsService', 'SkillObjectFactory', 'SolutionObjectFactory',
+      'StateCardObjectFactory', 'StateImprovementSuggestionService',
+      'StateObjectFactory', 'StatesObjectFactory', 'TextInputRulesService',
+      'UrlInterpolationService', 'UrlService', 'UserInfoObjectFactory',
+      'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
+      'WindowRef'];
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       if (servicesToProvide.includes(key)) {
         $provide.value(key, value);

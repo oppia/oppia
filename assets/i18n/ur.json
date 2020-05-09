@@ -6,7 +6,7 @@
 	"I18N_ABOUT_PAGE_ABOUT_TAB_HEADING": " Oppia کے متعلق",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_1": "oppia کامقصدکسی شخص کو مؤثر اور لطیف طریقے سےجو کچھ بھی وہ سیکھنا چاہیں میں مدد کرنا ھے۔",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_2": "اوپیا کا مقصد دنیا بھر کے اساتذہ کی مدد سے مفت، اعلیٰ معیاری، تصریحی طور پر مؤثر اسباق کا دستہ تخلیق کر کے، طالبعلموں کو معیاری تعلیم مہیا کرنا ہے؛ اس تغافل کے بغیر کہ وہ کہاں سے ہیں یا کن روایتی زرائع تک وہ رسائی رکھتے ہیں۔",
-	"I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_3": "ابھی تک اساتذہ نےان اسباق سے زیادہ،  <[numberOfExplorations]> تخلیق کیۓ ہیں۔جسے ہم<em>explorations</em> کہتے ہیں۔اور وہ تقریبا <[numberofStudentsServed]>طالب علموں کی دنیابھر میں خدمت کرتے ہیں۔",
+	"I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_3": "ابھی تک اساتذہ نےان اسباق سے زیادہ،  {{ numberOfExplorations }} تخلیق کیۓ ہیں۔جسے ہم<em>explorations</em> کہتے ہیں۔اور وہ تقریبا {{ numberofStudentsServed}}طالب علموں کی دنیابھر میں خدمت کرتے ہیں۔",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_SHARE": "محبان اور شائع کریں;شیئر",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_SHARE_TEXT": "برادری کے ساتھ آپکی تخلیقات",
 	"I18N_ABOUT_PAGE_CREDITS_TAB_HEADING": "ساکھتیں",

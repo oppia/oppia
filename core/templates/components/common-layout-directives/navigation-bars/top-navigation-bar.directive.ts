@@ -38,12 +38,14 @@ angular.module('oppia').directive('topNavigationBar', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$http', '$window', '$timeout', '$translate',
+        'I18nLanguageCodeService',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
         'SiteAnalyticsService', 'NavigationService', 'WindowDimensionsService',
         'DebouncerService', 'DeviceInfoService', 'LOGOUT_URL',
         'SHOW_CLASSROOM_CALLOUT',
         function(
             $scope, $http, $window, $timeout, $translate,
+            I18nLanguageCodeService,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
             SiteAnalyticsService, NavigationService, WindowDimensionsService,
             DebouncerService, DeviceInfoService, LOGOUT_URL,
@@ -236,6 +238,10 @@ angular.module('oppia').directive('topNavigationBar', [
 
             UserService.getUserInfoAsync().then(function(userInfo) {
               if (userInfo.getPreferredSiteLanguageCode()) {
+                // eslint-disable-next-line no-console, max-len
+                console.log('I came here too', userInfo.getPreferredSiteLanguageCode());
+                I18nLanguageCodeService.setI18nLanguageCodeSubject(
+                  userInfo.getPreferredSiteLanguageCode());
                 $translate.use(userInfo.getPreferredSiteLanguageCode());
               }
               ctrl.isModerator = userInfo.isModerator();

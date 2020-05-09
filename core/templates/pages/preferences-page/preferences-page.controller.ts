@@ -51,18 +51,18 @@ angular.module('oppia').directive('preferencesPage', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$q', '$scope', '$translate', '$timeout', '$window',
-        '$uibModal', 'AlertsService', 'LanguageUtilService', 'LoaderService',
-        'UrlInterpolationService', 'UserService', 'UtilsService',
-        'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
-        'ENABLE_ACCOUNT_DELETION', 'SUPPORTED_AUDIO_LANGUAGES',
-        'SUPPORTED_SITE_LANGUAGES',
+        '$uibModal', 'AlertsService', 'I18nLanguageCodeService',
+        'LanguageUtilService', 'LoaderService', 'UrlInterpolationService',
+        'UserService', 'UtilsService', 'DASHBOARD_TYPE_CREATOR',
+        'DASHBOARD_TYPE_LEARNER', 'ENABLE_ACCOUNT_DELETION',
+        'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES',
         function(
             $http, $q, $scope, $translate, $timeout, $window,
-            $uibModal, AlertsService, LanguageUtilService, LoaderService,
-            UrlInterpolationService, UserService, UtilsService,
-            DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
-            ENABLE_ACCOUNT_DELETION, SUPPORTED_AUDIO_LANGUAGES,
-            SUPPORTED_SITE_LANGUAGES) {
+            $uibModal, AlertsService, I18nLanguageCodeService,
+            LanguageUtilService, LoaderService, UrlInterpolationService,
+            UserService, UtilsService, DASHBOARD_TYPE_CREATOR,
+            DASHBOARD_TYPE_LEARNER, ENABLE_ACCOUNT_DELETION,
+            SUPPORTED_AUDIO_LANGUAGES, SUPPORTED_SITE_LANGUAGES) {
           var ctrl = this;
           var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
@@ -99,6 +99,10 @@ angular.module('oppia').directive('preferencesPage', [
 
           ctrl.savePreferredSiteLanguageCodes = function(
               preferredSiteLanguageCode) {
+            // eslint-disable-next-line no-console
+            console.log('I came here', preferredSiteLanguageCode);
+            I18nLanguageCodeService.setI18nLanguageCodeSubject(
+              preferredSiteLanguageCode);
             $translate.use(preferredSiteLanguageCode);
             _forceSelect2Refresh();
             _saveDataItem(

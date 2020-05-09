@@ -9,7 +9,7 @@
 	"I18N_ABOUT_PAGE_ABOUT_TAB_SHARE": "Publikigi &amp; Diskonigi",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_SHARE_TEXT": "viajn kreaĵojn kun la komunumo.",
 	"I18N_ABOUT_PAGE_CREDITS_TAB_HEADING": "Agnoskoj",
-	"I18N_ABOUT_PAGE_CREDITS_TAB_TEXT_BOTTOM": "La Oppia-teamo ankaŭ dankas <[listOfNames]> pro komentoj, ideoj, helpoj, kaj sugestoj.",
+	"I18N_ABOUT_PAGE_CREDITS_TAB_TEXT_BOTTOM": "La Oppia-teamo ankaŭ dankas {{ listOfNames}} pro komentoj, ideoj, helpoj, kaj sugestoj.",
 	"I18N_ABOUT_PAGE_CREDITS_THANK_TRANSLATEWIKI": "Ni ankaŭ dankas la retejon <a href=\"https://translatewiki.net/wiki/Translating:Oppia\">translatewiki.net</a> pro amase farata tradukado.",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_DONATE_BUTTON": "Donaci",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_GET_INVOLVED_BUTTON": "Partopreni",
