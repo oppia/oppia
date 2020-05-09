@@ -207,14 +207,12 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
               }
             });
             // @ts-ignore
-            // Ts Ignore is used here because actually Guppy is a class
-            // constructor having some properties. Ts doesn't support these
-            // kind of objects.
+            // Type system does not support constructor properties (Guppy.Symbols)
+            // thus we need ts-ignore it.
             if (angular.equals(Guppy.Symbols.symbols, {})) {
               // @ts-ignore
-              // Ts Ignore is used here because actually Guppy is a class
-              // constructor having some properties. Ts doesn't support these
-              // kind of objects.
+              // Type system does not support constructor properties
+              // (Guppy.init) thus we need ts-ignore it.
               Guppy.init({
                 symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
                   oppiaSymbolsUrl]});
