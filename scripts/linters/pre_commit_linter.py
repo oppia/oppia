@@ -67,6 +67,7 @@ from . import general_purpose_linter
 from . import html_linter
 from . import js_ts_linter
 from . import python_linter
+from .. import common
 from .. import concurrent_task_utils
 from .. import install_third_party_libs
 
@@ -116,19 +117,24 @@ _PATHS_TO_INSERT = [
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-2.0.33'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'Pillow-6.0.0'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'psutil-5.6.7'),
-    os.path.join('third_party', 'backports.functools_lru_cache-1.5'),
-    os.path.join('third_party', 'beautifulsoup4-4.7.1'),
-    os.path.join('third_party', 'bleach-3.1.0'),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools', 'webtest-%s' % common.WEBTEST_VERSION),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools', 'Pillow-%s' % common.PILLOW_VERSION),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools', 'psutil-%s' % common.PSUTIL_VERSION),
+    os.path.join('third_party', 'backports.functools_lru_cache-1.6.1'),
+    os.path.join('third_party', 'beautifulsoup4-4.9.0'),
+    os.path.join('third_party', 'bleach-3.1.5'),
     os.path.join('third_party', 'callbacks-0.3.0'),
     os.path.join('third_party', 'gae-cloud-storage-1.9.22.1'),
     os.path.join('third_party', 'gae-mapreduce-1.9.22.0'),
     os.path.join('third_party', 'gae-pipeline-1.9.22.1'),
-    os.path.join('third_party', 'mutagen-1.42.0'),
-    os.path.join('third_party', 'soupsieve-1.9.1'),
+    os.path.join('third_party', 'mutagen-1.43.0'),
+    os.path.join('third_party', 'packaging-20.3'),
+    os.path.join('third_party', 'soupsieve-1.9.5'),
     os.path.join('third_party', 'six-1.12.0'),
     os.path.join('third_party', 'webencodings-0.5.1'),
 ]

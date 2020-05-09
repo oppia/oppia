@@ -402,6 +402,23 @@ class TestBase(unittest.TestCase):
         'next_node_id': 'node_2'
     }
 
+    VERSION_3_STORY_CONTENTS_DICT = {
+        'nodes': [{
+            'outline': u'',
+            'exploration_id': None,
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None}],
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2'
+    }
+
     VERSION_1_SUBTOPIC_DICT = {
         'skill_ids': ['skill_1'],
         'id': 1,
@@ -1683,11 +1700,11 @@ tags: []
         else:
             skill.rubrics = [
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                    constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                    constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                    constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skill.language_code = language_code
         skill.version = 0
         skill_services.save_new_skill(owner_id, skill)
@@ -1732,20 +1749,12 @@ tags: []
             language_code: str. The ISO 639-1 code for the language this
                 skill is written in.
         """
-        if rubrics is None:
-            rubrics = [
-                skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[0], '<p>Explanation 1</p>'),
-                skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[1], '<p>Explanation 2</p>'),
-                skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[2], '<p>Explanation 3</p>')]
         skill_model = skill_models.SkillModel(
             id=skill_id,
             description=description,
             language_code=language_code,
             misconceptions=misconceptions,
-            rubrics=[rubric.to_dict() for rubric in rubrics],
+            rubrics=rubrics,
             skill_contents=skill_contents,
             next_misconception_id=next_misconception_id,
             misconceptions_schema_version=misconceptions_schema_version,
