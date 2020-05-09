@@ -32,7 +32,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'about-page',
-  template: require('./about-page.directive.html'),
+  template: require('./about-page.component.html'),
   styleUrls: []
 })
 export class AboutPageComponent implements OnInit {

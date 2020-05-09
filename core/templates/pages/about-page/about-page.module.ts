@@ -34,7 +34,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 
-import { AboutPageComponent } from './about-page.controller';
+import { AboutPageComponent } from './about-page.component';
 import { AppConstants } from 'app.constants';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
