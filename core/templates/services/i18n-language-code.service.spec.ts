@@ -19,7 +19,7 @@
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { Subscription } from 'rxjs';
 
-fdescribe('Loader Service', () => {
+describe('Loader Service', () => {
   const i18nLanguageCodeService = new I18nLanguageCodeService();
   let languageCode: string = '';
   let parentSubscription: Subscription;
@@ -33,12 +33,12 @@ fdescribe('Loader Service', () => {
     parentSubscription.unsubscribe();
   });
 
-  fit('should set the language code', () => {
+  it('should set the language code', () => {
     i18nLanguageCodeService.setI18nLanguageCodeSubject('pt-br');
     expect(languageCode).toBe('pt-br');
   });
 
-  fit('should get the latest language code', () => {
+  it('should get the latest language code', () => {
     i18nLanguageCodeService.setI18nLanguageCodeSubject('es');
     const latestCode = i18nLanguageCodeService.getCurrentI18nLanguageCode();
     expect(latestCode).toBe('es');
