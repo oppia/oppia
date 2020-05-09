@@ -1773,10 +1773,17 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         payload = {
-            'exploration_id': None
+            'exploration_id': 'invalid_exp'
         }
 
         response = self.get_json(
             '/interactionsbyexplorationid', params=payload,
             expected_status_int=400)
         self.assertEqual(response['error'], 'Exploration does not exist.')
+
+    def test_interaction_id_handler_with_no_id(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.get_json(
+            '/interactionsbyexplorationid', params={},
+            expected_status_int=400)
+        self.assertEqual(response['error'], 'Exploration id must be a string.')

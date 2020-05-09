@@ -866,5 +866,5 @@ class InteractionsByExplorationId(base.BaseHandler):
         interaction_ids = {
             state.interaction.id for state in
             exploration.states.values() if state.interaction.id is not None
-            }
+        }
         self.render_json({'interactions': list(interaction_ids)})
