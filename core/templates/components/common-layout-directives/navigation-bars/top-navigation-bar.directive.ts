@@ -238,8 +238,6 @@ angular.module('oppia').directive('topNavigationBar', [
 
             UserService.getUserInfoAsync().then(function(userInfo) {
               if (userInfo.getPreferredSiteLanguageCode()) {
-                // eslint-disable-next-line no-console, max-len
-                console.log('I came here too', userInfo.getPreferredSiteLanguageCode());
                 I18nLanguageCodeService.setI18nLanguageCodeSubject(
                   userInfo.getPreferredSiteLanguageCode());
                 $translate.use(userInfo.getPreferredSiteLanguageCode());

@@ -99,8 +99,6 @@ angular.module('oppia').directive('preferencesPage', [
 
           ctrl.savePreferredSiteLanguageCodes = function(
               preferredSiteLanguageCode) {
-            // eslint-disable-next-line no-console
-            console.log('I came here', preferredSiteLanguageCode);
             I18nLanguageCodeService.setI18nLanguageCodeSubject(
               preferredSiteLanguageCode);
             $translate.use(preferredSiteLanguageCode);
