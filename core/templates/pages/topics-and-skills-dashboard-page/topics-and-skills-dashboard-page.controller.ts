@@ -84,6 +84,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                     return summary.can_edit_topic === true;
                   }
                 );
+                ctrl.skillsCategorizedByTopics =
+                  response.data.categorized_skills_dict;
                 ctrl.untriagedSkillSummaries =
                   response.data.untriaged_skill_summary_dicts;
                 ctrl.mergeableSkillSummaries =

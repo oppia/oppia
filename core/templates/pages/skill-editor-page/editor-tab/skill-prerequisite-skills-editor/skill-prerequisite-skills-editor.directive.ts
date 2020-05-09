@@ -21,13 +21,18 @@ require('domain/skill/skill-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/alerts.service.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-backend-api.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
-  'SkillEditorStateService', 'SkillUpdateService', 'UrlInterpolationService',
+  'SkillEditorStateService', 'SkillUpdateService',
+  'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
   function(
-      SkillEditorStateService, SkillUpdateService, UrlInterpolationService) {
+      SkillEditorStateService, SkillUpdateService
+      , TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -42,6 +47,11 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
             $scope, $filter, $uibModal, $rootScope,
             EVENT_SKILL_REINITIALIZED, AlertsService) {
           var ctrl = this;
+          var categorizedSkills = null;
+          TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+            function(response) {
+              categorizedSkills = response.data.categorized_skills_dict;
+            });
           var groupedSkillSummaries =
             SkillEditorStateService.getGroupedSkillSummaries();
 
@@ -71,6 +81,8 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
                   $scope.skillSummaries = sortedSkillSummaries;
                   $scope.selectedSkillId = null;
                   $scope.countOfSkillsToPrioritize = skillsInSameTopicCount;
+                  $scope.allowSkillsFromOtherTopics = true;
+                  $scope.categorizedSkills = categorizedSkills;
                   $scope.save = function() {
                     $uibModalInstance.close($scope.selectedSkillId);
                   };
@@ -78,7 +90,7 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
                     $uibModalInstance.dismiss('cancel');
                   };
                 }
-              ]
+              ], windowClass: 'app-modal-window'
             });
 
             modalInstance.result.then(function(skillId) {

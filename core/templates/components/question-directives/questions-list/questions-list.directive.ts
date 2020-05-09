@@ -41,6 +41,9 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-backend-api.service.ts');
 require('services/alerts.service.ts');
 require('services/contextual/url.service.ts');
 
@@ -69,6 +72,7 @@ angular.module('oppia').directive('questionsList', [
         '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
         '$location', 'AlertsService', 'QuestionCreationService', 'UrlService',
         'NUM_QUESTIONS_PER_PAGE', 'EditableQuestionBackendApiService',
+        'TopicsAndSkillsDashboardBackendApiService',
         'SkillBackendApiService', 'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'SkillDifficultyObjectFactory',
         'SkillSummaryObjectFactory', 'DEFAULT_SKILL_DIFFICULTY',
@@ -79,6 +83,7 @@ angular.module('oppia').directive('questionsList', [
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
             $location, AlertsService, QuestionCreationService, UrlService,
             NUM_QUESTIONS_PER_PAGE, EditableQuestionBackendApiService,
+            TopicsAndSkillsDashboardBackendApiService,
             SkillBackendApiService, MisconceptionObjectFactory,
             QuestionObjectFactory, SkillDifficultyObjectFactory,
             SkillSummaryObjectFactory, DEFAULT_SKILL_DIFFICULTY,
@@ -511,6 +516,11 @@ angular.module('oppia').directive('questionsList', [
             var misconceptionsBySkill = ctrl.misconceptionsBySkill;
             var associatedSkillSummaries = ctrl.associatedSkillSummaries;
             var newQuestionIsBeingCreated = ctrl.newQuestionIsBeingCreated;
+            var categorizedSkills = null;
+            TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+              function(response) {
+                categorizedSkills = response.data.categorized_skills_dict;
+              });
             QuestionUndoRedoService.clearChanges();
             ctrl.editorIsOpen = true;
             var groupedSkillSummaries = ctrl.getGroupedSkillSummaries();
@@ -593,6 +603,8 @@ angular.module('oppia').directive('questionsList', [
                           $scope.selectedSkillId = null;
                           $scope.countOfSkillsToPrioritize =
                             skillsInSameTopicCount;
+                          $scope.allowSkillsFromOtherTopics = true;
+                          $scope.categorizedSkills = categorizedSkills;
                           $scope.save = function() {
                             for (var idx in sortedSkillSummaries) {
                               if (
@@ -607,7 +619,9 @@ angular.module('oppia').directive('questionsList', [
                             $uibModalInstance.dismiss('cancel');
                           };
                         }
-                      ]
+                      ],
+                      windowClass: 'app-modal-window'
+
                     });
 
                     modalInstance.result.then(function(summary) {

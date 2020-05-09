@@ -25,6 +25,9 @@ require('domain/story/story-update.service.ts');
 require('domain/exploration/exploration-id-validation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/alerts.service.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-backend-api.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
@@ -52,12 +55,14 @@ angular.module('oppia').directive('storyNodeEditor', [
       controller: [
         '$scope', '$rootScope', '$uibModal', 'AlertsService',
         'StoryEditorStateService', 'ExplorationIdValidationService',
+        'TopicsAndSkillsDashboardBackendApiService',
         'StoryUpdateService', 'UndoRedoService', 'EVENT_STORY_INITIALIZED',
         'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_STORY_NODE_EDITOR',
         'MAX_CHARS_IN_CHAPTER_TITLE',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
             StoryEditorStateService, ExplorationIdValidationService,
+            TopicsAndSkillsDashboardBackendApiService,
             StoryUpdateService, UndoRedoService, EVENT_STORY_INITIALIZED,
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
             MAX_CHARS_IN_CHAPTER_TITLE) {
@@ -88,7 +93,7 @@ angular.module('oppia').directive('storyNodeEditor', [
               }
             }
           };
-
+          var categorizedSkills = null;
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyNodeIds = $scope.story.getStoryContents().getNodeIds();
@@ -100,6 +105,10 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.allowedBgColors = (
               storyNodeConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
+            TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+              function(response) {
+                categorizedSkills = response.data.categorized_skills_dict;
+              });
             for (var idx in skillSummaries) {
               $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
                 skillSummaries[idx].description;
@@ -233,6 +242,8 @@ angular.module('oppia').directive('storyNodeEditor', [
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = null;
                   $scope.countOfSkillsToPrioritize = 0;
+                  $scope.allowSkillsFromOtherTopics = true;
+                  $scope.categorizedSkills = categorizedSkills;
                   $scope.save = function() {
                     $uibModalInstance.close($scope.selectedSkillId);
                   };
@@ -240,7 +251,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                     $uibModalInstance.dismiss('cancel');
                   };
                 }
-              ]
+              ], windowClass: 'app-modal-window'
             });
 
             modalInstance.result.then(function(skillId) {
@@ -268,6 +279,12 @@ angular.module('oppia').directive('storyNodeEditor', [
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
+                  var topicName = StoryEditorStateService.getTopicName();
+                  var categorizedSkillsInTopic = {};
+                  categorizedSkillsInTopic[topicName] = angular.copy(
+                    categorizedSkills[topicName]);
+                  $scope.categorizedSkills = categorizedSkillsInTopic;
+                  $scope.allowSkillsFromOtherTopics = false;
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = null;
                   $scope.countOfSkillsToPrioritize = 0;
@@ -278,7 +295,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                     $uibModalInstance.dismiss('cancel');
                   };
                 }
-              ]
+              ], windowClass: 'app-modal-window'
             });
 
             modalInstance.result.then(function(skillId) {

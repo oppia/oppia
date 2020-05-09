@@ -90,6 +90,8 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
             json_response['mergeable_skill_summary_dicts'][0]['id'],
             self.linked_skill_id)
         self.assertEqual(
+            len(json_response['categorized_skills_dict']), 2)
+        self.assertEqual(
             json_response['untriaged_skill_summary_dicts'][0]['id'],
             skill_id)
         self.assertEqual(

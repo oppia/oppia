@@ -43,7 +43,8 @@ angular.module('oppia').directive('skillsList', [
         getMergeableSkillSummaries: '&mergeableSkillSummaries',
         canDeleteSkill: '&userCanDeleteSkill',
         canCreateSkill: '&userCanCreateSkill',
-        isUnpublishedSkill: '&unpublishedSkill'
+        isUnpublishedSkill: '&unpublishedSkill',
+        getSkillsCategorizedByTopics: '&skillsCategorizedByTopics'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics-and-skills-dashboard-page/skills-list/' +
@@ -164,6 +165,7 @@ angular.module('oppia').directive('skillsList', [
 
           $scope.mergeSkill = function(skill) {
             var skillSummaries = $scope.getMergeableSkillSummaries();
+            var categorizedSkills = $scope.getSkillsCategorizedByTopics();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
@@ -172,6 +174,8 @@ angular.module('oppia').directive('skillsList', [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
                   $scope.skillSummaries = skillSummaries;
+                  $scope.categorizedSkills = categorizedSkills;
+                  $scope.allowSkillsFromOtherTopics = true;
                   $scope.selectedSkillId = '';
                   $scope.save = function() {
                     $uibModalInstance.close(
@@ -183,7 +187,7 @@ angular.module('oppia').directive('skillsList', [
                     $uibModalInstance.dismiss('cancel');
                   };
                 }
-              ]
+              ], windowClass: 'app-modal-window'
             });
 
             modalInstance.result.then(function(result) {

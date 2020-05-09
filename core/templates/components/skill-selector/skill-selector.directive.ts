@@ -28,7 +28,9 @@ angular.module('oppia').directive('selectSkill', [
         // the same priority.
         getSortedSkillSummaries: '&sortedSkillSummaries',
         selectedSkillId: '=',
-        getCountOfSkillsToPrioritize: '&countOfSkillsToPrioritize'
+        getCountOfSkillsToPrioritize: '&countOfSkillsToPrioritize',
+        getCategorizedSkills: '&categorizedSkills',
+        canAllowSkillsFromOtherTopics: '&allowSkillsFromOtherTopics',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/skill-selector/skill-selector.directive.html'),
@@ -37,23 +39,108 @@ angular.module('oppia').directive('selectSkill', [
         function(
             $scope, $uibModal, $rootScope) {
           var ctrl = this;
-          $scope.selectSkill = function(skillId) {
-            $scope.selectedSkillId = skillId;
-          };
           ctrl.$onInit = function() {
-            $scope.sortedSkillSummaries = $scope.getSortedSkillSummaries();
-            $scope.skillSummariesInitial = [];
-            $scope.skillSummariesFinal = [];
-
-            for (var idx in $scope.sortedSkillSummaries) {
-              if (idx < $scope.getCountOfSkillsToPrioritize()) {
-                $scope.skillSummariesInitial.push(
-                  $scope.sortedSkillSummaries[idx]);
-              } else {
-                $scope.skillSummariesFinal.push(
-                  $scope.sortedSkillSummaries[idx]);
+            $scope.selectedSkill = null;
+            $scope.categorizedSkills = $scope.getCategorizedSkills();
+            $scope.allowSkillsFromOtherTopics =
+              $scope.canAllowSkillsFromOtherTopics();
+            $scope.checkIfEmpty = function(skills) {
+              return (skills.length === 0);
+            };
+            $scope.skillChanged = function() {
+              $scope.selectedSkillId = $scope.selectedSkill;
+            };
+            $scope.isUntriagedSkills = function(topicName) {
+              return (topicName === 'untriaged_skills');
+            };
+            $scope.topicFilterList = [];
+            $scope.subTopicFilterDict = {};
+            for (var topicName in $scope.categorizedSkills) {
+              if (topicName === 'untriaged_skills') {
+                continue;
+              }
+              var topicNameDict = {
+                topicName: topicName,
+                checked: false
+              };
+              $scope.topicFilterList.push(topicNameDict);
+              var subTopics = $scope.categorizedSkills[topicName];
+              $scope.subTopicFilterDict[topicName] = [];
+              for (var subTopic in subTopics) {
+                var subTopicNameDict = {
+                  subTopicName: subTopic,
+                  checked: false
+                };
+                $scope.subTopicFilterDict[topicName].push(subTopicNameDict);
               }
             }
+            var intialSubTopicFilterDict = angular.copy(
+              $scope.subTopicFilterDict);
+
+            $scope.updateOnSubTopic = function() {
+              var skills = $scope.getSortedSkillSummaries();
+              var updatedSkillsDict = {};
+              var isAnySubTopicChecked = false;
+              for (var topicName in $scope.subTopicFilterDict) {
+                var subTopics = $scope.subTopicFilterDict[topicName];
+                for (var i = 0; i < subTopics.length; i++) {
+                  if (subTopics[i].checked) {
+                    if (!updatedSkillsDict.hasOwnProperty(topicName)) {
+                      updatedSkillsDict[topicName] = {};
+                    }
+                    var categorizedSkills = $scope.getCategorizedSkills();
+                    var subTopicName = subTopics[i].subTopicName;
+                    updatedSkillsDict[topicName][subTopicName] =
+                      categorizedSkills[topicName][subTopicName];
+                    isAnySubTopicChecked = true;
+                  }
+                }
+              }
+              if (!isAnySubTopicChecked) {
+                var isAnyTopicChecked = false;
+                for (var i = 0; i < $scope.topicFilterList.length; i++) {
+                  if ($scope.topicFilterList[i].checked) {
+                    var categorizedSkills = $scope.getCategorizedSkills();
+                    var topicName = $scope.topicFilterList[i].topicName;
+                    updatedSkillsDict[topicName] =
+                      categorizedSkills[topicName];
+                    isAnyTopicChecked = true;
+                  }
+                }
+                if (isAnyTopicChecked) {
+                  $scope.categorizedSkills = angular.copy(updatedSkillsDict);
+                } else {
+                  $scope.categorizedSkills = $scope.getCategorizedSkills();
+                }
+              } else {
+                $scope.categorizedSkills = angular.copy(updatedSkillsDict);
+              }
+            };
+
+            $scope.updateOnTopic = function() {
+              var updatedSubTopicFilterList = {};
+              var isAnyTopicChecked = false;
+              for (var i = 0; i < $scope.topicFilterList.length; i++) {
+                if ($scope.topicFilterList[i].checked) {
+                  var topicName = $scope.topicFilterList[i].topicName;
+                  updatedSubTopicFilterList[topicName] =
+                    angular.copy(intialSubTopicFilterDict[topicName]);
+                  isAnyTopicChecked = true;
+                }
+              }
+              if (!isAnyTopicChecked) {
+                for (var topic in intialSubTopicFilterDict) {
+                  if (!$scope.subTopicFilterDict.hasOwnProperty(topic)) {
+                    $scope.subTopicFilterDict[topic] =
+                      angular.copy(intialSubTopicFilterDict[topic]);
+                  }
+                }
+              } else {
+                $scope.subTopicFilterDict =
+                   angular.copy(updatedSubTopicFilterList);
+              }
+              $scope.updateOnSubTopic();
+            };
           };
         }
       ]
