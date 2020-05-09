@@ -46,9 +46,9 @@ export class UserExplorationPermissionsService {
 
       this.permissionsPromise = this.http.get(explorationPermissionsUrl,
         {observe: 'response'}).toPromise().then(
-          (response: HttpResponse<any>) => {
-        return response.body;
-      });
+        (response: HttpResponse<any>) => {
+          return response.body;
+        });
     }
     return this.permissionsPromise;
   }
