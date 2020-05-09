@@ -10,7 +10,7 @@ class Guppy {
   activate: () => void;
   asciimath: () => void;
   deactivate: () => void;
-  doc: (doc?: string) => Object;
+  doc: () => Object;
   equations: () => Array<Object>;
   evaluate: (evaluators?: Object) => Object;
   func: (evaluators?: Object) => Function;
