@@ -40,9 +40,9 @@ type ContributionOpportunityParams = {
 };
 
 export interface IFetchedOpportunitiesSuccessCallbackParams {
-  opportunities?: IOpportunityDict[],
-  nextCursor?: string,
-  more?: boolean
+  opportunities: IOpportunityDict[],
+  nextCursor: string,
+  more: boolean
 }
 
 export interface IOpportunityDict {
