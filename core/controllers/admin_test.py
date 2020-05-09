@@ -1145,7 +1145,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'], 'Please ensure that the usernames are '
             'not empty.')
-        
+
         response = self.put_json(
             '/updateusernamehandler',
             payload={
@@ -1161,7 +1161,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         # The new username must not be longer than 30 characters.
         long_username = 'a' * 31
         csrf_token = self.get_new_csrf_token()
-   
+
         response = self.put_json(
             '/updateusernamehandler',
             payload={

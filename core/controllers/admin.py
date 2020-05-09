@@ -871,14 +871,14 @@ class UpdateUsernameHandler(base.BaseHandler):
         user_id = user_services.get_user_id_from_username(current_username)
         if user_id is None:
             raise self.InvalidInputException('User does not exist.')
-        
+
         if len(new_username) > constants.MAX_USERNAME_LENGTH:
             raise self.InvalidInputException(
                 'Please make sure that the new username is not longer '
                 'than %s characters.' % constants.MAX_USERNAME_LENGTH)
         if user_services.is_username_taken(new_username):
             raise self.InvalidInputException('Username already taken.')
-        
+
         user_services.set_username(user_id, new_username)
         user_services.log_username_change(
             self.user_id, current_username, new_username)

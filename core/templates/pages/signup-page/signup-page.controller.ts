@@ -40,7 +40,7 @@ angular.module('oppia').directive('signupPage', [
         '$http', '$timeout', '$uibModal', 'AlertsService',
         'FocusManagerService', 'LoaderService', 'SiteAnalyticsService',
         'UrlInterpolationService', 'UrlService', 'DASHBOARD_TYPE_CREATOR',
-        'DASHBOARD_TYPE_LEARNER', 'SITE_NAME', 'MAX_USERNAME_LENGTH'
+        'DASHBOARD_TYPE_LEARNER', 'SITE_NAME', 'MAX_USERNAME_LENGTH',
         function(
             $http, $timeout, $uibModal, AlertsService,
             FocusManagerService, LoaderService, SiteAnalyticsService,
