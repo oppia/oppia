@@ -18,6 +18,9 @@
 
 require('directives/angular-html-bind.directive.ts');
 require(
+  'components/question-difficulty-selector/' +
+  'question-difficulty-selector.directive.ts');
+require(
   'components/question-directives/question-editor/' +
   'question-editor.directive.ts');
 require(

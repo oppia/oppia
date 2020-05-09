@@ -227,9 +227,13 @@ var TopicsAndSkillsDashboardPage = function() {
       waitFor.invisibilityOf(
         editor, 'Explanation Editor takes too long to close');
 
-      for (var i = 0; i < 3; i++) {
-        skillEditorPage.editRubricExplanationWithIndex(i, 'Explanation ' + i);
-      }
+      skillEditorPage.addRubricExplanationForDifficulty(
+        'Easy', 'Explanation for easy difficulty.');
+      skillEditorPage.addRubricExplanationForDifficulty(
+        'Medium', 'Explanation for medium difficulty.');
+      skillEditorPage.addRubricExplanationForDifficulty(
+        'Hard', 'Explanation for hard difficulty.');
+
       waitFor.elementToBeClickable(
         confirmSkillCreationButton,
         'Create skill button takes too long to be clickable');
@@ -271,7 +275,7 @@ var TopicsAndSkillsDashboardPage = function() {
       topicsTabButton, 'Unable to click on topics tab.');
     _getTopicElements(topicName).then(function(topicElements) {
       if (topicElements.length === 0) {
-        throw 'Could not find topic tile with name ' + topicName;
+        throw new Error('Could not find topic tile with name ' + topicName);
       }
       waitFor.elementToBeClickable(
         topicElements[0], 'Unable to click on topic: ' + topicName);

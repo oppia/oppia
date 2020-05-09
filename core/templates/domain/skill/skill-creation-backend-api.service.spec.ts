@@ -49,7 +49,7 @@ describe('Topic creation backend api service', () => {
     });
 
     rubricDict = {
-      explanation: 'test-explanation',
+      explanations: ['test-explanation'],
       difficulty: 'test-difficulty'
     };
     postData = {

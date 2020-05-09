@@ -163,7 +163,8 @@ angular.module('oppia').directive('feedbackTab', [
           // TODO(Allan): Implement ability to edit suggestions before applying.
           ctrl.showSuggestionModal = () => {
             if (ctrl.activeThread === null) {
-              throw Error('Trying to show suggestion of a non-existent thread');
+              throw new Error(
+                'Trying to show suggestion of a non-existent thread');
             }
             SuggestionModalForExplorationEditorService.showSuggestionModal(
               ctrl.activeThread.suggestion.suggestionType, {
@@ -192,7 +193,8 @@ angular.module('oppia').directive('feedbackTab', [
             ctrl.messageSendingInProgress = true;
             let thread = ThreadDataService.getThread(threadId);
             if (thread === null) {
-              throw Error('Trying to add message to a non-existent thread.');
+              throw new Error(
+                'Trying to add message to a non-existent thread.');
             }
             ThreadDataService.addNewMessageAsync(thread, tmpText, tmpStatus)
               .then(() => {
@@ -207,7 +209,7 @@ angular.module('oppia').directive('feedbackTab', [
           ctrl.setActiveThread = function(threadId) {
             let thread = ThreadDataService.getThread(threadId);
             if (thread === null) {
-              throw Error('Trying to display a non-existent thread');
+              throw new Error('Trying to display a non-existent thread');
             }
             ThreadDataService.getMessagesAsync(thread).then(() => {
               ctrl.activeThread = thread;

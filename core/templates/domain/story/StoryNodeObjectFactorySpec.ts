@@ -83,25 +83,25 @@ describe('Story node object factory', () => {
     () => {
       expect(() => {
         _sampleStoryNode.addDestinationNodeId('node_2');
-      }).toThrow();
+      }).toThrowError('The given node is already a destination node.');
       expect(() => {
         _sampleStoryNode.addPrerequisiteSkillId('skill_1');
-      }).toThrow();
+      }).toThrowError('The given skill id is already a prerequisite skill.');
       expect(() => {
         _sampleStoryNode.addAcquiredSkillId('skill_2');
-      }).toThrow();
+      }).toThrowError('The given skill is already an acquired skill.');
     });
 
   it('should correctly throw error when invalid values are deleted from arrays',
     () => {
       expect(() => {
         _sampleStoryNode.removeDestinationNodeId('node_5');
-      }).toThrow();
+      }).toThrowError('The given node is not a destination node.');
       expect(() => {
         _sampleStoryNode.removePrerequisiteSkillId('skill_4');
-      }).toThrow();
+      }).toThrowError('The given skill id is not a prerequisite skill.');
       expect(() => {
         _sampleStoryNode.removeAcquiredSkillId('skill_4');
-      }).toThrow();
+      }).toThrowError('The given skill is not an acquired skill.');
     });
 });
