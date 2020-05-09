@@ -172,6 +172,7 @@ FULLY_COVERED_FILENAMES = [
     'GuestCollectionProgressObjectFactory.ts',
     'HintObjectFactory.ts',
     'hints-and-solution-manager.service.ts',
+    'i18n-language-code.service.ts',
     'id-generation.service.ts',
     'image-click-input-rules.service.ts',
     'image-click-input-validation.service.ts',
