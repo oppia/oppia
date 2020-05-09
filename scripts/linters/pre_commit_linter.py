@@ -560,8 +560,8 @@ def main(args=None):
         semaphore.acquire()
         _get_task_output(all_messages, err_messages, task, semaphore)
 
-    # all_messages += codeowner_linter.check_codeowner_file(
-    #     verbose_mode_enabled)
+    all_messages += codeowner_linter.check_codeowner_file(
+        verbose_mode_enabled)
 
     _print_complete_summary_of_errors(all_messages)
 
