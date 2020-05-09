@@ -22,6 +22,7 @@ import { Injectable } from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
+import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { StateObjectFactory, State } from 'domain/state/StateObjectFactory';
 
@@ -89,7 +90,7 @@ export class Question {
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'units' is a list with varying element types. An exact
   // type needs to be found for it.
-  validate(misconceptionsBySkill: any): string|boolean {
+  validate(misconceptionsBySkill: Misconception[]): string|boolean {
     const interaction = this.stateData.interaction;
     if (interaction.id === null) {
       return 'An interaction must be specified';
