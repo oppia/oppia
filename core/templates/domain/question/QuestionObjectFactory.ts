@@ -22,8 +22,8 @@ import { Injectable } from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 import { StateObjectFactory, State } from 'domain/state/StateObjectFactory';
 
 export interface IQuestionBackendDict {
