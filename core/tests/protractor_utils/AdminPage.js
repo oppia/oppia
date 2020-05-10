@@ -39,7 +39,8 @@ var AdminPage = function() {
   var assignReviewerForm = element(
     by.css('.protractor-test-assign-reviewer-form'));
   var viewReviewerForm = element(by.css('.protractor-test-view-reviewer-form'));
-  var removeReviewerForm = element(by.css('.protractor-remove-reviewer-form'));
+  var removeReviewerForm = element(by.css(
+    '.protractor-test-remove-reviewer-form'));
   var languageSelectCss = by.css('.protractor-test-form-language-select');
   var reviewerUsernameCss = by.css('.protractor-test-form-reviewer-username');
   var reviewCategorySelectCss = by.css(
@@ -253,8 +254,6 @@ var AdminPage = function() {
     updateFormName.sendKeys(name);
     var roleOption = roleSelect.element(
       by.cssContainingText('option', newRole));
-    waitFor.visibilityOf(
-      roleOption, 'Admin Role option is not visible');
     roleOption.click();
     updateFormSubmit.click();
     waitFor.visibilityOf(statusMessage, 'Confirmation message not visible');
@@ -396,13 +395,13 @@ var AdminPage = function() {
     }
 
     reviewRights[REVIEW_CATEGORY_TRANSLATION] = (
-      translationReviewRightsLanguages.map(function(languageElement) {
-        return languageElement.getText();
+      translationReviewRightsLanguages.map(async function(languageElement) {
+        return await languageElement.getText();
       }));
 
     reviewRights[REVIEW_CATEGORY_VOICEOVER] = (
-      voiceoverReviewRightsLanguages.map(function(languageElement) {
-        return languageElement.getText();
+      voiceoverReviewRightsLanguages.map(async function(languageElement) {
+        return await languageElement.getText();
       }));
 
     return reviewRights;

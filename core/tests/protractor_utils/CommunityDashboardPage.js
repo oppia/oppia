@@ -78,7 +78,7 @@ var CommunityDashboardPage = function() {
     );
   };
 
-  var _expecteUserToBeReviewer = function(
+  var _expectUserToBeReviewer = function(
       reviewCategory, langaugeDescription = null) {
     waitFor.visibilityOf(
       reviewRightsDiv,

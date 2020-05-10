@@ -32,15 +32,15 @@ var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 
 describe('Community dashboard page', function() {
-  const topicName0 = 'Topic 0';
-  const skillDescription0 = 'Skill 0';
-  const reviewMaterial0 = 'Review Material 0';
-  const topicName1 = 'Topic 1';
-  const skillDescription1 = 'Skill 1';
-  const reviewMaterial1 = 'Review Material 1';
-  const adminEmail = 'management@community.com';
-  const user1Email = 'user1@community.com';
-  const user2Email = 'user2@community.com';
+  const TOPIC_NAMES = [
+    'Topic 0 for contribution', 'Topic 1 for contribution'];
+  const SKILL_DESCRIPTIONS = [
+    'Skill 0 for question suggestion', 'Skill 1 for question suggestion'];
+  const REVIEW_MATERIALS = [
+    'Review Material 0 for question suggestion',
+    'Review Material 1 for question suggestion'];
+  const ADMIN_EMAIL = 'management@community.com';
+  const USER_EMAILS = ['user0@community.com', 'user1@community.com'];
 
   let communityDashboardPage = null;
   let communityDashboardTranslateTextTab = null;
@@ -62,22 +62,22 @@ describe('Community dashboard page', function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     adminPage = new AdminPage.AdminPage();
-    users.createUser(user1Email, 'user1');
-    users.createUser(user2Email, 'user2');
-    users.createAndLoginAdminUser(adminEmail, 'management');
+    users.createUser(USER_EMAILS[0], 'user0');
+    users.createUser(USER_EMAILS[1], 'user1');
+    users.createAndLoginAdminUser(ADMIN_EMAIL, 'management');
     // Create 2 topics and 2 skills. Link 1 skill to 1 topic.
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic(topicName0, 'abbrev');
+    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAMES[0], 'abbrev');
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic(topicName1, 'abbrev');
+    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAMES[1], 'abbrev');
     workflow.createSkillAndAssignTopic(
-      skillDescription0, reviewMaterial0, topicName0);
+      SKILL_DESCRIPTIONS[0], REVIEW_MATERIALS[0], TOPIC_NAMES[0]);
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      skillDescription1, reviewMaterial1);
-    // Allow user2 to review suggestions.
+      SKILL_DESCRIPTIONS[1], REVIEW_MATERIALS[1]);
+    // Allow user1 to review suggestions.
     adminPage.get();
-    adminPage.assignQuestionReviewer('user2');
+    adminPage.assignQuestionReviewer('user1');
     users.logout();
   });
 
@@ -91,7 +91,7 @@ describe('Community dashboard page', function() {
 
   it('should allow users to accept question suggestions', function() {
     // Baseline verification.
-    users.login(user1Email);
+    users.login(USER_EMAILS[0]);
     communityDashboardPage.get();
     // Initially, there should be no opportunity contributions, only the 2
     // placeholder opportunities used when loading.
@@ -103,9 +103,9 @@ describe('Community dashboard page', function() {
     communityDashboardPage.expectOpportunityListItemProgressPercentageToBe(
       '(0.00%)', 0);
     communityDashboardPage.expectOpportunityListItemHeadingToBe(
-      skillDescription0, 0);
+      SKILL_DESCRIPTIONS[0], 0);
 
-    // Submit suggestion as user1.
+    // Submit suggestion as user0.
     communityDashboardPage.clickOpportunityListItemButton(0);
     skillEditorPage.confirmSkillDifficulty();
     explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
@@ -122,8 +122,8 @@ describe('Community dashboard page', function() {
     skillEditorPage.saveQuestion();
     users.logout();
 
-    // Review and accept the suggestion as user2.
-    users.login(user2Email);
+    // Review and accept the suggestion as user1.
+    users.login(USER_EMAILS[1]);
     communityDashboardPage.get();
     communityDashboardPage.waitForOpportunitiesToLoad();
     communityDashboardPage.clickOpportunityListItemButton(0);
@@ -141,28 +141,28 @@ describe('Community dashboard page', function() {
     users.logout();
 
     // Validate the contribution status changed.
-    users.login(user1Email);
+    users.login(USER_EMAILS[0]);
     communityDashboardPage.get();
     communityDashboardPage.waitForOpportunitiesToLoad();
     communityDashboardPage.expectNumberOfOpportunitiesToBe(3);
     communityDashboardPage.expectOpportunityListItemHeadingToBe(
       'Question 1', 0);
     communityDashboardPage.expectOpportunityListItemSubheadingToBe(
-      skillDescription0, 0);
+      SKILL_DESCRIPTIONS[0], 0);
     communityDashboardPage.expectOpportunityListItemLabelToBe(
       'Accepted', 0);
   });
 
   it('should allow users to reject question suggestions', function() {
     // Baseline verification.
-    users.login(user1Email);
+    users.login(USER_EMAILS[0]);
     communityDashboardPage.get();
     communityDashboardPage.navigateToSubmitQuestionTab();
     communityDashboardPage.waitForOpportunitiesToLoad();
     communityDashboardPage.expectOpportunityListItemProgressPercentageToBe(
       '(2.00%)', 0);
 
-    // Submit suggestion as user1.
+    // Submit suggestion as user0.
     communityDashboardPage.clickOpportunityListItemButton(0);
     skillEditorPage.confirmSkillDifficulty();
     explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
@@ -179,8 +179,8 @@ describe('Community dashboard page', function() {
     skillEditorPage.saveQuestion();
     users.logout();
 
-    // Review and reject the suggestion as user2.
-    users.login(user2Email);
+    // Review and reject the suggestion as user1.
+    users.login(USER_EMAILS[1]);
     communityDashboardPage.get();
     communityDashboardPage.waitForOpportunitiesToLoad();
     communityDashboardPage.clickOpportunityListItemButton(0);
@@ -206,14 +206,14 @@ describe('Community dashboard page', function() {
     communityDashboardPage.expectOpportunityListItemHeadingToBe(
       'Question 1', 0);
     communityDashboardPage.expectOpportunityListItemSubheadingToBe(
-      skillDescription0, 0);
+      SKILL_DESCRIPTIONS[0], 0);
     communityDashboardPage.expectOpportunityListItemLabelToBe(
       'Rejected', 0);
   });
 
   describe('Submit question tab', function() {
     it('should list skill opportunities for admin user', function() {
-      users.login(adminEmail, true /* isSuperAdmin */);
+      users.login(ADMIN_EMAIL, true);
       communityDashboardPage.get();
       communityDashboardPage.navigateToSubmitQuestionTab();
       communityDashboardPage.waitForOpportunitiesToLoad();
@@ -221,11 +221,11 @@ describe('Community dashboard page', function() {
       // There are always at least 2 placeholder opportunity list items.
       communityDashboardPage.expectNumberOfOpportunitiesToBe(3);
       communityDashboardPage.expectOpportunityListItemHeadingToBe(
-        skillDescription0, 0);
+        SKILL_DESCRIPTIONS[0], 0);
     });
 
     it('should list skill opportunities for non-admin user', function() {
-      users.login(user1Email);
+      users.login(USER_EMAILS[0]);
       communityDashboardPage.get();
       communityDashboardPage.navigateToSubmitQuestionTab();
       communityDashboardPage.waitForOpportunitiesToLoad();
@@ -233,7 +233,7 @@ describe('Community dashboard page', function() {
       // There are always at least 2 placeholder opportunity list items.
       communityDashboardPage.expectNumberOfOpportunitiesToBe(3);
       communityDashboardPage.expectOpportunityListItemHeadingToBe(
-        skillDescription0, 0);
+        SKILL_DESCRIPTIONS[0], 0);
     });
   });
 
@@ -252,7 +252,7 @@ describe('Admin page community reviewer form', function() {
   var voiceoverReviewerEmail = 'voiceartist@community.com';
   var questionReviewerUsername = 'questionreviewer';
   var questionReviewerEmail = 'questionreviewer@community.com';
-  var superAdminEmail = 'management@adminTab.com';
+  var ADMIN_EMAIL = 'management@adminTab.com';
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
@@ -261,11 +261,11 @@ describe('Admin page community reviewer form', function() {
     users.createUser(translationReviewerEmail, translationReviewerUsername);
     users.createUser(voiceoverReviewerEmail, voiceoverReviewerUsername);
     users.createUser(questionReviewerEmail, questionReviewerUsername);
-    users.createUser(superAdminEmail, 'management');
+    users.createUser(ADMIN_EMAIL, 'management');
   });
 
   beforeEach(function() {
-    users.login(superAdminEmail, true);
+    users.login(ADMIN_EMAIL, true);
   });
 
   it('should allow admin to add translation reviewer', function() {
