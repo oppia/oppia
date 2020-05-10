@@ -146,7 +146,7 @@ describe('Story contents object factory', () => {
       }).toThrowError('The node with given id doesn\'t exist');
       expect(() => {
         _sampleStoryContents.setNodeDescription('node_5', 'Description');
-      }).toThrow();
+      }).toThrowError();
       expect(() => {
         _sampleStoryContents.markNodeOutlineAsFinalized('node_5');
       }).toThrowError('The node with given id doesn\'t exist');
