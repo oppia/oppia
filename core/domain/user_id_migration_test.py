@@ -1478,11 +1478,10 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             score_category='category',
             score=1.5,
             has_email_been_sent=False).put()
-        feedback_models.GeneralFeedbackThreadModel(
+        feedback_models.GeneralFeedbackMessageModel(
             id='type.id.generated',
-            entity_type='type',
-            entity_id='id',
-            subject='subject').put()
+            thread_id='thread_id',
+            message_id=2).put()
         feedback_models.GeneralFeedbackThreadUserModel(
             id='None.thread_id',
             thread_id='thread_id').put()
@@ -1496,29 +1495,21 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
                 manager_ids=[feconf.SYSTEM_COMMITTER_ID])])
 
         output = self._run_one_off_job()
-        self.assertIn(
+        self.assertItemsEqual([
+            ['SUCCESS - UserSettingsModel', 3],
             ['FAILURE - CompletedActivitiesModel', [self.USER_1_GAE_ID]],
-            output)
-        self.assertIn(
-            ['SUCCESS - CompletedActivitiesModel', 1], output)
-        self.assertIn(
+            ['SUCCESS - CompletedActivitiesModel', 1],
             ['FAILURE - ExpUserLastPlaythroughModel',
              ['%s.%s' % (self.USER_2_GAE_ID, 'exp_id')]],
-            output)
-        self.assertIn(
             ['SUCCESS - ExpUserLastPlaythroughModel', 1],
-            output)
-        self.assertIn(
             ['FAILURE - UserContributionScoringModel',
              ['%s.%s' % ('category', self.USER_2_GAE_ID)]],
-            output)
-        self.assertIn(
-            ['SUCCESS - GeneralFeedbackThreadModel', 1], output)
-        self.assertIn(
-            ['SUCCESS_NONE - GeneralFeedbackThreadUserModel', 1], output)
-        self.assertIn(
-            ['FAILURE - TopicRightsModel', ['topic_1_id']], output)
-        self.assertIn(['SUCCESS - TopicRightsModel', 1], output)
+            ['SUCCESS_NONE - GeneralFeedbackMessageModel', 1],
+            ['SUCCESS_NONE - GeneralFeedbackThreadUserModel', 1],
+            ['FAILURE - TopicRightsModel', ['topic_1_id']],
+            ['SUCCESS - TopicRightsModel', 1],
+        ], output)
+
 
 
 class ModelsUserIdsHaveUserSettingsExplorationsVerificationJobTests(
