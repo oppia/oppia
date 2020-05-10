@@ -417,13 +417,15 @@ describe('Answer classification service with string classifier enabled',
     var EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION,
       STATISTICAL_CLASSIFICATION;
     var acs, scms, sof, oof, acrof, stateName, state, state2,
-      registryService, stateClassifierMapping;
+      registryService, PredictionSampleService, stateClassifierMapping;
     beforeEach(angular.mock.inject(function($injector) {
       acs = $injector.get('AnswerClassificationService');
       scms = $injector.get('StateClassifierMappingService');
       sof = $injector.get('StateObjectFactory');
       oof = $injector.get('OutcomeObjectFactory');
       acrof = $injector.get('AnswerClassificationResultObjectFactory');
+      PredictionSampleService = $injector.get('PredictionSampleService');
+
       EXPLICIT_CLASSIFICATION = $injector.get('EXPLICIT_CLASSIFICATION');
       DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
         'DEFAULT_OUTCOME_CLASSIFICATION');
@@ -522,11 +524,8 @@ describe('Answer classification service with string classifier enabled',
       };
       scms.init(stateClassifierMapping);
 
-      registryService.setMapping({
-        TestClassifier: {
-          v1: 'PredictionSampleService'
-        }
-      });
+      registryService.testOnlySetPredictionService(
+        'TestClassifier', 1, PredictionSampleService);
 
       state2 = angular.copy(state);
       state2.interaction.id = 'UntrainableInteraction';
