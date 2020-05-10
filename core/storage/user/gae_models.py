@@ -459,7 +459,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     """Stores the "last playthrough" information for partially-completed
     explorations.
 
-    ID for this model is of format [user_id].[exploration_id].
+    ID for this model is of format '[user_id].[exploration_id]'.
     """
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
@@ -523,7 +523,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
         Returns:
             str. The generated id using user_id and exploration_id
-                of the form [user_id].[exploration_id].
+                of the form '[user_id].[exploration_id]'.
         """
         return '%s.%s' % (user_id, exploration_id)
 
@@ -1246,7 +1246,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 class ExplorationUserDataModel(base_models.BaseModel):
     """User-specific data pertaining to a specific exploration.
 
-    ID for this model is of format [user_id].[exploration_id].
+    ID for this model is of format '[user_id].[exploration_id]'.
     """
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
@@ -1328,7 +1328,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
         Returns:
             str. The generated id using user_id and exploration_id
-                of the form [user_id].[exploration_id].
+                of the form '[user_id].[exploration_id]'.
         """
         return '%s.%s' % (user_id, exploration_id)
 
@@ -1500,7 +1500,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
         Returns:
             str. The generated id using user_id and exploration_id
-                of the form [user_id].[collection_id].
+                of the form '[user_id].[collection_id]'.
         """
         return '%s.%s' % (user_id, collection_id)
 
@@ -1609,7 +1609,7 @@ class StoryProgressModel(base_models.BaseModel):
     Please note instances of this progress model will persist even after a
     story is deleted.
 
-    ID for this model is of format [user_id].[story_id].
+    ID for this model is of format '[user_id].[story_id]'.
     """
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
@@ -1937,7 +1937,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     This model stores the degree of mastery of each skill for a given user.
 
-    ID for this model is of format [user_id].[skill_id].
+    ID for this model is of format '[user_id].[skill_id]'.
     """
 
     # The user id of the user.
@@ -2028,7 +2028,7 @@ class UserContributionScoringModel(base_models.BaseModel):
     the user. Users having scores above a particular threshold for a category
     can review suggestions for that category.
 
-    ID for this model is of format [score_category].[user_id].
+    ID for this model is of format '[score_category].[user_id]'.
     """
 
     # The user id of the user.
@@ -2150,7 +2150,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
     @classmethod
     def _get_instance_id(cls, user_id, score_category):
-        """Generates the instance id in the form {{score_category}}.{{user_id}}.
+        """Generates the instance id in the form '[score_category].[user_id]'.
 
         Args:
             user_id: str. The ID of the user.

@@ -36,8 +36,7 @@ class SentEmailModel(base_models.BaseModel):
     """Records the content and metadata of an email sent from Oppia.
 
     This model is read-only; entries cannot be modified once created. The
-    id/key of instances of this class has the form
-        [INTENT].[random hash].
+    id/key of instances of this class has the form '[intent].[random hash]'.
     """
     # TODO(sll): Implement functionality to get all emails sent to a particular
     # user with a given intent within a given time period.
@@ -300,7 +299,6 @@ class SentEmailModel(base_models.BaseModel):
         user_settings_models = user_models.UserSettingsModel.get_multi(
             user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
-
 
 
 class BulkEmailModel(base_models.BaseModel):

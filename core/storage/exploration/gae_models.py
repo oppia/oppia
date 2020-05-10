@@ -223,8 +223,7 @@ class ExplorationModel(base_models.VersionedModel):
 class ExplorationContextModel(base_models.BaseModel):
     """Model for storing Exploration context.
 
-    The ID of instances of this class has the form
-    {{random_hash_of_12_chars}}, which is the ID of the exploration itself.
+    The ID of instances of this class is the ID of the exploration itself.
     """
 
     # The ID of the story that the exploration is a part of.
@@ -606,7 +605,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     ExplorationModel or ExplorationRightsModel occurs.
 
     The id for this model is of the form
-    'exploration-{{EXP_ID}}-{{EXP_VERSION}}'.
+    'exploration-[exploration_id]-[version]'.
     """
     # The id of the exploration being edited.
     exploration_id = ndb.StringProperty(indexed=True, required=True)
@@ -775,6 +774,7 @@ class ExpSummaryModel(base_models.BaseModel):
     # The version number of the exploration after this commit. Only populated
     # for commits to an exploration (as opposed to its rights, etc.).
     version = ndb.IntegerProperty()
+
     # DEPRECATED in v2.8.3. Do not use.
     translator_ids = ndb.StringProperty(indexed=True, repeated=True)
 

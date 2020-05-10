@@ -65,13 +65,14 @@ class CollectionModel(base_models.VersionedModel):
     # The version of all property blob schemas.
     schema_version = ndb.IntegerProperty(
         required=True, default=1, indexed=True)
-    # DEPRECATED in v2.4.2. Do not use.
-    nodes = ndb.JsonProperty(default={}, indexed=False)
 
     # A dict representing the contents of a collection. Currently, this
     # contains the list of nodes. This dict should contain collection data
     # whose structure might need to be changed in the future.
     collection_contents = ndb.JsonProperty(default={}, indexed=False)
+
+    # DEPRECATED in v2.4.2. Do not use.
+    nodes = ndb.JsonProperty(default={}, indexed=False)
 
     @staticmethod
     def get_deletion_policy():
@@ -520,8 +521,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     A new instance of this model is created and saved every time a commit to
     CollectionModel or CollectionRightsModel occurs.
 
-    The id for this model is of the form
-    'collection-{{COLLECTION_ID}}-{{COLLECTION_VERSION}}'.
+    The id for this model is of the form 'collection-[collection_id]-[version]'.
     """
     # The id of the collection being edited.
     collection_id = ndb.StringProperty(indexed=True, required=True)

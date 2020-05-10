@@ -175,8 +175,7 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     A new instance of this model is created and saved every time a commit to
     TopicModel occurs.
 
-    The id for this model is of the form
-    'topic-{{TOPIC_ID}}-{{TOPIC_VERSION}}'.
+    The id for this model is of the form 'topic-[topic_id]-[version]'.
     """
     # The id of the topic being edited.
     topic_id = ndb.StringProperty(indexed=True, required=True)
@@ -381,7 +380,7 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     SubtopicPageModel occurs.
 
     The id for this model is of the form
-    'subtopicpage-{{SUBTOPIC_PAGE_ID}}-{{SUBTOPIC_PAGE_VERSION}}'.
+    'subtopicpage-[subtopic_page_id]-[version]'.
     """
     # The id of the subtopic page being edited.
     subtopic_page_id = ndb.StringProperty(indexed=True, required=True)
