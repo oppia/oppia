@@ -118,9 +118,6 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
-import { ImprovementsDisplayService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/improvements-tab/services/improvements-display.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
@@ -138,6 +135,7 @@ import { LearnerDashboardActivityIdsObjectFactory } from
 import { LearnerParamsService } from
   'pages/exploration-player-page/services/learner-params.service';
 import { LocalStorageService } from 'services/local-storage.service';
+import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
@@ -358,8 +356,6 @@ export class UpgradedServices {
     upgradedServices['IdGenerationService'] = new IdGenerationService();
     upgradedServices['ImprovementActionButtonObjectFactory'] =
       new ImprovementActionButtonObjectFactory();
-    upgradedServices['ImprovementsDisplayService'] =
-      new ImprovementsDisplayService();
     upgradedServices['ImprovementsService'] = new ImprovementsService();
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
@@ -370,6 +366,7 @@ export class UpgradedServices {
     upgradedServices['LearnerDashboardActivityIdsObjectFactory'] =
       new LearnerDashboardActivityIdsObjectFactory();
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
+    upgradedServices['LoaderService'] = new LoaderService();
     upgradedServices['LoggerService'] = new LoggerService();
     upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
       new UtilsService);
