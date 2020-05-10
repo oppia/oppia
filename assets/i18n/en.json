@@ -584,11 +584,7 @@
     "I18N_WELCOME_GUIDE_BROWSER_BULLET_3": "Language Filter to filter explorations by language",
     "I18N_WELCOME_GUIDE_BROWSER_BULLET_4": "Navigation button that you can click on to browse through more explorations",
     "I18N_WELCOME_GUIDE_BROWSER_BULLET_5": "Language Selector used to change the language of the entire page",
-    "I18N_WELCOME_PAGE_COLLECTIONS_PARAGRAPH": "A Collection in Oppia is a library of lessons.  Oppia has several collections, including the “Fractions” collection. Within the “Fractions” collection, there are different explorations that help a student strengthen their fraction skills. ",
-    "I18N_WELCOME_PAGE_COLLECTIONS_TITLE": "What is a Collection?",
     "I18N_WELCOME_GUIDE_EXPLORATION_BROSWER_IMAGE": "Screenshot of Oppia's browser",
-    "I18N_WELCOME_PAGE_EXPLORATION_PARAGRAPH": "At Oppia, the lessons we provide for students are called explorations. All Explorations are comprised of images, videos, and questions that help students explore and strengthen their knowledge on various topics in a fun and interactive way. The first exploration in the Fraction collection is called “What is a Fraction?” ",
-    "I18N_WELCOME_PAGE_EXPLORATION_TITLE": "What is an Exploration?",
     "I18N_WELCOME_GUIDE_FRACTIONS_IMAGE": "Screenshot of fractions exploration",
     "I18N_WELCOME_GUIDE_HEADER_IMAGE":"A child learning using Oppia.",
     "I18N_WELCOME_GUIDE_HOW_TO_TITLE": "How Can I Find Explorations and Collections?",
@@ -597,5 +593,9 @@
     "I18N_WELCOME_GUIDE_PARAGRAH_3":"You can filter explorations by different categories including Art, Mathematics,  English and more! You can also look for specific explorations using the search bar. Below each collection there is a rating and also the number of students who have completed that exploration. To help you evaluate its usefulness, each collection has a rating and shows you how many students have used it. ",
     "I18N_WELCOME_GUIDE_PARAGRAH_4":"Below is a snapshot of the library. The highlighted parts are different features of the page you can use to find explorations. Read the descriptions below to understand what these features do.  ",
     "I18N_WELCOME_GUIDE_TITLE": "Teachers and Parents: A Guide to Oppia",
+    "I18N_WELCOME_PAGE_COLLECTIONS_PARAGRAPH": "A Collection in Oppia is a library of lessons.  Oppia has several collections, including the “Fractions” collection. Within the “Fractions” collection, there are different explorations that help a student strengthen their fraction skills. ",
+    "I18N_WELCOME_PAGE_COLLECTIONS_TITLE": "What is a Collection?",
+    "I18N_WELCOME_PAGE_EXPLORATION_PARAGRAPH": "At Oppia, the lessons we provide for students are called explorations. All Explorations are comprised of images, videos, and questions that help students explore and strengthen their knowledge on various topics in a fun and interactive way. The first exploration in the Fraction collection is called “What is a Fraction?” ",
+    "I18N_WELCOME_PAGE_EXPLORATION_TITLE": "What is an Exploration?",
     "I18N_WORKED_EXAMPLE": "Worked Example"
 }
