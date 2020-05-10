@@ -22,36 +22,33 @@ var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 // The 'tabArray' arg should be an array of dictionaries with keys:
 //   'title': a string
 //   'content': a function that gives rich text editing instructions
-var customizeComponent = function(modal, tabArray) {
+var customizeComponent = async function(modal, tabArray) {
   var listEditor = forms.ListEditor(modal);
 
-  listEditor.setLength(tabArray.length);
+  await listEditor.setLength(tabArray.length);
   for (var i = 0; i < tabArray.length; i++) {
-    var dictionaryEditor = listEditor.editItem(i, 'Dictionary');
-    dictionaryEditor.editEntry(0, 'UnicodeString').setValue(tabArray[i].title);
-    var richTextEditor = dictionaryEditor.editEntry(1, 'RichText');
-    richTextEditor.clear();
-    tabArray[i].content(richTextEditor);
+    var dictionaryEditor = await listEditor.editItem(i, 'Dictionary');
+    await dictionaryEditor.editEntry(0, 'UnicodeString')
+      .setValue(tabArray[i].title);
+    var richTextEditor = await dictionaryEditor.editEntry(1, 'RichText');
+    await richTextEditor.clear();
+    await tabArray[i].content(richTextEditor);
   }
 };
 
-var expectComponentDetailsToMatch = function(elem, tabArray) {
-  elem.element(by.tagName('ul')).all(by.tagName('li')).then(
-    function(titleElems) {
-      expect(titleElems.length).toEqual(tabArray.length);
-      elem.element(by.css('.tab-content')).all(by.xpath('./*'))
-        .then(function(contentElems) {
-          for (var i = 0; i < tabArray.length; i++) {
-            // Click on each tab in turn to check its contents
-            expect(titleElems[i].getText()).toMatch(tabArray[i].title);
-            titleElems[i].click();
-            forms.expectRichText(
-              contentElems[i].element(by.css('.protractor-test-tab-content'))
-            ).toMatch(tabArray[i].content);
-          }
-        });
-    }
-  );
+var expectComponentDetailsToMatch = async function(elem, tabArray) {
+  var titleElems = await elem.element(by.tagName('ul')).all(by.tagName('li'));
+  expect(titleElems.length).toEqual(tabArray.length);
+  var contentElems = await elem.element(by.css('.tab-content'))
+    .all(by.xpath('./*'));
+  for (var i = 0; i < tabArray.length; i++) {
+    // Click on each tab in turn to check its contents
+    expect(await titleElems[i].getText()).toMatch(tabArray[i].title);
+    await titleElems[i].click();
+    await forms.expectRichText(
+      contentElems[i].element(by.css('.protractor-test-tab-content'))
+    ).toMatch(tabArray[i].content);
+  }
 };
 
 exports.customizeComponent = customizeComponent;
