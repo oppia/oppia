@@ -7,7 +7,7 @@
             Learner's Answers and Oppia's Responses
           </strong>
         </td>
-        <td class="col-md-5">
+        <td class="col-md-5" ng-if="!isInQuestionMode()">
           <span ng-if="!isCurrentInteractionTrivial()" ng-hide="!enableSolicitAnswerDetailsFeature" class="solicit-answer-details-span">
             <input type="checkbox" class="protractor-test-solicit-answer-details-checkbox" ng-change="onChangeSolicitAnswerDetails()" ng-model="stateSolicitAnswerDetailsService.displayed">
             Solicit Answer Details

@@ -5152,10 +5152,14 @@ export = {
 
   "INLINE_RTE_COMPONENTS": ["link", "math", "skillreview"],
 
+  // If new difficulties are added or the names changed, only the constants
+  // below need to be edited.
+  "SKILL_DIFFICULTY_EASY": "Easy",
+  "SKILL_DIFFICULTY_MEDIUM": "Medium",
+  "SKILL_DIFFICULTY_HARD": "Hard",
+
   "SKILL_DIFFICULTIES": ["Easy", "Medium", "Hard"],
 
-  // The skill difficulty values here should correspond to the SKILL_DIFFICULTY
-  // constant values in feconf.py.
   "SKILL_DIFFICULTY_LABEL_TO_FLOAT": {
     "Easy": 0.3,
     "Medium": 0.6,
@@ -5188,9 +5192,11 @@ export = {
   "MAX_CHARS_IN_TOPIC_NAME": 39,
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
-  "MAX_CHARS_IN_SKILL_DESCRIPTION": 64,
+  "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
   "MAX_CHARS_IN_STORY_TITLE": 39,
   "MAX_CHARS_IN_CHAPTER_TITLE": 36,
+  "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
+  "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
