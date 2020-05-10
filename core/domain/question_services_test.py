@@ -271,14 +271,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         # question summaries.
         for index, link_object in enumerate(merged_question_skill_links):
             if question_ids[index] == self.question_id:
-                self.assertIn('Skill Description 1',
-                              link_object.skill_descriptions)
-                self.assertIn('Skill Description 3',
-                              link_object.skill_descriptions)
-                self.assertIn(0.5,
-                              link_object.skill_difficulties)
-                self.assertIn(0.8,
-                              link_object.skill_difficulties)
+                self.assertEqual(
+                    ['Skill Description 3', 'Skill Description 1'],
+                    link_object.skill_descriptions)
+                self.assertEqual(
+                    [0.8, 0.5], link_object.skill_difficulties)
             elif question_ids[index] == question_id_2:
                 self.assertEqual(
                     ['Skill Description 1'], link_object.skill_descriptions)

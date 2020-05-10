@@ -96,28 +96,23 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
                 json_response['question_summary_dicts'])
             self.assertEqual(len(question_summary_dicts_2), 2)
             for i in python_utils.RANGE(0, 2):
-                skill_desc = question_summary_dicts[i]['skill_descriptions']
-                skill_desc.sort()
                 self.assertEqual(
-                    skill_desc, ['Skill Description', 'Skill Description 2'])
-                skill_desc = question_summary_dicts_2[i]['skill_descriptions']
-                skill_desc.sort()
+                    question_summary_dicts[i]['skill_descriptions'],
+                    ['Skill Description 2', 'Skill Description'])
                 self.assertEqual(
-                    skill_desc, ['Skill Description', 'Skill Description 2'])
-                skill_ids = question_summary_dicts[i]['skill_ids']
-                skill_ids.sort()
-                test_skill_ids = [self.skill_id_2, self.skill_id]
-                test_skill_ids.sort()
-                self.assertEqual(skill_ids, test_skill_ids)
-                skill_ids = question_summary_dicts_2[i]['skill_ids']
-                skill_ids.sort()
-                self.assertEqual(skill_ids, test_skill_ids)
-                skill_diff = question_summary_dicts[i]['skill_difficulties']
-                skill_diff.sort()
-                self.assertEqual(skill_diff, [0.3, 0.5])
-                skill_diff = question_summary_dicts_2[i]['skill_difficulties']
-                skill_diff.sort()
-                self.assertEqual(skill_diff, [0.3, 0.5])
+                    question_summary_dicts_2[i]['skill_descriptions'],
+                    ['Skill Description 2', 'Skill Description'])
+                self.assertEqual(
+                    question_summary_dicts[i]['skill_ids'],
+                    [self.skill_id_2, self.skill_id])
+                self.assertEqual(
+                    question_summary_dicts_2[i]['skill_ids'],
+                    [self.skill_id_2, self.skill_id])
+                self.assertEqual(
+                    question_summary_dicts[i]['skill_difficulties'], [0.3, 0.5])
+                self.assertEqual(
+                    question_summary_dicts_2[i]['skill_difficulties'],
+                    [0.3, 0.5])
             json_response = self.get_json(
                 '%s/%s?cursor=' % (
                     feconf.QUESTIONS_LIST_URL_PREFIX,

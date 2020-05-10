@@ -295,63 +295,19 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(len(question_skill_link_models), 2)
-        self.assertIn(
-            question_skill_link_models[0].skill_id, [skill_id_1, skill_id_2])
-        self.assertIn(
-            question_skill_link_models[1].skill_id, [skill_id_1, skill_id_2])
+        self.assertEqual(question_skill_link_models[0].skill_id, skill_id_2)
+        self.assertEqual(question_skill_link_models[1].skill_id, skill_id_1)
 
         question_skill_link_models_2, next_cursor_str = (
             question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( # pylint: disable=line-too-long
                 1, [skill_id_1, skill_id_2], next_cursor_str
             )
         )
-        self.assertIn(
-            question_skill_link_models_2[0].skill_id, [skill_id_1, skill_id_2])
+        self.assertEqual(len(question_skill_link_models_2), 1)
+        self.assertEqual(question_skill_link_models_2[0].skill_id, skill_id_1)
 
         self.assertNotEqual(
             question_skill_link_models[0], question_skill_link_models_2[0])
-
-    def test_get_random_question_skill_links(self):
-        skill_id_1 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_1, 'user', description='Description 1')
-        skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_2, 'user', description='Description 2')
-
-        questionskilllink_model_list = []
-        for i in python_utils.RANGE(10):
-            question_id = 'question_id%s' % python_utils.UNICODE(i)
-            if utils.get_random_int(2) == 0:
-                questionskilllink_model = (
-                    question_models.QuestionSkillLinkModel.create(
-                        question_id, skill_id_1, 0.1)
-                    )
-            else:
-                questionskilllink_model = (
-                    question_models.QuestionSkillLinkModel.create(
-                        question_id, skill_id_2, 0.3)
-                    )
-            questionskilllink_model_list.append(questionskilllink_model)
-
-        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
-            questionskilllink_model_list)
-
-        # Overriding the convert_hash_function to get expected random results.
-        utils.convert_to_hash = lambda a, b: u'question_id5'
-        question_skill_link_models, _ = (
-            question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( # pylint: disable=line-too-long
-                2, [skill_id_1, skill_id_2], ''
-            )
-        )
-        self.assertEqual(len(question_skill_link_models), 4)
-        utils.convert_to_hash = lambda a, b: u'question_id1'
-        question_skill_link_models_2, _ = (
-            question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( # pylint: disable=line-too-long
-                2, [skill_id_1, skill_id_2], ''
-            )
-        )
-        self.assertEqual(len(question_skill_link_models_2), 4)
-        for question in question_skill_link_models_2:
-            self.assertFalse(question in question_skill_link_models)
 
     def test_get_question_skill_links_by_skill_ids_many_skills(self):
         # Test the case when len(skill_ids) > constants.MAX_SKILLS_PER_QUESTION.
@@ -389,11 +345,10 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
                 1, [skill_id_1, skill_id_2, skill_id_3, skill_id_4], ''
             )
         )
-        skill_list = [skill_id_1, skill_id_2, skill_id_3, skill_id_4]
         self.assertEqual(len(question_skill_link_models), 3)
-        self.assertIn(question_skill_link_models[0].skill_id, skill_list)
-        self.assertIn(question_skill_link_models[1].skill_id, skill_list)
-        self.assertIn(question_skill_link_models[2].skill_id, skill_list)
+        self.assertEqual(question_skill_link_models[0].skill_id, skill_id_4)
+        self.assertEqual(question_skill_link_models[1].skill_id, skill_id_3)
+        self.assertEqual(question_skill_link_models[2].skill_id, skill_id_2)
 
     def test_get_question_skill_links_based_on_difficulty(self):
         questionskilllink_model1 = (
@@ -433,6 +388,56 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(question_skill_links), 2)
         self.assertTrue(questionskilllink_model2 in question_skill_links)
         self.assertTrue(questionskilllink_model4 in question_skill_links)
+
+    def test_get_random_question_skill_links_based_on_difficulty(self):
+        questionskilllink_model1 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id1', 'skill_id1', 0.3)
+            )
+        questionskilllink_model2 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id2', 'skill_id1', 0.6)
+            )
+        questionskilllink_model3 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id3', 'skill_id1', 0.3)
+            )
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            [questionskilllink_model1, questionskilllink_model2,
+             questionskilllink_model3])
+        question_skill_links = (
+            question_models.QuestionSkillLinkModel.
+            get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
+                2, ['skill_id1'], 0.6
+            )
+        )
+        self.assertEqual(len(question_skill_links), 2)
+        self.assertTrue(questionskilllink_model2 in question_skill_links)
+        self.assertTrue(questionskilllink_model1 in question_skill_links or
+                        questionskilllink_model3 in question_skill_links)
+        questionskilllink_model4 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id4', 'skill_id1', 0.9)
+            )
+        questionskilllink_model5 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id5', 'skill_id1', 0.9)
+            )
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            [questionskilllink_model4, questionskilllink_model5])
+        question_skill_links = (
+            question_models.QuestionSkillLinkModel.
+            get_question_skill_links_based_on_difficulty_equidistributed_by_skill( # pylint: disable=line-too-long
+                4, ['skill_id1'], 0.6
+            )
+        )
+        self.assertEqual(len(question_skill_links), 4)
+        self.assertTrue(questionskilllink_model1 in question_skill_links)
+        self.assertTrue(questionskilllink_model2 in question_skill_links)
+        self.assertTrue(questionskilllink_model3 in question_skill_links)
+        self.assertTrue(questionskilllink_model4 in question_skill_links or
+                        questionskilllink_model5 in question_skill_links)
+
 
     def test_request_too_many_skills_raises_error_when_fetch_by_difficulty(
             self):
@@ -537,6 +542,38 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         # Test questions with multiple linked skills are deduplicated.
         question_ids = [link.question_id for link in question_skill_links]
         self.assertEqual(question_ids.count('question_id2'), 1)
+
+    def test_get_random_question_skill_links_equidistributed_by_skill(self):
+        questionskilllink_model1 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id1', 'skill_id1', 0.1)
+            )
+        questionskilllink_model2 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id2', 'skill_id1', 0.5)
+            )
+        questionskilllink_model3 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id3', 'skill_id2', 0.8)
+            )
+        questionskilllink_model4 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id4', 'skill_id2', 0.9)
+            )
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            [questionskilllink_model1, questionskilllink_model2,
+             questionskilllink_model3, questionskilllink_model4])
+        question_skill_links = (
+            question_models.QuestionSkillLinkModel.
+            get_question_skill_links_equidistributed_by_skill(
+                2, ['skill_id1', 'skill_id2']
+            )
+        )
+        self.assertEqual(len(question_skill_links), 2)
+        self.assertTrue(questionskilllink_model1 in question_skill_links or
+                        questionskilllink_model2 in question_skill_links)
+        self.assertTrue(questionskilllink_model3 in question_skill_links or
+                        questionskilllink_model4 in question_skill_links)
 
     def test_request_too_many_skills_raises_error(self):
         skill_ids = ['skill_id%s' % number for number in python_utils.RANGE(25)]

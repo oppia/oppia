@@ -333,9 +333,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                     5, [self.skill_id, 'skill_2'], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(len(merged_question_skill_links), 1)
-        skill_difficulties = merged_question_skill_links[0].skill_difficulties
-        skill_difficulties.sort()
-        self.assertEqual(skill_difficulties, [0.6, 0.9])
+        self.assertEqual(
+            merged_question_skill_links[0].skill_difficulties, [0.6, 0.9])
 
         self.put_json(
             '%s/%s' % (
