@@ -258,6 +258,7 @@ def get_random_choice(alist):
     index = get_random_int(len(alist))
     return alist[index]
 
+
 def get_random_sample(alist, sample_length):
     """Gets a random sample from a list.
 
@@ -274,6 +275,7 @@ def get_random_sample(alist, sample_length):
 
     sample_list = random.sample(alist, sample_length)
     return sample_list
+
 
 def convert_png_binary_to_data_url(content):
     """Converts a png image string (represented by 'content') to a data URL.
