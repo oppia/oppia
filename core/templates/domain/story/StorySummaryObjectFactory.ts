@@ -25,6 +25,7 @@ export class StorySummary {
     private _id: string,
     private _title: string,
     private _nodeCount: number,
+    private _description: string,
     private _storyIsPublished: boolean
   ) {}
 
@@ -38,6 +39,10 @@ export class StorySummary {
 
   getNodeCount(): number {
     return this._nodeCount;
+  }
+
+  getDescription(): string {
+    return this._description;
   }
 
   isStoryPublished(): boolean {
@@ -54,6 +59,7 @@ export class StorySummaryObjectFactory {
     title: string;
     // eslint-disable-next-line camelcase
     node_count: number;
+    description: string;
     // eslint-disable-next-line camelcase
     story_is_published: boolean;
   }): StorySummary {
@@ -61,6 +67,7 @@ export class StorySummaryObjectFactory {
       storySummaryBackendDict.id,
       storySummaryBackendDict.title,
       storySummaryBackendDict.node_count,
+      storySummaryBackendDict.description,
       storySummaryBackendDict.story_is_published
     );
   }

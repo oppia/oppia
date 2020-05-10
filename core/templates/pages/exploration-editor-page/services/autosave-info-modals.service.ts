@@ -18,20 +18,19 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'changes-in-human-readable-form.service.ts');
+require('pages/exploration-editor-page/changes-in-human-readable-form/' +
+    'changes-in-human-readable-form.directive');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/local-storage.service.ts');
 
 angular.module('oppia').factory('AutosaveInfoModalsService', [
   '$log', '$timeout', '$uibModal', '$window',
-  'ChangesInHumanReadableFormService', 'ExplorationDataService',
-  'LocalStorageService', 'UrlInterpolationService',
+  'ExplorationDataService', 'LocalStorageService',
+  'LostChangeObjectFactory', 'UrlInterpolationService',
   function(
       $log, $timeout, $uibModal, $window,
-      ChangesInHumanReadableFormService, ExplorationDataService,
-      LocalStorageService, UrlInterpolationService) {
+      ExplorationDataService, LocalStorageService,
+      LostChangeObjectFactory, UrlInterpolationService) {
     var _isModalOpen = false;
     var _refreshPage = function(delay) {
       $timeout(function() {
@@ -86,9 +85,8 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
             if ($scope.hasLostChanges) {
               // TODO(sll): This should also include changes to exploration
               // properties (such as the exploration title, category, etc.).
-              $scope.lostChangesHtml = (
-                ChangesInHumanReadableFormService.makeHumanReadable(
-                  lostChanges).html());
+              $scope.lostChanges = lostChanges.map(
+                LostChangeObjectFactory.createNew);
               $log.error('Lost changes: ' + JSON.stringify(lostChanges));
             }
           }],
@@ -117,9 +115,8 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
               $uibModalInstance.dismiss('cancel');
             };
 
-            $scope.lostChangesHtml = (
-              ChangesInHumanReadableFormService.makeHumanReadable(
-                lostChanges).html());
+            $scope.lostChanges = lostChanges.map(
+              LostChangeObjectFactory.createNew);
             $log.error('Lost changes: ' + JSON.stringify(lostChanges));
           }],
           windowClass: 'oppia-lost-changes-modal'

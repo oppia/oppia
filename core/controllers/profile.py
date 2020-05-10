@@ -26,6 +26,7 @@ from core.domain import email_manager
 from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
+from core.domain import takeout_service
 from core.domain import user_services
 from core.domain import wipeout_service
 from core.platform import models
@@ -356,6 +357,21 @@ class DeleteAccountHandler(base.BaseHandler):
         self.render_json({'success': True})
 
 
+class ExportAccountHandler(base.BaseHandler):
+    """Provides user with relevant data for Takeout."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_manage_own_profile
+    def get(self):
+        """Handles GET requests."""
+        if not constants.ENABLE_ACCOUNT_EXPORT:
+            raise self.PageNotFoundException
+
+        user_data = takeout_service.export_data_for_user(self.user_id)
+        self.render_json(user_data)
+
+
 class PendingAccountDeletionPage(base.BaseHandler):
     """The account pending deletion page. This page is accessible by all users
     even if they are not scheduled for deletion. This is because users that are
@@ -453,10 +469,7 @@ class UrlHandler(base.BaseHandler):
             self.render_json({'login_url': None})
         else:
             if self.request and self.request.get('current_url'):
-                target_url = (
-                    '/' if self.request.get('current_url').endswith(
-                        feconf.SPLASH_URL)
-                    else self.request.get('current_url'))
+                target_url = self.request.get('current_url')
                 login_url = (
                     current_user_services.create_login_url(target_url))
                 self.render_json({'login_url': login_url})

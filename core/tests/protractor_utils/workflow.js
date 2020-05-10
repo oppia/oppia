@@ -18,12 +18,18 @@
  */
 
 var forms = require('./forms.js');
+var path = require('path');
 var users = require('./users.js');
 var waitFor = require('./waitFor.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var LibraryPage = require('./LibraryPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
+
+var imageUploadInput = element(
+  by.css('.protractor-test-photo-upload-input'));
+var imageSubmitButton = element(
+  by.css('.protractor-test-photo-upload-submit'));
 
 // check if the save roles button is clickable
 var canAddRolesToUsers = function() {
@@ -256,13 +262,51 @@ var createSkillAndAssignTopic = function(
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
   topicsAndSkillsDashboardPage.get();
   topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-    skillDescription, material);
+    skillDescription, material, true);
   topicsAndSkillsDashboardPage.get();
   topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
   topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
   topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
     0, topicName);
 };
+
+var getImageSource = function(customImageElement) {
+  waitFor.visibilityOf(
+    customImageElement,
+    'Image element is taking too long to appear.');
+  return customImageElement.getAttribute('src');
+};
+
+var uploadImage = function(imageClickableElement, imgPath) {
+  waitFor.visibilityOf(
+    imageClickableElement,
+    'Image element is taking too long to appear.');
+  imageClickableElement.click();
+  absPath = path.resolve(__dirname, imgPath);
+  return imageUploadInput.sendKeys(absPath);
+};
+
+var submitImage = function(imageClickableElement, imageContainer, imgPath) {
+  waitFor.visibilityOf(
+    imageClickableElement,
+    'Image element is taking too long to appear.');
+  return this.uploadImage(
+    imageClickableElement, imgPath).then(function() {
+    waitFor.visibilityOf(
+      imageContainer, 'Image container is taking too long to appear');
+  }).then(function() {
+    imageSubmitButton.click();
+  }).then(function() {
+    waitFor.invisibilityOf(
+      imageUploadInput,
+      'Image uploader is taking too long to disappear');
+    return waitFor.pageToFullyLoad();
+  });
+};
+
+exports.getImageSource = getImageSource;
+exports.submitImage = submitImage;
+exports.uploadImage = uploadImage;
 
 exports.createExploration = createExploration;
 exports.createExplorationAndStartTutorial = createExplorationAndStartTutorial;

@@ -283,6 +283,30 @@ class Question(python_utils.OBJECT):
 
         return question_state_dict
 
+    @classmethod
+    def _convert_state_v32_dict_to_v33_dict(cls, question_state_dict):
+        """Converts from version 32 to 33. Version 33 adds a new
+        customization arg to MultipleChoiceInput Interaction which allows
+        answer choices to be shuffled.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'MultipleChoiceInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'showChoicesInShuffledOrder': {
+                    'value': True
+                }
+            })
+
+        return question_state_dict
 
     @classmethod
     def update_state_from_model(

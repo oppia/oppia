@@ -47,14 +47,17 @@ describe('Skill Editor functionality', function() {
     users.createAndLoginAdminUser(
       'creator@skillEditor.com', 'creatorSkillEditor');
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 1', 'Concept card explanation');
-    browser.getCurrentUrl().then(function(url) {
-      skillId = url.split('/')[4];
-    }, function() {
-      // Note to developers:
-      // Promise is returned by getCurrentUrl which is handled here.
-      // No further action is needed.
+    browser.getWindowHandle().then(function(handle) {
+      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+        'Skill 1', 'Concept card explanation', false);
+      browser.getCurrentUrl().then(function(url) {
+        skillId = url.split('/')[4];
+        general.closeCurrentTabAndSwitchTo(handle);
+      }, function() {
+        // Note to developers:
+        // Promise is returned by getCurrentUrl which is handled here.
+        // No further action is needed.
+      });
     });
   });
 
@@ -102,19 +105,43 @@ describe('Skill Editor functionality', function() {
   });
 
   it('should edit rubrics for the skill', function() {
-    skillEditorPage.expectRubricExplanationToMatch(0, 'Explanation 0');
-    skillEditorPage.expectRubricExplanationToMatch(1, 'Explanation 1');
-    skillEditorPage.expectRubricExplanationToMatch(2, 'Explanation 2');
+    skillEditorPage.expectRubricExplanationsToMatch(
+      'Easy', ['Explanation for easy difficulty']);
+    skillEditorPage.expectRubricExplanationsToMatch(
+      'Medium', ['Skill 1', 'Explanation for medium difficulty']);
+    skillEditorPage.expectRubricExplanationsToMatch(
+      'Hard', ['Explanation for hard difficulty']);
 
-    skillEditorPage.editRubricExplanationWithIndex(0, 'Explanation 0 edited');
-    skillEditorPage.editRubricExplanationWithIndex(1, 'Explanation 1 edited');
-    skillEditorPage.editRubricExplanationWithIndex(2, 'Explanation 2 edited');
+    skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy', 'Second explanation for easy difficulty.');
+    skillEditorPage.addRubricExplanationForDifficulty(
+      'Medium', 'Second explanation for medium difficulty.');
+    skillEditorPage.addRubricExplanationForDifficulty(
+      'Hard', 'Second explanation for hard difficulty.');
+
+    skillEditorPage.editRubricExplanationWithIndex(
+      'Easy', 0, 'Easy explanation 1 edited');
+    skillEditorPage.editRubricExplanationWithIndex(
+      'Easy', 1, 'Easy explanation 2 edited');
+    skillEditorPage.editRubricExplanationWithIndex(
+      'Medium', 1, 'Medium explanation 1 edited');
+    skillEditorPage.editRubricExplanationWithIndex(
+      'Medium', 2, 'Medium explanation 2 edited');
+    skillEditorPage.deleteRubricExplanationWithIndex('Medium', 0);
+    skillEditorPage.editRubricExplanationWithIndex(
+      'Hard', 0, 'Hard explanation 1 edited');
+    skillEditorPage.editRubricExplanationWithIndex(
+      'Hard', 1, 'Hard explanation 2 edited');
+
     skillEditorPage.saveOrPublishSkill('Edited rubrics');
 
     skillEditorPage.get(skillId);
-    skillEditorPage.expectRubricExplanationToMatch(0, 'Explanation 0 edited');
-    skillEditorPage.expectRubricExplanationToMatch(1, 'Explanation 1 edited');
-    skillEditorPage.expectRubricExplanationToMatch(2, 'Explanation 2 edited');
+    skillEditorPage.expectRubricExplanationsToMatch(
+      'Easy', ['Easy explanation 1 edited', 'Easy explanation 2 edited']);
+    skillEditorPage.expectRubricExplanationsToMatch(
+      'Medium', ['Medium explanation 1 edited', 'Medium explanation 2 edited']);
+    skillEditorPage.expectRubricExplanationsToMatch(
+      'Hard', ['Hard explanation 1 edited', 'Hard explanation 2 edited']);
   });
 
   it('should create a question for the skill', function() {

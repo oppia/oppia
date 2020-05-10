@@ -130,6 +130,10 @@ angular.module('oppia').directive('stateResponses', [
             return existingContentIds;
           };
 
+          $scope.isInQuestionMode = function() {
+            return StateEditorService.isInQuestionMode();
+          };
+
           $scope.suppressDefaultAnswerGroupWarnings = function() {
             var interactionId = $scope.getCurrentInteractionId();
             var answerGroups = ResponsesService.getAnswerGroups();
@@ -635,11 +639,9 @@ angular.module('oppia').directive('stateResponses', [
                 ResponsesService.getActiveAnswerGroupIndex());
             });
 
-            $scope.$on('updateAnswerChoices', function(
-                evt, newAnswerChoices, oldToNewListMapping) {
+            $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
               ResponsesService.updateAnswerChoices(
-                newAnswerChoices, oldToNewListMapping, function(
-                    newAnswerGroups) {
+                newAnswerChoices, function(newAnswerGroups) {
                   $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
                   $scope.refreshWarnings()();
                 });

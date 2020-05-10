@@ -17,6 +17,8 @@
  */
 
 require(
+  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
 
@@ -26,6 +28,10 @@ require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
+
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+const storyConstants = require('constants.ts');
 
 angular.module('oppia').directive('storyEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -38,11 +44,14 @@ angular.module('oppia').directive('storyEditor', [
         '$scope', 'StoryEditorStateService', 'StoryUpdateService',
         'UndoRedoService', 'EVENT_VIEW_STORY_NODE_EDITOR', '$uibModal',
         'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED', 'AlertsService',
+        'MAX_CHARS_IN_STORY_TITLE', 'MAX_CHARS_IN_CHAPTER_TITLE',
         function(
             $scope, StoryEditorStateService, StoryUpdateService,
             UndoRedoService, EVENT_VIEW_STORY_NODE_EDITOR, $uibModal,
-            EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED, AlertsService) {
+            EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED, AlertsService,
+            MAX_CHARS_IN_STORY_TITLE, MAX_CHARS_IN_CHAPTER_TITLE) {
           var ctrl = this;
+          $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyContents = $scope.story.getStoryContents();
@@ -58,6 +67,8 @@ angular.module('oppia').directive('storyEditor', [
             $scope.disconnectedNodes = [];
             $scope.linearNodesList = [];
             $scope.nodes = [];
+            $scope.allowedBgColors = (
+              storyConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
             if ($scope.storyContents &&
                 $scope.storyContents.getNodes().length > 0) {
               $scope.nodes = $scope.storyContents.getNodes();
@@ -134,10 +145,14 @@ angular.module('oppia').directive('storyEditor', [
               ]
             });
 
-            modalInstance.result.then(function(title) {
+            modalInstance.result.then(function() {
               StoryUpdateService.deleteStoryNode($scope.story, nodeId);
               _initEditor();
               $scope.$broadcast('recalculateAvailableNodes');
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -156,6 +171,8 @@ angular.module('oppia').directive('storyEditor', [
                   $scope.nodeTitle = '';
                   $scope.nodeTitles = nodeTitles;
                   $scope.errorMsg = null;
+                  $scope.MAX_CHARS_IN_CHAPTER_TITLE =
+                    MAX_CHARS_IN_CHAPTER_TITLE;
 
                   $scope.resetErrorMsg = function() {
                     $scope.errorMsg = null;
@@ -208,6 +225,24 @@ angular.module('oppia').directive('storyEditor', [
               return;
             }
             StoryUpdateService.setStoryTitle($scope.story, newTitle);
+          };
+
+          $scope.updateStoryThumbnailFilename = function(
+              newThumbnailFilename) {
+            if (newThumbnailFilename === $scope.story.getThumbnailFilename()) {
+              return;
+            }
+            StoryUpdateService.setThumbnailFilename(
+              $scope.story, newThumbnailFilename);
+          };
+
+          $scope.updateStoryThumbnailBgColor = function(
+              newThumbnailBgColor) {
+            if (newThumbnailBgColor === $scope.story.getThumbnailBgColor()) {
+              return;
+            }
+            StoryUpdateService.setThumbnailBgColor(
+              $scope.story, newThumbnailBgColor);
           };
 
           $scope.updateStoryDescription = function(newDescription) {

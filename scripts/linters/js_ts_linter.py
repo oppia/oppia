@@ -20,12 +20,11 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
+import json
 import os
 import re
-import shutil
 import subprocess
 import sys
-import tempfile
 import time
 
 import python_utils
@@ -33,11 +32,11 @@ import python_utils
 from . import linter_utils
 from .. import common
 
-ESPRIMA_VERSION = '4.0.1'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 
-ESPRIMA_PATH = os.path.join(OPPIA_TOOLS_DIR, 'esprima-%s' % ESPRIMA_VERSION)
+ESPRIMA_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'esprima-%s' % common.ESPRIMA_VERSION)
 
 sys.path.insert(1, ESPRIMA_PATH)
 
@@ -47,6 +46,12 @@ import esprima  # isort:skip
 from .. import build  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
+
+FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH = os.path.join(
+    CURR_DIR, 'scripts', 'linters', 'excluded_any_type_files.json')
+
+FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(python_utils.open_file(
+    FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH, 'r'))
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
@@ -111,6 +116,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             validating and parsing the files.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
+
     def __init__(self, js_files, ts_files, verbose_mode_enabled):
         """Constructs a JsTsLintChecksManager object.
 
@@ -156,8 +162,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         parsed_js_and_ts_files = dict()
         if not files_to_check:
             return parsed_js_and_ts_files
-        compiled_js_dir = tempfile.mkdtemp(
-            dir=os.getcwd(), prefix='tmpcompiledjs')
         if not self.verbose_mode_enabled:
             python_utils.PRINT('Validating and parsing JS and TS files ...')
         for filepath in files_to_check:
@@ -170,23 +174,17 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 # Use esprima to parse a JS or TS file.
                 parsed_js_and_ts_files[filepath] = esprima.parseScript(
                     file_content, comment=True)
-            except Exception as e:
-                # Compile typescript file which has syntax not valid for JS
-                # file.
+            except Exception:
                 if filepath.endswith('.js'):
-                    shutil.rmtree(compiled_js_dir)
-                    raise Exception(e)
-                try:
+                    raise
+                # Compile typescript file which has syntax invalid for JS file.
+                with linter_utils.temp_dir(prefix='tmpcompiledjs',
+                                           parent=os.getcwd()) as temp_dir:
                     compiled_js_filepath = self._compile_ts_file(
-                        filepath, compiled_js_dir)
+                        filepath, temp_dir)
                     file_content = FILE_CACHE.read(compiled_js_filepath)
                     parsed_js_and_ts_files[filepath] = esprima.parseScript(
                         file_content)
-                except Exception as e:
-                    shutil.rmtree(compiled_js_dir)
-                    raise Exception(e)
-
-        shutil.rmtree(compiled_js_dir)
 
         return parsed_js_and_ts_files
 
@@ -229,6 +227,63 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         compiled_js_filepath = os.path.join(
             dir_path, os.path.basename(filepath).replace('.ts', '.js'))
         return compiled_js_filepath
+
+    def _check_any_type(self):
+        """Checks if the type of any variable is declared as 'any'
+        in TypeScript files.
+        """
+
+        if self.verbose_mode_enabled:
+            python_utils.PRINT('Starting any type check')
+            python_utils.PRINT('----------------------------------------')
+
+        # This pattern is used to match cases like ': any'.
+        any_type_pattern = r':\ *any'
+
+        # This pattern is used to match cases where the previous line ended
+        # with a ':', so we know this line begins with a type.
+        starts_with_any_pattern = r'^\ *any'
+
+        with linter_utils.redirect_stdout(sys.stdout):
+            failed = False
+
+            for file_path in self.all_filepaths:
+                if file_path in FILES_EXCLUDED_FROM_ANY_TYPE_CHECK:
+                    continue
+
+                file_content = FILE_CACHE.read(file_path)
+                starts_with_type = False
+
+                for line_number, line in enumerate(file_content.split('\n')):
+                    if starts_with_type and re.findall(
+                            starts_with_any_pattern, line):
+                        failed = True
+                        python_utils.PRINT(
+                            '%s --> ANY type found in this file. Line no.'
+                            ' %s' % (file_path, line_number + 1))
+                        python_utils.PRINT('')
+
+                    if re.findall(any_type_pattern, line):
+                        failed = True
+                        python_utils.PRINT(
+                            '%s --> ANY type found in this file. Line no.'
+                            ' %s' % (file_path, line_number + 1))
+                        python_utils.PRINT('')
+
+                    if line:
+                        starts_with_type = line[len(line) - 1] == ':'
+
+            if failed:
+                summary_message = (
+                    '%s ANY type check failed' % _MESSAGE_TYPE_FAILED)
+            else:
+                summary_message = (
+                    '%s ANY type check passed' % _MESSAGE_TYPE_SUCCESS)
+
+            python_utils.PRINT(summary_message)
+            python_utils.PRINT('')
+
+        return [summary_message]
 
     def _check_extra_js_files(self):
         """Checks if the changes made include extra js files in core
@@ -644,12 +699,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     filename_without_extension = filepath[:-3]
                     corresponding_angularjs_filepath = (
                         filename_without_extension + '.ajs.ts')
-                    compiled_js_dir = tempfile.mkdtemp(dir=os.getcwd())
-                    try:
+                    with linter_utils.temp_dir(parent=os.getcwd()) as temp_dir:
                         if os.path.isfile(corresponding_angularjs_filepath):
                             compiled_js_filepath = self._compile_ts_file(
-                                corresponding_angularjs_filepath,
-                                compiled_js_dir)
+                                corresponding_angularjs_filepath, temp_dir)
                             file_content = FILE_CACHE.read(
                                 compiled_js_filepath).decode('utf-8')
 
@@ -705,8 +758,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                 '%s --> Corresponding AngularJS constants '
                                 'file not found.' % filepath)
 
-                    finally:
-                        shutil.rmtree(compiled_js_dir)
                 # Check that the constants are declared only in a
                 # *.constants.ajs.ts file.
                 if not filepath.endswith('.constants.ajs.ts'):
@@ -810,6 +861,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         self.parsed_expressions_in_files = (
             self._get_expressions_from_parsed_script())
 
+        any_type_messages = self._check_any_type()
         extra_js_files_messages = self._check_extra_js_files()
         js_and_ts_component_messages = (
             self._check_js_and_ts_component_name_and_count())
@@ -819,7 +871,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             self._match_line_breaks_in_controller_dependencies())
 
         all_messages = (
-            extra_js_files_messages +
+            any_type_messages + extra_js_files_messages +
             js_and_ts_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages)
         return all_messages

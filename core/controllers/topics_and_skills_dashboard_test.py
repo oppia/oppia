@@ -17,6 +17,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+
 from constants import constants
 from core.domain import question_services
 from core.domain import skill_services
@@ -25,6 +27,7 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 
 class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
@@ -49,7 +52,6 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             self.linked_skill_id, self.admin_id, description='Description 3')
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.linked_skill_id],
@@ -166,34 +168,52 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             topic_fetchers.get_topic_by_id(topic_id, strict=False))
         self.logout()
 
+    def test_topic_creation_with_invalid_name(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'name': 'Topic name that is too long for validation.',
+            'abbreviated_name': 'name'
+        }
+        self.post_json(
+            self.url, payload, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
 
 class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def setUp(self):
         super(NewSkillHandlerTests, self).setUp()
         self.url = feconf.NEW_SKILL_URL
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), mode='rb',
+            encoding=None) as f:
+            self.original_image_content = f.read()
 
     def test_skill_creation(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         rubrics = [{
             'difficulty': constants.SKILL_DIFFICULTIES[0],
-            'explanation': 'Explanation 1'
+            'explanations': ['Explanation 1']
         }, {
             'difficulty': constants.SKILL_DIFFICULTIES[1],
-            'explanation': 'Explanation 2'
+            'explanations': ['Explanation 2']
         }, {
             'difficulty': constants.SKILL_DIFFICULTIES[2],
-            'explanation': 'Explanation 3'
+            'explanations': ['Explanation 3']
         }]
         json_response = self.post_json(
             self.url, {
                 'description': 'Skill Description',
                 'rubrics': rubrics,
                 'explanation_dict': state_domain.SubtitledHtml(
-                    '1', '<p>Explanation</p>').to_dict()
+                    '1', '<p>Explanation</p>').to_dict(),
+                'thumbnail_filename': 'image.svg'
             },
-            csrf_token=csrf_token)
+            csrf_token=csrf_token,
+            upload_files=((
+                'image', 'unused_filename', self.original_image_content),))
         skill_id = json_response['skillId']
         self.assertEqual(len(skill_id), 12)
         self.assertIsNotNone(
@@ -208,11 +228,14 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'linked_topic_ids': ['topic'],
             'rubrics': [],
             'explanation_dict': state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>').to_dict()
+                '1', '<p>Explanation</p>').to_dict(),
+            'thumbnail_filename': 'image.svg'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
-            expected_status_int=400)
+            expected_status_int=400,
+            upload_files=((
+                'image', 'unused_filename', self.original_image_content),))
         self.assertEqual(json_response['status_code'], 400)
         self.logout()
 
@@ -222,11 +245,14 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         payload = {
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
-            'rubrics': 'invalid'
+            'rubrics': 'invalid',
+            'thumbnail_filename': 'image.svg'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
-            expected_status_int=400)
+            expected_status_int=400,
+            upload_files=((
+                'image', 'unused_filename', self.original_image_content),))
         self.assertEqual(json_response['status_code'], 400)
         self.logout()
 
@@ -237,11 +263,14 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
             'rubrics': [],
-            'explanation_dict': 'explanation'
+            'explanation_dict': 'explanation',
+            'thumbnail_filename': 'image.svg'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
-            expected_status_int=400)
+            expected_status_int=400,
+            upload_files=((
+                'image', 'unused_filename', self.original_image_content),))
         self.assertEqual(json_response['status_code'], 400)
 
         payload = {
@@ -250,7 +279,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'rubrics': [],
             'explanation_dict': {
                 'explanation': 'Explanation'
-            }
+            },
+            'thumbnail_filename': 'image.svg'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -263,23 +293,26 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         rubrics = [{
             'difficulty': constants.SKILL_DIFFICULTIES[0],
-            'explanation': 'Explanation 1'
+            'explanations': ['Explanation 1']
         }, {
             'difficulty': constants.SKILL_DIFFICULTIES[1],
-            'explanation': 'Explanation 2'
+            'explanations': ['Explanation 2']
         }, {
             'difficulty': constants.SKILL_DIFFICULTIES[2],
-            'explanation': 'Explanation 3'
+            'explanations': ['Explanation 3']
         }]
         payload = {
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>').to_dict()
+                '1', '<p>Explanation</p>').to_dict(),
+            'thumbnail_filename': 'image.svg'
         }
         json_response = self.post_json(
-            self.url, payload, csrf_token=csrf_token)
+            self.url, payload, csrf_token=csrf_token,
+            upload_files=((
+                'image', 'unused_filename', self.original_image_content),))
         skill_id = json_response['skillId']
         self.assertEqual(len(skill_id), 12)
         self.assertIsNotNone(

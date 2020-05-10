@@ -126,6 +126,11 @@ _PARSER.add_argument(
          'https://www.protractortest.org/#/debugging#disabled-control-flow',
     action='store_true')
 
+_PARSER.add_argument(
+    '--deparallelize_terser',
+    help='Disable parallelism on terser plugin in webpack. Use with prod_env.',
+    action='store_true')
+
 # This list contains the sub process triggered by this script. This includes
 # the oppia web server.
 SUBPROCESSES = []
@@ -145,13 +150,13 @@ def ensure_screenshots_dir_is_removed():
 
 def cleanup():
     """Kill the running subprocesses and server fired in this program."""
-    dev_appserver_path = '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME
+    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_HOME
     webdriver_download_path = '%s/downloads' % WEBDRIVER_HOME_PATH
     if common.is_windows_os():
         # In windows system, the java command line will use absolute path.
         webdriver_download_path = os.path.abspath(webdriver_download_path)
     processes_to_kill = [
-        '.*%s.*' % re.escape(dev_appserver_path),
+        '.*%s.*' % re.escape(google_app_engine_path),
         '.*%s.*' % re.escape(webdriver_download_path)
     ]
     for p in SUBPROCESSES:
@@ -257,17 +262,22 @@ def setup_and_install_dependencies(skip_install):
         install_chrome_on_travis.main(args=[])
 
 
-def build_js_files(dev_mode_setting):
+def build_js_files(dev_mode_setting, deparallelize_terser=False):
     """Build the javascript files.
 
     Args:
         dev_mode_setting: bool. Represents whether to run the related commands
         in dev mode.
+        deparallelize_terser: bool. Represents whether to use webpack
+        compilation config that disables parallelism on terser plugin.
     """
     update_dev_mode_in_constants_js(CONSTANT_FILE_PATH, dev_mode_setting)
     if not dev_mode_setting:
         python_utils.PRINT('  Generating files for production mode...')
-        build.main(args=['--prod_env'])
+        if deparallelize_terser:
+            build.main(args=['--prod_env', '--deparallelize_terser'])
+        else:
+            build.main(args=['--prod_env'])
     else:
         # The 'hashes.json' file is used by the `url-interpolation` service.
         if not os.path.isfile(HASHES_FILE_PATH):
@@ -431,7 +441,8 @@ def main(args=None):
 
     dev_mode = not parsed_args.prod_env
     if not parsed_args.skip_build:
-        build_js_files(dev_mode)
+        build_js_files(
+            dev_mode, deparallelize_terser=parsed_args.deparallelize_terser)
     start_webdriver_manager()
 
     start_google_app_engine_server(dev_mode)

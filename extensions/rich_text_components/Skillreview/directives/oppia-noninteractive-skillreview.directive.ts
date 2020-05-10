@@ -65,7 +65,7 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
             }).result['catch'](function(res) {
               ContextService.removeCustomEntityContext();
               if (!(res === 'cancel' || res === 'escape key press')) {
-                throw res;
+                throw new Error(res);
               }
             });
           };

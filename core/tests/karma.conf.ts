@@ -11,9 +11,8 @@ module.exports = function(config) {
     basePath: '../../',
     frameworks: ['jasmine'],
     files: [
-      'local_compiled_js/core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
-      // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
+      // Since jquery, jquery-ui, angular, angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.4.1/jquery.min.js',
       'third_party/static/jqueryui-1.12.1/jquery-ui.min.js',

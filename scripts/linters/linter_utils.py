@@ -20,10 +20,13 @@ Do not use this module anywhere else in the code base!
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import contextlib
 import functools
 import inspect
+import shutil
 import sys
+import tempfile
 import threading
 
 import python_utils
@@ -122,3 +125,44 @@ def redirect_stdout(new_target):
         yield new_target
     finally:
         sys.stdout = old_target
+
+
+def get_duplicates_from_list_of_strings(strings):
+    """Returns a list of duplicate strings in the list of given strings.
+
+    Args:
+        strings: list(str). A list of strings.
+
+    Returns:
+        list(str). A list of duplicate string present in the given list of
+        strings.
+    """
+    duplicates = []
+    item_count_map = collections.defaultdict(int)
+    for string in strings:
+        item_count_map[string] += 1
+        # Counting as duplicate once it's appeared twice in the list.
+        if item_count_map[string] == 2:
+            duplicates.append(string)
+
+    return duplicates
+
+
+@contextlib.contextmanager
+def temp_dir(suffix='', prefix='', parent=None):
+    """Creates a temporary directory which is only usable in a `with` context.
+
+    Args:
+        suffix: str. Appended to the temporary directory.
+        prefix: str. Prepended to the temporary directory.
+        parent: str or None. The parent directory to place the temporary one. If
+            None, a platform-specific directory is used instead.
+
+    Yields:
+        str. The full path to the temporary directory.
+    """
+    new_dir = tempfile.mkdtemp(suffix=suffix, prefix=prefix, dir=parent)
+    try:
+        yield new_dir
+    finally:
+        shutil.rmtree(new_dir)

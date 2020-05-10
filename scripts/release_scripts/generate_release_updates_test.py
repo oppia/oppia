@@ -112,7 +112,7 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
             generate_release_updates,
             'get_new_authors_and_contributors_mail_ids',
             mock_get_new_authors_and_contributors_mail_ids)
-        with self.input_swap, open_tab_swap:
+        with self.branch_name_swap, self.input_swap, open_tab_swap:
             with get_new_authors_and_contributors_mail_ids_swap:
                 (
                     generate_release_updates

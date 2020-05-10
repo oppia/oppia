@@ -12,7 +12,7 @@
           </i>
         </div>
         <strong>
-          <[StateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One']> solution is...
+          <[$ctrl.StateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One']> solution is...
         </strong>
         <span>
           <angular-html-bind html-data="$ctrl.getAnswerHtml()">

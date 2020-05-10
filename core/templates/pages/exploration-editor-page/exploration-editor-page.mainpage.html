@@ -10,7 +10,8 @@
         if (window.google && window.google.charts) {
         google.charts.load('current', { packages: ['corechart'] });
       } else {
-        throw 'error: Could not load google visualization library. Are you offline?';
+        throw new Error(
+          'Could not load google visualization library. Are you offline?');
       }
     </script>
     <style>
@@ -114,7 +115,6 @@
     </div>
 
     @load('pages/footer_js_libs.html')
-    <script src="/third_party/static/ckeditor-4.12.1/ckeditor.js"></script>
     <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     @loadExtensions('interactions/dependency_html.html')
   </body>

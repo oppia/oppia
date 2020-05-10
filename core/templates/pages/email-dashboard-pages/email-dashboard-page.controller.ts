@@ -32,8 +32,10 @@ angular.module('oppia').directive('emailDashboardPage', [
         '/pages/email-dashboard-pages/email-dashboard-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', 'EmailDashboardDataService', 'UserService',
-        function($rootScope, EmailDashboardDataService, UserService) {
+        '$rootScope', 'EmailDashboardDataService', 'LoaderService',
+        'UserService',
+        function($rootScope, EmailDashboardDataService, LoaderService,
+            UserService) {
           var ctrl = this;
           ctrl.resetForm = function() {
             ctrl.has_not_logged_in_for_n_days = null;
@@ -111,10 +113,10 @@ angular.module('oppia').directive('emailDashboardPage', [
 
           ctrl.$onInit = function() {
             ctrl.username = '';
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.username = userInfo.getUsername();
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
             });
 
             ctrl.currentPageOfQueries = [];
