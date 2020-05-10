@@ -472,7 +472,7 @@ def main(args=None):
     custom_semaphore = threading.Semaphore(custom_concurrent_count)
 
     # Prepare third_party tasks.
-    third_party_max_concurrent_runs = 2
+    third_party_max_concurrent_runs = 25
     third_party_concurrent_count = min(
         multiprocessing.cpu_count(), third_party_max_concurrent_runs)
     third_party_semaphore = threading.Semaphore(third_party_concurrent_count)
