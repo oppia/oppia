@@ -65,7 +65,7 @@ describe('PredictionAlgorithmRegistryService', () => {
   describe('.testOnlySetPredictionService', () => {
     beforeEach(() => {
       class MockPredictionService {
-        predict(classifierData: any, answer: any): number {
+        predict(classifierData, answer): number {
           return 1;
         }
       }

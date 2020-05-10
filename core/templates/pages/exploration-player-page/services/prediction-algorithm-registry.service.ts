@@ -25,7 +25,7 @@ import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
 
 interface IPredictionService {
-  predict(classifierData: any, answer: any): number;
+  predict(classifierData, answer): number;
 }
 
 type AlgorithmIdPredictionServiceMap =
