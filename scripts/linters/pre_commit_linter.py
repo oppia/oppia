@@ -466,7 +466,7 @@ def main(args=None):
     categorize_files(all_filepaths)
 
     # Prepare custom tasks.
-    custom_max_concurrent_runs = 30
+    custom_max_concurrent_runs = 25
     custom_concurrent_count = min(
         multiprocessing.cpu_count(), custom_max_concurrent_runs)
     custom_semaphore = threading.Semaphore(custom_concurrent_count)
