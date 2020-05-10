@@ -98,14 +98,14 @@ angular.module('oppia').config([
       'ExpressionParserService', 'ExtensionTagAssemblerService',
       'ExtractImageFilenamesFromStateService',
       'HtmlEscaperService', 'IdGenerationService', 'InteractionObjectFactory',
-      'LoggerService', 'MetaTagCustomizationService', 'NormalizeWhitespacePipe',
-      'PencilCodeEditorRulesService', 'SidebarStatusService',
-      'SiteAnalyticsService', 'SkillObjectFactory', 'SolutionObjectFactory',
-      'StateCardObjectFactory', 'StateImprovementSuggestionService',
-      'StateObjectFactory', 'StatesObjectFactory', 'TextInputRulesService',
-      'UrlInterpolationService', 'UrlService', 'UserInfoObjectFactory',
-      'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
-      'WindowRef'];
+      'LoaderService', 'LoggerService', 'MetaTagCustomizationService',
+      'NormalizeWhitespacePipe', 'PencilCodeEditorRulesService',
+      'SidebarStatusService', 'SiteAnalyticsService', 'SkillObjectFactory',
+      'SolutionObjectFactory', 'StateCardObjectFactory',
+      'StateImprovementSuggestionService', 'StateObjectFactory',
+      'StatesObjectFactory', 'TextInputRulesService', 'UrlInterpolationService',
+      'UrlService', 'UserInfoObjectFactory', 'UtilsService',
+      'ValidatorsService', 'WindowDimensionsService', 'WindowRef'];
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       if (servicesToProvide.includes(key)) {
         $provide.value(key, value);
