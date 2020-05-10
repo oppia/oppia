@@ -67,7 +67,7 @@ var FractionEditor = function(elem) {
       await elem.element(by.tagName('input')).sendKeys(value);
     },
     expectValueToBe: async function(expectedValue) {
-      value = await elem.element(by.tagName('input')).getAttribute('value');
+      var value = await elem.element(by.tagName('input')).getAttribute('value');
       expect(value).toEqual(expectedValue);
     }
   };
@@ -80,7 +80,7 @@ var IntEditor = function(elem) {
       await elem.element(by.tagName('input')).sendKeys(value);
     },
     expectValueToBe: async function(expectedValue) {
-      value = await elem.element(by.tagName('input')).getAttribute('value');
+      var value = await elem.element(by.tagName('input')).getAttribute('value');
       expect(value).toEqual(expectedValue);
     }
   };
@@ -102,7 +102,7 @@ var NonnegativeIntEditor = function(elem) {
       await elem.element(by.tagName('input')).sendKeys(value);
     },
     expectValueToBe: async function(expectedValue) {
-      value = await elem.element(by.tagName('input')).getAttribute('value');
+      var value = await elem.element(by.tagName('input')).getAttribute('value');
       expect(value).toEqual(expectedValue);
     }
   };
@@ -115,11 +115,8 @@ var NormalizedStringEditor = function(elem) {
       await elem.element(by.tagName('input')).sendKeys(value);
     },
     expectValueToBe: async function(expectedValue) {
-      elem.element(by.tagName('input')).getAttribute('value').then(
-        function(value) {
-          expect(value).toEqual(expectedValue);
-        }
-      );
+      var value = await elem.element(by.tagName('input')).getAttribute('value');
+      expect(value).toEqual(expectedValue);
     }
   };
 };
@@ -131,7 +128,7 @@ var NumberWithUnitsEditor = function(elem) {
       await elem.element(by.tagName('input')).sendKeys(value);
     },
     expectValueToBe: async function(expectedValue) {
-      value = await elem.element(by.tagName('input')).getAttribute('value');
+      var value = await elem.element(by.tagName('input')).getAttribute('value');
       expect(value).toEqual(expectedValue);
     }
   };
@@ -152,7 +149,7 @@ var SanitizedUrlEditor = function(elem) {
       await elem.element(by.tagName('input')).sendKeys(text);
     },
     expectValueToBe: async function(expectedValue) {
-      value = await elem.element(by.tagName('input')).getAttribute('value');
+      var value = await elem.element(by.tagName('input')).getAttribute('value');
       expect(value).toEqual(expectedValue);
     }
   };
@@ -176,7 +173,7 @@ var UnicodeStringEditor = function(elem) {
       await elem.element(by.tagName('input')).sendKeys(text);
     },
     expectValueToBe: async function(expectedValue) {
-      value = await elem.element(by.tagName('input')).getAttribute('value');
+      var value = await elem.element(by.tagName('input')).getAttribute('value');
       expect(value).toEqual(expectedValue);
     }
   };
