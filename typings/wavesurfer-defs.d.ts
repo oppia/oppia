@@ -1,6 +1,6 @@
 // Code (Release 3.3) - https://github.com/katspaugh/wavesurfer.js/blob/4421b44e205c76359407ae995dcb8b8453f903a1/src/wavesurfer.js
 
-interface WaveSurfer {
+class WaveSurfer {
   addPlugin: (plugin: Object) => WaveSurfer;
   cancelAjax: () => void;
   clearTmpEvents: () => void;
@@ -70,4 +70,12 @@ interface WaveSurfer {
   toggleMute: () => void;
   toggleScroll: () => void;
   zoom: (pxPerSec?: number) => void;
+
+  constructor(params: Object);
+}
+
+namespace WaveSurfer {
+  export function create(params: Object): WaveSurfer;
+  export let VERSION: string;
+  export let util: Object;
 }
