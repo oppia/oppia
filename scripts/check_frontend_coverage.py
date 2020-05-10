@@ -272,6 +272,7 @@ FULLY_COVERED_FILENAMES = [
     'PlaythroughObjectFactory.ts',
     'practice-session-page.constants.ajs.ts',
     'practice-session-page.constants.ts',
+    'prediction-algorithm-registry.service.ts',
     'PredictionResultObjectFactory.ts',
     'question-backend-api.service.ts',
     'question-domain.constants.ajs.ts',
