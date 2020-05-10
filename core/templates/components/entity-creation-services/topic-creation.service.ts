@@ -110,6 +110,10 @@ angular.module('oppia').factory('TopicCreationService', [
                 TOPIC_EDITOR_URL_TEMPLATE, {
                   topic_id: response.topicId
                 });
+            }, function(errorResponse) {
+              newTab.close();
+              topicCreationInProgress = false;
+              AlertsService.addWarning(errorResponse.error);
             });
         });
       }
