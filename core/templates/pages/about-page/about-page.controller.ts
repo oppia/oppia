@@ -79,7 +79,7 @@ angular.module('oppia').directive('aboutPage', [
           ctrl.$onInit = function() {
             ctrl.allCredits = [];
             var alphabetList = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-            for (var i = 0; i < 26; i++) {
+            for (var i = 0; i < alphabetList.length; i++) {
               var letter = alphabetList[i];
               var credits = ctrl.getCredits(letter);
               if (credits.length > 0) {
