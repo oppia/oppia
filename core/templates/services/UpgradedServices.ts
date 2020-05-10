@@ -181,6 +181,7 @@ import { PredictionResultObjectFactory } from
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
 import { ReadOnlyStoryNodeObjectFactory } from
@@ -678,6 +679,8 @@ export class UpgradedServices {
       upgradedServices['WrittenTranslationsObjectFactory']);
 
     // Topological level: 7.
+    upgradedServices['QuestionObjectFactory'] = new QuestionObjectFactory(
+      upgradedServices['StateObjectFactory']);
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
       upgradedServices['StateObjectFactory']);
 
