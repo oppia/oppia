@@ -5058,7 +5058,8 @@ export = {
       "ImageClickInput",
       "ItemSelectionInput",
       "MultipleChoiceInput",
-      "TextInput"
+      "TextInput",
+      "DragAndDropSortInput"
     ]
   }, {
     "name": "Math",

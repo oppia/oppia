@@ -31,8 +31,9 @@ require(
 
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('services/page-title.service.ts');
+require('services/context.service.ts');
 require('services/contextual/url.service.ts');
+require('services/page-title.service.ts');
 
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
@@ -48,15 +49,18 @@ angular.module('oppia').directive('topicEditorPage', [
         '/pages/topic-editor-page/topic-editor-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'PageTitleService', 'TopicEditorRoutingService',
-        'TopicEditorStateService', 'UrlService',
+        '$scope', 'ContextService', 'PageTitleService',
+        'TopicEditorRoutingService', 'TopicEditorStateService', 'UrlService',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
-        function($scope, PageTitleService, TopicEditorRoutingService,
-            TopicEditorStateService, UrlService,
+        function($scope, ContextService, PageTitleService,
+            TopicEditorRoutingService, TopicEditorStateService, UrlService,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
           var ctrl = this;
           ctrl.getActiveTabName = function() {
             return TopicEditorRoutingService.getActiveTabName();
+          };
+          ctrl.getEntityType = function() {
+            return ContextService.getEntityType();
           };
 
           var setPageTitle = function() {
