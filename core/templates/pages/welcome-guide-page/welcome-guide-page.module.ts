@@ -16,13 +16,15 @@
  * @fileoverview Module for the welcome guide page.
  */
 
-import { BrowserModule } from '@angular/platform-browser';
-import { Component, NgModule, StaticProvider } from '@angular/core';
 import 'core-js/es7/reflect';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
 import 'zone.js';
+
+import { Component, NgModule, StaticProvider } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { RequestInterceptor } from 'services/request-interceptor.service';
 // This component is needed to force-bootstrap Angular at the beginning of the
 // app.
 @Component({
@@ -70,7 +72,7 @@ const downgradedModule = downgradeModule(bootstrapFn);
 declare var angular: ng.IAngularStatic;
 
 angular.module('oppia', [
-  require('angular-cookies'), 'pascalprecht.translate', 'toastr',
+  require('angular-cookies'), 'pascalprecht.translate', 'toastr', 'ngSanitize',
   'ui.bootstrap',
   downgradedModule
 ])
