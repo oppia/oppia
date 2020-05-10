@@ -206,13 +206,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
                 }
               }
             });
-            // @ts-ignore
-            // Type system does not support constructor properties
-            // (Guppy.Symbols) thus we need ts-ignore it.
             if (angular.equals(Guppy.Symbols.symbols, {})) {
-              // @ts-ignore
-              // Type system does not support constructor properties
-              // (Guppy.init) thus we need ts-ignore it.
               Guppy.init({
                 symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
                   oppiaSymbolsUrl]});
