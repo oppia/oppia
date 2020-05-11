@@ -28,17 +28,15 @@ import sys
 import time
 import traceback
 
-from constants import constants
 from core.domain import config_domain
 from core.domain import config_services
-from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
 import feconf
-import jinja_utils
 import python_utils
 import utils
 
+import backports.functools_lru_cache
 import webapp2
 
 current_user_services = models.Registry.import_current_user_services()
@@ -70,6 +68,21 @@ def _clear_login_cookies(response_headers):
             datetime.timedelta(seconds=ONE_DAY_AGO_IN_SECS)
         ).strftime('%a, %d %b %Y %H:%M:%S GMT')
         response_headers.add_header(*cookie.output().split(b': ', 1))
+
+
+@backports.functools_lru_cache.lru_cache(maxsize=32)
+def _load_template(filepath):
+    """Return the HTML file contents at filepath.
+
+    Args:
+        filepath: str. Path to the requested HTML file.
+
+    Returns:
+        str. The HTML file content.
+    """
+    with open(os.path.join(feconf.FRONTEND_TEMPLATES_DIR, filepath), 'r') as f:
+        html_text = f.read()
+    return html_text
 
 
 class LogoutPage(webapp2.RequestHandler):
@@ -123,15 +136,6 @@ class BaseHandler(webapp2.RequestHandler):
     POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @webapp2.cached_property
-    def jinja2_env(self):
-        """Returns a Jinja2 environment cached for frontend templates.
-
-        Returns:
-            Environment. A Jinja2 environment object used to load templates.
-        """
-        return jinja_utils.get_jinja_env(feconf.FRONTEND_TEMPLATES_DIR)
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
@@ -327,36 +331,6 @@ class BaseHandler(webapp2.RequestHandler):
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
         """
-        values = self.values
-
-        scheme, netloc, path, _, _ = python_utils.url_split(self.request.uri)
-
-        values.update({
-            'DEV_MODE': constants.DEV_MODE,
-            'DOMAIN_URL': '%s://%s' % (scheme, netloc),
-            'ACTIVITY_STATUS_PRIVATE': (
-                rights_manager.ACTIVITY_STATUS_PRIVATE),
-            'ACTIVITY_STATUS_PUBLIC': (
-                rights_manager.ACTIVITY_STATUS_PUBLIC),
-            # The 'path' variable starts with a forward slash.
-            'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
-        })
-
-        if 'status_code' not in values:
-            values['status_code'] = 200
-
-        if 'meta_name' not in values:
-            values['meta_name'] = 'Personalized Online Learning from Oppia'
-
-        if 'meta_description' not in values:
-            values['meta_description'] = (
-                'Oppia is a free, open-source learning platform. Join the '
-                'community to create or try an exploration today!')
-
-        # Create a new csrf token for inclusion in HTML responses. This assumes
-        # that tokens generated in one handler will be sent back to a handler
-        # with the same page name.
-
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True
         self.response.headers[b'Strict-Transport-Security'] = (
@@ -376,8 +350,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
 
-        self.response.write(
-            self.jinja2_env.get_template(filepath).render(**values))
+        self.response.write(_load_template(filepath))
 
     def _render_exception_json_or_html(self, return_type, values):
         """Renders an error page, or an error JSON response.
