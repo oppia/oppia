@@ -83,10 +83,11 @@ describe('PlaythroughService', () => {
         playthroughService.recordExplorationStartAction('initStateName1');
 
         var playthrough = playthroughService.getPlaythrough();
+        var actionSchemaVersion = 1;
         expect(playthrough.actions).toEqual([
           learnerActionObjectFactory.createNew('ExplorationStart', {
             state_name: {value: 'initStateName1'},
-          }, 1),
+          }, actionSchemaVersion),
         ]);
       });
     });
@@ -97,6 +98,7 @@ describe('PlaythroughService', () => {
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
 
         var playthrough = playthroughService.getPlaythrough();
+        var actionSchemaVersion = 1;
         expect(playthrough.actions).toEqual([
           learnerActionObjectFactory.createNew('AnswerSubmit', {
             state_name: {value: 'stateName1'},
@@ -105,7 +107,7 @@ describe('PlaythroughService', () => {
             submitted_answer: {value: 'Hello'},
             feedback: {value: 'Try again'},
             time_spent_state_in_msecs: {value: 30},
-          }, 1),
+          }, actionSchemaVersion),
         ]);
       });
     });
@@ -115,11 +117,12 @@ describe('PlaythroughService', () => {
         playthroughService.recordExplorationQuitAction('stateName1', 120);
 
         var playthrough = playthroughService.getPlaythrough();
+        var actionSchemaVersion = 1;
         expect(playthrough.actions).toEqual([
           learnerActionObjectFactory.createNew('ExplorationQuit', {
             state_name: {value: 'stateName1'},
             time_spent_in_state_in_msecs: {value: 120}
-          }, 1),
+          }, actionSchemaVersion),
         ]);
       });
     });
