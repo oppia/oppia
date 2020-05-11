@@ -34,6 +34,7 @@ from .. import common
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
+OPPIA_HOME_DIR = os.path.join(CURR_DIR, os.pardir)
 
 ESPRIMA_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'esprima-%s' % common.ESPRIMA_VERSION)
@@ -52,6 +53,9 @@ FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH = os.path.join(
 
 FILES_EXCLUDED_FROM_ANY_TYPE_CHECK = json.load(python_utils.open_file(
     FILES_EXCLUDED_FROM_ANY_TYPE_CHECK_PATH, 'r'))
+
+OPPIABOT_DIST_PATH = os.path.join(
+    OPPIA_HOME_DIR, '.github', 'actions', 'oppiabot', 'dist', 'index.js')
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
@@ -248,7 +252,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             failed = False
 
             for file_path in self.all_filepaths:
-                if file_path in FILES_EXCLUDED_FROM_ANY_TYPE_CHECK:
+                if file_path in FILES_EXCLUDED_FROM_ANY_TYPE_CHECK or (
+                        file_path == OPPIABOT_DIST_PATH):
                     continue
 
                 file_content = FILE_CACHE.read(file_path)
