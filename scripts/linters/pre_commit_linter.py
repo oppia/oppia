@@ -84,21 +84,16 @@ _EXCLUSIVE_GROUP.add_argument(
     nargs='+',
     help='specific files to be linted. Space separated list',
     action='store')
-_EXCLUSIVE_GROUP.add_argument(
-    '--only-check-file-extensions',
-    nargs='+',
-    choices=['html', 'css', 'js', 'ts', 'py', 'other'],
-    help='specific file extensions to be linted. Space separated list. '
-    'If either of js or ts used then both js and ts files will be linted.',
-    action='store')
 _PARSER.add_argument(
     '--verbose',
     help='verbose mode. All details will be printed.',
     action='store_true')
 _PARSER.add_argument(
-    '--linter-type',
-    choices=['third_party', 'custom'],
-    help='type of linter to be used',
+    '--only-check-file-extensions',
+    nargs='+',
+    choices=['html', 'css', 'js', 'ts', 'py', 'other'],
+    help='specific file extensions to be linted. Space separated list. '
+    'If either of js or ts used then both js and ts files will be linted.',
     action='store')
 
 if not os.getcwd().endswith('oppia'):
@@ -313,21 +308,6 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     return files_in_directory
 
 
-def _get_linter_type(linter_type):
-    """This function is used to return the type of linters to be used.
-
-    Args:
-        linter_type: str. Type of linter.
-
-    Returns:
-        list(str). The list of all linter types.
-    """
-    if linter_type:
-        return [linter_type]
-
-    return ['custom', 'third_party']
-
-
 def _get_file_extensions(file_extensions_to_lint):
     """This function is used to return the file extensions which need to be
     linted and checked.
@@ -472,7 +452,6 @@ def main(args=None):
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
-    linter_type_used = _get_linter_type(parsed_args.linter_type)
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
 
     python_utils.PRINT('Starting Linter....')
@@ -487,7 +466,7 @@ def main(args=None):
     categorize_files(all_filepaths)
 
     # Prepare custom tasks.
-    custom_max_concurrent_runs = 30
+    custom_max_concurrent_runs = 25
     custom_concurrent_count = min(
         multiprocessing.cpu_count(), custom_max_concurrent_runs)
     custom_semaphore = threading.Semaphore(custom_concurrent_count)
@@ -510,19 +489,17 @@ def main(args=None):
     tasks_custom = []
     tasks_third_party = []
 
-    if 'custom' in linter_type_used:
-        for linter in custom_linters:
-            task_custom = concurrent_task_utils.create_task(
-                linter.perform_all_lint_checks, verbose_mode_enabled,
-                custom_semaphore, name='custom')
-            tasks_custom.append(task_custom)
+    for linter in custom_linters:
+        task_custom = concurrent_task_utils.create_task(
+            linter.perform_all_lint_checks, verbose_mode_enabled,
+            custom_semaphore, name='custom')
+        tasks_custom.append(task_custom)
 
-    if 'third_party' in linter_type_used:
-        for linter in third_party_linters:
-            task_third_party = concurrent_task_utils.create_task(
-                linter.perform_all_lint_checks, verbose_mode_enabled,
-                third_party_semaphore, name='third_party')
-            tasks_third_party.append(task_third_party)
+    for linter in third_party_linters:
+        task_third_party = concurrent_task_utils.create_task(
+            linter.perform_all_lint_checks, verbose_mode_enabled,
+            third_party_semaphore, name='third_party')
+        tasks_third_party.append(task_third_party)
 
     # Execute tasks.
     # Here we set Concurrency limit for custom task to 25 because we need to
@@ -532,27 +509,23 @@ def main(args=None):
     # (ie. might parallelize on their own)
 
     # Concurrency limit: 25.
-    if 'custom' in linter_type_used:
-        concurrent_task_utils.execute_tasks(tasks_custom, custom_semaphore)
+    concurrent_task_utils.execute_tasks(tasks_custom, custom_semaphore)
     # Concurrency limit: 2.
-    if 'third_party' in linter_type_used:
-        concurrent_task_utils.execute_tasks(
-            tasks_third_party, third_party_semaphore)
+    concurrent_task_utils.execute_tasks(
+        tasks_third_party, third_party_semaphore)
 
     all_messages = []
 
     # Prepare semaphore for locking mechanism.
     semaphore = threading.Semaphore(1)
 
-    if 'custom' in linter_type_used:
-        for task in tasks_custom:
-            semaphore.acquire()
-            _get_task_output(all_messages, task, semaphore)
+    for task in tasks_custom:
+        semaphore.acquire()
+        _get_task_output(all_messages, task, semaphore)
 
-    if 'third_party' in linter_type_used:
-        for task in tasks_third_party:
-            semaphore.acquire()
-            _get_task_output(all_messages, task, semaphore)
+    for task in tasks_third_party:
+        semaphore.acquire()
+        _get_task_output(all_messages, task, semaphore)
 
     all_messages += codeowner_linter.check_codeowner_file(
         verbose_mode_enabled)

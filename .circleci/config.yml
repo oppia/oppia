@@ -19,10 +19,19 @@ workflows:
 
     jobs:
       - setup
-      - custom_lint_tests:
+      - py_lint_tests:
           requires:
             - setup
-      - third_party_lint_tests:
+      - js_ts_lint_tests:
+          requires:
+            - setup
+      - html_lint_tests:
+          requires:
+            - setup
+      - css_lint_tests:
+          requires:
+            - setup
+      - other_lint_tests:
           requires:
             - setup
       # - frontend_tests:
@@ -119,7 +128,7 @@ jobs:
             - oppia/third_party/
             - oppia_tools/
 
-  custom_lint_tests:
+  py_lint_tests:
     <<: *job_defaults
     steps:
       - checkout
@@ -133,9 +142,9 @@ jobs:
           # Python files and that is only possible if we treat it as a module.
           command: |
             python -m scripts.third_party_size_check
-            python -m scripts.linters.pre_commit_linter --path=. --linter-type=custom --verbose
+            python -m scripts.linters.pre_commit_linter --path=. --only-check-file-extensions=py --verbose
 
-  third_party_lint_tests:
+  js_ts_lint_tests:
     <<: *job_defaults
     steps:
       - checkout
@@ -149,7 +158,55 @@ jobs:
           # Python files and that is only possible if we treat it as a module.
           command: |
             python -m scripts.third_party_size_check
-            python -m scripts.linters.pre_commit_linter --path=. --linter-type=third_party --verbose
+            python -m scripts.linters.pre_commit_linter --path=. --only-check-file-extensions=js --verbose
+
+  html_lint_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - merge_target_branch
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run third party lint tests
+          # All the python scripts should behave as modules. Files like the
+          # pre_commit_linter and third_party_size_check need to import other
+          # Python files and that is only possible if we treat it as a module.
+          command: |
+            python -m scripts.third_party_size_check
+            python -m scripts.linters.pre_commit_linter --path=. --only-check-file-extensions=html --verbose
+
+  css_lint_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - merge_target_branch
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run third party lint tests
+          # All the python scripts should behave as modules. Files like the
+          # pre_commit_linter and third_party_size_check need to import other
+          # Python files and that is only possible if we treat it as a module.
+          command: |
+            python -m scripts.third_party_size_check
+            python -m scripts.linters.pre_commit_linter --path=. --only-check-file-extensions=css --verbose
+
+  other_lint_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - merge_target_branch
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run third party lint tests
+          # All the python scripts should behave as modules. Files like the
+          # pre_commit_linter and third_party_size_check need to import other
+          # Python files and that is only possible if we treat it as a module.
+          command: |
+            python -m scripts.third_party_size_check
+            python -m scripts.linters.pre_commit_linter --path=. --only-check-file-extensions=other --verbose
 
   # typescript_tests:
   #   <<: *job_defaults
