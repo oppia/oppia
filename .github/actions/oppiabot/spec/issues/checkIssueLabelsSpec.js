@@ -6,6 +6,9 @@ const whitelist = require('../../src/whitelist.json');
 const checkIssueLabelModule = require('../../src/issues/checkIssueLabels');
 
 describe('Check Issue Labels Module', () => {
+  /**
+   * @type {import('@actions/github').GitHub} octokit
+   */
   let octokit;
 
   beforeEach(async () => {
@@ -25,6 +28,8 @@ describe('Check Issue Labels Module', () => {
     };
 
     spyOn(core, 'getInput').and.returnValue('sample-token');
+
+    // Mock GitHub API.
     Object.setPrototypeOf(github.GitHub, function () {
       return octokit;
     });
@@ -58,13 +63,10 @@ describe('Check Issue Labels Module', () => {
     it('should create appropriate comment', () => {
       expect(octokit.issues.createComment).toHaveBeenCalled();
       const user = payload.sender.login;
-      const body =
-        'Hi @' +
-        user +
-        ', thanks for proposing this as a good first ' +
-        'issue. Looping in @' +
-        whitelist.teamLeads.onboardingTeam +
-        ' to confirm, removing the label until he does so.';
+      const body = (
+        'Hi @' + user + ', thanks for proposing this as a good first issue. ' +
+        'Looping in @' + whitelist.teamLeads.onboardingTeam +
+        ' to confirm, removing the label until he does so.');
 
       expect(octokit.issues.createComment).toHaveBeenCalledWith({
         issue_number: payload.issue.number,
@@ -118,9 +120,12 @@ describe('Check Issue Labels Module', () => {
       expect(octokit.issues.createComment).toHaveBeenCalled();
 
       const user = payload.sender.login;
-      const link = 'here'.link()
-      const body = 'Hi @' + user + ', changelog labels should not be used on issues.' +
-      ' I’m removing the label. You can learn more about labels ' + link;
+      const link = 'here'.link(
+        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+        'labeling-issues-and-pull-requests');
+      const body = (
+        'Hi @' + user + ', changelog labels should not be used on issues.' +
+        ' I’m removing the label. You can learn more about labels ' + link);
 
       expect(octokit.issues.createComment).toHaveBeenCalledWith({
         issue_number: payload.issue.number,
@@ -142,8 +147,9 @@ describe('Check Issue Labels Module', () => {
   });
 
   describe('check for other PR labels', () => {
+    const testLabel = 'dependencies';
     beforeEach(async () => {
-      payload.label.name = 'dependencies';
+      payload.label.name = testLabel;
       await dispatcher.dispatch('issues', 'labeled');
     });
 
@@ -155,9 +161,13 @@ describe('Check Issue Labels Module', () => {
       expect(octokit.issues.createComment).toHaveBeenCalled();
 
       const user = payload.sender.login;
-      const link = 'here'.link();
-      const body = 'Hi @' + user + ', the label label should only be used in pull requests.' +
-      ' I’m removing the label. You can learn more about labels ' + link;
+      const link = 'here'.link(
+        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+        'labeling-issues-and-pull-requests');
+      const body = (
+        'Hi @' + user + ', the ' + testLabel + ' label should only be used ' +
+        'in pull requests. I’m removing the label. You can learn more ' +
+        'about labels ' + link);
 
       expect(octokit.issues.createComment).toHaveBeenCalledWith({
         issue_number: payload.issue.number,
@@ -171,7 +181,7 @@ describe('Check Issue Labels Module', () => {
       expect(octokit.issues.removeLabel).toHaveBeenCalled();
       expect(octokit.issues.removeLabel).toHaveBeenCalledWith({
         issue_number: payload.issue.number,
-        name: 'dependencies',
+        name: testLabel,
         owner: payload.repository.owner.login,
         repo: payload.repository.name,
       });
