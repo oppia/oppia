@@ -55,6 +55,9 @@ workflows:
       - e2e_library:
           requires:
             - e2e_navigation
+      - e2e_users:
+          requires:
+          - e2e_navigation
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
@@ -245,6 +248,30 @@ jobs:
           name: Run e2e library test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
+
+  e2e_users:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - merge_target_branch
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run e2e users test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="users" --prod_env
+      - run:
+          name: Run e2e profile features test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
+      - run:
+          name: Run e2e profile menu test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileMenu" --prod_env
+      - run:
+          name: Run e2e preferences test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="preferences" --prod_env
 
   # Non-prod e2e Tests
   # The following tests must be run in a non-production environment because they are uploading files.
