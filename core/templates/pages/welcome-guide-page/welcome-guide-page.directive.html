@@ -56,27 +56,8 @@
       <img style="width: 625px;" ng-src="<[$ctrl.explorationLibraryPngImageUrl]>" alt="I18N_WELCOME_GUIDE_EXPLORATION_BROSWER_IMAGE">
     </picture>
   </div>
-  <!-- <div class="oppia-welcome-guide-browser-image col-lg-6">
-    <span class="oppia-welcome-guide-blue">1</span><p class="oppia-welcome-guide-numbers" translate="I18N_WELCOME_GUIDE_BROWSER_BULLET_1"> </p>
-    <br>
-    <br>
-    <span class="oppia-welcome-guide-purple">2</span><p class="oppia-welcome-guide-numbers" translate="I18N_WELCOME_GUIDE_BROWSER_BULLET_2"> </p>
-    <br>
-    <br>
-    <span class="oppia-welcome-guide-red">3</span><p class="oppia-welcome-guide-numbers" translate="I18N_WELCOME_GUIDE_BROWSER_BULLET_3"></p>
-    <br>
-    <br>
-    <span class="oppia-welcome-guide-orange">4</span><p class="oppia-welcome-guide-numbers" translate="I18N_WELCOME_GUIDE_BROWSER_BULLET_4"></p>
-    <br>
-    <br>
-    <span class="oppia-welcome-guide-green">5</span><p class="oppia-welcome-guide-numbers" translate="I18N_WELCOME_GUIDE_BROWSER_BULLET_5"></p>
-  </div> -->
   <div class="oppia-welcome-guide-browser-image col-lg-6">
     <div ng-repeat="element in $ctrl.arr track by $index"><span class = "<[element.spanClass]>"><[$index+1]></span>
       <p class="<[element.pClass]>" translate = "<[element.I8n]>"></p></div>
-
   </div>
-
-
-  
 </div>
