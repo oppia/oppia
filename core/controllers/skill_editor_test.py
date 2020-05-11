@@ -230,7 +230,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         # Check DELETE returns 500 when the skill still has associated
         # questions.
         skill_has_questions_swap = self.swap(
-            skill_services, 'skill_has_associated_questions', lambda: True)
+            skill_services, 'skill_has_associated_questions', lambda x: True)
         skill_has_topics_swap = self.swap(
             topic_services,
             'get_all_skill_ids_assigned_to_some_topic',

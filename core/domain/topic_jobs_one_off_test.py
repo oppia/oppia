@@ -207,7 +207,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
 
-class RemoveDeletedUncategorizedSkillsOneOffJobTests(
+class RemoveDeletedSkillsFromTopicOneOffJobTests(
         test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -216,7 +216,7 @@ class RemoveDeletedUncategorizedSkillsOneOffJobTests(
     TOPIC_ID = 'topic_id'
 
     def setUp(self):
-        super(RemoveDeletedUncategorizedSkillsOneOffJobTests, self).setUp()
+        super(RemoveDeletedSkillsFromTopicOneOffJobTests, self).setUp()
         # Setup user who will own the test topics.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -230,7 +230,7 @@ class RemoveDeletedUncategorizedSkillsOneOffJobTests(
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
 
     def test_job_removes_deleted_uncategorized_skill_ids(self):
-        """Tests that the RemoveDeletedUncategorizedSkillsOneOffJob job removes
+        """Tests that the RemoveDeletedSkillsFromTopicOneOffJob job removes
         deleted uncategorized skills ids from the topic.
         """
         valid_skill_1 = skill_domain.Skill.create_default_skill(
@@ -262,9 +262,9 @@ class RemoveDeletedUncategorizedSkillsOneOffJobTests(
 
         # Start migration job.
         job_id = (
-            topic_jobs_one_off.RemoveDeletedUncategorizedSkillsOneOffJob
+            topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob
             .create_new())
-        topic_jobs_one_off.RemoveDeletedUncategorizedSkillsOneOffJob.enqueue(
+        topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob.enqueue(
             job_id)
         self.process_and_flush_pending_tasks()
 
@@ -276,7 +276,7 @@ class RemoveDeletedUncategorizedSkillsOneOffJobTests(
         self.assertEqual(
             updated_topic.subtopics[0].skill_ids, ['valid_skill_3'])
         output = (
-            topic_jobs_one_off.RemoveDeletedUncategorizedSkillsOneOffJob
+            topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob
             .get_output(job_id))
         expected = [[
             u'Skill IDs deleted for topic topic_id:',
@@ -286,7 +286,7 @@ class RemoveDeletedUncategorizedSkillsOneOffJobTests(
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_job_skips_deleted_topic(self):
-        """Tests that RemoveDeletedUncategorizedSkillsOneOffJob job skips
+        """Tests that RemoveDeletedSkillsFromTopicOneOffJob job skips
         deleted topic and does not attempt to remove uncategorized skills for
         skills that are deleted.
         """
@@ -306,9 +306,9 @@ class RemoveDeletedUncategorizedSkillsOneOffJobTests(
 
         # Start migration job on sample topic.
         job_id = (
-            topic_jobs_one_off.RemoveDeletedUncategorizedSkillsOneOffJob
+            topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob
             .create_new())
-        topic_jobs_one_off.RemoveDeletedUncategorizedSkillsOneOffJob.enqueue(
+        topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob.enqueue(
             job_id)
 
         # This running without errors indicates the deleted topic is
@@ -320,7 +320,7 @@ class RemoveDeletedUncategorizedSkillsOneOffJobTests(
             topic_fetchers.get_topic_by_id(self.TOPIC_ID)
 
         output = (
-            topic_jobs_one_off.RemoveDeletedUncategorizedSkillsOneOffJob
+            topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob
             .get_output(job_id))
         expected = [[u'topic_deleted',
                      [u'Encountered 1 deleted topics.']]]

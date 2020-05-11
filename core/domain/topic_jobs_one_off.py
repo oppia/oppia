@@ -96,7 +96,7 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class RemoveDeletedUncategorizedSkillsOneOffJob(
+class RemoveDeletedSkillsFromTopicOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job to remove deleted uncategorized skills linked to a topic."""
 
@@ -109,7 +109,7 @@ class RemoveDeletedUncategorizedSkillsOneOffJob(
     @staticmethod
     def map(item):
         if item.deleted:
-            yield (RemoveDeletedUncategorizedSkillsOneOffJob._DELETED_KEY, 1)
+            yield (RemoveDeletedSkillsFromTopicOneOffJob._DELETED_KEY, 1)
             return
 
         # Note: the read will bring the topic up to the newest version.
@@ -151,7 +151,7 @@ class RemoveDeletedUncategorizedSkillsOneOffJob(
 
     @staticmethod
     def reduce(key, values):
-        if key == RemoveDeletedUncategorizedSkillsOneOffJob._DELETED_KEY:
+        if key == RemoveDeletedSkillsFromTopicOneOffJob._DELETED_KEY:
             yield (key, ['Encountered %d deleted topics.' % (
                 sum(ast.literal_eval(v) for v in values))])
         else:
