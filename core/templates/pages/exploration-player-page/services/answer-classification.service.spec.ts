@@ -41,10 +41,10 @@ describe('AnswerClassificationService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
 
-    this.as = TestBed.get(AppService);
-    this.iss = TestBed.get(InteractionSpecsService);
     this.acrof = TestBed.get(AnswerClassificationResultObjectFactory);
     this.acs = TestBed.get(AnswerClassificationService);
+    this.as = TestBed.get(AppService);
+    this.iss = TestBed.get(InteractionSpecsService);
     this.oof = TestBed.get(OutcomeObjectFactory);
     this.pars = TestBed.get(PredictionAlgorithmRegistryService);
     this.scms = TestBed.get(StateClassifierMappingService);
