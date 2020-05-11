@@ -161,28 +161,31 @@ describe('StateRulesStatsService', () => {
         '/createhandler/state_rules_stats/expid/Fraction');
       expect(req.request.method).toEqual('GET');
       req.flush({
-          visualizations_info: [{
-          data: [
-            {
-              answer: {
-                isNegative: false,
-                wholeNumber: 0,
-                numerator: 1,
-                denominator: 2
+        visualizations_info: [
+          {
+            data: [
+              {
+                answer: {
+                  isNegative: false,
+                  wholeNumber: 0,
+                  numerator: 1,
+                  denominator: 2
+                },
+                frequency: 3
               },
-              frequency: 3
-            },
-            {
-              answer: {
-                isNegative: false,
-                wholeNumber: 0,
-                numerator: 0,
-                denominator: 1
-              },
-              frequency: 5
-            }]
-          }]
-        });
+              {
+                answer: {
+                  isNegative: false,
+                  wholeNumber: 0,
+                  numerator: 0,
+                  denominator: 1
+                },
+                frequency: 5
+              }
+            ]
+          }
+        ]
+      });
       flushMicrotasks();
 
       expect(this.onSuccess).toHaveBeenCalledWith(jasmine.objectContaining({

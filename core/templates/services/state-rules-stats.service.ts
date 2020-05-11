@@ -35,21 +35,21 @@ import { UrlInterpolationService } from
 
 export interface IAnswerData {
   /* eslint-disable camelcase */
-  answer; // Type depends on interaction id of answer.
-  is_addressed: boolean;
+  answer; // Type dependant on interaction id.
+  frequency: number;
+  is_addressed?: boolean;
   /* eslint-enable camelcase */
 }
 
 export interface IVisualizationInfo {
   /* eslint-disable camelcase */
   data: IAnswerData[],
-  answer: object,
   options: object,
   addressed_info_is_supported: boolean,
   /* eslint-enable camelcase */
 }
 
-export interface IStateRulesStats {
+export interface IStateRulesStatsBackendDict {
   /* eslint-disable camelcase */
   state_name: string;
   exploration_id: string;
@@ -81,12 +81,12 @@ export class StateRulesStatsService {
    * Returns a promise which will provide details of the given state's
    * answer-statistics.
    */
-  computeStateRulesStats(state: State): Promise<IStateRulesStats> {
+  computeStateRulesStats(state: State): Promise<IStateRulesStatsBackendDict> {
     const explorationId = this.contextService.getExplorationId();
     const interactionRulesService =
       this.interactionRulesRegistryService.getRulesServiceByInteractionId(
         state.interaction.id);
-    return this.http.get<IStateRulesStats>(
+    return this.http.get<IStateRulesStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         '/createhandler/state_rules_stats/<exploration_id>/<state_name>', {
           exploration_id: encodeURIComponent(explorationId),
