@@ -4699,6 +4699,9 @@ export = {
     "code": "ar",
     "description": "العربية (Arabic)"
   }, {
+    "code": "sq",
+    "description": "shqip (Albanian)"
+  }, {
     "code": "bg",
     "description": "български (Bulgarian)"
   }, {
@@ -4864,6 +4867,10 @@ export = {
     "id": "ak",
     "description": "Akan",
     "relatedLanguages": ["ak"]
+  }, {
+    "id": "sq",
+    "description": "Albanian",
+    "relatedLanguages": ["sq"]
   }, {
     "id": "ar",
     "description": "Arabic",
