@@ -28,6 +28,7 @@ import sys
 import time
 import traceback
 
+import backports.functools_lru_cache
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import user_services
@@ -36,7 +37,6 @@ import feconf
 import python_utils
 import utils
 
-import backports.functools_lru_cache
 import webapp2
 
 current_user_services = models.Registry.import_current_user_services()
@@ -71,16 +71,17 @@ def _clear_login_cookies(response_headers):
 
 
 @backports.functools_lru_cache.lru_cache(maxsize=32)
-def _load_template(filepath):
+def _load_template(filename):
     """Return the HTML file contents at filepath.
 
     Args:
-        filepath: str. Path to the requested HTML file.
+        filename: str. Name of the requested HTML file.
 
     Returns:
         str. The HTML file content.
     """
-    with open(os.path.join(feconf.FRONTEND_TEMPLATES_DIR, filepath), 'r') as f:
+    filepath = os.path.join(feconf.FRONTEND_TEMPLATES_DIR, filename)
+    with python_utils.open_file(filepath, 'r') as f:
         html_text = f.read()
     return html_text
 
