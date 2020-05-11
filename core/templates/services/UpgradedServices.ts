@@ -31,6 +31,8 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
+import { AnswerClassificationService } from
+  'pages/exploration-player-page/services/answer-classification.service';
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
@@ -677,6 +679,12 @@ export class UpgradedServices {
       upgradedServices['AudioTranslationLanguageService']);
 
     // Topological level: 5.
+    upgradedServices['AnswerClassificationService'] =
+      new AnswerClassificationService(
+        upgradedServices['AlertsService'],
+        upgradedServices['AnswerClassificationResultObjectFactory'],
+        upgradedServices['PredictionAlgorithmRegistryService'],
+        upgradedServices['StateClassifierMappingService']);
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
       upgradedServices['AnswerGroupObjectFactory'],
       upgradedServices['HintObjectFactory'],

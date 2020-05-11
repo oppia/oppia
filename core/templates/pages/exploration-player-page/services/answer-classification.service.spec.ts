@@ -16,122 +16,144 @@
  * @fileoverview Unit tests for the answer classification service
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// answer-classification.service.ts is upgraded to Angular 8.
+import { TestBed } from '@angular/core/testing';
+
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+
+import { AppConstants } from 'app.constants';
+import { ExplorationPlayerConstants } from
+  'pages/exploration-player-page/exploration-player-page.constants';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { AnswerClassificationService } from
+  'pages/exploration-player-page/services/answer-classification.service';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { PredictionAlgorithmRegistryService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
+describe('AnswerClassificationService', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
 
-require('domain/exploration/OutcomeObjectFactory.ts');
-require('domain/exploration/StatesObjectFactory.ts');
-require(
-  'pages/exploration-player-page/services/answer-classification.service.ts');
+    this.acrof = TestBed.get(AnswerClassificationResultObjectFactory);
+    this.acs = TestBed.get(AnswerClassificationService);
+    this.oof = TestBed.get(OutcomeObjectFactory);
+    this.scms = TestBed.get(StateClassifierMappingService);
+    this.sof = TestBed.get(StateObjectFactory);
 
-describe('Answer classification service with string classifier disabled',
-  function() {
-    beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value(
-        'AnswerClassificationResultObjectFactory',
-        new AnswerClassificationResultObjectFactory());
-      $provide.value(
-        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-          new RuleObjectFactory()));
-      $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
-      $provide.value('FractionObjectFactory', new FractionObjectFactory());
-      $provide.value(
-        'HintObjectFactory', new HintObjectFactory(
-          new SubtitledHtmlObjectFactory()));
-      $provide.value(
-        'OutcomeObjectFactory', new OutcomeObjectFactory(
-          new SubtitledHtmlObjectFactory()));
-      $provide.value(
-        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-      $provide.value(
-        'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-          new ParamChangeObjectFactory()));
-      $provide.value(
-        'RecordedVoiceoversObjectFactory',
-        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-      $provide.value('RuleObjectFactory', new RuleObjectFactory());
-      $provide.value(
-        'StateClassifierMappingService', new StateClassifierMappingService(
-          new ClassifierObjectFactory()));
-      $provide.value(
-        'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-      $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-      $provide.value(
-        'WrittenTranslationObjectFactory',
-        new WrittenTranslationObjectFactory());
-      $provide.value(
-        'WrittenTranslationsObjectFactory',
-        new WrittenTranslationsObjectFactory(
-          new WrittenTranslationObjectFactory()));
-    }));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      var ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-        $provide.value(key, value);
+    this.stateName = 'stateName';
+    this.stateDict = {
+      content: {
+        content_id: 'content',
+        html: 'content'
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {},
+          feedback_2: {}
+        }
+      },
+      interaction: {
+        id: 'RuleTest',
+        answer_groups: [{
+          outcome: {
+            dest: 'outcome 1',
+            feedback: {
+              content_id: 'feedback_1',
+              html: ''
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
+          },
+          rule_specs: [{
+            inputs: {
+              x: 10
+            },
+            rule_type: 'Equals'
+          }]
+        }, {
+          outcome: {
+            dest: 'outcome 2',
+            feedback: {
+              content_id: 'feedback_2',
+              html: ''
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
+          },
+          rule_specs: [{
+            inputs: {
+              x: 5
+            },
+            rule_type: 'Equals'
+          }, {
+            inputs: {
+              x: 7
+            },
+            rule_type: 'NotEquals'
+          }, {
+            inputs: {
+              x: 6
+            },
+            rule_type: 'Equals'
+          }]
+        }],
+        default_outcome: {
+          dest: 'default',
+          feedback: {
+            content_id: 'default_outcome',
+            html: ''
+          },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        hints: []
+      },
+      param_changes: [],
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {},
+          feedback_2: {}
+        }
       }
-    }));
-    beforeEach(function() {
-      angular.mock.module(function($provide) {
-        $provide.constant('INTERACTION_SPECS', {
-          RuleTest: {
-            is_trainable: false
-          }
-        });
-        $provide.constant('ENABLE_ML_CLASSIFIERS', false);
-      });
-    });
+    };
+    this.state = this.sof.createFromBackendDict(this.stateName, this.stateDict);
 
-    beforeEach(
-      angular.mock.module('oppia', TranslatorProviderForTests));
+    this.rules = {
+      Equals: (answer, inputs) => answer === inputs.x,
+      NotEquals: (answer, inputs) => answer !== inputs.x,
+    };
+  });
 
-    var EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION;
-    var acs, sof, oof, acrof, stateName, state;
-    beforeEach(angular.mock.inject(function($injector) {
-      acs = $injector.get('AnswerClassificationService');
-      sof = $injector.get('StateObjectFactory');
-      oof = $injector.get('OutcomeObjectFactory');
-      acrof = $injector.get('AnswerClassificationResultObjectFactory');
-      EXPLICIT_CLASSIFICATION = $injector.get('EXPLICIT_CLASSIFICATION');
-      DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
-        'DEFAULT_OUTCOME_CLASSIFICATION');
+  describe('with string classifier disabled', () => {
+    beforeEach(() => {
+      InteractionSpecsConstants.INTERACTION_SPECS = {
+        RuleTest: {
+          is_trainable: false
+        }
+      };
+      AppConstants.ENABLE_ML_CLASSIFIERS = false;
 
-      stateName = 'stateName';
-      state = sof.createFromBackendDict(stateName, {
+      this.stateDict = {
         content: {
           content_id: 'content',
           html: 'content'
@@ -216,85 +238,118 @@ describe('Answer classification service with string classifier disabled',
             feedback_2: {}
           }
         }
-      });
-    }));
+      };
+    });
 
-    var explorationId = 'exploration';
-
-    var rules = {
-      Equals: function(answer, inputs) {
-        return inputs.x === answer;
-      },
-      NotEquals: function(answer, inputs) {
-        return inputs.x !== answer;
-      }
-    };
-
-    it('should fail if no frontend rules are provided', function() {
-      expect(function() {
-        acs.getMatchingClassificationResult(stateName, state.interaction, 0);
-      }).toThrowError(
+    it('should fail if no frontend rules are provided', () => {
+      expect(
+        () => this.acs.getMatchingClassificationResult(
+          this.stateName, this.state.interaction, 0)
+      ).toThrowError(
         'No interactionRulesService was available to classify the answer.');
     });
 
-    it('should return the first matching answer group and first matching rule' +
-       'spec', function() {
-      expect(
-        acs.getMatchingClassificationResult(
-          stateName, state.interaction, 10, rules)
-      ).toEqual(acrof.createNew(
-        oof.createNew('outcome 1', 'feedback_1', '', []), 0, 0,
-        EXPLICIT_CLASSIFICATION)
-      );
+    it(
+      'should return the first matching answer group and first matching ' +
+        'rule spec',
+      () => {
+        expect(
+          this.acs.getMatchingClassificationResult(
+            this.stateName, this.state.interaction, 10, this.rules)
+        ).toEqual(
+          this.acrof.createNew(
+            this.oof.createNew('outcome 1', 'feedback_1', '', []), 0, 0,
+            ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
 
-      expect(
-        acs.getMatchingClassificationResult(
-          stateName, state.interaction, 5, rules)
-      ).toEqual(acrof.createNew(
-        oof.createNew('outcome 2', 'feedback_2', '', []), 1, 0,
-        EXPLICIT_CLASSIFICATION)
-      );
+        expect(
+          this.acs.getMatchingClassificationResult(
+            this.stateName, this.state.interaction, 5, this.rules)
+        ).toEqual(
+          this.acrof.createNew(
+            this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 0,
+            ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
 
+        expect(
+          this.acs.getMatchingClassificationResult(
+            this.stateName, this.state.interaction, 6, this.rules)
+        ).toEqual(
+          this.acrof.createNew(
+            this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 1,
+            ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
+      });
+
+    it('should return the default rule if no answer group matches', () => {
       expect(
-        acs.getMatchingClassificationResult(
-          stateName, state.interaction, 6, rules)
-      ).toEqual(acrof.createNew(
-        oof.createNew('outcome 2', 'feedback_2', '', []), 1, 1,
-        EXPLICIT_CLASSIFICATION)
-      );
+        this.acs.getMatchingClassificationResult(
+          this.stateName, this.state.interaction, 7, this.rules)
+      ).toEqual(
+        this.acrof.createNew(
+          this.oof.createNew('default', 'default_outcome', '', []), 2, 0,
+          ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
     });
 
-    it('should return the default rule if no answer group matches', function() {
-      expect(
-        acs.getMatchingClassificationResult(
-          stateName, state.interaction, 7, rules)
-      ).toEqual(acrof.createNew(
-        oof.createNew('default', 'default_outcome', '', []), 2, 0,
-        DEFAULT_OUTCOME_CLASSIFICATION)
-      );
-    });
-
-    it('should fail if no answer group matches and no default rule is ' +
-       'provided', function() {
-      var state2 = sof.createFromBackendDict(stateName, {
-        content: {
-          content_id: 'content',
-          html: 'content'
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
-          }
-        },
-        interaction: {
-          id: 'RuleTest',
-          answer_groups: [{
-            outcome: {
-              dest: 'outcome 1',
+    it(
+      'should fail if no answer group matches and no default rule is ' +
+        'provided',
+      () => {
+        this.stateDict = {
+          content: {
+            content_id: 'content',
+            html: 'content'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
+          },
+          interaction: {
+            id: 'TrainableInteraction',
+            answer_groups: [{
+              outcome: {
+                dest: 'outcome 1',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
+              },
+              training_data: ['abc', 'input'],
+              rule_specs: [{
+                inputs: {
+                  x: 'equal'
+                },
+                rule_type: 'Equals'
+              }]
+            }, {
+              outcome: {
+                dest: 'outcome 2',
+                feedback: {
+                  content_id: 'feedback_2',
+                  html: ''
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
+              },
+              training_data: ['xyz'],
+              rule_specs: [{
+                inputs: {
+                  x: 'npu'
+                },
+                rule_type: 'Contains'
+              }]
+            }],
+            default_outcome: {
+              dest: 'default',
               feedback: {
-                content_id: 'feedback_1',
+                content_id: 'default_outcome',
                 html: ''
               },
               labelled_as_correct: false,
@@ -302,136 +357,43 @@ describe('Answer classification service with string classifier disabled',
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_specs: [{
-              inputs: {
-                x: 10
-              },
-              rule_type: 'Equals'
-            }]
-          }],
-          default_outcome: {
-            dest: 'default',
-            feedback: {
-              content_id: 'default_outcome',
-              html: ''
-            },
-            labelled_as_correct: false,
-            param_changes: [],
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null
+            hints: []
           },
-          hints: []
-        },
-        param_changes: [],
-        solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
+          param_changes: [],
+          solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              feedback_2: {}
+            }
           }
-        }
-      });
+        };
+        this.state = this.sof.createFromBackendDict(
+          this.stateName, this.stateDict);
 
-      expect(function() {
-        acs.getMatchingClassificationResult(
-          stateName, state.interaction, 0);
-      }).toThrowError(
-        'No interactionRulesService was available to classify the answer.');
-    });
+        expect(
+          () => this.acs.getMatchingClassificationResult(
+            this.stateName, this.state.interaction, 0)
+        ).toThrowError(
+          'No interactionRulesService was available to classify the answer.');
+      });
   });
 
-describe('Answer classification service with string classifier enabled',
-  function() {
-    beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value(
-        'AnswerClassificationResultObjectFactory',
-        new AnswerClassificationResultObjectFactory());
-      $provide.value(
-        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-          new RuleObjectFactory()));
-      $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
-      $provide.value('FractionObjectFactory', new FractionObjectFactory());
-      $provide.value(
-        'HintObjectFactory', new HintObjectFactory(
-          new SubtitledHtmlObjectFactory()));
-      $provide.value(
-        'OutcomeObjectFactory', new OutcomeObjectFactory(
-          new SubtitledHtmlObjectFactory()));
-      $provide.value(
-        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-      $provide.value(
-        'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-          new ParamChangeObjectFactory()));
-      $provide.value(
-        'RecordedVoiceoversObjectFactory',
-        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-      $provide.value('RuleObjectFactory', new RuleObjectFactory());
-      $provide.value(
-        'StateClassifierMappingService', new StateClassifierMappingService(
-          new ClassifierObjectFactory()));
-      $provide.value(
-        'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-      $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-      $provide.value(
-        'WrittenTranslationObjectFactory',
-        new WrittenTranslationObjectFactory());
-      $provide.value(
-        'WrittenTranslationsObjectFactory',
-        new WrittenTranslationsObjectFactory(
-          new WrittenTranslationObjectFactory()));
-    }));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      var ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-        $provide.value(key, value);
-      }
-    }));
-    beforeEach(function() {
-      angular.mock.module(function($provide) {
-        $provide.constant('INTERACTION_SPECS', {
-          TrainableInteraction: {
-            is_trainable: true
-          },
-          UntrainableInteraction: {
-            is_trainable: false
-          }
-        });
-        $provide.constant('ENABLE_ML_CLASSIFIERS', true);
-        $provide.factory('PredictionSampleService', [function() {
-          return {
-            predict: function(classifierData, answer) {
-              return 1;
-            }
-          };
-        }]);
-      });
-    });
+  describe('with string classifier enabled', () => {
+    beforeEach(() => {
+      InteractionSpecsConstants.INTERACTION_SPECS = {
+        TrainableInteraction: {
+          is_trainable: true
+        },
+        UntrainableInteraction: {
+          is_trainable: false
+        }
+      };
+      AppConstants.ENABLE_ML_CLASSIFIERS = true;
 
-    beforeEach(
-      angular.mock.module('oppia', TranslatorProviderForTests));
-
-    var EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION,
-      STATISTICAL_CLASSIFICATION;
-    var acs, scms, sof, oof, acrof, stateName, state, state2,
-      registryService, stateClassifierMapping;
-    beforeEach(angular.mock.inject(function($injector) {
-      acs = $injector.get('AnswerClassificationService');
-      scms = $injector.get('StateClassifierMappingService');
-      sof = $injector.get('StateObjectFactory');
-      oof = $injector.get('OutcomeObjectFactory');
-      acrof = $injector.get('AnswerClassificationResultObjectFactory');
-      EXPLICIT_CLASSIFICATION = $injector.get('EXPLICIT_CLASSIFICATION');
-      DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
-        'DEFAULT_OUTCOME_CLASSIFICATION');
-      STATISTICAL_CLASSIFICATION = $injector.get('STATISTICAL_CLASSIFICATION');
-      registryService = $injector.get('PredictionAlgorithmRegistryService');
-
-      stateName = 'stateName';
-      state = sof.createFromBackendDict(stateName, {
+      this.stateDict = {
         content: {
           content_id: 'content',
           html: 'content'
@@ -511,140 +473,72 @@ describe('Answer classification service with string classifier enabled',
             feedback_2: {}
           }
         }
-      });
+      };
+      this.state = this.sof.createFromBackendDict(
+        this.stateName, this.stateDict);
+    });
 
-      stateClassifierMapping = {
-        stateName: {
-          algorithm_id: 'TestClassifier',
-          classifier_data: {},
-          data_schema_version: 1
+    beforeEach(() => {
+      this.registryService = TestBed.get(PredictionAlgorithmRegistryService);
+      class StringPredictionService {
+        predict(classifierData, answer): number {
+          return 1;
         }
       };
-      scms.init(stateClassifierMapping);
 
-      registryService.testOnlySetPredictionService(
-        'TestClassifier', 1, $injector.get('PredictionSampleService'));
-
-      state2 = angular.copy(state);
-      state2.interaction.id = 'UntrainableInteraction';
-    }));
-
-    var explorationId = 'exploration';
-
-    var rules = {
-      Equals: function(answer, inputs) {
-        return inputs.x === answer;
-      },
-      NotEquals: function(answer, inputs) {
-        return inputs.x !== answer;
-      }
-    };
-
-    it('should query the prediction service if no answer group matches and ' +
-       'interaction is trainable', function() {
-      // The prediction result is the same as default until there is a mapping
-      // in PredictionAlgorithmRegistryService.
-      expect(
-        acs.getMatchingClassificationResult(
-          stateName, state.interaction, 0, rules)
-      ).toEqual(
-        acrof.createNew(
-          state.interaction.answerGroups[1].outcome, 1, null,
-          STATISTICAL_CLASSIFICATION)
-      );
+      this.registryService.testOnlySetPredictionService(
+        'TestClassifier', 1, new StringPredictionService());
+      this.rules = {
+        Equals: (answer, input) => answer === input,
+        Contains: (answer, input) => (
+          answer.toLowerCase().indexOf(input.x.toLowerCase()) !== -1)
+      };
     });
 
-    it('should return the default rule if no answer group matches and ' +
-       'interaction is not trainable', function() {
-      expect(
-        acs.getMatchingClassificationResult(
-          stateName, state2.interaction, 0, rules)
-      ).toEqual(acrof.createNew(
-        oof.createNew('default', 'default_outcome', '', []), 2, 0,
-        DEFAULT_OUTCOME_CLASSIFICATION)
-      );
-    });
-  }
-);
-
-describe('Answer classification service with training data classification',
-  function() {
-    beforeEach(angular.mock.module('oppia'));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value(
-        'AnswerClassificationResultObjectFactory',
-        new AnswerClassificationResultObjectFactory());
-      $provide.value(
-        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-          new RuleObjectFactory()));
-      $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
-      $provide.value('FractionObjectFactory', new FractionObjectFactory());
-      $provide.value(
-        'HintObjectFactory', new HintObjectFactory(
-          new SubtitledHtmlObjectFactory()));
-      $provide.value(
-        'OutcomeObjectFactory', new OutcomeObjectFactory(
-          new SubtitledHtmlObjectFactory()));
-      $provide.value(
-        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-      $provide.value(
-        'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-          new ParamChangeObjectFactory()));
-      $provide.value(
-        'RecordedVoiceoversObjectFactory',
-        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-      $provide.value('RuleObjectFactory', new RuleObjectFactory());
-      $provide.value(
-        'StateClassifierMappingService', new StateClassifierMappingService(
-          new ClassifierObjectFactory()));
-      $provide.value(
-        'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-      $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-      $provide.value(
-        'WrittenTranslationObjectFactory',
-        new WrittenTranslationObjectFactory());
-      $provide.value(
-        'WrittenTranslationsObjectFactory',
-        new WrittenTranslationsObjectFactory(
-          new WrittenTranslationObjectFactory()));
-    }));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      var ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-        $provide.value(key, value);
-      }
-    }));
-    beforeEach(function() {
-      angular.mock.module(function($provide) {
-        $provide.constant('INTERACTION_SPECS', {
-          TrainableInteraction: {
-            is_trainable: true
-          }
-        });
-        $provide.constant('ENABLE_ML_CLASSIFIERS', true);
-        $provide.constant('ENABLE_TRAINING_DATA_CLASSIFICATION', true);
+    it(
+      'should query the prediction service if no answer group matches and ' +
+        'interaction is trainable',
+      () => {
+        this.stateDict.interaction.id = 'TrainableInteraction';
+        // The prediction result is the same as default until there is a mapping
+        // in PredictionAlgorithmRegistryService.
+        expect(
+          this.acs.getMatchingClassificationResult(
+            this.stateName, this.state.interaction, 0, this.rules)
+        ).toEqual(
+          this.acrof.createNew(
+            this.state.interaction.answerGroups[1].outcome, 1, null,
+            ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION));
       });
-    });
 
-    beforeEach(
-      angular.mock.module('oppia', TranslatorProviderForTests));
+    it(
+      'should return the default rule if no answer group matches and ' +
+        'interaction is not trainable',
+      () => {
+        this.stateDict.interaction.id = 'UntrainableInteraction';
+        this.state = this.sof.createFromBackendDict(
+          this.stateName, this.stateDict);
 
-    var EXPLICIT_CLASSIFICATION, TRAINING_DATA_CLASSIFICATION;
-    var acs, sof, oof, acrof, stateName, state, state2,
-      registryService, stateClassifierMapping;
-    beforeEach(angular.mock.inject(function($injector) {
-      acs = $injector.get('AnswerClassificationService');
-      sof = $injector.get('StateObjectFactory');
-      oof = $injector.get('OutcomeObjectFactory');
-      acrof = $injector.get('AnswerClassificationResultObjectFactory');
-      TRAINING_DATA_CLASSIFICATION = $injector.get(
-        'TRAINING_DATA_CLASSIFICATION');
-      EXPLICIT_CLASSIFICATION = $injector.get('EXPLICIT_CLASSIFICATION');
+        expect(
+          this.acs.getMatchingClassificationResult(
+            this.stateName, this.state.interaction, 0, this.rules)
+        ).toEqual(
+          this.acrof.createNew(
+            this.oof.createNew('default', 'default_outcome', '', []), 2, 0,
+            ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
+      });
+  });
 
-      stateName = 'stateName';
-      state = sof.createFromBackendDict(stateName, {
+  describe('with training data classification', () => {
+    beforeEach(() => {
+      InteractionSpecsConstants.INTERACTION_SPECS = {
+        TrainableInteraction: {
+          is_trainable: true
+        }
+      };
+      AppConstants.ENABLE_ML_CLASSIFIERS = true;
+
+      this.stateDict = {
         content: {
           content_id: 'content',
           html: 'content'
@@ -721,52 +615,43 @@ describe('Answer classification service with training data classification',
             feedback_2: {}
           }
         }
+      };
+      this.state = this.sof.createFromBackendDict(
+        this.stateName, this.stateDict);
+    });
+
+    it(
+      'should use training data classification if no answer group matches ' +
+        'and interaction is trainable',
+      () => {
+        expect(
+          this.acs.getMatchingClassificationResult(
+            this.stateName, this.state.interaction, 'abc', this.rules)
+        ).toEqual(
+          this.acrof.createNew(
+            this.state.interaction.answerGroups[0].outcome, 0, null,
+            ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
+
+        expect(
+          this.acs.getMatchingClassificationResult(
+            this.stateName, this.state.interaction, 'xyz', this.rules)
+        ).toEqual(
+          this.acrof.createNew(
+            this.state.interaction.answerGroups[1].outcome, 1, null,
+            ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
       });
-    }));
 
-    var explorationId = 'exploration';
-
-    var rules = {
-      Equals: function(answer, input) {
-        return answer === input;
-      },
-      Contains: function(answer, input) {
-        return answer.toLowerCase().indexOf(
-          input.x.toLowerCase()) !== -1;
-      }
-    };
-
-    it('should use training data classification if no answer group matches ' +
-       'and interaction is trainable', function() {
-      expect(
-        acs.getMatchingClassificationResult(
-          stateName, state.interaction, 'abc', rules)
-      ).toEqual(
-        acrof.createNew(
-          state.interaction.answerGroups[0].outcome, 0, null,
-          TRAINING_DATA_CLASSIFICATION)
-      );
-
-      expect(
-        acs.getMatchingClassificationResult(
-          stateName, state.interaction, 'xyz', rules)
-      ).toEqual(
-        acrof.createNew(
-          state.interaction.answerGroups[1].outcome, 1, null,
-          TRAINING_DATA_CLASSIFICATION)
-      );
-    });
-
-    it('should perform explicit classification before doing training data ' +
-      'classification', function() {
-      expect(
-        acs.getMatchingClassificationResult(
-          stateName, state.interaction, 'input', rules)
-      ).toEqual(
-        acrof.createNew(
-          state.interaction.answerGroups[1].outcome, 1, 0,
-          EXPLICIT_CLASSIFICATION)
-      );
-    });
-  }
-);
+    it(
+      'should perform explicit classification before doing training data ' +
+        'classification',
+      () => {
+        expect(
+          this.acs.getMatchingClassificationResult(
+            this.stateName, this.state.interaction, 'input', this.rules)
+        ).toEqual(
+          this.acrof.createNew(
+            this.state.interaction.answerGroups[1].outcome, 1, 0,
+            ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
+      });
+  });
+});
