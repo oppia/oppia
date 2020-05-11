@@ -215,62 +215,25 @@ describe('AnswerClassificationService', () => {
       'should fail if no answer group matches and no default rule is ' +
         'provided',
       () => {
-        this.stateDict = {
-          content: {
-            content_id: 'content',
-            html: 'content'
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {}
-            }
-          },
-          interaction: {
-            id: 'RuleTest',
-            answer_groups: [{
-              outcome: {
-                dest: 'outcome 1',
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: ''
-                },
-                labelled_as_correct: false,
-                param_changes: [],
-                refresher_exploration_id: null,
-                missing_prerequisite_skill_id: null
-              },
-              rule_specs: [{
-                inputs: {
-                  x: 10
-                },
-                rule_type: 'Equals'
-              }]
-            }],
-            default_outcome: {
-              dest: 'default',
-              feedback: {
-                content_id: 'default_outcome',
-                html: ''
-              },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null
+        this.stateDict.interaction.answer_groups = [{
+          outcome: {
+            dest: 'outcome 1',
+            feedback: {
+              content_id: 'feedback_1',
+              html: ''
             },
-            hints: []
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
-          param_changes: [],
-          solicit_answer_details: false,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {}
-            }
-          }
-        };
+          rule_specs: [{
+            inputs: {
+              x: 10
+            },
+            rule_type: 'Equals'
+          }]
+        }];
         this.state = this.sof.createFromBackendDict(
           this.stateName, this.stateDict);
 
@@ -377,7 +340,9 @@ describe('AnswerClassificationService', () => {
       };
       this.state = this.sof.createFromBackendDict(
         this.stateName, this.stateDict);
+    });
 
+    beforeEach(() => {
       this.scms.init({
         stateName: {
           algorithm_id: 'TestClassifier',
@@ -385,7 +350,6 @@ describe('AnswerClassificationService', () => {
           data_schema_version: 1
         }
       });
-
       this.pars.testOnlySetPredictionService(
         'TestClassifier', 1, { predict: (classifierData, answer) => 1 });
     });
