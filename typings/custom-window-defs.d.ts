@@ -17,14 +17,10 @@ namespace CodeMirror {
 }
 
 interface Window {
-    BlobBuilder?: any;
     CodeMirror?: typeof CodeMirror;
     // Date?: any;
     HTMLElement?: HTMLElement;
-    MSBlobBuilder?: any;
     MathJax?: any;
-    MozBlobBuilder?: any;
-    WebKitBlobBuilder?: any;
     __fixtures__?: any;
     decodeURIComponent?: (encodedURIComponent: string) => string;
     encodeURIComponent?: (decodedURIComponent: string) => string;

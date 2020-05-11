@@ -101,8 +101,6 @@ describe('Assets Backend API Service', function() {
           exploration_id: '0',
           filename: 'myfile.png'
         });
-
-      window.BlobBuilder = undefined;
     }));
 
     afterEach(function() {
@@ -191,83 +189,6 @@ describe('Assets Backend API Service', function() {
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('myfile.mp3');
       expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
-      $httpBackend.verifyNoOutstandingExpectation();
-    });
-
-    it('should handler rejection on trying to process fetched file when' +
-      ' Blob throws a TypeError and BlobBuilder does not exist', function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
-      spyOn(window, 'Blob').and.callFake(function() {
-        throw new TypeError();
-      });
-
-      $httpBackend.expect('GET', audioRequestUrl).respond(201, 'Error');
-      expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
-
-      AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
-        successHandler, failHandler);
-      $httpBackend.flush();
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('myfile.mp3');
-      $httpBackend.verifyNoOutstandingExpectation();
-    });
-
-    it('should handler rejection on trying to process fetched file when Blob' +
-      ' throws a TypeError and BlobBuilder does not work correctly',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
-      spyOn(window, 'Blob').and.callFake(function() {
-        throw new TypeError();
-      });
-
-      window.BlobBuilder = function BlobBuilder() {
-        this.blob = new Object({ blobBuilder: true });
-      };
-
-      $httpBackend.expect('GET', audioRequestUrl).respond(201, 'Error');
-      expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
-
-      AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
-        successHandler, failHandler);
-      $httpBackend.flush();
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('myfile.mp3');
-      $httpBackend.verifyNoOutstandingExpectation();
-    });
-
-    it('should successfully process a fetch file when Blob throws a TypeError' +
-      ' and BlobBuilder is correctly implemented', function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
-      spyOn(window, 'Blob').and.callFake(function() {
-        throw new TypeError();
-      });
-
-      window.BlobBuilder = function BlobBuilder() {
-        this.blob = new Object({ blobBuilder: true });
-        this.append = function append(data) {};
-        this.getBlob = function getBlob(contentType) {
-          return this.blob;
-        };
-      };
-
-      $httpBackend.expect('GET', audioRequestUrl).respond(201, 'Error');
-      expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
-
-      AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
-        successHandler, failHandler);
-      $httpBackend.flush();
-      expect(successHandler).toHaveBeenCalledWith(
-        audioFileObjectFactory.createNew(
-          'myfile.mp3',
-          { blobBuilder: true }
-        ));
-      expect(failHandler).not.toHaveBeenCalled();
       $httpBackend.verifyNoOutstandingExpectation();
     });
 
