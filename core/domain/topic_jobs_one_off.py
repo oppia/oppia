@@ -96,7 +96,8 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class RemoveDeletedUncategorizedSkillsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class RemoveDeletedUncategorizedSkillsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
     """One-off job to remove deleted uncategorized skills linked to a topic."""
 
     _DELETED_KEY = 'topic_deleted'
