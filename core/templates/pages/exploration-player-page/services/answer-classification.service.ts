@@ -34,7 +34,7 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { PredictionAlgorithmRegistryService }
   // eslint-disable-next-line max-len
   from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
-import { State } from 'domain/state/StateObjectFactory'
+import { State } from 'domain/state/StateObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 
