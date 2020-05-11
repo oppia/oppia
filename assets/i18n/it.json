@@ -217,7 +217,7 @@
 	"I18N_PLAYER_AUDIO_LANGUAGE": "Lingua",
 	"I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT": "L'audio potrebbe non corrispondere interamente al testo",
 	"I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN": "Non disponibile in <[languageDescription]>",
-	"I18N_PLAYER_AUDIO_TRANSLATION_SETTINGS": "Impostazioni Traduzione Audio",
+	"I18N_PLAYER_AUDIO_TRANSLATION_SETTINGS": "Impostazioni audio traduzione",
 	"I18N_PLAYER_BACK": "Indietro",
 	"I18N_PLAYER_BACK_TO_COLLECTION": "Torna alla collezione",
 	"I18N_PLAYER_BANDWIDTH_USAGE_WARNING_MODAL_BODY": "Questa traduzione audio contiene <b><[fileSizeMB]>MB</b> di <b><[languageDescription]></b> audio. Continuare il download?",

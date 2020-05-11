@@ -336,7 +336,7 @@
 	"I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION": "Oppiaは無料でオープンソースの学習プラットフォームで、「探検」と呼ばれるインタラクティブなアクティビティーが満載です。Oppiaが正しく動作するにはウェブ・ブラウザーでJavaScriptを有効にする必要がありますが、お使いのブラウザーではJavaScriptが無効になっています。JavaScriptを有効にするヘルプは<a href=\"<[hrefUrl]>\">こちらをクリック</a>してください。",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_THANKS": "ありがとうございます。",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_TITLE": "お使いのブラウザーでJavaScriptが必要",
-	"I18N_SPLASH_PAGE_TITLE": "Oppia：教える、学ぶ、探検する",
+	"I18N_SPLASH_PAGE_TITLE": "Oppia | だれでも学べるオンラインのインタラクティブなレッスン集",
 	"I18N_SPLASH_SECOND_EXPLORATION_DESCRIPTION": "探検はシンプルに作成できます。探検をした世界中の学習者からのフィードバックやトレンドを受けて簡単に改良できます。",
 	"I18N_SPLASH_SITE_FEEDBACK": "サイトへのフィードバック",
 	"I18N_SPLASH_SUBTITLE": "Oppiaでは、学習と参加を促すインタラクティブな授業を簡単に作れます。",
