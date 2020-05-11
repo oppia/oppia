@@ -50,7 +50,9 @@ export class BrowserCheckerService {
 
   private _isMobileDevice(): boolean {
     var userAgent = navigator.userAgent;
-    return !!(userAgent.match(/iPhone/i)) || !!(userAgent.match(/Android/i));
+    return (
+      Boolean(userAgent.match(/iPhone/i)) || Boolean(
+        userAgent.match(/Android/i)));
   }
 
   supportsSpeechSynthesis(): boolean {
