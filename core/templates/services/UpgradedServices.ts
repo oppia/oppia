@@ -27,6 +27,7 @@ import {
 } from '@angular/common/http';
 
 import { AlertsService } from 'services/alerts.service';
+import { AppService } from 'services/app.service';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationResultObjectFactory } from
@@ -123,6 +124,7 @@ import { ImprovementActionButtonObjectFactory } from
 import { ImprovementsService } from 'services/improvements.service';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
+import { InteractionSpecsService } from 'services/interaction-specs.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
@@ -316,6 +318,7 @@ export class UpgradedServices {
     /* eslint-disable dot-notation */
 
     // Topological level: 0.
+    upgradedServices['AppService'] = new AppService();
     upgradedServices['AngularNameService'] = new AngularNameService();
     upgradedServices['AnswerClassificationResultObjectFactory'] =
       new AnswerClassificationResultObjectFactory();
@@ -363,6 +366,7 @@ export class UpgradedServices {
     upgradedServices['ImprovementActionButtonObjectFactory'] =
       new ImprovementActionButtonObjectFactory();
     upgradedServices['ImprovementsService'] = new ImprovementsService();
+    upgradedServices['InteractionSpecsService'] = new InteractionSpecsService();
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
     upgradedServices['LearnerAnswerDetailsObjectFactory'] =
@@ -682,7 +686,9 @@ export class UpgradedServices {
     upgradedServices['AnswerClassificationService'] =
       new AnswerClassificationService(
         upgradedServices['AlertsService'],
+        upgradedServices['AppService'],
         upgradedServices['AnswerClassificationResultObjectFactory'],
+        upgradedServices['InteractionSpecsService'],
         upgradedServices['PredictionAlgorithmRegistryService'],
         upgradedServices['StateClassifierMappingService']);
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(

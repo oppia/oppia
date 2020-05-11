@@ -19,10 +19,10 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AppConstants } from 'app.constants';
+import { AppService } from 'services/app.service';
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { InteractionSpecsService } from 'services/interaction-specs.service';
 
 import { AlertsService } from 'services/alerts.service';
 import {
@@ -44,8 +44,10 @@ type IRulesService = {[name: string]: (answer, inputs) => boolean};
 export class AnswerClassificationService {
   constructor(
       private alertsService: AlertsService,
+      private appService: AppService,
       private answerClassificationResultObjectFactory:
         AnswerClassificationResultObjectFactory,
+      private interactionSpecsService: InteractionSpecsService,
       private predictionAlgorithmRegistryService:
         PredictionAlgorithmRegistryService,
       private stateClassifierMappingService: StateClassifierMappingService) {}
@@ -124,8 +126,9 @@ export class AnswerClassificationService {
 
     var ruleBasedOutcomeIsDefault = (
       answerClassificationResult.outcome === defaultOutcome);
-    var interactionIsTrainable = InteractionSpecsConstants.INTERACTION_SPECS[
-      interactionInOldState.id].is_trainable;
+    var interactionIsTrainable =
+      this.interactionSpecsService.isInteractionTrainable(
+        interactionInOldState.id);
 
     if (ruleBasedOutcomeIsDefault && interactionIsTrainable) {
       for (var i = 0; i < answerGroups.length; i++) {
@@ -139,7 +142,7 @@ export class AnswerClassificationService {
           }
         }
       }
-      if (AppConstants.ENABLE_ML_CLASSIFIERS) {
+      if (this.appService.areMachineLearningClassifiersEnabled()) {
         var classifier = this.stateClassifierMappingService.getClassifier(
           stateName);
         if (classifier && classifier.classifierData &&

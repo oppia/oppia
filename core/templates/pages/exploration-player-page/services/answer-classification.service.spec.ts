@@ -22,12 +22,12 @@ import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
-import { AppConstants } from 'app.constants';
+import { AppService } from 'services/app.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { InteractionSpecsService } from 'services/interaction-specs.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { PredictionAlgorithmRegistryService } from
   // eslint-disable-next-line max-len
@@ -41,10 +41,9 @@ describe('AnswerClassificationService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
 
-    this.ac = AppConstants;
-    this.epc = ExplorationPlayerConstants;
-    this.isc = InteractionSpecsConstants;
-
+    this.as = TestBed.get(AppService);
+    this.epc = TestBed.get(ExplorationPlayerConstants);
+    this.iss = TestBed.get(InteractionSpecsService);
     this.acrof = TestBed.get(AnswerClassificationResultObjectFactory);
     this.acs = TestBed.get(AnswerClassificationService);
     this.oof = TestBed.get(OutcomeObjectFactory);
@@ -54,12 +53,8 @@ describe('AnswerClassificationService', () => {
 
     this.stateName = 'stateName';
     this.rules = {
-      Equals: function(answer, inputs) {
-        return inputs.x === answer;
-      },
-      NotEquals: function(answer, inputs) {
-        return inputs.x !== answer;
-      },
+      Equals: (answer, inputs) => inputs.x === answer,
+      NotEquals: (answer, inputs) => inputs.x !== answer,
       Contains: (answer, inputs) => (
         answer.toLowerCase().indexOf(inputs.x.toLowerCase()) !== -1)
     };
@@ -67,12 +62,9 @@ describe('AnswerClassificationService', () => {
 
   describe('with string classifier disabled', () => {
     beforeEach(() => {
-      this.isc.INTERACTION_SPECS = {
-        RuleTest: {
-          is_trainable: false
-        }
-      };
-      this.ac.ENABLE_ML_CLASSIFIERS = false;
+      spyOn(this.iss, 'isInteractionTrainable').and.returnValue(false);
+      spyOn(this.as, 'areMachineLearningClassifiersEnabled')
+        .and.returnValue(false);
 
       this.stateDict = {
         content: {
@@ -247,15 +239,8 @@ describe('AnswerClassificationService', () => {
 
   describe('with string classifier enabled', () => {
     beforeEach(() => {
-      this.isc.INTERACTION_SPECS = {
-        TrainableInteraction: {
-          is_trainable: true
-        },
-        UntrainableInteraction: {
-          is_trainable: false
-        }
-      };
-      this.ac.ENABLE_ML_CLASSIFIERS = true;
+      spyOn(this.as, 'areMachineLearningClassifiersEnabled')
+        .and.returnValue(true);
 
       this.stateDict = {
         content: {
@@ -271,7 +256,7 @@ describe('AnswerClassificationService', () => {
           }
         },
         interaction: {
-          id: 'TrainableInteraction',
+          id: 'RuleTest',
           answer_groups: [{
             outcome: {
               dest: 'outcome 1',
@@ -358,7 +343,8 @@ describe('AnswerClassificationService', () => {
       'should query the prediction service if no answer group matches and ' +
         'interaction is trainable',
       () => {
-        this.stateDict.interaction.id = 'TrainableInteraction';
+        spyOn(this.iss, 'isInteractionTrainable').and.returnValue(true);
+        this.stateDict.interaction.id = 'RuleTest';
         this.state = this.sof.createFromBackendDict(
           this.stateName, this.stateDict);
 
@@ -375,7 +361,7 @@ describe('AnswerClassificationService', () => {
       'should return the default rule if no answer group matches and ' +
         'interaction is not trainable',
       () => {
-        this.stateDict.interaction.id = 'UntrainableInteraction';
+        spyOn(this.iss, 'isInteractionTrainable').and.returnValue(false);
         this.state = this.sof.createFromBackendDict(
           this.stateName, this.stateDict);
 
@@ -391,12 +377,9 @@ describe('AnswerClassificationService', () => {
 
   describe('with training data classification', () => {
     beforeEach(() => {
-      this.isc.INTERACTION_SPECS = {
-        TrainableInteraction: {
-          is_trainable: true
-        }
-      };
-      this.ac.ENABLE_ML_CLASSIFIERS = true;
+      spyOn(this.iss, 'isInteractionTrainable').and.returnValue(true);
+      spyOn(this.as, 'areMachineLearningClassifiersEnabled')
+        .and.returnValue(true);
 
       this.stateDict = {
         content: {
@@ -412,7 +395,7 @@ describe('AnswerClassificationService', () => {
           }
         },
         interaction: {
-          id: 'TrainableInteraction',
+          id: 'RuleTest',
           answer_groups: [{
             outcome: {
               dest: 'outcome 1',
