@@ -514,7 +514,7 @@ angular.module('oppia').directive('questionPlayer', [
 
           ctrl.reviewConceptCardAndRetryTest = function() {
             if (!ctrl.failedSkillIds || ctrl.failedSkillIds.length === 0) {
-              throw Error('No failed skills');
+              throw new Error('No failed skills');
             }
             openConceptCardModal(ctrl.failedSkillIds);
           };

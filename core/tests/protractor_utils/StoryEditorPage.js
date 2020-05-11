@@ -20,9 +20,12 @@
 var forms = require('./forms.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
+var workflow = require('../protractor_utils/workflow.js');
 
 var StoryEditorPage = function() {
   var EDITOR_URL_PREFIX = '/story_editor/';
+  var thumbnailContainer = element(
+    by.css('.protractor-test-thumbnail-container'));
   var storyTitleField = element(by.css('.protractor-test-story-title-field'));
   var storyDescriptionField = element(
     by.css('.protractor-test-story-description-field'));
@@ -71,8 +74,11 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-exploration-id-input'));
   var explorationIdSaveButton = element(
     by.css('.protractor-test-exploration-id-save-button'));
+  var nodeDescriptionInputField = element(
+    by.css('.protractor-test-add-chapter-description'));
   var nodeOutlineEditor = element(
     by.css('.protractor-test-add-chapter-outline'));
+  var nodeOutlineEditorRteContent = element.all(by.css('.oppia-rte'));
   var nodeOutlineSaveButton = element(
     by.css('.protractor-test-node-outline-save-button'));
   var addPrerequisiteSkillButton = element(
@@ -101,9 +107,35 @@ var StoryEditorPage = function() {
   var warningIndicator = element(by.css('.protractor-test-warning-indicator'));
   var warningTextElements = element.all(
     by.css('.protractor-test-warnings-text'));
+  var storyThumbnailImageElement = element(
+    by.css('.story-thumbnail .protractor-test-custom-photo'));
+  var storyThumbnailButton = element(
+    by.css('.story-thumbnail .protractor-test-photo-button'));
+  var chapterThumbnailImageElement = element(
+    by.css('.story-node-thumbnail .protractor-test-custom-photo'));
+  var chapterThumbnailButton = element(
+    by.css('.story-node-thumbnail .protractor-test-photo-button'));
   this.get = function(storyId) {
     browser.get(EDITOR_URL_PREFIX + storyId);
     return waitFor.pageToFullyLoad();
+  };
+
+  this.getStoryThumbnailSource = function() {
+    return workflow.getImageSource(storyThumbnailImageElement);
+  };
+
+  this.getChapterThumbnailSource = function() {
+    return workflow.getImageSource(chapterThumbnailImageElement);
+  };
+
+  this.submitStoryThumbnail = function(imgPath) {
+    return workflow.submitImage(
+      storyThumbnailButton, thumbnailContainer, imgPath);
+  };
+
+  this.submitChapterThumbnail = function(imgPath) {
+    return workflow.submitImage(
+      chapterThumbnailButton, thumbnailContainer, imgPath);
   };
 
   this.publishStory = function() {
@@ -115,6 +147,7 @@ var StoryEditorPage = function() {
   };
 
   this.deleteChapterWithIndex = function(index) {
+    general.scrollToTop();
     deleteChapterButtons.then(function(elems) {
       elems[index].click();
     });
@@ -174,6 +207,7 @@ var StoryEditorPage = function() {
   };
 
   this.returnToTopic = function() {
+    general.scrollToTop();
     returnToTopicButton.click();
     waitFor.pageToFullyLoad();
   };
@@ -226,6 +260,29 @@ var StoryEditorPage = function() {
     explorationIdSaveButton.click();
   };
 
+  this.changeNodeDescription = function(nodeDescription) {
+    waitFor.visibilityOf(
+      nodeDescriptionInputField,
+      'NodeDescriptionInputField takes too long to be visible'
+    );
+    nodeDescriptionInputField.clear();
+    nodeDescriptionInputField.sendKeys(nodeDescription);
+  };
+
+  this.expectNodeDescription = function(nodeDescription) {
+    waitFor.visibilityOf(
+      nodeDescriptionInputField,
+      'NodeDescriptionInputField takes too long to be visible'
+    );
+    expect(nodeDescriptionInputField.getAttribute('value')).toMatch(
+      nodeDescription
+    );
+  };
+
+  this.expectChapterExplorationIdToBe = function(id) {
+    expect(explorationIdInput.getAttribute('value')).toEqual(id);
+  };
+
   this.changeNodeOutline = function(richTextInstructions) {
     var editor = forms.RichTextEditor(
       nodeOutlineEditor);
@@ -235,9 +292,17 @@ var StoryEditorPage = function() {
   };
 
   this.navigateToChapterByIndex = function(index) {
+    // scrollToTop is added to prevent chapterTitles from being hidden
+    // by the navbar.
+    general.scrollToTop();
     chapterTitles.then(function(elements) {
       elements[index].click();
     });
+  };
+
+  this.expectNodeOutlineToMatch = function(nodeOutline) {
+    expect(
+      nodeOutlineEditorRteContent.first().getText()).toEqual(nodeOutline);
   };
 
   this.expectExplorationIdAlreadyExistWarningAndCloseIt = function() {

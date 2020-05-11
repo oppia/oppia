@@ -21,19 +21,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import getpass
 import os
-import sys
 
 from core.tests import test_utils
 import release_constants
 from scripts import common
 from scripts.release_scripts import wrap_up_release
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
-sys.path.insert(0, _PY_GITHUB_PATH)
-
 # pylint: disable=wrong-import-position
-import github # isort:skip
+import github  # isort:skip
 # pylint: enable=wrong-import-position
 
 

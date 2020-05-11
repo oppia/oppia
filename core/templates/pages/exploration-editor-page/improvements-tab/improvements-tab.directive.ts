@@ -17,28 +17,7 @@
  * exploration editor.
  */
 
-require(
-  'pages/exploration-editor-page/improvements-tab/' +
-  'answer-details-improvement-task/answer-details-improvement-task.directive.ts'
-);
-require(
-  'pages/exploration-editor-page/improvements-tab/' +
-  'feedback-improvement-task/feedback-improvement-task.directive.ts'
-);
-require(
-  'pages/exploration-editor-page/improvements-tab/' +
-  'playthrough-improvement-task/playthrough-improvement-task.directive.ts'
-);
-require(
-  'pages/exploration-editor-page/improvements-tab/' +
-  'suggestion-improvement-task/suggestion-improvement-task.directive.ts'
-);
-
 require('domain/utilities/url-interpolation.service.ts');
-require('services/improvement-task.service.ts');
-require(
-  'pages/exploration-editor-page/improvements-tab/services/' +
-  'improvements-display.service.ts');
 
 angular.module('oppia').directive('improvementsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -48,51 +27,7 @@ angular.module('oppia').directive('improvementsTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration-editor-page/improvements-tab/' +
         'improvements-tab.directive.html'),
-      controller: [
-        '$scope', 'ImprovementTaskService', 'ImprovementsDisplayService',
-        function($scope, ImprovementTaskService, ImprovementsDisplayService) {
-          var ctrl = this;
-          var fetchedTasks = [];
-
-          $scope.getStatusCssClass = function(status) {
-            return ImprovementsDisplayService.getStatusCssClass(status);
-          };
-
-          $scope.getHumanReadableStatus = function(status) {
-            return ImprovementsDisplayService.getHumanReadableStatus(status);
-          };
-
-          $scope.getTasks = function() {
-            return fetchedTasks;
-          };
-
-          $scope.isTaskOpen = function(task) {
-            return ImprovementsDisplayService.isOpen(task.getStatus());
-          };
-
-          $scope.isTaskShown = function(task) {
-            return $scope.isTaskOpen(task) || !$scope.onlyShowOpenTasks;
-          };
-
-          $scope.getTaskTitle = function(task) {
-            return task.getTitle();
-          };
-
-          $scope.isTaskObsolete = function(task) {
-            return task.isObsolete();
-          };
-
-          $scope.getOpenTaskCount = function() {
-            return fetchedTasks.filter($scope.isTaskOpen).length;
-          };
-
-          ctrl.$onInit = function() {
-            ImprovementTaskService.fetchTasks().then(function(tasks) {
-              fetchedTasks = tasks;
-            });
-            $scope.onlyShowOpenTasks = true;
-          };
-        }
-      ],
+      controller: ['$scope', $scope => {}],
     };
-  }]);
+  }
+]);

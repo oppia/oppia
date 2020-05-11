@@ -45,24 +45,27 @@ angular.module('oppia').directive('imageUploader', [
             return 'This file is not recognized as an image.';
           }
 
-          if (!file.type.match('image.jpeg') &&
-            !file.type.match('image.gif') &&
-            !file.type.match('image.jpg') &&
-            !file.type.match('image.png')) {
+          if (!file.type.match('image/jpeg') &&
+            !file.type.match('image/gif') &&
+            !file.type.match('image/jpg') &&
+            !file.type.match('image/png') &&
+            !file.type.match('image/svg\\+xml')) {
             return 'This image format is not supported.';
           }
 
           if ((file.type.match(/jp(e?)g$/) && !file.name.match(/\.jp(e?)g$/)) ||
             (file.type.match(/gif$/) && !file.name.match(/\.gif$/)) ||
-            (file.type.match(/png$/) && !file.name.match(/\.png$/))) {
+            (file.type.match(/png$/) && !file.name.match(/\.png$/)) ||
+            (file.type.match(/svg\+xml$/) && !file.name.match(/\.svg$/))) {
             return 'This image format does not match the filename extension.';
           }
 
-          var ONE_MB_IN_BYTES = 1048576;
-          if (file.size > ONE_MB_IN_BYTES) {
-            var currentSize = (file.size / ONE_MB_IN_BYTES).toFixed(1) + ' MB';
-            return 'The maximum allowed file size is 1 MB' +
-              ' (' + currentSize + ' given).';
+          const HUNDRED_KB_IN_BYTES = 100 * 1024;
+          if (file.size > HUNDRED_KB_IN_BYTES) {
+            var currentSizeInKb = (
+              (file.size * 100 / HUNDRED_KB_IN_BYTES).toFixed(1) + '  KB');
+            return 'The maximum allowed file size is 100 KB' +
+              ' (' + currentSizeInKb + ' given).';
           }
 
           return null;
