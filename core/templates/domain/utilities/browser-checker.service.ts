@@ -49,8 +49,8 @@ export class BrowserCheckerService {
   }
 
   private _isMobileDevice(): boolean {
-    var userAgent = navigator.userAgent || this.windowRef.nativeWindow.opera;
-    return userAgent.match(/iPhone/i) || userAgent.match(/Android/i);
+    var userAgent = navigator.userAgent;
+    return !!(userAgent.match(/iPhone/i)) || !!(userAgent.match(/Android/i));
   }
 
   supportsSpeechSynthesis(): boolean {

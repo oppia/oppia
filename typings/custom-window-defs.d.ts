@@ -18,12 +18,9 @@ namespace CodeMirror {
 
 interface Window {
     CodeMirror?: typeof CodeMirror;
-    // Date?: any;
     HTMLElement?: HTMLElement;
-    MathJax?: any;
     __fixtures__?: any;
     decodeURIComponent?: (encodedURIComponent: string) => string;
     encodeURIComponent?: (decodedURIComponent: string) => string;
-    opera?: any;
     ga?: Function;
 }

@@ -1,4 +1,5 @@
 window.MathJax = {
+  // @ts-ignore
   skipStartupTypeset: true,
   messageStyle: 'none',
   'HTML-CSS': {
