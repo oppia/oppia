@@ -31,6 +31,12 @@ angular.module('oppia').directive('welcomeGuidePage', [
           UrlInterpolationService) {
         var ctrl = this;
         ctrl.$onInit = function() {
+          ctrl.arr = [{pClass: 'oppia-welcome-guide-numbers', spanClass: 'oppia-welcome-guide-blue', I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_1'},
+            {pClass: 'oppia-welcome-guide-numbers', spanClass: 'oppia-welcome-guide-purple', I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_2'},
+            {pClass: 'oppia-welcome-guide-numbers', spanClass: 'oppia-welcome-guide-red', I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_3'},
+            {pClass: 'oppia-welcome-guide-numbers', spanClass: 'oppia-welcome-guide-orange', I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_4'},
+            {pClass: 'oppia-welcome-guide-numbers', spanClass: 'oppia-welcome-guide-green', I8n: 'I18N_WELCOME_GUIDE_BROWSER_BULLET_5'}];
+
           ctrl.fractionExplorationPngImageUrl = UrlInterpolationService.getStaticImageUrl(
             '/welcome_guide/fractions_exploration.png');
           ctrl.fractionExplorationWebpImageUrl = UrlInterpolationService.getStaticImageUrl(

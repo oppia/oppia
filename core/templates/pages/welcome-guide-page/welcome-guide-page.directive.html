@@ -56,7 +56,7 @@
       <img style="width: 625px;" ng-src="<[$ctrl.explorationLibraryPngImageUrl]>" alt="I18N_WELCOME_GUIDE_EXPLORATION_BROSWER_IMAGE">
     </picture>
   </div>
-  <div class="oppia-welcome-guide-browser-image col-lg-6">
+  <!-- <div class="oppia-welcome-guide-browser-image col-lg-6">
     <span class="oppia-welcome-guide-blue">1</span><p class="oppia-welcome-guide-numbers" translate="I18N_WELCOME_GUIDE_BROWSER_BULLET_1"> </p>
     <br>
     <br>
@@ -70,5 +70,13 @@
     <br>
     <br>
     <span class="oppia-welcome-guide-green">5</span><p class="oppia-welcome-guide-numbers" translate="I18N_WELCOME_GUIDE_BROWSER_BULLET_5"></p>
+  </div> -->
+  <div class="oppia-welcome-guide-browser-image col-lg-6">
+    <div ng-repeat="element in $ctrl.arr track by $index"><span class = "<[element.spanClass]>"><[$index+1]></span>
+      <p class="<[element.pClass]>" translate = "<[element.I8n]>"></p></div>
+
   </div>
+
+
+  
 </div>
