@@ -43,9 +43,9 @@ export interface IAnswerData {
 
 export interface IVisualizationInfo {
   /* eslint-disable camelcase */
-  data: IAnswerData[],
-  options: object,
-  addressed_info_is_supported: boolean,
+  data: IAnswerData[];
+  options: object;
+  addressed_info_is_supported: boolean;
   /* eslint-enable camelcase */
 }
 
