@@ -118,10 +118,10 @@ class RemoveDeletedUncategorizedSkillsOneOffJob(
         all_skill_ids_to_be_removed = []
         commit_cmds = []
         for subtopic in topic.get_all_subtopics():
-            local_skill_models = skill_models.SkillModel.get_multi(
+            subtopic_skill_models = skill_models.SkillModel.get_multi(
                 subtopic['skill_ids'])
             for skill_id, skill_model in python_utils.ZIP(
-                    subtopic['skill_ids'], local_skill_models):
+                    subtopic['skill_ids'], subtopic_skill_models):
                 if skill_model is None:
                     commit_cmds.append(topic_domain.TopicChange({
                         'cmd': topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
@@ -130,13 +130,10 @@ class RemoveDeletedUncategorizedSkillsOneOffJob(
                     }))
                     skill_ids_to_be_removed_from_subtopic.append(skill_id)
 
-        local_skill_models = skill_models.SkillModel.get_multi(
+        all_skill_models = skill_models.SkillModel.get_multi(
             topic.get_all_skill_ids())
-        list_of_all_skill_ids = (
-            topic.uncategorized_skill_ids +
-            skill_ids_to_be_removed_from_subtopic)
         for skill_id, skill_model in python_utils.ZIP(
-                list_of_all_skill_ids, local_skill_models):
+                topic.get_all_skill_ids(), all_skill_models):
             if skill_model is None:
                 commit_cmds.append(topic_domain.TopicChange({
                     'cmd': topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID,

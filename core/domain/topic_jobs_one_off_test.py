@@ -22,9 +22,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import logging
 
+from constants import constants
+from core.domain import skill_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_jobs_one_off
+from core.domain import skill_services
 from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
@@ -218,24 +221,44 @@ class RemoveDeletedUncategorizedSkillsOneOffJobTests(
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
+        self.rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
 
     def test_job_removes_deleted_uncategorized_skill_ids(self):
         """Tests that the RemoveDeletedUncategorizedSkillsOneOffJob job removes
         deleted uncategorized skills ids from the topic.
         """
+        valid_skill_1 = skill_domain.Skill.create_default_skill(
+            'valid_skill_1', description='A description', rubrics=self.rubrics)
+        valid_skill_2 = skill_domain.Skill.create_default_skill(
+            'valid_skill_2', description='A description', rubrics=self.rubrics)
+        valid_skill_3 = skill_domain.Skill.create_default_skill(
+            'valid_skill_3', description='A description', rubrics=self.rubrics)
+        skill_services.save_new_skill(self.albert_id, valid_skill_1)
+        skill_services.save_new_skill(self.albert_id, valid_skill_2)
+        skill_services.save_new_skill(self.albert_id, valid_skill_3)
         # Create a new topic that should not be affected by the
         # job.
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, name='A name', abbreviated_name='abbrev')
         topic.add_subtopic(1, title='A subtitle')
-        topic.add_uncategorized_skill_id('skill_1')
-        topic.add_uncategorized_skill_id('skill_2')
-        topic.add_uncategorized_skill_id('skill_3')
-        topic.move_skill_id_to_subtopic(None, 1, 'skill_3')
+        topic.add_uncategorized_skill_id('valid_skill_1')
+        topic.add_uncategorized_skill_id('valid_skill_2')
+        topic.add_uncategorized_skill_id('valid_skill_3')
+        topic.add_uncategorized_skill_id('deleted_skill_1')
+        topic.add_uncategorized_skill_id('deleted_skill_2')
+        topic.add_uncategorized_skill_id('deleted_skill_3')
+        topic.move_skill_id_to_subtopic(None, 1, 'valid_skill_3')
+        topic.move_skill_id_to_subtopic(None, 1, 'deleted_skill_3')
         topic_services.save_new_topic(self.albert_id, topic)
         self.assertEqual(
-            topic.subtopic_schema_version,
-            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
+            set(topic.subtopics[0].skill_ids),
+            set(['valid_skill_3', 'deleted_skill_3']))
 
         # Start migration job.
         job_id = (
@@ -246,15 +269,59 @@ class RemoveDeletedUncategorizedSkillsOneOffJobTests(
         self.process_and_flush_pending_tasks()
 
         # Verify the topic is exactly the same after migration.
-        updated_topic = (
-            topic_fetchers.get_topic_by_id(self.TOPIC_ID))
-        self.assertEqual(updated_topic.uncategorized_skill_ids, [])
-        self.assertEqual(updated_topic.subtopics[0].skill_ids, [])
+        updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(
+            updated_topic.uncategorized_skill_ids,
+            ['valid_skill_1', 'valid_skill_2'])
+        self.assertEqual(
+            updated_topic.subtopics[0].skill_ids, ['valid_skill_3'])
         output = (
             topic_jobs_one_off.RemoveDeletedUncategorizedSkillsOneOffJob
             .get_output(job_id))
         expected = [[
             u'Skill IDs deleted for topic topic_id:',
-            [u'[u\'skill_1\', u\'skill_2\', u\'skill_3\']']]]
+            [u'[u\'deleted_skill_1\', u\'deleted_skill_2\','
+              ' u\'deleted_skill_3\']']]]
 
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_job_skips_deleted_topic(self):
+        """Tests that RemoveDeletedUncategorizedSkillsOneOffJob job skips
+        deleted topic and does not attempt to remove uncategorized skills for
+        skills that are deleted.
+        """
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, name='A name', abbreviated_name='abbrev')
+        topic.add_uncategorized_skill_id('skill_1')
+        topic.add_uncategorized_skill_id('skill_2')
+        topic_services.save_new_topic(self.albert_id, topic)
+
+        # Delete the topic before migration occurs.
+        topic_services.delete_topic(
+            self.albert_id, self.TOPIC_ID)
+
+        # Ensure the topic is deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.RemoveDeletedUncategorizedSkillsOneOffJob
+            .create_new())
+        topic_jobs_one_off.RemoveDeletedUncategorizedSkillsOneOffJob.enqueue(
+            job_id)
+
+        # This running without errors indicates the deleted topic is
+        # being ignored.
+        self.process_and_flush_pending_tasks()
+
+        # Ensure the topic is still deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+
+        output = (
+            topic_jobs_one_off.RemoveDeletedUncategorizedSkillsOneOffJob
+            .get_output(job_id))
+        expected = [[u'topic_deleted',
+                     [u'Encountered 1 deleted topics.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
