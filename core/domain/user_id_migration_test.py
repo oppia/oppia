@@ -1485,7 +1485,8 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             thread_id='thread_id',
             message_id=2).put()
         feedback_models.GeneralFeedbackThreadUserModel(
-            id='None.thread_id',
+            id='%s.thread_id' % self.USER_1_USER_ID,
+            user_id=self.USER_1_USER_ID,
             thread_id='thread_id').put()
         topic_models.TopicRightsModel.put_multi([
             topic_models.TopicRightsModel(
@@ -1507,7 +1508,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             ['FAILURE - UserContributionScoringModel',
              ['%s.%s' % ('category', self.USER_2_GAE_ID)]],
             ['SUCCESS_NONE - GeneralFeedbackMessageModel', 1],
-            ['SUCCESS_NONE - GeneralFeedbackThreadUserModel', 1],
+            ['SUCCESS - GeneralFeedbackThreadUserModel', 1],
             ['FAILURE - TopicRightsModel', ['topic_1_id']],
             ['SUCCESS - TopicRightsModel', 1],
         ], output)
