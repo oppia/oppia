@@ -21,7 +21,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service'
+  'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { ContextService } from 'services/context.service';
@@ -34,21 +34,27 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 export interface IAnswerData {
+  /* eslint-disable camelcase */
   answer; // Type depends on interaction id of answer.
   is_addressed: boolean;
+  /* eslint-enable camelcase */
 }
 
 export interface IVisualizationInfo {
+  /* eslint-disable camelcase */
   data: IAnswerData[],
   answer: object,
   options: object,
   addressed_info_is_supported: boolean,
+  /* eslint-enable camelcase */
 }
 
 export interface IStateRulesStats {
+  /* eslint-disable camelcase */
   state_name: string;
   exploration_id: string;
   visualizations_info: IVisualizationInfo[];
+  /* eslint-enable camelcase */
 }
 
 @Injectable({providedIn: 'root'})

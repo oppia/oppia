@@ -13,53 +13,52 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service enumerating the answer rules of every interaction type.
+ * @fileoverview Service for getting the rules services of interactions.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { GraphInputRulesService } from
-  'interactions/GraphInput/directives/graph-input-rules.service'
+  'interactions/GraphInput/directives/graph-input-rules.service';
 import { EndExplorationRulesService } from
-  'interactions/EndExploration/directives/end-exploration-rules.service'
+  'interactions/EndExploration/directives/end-exploration-rules.service';
 import { CodeReplRulesService } from
-  'interactions/CodeRepl/directives/code-repl-rules.service'
+  'interactions/CodeRepl/directives/code-repl-rules.service';
 import { ImageClickInputRulesService } from
-  'interactions/ImageClickInput/directives/image-click-input-rules.service'
+  'interactions/ImageClickInput/directives/image-click-input-rules.service';
 import { FractionInputRulesService } from
-  'interactions/FractionInput/directives/fraction-input-rules.service'
+  'interactions/FractionInput/directives/fraction-input-rules.service';
 import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service'
+  'interactions/TextInput/directives/text-input-rules.service';
 import { InteractiveMapRulesService } from
-  'interactions/InteractiveMap/directives/interactive-map-rules.service'
+  'interactions/InteractiveMap/directives/interactive-map-rules.service';
 import { NumericInputRulesService } from
-  'interactions/NumericInput/directives/numeric-input-rules.service'
+  'interactions/NumericInput/directives/numeric-input-rules.service';
 import { LogicProofRulesService } from
-  'interactions/LogicProof/directives/logic-proof-rules.service'
+  'interactions/LogicProof/directives/logic-proof-rules.service';
 import { DragAndDropSortInputRulesService } from
   // eslint-disable-next-line max-len
-  'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service'
+  'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { MultipleChoiceInputRulesService } from
   // eslint-disable-next-line max-len
-  'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service'
+  'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { ItemSelectionInputRulesService } from
   // eslint-disable-next-line max-len
-  'interactions/ItemSelectionInput/directives/item-selection-input-rules.service'
+  'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { SetInputRulesService } from
-  'interactions/SetInput/directives/set-input-rules.service'
+  'interactions/SetInput/directives/set-input-rules.service';
 import { MusicNotesInputRulesService } from
-  'interactions/MusicNotesInput/directives/music-notes-input-rules.service'
+  'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
 import { NumberWithUnitsRulesService } from
-  'interactions/NumberWithUnits/directives/number-with-units-rules.service'
+  'interactions/NumberWithUnits/directives/number-with-units-rules.service';
 import { PencilCodeEditorRulesService } from
-  'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service'
+  'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import { MathExpressionInputRulesService } from
   // eslint-disable-next-line max-len
-  'interactions/MathExpressionInput/directives/math-expression-input-rules.service'
+  'interactions/MathExpressionInput/directives/math-expression-input-rules.service';
 import { ContinueRulesService } from
-  'interactions/Continue/directives/continue-rules.service'
-
+  'interactions/Continue/directives/continue-rules.service';
 
 @Injectable({providedIn: 'root'})
 export class InteractionRulesRegistryService {
@@ -86,24 +85,24 @@ export class InteractionRulesRegistryService {
       private setInputRulesService: SetInputRulesService,
       private textInputRulesService: TextInputRulesService) {
     this.rulesServiceRegistry = new Map(Object.entries({
-      'CodeReplRulesService': this.codeReplRulesService,
-      'ContinueRulesService': this.continueRulesService,
-      'DragAndDropSortInputRulesService': this.dragAndDropSortInputRulesService,
-      'EndExplorationRulesService': this.endExplorationRulesService,
-      'FractionInputRulesService': this.fractionInputRulesService,
-      'GraphInputRulesService': this.graphInputRulesService,
-      'ImageClickInputRulesService': this.imageClickInputRulesService,
-      'InteractiveMapRulesService': this.interactiveMapRulesService,
-      'ItemSelectionInputRulesService': this.itemSelectionInputRulesService,
-      'LogicProofRulesService': this.logicProofRulesService,
-      'MathExpressionInputRulesService': this.mathExpressionInputRulesService,
-      'MultipleChoiceInputRulesService': this.multipleChoiceInputRulesService,
-      'MusicNotesInputRulesService': this.musicNotesInputRulesService,
-      'NumberWithUnitsRulesService': this.numberWithUnitsRulesService,
-      'NumericInputRulesService': this.numericInputRulesService,
-      'PencilCodeEditorRulesService': this.pencilCodeEditorRulesService,
-      'SetInputRulesService': this.setInputRulesService,
-      'TextInputRulesService': this.textInputRulesService,
+      CodeReplRulesService: this.codeReplRulesService,
+      ContinueRulesService: this.continueRulesService,
+      DragAndDropSortInputRulesService: this.dragAndDropSortInputRulesService,
+      EndExplorationRulesService: this.endExplorationRulesService,
+      FractionInputRulesService: this.fractionInputRulesService,
+      GraphInputRulesService: this.graphInputRulesService,
+      ImageClickInputRulesService: this.imageClickInputRulesService,
+      InteractiveMapRulesService: this.interactiveMapRulesService,
+      ItemSelectionInputRulesService: this.itemSelectionInputRulesService,
+      LogicProofRulesService: this.logicProofRulesService,
+      MathExpressionInputRulesService: this.mathExpressionInputRulesService,
+      MultipleChoiceInputRulesService: this.multipleChoiceInputRulesService,
+      MusicNotesInputRulesService: this.musicNotesInputRulesService,
+      NumberWithUnitsRulesService: this.numberWithUnitsRulesService,
+      NumericInputRulesService: this.numericInputRulesService,
+      PencilCodeEditorRulesService: this.pencilCodeEditorRulesService,
+      SetInputRulesService: this.setInputRulesService,
+      TextInputRulesService: this.textInputRulesService,
     }));
   }
 
@@ -116,11 +115,11 @@ export class InteractionRulesRegistryService {
 
   getRulesServiceByInteractionId(interactionId: string): object {
     if (!interactionId) {
-      throw Error('Interaction ID must not be empty');
+      throw new Error('Interaction ID must not be empty');
     }
     const service = this.getRulesServiceByName(interactionId + 'RulesService');
     if (service === null) {
-      throw Error('Unknown interaction ID: ' + interactionId);
+      throw new Error('Unknown interaction ID: ' + interactionId);
     }
     return service;
   }

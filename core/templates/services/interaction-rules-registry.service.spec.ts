@@ -18,56 +18,56 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { NormalizeWhitespacePipe } from 
+import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 import { NormalizeWhitespacePunctuationAndCasePipe } from
   // eslint-disable-next-line max-len
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 
-import { CodeReplRulesService } from 
-  'interactions/CodeRepl/directives/code-repl-rules.service'
-import { ContinueRulesService } from 
-  'interactions/Continue/directives/continue-rules.service'
+import { CodeReplRulesService } from
+  'interactions/CodeRepl/directives/code-repl-rules.service';
+import { ContinueRulesService } from
+  'interactions/Continue/directives/continue-rules.service';
 import { DragAndDropSortInputRulesService } from
   // eslint-disable-next-line max-len
-  'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service'
+  'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { EndExplorationRulesService } from
-  'interactions/EndExploration/directives/end-exploration-rules.service'
+  'interactions/EndExploration/directives/end-exploration-rules.service';
 import { FractionInputRulesService } from
-  'interactions/FractionInput/directives/fraction-input-rules.service'
+  'interactions/FractionInput/directives/fraction-input-rules.service';
 import { GraphInputRulesService } from
-  'interactions/GraphInput/directives/graph-input-rules.service'
+  'interactions/GraphInput/directives/graph-input-rules.service';
 import { ImageClickInputRulesService } from
-  'interactions/ImageClickInput/directives/image-click-input-rules.service'
+  'interactions/ImageClickInput/directives/image-click-input-rules.service';
 import { InteractionRulesRegistryService } from
   'services/interaction-rules-registry.service';
 import { InteractionSpecsConstants } from
   'pages/interaction-specs.constants';
 import { InteractiveMapRulesService } from
-  'interactions/InteractiveMap/directives/interactive-map-rules.service'
+  'interactions/InteractiveMap/directives/interactive-map-rules.service';
 import { ItemSelectionInputRulesService } from
   // eslint-disable-next-line max-len
-  'interactions/ItemSelectionInput/directives/item-selection-input-rules.service'
+  'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { LogicProofRulesService } from
-  'interactions/LogicProof/directives/logic-proof-rules.service'
+  'interactions/LogicProof/directives/logic-proof-rules.service';
 import { MathExpressionInputRulesService } from
   // eslint-disable-next-line max-len
-  'interactions/MathExpressionInput/directives/math-expression-input-rules.service'
+  'interactions/MathExpressionInput/directives/math-expression-input-rules.service';
 import { MultipleChoiceInputRulesService } from
   // eslint-disable-next-line max-len
-  'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service'
+  'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { MusicNotesInputRulesService } from
-  'interactions/MusicNotesInput/directives/music-notes-input-rules.service'
+  'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
 import { NumberWithUnitsRulesService } from
-  'interactions/NumberWithUnits/directives/number-with-units-rules.service'
+  'interactions/NumberWithUnits/directives/number-with-units-rules.service';
 import { NumericInputRulesService } from
-  'interactions/NumericInput/directives/numeric-input-rules.service'
+  'interactions/NumericInput/directives/numeric-input-rules.service';
 import { PencilCodeEditorRulesService } from
-  'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service'
+  'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import { SetInputRulesService } from
-  'interactions/SetInput/directives/set-input-rules.service'
+  'interactions/SetInput/directives/set-input-rules.service';
 import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service'
+  'interactions/TextInput/directives/text-input-rules.service';
 
 describe('InteractionRulesRegistryService', () => {
   beforeEach(() => {
@@ -121,7 +121,6 @@ describe('InteractionRulesRegistryService', () => {
 
   it('should return a non-null service for each interaction spec', () => {
     for (const interactionId in InteractionSpecsConstants.INTERACTION_SPECS) {
-      console.log(interactionId);
       expect(this.registry.getRulesServiceByInteractionId(interactionId))
         .not.toBeNull();
     }
