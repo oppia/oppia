@@ -160,7 +160,7 @@ describe('AnswerClassificationService', () => {
 
       expect(
         () => this.acs.getMatchingClassificationResult(
-          state.name, state.interaction, 0, null)
+          state.name, state.interaction, 0, {})
       ).toThrowError(
         'No interactionRulesService was available to classify the answer.');
     });
@@ -236,7 +236,7 @@ describe('AnswerClassificationService', () => {
 
         expect(
           () => this.acs.getMatchingClassificationResult(
-            state.name, state.interaction, 0, null)
+            state.name, state.interaction, 0, {})
         ).toThrowError(
           'No interactionRulesService was available to classify the answer.');
       });
