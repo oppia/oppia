@@ -375,8 +375,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 # requested difficulty and sort them by decreasing difficulty.
                 easier_questions_query = query.filter(
                     cls.skill_difficulty < difficulty_requested)
-                easier_questions_query = easier_questions_query.order(
-                    -cls.skill_difficulty)
                 easier_question_skill_link_models = (
                     easier_questions_query.fetch())
                 for model in easier_question_skill_link_models:
@@ -402,8 +400,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                         easier_question_skill_link_models)
                     harder_questions_query = query.filter(
                         cls.skill_difficulty > difficulty_requested)
-                    harder_questions_query = harder_questions_query.order(
-                        cls.skill_difficulty)
                     harder_question_skill_link_models = (
                         harder_questions_query.fetch())
                     for model in harder_question_skill_link_models:
