@@ -31,18 +31,18 @@ angular.module('oppia').directive('welcomeGuidePage', [
           UrlInterpolationService) {
         var ctrl = this;
         ctrl.$onInit = function() {
-          ctrl.fractionImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/welcomeguide/fractions.png');
-          ctrl.fractionImgUrlWebp = UrlInterpolationService.getStaticImageUrl(
-            '/welcomeguide/fractions.webp');
-          ctrl.headerImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/welcomeguide/header.jpg');
-          ctrl.headerImgUrlWebp = UrlInterpolationService.getStaticImageUrl(
-            '/welcomeguide/header.webp');
-          ctrl.browserImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/welcomeguide/browser.png');
-          ctrl.browserImgUrlWebp = UrlInterpolationService.getStaticImageUrl(
-            '/welcomeguide/browser.webp');
+          ctrl.fractionExplorationPngImageUrl = UrlInterpolationService.getStaticImageUrl(
+            '/welcome_guide/fractions_exploration.png');
+          ctrl.fractionExplorationWebpImageUrl = UrlInterpolationService.getStaticImageUrl(
+            '/welcome_guide/fractions_exploration.webp');
+          ctrl.oppiaUsersPngImageUrl = UrlInterpolationService.getStaticImageUrl(
+            '/welcome_guide/oppia_users.png');
+          ctrl.oppiaUsersWebpImageUrl = UrlInterpolationService.getStaticImageUrl(
+            '/welcome_guide/oppia_users.webp');
+          ctrl.explorationLibraryPngImageUrl = UrlInterpolationService.getStaticImageUrl(
+            '/welcome_guide/exploration_library.png');
+          ctrl.explorationLibraryWebpImageUrl = UrlInterpolationService.getStaticImageUrl(
+            '/welcome_guide/exploration_library.webp');
         };
       }]
     };
