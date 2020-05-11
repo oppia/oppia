@@ -202,3 +202,59 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
                      [u'Topic topic_id failed validation: '
                       'Invalid language code: invalid_language_code']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+
+class RemoveDeletedUncategorizedSkillsOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    TOPIC_ID = 'topic_id'
+
+    def setUp(self):
+        super(RemoveDeletedUncategorizedSkillsOneOffJobTests, self).setUp()
+        # Setup user who will own the test topics.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def test_job_removes_deleted_uncategorized_skill_ids(self):
+        """Tests that the RemoveDeletedUncategorizedSkillsOneOffJob job removes
+        deleted uncategorized skills ids from the topic.
+        """
+        # Create a new topic that should not be affected by the
+        # job.
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, name='A name', abbreviated_name='abbrev')
+        topic.add_subtopic(1, title='A subtitle')
+        topic.add_uncategorized_skill_id('skill_1')
+        topic.add_uncategorized_skill_id('skill_2')
+        topic.add_uncategorized_skill_id('skill_3')
+        topic.move_skill_id_to_subtopic(None, 1, 'skill_3')
+        topic_services.save_new_topic(self.albert_id, topic)
+        self.assertEqual(
+            topic.subtopic_schema_version,
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
+
+        # Start migration job.
+        job_id = (
+            topic_jobs_one_off.RemoveDeletedUncategorizedSkillsOneOffJob
+            .create_new())
+        topic_jobs_one_off.RemoveDeletedUncategorizedSkillsOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        # Verify the topic is exactly the same after migration.
+        updated_topic = (
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID))
+        self.assertEqual(updated_topic.uncategorized_skill_ids, [])
+        self.assertEqual(updated_topic.subtopics[0].skill_ids, [])
+        output = (
+            topic_jobs_one_off.RemoveDeletedUncategorizedSkillsOneOffJob
+            .get_output(job_id))
+        expected = [[
+            u'Skill IDs deleted for topic topic_id:',
+            [u'[u\'skill_1\', u\'skill_2\', u\'skill_3\']']]]
+
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
