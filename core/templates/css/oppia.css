@@ -4567,6 +4567,10 @@ div.oppia-issues-learner-action {
   width: auto;
 }
 
+.oppia-welcome-guide-header {
+  height: auto;
+}
+
 @media (max-width: 768px) {
   .oppia-welcome-guide-body {
     padding: 20px 0 0 20px;
@@ -4580,7 +4584,6 @@ div.oppia-issues-learner-action {
   }
 
   .oppia-welcome-guide-header {
-    height: 460px;
     padding: 80px 20px 0 70px;
   }
 
@@ -4616,7 +4619,6 @@ div.oppia-issues-learner-action {
   }
 
   .oppia-welcome-guide-header {
-    height: 300px;
     padding: 70px 70px 0 70px;
   }
 
@@ -4649,7 +4651,6 @@ div.oppia-issues-learner-action {
   }
 
   .oppia-welcome-guide-header {
-    height: 400px;
     padding: 40px 70px 0 70px;
   }
 
@@ -4663,6 +4664,7 @@ div.oppia-issues-learner-action {
     padding: 15px 70px 0 70px;
   }
 }
+
 
 .oppia-welcome-guide-numbers {
   display: inline;
