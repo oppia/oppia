@@ -1756,8 +1756,9 @@ class CollectionRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
         rights_manager.assign_role_for_collection(
             self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
 
-        user_id_migration.AddAllUserIdsSnapshotsVerificationJob.enqueue(
-            user_id_migration.AddAllUserIdsSnapshotsVerificationJob.create_new()
+        user_id_migration.AddAllUserIdsSnapshotContentVerificationJob.enqueue(
+            user_id_migration.AddAllUserIdsSnapshotContentVerificationJob
+            .create_new()
         )
         self.process_and_flush_pending_tasks()
 
@@ -4351,8 +4352,9 @@ class ExplorationRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
         rights_manager.assign_role_for_exploration(
             self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
 
-        user_id_migration.AddAllUserIdsSnapshotsVerificationJob.enqueue(
-            user_id_migration.AddAllUserIdsSnapshotsVerificationJob.create_new()
+        user_id_migration.AddAllUserIdsSnapshotContentVerificationJob.enqueue(
+            user_id_migration.AddAllUserIdsSnapshotContentVerificationJob
+            .create_new()
         )
         self.process_and_flush_pending_tasks()
 
@@ -10490,8 +10492,9 @@ class TopicRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
         topic_services.assign_role(
             self.admin, self.manager1, topic_domain.ROLE_MANAGER, '0')
 
-        user_id_migration.AddAllUserIdsSnapshotsVerificationJob.enqueue(
-            user_id_migration.AddAllUserIdsSnapshotsVerificationJob.create_new()
+        user_id_migration.AddAllUserIdsSnapshotContentVerificationJob.enqueue(
+            user_id_migration.AddAllUserIdsSnapshotContentVerificationJob
+            .create_new()
         )
         self.process_and_flush_pending_tasks()
 

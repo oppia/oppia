@@ -82,7 +82,25 @@ def replace_gae_id(gae_id):
     Raises:
         MissingUserException: UserSettingsModel with GAE ID doesn't exist.
     """
-    return replace_gae_ids([gae_id])
+    return replace_gae_ids([gae_id])[0]
+
+
+def are_commit_cmds_role_change(commit_cmds):
+    """Check if commit_cmds are of role_change type.
+
+    Args:
+        commit_cmds: list(dict(str, str)). List of commit commands.
+
+    Returns:
+        True when there is one command and it is of role_change type.
+    """
+    role_change_cmds = (
+        rights_manager.CMD_CHANGE_ROLE,
+        topic_domain.CMD_CHANGE_ROLE,
+        topic_domain.CMD_REMOVE_MANAGER_ROLE)
+    return (
+        len(commit_cmds) == 1 and
+        commit_cmds[0]['cmd'] in role_change_cmds)
 
 
 class MissingUserException(Exception):
@@ -417,24 +435,6 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     """
 
     @staticmethod
-    def _are_commit_cmds_role_change(commit_cmds):
-        """Check if commit_cmds are of role_change type.
-
-        Args:
-            commit_cmds: list(dict(str, str)). List of commit commands.
-
-        Returns:
-            True when there is one command and it is of role_change type.
-        """
-        role_change_cmds = (
-            rights_manager.CMD_CHANGE_ROLE,
-            topic_domain.CMD_CHANGE_ROLE,
-            topic_domain.CMD_REMOVE_MANAGER_ROLE)
-        return (
-            len(commit_cmds) == 1 and
-            commit_cmds[0]['cmd'] in role_change_cmds)
-
-    @staticmethod
     def _migrate_collection(snapshot_model):
         """Migrate CollectionRightsSnapshotMetadataModel to use the new user ID
         in the commit_cmds.
@@ -443,8 +443,7 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             snapshot_model: CollectionRightsSnapshotMetadataModel. The model
                 that contains the old user IDs.
         """
-        if (SnapshotsMetadataUserIdMigrationJob
-                ._are_commit_cmds_role_change(snapshot_model.commit_cmds)):
+        if are_commit_cmds_role_change(snapshot_model.commit_cmds):
             commit_cmd = snapshot_model.commit_cmds[0]
             commit_cmd['assignee_id'] = (
                 replace_gae_id(commit_cmd['assignee_id']))
@@ -452,7 +451,7 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 collection_models.CollectionCommitLogEntryModel.get_by_id(
                     'rights-%s-%s' % (
                         snapshot_model.get_unversioned_instance_id(),
-                        snapshot_model.get_version_string)))
+                        snapshot_model.get_version_string())))
             commit_cmd = commit_log_model.commit_cmds[0]
             commit_cmd['assignee_id'] = (
                 replace_gae_id(commit_cmd['assignee_id']))
@@ -464,7 +463,6 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
             transaction_services.run_in_transaction(_put_both_models)
 
-
     @staticmethod
     def _migrate_exploration(snapshot_model):
         """Migrate ExplorationRightsSnapshotMetadataModel to use the new user ID
@@ -474,8 +472,7 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             snapshot_model: ExplorationRightsSnapshotMetadataModel. The model
                 that contains the old user IDs.
         """
-        if (SnapshotsMetadataUserIdMigrationJob
-                ._are_commit_cmds_role_change(snapshot_model.commit_cmds)):
+        if are_commit_cmds_role_change(snapshot_model.commit_cmds):
             commit_cmd = snapshot_model.commit_cmds[0]
             commit_cmd['assignee_id'] = (
                 replace_gae_id(commit_cmd['assignee_id']))
@@ -483,7 +480,7 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 exp_models.ExplorationCommitLogEntryModel.get_by_id(
                     'rights-%s-%s' % (
                         snapshot_model.get_unversioned_instance_id(),
-                        snapshot_model.get_version_string)))
+                        snapshot_model.get_version_string())))
             commit_cmd = commit_log_model.commit_cmds[0]
             commit_cmd['assignee_id'] = (
                 replace_gae_id(commit_cmd['assignee_id']))
@@ -504,8 +501,7 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             snapshot_model: TopicRightsSnapshotMetadataModel. The model
                 that contains the old user IDs.
         """
-        if (SnapshotsMetadataUserIdMigrationJob
-                ._are_commit_cmds_role_change(snapshot_model.commit_cmds)):
+        if are_commit_cmds_role_change(snapshot_model.commit_cmds):
             commit_cmd = snapshot_model.commit_cmds[0]
             if commit_cmd['cmd'] == topic_domain.CMD_CHANGE_ROLE:
                 commit_cmd['assignee_id'] = (
@@ -517,7 +513,7 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 topic_models.TopicCommitLogEntryModel.get_by_id(
                     'rights-%s-%s' % (
                         snapshot_model.get_unversioned_instance_id(),
-                        snapshot_model.get_version_string)))
+                        snapshot_model.get_version_string())))
             commit_cmd = commit_log_model.commit_cmds[0]
             if commit_cmd['cmd'] == topic_domain.CMD_CHANGE_ROLE:
                 commit_cmd['assignee_id'] = (
@@ -548,29 +544,29 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 topic_models.TopicRightsSnapshotMetadataModel]
 
     @staticmethod
-    def map(rights_snapshot_model):
+    def map(snapshot_model):
         """Implements the map function for this job."""
-        class_name = rights_snapshot_model.__class__.__name__
+        class_name = snapshot_model.__class__.__name__
         try:
             if isinstance(
-                    rights_snapshot_model,
+                    snapshot_model,
                     collection_models.CollectionRightsSnapshotMetadataModel):
                 SnapshotsMetadataUserIdMigrationJob._migrate_collection(
-                    rights_snapshot_model)
+                    snapshot_model)
             elif isinstance(
-                    rights_snapshot_model,
+                    snapshot_model,
                     exp_models.ExplorationRightsSnapshotMetadataModel):
                 SnapshotsMetadataUserIdMigrationJob._migrate_exploration(
-                    rights_snapshot_model)
+                    snapshot_model)
             elif isinstance(
-                    rights_snapshot_model,
+                    snapshot_model,
                     topic_models.TopicRightsSnapshotMetadataModel):
                 SnapshotsMetadataUserIdMigrationJob._migrate_topic(
-                    rights_snapshot_model)
+                    snapshot_model)
         except MissingUserException as e:
             yield ('FAILURE - %s' % class_name, e)
         else:
-            yield ('SUCCESS - %s' % class_name, rights_snapshot_model.id)
+            yield ('SUCCESS - %s' % class_name, snapshot_model.id)
 
     @staticmethod
     def reduce(key, ids):
@@ -720,7 +716,7 @@ class BaseModelsUserIdsHaveUserSettingsVerificationJob(
         elif (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD):
             if (BaseModelsUserIdsHaveUserSettingsVerificationJob
-                  ._check_id_and_user_id_exist(model.id, model.user_id)):
+                    ._check_id_and_user_id_exist(model.id, model.user_id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
                 yield ('FAILURE - %s' % model_class.__name__, model.id)
@@ -959,20 +955,21 @@ class AddAllUserIdsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, ids)
 
 
-class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
-    """For every snapshot of a rights model, merge the data from all the user id
-    fields together and put them in the all_user_ids field of an appropriate
-    RightsAllUsersModel.
+class AddAllUserIdsSnapshotContentVerificationJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """For every snapshot content of a rights model, merge the data from all
+    the user id fields together and put them in the all_user_ids field of
+    an appropriate RightsAllUsersModel.
     """
 
     @staticmethod
-    def _add_collection_user_ids(rights_snapshot_model, all_users_model):
+    def _add_collection_user_ids(snapshot_model, all_users_model):
         """Merge the user ids from the snapshot and put them in the parent
         collection rights model.
         """
         content_dict = (
             collection_models.CollectionRightsModel.convert_to_valid_dict(
-                rights_snapshot_model.content))
+                snapshot_model.content))
         reconstituted_rights_model = (
             collection_models.CollectionRightsModel(**content_dict))
         all_users_model.all_user_ids = list(
@@ -984,13 +981,13 @@ class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
         all_users_model.put()
 
     @staticmethod
-    def _add_exploration_user_ids(rights_snapshot_model, all_users_model):
+    def _add_exploration_user_ids(snapshot_model, all_users_model):
         """Merge the user ids from the snapshot and put them in the parent
         exploration rights model.
         """
         content_dict = (
             exp_models.ExplorationRightsModel.convert_to_valid_dict(
-                rights_snapshot_model.content))
+                snapshot_model.content))
         reconstituted_rights_model = (
             exp_models.ExplorationRightsModel(**content_dict))
         all_users_model.all_user_ids = list(
@@ -1002,12 +999,12 @@ class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
         all_users_model.put()
 
     @staticmethod
-    def _add_topic_user_ids(rights_snapshot_model, all_users_model):
+    def _add_topic_user_ids(snapshot_model, all_users_model):
         """Merge the user ids from the snapshot and put them in the parent
         topic rights model.
         """
         reconstituted_rights_model = topic_models.TopicRightsModel(
-            **rights_snapshot_model.content)
+            **snapshot_model.content)
         all_users_model.all_user_ids = list(
             set(all_users_model.all_user_ids) |
             set(reconstituted_rights_model.manager_ids))
@@ -1017,7 +1014,7 @@ class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     def enqueue(cls, job_id, additional_job_params=None):
         # We can raise the number of shards for this job, since it goes only
         # over three types of entity class.
-        super(AddAllUserIdsSnapshotsVerificationJob, cls).enqueue(
+        super(AddAllUserIdsSnapshotContentVerificationJob, cls).enqueue(
             job_id, shard_count=32)
 
     @classmethod
@@ -1043,8 +1040,8 @@ class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
                     collection_models.CollectionRightsAllUsersModel(
                         id=rights_model_id,
                         all_user_ids=[]))
-            AddAllUserIdsSnapshotsVerificationJob._add_collection_user_ids(
-                rights_snapshot_model, all_users_model)
+            (AddAllUserIdsSnapshotContentVerificationJob
+             ._add_collection_user_ids(rights_snapshot_model, all_users_model))
         elif isinstance(
                 rights_snapshot_model,
                 exp_models.ExplorationRightsSnapshotContentModel):
@@ -1055,8 +1052,8 @@ class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
                 all_users_model = exp_models.ExplorationRightsAllUsersModel(
                     id=rights_model_id,
                     all_user_ids=[])
-            AddAllUserIdsSnapshotsVerificationJob._add_exploration_user_ids(
-                rights_snapshot_model, all_users_model)
+            (AddAllUserIdsSnapshotContentVerificationJob
+             ._add_exploration_user_ids(rights_snapshot_model, all_users_model))
         elif isinstance(
                 rights_snapshot_model,
                 topic_models.TopicRightsSnapshotContentModel):
@@ -1066,9 +1063,105 @@ class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
                 all_users_model = topic_models.TopicRightsAllUsersModel(
                     id=rights_model_id,
                     all_user_ids=[])
-            AddAllUserIdsSnapshotsVerificationJob._add_topic_user_ids(
+            AddAllUserIdsSnapshotContentVerificationJob._add_topic_user_ids(
                 rights_snapshot_model, all_users_model)
         yield ('SUCCESS-%s' % class_name, rights_snapshot_model.id)
+
+    @staticmethod
+    def reduce(key, ids):
+        """Implements the reduce function for this job."""
+        yield (key, len(ids))
+
+
+class AddAllUserIdsSnapshotMetadataVerificationJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """For every snapshot metadata of a rights model, merge the data from all
+    the user id fields in commit_cmds together and put them in the all_user_ids
+    field of an appropriate RightsAllUsersModel.
+    """
+
+    @staticmethod
+    def _add_col_and_exp_user_ids(snapshot_model, all_users_model):
+        """Merge the user ids from the snapshot and put them in the parent
+        collection rights model.
+        """
+        if are_commit_cmds_role_change(snapshot_model.commit_cmds):
+            all_users_model.all_user_ids.add(
+                snapshot_model.commit_cmds[0]['assignee_id'])
+            all_users_model.put()
+
+    @staticmethod
+    def _add_topic_user_ids(snapshot_model, all_users_model):
+        """Merge the user ids from the snapshot and put them in the parent
+        topic rights model.
+        """
+        commit_cmds = snapshot_model.commit_cmds
+        if are_commit_cmds_role_change(commit_cmds):
+            if commit_cmds[0]['cmd'] == topic_domain.CMD_CHANGE_ROLE:
+                all_users_model.all_user_ids.add(
+                    snapshot_model.commit_cmds[0]['assignee_id'])
+                all_users_model.put()
+            elif commit_cmds[0]['cmd'] == topic_domain.CMD_REMOVE_MANAGER_ROLE:
+                all_users_model.all_user_ids.add(
+                    snapshot_model.commit_cmds[0]['removed_user_id'])
+                all_users_model.put()
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over three types of entity class.
+        super(AddAllUserIdsSnapshotMetadataVerificationJob, cls).enqueue(
+            job_id, shard_count=32)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [collection_models.CollectionRightsSnapshotMetadataModel,
+                exp_models.ExplorationRightsSnapshotMetadataModel,
+                topic_models.TopicRightsSnapshotMetadataModel]
+
+    @staticmethod
+    def map(snapshot_model):
+        """Implements the map function for this job."""
+        class_name = snapshot_model.__class__.__name__
+        rights_model_id = snapshot_model.get_unversioned_instance_id()
+        if isinstance(
+                snapshot_model,
+                collection_models.CollectionRightsSnapshotMetadataModel):
+            all_users_model = (
+                collection_models.CollectionRightsAllUsersModel.get_by_id(
+                    rights_model_id))
+            if all_users_model is None:
+                all_users_model = (
+                    collection_models.CollectionRightsAllUsersModel(
+                        id=rights_model_id,
+                        all_user_ids=[]))
+            (AddAllUserIdsSnapshotMetadataVerificationJob
+             ._add_col_and_exp_user_ids(snapshot_model, all_users_model))
+        elif isinstance(
+                snapshot_model,
+                exp_models.ExplorationRightsSnapshotMetadataModel):
+            all_users_model = (
+                exp_models.ExplorationRightsAllUsersModel.get_by_id(
+                    rights_model_id))
+            if all_users_model is None:
+                all_users_model = exp_models.ExplorationRightsAllUsersModel(
+                    id=rights_model_id,
+                    all_user_ids=[])
+            (AddAllUserIdsSnapshotMetadataVerificationJob
+             ._add_col_and_exp_user_ids(snapshot_model, all_users_model))
+        elif isinstance(
+                snapshot_model,
+                topic_models.TopicRightsSnapshotMetadataModel):
+            all_users_model = topic_models.TopicRightsAllUsersModel.get_by_id(
+                rights_model_id)
+            if all_users_model is None:
+                all_users_model = topic_models.TopicRightsAllUsersModel(
+                    id=rights_model_id,
+                    all_user_ids=[])
+            AddAllUserIdsSnapshotMetadataVerificationJob._add_topic_user_ids(
+                snapshot_model, all_users_model)
+        yield ('SUCCESS-%s' % class_name, snapshot_model.id)
 
     @staticmethod
     def reduce(key, ids):

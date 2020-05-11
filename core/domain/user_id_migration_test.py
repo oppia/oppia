@@ -23,6 +23,7 @@ import ast
 
 from constants import constants
 from core.domain import rights_manager
+from core.domain import topic_domain
 from core.domain import user_id_migration
 from core.platform import models
 from core.tests import test_utils
@@ -39,6 +40,105 @@ import feconf
          models.NAMES.topic, models.NAMES.user])
 taskqueue_services = models.Registry.import_taskqueue_services()
 search_services = models.Registry.import_search_services()
+
+
+class HelperFunctionsTests(test_utils.GenericTestBase):
+    """Tests for UserIdMigrationJobTests."""
+    USER_1_USER_ID = 'uid_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    USER_1_GAE_ID = 'gae_id_1'
+    USER_2_USER_ID = 'uid_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
+    USER_2_GAE_ID = 'gae_id_2'
+    USER_3_USER_ID = 'uid_cccccccccccccccccccccccccccccccc'
+    USER_3_GAE_ID = 'gae_id_3'
+
+    def setUp(self):
+        super(HelperFunctionsTests, self).setUp()
+
+        user_models.UserSettingsModel(
+            id=self.USER_1_USER_ID,
+            gae_id=self.USER_1_GAE_ID,
+            email='some@email.com'
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_2_USER_ID,
+            gae_id=self.USER_2_GAE_ID,
+            email='some.different@email.com'
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_3_USER_ID,
+            gae_id=self.USER_3_GAE_ID,
+            email='some.different@email.cz'
+        ).put()
+
+    def test_replace_gae_ids(self):
+        self.assertEqual(
+            user_id_migration.replace_gae_ids(
+                [self.USER_1_GAE_ID, self.USER_2_GAE_ID, self.USER_3_GAE_ID]),
+            [self.USER_1_USER_ID, self.USER_2_USER_ID, self.USER_3_USER_ID]
+        )
+        with self.assertRaises(user_id_migration.MissingUserException):
+            user_id_migration.replace_gae_ids(
+                [self.USER_1_GAE_ID, 'nonexistent_gae_id'])
+
+        self.assertEqual(
+            user_id_migration.replace_gae_ids(
+                [self.USER_1_GAE_ID, feconf.SYSTEM_COMMITTER_ID]),
+            [self.USER_1_USER_ID, feconf.SYSTEM_COMMITTER_ID]
+        )
+
+    def test_replace_gae_id(self):
+        self.assertEqual(
+            user_id_migration.replace_gae_id(self.USER_1_GAE_ID),
+            self.USER_1_USER_ID
+        )
+        with self.assertRaises(user_id_migration.MissingUserException):
+            user_id_migration.replace_gae_id('nonexistent_gae_id')
+
+        self.assertEqual(
+            user_id_migration.replace_gae_id(feconf.SYSTEM_COMMITTER_ID),
+            feconf.SYSTEM_COMMITTER_ID
+        )
+
+    def test_are_commit_cmds_role_change(self):
+        self.assertTrue(
+            user_id_migration.are_commit_cmds_role_change([{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR
+            }])
+        )
+        self.assertTrue(
+            user_id_migration.are_commit_cmds_role_change([{
+                'cmd': topic_domain.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR
+            }])
+        )
+        self.assertTrue(
+            user_id_migration.are_commit_cmds_role_change([{
+                'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
+                'removed_user_id': self.USER_1_GAE_ID
+            }])
+        )
+        self.assertFalse(
+            user_id_migration.are_commit_cmds_role_change([
+                {
+                    'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
+                    'removed_user_id': self.USER_1_GAE_ID
+                },
+                {
+                    'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
+                    'removed_user_id': self.USER_1_GAE_ID
+                }
+            ])
+        )
+        self.assertFalse(
+            user_id_migration.are_commit_cmds_role_change([{
+                'cmd': topic_domain.CMD_PUBLISH_TOPIC
+            }])
+        )
 
 
 class CreateNewUsersMigrationJobTests(test_utils.GenericTestBase):
@@ -923,7 +1023,7 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
                 'instance_2_id').committer_id, self.USER_A_ID)
 
 
-class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
+class SnapshotsContentUserIdMigrationJobTests(test_utils.GenericTestBase):
     """Tests for SnapshotsUserIdMigrationJobTests."""
     SNAPSHOT_ID = '2'
     USER_1_USER_ID = 'user_id_1'
@@ -957,7 +1057,7 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
 
         # We don't want to signup the superadmin user.
         with self.swap(test_utils.TestBase, 'signup_superadmin_user', empty):
-            super(SnapshotsUserIdMigrationJobTests, self).setUp()
+            super(SnapshotsContentUserIdMigrationJobTests, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_1_USER_ID,
             gae_id=self.USER_1_GAE_ID,
@@ -1253,6 +1353,308 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
             output)
 
 
+class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
+    """Tests for SnapshotsUserIdMigrationJobTests."""
+    USER_1_USER_ID = 'user_id_1'
+    USER_1_GAE_ID = 'gae_id_1'
+    WRONG_GAE_ID = 'wrong_id'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_id_migration.SnapshotsMetadataUserIdMigrationJob.create_new())
+        user_id_migration.SnapshotsMetadataUserIdMigrationJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            user_id_migration.SnapshotsMetadataUserIdMigrationJob.get_output(
+                job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def setUp(self):
+        def empty(*_):
+            """Function that takes any number of arguments and does nothing."""
+            pass
+
+        # We don't want to signup the superadmin user.
+        with self.swap(test_utils.TestBase, 'signup_superadmin_user', empty):
+            super(SnapshotsMetadataUserIdMigrationJobTests, self).setUp()
+        user_models.UserSettingsModel(
+            id=self.USER_1_USER_ID,
+            gae_id=self.USER_1_GAE_ID,
+            email='some@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+
+    def test_migrate_collection_rights_snapshot_model(self):
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='col_1_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}]
+        ).put()
+        collection_models.CollectionCommitLogEntryModel(
+            id='rights-col_1_id-1',
+            user_id=self.USER_1_GAE_ID,
+            username='user',
+            collection_id='col_1_id',
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}],
+            version=1,
+            post_commit_status='public'
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['SUCCESS - CollectionRightsSnapshotMetadataModel', 1]])
+
+        rights_snapshot_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+                'col_1_id-1'))
+        self.assertEqual(
+            rights_snapshot_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+
+        rights_commit_model = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id(
+                'rights-col_1_id-1'))
+        self.assertEqual(
+            rights_commit_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+
+    def test_migrate_collection_rights_snapshot_model_admin_id(self):
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='col_1_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': feconf.SYSTEM_COMMITTER_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}]
+        ).put()
+        collection_models.CollectionCommitLogEntryModel(
+            id='rights-col_1_id-1',
+            user_id=self.USER_1_GAE_ID,
+            username='user',
+            collection_id='col_1_id',
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': feconf.SYSTEM_COMMITTER_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}],
+            version=1,
+            post_commit_status='public'
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['SUCCESS - CollectionRightsSnapshotMetadataModel', 1]])
+
+        rights_snapshot_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+                'col_1_id-1'))
+        self.assertEqual(
+            rights_snapshot_model.commit_cmds[0]['assignee_id'],
+            feconf.SYSTEM_COMMITTER_ID)
+
+        rights_commit_model = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id(
+                'rights-col_1_id-1'))
+        self.assertEqual(
+            rights_commit_model.commit_cmds[0]['assignee_id'],
+            feconf.SYSTEM_COMMITTER_ID)
+
+    def test_migrate_collection_rights_snapshot_model_bot_id(self):
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='col_1_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': feconf.MIGRATION_BOT_USER_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}]
+        ).put()
+        collection_models.CollectionCommitLogEntryModel(
+            id='rights-col_1_id-1',
+            user_id=self.USER_1_GAE_ID,
+            username='user',
+            collection_id='col_1_id',
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': feconf.MIGRATION_BOT_USER_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}],
+            version=1,
+            post_commit_status='public'
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['SUCCESS - CollectionRightsSnapshotMetadataModel', 1]])
+
+        rights_snapshot_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+                'col_1_id-1'))
+        self.assertEqual(
+            rights_snapshot_model.commit_cmds[0]['assignee_id'],
+            feconf.MIGRATION_BOT_USER_ID)
+
+        rights_commit_model = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id(
+                'rights-col_1_id-1'))
+        self.assertEqual(
+            rights_commit_model.commit_cmds[0]['assignee_id'],
+            feconf.MIGRATION_BOT_USER_ID)
+
+    def test_migrate_collection_rights_snapshot_model_wrong_id(self):
+        collection_models.CollectionRightsSnapshotMetadataModel(
+            id='col_1_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.WRONG_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}]
+        ).put()
+        collection_models.CollectionCommitLogEntryModel(
+            id='rights-col_1_id-1',
+            user_id=self.USER_1_GAE_ID,
+            username='user',
+            collection_id='col_1_id',
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.WRONG_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}],
+            version=1,
+            post_commit_status='public'
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [['FAILURE - CollectionRightsSnapshotMetadataModel',
+              [self.WRONG_GAE_ID]]])
+
+    def test_migrate_exploration_rights_snapshot_model(self):
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='exp_1_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}]
+        ).put()
+        exp_models.ExplorationCommitLogEntryModel(
+            id='rights-exp_1_id-1',
+            user_id=self.USER_1_GAE_ID,
+            username='user',
+            exploration_id='exp_1_id',
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}],
+            version=1,
+            post_commit_status='public'
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['SUCCESS - ExplorationRightsSnapshotMetadataModel', 1]])
+
+        rights_snapshot_model = (
+            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
+                'exp_1_id-1'))
+        self.assertEqual(
+            rights_snapshot_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+
+        rights_commit_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'rights-exp_1_id-1'))
+        self.assertEqual(
+            rights_commit_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+
+    def test_migrate_topic_rights_snapshot_model(self):
+        topic_models.TopicRightsSnapshotMetadataModel(
+            id='top_1_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': topic_domain.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}]
+        ).put()
+        topic_models.TopicCommitLogEntryModel(
+            id='rights-top_1_id-1',
+            user_id=self.USER_1_GAE_ID,
+            username='user',
+            topic_id='top_1_id',
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': topic_domain.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_1_GAE_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR}],
+            version=1,
+            post_commit_status='public'
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['SUCCESS - TopicRightsSnapshotMetadataModel', 1]])
+
+        rights_snapshot_model = (
+            topic_models.TopicRightsSnapshotMetadataModel.get_by_id(
+                'top_1_id-1'))
+        self.assertEqual(
+            rights_snapshot_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+
+        rights_commit_model = (
+            topic_models.TopicCommitLogEntryModel.get_by_id(
+                'rights-top_1_id-1'))
+        self.assertEqual(
+            rights_commit_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+
+
 class GaeIdNotInModelsVerificationJobTests(test_utils.GenericTestBase):
     """Tests for GaeIdNotInModelsVerificationJob."""
     USER_1_USER_ID = 'uid_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
@@ -1512,7 +1914,6 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             ['FAILURE - TopicRightsModel', ['topic_1_id']],
             ['SUCCESS - TopicRightsModel', 1],
         ], output)
-
 
 
 class ModelsUserIdsHaveUserSettingsExplorationsVerificationJobTests(
@@ -1947,7 +2348,8 @@ class AddAllUserIdsVerificationJobTests(test_utils.GenericTestBase):
             .all_user_ids)
 
 
-class AddAllUserIdsSnapshotsVerificationJobTests(test_utils.GenericTestBase):
+class AddAllUserIdsSnapshotContentVerificationJobTests(
+        test_utils.GenericTestBase):
 
     COL_1_ID = 'col_1_id'
     EXP_1_ID = 'exp_1_id'
@@ -1961,16 +2363,17 @@ class AddAllUserIdsSnapshotsVerificationJobTests(test_utils.GenericTestBase):
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
-            user_id_migration.AddAllUserIdsSnapshotsVerificationJob
+            user_id_migration.AddAllUserIdsSnapshotContentVerificationJob
             .create_new())
-        user_id_migration.AddAllUserIdsSnapshotsVerificationJob.enqueue(job_id)
+        (user_id_migration.AddAllUserIdsSnapshotContentVerificationJob
+         .enqueue(job_id))
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         stringified_output = (
-            user_id_migration.AddAllUserIdsSnapshotsVerificationJob.get_output(
-                job_id))
+            user_id_migration.AddAllUserIdsSnapshotContentVerificationJob
+            .get_output(job_id))
         eval_output = [ast.literal_eval(stringified_item) for
                        stringified_item in stringified_output]
         return [
