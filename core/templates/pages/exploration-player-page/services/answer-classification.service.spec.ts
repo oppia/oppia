@@ -42,7 +42,6 @@ describe('AnswerClassificationService', () => {
     TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
 
     this.as = TestBed.get(AppService);
-    this.epc = TestBed.get(ExplorationPlayerConstants);
     this.iss = TestBed.get(InteractionSpecsService);
     this.acrof = TestBed.get(AnswerClassificationResultObjectFactory);
     this.acs = TestBed.get(AnswerClassificationService);
@@ -174,7 +173,7 @@ describe('AnswerClassificationService', () => {
         ).toEqual(
           this.acrof.createNew(
             this.oof.createNew('outcome 1', 'feedback_1', '', []), 0, 0,
-            this.epc.EXPLICIT_CLASSIFICATION));
+            ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
 
         expect(
           this.acs.getMatchingClassificationResult(
@@ -182,7 +181,7 @@ describe('AnswerClassificationService', () => {
         ).toEqual(
           this.acrof.createNew(
             this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 0,
-            this.epc.EXPLICIT_CLASSIFICATION));
+            ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
 
         expect(
           this.acs.getMatchingClassificationResult(
@@ -190,7 +189,7 @@ describe('AnswerClassificationService', () => {
         ).toEqual(
           this.acrof.createNew(
             this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 1,
-            this.epc.EXPLICIT_CLASSIFICATION));
+            ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
       });
 
     it('should return the default rule if no answer group matches', () => {
@@ -200,7 +199,7 @@ describe('AnswerClassificationService', () => {
       ).toEqual(
         this.acrof.createNew(
           this.oof.createNew('default', 'default_outcome', '', []), 2, 0,
-          this.epc.DEFAULT_OUTCOME_CLASSIFICATION));
+          ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
     });
 
     it(
@@ -354,7 +353,7 @@ describe('AnswerClassificationService', () => {
         ).toEqual(
           this.acrof.createNew(
             this.state.interaction.answerGroups[1].outcome, 1, null,
-            this.epc.STATISTICAL_CLASSIFICATION));
+            ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION));
       });
 
     it(
@@ -371,7 +370,7 @@ describe('AnswerClassificationService', () => {
         ).toEqual(
           this.acrof.createNew(
             this.oof.createNew('default', 'default_outcome', '', []), 2, 0,
-            this.epc.DEFAULT_OUTCOME_CLASSIFICATION));
+            ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
       });
   });
 
@@ -473,7 +472,7 @@ describe('AnswerClassificationService', () => {
         ).toEqual(
           this.acrof.createNew(
             this.state.interaction.answerGroups[0].outcome, 0, null,
-            this.epc.TRAINING_DATA_CLASSIFICATION));
+            ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
 
         expect(
           this.acs.getMatchingClassificationResult(
@@ -481,7 +480,7 @@ describe('AnswerClassificationService', () => {
         ).toEqual(
           this.acrof.createNew(
             this.state.interaction.answerGroups[1].outcome, 1, null,
-            this.epc.TRAINING_DATA_CLASSIFICATION));
+            ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
       });
 
     it(
@@ -494,7 +493,7 @@ describe('AnswerClassificationService', () => {
         ).toEqual(
           this.acrof.createNew(
             this.state.interaction.answerGroups[1].outcome, 1, 0,
-            this.epc.EXPLICIT_CLASSIFICATION));
+            ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
       });
   });
 });
