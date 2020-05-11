@@ -2044,6 +2044,24 @@ module.exports = {"_from":"@octokit/rest@^16.43.1","_id":"@octokit/rest@16.43.1"
 /***/ 258:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Handles dispatching events and actions to different handlers.
+ */
+
 const core = __webpack_require__(470);
 const issueLabelsModule = __webpack_require__(682);
 
@@ -4192,6 +4210,24 @@ isStream.transform = function (stream) {
 
 /***/ 334:
 /***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
+
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Entry point of oppiabot github actions.
+ */
 
 const core = __webpack_require__(470);
 const {context} = __webpack_require__(469);
@@ -8636,6 +8672,24 @@ module.exports = function btoa(str) {
 
 /***/ 682:
 /***/ (function(module, __unusedexports, __webpack_require__) {
+
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Handles issues getting labeled.
+ */
 
 const core = __webpack_require__(470);
 const { context, GitHub } = __webpack_require__(469);
