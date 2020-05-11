@@ -41,9 +41,9 @@ describe('AnswerClassificationService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
 
-    this.ac = angular.copy(AppConstants);
-    this.epc = angular.copy(ExplorationPlayerConstants);
-    this.isc = angular.copy(InteractionSpecsConstants);
+    this.ac = AppConstants;
+    this.epc = ExplorationPlayerConstants;
+    this.isc = InteractionSpecsConstants;
 
     this.acrof = TestBed.get(AnswerClassificationResultObjectFactory);
     this.acs = TestBed.get(AnswerClassificationService);
