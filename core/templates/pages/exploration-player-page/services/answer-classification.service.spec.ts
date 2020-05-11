@@ -157,11 +157,11 @@ describe('AnswerClassificationService', () => {
     });
 
     it('should fail if no frontend rules are provided', () => {
-      this.state = this.createStateFromBackendDict();
+      const state = this.createStateFromBackendDict();
 
       expect(
         () => this.acs.getMatchingClassificationResult(
-          this.state.name, this.state.interaction, 0, null)
+          state.name, state.interaction, 0, null)
       ).toThrowError(
         'No interactionRulesService was available to classify the answer.');
     });
@@ -170,11 +170,11 @@ describe('AnswerClassificationService', () => {
       'should return the first matching answer group and first matching rule ' +
         'spec',
       () => {
-        this.state = this.createStateFromBackendDict();
+        const state = this.createStateFromBackendDict();
 
         expect(
           this.acs.getMatchingClassificationResult(
-            this.state.name, this.state.interaction, 10, this.rules)
+            state.name, state.interaction, 10, this.rules)
         ).toEqual(
           this.acrof.createNew(
             this.oof.createNew('outcome 1', 'feedback_1', '', []), 0, 0,
@@ -182,7 +182,7 @@ describe('AnswerClassificationService', () => {
 
         expect(
           this.acs.getMatchingClassificationResult(
-            this.state.name, this.state.interaction, 5, this.rules)
+            state.name, state.interaction, 5, this.rules)
         ).toEqual(
           this.acrof.createNew(
             this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 0,
@@ -190,7 +190,7 @@ describe('AnswerClassificationService', () => {
 
         expect(
           this.acs.getMatchingClassificationResult(
-            this.state.name, this.state.interaction, 6, this.rules)
+            state.name, state.interaction, 6, this.rules)
         ).toEqual(
           this.acrof.createNew(
             this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 1,
@@ -198,11 +198,11 @@ describe('AnswerClassificationService', () => {
       });
 
     it('should return the default rule if no answer group matches', () => {
-        this.state = this.createStateFromBackendDict();
+      const state = this.createStateFromBackendDict();
 
       expect(
         this.acs.getMatchingClassificationResult(
-          this.state.name, this.state.interaction, 7, this.rules)
+          state.name, state.interaction, 7, this.rules)
       ).toEqual(
         this.acrof.createNew(
           this.oof.createNew('default', 'default_outcome', '', []), 2, 0,
@@ -232,11 +232,12 @@ describe('AnswerClassificationService', () => {
             rule_type: 'Equals'
           }]
         }];
-        this.state = this.createStateFromBackendDict();
+
+        const state = this.createStateFromBackendDict();
 
         expect(
           () => this.acs.getMatchingClassificationResult(
-            this.state.name, this.state.interaction, 0, null)
+            state.name, state.interaction, 0, null)
         ).toThrowError(
           'No interactionRulesService was available to classify the answer.');
       });
@@ -345,14 +346,15 @@ describe('AnswerClassificationService', () => {
         'interaction is trainable',
       () => {
         spyOn(this.iss, 'isInteractionTrainable').and.returnValue(true);
-        this.state = this.createStateFromBackendDict();
+
+        const state = this.createStateFromBackendDict();
 
         expect(
           this.acs.getMatchingClassificationResult(
-            this.state.name, this.state.interaction, 0, this.rules)
+            state.name, state.interaction, 0, this.rules)
         ).toEqual(
           this.acrof.createNew(
-            this.state.interaction.answerGroups[1].outcome, 1, null,
+            state.interaction.answerGroups[1].outcome, 1, null,
             ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION));
       });
 
@@ -361,11 +363,12 @@ describe('AnswerClassificationService', () => {
         'interaction is not trainable',
       () => {
         spyOn(this.iss, 'isInteractionTrainable').and.returnValue(false);
-        this.state = this.createStateFromBackendDict();
+
+        const state = this.createStateFromBackendDict();
 
         expect(
           this.acs.getMatchingClassificationResult(
-            this.state.name, this.state.interaction, 0, this.rules)
+            state.name, state.interaction, 0, this.rules)
         ).toEqual(
           this.acrof.createNew(
             this.oof.createNew('default', 'default_outcome', '', []), 2, 0,
@@ -463,22 +466,22 @@ describe('AnswerClassificationService', () => {
       'should use training data classification if no answer group matches ' +
         'and interaction is trainable',
       () => {
-        this.state = this.createStateFromBackendDict();
+        const state = this.createStateFromBackendDict();
 
         expect(
           this.acs.getMatchingClassificationResult(
-            this.state.name, this.state.interaction, 'abc', this.rules)
+            state.name, state.interaction, 'abc', this.rules)
         ).toEqual(
           this.acrof.createNew(
-            this.state.interaction.answerGroups[0].outcome, 0, null,
+            state.interaction.answerGroups[0].outcome, 0, null,
             ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
 
         expect(
           this.acs.getMatchingClassificationResult(
-            this.state.name, this.state.interaction, 'xyz', this.rules)
+            state.name, state.interaction, 'xyz', this.rules)
         ).toEqual(
           this.acrof.createNew(
-            this.state.interaction.answerGroups[1].outcome, 1, null,
+            state.interaction.answerGroups[1].outcome, 1, null,
             ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
       });
 
@@ -486,14 +489,14 @@ describe('AnswerClassificationService', () => {
       'should perform explicit classification before doing training data ' +
         'classification',
       () => {
-        this.state = this.createStateFromBackendDict();
+        const state = this.createStateFromBackendDict();
 
         expect(
           this.acs.getMatchingClassificationResult(
-            this.state.name, this.state.interaction, 'input', this.rules)
+            state.name, state.interaction, 'input', this.rules)
         ).toEqual(
           this.acrof.createNew(
-            this.state.interaction.answerGroups[1].outcome, 1, 0,
+            state.interaction.answerGroups[1].outcome, 1, 0,
             ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
       });
   });
