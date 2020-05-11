@@ -478,7 +478,7 @@ describe('AnswerClassificationService', () => {
       };
       this.state = this.sof.createFromBackendDict(
         this.stateName, this.stateDict);
-		});
+    });
 
     it(
       'should use training data classification if no answer group matches ' +

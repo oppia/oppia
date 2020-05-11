@@ -26,17 +26,17 @@ import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
 import { AlertsService } from 'services/alerts.service';
 import {
-	AnswerClassificationResult, AnswerClassificationResultObjectFactory
+  AnswerClassificationResult, AnswerClassificationResultObjectFactory
 } from 'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { PredictionAlgorithmRegistryService }
   // eslint-disable-next-line max-len
-	from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
+  from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { State } from 'domain/state/StateObjectFactory'
 import { StateClassifierMappingService } from
-	'pages/exploration-player-page/services/state-classifier-mapping.service';
+  'pages/exploration-player-page/services/state-classifier-mapping.service';
 
 type IRulesService = {[name: string]: (answer, inputs) => boolean};
 
@@ -54,11 +54,11 @@ export class AnswerClassificationService {
    * Finds the first answer group with a rule that returns true.
    *
    * @param answer - The answer that the user has submitted.
-	 * @param answerGroups - The answer groups of the interaction. Each answer
-	 * 		group contains rule_specs, which is a list of rules.
+   * @param answerGroups - The answer groups of the interaction. Each answer
+   *     group contains rule_specs, which is a list of rules.
    * @param defaultOutcome - The default outcome of the interaction.
-	 * @param interactionRulesService The service which contains the explicit
-	 * 		rules of that interaction.
+   * @param interactionRulesService The service which contains the explicit
+   *     rules of that interaction.
    *
    * @return AnswerClassificationResult domain object.
    */
@@ -94,15 +94,15 @@ export class AnswerClassificationService {
    * Classifies the answer according to the answer groups. and returns the
    * corresponding answer classification result.
    *
-	 * @param stateName - The name of the state where the user submitted the
-	 * 		answer.
-	 * @param interactionInOldState - The interaction present in the state where
-	 * 		the user submitted the answer.
+   * @param stateName - The name of the state where the user submitted the
+   *     answer.
+   * @param interactionInOldState - The interaction present in the state where
+   *     the user submitted the answer.
    * @param answer - The answer that the user has submitted.
-	 * @param interactionRulesService - The service which contains the explicit
-	 * 		rules of that interaction.
+   * @param interactionRulesService - The service which contains the explicit
+   *     rules of that interaction.
    *
-	 * @return The resulting AnswerClassificationResult domain object.
+   * @return The resulting AnswerClassificationResult domain object.
    */
   getMatchingClassificationResult(
       stateName: string, interactionInOldState: Interaction, answer: object,
