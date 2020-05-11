@@ -37,8 +37,6 @@ import { State } from 'domain/state/StateObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 
-type IRulesService = {[name: string]: (answer, inputs) => boolean};
-
 @Injectable({providedIn: 'root'})
 export class AnswerClassificationService {
   constructor(
@@ -65,7 +63,7 @@ export class AnswerClassificationService {
    */
   private classifyAnswer(
       answer, answerGroups: AnswerGroup[], defaultOutcome: Outcome,
-      interactionRulesService: IRulesService): AnswerClassificationResult {
+      interactionRulesService): AnswerClassificationResult {
     // Find the first group that contains a rule which returns true
     // TODO(bhenning): Implement training data classification.
     for (var i = 0; i < answerGroups.length; i++) {
@@ -107,7 +105,7 @@ export class AnswerClassificationService {
    */
   getMatchingClassificationResult(
       stateName: string, interactionInOldState: Interaction, answer: object,
-      interactionRulesService: IRulesService): AnswerClassificationResult {
+      interactionRulesService): AnswerClassificationResult {
     var answerClassificationResult = null;
 
     var answerGroups = interactionInOldState.answerGroups;
@@ -175,7 +173,7 @@ export class AnswerClassificationService {
 
   isClassifiedExplicitlyOrGoesToNewState(
       stateName: string, state: State, answer: object,
-      interactionRulesService: IRulesService): boolean {
+      interactionRulesService): boolean {
     var result = this.getMatchingClassificationResult(
       stateName, state.interaction, answer, interactionRulesService);
     return (
