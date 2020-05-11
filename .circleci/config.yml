@@ -24,7 +24,7 @@ workflows:
             - setup
       - third_party_lint_tests:
           requires:
-            -setup
+            - setup
       # - frontend_tests:
       #     requires:
       #       - setup
