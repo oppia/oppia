@@ -23,7 +23,10 @@ describe('Splash Page', function() {
   var $timeout = null;
   var $q = null;
   var UserService = null;
+  var LoaderService = null;
+  var loadingMessage = null;
   var SiteAnalyticsService = null;
+  var subscriptions = [];
   var windowRefMock = {
     nativeWindow: {
       location: ''
@@ -38,8 +41,12 @@ describe('Splash Page', function() {
     $timeout = $injector.get('$timeout');
     $q = $injector.get('$q');
     UserService = $injector.get('UserService');
+    LoaderService = $injector.get('LoaderService');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
-
+    subscriptions.push(LoaderService.getLoadingMessageSubject().subscribe(
+      (message: string) => loadingMessage = message
+    ));
+    loadingMessage = '';
     var $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     var directive = $injector.get('splashPageDirective')[0];
@@ -47,6 +54,12 @@ describe('Splash Page', function() {
       $rootScope: $scope
     });
   }));
+
+  afterEach(function() {
+    for (let subscription of subscriptions) {
+      subscription.unsubscribe();
+    }
+  });
 
   it('should get static image url', function() {
     expect(ctrl.getStaticImageUrl('/path/to/image')).toBe(
@@ -104,11 +117,11 @@ describe('Splash Page', function() {
 
     ctrl.$onInit();
     expect(ctrl.userIsLoggedIn).toBe(null);
-    expect($scope.loadingMessage).toBe('Loading');
+    expect(loadingMessage).toBe('Loading');
 
     $scope.$digest();
     expect(ctrl.userIsLoggedIn).toBe(true);
-    expect($scope.loadingMessage).toBe('');
+    expect(loadingMessage).toBe('');
   });
 
   it('should evaluate if user is not logged in', function() {
@@ -124,10 +137,10 @@ describe('Splash Page', function() {
 
     ctrl.$onInit();
     expect(ctrl.userIsLoggedIn).toBe(null);
-    expect($scope.loadingMessage).toBe('Loading');
+    expect(loadingMessage).toBe('Loading');
 
     $scope.$digest();
     expect(ctrl.userIsLoggedIn).toBe(false);
-    expect($scope.loadingMessage).toBe('');
+    expect(loadingMessage).toBe('');
   });
 });

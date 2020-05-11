@@ -39,6 +39,7 @@ angular.module('oppia').directive('storyNodeEditor', [
       scope: {
         getId: '&nodeId',
         getOutline: '&outline',
+        getDescription: '&description',
         getExplorationId: '&explorationId',
         getThumbnailFilename: '&thumbnailFilename',
         getThumbnailBgColor: '&thumbnailBgColor',
@@ -54,15 +55,17 @@ angular.module('oppia').directive('storyNodeEditor', [
         'StoryEditorStateService', 'ExplorationIdValidationService',
         'StoryUpdateService', 'UndoRedoService', 'EVENT_STORY_INITIALIZED',
         'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_STORY_NODE_EDITOR',
-        'MAX_CHARS_IN_CHAPTER_TITLE',
+        'MAX_CHARS_IN_CHAPTER_TITLE', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
             StoryEditorStateService, ExplorationIdValidationService,
             StoryUpdateService, UndoRedoService, EVENT_STORY_INITIALIZED,
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
-            MAX_CHARS_IN_CHAPTER_TITLE) {
+            MAX_CHARS_IN_CHAPTER_TITLE, MAX_CHARS_IN_CHAPTER_DESCRIPTION) {
           var ctrl = this;
           $scope.MAX_CHARS_IN_CHAPTER_TITLE = MAX_CHARS_IN_CHAPTER_TITLE;
+          $scope.MAX_CHARS_IN_CHAPTER_DESCRIPTION = (
+            MAX_CHARS_IN_CHAPTER_DESCRIPTION);
           var _recalculateAvailableNodes = function() {
             $scope.newNodeId = null;
             $scope.availableNodes = [];
@@ -107,6 +110,8 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
             $scope.editableTitle = $scope.currentTitle;
+            $scope.currentDescription = $scope.getDescription();
+            $scope.editableDescription = $scope.currentDescription;
             $scope.editableThumbnailFilename = $scope.getThumbnailFilename();
             $scope.editableThumbnailBgColor = $scope.getThumbnailBgColor();
             $scope.oldOutline = $scope.getOutline();
@@ -151,6 +156,15 @@ angular.module('oppia').directive('storyNodeEditor', [
                 $scope.story, $scope.getId(), newTitle);
               $scope.currentTitle = newTitle;
             }
+          };
+
+          $scope.updateDescription = function(newDescription) {
+            if (newDescription === $scope.currentDescription) {
+              return;
+            }
+            StoryUpdateService.setStoryNodeDescription(
+              $scope.story, $scope.getId(), newDescription);
+            $scope.currentDescription = newDescription;
           };
 
           $scope.updateThumbnailFilename = function(newThumbnailFilename) {

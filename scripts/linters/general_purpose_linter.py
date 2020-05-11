@@ -175,7 +175,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'extensions/visualizations/')
     },
     {
-        'regexp': re.compile(r'tothrow[(]'),
+        'regexp': re.compile(r'toThrow[(]'),
         'message': 'Please use \'toThrowError\' instead of '
                    '\'toThrow\'',
         'excluded_files': (
@@ -189,7 +189,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'(?!catch\s(\n|.)*throw\s\w;\n.*})'
+        'regexp': re.compile(r'(?!catch\s(\n|.)*throw\s\w+;\n.*})'
                              r'throw\s\b(\bError|\bTypeError|\bRangeError'
                              r'\bSyntaxError|\bDimensionError)\('),
         'message': 'Please use \'throw new\' instead of \'throw\'',
@@ -197,7 +197,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'(?!catch\s(\n|.)*throw\s\w;\n.*})throw\s*\''),
+        'regexp': re.compile(r'(?!catch\s(\n|.)*throw\s\w+;\n.*})'
+                             r'throw\s\'.*\';'),
         'message': 'Please use '
                    '\'throw new Error\' instead of \'throw\'',
         'excluded_files': (),
