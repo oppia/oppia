@@ -50,15 +50,14 @@ describe('AnswerClassificationService', () => {
     this.sof = TestBed.get(StateObjectFactory);
     this.pars = TestBed.get(PredictionAlgorithmRegistryService);
 
-    this.pars.testOnlySetPredictionService(
-      'TestClassifier', 1, { predict: (classifierData, answer) => 1 });
-  });
-
-  beforeEach(() => {
     this.stateName = 'stateName';
     this.rules = {
-      Equals: (answer, inputs) => answer === inputs.x,
-      NotEquals: (answer, inputs) => answer !== inputs.x,
+      Equals: function(answer, inputs) {
+        return inputs.x === answer;
+      },
+      NotEquals: function(answer, inputs) {
+        return inputs.x !== answer;
+      },
       Contains: (answer, inputs) => (
         answer.toLowerCase().indexOf(inputs.x.toLowerCase()) !== -1)
     };
@@ -159,6 +158,8 @@ describe('AnswerClassificationService', () => {
           }
         }
       };
+      this.state = this.sof.createFromBackendDict(
+        this.stateName, this.stateDict);
     });
 
     it('should fail if no frontend rules are provided', () => {
@@ -170,8 +171,8 @@ describe('AnswerClassificationService', () => {
     });
 
     it(
-      'should return the first matching answer group and first matching ' +
-        'rule spec',
+      'should return the first matching answer group and first matching rule ' +
+        'spec',
       () => {
         expect(
           this.acs.getMatchingClassificationResult(
@@ -205,7 +206,7 @@ describe('AnswerClassificationService', () => {
       ).toEqual(
         this.acrof.createNew(
           this.oof.createNew('default', 'default_outcome', '', []), 2, 0,
-          ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
+          ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
     });
 
     it(
@@ -221,12 +222,11 @@ describe('AnswerClassificationService', () => {
             voiceovers_mapping: {
               content: {},
               default_outcome: {},
-              feedback_1: {},
-              feedback_2: {}
+              feedback_1: {}
             }
           },
           interaction: {
-            id: 'TrainableInteraction',
+            id: 'RuleTest',
             answer_groups: [{
               outcome: {
                 dest: 'outcome 1',
@@ -239,31 +239,11 @@ describe('AnswerClassificationService', () => {
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null
               },
-              training_data: ['abc', 'input'],
               rule_specs: [{
                 inputs: {
-                  x: 'equal'
+                  x: 10
                 },
                 rule_type: 'Equals'
-              }]
-            }, {
-              outcome: {
-                dest: 'outcome 2',
-                feedback: {
-                  content_id: 'feedback_2',
-                  html: ''
-                },
-                labelled_as_correct: false,
-                param_changes: [],
-                refresher_exploration_id: null,
-                missing_prerequisite_skill_id: null
-              },
-              training_data: ['xyz'],
-              rule_specs: [{
-                inputs: {
-                  x: 'npu'
-                },
-                rule_type: 'Contains'
               }]
             }],
             default_outcome: {
@@ -285,8 +265,7 @@ describe('AnswerClassificationService', () => {
             translations_mapping: {
               content: {},
               default_outcome: {},
-              feedback_1: {},
-              feedback_2: {}
+              feedback_1: {}
             }
           }
         };
@@ -396,6 +375,17 @@ describe('AnswerClassificationService', () => {
       };
       this.state = this.sof.createFromBackendDict(
         this.stateName, this.stateDict);
+
+      this.scms.init({
+        stateName: {
+          algorithm_id: 'TestClassifier',
+          classifier_data: {},
+          data_schema_version: 1
+        }
+      });
+
+      this.pars.testOnlySetPredictionService(
+        'TestClassifier', 1, { predict: (classifierData, answer) => 1 });
     });
 
     it(
@@ -429,7 +419,7 @@ describe('AnswerClassificationService', () => {
         ).toEqual(
           this.acrof.createNew(
             this.oof.createNew('default', 'default_outcome', '', []), 2, 0,
-            ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
+            ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
       });
   });
 
@@ -522,7 +512,7 @@ describe('AnswerClassificationService', () => {
       };
       this.state = this.sof.createFromBackendDict(
         this.stateName, this.stateDict);
-    });
+		});
 
     it(
       'should use training data classification if no answer group matches ' +
