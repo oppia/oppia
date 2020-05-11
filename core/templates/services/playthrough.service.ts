@@ -40,7 +40,7 @@ interface MultipleIncorrectStateNames {
   num_times_incorrect: number;
 }
 interface CycleIdentifier {
-  cycle: boolean;
+  cycle: string;
   // eslint-disable-next-line camelcase
   num_cycles: number;
 }
