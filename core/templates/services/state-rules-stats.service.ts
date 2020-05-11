@@ -16,79 +16,103 @@
  * @fileoverview Factory for calculating the statistics of a particular state.
  */
 
-angular.module('oppia').factory('StateRulesStatsService', [
-  '$http', '$injector', '$q', 'AngularNameService',
-  'AnswerClassificationService', 'ContextService', 'FractionObjectFactory',
-  function(
-      $http, $injector, $q, AngularNameService,
-      AnswerClassificationService, ContextService, FractionObjectFactory) {
-    return {
-      /**
-       * TODO(brianrodri): Consider moving this into a visualization domain
-       * object.
-       *
-       * @param {Object!} state
-       * @return {Boolean} whether given state has an implementation for
-       *     displaying the improvements overview tab in the State Editor.
-       */
-      stateSupportsImprovementsOverview: function(state) {
-        return state.interaction.id === 'TextInput';
-      },
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-      /**
-       * Returns a promise which will provide details of the given state's
-       * answer-statistics.
-       *
-       * @param {Object!} state
-       * @returns {Promise}
-       */
-      computeStateRulesStats: function(state) {
-        var explorationId = ContextService.getExplorationId();
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service'
+import { AnswerClassificationService } from
+  'pages/exploration-player-page/services/answer-classification.service';
+import { ContextService } from 'services/context.service';
+import { FractionObjectFactory, IFractionDict } from
+  'domain/objects/FractionObjectFactory';
+import { InteractionRulesRegistryService } from
+  'services/interaction-rules-registry.service';
+import { State } from 'domain/state/StateObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
-        if (!state.interaction.id) {
-          return $q.resolve({
-            state_name: state.name,
-            exploration_id: explorationId,
-            visualizations_info: [],
-          });
-        }
+export interface IAnswerData {
+  answer; // Type depends on interaction id of answer.
+  is_addressed: boolean;
+}
 
-        var interactionRulesService = $injector.get(
-          AngularNameService.getNameOfInteractionRulesService(
-            state.interaction.id));
-        return $http.get(
-          '/createhandler/state_rules_stats/' + [
-            encodeURIComponent(explorationId),
-            encodeURIComponent(state.name)
-          ].join('/')
-        ).then(function(response) {
-          return {
-            state_name: state.name,
-            exploration_id: explorationId,
-            visualizations_info: response.data.visualizations_info.map(
-              function(vizInfo) {
-                var newVizInfo = angular.copy(vizInfo);
-                newVizInfo.data.forEach(function(vizInfoDatum) {
-                  // If data is a FractionInput, need to change data so that
-                  // visualization displays the input in a readable manner.
-                  if (state.interaction.id === 'FractionInput') {
-                    vizInfoDatum.answer =
-                        FractionObjectFactory.fromDict(
-                          vizInfoDatum.answer).toString();
-                  }
-                  if (newVizInfo.addressed_info_is_supported) {
-                    vizInfoDatum.is_addressed =
-                      AnswerClassificationService
-                        .isClassifiedExplicitlyOrGoesToNewState(
-                          state.name, state, vizInfoDatum.answer,
-                          interactionRulesService);
-                  }
-                });
-                return newVizInfo;
-              })
-          };
-        });
-      }
-    };
+export interface IVisualizationInfo {
+  data: IAnswerData[],
+  answer: object,
+  options: object,
+  addressed_info_is_supported: boolean,
+}
+
+export interface IStateRulesStats {
+  state_name: string;
+  exploration_id: string;
+  visualizations_info: IVisualizationInfo[];
+}
+
+@Injectable({providedIn: 'root'})
+export class StateRulesStatsService {
+  constructor(
+      private angularNameService: AngularNameService,
+      private answerClassificationService: AnswerClassificationService,
+      private contextService: ContextService,
+      private fractionObjectFactory: FractionObjectFactory,
+      private http: HttpClient,
+      private interactionRulesRegistryService:
+        InteractionRulesRegistryService,
+      private urlInterpolationService: UrlInterpolationService) {}
+
+  /**
+   * Returns whether given state has an implementation for displaying the
+   * improvements overview tab in the State Editor.
+   */
+  stateSupportsImprovementsOverview(state: State): boolean {
+    return state.interaction.id === 'TextInput';
   }
-]);
+
+  /**
+   * Returns a promise which will provide details of the given state's
+   * answer-statistics.
+   */
+  computeStateRulesStats(state: State): Promise<IStateRulesStats> {
+    const explorationId = this.contextService.getExplorationId();
+    const interactionRulesService =
+      this.interactionRulesRegistryService.getRulesServiceByInteractionId(
+        state.interaction.id);
+    return this.http.get<IStateRulesStats>(
+      this.urlInterpolationService.interpolateUrl(
+        '/createhandler/state_rules_stats/<exploration_id>/<state_name>', {
+          exploration_id: encodeURIComponent(explorationId),
+          state_name: encodeURIComponent(state.name)
+        })
+    ).toPromise().then(response => {
+      return {
+        state_name: state.name,
+        exploration_id: explorationId,
+        visualizations_info: response.visualizations_info.map(info => {
+          info = angular.copy(info);
+          info.data.forEach(datum => {
+            // If data is a FractionInput, need to change data so that
+            // visualization displays the input in a readable manner.
+            if (state.interaction.id === 'FractionInput') {
+              datum.answer = this.fractionObjectFactory.fromDict(
+                <IFractionDict> datum.answer).toString();
+            }
+            if (info.addressed_info_is_supported) {
+              datum.is_addressed =
+                this.answerClassificationService
+                  .isClassifiedExplicitlyOrGoesToNewState(
+                    state.name, state, datum.answer,
+                    interactionRulesService);
+            }
+          });
+          return info;
+        })
+      };
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'StateRulesStatsService', downgradeInjectable(StateRulesStatsService));

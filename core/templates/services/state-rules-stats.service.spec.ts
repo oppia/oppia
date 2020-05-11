@@ -16,90 +16,87 @@
  * @fileoverview Unit tests for state rules stats service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// StateRulesStatsService.ts is upgraded to Angular 8.
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-import { FractionInputRulesService } from
-  'interactions/FractionInput/directives/fraction-input-rules.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { UtilsService } from 'services/utils.service';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed, flushMicrotasks, fakeAsync } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
+import { NormalizeWhitespacePunctuationAndCasePipe } from
+  // eslint-disable-next-line max-len
+  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 
-require('App.ts');
-require('services/state-rules-stats.service.ts');
+import { ContextService } from 'services/context.service';
+import { StateRulesStatsService } from 'services/state-rules-stats.service.ts';
 
-describe('State Rules Stats Service', function() {
-  var StateRulesStatsService = null;
+describe('StateRulesStatsService', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        NormalizeWhitespacePipe,
+        NormalizeWhitespacePunctuationAndCasePipe,
+      ],
+    });
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', new AngularNameService());
-    $provide.value(
-      'AnswerClassificationResultObjectFactory',
-      new AnswerClassificationResultObjectFactory());
-    $provide.value(
-      'FractionInputRulesService', new FractionInputRulesService(
-        new FractionObjectFactory(), new UtilsService()));
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
-    $provide.value(
-      'StateClassifierMappingService', new StateClassifierMappingService(
-        new ClassifierObjectFactory()));
-  }));
-  beforeEach(angular.mock.inject(function($injector) {
-    StateRulesStatsService = $injector.get('StateRulesStatsService');
-  }));
+    this.contextService = TestBed.get(ContextService);
+    this.httpTestingController = TestBed.get(HttpTestingController);
+    this.stateRulesStatsService = TestBed.get(StateRulesStatsService);
+  });
 
-  it(
-    'should claim text-input interaction states support issues overview',
-    function() {
+  afterEach(() => this.httpTestingController.verify());
+
+  beforeEach(() => {
+    this.mockState = {
+      name: 'Hola',
+      interaction: {
+        answerGroups: [{
+          rules: [{type: 'Equals', inputs: {x: 'hola!'}}],
+          outcome: {dest: 'Me Llamo'}
+        }, {
+          rules: [{type: 'Contains', inputs: {x: 'hola'}}],
+          outcome: {dest: 'Me Llamo'}
+        }, {
+          rules: [{type: 'FuzzyEquals', inputs: {x: 'hola'}}],
+          outcome: {dest: 'Hola'}
+        }],
+        defaultOutcome: {dest: 'Hola'},
+        id: 'TextInput'
+      }
+    };
+  });
+
+  describe('.stateSupportsImprovementsOverview', () => {
+    it('should return true for states with text-input interactions', () => {
       // Only including properties required to identify supported states.
-      var TEXT_INPUT_STATE = {interaction: {id: 'TextInput'}};
+      this.mockState.interaction.id = 'TextInput';
 
       expect(
-        StateRulesStatsService.stateSupportsImprovementsOverview(
-          TEXT_INPUT_STATE)
-      ).toBe(true);
+        this.stateRulesStatsService.stateSupportsImprovementsOverview(
+          this.mockState)
+      ).toBeTrue();
+    });
+  });
+
+  describe('.computeStateRulesStats', () => {
+    beforeEach(() => {
+      spyOn(this.contextService, 'getExplorationId').and.returnValue('expid');
     });
 
-  describe('Stats Computation', function() {
-    var $httpBackend = null;
-    beforeEach(angular.mock.inject(function($injector) {
-      $httpBackend = $injector.get('$httpBackend');
-    }));
-    afterEach(function() {
-      $httpBackend.verifyNoOutstandingExpectation();
-      $httpBackend.verifyNoOutstandingRequest();
-    });
-
-    var EXPLORATION_ID = '7';
-    beforeEach(angular.mock.inject(function(ContextService) {
-      spyOn(
-        ContextService, 'getExplorationId'
-      ).and.returnValue(EXPLORATION_ID);
-    }));
-
-    it('should respond with answer frequencies', function() {
+    it('should respond with answer frequencies', fakeAsync(() => {
       // Only including properties required for stat computation.
-      var HOLA_STATE = {name: 'Hola', interaction: {id: 'TextInput'}};
+      this.mockState.interaction.id = 'TextInput';
+
       // Only including properties required for stat computation.
-      var HOLA_STATE_RULES_STATS_RESPONSE = {
+      this.onSuccess = jasmine.createSpy('success');
+      this.onFailure = jasmine.createSpy('failure');
+
+      this.stateRulesStatsService.computeStateRulesStats(this.mockState)
+        .then(this.onSuccess, this.onFailure);
+
+      const req = this.httpTestingController.expectOne(
+        '/createhandler/state_rules_stats/expid/Hola');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
         visualizations_info: [{
           data: [
             {answer: 'Ni Hao', frequency: 5},
@@ -107,88 +104,64 @@ describe('State Rules Stats Service', function() {
             {answer: 'Hola', frequency: 1}
           ]
         }]
-      };
-      var successHandler = jasmine.createSpy('success');
-      var failureHandler = jasmine.createSpy('failure');
-      $httpBackend.expectGET('/createhandler/state_rules_stats/7/Hola').respond(
-        HOLA_STATE_RULES_STATS_RESPONSE
-      );
+      });
+      flushMicrotasks();
 
-      StateRulesStatsService.computeStateRulesStats(
-        HOLA_STATE
-      ).then(successHandler, failureHandler);
-      $httpBackend.flush();
+      expect(this.onSuccess).toHaveBeenCalledWith(jasmine.objectContaining({
+        visualizations_info: [jasmine.objectContaining({
+          data: [
+            {answer: 'Ni Hao', frequency: 5},
+            {answer: 'Aloha', frequency: 3},
+            {answer: 'Hola', frequency: 1}
+          ]
+        })]
+      }));
+      expect(this.onFailure).not.toHaveBeenCalled();
+    }));
 
-      expect(successHandler).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          visualizations_info: [jasmine.objectContaining({
-            data: [
-              {answer: 'Ni Hao', frequency: 5},
-              {answer: 'Aloha', frequency: 3},
-              {answer: 'Hola', frequency: 1}
-            ]
-          })]
-        })
-      );
-      expect(failureHandler).not.toHaveBeenCalled();
-    });
+    it('should handle addressed info for TextInput', fakeAsync(() => {
+      this.onSuccess = jasmine.createSpy('success');
+      this.onFailure = jasmine.createSpy('failure');
 
-    it('should handle addressed info for TextInput', function() {
-      // Only including properties required for stat computation.
-      var HOLA_STATE = {
-        name: 'Hola',
-        interaction: {
-          answerGroups: [{
-            rules: [{type: 'Equals', inputs: {x: 'hola!'}}],
-            outcome: {dest: 'Me Llamo'}
-          }, {
-            rules: [{type: 'Contains', inputs: {x: 'hola'}}],
-            outcome: {dest: 'Me Llamo'}
-          }, {
-            rules: [{type: 'FuzzyEquals', inputs: {x: 'hola'}}],
-            outcome: {dest: 'Hola'}
-          }],
-          defaultOutcome: {dest: 'Hola'},
-          id: 'TextInput'
-        }
-      };
-      // Only including properties required for stat computation.
-      var HOLA_STATE_RULES_STATS_RESPONSE = {
+      this.stateRulesStatsService.computeStateRulesStats(this.mockState)
+        .then(this.onSuccess, this.onFailure);
+
+      const req = this.httpTestingController.expectOne(
+        '/createhandler/state_rules_stats/expid/Hola');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
         visualizations_info: [{
           data: [{answer: 'Ni Hao'}, {answer: 'Aloha'}, {answer: 'Hola'}],
           addressed_info_is_supported: true
         }]
-      };
-      var successHandler = jasmine.createSpy('success');
-      var failureHandler = jasmine.createSpy('failure');
-      $httpBackend.expectGET('/createhandler/state_rules_stats/7/Hola').respond(
-        HOLA_STATE_RULES_STATS_RESPONSE);
+      });
+      flushMicrotasks();
 
-      StateRulesStatsService.computeStateRulesStats(HOLA_STATE).then(
-        successHandler, failureHandler);
-      $httpBackend.flush();
+      expect(this.onSuccess).toHaveBeenCalledWith(jasmine.objectContaining({
+        visualizations_info: [jasmine.objectContaining({
+          data: [
+            jasmine.objectContaining({answer: 'Ni Hao', is_addressed: false}),
+            jasmine.objectContaining({answer: 'Aloha', is_addressed: false}),
+            jasmine.objectContaining({answer: 'Hola', is_addressed: true})
+          ]
+        })]
+      }));
+      expect(this.onFailure).not.toHaveBeenCalled();
+    }));
 
-      expect(successHandler).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          visualizations_info: [jasmine.objectContaining({
-            data: [
-              jasmine.objectContaining({answer: 'Ni Hao', is_addressed: false}),
-              jasmine.objectContaining({answer: 'Aloha', is_addressed: false}),
-              jasmine.objectContaining({answer: 'Hola', is_addressed: true})
-            ]
-          })]
-        })
-      );
-      expect(failureHandler).not.toHaveBeenCalled();
-    });
+    it('should convert FractionInput into readable strings', fakeAsync(() => {
+      this.onSuccess = jasmine.createSpy('success');
+      this.onFailure = jasmine.createSpy('failure');
 
-    it('should convert FractionInput into readable strings', function() {
-      var successHandler = jasmine.createSpy('success');
-      var failureHandler = jasmine.createSpy('failure');
+      this.stateRulesStatsService.computeStateRulesStats({
+        name: 'Fraction', interaction: {id: 'FractionInput'}
+      }).then(this.onSuccess, this.onFailure);
 
-      $httpBackend.expectGET(
-        '/createhandler/state_rules_stats/7/Fraction').respond(
-        {visualizations_info: [{
+      const req = this.httpTestingController.expectOne(
+        '/createhandler/state_rules_stats/expid/Fraction');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+          visualizations_info: [{
           data: [
             {
               answer: {
@@ -208,38 +181,18 @@ describe('State Rules Stats Service', function() {
               },
               frequency: 5
             }]
-        }]});
+          }]
+        });
+      flushMicrotasks();
 
-      StateRulesStatsService.computeStateRulesStats(
-        {name: 'Fraction', interaction: {id: 'FractionInput'}}).then(
-        successHandler, failureHandler);
-      $httpBackend.flush();
-
-      expect(successHandler).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          visualizations_info: [jasmine.objectContaining({
-            data: [
-              jasmine.objectContaining({ answer: '1/2' }),
-              jasmine.objectContaining({ answer: '0' })
-            ]
-          })]
-        })
-      );
-    });
-
-    it('should not fetch or return answers for null interactions', function() {
-      var MOCK_STATE = {name: 'Hola', interaction: {id: null}};
-      var successHandler = jasmine.createSpy('success');
-      var failureHandler = jasmine.createSpy('failure');
-
-      StateRulesStatsService.computeStateRulesStats(MOCK_STATE)
-        .then(successHandler, failureHandler);
-
-      expect($httpBackend.flush).toThrowError(/No pending request to flush/);
-      expect(successHandler).toHaveBeenCalledWith(jasmine.objectContaining({
-        visualizations_info: [],
+      expect(this.onSuccess).toHaveBeenCalledWith(jasmine.objectContaining({
+        visualizations_info: [jasmine.objectContaining({
+          data: [
+            jasmine.objectContaining({ answer: '1/2' }),
+            jasmine.objectContaining({ answer: '0' })
+          ]
+        })]
       }));
-      expect(failureHandler).not.toHaveBeenCalled();
-    });
+    }));
   });
 });
