@@ -105,13 +105,15 @@ describe('InteractionRulesRegistryService', () => {
     this.textInputRulesService = TestBed.get(TextInputRulesService);
   });
 
-  it('should throw an error for a falsey interaction ids', () => {
+  it('should throw an error for falsey interaction ids', () => {
     expect(() => this.registry.getRulesServiceByInteractionId(''))
-      .toThrowError(/Interaction ID must not be empty/);
+      .toThrowError('Interaction ID must not be empty');
     expect(() => this.registry.getRulesServiceByInteractionId(null))
-      .toThrowError(/Interaction ID must not be empty/);
+      .toThrowError('Interaction ID must not be empty');
     expect(() => this.registry.getRulesServiceByInteractionId(undefined))
-      .toThrowError(/Interaction ID must not be empty/);
+      .toThrowError('Interaction ID must not be empty');
+    expect(() => this.registry.getRulesServiceByInteractionId())
+      .toThrowError('Interaction ID must not be empty');
   });
 
   it('should throw an error for an interaction id that does not exist', () => {
@@ -121,8 +123,8 @@ describe('InteractionRulesRegistryService', () => {
 
   it('should return a non-null service for each interaction spec', () => {
     for (const interactionId in InteractionSpecsConstants.INTERACTION_SPECS) {
-      expect(this.registry.getRulesServiceByInteractionId(interactionId))
-        .not.toBeNull();
+      expect(() => this.registry.getRulesServiceByInteractionId(interactionId))
+        .not.toThrowError();
     }
   });
 

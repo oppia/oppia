@@ -106,22 +106,15 @@ export class InteractionRulesRegistryService {
     }));
   }
 
-  private getRulesServiceByName(ruleServiceName: string): object {
-    if (!this.rulesServiceRegistry.has(ruleServiceName)) {
-      return null;
-    }
-    return this.rulesServiceRegistry.get(ruleServiceName);
-  }
-
   getRulesServiceByInteractionId(interactionId: string): object {
     if (!interactionId) {
       throw new Error('Interaction ID must not be empty');
     }
-    const service = this.getRulesServiceByName(interactionId + 'RulesService');
-    if (service === null) {
+    const rulesServiceName = interactionId + 'RulesService';
+    if (!this.rulesServiceRegistry.has(rulesServiceName)) {
       throw new Error('Unknown interaction ID: ' + interactionId);
     }
-    return service;
+    return this.rulesServiceRegistry.get(rulesServiceName);
   }
 }
 

@@ -31,7 +31,9 @@ import { StateRulesStatsService } from 'services/state-rules-stats.service.ts';
 describe('StateRulesStatsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+      ],
       providers: [
         NormalizeWhitespacePipe,
         NormalizeWhitespacePunctuationAndCasePipe,
@@ -49,25 +51,28 @@ describe('StateRulesStatsService', () => {
     this.mockState = {
       name: 'Hola',
       interaction: {
-        answerGroups: [{
-          rules: [{type: 'Equals', inputs: {x: 'hola!'}}],
-          outcome: {dest: 'Me Llamo'}
-        }, {
-          rules: [{type: 'Contains', inputs: {x: 'hola'}}],
-          outcome: {dest: 'Me Llamo'}
-        }, {
-          rules: [{type: 'FuzzyEquals', inputs: {x: 'hola'}}],
-          outcome: {dest: 'Hola'}
-        }],
-        defaultOutcome: {dest: 'Hola'},
-        id: 'TextInput'
+        id: 'TextInput',
+        answerGroups: [
+          {
+            rules: [{type: 'Equals', inputs: {x: 'hola!'}}],
+            outcome: {dest: 'Me Llamo'}
+          },
+          {
+            rules: [{type: 'Contains', inputs: {x: 'hola'}}],
+            outcome: {dest: 'Me Llamo'}
+          },
+          {
+            rules: [{type: 'FuzzyEquals', inputs: {x: 'hola'}}],
+            outcome: {dest: 'Hola'}
+          }
+        ],
+        defaultOutcome: {dest: 'Hola'}
       }
     };
   });
 
   describe('.stateSupportsImprovementsOverview', () => {
     it('should return true for states with text-input interactions', () => {
-      // Only including properties required to identify supported states.
       this.mockState.interaction.id = 'TextInput';
 
       expect(
@@ -83,10 +88,6 @@ describe('StateRulesStatsService', () => {
     });
 
     it('should respond with answer frequencies', fakeAsync(() => {
-      // Only including properties required for stat computation.
-      this.mockState.interaction.id = 'TextInput';
-
-      // Only including properties required for stat computation.
       this.onSuccess = jasmine.createSpy('success');
       this.onFailure = jasmine.createSpy('failure');
 
