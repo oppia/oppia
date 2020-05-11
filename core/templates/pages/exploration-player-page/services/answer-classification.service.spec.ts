@@ -35,7 +35,6 @@ import { PredictionAlgorithmRegistryService } from
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 
 describe('AnswerClassificationService', () => {
   beforeEach(() => {

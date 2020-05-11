@@ -19,17 +19,16 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AppService } from 'services/app.service';
-import { ExplorationPlayerConstants } from
-  'pages/exploration-player-page/exploration-player-page.constants';
-import { InteractionSpecsService } from 'services/interaction-specs.service';
-
 import { AlertsService } from 'services/alerts.service';
 import {
   AnswerClassificationResult, AnswerClassificationResultObjectFactory
 } from 'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { AppService } from 'services/app.service';
+import { ExplorationPlayerConstants } from
+  'pages/exploration-player-page/exploration-player-page.constants';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { InteractionSpecsService } from 'services/interaction-specs.service';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { PredictionAlgorithmRegistryService }
   // eslint-disable-next-line max-len
@@ -44,9 +43,9 @@ type IRulesService = {[name: string]: (answer, inputs) => boolean};
 export class AnswerClassificationService {
   constructor(
       private alertsService: AlertsService,
-      private appService: AppService,
       private answerClassificationResultObjectFactory:
         AnswerClassificationResultObjectFactory,
+      private appService: AppService,
       private interactionSpecsService: InteractionSpecsService,
       private predictionAlgorithmRegistryService:
         PredictionAlgorithmRegistryService,
