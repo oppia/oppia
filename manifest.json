@@ -503,14 +503,6 @@
         "bundle": {
           "js": ["src/validate.js"]
         }
-      },
-      "waveSurferJs": {
-        "version": "2.2.1",
-        "downloadFormat": "files",
-        "url": "https://unpkg.com/wavesurfer.js@2.2.1/dist",
-        "rootDirPrefix": "waveSurfer-js-",
-        "targetDirPrefix": "wave-surfer-js-",
-        "files": ["wavesurfer.min.js"]
       }
     },
     "oppiaTools": {
