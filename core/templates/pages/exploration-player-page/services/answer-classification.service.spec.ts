@@ -31,13 +31,13 @@ import { AnswerClassificationResultObjectFactory } from
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { PredictionAlgorithmRegistryService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { PredictionAlgorithmRegistryService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 
 describe('AnswerClassificationService', () => {
   beforeEach(() => {
@@ -48,99 +48,19 @@ describe('AnswerClassificationService', () => {
     this.oof = TestBed.get(OutcomeObjectFactory);
     this.scms = TestBed.get(StateClassifierMappingService);
     this.sof = TestBed.get(StateObjectFactory);
+    this.pars = TestBed.get(PredictionAlgorithmRegistryService);
 
+    this.pars.testOnlySetPredictionService(
+      'TestClassifier', 1, { predict: (classifierData, answer) => 1 });
+  });
+
+  beforeEach(() => {
     this.stateName = 'stateName';
-    this.stateDict = {
-      content: {
-        content_id: 'content',
-        html: 'content'
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {},
-          feedback_2: {}
-        }
-      },
-      interaction: {
-        id: 'RuleTest',
-        answer_groups: [{
-          outcome: {
-            dest: 'outcome 1',
-            feedback: {
-              content_id: 'feedback_1',
-              html: ''
-            },
-            labelled_as_correct: false,
-            param_changes: [],
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null
-          },
-          rule_specs: [{
-            inputs: {
-              x: 10
-            },
-            rule_type: 'Equals'
-          }]
-        }, {
-          outcome: {
-            dest: 'outcome 2',
-            feedback: {
-              content_id: 'feedback_2',
-              html: ''
-            },
-            labelled_as_correct: false,
-            param_changes: [],
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null
-          },
-          rule_specs: [{
-            inputs: {
-              x: 5
-            },
-            rule_type: 'Equals'
-          }, {
-            inputs: {
-              x: 7
-            },
-            rule_type: 'NotEquals'
-          }, {
-            inputs: {
-              x: 6
-            },
-            rule_type: 'Equals'
-          }]
-        }],
-        default_outcome: {
-          dest: 'default',
-          feedback: {
-            content_id: 'default_outcome',
-            html: ''
-          },
-          labelled_as_correct: false,
-          param_changes: [],
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null
-        },
-        hints: []
-      },
-      param_changes: [],
-      solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {},
-          feedback_2: {}
-        }
-      }
-    };
-    this.state = this.sof.createFromBackendDict(this.stateName, this.stateDict);
-
     this.rules = {
       Equals: (answer, inputs) => answer === inputs.x,
       NotEquals: (answer, inputs) => answer !== inputs.x,
+      Contains: (answer, inputs) => (
+        answer.toLowerCase().indexOf(inputs.x.toLowerCase()) !== -1)
     };
   });
 
@@ -478,30 +398,14 @@ describe('AnswerClassificationService', () => {
         this.stateName, this.stateDict);
     });
 
-    beforeEach(() => {
-      this.registryService = TestBed.get(PredictionAlgorithmRegistryService);
-      class StringPredictionService {
-        predict(classifierData, answer): number {
-          return 1;
-        }
-      };
-
-      this.registryService.testOnlySetPredictionService(
-        'TestClassifier', 1, new StringPredictionService());
-      this.rules = {
-        Equals: (answer, input) => answer === input,
-        Contains: (answer, input) => (
-          answer.toLowerCase().indexOf(input.x.toLowerCase()) !== -1)
-      };
-    });
-
     it(
       'should query the prediction service if no answer group matches and ' +
         'interaction is trainable',
       () => {
         this.stateDict.interaction.id = 'TrainableInteraction';
-        // The prediction result is the same as default until there is a mapping
-        // in PredictionAlgorithmRegistryService.
+        this.state = this.sof.createFromBackendDict(
+          this.stateName, this.stateDict);
+
         expect(
           this.acs.getMatchingClassificationResult(
             this.stateName, this.state.interaction, 0, this.rules)
