@@ -157,6 +157,5 @@
     "extensions/interactions/SetInput/directives/set-input-validation.service.ts",
     "extensions/interactions/TextInput/directives/text-input-validation.service.ts",
     "extensions/interactions/base-interaction-validation.service.ts",
-    "extensions/interactions/rules.spec.ts",
-    ".github/actions/oppiabot/dist/index.js"
+    "extensions/interactions/rules.spec.ts"
 ]
