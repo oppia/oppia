@@ -26,7 +26,7 @@ describe('AppService', () => {
     this.appService = TestBed.get(AppService);
   });
 
-  describe('.areMachineLearningClassifiersEnabled', () => {
+  describe('.isMachineLearningClassificationEnabled', () => {
     beforeEach(() => {
       this.initialValue = AppConstants.ENABLE_ML_CLASSIFIERS;
     });
@@ -37,13 +37,13 @@ describe('AppService', () => {
 
     it('returns true if AppConstants.ENABLE_ML_CLASSIFIERS is true', () => {
       AppConstants.ENABLE_ML_CLASSIFIERS = true;
-      expect(this.appService.areMachineLearningClassifiersEnabled())
+      expect(this.appService.isMachineLearningClassificationEnabled())
         .toBeTrue();
     });
 
     it('returns false if AppConstants.ENABLE_ML_CLASSIFIERS is false', () => {
       AppConstants.ENABLE_ML_CLASSIFIERS = false;
-      expect(this.appService.areMachineLearningClassifiersEnabled())
+      expect(this.appService.isMachineLearningClassificationEnabled())
         .toBeFalse();
     });
   });

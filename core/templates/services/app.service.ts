@@ -23,7 +23,7 @@ import { AppConstants } from 'app.constants';
 
 @Injectable({providedIn: 'root'})
 export class AppService {
-  areMachineLearningClassifiersEnabled(): boolean {
+  isMachineLearningClassificationEnabled(): boolean {
     return AppConstants.ENABLE_ML_CLASSIFIERS;
   }
 }

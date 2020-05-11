@@ -142,7 +142,7 @@ export class AnswerClassificationService {
           }
         }
       }
-      if (this.appService.areMachineLearningClassifiersEnabled()) {
+      if (this.appService.isMachineLearningClassificationEnabled()) {
         var classifier = this.stateClassifierMappingService.getClassifier(
           stateName);
         if (classifier && classifier.classifierData &&
