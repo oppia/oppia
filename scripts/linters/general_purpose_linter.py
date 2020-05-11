@@ -39,7 +39,8 @@ EXCLUDED_PATHS = (
     '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
     'webpack_bundles/*', 'core/tests/services_sources/*',
     'core/tests/release_sources/tmp_unzip.zip',
-    'core/tests/release_sources/tmp_unzip.tar.gz', '.github/actions/oppiabot/dist/*')
+    'core/tests/release_sources/tmp_unzip.tar.gz',
+    '.github/actions/oppiabot/dist/*')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
