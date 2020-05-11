@@ -1819,6 +1819,10 @@ pre.oppia-pre-wrapped-text {
   text-align: left;
 }
 
+.oppia-welcome-guide-third-section p {
+  line-height: 200%;
+}
+
 .oppia-rte-content > div > p {
   line-height: 1.846;
 }
@@ -4529,6 +4533,23 @@ div.oppia-issues-learner-action {
 
 .oppia-rule-preview {
   word-wrap: break-word;
+}
+
+.oppia-welcome-guide-second-section-description {
+  padding-bottom: 40px;
+}
+
+.oppia-welcome-guide-top-section {
+  height: auto;
+  background-color: #FFFFFF;
+}
+
+.oppia-welcome-guide-exploration-and-collection {
+  background-color: #E5E5E5;
+}
+
+.oppia-welcome-guide-find-explorations {
+  background-color: #FFFFFF;
 }
 
 .oppia-welcome-guide-second-section {
