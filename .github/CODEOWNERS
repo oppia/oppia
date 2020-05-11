@@ -473,7 +473,7 @@
 /core/templates/pages/splash-page/ @jameesjohn @vojtechjelinek
 /core/templates/pages/teach-page/ @jameesjohn @vojtechjelinek
 /core/templates/pages/thanks-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/welcome-guide-page/ @kmaraj @pmets @sm6957
+/core/templates/pages/welcome-guide-page/ @jameesjohn @vojtechjelinek
 
 # Speed Improvement team.
 /app_dev.yaml @jameesjohn @vojtechjelinek
