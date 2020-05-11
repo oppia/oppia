@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the answer classification service
  */
 
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { TestBed } from '@angular/core/testing';
 
 import { AnswerClassificationResultObjectFactory } from
@@ -25,6 +23,8 @@ import { AnswerClassificationResultObjectFactory } from
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { AppConstants } from 'app.constants';
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants';
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
@@ -41,11 +41,12 @@ describe('AnswerClassificationService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
 
-    this.ac = TestBed.get(AppConstants);
+    this.ac = angular.copy(AppConstants);
+    this.epc = angular.copy(ExplorationPlayerConstants);
+    this.isc = angular.copy(InteractionSpecsConstants);
+
     this.acrof = TestBed.get(AnswerClassificationResultObjectFactory);
     this.acs = TestBed.get(AnswerClassificationService);
-    this.epc = TestBed.get(ExplorationPlayerConstants);
-    this.isc = TestBed.get(InteractionSpecsConstants);
     this.oof = TestBed.get(OutcomeObjectFactory);
     this.pars = TestBed.get(PredictionAlgorithmRegistryService);
     this.scms = TestBed.get(StateClassifierMappingService);
