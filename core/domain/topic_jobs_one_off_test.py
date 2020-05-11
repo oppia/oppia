@@ -24,10 +24,10 @@ import logging
 
 from constants import constants
 from core.domain import skill_domain
+from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_jobs_one_off
-from core.domain import skill_services
 from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
@@ -281,7 +281,7 @@ class RemoveDeletedUncategorizedSkillsOneOffJobTests(
         expected = [[
             u'Skill IDs deleted for topic topic_id:',
             [u'[u\'deleted_skill_1\', u\'deleted_skill_2\','
-              ' u\'deleted_skill_3\']']]]
+             ' u\'deleted_skill_3\']']]]
 
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
