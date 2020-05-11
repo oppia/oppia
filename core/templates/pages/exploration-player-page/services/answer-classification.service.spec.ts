@@ -16,39 +16,40 @@
  * @fileoverview Unit tests for the answer classification service
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-
-import { AppConstants } from 'app.constants';
-import { ExplorationPlayerConstants } from
-  'pages/exploration-player-page/exploration-player-page.constants';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { TestBed } from '@angular/core/testing';
 
 import { AnswerClassificationResultObjectFactory } from
   'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
+import { AppConstants } from 'app.constants';
+import { ExplorationPlayerConstants } from
+  'pages/exploration-player-page/exploration-player-page.constants';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { PredictionAlgorithmRegistryService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 
 describe('AnswerClassificationService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
 
+    this.ac = TestBed.get(AppConstants);
     this.acrof = TestBed.get(AnswerClassificationResultObjectFactory);
     this.acs = TestBed.get(AnswerClassificationService);
+    this.epc = TestBed.get(ExplorationPlayerConstants);
+    this.isc = TestBed.get(InteractionSpecsConstants);
     this.oof = TestBed.get(OutcomeObjectFactory);
+    this.pars = TestBed.get(PredictionAlgorithmRegistryService);
     this.scms = TestBed.get(StateClassifierMappingService);
     this.sof = TestBed.get(StateObjectFactory);
-    this.pars = TestBed.get(PredictionAlgorithmRegistryService);
 
     this.stateName = 'stateName';
     this.rules = {
@@ -65,12 +66,12 @@ describe('AnswerClassificationService', () => {
 
   describe('with string classifier disabled', () => {
     beforeEach(() => {
-      InteractionSpecsConstants.INTERACTION_SPECS = {
+      this.isc.INTERACTION_SPECS = {
         RuleTest: {
           is_trainable: false
         }
       };
-      AppConstants.ENABLE_ML_CLASSIFIERS = false;
+      this.ac.ENABLE_ML_CLASSIFIERS = false;
 
       this.stateDict = {
         content: {
@@ -180,7 +181,7 @@ describe('AnswerClassificationService', () => {
         ).toEqual(
           this.acrof.createNew(
             this.oof.createNew('outcome 1', 'feedback_1', '', []), 0, 0,
-            ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
+            this.epc.EXPLICIT_CLASSIFICATION));
 
         expect(
           this.acs.getMatchingClassificationResult(
@@ -188,7 +189,7 @@ describe('AnswerClassificationService', () => {
         ).toEqual(
           this.acrof.createNew(
             this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 0,
-            ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
+            this.epc.EXPLICIT_CLASSIFICATION));
 
         expect(
           this.acs.getMatchingClassificationResult(
@@ -196,7 +197,7 @@ describe('AnswerClassificationService', () => {
         ).toEqual(
           this.acrof.createNew(
             this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 1,
-            ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
+            this.epc.EXPLICIT_CLASSIFICATION));
       });
 
     it('should return the default rule if no answer group matches', () => {
@@ -206,7 +207,7 @@ describe('AnswerClassificationService', () => {
       ).toEqual(
         this.acrof.createNew(
           this.oof.createNew('default', 'default_outcome', '', []), 2, 0,
-          ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
+          this.epc.DEFAULT_OUTCOME_CLASSIFICATION));
     });
 
     it(
@@ -282,7 +283,7 @@ describe('AnswerClassificationService', () => {
 
   describe('with string classifier enabled', () => {
     beforeEach(() => {
-      InteractionSpecsConstants.INTERACTION_SPECS = {
+      this.isc.INTERACTION_SPECS = {
         TrainableInteraction: {
           is_trainable: true
         },
@@ -290,7 +291,7 @@ describe('AnswerClassificationService', () => {
           is_trainable: false
         }
       };
-      AppConstants.ENABLE_ML_CLASSIFIERS = true;
+      this.ac.ENABLE_ML_CLASSIFIERS = true;
 
       this.stateDict = {
         content: {
@@ -402,7 +403,7 @@ describe('AnswerClassificationService', () => {
         ).toEqual(
           this.acrof.createNew(
             this.state.interaction.answerGroups[1].outcome, 1, null,
-            ExplorationPlayerConstants.STATISTICAL_CLASSIFICATION));
+            this.epc.STATISTICAL_CLASSIFICATION));
       });
 
     it(
@@ -419,18 +420,18 @@ describe('AnswerClassificationService', () => {
         ).toEqual(
           this.acrof.createNew(
             this.oof.createNew('default', 'default_outcome', '', []), 2, 0,
-            ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION));
+            this.epc.DEFAULT_OUTCOME_CLASSIFICATION));
       });
   });
 
   describe('with training data classification', () => {
     beforeEach(() => {
-      InteractionSpecsConstants.INTERACTION_SPECS = {
+      this.isc.INTERACTION_SPECS = {
         TrainableInteraction: {
           is_trainable: true
         }
       };
-      AppConstants.ENABLE_ML_CLASSIFIERS = true;
+      this.ac.ENABLE_ML_CLASSIFIERS = true;
 
       this.stateDict = {
         content: {
@@ -524,7 +525,7 @@ describe('AnswerClassificationService', () => {
         ).toEqual(
           this.acrof.createNew(
             this.state.interaction.answerGroups[0].outcome, 0, null,
-            ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
+            this.epc.TRAINING_DATA_CLASSIFICATION));
 
         expect(
           this.acs.getMatchingClassificationResult(
@@ -532,7 +533,7 @@ describe('AnswerClassificationService', () => {
         ).toEqual(
           this.acrof.createNew(
             this.state.interaction.answerGroups[1].outcome, 1, null,
-            ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION));
+            this.epc.TRAINING_DATA_CLASSIFICATION));
       });
 
     it(
@@ -545,7 +546,7 @@ describe('AnswerClassificationService', () => {
         ).toEqual(
           this.acrof.createNew(
             this.state.interaction.answerGroups[1].outcome, 1, 0,
-            ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
+            this.epc.EXPLICIT_CLASSIFICATION));
       });
   });
 });
