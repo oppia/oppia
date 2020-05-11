@@ -91,27 +91,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       }).then(function(response) {
         var assetBlob = null;
         var data = response.data;
-        try {
-          assetBlob = new Blob([data], {type: data.type});
-        } catch (exception) {
-          window.BlobBuilder = window.BlobBuilder ||
-                         window.WebKitBlobBuilder ||
-                         window.MozBlobBuilder ||
-                         window.MSBlobBuilder;
-          if (exception.name === 'TypeError' && window.BlobBuilder) {
-            var blobBuilder = new BlobBuilder();
-            blobBuilder.append(data);
-            assetBlob = blobBuilder.getBlob(assetType.concat('/*'));
-          } else {
-            var additionalInfo = (
-              '\nBlob construction error debug logs:' +
-              '\nAsset type: ' + assetType +
-              '\nData: ' + data
-            );
-            exception.message += additionalInfo;
-            throw exception;
-          }
-        }
+        assetBlob = new Blob([data], {type: data.type});
         assetsCache[filename] = assetBlob;
         if (assetType === ASSET_TYPE_AUDIO) {
           successCallback(
