@@ -32,7 +32,8 @@ describe('Oppia static pages tour', function() {
     var LINKS_CLASS_NAMES = [
       '.protractor-test-about-link',
       '.protractor-test-get-started-link',
-      '.protractor-test-playbook-link'
+      '.protractor-test-playbook-link',
+      '.protractor-test-welcome-guide-page'
     ];
 
     LINKS_CLASS_NAMES.forEach(function(className) {
