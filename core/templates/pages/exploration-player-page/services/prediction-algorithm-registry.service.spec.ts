@@ -18,12 +18,11 @@
 
 import { TestBed } from '@angular/core/testing';
 
+import { CodeReplPredictionService } from
+  'interactions/CodeRepl/code-repl-prediction.service';
 import { PredictionAlgorithmRegistryService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
-
-import { CodeReplPredictionService } from
-  'interactions/CodeRepl/code-repl-prediction.service';
 import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
 
