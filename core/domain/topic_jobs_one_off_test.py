@@ -256,11 +256,20 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
         topic.move_skill_id_to_subtopic(None, 1, 'valid_skill_3')
         topic.move_skill_id_to_subtopic(None, 1, 'deleted_skill_3')
         topic_services.save_new_topic(self.albert_id, topic)
+        # Pre-assert that all skills are added correctly.
+        self.assertEqual(
+            set(topic.uncategorized_skill_ids),
+            set([
+                'valid_skill_1',
+                'valid_skill_2',
+                'deleted_skill_1',
+                'deleted_skill_2'
+            ]))
         self.assertEqual(
             set(topic.subtopics[0].skill_ids),
             set(['valid_skill_3', 'deleted_skill_3']))
 
-        # Start migration job.
+        # Start RemoveDeletedSkillsFromTopicOneOffJob.
         job_id = (
             topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob
             .create_new())
@@ -268,7 +277,8 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
             job_id)
         self.process_and_flush_pending_tasks()
 
-        # Verify the topic is exactly the same after migration.
+        # Assert that only valid skills remain after
+        # RemoveDeletedSkillsFromTopicOneOffJob.
         updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(
             updated_topic.uncategorized_skill_ids,

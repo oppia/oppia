@@ -117,6 +117,9 @@ class RemoveDeletedSkillsFromTopicOneOffJob(
         skill_ids_to_be_removed_from_subtopic = []
         all_skill_ids_to_be_removed = []
         commit_cmds = []
+
+        # This block of code removes deleted skills from subtopics, but keeps
+        # them in the topic.
         for subtopic in topic.get_all_subtopics():
             subtopic_skill_models = skill_models.SkillModel.get_multi(
                 subtopic['skill_ids'])
@@ -132,6 +135,8 @@ class RemoveDeletedSkillsFromTopicOneOffJob(
 
         all_skill_models = skill_models.SkillModel.get_multi(
             topic.get_all_skill_ids())
+
+        # This block of code removes all deleted skills from topics.
         for skill_id, skill_model in python_utils.ZIP(
                 topic.get_all_skill_ids(), all_skill_models):
             if skill_model is None:
@@ -140,7 +145,7 @@ class RemoveDeletedSkillsFromTopicOneOffJob(
                     'uncategorized_skill_id': skill_id
                 }))
                 all_skill_ids_to_be_removed.append(skill_id)
-        if len(commit_cmds) > 0:
+        if commit_cmds:
             python_utils.PRINT(commit_cmds)
             topic_services.update_topic_and_subtopic_pages(
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,

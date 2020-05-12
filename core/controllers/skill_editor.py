@@ -184,10 +184,10 @@ class EditableSkillDataHandler(base.BaseHandler):
         skill_ids_assigned_to_some_topic = (
             topic_services.get_all_skill_ids_assigned_to_some_topic())
         if skill_id in skill_ids_assigned_to_some_topic:
-            raise Exception(
+            raise self.InvalidInputException(
                 'Cannot delete skill that is assigned to a topic.')
         if skill_services.skill_has_associated_questions(skill_id):
-            raise Exception(
+            raise self.InvalidInputException(
                 'Please delete all questions associated with this skill '
                 'first.')
 
