@@ -15,6 +15,7 @@
 """Lighthouse checks and store reports script."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import re
@@ -153,11 +154,9 @@ def run_lighthouse_checks():
     """Runs the lighthouserc.js config with bash command lhci autorun."""
     bash_command = 'lhci autorun'
     process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
-    output = ''
 
     for line in iter(process.stdout.readline, ''):
         python_utils.PRINT(line[:-1])
-        output += line
 
     process.wait()
 
