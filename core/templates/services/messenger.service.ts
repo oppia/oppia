@@ -84,7 +84,13 @@ export class MessengerService {
 
   MESSAGE_VALIDATORS: MessageValidatorsType = {
     heightChange(payload): boolean {
-      return this.isPositiveInteger(payload.height) && this.isBoolean(
+      var isPositiveInteger = (n: Object): boolean => {
+        return (typeof n === 'number' && n % 1 === 0 && n > 0);
+      };
+      var isBoolean = (b: Object): boolean => {
+        return typeof b === 'boolean';
+      };
+      return isPositiveInteger(payload.height) && isBoolean(
         payload.scroll);
     },
     explorationLoaded(): boolean {
@@ -134,14 +140,6 @@ export class MessengerService {
       };
     }
   };
-
-  private isPositiveInteger(n: Object): boolean {
-    return (typeof n === 'number' && n % 1 === 0 && n > 0);
-  }
-
-  private isBoolean(b: Object): boolean {
-    return typeof b === 'boolean';
-  }
 
   // The argument messageData is of type Object since it can have
   // different properties based on the messageTitle.
