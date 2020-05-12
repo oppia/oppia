@@ -63,10 +63,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
               RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
               RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
               RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
-            // Create an 8-digit random int as the temporary ID for the skill.
-            var randomId = Math.floor(Math.random() * 100000000).toString();
-            ContextService.setCustomEntityContext(
-              ENTITY_TYPE.SKILL, randomId);
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
@@ -141,10 +137,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                 }
               ]
             }).result.then(function(result) {
-              ContextService.removeCustomEntityContext();
               SkillCreationService.createNewSkill(
-                result.description, result.rubrics, result.explanation, [],
-                randomId);
+                result.description, result.rubrics, result.explanation, []);
             });
           };
           ctrl.$onInit = function() {

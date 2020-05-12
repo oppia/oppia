@@ -61,7 +61,7 @@ angular.module('oppia').factory('SkillCreationService', [
       },
 
       createNewSkill: function(
-          description, rubrics, explanation, linkedTopicIds, tempId) {
+          description, rubrics, explanation, linkedTopicIds) {
         if (skillCreationInProgress) {
           return;
         }
@@ -78,7 +78,7 @@ angular.module('oppia').factory('SkillCreationService', [
         // once the details are fetched from the backend.
         var newTab = $window.open();
         SkillCreationBackendApiService.createSkill(
-          description, rubrics, explanation, linkedTopicIds, tempId)
+          description, rubrics, explanation, linkedTopicIds)
           .then(function(response) {
             $timeout(function() {
               $rootScope.$broadcast(
