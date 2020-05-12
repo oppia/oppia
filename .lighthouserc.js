@@ -51,7 +51,7 @@
               'first-meaningful-paint': ['warn', {maxNumericValue: 12800}],
               'first-cpu-idle': ['warn', {maxNumericValue: 14600}],
               'speed-index': ['warn', {maxNumericValue: 12300}],
-              interactive: ['warn', {maxNumericValue: 15400}],
+              'interactive': ['warn', {maxNumericValue: 15400}],
               'max-potential-fid': ["warn", {maxNumericValue: 1300}],
               // Performance Opportunities
               // 'render-blocking-resources': ['warn', {minScore: 1}], // failing
@@ -65,7 +65,7 @@
               // 'uses-text-compression': ['warn', {minScore: 1}], // failing
               'uses-rel-preconnect': ['warn', {minScore: 1}],
               'time-to-first-byte': ['warn', {minScore: 1}],
-              redirects: ['warn', {minScore: 1}],
+              'redirects': ['warn', {minScore: 1}],
               'uses-rel-preload': ['warn', {minScore: 1}],
               'efficient-animated-content': ['warn', {minScore: 1}],
               // Best Practice Audits
@@ -76,11 +76,11 @@
               'no-document-write': ['error', {minScore: 1}],
               'external-anchors-use-rel-noopener': ['error', {minScore: 1}],
               'geolocation-on-start': ['error', {minScore: 1}],
-              doctype: ['error', {minScore: 1}],
+              'doctype': ['error', {minScore: 1}],
               'no-vulnerable-libraries': ['error', {minScore: 1}],
               'js-libraries': ['error', {minScore: 1}],
               'notification-on-start': ['error', {minScore: 1}],
-              deprecations: ['error', {minScore: 1}],
+              'deprecations': ['error', {minScore: 1}],
               'password-inputs-can-be-pasted-into': ['error', {minScore: 1}],
               // 'errors-in-console': ['warn', {minScore: 1}], //failing
               'image-aspect-ratio': ['error', {minScore: 1}]
