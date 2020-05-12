@@ -18,7 +18,8 @@
 
 import { DateTimeFormatService } from 'services/date-time-format.service';
 
-// Needed to avoid typescript errors.
+// Needed because MockDateContructor should be of same type as
+// DateConstructor to be used in callFake
 interface MockDateContructorType {
   parse: (s: string) => number;
   UTC: (
