@@ -54,6 +54,14 @@ import WaveSurfer from 'wavesurfer.js';
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
+interface AudioTranslationBarCustomScope extends ng.IScope {
+  userIsGuest?: boolean;
+  dropAreaIsAccessible?: boolean;
+  showDropArea?: boolean;
+  getVoiceoverRecorder?: () => void;
+  openAddAudioTranslationModal?: (files: FileList) => void;
+}
+
 angular.module('oppia').directive('audioTranslationBar', [
   'UrlInterpolationService', 'UserExplorationPermissionsService',
   'UserService',
@@ -65,7 +73,7 @@ angular.module('oppia').directive('audioTranslationBar', [
       scope: {
         isTranslationTabBusy: '='
       },
-      link: function(scope: ICustomScope, elm) {
+      link: function(scope: AudioTranslationBarCustomScope, elm) {
         scope.getVoiceoverRecorder();
 
         var userIsLoggedIn;
