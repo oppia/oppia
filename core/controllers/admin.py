@@ -868,6 +868,11 @@ class UpdateUsernameHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Please ensure that the usernames are not empty.')
 
+        if type(current_username).__name__ != 'unicode' or type(
+                new_username).__name__ != 'unicode':
+            raise self.InvalidInputException(
+                'Please ensure that the usernames are strings.')
+
         user_id = user_services.get_user_id_from_username(current_username)
         if user_id is None:
             raise self.InvalidInputException('User does not exist.')
