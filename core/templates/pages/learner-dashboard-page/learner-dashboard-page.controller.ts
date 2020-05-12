@@ -53,8 +53,8 @@ angular.module('oppia').directive('learnerDashboardPage', [
         '/pages/learner-dashboard-page/learner-dashboard-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$rootScope', '$q', '$window', '$http', '$uibModal',
-        'AlertsService', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
+        '$scope', '$q', '$window', '$http', '$uibModal', 'AlertsService',
+        'LoaderService', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
         'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
         'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
         'LearnerDashboardBackendApiService', 'UrlInterpolationService',
@@ -65,8 +65,8 @@ angular.module('oppia').directive('learnerDashboardPage', [
         'FeedbackMessageSummaryObjectFactory',
         'SuggestionModalForLearnerDashboardService', 'UserService',
         function(
-            $scope, $rootScope, $q, $window, $http, $uibModal,
-            AlertsService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
+            $scope, $q, $window, $http, $uibModal, AlertsService,
+            LoaderService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
             ACTIVITY_TYPE_COLLECTION, ACTIVITY_TYPE_EXPLORATION,
             SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
             LearnerDashboardBackendApiService, UrlInterpolationService,
@@ -491,7 +491,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
               ctrl.profilePictureDataUrl = dataUrl;
             });
 
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             ctrl.username = '';
             var userInfoPromise = UserService.getUserInfoAsync();
             userInfoPromise.then(function(userInfo) {
@@ -595,7 +595,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
             );
 
             $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
             });
 
             ctrl.loadingFeedbacks = false;
