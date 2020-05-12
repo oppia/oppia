@@ -291,7 +291,8 @@ class RemoveDeletedSkillsFromTopicOneOffJobTests(
         expected = [[
             u'Skill IDs deleted for topic topic_id:',
             [u'[u\'deleted_skill_1\', u\'deleted_skill_2\','
-             ' u\'deleted_skill_3\']']]]
+             ' u\'deleted_skill_3\']']],
+            [u'topic_processed', [u'Processed 1 topics.']]]
 
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
