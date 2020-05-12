@@ -247,7 +247,8 @@ export class StatsReportingService {
       });
     }
 
-    recordLeaveForRefresherExp(stateName: string, refresherExpId: string) {
+    recordLeaveForRefresherExp(
+        stateName: string, refresherExpId: string): void {
       this.currentStateName = stateName;
       this.nextExpId = refresherExpId;
       this.http.post(this.getFullStatsUrl('LEAVE_FOR_REFRESHER_EXP'), {
