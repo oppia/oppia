@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import json
 
 from constants import constants
 from core.domain import exp_domain
@@ -446,9 +447,56 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
     def test_export_nonexistent_user(self):
         """Setup for nonexistent user test of export_data functionality."""
-        with self.assertRaises(
-            user_models.UserSettingsModel.EntityNotFoundError):
-            takeout_service.export_data_for_user('fake_user_id')
+        user_data = takeout_service.export_data_for_user('fake_user_id')
+        expected_data = {
+            'collection_progress_data': {},
+            'collection_rights_data': {
+                'editable_collection_ids': [],
+                'owned_collection_ids': [],
+                'viewable_collection_ids': [],
+                'voiced_collection_ids': []
+            },
+            'collection_rights_snapshot_metadata_data': {},
+            'collection_snapshot_metadata_data': {},
+            'completed_activities_data': {},
+            'config_property_snapshot_metadata_data': {},
+            'exp_user_last_playthrough_data': {},
+            'exploration_rights_data': {
+                'editable_exploration_ids': [],
+                'owned_exploration_ids': [],
+                'viewable_exploration_ids': [],
+                'voiced_exploration_ids': []
+            },
+            'exploration_rights_snapshot_metadata_data': {},
+            'exploration_snapshot_metadata_data': {},
+            'exploration_user_data_data': {},
+            'general_feedback_email_reply_to_id_data': {},
+            'general_feedback_message_data': {},
+            'general_feedback_thread_data': {},
+            'general_feedback_thread_user_data': {},
+            'general_suggestion_data': {},
+            'general_voiceover_application_data': {},
+            'incomplete_activities_data': {},
+            'learner_playlist_data': {},
+            'question_snapshot_metadata_data': {},
+            'skill_snapshot_metadata_data': {},
+            'story_progress_data': {},
+            'story_snapshot_metadata_data': {},
+            'subtopic_page_snapshot_metadata_data': {},
+            'topic_rights_data': {
+                'managed_topic_ids': []
+            },
+            'topic_rights_snapshot_metadata_data': {},
+            'topic_snapshot_metadata_data': {},
+            'user_community_rights_data': {},
+            'user_contribution_scoring_data': {},
+            'user_contributions_data': {},
+            'user_settings_data': {},
+            'user_skill_mastery_data': {},
+            'user_stats_data': {},
+            'user_subscriptions_data': {}
+        }
+        self.assertEqual(expected_data, user_data)
 
     def test_export_data_trivial(self):
         """Trivial test of export_data functionality."""
@@ -577,6 +625,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         # Perform export and compare.
         exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
         self.assertEqual(expected_export, exported_data)
+        exported_json = json.dumps(exported_data)
+        expected_json = json.dumps(expected_export)
+        self.assertEqual(json.loads(expected_json), json.loads(exported_json))
 
     def test_export_data_nontrivial(self):
         """Nontrivial test of export_data functionality."""
@@ -671,7 +722,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 'has_suggestion': self.THREAD_HAS_SUGGESTION,
                 'summary': self.THREAD_SUMMARY,
                 'message_count': self.THREAD_MESSAGE_COUNT,
-                'last_updated': feedback_thread_model.last_updated
+                'last_updated': utils.get_time_in_millisecs(
+                        feedback_thread_model.last_updated)
             },
             thread_id: {
                 'entity_type': self.THREAD_ENTITY_TYPE,
@@ -681,9 +733,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 'has_suggestion': False,
                 'summary': None,
                 'message_count': 2,
-                'last_updated': (feedback_models.
-                                 GeneralFeedbackThreadModel.
-                                 get(thread_id).last_updated)
+                'last_updated': utils.get_time_in_millisecs(feedback_models.
+                                GeneralFeedbackThreadModel.
+                                get(thread_id).last_updated)
             }
         }
         expected_general_feedback_thread_user_data = {
@@ -959,3 +1011,6 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
         exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
         self.assertEqual(exported_data, expected_export)
+        exported_json = json.dumps(exported_data)
+        expected_json = json.dumps(expected_export)
+        self.assertEqual(json.loads(exported_json), json.loads(expected_json))

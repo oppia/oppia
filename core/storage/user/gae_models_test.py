@@ -136,9 +136,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         self.assertEqual(user[0].role, feconf.ROLE_ID_ADMIN)
 
     def test_export_data_nonexistent_user(self):
-        with self.assertRaises(user_models.UserSettingsModel
-                               .EntityNotFoundError):
-            user_models.UserSettingsModel.export_data('fake_user')
+        user_data = user_models.UserSettingsModel.export_data('fake_user')
+        self.assertEqual({}, user_data)
 
     def test_export_data_trivial(self):
         user = user_models.UserSettingsModel.get_by_id(self.USER_1_ID)
@@ -838,12 +837,9 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
 
     def test_export_data_on_nonexistent_user(self):
         """Test if exception is raised on nonexistent UserSubscriptionsModel."""
-        export_data_exception = (
-            self.assertRaisesRegexp(
-                Exception, 'UserSubscriptionsModel does not exist.'))
-        with export_data_exception:
-            user_models.UserSubscriptionsModel.export_data(self.USER_ID_3)
-
+        user_data = user_models.UserSubscriptionsModel.export_data(
+            self.USER_ID_3)
+        self.assertEqual({}, user_data)
 
 class UserSubscribersModelTests(test_utils.GenericTestBase):
     """Tests for UserSubscribersModel."""
