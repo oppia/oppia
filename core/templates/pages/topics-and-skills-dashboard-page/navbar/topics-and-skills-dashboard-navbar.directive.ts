@@ -63,6 +63,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
               RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
               RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
               RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
+            ContextService.setSaveImagesToLocalStorageContext();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
@@ -137,6 +138,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                 }
               ]
             }).result.then(function(result) {
+              ContextService.unsetSaveImagesToLocalStorageContext();
               SkillCreationService.createNewSkill(
                 result.description, result.rubrics, result.explanation, []);
             });

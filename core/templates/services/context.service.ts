@@ -40,6 +40,7 @@ export class ContextService {
   questionId = null;
   editorContext = null;
   customEntityContext = null;
+  saveImagesToLocalStorage = false;
 
   init(editorName: string): void {
     this.editorContext = editorName;
@@ -259,6 +260,18 @@ export class ContextService {
       ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD
     ];
     return (allowedPageContext.includes(currentPageContext));
+  }
+
+  setSaveImagesToLocalStorageContext(): void {
+    this.saveImagesToLocalStorage = true;
+  }
+
+  unsetSaveImagesToLocalStorageContext(): void {
+    this.saveImagesToLocalStorage = false;
+  }
+
+  areImagesSavedInLocalStorage(): boolean {
+    return this.saveImagesToLocalStorage;
   }
 }
 

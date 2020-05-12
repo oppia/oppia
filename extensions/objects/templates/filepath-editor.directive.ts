@@ -346,6 +346,14 @@ angular.module('oppia').directive('filepathEditor', [
         };
 
         var getTrustedResourceUrlForImageFileName = function(imageFileName) {
+          if (ContextService.areImagesSavedInLocalStorage()) {
+            var urlCreator = window.URL || window.webkitURL;
+            var imageBlob = (
+              ImageUploadHelperService.convertImageDataToImageFile(
+                window.localStorage.getItem(imageFileName)));
+            return $sce.trustAsResourceUrl(
+              urlCreator.createObjectURL(imageBlob));
+          }
           var encodedFilepath = window.encodeURIComponent(imageFileName);
           return $sce.trustAsResourceUrl(
             AssetsBackendApiService.getImageUrlForPreview(
@@ -734,7 +742,7 @@ angular.module('oppia').directive('filepathEditor', [
                     AlertsService.addWarning('Could not get resampled file.');
                     return;
                   }
-                  ctrl.postImageToServer(dimensions, resampledFile, 'gif');
+                  ctrl.saveImage(dimensions, resampledFile, 'gif');
                   document.body.style.cursor = 'default';
                 }
               });
@@ -749,7 +757,7 @@ angular.module('oppia').directive('filepathEditor', [
               resampledFile = (
                 ImageUploadHelperService.convertImageDataToImageFile(
                   imageDataURI));
-              ctrl.postImageToServer(dimensions, resampledFile, 'svg');
+              ctrl.saveImage(dimensions, resampledFile, 'svg');
               ctrl.data.crop = false;
             }
           } else {
@@ -762,7 +770,40 @@ angular.module('oppia').directive('filepathEditor', [
               AlertsService.addWarning('Could not get resampled file.');
               return;
             }
-            ctrl.postImageToServer(dimensions, resampledFile);
+            ctrl.saveImage(dimensions, resampledFile);
+          }
+        };
+
+        ctrl.saveImageToLocalStorage = function(
+            dimensions, resampledFile, imageType) {
+          var filename = ImageUploadHelperService.generateImageFilename(
+            dimensions.height, dimensions.width, imageType);
+          var reader = new FileReader();
+          reader.onload = function() {
+            var imageData = reader.result;
+            window.localStorage.setItem(filename, imageData);
+            var img = new Image();
+            img.onload = function() {
+              ctrl.setSavedImageFilename(filename, true);
+              var dimensions = (
+                ImagePreloaderService.getDimensionsOfImage(filename));
+              ctrl.imageContainerStyle = {
+                height: dimensions.height + 'px',
+                width: dimensions.width + 'px'
+              };
+              $scope.$apply();
+            };
+            img.src = getTrustedResourceUrlForImageFileName(filename);
+          };
+          reader.readAsDataURL(resampledFile);
+        };
+
+        ctrl.saveImage = function(
+            dimensions, resampledFile, imageType = 'png') {
+          if (ContextService.areImagesSavedInLocalStorage()) {
+            ctrl.saveImageToLocalStorage(dimensions, resampledFile, imageType);
+          } else {
+            ctrl.postImageToServer(dimensions, resampledFile, imageType);
           }
         };
 
