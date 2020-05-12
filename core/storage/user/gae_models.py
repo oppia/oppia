@@ -160,7 +160,7 @@ class UserSettingsModel(base_models.BaseModel):
             dict. Dictionary of the data from UserSettingsModel.
         """
         user = UserSettingsModel.get(user_id, strict=False)
-        if user == None:
+        if user is None:
             return {}
         return {
             'email': user.email,
