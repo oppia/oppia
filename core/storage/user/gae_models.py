@@ -159,55 +159,54 @@ class UserSettingsModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from UserSettingsModel.
         """
-        try:
-            user = UserSettingsModel.get(user_id)
-            return {
-                'email': user.email,
-                'role': user.role,
-                'username': user.username,
-                'normalized_username': user.normalized_username,
-                'last_agreed_to_terms': (
-                    utils.get_time_in_millisecs(user.last_agreed_to_terms)
-                    if user.last_agreed_to_terms
-                    else None
-                ),
-                'last_started_state_editor_tutorial': (
-                    utils.get_time_in_millisecs(
-                        user.last_started_state_editor_tutorial)
-                    if user.last_started_state_editor_tutorial
-                    else None
-                ),
-                'last_started_state_translation_tutorial': (
-                    utils.get_time_in_millisecs(
-                        user.last_started_state_translation_tutorial)
-                    if user.last_started_state_translation_tutorial
-                    else None
-                ),
-                'last_logged_in': (
-                    utils.get_time_in_millisecs(user.last_logged_in)
-                    if user.last_logged_in
-                    else None
-                ),
-                'last_edited_an_exploration': (
-                    utils.get_time_in_millisecs(user.last_edited_an_exploration)
-                    if user.last_edited_an_exploration
-                    else None
-                ),
-                'profile_picture_data_url': user.profile_picture_data_url,
-                'default_dashboard': user.default_dashboard,
-                'creator_dashboard_display_pref': (
-                    user.creator_dashboard_display_pref),
-                'user_bio': user.user_bio,
-                'subject_interests': user.subject_interests,
-                'first_contribution_msec': user.first_contribution_msec,
-                'preferred_language_codes': user.preferred_language_codes,
-                'preferred_site_language_code':
-                    user.preferred_site_language_code,
-                'preferred_audio_language_code':
-                    user.preferred_audio_language_code
-            }
-        except:
+        user = UserSettingsModel.get(user_id, strict=False)
+        if user == None:
             return {}
+        return {
+            'email': user.email,
+            'role': user.role,
+            'username': user.username,
+            'normalized_username': user.normalized_username,
+            'last_agreed_to_terms': (
+                utils.get_time_in_millisecs(user.last_agreed_to_terms)
+                if user.last_agreed_to_terms
+                else None
+            ),
+            'last_started_state_editor_tutorial': (
+                utils.get_time_in_millisecs(
+                    user.last_started_state_editor_tutorial)
+                if user.last_started_state_editor_tutorial
+                else None
+            ),
+            'last_started_state_translation_tutorial': (
+                utils.get_time_in_millisecs(
+                    user.last_started_state_translation_tutorial)
+                if user.last_started_state_translation_tutorial
+                else None
+            ),
+            'last_logged_in': (
+                utils.get_time_in_millisecs(user.last_logged_in)
+                if user.last_logged_in
+                else None
+            ),
+            'last_edited_an_exploration': (
+                utils.get_time_in_millisecs(user.last_edited_an_exploration)
+                if user.last_edited_an_exploration
+                else None
+            ),
+            'profile_picture_data_url': user.profile_picture_data_url,
+            'default_dashboard': user.default_dashboard,
+            'creator_dashboard_display_pref': (
+                user.creator_dashboard_display_pref),
+            'user_bio': user.user_bio,
+            'subject_interests': user.subject_interests,
+            'first_contribution_msec': user.first_contribution_msec,
+            'preferred_language_codes': user.preferred_language_codes,
+            'preferred_site_language_code':
+                user.preferred_site_language_code,
+            'preferred_audio_language_code':
+                user.preferred_audio_language_code
+        }
 
     @classmethod
     def get_new_id(cls, unused_entity_name):
