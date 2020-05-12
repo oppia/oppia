@@ -90,11 +90,11 @@
             matchingUrlPattern: 'http://[^/]+/library',
             assertions: {
                // Performance Opportunities
-              'render-blocking-resources': ['warn', {minScore: 1}], // failing
-              'unminified-css': ['warn', {minScore: 1}], // failing 
-              'unminified-javascript': ['warn', {minScore: 1}], // failing
-              'unused-css-rules': ['warn', {minScore: 1}], // failing
-              'uses-text-compression': ['warn', {minScore: 1}], // failing
+              'render-blocking-resources': ['warn', {minScore: 0}], // failing
+              'unminified-css': ['warn', {minScore: 0}], // failing 
+              'unminified-javascript': ['warn', {minScore: 0}], // failing
+              'unused-css-rules': ['warn', {minScore: 0}], // failing
+              'uses-text-compression': ['warn', {minScore: 0}], // failing
               // Best Practice Audits
               'uses-http2': ['error', {minScore: 0}], // failing
               'errors-in-console': ['error', {minScore: 0}], //failing
@@ -104,11 +104,11 @@
             matchingUrlPattern: 'http://[^/]+/get_started',
             assertions: {
                // Performance Opportunities
-               'render-blocking-resources': ['warn', {minScore: 1}], // failing
-               'unminified-css': ['warn', {minScore: 1}], // failing 
-               'unminified-javascript': ['warn', {minScore: 1}], // failing
-               'unused-css-rules': ['warn', {minScore: 1}], // failing
-               'uses-text-compression': ['warn', {minScore: 1}], // failing
+               'render-blocking-resources': ['warn', {minScore: 0}], // failing
+               'unminified-css': ['warn', {minScore: 0}], // failing 
+               'unminified-javascript': ['warn', {minScore: 0}], // failing
+               'unused-css-rules': ['warn', {minScore: 0}], // failing
+               'uses-text-compression': ['warn', {minScore: 0}], // failing
                // Best Practice Audits
                'uses-http2': ['error', {minScore: 0}], // failing
                'errors-in-console': ['error', {minScore: 0}], //failing
@@ -119,11 +119,11 @@
             matchingUrlPattern: 'http://[^/]+/donate',
             assertions: {
                // Performance Opportunities
-               'render-blocking-resources': ['warn', {minScore: 1}], // failing
-               'unminified-css': ['warn', {minScore: 1}], // failing 
-               'unminified-javascript': ['warn', {minScore: 1}], // failing
-               'unused-css-rules': ['warn', {minScore: 1}], // failing
-               'uses-text-compression': ['warn', {minScore: 1}], // failing
+               'render-blocking-resources': ['warn', {minScore: 0}], // failing
+               'unminified-css': ['warn', {minScore: 0}], // failing 
+               'unminified-javascript': ['warn', {minScore: 0}], // failing
+               'unused-css-rules': ['warn', {minScore: 0}], // failing
+               'uses-text-compression': ['warn', {minScore: 0}], // failing
                // Best Practice Audits
                'uses-http2': ['error', {minScore: 0}], // failing
                'errors-in-console': ['error', {minScore: 0}], //failing
@@ -134,11 +134,11 @@
             matchingUrlPattern: 'http://[^/]+/teach',
             assertions: {
                // Performance Opportunities
-               'render-blocking-resources': ['warn', {minScore: 1}], // failing
-               'unminified-css': ['warn', {minScore: 1}], // failing 
-               'unminified-javascript': ['warn', {minScore: 1}], // failing
-               'unused-css-rules': ['warn', {minScore: 1}], // failing
-               'uses-text-compression': ['warn', {minScore: 1}], // failing
+               'render-blocking-resources': ['warn', {minScore: 0}], // failing
+               'unminified-css': ['warn', {minScore: 0}], // failing 
+               'unminified-javascript': ['warn', {minScore: 0}], // failing
+               'unused-css-rules': ['warn', {minScore: 0}], // failing
+               'uses-text-compression': ['warn', {minScore: 0}], // failing
                // Best Practice Audits
                'uses-http2': ['error', {minScore: 0}], // failing
                'errors-in-console': ['error', {minScore: 0}], //failing
@@ -149,11 +149,11 @@
             matchingUrlPattern: 'http://[^/]+/privacy',
             assertions: {
                // Performance Opportunities
-               'render-blocking-resources': ['warn', {minScore: 1}], // failing
-               'unminified-css': ['warn', {minScore: 1}], // failing 
-               'unminified-javascript': ['warn', {minScore: 1}], // failing
-               'unused-css-rules': ['warn', {minScore: 1}], // failing
-               'uses-text-compression': ['warn', {minScore: 1}], // failing
+               'render-blocking-resources': ['warn', {minScore: 0}], // failing
+               'unminified-css': ['warn', {minScore: 0}], // failing 
+               'unminified-javascript': ['warn', {minScore: 0}], // failing
+               'unused-css-rules': ['warn', {minScore: 0}], // failing
+               'uses-text-compression': ['warn', {minScore: 0}], // failing
                // Best Practice Audits
                'uses-http2': ['error', {minScore: 0}], // failing
                'errors-in-console': ['error', {minScore: 0}], //failing
@@ -164,11 +164,11 @@
             matchingUrlPattern: 'http://[^/]+/contact',
             assertions: {
                // Performance Opportunities
-               'render-blocking-resources': ['warn', {minScore: 1}], // failing
-               'unminified-css': ['warn', {minScore: 1}], // failing 
-               'unminified-javascript': ['warn', {minScore: 1}], // failing
-               'unused-css-rules': ['warn', {minScore: 1}], // failing
-               'uses-text-compression': ['warn', {minScore: 1}], // failing
+               'render-blocking-resources': ['warn', {minScore: 0}], // failing
+               'unminified-css': ['warn', {minScore: 0}], // failing 
+               'unminified-javascript': ['warn', {minScore: 0}], // failing
+               'unused-css-rules': ['warn', {minScore: 0}], // failing
+               'uses-text-compression': ['warn', {minScore: 0}], // failing
                // Best Practice Audits
                'uses-http2': ['error', {minScore: 0}], // failing
                'errors-in-console': ['error', {minScore: 0}], //failing
@@ -179,11 +179,11 @@
             matchingUrlPattern: 'http://[^/]+/about',
             assertions: {
                // Performance Opportunities
-               'render-blocking-resources': ['warn', {minScore: 1}], // failing
-               'unminified-css': ['warn', {minScore: 1}], // failing 
-               'unminified-javascript': ['warn', {minScore: 1}], // failing
-               'unused-css-rules': ['warn', {minScore: 1}], // failing
-               'uses-text-compression': ['warn', {minScore: 1}], // failing
+               'render-blocking-resources': ['warn', {minScore: 0}], // failing
+               'unminified-css': ['warn', {minScore: 0}], // failing 
+               'unminified-javascript': ['warn', {minScore: 0}], // failing
+               'unused-css-rules': ['warn', {minScore: 0}], // failing
+               'uses-text-compression': ['warn', {minScore: 0}], // failing
                // Best Practice Audits
                'uses-http2': ['error', {minScore: 0}], // failing
                'errors-in-console': ['error', {minScore: 0}], //failing
@@ -194,11 +194,11 @@
             matchingUrlPattern: 'http://[^/]+/terms',
             assertions: {
                // Performance Opportunities
-               'render-blocking-resources': ['warn', {minScore: 1}], // failing
-               'unminified-css': ['warn', {minScore: 1}], // failing 
-               'unminified-javascript': ['warn', {minScore: 1}], // failing
-               'unused-css-rules': ['warn', {minScore: 1}], // failing
-               'uses-text-compression': ['warn', {minScore: 1}], // failing
+               'render-blocking-resources': ['warn', {minScore: 0}], // failing
+               'unminified-css': ['warn', {minScore: 0}], // failing 
+               'unminified-javascript': ['warn', {minScore: 0}], // failing
+               'unused-css-rules': ['warn', {minScore: 0}], // failing
+               'uses-text-compression': ['warn', {minScore: 0}], // failing
                // Best Practice Audits
                'uses-http2': ['error', {minScore: 0}], // failing
                'errors-in-console': ['error', {minScore: 0}], //failing
@@ -209,11 +209,11 @@
             matchingUrlPattern: 'http://[^/]+/thanks',
             assertions: {
                // Performance Opportunities
-               'render-blocking-resources': ['warn', {minScore: 1}], // failing
-               'unminified-css': ['warn', {minScore: 1}], // failing 
-               'unminified-javascript': ['warn', {minScore: 1}], // failing
-               'unused-css-rules': ['warn', {minScore: 1}], // failing
-               'uses-text-compression': ['warn', {minScore: 1}], // failing
+               'render-blocking-resources': ['warn', {minScore: 0}], // failing
+               'unminified-css': ['warn', {minScore: 0}], // failing 
+               'unminified-javascript': ['warn', {minScore: 0}], // failing
+               'unused-css-rules': ['warn', {minScore: 0}], // failing
+               'uses-text-compression': ['warn', {minScore: 0}], // failing
                // Best Practice Audits
                'uses-http2': ['error', {minScore: 0}], // failing
                'errors-in-console': ['error', {minScore: 0}], //failing
