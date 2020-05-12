@@ -58,9 +58,9 @@ import python_utils
 
 from . import common
 from . import concurrent_task_utils
+from . import install_third_party_libs
 from . import setup
 from . import setup_gae
-
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.OPPIA_TOOLS_DIR, 'pylint-1.9.4'),
@@ -241,6 +241,10 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
 def main(args=None):
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
+
+    # Make sure that third-party libraries are up-to-date before running tests,
+    # otherwise import errors may result.
+    install_third_party_libs.main()
 
     setup.main(args=[])
     setup_gae.main(args=[])
