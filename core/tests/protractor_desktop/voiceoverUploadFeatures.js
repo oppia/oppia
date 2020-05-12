@@ -45,7 +45,7 @@ describe('Voiceover upload features', function() {
 
     await users.createUser(TEST_EMAIL, TEST_USERNAME);
     await users.login(TEST_EMAIL);
-    workflow.createExploration();
+    await workflow.createExploration();
 
     explorationEditorMainTab.setStateName('Uploading translation file');
     explorationEditorMainTab.setContent(forms.toRichText(

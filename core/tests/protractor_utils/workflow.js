@@ -32,39 +32,39 @@ var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 
 // check if the save roles button is clickable
-var canAddRolesToUsers = function() {
-  return element(by.css('.protractor-test-save-role')).isEnabled();
+var canAddRolesToUsers = async function() {
+  return await element(by.css('.protractor-test-save-role')).isEnabled();
 };
 
 // check if the warning message is visible when the title is ''
-var checkForAddTitleWarning = function() {
-  return element(by.className('protractor-test-title-warning')).isDisplayed();
+var checkForAddTitleWarning = async function() {
+  return await element(by.className('protractor-test-title-warning')).isDisplayed();
 };
 
 // trigger onblur event for title
-var triggerTitleOnBlurEvent = function() {
-  element(by.css('.protractor-test-exploration-title-input')).click();
-  element(by.css('.protractor-test-exploration-objective-input')).click();
+var triggerTitleOnBlurEvent = async function() {
+  await element(by.css('.protractor-test-exploration-title-input')).click();
+  await element(by.css('.protractor-test-exploration-objective-input')).click();
 };
 
 // open edit roles
-var openEditRolesForm = function() {
-  element(by.css('.protractor-test-edit-roles')).click();
-  element(by.css('.protractor-test-role-username')).sendKeys('Chuck Norris');
+var openEditRolesForm = async function() {
+  await element(by.css('.protractor-test-edit-roles')).click();
+  await element(by.css('.protractor-test-role-username')).sendKeys('Chuck Norris');
 };
 
 // Creates an exploration, opens its editor and skips the tutorial.
-var createExploration = function() {
-  createExplorationAndStartTutorial();
+var createExploration = async function() {
+  await createExplorationAndStartTutorial();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  explorationEditorMainTab.exitTutorial();
+  await explorationEditorMainTab.exitTutorial();
 };
 
 // Creates a new exploration and wait for the exploration tutorial to start.
-var createExplorationAndStartTutorial = function() {
+var createExplorationAndStartTutorial = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
-  creatorDashboardPage.get();
+  await creatorDashboardPage.get();
   // Wait for the dashboard to transition the creator into the editor page.
   users.isAdmin().then(function(isAdmin) {
     creatorDashboardPage.clickCreateActivityButton();
@@ -79,7 +79,7 @@ var createExplorationAndStartTutorial = function() {
       waitFor.elementToBeClickable(
         createExplorationButton,
         'createExplorationButton takes too long to be clickable.');
-      createExplorationButton.click();
+      await createExplorationButton.click();
     }
   });
 };
@@ -142,9 +142,9 @@ var publishExploration = function() {
 };
 
 // Creates and publishes a minimal exploration
-var createAndPublishExploration = function(
+var createAndPublishExploration = async function(
     title, category, objective, language) {
-  createExploration();
+  await createExploration();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   explorationEditorMainTab.setContent(forms.toRichText('new exploration'));
@@ -162,9 +162,9 @@ var createAndPublishExploration = function(
   publishExploration();
 };
 
-var createAddExpDetailsAndPublishExp = function(
+var createAddExpDetailsAndPublishExp = async function(
     title, category, objective, language, tags) {
-  createExploration();
+  await createExploration();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   explorationEditorMainTab.setContent(forms.toRichText('new exploration'));
@@ -175,9 +175,9 @@ var createAddExpDetailsAndPublishExp = function(
 };
 
 // Creates and publishes a exploration with two cards
-var createAndPublishTwoCardExploration = function(
+var createAndPublishTwoCardExploration = async function(
     title, category, objective, language) {
-  createExploration();
+  await createExploration();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   explorationEditorMainTab.setContent(forms.toRichText('card 1'));

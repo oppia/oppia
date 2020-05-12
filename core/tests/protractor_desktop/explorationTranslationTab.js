@@ -57,7 +57,7 @@ describe('Exploration translation and voiceover tab', function() {
       'Exposes the Improvements Tab for creators in the exploration editor',
       'Boolean', (elem) => elem.setValue(false));
     await users.login('user@editorTab.com');
-    workflow.createExploration();
+    await workflow.createExploration();
 
     explorationEditorMainTab.setStateName('first');
     explorationEditorMainTab.setContent(forms.toRichText(

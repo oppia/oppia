@@ -149,7 +149,7 @@ describe('Full exploration editor', function() {
   it('should prevent going back when help card is shown', async function() {
     await users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
     await users.login('user2@editorAndPlayer.com');
-    workflow.createExploration();
+    await workflow.createExploration();
     explorationEditorMainTab.setStateName('card 1');
     explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
     explorationEditorMainTab.setInteraction('Continue');
@@ -367,7 +367,7 @@ describe('Full exploration editor', function() {
         'user4@editorAndPlayer.com', 'user4EditorAndPlayer');
       await users.login('user4@editorAndPlayer.com');
 
-      workflow.createExploration();
+      await workflow.createExploration();
       explorationEditorMainTab.setStateName('card 1');
       explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
       explorationEditorMainTab.setInteraction('NumericInput');
@@ -418,7 +418,7 @@ describe('Full exploration editor', function() {
 
     // Creator creates and publishes an exploration.
     await users.login('user1@hintsAndSolutions.com');
-    workflow.createExploration();
+    await workflow.createExploration();
 
     explorationEditorMainTab.setStateName('Introduction');
     explorationEditorMainTab.setContent(
@@ -458,7 +458,7 @@ describe('Full exploration editor', function() {
       'user10editorAndPlayer');
     await users.login('user9@editorAndPlayer.com');
     // Publish new exploration.
-    workflow.createExploration();
+    await workflow.createExploration();
     explorationEditorMainTab.setContent(
       forms.toRichText('You should recommend this exploration'));
     explorationEditorMainTab.setInteraction('EndExploration');
@@ -479,7 +479,7 @@ describe('Full exploration editor', function() {
     // Using the Id from Player and create a new exploration
     // and add the Id as suggestion.
     var recommendedExplorationId = await general.getExplorationIdFromPlayer();
-    workflow.createExploration();
+    await workflow.createExploration();
     explorationEditorMainTab.setContent(
       forms.toRichText('I want to recommend an exploration at the end'));
     explorationEditorMainTab.setInteraction(

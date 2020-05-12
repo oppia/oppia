@@ -51,7 +51,7 @@ describe('Exploration history', function() {
   it('should display the history', async function() {
     await users.createUser('user@historyTab.com', 'userHistoryTab');
     await users.login('user@historyTab.com');
-    workflow.createExploration();
+    await workflow.createExploration();
 
     // Check renaming state, editing text, editing interactions and adding
     // state.
@@ -543,7 +543,7 @@ describe('Exploration history', function() {
   it('should revert to old exploration commit', async function() {
     await users.createUser('user2@historyTab.com', 'user2HistoryTab');
     await users.login('user2@historyTab.com');
-    workflow.createExploration();
+    await workflow.createExploration();
 
     // Make changes for second commit.
     // First card.
