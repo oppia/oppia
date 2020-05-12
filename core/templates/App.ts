@@ -37,6 +37,7 @@ require('services/contextual/device-info.service.ts');
 require('services/contextual/url.service.ts');
 require('services/stateful/focus-manager.service.ts');
 require('services/site-analytics.service.ts');
+require('services/interaction-rules-registry.service.ts');
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -98,14 +99,17 @@ angular.module('oppia').config([
       'ExpressionParserService', 'ExtensionTagAssemblerService',
       'ExtractImageFilenamesFromStateService',
       'HtmlEscaperService', 'IdGenerationService', 'InteractionObjectFactory',
+      'InteractionRulesRegistryService',
       'LoaderService', 'LoggerService', 'MetaTagCustomizationService',
-      'NormalizeWhitespacePipe', 'PencilCodeEditorRulesService',
-      'SidebarStatusService', 'SiteAnalyticsService', 'SkillObjectFactory',
-      'SolutionObjectFactory', 'StateCardObjectFactory',
-      'StateImprovementSuggestionService', 'StateObjectFactory',
-      'StatesObjectFactory', 'TextInputRulesService', 'UrlInterpolationService',
-      'UrlService', 'UserInfoObjectFactory', 'UtilsService',
-      'ValidatorsService', 'WindowDimensionsService', 'WindowRef'];
+      'NormalizeWhitespacePipe', 'NormalizeWhitespacePunctuationAndCasePipe',
+      'PencilCodeEditorRulesService', 'SidebarStatusService',
+      'SiteAnalyticsService', 'SkillObjectFactory', 'SolutionObjectFactory',
+      'StateCardObjectFactory', 'StateImprovementSuggestionService',
+      'StateObjectFactory', 'StatesObjectFactory', 'TextInputRulesService',
+      'UrlInterpolationService', 'UrlService', 'UserInfoObjectFactory',
+      'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
+      'WindowRef'
+    ];
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       if (servicesToProvide.includes(key)) {
         $provide.value(key, value);
