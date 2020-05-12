@@ -1086,8 +1086,9 @@ class AddAllUserIdsSnapshotMetadataVerificationJob(
         collection rights model.
         """
         if are_commit_cmds_role_change(snapshot_model.commit_cmds):
-            all_users_model.all_user_ids.add(
-                snapshot_model.commit_cmds[0]['assignee_id'])
+            all_user_ids = set(all_users_model.all_user_ids)
+            all_user_ids.add(snapshot_model.commit_cmds[0]['assignee_id'])
+            all_users_model.all_user_ids = list(all_user_ids)
             all_users_model.put()
 
     @staticmethod
@@ -1097,14 +1098,14 @@ class AddAllUserIdsSnapshotMetadataVerificationJob(
         """
         commit_cmds = snapshot_model.commit_cmds
         if are_commit_cmds_role_change(commit_cmds):
+            all_user_ids = set(all_users_model.all_user_ids)
             if commit_cmds[0]['cmd'] == topic_domain.CMD_CHANGE_ROLE:
-                all_users_model.all_user_ids.add(
-                    snapshot_model.commit_cmds[0]['assignee_id'])
-                all_users_model.put()
+                all_user_ids.add(snapshot_model.commit_cmds[0]['assignee_id'])
             elif commit_cmds[0]['cmd'] == topic_domain.CMD_REMOVE_MANAGER_ROLE:
-                all_users_model.all_user_ids.add(
+                all_user_ids.add(
                     snapshot_model.commit_cmds[0]['removed_user_id'])
-                all_users_model.put()
+            all_users_model.all_user_ids = list(all_user_ids)
+            all_users_model.put()
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):

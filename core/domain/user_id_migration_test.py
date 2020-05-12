@@ -1608,7 +1608,7 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
             rights_commit_model.commit_cmds[0]['assignee_id'],
             self.USER_1_USER_ID)
 
-    def test_migrate_topic_rights_snapshot_model(self):
+    def test_migrate_topic_rights_snapshot_model_change_role(self):
         topic_models.TopicRightsSnapshotMetadataModel(
             id='top_1_id-1',
             committer_id=self.USER_1_GAE_ID,
@@ -1652,6 +1652,48 @@ class SnapshotsMetadataUserIdMigrationJobTests(test_utils.GenericTestBase):
                 'rights-top_1_id-1'))
         self.assertEqual(
             rights_commit_model.commit_cmds[0]['assignee_id'],
+            self.USER_1_USER_ID)
+
+    def test_migrate_topic_rights_snapshot_model_remove_manager_role(self):
+        topic_models.TopicRightsSnapshotMetadataModel(
+            id='top_1_id-1',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
+                'removed_user_id': self.USER_1_GAE_ID}]
+        ).put()
+        topic_models.TopicCommitLogEntryModel(
+            id='rights-top_1_id-1',
+            user_id=self.USER_1_GAE_ID,
+            username='user',
+            topic_id='top_1_id',
+            commit_type='edit',
+            commit_message='commit message 2',
+            commit_cmds=[{
+                'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
+                'removed_user_id': self.USER_1_GAE_ID}],
+            version=1,
+            post_commit_status='public'
+        ).put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['SUCCESS - TopicRightsSnapshotMetadataModel', 1]])
+
+        rights_snapshot_model = (
+            topic_models.TopicRightsSnapshotMetadataModel.get_by_id(
+                'top_1_id-1'))
+        self.assertEqual(
+            rights_snapshot_model.commit_cmds[0]['removed_user_id'],
+            self.USER_1_USER_ID)
+
+        rights_commit_model = (
+            topic_models.TopicCommitLogEntryModel.get_by_id(
+                'rights-top_1_id-1'))
+        self.assertEqual(
+            rights_commit_model.commit_cmds[0]['removed_user_id'],
             self.USER_1_USER_ID)
 
 
@@ -2533,6 +2575,247 @@ class AddAllUserIdsSnapshotContentVerificationJobTests(
             .all_user_ids)
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_4_ID],
+            topic_models.TopicRightsAllUsersModel.get_by_id(self.TOP_2_ID)
+            .all_user_ids)
+
+
+class AddAllUserIdsSnapshotMetadataVerificationJobTests(
+        test_utils.GenericTestBase):
+
+    COL_1_ID = 'col_1_id'
+    EXP_1_ID = 'exp_1_id'
+    TOP_1_ID = 'top_1_id'
+    TOP_2_ID = 'top_2_id'
+    USER_1_ID = 'user_1_id'
+    USER_2_ID = 'user_2_id'
+    USER_3_ID = 'user_3_id'
+    USER_4_ID = 'user_4_id'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_id_migration.AddAllUserIdsSnapshotMetadataVerificationJob
+            .create_new())
+        (user_id_migration.AddAllUserIdsSnapshotMetadataVerificationJob
+         .enqueue(job_id))
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            user_id_migration.AddAllUserIdsSnapshotMetadataVerificationJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return [
+            [key, sorted(values) if isinstance(values, list) else values]
+            for key, values in eval_output]
+
+    def test_one_collection_rights(self):
+        collection_model = collection_models.CollectionRightsModel(
+            id=self.COL_1_ID,
+            owner_ids=[self.USER_1_ID],
+            editor_ids=[self.USER_2_ID],
+            voice_artist_ids=[],
+            viewer_ids=[],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        )
+        collection_model.save(
+            'cid',
+            'Created new collection rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        collection_model.owner_ids = [self.USER_3_ID]
+        collection_model.save(
+            'cid',
+            'Change owner',
+            [{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_3_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_OWNER
+            }])
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['SUCCESS-CollectionRightsSnapshotMetadataModel', 2]])
+        self.assertItemsEqual(
+            [self.USER_3_ID],
+            collection_models.CollectionRightsAllUsersModel
+            .get_by_id(self.COL_1_ID).all_user_ids)
+
+    def test_one_exploration_rights(self):
+        exp_model = exp_models.ExplorationRightsModel(
+            id=self.EXP_1_ID,
+            owner_ids=[self.USER_1_ID, self.USER_2_ID],
+            editor_ids=[self.USER_2_ID],
+            voice_artist_ids=[],
+            viewer_ids=[],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        exp_model.save(
+            'cid', 'Created new exploration rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        exp_model.owner_ids = [self.USER_3_ID]
+        exp_model.save(
+            'cid',
+            'Change owner',
+            [{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_3_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_OWNER
+            }])
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['SUCCESS-ExplorationRightsSnapshotMetadataModel', 2]])
+        self.assertItemsEqual(
+            [self.USER_3_ID],
+            exp_models.ExplorationRightsAllUsersModel.get_by_id(self.EXP_1_ID)
+            .all_user_ids)
+
+    def test_one_topic_rights_cahnge_role(self):
+        topic_model = topic_models.TopicRightsModel(
+            id=self.TOP_1_ID,
+            manager_ids=[self.USER_1_ID])
+        topic_model.commit(
+            'cid',
+            'Created new topic rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        topic_model.manager_ids = [self.USER_1_ID, self.USER_3_ID]
+        topic_model.commit(
+            'cid',
+            'Add manager',
+            [{
+                'cmd': topic_domain.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_3_ID,
+                'old_role': topic_domain.ROLE_NONE,
+                'new_role': topic_domain.ROLE_MANAGER
+            }])
+        topic_model.manager_ids = [self.USER_3_ID]
+        topic_model.commit(
+            'cid',
+            'Remove manager',
+            [{
+                'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
+                'removed_user_id': self.USER_1_ID,
+            }])
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output, [['SUCCESS-TopicRightsSnapshotMetadataModel', 3]])
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_3_ID],
+            topic_models.TopicRightsAllUsersModel.get_by_id(self.TOP_1_ID)
+            .all_user_ids)
+
+    def test_multiple_rights(self):
+        collection_model = collection_models.CollectionRightsModel(
+            id=self.COL_1_ID,
+            owner_ids=[],
+            editor_ids=[self.USER_1_ID],
+            voice_artist_ids=[],
+            viewer_ids=[],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        )
+        collection_model.save(
+            'cid',
+            'Created new collection rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        collection_model.editor_ids = [self.USER_1_ID, self.USER_4_ID]
+        collection_model.save(
+            'cid',
+            'Add editor',
+            [{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_4_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_EDITOR
+            }])
+        exp_model = exp_models.ExplorationRightsModel(
+            id=self.EXP_1_ID,
+            owner_ids=[self.USER_1_ID, self.USER_2_ID],
+            editor_ids=[],
+            voice_artist_ids=[],
+            viewer_ids=[self.USER_4_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        exp_model.save(
+            'cid', 'Created new exploration rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        exp_model.owner_ids = [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID]
+        exp_model.save(
+            'cid',
+            'Add owner',
+            [{
+                'cmd': rights_manager.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_3_ID,
+                'old_role': rights_manager.ROLE_NONE,
+                'new_role': rights_manager.ROLE_OWNER
+            }])
+        topic_model_1 = topic_models.TopicRightsModel(
+            id=self.TOP_1_ID,
+            manager_ids=[self.USER_1_ID, self.USER_2_ID])
+        topic_model_1.commit(
+            'cid',
+            'Created new topic rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        topic_model_1.manager_ids = [
+            self.USER_1_ID, self.USER_2_ID, self.USER_3_ID]
+        topic_model_1.commit(
+            'cid',
+            'Add manager',
+            [{
+                'cmd': topic_domain.CMD_CHANGE_ROLE,
+                'assignee_id': self.USER_3_ID,
+                'old_role': topic_domain.ROLE_NONE,
+                'new_role': topic_domain.ROLE_MANAGER
+            }])
+        topic_model_2 = topic_models.TopicRightsModel(
+            id=self.TOP_2_ID,
+            manager_ids=[self.USER_1_ID, self.USER_4_ID])
+        topic_model_2.commit(
+            'cid', 'Created new topic rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        topic_model_2.manager_ids = [self.USER_4_ID]
+        topic_model_2.commit(
+            'cid', 'Remove manager',
+            [{
+                'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
+                'removed_user_id': self.USER_1_ID,
+            }])
+
+        output = self._run_one_off_job()
+        self.assertIn(
+            ['SUCCESS-CollectionRightsSnapshotMetadataModel', 2], output)
+        self.assertIn(
+            ['SUCCESS-ExplorationRightsSnapshotMetadataModel', 2], output)
+        self.assertIn(['SUCCESS-TopicRightsSnapshotMetadataModel', 4], output)
+
+        self.assertItemsEqual(
+            [self.USER_4_ID],
+            collection_models.CollectionRightsAllUsersModel
+            .get_by_id(self.COL_1_ID).all_user_ids)
+        self.assertItemsEqual(
+            [self.USER_3_ID],
+            exp_models.ExplorationRightsAllUsersModel.get_by_id(self.EXP_1_ID)
+            .all_user_ids)
+        self.assertItemsEqual(
+            [self.USER_3_ID],
+            topic_models.TopicRightsAllUsersModel.get_by_id(self.TOP_1_ID)
+            .all_user_ids)
+        self.assertItemsEqual(
+            [self.USER_1_ID],
             topic_models.TopicRightsAllUsersModel.get_by_id(self.TOP_2_ID)
             .all_user_ids)
 
