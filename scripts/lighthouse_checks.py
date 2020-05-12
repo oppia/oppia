@@ -18,12 +18,11 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
-import python_utils
+import re
 import subprocess
 import sys
-
-import re
 import time
+import python_utils
 
 from . import common
 from . import install_third_party_libs
