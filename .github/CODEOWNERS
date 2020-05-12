@@ -488,11 +488,14 @@
 /core/templates/services/csrf-token.service*.ts @jameesjohn @vojtechjelinek
 /core/templates/third-party-imports/ @nishantwrp @vojtechjelinek
 /jinja_utils*.py @jameesjohn @vojtechjelinek
+/lighthouserc.js @jimbyo @jameesjohn
+/scripts/lighthouse_checks.py @jameesjohn @jimbyo
 /webpack.common.config.ts @jameesjohn @vojtechjelinek
 /webpack.common.macros.ts @jameesjohn @vojtechjelinek
 /webpack.dev.config.ts @jameesjohn @vojtechjelinek
 /webpack.prod.config.ts @jameesjohn @vojtechjelinek
 /webpack.terser.config.ts @nishantwrp @vojtechjelinek
+
 
 
 # Typings.

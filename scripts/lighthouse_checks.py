@@ -15,7 +15,7 @@ from . import build
 OPPIA_SERVER_PORT = 8181
 COMPY_SERVER_PORT = 9999
 RUNNING_PROCESSES = []
-GO_VERSION = "1.14.1"
+GO_VERSION = '1.14.1'
 GO_PATH = os.path.join(common.OPPIA_TOOLS_DIR, 'go-%s' % GO_VERSION)
 GO_BINARY = os.path.join(GO_PATH, 'bin', 'go')
 GO_HOME_PATH = os.path.join(os.path.expanduser('~'), 'go')
@@ -51,18 +51,18 @@ def download_and_install_go():
     """Download and install GO."""
     outfile_name = 'go-download'
 
-    if(common.is_windows_os()):
+    if common.is_windows_os():
         pass
     else:
         extension = '.tar.gz'
 
-        if (common.is_mac_os()):
+        if common.is_mac_os():
             go_file_name = 'go%s.darwin-amd64' % (GO_VERSION)
-        elif(common.is_linux_os()):
+        elif common.is_linux_os():
             go_file_name = 'go%s.linux-amd64' % (GO_VERSION)
 
         url_to_retrieve = 'https://storage.googleapis.com/golang/%s%s' % (
-                go_file_name, extension)
+            go_file_name, extension)
 
         python_utils.url_retrieve(url_to_retrieve, outfile_name)
 
@@ -101,8 +101,8 @@ def cleanup():
 
 def delete_reports():
     """"Delete the reports that are stored in the lighthouse ci folder"""
-    bashCommand = 'rm -r .lighthouseci'
-    process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+    bash_command = 'rm -r .lighthouseci'
+    process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
 
 
@@ -110,15 +110,8 @@ def start_proxy_server():
     """Start compy proxy server to serve gzipped assets."""
     ssl_options = '-cert cert.crt -key cert.key -ca ca.crt -cakey ca.key'
     p = subprocess.Popen([COMPY_BINARY, '-host', ':%s' % COMPY_SERVER_PORT,
-        '-gzip', '9'])
+                                                                '-gzip', '9'])
     RUNNING_PROCESSES.append(p)
-
-# def start_regular_server():
-#     """Run command python -m scripts.start"""
-#     bashCommand = 'python -m scripts.start'
-#     process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
-#     output, error = process.communicate()
-
 
 def wait_for_port_to_be_open(port_number):
     """Wait until the port is open.
@@ -144,60 +137,16 @@ def run_lighthouse_checks():
     process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
     output = ''
 
-    for line in iter(process.stdout.readline, ""):
+    for line in iter(process.stdout.readline, ''):
         python_utils.PRINT(line[:-1])
         output += line
 
     process.wait()
     exitCode = process.returncode
 
-    # if (exitCode == 0):
-    #     return output
-    # else:
-    #     raise Exception(bashCommand, exitCode, output)
-    
-
-
 def main():
-    
-    ## Commented code is code used to run a proxy server
-    # cleanup()
-    # if(common.is_port_open(OPPIA_SERVER_PORT)):
-    #     python_utils.PRINT(
-    #             'There is already a server running on localhost:%s.'
-    #             'Please terminate it before running the lighthouse checks.'
-    #             'Exiting.' % OPPIA_SERVER_PORT)
-    #     sys.exit(1)
-
-    # setup_and_install_dependencies()
-
-    # python_utils.PRINT('Checking if GO is installed in %s' % GO_PATH)
-    # if not os.path.exists(GO_PATH):
-    #     python_utils.PRINT('Downloading and installing GO...')
-    #     download_and_install_go()
-
-    # python_utils.PRINT('Checking if Compy is installed in %s' % COMPY_BINARY)
-    # if not os.path.exists(COMPY_BINARY):
-    #     python_utils.PRINT('Downloading and installing Compy Proxy Server...')
-    #     download_and_install_compy()
-
-
-    # atexit.register(cleanup)
-
-
-    # python_utils.PRINT('Generating files for production mode...')
-    # build.main(args=['--prod_env'])
-
-    # start_google_app_engine_server()
-    # wait_for_port_to_be_open(OPPIA_SERVER_PORT)
-    # start_proxy_server()
-
-    # Action to run lighthouse checks.
-    
-    # start_regular_server()
-    
     run_lighthouse_checks()
     delete_reports()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
