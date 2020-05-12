@@ -121,9 +121,11 @@ var CommunityDashboardPage = function() {
       'Opportunity list is not empty');
   };
 
-  this.expectOpportunityListItemHeadingToBe = function(heading, index) {
-    opportunityListItemHeadings.then(function(headings) {
-      expect(headings[index].getText()).toEqual(heading);
+  this.expectOpportunityHeadingToBe = function(opportunityHeading) {
+    opportunityListItemHeadings.map(function(headingElement) {
+      return headingElement.getText();
+    }).then(function(headings) {
+      expect(headings).toContain(opportunityHeading);
     });
   };
 

@@ -41,7 +41,7 @@ describe('Community dashboard page', function() {
     'Review Material 1 for question suggestion'];
   const ADMIN_EMAIL = 'management@community.com';
   const USER_EMAILS = ['user0@community.com', 'user1@community.com'];
-
+  const HINDI_LANGUAGE = 'Hindi';
   let communityDashboardPage = null;
   let communityDashboardTranslateTextTab = null;
   let topicsAndSkillsDashboardPage = null;
@@ -102,8 +102,7 @@ describe('Community dashboard page', function() {
     // Before submission, progress percentage should be 0/50 = 0%.
     communityDashboardPage.expectOpportunityListItemProgressPercentageToBe(
       '(0.00%)', 0);
-    communityDashboardPage.expectOpportunityListItemHeadingToBe(
-      SKILL_DESCRIPTIONS[0], 0);
+    communityDashboardPage.expectOpportunityHeadingToBe(SKILL_DESCRIPTIONS[0]);
 
     // Submit suggestion as user0.
     communityDashboardPage.clickOpportunityListItemButton(0);
@@ -145,8 +144,7 @@ describe('Community dashboard page', function() {
     communityDashboardPage.get();
     communityDashboardPage.waitForOpportunitiesToLoad();
     communityDashboardPage.expectNumberOfOpportunitiesToBe(3);
-    communityDashboardPage.expectOpportunityListItemHeadingToBe(
-      'Question 1', 0);
+    communityDashboardPage.expectOpportunityHeadingToBe('Question 1');
     communityDashboardPage.expectOpportunityListItemSubheadingToBe(
       SKILL_DESCRIPTIONS[0], 0);
     communityDashboardPage.expectOpportunityListItemLabelToBe(
@@ -203,8 +201,7 @@ describe('Community dashboard page', function() {
     communityDashboardPage.get();
     communityDashboardPage.waitForOpportunitiesToLoad();
     communityDashboardPage.expectNumberOfOpportunitiesToBe(4);
-    communityDashboardPage.expectOpportunityListItemHeadingToBe(
-      'Question 1', 0);
+    communityDashboardPage.expectOpportunityHeadingToBe('Question 1');
     communityDashboardPage.expectOpportunityListItemSubheadingToBe(
       SKILL_DESCRIPTIONS[0], 0);
     communityDashboardPage.expectOpportunityListItemLabelToBe(
@@ -220,8 +217,8 @@ describe('Community dashboard page', function() {
 
       // There are always at least 2 placeholder opportunity list items.
       communityDashboardPage.expectNumberOfOpportunitiesToBe(3);
-      communityDashboardPage.expectOpportunityListItemHeadingToBe(
-        SKILL_DESCRIPTIONS[0], 0);
+      communityDashboardPage.expectOpportunityHeadingToBe(
+        SKILL_DESCRIPTIONS[0]);
     });
 
     it('should list skill opportunities for non-admin user', function() {
@@ -232,8 +229,8 @@ describe('Community dashboard page', function() {
 
       // There are always at least 2 placeholder opportunity list items.
       communityDashboardPage.expectNumberOfOpportunitiesToBe(3);
-      communityDashboardPage.expectOpportunityListItemHeadingToBe(
-        SKILL_DESCRIPTIONS[0], 0);
+      communityDashboardPage.expectOpportunityHeadingToBe(
+        SKILL_DESCRIPTIONS[0]);
     });
   });
 
@@ -242,7 +239,7 @@ describe('Community dashboard page', function() {
   });
 });
 
-describe('Admin page community reviewer form', function() {
+fdescribe('Admin page community reviewer form', function() {
   var HINDI_LANGUAGE = 'Hindi';
   var adminPage = null;
   var communityDashboardPage = null;
@@ -282,7 +279,7 @@ describe('Admin page community reviewer form', function() {
     users.logout();
   });
 
-  it('should allow admin to add voiceover reviewer', function() {
+  fit('should allow admin to add voiceover reviewer', function() {
     adminPage.get();
     adminPage.assignVoiceoverReviewer(
       voiceoverReviewerUsername, HINDI_LANGUAGE);

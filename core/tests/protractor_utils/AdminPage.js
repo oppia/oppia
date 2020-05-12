@@ -403,7 +403,6 @@ var AdminPage = function() {
       voiceoverReviewRightsLanguages.map(async function(languageElement) {
         return await languageElement.getText();
       }));
-
     return reviewRights;
   };
 
