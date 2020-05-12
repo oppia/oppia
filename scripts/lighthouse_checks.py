@@ -20,14 +20,12 @@ import subprocess
 import sys
 
 import re
-# Uncomment when adding compy import atexit
 import time
 
 from . import common
-# Uncomment when adding compy from . import install_third_party_libs
+from . import install_third_party_libs
 from . import setup
 from . import setup_gae
-# Uncomment when adding compy from . import build
 
 OPPIA_SERVER_PORT = 8181
 COMPY_SERVER_PORT = 9999
@@ -116,6 +114,7 @@ def cleanup():
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
 
+
 def delete_reports():
     """"Delete the reports that are stored in the lighthouse ci folder."""
     bash_command = 'rm -r .lighthouseci'
@@ -127,8 +126,9 @@ def start_proxy_server():
     """Start compy proxy server to serve gzipped assets."""
     ssl_options = '-cert cert.crt -key cert.key -ca ca.crt -cakey ca.key'
     p = subprocess.Popen([COMPY_BINARY, '-host', ':%s' % COMPY_SERVER_PORT,
-        '-gzip', '9'])
+                          '-gzip', '9', ssl_options])
     RUNNING_PROCESSES.append(p)
+
 
 def wait_for_port_to_be_open(port_number):
     """Wait until the port is open.
@@ -149,9 +149,9 @@ def wait_for_port_to_be_open(port_number):
 
 
 def run_lighthouse_checks():
-    """Runs the lighthouserc.js config with bash command lhci autorun"""
-    bashCommand = 'lhci autorun'
-    process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+    """Runs the lighthouserc.js config with bash command lhci autorun."""
+    bash_command = 'lhci autorun'
+    process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
     output = ''
 
     for line in iter(process.stdout.readline, ''):
@@ -159,13 +159,15 @@ def run_lighthouse_checks():
         output += line
 
     process.wait()
-    exit_code = process.returncode
+    process.returncode
+
 
 def main():
-    """Runs lighthouse checks and deletes reports"""
+    """Runs lighthouse checks and deletes reports."""
     setup_and_install_dependencies()
     run_lighthouse_checks()
     delete_reports()
+
 
 if __name__ == '__main__':
     main()
