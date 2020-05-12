@@ -143,7 +143,9 @@ export class MessengerService {
     return typeof b === 'boolean';
   }
 
-  sendMessage(messageTitle: string, messageData): void {
+  // The argument messageData is of type Object since it can have
+  // different properties based on the messageTitle.
+  sendMessage(messageTitle: string, messageData: Object): void {
     // TODO(sll): For the stateTransition and explorationCompleted events,
     // we now send paramValues in the messageData. We should broadcast these
     // to the parent page as well.
