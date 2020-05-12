@@ -10,7 +10,8 @@
         if (window.google && window.google.charts) {
         google.charts.load('current', { packages: ['corechart'] });
       } else {
-        throw 'error: Could not load google visualization library. Are you offline?';
+        throw new Error(
+          'Could not load google visualization library. Are you offline?');
       }
     </script>
     <style>

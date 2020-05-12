@@ -46,11 +46,13 @@ export class baseInteractionValidationService {
     }
     if (missingArgs.length > 0) {
       if (missingArgs.length === 1) {
-        throw 'Expected customization arguments to have property: ' +
-          missingArgs[0];
+        throw new Error(
+          'Expected customization arguments to have property: ' +
+          missingArgs[0]);
       } else {
-        throw 'Expected customization arguments to have properties: ' +
-          missingArgs.join(', ');
+        throw new Error(
+          'Expected customization arguments to have properties: ' +
+          missingArgs.join(', '));
       }
     }
   }
