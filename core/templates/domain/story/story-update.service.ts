@@ -29,7 +29,7 @@ angular.module('oppia').factory('StoryUpdateService', [
   'CMD_UPDATE_STORY_CONTENTS_PROPERTY', 'CMD_UPDATE_STORY_NODE_OUTLINE_STATUS',
   'CMD_UPDATE_STORY_NODE_PROPERTY', 'CMD_UPDATE_STORY_PROPERTY',
   'INITIAL_NODE_ID', 'STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS',
-  'STORY_NODE_PROPERTY_DESTINATION_NODE_IDS',
+  'STORY_NODE_PROPERTY_DESCRIPTION', 'STORY_NODE_PROPERTY_DESTINATION_NODE_IDS',
   'STORY_NODE_PROPERTY_EXPLORATION_ID',
   'STORY_NODE_PROPERTY_OUTLINE', 'STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS',
   'STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR',
@@ -42,7 +42,7 @@ angular.module('oppia').factory('StoryUpdateService', [
       CMD_UPDATE_STORY_CONTENTS_PROPERTY, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
       CMD_UPDATE_STORY_NODE_PROPERTY, CMD_UPDATE_STORY_PROPERTY,
       INITIAL_NODE_ID, STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
-      STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
+      STORY_NODE_PROPERTY_DESCRIPTION, STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
       STORY_NODE_PROPERTY_EXPLORATION_ID,
       STORY_NODE_PROPERTY_OUTLINE, STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
       STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
@@ -76,7 +76,7 @@ angular.module('oppia').factory('StoryUpdateService', [
     var _getStoryNode = function(storyContents, nodeId) {
       var storyNodeIndex = storyContents.getNodeIndex(nodeId);
       if (storyNodeIndex === -1) {
-        throw Error('The given node doesn\'t exist');
+        throw new Error('The given node doesn\'t exist');
       }
       return storyContents.getNodes()[storyNodeIndex];
     };
@@ -281,7 +281,7 @@ angular.module('oppia').factory('StoryUpdateService', [
           StoryEditorStateService.setExpIdsChanged();
         }, function(changeDict, story) {
           // Undo.
-          throw Error('A deleted story node cannot be restored.');
+          throw new Error('A deleted story node cannot be restored.');
         });
       },
 
@@ -292,7 +292,7 @@ angular.module('oppia').factory('StoryUpdateService', [
       finalizeStoryNodeOutline: function(story, nodeId) {
         var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
         if (storyNode.getOutlineStatus()) {
-          throw Error('Node outline is already finalized.');
+          throw new Error('Node outline is already finalized.');
         }
         _applyChange(story, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS, {
           node_id: nodeId,
@@ -314,7 +314,7 @@ angular.module('oppia').factory('StoryUpdateService', [
       unfinalizeStoryNodeOutline: function(story, nodeId) {
         var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
         if (!storyNode.getOutlineStatus()) {
-          throw Error('Node outline is already not finalized.');
+          throw new Error('Node outline is already not finalized.');
         }
         _applyChange(story, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS, {
           node_id: nodeId,
@@ -367,6 +367,26 @@ angular.module('oppia').factory('StoryUpdateService', [
           }, function(changeDict, story) {
             // Undo.
             story.getStoryContents().setNodeTitle(nodeId, oldTitle);
+          });
+      },
+
+      /**
+       * Sets the description of a node of the story and records the change
+       * in the undo/redo service.
+       */
+      setStoryNodeDescription: function(story, nodeId, newDescription) {
+        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
+        var oldDescription = storyNode.getDescription();
+
+        _applyStoryNodePropertyChange(
+          story, STORY_NODE_PROPERTY_DESCRIPTION, nodeId,
+          oldDescription, newDescription,
+          function(changeDict, story) {
+            // Apply.
+            story.getStoryContents().setNodeDescription(nodeId, newDescription);
+          }, function(changeDict, story) {
+            // Undo.
+            story.getStoryContents().setNodeDescription(nodeId, oldDescription);
           });
       },
 
@@ -473,7 +493,7 @@ angular.module('oppia').factory('StoryUpdateService', [
         var newDestinationNodeIds = angular.copy(oldDestinationNodeIds);
         var index = newDestinationNodeIds.indexOf(destinationNodeId);
         if (index === -1) {
-          throw Error('The given destination node is not part of the node');
+          throw new Error('The given destination node is not part of the node');
         }
         newDestinationNodeIds.splice(index, 1);
 
@@ -528,7 +548,8 @@ angular.module('oppia').factory('StoryUpdateService', [
         var newPrerequisiteSkillIds = angular.copy(oldPrerequisiteSkillIds);
         var index = newPrerequisiteSkillIds.indexOf(skillId);
         if (index === -1) {
-          throw Error('The given prerequisite skill is not part of the node');
+          throw new Error(
+            'The given prerequisite skill is not part of the node');
         }
         newPrerequisiteSkillIds.splice(index, 1);
 
@@ -582,7 +603,8 @@ angular.module('oppia').factory('StoryUpdateService', [
         var newAcquiredSkillIds = angular.copy(oldAcquiredSkillIds);
         var index = newAcquiredSkillIds.indexOf(skillId);
         if (index === -1) {
-          throw Error('The given acquired skill id is not part of the node');
+          throw new Error(
+            'The given acquired skill id is not part of the node');
         }
         newAcquiredSkillIds.splice(index, 1);
 

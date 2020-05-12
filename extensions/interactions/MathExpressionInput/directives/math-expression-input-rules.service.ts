@@ -30,7 +30,7 @@ export class MathExpressionInputRulesService {
     try {
       MathExpression.fromLatex(answer.latex);
     } catch (e) {
-      throw Error(
+      throw new Error(
         'Bad expression in answer.latex: ' + e.message + ' inputs: ' +
         JSON.stringify(answer));
     }
@@ -38,7 +38,7 @@ export class MathExpressionInputRulesService {
     try {
       MathExpression.fromLatex(inputs.x);
     } catch (e) {
-      throw Error(
+      throw new Error(
         'Bad expression in inputs.x: ' + e.message + ' inputs: ' +
         JSON.stringify(inputs));
     }

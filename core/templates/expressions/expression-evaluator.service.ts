@@ -87,7 +87,8 @@ angular.module('oppia').factory('ExpressionEvaluatorService', [
       // section of parser.pegjs).
       if (parsed instanceof Array) {
         if (parsed.length === 0) {
-          throw 'Parser generated an intermediate node with zero children';
+          throw new Error(
+            'Parser generated an intermediate node with zero children');
         }
 
         if (parsed[0] === '#') {

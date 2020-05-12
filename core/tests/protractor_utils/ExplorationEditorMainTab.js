@@ -181,7 +181,8 @@ var ExplorationEditorMainTab = function() {
       if (buttons.length === 1) {
         buttons[0].click();
       } else if (buttons.length !== 0) {
-        throw 'Expected to find at most one \'exit tutorial\' button';
+        throw new Error(
+          'Expected to find at most one \'exit tutorial\' button');
       }
     });
   };
@@ -196,7 +197,7 @@ var ExplorationEditorMainTab = function() {
       if (buttons.length === 1) {
         buttons[0].click();
       } else {
-        throw Error('There is more than 1 Finish button!');
+        throw new Error('There is more than 1 Finish button!');
       }
     });
   };
@@ -227,7 +228,7 @@ var ExplorationEditorMainTab = function() {
             tutorialTabHeadingElement,
             'Tutorial stage takes too long to disappear');
         } else {
-          throw Error('There is more than one Next button!');
+          throw new Error('There is more than one Next button!');
         }
       });
     });
@@ -844,10 +845,10 @@ var ExplorationEditorMainTab = function() {
       if (ruleTemplates[interactionId].hasOwnProperty(ruleName)) {
         return ruleTemplates[interactionId][ruleName].description;
       } else {
-        throw Error('Unknown rule: ' + ruleName);
+        throw new Error('Unknown rule: ' + ruleName);
       }
     } else {
-      throw Error('Could not find rules for interaction: ' + interactionId);
+      throw new Error('Could not find rules for interaction: ' + interactionId);
     }
   };
 
@@ -928,9 +929,10 @@ var ExplorationEditorMainTab = function() {
           ruleDescription = ruleDescription.replace(placeholderElement, '...');
         } else {
           if (providedText.length !== placeholders.length) {
-            throw Error('# of feedback text(' + textArray.length +
-            ') is expected to match # of placeholders(' +
-            (placeholders.length) + ')');
+            throw new Error(
+              '# of feedback text(' + textArray.length +
+              ') is expected to match # of placeholders(' +
+              (placeholders.length) + ')');
           }
           ruleDescription = ruleDescription.replace(
             placeholderElement, providedText[index].toString());
@@ -1000,7 +1002,7 @@ var ExplorationEditorMainTab = function() {
         }
       }
       if (!matched) {
-        throw Error(
+        throw new Error(
           'State ' + targetName + ' not found by editorMainTab.moveToState.');
       }
     });

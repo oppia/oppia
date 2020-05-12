@@ -118,9 +118,6 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
-import { ImprovementsDisplayService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/improvements-tab/services/improvements-display.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
@@ -138,6 +135,7 @@ import { LearnerDashboardActivityIdsObjectFactory } from
 import { LearnerParamsService } from
   'pages/exploration-player-page/services/learner-params.service';
 import { LocalStorageService } from 'services/local-storage.service';
+import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
@@ -178,6 +176,7 @@ import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
+import { PlaythroughService } from 'services/playthrough.service';
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
@@ -358,8 +357,6 @@ export class UpgradedServices {
     upgradedServices['IdGenerationService'] = new IdGenerationService();
     upgradedServices['ImprovementActionButtonObjectFactory'] =
       new ImprovementActionButtonObjectFactory();
-    upgradedServices['ImprovementsDisplayService'] =
-      new ImprovementsDisplayService();
     upgradedServices['ImprovementsService'] = new ImprovementsService();
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
@@ -370,6 +367,7 @@ export class UpgradedServices {
     upgradedServices['LearnerDashboardActivityIdsObjectFactory'] =
       new LearnerDashboardActivityIdsObjectFactory();
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
+    upgradedServices['LoaderService'] = new LoaderService();
     upgradedServices['LoggerService'] = new LoggerService();
     upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
       new UtilsService);
@@ -673,6 +671,14 @@ export class UpgradedServices {
       upgradedServices['OutcomeObjectFactory']);
 
     // Topological level: 6.
+    upgradedServices['PlaythroughService'] =
+      new PlaythroughService(
+        upgradedServices['HttpClient'],
+        upgradedServices['ExplorationFeaturesService'],
+        upgradedServices['LearnerActionObjectFactory'],
+        upgradedServices['PlaythroughObjectFactory'],
+        upgradedServices['StopwatchObjectFactory'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['StateObjectFactory'] = new StateObjectFactory(
       upgradedServices['InteractionObjectFactory'],
       upgradedServices['ParamChangesObjectFactory'],
