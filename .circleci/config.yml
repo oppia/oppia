@@ -25,6 +25,9 @@ workflows:
       - third_party_lint_tests:
           requires:
             - setup
+      - frontend_tests:
+          requires:
+            - setup
       - typescript_tests:
           requires:
             - frontend_tests
