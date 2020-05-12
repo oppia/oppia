@@ -680,7 +680,6 @@ def _save_user_settings(user_settings):
         user_settings: UserSettings domain object.
     """
     user_settings.validate()
-    user_model = user_models.UserSettingsModel.get_by_id(user_settings.user_id)
 
     user_settings_dict = {
         'gae_id': user_settings.gae_id,
@@ -714,6 +713,7 @@ def _save_user_settings(user_settings):
 
     # If user with the given user_id already exists, update that model
     # with the given user settings, otherwise, create a new one.
+    user_model = user_models.UserSettingsModel.get_by_id(user_settings.user_id)
     if user_model is not None:
         user_model.populate(**user_settings_dict)
         user_model.put()
