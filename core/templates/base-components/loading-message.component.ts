@@ -13,8 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the wavesurfer library.
+ * @fileoverview Component for showing the loading screen with a message.
  */
 
-module.exports = require(
-  'static/wave-surfer-js-2.2.1/wavesurfer.min.js');
+angular.module('oppia').component('loadingMessage', {
+  template: require('./loading-message.component.html'),
+  bindings: {
+    message: '<'
+  }
+});

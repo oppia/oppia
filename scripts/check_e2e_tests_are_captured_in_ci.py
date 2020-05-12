@@ -31,12 +31,13 @@ import utils
 TEST_SUITES_NOT_RUN_ON_TRAVIS = [
     'full', 'adminPage', 'accessibility', 'classroomPageFileUploadFeatures',
     'embedding', 'fileUploadFeatures', 'library', 'navigation',
-    'topicAndStoryEditorFileUploadFeatures']
+    'preferences', 'profileFeatures', 'profileMenu',
+    'topicAndStoryEditorFileUploadFeatures', 'users']
 
 TRAVIS_CI_FILE_PATH = os.path.join(os.getcwd(), '.travis.yml')
 PROTRACTOR_CONF_FILE_PATH = os.path.join(
     os.getcwd(), 'core', 'tests', 'protractor.conf.js')
-SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST = 'explorationImprovementsTab'
+SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST = 'coreEditorAndPlayerFeatures'
 
 
 def get_e2e_suite_names_from_jobs_travis_yml_file():
