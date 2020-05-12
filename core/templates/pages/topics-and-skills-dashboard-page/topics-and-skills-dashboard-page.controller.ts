@@ -61,7 +61,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
         'RubricObjectFactory', 'SkillCreationService',
         'SkillObjectFactory', 'TopicCreationService',
         'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
-        'ENTITY_TYPE', 'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+        'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         'EVENT_TYPE_SKILL_CREATION_ENABLED',
         'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         'FATAL_ERROR_CODES', 'SKILL_DIFFICULTIES',
@@ -72,7 +72,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             RubricObjectFactory, SkillCreationService,
             SkillObjectFactory, TopicCreationService,
             TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService,
-            ENTITY_TYPE, EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
+            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
             EVENT_TYPE_SKILL_CREATION_ENABLED,
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
             FATAL_ERROR_CODES, SKILL_DIFFICULTIES,
@@ -139,6 +139,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
               RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
               RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
               RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
+            ContextService.setSaveImagesToLocalStorageContext();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
@@ -213,6 +214,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 }
               ]
             }).result.then(function(result) {
+              ContextService.unsetSaveImagesToLocalStorageContext();
               SkillCreationService.createNewSkill(
                 result.description, result.rubrics, result.explanation, []);
             });

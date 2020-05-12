@@ -42,7 +42,7 @@ export class SkillCreationBackendApiService {
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback:(reason?: any) => void,
       description: string, rubrics: IRubricBackend, explanation: string,
-      linkedTopicIds: string[], tempId: string): void {
+      linkedTopicIds: string[]): void {
     let postData:ISkillCreationBackend = {
       description: description,
       linked_topic_ids: linkedTopicIds,
