@@ -176,6 +176,7 @@ import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
+import { PlaythroughService } from 'services/playthrough.service';
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
@@ -670,6 +671,14 @@ export class UpgradedServices {
       upgradedServices['OutcomeObjectFactory']);
 
     // Topological level: 6.
+    upgradedServices['PlaythroughService'] =
+      new PlaythroughService(
+        upgradedServices['HttpClient'],
+        upgradedServices['ExplorationFeaturesService'],
+        upgradedServices['LearnerActionObjectFactory'],
+        upgradedServices['PlaythroughObjectFactory'],
+        upgradedServices['StopwatchObjectFactory'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['StateObjectFactory'] = new StateObjectFactory(
       upgradedServices['InteractionObjectFactory'],
       upgradedServices['ParamChangesObjectFactory'],
