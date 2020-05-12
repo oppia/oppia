@@ -16,66 +16,92 @@
  * @fileoverview Services for stats reporting.
  */
 
-require('domain/utilities/StopwatchObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require(
-  'pages/exploration-player-page/services/answer-classification.service.ts');
-require('services/context.service.ts');
-require('services/messenger.service.ts');
-require('services/playthrough.service.ts');
-require('services/site-analytics.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { interval } from 'rxjs';
 
-require(
-  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
+import { ContextService } from 'services/context.service';
+import { ExplorationPlayerConstants } from
+  'pages/exploration-player-page/exploration-player-page.constants';
+import { MessengerService } from 'services/messenger.service';
+import { PlaythroughService } from 'services/playthrough.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { Stopwatch, StopwatchObjectFactory } from
+  'domain/utilities/StopwatchObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
-angular.module('oppia').factory('StatsReportingService', [
-  '$http', '$interval', 'ContextService', 'MessengerService',
-  'PlaythroughService', 'SiteAnalyticsService', 'StopwatchObjectFactory',
-  'UrlInterpolationService', 'STATS_REPORTING_URLS',
-  function(
-      $http, $interval, ContextService, MessengerService,
-      PlaythroughService, SiteAnalyticsService, StopwatchObjectFactory,
-      UrlInterpolationService, STATS_REPORTING_URLS) {
-    var explorationId = null;
-    var explorationTitle = null;
-    var explorationVersion = null;
-    var sessionId = null;
-    var stateStopwatch = null;
-    var optionalCollectionId = undefined;
-    var statesVisited = {};
-    var numStatesVisited = 0;
-    var explorationStarted = false;
-    var explorationActuallyStarted = false;
-    var explorationIsComplete = false;
-    var currentStateName = null;
-    var nextExpId = null;
-    var previousStateName = null;
-    var nextStateName = null;
+@Injectable({
+  providedIn: 'root'
+})
+export class StatsReportingService {
+  constructor(
+    private http: HttpClient,
+    private contextService: ContextService,
+    private messengerService: MessengerService,
+    private playthroughService: PlaythroughService,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private stopwatchObjectFactory: StopwatchObjectFactory,
+    private urlInterpolationService: UrlInterpolationService) {}
 
-    var _editorPreviewMode = ContextService.isInExplorationEditorPage();
-    var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
+    explorationId: string = null;
+    explorationTitle: string = null;
+    explorationVersion: number = null;
+    sessionId: string = null;
+    stateStopwatch: Stopwatch = null;
+    optionalCollectionId: string = undefined;
+    statesVisited: {[stateName: string]: boolean} = {};
+    numStatesVisited: number = 0;
+    explorationStarted: boolean = false;
+    explorationActuallyStarted: boolean = false;
+    explorationIsComplete: boolean = false;
+    currentStateName: string = null;
+    nextExpId: string = null;
+    previousStateName: string = null;
+    nextStateName: string = null;
+
+    _editorPreviewMode: boolean = (
+      this.contextService.isInExplorationEditorPage());
+    _questionPlayerMode: boolean = this.contextService.isInQuestionPlayerMode();
 
     // The following dict will contain all stats data accumulated over the
     // interval time and will be reset when the dict is sent to backend for
     // recording.
-    var aggregatedStats = {
+    aggregatedStats: {
+      /* eslint-disable camelcase */
+      num_starts: number;
+      num_completions: number;
+      num_actual_starts: number;
+      state_stats_mapping: {
+        [stateName: string]: {
+          total_answers_count: number;
+          useful_feedback_count: number;
+          total_hit_count: number;
+          first_hit_count: number;
+          num_times_solution_viewed: number;
+          num_completions: number;
+        };
+      };
+      /* eslint-enable camelcase */
+    } = {
       num_starts: null,
       num_completions: null,
       num_actual_starts: null,
       state_stats_mapping: null
     };
 
-    var refreshAggregatedStats = function() {
-      aggregatedStats = {
+    private refreshAggregatedStats(): void {
+      this.aggregatedStats = {
         num_starts: 0,
         num_completions: 0,
         num_actual_starts: 0,
         state_stats_mapping: {}
       };
-    };
+    }
 
-    var createDefaultStateStatsMapping = function(stateName) {
-      aggregatedStats.state_stats_mapping[stateName] = {
+    private createDefaultStateStatsMapping(stateName: string): void {
+      this.aggregatedStats.state_stats_mapping[stateName] = {
         total_answers_count: 0,
         useful_feedback_count: 0,
         total_hit_count: 0,
@@ -83,277 +109,304 @@ angular.module('oppia').factory('StatsReportingService', [
         num_times_solution_viewed: 0,
         num_completions: 0
       };
-    };
+    }
 
-    var getFullStatsUrl = function(urlIdentifier) {
+    private getFullStatsUrl(urlIdentifier: string): string {
       try {
-        return UrlInterpolationService.interpolateUrl(
-          STATS_REPORTING_URLS[urlIdentifier], {
-            exploration_id: explorationId
+        return this.urlInterpolationService.interpolateUrl(
+          ExplorationPlayerConstants.STATS_REPORTING_URLS[urlIdentifier], {
+            exploration_id: this.explorationId
           });
       } catch (e) {
         var additionalInfo = ('\nUndefined exploration id error debug logs:' +
           '\nThe event being recorded: ' + urlIdentifier +
-          '\nExploration ID: ' + ContextService.getExplorationId()
+          '\nExploration ID: ' + this.contextService.getExplorationId()
         );
-        if (currentStateName) {
-          additionalInfo += ('\nCurrent State name: ' + currentStateName);
+        if (this.currentStateName) {
+          additionalInfo += ('\nCurrent State name: ' + this.currentStateName);
         }
-        if (nextExpId) {
-          additionalInfo += ('\nRefresher exp id: ' + nextExpId);
+        if (this.nextExpId) {
+          additionalInfo += ('\nRefresher exp id: ' + this.nextExpId);
         }
-        if (previousStateName && nextStateName) {
-          additionalInfo += ('\nOld State name: ' + previousStateName +
-            '\nNew State name: ' + nextStateName);
+        if (this.previousStateName && this.nextStateName) {
+          additionalInfo += ('\nOld State name: ' + this.previousStateName +
+            '\nNew State name: ' + this.nextStateName);
         }
         e.message += additionalInfo;
         throw e;
       }
-    };
+    }
 
-    var startStatsTimer = function() {
-      if (!_editorPreviewMode && !_questionPlayerMode ) {
-        $interval(function() {
-          postStatsToBackend();
-        }, 300000);
+    private startStatsTimer(): void {
+      if (!this._editorPreviewMode && !this._questionPlayerMode ) {
+        const secondsCounter = interval(300000);
+        secondsCounter.subscribe(n => this.postStatsToBackend());
       }
-    };
+    }
 
     // This method is called whenever a learner tries to leave an exploration,
     // when a learner starts an exploration, when a learner completes an
     // exploration and also every five minutes.
-    var postStatsToBackend = function() {
-      if (explorationIsComplete) {
+    private postStatsToBackend(): void {
+      if (this.explorationIsComplete) {
         return;
       }
-      $http.post(getFullStatsUrl('STATS_EVENTS'), {
-        aggregated_stats: aggregatedStats,
-        exp_version: explorationVersion
+      this.http.post(this.getFullStatsUrl('STATS_EVENTS'), {
+        aggregated_stats: this.aggregatedStats,
+        exp_version: this.explorationVersion
       });
-      refreshAggregatedStats();
-    };
+      this.refreshAggregatedStats();
+    }
 
-    return {
-      initSession: function(
-          newExplorationId, newExplorationTitle, newExplorationVersion,
-          newSessionId, collectionId) {
-        explorationId = newExplorationId;
-        explorationTitle = newExplorationTitle;
-        explorationVersion = newExplorationVersion;
-        sessionId = newSessionId;
-        stateStopwatch = StopwatchObjectFactory.create();
-        optionalCollectionId = collectionId;
-        refreshAggregatedStats();
-        startStatsTimer();
-      },
-      // Note that this also resets the stateStopwatch.
-      recordExplorationStarted: function(stateName, params) {
-        if (explorationStarted) {
-          return;
-        }
-        aggregatedStats.num_starts += 1;
+    initSession(
+        newExplorationId, newExplorationTitle, newExplorationVersion,
+        newSessionId, collectionId): void {
+      this.explorationId = newExplorationId;
+      this.explorationTitle = newExplorationTitle;
+      this.explorationVersion = newExplorationVersion;
+      this.sessionId = newSessionId;
+      this.stateStopwatch = this.stopwatchObjectFactory.create();
+      this.optionalCollectionId = collectionId;
+      this.refreshAggregatedStats();
+      this.startStatsTimer();
+    }
 
-        createDefaultStateStatsMapping(stateName);
-        aggregatedStats.state_stats_mapping[stateName].total_hit_count += 1;
-        aggregatedStats.state_stats_mapping[stateName].first_hit_count += 1;
+    // Note that this also resets the stateStopwatch.
+    // The type of params is declared as Object since it can vary depending
+    // on the stateName.
+    recordExplorationStarted(stateName: string, params: Object): void {
+      if (this.explorationStarted) {
+        return;
+      }
+      this.aggregatedStats.num_starts += 1;
 
-        postStatsToBackend();
+      this.createDefaultStateStatsMapping(stateName);
+      this.aggregatedStats.state_stats_mapping[stateName].total_hit_count += 1;
+      this.aggregatedStats.state_stats_mapping[stateName].first_hit_count += 1;
 
-        currentStateName = stateName;
-        $http.post(getFullStatsUrl('EXPLORATION_STARTED'), {
-          params: params,
-          session_id: sessionId,
-          state_name: stateName,
-          version: explorationVersion
+      this.postStatsToBackend();
+
+      this.currentStateName = stateName;
+      this.http.post(this.getFullStatsUrl('EXPLORATION_STARTED'), {
+        params: params,
+        session_id: this.sessionId,
+        state_name: stateName,
+        version: this.explorationVersion
+      });
+
+      this.http.post(this.getFullStatsUrl('STATE_HIT'), {
+        client_time_spent_in_secs: 0.0,
+        exploration_version: this.explorationVersion,
+        new_state_name: stateName,
+        old_params: params,
+        session_id: this.sessionId,
+      });
+
+      this.messengerService.sendMessage(
+        this.messengerService.EXPLORATION_LOADED, {
+          explorationVersion: this.explorationVersion,
+          explorationTitle: this.explorationTitle
         });
 
-        $http.post(getFullStatsUrl('STATE_HIT'), {
-          client_time_spent_in_secs: 0.0,
-          exploration_version: explorationVersion,
-          new_state_name: stateName,
-          old_params: params,
-          session_id: sessionId,
-        });
+      this.statesVisited[stateName] = true;
+      this.numStatesVisited = 1;
+      this.siteAnalyticsService.registerNewCard(1);
 
-        MessengerService.sendMessage(MessengerService.EXPLORATION_LOADED, {
-          explorationVersion: explorationVersion,
-          explorationTitle: explorationTitle
-        });
+      this.stateStopwatch.reset();
+      this.explorationStarted = true;
+    }
 
-        statesVisited[stateName] = true;
-        numStatesVisited = 1;
-        SiteAnalyticsService.registerNewCard(1);
+    recordExplorationActuallyStarted(stateName: string): void {
+      if (this.explorationActuallyStarted) {
+        return;
+      }
+      this.aggregatedStats.num_actual_starts += 1;
+      this.currentStateName = stateName;
+      this.http.post(this.getFullStatsUrl('EXPLORATION_ACTUALLY_STARTED'), {
+        exploration_version: this.explorationVersion,
+        state_name: stateName,
+        session_id: this.sessionId
+      });
 
-        stateStopwatch.reset();
-        explorationStarted = true;
-      },
-      recordExplorationActuallyStarted: function(stateName) {
-        if (explorationActuallyStarted) {
-          return;
-        }
-        aggregatedStats.num_actual_starts += 1;
-        currentStateName = stateName;
-        $http.post(getFullStatsUrl('EXPLORATION_ACTUALLY_STARTED'), {
-          exploration_version: explorationVersion,
-          state_name: stateName,
-          session_id: sessionId
-        });
+      this.playthroughService.recordExplorationStartAction(stateName);
+      this.explorationActuallyStarted = true;
+    }
 
-        PlaythroughService.recordExplorationStartAction(stateName);
-        explorationActuallyStarted = true;
-      },
-      recordSolutionHit: function(stateName) {
-        if (!aggregatedStats.state_stats_mapping.hasOwnProperty(stateName)) {
-          createDefaultStateStatsMapping(stateName);
-        }
-        aggregatedStats.state_stats_mapping[
-          stateName].num_times_solution_viewed += 1;
-        currentStateName = stateName;
-        $http.post(getFullStatsUrl('SOLUTION_HIT'), {
-          exploration_version: explorationVersion,
-          state_name: stateName,
-          session_id: sessionId,
-          time_spent_in_state_secs: stateStopwatch.getTimeInSecs()
-        });
-      },
-      recordLeaveForRefresherExp: function(stateName, refresherExpId) {
-        currentStateName = stateName;
-        nextExpId = refresherExpId;
-        $http.post(getFullStatsUrl('LEAVE_FOR_REFRESHER_EXP'), {
-          exploration_version: explorationVersion,
-          refresher_exp_id: refresherExpId,
-          state_name: stateName,
-          session_id: sessionId,
-          time_spent_in_state_secs: stateStopwatch.getTimeInSecs()
-        });
-      },
-      // Note that this also resets the stateStopwatch.
-      recordStateTransition: function(
-          oldStateName, newStateName, answer, oldParams, isFirstHit) {
-        if (!aggregatedStats.state_stats_mapping.hasOwnProperty(newStateName)) {
-          createDefaultStateStatsMapping(newStateName);
-        }
-        aggregatedStats.state_stats_mapping[newStateName].total_hit_count += 1;
-        if (isFirstHit) {
-          aggregatedStats.state_stats_mapping[
-            newStateName].first_hit_count += 1;
-        }
+    recordSolutionHit(stateName: string): void {
+      if (!this.aggregatedStats.state_stats_mapping.hasOwnProperty(stateName)) {
+        this.createDefaultStateStatsMapping(stateName);
+      }
+      this.aggregatedStats.state_stats_mapping[
+        stateName].num_times_solution_viewed += 1;
+      this.currentStateName = stateName;
+      this.http.post(this.getFullStatsUrl('SOLUTION_HIT'), {
+        exploration_version: this.explorationVersion,
+        state_name: stateName,
+        session_id: this.sessionId,
+        time_spent_in_state_secs: this.stateStopwatch.getTimeInSecs()
+      });
+    }
 
-        previousStateName = oldStateName;
-        nextStateName = newStateName;
-        $http.post(getFullStatsUrl('STATE_HIT'), {
-          // This is the time spent since the last submission.
-          client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
-          exploration_version: explorationVersion,
-          new_state_name: newStateName,
-          old_params: oldParams,
-          session_id: sessionId,
-        });
+    recordLeaveForRefresherExp(stateName: string, refresherExpId: string) {
+      this.currentStateName = stateName;
+      this.nextExpId = refresherExpId;
+      this.http.post(this.getFullStatsUrl('LEAVE_FOR_REFRESHER_EXP'), {
+        exploration_version: this.explorationVersion,
+        refresher_exp_id: refresherExpId,
+        state_name: stateName,
+        session_id: this.sessionId,
+        time_spent_in_state_secs: this.stateStopwatch.getTimeInSecs()
+      });
+    }
 
-        // Broadcast information about the state transition to listeners.
-        MessengerService.sendMessage(MessengerService.STATE_TRANSITION, {
-          explorationVersion: explorationVersion,
+    // Note that this also resets the stateStopwatch.
+    // The type of oldParams is declared as Object since it can vary depending
+    // on the oldStateName.
+    recordStateTransition(
+        oldStateName: string, newStateName: string, answer: string,
+        oldParams: Object, isFirstHit: boolean): void {
+      if (!this.aggregatedStats.state_stats_mapping.hasOwnProperty(
+        newStateName)) {
+        this.createDefaultStateStatsMapping(newStateName);
+      }
+      this.aggregatedStats.state_stats_mapping[
+        newStateName].total_hit_count += 1;
+      if (isFirstHit) {
+        this.aggregatedStats.state_stats_mapping[
+          newStateName].first_hit_count += 1;
+      }
+
+      this.previousStateName = oldStateName;
+      this.nextStateName = newStateName;
+      this.http.post(this.getFullStatsUrl('STATE_HIT'), {
+        // This is the time spent since the last submission.
+        client_time_spent_in_secs: this.stateStopwatch.getTimeInSecs(),
+        exploration_version: this.explorationVersion,
+        new_state_name: newStateName,
+        old_params: oldParams,
+        session_id: this.sessionId,
+      });
+
+      // Broadcast information about the state transition to listeners.
+      this.messengerService.sendMessage(
+        this.messengerService.STATE_TRANSITION, {
+          explorationVersion: this.explorationVersion,
           jsonAnswer: JSON.stringify(answer),
           newStateName: newStateName,
           oldStateName: oldStateName,
           paramValues: oldParams
         });
 
-        if (!statesVisited.hasOwnProperty(newStateName)) {
-          statesVisited[newStateName] = true;
-          numStatesVisited++;
-          SiteAnalyticsService.registerNewCard(numStatesVisited);
-        }
+      if (!this.statesVisited.hasOwnProperty(newStateName)) {
+        this.statesVisited[newStateName] = true;
+        this.numStatesVisited++;
+        this.siteAnalyticsService.registerNewCard(this.numStatesVisited);
+      }
 
-        stateStopwatch.reset();
-      },
-      recordStateCompleted: function(stateName) {
-        if (!aggregatedStats.state_stats_mapping.hasOwnProperty(stateName)) {
-          createDefaultStateStatsMapping(stateName);
-        }
-        aggregatedStats.state_stats_mapping[stateName].num_completions += 1;
+      this.stateStopwatch.reset();
+    }
 
-        currentStateName = stateName;
-        $http.post(getFullStatsUrl('STATE_COMPLETED'), {
-          exp_version: explorationVersion,
-          state_name: stateName,
-          session_id: sessionId,
-          time_spent_in_state_secs: stateStopwatch.getTimeInSecs()
-        });
-      },
-      recordExplorationCompleted: function(stateName, params) {
-        aggregatedStats.num_completions += 1;
-        currentStateName = stateName;
-        $http.post(getFullStatsUrl('EXPLORATION_COMPLETED'), {
-          client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
-          collection_id: optionalCollectionId,
-          params: params,
-          session_id: sessionId,
-          state_name: stateName,
-          version: explorationVersion
-        });
+    recordStateCompleted(stateName: string): void {
+      if (!this.aggregatedStats.state_stats_mapping.hasOwnProperty(stateName)) {
+        this.createDefaultStateStatsMapping(stateName);
+      }
+      this.aggregatedStats.state_stats_mapping[stateName].num_completions += 1;
 
-        MessengerService.sendMessage(MessengerService.EXPLORATION_COMPLETED, {
-          explorationVersion: explorationVersion,
+      this.currentStateName = stateName;
+      this.http.post(this.getFullStatsUrl('STATE_COMPLETED'), {
+        exp_version: this.explorationVersion,
+        state_name: stateName,
+        session_id: this.sessionId,
+        time_spent_in_state_secs: this.stateStopwatch.getTimeInSecs()
+      });
+    }
+
+    // The type of params is declared as Object since it can vary depending
+    // on the stateName.
+    recordExplorationCompleted(stateName: string, params: Object): void {
+      this.aggregatedStats.num_completions += 1;
+      this.currentStateName = stateName;
+      this.http.post(this.getFullStatsUrl('EXPLORATION_COMPLETED'), {
+        client_time_spent_in_secs: this.stateStopwatch.getTimeInSecs(),
+        collection_id: this.optionalCollectionId,
+        params: params,
+        session_id: this.sessionId,
+        state_name: stateName,
+        version: this.explorationVersion
+      });
+
+      this.messengerService.sendMessage(
+        this.messengerService.EXPLORATION_COMPLETED, {
+          explorationVersion: this.explorationVersion,
           paramValues: params
         });
 
-        SiteAnalyticsService.registerFinishExploration();
+      this.siteAnalyticsService.registerFinishExploration();
 
-        postStatsToBackend();
-        PlaythroughService.recordExplorationQuitAction(
-          stateName, stateStopwatch.getTimeInSecs());
+      this.postStatsToBackend();
+      this.playthroughService.recordExplorationQuitAction(
+        stateName, this.stateStopwatch.getTimeInSecs());
 
-        PlaythroughService.recordPlaythrough(true);
-        explorationIsComplete = true;
-      },
-      recordAnswerSubmitted: function(
-          stateName, params, answer, answerGroupIndex, ruleIndex,
-          classificationCategorization, feedbackIsUseful) {
-        if (!aggregatedStats.state_stats_mapping.hasOwnProperty(stateName)) {
-          createDefaultStateStatsMapping(stateName);
-        }
-        aggregatedStats.state_stats_mapping[stateName].total_answers_count += 1;
-        if (feedbackIsUseful) {
-          aggregatedStats.state_stats_mapping[
-            stateName].useful_feedback_count += 1;
-        }
-        currentStateName = stateName;
-        $http.post(getFullStatsUrl('ANSWER_SUBMITTED'), {
-          answer: answer,
-          params: params,
-          version: explorationVersion,
-          session_id: sessionId,
-          client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
-          old_state_name: stateName,
-          answer_group_index: answerGroupIndex,
-          rule_spec_index: ruleIndex,
-          classification_categorization: classificationCategorization
-        });
-      },
-      recordMaybeLeaveEvent: function(stateName, params) {
-        currentStateName = stateName;
-        $http.post(getFullStatsUrl('EXPLORATION_MAYBE_LEFT'), {
-          client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
-          collection_id: optionalCollectionId,
-          params: params,
-          session_id: sessionId,
-          state_name: stateName,
-          version: explorationVersion
-        });
+      this.playthroughService.recordPlaythrough(true);
+      this.explorationIsComplete = true;
+    }
 
-        postStatsToBackend();
-
-        PlaythroughService.recordExplorationQuitAction(
-          stateName, stateStopwatch.getTimeInSecs());
-        PlaythroughService.recordPlaythrough();
-      },
-      recordAnswerSubmitAction: function(
-          stateName, destStateName, interactionId, answer, feedback) {
-        PlaythroughService.recordAnswerSubmitAction(
-          stateName, destStateName, interactionId, answer, feedback,
-          stateStopwatch.getTimeInSecs());
+    // The type of params is declared as Object since it can vary depending
+    // on the stateName.
+    recordAnswerSubmitted(
+        stateName: string, params: Object, answer: string,
+        answerGroupIndex: number, ruleIndex: number,
+        classificationCategorization: string, feedbackIsUseful: boolean): void {
+      if (!this.aggregatedStats.state_stats_mapping.hasOwnProperty(stateName)) {
+        this.createDefaultStateStatsMapping(stateName);
       }
-    };
-  }
-]);
+      this.aggregatedStats.state_stats_mapping[
+        stateName].total_answers_count += 1;
+      if (feedbackIsUseful) {
+        this.aggregatedStats.state_stats_mapping[
+          stateName].useful_feedback_count += 1;
+      }
+      this.currentStateName = stateName;
+      this.http.post(this.getFullStatsUrl('ANSWER_SUBMITTED'), {
+        answer: answer,
+        params: params,
+        version: this.explorationVersion,
+        session_id: this.sessionId,
+        client_time_spent_in_secs: this.stateStopwatch.getTimeInSecs(),
+        old_state_name: stateName,
+        answer_group_index: answerGroupIndex,
+        rule_spec_index: ruleIndex,
+        classification_categorization: classificationCategorization
+      });
+    }
+
+    // The type of params is declared as Object since it can vary depending
+    // on the stateName.
+    recordMaybeLeaveEvent(stateName: string, params: Object): void {
+      this.currentStateName = stateName;
+      this.http.post(this.getFullStatsUrl('EXPLORATION_MAYBE_LEFT'), {
+        client_time_spent_in_secs: this.stateStopwatch.getTimeInSecs(),
+        collection_id: this.optionalCollectionId,
+        params: params,
+        session_id: this.sessionId,
+        state_name: stateName,
+        version: this.explorationVersion
+      });
+
+      this.postStatsToBackend();
+
+      this.playthroughService.recordExplorationQuitAction(
+        stateName, this.stateStopwatch.getTimeInSecs());
+      this.playthroughService.recordPlaythrough(false);
+    }
+
+    recordAnswerSubmitAction(
+        stateName:string, destStateName: string,
+        interactionId: string, answer: string, feedback: string): void {
+      this.playthroughService.recordAnswerSubmitAction(
+        stateName, destStateName, interactionId, answer, feedback,
+        this.stateStopwatch.getTimeInSecs());
+    }
+}
+angular.module('oppia').factory('StatsReportingService',
+  downgradeInjectable(StatsReportingService));
