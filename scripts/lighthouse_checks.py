@@ -1,16 +1,33 @@
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Lighthouse checks and store reports script."""
+
 import os
 import python_utils
 import subprocess
 import sys
+
 import re
-import atexit
+# Uncomment when adding compy import atexit
 import time
 
 from . import common
-from . import install_third_party_libs
+# Uncomment when adding compy from . import install_third_party_libs
 from . import setup
 from . import setup_gae
-from . import build
+# Uncomment when adding compy from . import build
 
 OPPIA_SERVER_PORT = 8181
 COMPY_SERVER_PORT = 9999
@@ -29,7 +46,7 @@ MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
 def setup_and_install_dependencies():
     """Run the setup and installation scripts."""
 
-    # install_third_party_libs.main()
+    install_third_party_libs.main()
     setup.main(args=[])
     setup_gae.main(args=[])
 
@@ -100,17 +117,17 @@ def cleanup():
         common.kill_processes_based_on_regex(p)
 
 def delete_reports():
-    """"Delete the reports that are stored in the lighthouse ci folder"""
+    """"Delete the reports that are stored in the lighthouse ci folder."""
     bash_command = 'rm -r .lighthouseci'
     process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
-    output, error = process.communicate()
+    process.communicate()
 
 
 def start_proxy_server():
     """Start compy proxy server to serve gzipped assets."""
     ssl_options = '-cert cert.crt -key cert.key -ca ca.crt -cakey ca.key'
     p = subprocess.Popen([COMPY_BINARY, '-host', ':%s' % COMPY_SERVER_PORT,
-                                                                '-gzip', '9'])
+        '-gzip', '9'])
     RUNNING_PROCESSES.append(p)
 
 def wait_for_port_to_be_open(port_number):
@@ -132,7 +149,7 @@ def wait_for_port_to_be_open(port_number):
 
 
 def run_lighthouse_checks():
-    """Run the lighthouse checks"""
+    """Runs the lighthouserc.js config with bash command lhci autorun"""
     bashCommand = 'lhci autorun'
     process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
     output = ''
@@ -142,9 +159,11 @@ def run_lighthouse_checks():
         output += line
 
     process.wait()
-    exitCode = process.returncode
+    exit_code = process.returncode
 
 def main():
+    """Runs lighthouse checks and deletes reports"""
+    setup_and_install_dependencies()
     run_lighthouse_checks()
     delete_reports()
 
