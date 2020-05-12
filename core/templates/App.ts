@@ -27,6 +27,7 @@ require('services/debouncer.service.ts');
 require('services/date-time-format.service.ts');
 require('services/id-generation.service.ts');
 require('services/html-escaper.service.ts');
+require('services/interaction-rules-registry.service');
 require('services/translation-file-hash-loader.service.ts');
 require('services/rte-helper.service.ts');
 require('services/state-rules-stats.service.ts');
@@ -37,7 +38,6 @@ require('services/contextual/device-info.service.ts');
 require('services/contextual/url.service.ts');
 require('services/stateful/focus-manager.service.ts');
 require('services/site-analytics.service.ts');
-require('services/interaction-rules-registry.service.ts');
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -92,23 +92,23 @@ angular.module('oppia').config([
     var servicesToProvide = [
       'AlertsService', 'BackgroundMaskService', 'BrowserCheckerService',
       'CodeReplRulesService', 'CollectionCreationBackendService',
-      'ContextService', 'CsrfTokenService',
-      'DateTimeFormatService', 'DebouncerService', 'DeviceInfoService',
+      'ContextService', 'CsrfTokenService', 'DateTimeFormatService',
+      'DebouncerService', 'DeviceInfoService',
       'DocumentAttributeCustomizationService',
       'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
       'ExpressionParserService', 'ExtensionTagAssemblerService',
-      'ExtractImageFilenamesFromStateService',
-      'HtmlEscaperService', 'IdGenerationService', 'InteractionObjectFactory',
-      'InteractionRulesRegistryService',
-      'LoaderService', 'LoggerService', 'MetaTagCustomizationService',
-      'NormalizeWhitespacePipe', 'NormalizeWhitespacePunctuationAndCasePipe',
+      'ExtractImageFilenamesFromStateService', 'HtmlEscaperService',
+      'IdGenerationService', 'InteractionObjectFactory',
+      'InteractionRulesRegistryService', 'LoaderService', 'LoggerService',
+      'MetaTagCustomizationService', 'NormalizeWhitespacePipe',
+      'NormalizeWhitespacePunctuationAndCasePipe',
       'PencilCodeEditorRulesService', 'SidebarStatusService',
       'SiteAnalyticsService', 'SkillObjectFactory', 'SolutionObjectFactory',
       'StateCardObjectFactory', 'StateImprovementSuggestionService',
-      'StateObjectFactory', 'StatesObjectFactory', 'TextInputRulesService',
-      'UrlInterpolationService', 'UrlService', 'UserInfoObjectFactory',
-      'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
-      'WindowRef'
+      'StateObjectFactory', 'StateRulesStatsService', 'StatesObjectFactory',
+      'TextInputRulesService', 'UrlInterpolationService', 'UrlService',
+      'UserInfoObjectFactory', 'UtilsService', 'ValidatorsService',
+      'WindowDimensionsService', 'WindowRef'
     ];
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       if (servicesToProvide.includes(key)) {

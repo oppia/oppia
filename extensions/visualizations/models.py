@@ -94,6 +94,12 @@ class BarChart(BaseVisualization):
     }]
 
 
+class ClickHexbins(BaseVisualization):
+    """A visualization representing a two-column table with answer counts."""
+
+    _OPTIONS_SPECS = []
+
+
 class FrequencyTable(BaseVisualization):
     """A visualization representing a two-column table with answer counts."""
 

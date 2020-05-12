@@ -34,6 +34,7 @@ require('services/date-time-format.service.ts');
 require('services/exploration-features.service.ts');
 require('services/state-rules-stats.service.ts');
 require('visualizations/oppia-visualization-bar-chart.directive.ts');
+require('visualizations/oppia-visualization-click-hexbins.directive.ts');
 require(
   'visualizations/oppia-visualization-enumerated-frequency-table.directive.ts');
 require('visualizations/oppia-visualization-frequency-table.directive.ts');
@@ -70,47 +71,50 @@ angular.module('oppia').directive('statisticsTab', [
           var ctrl = this;
           var _EXPLORATION_STATS_VERSION_ALL = 'all';
           var stateStatsModalIsOpen = false;
+          var expId = ExplorationDataService.explorationId;
+
+          const expDataPromise =
+            ReadOnlyExplorationBackendApiService.loadLatestExploration(expId)
+              .then(response => {
+                ctrl.states = StatesObjectFactory.createFromBackendDict(
+                  response.exploration.states);
+
+                ctrl.statsGraphData = ComputeGraphService.compute(
+                  response.exploration.init_state_name, ctrl.states);
+
+                ctrl.playthroughsAreAvailable =
+                  ExplorationFeaturesService.isPlaythroughRecordingEnabled() &&
+                  !ExplorationFeaturesService.isImprovementsTabEnabled();
+              });
 
           ctrl.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               millisSinceEpoch);
           };
-          ctrl.refreshExplorationStatistics = function(version) {
-            ctrl.explorationStatisticsUrl = (
-              '/createhandler/statistics/' +
-              ExplorationDataService.explorationId);
 
-            $http.get(ctrl.explorationStatisticsUrl).then(function(
-                statsResponse) {
+          ctrl.refreshExplorationStatistics = function(version) {
+            ctrl.explorationStatisticsUrl =
+              '/createhandler/statistics/' + expId;
+
+            $http.get(ctrl.explorationStatisticsUrl).then(statsResponse => {
               var data = statsResponse.data;
               var numStarts = data.num_starts;
               var numActualStarts = data.num_actual_starts;
               var numCompletions = data.num_completions;
               ctrl.stateStats = data.state_stats_mapping;
 
-              ReadOnlyExplorationBackendApiService.loadLatestExploration(
-                ExplorationDataService.explorationId).then(function(response) {
-                var statesDict = response.exploration.states;
-                var states = StatesObjectFactory.createFromBackendDict(
-                  statesDict);
-                var initStateName = response.exploration.init_state_name;
-
-                ctrl.playthroughsAreAvailable =
-                  ExplorationFeaturesService.isPlaythroughRecordingEnabled() &&
-                  !ExplorationFeaturesService.isImprovementsTabEnabled();
-                ctrl.statsGraphData = ComputeGraphService.compute(
-                  initStateName, states);
-                var improvements = (
+              expDataPromise.then(() => {
+                const improvementSuggestions =
                   StateImprovementSuggestionService.getStateImprovements(
-                    states, ctrl.stateStats));
+                    ctrl.states, ctrl.stateStats);
+
                 ctrl.highlightStates = {};
-                improvements.forEach(function(impItem) {
+                improvementSuggestions.forEach(item => {
                   // TODO(bhenning): This is the feedback for improvement types
                   // and should be included with the definitions of the
                   // improvement types.
-                  if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
-                    ctrl.highlightStates[impItem.stateName] = (
-                      'May be confusing');
+                  if (item.type === IMPROVE_TYPE_INCOMPLETE) {
+                    ctrl.highlightStates[item.stateName] = 'May be confusing';
                   }
                 });
               });
@@ -127,6 +131,7 @@ angular.module('oppia').directive('statisticsTab', [
               ];
             });
           };
+
           ctrl.onClickStateInStatsGraph = function(stateName) {
             if (!stateStatsModalIsOpen) {
               stateStatsModalIsOpen = true;
@@ -147,28 +152,24 @@ angular.module('oppia').directive('statisticsTab', [
                   'state-stats-modal.template.html'),
                 backdrop: true,
                 resolve: {
-                  stateName: function() {
-                    return stateName;
-                  },
-                  stateStats: function() {
-                    return ctrl.stateStats[stateName];
-                  },
-                  improvementType: function() {
-                    return improvementType;
-                  },
-                  visualizationsInfo: function() {
-                    return stateRulesStats.visualizations_info;
-                  }
+                  stateName: () => stateName,
+                  stateStats: () => ctrl.stateStats[stateName],
+                  customizationArgs: expDataPromise.then(() => {
+                    const state = ctrl.states.getState(stateName);
+                    return Object.entries(state.interaction.customizationArgs);
+                  }),
+                  improvementType: () => improvementType,
+                  visualizationsInfo: () => stateRulesStats.visualizations_info,
                 },
                 controller: [
                   '$scope', '$uibModalInstance', '$filter', '$injector',
-                  'stateName', 'stateStats', 'improvementType',
-                  'visualizationsInfo', 'HtmlEscaperService',
+                  'customizationArgs', 'stateName', 'stateStats',
+                  'improvementType', 'visualizationsInfo', 'HtmlEscaperService',
                   'AngularNameService', 'AnswerClassificationService',
                   function(
                       $scope, $uibModalInstance, $filter, $injector,
-                      stateName, stateStats, improvementType,
-                      visualizationsInfo, HtmlEscaperService,
+                      customizationArgs, stateName, stateStats,
+                      improvementType, visualizationsInfo, HtmlEscaperService,
                       AngularNameService, AnswerClassificationService) {
                     var COMPLETION_RATE_PIE_CHART_OPTIONS = {
                       left: 20,
@@ -235,6 +236,12 @@ angular.module('oppia').directive('statisticsTab', [
                         el.attr(
                           'addressed-info-is-supported',
                           vizInfo.addressed_info_is_supported);
+                        for (const [argName, arg] of customizationArgs) {
+                          const argAttrName = argName + 'WithValue';
+                          el.attr(
+                            $filter('camelCaseToHyphens')(argAttrName),
+                            HtmlEscaperService.objToEscapedJson(arg.value));
+                        }
                         return el.get(0).outerHTML;
                       });
 

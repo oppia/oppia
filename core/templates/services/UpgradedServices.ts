@@ -381,8 +381,6 @@ export class UpgradedServices {
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
     upgradedServices['LoaderService'] = new LoaderService();
     upgradedServices['LoggerService'] = new LoggerService();
-    upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
-      new UtilsService);
     upgradedServices['MisconceptionObjectFactory'] =
       new MisconceptionObjectFactory();
     upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'] =
@@ -472,6 +470,8 @@ export class UpgradedServices {
       upgradedServices['ɵangular_packages_common_http_http_d']);
     upgradedServices['LocalStorageService'] = new LocalStorageService(
       upgradedServices['ExplorationDraftObjectFactory']);
+    upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
+      upgradedServices['UtilsService']);
     upgradedServices['MetaTagCustomizationService'] =
       new MetaTagCustomizationService(upgradedServices['WindowRef']);
     upgradedServices['NormalizeWhitespacePipe'] = new NormalizeWhitespacePipe(
