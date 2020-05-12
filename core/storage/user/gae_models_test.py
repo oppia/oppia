@@ -841,6 +841,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             self.USER_ID_3)
         self.assertEqual({}, user_data)
 
+
 class UserSubscribersModelTests(test_utils.GenericTestBase):
     """Tests for UserSubscribersModel."""
 

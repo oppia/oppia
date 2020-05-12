@@ -723,7 +723,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 'summary': self.THREAD_SUMMARY,
                 'message_count': self.THREAD_MESSAGE_COUNT,
                 'last_updated': utils.get_time_in_millisecs(
-                        feedback_thread_model.last_updated)
+                    feedback_thread_model.last_updated)
             },
             thread_id: {
                 'entity_type': self.THREAD_ENTITY_TYPE,
@@ -733,9 +733,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 'has_suggestion': False,
                 'summary': None,
                 'message_count': 2,
-                'last_updated': utils.get_time_in_millisecs(feedback_models.
-                                GeneralFeedbackThreadModel.
-                                get(thread_id).last_updated)
+                'last_updated': utils.get_time_in_millisecs(
+                    feedback_models.
+                    GeneralFeedbackThreadModel.
+                    get(thread_id).last_updated)
             }
         }
         expected_general_feedback_thread_user_data = {
