@@ -71,7 +71,7 @@ def _clear_login_cookies(response_headers):
 
 
 @backports.functools_lru_cache.lru_cache(maxsize=32)
-def _load_template(filename):
+def load_template(filename):
     """Return the HTML file contents at filepath.
 
     Args:
@@ -351,7 +351,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
 
-        self.response.write(_load_template(filepath))
+        self.response.write(load_template(filepath))
 
     def _render_exception_json_or_html(self, return_type, values):
         """Renders an error page, or an error JSON response.

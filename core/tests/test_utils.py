@@ -124,12 +124,12 @@ def get_filepath_from_filename(filename, rootdir):
     return filepath
 
 
-def mock__load_template(filename):
-    """Mock for _load_template function. This mock is required for backend tests
+def mock_load_template(filename):
+    """Mock for load_template function. This mock is required for backend tests
     since we do not have webpack compilation before backend tests. The folder
     to search templates is webpack_bundles which is generated after webpack
-    compilation. Since this folder will be missing, _load_template function will
-    return an error. So, we use a mock for _load_template which returns the html
+    compilation. Since this folder will be missing, load_template function will
+    return an error. So, we use a mock for load_template which returns the html
     file from the source directory instead.
 
     Args:
@@ -651,7 +651,7 @@ tags: []
         # is only produced after webpack compilation which is not performed
         # during backend tests.
         with self.swap(
-            base, '_load_template', mock__load_template):
+            base, 'load_template', mock_load_template):
             response = self.testapp.get(
                 url, params, expect_errors=expect_errors,
                 status=expected_status_int)
@@ -741,7 +741,7 @@ tags: []
         # is only produced after webpack compilation which is not performed
         # during backend tests.
         with self.swap(
-            base, '_load_template', mock__load_template):
+            base, 'load_template', mock_load_template):
             response = self.testapp.get(url, params, expect_errors=True)
 
         self.assertIn(response.status_int, expected_status_int_list)
