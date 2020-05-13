@@ -79,6 +79,6 @@ describe('User Exploration Permissions Service', () => {
     req.flush(samplePermissionsData);
     flushMicrotasks();
 
-    expect(ueps.getPermissionsAsync).toThrow();
+    expect(ueps.getPermissionsAsync).toThrowError();
   }));
 });
