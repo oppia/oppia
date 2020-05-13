@@ -121,7 +121,7 @@ describe('Site language', function() {
     await users.logout();
 
     await users.login('langCreator@explorations.com');
-    workflow.createExploration();
+    await workflow.createExploration();
     firstExplorationId = await general.getExplorationIdFromEditor();
     explorationEditorMainTab.setContent(forms.toRichText('Language Test'));
     explorationEditorMainTab.setInteraction('NumericInput');

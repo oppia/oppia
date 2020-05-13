@@ -185,10 +185,10 @@ var checkConsoleErrorsExist = function(expectedErrors) {
   });
 };
 
-var goToHomePage = function() {
+var goToHomePage = async function() {
   var oppiaMainLogo = element(by.css('.protractor-test-oppia-main-logo'));
-  oppiaMainLogo.click();
-  return waitFor.pageToFullyLoad();
+  await oppiaMainLogo.click();
+  return await waitFor.pageToFullyLoad();
 };
 
 exports.acceptAlert = acceptAlert;

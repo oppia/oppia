@@ -98,7 +98,7 @@ describe('Library index page', function() {
     await users.logout();
 
     await users.login('celebrimor@publicationAndLibrary.com');
-    workflow.createExploration();
+    await workflow.createExploration();
     explorationEditorMainTab.setContent(
       forms.toRichText('Celebrimbor wrote this'));
     explorationEditorMainTab.setInteraction('EndExploration');
@@ -236,16 +236,16 @@ describe('Permissions for private explorations', function() {
     async function() {
       await users.createUser('checkFor@title.com', 'Thanos');
       await users.login('checkFor@title.com');
-      workflow.createExploration();
+      await workflow.createExploration();
       explorationEditorPage.navigateToSettingsTab();
 
-      workflow.openEditRolesForm();
-      expect(workflow.canAddRolesToUsers()).toBe(false);
-      expect(workflow.checkForAddTitleWarning()).toBe(true);
+      await workflow.openEditRolesForm();
+      expect(await workflow.canAddRolesToUsers()).toBe(false);
+      expect(await workflow.checkForAddTitleWarning()).toBe(true);
       explorationEditorSettingsTab.setTitle('Pass');
-      workflow.triggerTitleOnBlurEvent();
-      expect(workflow.canAddRolesToUsers()).toBe(true);
-      expect(workflow.checkForAddTitleWarning()).toBe(false);
+      await workflow.triggerTitleOnBlurEvent();
+      expect(await workflow.canAddRolesToUsers()).toBe(true);
+      expect(await workflow.checkForAddTitleWarning()).toBe(false);
     }
   );
 
@@ -255,7 +255,7 @@ describe('Permissions for private explorations', function() {
     await users.createUser('eve@privileges.com', 'evePrivileges');
 
     await users.login('alice@privileges.com');
-    workflow.createExploration();
+    await workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.setTitle('CollaboratorPermissions');
     workflow.addExplorationCollaborator('bobPrivileges');
@@ -284,7 +284,7 @@ describe('Permissions for private explorations', function() {
     await users.createUser('guestUser@oppia.tests', 'guestUser');
 
     await users.login('expOwner@oppia.tests');
-    workflow.createExploration();
+    await workflow.createExploration();
     explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
     explorationEditorPage.saveChanges('Added content to first card.');
     explorationEditorPage.navigateToSettingsTab();

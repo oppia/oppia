@@ -71,7 +71,7 @@ describe('Full exploration editor', function() {
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
       await users.login('userTutorial@stateEditor.com');
 
-      workflow.createExplorationAndStartTutorial();
+      await workflow.createExplorationAndStartTutorial();
       explorationEditorMainTab.startTutorial();
       explorationEditorMainTab.playTutorial();
       explorationEditorMainTab.finishTutorial();
@@ -84,7 +84,7 @@ describe('Full exploration editor', function() {
       await users.createUser('user@heightWarning.com', 'userHeightWarning');
       await users.login('user@heightWarning.com');
 
-      workflow.createExploration();
+      await workflow.createExploration();
 
       var postTutorialPopover = element(by.css('.popover-content'));
       var stateEditContent = element(by.css('.protractor-test-edit-content'));
@@ -132,7 +132,7 @@ describe('Full exploration editor', function() {
     await users.createUser('user5@editorAndPlayer.com', 'user5EditorAndPlayer');
     await users.login('user5@editorAndPlayer.com');
 
-    workflow.createExploration();
+    await workflow.createExploration();
     explorationEditorMainTab.setStateName('card1');
     explorationEditorMainTab.expectCurrentStateToBe('card1');
     explorationEditorMainTab.setContent(forms.toRichText('card1 content'));
@@ -250,7 +250,7 @@ describe('Full exploration editor', function() {
     await users.createUser('user6@editorAndPlayer.com', 'user6EditorAndPlayer');
     await users.createUser('user7@editorAndPlayer.com', 'user7EditorAndPlayer');
     await users.login('user6@editorAndPlayer.com');
-    workflow.createExploration();
+    await workflow.createExploration();
 
     // Create an exploration with multiple groups.
     explorationEditorMainTab.setStateName('first card');
@@ -358,7 +358,7 @@ describe('Full exploration editor', function() {
   it('should delete interactions cleanly', async function() {
     await users.createUser('user8@editorAndPlayer.com', 'user8EditorAndPlayer');
     await users.login('user8@editorAndPlayer.com');
-    workflow.createExploration();
+    await workflow.createExploration();
     explorationEditorMainTab.setContent(forms.toRichText(
       'How are you feeling?'));
     explorationEditorMainTab.setInteraction('EndExploration');

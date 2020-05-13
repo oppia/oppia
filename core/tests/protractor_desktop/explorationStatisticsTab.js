@@ -289,7 +289,7 @@ describe('Statistics tab', function() {
 
     // Creator creates and publishes an exploration.
     await users.login('user1@statisticsTab.com');
-    workflow.createExploration();
+    await workflow.createExploration();
 
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);

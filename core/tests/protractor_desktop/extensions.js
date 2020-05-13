@@ -45,7 +45,7 @@ describe('rich-text components', function() {
       'user@richTextComponents.com', 'userRichTextComponents');
     await users.login('user@richTextComponents.com');
 
-    workflow.createExploration();
+    await workflow.createExploration();
 
     explorationEditorMainTab.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold');
@@ -122,7 +122,7 @@ describe('Interactions', function() {
   it('should pass their own test suites', async function() {
     await users.createUser('user@interactions.com', 'userInteractions');
     await users.login('user@interactions.com');
-    workflow.createExploration();
+    await workflow.createExploration();
     explorationEditorMainTab.setStateName('first');
     explorationEditorMainTab.setContent(forms.toRichText('some content'));
 
@@ -200,7 +200,7 @@ describe('Interactions', function() {
      */
     await users.createAndLoginUser(
       'explorationEditor@interactions.com', 'explorationEditor');
-    workflow.createExploration();
+    await workflow.createExploration();
 
     explorationEditorMainTab.setStateName('Graph');
     explorationEditorMainTab.setContent(forms.toRichText(

@@ -24,8 +24,9 @@ describe('Oppia static pages tour', function() {
   var thanksPage = null;
 
   beforeEach(async function() {
+    await browser.driver.get("about:blank");
     await browser.get(general.SERVER_URL_PREFIX);
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   });
 
   it('visits the links in About dropdown', async function() {
@@ -40,58 +41,60 @@ describe('Oppia static pages tour', function() {
       var dropdown = element(by.css('.protractor-test-about-oppia-list-item'));
       await browser.actions().mouseMove(dropdown).perform();
       await dropdown.element(by.css(className)).click();
-      waitFor.pageToFullyLoad();
+      await waitFor.pageToFullyLoad();
     }
   });
 
   it('visits the donate link', async function() {
     await element(by.css('.protractor-test-donate-link')).click();
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   });
 
   it('visits the thanks for donating page', async function() {
     thanksPage = new ThanksPage.ThanksPage();
     thanksPage.get();
+    await waitFor.pageToFullyLoad();
   });
 
   it('visits the terms page', async function() {
+    browser.ignoresynchronisation = true
     await element(by.css('.protractor-test-terms-link')).click();
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   });
 
   it('visits the privacy page', async function() {
     await element(by.css('.protractor-test-privacy-policy-link')).click();
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   });
 
   it('visits the Fractions landing page', async function() {
     await browser.get('/fractions');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   });
 
   it('visits the Partners landing page', async function() {
     await browser.get('/partners');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   });
 
   it('visits the Nonprofits landing page', async function() {
     await browser.get('/nonprofits');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   });
 
   it('visits the Parents landing page', async function() {
     await browser.get('/parents');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   });
 
   it('visits the Teachers landing page', async function() {
     await browser.get('/teachers');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   });
 
   it('visits the Volunteers landing page', async function() {
     await browser.get('/volunteers');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   });
 
   afterEach(function() {
@@ -115,27 +118,28 @@ describe('Meta Tags', function() {
   var getStartedPage = new GetStartedPage.GetStartedPage();
 
   beforeEach(async function() {
-    getStartedPage.get();
+    await getStartedPage.get();
   });
 
   it('should set the correct itemprop meta tags', async function() {
-    expect(getStartedPage.getMetaTagContent('name', 'itemprop')).toEqual(
+    expect(await getStartedPage.getMetaTagContent('name', 'itemprop')).toEqual(
       EXPECTED_META_NAME);
-    expect(getStartedPage.getMetaTagContent('description', 'itemprop')).toEqual(
-      EXPECTED_META_DESCRIPTION);
+    expect(
+      await getStartedPage.getMetaTagContent(
+        'description', 'itemprop')).toEqual(EXPECTED_META_DESCRIPTION);
   });
 
   it('should set the correct og meta tags', async function() {
-    expect(getStartedPage.getMetaTagContent('title', 'og')).toEqual(
+    expect(await getStartedPage.getMetaTagContent('title', 'og')).toEqual(
       EXPECTED_META_NAME);
-    expect(getStartedPage.getMetaTagContent('description', 'og')).toEqual(
+    expect(await getStartedPage.getMetaTagContent('description', 'og')).toEqual(
       EXPECTED_META_DESCRIPTION);
-    expect(getStartedPage.getMetaTagContent('url', 'og')).toEqual(
+    expect(await getStartedPage.getMetaTagContent('url', 'og')).toEqual(
       'http://localhost:9001/get_started');
   });
 
   it('should set the correct application name', async function() {
-    expect(getStartedPage.getMetaTagContent(
+    expect(await getStartedPage.getMetaTagContent(
       'application-name', 'name')).toEqual('Oppia.org');
   });
 });
@@ -143,7 +147,7 @@ describe('Meta Tags', function() {
 describe('DEV MODE Test', function() {
   it('should not show Dev Mode label in prod', async function() {
     await browser.get('/');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-dev-mode')).isPresent())
       .toBe(general.isInDevMode());
@@ -153,73 +157,71 @@ describe('DEV MODE Test', function() {
 describe('Static Pages Tour', function() {
   var getStartedPage = new GetStartedPage.GetStartedPage();
   it('visits the Get started page', async function() {
-    getStartedPage.get();
-    waitFor.pageToFullyLoad();
+    await getStartedPage.get();
+    await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-get-started-page')).isPresent()).toBe(true);
   });
 
   it('visits the Teach page', async function() {
     await browser.get('/teach');
-    waitFor.pageToFullyLoad();
-    expect(element(
+    await waitFor.pageToFullyLoad();
+    expect(await element(
       by.css('.protractor-test-teach-page')).isPresent()).toBe(true);
   });
 
   it('visits the Home page', async function() {
     await browser.get('/');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-splash-page')).isPresent()).toBe(true);
   });
 
   it('visits the About page', async function() {
     await browser.get('/about');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-about-page')).isPresent()).toBe(true);
   });
 
   it('visits the Contact page', async function() {
     await browser.get('/contact');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-contact-page')).isPresent()).toBe(true);
   });
 
   it('visits the Donate page', async function() {
     await browser.get('/donate');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-donate-page')).isPresent()).toBe(true);
   });
 
   it('visits the Privacy page', async function() {
     await browser.get('/privacy');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-privacy-page')).isPresent()).toBe(true);
   });
 
   it('visits the Terms page', async function() {
     await browser.get('/terms');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-terms-page')).isPresent()).toBe(true);
   });
 
   it('visits the Thanks page', async function() {
     await browser.get('/thanks');
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-thanks-page')).isPresent()).toBe(true);
   });
 
   it('shows the error page when an incorrect url is given', async function() {
     await browser.get('/splashes');
-    waitFor.pageToFullyLoad();
-
-    var url = await browser.getCurrentUrl();
+    await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-error-page')).isPresent()).toBe(true);
   });

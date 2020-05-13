@@ -143,7 +143,7 @@ describe('Embedding', function() {
 
     // Create exploration.
     // Version 1 is creation of the exploration.
-    workflow.createExploration();
+    await workflow.createExploration();
     var explorationId = await general.getExplorationIdFromEditor();
     // Create Version 2 of the exploration.
     createCountingExploration();
@@ -271,7 +271,7 @@ describe('Embedding', function() {
     await users.login('embedder2@example.com', true);
 
     // Create an exploration.
-    workflow.createExploration();
+    await workflow.createExploration();
     explorationId = await general.getExplorationIdFromEditor();
 
     explorationEditorMainTab.setContent(forms.toRichText('Language Test'));
