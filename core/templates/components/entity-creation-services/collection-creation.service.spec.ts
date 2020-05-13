@@ -16,11 +16,11 @@
  * @fileoverview Unit test for CollectionCreationService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } 
-	from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController }
+  from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { TestBed, fakeAsync, flushMicrotasks, tick } 
-	from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, tick }
+  from '@angular/core/testing';
 import { Location, SpyLocation } from '@angular/common';
 
 import { AlertsService } from 'services/alerts.service';
@@ -30,10 +30,10 @@ import { LoaderService } from 'services/loader.service.ts';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 describe('Collection Creation service', () => {
- 	let collectionCreationService: CollectionCreationService = null;
- 	let alertsService: AlertsService = null;
- 	let loaderService: LoaderService = null;
- 	let analyticsService: SiteAnalyticsService = null;
+  let collectionCreationService: CollectionCreationService = null;
+  let alertsService: AlertsService = null;
+  let loaderService: LoaderService = null;
+  let analyticsService: SiteAnalyticsService = null;
   let httpTestingController: HttpTestingController;
   let location: Location;
   let SAMPLE_COLLECTION_ID = 'hyuy4GUlvTqJ';
@@ -43,8 +43,8 @@ describe('Collection Creation service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-      	HttpClientTestingModule, 
-      	RouterTestingModule,
+        HttpClientTestingModule,
+        RouterTestingModule,
       ],
     });
 
@@ -60,17 +60,17 @@ describe('Collection Creation service', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully create a collection and navigate to the collection', 
-  	fakeAsync(() => {
-    	spyOn(alertsService, 'clearWarnings').and.callThrough();
-    	spyOn(loaderService, 'showLoadingScreen').and.callThrough();
-    	spyOn(analyticsService, 'registerCreateNewCollectionEvent')
-    		.and.callThrough();
+  it('should successfully create a collection and navigate to collection',
+    fakeAsync(() => {
+      spyOn(alertsService, 'clearWarnings').and.callThrough();
+      spyOn(loaderService, 'showLoadingScreen').and.callThrough();
+      spyOn(analyticsService, 'registerCreateNewCollectionEvent')
+        .and.callThrough();
 
-  		collectionCreationService.createNewCollection();
+      collectionCreationService.createNewCollection();
 
-  		let req = httpTestingController.expectOne(
-  			'/collection_editor_handler/create_new');
+      let req = httpTestingController.expectOne(
+        '/collection_editor_handler/create_new');
       expect(req.request.method).toEqual('POST');
       req.flush({collectionId: SAMPLE_COLLECTION_ID});
 
@@ -78,24 +78,24 @@ describe('Collection Creation service', () => {
       tick(150);
 
       expect(alertsService.clearWarnings).toHaveBeenCalled();
-     	expect(loaderService.showLoadingScreen)
-     		.toHaveBeenCalledWith('Creating collection');
-     	expect(analyticsService.registerCreateNewCollectionEvent)
-     		.toHaveBeenCalledWith(SAMPLE_COLLECTION_ID);
+      expect(loaderService.showLoadingScreen)
+        .toHaveBeenCalledWith('Creating collection');
+      expect(analyticsService.registerCreateNewCollectionEvent)
+        .toHaveBeenCalledWith(SAMPLE_COLLECTION_ID);
 
       expect(location.path()).toEqual(
-      	'/collection_editor/create/' + SAMPLE_COLLECTION_ID);
-  	})
-	);
+        '/collection_editor/create/' + SAMPLE_COLLECTION_ID);
+    })
+  );
 
-	it('should fail to create a collection and hide the loading screen', 
-  	fakeAsync(() => {
-  		spyOn(loaderService, 'hideLoadingScreen').and.callThrough();
+  it('should fail to create a collection and hide the loading screen',
+    fakeAsync(() => {
+      spyOn(loaderService, 'hideLoadingScreen').and.callThrough();
 
-  		collectionCreationService.createNewCollection();
+      collectionCreationService.createNewCollection();
 
-  		let req = httpTestingController.expectOne(
-  			'/collection_editor_handler/create_new');
+      let req = httpTestingController.expectOne(
+        '/collection_editor_handler/create_new');
       expect(req.request.method).toEqual('POST');
       req.flush('Error creating a new collection.', {
         status: ERROR_STATUS_CODE,
@@ -105,21 +105,21 @@ describe('Collection Creation service', () => {
       flushMicrotasks();
 
       expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  	})
-	);
+    })
+  );
 
-  it('should not be able to be used while in progress', 
-  	fakeAsync(() => {
-  		spyOn(alertsService, 'clearWarnings').and.callThrough();
-    	spyOn(loaderService, 'showLoadingScreen').and.callThrough();
-    	spyOn(analyticsService, 'registerCreateNewCollectionEvent')
-    		.and.callThrough();
+  it('should not be able to be used while in progress',
+    fakeAsync(() => {
+      spyOn(alertsService, 'clearWarnings').and.callThrough();
+      spyOn(loaderService, 'showLoadingScreen').and.callThrough();
+      spyOn(analyticsService, 'registerCreateNewCollectionEvent')
+        .and.callThrough();
 
-  		collectionCreationService.createNewCollection();
-  		collectionCreationService.createNewCollection();
+      collectionCreationService.createNewCollection();
+      collectionCreationService.createNewCollection();
 
-  		let req = httpTestingController.expectOne(
-  			'/collection_editor_handler/create_new');
+      let req = httpTestingController.expectOne(
+        '/collection_editor_handler/create_new');
       expect(req.request.method).toEqual('POST');
       req.flush({collectionId: SAMPLE_COLLECTION_ID});
 
@@ -127,14 +127,14 @@ describe('Collection Creation service', () => {
       tick(150);
 
       expect(alertsService.clearWarnings)
-      	.toHaveBeenCalledTimes(1);
-     	expect(loaderService.showLoadingScreen)
-     		.toHaveBeenCalledTimes(1);
-     	expect(analyticsService.registerCreateNewCollectionEvent)
-     		.toHaveBeenCalledTimes(1);
+        .toHaveBeenCalledTimes(1);
+      expect(loaderService.showLoadingScreen)
+        .toHaveBeenCalledTimes(1);
+      expect(analyticsService.registerCreateNewCollectionEvent)
+        .toHaveBeenCalledTimes(1);
 
       expect(location.path()).toEqual(
-      	'/collection_editor/create/' + SAMPLE_COLLECTION_ID);
-  	})
-	);
+        '/collection_editor/create/' + SAMPLE_COLLECTION_ID);
+    })
+  );
 });
