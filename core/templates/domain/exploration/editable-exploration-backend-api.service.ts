@@ -96,12 +96,12 @@ export class EditableExplorationBackendApiService {
     let editableExplorationDataUrl = this._getExplorationUrl(
       explorationId, null);
 
-    this.http.delete(editableExplorationDataUrl).toPromise().then(() => {
+    this.http.delete(editableExplorationDataUrl).toPromise().then((r) => {
       // Delete item from the ReadOnlyExplorationBackendApiService's cache
       this.readOnlyExplorationBackendApiService.deleteExplorationFromCache(
         explorationId);
       if (successCallback) {
-        successCallback({});
+        successCallback(r);
       }
     }, (errorResponse: HttpErrorResponse) => {
       if (errorCallback) {
