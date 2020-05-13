@@ -18,7 +18,6 @@
 
 import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { TestBed, fakeAsync, flushMicrotasks, tick }
   from '@angular/core/testing';
 import { Location } from '@angular/common';
@@ -28,14 +27,15 @@ import { CollectionCreationService } from
   'components/entity-creation-services/collection-creation.service';
 import { LoaderService } from 'services/loader.service.ts';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Collection Creation service', () => {
   let collectionCreationService: CollectionCreationService = null;
   let alertsService: AlertsService = null;
   let loaderService: LoaderService = null;
   let analyticsService: SiteAnalyticsService = null;
+  let windowRef: WindowRef = null;
   let httpTestingController: HttpTestingController;
-  let location: Location;
   let SAMPLE_COLLECTION_ID = 'hyuy4GUlvTqJ';
   let SUCCESS_STATUS_CODE = 200;
   let ERROR_STATUS_CODE = 500;
@@ -44,7 +44,6 @@ describe('Collection Creation service', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        RouterTestingModule,
       ],
     });
 
@@ -52,8 +51,8 @@ describe('Collection Creation service', () => {
     alertsService = TestBed.get(AlertsService);
     loaderService = TestBed.get(LoaderService);
     analyticsService = TestBed.get(SiteAnalyticsService);
+    windowRef = TestBed.get(WindowRef);
     httpTestingController = TestBed.get(HttpTestingController);
-    location = TestBed.get(Location);
   });
 
   afterEach(() => {
@@ -66,6 +65,12 @@ describe('Collection Creation service', () => {
       spyOn(loaderService, 'showLoadingScreen').and.callThrough();
       spyOn(analyticsService, 'registerCreateNewCollectionEvent')
         .and.callThrough();
+
+      spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+        location: {
+          href: ''
+        }
+      });
 
       collectionCreationService.createNewCollection();
 
@@ -83,7 +88,7 @@ describe('Collection Creation service', () => {
       expect(analyticsService.registerCreateNewCollectionEvent)
         .toHaveBeenCalledWith(SAMPLE_COLLECTION_ID);
 
-      expect(location.path()).toEqual(
+      expect(windowRef.nativeWindow.location.href).toEqual(
         '/collection_editor/create/' + SAMPLE_COLLECTION_ID);
     })
   );
@@ -115,6 +120,12 @@ describe('Collection Creation service', () => {
       spyOn(analyticsService, 'registerCreateNewCollectionEvent')
         .and.callThrough();
 
+      spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+        location: {
+          href: ''
+        }
+      });
+
       collectionCreationService.createNewCollection();
       collectionCreationService.createNewCollection();
 
@@ -133,7 +144,7 @@ describe('Collection Creation service', () => {
       expect(analyticsService.registerCreateNewCollectionEvent)
         .toHaveBeenCalledTimes(1);
 
-      expect(location.path()).toEqual(
+      expect(windowRef.nativeWindow.location.href).toEqual(
         '/collection_editor/create/' + SAMPLE_COLLECTION_ID);
     })
   );

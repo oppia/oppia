@@ -28,6 +28,7 @@ import { LoaderService } from 'services/loader.service.ts';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +42,7 @@ export class CollectionCreationService {
     private analyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private loaderService: LoaderService,
-    private location: Location) {
+    private windowRef: WindowRef) {
   }
 
   CREATE_NEW_COLLECTION_URL_TEMPLATE = (
@@ -63,11 +64,12 @@ export class CollectionCreationService {
           response.collectionId);
 
         setTimeout(() => {
-          this.location.go(this.urlInterpolationService.interpolateUrl(
-            this.CREATE_NEW_COLLECTION_URL_TEMPLATE, {
-              collection_id: response.collectionId
-            }
-          ));
+          this.windowRef.nativeWindow.location.href = 
+            this.urlInterpolationService.interpolateUrl(
+              this.CREATE_NEW_COLLECTION_URL_TEMPLATE, {
+                collection_id: response.collectionId
+              }
+            );
         }, 150);
       }, () => {
         this.loaderService.hideLoadingScreen();
