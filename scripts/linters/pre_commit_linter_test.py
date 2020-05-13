@@ -66,8 +66,8 @@ INVALID_RELATIVE_IMPORT_FILEPATH = os.path.join(
 INVALID_PARENT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_parent.ts')
 INVALID_TEMPLATE_URL_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_templateurl.ts')
-INVALID_WITHOUT_AJS_CONSTANT_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_without_ajs.constants.ts')
+INVALID_CONSTANT_IN_TS_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_constant_in_ts_file.ts')
 INVALID_CONSTANT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid.constants.ts')
 INVALID_LINE_BREAK_IN_CONTROLLER_DEPENDENCIES_FILEPATH = os.path.join(
@@ -81,6 +81,13 @@ INVALID_SORTED_DEPENDENCIES_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_sorted_dependencies.ts')
 INVALID_FILEOVERVIEW_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_fileoverview.ts')
+INVALID_ANY_TYPE_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_any_type.ts')
+INVALID_TO_THROW_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_toThrow.ts')
+INVALID_THROW_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_throw.ts')
+INVALID_THROW_WITH_STRING_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_throw_with_string.ts')
 
 # PY filepaths.
 VALID_PY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.py')
@@ -441,16 +448,6 @@ class JsTsLintTests(LintTests):
                 ['Line 26: Please do not use innerHTML property.'],
                 self.linter_stdout))
 
-    def test_invalid_constant_file_without_ajs_file(self):
-        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_WITHOUT_AJS_CONSTANT_FILEPATH])
-        self.assertFalse(all_checks_passed(self.linter_stdout))
-        self.assertTrue(
-            appears_in_linter_stdout(
-                ['Corresponding AngularJS constants file not found.'],
-                self.linter_stdout))
-
     def test_invalid_constant_file(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
             pre_commit_linter.main(
@@ -462,8 +459,21 @@ class JsTsLintTests(LintTests):
                 self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
-                ['The constant PROFILE_URL_TEMPLATE is not declared in the '
-                 'corresponding angularjs constants file.'],
+                ['Please ensure that the constant ADMIN_TABS is initialized '
+                 'from the value from the corresponding Angular constants file '
+                 '(the *.constants.ts file). Please create one in the Angular '
+                 'constants file if it does not exist there.'],
+                self.linter_stdout))
+
+    def test_invalid_constant_in_ts_file(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_CONSTANT_IN_TS_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Constant declaration found at line 19. Please declare the '
+                 'constants in a separate constants file.'],
                 self.linter_stdout))
 
     def test_invalid_line_break_in_controller_dependencies(self):
@@ -527,6 +537,52 @@ class JsTsLintTests(LintTests):
                  ' in file ', 'the stringfied dependencies should be in the '
                  'following manner: dollar imports, regular imports and '
                  'constant imports, all in sorted order.'],
+                self.linter_stdout))
+
+    def test_invalid_any_type(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_ANY_TYPE_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['\'any\' type found at line 20. Please do not declare variable'
+                 ' as \'any\' type'],
+                self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['\'any\' type found at line 22. Please do not declare variable'
+                 ' as \'any\' type'],
+                self.linter_stdout))
+
+    def test_invalid_to_throw(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_TO_THROW_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 25: Please use \'toThrowError\' instead of \'toThrow\''],
+                self.linter_stdout))
+
+    def test_invalid_throw(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(args=['--path=%s' % INVALID_THROW_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 27: Please use \'throw new\' instead of \'throw\''],
+                self.linter_stdout))
+
+    def test_invalid_throw_with_string(self):
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            pre_commit_linter.main(
+                args=['--path=%s' % INVALID_THROW_WITH_STRING_FILEPATH])
+        self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.assertTrue(
+            appears_in_linter_stdout(
+                ['Line 27: Please use \'throw new Error\' instead of '
+                 '\'throw\''],
                 self.linter_stdout))
 
 

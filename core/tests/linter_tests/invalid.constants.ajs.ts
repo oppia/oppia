@@ -34,3 +34,6 @@ angular.module('oppia').constant(
 
 angular.module('oppia').constant(
   'ADMIN_TAB_URLS', AdminPageConstants.ADMIN_TAB_URLS);
+
+angular.module('oppia').constant(
+  'ADMIN_TABS', AdminPageConstants.ADMIN_TAB);

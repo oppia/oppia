@@ -17,22 +17,5 @@
     scripts/pre_commit_linter_test.
  */
 
-export class AdminPageConstants {
-  public static ADMIN_HANDLER_URL = '/adminhandler';
-  public static
-    ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL = '/admintopicscsvdownloadhandler';
-
-  public static
-    ADMIN_JOB_OUTPUT_URL_TEMPLATE = '/adminjoboutput?job_id=<jobId>';
-
-  public static ADMIN_TAB_URLS = {
-    ACTIVITIES: '#activities',
-    JOBS: '#jobs',
-    CONFIG: '#config',
-    ROLES: '#roles',
-    MISC: '#misc'
-  };
-
-  public static
-    PROFILE_URL_TEMPLATE = '/profile/<username>';
-}
+angular.module('oppia').constant(
+  'ADMIN_ROLE_HANDLER_URL', AdminPageConstants.ADMIN_ROLE_HANDLER_URL);

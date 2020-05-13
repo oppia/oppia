@@ -261,8 +261,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             starts_with_any_pattern, line):
                         failed = True
                         summary_message = (
-                            '%s --> ANY type found in this file. Line no.'
-                            ' %s' % (file_path, line_number + 1))
+                            '%s --> \'any\' type found at line %s. Please do '
+                            'not declare variable as \'any\' type' % (
+                                file_path, line_number + 1))
                         python_utils.PRINT(summary_message)
                         summary_messages.append(summary_message)
                         python_utils.PRINT('')
@@ -270,8 +271,9 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     if re.findall(any_type_pattern, line):
                         failed = True
                         summary_message = (
-                            '%s --> ANY type found in this file. Line no.'
-                            ' %s' % (file_path, line_number + 1))
+                            '%s --> \'any\' type found at line %s. Please do '
+                            'not declare variable as \'any\' type' % (
+                                file_path, line_number + 1))
                         python_utils.PRINT(summary_message)
                         summary_messages.append(summary_message)
                         python_utils.PRINT('')
@@ -281,15 +283,16 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
             if failed:
                 summary_message = (
-                    '%s ANY type check failed' % _MESSAGE_TYPE_FAILED)
+                    '%s \'any\' type check failed' % _MESSAGE_TYPE_FAILED)
             else:
                 summary_message = (
-                    '%s ANY type check passed' % _MESSAGE_TYPE_SUCCESS)
+                    '%s \'any\' type check passed' % _MESSAGE_TYPE_SUCCESS)
 
             python_utils.PRINT(summary_message)
+            summary_messages.append(summary_message)
             python_utils.PRINT('')
 
-        return [summary_message]
+        return summary_messages
 
     def _check_extra_js_files(self):
         """Checks if the changes made include extra js files in core
@@ -779,20 +782,14 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             angularjs_source_filepaths_to_constants_dict[
                                 corresponding_angularjs_filepath] = (
                                     angularjs_constants_set)
-                        else:
-                            failed = True
-                            summary_message = (
-                                '%s --> Corresponding AngularJS constants '
-                                'file not found.' % filepath)
-                            summary_messages.append(summary_message)
-                            python_utils.PRINT(summary_message)
 
                 # Check that the constants are declared only in a
                 # *.constants.ajs.ts file.
-                if not filepath.endswith('.constants.ajs.ts'):
+                if not filepath.endswith(
+                        ('.constants.ajs.ts', '.constants.ts')):
                     for line_num, line in enumerate(self.file_cache.readlines(
                             filepath)):
-                        if 'oppia.constant(' in line:
+                        if 'angular.module(\'oppia\').constant(' in line:
                             failed = True
                             summary_message = (
                                 '%s --> Constant declaration found at line '
@@ -834,6 +831,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 # Checks that the *.constants.ts and the corresponding
                 # *.constants.ajs.ts file are in sync.
                 if filepath.endswith('.constants.ts'):
+                    # Ignore if file contains only type definitions for
+                    # constants.
+                    if len(parsed_nodes) == 1:
+                        continue
                     angular_constants_nodes = (
                         parsed_nodes[1].declarations[0].init.callee.body.body)
                     for angular_constant_node in angular_constants_nodes:
@@ -852,20 +853,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                             % filepath)
                         summary_messages.append(summary_message)
                         python_utils.PRINT(summary_message)
-                    if corresponding_angularjs_filepath in (
-                            angularjs_source_filepaths_to_constants_dict):
-                        angular_minus_angularjs_constants = (
-                            angular_constants_set.difference(
-                                angularjs_source_filepaths_to_constants_dict[
-                                    corresponding_angularjs_filepath]))
-                        for constant in angular_minus_angularjs_constants:
-                            failed = True
-                            summary_message = (
-                                '%s --> The constant %s is not declared '
-                                'in the corresponding angularjs '
-                                'constants file.' % (filepath, constant))
-                            summary_messages.append(summary_message)
-                            python_utils.PRINT(summary_message)
 
             if failed:
                 summary_message = (
