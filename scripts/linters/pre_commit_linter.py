@@ -44,6 +44,9 @@ CUSTOMIZATION OPTIONS
         python -m scripts.linters.pre_commit_linter
             --only-check-file-extensions py js
 
+6. To run a specific type of linter (third_party, custom)
+        python -m scripts.linters.pre_commit_linter --linter-type=custom
+
 Note that the root folder MUST be named 'oppia'.
  """
 
@@ -322,10 +325,11 @@ def _get_linter_type(linter_type):
     Returns:
         list(str). The list of all linter types.
     """
+    linter_types = ['custom', 'third_party']
     if linter_type:
         return [linter_type]
 
-    return ['custom', 'third_party']
+    return linter_types
 
 
 def _get_file_extensions(file_extensions_to_lint):
