@@ -5285,5 +5285,5 @@ export = {
   // Used to hide the callout to classroom until it is ready.
   "SHOW_CLASSROOM_CALLOUT": false,
 
-  "DEV_MODE": false
+  "DEV_MODE": true
 };
