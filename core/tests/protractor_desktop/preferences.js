@@ -18,8 +18,9 @@
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 
-describe('Preferences', function() {
+fdescribe('Preferences', function() {
   var preferencesPage = null;
 
   beforeEach(function() {
@@ -29,13 +30,15 @@ describe('Preferences', function() {
   it('should let a user upload a profile photo', async function() {
     await users.createUser('eve@preferences.com', 'evePreferences');
     await users.login('eve@preferences.com');
-    preferencesPage.get();
-    expect(preferencesPage.getProfilePhotoSource())
+    await preferencesPage.get();
+    await waitFor.pageToFullyLoad();
+
+    expect(await preferencesPage.getProfilePhotoSource())
       .not
       .toEqual(
-        preferencesPage.submitProfilePhoto('../data/img.png')
-          .then(function() {
-            return preferencesPage.getProfilePhotoSource();
+        await preferencesPage.submitProfilePhoto('../data/img.png')
+          .then(async function() {
+            return await preferencesPage.getProfilePhotoSource();
           })
       );
   });
@@ -43,8 +46,9 @@ describe('Preferences', function() {
   it('should show an error if uploaded photo is too large', async function() {
     await users.createUser('lou@preferences.com', 'louPreferences');
     await users.login('lou@preferences.com');
-    preferencesPage.get();
-    preferencesPage.uploadProfilePhoto(
+    await preferencesPage.get();
+    await waitFor.pageToFullyLoad();
+    await preferencesPage.uploadProfilePhoto(
       '../data/dummyLargeImage.jpg')
       .then(function() {
         preferencesPage.expectUploadError();
@@ -54,83 +58,106 @@ describe('Preferences', function() {
   it('should change editor role email checkbox value', async function() {
     await users.createUser('alice@preferences.com', 'alicePreferences');
     await users.login('alice@preferences.com');
-    preferencesPage.get();
-    expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(true);
-    preferencesPage.toggleEditorRoleEmailsCheckbox();
-    expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(false);
-    browser.refresh();
-    expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(false);
+    await preferencesPage.get();
+    await waitFor.pageToFullyLoad();
+    expect(await preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(
+      true);
+    await preferencesPage.toggleEditorRoleEmailsCheckbox();
+    expect(await preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(
+      false);
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+    expect(await preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(
+      false);
   });
 
   it('should change feedback message email checkbox value', async function() {
     await users.createUser('bob@preferences.com', 'bobPreferences');
     await users.login('bob@preferences.com');
-    preferencesPage.get();
-    expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(true);
-    preferencesPage.toggleFeedbackEmailsCheckbox();
-    expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
-    browser.refresh();
-    expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
+    await preferencesPage.get();
+    await waitFor.pageToFullyLoad();
+    expect(await preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(true);
+    await preferencesPage.toggleFeedbackEmailsCheckbox();
+    expect(await preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(
+      false);
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+    expect(await preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(
+      false);
   });
 
   it('should set and edit bio in user profile', async function() {
     await users.createUser('lisa@preferences.com', 'lisaPreferences');
     await users.login('lisa@preferences.com');
-    preferencesPage.get();
-    preferencesPage.setUserBio('I am Lisa');
-    browser.refresh();
-    preferencesPage.expectUserBioToBe('I am Lisa');
-    preferencesPage.setUserBio('Junior student');
-    browser.refresh();
-    preferencesPage.expectUserBioToBe('Junior student');
-    preferencesPage.editUserBio(' from USA');
-    preferencesPage.editUserBio(' studying CS!');
-    browser.refresh();
-    preferencesPage.expectUserBioToBe('Junior student from USA studying CS!');
+    await preferencesPage.get();
+    await preferencesPage.setUserBio('I am Lisa');
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+    await preferencesPage.expectUserBioToBe('I am Lisa');
+
+    await preferencesPage.setUserBio('Junior student');
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+    await preferencesPage.expectUserBioToBe('Junior student');
+
+    await preferencesPage.editUserBio(' from USA');
+    await preferencesPage.editUserBio(' studying CS!');
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+    await preferencesPage.expectUserBioToBe(
+      'Junior student from USA studying CS!');
   });
 
   it('should change prefered audio language of the learner', async function() {
     await users.createUser('paul@preferences.com', 'paulPreferences');
     await users.login('paul@preferences.com');
-    preferencesPage.get();
+    await preferencesPage.get();
     expect(preferencesPage.preferredAudioLanguageSelector).toBeUndefined();
-    preferencesPage.selectPreferredAudioLanguage('Hindi');
-    preferencesPage.expectPreferredAudioLanguageToBe('Hindi');
-    browser.refresh();
-    preferencesPage.expectPreferredAudioLanguageToBe('Hindi');
-    preferencesPage.selectPreferredAudioLanguage('Arabic');
-    preferencesPage.expectPreferredAudioLanguageToBe('Arabic');
-    browser.refresh();
-    preferencesPage.expectPreferredAudioLanguageToBe('Arabic');
+    await preferencesPage.selectPreferredAudioLanguage('Hindi');
+    await preferencesPage.expectPreferredAudioLanguageToBe('Hindi');
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+
+    await preferencesPage.expectPreferredAudioLanguageToBe('Hindi');
+    await preferencesPage.selectPreferredAudioLanguage('Arabic');
+    await preferencesPage.expectPreferredAudioLanguageToBe('Arabic');
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+
+    await preferencesPage.expectPreferredAudioLanguageToBe('Arabic');
   });
 
   it('should change prefered site language of the learner', async function() {
     await users.createUser('john@preferences.com', 'johnPreferences');
     await users.login('john@preferences.com');
-    preferencesPage.get();
+    await preferencesPage.get();
     expect(preferencesPage.systemLanguageSelector).toBeUndefined();
-    preferencesPage.selectSystemLanguage('Español');
-    preferencesPage.expectPreferredSiteLanguageToBe('Español');
-    browser.refresh();
-    preferencesPage.expectPreferredSiteLanguageToBe('Español');
-    preferencesPage.selectSystemLanguage('English');
-    preferencesPage.expectPreferredSiteLanguageToBe('English');
-    browser.refresh();
-    preferencesPage.expectPreferredSiteLanguageToBe('English');
+    await preferencesPage.selectSystemLanguage('Español');
+    await preferencesPage.expectPreferredSiteLanguageToBe('Español');
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+
+    await preferencesPage.expectPreferredSiteLanguageToBe('Español');
+    await preferencesPage.selectSystemLanguage('English');
+    await preferencesPage.expectPreferredSiteLanguageToBe('English');
+    await browser.refresh();
+    await waitFor.pageToFullyLoad();
+
+    await preferencesPage.expectPreferredSiteLanguageToBe('English');
   });
 
   it('should load the correct dashboard according to selection',
     async function() {
       await users.createUser('lorem@preferences.com', 'loremPreferences');
       await users.login('lorem@preferences.com');
-      preferencesPage.get();
-      preferencesPage.selectCreatorDashboard();
-      general.goToHomePage();
+      await preferencesPage.get();
+      await preferencesPage.selectCreatorDashboard();
+      await general.goToHomePage();
       expect(await browser.getCurrentUrl()).toEqual(
         'http://localhost:9001/creator_dashboard');
-      preferencesPage.get();
-      preferencesPage.selectLearnerDashboard();
-      general.goToHomePage();
+      await preferencesPage.get();
+      await preferencesPage.selectLearnerDashboard();
+      await general.goToHomePage();
       expect(await browser.getCurrentUrl()).toEqual(
         'http://localhost:9001/learner_dashboard');
     });

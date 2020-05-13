@@ -50,18 +50,18 @@ var _completeSignup = async function(username) {
   // as a client side navigation and the tests fail since Angular is
   // not found due to the navigation interfering with protractor's
   // bootstrapping.
-  browser.waitForAngularEnabled(false);
+  await browser.waitForAngularEnabled(false);
   await browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
-  browser.waitForAngularEnabled(true);
+  await browser.waitForAngularEnabled(true);
   var usernameInput = element(by.css('.protractor-test-username-input'));
   var agreeToTermsCheckbox = element(
     by.css('.protractor-test-agree-to-terms-checkbox'));
   var registerUser = element(by.css('.protractor-test-register-user'));
-  waitFor.visibilityOf(usernameInput, 'No username input field was displayed');
+  await waitFor.visibilityOf(usernameInput, 'No username input field was displayed');
   await usernameInput.sendKeys(username);
   await agreeToTermsCheckbox.click();
   await registerUser.click();
-  waitFor.pageToFullyLoad();
+  await waitFor.pageToFullyLoad();
 };
 
 var createUser = async function(email, username) {

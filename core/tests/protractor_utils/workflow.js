@@ -66,17 +66,17 @@ var createExplorationAndStartTutorial = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   await creatorDashboardPage.get();
   // Wait for the dashboard to transition the creator into the editor page.
-  users.isAdmin().then(function(isAdmin) {
+  users.isAdmin().then(async function(isAdmin) {
     creatorDashboardPage.clickCreateActivityButton();
     if (isAdmin) {
       var activityCreationModal = element(
         by.css('.protractor-test-creation-modal'));
-      waitFor.visibilityOf(
+      await waitFor.visibilityOf(
         activityCreationModal,
         'ActivityCreationModal takes too long to be visible.');
       var createExplorationButton = element(
         by.css('.protractor-test-create-exploration'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         createExplorationButton,
         'createExplorationButton takes too long to be clickable.');
       await createExplorationButton.click();
@@ -270,37 +270,37 @@ var createSkillAndAssignTopic = function(
     0, topicName);
 };
 
-var getImageSource = function(customImageElement) {
-  waitFor.visibilityOf(
+var getImageSource = async function(customImageElement) {
+  await waitFor.visibilityOf(
     customImageElement,
     'Image element is taking too long to appear.');
-  return customImageElement.getAttribute('src');
+  return await customImageElement.getAttribute('src');
 };
 
-var uploadImage = function(imageClickableElement, imgPath) {
-  waitFor.visibilityOf(
+var uploadImage = async function(imageClickableElement, imgPath) {
+  await waitFor.visibilityOf(
     imageClickableElement,
     'Image element is taking too long to appear.');
-  imageClickableElement.click();
+  await imageClickableElement.click();
   absPath = path.resolve(__dirname, imgPath);
-  return imageUploadInput.sendKeys(absPath);
+  return await imageUploadInput.sendKeys(absPath);
 };
 
-var submitImage = function(imageClickableElement, imageContainer, imgPath) {
-  waitFor.visibilityOf(
+var submitImage = async function(imageClickableElement, imageContainer, imgPath) {
+  await waitFor.visibilityOf(
     imageClickableElement,
     'Image element is taking too long to appear.');
-  return this.uploadImage(
-    imageClickableElement, imgPath).then(function() {
-    waitFor.visibilityOf(
+  return await this.uploadImage(
+    imageClickableElement, imgPath).then(async function() {
+    await waitFor.visibilityOf(
       imageContainer, 'Image container is taking too long to appear');
-  }).then(function() {
-    imageSubmitButton.click();
-  }).then(function() {
-    waitFor.invisibilityOf(
+  }).then(async function() {
+    await imageSubmitButton.click();
+  }).then(async function() {
+    await waitFor.invisibilityOf(
       imageUploadInput,
       'Image uploader is taking too long to disappear');
-    return waitFor.pageToFullyLoad();
+    return await waitFor.pageToFullyLoad();
   });
 };
 

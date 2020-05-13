@@ -206,7 +206,7 @@ describe('Static Pages Tour', function() {
   });
 
   it('visits the Terms page', async function() {
-    await browser.get('http://localhost:9001/terms');
+    await browser.get('/terms');
     await waitFor.pageToFullyLoad();
     expect(await element(
       by.css('.protractor-test-terms-page')).isPresent()).toBe(true);

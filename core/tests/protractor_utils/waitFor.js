@@ -44,8 +44,8 @@ var elementToBeClickable = function(element, errorMessage) {
  *                           have height or width.
  * @param {string} errorMessage - Error message when element is still visible.
  */
-var invisibilityOf = function(element, errorMessage) {
-  return browser.wait(
+var invisibilityOf = async function(element, errorMessage) {
+  return await browser.wait(
     until.invisibilityOf(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
@@ -79,8 +79,8 @@ var textToBePresentInElement = function(element, text, errorMessage) {
  *                           height and width that is greater than 0.
  * @param {string} errorMessage - Error message when element is invisible.
  */
-var visibilityOf = function(element, errorMessage) {
-  return browser.wait(
+var visibilityOf = async function(element, errorMessage) {
+  return await browser.wait(
     until.visibilityOf(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
