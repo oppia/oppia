@@ -522,11 +522,8 @@ describe('Answer classification service with string classifier enabled',
       };
       scms.init(stateClassifierMapping);
 
-      registryService.setMapping({
-        TestClassifier: {
-          v1: 'PredictionSampleService'
-        }
-      });
+      registryService.testOnlySetPredictionService(
+        'TestClassifier', 1, $injector.get('PredictionSampleService'));
 
       state2 = angular.copy(state);
       state2.interaction.id = 'UntrainableInteraction';

@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,46 +16,61 @@
  * @fileoverview Service for mapping algorithmId to PredictionAlgorithmService.
  */
 
-angular.module('oppia').factory('PredictionAlgorithmRegistryService', [
-  '$injector', function($injector) {
-    /**
-     * This mapping needs to be updated whenever a new prediction service needs
-     * to be added for classification. The mapping is from algorithmId to a
-     * list of objects. The mapping should be of the type:
-     * {
-     *   algorithmId: {
-     *     dataSchemaVersion: predictionService
-     *   }
-     * }
-     */
-    var algorithmIdPredictionServiceMapping = {
-      CodeClassifier: {
-        v1: 'CodeReplPredictionService'
-      },
-      TextClassifier: {
-        v1: 'TextInputPredictionService'
-      }
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-    };
+import { CodeReplPredictionService } from
+  'interactions/CodeRepl/code-repl-prediction.service';
+import { TextInputPredictionService } from
+  'interactions/TextInput/text-input-prediction.service';
 
-    return {
-      getPredictionService: function(algorithmId, dataSchemaVersion) {
-        if (algorithmIdPredictionServiceMapping.hasOwnProperty(algorithmId)) {
-          // We convert dataSchemaVersion to a string below since JS objects
-          // can't have integer properties.
-          var serviceName = (
-            algorithmIdPredictionServiceMapping[algorithmId][
-              'v' + dataSchemaVersion.toString()]);
-          return $injector.get(serviceName);
-        } else {
-          return null;
-        }
-      },
-      // The below function is required for running tests with sample
-      // prediction services.
-      setMapping: function(newAlgorithmIdPredictionServiceMapping) {
-        algorithmIdPredictionServiceMapping = (
-          newAlgorithmIdPredictionServiceMapping);
+interface IPredictionService {
+  predict(classifierData, answer): number;
+}
+
+type AlgorithmIdPredictionServiceMap = (
+  Map<string, Map<number, IPredictionService>>);
+
+@Injectable({providedIn: 'root'})
+export class PredictionAlgorithmRegistryService {
+  private algorithmIdPredictionServiceMapping: AlgorithmIdPredictionServiceMap;
+
+  constructor(
+      private codeReplPredictionService: CodeReplPredictionService,
+      private textInputPredictionService: TextInputPredictionService) {
+    this.algorithmIdPredictionServiceMapping = new Map(Object.entries({
+      CodeClassifier: new Map([
+        [1, this.codeReplPredictionService]
+      ]),
+      TextClassifier: new Map([
+        [1, this.textInputPredictionService]
+      ])
+    }));
+  }
+
+  getPredictionService(
+      algorithmId: string, dataSchemaVersion: number): IPredictionService {
+    if (this.algorithmIdPredictionServiceMapping.has(algorithmId)) {
+      const predictionServicesByDataSchemaVersion = (
+        this.algorithmIdPredictionServiceMapping.get(algorithmId));
+      if (predictionServicesByDataSchemaVersion.has(dataSchemaVersion)) {
+        return predictionServicesByDataSchemaVersion.get(dataSchemaVersion);
       }
-    };
-  }]);
+    }
+    return null;
+  }
+
+  testOnlySetPredictionService(
+      algorithmId: string, dataSchemaVersion: number,
+      service: IPredictionService): void {
+    if (!this.algorithmIdPredictionServiceMapping.has(algorithmId)) {
+      this.algorithmIdPredictionServiceMapping.set(algorithmId, new Map());
+    }
+    this.algorithmIdPredictionServiceMapping.get(algorithmId)
+      .set(dataSchemaVersion, service);
+  }
+}
+
+angular.module('oppia').factory(
+  'PredictionAlgorithmRegistryService',
+  downgradeInjectable(PredictionAlgorithmRegistryService));
