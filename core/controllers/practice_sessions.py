@@ -58,9 +58,7 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(e)
         skill_descriptions = {}
         for skill in skills:
-            skill_descriptions[skill.id] = skill.description
-
-        topic_name = topic.name
+            skill_descriptions[skill.id] = skill.descriptio
 
         self.values.update({
             'topic_name': topic.name,
