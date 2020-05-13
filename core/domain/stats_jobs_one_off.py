@@ -1373,3 +1373,50 @@ class RegenerateMissingV2StatsModelsOneOffJob(
             yield (key, len(items))
         else:
             yield (key, items)
+
+
+class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for finding explorations that are missing stats models.
+
+    If this job outputs any explorations, then the following two jobs need to be
+    run in succession:
+        - RegenerateMissingV1StatsModelsOneOffJob
+        - RegenerateMissingV2StatsModelsOneOffJob
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel, stats_models.ExplorationStatsModel]
+
+    @staticmethod
+    def map(model):
+        if isinstance(model, stats_models.ExplorationStatsModel):
+            key = '%s.%s' % (model.exp_id, model.exp_version)
+            value = 'ExplorationStatsModel'
+        else: # exp_models.ExplorationModel
+            key = '%s.%s' % (model.id, model.version)
+            value = 'ExplorationModel'
+        if model.deleted:
+            value = 'Deleted%s' % value
+        yield (key, value)
+
+    @staticmethod
+    def reduce(key, values):
+        exp_exists = 'ExplorationModel' in values
+        exp_stats_exists = 'ExplorationStatsModel' in values
+
+        if exp_exists and not exp_stats_exists:
+            status = (
+                'deleted' if 'DeletedExplorationStatsModel' in values else
+                'missing')
+            yield (
+                'ERROR',
+                'ExplorationStats %s %s, but corresponding Exploration exists' %
+                (key, status))
+        elif not exp_exists and exp_stats_exists:
+            status = (
+                'deleted' if 'DeletedExplorationModel' in values else 'missing')
+            yield (
+                'WARNING',
+                'Exploration %s %s, but corresponding ExplorationStats exists' %
+                (key, status))
