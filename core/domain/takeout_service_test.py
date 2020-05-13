@@ -447,9 +447,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
     def test_export_nonexistent_user(self):
         """Setup for nonexistent user test of export_data functionality."""
-        with self.assertRaises(user_models.UserSettingsModel
-                               .EntityNotFoundError):
-            user_models.UserSettingsModel.export_data('fake_user')
+        with self.assertRaises(
+            user_models.UserSettingsModel.EntityNotFoundError):
+            takeout_service.export_data_for_user('fake_user')
 
     def test_export_data_trivial(self):
         """Trivial test of export_data functionality."""
@@ -576,11 +576,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
 
         # Perform export and compare.
-        exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
-        self.assertEqual(expected_export, exported_data)
-        exported_json = json.dumps(exported_data)
+        observed_data = takeout_service.export_data_for_user(self.USER_ID_1)
+        self.assertEqual(expected_export, observed_data)
+        observed_json = json.dumps(observed_data)
         expected_json = json.dumps(expected_export)
-        self.assertEqual(json.loads(expected_json), json.loads(exported_json))
+        self.assertEqual(json.loads(expected_json), json.loads(observed_json))
 
     def test_export_data_nontrivial(self):
         """Nontrivial test of export_data functionality."""
@@ -963,8 +963,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata_data': expected_exploration_sm,
         }
-        exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
-        self.assertEqual(exported_data, expected_export)
-        exported_json = json.dumps(exported_data)
+        observed_data = takeout_service.export_data_for_user(self.USER_ID_1)
+        self.assertEqual(observed_data, expected_export)
+        observed_json = json.dumps(observed_data)
         expected_json = json.dumps(expected_export)
-        self.assertEqual(json.loads(exported_json), json.loads(expected_json))
+        self.assertEqual(json.loads(observed_json), json.loads(expected_json))
