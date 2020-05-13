@@ -138,7 +138,7 @@ angular.module('oppia').run([
                   // when 'Cancel' was clicked in the customization modal.
                   var widgetElement = editor.editable().findOne(
                     newWidgetSelector);
-                  if (widgetElement.getText() === '') {
+                  if (widgetElement && widgetElement.getText() === '') {
                     widgetElement.remove();
                   }
                 });

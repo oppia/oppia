@@ -17,8 +17,9 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/alerts.service.ts');
 require('domain/skill/skill-creation-backend-api.service.ts');
+require('services/alerts.service.ts');
+require('services/image-local-storage.service.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/' +
@@ -26,12 +27,14 @@ require(
 
 angular.module('oppia').factory('SkillCreationService', [
   '$rootScope', '$timeout', '$window', 'AlertsService',
-  'SkillCreationBackendApiService', 'UrlInterpolationService',
+  'ImageLocalStorageService', 'SkillCreationBackendApiService',
+  'UrlInterpolationService', 'ENTITY_TYPE',
   'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
   'SKILL_DESCRIPTION_STATUS_VALUES',
   function(
       $rootScope, $timeout, $window, AlertsService,
-      SkillCreationBackendApiService, UrlInterpolationService,
+      ImageLocalStorageService, SkillCreationBackendApiService,
+      UrlInterpolationService, ENTITY_TYPE,
       EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
       SKILL_DESCRIPTION_STATUS_VALUES) {
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
@@ -84,6 +87,8 @@ angular.module('oppia').factory('SkillCreationService', [
               $rootScope.$broadcast(
                 EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, true);
               skillCreationInProgress = false;
+              ImageLocalStorageService.postImagesToServer(
+                ENTITY_TYPE.SKILL, response.skillId);
               newTab.location.href = UrlInterpolationService.interpolateUrl(
                 CREATE_NEW_SKILL_URL_TEMPLATE, {
                   skill_id: response.skillId

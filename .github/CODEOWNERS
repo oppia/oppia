@@ -61,6 +61,7 @@
 /core/storage/opportunity/ @DubeySandeep @sagangwee
 /core/templates/domain/opportunity @DubeySandeep @sagangwee
 /core/templates/pages/community-dashboard-page/ @DubeySandeep @sagangwee
+/core/templates/services/image-local-storage*.ts @DubeySandeep
 
 
 # Core documentation

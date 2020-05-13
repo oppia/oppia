@@ -91,38 +91,6 @@ def save_original_and_compressed_versions_of_image(
             micro_image_content, mimetype=mimetype)
 
 
-def move_images_between_directories(
-        source_entity_type, source_entity_id, target_entity_type,
-        target_entity_id):
-    """Move all the images from the source entity's directory to the target
-    entity's directory. Note that the files are deleted from the source entity's
-    directory during the operation.
-
-    Args:
-        source_entity_type: str. Entity type of source directory.
-        source_entity_id: str. Entity Id of source directory.
-        target_entity_type: str. Entity type of target directory.
-        target_entity_id: str. Entity Id of target directory.
-    """
-    file_system_class = get_entity_file_system_class()
-
-    source_fs = fs_domain.AbstractFileSystem(
-        file_system_class(source_entity_type, source_entity_id))
-
-    target_fs = fs_domain.AbstractFileSystem(
-        file_system_class(target_entity_type, target_entity_id))
-
-    for filepath in source_fs.listdir('image'):
-        image_content = source_fs.get(filepath)
-        file_format = filepath[(filepath.rfind('.') + 1):]
-        mimetype = (
-            'image/svg+xml'
-            if file_format == 'svg' else 'image/%s' % file_format)
-        target_fs.commit(
-            filepath.encode('utf-8'), image_content, mimetype=mimetype)
-        source_fs.delete(filepath)
-
-
 def save_classifier_data(exp_id, job_id, classifier_data):
     """Store classifier model data in a file.
 

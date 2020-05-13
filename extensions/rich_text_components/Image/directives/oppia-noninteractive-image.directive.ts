@@ -25,14 +25,15 @@ require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
+require('services/image-local-storage.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveImage', [
   'AssetsBackendApiService', 'ContextService',
-  'HtmlEscaperService', 'ImagePreloaderService',
+  'HtmlEscaperService', 'ImageLocalStorageService', 'ImagePreloaderService',
   'UrlInterpolationService', 'ENTITY_TYPE', 'LOADING_INDICATOR_URL',
   function(
       AssetsBackendApiService, ContextService,
-      HtmlEscaperService, ImagePreloaderService,
+      HtmlEscaperService, ImageLocalStorageService, ImagePreloaderService,
       UrlInterpolationService, ENTITY_TYPE, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
@@ -91,14 +92,18 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
             };
             ctrl.loadImage();
           } else {
-            // This is the case when user is in exploration editor or in
-            // preview mode. We don't have loading indicator or try again for
-            // showing images in the exploration editor or in preview mode. So
-            // we directly assign the url to the imageUrl.
+            // This is the case when user is not in the exploration player. We
+            // don't have loading indicator or try again for showing images in
+            // this case. So we directly assign the url to the imageUrl.
             try {
-              ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
-                ContextService.getEntityType(), ContextService.getEntityId(),
-                ctrl.filepath);
+              if (ContextService.areImagesSavedInLocalStorage()) {
+                ctrl.imageUrl = ImageLocalStorageService.getObjectUrlForImage(
+                  ctrl.filepath);
+              } else {
+                ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
+                  ContextService.getEntityType(), ContextService.getEntityId(),
+                  ctrl.filepath);
+              }
             } catch (e) {
               var additionalInfo = (
                 '\nEntity type: ' + ContextService.getEntityType() +

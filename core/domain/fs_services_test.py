@@ -87,49 +87,6 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         self.assertEqual(
             fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), True)
 
-    def test_move_images_between_directories(self):
-        with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), mode='rb',
-            encoding=None) as f:
-            original_image_content = f.read()
-        source_fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
-
-        target_fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_SKILL, 'skill_id'))
-
-        fs_services.save_original_and_compressed_versions_of_image(
-            self.FILENAME, feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID,
-            original_image_content, 'image', True)
-        self.assertEqual(source_fs.isfile('image/%s' % self.FILENAME), True)
-        self.assertEqual(
-            source_fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), True)
-        self.assertEqual(
-            source_fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), True)
-        self.assertEqual(target_fs.isfile('image/%s' % self.FILENAME), False)
-        self.assertEqual(
-            target_fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME),
-            False)
-        self.assertEqual(
-            target_fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), False)
-
-        fs_services.move_images_between_directories(
-            feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID,
-            feconf.ENTITY_TYPE_SKILL, 'skill_id')
-        self.assertEqual(source_fs.isfile('image/%s' % self.FILENAME), False)
-        self.assertEqual(
-            source_fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME),
-            False)
-        self.assertEqual(
-            source_fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), False)
-        self.assertEqual(target_fs.isfile('image/%s' % self.FILENAME), True)
-        self.assertEqual(
-            target_fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), True)
-        self.assertEqual(
-            target_fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), True)
-
     def test_compress_image_on_prod_mode_with_big_image_size(self):
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
         # This swap is done to make the image's dimensions greater than
