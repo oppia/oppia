@@ -1626,8 +1626,8 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.ExplorationMissingStatsAudit
 
     def _save_new_exploration(self, exp_id, deleted=False):
-        """Creates and commits an exploration model to directly to storage,
-        bypassing checks since these tests are only concerned with the deleted
+        """Creates and commits an exploration model directly to storage,
+        bypassing checks because these tests are only concerned with the deleted
         field.
 
         Args:
@@ -1662,7 +1662,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
 
     def _save_new_exploration_stats(self, exp_id, deleted=False):
         """Creates and commits an exploration stats model directly to storage,
-        bypassing checks since these tests are only concerned with the deleted
+        bypassing checks because these tests are only concerned with the deleted
         field.
 
         Args:
@@ -1712,17 +1712,6 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         self.assertIn('ExplorationStats id.1 missing', output[0])
         self.assertIn('corresponding Exploration exists', output[0])
 
-    def test_warning_when_exploration_is_missing_but_stats_model_exists(self):
-        # Do not create exploration model.
-        self._save_new_exploration_stats('id')
-
-        output = self.run_one_off_job()
-
-        self.assertEqual(len(output), 1)
-        self.assertIn('WARNING', output[0])
-        self.assertIn('Exploration id.1 missing', output[0])
-        self.assertIn('corresponding ExplorationStats exists', output[0])
-
     def test_error_when_exploration_exists_but_stats_model_is_deleted(self):
         self._save_new_exploration('id')
         self._save_new_exploration_stats('id', deleted=True)
@@ -1733,6 +1722,17 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         self.assertIn('ERROR', output[0])
         self.assertIn('ExplorationStats id.1 deleted', output[0])
         self.assertIn('corresponding Exploration exists', output[0])
+
+    def test_warning_when_exploration_is_missing_but_stats_model_exists(self):
+        # Do not create exploration model.
+        self._save_new_exploration_stats('id')
+
+        output = self.run_one_off_job()
+
+        self.assertEqual(len(output), 1)
+        self.assertIn('WARNING', output[0])
+        self.assertIn('Exploration id.1 missing', output[0])
+        self.assertIn('corresponding ExplorationStats exists', output[0])
 
     def test_warning_when_exploration_is_deleted_but_stats_model_exists(self):
         self._save_new_exploration('id', deleted=True)
