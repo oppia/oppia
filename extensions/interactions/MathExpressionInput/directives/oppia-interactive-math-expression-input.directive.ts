@@ -52,7 +52,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
             DebouncerService, DeviceInfoService, WindowDimensionsService,
             CurrentInteractionService) {
           var ctrl = this;
-          var guppyDivElt, guppyDivId, guppyInstance;
+          var guppyDivElt, guppyDivId, guppyInstance: Guppy;
           var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
             '/overrides/guppy/oppia_symbols.json');
           var labelForFocusTarget = $attrs.labelForFocusTarget || null;
