@@ -150,7 +150,7 @@ describe('Topic editor functionality', function() {
 
   it(
     'should create an additional skill in the topic and edit the skill' +
-    'linkages for the existing question', function() {
+    ' linkages for the existing question', function() {
       topicsAndSkillsDashboardPage.get();
       topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
         'Skill2TopicAndStoryEditor', 'Concept card explanation');
