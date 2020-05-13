@@ -29,7 +29,7 @@ angular.module('oppia').factory('StoryUpdateService', [
   'CMD_UPDATE_STORY_CONTENTS_PROPERTY', 'CMD_UPDATE_STORY_NODE_OUTLINE_STATUS',
   'CMD_UPDATE_STORY_NODE_PROPERTY', 'CMD_UPDATE_STORY_PROPERTY',
   'INITIAL_NODE_ID', 'STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS',
-  'STORY_NODE_PROPERTY_DESTINATION_NODE_IDS',
+  'STORY_NODE_PROPERTY_DESCRIPTION', 'STORY_NODE_PROPERTY_DESTINATION_NODE_IDS',
   'STORY_NODE_PROPERTY_EXPLORATION_ID',
   'STORY_NODE_PROPERTY_OUTLINE', 'STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS',
   'STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR',
@@ -42,7 +42,7 @@ angular.module('oppia').factory('StoryUpdateService', [
       CMD_UPDATE_STORY_CONTENTS_PROPERTY, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
       CMD_UPDATE_STORY_NODE_PROPERTY, CMD_UPDATE_STORY_PROPERTY,
       INITIAL_NODE_ID, STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
-      STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
+      STORY_NODE_PROPERTY_DESCRIPTION, STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
       STORY_NODE_PROPERTY_EXPLORATION_ID,
       STORY_NODE_PROPERTY_OUTLINE, STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
       STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
@@ -367,6 +367,26 @@ angular.module('oppia').factory('StoryUpdateService', [
           }, function(changeDict, story) {
             // Undo.
             story.getStoryContents().setNodeTitle(nodeId, oldTitle);
+          });
+      },
+
+      /**
+       * Sets the description of a node of the story and records the change
+       * in the undo/redo service.
+       */
+      setStoryNodeDescription: function(story, nodeId, newDescription) {
+        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
+        var oldDescription = storyNode.getDescription();
+
+        _applyStoryNodePropertyChange(
+          story, STORY_NODE_PROPERTY_DESCRIPTION, nodeId,
+          oldDescription, newDescription,
+          function(changeDict, story) {
+            // Apply.
+            story.getStoryContents().setNodeDescription(nodeId, newDescription);
+          }, function(changeDict, story) {
+            // Undo.
+            story.getStoryContents().setNodeDescription(nodeId, oldDescription);
           });
       },
 
