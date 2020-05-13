@@ -722,7 +722,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 'has_suggestion': self.THREAD_HAS_SUGGESTION,
                 'summary': self.THREAD_SUMMARY,
                 'message_count': self.THREAD_MESSAGE_COUNT,
-                'last_updated': utils.get_time_in_millisecs(
+                'last_updated_msec': utils.get_time_in_millisecs(
                     feedback_thread_model.last_updated)
             },
             thread_id: {
@@ -733,7 +733,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 'has_suggestion': False,
                 'summary': None,
                 'message_count': 2,
-                'last_updated': utils.get_time_in_millisecs(
+                'last_updated_msec': utils.get_time_in_millisecs(
                     feedback_models.
                     GeneralFeedbackThreadModel.
                     get(thread_id).last_updated)
