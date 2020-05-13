@@ -359,7 +359,7 @@ exports.config = {
     format: 'summary'
   },
 
-  SELENIUM_PROMISE_MANAGER: False,
+  SELENIUM_PROMISE_MANAGER: false,
 
   // ----- The cleanup step -----
   //
