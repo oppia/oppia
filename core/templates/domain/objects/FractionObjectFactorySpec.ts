@@ -91,51 +91,51 @@ describe('Fraction Object Factory', () => {
     // Invalid characters.
     expect(() => {
       fraction.fromRawInputString('3 \ b');
-    }).toThrow(new Error(errors.INVALID_CHARS));
+    }).toThrowError(errors.INVALID_CHARS);
     expect(() => {
       fraction.fromRawInputString('a 3/5');
-    }).toThrow(new Error(errors.INVALID_CHARS));
+    }).toThrowError(errors.INVALID_CHARS);
     expect(() => {
       fraction.fromRawInputString('5 b/c');
-    }).toThrow(new Error(errors.INVALID_CHARS));
+    }).toThrowError(errors.INVALID_CHARS);
     expect(() => {
       fraction.fromRawInputString('a b/c');
-    }).toThrow(new Error(errors.INVALID_CHARS));
+    }).toThrowError(errors.INVALID_CHARS);
     // Invalid format.
     expect(() => {
       fraction.fromRawInputString('1 / -3');
-    }).toThrow(new Error(errors.INVALID_FORMAT));
+    }).toThrowError(errors.INVALID_FORMAT);
     expect(() => {
       fraction.fromRawInputString('-1 -3/2');
-    }).toThrow(new Error(errors.INVALID_FORMAT));
+    }).toThrowError(errors.INVALID_FORMAT);
     expect(() => {
       fraction.fromRawInputString('3 -');
-    }).toThrow(new Error(errors.INVALID_FORMAT));
+    }).toThrowError(errors.INVALID_FORMAT);
     expect(() => {
       fraction.fromRawInputString('1  1');
-    }).toThrow(new Error(errors.INVALID_FORMAT));
+    }).toThrowError(errors.INVALID_FORMAT);
     expect(() => {
       fraction.fromRawInputString('1/3 1/2');
-    }).toThrow(new Error(errors.INVALID_FORMAT));
+    }).toThrowError(errors.INVALID_FORMAT);
     expect(() => {
       fraction.fromRawInputString('1 2 3 / 4');
-    }).toThrow(new Error(errors.INVALID_FORMAT));
+    }).toThrowError(errors.INVALID_FORMAT);
     expect(() => {
       fraction.fromRawInputString('1 / 2 3');
-    }).toThrow(new Error(errors.INVALID_FORMAT));
+    }).toThrowError(errors.INVALID_FORMAT);
     expect(() => {
       fraction.fromRawInputString('- / 3');
-    }).toThrow(new Error(errors.INVALID_FORMAT));
+    }).toThrowError(errors.INVALID_FORMAT);
     expect(() => {
       fraction.fromRawInputString('/ 3');
-    }).toThrow(new Error(errors.INVALID_FORMAT));
+    }).toThrowError(errors.INVALID_FORMAT);
     // Division by zero.
     expect(() => {
       fraction.fromRawInputString(' 1/0');
-    }).toThrow(new Error(errors.DIVISION_BY_ZERO));
+    }).toThrowError(errors.DIVISION_BY_ZERO);
     expect(() => {
       fraction.fromRawInputString('1 2 /0');
-    }).toThrow(new Error(errors.DIVISION_BY_ZERO));
+    }).toThrowError(errors.DIVISION_BY_ZERO);
   });
 
   it('should convert to the correct float value', () => {

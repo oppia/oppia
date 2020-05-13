@@ -518,7 +518,7 @@ def apply_change_list(skill_id, change_list, committer_id):
                 skill.delete_prerequisite_skill(change.skill_id)
             elif change.cmd == skill_domain.CMD_UPDATE_RUBRICS:
                 skill.update_rubric(
-                    change.difficulty, change.explanation)
+                    change.difficulty, change.explanations)
             elif (change.cmd ==
                   skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
                 if (change.property_name ==
@@ -867,3 +867,31 @@ def skill_has_associated_questions(skill_id):
         question_models.QuestionSkillLinkModel.get_all_question_ids_linked_to_skill_id( # pylint: disable=line-too-long
             skill_id))
     return len(question_ids) > 0
+
+
+def filter_skills_by_mastery(user_id, skill_ids):
+    """Given a list of skill_ids, it returns a list of
+    feconf.MAX_NUMBER_OF_SKILL_IDS skill_ids in which the user has
+    the least mastery.(Please note that python 2.7 considers the None
+    type smaller than any value, so None types will be returned first)
+
+    Args:
+        user_id: str. The unique user ID of the user.
+        skill_ids: list(str). The skill_ids that are to be filtered.
+
+    Returns:
+        list(str). A list of the filtered skill_ids.
+    """
+    degrees_of_mastery = get_multi_user_skill_mastery(user_id, skill_ids)
+
+    sorted_skill_ids = sorted(
+        degrees_of_mastery, key=degrees_of_mastery.get)
+
+    filtered_skill_ids = sorted_skill_ids[:feconf.MAX_NUMBER_OF_SKILL_IDS]
+
+    # Arranges the skill_ids in the order as it was received.
+    arranged_filtered_skill_ids = []
+    for i in python_utils.RANGE(len(skill_ids)):
+        if skill_ids[i] in filtered_skill_ids:
+            arranged_filtered_skill_ids.append(skill_ids[i])
+    return arranged_filtered_skill_ids

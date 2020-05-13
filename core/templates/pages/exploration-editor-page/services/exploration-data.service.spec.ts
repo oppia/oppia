@@ -406,6 +406,6 @@ describe('Exploration data service', function() {
     var errorCallback = jasmine.createSpy('error');
     expect(function() {
       eds.getData(errorCallback);
-    }).toThrow(TypeError('eds.getData is not a function'));
+    }).toThrowError('eds.getData is not a function');
   });
 });

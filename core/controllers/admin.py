@@ -335,11 +335,11 @@ class AdminHandler(base.BaseHandler):
         """
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
         skill = skill_domain.Skill.create_default_skill(
             skill_id, skill_description, rubrics)
         skill.update_explanation(state_domain.SubtitledHtml('1', explanation))
@@ -476,9 +476,8 @@ class AdminHandler(base.BaseHandler):
                 question = self._create_dummy_question(
                     question_id, question_name, [skill_id])
                 question_services.add_question(self.user_id, question)
-                question_difficulty = [feconf.EASY_SKILL_DIFFICULTY,
-                                       feconf.MEDIUM_SKILL_DIFFICULTY,
-                                       feconf.HARD_SKILL_DIFFICULTY]
+                question_difficulty = list(
+                    constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.values())
                 random_difficulty = random.choice(question_difficulty)
                 question_services.create_new_question_skill_link(
                     self.user_id, question_id, skill_id, random_difficulty)

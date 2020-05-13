@@ -42,6 +42,7 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (classifier_models, stats_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.statistics])
@@ -262,7 +263,6 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, 'user', name='Topic',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
@@ -346,9 +346,15 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
 class QuestionsUnitTest(test_utils.GenericTestBase):
     """Test the handler for fetching questions."""
 
+    USER_EMAIL = 'user@example.com'
+    USER_USERNAME = 'user'
+
     def setUp(self):
         """Before each individual test, initialize data."""
         super(QuestionsUnitTest, self).setUp()
+        self.signup(self.USER_EMAIL, self.USER_USERNAME)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -400,6 +406,44 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         question_ids = [data['id'] for data in json_response['question_dicts']]
         self.assertItemsEqual(
             [self.question_id, self.question_id_2, question_id_3], question_ids)
+
+    def test_filter_multiple_skill_id_return_questions(self):
+        self.login(self.USER_EMAIL)
+        skill_ids_for_url = ''
+
+        # Create multiple skills, questions and skill links.
+        for _ in python_utils.RANGE(
+                feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
+            skill_id = skill_services.get_new_skill_id()
+            skill_ids_for_url = skill_ids_for_url + skill_id + ','
+            self.save_new_skill(skill_id, 'user', description='Description')
+            question_id = question_services.get_new_question_id()
+            self.save_new_question(
+                question_id, 'user',
+                self._create_valid_question_data('ABC'), [skill_id])
+            question_services.create_new_question_skill_link(
+                self.editor_id, question_id, skill_id, 0.5)
+
+        # Create additional skills with user skill mastery > 0.0,
+        # so that these are filtered out correctly.
+        for _ in python_utils.RANGE(5):
+            skill_id = skill_services.get_new_skill_id()
+            skill_ids_for_url = skill_ids_for_url + skill_id + ','
+            self.save_new_skill(skill_id, 'user', description='Description')
+            skill_services.create_user_skill_mastery(
+                self.user_id, skill_id, 0.5)
+
+        # Removing the last comma of the string.
+        skill_ids_for_url = skill_ids_for_url[:-1]
+
+        url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
+            feconf.QUESTIONS_URL_PREFIX,
+            python_utils.convert_to_bytes(
+                feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME),
+            skill_ids_for_url, 'true')
+        json_response = self.get_json(url)
+        self.assertEqual(len(json_response['question_dicts']),
+                         feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
 
     def test_invalid_skill_id_returns_no_questions(self):
         # Call the handler.

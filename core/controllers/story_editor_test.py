@@ -45,7 +45,6 @@ class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
             self.story_id, self.admin_id, corresponding_topic_id=self.topic_id)
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[self.story_id],
             additional_story_ids=[], uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=1)
@@ -222,7 +221,6 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         self.save_new_topic(
             'topic_id_new', self.admin_id, name='Name 2',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=1)
@@ -297,7 +295,6 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         # associated with the new topic.
         self.save_new_topic(
             'topic_id_new', self.admin_id, name='Name 2',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[], subtopics=[],
             next_subtopic_id=1)
