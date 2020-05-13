@@ -316,6 +316,7 @@ var ExplorationEditorMainTab = function() {
       if (responseNum === 'default') {
         headerElem = defaultResponseTab;
       } else {
+        waitFor.visibilityOf(responseTab.first());
         headerElem = responseTab.get(
           responseNum);
       }
