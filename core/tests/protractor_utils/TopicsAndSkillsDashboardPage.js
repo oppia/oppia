@@ -87,39 +87,6 @@ var TopicsAndSkillsDashboardPage = function() {
     });
   };
 
-  var getAssignSkillToTopicButtons = async function(
-      skillDescription, topicName) {
-    return new Promise(function(resolve, reject) {
-      assignSkillToTopicButtons.then(function(elems) {
-        resolve(elems);
-      });
-    });
-  };
-
-  var getSkillDescriptions = async function() {
-    return new Promise(function(resolve, reject) {
-      skillDescriptions.then(function(elems) {
-        resolve(elems);
-      });
-    });
-  };
-
-  var getTopicsListItems = async function(topicName) {
-    return new Promise(function(resolve, reject) {
-      topicsListItems.then(function(topics) {
-        resolve(topics);
-      });
-    });
-  };
-
-  var getTopicNamesInTopicSelectModal = async function() {
-    return new Promise(function(resolve, reject) {
-      topicNamesInTopicSelectModal.then(function(topics) {
-        resolve(topics);
-      });
-    });
-  };
-
   this.get = function() {
     browser.get(DASHBOARD_URL);
     waitFor.pageToFullyLoad();
@@ -154,18 +121,16 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.assignSkillWithDescriptionToTopicByTopicName = async function(
       skillDescription, topicName) {
-    var elems = await getAssignSkillToTopicButtons();
-    var skills = await getSkillDescriptions();
-    for (var i = 0 ;i < skills.length;i++) {
-      var skillText = await skills[i].getText();
+    var skillsLength = await skillDescriptions.count();
+    for (var i = 0; i < skillsLength; i++) {
+      var skillText = await skillDescriptions.get(i).getText();
       if (skillText === skillDescription) {
-        await elems[i].click();
-        var topics = await getTopicsListItems();
-        var topicNames = await getTopicNamesInTopicSelectModal();
-        for (var j = 0; j < topicNames.length; j++) {
-          var topicText = await topicNames[j].getText();
+        await assignSkillToTopicButtons.get(i).click();
+        var topicNamesLength = await topicNamesInTopicSelectModal.count();
+        for (var j = 0; j < topicNamesLength; j++) {
+          var topicText = await topicNamesInTopicSelectModal.get(j).getText();
           if (topicText === topicName) {
-            await topics[j].click();
+            await topicsListItems.get(j).click();
             await confirmMoveButton.click();
           }
         }

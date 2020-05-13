@@ -111,29 +111,6 @@ var TopicEditorPage = function() {
   var dragAndDrop = function(fromElement, toElement) {
     browser.executeScript(dragAndDropScript, fromElement, toElement);
   };
-  var getQuestionItems = async function() {
-    return new Promise(function(resolve, reject) {
-      questionItems.then(function(items) {
-        resolve(items);
-      });
-    });
-  };
-
-  var getSkillItems = async function() {
-    return new Promise(function(resolve, reject) {
-      skillItems.then(function(elem) {
-        resolve(elem);
-      });
-    });
-  };
-
-  var getSkillListItems = async function() {
-    return new Promise(function(resolve, reject) {
-      skillListItems.then(function(elem) {
-        resolve(elem);
-      });
-    });
-  };
 
   this.get = function(topicId) {
     browser.get(EDITOR_URL_PREFIX + topicId);
@@ -207,12 +184,12 @@ var TopicEditorPage = function() {
 
   this.createQuestionForSkillWithDescription = async function(
       skillDescription) {
-    createQuestionButton.click();
-    var skills = await getSkillItems();
-    for (var i = 0; i < skills.length; i++) {
-      var skillText = await skills[i].getText();
+    await createQuestionButton.click();
+    var skillsLength = await skillItems.count();
+    for (var i = 0; i < skillsLength; i++) {
+      var skillText = await skillItems.get(i).getText();
       if (skillText === skillDescription) {
-        await skills[i].click();
+        await skillItems.get(i).click();
         waitFor.elementToBeClickable(
           confirmSkillButton,
           'Confirm Skill button takes too long to be clickable');
@@ -226,14 +203,13 @@ var TopicEditorPage = function() {
   };
 
   this.linkSkillWithDescriptionToQuestion = async function(skillDescription) {
-    var questions = await getQuestionItems();
-    await questions[0].click();
+    await questionItems.get(0).click();
     await linkAnotherSkillButton.click();
-    var skills = await getSkillListItems();
-    for (var i = 0; i < skills.length; i++) {
-      var skillText = await skills[i].getText();
+    var skillsLength = await skillListItems.count();
+    for (var i = 0; i < skillsLength; i++) {
+      var skillText = await skillListItems.get(i).getText();
       if (skillText === skillDescription) {
-        await skills[i].click();
+        await skillListItems.get(i).click();
         await skillSaveButton.click();
         waitFor.elementToBeClickable(
           saveQuestionButton,

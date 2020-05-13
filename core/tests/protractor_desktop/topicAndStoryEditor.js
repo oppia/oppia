@@ -54,7 +54,8 @@ describe('Topic editor functionality', function() {
       'creator@topicEditor.com', 'creatorTopicEditor');
     browser.getWindowHandle().then(function(handle) {
       topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.createTopic('Topic 1', false);
+      topicsAndSkillsDashboardPage.createTopic(
+        'Topic1TopicAndStoryEditor', false);
       browser.getCurrentUrl().then(function(url) {
         topicId = url.split('/')[4];
         general.closeCurrentTabAndSwitchTo(handle);
@@ -89,7 +90,7 @@ describe('Topic editor functionality', function() {
     browser.getWindowHandle().then(function(handle) {
       topicsAndSkillsDashboardPage.get();
       topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-        'Skill 1', 'Concept card explanation', false);
+        'Skill1TopicAndStoryEditor', 'Concept card explanation', false);
       browser.getCurrentUrl().then(function(url) {
         skillId = url.split('/')[4];
         general.closeCurrentTabAndSwitchTo(handle);
@@ -98,13 +99,14 @@ describe('Topic editor functionality', function() {
         waitFor.promiseToResolve(
           topicsAndSkillsDashboardPage.
             assignSkillWithDescriptionToTopicByTopicName(
-              'Skill 1', 'Topic 1')
+              'Skill1TopicAndStoryEditor', 'Topic1TopicAndStoryEditor')
           , 'Assigning skill to topic taking too long.');
         topicsAndSkillsDashboardPage.get();
-        topicsAndSkillsDashboardPage.editTopic('Topic 1');
+        topicsAndSkillsDashboardPage.editTopic('Topic1TopicAndStoryEditor');
         topicEditorPage.moveToQuestionsTab();
         waitFor.promiseToResolve(
-          topicEditorPage.createQuestionForSkillWithDescription('Skill 1')
+          topicEditorPage.createQuestionForSkillWithDescription(
+            'Skill1TopicAndStoryEditor')
           , 'Creating the question takes too long.');
         explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
         explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
@@ -119,16 +121,18 @@ describe('Topic editor functionality', function() {
         });
         topicEditorPage.saveQuestion();
         topicsAndSkillsDashboardPage.get();
-        topicsAndSkillsDashboardPage.editTopic('Topic 1');
+        topicsAndSkillsDashboardPage.editTopic('Topic1TopicAndStoryEditor');
         topicEditorPage.moveToQuestionsTab();
         topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
-          1, 'Skill 1');
+          1, 'Skill1TopicAndStoryEditor');
         topicEditorPage.editQuestionContents(
           0, 'Question 2', 'Edited the question content.');
-        topicEditorPage.get(topicId);
+        topicsAndSkillsDashboardPage.get();
+        topicsAndSkillsDashboardPage.editTopic('Topic1TopicAndStoryEditor');
         topicEditorPage.moveToQuestionsTab();
         // Confirm that the content of the question has changed.
-        topicEditorPage.selectSkillWithDescriptionFromDropDown('Skill 1');
+        topicEditorPage.selectSkillWithDescriptionFromDropDown(
+          'Skill1TopicAndStoryEditor');
         topicEditorPage.openQuestionEditor(0);
         explorationEditorMainTab.expectContentToMatch(
           forms.toRichText('Question 2'));
@@ -149,24 +153,26 @@ describe('Topic editor functionality', function() {
     'linkages for the existing question', function() {
       topicsAndSkillsDashboardPage.get();
       topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-        'Skill 2', 'Concept card explanation');
+        'Skill2TopicAndStoryEditor', 'Concept card explanation');
       topicsAndSkillsDashboardPage.get();
       topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
       waitFor.promiseToResolve(
         topicsAndSkillsDashboardPage.
           assignSkillWithDescriptionToTopicByTopicName(
-            'Skill 2', 'Topic 1')
+            'Skill2TopicAndStoryEditor', 'Topic1TopicAndStoryEditor')
         , 'Assigning skill to topic taking too long.');
       topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.editTopic('Topic 1');
+      topicsAndSkillsDashboardPage.editTopic('Topic1TopicAndStoryEditor');
       topicEditorPage.moveToQuestionsTab();
-      topicEditorPage.selectSkillWithDescriptionFromDropDown('Skill 1');
+      topicEditorPage.selectSkillWithDescriptionFromDropDown(
+        'Skill1TopicAndStoryEditor');
       waitFor.promiseToResolve(
-        topicEditorPage.linkSkillWithDescriptionToQuestion('Skill 2')
+        topicEditorPage.linkSkillWithDescriptionToQuestion(
+          'Skill2TopicAndStoryEditor')
         , 'Linking the skill to the question takes too long.');
       topicEditorPage.moveToQuestionsTab();
       topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
-        1, 'Skill 2');
+        1, 'Skill2TopicAndStoryEditor');
     });
 
 
