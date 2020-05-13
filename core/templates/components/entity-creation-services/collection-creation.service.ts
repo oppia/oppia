@@ -64,7 +64,7 @@ export class CollectionCreationService {
           response.collectionId);
 
         setTimeout(() => {
-          this.windowRef.nativeWindow.location.href = 
+          this.windowRef.nativeWindow.location.href =
             this.urlInterpolationService.interpolateUrl(
               this.CREATE_NEW_COLLECTION_URL_TEMPLATE, {
                 collection_id: response.collectionId
