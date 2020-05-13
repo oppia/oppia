@@ -96,7 +96,7 @@ export class ExplorationDataService {
         change_list: changeList,
         version: this.explorationData.data.version }).toPromise()
         .then((response) => {
-        this.draftChangeListId = response.body.draft_change_list_id;
+          this.draftChangeListId = response.body.draft_change_list_id;
           // We can safely remove the locally saved draft copy if it was saved
           // to the backend.
           this.localStorageService.removeExplorationDraft(this.explorationId);
