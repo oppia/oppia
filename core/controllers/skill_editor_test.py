@@ -216,17 +216,39 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
     def test_editable_skill_handler_delete_succeeds(self):
         self.login(self.ADMIN_EMAIL)
         # Check that admins can delete a skill.
-        self.delete_json(self.url)
+        skill_has_topics_swap = self.swap(
+            topic_services,
+            'get_all_skill_ids_assigned_to_some_topic',
+            lambda: [])
+        with skill_has_topics_swap:
+            self.delete_json(self.url)
         self.logout()
 
-    def test_editable_skill_handler_delete_fails(self):
+    def test_editable_skill_handler_delete_when_associated_questions_exist(
+            self):
         self.login(self.ADMIN_EMAIL)
-        # Check DELETE returns 500 when the skill still has associated
+        # Check DELETE returns 400 when the skill still has associated
         # questions.
         skill_has_questions_swap = self.swap(
             skill_services, 'skill_has_associated_questions', lambda x: True)
-        with skill_has_questions_swap:
-            self.delete_json(self.url, expected_status_int=500)
+        skill_has_topics_swap = self.swap(
+            topic_services,
+            'get_all_skill_ids_assigned_to_some_topic',
+            lambda: [])
+        with skill_has_questions_swap, skill_has_topics_swap:
+            self.delete_json(self.url, expected_status_int=400)
+        self.logout()
+
+    def test_editable_skill_handler_delete_when_associated_topics_exist(self):
+        self.login(self.ADMIN_EMAIL)
+        # Check DELETE returns 400 when the skill still has associated
+        # topics.
+        skill_has_topics_swap = self.swap(
+            topic_services,
+            'get_all_skill_ids_assigned_to_some_topic',
+            lambda: [self.skill_id])
+        with skill_has_topics_swap:
+            self.delete_json(self.url, expected_status_int=400)
         self.logout()
 
 
