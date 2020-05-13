@@ -28,8 +28,8 @@ interface IPredictionService {
   predict(classifierData, answer): number;
 }
 
-type AlgorithmIdPredictionServiceMap =
-  Map<string, Map<number, IPredictionService>>;
+type AlgorithmIdPredictionServiceMap = (
+  Map<string, Map<number, IPredictionService>>);
 
 @Injectable({providedIn: 'root'})
 export class PredictionAlgorithmRegistryService {
@@ -51,8 +51,8 @@ export class PredictionAlgorithmRegistryService {
   getPredictionService(
       algorithmId: string, dataSchemaVersion: number): IPredictionService {
     if (this.algorithmIdPredictionServiceMapping.has(algorithmId)) {
-      const predictionServicesByDataSchemaVersion =
-        this.algorithmIdPredictionServiceMapping.get(algorithmId);
+      const predictionServicesByDataSchemaVersion = (
+        this.algorithmIdPredictionServiceMapping.get(algorithmId));
       if (predictionServicesByDataSchemaVersion.has(dataSchemaVersion)) {
         return predictionServicesByDataSchemaVersion.get(dataSchemaVersion);
       }
