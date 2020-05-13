@@ -153,7 +153,7 @@ def wait_for_port_to_be_open(port_number):
 def run_lighthouse_checks():
     """Runs the lighthouserc.js config with bash command lhci autorun."""
     bash_command = 'lhci autorun'
-    process = subprocess.Popen(bash_command, shell = True, stdout=subprocess.PIPE)
+    process = subprocess.Popen(bash_command, shell=True, stdout=subprocess.PIPE)
 
     for line in iter(process.stdout.readline, ''):
         python_utils.PRINT(line[:-1])
