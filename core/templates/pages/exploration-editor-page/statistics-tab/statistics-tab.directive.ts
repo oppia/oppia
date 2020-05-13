@@ -17,7 +17,8 @@
  * exploration editor.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
 require('domain/exploration/read-only-exploration-backend-api.service.ts');

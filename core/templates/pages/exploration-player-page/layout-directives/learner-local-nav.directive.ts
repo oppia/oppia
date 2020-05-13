@@ -16,7 +16,8 @@
  * @fileoverview Directive for the local navigation in the learner view.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');

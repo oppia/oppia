@@ -16,7 +16,8 @@
  * @fileoverview Directive for the concept card editor.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/state-directives/answer-group-editor/' +

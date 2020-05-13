@@ -16,7 +16,8 @@
  * @fileoverview Controller for the topics list viewer.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller');
 
 require('domain/topic/editable-topic-backend-api.service.ts');

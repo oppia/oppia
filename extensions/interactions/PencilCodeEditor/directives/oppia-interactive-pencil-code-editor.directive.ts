@@ -20,7 +20,8 @@
  * followed by the name of the arg.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
 require(

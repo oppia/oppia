@@ -16,7 +16,8 @@
  * @fileoverview Directive for the exploration history tab.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('components/profile-link-directives/profile-link-text.directive.ts');
 require(

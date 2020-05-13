@@ -19,7 +19,8 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
   'pages/exploration-editor-page/translation-tab/state-translation/' +

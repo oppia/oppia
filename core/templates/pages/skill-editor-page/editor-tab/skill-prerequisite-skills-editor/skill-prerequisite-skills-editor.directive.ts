@@ -16,7 +16,8 @@
  * @fileoverview Directive for the skill prerequisite skills editor.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/skill-selector/skill-selector.directive.ts');

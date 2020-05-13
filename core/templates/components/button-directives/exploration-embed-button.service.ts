@@ -16,7 +16,8 @@
  * @fileoverview Service for the 'embed exploration' modal.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/site-analytics.service.ts');

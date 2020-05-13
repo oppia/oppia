@@ -16,7 +16,8 @@
  * @fileoverview Service for detecting spamming behavior from the learner.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
 angular.module('oppia').factory('FatigueDetectionService', [

@@ -16,7 +16,8 @@
  * @fileoverview Directive for the NumberWithUnits interaction.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require(

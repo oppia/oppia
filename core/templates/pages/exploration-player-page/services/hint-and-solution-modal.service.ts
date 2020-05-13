@@ -16,7 +16,8 @@
  * @fileoverview Service for showing the hint and solution modals.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
 require(

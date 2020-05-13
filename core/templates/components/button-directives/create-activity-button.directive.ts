@@ -16,7 +16,8 @@
  * @fileoverview Directive for the Create Exploration/Collection button.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
 require('components/entity-creation-services/collection-creation.service.ts');

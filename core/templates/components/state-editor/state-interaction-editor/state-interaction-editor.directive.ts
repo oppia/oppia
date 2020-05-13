@@ -17,7 +17,8 @@
  * editor.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('directives/angular-html-bind.directive.ts');
 

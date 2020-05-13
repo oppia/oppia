@@ -16,7 +16,8 @@
  * @fileoverview Directive for the LogicProof Interaction.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('interactions/codemirrorRequires.ts');
 

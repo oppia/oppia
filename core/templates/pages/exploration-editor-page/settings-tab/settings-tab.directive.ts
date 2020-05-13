@@ -16,7 +16,8 @@
  * @fileoverview Directive for the exploration settings tab.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');

@@ -16,7 +16,8 @@
  * @fileoverview Directive for the skills mastery list.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('components/concept-card/concept-card.directive.ts');
 require('components/skills-mastery-list/skills-mastery-list.constants.ajs.ts');

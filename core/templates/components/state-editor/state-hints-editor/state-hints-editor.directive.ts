@@ -17,7 +17,8 @@
  * editor.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('components/state-directives/hint-editor/hint-editor.directive.ts');
 require(

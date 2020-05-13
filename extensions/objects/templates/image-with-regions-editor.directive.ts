@@ -16,7 +16,8 @@
  * @fileoverview Directive for image with regions editor.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 
 // Every editor directive should implement an alwaysEditable option. There

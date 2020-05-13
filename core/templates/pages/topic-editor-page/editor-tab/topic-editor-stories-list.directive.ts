@@ -16,7 +16,8 @@
  * @fileoverview Controller for the stories list viewer.
  */
 
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/editable-topic-backend-api.service.ts');

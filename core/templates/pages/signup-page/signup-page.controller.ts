@@ -17,7 +17,8 @@
  */
 
 require('base-components/base-content.directive.ts');
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');

@@ -17,7 +17,8 @@
  */
 
 require('directives/angular-html-bind.directive.ts');
-require('components/common-layout-directives/common-elements/' +
+require(
+  'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
   'components/question-difficulty-selector/' +
