@@ -1382,6 +1382,8 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
     run in succession:
         - RegenerateMissingV1StatsModelsOneOffJob
         - RegenerateMissingV2StatsModelsOneOffJob
+
+    Otherwise, an empty output signals that all explorations have stats.
     """
 
     @classmethod

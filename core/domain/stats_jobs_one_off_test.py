@@ -1625,7 +1625,15 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
 class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.ExplorationMissingStatsAudit
 
-    def save_new_exploration(self, exp_id, deleted=False):
+    def _save_new_exploration(self, exp_id, deleted=False):
+        """Creates and commits an exploration model to directly to storage,
+        bypassing checks since these tests are only concerned with the deleted
+        field.
+
+        Args:
+            exp_id: str. The ID of the exploration being created.
+            deleted: boolean. Whether the model should be marked as deleted.
+        """
         exploration = exp_domain.Exploration.create_default_exploration(exp_id)
         states = {
             state_name: state.to_dict()
@@ -1649,10 +1657,18 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
             auto_tts_enabled=exploration.auto_tts_enabled,
             correctness_feedback_enabled=(
                 exploration.correctness_feedback_enabled))
-        super(base_models.VersionedModel, model).put()
-        return model
+        super( # pylint: disable=bad-super-call
+            base_models.VersionedModel, model).put()
 
-    def save_new_exploration_stats(self, exp_id, deleted=False):
+    def _save_new_exploration_stats(self, exp_id, deleted=False):
+        """Creates and commits an exploration stats model directly to storage,
+        bypassing checks since these tests are only concerned with the deleted
+        field.
+
+        Args:
+            exp_id: str. The ID of the exploration being created.
+            deleted: boolean. Whether the model should be marked as deleted.
+        """
         exploration_stats_id = (
             stats_models.ExplorationStatsModel.get_entity_id(exp_id, 1))
         model = stats_models.ExplorationStatsModel(
@@ -1671,7 +1687,6 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
                     stats_domain.StateStats.create_default().to_dict())
             })
         model.put()
-        return model
 
     def test_success_when_there_are_no_models(self):
         output = self.run_one_off_job()
@@ -1679,15 +1694,15 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         self.assertEqual(output, [])
 
     def test_success_when_exploration_exists_and_stats_model_exists(self):
-        self.save_new_exploration('id')
-        self.save_new_exploration_stats('id')
+        self._save_new_exploration('id')
+        self._save_new_exploration_stats('id')
 
         output = self.run_one_off_job()
 
         self.assertEqual(output, [])
 
     def test_error_when_exploration_exists_but_stats_model_is_missing(self):
-        self.save_new_exploration('id')
+        self._save_new_exploration('id')
         # Do not create exploration stats model.
 
         output = self.run_one_off_job()
@@ -1699,7 +1714,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
 
     def test_warning_when_exploration_is_missing_but_stats_model_exists(self):
         # Do not create exploration model.
-        self.save_new_exploration_stats('id')
+        self._save_new_exploration_stats('id')
 
         output = self.run_one_off_job()
 
@@ -1709,8 +1724,8 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         self.assertIn('corresponding ExplorationStats exists', output[0])
 
     def test_error_when_exploration_exists_but_stats_model_is_deleted(self):
-        self.save_new_exploration('id')
-        self.save_new_exploration_stats('id', deleted=True)
+        self._save_new_exploration('id')
+        self._save_new_exploration_stats('id', deleted=True)
 
         output = self.run_one_off_job()
 
@@ -1720,8 +1735,8 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         self.assertIn('corresponding Exploration exists', output[0])
 
     def test_warning_when_exploration_is_deleted_but_stats_model_exists(self):
-        self.save_new_exploration('id', deleted=True)
-        self.save_new_exploration_stats('id')
+        self._save_new_exploration('id', deleted=True)
+        self._save_new_exploration_stats('id')
 
         output = self.run_one_off_job()
 
