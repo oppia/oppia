@@ -7,7 +7,7 @@ interface Window {
     HTMLElement?: any;
     Math?: any;
     MathJax?: any;
-    __fixtures__?: any;
+    __fixtures__?: KarmaFixtures;
     decodeURIComponent?: any;
     encodeURIComponent?: any;
     opera?: any;
