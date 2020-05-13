@@ -41,25 +41,25 @@ export class EditableExplorationBackendApiService {
     private urlInterpolationService: UrlInterpolationService,
   ) { }
 
-  private _fetchExploration (explorationId: string, applyDraft,
-    successCallback: (value?: Object | PromiseLike<Object>) => void,
-    errorCallback: (reason?: HttpErrorResponse) => void): void {
+  private _fetchExploration(explorationId: string, applyDraft,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: HttpErrorResponse) => void): void {
     let editableExplorationDataUrl = this._getExplorationUrl(
       explorationId, applyDraft);
     this.http.get(editableExplorationDataUrl, { observe: 'response' })
       .toPromise().then((response: HttpResponse<any>) => {
-      let exploration = cloneDeep(response.body);
-      if (successCallback) {
-        successCallback(exploration);
-      }
-    }, (errorResponse: HttpErrorResponse) => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error);
-      }
-    });
-  };
+        let exploration = cloneDeep(response.body);
+        if (successCallback) {
+          successCallback(exploration);
+        }
+      }, (errorResponse: HttpErrorResponse) => {
+        if (errorCallback) {
+          errorCallback(errorResponse.error);
+        }
+      });
+  }
 
-  private _updateExploration (
+  private _updateExploration(
       explorationId, explorationVersion, commitMessage, changeList,
       successCallback, errorCallback) {
     let editableExplorationDataUrl = this._getExplorationUrl(
@@ -89,14 +89,14 @@ export class EditableExplorationBackendApiService {
         }
       }
     );
-  };
+  }
 
-  private _deleteExploration = function(
+  private _deleteExploration(
       explorationId, successCallback, errorCallback) {
     let editableExplorationDataUrl = this._getExplorationUrl(
       explorationId, null);
 
-    this.http.delete(editableExplorationDataUrl).then(function() {
+    this.http.delete(editableExplorationDataUrl).then(() => {
       // Delete item from the ReadOnlyExplorationBackendApiService's cache
       this.readOnlyExplorationBackendApiService.deleteExplorationFromCache(
         explorationId);
@@ -110,7 +110,7 @@ export class EditableExplorationBackendApiService {
     });
   };
 
-  private _getExplorationUrl (explorationId: string, applyDraft): string {
+  private _getExplorationUrl(explorationId: string, applyDraft): string {
     if (applyDraft) {
       return this.urlInterpolationService.interpolateUrl(
         AppConstants.EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE, {
@@ -124,16 +124,16 @@ export class EditableExplorationBackendApiService {
         exploration_id: explorationId
       }
     );
-  };
+  }
 
 
-  fetchExploration (explorationId: string): Promise<Object> {
+  fetchExploration(explorationId: string): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchExploration(explorationId, null, resolve, reject);
     });
   }
 
-  fetchApplyDraftExploration (explorationId: string): Promise<Object> {
+  fetchApplyDraftExploration(explorationId: string): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchExploration(explorationId, true, resolve, reject);
     });
@@ -155,8 +155,8 @@ export class EditableExplorationBackendApiService {
    * we are unable to cache any Exploration object obtained from the
    * editor beackend.
    */
-  updateExploration (
-    explorationId, explorationVersion, commitMessage, changeList)
+  updateExploration(
+      explorationId, explorationVersion, commitMessage, changeList)
     : Promise<Object> {
     return new Promise((resolve, reject) => {
       this._updateExploration(
@@ -171,7 +171,7 @@ export class EditableExplorationBackendApiService {
    * ReadOnlyExplorationBackendApiService cache as well.
    * Errors are passed to the error callback, if one is provided.
    */
-  deleteExploration (explorationId): Promise<Object> {
+  deleteExploration(explorationId): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._deleteExploration(
         explorationId, resolve, reject);

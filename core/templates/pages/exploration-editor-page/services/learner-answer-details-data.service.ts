@@ -52,16 +52,16 @@ export class LearnerAnswerDetailsDataService {
     private urlInterpolationService: UrlInterpolationService
   ) { }
 
-  private _fetchLearnerAnswerInfoData (): any {
+  private _fetchLearnerAnswerInfoData() {
     let learnerAnswerInfoDataUrl = this.urlInterpolationService.interpolateUrl(
       this.LEARNER_ANSWER_INFO_DATA_URL, {
         entity_type: 'exploration',
         entity_id: this._expId});
 
     return this.http.get(learnerAnswerInfoDataUrl);
-  };
+  }
 
-  private _deleteLearnerAnswerInfo (
+  private _deleteLearnerAnswerInfo(
       entityId, stateName, learnerAnswerInfoId) {
     let learnerAnswerInfoDataUrl = this.urlInterpolationService.interpolateUrl(
       this.LEARNER_ANSWER_INFO_DATA_URL, {
@@ -73,7 +73,7 @@ export class LearnerAnswerDetailsDataService {
         learner_answer_info_id: learnerAnswerInfoId
       }
     });
-  };
+  }
 
   getData(): Array<any> {
     return this._data;
@@ -96,21 +96,21 @@ export class LearnerAnswerDetailsDataService {
             .createDefaultLearnerAnswerDetails(
               this._expId, stateName, interactionId, customizationArgs,
               learnerAnswerInfoDicts.map(
-              this.learnerAnswerInfoObjectFactory.createFromBackendDict)));
+                this.learnerAnswerInfoObjectFactory.createFromBackendDict)));
         this._data.push(learnerAnswerDetails);
       }
       return response.data;
     });
   }
 
-  deleteLearnerAnswerInfo(entityId, stateName, learnerAnswerInfoId): any {
+  deleteLearnerAnswerInfo(entityId, stateName, learnerAnswerInfoId) {
     return this._deleteLearnerAnswerInfo(
       entityId, stateName, learnerAnswerInfoId).toPromise()
-        .then((response: HttpResponse<any>) => {
-          return response.status;
-        }, (errorResponse: HttpErrorResponse) => {
-          return errorResponse.error;
-    });
+      .then((response: HttpResponse<any>) => {
+        return response.status;
+      }, (errorResponse: HttpErrorResponse) => {
+        return errorResponse.error;
+      });
   }
 }
 

@@ -41,9 +41,9 @@ export class ReadOnlyExplorationBackendApiService {
     private urlInterpolationService: UrlInterpolationService,
   ) { }
 
-  private _fetchExploration (explorationId: string, version: number,
-    successCallback: (value?: Object | PromiseLike<Object>) => void,
-    errorCallback: (reason?: HttpErrorResponse) => void): void {
+  private _fetchExploration(explorationId: string, version: number,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: HttpErrorResponse) => void): void {
     let explorationDataUrl = this._getExplorationUrl(explorationId, version);
 
     this.http.get(explorationDataUrl, { observe: 'response' }).toPromise()
@@ -60,11 +60,11 @@ export class ReadOnlyExplorationBackendApiService {
       });
   }
 
-  private _isCached (explorationId: string): boolean {
+  private _isCached(explorationId: string): boolean {
     return this._explorationCache.hasOwnProperty(explorationId);
-  };
+  }
 
-  private _getExplorationUrl (explorationId: string, version: number): string {
+  private _getExplorationUrl(explorationId: string, version: number): string {
     if (version) {
       return this.urlInterpolationService.interpolateUrl(
         AppConstants.EXPLORATION_VERSION_DATA_URL_TEMPLATE, {
@@ -77,7 +77,7 @@ export class ReadOnlyExplorationBackendApiService {
         exploration_id: explorationId
       }
     );
-  };
+  }
 
   /**
    * Retrieves an exploration from the backend given an exploration ID
@@ -90,7 +90,7 @@ export class ReadOnlyExplorationBackendApiService {
    * is called instead, if present. The rejection callback function is
    * passed any data returned by the backend in the case of an error.
    */
-  fetchExploration (explorationId: string, version: number): Promise<Object> {
+  fetchExploration(explorationId: string, version: number): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchExploration(explorationId, version, resolve, reject);
     });
@@ -106,7 +106,7 @@ export class ReadOnlyExplorationBackendApiService {
    * will store the exploration in the cache to avoid requests from the
    * backend in further function calls.
    */
-  loadLatestExploration (explorationId: string): Promise<Object> {
+  loadLatestExploration(explorationId: string): Promise<Object> {
     return new Promise((resolve, reject) => {
       if (this._isCached(explorationId)) {
         if (resolve) {
@@ -116,11 +116,11 @@ export class ReadOnlyExplorationBackendApiService {
         this._fetchExploration(
           explorationId, null, (exploration) => {
             // Save the fetched exploration to avoid future fetches.
-          this._explorationCache[explorationId] = exploration;
-          if (resolve) {
-            resolve(cloneDeep(exploration));
-          }
-        }, reject);
+            this._explorationCache[explorationId] = exploration;
+            if (resolve) {
+              resolve(cloneDeep(exploration));
+            }
+          }, reject);
       }
     });
   }
@@ -132,7 +132,7 @@ export class ReadOnlyExplorationBackendApiService {
    * cache. All previous data in the cache will still be retained after
    * this call.
    */
-  loadExploration (explorationId: string, version: number): Promise<Object> {
+  loadExploration(explorationId: string, version: number): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchExploration(
         explorationId, version, (exploration) => {
@@ -148,7 +148,7 @@ export class ReadOnlyExplorationBackendApiService {
    * data cache or if it needs to be retrieved from the backend upon a
    * load.
    */
-  isCached (explorationId: string): boolean {
+  isCached(explorationId: string): boolean {
     return this._isCached(explorationId);
   }
 
@@ -156,7 +156,7 @@ export class ReadOnlyExplorationBackendApiService {
    * Replaces the current exploration in the cache given by the specified
    * exploration ID with a new exploration object.
    */
-  cacheExploration (explorationId: string, exploration): void {
+  cacheExploration(explorationId: string, exploration): void {
     this._explorationCache[explorationId] = cloneDeep(exploration);
   }
 
@@ -171,7 +171,7 @@ export class ReadOnlyExplorationBackendApiService {
   /**
    * Deletes a specific exploration from the local cache
    */
-  deleteExplorationFromCache (explorationId: string): void {
+  deleteExplorationFromCache(explorationId: string): void {
     if (this._isCached(explorationId)) {
       delete this._explorationCache[explorationId];
     }

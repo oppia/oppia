@@ -64,7 +64,7 @@ export class ExplorationDataService {
         this.explorationId = this.pathnameArray[i + 1];
         break;
       }
-    };
+    }
 
     if (!this.explorationId) {
       this.loggerService.error(
@@ -72,7 +72,7 @@ export class ExplorationDataService {
         this.pathname);
       // Note: if we do not return anything, Karma unit tests fail.
       return null;
-    };
+    }
 
     this.resolvedAnswersUrlPrefix = (
       '/createhandler/resolved_answers/' + this.explorationId);
@@ -85,18 +85,18 @@ export class ExplorationDataService {
     data: null,
     // Note that the changeList is the full changeList since the last
     // committed version (as opposed to the most recent autosave).
-    autosaveChangeList (changeList,
+    autosaveChangeList(changeList,
         successCallback: (value?: Object | PromiseLike<Object>) => void,
         errorCallback: () => {}): void {
-        // First save locally to be retrieved later if save is unsuccessful.
-        this.localStorageService.saveExplorationDraft(
-         this.explorationId, changeList, this.draftChangeListId);
-        
-        this.http.put(this.explorationDraftAutosaveUrl, {
-          change_list: changeList,
-          version: this.explorationData.data.version }).toPromise()
-          .then((response) => {
-          this.draftChangeListId = response.body.draft_change_list_id;
+      // First save locally to be retrieved later if save is unsuccessful.
+      this.localStorageService.saveExplorationDraft(
+        this.explorationId, changeList, this.draftChangeListId);
+
+      this.http.put(this.explorationDraftAutosaveUrl, {
+        change_list: changeList,
+        version: this.explorationData.data.version }).toPromise()
+        .then((response) => {
+        this.draftChangeListId = response.body.draft_change_list_id;
           // We can safely remove the locally saved draft copy if it was saved
           // to the backend.
           this.localStorageService.removeExplorationDraft(this.explorationId);
@@ -107,24 +107,24 @@ export class ExplorationDataService {
           if (errorCallback) {
             errorCallback();
           }
-      });
+        });
     },
 
-    discardDraft (successCallback, errorCallback): void {
+    discardDraft(successCallback, errorCallback): void {
       this.http.post(this.explorationDraftAutosaveUrl, {}).toPromise()
         .then(() => {
-        this.localStorageService.removeExplorationDraft(this.explorationId);
-        if (successCallback) {
-          successCallback();
-        }
-      }, () => {
-        if (errorCallback) {
-          errorCallback();
-        }
-      });
+          this.localStorageService.removeExplorationDraft(this.explorationId);
+          if (successCallback) {
+            successCallback();
+          }
+        }, () => {
+          if (errorCallback) {
+            errorCallback();
+          }
+        });
     },
     // Returns a promise that supplies the data for the current exploration.
-    getData (errorCallback): Promise<Object> {
+    getData(errorCallback): Promise<Object> {
       if (this.explorationData.data) {
         this.loggerService.info('Found exploration data in cache.');
         return (this.explorationData.data);
@@ -167,7 +167,7 @@ export class ExplorationDataService {
     },
     // Returns a promise supplying the last saved version for the current
     // exploration.
-    getLastSavedData (): Promise<Object> {
+    getLastSavedData(): Promise<Object> {
       return this.readOnlyExplorationBackendApiService.loadLatestExploration(
         this.explorationId).toPromose().then((response) => {
         this.loggerService.info('Retrieved saved exploration data.');
@@ -176,7 +176,7 @@ export class ExplorationDataService {
         return response.exploration;
       });
     },
-    resolveAnswers (stateName, resolvedAnswersList) {
+    resolveAnswers(stateName, resolvedAnswersList) {
       this.alertsService.clearWarnings();
       this.http.put(
         this.resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName), {
@@ -194,28 +194,28 @@ export class ExplorationDataService {
      * @param {string} commitMessage - The user-entered commit message for
      *   this save operation.
      */
-    save (
+    save(
         changeList, commitMessage, successCallback, errorCallback) {
       this.editableExplorationBackendApiService
         .updateExploration(this.explorationId,
         this.explorationData.data ? this.explorationData.data.version : null,
         commitMessage, changeList).then(
-        (response) => {
-          this.alertsService.clearWarnings();
-          this.explorationData.data = response;
-          if (successCallback) {
-            successCallback(
-              response.is_version_of_draft_valid,
-              response.draft_changes);
+          (response) => {
+            this.alertsService.clearWarnings();
+            this.explorationData.data = response;
+            if (successCallback) {
+              successCallback(
+                response.is_version_of_draft_valid,
+                response.draft_changes);
+            }
+          }, () => {
+            if (errorCallback) {
+              errorCallback();
+            }
           }
-        }, () => {
-          if (errorCallback) {
-            errorCallback();
-          }
-        }
-      );
+        );
     }
-  }
+  };
 }
 
 angular.module('oppia').factory(
