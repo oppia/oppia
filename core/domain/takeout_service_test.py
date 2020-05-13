@@ -447,56 +447,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
     def test_export_nonexistent_user(self):
         """Setup for nonexistent user test of export_data functionality."""
-        user_data = takeout_service.export_data_for_user('fake_user_id')
-        expected_data = {
-            'collection_progress_data': {},
-            'collection_rights_data': {
-                'editable_collection_ids': [],
-                'owned_collection_ids': [],
-                'viewable_collection_ids': [],
-                'voiced_collection_ids': []
-            },
-            'collection_rights_snapshot_metadata_data': {},
-            'collection_snapshot_metadata_data': {},
-            'completed_activities_data': {},
-            'config_property_snapshot_metadata_data': {},
-            'exp_user_last_playthrough_data': {},
-            'exploration_rights_data': {
-                'editable_exploration_ids': [],
-                'owned_exploration_ids': [],
-                'viewable_exploration_ids': [],
-                'voiced_exploration_ids': []
-            },
-            'exploration_rights_snapshot_metadata_data': {},
-            'exploration_snapshot_metadata_data': {},
-            'exploration_user_data_data': {},
-            'general_feedback_email_reply_to_id_data': {},
-            'general_feedback_message_data': {},
-            'general_feedback_thread_data': {},
-            'general_feedback_thread_user_data': {},
-            'general_suggestion_data': {},
-            'general_voiceover_application_data': {},
-            'incomplete_activities_data': {},
-            'learner_playlist_data': {},
-            'question_snapshot_metadata_data': {},
-            'skill_snapshot_metadata_data': {},
-            'story_progress_data': {},
-            'story_snapshot_metadata_data': {},
-            'subtopic_page_snapshot_metadata_data': {},
-            'topic_rights_data': {
-                'managed_topic_ids': []
-            },
-            'topic_rights_snapshot_metadata_data': {},
-            'topic_snapshot_metadata_data': {},
-            'user_community_rights_data': {},
-            'user_contribution_scoring_data': {},
-            'user_contributions_data': {},
-            'user_settings_data': {},
-            'user_skill_mastery_data': {},
-            'user_stats_data': {},
-            'user_subscriptions_data': {}
-        }
-        self.assertEqual(expected_data, user_data)
+        with self.assertRaises(user_models.UserSettingsModel
+                               .EntityNotFoundError):
+            user_models.UserSettingsModel.export_data('fake_user')
 
     def test_export_data_trivial(self):
         """Trivial test of export_data functionality."""
@@ -736,7 +689,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 'last_updated_msec': utils.get_time_in_millisecs(
                     feedback_models.
                     GeneralFeedbackThreadModel.
-                    get(thread_id).last_updated)
+                    get_by_id(thread_id).last_updated)
             }
         }
         expected_general_feedback_thread_user_data = {
