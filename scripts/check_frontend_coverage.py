@@ -77,6 +77,7 @@ FULLY_COVERED_FILENAMES = [
     'codemirrorRequires.ts',
     'CodeRepl.ts',
     'collection-creation-backend-api.service.ts',
+    'collection-creation.service.ts',
     'collection-domain.constants.ajs.ts',
     'collection-domain.constants.ts',
     'collection-editor-page.constants.ajs.ts',
