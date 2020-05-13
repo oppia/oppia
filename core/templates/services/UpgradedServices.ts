@@ -84,6 +84,8 @@ import { DragAndDropSortInputRulesService } from
   // eslint-disable-next-line max-len
   'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { EditabilityService } from 'services/editability.service';
+import { EditableExplorationBackendApiService } from
+  'domain/exploration/editable-exploration-backend-api.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { EndExplorationValidationService } from
@@ -92,6 +94,8 @@ import { EmailDashboardDataService } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
 import { EntityContextObjectFactory } from
   'domain/utilities/EntityContextObjectFactory';
+import { ExplorationDataService } from
+  'pages/exploration-editor-page/services/exploration-data.service';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
 import { ExplorationDraftObjectFactory } from
@@ -128,6 +132,8 @@ import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
+import { LearnerAnswerDetailsDataService } from
+  'pages/exploration-editor-page/services/learner-answer-details-data.service';
 import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerAnswerInfoObjectFactory } from
@@ -185,6 +191,8 @@ import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 import { ReadOnlyStoryNodeObjectFactory } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 import { ReadOnlyTopicObjectFactory } from
@@ -342,12 +350,26 @@ export class UpgradedServices {
     upgradedServices['DragAndDropSortInputRulesService'] =
       new DragAndDropSortInputRulesService();
     upgradedServices['EditabilityService'] = new EditabilityService();
+    upgradedServices['EditableExplorationBackendApiService'] =
+      new EditableExplorationBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['ReadOnlyExplorationBackendApiService'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['EmailDashboardDataService'] =
       new EmailDashboardDataService(
         new HttpClient(new HttpXhrBackend(
           new ɵangular_packages_common_http_http_d())));
     upgradedServices['EntityContextObjectFactory'] =
       new EntityContextObjectFactory();
+    upgradedServices['ExplorationDataService'] = new ExplorationDataService(
+      upgradedServices['AlertsService'],
+      upgradedServices['EditableExplorationBackendApiService'],
+      upgradedServices['HttpClient'],
+      upgradedServices['LocalStorageService'],
+      upgradedServices['LoggerService'],
+      upgradedServices['ReadOnlyExplorationBackendApiService'],
+      upgradedServices['UrlService'],
+      upgradedServices['WindowRef']);
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
     upgradedServices['ExplorationDraftObjectFactory'] =
       new ExplorationDraftObjectFactory();
@@ -389,6 +411,10 @@ export class UpgradedServices {
       new PredictionResultObjectFactory();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
+    upgradedServices['ReadOnlyExplorationBackendApiService'] =
+      new ReadOnlyExplorationBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['ReadOnlyStoryNodeObjectFactory'] =
       new ReadOnlyStoryNodeObjectFactory();
     upgradedServices['RubricObjectFactory'] =
@@ -637,6 +663,13 @@ export class UpgradedServices {
     upgradedServices['LearnerAnswerDetailsBackendApiService'] =
         new LearnerAnswerDetailsBackendApiService(
           upgradedServices['HttpClient'],
+          upgradedServices['UrlInterpolationService']);
+    upgradedServices['LearnerAnswerDetailsDataService'] =
+        new LearnerAnswerDetailsDataService(
+          upgradedServices['ExplorationDataService'],
+          upgradedServices['HttpClient'],
+          upgradedServices['LearnerAnswerDetailsObjectFactory'],
+          upgradedServices['LearnerAnswerInfoObjectFactory'],
           upgradedServices['UrlInterpolationService']);
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
       upgradedServices['ContextService'],

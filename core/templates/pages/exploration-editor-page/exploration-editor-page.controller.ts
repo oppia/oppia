@@ -319,9 +319,6 @@ angular.module('oppia').directive('explorationEditorPage', [
                   if (permissions.can_voiceover || permissions.can_edit) {
                     EditabilityService.markTranslatable();
                   }
-                  // TODO(#8521): Remove the use of $rootScope.$apply()
-                  // once the controller is migrated to angular.
-                  $rootScope.$apply();
                 });
 
               StateEditorService.updateExplorationWhitelistedStatus(
@@ -638,9 +635,6 @@ angular.module('oppia').directive('explorationEditorPage', [
                     saveButtonTutorialElement);
                   ctrl.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
                 }
-                // TODO(#8521): Remove the use of $rootScope.$apply()
-                // once the controller is migrated to angular.
-                $rootScope.$apply();
               });
 
             // Replace the ng-joyride template with one that uses <[...]>
