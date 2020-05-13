@@ -307,7 +307,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'Polyfills.ts',
     'practice-session-page.controller.ts',
     'practice-tab.directive.ts',
-    'prediction-algorithm-registry.service.ts',
     'preferences-page.controller.ts',
     'pretest-question-backend-api.service.ts',
     'preview-tab.directive.ts',
