@@ -837,7 +837,7 @@ class BaseMapReduceJobManagerForContinuousComputationsTests(
 
 
 class BaseContinuousComputationManagerTests(test_utils.GenericTestBase):
-    
+
     EXP_ID = 'exp_id'
 
     def test_raise_error_with_get_event_types_listened_to(self):
