@@ -22,7 +22,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
-import { CollectionCreationBackendService } from
+import { CollectionCreationBackendService, CollectionCreationResponse } from
   'components/entity-creation-services/collection-creation-backend-api.service';
 import { LoaderService } from 'services/loader.service.ts';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -33,6 +33,8 @@ import { UrlInterpolationService } from
   providedIn: 'root'
 })
 export class CollectionCreationService {
+  private collectionCreationInProgress: boolean = false;
+
   constructor(
     private backendService: CollectionCreationBackendService,
     private alertsService: AlertsService,
@@ -40,7 +42,6 @@ export class CollectionCreationService {
     private urlInterpolationService: UrlInterpolationService,
     private loaderService: LoaderService,
     private location: Location) {
-    this.collectionCreationInProgress = false;
   }
 
   CREATE_NEW_COLLECTION_URL_TEMPLATE = (
@@ -56,20 +57,21 @@ export class CollectionCreationService {
 
     this.loaderService.showLoadingScreen('Creating collection');
 
-    this.backendService.createCollection().then((response) => {
-      this.analyticsService.registerCreateNewCollectionEvent(
-        response.collectionId);
+    this.backendService.createCollection()
+      .then((response: CollectionCreationResponse) => {
+        this.analyticsService.registerCreateNewCollectionEvent(
+          response.collectionId);
 
-      setTimeout(() => {
-        this.location.go(this.urlInterpolationService.interpolateUrl(
-          this.CREATE_NEW_COLLECTION_URL_TEMPLATE, {
-            collection_id: response.collectionId
-          }
-        ));
-      }, 150);
-    }, () => {
-      this.loaderService.hideLoadingScreen();
-    });
+        setTimeout(() => {
+          this.location.go(this.urlInterpolationService.interpolateUrl(
+            this.CREATE_NEW_COLLECTION_URL_TEMPLATE, {
+              collection_id: response.collectionId
+            }
+          ));
+        }, 150);
+      }, () => {
+        this.loaderService.hideLoadingScreen();
+      });
   }
 }
 

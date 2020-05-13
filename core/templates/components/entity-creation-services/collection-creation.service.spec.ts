@@ -21,7 +21,7 @@ import { HttpClientTestingModule, HttpTestingController }
 import { RouterTestingModule } from '@angular/router/testing';
 import { TestBed, fakeAsync, flushMicrotasks, tick }
   from '@angular/core/testing';
-import { Location, SpyLocation } from '@angular/common';
+import { Location } from '@angular/common';
 
 import { AlertsService } from 'services/alerts.service';
 import { CollectionCreationService } from
