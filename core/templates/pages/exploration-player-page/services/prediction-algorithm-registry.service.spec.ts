@@ -26,7 +26,7 @@ import { PredictionAlgorithmRegistryService } from
 import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
 
-describe('PredictionAlgorithmRegistryService', () => {
+describe('Prediction Algorithm Registry Service', () => {
   beforeEach(() => {
     this.registryService = TestBed.get(PredictionAlgorithmRegistryService);
 
@@ -34,34 +34,32 @@ describe('PredictionAlgorithmRegistryService', () => {
     this.textInputPredictionService = TestBed.get(TextInputPredictionService);
   });
 
-  describe('.getPredictionService', () => {
-    it('should return service for CodeClassifier at schema version 1.', () => {
-      expect(this.registryService.getPredictionService('CodeClassifier', 1))
-        .toBe(this.codeReplPredictionService);
-    });
-
-    it('should return null for CodeClassifier at schema version 999.', () => {
-      expect(this.registryService.getPredictionService('CodeClassifier', 999))
-        .toBeNull();
-    });
-
-    it('should return service for TextClassifier at schema version 1.', () => {
-      expect(this.registryService.getPredictionService('TextClassifier', 1))
-        .toBe(this.textInputPredictionService);
-    });
-
-    it('should return null for TextClassifier at schema version 999.', () => {
-      expect(this.registryService.getPredictionService('TextClassifier', 999))
-        .toBeNull();
-    });
-
-    it('shoud return null for NullClassifier which does not exist.', () => {
-      expect(this.registryService.getPredictionService('NullClassifier', 1))
-        .toBeNull();
-    });
+  it('should return service for CodeClassifier at schema version 1.', () => {
+    expect(this.registryService.getPredictionService('CodeClassifier', 1))
+    .toBe(this.codeReplPredictionService);
   });
 
-  describe('.testOnlySetPredictionService', () => {
+  it('should return null for CodeClassifier at schema version 999.', () => {
+    expect(this.registryService.getPredictionService('CodeClassifier', 999))
+    .toBeNull();
+  });
+
+  it('should return service for TextClassifier at schema version 1.', () => {
+    expect(this.registryService.getPredictionService('TextClassifier', 1))
+    .toBe(this.textInputPredictionService);
+  });
+
+  it('should return null for TextClassifier at schema version 999.', () => {
+    expect(this.registryService.getPredictionService('TextClassifier', 999))
+    .toBeNull();
+  });
+
+  it('shoud return null for NullClassifier which does not exist.', () => {
+    expect(this.registryService.getPredictionService('NullClassifier', 1))
+    .toBeNull();
+  });
+
+  describe('when trying to mock prediction services in tests', () => {
     beforeEach(() => {
       class MockPredictionService {
         predict(classifierData, answer): number {
