@@ -34,7 +34,8 @@ from google.appengine.ext import ndb
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 transaction_services = models.Registry.import_transaction_services()
 
-USER_ID_LENGTH = 32
+USER_ID_RANDOM_PART_LENGTH = 32
+USER_ID_LENGTH = 36
 
 
 class UserSettingsModel(base_models.BaseModel):
@@ -223,11 +224,11 @@ class UserSettingsModel(base_models.BaseModel):
                 of attempts.
         """
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
-            new_id = ''.join(
+            new_id = 'uid_%s' % ''.join(
                 random.choice(string.ascii_lowercase)
-                for _ in python_utils.RANGE(USER_ID_LENGTH))
-            if (not cls.get_by_id(new_id) and
-                    not PseudonymizedUserModel.get_by_id(new_id)):
+                for _ in python_utils.RANGE(USER_ID_RANDOM_PART_LENGTH))
+
+            if not cls.get_by_id(new_id):
                 return new_id
 
         raise Exception('New id generator is producing too many collisions.')
@@ -2295,3 +2296,31 @@ class PseudonymizedUserModel(base_models.BaseModel):
     def get_user_id_migration_policy():
         """PseudonymizedUserModel contains only anonymous ids."""
         return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def get_new_id(cls, unused_entity_name=''):
+        """Gets a new id for an entity, based on its name.
+
+        The returned id is guaranteed to be unique among all instances of this
+        entity.
+
+        Args:
+            unused_entity_name: The name of the entity. Coerced to a utf-8
+                encoded string. Defaults to ''.
+
+        Returns:
+            str. New unique id for this entity class.
+
+        Raises:
+            Exception: An ID cannot be generated within a reasonable number
+                of attempts.
+        """
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+            new_id = 'pid_%s' % ''.join(
+                random.choice(string.ascii_lowercase)
+                for _ in python_utils.RANGE(USER_ID_RANDOM_PART_LENGTH))
+
+            if not cls.get_by_id(new_id):
+                return new_id
+
+        raise Exception('New id generator is producing too many collisions.')

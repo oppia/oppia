@@ -138,7 +138,7 @@ def _generate_activity_to_user_ids_mapping(activity_ids):
         IDs.
     """
     return {
-        activity_id: user_models.UserSettingsModel.get_new_id()
+        activity_id: user_models.PseudonymizedUserModel.get_new_id()
         for activity_id in activity_ids
     }
 
