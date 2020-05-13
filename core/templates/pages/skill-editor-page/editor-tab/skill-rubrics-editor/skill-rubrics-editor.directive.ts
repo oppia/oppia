@@ -51,10 +51,8 @@ angular.module('oppia').directive('skillRubricsEditor', [
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
             ctrl.parentSubscription.add(
-              SkillEditorStateService.getSkillReinitializedSubject()
-                .subscribe(
-                  () => $scope.rubrics = $scope.skill.getRubrics()
-                )
+              SkillEditorStateService.getSkillReinitializedSubject().subscribe(
+                () => $scope.rubrics = $scope.skill.getRubrics())
             );
           };
 

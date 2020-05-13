@@ -34,6 +34,7 @@ require(
 require('services/alerts.service.ts');
 require('services/questions-list.service.ts');
 require('services/contextual/url.service.ts');
+
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('questionsTab', [
@@ -76,16 +77,12 @@ angular.module('oppia').directive('questionsTab', [
           ctrl.$onInit = function() {
             _init();
             ctrl.parentSubscription.add(
-              SkillEditorStateService.getSkillInitializedSubject()
-                .subscribe(
-                  () => _init()
-                )
+              SkillEditorStateService.getSkillInitializedSubject().subscribe(
+                () => _init())
             );
             ctrl.parentSubscription.add(
-              SkillEditorStateService.getSkillReinitializedSubject()
-                .subscribe(
-                  () => _init()
-                )
+              SkillEditorStateService.getSkillReinitializedSubject().subscribe(
+                () => _init())
             );
           };
 

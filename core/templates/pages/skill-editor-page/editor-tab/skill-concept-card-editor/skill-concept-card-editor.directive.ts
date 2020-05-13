@@ -187,10 +187,8 @@ angular.module('oppia').directive('skillConceptCardEditor', [
               '/general/drag_dots.png');
             initBindableFieldsDict();
             ctrl.parentSubscription.add(
-              SkillEditorStateService.getSkillReinitializedSubject()
-                .subscribe(
-                  () => initBindableFieldsDict()
-                )
+              SkillEditorStateService.getSkillReinitializedSubject().subscribe(
+                () => initBindableFieldsDict())
             );
 
             // When the page is scrolled so that the top of the page is above

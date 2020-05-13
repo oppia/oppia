@@ -164,10 +164,8 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.misconceptions = $scope.skill.getMisconceptions();
             ctrl.parentSubscription.add(
-              SkillEditorStateService.getSkillReinitializedSubject()
-                .subscribe(
-                  () => $scope.misconceptions = $scope.skill.getMisconceptions()
-                )
+              SkillEditorStateService.getSkillReinitializedSubject().subscribe(
+                () => $scope.misconceptions = $scope.skill.getMisconceptions())
             );
           };
 
