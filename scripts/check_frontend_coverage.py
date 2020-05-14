@@ -380,7 +380,7 @@ FULLY_COVERED_FILENAMES = [
     'suggestions.service.ts',
     'SuggestionThreadObjectFactory.ts',
     'summarize-nonnegative-number.filter.ts',
-    'teach-page.controller.ts',
+    'teach-page.component.ts',
     'test.extras.ts',
     'text-input-prediction.service.ts',
     'text-input-rules.service.ts',
