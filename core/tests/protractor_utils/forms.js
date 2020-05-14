@@ -17,6 +17,9 @@
  * out end-to-end testing with protractor.
  */
 
+// Note: Instantiating some of the editors, e.g. RichTextEditor, occurs
+// asynchronously and so must be prefixed by "await".
+
 var interactions = require('../../../extensions/interactions/protractor.js');
 var richTextComponents = require(
   '../../../extensions/rich_text_components/protractor.js');
@@ -24,11 +27,11 @@ var objects = require('../../../extensions/objects/protractor.js');
 
 var DictionaryEditor = function(elem) {
   return {
-    editEntry: function(index, objectType) {
-      var entry = elem.element(by.repeater('property in propertySchemas()').
+    editEntry: async function(index, objectType) {
+      var entry = elem.element(await by.repeater('property in propertySchemas()').
         row(index));
       var editor = getEditor(objectType);
-      return editor(entry);
+      return await editor(entry);
     }
   };
 };
@@ -44,69 +47,67 @@ var GraphEditor = function(graphInputContainer) {
       '.protractor-test-graph-vertex-' + index));
   };
 
-  var createVertex = function(xOffset, yOffset) {
+  var createVertex = async function(xOffset, yOffset) {
     var addNodeButton = graphInputContainer.element(
       by.css('.protractor-test-Add-Node-button'));
-    addNodeButton.click();
+    await addNodeButton.click();
     // Offsetting from the graph container.
-    browser.actions()
+    await browser.actions()
       .mouseMove(graphInputContainer, {x: xOffset, y: yOffset})
       .click()
       .perform();
   };
 
-  var createEdge = function(vertexIndex1, vertexIndex2) {
+  var createEdge = async function(vertexIndex1, vertexIndex2) {
     var addEdgeButton = graphInputContainer.element(
       by.css('.protractor-test-Add-Edge-button'));
-    addEdgeButton.click();
-    browser.actions()
+    await addEdgeButton.click();
+    await browser.actions()
       .dragAndDrop(vertexElement(vertexIndex1), vertexElement(vertexIndex2))
       .perform();
   };
   return {
-    setValue: function(graphDict) {
+    setValue: async function(graphDict) {
       var nodeCoordinatesList = graphDict.vertices;
       var edgesList = graphDict.edges;
       if (nodeCoordinatesList) {
         expect(nodeCoordinatesList.length).toBeGreaterThan(0);
         // Assume x-coord is at index 0.
         nodeCoordinatesList.forEach(function(coordinateElement) {
-          createVertex(coordinateElement[0], coordinateElement[1]);
+          await createVertex(coordinateElement[0], coordinateElement[1]);
         });
       }
       if (edgesList) {
         edgesList.forEach(function(edgeElement) {
-          createEdge(edgeElement[0], edgeElement[1]);
+          await createEdge(edgeElement[0], edgeElement[1]);
         });
       }
     },
-    clearDefaultGraph: function() {
+    clearDefaultGraph: async function() {
       var deleteButton = graphInputContainer.element(
         by.css('.protractor-test-Delete-button'));
-      deleteButton.click();
+      await deleteButton.click();
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
-        vertexElement(i).click();
+        await vertexElement(i).click();
       }
     },
-    expectCurrentGraphToBe: function(graphDict) {
+    expectCurrentGraphToBe: async function(graphDict) {
       var nodeCoordinatesList = graphDict.vertices;
       var edgesList = graphDict.edges;
       if (nodeCoordinatesList) {
         // Expecting total no. of vertices on the graph matches with the given
         // dict's vertices.
         nodeCoordinatesList.forEach(function(node, index) {
-          expect(vertexElement(index).isDisplayed()).toBe(true);
+          expect(await vertexElement(index).isDisplayed()).toBe(true);
         });
       }
       if (edgesList) {
         // Expecting total no. of edges on the graph matches with the given
         // dict's edges.
-        var allEdgesElement = element.all(by.css(
+        var allEdgesElement = await element.all(by.css(
           '.protractor-test-graph-edge'));
-        allEdgesElement.then(function(allEdges) {
-          expect(allEdges.length).toEqual(edgesList.length);
-        });
+        expect(allEdges.length).toEqual(edgesList.length);
       }
     }
   };
@@ -128,48 +129,46 @@ var ListEditor = function(elem) {
     var listLength = await _getLength();
     await elem.element(by.css('.protractor-test-add-list-entry')).click();
     if (objectType !== null) {
-      return getEditor(objectType)(
+      return await _getEditor(objectType)(
         elem.element(
-          by.repeater('item in localValue track by $index').row(listLength)));
+          await by.repeater('item in localValue track by $index').row(listLength)));
     }
   };
-  var deleteItem = function(index) {
-    elem.element(
-      by.repeater('item in localValue track by $index').row(index)
+  var deleteItem = async function(index) {
+    await _elem.element(
+      await by.repeater('item in localValue track by $index').row(index)
     ).element(by.css('.protractor-test-delete-list-entry')).click();
   };
 
   return {
-    editItem: function(index, objectType) {
-      var item = elem.element(
-        by.repeater('item in localValue track by $index'
+    editItem: async function(index, objectType) {
+      var item = await elem.element(
+        await by.repeater('item in localValue track by $index'
         ).row(index));
       var editor = getEditor(objectType);
-      return editor(item);
+      return await editor(item);
     },
     addItem: addItem,
     deleteItem: deleteItem,
     // This will add or delete list elements as necessary
-    setLength: function(desiredLength) {
-      elem.all(by.repeater('item in localValue track by $index')).count().then(
-        function(startingLength) {
-          for (var i = startingLength; i < desiredLength; i++) {
-            addItem();
-          }
-          for (var j = startingLength - 1; j >= desiredLength; j--) {
-            deleteItem(j);
-          }
-        }
-      );
+    setLength: async function(desiredLength) {
+      var startingLength = await elem.all(
+        await by.repeater('item in localValue track by $index')).count();
+      for (var i = startingLength; i < desiredLength; i++) {
+        await addItem();
+      }
+      for (var j = startingLength - 1; j >= desiredLength; j--) {
+        await deleteItem(j);
+      }
     }
   };
 };
 
 var RealEditor = function(elem) {
   return {
-    setValue: function(value) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(value);
+    setValue: async function(value) {
+      await elem.element(by.tagName('input')).clear();
+      await elem.element(by.tagName('input')).sendKeys(value);
     }
   };
 };
@@ -231,11 +230,10 @@ var RichTextEditor = async function(elem) {
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
     addRteComponent: async function(componentName) {
-      await _clickToolbarButton(
-        'cke_button__oppia' + componentName.toLowerCase());
+      await _clickToolbarButton('cke_button__oppia' + componentName.toLowerCase());
 
       // The currently active modal is the last in the DOM
-      var modal = element.all(by.css('.modal-dialog')).last();
+      var modal = await element.all(by.css('.modal-dialog')).last();
 
       // Need to convert arguments to an actual array; we tell the component
       // which modal to act on but drop the componentName.
@@ -243,7 +241,7 @@ var RichTextEditor = async function(elem) {
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      richTextComponents.getComponent(componentName).customizeComponent.apply(
+      await richTextComponents.getComponent(componentName).customizeComponent.apply(
         null, args);
       await modal.element(
         by.css('.protractor-test-close-rich-text-component-editor')).click();
@@ -251,8 +249,7 @@ var RichTextEditor = async function(elem) {
       // Ensure that focus is not on added component once it is added so that
       // the component is not overwritten by some other element.
       if (['Video', 'Image', 'Collapsible', 'Tabs'].includes(componentName)) {
-        await elem.all(by.css('.oppia-rte')).first().sendKeys(
-          protractor.Key.DOWN);
+        await elem.all(by.css('.oppia-rte')).first().sendKeys(protractor.Key.DOWN);
       }
 
       // Ensure that the cursor is at the end of the RTE.
@@ -266,11 +263,11 @@ var RichTextEditor = async function(elem) {
 // selection interaction test to customize interaction details
 var SetOfHtmlStringEditor = function(elem) {
   return {
-    editEntry: function(index, objectType) {
-      var entry = elem.element(by.repeater('property in propertySchemas()').
+    editEntry: async function(index, objectType) {
+      var entry = elem.element(await by.repeater('property in propertySchemas()').
         row(index));
       var editor = getEditor(objectType);
-      return editor(entry);
+      return await editor(entry);
     }
   };
 };
@@ -296,8 +293,13 @@ var AutocompleteDropdownEditor = function(elem) {
     },
     expectOptionsToBe: async function(expectedOptions) {
       await elem.element(by.css('.select2-container')).click();
-      var actualOptions = await element(by.css('.select2-dropdown')).all(
-        by.tagName('li')).map((optionElem) => optionElem.getText());
+      var actualOptions = await Promise.all(
+        element(by.css('.select2-dropdown')).all(by.tagName('li')).map(
+          function(optionElem) {
+            return await optionElem.getText();
+          }
+        )
+      );
       expect(actualOptions).toEqual(expectedOptions);
       // Re-close the dropdown.
       await element(by.css('.select2-dropdown')).element(
@@ -308,37 +310,39 @@ var AutocompleteDropdownEditor = function(elem) {
 
 var AutocompleteMultiDropdownEditor = function(elem) {
   return {
-    setValues: function(texts) {
+    setValues: async function(texts) {
       // Clear all existing choices.
-      elem.element(by.css('.select2-selection__rendered'))
+      var deleteButtons = await Promise.all(
+        elem.element(by.css('.select2-selection__rendered'))
         .all(by.tagName('li')).map(function(choiceElem) {
           return choiceElem.element(
             by.css('.select2-selection__choice__remove'));
-        }).then(function(deleteButtons) {
-          // We iterate in descending order, because clicking on a delete button
-          // removes the element from the DOM. We also omit the last element
-          // because it is the field for new input.
-          for (var i = deleteButtons.length - 2; i >= 0; i--) {
-            deleteButtons[i].click();
-          }
-        });
+        })
+      );
+      // We iterate in descending order, because clicking on a delete button
+      // removes the element from the DOM. We also omit the last element
+      // because it is the field for new input.
+      for (var i = deleteButtons.length - 2; i >= 0; i--) {
+        await deleteButtons[i].click();
+      }
 
       for (var i = 0; i < texts.length; i++) {
-        elem.element(by.css('.select2-container')).click();
-        elem.element(by.css('.select2-search__field')).sendKeys(
+        await elem.element(by.css('.select2-container')).click();
+        await elem.element(by.css('.select2-search__field')).sendKeys(
           texts[i] + '\n');
       }
     },
-    expectCurrentSelectionToBe: function(expectedCurrentSelection) {
-      elem.element(by.css('.select2-selection__rendered'))
+    expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
+      actualSelection = await Promise.all(
+        elem.element(by.css('.select2-selection__rendered'))
         .all(by.tagName('li')).map(function(choiceElem) {
-          return choiceElem.getText();
-        }).then(function(actualSelection) {
-          // Remove the element corresponding to the last <li>, which actually
-          // corresponds to the field for new input.
-          actualSelection.pop();
-          expect(actualSelection).toEqual(expectedCurrentSelection);
-        });
+          return await choiceElem.getText();
+        })
+      );
+      // Remove the element corresponding to the last <li>, which actually
+      // corresponds to the field for new input.
+      actualSelection.pop();
+      expect(actualSelection).toEqual(expectedCurrentSelection);
     }
   };
 };
@@ -392,13 +396,13 @@ var MultiSelectEditor = function(elem) {
         '.protractor-test-search-bar-dropdown-toggle')).click();
 
       // Find the selected elements.
-      var actualSelection = (
-        await elem.element(
-          by.css('.protractor-test-search-bar-dropdown-menu')).all(
-          by.css('.protractor-test-selected')).map(
-          async function(selectedElem) {
+      var actualSelection = await Promise.all(
+        elem.element(by.css('.protractor-test-search-bar-dropdown-menu'))
+          .all(by.css('.protractor-test-selected'))
+          .map(async function(selectedElem) {
             return await selectedElem.getText();
-          }));
+          })
+      );
       expect(actualSelection).toEqual(expectedCurrentSelection);
 
       // Close the dropdown menu at the end.
@@ -423,37 +427,36 @@ var MultiSelectEditor = function(elem) {
 //   handler.readBoldText('bold');
 //   handler.readRteComponent('Math', ...);
 var expectRichText = function(elem) {
-  var toMatch = function(richTextInstructions) {
+  var toMatch = async function(richTextInstructions) {
     // We select all top-level non-paragraph elements, as well as all children
     // of paragraph elements. (Note that it is possible for <p> elements to
     // surround, e.g., <i> tags, so we can't just ignore the <p> elements
     // altogether.)
     var XPATH_SELECTOR = './p/*|./*[not(self::p)]';
-    elem.all(by.xpath(XPATH_SELECTOR)).map(function(entry) {
-      // It is necessary to obtain the texts of the elements in advance since
-      // applying .getText() while the RichTextChecker is running would be
-      // asynchronous and so not allow us to update the textPointer
-      // synchronously.
-      return entry.getText(function(text) {
-        return text;
-      });
-    }).then(function(arrayOfTexts) {
-      // We re-derive the array of elements as we need it too.
-      elem.all(by.xpath(XPATH_SELECTOR)).then(function(arrayOfElements) {
-        elem.getText().then(function(fullText) {
-          var checker = RichTextChecker(
-            arrayOfElements, arrayOfTexts, fullText);
-          richTextInstructions(checker);
-          checker.expectEnd();
+    var arrayOfTexts = await Promise.all(
+      elem.all(by.xpath(XPATH_SELECTOR)).map(async function(entry) {
+        // It is necessary to obtain the texts of the elements in advance since
+        // applying .getText() while the RichTextChecker is running would be
+        // asynchronous and so not allow us to update the textPointer
+        // synchronously.
+        return await entry.getText(function(text) {
+          return text;
         });
-      });
-    });
+      })
+    );
+    // We re-derive the array of elements as we need it too.
+    var arrayOfElements = await elem.all(by.xpath(XPATH_SELECTOR));
+    var fullText = await elem.getText();
+    var checker = RichTextChecker(
+      arrayOfElements, arrayOfTexts, fullText);
+    await richTextInstructions(checker);
+    checker.expectEnd();
   };
   return {
     toMatch: toMatch,
-    toEqual: function(text) {
-      toMatch(function(checker) {
-        checker.readPlainText(text);
+    toEqual: async function(text) {
+      await toMatch(async function(checker) {
+        await checker.readPlainText(text);
       });
     }
   };
@@ -480,10 +483,12 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
   // specially.
   var justPassedRteComponent = false;
 
-  var _readFormattedText = function(text, tagName) {
-    expect(arrayOfElems[arrayPointer].getTagName()).toBe(tagName);
+  var _readFormattedText = async function(text, tagName) {
     expect(
-      arrayOfElems[arrayPointer].getAttribute('innerHTML')
+      await arrayOfElems[arrayPointer].getTagName()
+    ).toBe(tagName);
+    expect(
+      await arrayOfElems[arrayPointer].getAttribute('innerHTML')
     ).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
@@ -500,20 +505,20 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
       textPointer = textPointer + text.length;
       justPassedRteComponent = false;
     },
-    readBoldText: function(text) {
-      _readFormattedText(text, 'strong');
+    readBoldText: async function(text) {
+      await _readFormattedText(text, 'strong');
     },
-    readItalicText: function(text) {
-      _readFormattedText(text, 'em');
+    readItalicText: async function(text) {
+      await _readFormattedText(text, 'em');
     },
     // TODO(Jacob): add functions for other rich text components.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
-    readRteComponent: function(componentName) {
+    readRteComponent: async function(componentName) {
       var elem = arrayOfElems[arrayPointer];
-      expect(elem.getTagName()).
+      expect(await elem.getTagName()).
         toBe('oppia-noninteractive-' + componentName.toLowerCase());
-      expect(elem.getText()).toBe(arrayOfTexts[arrayPointer]);
+      expect(await elem.getText()).toBe(arrayOfTexts[arrayPointer]);
 
       // Need to convert arguments to an actual array; we tell the component
       // which element to act on but drop the componentName.
@@ -521,7 +526,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      richTextComponents.getComponent(componentName).
+      await richTextComponents.getComponent(componentName).
         expectComponentDetailsToMatch.apply(null, args);
       textPointer = textPointer + arrayOfTexts[arrayPointer].length +
         (justPassedRteComponent ? 1 : 2);
@@ -550,7 +555,7 @@ var toRichText = async function(text) {
     if (handler.hasOwnProperty('setPlainText')) {
       await handler.setPlainText(text);
     } else {
-      handler.readPlainText(text);
+      await handler.readPlainText(text);
     }
   };
 };
@@ -582,51 +587,52 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
    *  - 'highlighted': true or false, whether the line is highlighted
    *  - 'checked': true or false, whether the line has been checked
    */
-  var _compareTextAndHighlightingFromLine = function(
+  var _compareTextAndHighlightingFromLine = async function(
       currentLineNumber, scrollTo, compareDict) {
     // This is used to match and scroll the text in codemirror to a point
     // scrollTo pixels from the top of the text or the bottom of the text
     // if scrollTo is too large.
-    browser.executeScript(
+    await browser.executeScript(
       '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
       '().scrollTop(' + String(scrollTo) + ');');
-    elem.all(by.xpath('./div')).map(function(lineElement) {
-      return lineElement.element(by.css('.CodeMirror-linenumber')).getText()
-        .then(function(lineNumber) {
-          // Note: the last line in codemirror will have an empty string for
-          // line number and for text. This is to skip that line.
-          if (lineNumber === '') {
-            return lineNumber;
-          }
-          if (!compareDict.hasOwnProperty(lineNumber)) {
-            throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
-          }
-          expect(lineElement.element(by.xpath('./pre')).getText())
-            .toEqual(compareDict[lineNumber].text);
-          expect(
-            lineElement.element(
-              by.css('.CodeMirror-linebackground')).isPresent())
-            .toEqual(compareDict[lineNumber].highlighted);
-          compareDict[lineNumber].checked = true;
+    var lineNumbers = await Promise.all(elem.all(by.xpath('./div')).map(
+      async function(lineElement) {
+        var lineNumber = await lineElement.element(
+          by.css('.CodeMirror-linenumber')).getText();
+        // Note: the last line in codemirror will have an empty string for
+        // line number and for text. This is to skip that line.
+        if (lineNumber === '') {
           return lineNumber;
-        });
-    }).then(function(lineNumbers) {
-      var largestLineNumber = lineNumbers[lineNumbers.length - 1];
-      if (largestLineNumber !== currentLineNumber) {
-        _compareTextAndHighlightingFromLine(
-          largestLineNumber,
-          scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
-          compareDict);
-      } else {
-        for (var lineNumber in compareDict) {
-          if (compareDict[lineNumber].checked !== true) {
-            throw new Error(
-              'Expected line ' + lineNumber + ': \'' +
-              compareDict[lineNumber].text + '\' to be found in CodeMirror');
-          }
+        }
+        if (!compareDict.hasOwnProperty(lineNumber)) {
+          throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
+        }
+        expect(await lineElement.element(by.xpath('./pre')).getText())
+          .toEqual(compareDict[lineNumber].text);
+        expect(
+          await lineElement.element(
+            by.css('.CodeMirror-linebackground')).isPresent())
+          .toEqual(compareDict[lineNumber].highlighted);
+        compareDict[lineNumber].checked = true;
+        return lineNumber;
+      }
+    ));
+    var largestLineNumber = lineNumbers[lineNumbers.length - 1];
+    if (largestLineNumber !== currentLineNumber) {
+      await _compareTextAndHighlightingFromLine(
+        largestLineNumber,
+        scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
+        compareDicti
+      );
+    } else {
+      for (var lineNumber in compareDict) {
+        if (compareDict[lineNumber].checked !== true) {
+          throw new Error(
+            'Expected line ' + lineNumber + ': \'' +
+            compareDict[lineNumber].text + '\' to be found in CodeMirror');
         }
       }
-    });
+    }
   };
 
   /**
@@ -642,50 +648,49 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
    *  - 'text': the exact string of text expected on that line
    *  - 'checked': true or false, whether the line has been checked
    */
-  var _compareTextFromLine = function(
+  var _compareTextFromLine = async function(
       currentLineNumber, scrollTo, compareDict) {
     // This is used to match and scroll the text in codemirror to a point
     // scrollTo pixels from the top of the text or the bottom of the text
     // if scrollTo is too large.
-    browser.executeScript(
+    await browser.executeScript(
       '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
       '().scrollTop(' + String(scrollTo) + ');');
-    elem.getText().then(function(text) {
-      // The 'text' arg is a string 2n lines long representing n lines of text
-      // codemirror has loaded. The (2i)th line contains a line number and the
-      // (2i+1)th line contains the text on that line.
-      var textArray = text.split('\n');
-      // We have an empty line in the codemirror panes which is retrived as NULL
-      // in codemirror5's getText() method. Therefore, we need to add an empty
-      // string at the end of the textArray to match with compareDict.
+    var text = await elem.getText();
+    // The 'text' arg is a string 2n lines long representing n lines of text
+    // codemirror has loaded. The (2i)th line contains a line number and the
+    // (2i+1)th line contains the text on that line.
+    var textArray = text.split('\n');
+    // We have an empty line in the codemirror panes which is retrived as NULL
+    // in codemirror5's getText() method. Therefore, we need to add an empty
+    // string at the end of the textArray to match with compareDict.
 
-      textArray[textArray.length] = '';
-      for (var i = 0; i < textArray.length; i += 2) {
-        var lineNumber = textArray[i];
-        var lineText = textArray[i + 1];
-        if (!compareDict.hasOwnProperty(lineNumber)) {
-          throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
-        }
-        expect(lineText).toEqual(compareDict[lineNumber].text);
-        compareDict[lineNumber].checked = true;
+    textArray[textArray.length] = '';
+    for (var i = 0; i < textArray.length; i += 2) {
+      var lineNumber = textArray[i];
+      var lineText = textArray[i + 1];
+      if (!compareDict.hasOwnProperty(lineNumber)) {
+        throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
       }
-      var largestLineNumber = textArray[textArray.length - 2];
-      if (largestLineNumber !== currentLineNumber) {
-        _compareTextFromLine(
-          largestLineNumber,
-          scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
-          compareDict);
-      } else {
-        for (var dictLineNumber in compareDict) {
-          if (compareDict[dictLineNumber].checked !== true) {
-            throw new Error(
-              'Expected line ' + lineNumber + ': \'' +
-              compareDict[dictLineNumber].text + '\' to be found in CodeMirror'
-            );
-          }
+      expect(lineText).toEqual(compareDict[lineNumber].text);
+      compareDict[lineNumber].checked = true;
+    }
+    var largestLineNumber = textArray[textArray.length - 2];
+    if (largestLineNumber !== currentLineNumber) {
+      await _compareTextFromLine(
+        largestLineNumber,
+        scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
+        compareDict);
+    } else {
+      for (var dictLineNumber in compareDict) {
+        if (compareDict[dictLineNumber].checked !== true) {
+          throw new Error(
+            'Expected line ' + lineNumber + ': \'' +
+            compareDict[dictLineNumber].text + '\' to be found in CodeMirror'
+          );
         }
       }
-    });
+    }
   };
 
   return {
@@ -698,17 +703,17 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
      * This runs much slower than checking without highlighting, so the
      * expectTextToBe() function should be used when possible.
      */
-    expectTextWithHighlightingToBe: function(expectedTextDict) {
+    expectTextWithHighlightingToBe: async function(expectedTextDict) {
       for (var lineNumber in expectedTextDict) {
         expectedTextDict[lineNumber].checked = false;
       }
-      _compareTextAndHighlightingFromLine(1, 0, expectedTextDict);
+      await _compareTextAndHighlightingFromLine(1, 0, expectedTextDict);
     },
     /**
      * Compares text with codemirror. The input should be a string (with
      * line breaks) of the expected display on codemirror.
      */
-    expectTextToBe: function(expectedTextString) {
+    expectTextToBe: async function(expectedTextString) {
       var expectedTextArray = expectedTextString.split('\n');
       var expectedDict = {};
       for (var lineNumber = 1; lineNumber <= expectedTextArray.length;
@@ -718,16 +723,16 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
           checked: false
         };
       }
-      _compareTextFromLine(1, 0, expectedDict);
+      await _compareTextFromLine(1, 0, expectedDict);
     }
   };
 };
 
 var CodeStringEditor = function(elem) {
   return {
-    setValue: function(code) {
-      elem.element(by.tagName('textarea')).clear();
-      elem.element(by.tagName('textarea')).sendKeys(code);
+    setValue: async function(code) {
+      await elem.element(by.tagName('textarea')).clear();
+      await elem.element(by.tagName('textarea')).sendKeys(code);
     }
   };
 };

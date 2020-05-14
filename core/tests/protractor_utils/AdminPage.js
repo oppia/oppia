@@ -138,10 +138,12 @@ var AdminPage = function() {
     await this.get();
     await configTab.click();
     await waitFor.elementToBeClickable(saveAllConfigs);
-    var results = await configProperties.map(async function(x) {
-      return await saveConfigProperty(
-        x, propertyName, objectType, editingInstructions);
-    });
+    var results = await Promise.all(
+      configProperties.map(async function(x) {
+        return await saveConfigProperty(
+          x, propertyName, objectType, editingInstructions);
+      })
+    );
     var success = null;
     for (var i = 0; i < results.length; i++) {
       success = success || results[i];
@@ -212,15 +214,13 @@ var AdminPage = function() {
     await adminRolesTab.click();
 
     // Change values for "update role" form, and submit it.
-    await waitFor.visibilityOf(
-      updateFormName, 'Update Form Name is not visible');
+    await waitFor.visibilityOf(updateFormName, 'Update Form Name is not visible');
     await updateFormName.sendKeys(name);
     var roleOption = roleSelect.element(
       by.cssContainingText('option', newRole));
     await roleOption.click();
     await updateFormSubmit.click();
-    await waitFor.visibilityOf(
-      statusMessage, 'Confirmation message not visible');
+    await waitFor.visibilityOf(statusMessage, 'Confirmation message not visible');
     await waitFor.textToBePresentInElement(
       statusMessage, 'successfully updated to',
       'Could not set role successfully');

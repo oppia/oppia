@@ -453,6 +453,7 @@ def main(args=None):
     commands = [common.NODE_BIN_PATH]
     if parsed_args.debug_mode:
         commands.append('--inspect-brk')
+    commands.append('--unhandled-rejections=strict')
     commands.append(PROTRACTOR_BIN_PATH)
     commands.extend(get_e2e_test_parameters(
         parsed_args.sharding_instances, parsed_args.suite, dev_mode))
