@@ -19,9 +19,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
 import os
 import sys
-import json
+
 import python_utils
 
 from . import linter_utils
@@ -83,7 +84,8 @@ def check_third_party_libs_type_defs(verbose_mode_enabled):
 
         for third_party_lib in THIRD_PARTY_LIBS:
             if 'manifest.json' in third_party_lib:
-                lib_version = manifest[third_party_lib['manifest.json']]['version']
+                lib_version = (
+                    manifest[third_party_lib['manifest.json']]['version'])
 
             if 'package.json' in third_party_lib:
                 lib_version = package[third_party_lib['package.json']]
@@ -103,14 +105,14 @@ def check_third_party_libs_type_defs(verbose_mode_enabled):
                 if file_name.startswith(prefix_name):
                     files_with_prefix_name.append(file_name)
 
-            if (len(files_with_prefix_name) > 1):
+            if len(files_with_prefix_name) > 1:
                 python_utils.PRINT(
                     'There are multiple type definitions for %s in the typings '
                     'dir.' % third_party_lib['name']
                 )
                 python_utils.PRINT('')
                 failed = True
-            elif (len(files_with_prefix_name) == 0):
+            elif len(files_with_prefix_name) == 0:
                 python_utils.PRINT(
                     'There are no type definitions for %s in the typings '
                     'dir.' % third_party_lib['name']
@@ -122,12 +124,13 @@ def check_third_party_libs_type_defs(verbose_mode_enabled):
 
                 type_defs_version = type_defs_file_name[len(prefix_name): -5]
 
-                if (lib_version != type_defs_version):
+                if lib_version != type_defs_version:
                     python_utils.PRINT(
-                        'Type definitions for %s are not up to date. The current '
-                        'version of %s is %s and the type definitions are for '
-                        'version %s.' % (third_party_lib['name'],
-                        third_party_lib['name'], lib_version, type_defs_version))
+                        'Type definitions for %s are not up to date. The '
+                        'current version of %s is %s and the type definitions '
+                        'are for version %s.' % (
+                            third_party_lib['name'], third_party_lib['name'],
+                            lib_version, type_defs_version))
                     python_utils.PRINT('')
                     failed = True
 
