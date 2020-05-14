@@ -1142,8 +1142,8 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
-            response['error'], 'Please ensure that the usernames are '
-            'not empty.')
+            response['error'], 'Invalid request: A new username must be '
+            'specified.')
 
     def test_update_username_with_none_current_username(self):
         csrf_token = self.get_new_csrf_token()
@@ -1156,8 +1156,8 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
-            response['error'], 'Please ensure that the usernames are '
-            'not empty.')
+            response['error'], 'Invalid request: The current username must be '
+            'specified.')
 
     def test_update_username_with_non_string_new_username(self):
         csrf_token = self.get_new_csrf_token()
@@ -1170,7 +1170,8 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
-            response['error'], 'Please ensure that the usernames are strings.')
+            response['error'], 'Expected new username to be a unicode '
+            'string, received 123')
 
     def test_update_username_with_non_string_current_username(self):
         csrf_token = self.get_new_csrf_token()
@@ -1183,10 +1184,11 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
-            response['error'], 'Please ensure that the usernames are strings.')
+            response['error'], 'Expected current username to be a unicode '
+            'string, received 123')
 
     def test_update_username_with_long_new_username(self):
-        long_username = 'a' * 31
+        long_username = 'a' * (constants.MAX_USERNAME_LENGTH + 1)
         csrf_token = self.get_new_csrf_token()
 
         response = self.put_json(
@@ -1197,9 +1199,10 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
-            response['error'], 'Please make sure that the new '
-            'username is not longer than %s characters.' %
-            constants.MAX_USERNAME_LENGTH)
+            response['error'], 'Expected new username to be less than %s '
+            'characters, received %s' % (
+                constants.MAX_USERNAME_LENGTH,
+                long_username))
 
     def test_update_username_with_nonexistent_current_username(self):
         non_existent_username = 'invalid'
@@ -1212,7 +1215,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token,
             expected_status_int=400)
-        self.assertEqual(response['error'], 'User does not exist.')
+        self.assertEqual(response['error'], 'Invalid username: invalid')
 
     def test_update_username_with_new_username_already_taken(self):
         csrf_token = self.get_new_csrf_token()

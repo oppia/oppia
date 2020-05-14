@@ -864,23 +864,34 @@ class UpdateUsernameHandler(base.BaseHandler):
         current_username = self.payload.get('current_username', None)
         new_username = self.payload.get('new_username', None)
 
-        if new_username is None or current_username is None:
+        if current_username is None:
             raise self.InvalidInputException(
-                'Please ensure that the usernames are not empty.')
+                'Invalid request: The current username must be specified.')
 
-        if type(current_username).__name__ != 'unicode' or type(
-                new_username).__name__ != 'unicode':
+        if new_username is None:
             raise self.InvalidInputException(
-                'Please ensure that the usernames are strings.')
+                'Invalid request: A new username must be specified.')
+
+        if type(current_username).__name__ != 'unicode':
+            raise self.InvalidInputException(
+                'Expected current username to be a unicode string, received %s'
+                % current_username)
+
+        if type(new_username).__name__ != 'unicode':
+            raise self.InvalidInputException(
+                'Expected new username to be a unicode string, received %s'
+                % new_username)
 
         user_id = user_services.get_user_id_from_username(current_username)
         if user_id is None:
-            raise self.InvalidInputException('User does not exist.')
+            raise self.InvalidInputException(
+                'Invalid username: %s' % current_username)
 
         if len(new_username) > constants.MAX_USERNAME_LENGTH:
             raise self.InvalidInputException(
-                'Please make sure that the new username is not longer '
-                'than %s characters.' % constants.MAX_USERNAME_LENGTH)
+                'Expected new username to be less than %s characters, '
+                'received %s' % (constants.MAX_USERNAME_LENGTH, new_username))
+
         if user_services.is_username_taken(new_username):
             raise self.InvalidInputException('Username already taken.')
 
