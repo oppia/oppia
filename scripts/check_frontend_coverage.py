@@ -92,6 +92,7 @@ FULLY_COVERED_FILENAMES = [
     'compare-versions.service.ts',
     'compute-graph.service.ts',
     'concept-card-backend-api.service.ts',
+    'confirm-or-cancel-modal.controller.ts',
     'constants.ts',
     'construct-translation-ids.service.ts',
     'continue-rules.service.ts',

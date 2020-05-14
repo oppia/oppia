@@ -16,6 +16,9 @@
  * @fileoverview Service for the 'embed exploration' modal.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/site-analytics.service.ts');
 
@@ -35,15 +38,17 @@ angular.module('oppia').factory('ExplorationEmbedButtonService', [
             }
           },
           controller: [
-            '$scope', '$uibModalInstance', '$window', 'explorationId',
-            function($scope, $uibModalInstance, $window, explorationId) {
+            '$controller', '$scope', '$uibModalInstance', '$window',
+            'explorationId',
+            function($controller, $scope, $uibModalInstance, $window,
+                explorationId) {
+              $controller('ConfirmOrCancelModalController', {
+                $scope: $scope,
+                $uibModalInstance: $uibModalInstance
+              });
               $scope.explorationId = explorationId;
               $scope.serverName = (
                 $window.location.protocol + '//' + $window.location.host);
-
-              $scope.close = function() {
-                $uibModalInstance.dismiss('close');
-              };
 
               $scope.selectText = function(evt) {
                 var codeDiv = evt.currentTarget;

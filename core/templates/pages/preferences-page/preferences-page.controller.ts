@@ -22,6 +22,9 @@ require('cropperjs/dist/cropper.min.css');
 
 require('base-components/base-content.directive.ts');
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require('components/forms/custom-forms-directives/image-uploader.directive.ts');
 require(
@@ -150,8 +153,13 @@ angular.module('oppia').directive('preferencesPage', [
                 'edit-profile-picture-modal.directive.html'),
               backdrop: 'static',
               controller: [
-                '$scope', '$uibModalInstance', function(
-                    $scope, $uibModalInstance) {
+                '$controller', '$scope', '$uibModalInstance', function(
+                    $controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
+
                   $scope.uploadedImage = null;
                   $scope.croppedImageDataUrl = '';
                   $scope.invalidImageWarningIsShown = false;
@@ -205,10 +213,6 @@ angular.module('oppia').directive('preferencesPage', [
                         width: 150
                       }).toDataURL());
                     $uibModalInstance.close($scope.croppedImageDataUrl);
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]

@@ -20,6 +20,9 @@ require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
   'pages/exploration-editor-page/translation-tab/state-translation/' +
   'state-translation.directive.ts');
 require(
@@ -51,7 +54,8 @@ require(
 require('services/context.service.ts');
 require('services/editability.service.ts');
 
-angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
+angular.module('oppia').directive('translationTab', [
+  'UrlInterpolationService',
   function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -62,15 +66,15 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
 
       controller: ['$scope', '$templateCache', '$uibModal',
         'ContextService', 'EditabilityService', 'ExplorationStatesService',
-        'LoaderService', 'StateEditorService', 'StateRecordedVoiceoversService',
-        'StateTutorialFirstTimeService', 'StateWrittenTranslationsService',
-        'TranslationTabActiveModeService',
+        'LoaderService', 'SiteAnalyticsService', 'StateEditorService',
+        'StateRecordedVoiceoversService', 'StateTutorialFirstTimeService',
+        'StateWrittenTranslationsService', 'TranslationTabActiveModeService',
         'UserExplorationPermissionsService',
         function($scope, $templateCache, $uibModal,
             ContextService, EditabilityService, ExplorationStatesService,
-            LoaderService, StateEditorService, StateRecordedVoiceoversService,
-            StateTutorialFirstTimeService, StateWrittenTranslationsService,
-            TranslationTabActiveModeService,
+            LoaderService, SiteAnalyticsService, StateEditorService,
+            StateRecordedVoiceoversService, StateTutorialFirstTimeService,
+            StateWrittenTranslationsService, TranslationTabActiveModeService,
             UserExplorationPermissionsService) {
           var ctrl = this;
           var _ID_TUTORIAL_TRANSLATION_LANGUAGE =
@@ -127,32 +131,25 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
           };
 
           $scope.showWelcomeTranslationModal = function() {
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/translation-tab/' +
                 'modal-templates/welcome-translation-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance', 'ContextService',
+                '$controller', '$scope', '$uibModalInstance', 'ContextService',
                 'SiteAnalyticsService',
-                function($scope, $uibModalInstance, ContextService,
+                function($controller, $scope, $uibModalInstance, ContextService,
                     SiteAnalyticsService) {
-                  var explorationId = ContextService.getExplorationId();
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
+                  $scope.explorationId = ContextService.getExplorationId();
 
                   SiteAnalyticsService.registerTutorialModalOpenEvent(
-                    explorationId);
+                    $scope.explorationId);
 
-                  $scope.beginTutorial = function() {
-                    SiteAnalyticsService.registerAcceptTutorialModalEvent(
-                      explorationId);
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    SiteAnalyticsService.registerDeclineTutorialModalEvent(
-                      explorationId);
-                    $uibModalInstance.dismiss('cancel');
-                  };
                   // translation tutorial image url for modal
                   $scope.translationWelcomeImgUrl = (
                     UrlInterpolationService.getStaticImageUrl(
@@ -160,11 +157,13 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
                 }
               ],
               windowClass: 'oppia-welcome-modal'
-            });
-
-            modalInstance.result.then(function() {
+            }).result.then(function(explorationId) {
+              SiteAnalyticsService.registerAcceptTutorialModalEvent(
+                explorationId);
               $scope.onStartTutorial();
-            }, function() {
+            }, function(explorationId) {
+              SiteAnalyticsService.registerDeclineTutorialModalEvent(
+                explorationId);
               StateTutorialFirstTimeService.markTranslationTutorialFinished();
             });
           };

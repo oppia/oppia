@@ -17,6 +17,10 @@
  */
 
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+
+require(
   'pages/exploration-player-page/services/' +
   'audio-translation-manager.service.ts');
 require(
@@ -113,18 +117,7 @@ angular.module('oppia').factory('HintAndSolutionModalService', [
             'pages/exploration-player-page/templates/' +
             'solution-interstitial-modal.template.html'),
           backdrop: 'static',
-          controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
-              $scope.continueToSolution = function() {
-                $uibModalInstance.close();
-              };
-
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-              };
-            }
-          ]
+          controller: 'ConfirmOrCancelModalController'
         });
       }
     };

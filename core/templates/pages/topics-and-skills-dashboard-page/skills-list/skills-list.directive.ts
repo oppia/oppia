@@ -17,6 +17,9 @@
  */
 
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
   'components/skill-selector/skill-selector.directive.ts');
 require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +
@@ -72,25 +75,13 @@ angular.module('oppia').directive('skillsList', [
           };
 
           $scope.deleteSkill = function(skillId) {
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'delete-skill-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.confirmDeletion = function() {
-                    $uibModalInstance.close();
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            });
-
-            modalInstance.result.then(function() {
+              controller: 'ConfirmOrCancelModalController'
+            }).result.then(function() {
               SkillBackendApiService.deleteSkill(skillId).then(
                 function(status) {
                   $timeout(function() {
@@ -99,6 +90,10 @@ angular.module('oppia').directive('skillsList', [
                   }, 100);
                 }
               );
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             }).then(function() {
               var successToast = 'The skill has been deleted.';
               AlertsService.addSuccessMessage(successToast, 1000);
@@ -107,27 +102,23 @@ angular.module('oppia').directive('skillsList', [
 
           $scope.assignSkillToTopic = function(skillId) {
             var topicSummaries = $scope.getEditableTopicSummaries();
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'assign-skill-to-topic-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$controller', '$scope', '$uibModalInstance',
+                function($controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
                   $scope.topicSummaries = topicSummaries;
                   $scope.selectedTopicIds = [];
-                  $scope.done = function() {
-                    $uibModalInstance.close($scope.selectedTopicIds);
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
                 }
               ]
-            });
-
-            modalInstance.result.then(function(topicIds) {
+            }).result.then(function(topicIds) {
               var changeList = [{
                 cmd: 'add_uncategorized_skill_id',
                 new_uncategorized_skill_id: skillId
@@ -164,29 +155,29 @@ angular.module('oppia').directive('skillsList', [
 
           $scope.mergeSkill = function(skill) {
             var skillSummaries = $scope.getMergeableSkillSummaries();
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$controller', '$scope', '$uibModalInstance',
+                function($controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
+
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = '';
-                  $scope.save = function() {
+                  $scope.confirm = function() {
                     $uibModalInstance.close(
                       {skill: skill,
                         supersedingSkillId: $scope.selectedSkillId
                       });
                   };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
                 }
               ]
-            });
-
-            modalInstance.result.then(function(result) {
+            }).result.then(function(result) {
               var skill = result.skill;
               var supersedingSkillId = result.supersedingSkillId;
               // Transfer questions from the old skill to the new skill.

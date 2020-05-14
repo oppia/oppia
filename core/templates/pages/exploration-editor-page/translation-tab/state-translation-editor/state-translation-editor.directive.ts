@@ -16,6 +16,10 @@
  * @fileoverview Directive for the state translation editor.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+
 angular.module('oppia').directive('stateTranslationEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -54,16 +58,7 @@ angular.module('oppia').directive('stateTranslationEditor', [
                   '/components/forms/forms-templates/' +
                   'mark-audio-as-needing-update-modal.template.html'),
                 backdrop: true,
-                controller: ['$scope', '$uibModalInstance', function(
-                    $scope, $uibModalInstance) {
-                  $scope.markNeedsUpdate = function() {
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }]
+                controller: 'ConfirmOrCancelModalController'
               }).result.then(function() {
                 recordedVoiceovers.toggleNeedsUpdateAttribute(
                   contentId, languageCode);

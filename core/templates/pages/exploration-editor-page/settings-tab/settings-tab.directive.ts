@@ -17,6 +17,9 @@
  */
 
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-title-editor/' +
@@ -277,8 +280,13 @@ angular.module('oppia').directive('settingsTab', [
                 'preview-summary-tile-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance', function(
-                    $scope, $uibModalInstance) {
+                '$controller', '$scope', '$uibModalInstance', function(
+                    $controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
+
                   $scope.getExplorationTitle = function() {
                     return ExplorationTitleService.displayed;
                   };
@@ -305,17 +313,10 @@ angular.module('oppia').directive('settingsTab', [
                     }
                     return color;
                   };
-
-                  $scope.close = function() {
-                    $uibModalInstance.dismiss();
-                    AlertsService.clearWarnings();
-                  };
                 }
               ]
             }).result.then(function() {}, function() {
-              // Note to developers:
-              // Promise is returned by getCurrentUrl which is handled here.
-              // No further action is needed.
+              AlertsService.clearWarnings();
             });
           };
 
@@ -326,19 +327,11 @@ angular.module('oppia').directive('settingsTab', [
                 '/pages/exploration-editor-page/settings-tab/templates/' +
                 'transfer-exploration-ownership-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', function(
-                    $scope, $uibModalInstance) {
-                  $scope.transfer = $uibModalInstance.close;
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               ExplorationRightsService.makeCommunityOwned();
+            }, function() {
+              AlertsService.clearWarnings();
             });
           };
 
@@ -350,26 +343,14 @@ angular.module('oppia').directive('settingsTab', [
                 '/pages/exploration-editor-page/settings-tab/templates/' +
                 'delete-exploration-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', function(
-                    $scope, $uibModalInstance) {
-                  $scope.reallyDelete = $uibModalInstance.close;
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               EditableExplorationBackendApiService.deleteExploration(
                 ctrl.explorationId).then(function() {
                 $window.location = CREATOR_DASHBOARD_PAGE_URL;
               });
             }, function() {
-              // Note to developers:
-              // Promise is returned by uimodal which is handled here.
-              // No further action is needed.
+              AlertsService.clearWarnings();
             });
           };
 
@@ -394,38 +375,34 @@ angular.module('oppia').directive('settingsTab', [
                     return draftEmailBody;
                   }
                 },
-                controllerAs: '$ctrl',
                 controller: [
-                  '$uibModalInstance', 'draftEmailBody',
-                  function($uibModalInstance, draftEmailBody) {
-                    var ctrl = this;
-                    ctrl.willEmailBeSent = Boolean(draftEmailBody);
-                    ctrl.emailBody = draftEmailBody;
+                  '$controller', '$scope', '$uibModalInstance',
+                  'draftEmailBody',
+                  function($controller, $scope, $uibModalInstance,
+                      draftEmailBody) {
+                    $controller('ConfirmOrCancelModalController', {
+                      $scope: $scope,
+                      $uibModalInstance: $uibModalInstance
+                    });
 
-                    if (ctrl.willEmailBeSent) {
-                      ctrl.EMAIL_BODY_SCHEMA = {
+                    $scope.willEmailBeSent = Boolean(draftEmailBody);
+                    $scope.emailBody = draftEmailBody;
+
+                    if ($scope.willEmailBeSent) {
+                      $scope.EMAIL_BODY_SCHEMA = {
                         type: 'unicode',
                         ui_config: {
                           rows: 20
                         }
                       };
                     }
-
-                    ctrl.reallyTakeAction = function() {
-                      $uibModalInstance.close({
-                        emailBody: ctrl.emailBody
-                      });
-                    };
-
-                    ctrl.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                      AlertsService.clearWarnings();
-                    };
                   }
                 ]
-              }).result.then(function(result) {
+              }).result.then(function(emailBody) {
                 ExplorationRightsService.saveModeratorChangeToBackend(
-                  result.emailBody);
+                  emailBody);
+              }, function() {
+                AlertsService.clearWarnings();
               });
             });
           };

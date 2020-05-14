@@ -17,6 +17,9 @@
  * editor page.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/ParamChangeObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -47,8 +50,8 @@ require('services/context.service.ts');
 require('services/exploration-features.service.ts');
 
 angular.module('oppia').directive('previewTab', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
+  'RouterService', 'UrlInterpolationService', function(
+      RouterService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -108,27 +111,28 @@ angular.module('oppia').directive('previewTab', [
           };
 
           ctrl.showSetParamsModal = function(manualParamChanges, callback) {
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/preview-tab/templates/' +
                 'preview-set-parameters-modal.template.html'),
               backdrop: 'static',
               windowClass: 'oppia-preview-set-params-modal',
               controller: [
-                '$scope', '$uibModalInstance', 'RouterService',
-                function($scope, $uibModalInstance, RouterService) {
+                '$controller', '$scope', '$uibModalInstance',
+                function($controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
                   $scope.manualParamChanges = manualParamChanges;
-                  $scope.previewParamModalOk = $uibModalInstance.close;
-                  $scope.previewParamModalCancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    RouterService.navigateToMainTab();
-                  };
                 }
               ]
             }).result.then(function() {
               if (callback) {
                 callback();
               }
+            }, function() {
+              RouterService.navigateToMainTab();
             });
           };
 

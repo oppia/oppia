@@ -18,6 +18,9 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
@@ -117,18 +120,19 @@ angular.module('oppia').factory('ExplorationSaveService', [
           'post-publish-modal.template.html'),
         backdrop: true,
         controller: [
-          '$scope', '$window', '$uibModalInstance',
+          '$controller', '$scope', '$window', '$uibModalInstance',
           'ContextService', 'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
           function(
-              $scope, $window, $uibModalInstance,
+              $controller, $scope, $window, $uibModalInstance,
               ContextService, DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR) {
+            $controller('ConfirmOrCancelModalController', {
+              $scope: $scope,
+              $uibModalInstance: $uibModalInstance
+            });
             $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/congrats.svg');
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
               DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
-            $scope.close = function() {
-              $uibModalInstance.dismiss('cancel');
-            };
             $scope.explorationId = (
               ContextService.getExplorationId());
             $scope.explorationLinkCopied = false;
@@ -160,23 +164,13 @@ angular.module('oppia').factory('ExplorationSaveService', [
       // This is resolved when modal is closed.
       var whenModalClosed = $q.defer();
 
-      var publishModalInstance = $uibModal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration-editor-page/modal-templates/' +
           'exploration-publish-modal.template.html'),
         backdrop: 'static',
-        controller: [
-          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-            $scope.publish = $uibModalInstance.close;
-
-            $scope.cancel = function() {
-              $uibModalInstance.dismiss('cancel');
-            };
-          }
-        ]
-      });
-
-      publishModalInstance.result.then(function() {
+        controller: 'ConfirmOrCancelModalController'
+      }).result.then(function() {
         if (onStartSaveCallback) {
           onStartSaveCallback();
         }
@@ -267,16 +261,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
             'confirm-discard-changes-modal.template.html'),
           backdrop: 'static',
           keyboard: false,
-          controller: [
-            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss();
-              };
-              $scope.confirmDiscard = function() {
-                $uibModalInstance.close();
-              };
-            }
-          ]
+          controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           AlertsService.clearWarnings();
           $rootScope.$broadcast('externalSave');
@@ -306,6 +291,10 @@ angular.module('oppia').factory('ExplorationSaveService', [
           // exploration-with-draft-changes will be reloaded
           // (since it is already cached in ExplorationDataService).
           $window.location.reload();
+        }, function() {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
         });
       },
 
@@ -328,16 +317,20 @@ angular.module('oppia').factory('ExplorationSaveService', [
               'exploration-metadata-modal.template.html'),
             backdrop: 'static',
             controller: [
-              '$scope', '$uibModalInstance', 'ExplorationObjectiveService',
-              'ExplorationTitleService', 'ExplorationCategoryService',
-              'ExplorationStatesService', 'ExplorationLanguageCodeService',
-              'ExplorationTagsService', 'ALL_CATEGORIES',
-              'DEFAULT_LANGUAGE_CODE', 'TAG_REGEX',
-              function($scope, $uibModalInstance, ExplorationObjectiveService,
-                  ExplorationTitleService, ExplorationCategoryService,
-                  ExplorationStatesService, ExplorationLanguageCodeService,
-                  ExplorationTagsService, ALL_CATEGORIES,
-                  DEFAULT_LANGUAGE_CODE, TAG_REGEX) {
+              '$controller', '$scope', '$uibModalInstance',
+              'ExplorationObjectiveService', 'ExplorationTitleService',
+              'ExplorationCategoryService', 'ExplorationStatesService',
+              'ExplorationLanguageCodeService', 'ExplorationTagsService',
+              'ALL_CATEGORIES', 'DEFAULT_LANGUAGE_CODE', 'TAG_REGEX',
+              function($controller, $scope, $uibModalInstance,
+                  ExplorationObjectiveService, ExplorationTitleService,
+                  ExplorationCategoryService, ExplorationStatesService,
+                  ExplorationLanguageCodeService, ExplorationTagsService,
+                  ALL_CATEGORIES, DEFAULT_LANGUAGE_CODE, TAG_REGEX) {
+                $controller('ConfirmOrCancelModalController', {
+                  $scope: $scope,
+                  $uibModalInstance: $uibModalInstance
+                });
                 $scope.explorationTitleService = ExplorationTitleService;
                 $scope.explorationObjectiveService =
                   ExplorationObjectiveService;
@@ -441,10 +434,6 @@ angular.module('oppia').factory('ExplorationSaveService', [
                   $timeout(function() {
                     $uibModalInstance.close(metadataList);
                   }, 500);
-                };
-
-                $scope.cancel = function() {
-                  $uibModalInstance.dismiss('cancel');
                 };
               }
             ]
@@ -564,9 +553,15 @@ angular.module('oppia').factory('ExplorationSaveService', [
             },
             windowClass: 'oppia-save-exploration-modal',
             controller: [
-              '$scope', '$uibModalInstance', 'isExplorationPrivate',
+              '$controller', '$scope', '$uibModalInstance',
+              'isExplorationPrivate',
               function(
-                  $scope, $uibModalInstance, isExplorationPrivate) {
+                  $controller, $scope, $uibModalInstance,
+                  isExplorationPrivate) {
+                $controller('ConfirmOrCancelModalController', {
+                  $scope: $scope,
+                  $uibModalInstance: $uibModalInstance
+                });
                 $scope.showDiff = false;
                 $scope.onClickToggleDiffButton = function() {
                   $scope.showDiff = !$scope.showDiff;
@@ -587,10 +582,6 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
                 $scope.save = function(commitMessage) {
                   $uibModalInstance.close(commitMessage);
-                };
-                $scope.cancel = function() {
-                  $uibModalInstance.dismiss('cancel');
-                  AlertsService.clearWarnings();
                 };
               }
             ]
@@ -623,6 +614,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
               whenModalClosed.resolve();
             });
           }, function() {
+            AlertsService.clearWarnings();
             modalIsOpen = false;
             whenModalClosed.resolve();
           });

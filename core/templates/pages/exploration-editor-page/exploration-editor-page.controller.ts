@@ -24,6 +24,9 @@ require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
@@ -436,32 +439,24 @@ angular.module('oppia').directive('explorationEditorPage', [
           };
 
           ctrl.showWelcomeExplorationModal = function() {
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/modal-templates/' +
                 'welcome-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance', 'SiteAnalyticsService',
-                'ContextService',
-                function($scope, $uibModalInstance, SiteAnalyticsService,
-                    ContextService) {
-                  var explorationId = ContextService.getExplorationId();
+                '$controller', '$scope', '$uibModalInstance',
+                'SiteAnalyticsService', 'ContextService',
+                function($controller, $scope, $uibModalInstance,
+                    SiteAnalyticsService, ContextService) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
+                  $scope.explorationId = ContextService.getExplorationId();
 
                   SiteAnalyticsService.registerTutorialModalOpenEvent(
-                    explorationId);
-
-                  $scope.beginTutorial = function() {
-                    SiteAnalyticsService.registerAcceptTutorialModalEvent(
-                      explorationId);
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    SiteAnalyticsService.registerDeclineTutorialModalEvent(
-                      explorationId);
-                    $uibModalInstance.dismiss('cancel');
-                  };
+                    $scope.explorationId);
 
                   $scope.editorWelcomeImgUrl = (
                     UrlInterpolationService.getStaticImageUrl(
@@ -469,11 +464,13 @@ angular.module('oppia').directive('explorationEditorPage', [
                 }
               ],
               windowClass: 'oppia-welcome-modal'
-            });
-
-            modalInstance.result.then(function() {
+            }).result.then(function(explorationId) {
+              SiteAnalyticsService.registerAcceptTutorialModalEvent(
+                explorationId);
               ctrl.startTutorial();
-            }, function() {
+            }, function(explorationId) {
+              SiteAnalyticsService.registerDeclineTutorialModalEvent(
+                explorationId);
               StateTutorialFirstTimeService.markEditorTutorialFinished();
             });
           };

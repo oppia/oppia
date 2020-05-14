@@ -18,6 +18,9 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
@@ -76,14 +79,7 @@ angular.module('oppia').directive('skillEditorNavbar', [
                   '/pages/skill-editor-page/modal-templates/' +
                   'save-pending-changes-modal.directive.html'),
                 backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
+                controller: 'ConfirmOrCancelModalController'
               }).result.then(null, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
@@ -114,25 +110,13 @@ angular.module('oppia').directive('skillEditorNavbar', [
           };
 
           $scope.saveChanges = function() {
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/skill-editor-page/modal-templates/' +
                 'skill-editor-save-modal.directive.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.save = function(commitMessage) {
-                    $uibModalInstance.close(commitMessage);
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            });
-
-            modalInstance.result.then(function(commitMessage) {
+              controller: 'ConfirmOrCancelModalController'
+            }).result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage);
               AlertsService.addSuccessMessage('Changes Saved.');
             }, function() {

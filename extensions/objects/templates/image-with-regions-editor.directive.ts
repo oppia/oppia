@@ -16,6 +16,10 @@
  * @fileoverview Directive for image with regions editor.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
@@ -481,17 +485,7 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
                 './image-with-regions-reset-confirmation.directive.html'),
               backdrop: 'static',
               keyboard: false,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss();
-                  };
-
-                  $scope.confirmClear = function() {
-                    $uibModalInstance.close();
-                  };
-                }]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               ctrl.value.imagePath = '';
               ctrl.value.labeledRegions = [];

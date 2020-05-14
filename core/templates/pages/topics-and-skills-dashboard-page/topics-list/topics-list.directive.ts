@@ -16,6 +16,10 @@
  * @fileoverview Controller for the topics list viewer.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller');
+
 require('domain/topic/editable-topic-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
@@ -56,25 +60,13 @@ angular.module('oppia').directive('topicsList', [
           };
 
           $scope.deleteTopic = function(topicId) {
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'delete-topic-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.confirmDeletion = function() {
-                    $uibModalInstance.close();
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            });
-
-            modalInstance.result.then(function() {
+              controller: 'ConfirmOrCancelModalController'
+            }).result.then(function() {
               EditableTopicBackendApiService.deleteTopic(topicId).then(
                 function(status) {
                   $rootScope.$broadcast(

@@ -18,6 +18,9 @@
  */
 
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
   'components/state-directives/response-header/response-header.directive.ts');
 require(
   'components/state-directives/solution-editor/solution-editor.directive.ts');
@@ -147,15 +150,19 @@ angular.module('oppia').directive('stateSolutionEditor', [
                 'modal-templates/add-or-update-solution-modal.template.html'),
               backdrop: 'static',
               controller: [
-                '$scope', '$uibModalInstance', 'ContextService',
+                '$controller', '$scope', '$uibModalInstance', 'ContextService',
                 'CurrentInteractionService', 'StateCustomizationArgsService',
                 'StateSolutionService', 'COMPONENT_NAME_SOLUTION',
                 'INTERACTION_SPECS',
                 function(
-                    $scope, $uibModalInstance, ContextService,
+                    $controller, $scope, $uibModalInstance, ContextService,
                     CurrentInteractionService, StateCustomizationArgsService,
                     StateSolutionService, COMPONENT_NAME_SOLUTION,
                     INTERACTION_SPECS) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
                   $scope.StateSolutionService = StateSolutionService;
                   $scope.correctAnswerEditorHtml = (
                     ExplorationHtmlFormatterService.getInteractionHtml(
@@ -223,11 +230,6 @@ angular.module('oppia').directive('stateSolutionEditor', [
                       throw new Error('Cannot save invalid solution');
                     }
                   };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
                 }
               ]
             }).result.then(function(result) {
@@ -253,9 +255,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
                 }
               }
             }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
+              AlertsService.clearWarnings();
             });
           };
 
@@ -268,28 +268,14 @@ angular.module('oppia').directive('stateSolutionEditor', [
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-solution-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.reallyDelete = function() {
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               StateSolutionService.displayed = null;
               StateSolutionService.saveDisplayedValue();
               $scope.onSaveSolution(StateSolutionService.displayed);
               StateEditorService.deleteCurrentSolutionValidity();
             }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
+              AlertsService.clearWarnings();
             });
           };
           ctrl.$onInit = function() {

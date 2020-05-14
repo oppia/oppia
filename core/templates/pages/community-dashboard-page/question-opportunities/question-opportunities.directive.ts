@@ -19,6 +19,9 @@
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require(
   'components/question-directives/question-editor/' +
@@ -110,16 +113,22 @@ angular.module('oppia').directive('questionOpportunities', [
           };
 
           ctrl.onClickSuggestQuestionButton = function(skillId) {
-            const modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
                 'select-skill-and-difficulty-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance', 'DEFAULT_SKILL_DIFFICULTY',
-                'MODE_SELECT_DIFFICULTY', 'SkillDifficultyObjectFactory',
-                function($scope, $uibModalInstance, DEFAULT_SKILL_DIFFICULTY,
-                    MODE_SELECT_DIFFICULTY, SkillDifficultyObjectFactory) {
+                '$controller', '$scope', '$uibModalInstance',
+                'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY',
+                'SkillDifficultyObjectFactory',
+                function($controller, $scope, $uibModalInstance,
+                    DEFAULT_SKILL_DIFFICULTY, MODE_SELECT_DIFFICULTY,
+                    SkillDifficultyObjectFactory) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
                   const init = function() {
                     $scope.instructionMessage = (
                       'Select the skill(s) to link the question to:');
@@ -153,20 +162,10 @@ angular.module('oppia').directive('questionOpportunities', [
                     $uibModalInstance.close(result);
                   };
 
-                  $scope.cancelModal = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-
-                  $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('ok');
-                  };
-
                   init();
                 }
               ]
-            });
-
-            modalInstance.result.then(function(result) {
+            }).result.then(function(result) {
               if (AlertsService.warnings.length === 0) {
                 ctrl.createQuestion(result.skill, result.skillDifficulty);
               }
@@ -242,27 +241,20 @@ angular.module('oppia').directive('questionOpportunities', [
 
                   $scope.cancel = function() {
                     if (QuestionUndoRedoService.hasChanges()) {
-                      const modalInstance = $uibModal.open({
+                      $uibModal.open({
                         templateUrl:
                           UrlInterpolationService.getDirectiveTemplateUrl(
                             '/components/question-directives/modal-templates/' +
                             'confirm-question-modal-exit-modal.directive.html'),
                         backdrop: true,
-                        controller: [
-                          '$scope', '$uibModalInstance',
-                          function($scope, $uibModalInstance) {
-                            $scope.cancel = function() {
-                              $uibModalInstance.dismiss('cancel');
-                            };
-
-                            $scope.close = function() {
-                              $uibModalInstance.close();
-                            };
-                          }
-                        ]
-                      });
-                      modalInstance.result.then(function() {
+                        controller: 'ConfirmOrCancelModalController'
+                      }).result.then(function() {
                         $uibModalInstance.dismiss('cancel');
+                      }, function() {
+                        // Note to developers:
+                        // This callback is triggered when the Cancel button
+                        // is clicked.
+                        // No further action is needed.
                       });
                     } else {
                       $uibModalInstance.dismiss('cancel');
@@ -270,6 +262,10 @@ angular.module('oppia').directive('questionOpportunities', [
                   };
                 }
               ]
+            }).result.then(function() {}, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 

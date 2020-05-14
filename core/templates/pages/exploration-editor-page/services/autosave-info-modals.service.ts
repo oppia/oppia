@@ -123,6 +123,9 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
         }).result.then(function() {
           _isModalOpen = false;
         }, function() {
+          // When the user clicks on discard changes button, signal backend
+          // to discard the draft and reload the page thereafter.
+          LocalStorageService.removeExplorationDraft(explorationId);
           _isModalOpen = false;
         });
 

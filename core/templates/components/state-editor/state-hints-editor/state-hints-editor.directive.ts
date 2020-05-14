@@ -17,6 +17,9 @@
  * editor.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('components/state-directives/hint-editor/hint-editor.directive.ts');
 require(
   'components/state-directives/response-header/response-header.directive.ts');
@@ -135,8 +138,14 @@ angular.module('oppia').directive('stateHintsEditor', [
                 'modal-templates/add-hint-modal.template.html'),
               backdrop: 'static',
               controller: [
-                '$scope', '$uibModalInstance', 'ContextService',
-                function($scope, $uibModalInstance, ContextService) {
+                '$controller', '$scope', '$uibModalInstance', 'ContextService',
+                function(
+                    $controller, $scope, $uibModalInstance, ContextService) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
+
                   $scope.HINT_FORM_SCHEMA = {
                     type: 'html',
                     ui_config: {
@@ -161,11 +170,6 @@ angular.module('oppia').directive('stateHintsEditor', [
                       contentId: contentId
                     });
                   };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
                 }
               ]
             }).result.then(function(result) {
@@ -173,9 +177,7 @@ angular.module('oppia').directive('stateHintsEditor', [
               StateHintsService.saveDisplayedValue();
               $scope.onSaveHints(StateHintsService.displayed);
             }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
+              AlertsService.clearWarnings();
             });
           };
 
@@ -187,19 +189,7 @@ angular.module('oppia').directive('stateHintsEditor', [
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-last-hint-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.deleteBothSolutionAndHint = function() {
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               var solutionContentId = StateSolutionService.displayed
                 .explanation.getContentId();
@@ -213,9 +203,7 @@ angular.module('oppia').directive('stateHintsEditor', [
               StateHintsService.saveDisplayedValue();
               $scope.onSaveHints(StateHintsService.displayed);
             }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
+              AlertsService.clearWarnings();
             });
           };
 
@@ -230,19 +218,7 @@ angular.module('oppia').directive('stateHintsEditor', [
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-hint-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', function(
-                    $scope, $uibModalInstance) {
-                  $scope.reallyDelete = function() {
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               if (StateSolutionService.savedMemento &&
                 StateHintsService.savedMemento.length === 1) {
@@ -259,9 +235,7 @@ angular.module('oppia').directive('stateHintsEditor', [
                 StateHintsService.setActiveHintIndex(null);
               }
             }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
+              AlertsService.clearWarnings();
             });
           };
 

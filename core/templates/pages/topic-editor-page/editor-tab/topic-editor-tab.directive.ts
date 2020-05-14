@@ -17,15 +17,18 @@
  */
 
 require(
-  'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
-
-require('components/entity-creation-services/story-creation.service.ts');
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+
+require('components/entity-creation-services/story-creation.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
+require(
+  'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/csrf-token.service.ts');
@@ -93,14 +96,7 @@ angular.module('oppia').directive('topicEditorTab', [
                   '/pages/topic-editor-page/modal-templates/' +
                   'topic-save-pending-changes-modal.template.html'),
                 backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
+                controller: 'ConfirmOrCancelModalController'
               }).result.then(function() {}, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.

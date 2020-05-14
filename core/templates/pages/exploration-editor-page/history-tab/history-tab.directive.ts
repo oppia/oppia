@@ -16,6 +16,9 @@
  * @fileoverview Directive for the exploration history tab.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('components/profile-link-directives/profile-link-text.directive.ts');
 require(
   'components/version-diff-visualization/' +
@@ -238,25 +241,21 @@ angular.module('oppia').directive('historyTab', [
                 }
               },
               controller: [
-                '$scope', '$uibModalInstance', 'version',
+                '$controller', '$scope', '$uibModalInstance', 'version',
                 'ExplorationDataService',
                 function(
-                    $scope, $uibModalInstance, version,
+                    $controller, $scope, $uibModalInstance, version,
                     ExplorationDataService) {
-                  $scope.version = version;
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
 
+                  $scope.version = version;
                   $scope.getExplorationUrl = function(version) {
                     return (
                       '/explore/' + ExplorationDataService.explorationId +
                       '?v=' + version);
-                  };
-
-                  $scope.revert = function() {
-                    $uibModalInstance.close(version);
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]
@@ -267,6 +266,10 @@ angular.module('oppia').directive('historyTab', [
               }).then(function() {
                 $window.location.reload();
               });
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 

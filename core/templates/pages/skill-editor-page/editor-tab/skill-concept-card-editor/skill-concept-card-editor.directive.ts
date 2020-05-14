@@ -17,6 +17,9 @@
  */
 
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
   'components/state-directives/answer-group-editor/' +
   'summary-list-header.directive.ts');
 require(
@@ -94,18 +97,8 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                 '/pages/skill-editor-page/modal-templates/' +
                 'delete-worked-example-modal.directive.html'),
               backdrop: 'static',
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.confirm = function() {
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }]
-            }).result.then(function(result) {
+              controller: 'ConfirmOrCancelModalController'
+            }).result.then(function() {
               SkillUpdateService.deleteWorkedExample($scope.skill, index);
               $scope.bindableFieldsDict.displayedWorkedExamples =
                 $scope.skill.getConceptCard().getWorkedExamples();
@@ -128,8 +121,13 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                 'add-worked-example-modal.directive.html'),
               backdrop: 'static',
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$controller', '$scope', '$uibModalInstance',
+                function($controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
+
                   $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
                     type: 'html',
                     ui_config: {}
@@ -145,10 +143,6 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                       workedExampleExplanationHtml:
                         $scope.tmpWorkedExampleExplanationHtml
                     });
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]
