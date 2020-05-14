@@ -34,21 +34,6 @@ import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { WinnowingPreprocessingService } from
   'classifiers/winnowing-preprocessing.service';
 
-// TODO(#7165): Replace 'any' with the exact type
-/* eslint-disable camelcase */
-export interface IKNN {
-  fingerprint_data: any;
-  occurrence: any;
-  top: any;
-  K?: any;
-  T?: any;
-  token_to_id?:any;
-}
-export interface IClassifierData {
-  KNN: IKNN
-  cv_vocabulary: object;
-  SVM: object;
-}
 @Injectable({
   providedIn: 'root'
 })

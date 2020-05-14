@@ -55,7 +55,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Rule spec services', function() {
   var rulesServices = {};
-  var ruleTemplates;
+  var ruleTemplates: IRuleTemplates;
 
   beforeEach(function() {
     angular.mock.module('oppia');
