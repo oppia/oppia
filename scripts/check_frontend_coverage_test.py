@@ -142,9 +142,9 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'LH:9\n'
             'end_of_record\n'
         )
-        fully_covered_tests_swap = self.swap(
+        blacklist_swap = self.swap(
             check_frontend_coverage,
-            'NOT_FULLY_COVERED_FILENAMES', [
+            'BLACKLIST', [
                 'file.ts',
                 'file2.ts'
             ]
@@ -160,7 +160,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             check_function_calls['sys_exit_is_called'] = True
         sys_exit_swap = self.swap(sys, 'exit', mock_sys_exit)
         with sys_exit_swap, self.exists_swap, self.open_file_swap, self.print_swap: # pylint: disable=line-too-long
-            with fully_covered_tests_swap:
+            with blacklist_swap:
                 check_frontend_coverage.check_coverage_changes()
             self.assertEqual(
                 check_function_calls,
@@ -178,20 +178,20 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                 check_frontend_coverage.check_coverage_changes()
 
 
-    def test_check_coverage_changes_cover_file(self):
+    def test_check_coverage_changes_for_covered_files(self):
         self.lcov_items_list = (
             'SF:/opensource/oppia/file.ts\n'
             'LF:10\n'
             'LH:9\n'
             'end_of_record\n'
         )
-        fully_covered_tests_swap = self.swap(
+        blacklist_swap = self.swap(
             check_frontend_coverage,
-            'NOT_FULLY_COVERED_FILENAMES', []
+            'BLACKLIST', []
         )
 
         with self.exists_swap, self.open_file_swap, self.print_swap:
-            with fully_covered_tests_swap:
+            with blacklist_swap:
                 with self.assertRaisesRegexp(
                     SystemExit,
                     r'\033\[1mfile.ts\033\[0m seems to be not completely'
@@ -207,15 +207,15 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'LH:10\n'
             'end_of_record\n'
         )
-        fully_covered_tests_swap = self.swap(
+        blacklist_swap = self.swap(
             check_frontend_coverage,
-            'NOT_FULLY_COVERED_FILENAMES', [
+            'BLACKLIST', [
                 'file.ts'
             ]
         )
 
         with self.exists_swap, self.open_file_swap, self.print_swap:
-            with fully_covered_tests_swap:
+            with blacklist_swap:
                 with self.assertRaisesRegexp(
                     SystemExit,
                     r'\033\[1mfile.ts\033\[0m seems to be fully covered!'
@@ -224,26 +224,27 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                     ' scripts/check_frontend_test_coverage.py, please'
                     ' make sure you\'ve followed the unit tests rules'
                     ' correctly on:'
-                    ' https://github.com/oppia/oppia/wiki/Frontend-unit-tests-guide#rules\n'): # pylint: disable=line-too-long
+                    ' https://github.com/oppia/oppia/wiki/Frontend-unit'
+                    '-tests-guide#rules\n'):
                     check_frontend_coverage.check_coverage_changes()
 
 
-    def test_check_coverage_changes_rename(self):
+    def test_check_coverage_changes_when_renaming_file(self):
         self.lcov_items_list = (
             'SF:/opensource/oppia/newfilename.ts\n'
             'LF:10\n'
             'LH:9\n'
             'end_of_record\n'
         )
-        fully_covered_tests_swap = self.swap(
+        blacklist_swap = self.swap(
             check_frontend_coverage,
-            'NOT_FULLY_COVERED_FILENAMES', [
+            'BLACKLIST', [
                 'file.ts'
             ]
         )
 
         with self.exists_swap, self.open_file_swap, self.print_swap:
-            with fully_covered_tests_swap:
+            with blacklist_swap:
                 with self.assertRaisesRegexp(
                     SystemExit,
                     r'\033\[1mnewfilename.ts\033\[0m seems to be not completely'
@@ -268,9 +269,9 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'LH:9\n'
             'end_of_record\n'
         )
-        fully_covered_tests_swap = self.swap(
+        blacklist_swap = self.swap(
             check_frontend_coverage,
-            'NOT_FULLY_COVERED_FILENAMES', [
+            'BLACKLIST', [
                 'anotherfile.ts'
                 'file.ts',
             ]
@@ -286,7 +287,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             check_function_calls['sys_exit_is_called'] = True
         sys_exit_swap = self.swap(sys, 'exit', mock_sys_exit)
         with sys_exit_swap, self.exists_swap, self.open_file_swap, self.print_swap: # pylint: disable=line-too-long
-            with fully_covered_tests_swap:
+            with blacklist_swap:
                 (check_frontend_coverage
                  .check_fully_covered_filenames_list_is_sorted())
                 self.assertEqual(
@@ -304,19 +305,19 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'LH:9\n'
             'end_of_record\n'
         )
-        fully_covered_tests_swap = self.swap(
+        blacklist_swap = self.swap(
             check_frontend_coverage,
-            'NOT_FULLY_COVERED_FILENAMES', [
+            'BLACKLIST', [
                 'file.ts',
                 'anotherfile.ts'
             ]
         )
 
         with self.exists_swap, self.open_file_swap, self.print_swap:
-            with fully_covered_tests_swap:
+            with blacklist_swap:
                 with self.assertRaisesRegexp(
                     SystemExit,
-                    r'The \033\[1mNOT_FULLY_COVERED_FILENAMES\033\[0m list'
+                    r'The \033\[1mBLACKLIST\033\[0m list'
                     ' must be kept in alphabetical order.'):
                     (check_frontend_coverage
                      .check_fully_covered_filenames_list_is_sorted())
@@ -328,13 +329,13 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'LH:9\n'
             'end_of_record\n'
         )
-        fully_covered_tests_swap = self.swap(
+        blacklist_swap = self.swap(
             check_frontend_coverage,
-            'NOT_FULLY_COVERED_FILENAMES', [
+            'BLACKLIST', [
                 'file.ts'
             ])
         with self.check_call_swap, self.exists_swap, self.open_file_swap:
-            with fully_covered_tests_swap:
+            with blacklist_swap:
                 check_frontend_coverage.main()
             self.assertEqual(
                 self.check_function_calls, self.expected_check_function_calls)

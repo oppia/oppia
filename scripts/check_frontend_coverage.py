@@ -32,7 +32,7 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # Please keep the list in alphabetical order.
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @marianazangrossi first.
-NOT_FULLY_COVERED_FILENAMES = [
+BLACKLIST = [
     'about-page.module.ts',
     'activity-tiles-infinity-grid.directive.ts',
     'admin-config-tab.directive.ts',
@@ -569,15 +569,16 @@ def get_stanzas_from_lcov_file():
 
 
 def check_fully_covered_filenames_list_is_sorted():
-    """Check if NOT_FULLY_COVERED_FILENAMES list is in alphabetical order."""
-    if NOT_FULLY_COVERED_FILENAMES != sorted(
-            NOT_FULLY_COVERED_FILENAMES, key=lambda s: s.lower()):
-        sys.exit('The \033[1mNOT_FULLY_COVERED_FILENAMES\033[0m list must be'
-                 ' kept in alphabetical order.')
+    """Check if BLACKLIST list is in alphabetical order."""
+    if BLACKLIST != sorted(
+            BLACKLIST, key=lambda s: s.lower()):
+        sys.exit(
+            'The \033[1mBLACKLIST\033[0m list must be'
+            ' kept in alphabetical order.')
 
 
 def check_coverage_changes():
-    """Checks if the whitelist for fully covered files needs to be changed by:
+    """Checks if the blacklist for fully covered files needs to be changed by:
     - New file insertion
     - File renaming
     - File deletion
@@ -586,11 +587,12 @@ def check_coverage_changes():
         Exception: LCOV_FILE_PATH doesn't exist.
     """
     if not os.path.exists(LCOV_FILE_PATH):
-        raise Exception('Expected lcov file to be available at {}, but the'
-                        ' file does not exist.'.format(LCOV_FILE_PATH))
+        raise Exception(
+            'Expected lcov file to be available at {}, but the'
+            ' file does not exist.'.format(LCOV_FILE_PATH))
 
     stanzas = get_stanzas_from_lcov_file()
-    blacklist = list(NOT_FULLY_COVERED_FILENAMES)
+    blacklist_list = list(BLACKLIST)
     errors = ''
 
     for stanza in stanzas:
@@ -598,32 +600,35 @@ def check_coverage_changes():
         total_lines = stanza.total_lines
         covered_lines = stanza.covered_lines
 
-        if file_name not in blacklist:
+        if file_name not in blacklist_list:
             if total_lines != covered_lines:
-                errors += ('\033[1m{}\033[0m seems to be not completely tested.'
-                           ' Make sure it\'s fully covered before pushing'
-                           ' your changes.\n'.format(file_name))
+                errors += (
+                    '\033[1m{}\033[0m seems to be not completely tested.'
+                    ' Make sure it\'s fully covered before pushing'
+                    ' your changes.\n'.format(file_name))
         else:
             if total_lines == covered_lines:
-                errors += ('\033[1m{}\033[0m seems to be fully covered!'
-                           ' Before removing it manually from the blacklist'
-                           ' in the file'
-                           ' scripts/check_frontend_test_coverage.py, please'
-                           ' make sure you\'ve followed the unit tests rules'
-                           ' correctly on:'
-                           ' https://github.com/oppia/oppia/wiki/Frontend-unit-tests-guide#rules\n' # pylint: disable=line-too-long
-                           .format(file_name))
+                errors += (
+                    '\033[1m{}\033[0m seems to be fully covered!'
+                    ' Before removing it manually from the blacklist'
+                    ' in the file'
+                    ' scripts/check_frontend_test_coverage.py, please'
+                    ' make sure you\'ve followed the unit tests rules'
+                    ' correctly on:'
+                    ' https://github.com/oppia/oppia/wiki/Frontend'
+                    '-unit-tests-guide#rules\n'.format(file_name))
 
-            blacklist.remove(file_name)
+            blacklist_list.remove(file_name)
 
-    if blacklist:
-        for test_name in blacklist:
-            errors += ('\033[1m{}\033[0m is in the frontend test coverage'
-                       ' blacklist but it doesn\'t exist anymore. If you have'
-                       ' renamed it, please make sure to remove the old file'
-                       ' name and add the new file name in the blacklist in'
-                       ' the file scripts/check_frontend_test_coverage.py.\n'
-                       .format(test_name))
+    if blacklist_list:
+        for test_name in blacklist_list:
+            errors += (
+                '\033[1m{}\033[0m is in the frontend test coverage'
+                ' blacklist but it doesn\'t exist anymore. If you have'
+                ' renamed it, please make sure to remove the old file'
+                ' name and add the new file name in the blacklist in'
+                ' the file scripts/check_frontend_test_coverage.py.\n'
+                .format(test_name))
 
     if errors:
         python_utils.PRINT('------------------------------------')
