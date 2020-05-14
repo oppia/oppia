@@ -430,6 +430,14 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(question_skill_links_1), 3)
         self.assertEqual(len(question_skill_links_2), 3)
+        self.assertEqual(
+            question_skill_links_1,
+            [questionskilllink_model1, questionskilllink_model3,
+             questionskilllink_model4])
+        self.assertEqual(
+            question_skill_links_2,
+            [questionskilllink_model1, questionskilllink_model4,
+             questionskilllink_model5])
         self.assertNotEqual(question_skill_links_1, question_skill_links_2)
 
     def test_request_too_many_skills_raises_error_when_fetch_by_difficulty(
@@ -577,6 +585,14 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(question_skill_links_1), 3)
         self.assertEqual(len(question_skill_links_2), 3)
+        self.assertEqual(
+            question_skill_links_1,
+            [questionskilllink_model1, questionskilllink_model4,
+             questionskilllink_model3])
+        self.assertEqual(
+            question_skill_links_2,
+            [questionskilllink_model2, questionskilllink_model3,
+             questionskilllink_model5])
         self.assertNotEqual(question_skill_links_1, question_skill_links_2)
 
     def test_request_too_many_skills_raises_error(self):
