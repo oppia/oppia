@@ -164,20 +164,20 @@ var ExplorationEditorMainTab = function() {
 
   this.exitTutorial = async function() {
     // If the editor welcome modal shows up, exit it.
-    editorWelcomeModal.isPresent().then(async function(isVisible) {
+    await editorWelcomeModal.isPresent().then(async function(isVisible) {
       if (isVisible) {
-        waitFor.elementToBeClickable(
+        await waitFor.elementToBeClickable(
           dismissWelcomeModalButton,
           'Welcome modal is taking too long to appear');
         await dismissWelcomeModalButton.click();
       }
     });
 
-    waitFor.invisibilityOf(
+    await waitFor.invisibilityOf(
       editorWelcomeModal, 'Editor Welcome modal takes too long to disappear');
 
     // Otherwise, if the editor tutorial shows up, exit it.
-    element.all(by.css('.skipBtn')).then(function(buttons) {
+    await element.all(by.css('.skipBtn')).then(async function(buttons) {
       if (buttons.length === 1) {
         buttons[0].click();
       } else if (buttons.length !== 0) {
@@ -187,22 +187,20 @@ var ExplorationEditorMainTab = function() {
     });
   };
 
-  this.finishTutorial = function() {
+  this.finishTutorial = async function() {
     // Finish the tutorial.
-    var finishTutorialButton = element.all(by.buttonText('Finish'));
-    waitFor.elementToBeClickable(
-      finishTutorialButton.first(),
+    var finishTutorialButtons = element.all(by.buttonText('Finish'));
+    await waitFor.elementToBeClickable(
+      await finishTutorialButtons.first(),
       'Finish Tutorial Stage button is not clickable');
-    finishTutorialButton.then(function(buttons) {
-      if (buttons.length === 1) {
-        buttons[0].click();
-      } else {
-        throw new Error('There is more than 1 Finish button!');
-      }
-    });
+    if (await finishTutorialButtons.count() === 1) {
+      await finishTutorialButtons.get(0).click();
+    } else {
+      throw new Error('There is more than 1 Finish button!');
+    }
   };
 
-  this.playTutorial = function() {
+  this.playTutorial = async function() {
     var tutorialTabHeadings = [
       'Creating in Oppia',
       'Content',
@@ -211,34 +209,33 @@ var ExplorationEditorMainTab = function() {
       'Preview',
       'Save',
     ];
-    tutorialTabHeadings.forEach(function(heading) {
+    for (const heading of tutorialTabHeadings) {
+    // await tutorialTabHeadings.forEach(async function(heading) {
       var tutorialTabHeadingElement = element(by.cssContainingText(
         '.popover-title', heading));
-      waitFor.visibilityOf(
+      await waitFor.visibilityOf(
         tutorialTabHeadingElement, 'Tutorial: ' + heading + 'is not visible');
       // Progress to the next instruction in the tutorial.
-      var nextTutorialStageButton = element.all(by.css('.nextBtn'));
-      waitFor.elementToBeClickable(
-        nextTutorialStageButton.first(),
+      var nextTutorialStageButtons = element.all(by.css('.nextBtn'));
+      await waitFor.elementToBeClickable(
+        await nextTutorialStageButtons.first(),
         'Next Tutorial Stage button is not clickable');
-      nextTutorialStageButton.then(function(buttons) {
-        if (buttons.length === 1) {
-          buttons[0].click();
-          waitFor.invisibilityOf(
-            tutorialTabHeadingElement,
-            'Tutorial stage takes too long to disappear');
-        } else {
-          throw new Error('There is more than one Next button!');
-        }
-      });
-    });
+      if (await nextTutorialStageButtons.count() === 1) {
+        await nextTutorialStageButtons.get(0).click();
+        await waitFor.invisibilityOf(
+          tutorialTabHeadingElement,
+          'Tutorial stage takes too long to disappear');
+      } else {
+        throw new Error('There is more than one Next button!');
+      }
+    }
   };
 
-  this.startTutorial = function() {
-    waitFor.visibilityOf(
+  this.startTutorial = async function() {
+    await waitFor.visibilityOf(
       editorWelcomeModal, 'Editor Welcome modal takes too long to appear');
-    element(by.css('.protractor-test-start-tutorial')).click();
-    waitFor.visibilityOf(
+    await element(by.css('.protractor-test-start-tutorial')).click();
+    await waitFor.visibilityOf(
       element(by.css('.ng-joyride-title')),
       'Tutorial modal takes too long to appear');
   };
