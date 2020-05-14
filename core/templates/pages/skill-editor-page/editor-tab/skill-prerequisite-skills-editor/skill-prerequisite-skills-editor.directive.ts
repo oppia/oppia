@@ -90,8 +90,10 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
                   $scope.skillSummaries = sortedSkillSummaries;
                   $scope.selectedSkillId = null;
                   $scope.countOfSkillsToPrioritize = skillsInSameTopicCount;
+                  $scope.categorizedSkills = categorizedSkills;
+                  $scope.allowSkillsFromOtherTopics = true;
                 }
-              ]
+              ], windowClass: 'skill-select-modal'
             }).result.then(function(skillId) {
               if (skillId === $scope.skill.getId()) {
                 AlertsService.addInfoMessage(

@@ -265,8 +265,10 @@ angular.module('oppia').directive('storyNodeEditor', [
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = null;
                   $scope.countOfSkillsToPrioritize = 0;
+                  $scope.categorizedSkills = categorizedSkills;
+                  $scope.allowSkillsFromOtherTopics = true;
                 }
-              ]
+              ], windowClass: 'skill-select-modal'
             }).result.then(function(skillId) {
               try {
                 StoryUpdateService.addPrerequisiteSkillIdToNode(
@@ -296,12 +298,17 @@ angular.module('oppia').directive('storyNodeEditor', [
                     $scope: $scope,
                     $uibModalInstance: $uibModalInstance
                   });
-
+                  var topicName = StoryEditorStateService.getTopicName();
+                  var categorizedSkillsInTopic = {};
+                  categorizedSkillsInTopic[topicName] = angular.copy(
+                    categorizedSkills[topicName]);
+                  $scope.categorizedSkills = categorizedSkillsInTopic;
+                  $scope.allowSkillsFromOtherTopics = false;
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = null;
                   $scope.countOfSkillsToPrioritize = 0;
                 }
-              ]
+              ], windowClass: 'skill-select-modal'
             }).result.then(function(skillId) {
               try {
                 StoryUpdateService.addAcquiredSkillIdToNode(

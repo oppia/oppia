@@ -23,6 +23,7 @@ from constants import constants
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
@@ -50,12 +51,19 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
         self.linked_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.linked_skill_id, self.admin_id, description='Description 3')
+        subtopic_skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            subtopic_skill_id, self.admin_id, description='Subtopic Skill')
+
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title')
+        subtopic.skill_ids = [subtopic_skill_id]
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.linked_skill_id],
-            subtopics=[], next_subtopic_id=1)
+            subtopics=[subtopic], next_subtopic_id=2)
 
 
 class TopicsAndSkillsDashboardPageDataHandlerTests(
@@ -85,9 +93,9 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(
             len(json_response['untriaged_skill_summary_dicts']), 1)
         self.assertEqual(
-            len(json_response['mergeable_skill_summary_dicts']), 1)
+            len(json_response['mergeable_skill_summary_dicts']), 2)
         self.assertEqual(
-            json_response['mergeable_skill_summary_dicts'][0]['id'],
+            json_response['mergeable_skill_summary_dicts'][1]['id'],
             self.linked_skill_id)
         self.assertEqual(
             len(json_response['categorized_skills_dict']), 2)
@@ -121,9 +129,9 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(
             len(json_response['untriaged_skill_summary_dicts']), 1)
         self.assertEqual(
-            len(json_response['mergeable_skill_summary_dicts']), 1)
+            len(json_response['mergeable_skill_summary_dicts']), 2)
         self.assertEqual(
-            json_response['mergeable_skill_summary_dicts'][0]['id'],
+            json_response['mergeable_skill_summary_dicts'][1]['id'],
             self.linked_skill_id)
         self.assertEqual(
             json_response['untriaged_skill_summary_dicts'][0]['id'],

@@ -615,7 +615,7 @@ angular.module('oppia').directive('questionsList', [
                             }
                           };
                         }
-                      ]
+                      ], windowClass: 'skill-select-modal'
                     }).result.then(function(summary) {
                       for (var idx in $scope.associatedSkillSummaries) {
                         if (

@@ -156,6 +156,7 @@ angular.module('oppia').directive('skillsList', [
 
           $scope.mergeSkill = function(skill) {
             var skillSummaries = $scope.getMergeableSkillSummaries();
+            var categorizedSkills = $scope.getSkillsCategorizedByTopics();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
@@ -179,7 +180,7 @@ angular.module('oppia').directive('skillsList', [
                       });
                   };
                 }
-              ]
+              ], windowClass: 'skill-select-modal'
             }).result.then(function(result) {
               var skill = result.skill;
               var supersedingSkillId = result.supersedingSkillId;
