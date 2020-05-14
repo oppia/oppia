@@ -235,7 +235,7 @@ FULLY_COVERED_FILENAMES = [
     'mathjaxConfig.ts',
     'meta-tag-customization.service.ts',
     'MisconceptionObjectFactory.ts',
-    'moderator-page.controller.ts',
+    'moderator-page.component.ts',
     'multiple-choice-input-rules.service.ts',
     'multiple-choice-input-validation.service.ts',
     'MultipleChoiceInput.ts',
