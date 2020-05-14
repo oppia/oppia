@@ -66,22 +66,21 @@ var createExplorationAndStartTutorial = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   await creatorDashboardPage.get();
   // Wait for the dashboard to transition the creator into the editor page.
-  users.isAdmin().then(async function(isAdmin) {
-    creatorDashboardPage.clickCreateActivityButton();
-    if (isAdmin) {
-      var activityCreationModal = element(
-        by.css('.protractor-test-creation-modal'));
-      await waitFor.visibilityOf(
-        activityCreationModal,
-        'ActivityCreationModal takes too long to be visible.');
-      var createExplorationButton = element(
-        by.css('.protractor-test-create-exploration'));
-      await waitFor.elementToBeClickable(
-        createExplorationButton,
-        'createExplorationButton takes too long to be clickable.');
-      await createExplorationButton.click();
-    }
-  });
+  isAdmin = await users.isAdmin();
+  await creatorDashboardPage.clickCreateActivityButton();
+  if (isAdmin) {
+    var activityCreationModal = element(
+      by.css('.protractor-test-creation-modal'));
+    await waitFor.visibilityOf(
+      activityCreationModal,
+      'ActivityCreationModal takes too long to be visible.');
+    var createExplorationButton = element(
+      by.css('.protractor-test-create-exploration'));
+    await waitFor.elementToBeClickable(
+      createExplorationButton,
+      'createExplorationButton takes too long to be clickable.');
+    await createExplorationButton.click();
+  }
 };
 
 /**
