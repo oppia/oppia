@@ -63,9 +63,9 @@ var CreatorDashboardPage = function() {
     });
   };
 
-  this.get = function() {
-    browser.get(CREATOR_DASHBOARD_URL);
-    return waitFor.pageToFullyLoad();
+  this.get = async function() {
+    await browser.get(CREATOR_DASHBOARD_URL);
+    await waitFor.pageToFullyLoad();
   };
 
   this.getNumberOfFeedbackMessages = function() {
@@ -80,12 +80,12 @@ var CreatorDashboardPage = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.clickCreateActivityButton = function() {
-    waitFor.elementToBeClickable(
+  this.clickCreateActivityButton = async function() {
+    await waitFor.elementToBeClickable(
       createActivityButton,
       'Create Activity button takes too long to be clickable');
-    createActivityButton.click();
-    waitFor.pageToFullyLoad();
+    await createActivityButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
   this.clickCreateCollectionButton = function() {
