@@ -65,7 +65,7 @@ var CreatorDashboardPage = function() {
 
   this.get = async function() {
     await browser.get(CREATOR_DASHBOARD_URL);
-    return await waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   };
 
   this.getNumberOfFeedbackMessages = function() {
@@ -88,14 +88,14 @@ var CreatorDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.clickCreateCollectionButton = function() {
-    waitFor.visibilityOf(
+  this.clickCreateCollectionButton = async function() {
+    await waitFor.visibilityOf(
       activityCreationModal, 'Activity Creation modal is not visible');
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       createCollectionButton,
       'Create Collection button takes too long to be clickable');
-    createCollectionButton.click();
-    waitFor.pageToFullyLoad();
+    await createCollectionButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
   this.clickCreateExplorationButton = function() {

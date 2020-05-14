@@ -133,16 +133,16 @@ var LibraryPage = function() {
     });
   };
 
-  this.playCollection = function(collectionName) {
-    waitFor.pageToFullyLoad();
-    waitFor.visibilityOf(
+  this.playCollection = async function(collectionName) {
+    await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(
       allCollectionSummaryTile.first(),
       'Library Page does not have any collections');
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       allCollectionsTitled(collectionName).first(),
       'Unable to find collection ' + collectionName);
-    allCollectionsTitled(collectionName).first().click();
-    waitFor.pageToFullyLoad();
+    await allCollectionsTitled(collectionName).first().click();
+    await waitFor.pageToFullyLoad();
   };
 
   this.playExploration = async function(explorationName) {
@@ -193,9 +193,9 @@ var LibraryPage = function() {
     await _submitSearchQuery(explorationTitle);
   };
 
-  this.findCollection = function(collectionTitle) {
-    waitFor.pageToFullyLoad();
-    _submitSearchQuery(collectionTitle);
+  this.findCollection = async function(collectionTitle) {
+    await waitFor.pageToFullyLoad();
+    await _submitSearchQuery(collectionTitle);
   };
 };
 
