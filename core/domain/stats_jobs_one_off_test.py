@@ -1634,29 +1634,26 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
             exp_id: str. The ID of the exploration being created.
             deleted: boolean. Whether the model should be marked as deleted.
         """
-        exploration = exp_domain.Exploration.create_default_exploration(exp_id)
-        states = {
-            state_name: state.to_dict()
-            for state_name, state in exploration.states.items()
-        }
+        exp = exp_domain.Exploration.create_default_exploration(exp_id)
+        states = {name: state.to_dict() for name, state in exp.states.items()}
         model = exp_models.ExplorationModel(
-            id=exploration.id,
+            id=exp.id,
             version=1,
             deleted=deleted,
-            category=exploration.category,
-            title=exploration.title,
-            objective=exploration.objective,
-            language_code=exploration.language_code,
-            tags=exploration.tags,
-            blurb=exploration.blurb,
-            author_notes=exploration.author_notes,
-            states_schema_version=exploration.states_schema_version,
-            init_state_name=exploration.init_state_name,
-            states=states, param_specs=exploration.param_specs_dict,
-            param_changes=exploration.param_change_dicts,
-            auto_tts_enabled=exploration.auto_tts_enabled,
-            correctness_feedback_enabled=(
-                exploration.correctness_feedback_enabled))
+            category=exp.category,
+            title=exp.title,
+            objective=exp.objective,
+            language_code=exp.language_code,
+            tags=exp.tags,
+            blurb=exp.blurb,
+            author_notes=exp.author_notes,
+            states_schema_version=exp.states_schema_version,
+            init_state_name=exp.init_state_name,
+            states=states,
+            param_specs=exp.param_specs_dict,
+            param_changes=exp.param_change_dicts,
+            auto_tts_enabled=exp.auto_tts_enabled,
+            correctness_feedback_enabled=exp.correctness_feedback_enabled)
         super( # pylint: disable=bad-super-call
             base_models.VersionedModel, model).put()
 
@@ -1669,10 +1666,10 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
             exp_id: str. The ID of the exploration being created.
             deleted: boolean. Whether the model should be marked as deleted.
         """
-        exploration_stats_id = (
+        exp_stats_id = (
             stats_models.ExplorationStatsModel.get_entity_id(exp_id, 1))
         model = stats_models.ExplorationStatsModel(
-            id=exploration_stats_id,
+            id=exp_stats_id,
             deleted=deleted,
             exp_id=exp_id,
             exp_version=1,
