@@ -338,7 +338,7 @@ FULLY_COVERED_FILENAMES = [
     'solution-verification.service.ts',
     'SolutionObjectFactory.ts',
     'speech-synthesis-chunker.service.ts',
-    'splash-page.controller.ts',
+    'splash-page.component.ts',
     'state-classifier-mapping.service.ts',
     'state-content.service.ts',
     'state-customization-args.service.ts',
