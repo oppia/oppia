@@ -26,42 +26,42 @@ import { Injectable } from '@angular/core';
 import { LoggerService } from 'services/contextual/logger.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-interface MessageValidatorsType {
-  heightChange: ((payload: {height: number; scroll: number}) => boolean);
-  explorationLoaded: (() => boolean);
-  stateTransition: (
-    (payload: {oldStateName: string; newStateName: string}) => boolean);
-  explorationReset: ((payload: {stateName: string}) => boolean);
-  explorationCompleted: (() => boolean);
-}
-
-interface HeightChangeData {
+interface IHeightChangeData {
   height: number;
   scroll: number;
 }
 
-interface ExplorationLoadedData {
+interface IExplorationLoadedData {
   explorationVersion: number;
   explorationTitle: string;
 }
 
-interface StateTransitionData {
+interface IStateTransitionData {
   explorationVersion: number;
   oldStateName: string;
   jsonAnswer: string;
   newStateName: string;
 }
 
-interface ExplorationCompletedData {
+interface IExplorationCompletedData {
   explorationVersion: number;
 }
 
+interface IMessageValidatorsType {
+  heightChange: ((payload: IHeightChangeData) => boolean);
+  explorationLoaded: (() => boolean);
+  stateTransition: (
+    (payload: IStateTransitionData) => boolean);
+  explorationReset: ((payload: {stateName: string}) => boolean);
+  explorationCompleted: (() => boolean);
+}
+
 interface GetPayloadType {
-  heightChange: ((data: HeightChangeData) => HeightChangeData);
-  explorationLoaded: ((data: ExplorationLoadedData) => ExplorationLoadedData);
-  stateTransition: ((data: StateTransitionData) => StateTransitionData);
+  heightChange: ((data: IHeightChangeData) => IHeightChangeData);
+  explorationLoaded: ((data: IExplorationLoadedData) => IExplorationLoadedData);
+  stateTransition: ((data: IStateTransitionData) => IStateTransitionData);
   explorationCompleted: (
-    (data: ExplorationCompletedData) => ExplorationCompletedData);
+    (data: IExplorationCompletedData) => IExplorationCompletedData);
   explorationReset: ((data: string) => {stateName: string});
 }
 
@@ -72,34 +72,29 @@ export class MessengerService {
   constructor(
     private loggerService: LoggerService, private windowRef: WindowRef) {}
 
+  // TODO(brianrodri): Move these into a .constants.ts file.
   HEIGHT_CHANGE: string = 'heightChange';
   EXPLORATION_LOADED: string = 'explorationLoaded';
   STATE_TRANSITION: string = 'stateTransition';
   EXPLORATION_RESET: string = 'explorationReset';
   EXPLORATION_COMPLETED: string = 'explorationCompleted';
 
-  SUPPORTED_HASHDICT_VERSIONS: string[] = [
-    '0.0.0', '0.0.1', '0.0.2', '0.0.3'
-  ];
+  SUPPORTED_HASHDICT_VERSIONS: Set<string> = (
+    new Set(['0.0.0', '0.0.1', '0.0.2', '0.0.3']));
 
-  MESSAGE_VALIDATORS: MessageValidatorsType = {
-    heightChange(payload): boolean {
-      var isPositiveInteger = (n: Object): boolean => {
-        return (typeof n === 'number' && n % 1 === 0 && n > 0);
-      };
-      var isBoolean = (b: Object): boolean => {
-        return typeof b === 'boolean';
-      };
-      return isPositiveInteger(payload.height) && isBoolean(
-        payload.scroll);
+  MESSAGE_VALIDATORS: IMessageValidatorsType = {
+    heightChange: (payload: IHeightChangeData): boolean => {
+      const {height, scroll} = payload;
+      return (
+        Number.isInteger(height) && height > 0 && typeof scroll === 'boolean');
     },
     explorationLoaded(): boolean {
       return true;
     },
-    stateTransition(payload): boolean {
+    stateTransition(payload: IStateTransitionData): boolean {
       return Boolean(payload.oldStateName) || Boolean(payload.newStateName);
     },
-    explorationReset(payload): boolean {
+    explorationReset(payload: {stateName: string}): boolean {
       return Boolean(payload.stateName);
     },
     explorationCompleted(): boolean {
@@ -108,19 +103,19 @@ export class MessengerService {
   };
 
   getPayload: GetPayloadType = {
-    heightChange(data) {
+    heightChange(data: IHeightChangeData) {
       return {
         height: data.height,
         scroll: data.scroll
       };
     },
-    explorationLoaded(data) {
+    explorationLoaded(data: IExplorationLoadedData) {
       return {
         explorationVersion: data.explorationVersion,
         explorationTitle: data.explorationTitle
       };
     },
-    stateTransition(data) {
+    stateTransition(data: IStateTransitionData) {
       return {
         explorationVersion: data.explorationVersion,
         oldStateName: data.oldStateName,
@@ -128,13 +123,13 @@ export class MessengerService {
         newStateName: data.newStateName
       };
     },
-    explorationCompleted(data) {
+    explorationCompleted(data: IExplorationCompletedData) {
       return {
         explorationVersion: data.explorationVersion
       };
     },
     // DEPRECATED
-    explorationReset(data) {
+    explorationReset(data: string) {
       return {
         stateName: data
       };
@@ -181,7 +176,7 @@ export class MessengerService {
         return;
       }
 
-      if (this.SUPPORTED_HASHDICT_VERSIONS.indexOf(hashDict.version) !== -1) {
+      if (this.SUPPORTED_HASHDICT_VERSIONS.has(hashDict.version)) {
         this.loggerService.info('Posting message to parent: ' + messageTitle);
 
         var payload = this.getPayload[messageTitle](messageData);

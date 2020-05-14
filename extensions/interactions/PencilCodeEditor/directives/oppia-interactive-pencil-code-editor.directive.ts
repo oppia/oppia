@@ -21,6 +21,10 @@
  */
 
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+
+require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
   'interactions/PencilCodeEditor/directives/' +
@@ -55,17 +59,7 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
                 './pencil-code-reset-confirmation.directive.html'),
               backdrop: 'static',
               keyboard: false,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss();
-                  };
-
-                  $scope.resetCode = function() {
-                    $uibModalInstance.close();
-                  };
-                }]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               pce.setCode(ctrl.initialCode);
             }, function() {
