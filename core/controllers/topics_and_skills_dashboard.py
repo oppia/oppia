@@ -86,7 +86,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                 skill_services.get_descriptions_of_skills(
                     topic['uncategorized_skill_ids'])[0])
             skills_list = []
-            for skill_id in uncategorized_skills:
+            for skill_id in topic['uncategorized_skill_ids']:
                 skill_dict = {
                     'skill_id': skill_id,
                     'skill_description': uncategorized_skills[skill_id]
@@ -98,7 +98,7 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                 skills = (skill_services.get_descriptions_of_skills(
                     subtopic['skill_ids']))[0]
                 skills_list = []
-                for skill_id in skills:
+                for skill_id in subtopic['skill_ids']:
                     skill_dict = {
                         'skill_id': skill_id,
                         'skill_description': skills[skill_id]
