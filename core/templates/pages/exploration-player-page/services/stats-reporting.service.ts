@@ -19,7 +19,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { interval } from 'rxjs';
 
 import { ContextService } from 'services/context.service';
 import { ExplorationPlayerConstants } from
@@ -32,6 +31,27 @@ import { Stopwatch, StopwatchObjectFactory } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
+interface IStateStats {
+  /* eslint-disable camelcase */
+  [stateName: string]: {
+    total_answers_count: number;
+    useful_feedback_count: number;
+    total_hit_count: number;
+    first_hit_count: number;
+    num_times_solution_viewed: number;
+    num_completions: number;
+  };
+  /* eslint-enable camelcase */
+}
+interface IAggregatedStats {
+  /* eslint-disable camelcase */
+  num_starts: number;
+  num_completions: number;
+  num_actual_starts: number;
+  state_stats_mapping: IStateStats;
+  /* eslint-enable camelcase */
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -43,7 +63,12 @@ export class StatsReportingService {
     private playthroughService: PlaythroughService,
     private siteAnalyticsService: SiteAnalyticsService,
     private stopwatchObjectFactory: StopwatchObjectFactory,
-    private urlInterpolationService: UrlInterpolationService) {}
+    private urlInterpolationService: UrlInterpolationService) {
+    this._editorPreviewMode = (
+      this.contextService.isInExplorationEditorPage());
+    this._questionPlayerMode = this.contextService.isInQuestionPlayerMode();
+    this.refreshAggregatedStats();
+  }
 
     explorationId: string = null;
     explorationTitle: string = null;
@@ -51,7 +76,7 @@ export class StatsReportingService {
     sessionId: string = null;
     stateStopwatch: Stopwatch = null;
     optionalCollectionId: string = undefined;
-    statesVisited: {[stateName: string]: boolean} = {};
+    statesVisited: Set<string> = new Set();
     numStatesVisited: number = 0;
     explorationStarted: boolean = false;
     explorationActuallyStarted: boolean = false;
@@ -60,31 +85,13 @@ export class StatsReportingService {
     nextExpId: string = null;
     previousStateName: string = null;
     nextStateName: string = null;
-
-    _editorPreviewMode: boolean = (
-      this.contextService.isInExplorationEditorPage());
-    _questionPlayerMode: boolean = this.contextService.isInQuestionPlayerMode();
+    _editorPreviewMode: boolean = null;
+    _questionPlayerMode: boolean = null;
 
     // The following dict will contain all stats data accumulated over the
     // interval time and will be reset when the dict is sent to backend for
     // recording.
-    aggregatedStats: {
-      /* eslint-disable camelcase */
-      num_starts: number;
-      num_completions: number;
-      num_actual_starts: number;
-      state_stats_mapping: {
-        [stateName: string]: {
-          total_answers_count: number;
-          useful_feedback_count: number;
-          total_hit_count: number;
-          first_hit_count: number;
-          num_times_solution_viewed: number;
-          num_completions: number;
-        };
-      };
-      /* eslint-enable camelcase */
-    } = {
+    aggregatedStats: IAggregatedStats = {
       num_starts: null,
       num_completions: null,
       num_actual_starts: null,
@@ -111,6 +118,7 @@ export class StatsReportingService {
       };
     }
 
+    // TODO(#8038): Move this into a backend-api.service.
     private getFullStatsUrl(urlIdentifier: string): string {
       try {
         return this.urlInterpolationService.interpolateUrl(
@@ -139,8 +147,7 @@ export class StatsReportingService {
 
     private startStatsTimer(): void {
       if (!this._editorPreviewMode && !this._questionPlayerMode ) {
-        const secondsCounter = interval(300000);
-        secondsCounter.subscribe(n => this.postStatsToBackend());
+        setInterval(() => this.postStatsToBackend(), 300000);
       }
     }
 
@@ -151,6 +158,7 @@ export class StatsReportingService {
       if (this.explorationIsComplete) {
         return;
       }
+      // TODO(#8038): Move this into a backend-api.service.
       this.http.post(this.getFullStatsUrl('STATS_EVENTS'), {
         aggregated_stats: this.aggregatedStats,
         exp_version: this.explorationVersion
@@ -187,6 +195,7 @@ export class StatsReportingService {
       this.postStatsToBackend();
 
       this.currentStateName = stateName;
+      // TODO(#8038): Move this into a backend-api.service.
       this.http.post(this.getFullStatsUrl('EXPLORATION_STARTED'), {
         params: params,
         session_id: this.sessionId,
@@ -194,6 +203,7 @@ export class StatsReportingService {
         version: this.explorationVersion
       });
 
+      // TODO(#8038): Move this into a backend-api.service.
       this.http.post(this.getFullStatsUrl('STATE_HIT'), {
         client_time_spent_in_secs: 0.0,
         exploration_version: this.explorationVersion,
@@ -208,7 +218,7 @@ export class StatsReportingService {
           explorationTitle: this.explorationTitle
         });
 
-      this.statesVisited[stateName] = true;
+      this.statesVisited.add(stateName);
       this.numStatesVisited = 1;
       this.siteAnalyticsService.registerNewCard(1);
 
@@ -222,6 +232,7 @@ export class StatsReportingService {
       }
       this.aggregatedStats.num_actual_starts += 1;
       this.currentStateName = stateName;
+      // TODO(#8038): Move this into a backend-api.service.
       this.http.post(this.getFullStatsUrl('EXPLORATION_ACTUALLY_STARTED'), {
         exploration_version: this.explorationVersion,
         state_name: stateName,
@@ -239,6 +250,7 @@ export class StatsReportingService {
       this.aggregatedStats.state_stats_mapping[
         stateName].num_times_solution_viewed += 1;
       this.currentStateName = stateName;
+      // TODO(#8038): Move this into a backend-api.service.
       this.http.post(this.getFullStatsUrl('SOLUTION_HIT'), {
         exploration_version: this.explorationVersion,
         state_name: stateName,
@@ -251,6 +263,7 @@ export class StatsReportingService {
         stateName: string, refresherExpId: string): void {
       this.currentStateName = stateName;
       this.nextExpId = refresherExpId;
+      // TODO(#8038): Move this into a backend-api.service.
       this.http.post(this.getFullStatsUrl('LEAVE_FOR_REFRESHER_EXP'), {
         exploration_version: this.explorationVersion,
         refresher_exp_id: refresherExpId,
@@ -279,6 +292,7 @@ export class StatsReportingService {
 
       this.previousStateName = oldStateName;
       this.nextStateName = newStateName;
+      // TODO(#8038): Move this into a backend-api.service.
       this.http.post(this.getFullStatsUrl('STATE_HIT'), {
         // This is the time spent since the last submission.
         client_time_spent_in_secs: this.stateStopwatch.getTimeInSecs(),
@@ -298,8 +312,8 @@ export class StatsReportingService {
           paramValues: oldParams
         });
 
-      if (!this.statesVisited.hasOwnProperty(newStateName)) {
-        this.statesVisited[newStateName] = true;
+      if (!this.statesVisited.has(newStateName)) {
+        this.statesVisited.add(newStateName);
         this.numStatesVisited++;
         this.siteAnalyticsService.registerNewCard(this.numStatesVisited);
       }
@@ -314,6 +328,7 @@ export class StatsReportingService {
       this.aggregatedStats.state_stats_mapping[stateName].num_completions += 1;
 
       this.currentStateName = stateName;
+      // TODO(#8038): Move this into a backend-api.service.
       this.http.post(this.getFullStatsUrl('STATE_COMPLETED'), {
         exp_version: this.explorationVersion,
         state_name: stateName,
@@ -327,6 +342,7 @@ export class StatsReportingService {
     recordExplorationCompleted(stateName: string, params: Object): void {
       this.aggregatedStats.num_completions += 1;
       this.currentStateName = stateName;
+      // TODO(#8038): Move this into a backend-api.service.
       this.http.post(this.getFullStatsUrl('EXPLORATION_COMPLETED'), {
         client_time_spent_in_secs: this.stateStopwatch.getTimeInSecs(),
         collection_id: this.optionalCollectionId,
@@ -368,6 +384,7 @@ export class StatsReportingService {
           stateName].useful_feedback_count += 1;
       }
       this.currentStateName = stateName;
+      // TODO(#8038): Move this into a backend-api.service.
       this.http.post(this.getFullStatsUrl('ANSWER_SUBMITTED'), {
         answer: answer,
         params: params,
@@ -385,6 +402,7 @@ export class StatsReportingService {
     // on the stateName.
     recordMaybeLeaveEvent(stateName: string, params: Object): void {
       this.currentStateName = stateName;
+      // TODO(#8038): Move this into a backend-api.service.
       this.http.post(this.getFullStatsUrl('EXPLORATION_MAYBE_LEFT'), {
         client_time_spent_in_secs: this.stateStopwatch.getTimeInSecs(),
         collection_id: this.optionalCollectionId,
