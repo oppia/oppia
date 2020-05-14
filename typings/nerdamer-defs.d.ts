@@ -2,10 +2,10 @@
 
 interface Expression {
     // Returns all variables in the given expression.
-    variables: () => String[];
+    variables: () => string[];
 
     // Returns the text representation of the expression.
-    text: (option: String, n: String) => strings;
+    text: (option: string, n: string) => string;
 
     // Evaluates the expression into the simplest form.
     evaluate: () => Expression;
@@ -17,32 +17,32 @@ interface Expression {
     denominator: () => Expression;
 
     // Adds two expressions.
-    add: (x: String) => Expression;
+    add: (x: string) => Expression;
 
     // Subtracts two expressions.
-    subtract: (x: String) => Expression;
+    subtract: (x: string) => Expression;
 
     // Multiplies two expressions.
-    multiply: (x: String) => Expression;
+    multiply: (x: string) => Expression;
     
     // Divides two expressions.
-    divides: (x: String) => Expression;
+    divides: (x: string) => Expression;
 
     // Raises one expression to another.
-    pow: (x: String) => Expression;
+    pow: (x: string) => Expression;
 
     // Checks for equality of two expressions.
-    eq: (x: String) => Boolean;
+    eq: (x: string) => boolean;
 
     // Checks if one expression is less than other.
-    lt: (x: String) => Boolean;
+    lt: (x: string) => boolean;
 
     // Checks if one expression is greater than other.
-    gt: (x: String) => Boolean;
+    gt: (x: string) => boolean;
 
     // Checks if one expression is less than, or equal to, other.
-    lte: (x: String) => Boolean;
+    lte: (x: string) => boolean;
 
     // Checks if one expression is greater than, or equal to, other.
-    gte: (x: String) => Boolean;
+    gte: (x: string) => boolean;
 }
