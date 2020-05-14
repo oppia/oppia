@@ -164,27 +164,27 @@ var ExplorationEditorMainTab = function() {
 
   this.exitTutorial = async function() {
     // If the editor welcome modal shows up, exit it.
-    editorWelcomeModal.isPresent().then(async function(isVisible) {
-      if (isVisible) {
-        waitFor.elementToBeClickable(
-          dismissWelcomeModalButton,
-          'Welcome modal is taking too long to appear');
-        await dismissWelcomeModalButton.click();
-      }
-    });
+    var isVisible = await editorWelcomeModal.isPresent();
 
-    waitFor.invisibilityOf(
+    if (isVisible) {
+      await waitFor.elementToBeClickable(
+        dismissWelcomeModalButton,
+        'Welcome modal is taking too long to appear');
+      await dismissWelcomeModalButton.click();
+    }
+
+
+    await waitFor.invisibilityOf(
       editorWelcomeModal, 'Editor Welcome modal takes too long to disappear');
 
     // Otherwise, if the editor tutorial shows up, exit it.
-    element.all(by.css('.skipBtn')).then(function(buttons) {
-      if (buttons.length === 1) {
-        buttons[0].click();
-      } else if (buttons.length !== 0) {
-        throw new Error(
-          'Expected to find at most one \'exit tutorial\' button');
-      }
-    });
+    var buttons = await element.all(by.css('.skipBtn'));
+    if (buttons.length === 1) {
+      await buttons[0].click();
+    } else if (buttons.length !== 0) {
+      throw new Error(
+        'Expected to find at most one \'exit tutorial\' button');
+    }
   };
 
   this.finishTutorial = function() {
@@ -494,27 +494,27 @@ var ExplorationEditorMainTab = function() {
   // 'richTextInstructions' is a function that is sent a RichTextEditor which it
   // can then use to alter the state content, for example by calling
   // .appendBoldText(...).
-  this.setContent = function(richTextInstructions) {
+  this.setContent = async function(richTextInstructions) {
     // Wait for browser to time out the popover, which is 4000 ms.
-    waitFor.invisibilityOf(
+    await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
 
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       stateEditContent,
       'stateEditContent taking too long to appear to set content');
-    stateEditContent.click();
+    await stateEditContent.click();
     var stateEditorTag = element(by.tagName('state-content-editor'));
     var stateContentEditor = stateEditorTag.element(
       by.css('.protractor-test-state-content-editor'));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       stateContentEditor,
       'stateContentEditor taking too long to appear to set content');
-    var richTextEditor = forms.RichTextEditor(stateContentEditor);
-    richTextEditor.clear();
-    richTextInstructions(richTextEditor);
-    expect(saveStateContentButton.isDisplayed()).toBe(true);
-    saveStateContentButton.click();
-    waitFor.invisibilityOf(
+    var richTextEditor = await forms.RichTextEditor(stateContentEditor);
+    await richTextEditor.clear();
+    await richTextInstructions(richTextEditor);
+    expect(await saveStateContentButton.isDisplayed()).toBe(true);
+    await saveStateContentButton.click();
+    await waitFor.invisibilityOf(
       saveStateContentButton,
       'State content editor takes too long to disappear');
   };
@@ -638,13 +638,13 @@ var ExplorationEditorMainTab = function() {
   // This function should be used as the standard way to specify interactions
   // for most purposes. Additional arguments may be sent to this function,
   // and they will be passed on to the relevant interaction editor.
-  this.setInteraction = function(interactionId) {
-    createNewInteraction(interactionId);
+  this.setInteraction = async function(interactionId) {
+    await createNewInteraction(interactionId);
     customizeInteraction.apply(null, arguments);
-    closeAddResponseModal();
-    waitFor.invisibilityOf(
+    await closeAddResponseModal();
+    await waitFor.invisibilityOf(
       addResponseHeader, 'Add Response modal takes too long to close');
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       interaction, 'interaction takes too long to appear');
   };
 
@@ -654,16 +654,16 @@ var ExplorationEditorMainTab = function() {
   };
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
-  var createNewInteraction = function(interactionId) {
-    waitFor.invisibilityOf(
+  var createNewInteraction = async function(interactionId) {
+    await waitFor.invisibilityOf(
       deleteInteractionButton,
       'Please delete interaction before creating a new one');
 
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       addInteractionButton,
       'Add Interaction button takes too long to be clickable');
-    expect(addInteractionButton.isDisplayed()).toBe(true);
-    addInteractionButton.click();
+    expect(await addInteractionButton.isDisplayed()).toBe(true);
+    await addInteractionButton.click();
 
     var INTERACTION_ID_TO_TAB_NAME = {
       Continue: 'General',
@@ -685,21 +685,21 @@ var ExplorationEditorMainTab = function() {
       InteractiveMap: 'Geography'
     };
 
-    expect(interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId])
+    expect(await interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId])
       .isDisplayed()).toBe(true);
-    interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]).click();
+    await interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]).click();
 
     var targetTile = interactionTile(interactionId);
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       targetTile,
       'Interaction tile ' + interactionId + ' takes too long to be visible'
     );
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       targetTile,
       'Interaction tile ' + interactionId + ' takes too long to be clickable'
     );
-    expect(targetTile.isDisplayed()).toBe(true);
-    targetTile.click();
+    expect(await targetTile.isDisplayed()).toBe(true);
+    await targetTile.click();
   };
 
   // This function should not usually be invoked directly; please consider
@@ -729,14 +729,13 @@ var ExplorationEditorMainTab = function() {
 
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
-  var closeAddResponseModal = function() {
+  var closeAddResponseModal = async function() {
     // If the "Add Response" modal opens, close it.
-    addResponseHeader.isPresent().then(function(isVisible) {
-      if (isVisible) {
-        expect(closeAddResponseButton.isDisplayed()).toBe(true);
-        closeAddResponseButton.click();
-      }
-    });
+    var isVisible = await addResponseHeader.isPresent();
+    if (isVisible) {
+      expect(await closeAddResponseButton.isDisplayed()).toBe(true);
+      await closeAddResponseButton.click();
+    }
   };
 
   // Likewise this can receive additional arguments.

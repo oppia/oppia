@@ -71,7 +71,7 @@ describe('Learner dashboard functionality', function() {
     await users.createUser(creator2Id + '@learnerDashboard.com',
       creator2Id);
     await users.login(creator1Id + '@learnerDashboard.com');
-    workflow.createAndPublishExploration(
+    await workflow.createAndPublishExploration(
       'Activations',
       'Chemistry',
       'Learn about different types of chemistry activations.',
@@ -81,28 +81,28 @@ describe('Learner dashboard functionality', function() {
 
     await users.login('learner1@learnerDashboard.com');
     // Subscribe to both the creators.
-    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id);
-    subscriptionDashboardPage.navigateToSubscriptionButton();
-    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator2Id);
-    subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id);
+    await subscriptionDashboardPage.navigateToSubscriptionButton();
+    await subscriptionDashboardPage.navigateToUserSubscriptionPage(creator2Id);
+    await subscriptionDashboardPage.navigateToSubscriptionButton();
 
     // Completing exploration 'Activations' to activate /learner_dashboard
-    libraryPage.get();
-    libraryPage.findExploration('Activations');
-    libraryPage.playExploration('Activations');
-    explorationPlayerPage.expectExplorationNameToBe('Activations');
-    explorationPlayerPage.rateExploration(4);
+    await libraryPage.get();
+    await libraryPage.findExploration('Activations');
+    await libraryPage.playExploration('Activations');
+    await explorationPlayerPage.expectExplorationNameToBe('Activations');
+    await explorationPlayerPage.rateExploration(4);
 
     // Both creators should be present in the subscriptions section of the
     // dashboard.
-    learnerDashboardPage.get();
-    learnerDashboardPage.navigateToSubscriptionsSection();
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToSubscriptionsSection();
     // The last user (collectionAdm) that learner subsribes to is placed first
     // in the list.
-    learnerDashboardPage.expectSubscriptionFirstNameToMatch('collect...');
+    await learnerDashboardPage.expectSubscriptionFirstNameToMatch('collect...');
     // The first user (creatorName) that learner subscribes to is placed
     // last in the list.
-    learnerDashboardPage.expectSubscriptionLastNameToMatch('creator...');
+    await learnerDashboardPage.expectSubscriptionLastNameToMatch('creator...');
     await users.logout();
   });
 
@@ -112,7 +112,7 @@ describe('Learner dashboard functionality', function() {
     await users.createUser(
       'feedbackAdm@learnerDashboard.com', 'feedbackAdmlearnerDashboard');
     await users.login('feedbackAdm@learnerDashboard.com');
-    workflow.createAndPublishExploration(
+    await workflow.createAndPublishExploration(
       'BUS101',
       'Business',
       'Learn about different business regulations around the world.',
@@ -122,17 +122,17 @@ describe('Learner dashboard functionality', function() {
 
     await users.login('learner2@learnerDashboard.com');
     var feedback = 'A good exploration. Would love to see a few more questions';
-    libraryPage.get();
-    libraryPage.findExploration('BUS101');
-    libraryPage.playExploration('BUS101');
-    explorationPlayerPage.submitFeedback(feedback);
+    await libraryPage.get();
+    await libraryPage.findExploration('BUS101');
+    await libraryPage.playExploration('BUS101');
+    await explorationPlayerPage.submitFeedback(feedback);
 
     // Verify feedback thread is created.
-    learnerDashboardPage.get();
-    learnerDashboardPage.navigateToFeedbackSection();
-    learnerDashboardPage.expectFeedbackExplorationTitleToMatch('BUS101');
-    learnerDashboardPage.navigateToFeedbackThread();
-    learnerDashboardPage.expectFeedbackMessageToMatch(feedback);
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToFeedbackSection();
+    await learnerDashboardPage.expectFeedbackExplorationTitleToMatch('BUS101');
+    await learnerDashboardPage.navigateToFeedbackThread();
+    await learnerDashboardPage.expectFeedbackMessageToMatch(feedback);
     await users.logout();
   });
 
@@ -148,10 +148,10 @@ describe('Learner dashboard functionality', function() {
     await users.createUser(
       'creator@learnerDashboard.com', 'creatorLearnerDashboard');
     await users.login('creator@learnerDashboard.com');
-    workflow.createAndPublishExploration(
+    await workflow.createAndPublishExploration(
       EXPLORATION_FRACTION, CATEGORY_MATHEMATICS,
       EXPLORATION_OBJECTIVE, LANGUAGE_ENGLISH);
-    workflow.createAndPublishExploration(
+    await workflow.createAndPublishExploration(
       EXPLORATION_SINGING, CATEGORY_MUSIC,
       EXPLORATION_OBJECTIVE2, LANGUAGE_ENGLISH);
     await users.logout();
@@ -159,24 +159,24 @@ describe('Learner dashboard functionality', function() {
     await users.createUser(
       'learner@learnerDashboard.com', 'learnerLearnerDashboard');
     await users.login('learner@learnerDashboard.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_FRACTION);
-    libraryPage.addSelectedExplorationToPlaylist();
-    learnerDashboardPage.get();
-    learnerDashboardPage.navigateToPlayLaterExplorationSection();
-    learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_FRACTION);
+    await libraryPage.addSelectedExplorationToPlaylist();
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToPlayLaterExplorationSection();
+    await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       EXPLORATION_FRACTION);
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_SINGING);
-    libraryPage.addSelectedExplorationToPlaylist();
-    learnerDashboardPage.get();
-    learnerDashboardPage.navigateToPlayLaterExplorationSection();
-    learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_SINGING);
+    await libraryPage.addSelectedExplorationToPlaylist();
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToPlayLaterExplorationSection();
+    await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       EXPLORATION_SINGING);
     await users.logout();
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });

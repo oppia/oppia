@@ -38,7 +38,8 @@ var canAddRolesToUsers = async function() {
 
 // check if the warning message is visible when the title is ''
 var checkForAddTitleWarning = async function() {
-  return await element(by.className('protractor-test-title-warning')).isDisplayed();
+  return await element(
+    by.className('protractor-test-title-warning')).isDisplayed();
 };
 
 // trigger onblur event for title
@@ -50,7 +51,8 @@ var triggerTitleOnBlurEvent = async function() {
 // open edit roles
 var openEditRolesForm = async function() {
   await element(by.css('.protractor-test-edit-roles')).click();
-  await element(by.css('.protractor-test-role-username')).sendKeys('Chuck Norris');
+  await element(by.css('.protractor-test-role-username')).sendKeys(
+    'Chuck Norris');
 };
 
 // Creates an exploration, opens its editor and skips the tutorial.
@@ -66,22 +68,22 @@ var createExplorationAndStartTutorial = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   await creatorDashboardPage.get();
   // Wait for the dashboard to transition the creator into the editor page.
-  users.isAdmin().then(async function(isAdmin) {
-    creatorDashboardPage.clickCreateActivityButton();
-    if (isAdmin) {
-      var activityCreationModal = element(
-        by.css('.protractor-test-creation-modal'));
-      await waitFor.visibilityOf(
-        activityCreationModal,
-        'ActivityCreationModal takes too long to be visible.');
-      var createExplorationButton = element(
-        by.css('.protractor-test-create-exploration'));
-      await waitFor.elementToBeClickable(
-        createExplorationButton,
-        'createExplorationButton takes too long to be clickable.');
-      await createExplorationButton.click();
-    }
-  });
+  var isAdmin = await users.isAdmin();
+
+  await creatorDashboardPage.clickCreateActivityButton();
+  if (isAdmin) {
+    var activityCreationModal = element(
+      by.css('.protractor-test-creation-modal'));
+    await waitFor.visibilityOf(
+      activityCreationModal,
+      'ActivityCreationModal takes too long to be visible.');
+    var createExplorationButton = element(
+      by.css('.protractor-test-create-exploration'));
+    await waitFor.elementToBeClickable(
+      createExplorationButton,
+      'createExplorationButton takes too long to be clickable.');
+    await createExplorationButton.click();
+  }
 };
 
 /**
@@ -114,31 +116,28 @@ var createExplorationAsAdmin = function() {
 
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
-var publishExploration = function() {
-  element(by.css('.protractor-test-publish-exploration')).isDisplayed().then(
-    function() {
-      element(by.css('.protractor-test-publish-exploration')).click();
-    });
+var publishExploration = async function() {
+  await element(by.css('.protractor-test-publish-exploration')).isDisplayed();
+  await element(by.css('.protractor-test-publish-exploration')).click();
   var prePublicationButtonElem = element(by.css(
     '.protractor-test-confirm-pre-publication'));
-  prePublicationButtonElem.isPresent().then(function() {
-    prePublicationButtonElem.click();
-  });
+  await prePublicationButtonElem.isPresent();
+  await prePublicationButtonElem.click();
 
-  waitFor.invisibilityOf(
+  await waitFor.invisibilityOf(
     prePublicationButtonElem,
     'prePublicationButtonElem taking too long to disappear while publishing');
-  element(by.css('.protractor-test-confirm-publish')).click();
+  await element(by.css('.protractor-test-confirm-publish')).click();
 
   var sharePublishModal = element(
     by.css('.protractor-test-share-publish-modal'));
   var closePublishModalButton = element(
     by.css('.protractor-test-share-publish-close'));
-  waitFor.visibilityOf(
+  await waitFor.visibilityOf(
     sharePublishModal, 'Share Publish Modal takes too long to appear');
-  waitFor.elementToBeClickable(
+  await waitFor.elementToBeClickable(
     closePublishModalButton, 'Close Publish Modal button is not clickable');
-  closePublishModalButton.click();
+  await closePublishModalButton.click();
 };
 
 // Creates and publishes a minimal exploration
@@ -147,19 +146,20 @@ var createAndPublishExploration = async function(
   await createExploration();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  explorationEditorMainTab.setContent(forms.toRichText('new exploration'));
-  explorationEditorMainTab.setInteraction('EndExploration');
+  await explorationEditorMainTab.setContent(
+    await forms.toRichText('new exploration'));
+  await explorationEditorMainTab.setInteraction('EndExploration');
 
   var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-  explorationEditorPage.navigateToSettingsTab();
-  explorationEditorSettingsTab.setTitle(title);
-  explorationEditorSettingsTab.setCategory(category);
-  explorationEditorSettingsTab.setObjective(objective);
+  await explorationEditorPage.navigateToSettingsTab();
+  await explorationEditorSettingsTab.setTitle(title);
+  await explorationEditorSettingsTab.setCategory(category);
+  await explorationEditorSettingsTab.setObjective(objective);
   if (language) {
     explorationEditorSettingsTab.setLanguage(language);
   }
-  explorationEditorPage.saveChanges();
-  publishExploration();
+  await explorationEditorPage.saveChanges();
+  await publishExploration();
 };
 
 var createAddExpDetailsAndPublishExp = async function(
@@ -286,7 +286,8 @@ var uploadImage = async function(imageClickableElement, imgPath) {
   return await imageUploadInput.sendKeys(absPath);
 };
 
-var submitImage = async function(imageClickableElement, imageContainer, imgPath) {
+var submitImage = async function(
+    imageClickableElement, imageContainer, imgPath) {
   await waitFor.visibilityOf(
     imageClickableElement,
     'Image element is taking too long to appear.');

@@ -52,16 +52,16 @@ var LearnerDashboardPage = function() {
   var feedbackMessage =
     element.all(by.css('.protractor-test-feedback-message'));
 
-  this.get = function() {
-    browser.get(LEARNER_DASHBOARD_URL);
-    return waitFor.pageToFullyLoad();
+  this.get = async function() {
+    await browser.get(LEARNER_DASHBOARD_URL);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToPlayLaterExplorationSection = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToPlayLaterExplorationSection = async function() {
+    await waitFor.elementToBeClickable(
       playLaterSection,
       'Play Later Exploration Section tab takes too long to be clickable');
-    playLaterSection.click();
+    await playLaterSection.click();
   };
 
   this.navigateToCompletedSection = function() {
@@ -104,23 +104,23 @@ var LearnerDashboardPage = function() {
     completedExplorationsSection.click();
   };
 
-  this.navigateToFeedbackSection = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToFeedbackSection = async function() {
+    await waitFor.elementToBeClickable(
       feedbackSection, 'Feedback Section tab takes too long to be clickable');
-    feedbackSection.click();
+    await feedbackSection.click();
   };
 
-  this.navigateToFeedbackThread = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToFeedbackThread = async function() {
+    await waitFor.elementToBeClickable(
       feedbackThread, 'Feedback Thread tab takes too long to be clickable');
-    feedbackThread.click();
+    await feedbackThread.click();
   };
 
-  this.navigateToSubscriptionsSection = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToSubscriptionsSection = async function() {
+    await waitFor.elementToBeClickable(
       subscriptionsSection,
       'Subscriptions Section tab takes too long to be clickable');
-    subscriptionsSection.click();
+    await subscriptionsSection.click();
   };
 
   this.expectTitleOfCollectionSummaryTileToBeHidden = function(title) {
@@ -146,44 +146,43 @@ var LearnerDashboardPage = function() {
     });
   };
 
-  this.expectTitleOfExplorationSummaryTileToMatch = function(title) {
+  this.expectTitleOfExplorationSummaryTileToMatch = async function(title) {
     // This explorationTitleArray is an Array but it will have only one element
     // that is the exploration with the title passed as a parameter
     var explorationTitleArray = element.all(
       by.css('.protractor-test-exp-summary-tile-title')).filter(
-      function(elem) {
-        return elem.getText().then(function(text) {
-          return text === title;
-        });
+      async function(elem) {
+        var text = await elem.getText();
+        return text === title;
       });
-    expect(explorationTitleArray.first().getText()).toMatch(title);
+    expect(await explorationTitleArray.first().getText()).toMatch(title);
   };
 
-  this.expectSubscriptionFirstNameToMatch = function(name) {
-    waitFor.visibilityOf(
+  this.expectSubscriptionFirstNameToMatch = async function(name) {
+    await waitFor.visibilityOf(
       subscriptionName.first(),
       'Subscription First Name takes too long to appear');
-    expect(subscriptionName.first().getText()).toMatch(name);
+    expect(await subscriptionName.first().getText()).toMatch(name);
   };
 
-  this.expectSubscriptionLastNameToMatch = function(name) {
-    waitFor.visibilityOf(
+  this.expectSubscriptionLastNameToMatch = async function(name) {
+    await waitFor.visibilityOf(
       subscriptionName.last(),
       'Subscription Last Name takes too long to appear');
-    expect(subscriptionName.last().getText()).toMatch(name);
+    expect(await subscriptionName.last().getText()).toMatch(name);
   };
 
-  this.expectFeedbackExplorationTitleToMatch = function(title) {
-    waitFor.visibilityOf(
+  this.expectFeedbackExplorationTitleToMatch = async function(title) {
+    await waitFor.visibilityOf(
       feedbackExplorationTitle.first(),
       'Feedback Exploration Title takes too long to appear');
-    expect(feedbackExplorationTitle.first().getText()).toMatch(title);
+    expect(await feedbackExplorationTitle.first().getText()).toMatch(title);
   };
 
-  this.expectFeedbackMessageToMatch = function(message) {
-    waitFor.visibilityOf(
+  this.expectFeedbackMessageToMatch = async function(message) {
+    await waitFor.visibilityOf(
       feedbackMessage.first(), 'Feedback Message takes too long to appear');
-    expect(feedbackMessage.first().getText()).toMatch(message);
+    expect(await feedbackMessage.first().getText()).toMatch(message);
   };
 
   this.checkIncompleteExplorationSection = function(explorationTitle) {

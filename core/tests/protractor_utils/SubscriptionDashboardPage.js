@@ -24,9 +24,9 @@ var SubscriptionDashboardPage = function() {
   var subscriptionName = element.all(
     by.css('.protractor-test-subscription-name'));
 
-  this.navigateToUserSubscriptionPage = function(userName) {
-    browser.get('/profile/' + userName);
-    return waitFor.pageToFullyLoad();
+  this.navigateToUserSubscriptionPage = async function(userName) {
+    await browser.get('/profile/' + userName);
+    await waitFor.pageToFullyLoad();
   };
 
   this.expectSubscriptionFirstNameToMatch = function(name) {
@@ -48,10 +48,10 @@ var SubscriptionDashboardPage = function() {
     expect(subscriptionName.count()).toEqual(value);
   };
 
-  this.navigateToSubscriptionButton = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToSubscriptionButton = async function() {
+    await waitFor.elementToBeClickable(
       subscriptionButton, 'Subscription button is not clickable');
-    subscriptionButton.click();
+    await subscriptionButton.click();
   };
 };
 

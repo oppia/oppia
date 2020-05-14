@@ -175,63 +175,65 @@ var RealEditor = function(elem) {
   };
 };
 
-var RichTextEditor = function(elem) {
+var RichTextEditor = async function(elem) {
   // Set focus in the RTE.
-  elem.all(by.css('.oppia-rte')).first().click();
+  await elem.all(by.css('.oppia-rte')).first().click();
 
-  var _appendContentText = function(text) {
-    elem.all(by.css('.oppia-rte')).first().sendKeys(text);
+  var _appendContentText = async function(text) {
+    await elem.all(by.css('.oppia-rte')).first().sendKeys(text);
   };
-  var _clickToolbarButton = function(buttonName) {
-    elem.element(by.css('.' + buttonName)).click();
+  var _clickToolbarButton = async function(buttonName) {
+    await elem.element(by.css('.' + buttonName)).click();
   };
-  var _clearContent = function() {
-    expect(elem.all(by.css('.oppia-rte')).first().isPresent()).toBe(true);
-    elem.all(by.css('.oppia-rte')).first().clear();
+  var _clearContent = async function() {
+    expect(await elem.all(by.css('.oppia-rte')).first().isPresent()).toBe(
+      true);
+    await elem.all(by.css('.oppia-rte')).first().clear();
   };
 
   return {
-    clear: function() {
-      _clearContent();
+    clear: async function() {
+      await _clearContent();
     },
-    setPlainText: function(text) {
-      _clearContent();
-      _appendContentText(text);
+    setPlainText: async function(text) {
+      await _clearContent();
+      await _appendContentText(text);
     },
-    appendPlainText: function(text) {
-      _appendContentText(text);
+    appendPlainText: async function(text) {
+      await _appendContentText(text);
     },
-    appendBoldText: function(text) {
-      _clickToolbarButton('cke_button__bold');
-      _appendContentText(text);
-      _clickToolbarButton('cke_button__bold');
+    appendBoldText: async function(text) {
+      await _clickToolbarButton('cke_button__bold');
+      await _appendContentText(text);
+      await _clickToolbarButton('cke_button__bold');
     },
-    appendItalicText: function(text) {
-      _clickToolbarButton('cke_button__italic');
-      _appendContentText(text);
-      _clickToolbarButton('cke_button__italic');
+    appendItalicText: async function(text) {
+      await _clickToolbarButton('cke_button__italic');
+      await _appendContentText(text);
+      await _clickToolbarButton('cke_button__italic');
     },
-    appendOrderedList: function(textArray) {
-      _appendContentText('\n');
-      _clickToolbarButton('cke_button__numberedlist');
+    appendOrderedList: async function(textArray) {
+      await _appendContentText('\n');
+      await _clickToolbarButton('cke_button__numberedlist');
       for (var i = 0; i < textArray.length; i++) {
-        _appendContentText(textArray[i] + '\n');
+        await _appendContentText(textArray[i] + '\n');
       }
-      _clickToolbarButton('cke_button__numberedlist');
+      await _clickToolbarButton('cke_button__numberedlist');
     },
-    appendUnorderedList: function(textArray) {
-      _appendContentText('\n');
-      _clickToolbarButton('cke_button__bulletedlist');
+    appendUnorderedList: async function(textArray) {
+      await _appendContentText('\n');
+      await _clickToolbarButton('cke_button__bulletedlist');
       for (var i = 0; i < textArray.length; i++) {
-        _appendContentText(textArray[i] + '\n');
+        await _appendContentText(textArray[i] + '\n');
       }
-      _clickToolbarButton('cke_button__bulletedlist');
+      await _clickToolbarButton('cke_button__bulletedlist');
     },
     // This adds and customizes RTE components.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
-    addRteComponent: function(componentName) {
-      _clickToolbarButton('cke_button__oppia' + componentName.toLowerCase());
+    addRteComponent: async function(componentName) {
+      await _clickToolbarButton(
+        'cke_button__oppia' + componentName.toLowerCase());
 
       // The currently active modal is the last in the DOM
       var modal = element.all(by.css('.modal-dialog')).last();
@@ -244,17 +246,18 @@ var RichTextEditor = function(elem) {
       }
       richTextComponents.getComponent(componentName).customizeComponent.apply(
         null, args);
-      modal.element(
+      await modal.element(
         by.css('.protractor-test-close-rich-text-component-editor')).click();
 
       // Ensure that focus is not on added component once it is added so that
       // the component is not overwritten by some other element.
       if (['Video', 'Image', 'Collapsible', 'Tabs'].includes(componentName)) {
-        elem.all(by.css('.oppia-rte')).first().sendKeys(protractor.Key.DOWN);
+        await elem.all(by.css('.oppia-rte')).first().sendKeys(
+          protractor.Key.DOWN);
       }
 
       // Ensure that the cursor is at the end of the RTE.
-      elem.all(by.css('.oppia-rte')).first().sendKeys(
+      await elem.all(by.css('.oppia-rte')).first().sendKeys(
         protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
     }
   };
@@ -284,25 +287,21 @@ var UnicodeEditor = function(elem) {
 
 var AutocompleteDropdownEditor = function(elem) {
   return {
-    setValue: function(text) {
-      elem.element(by.css('.select2-container')).click();
+    setValue: async function(text) {
+      await elem.element(by.css('.select2-container')).click();
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
-      element(by.css('.select2-dropdown')).element(
+      await element(by.css('.select2-dropdown')).element(
         by.css('.select2-search input')).sendKeys(text + '\n');
     },
-    expectOptionsToBe: function(expectedOptions) {
-      elem.element(by.css('.select2-container')).click();
-      element(by.css('.select2-dropdown')).all(by.tagName('li')).map(
-        function(optionElem) {
-          return optionElem.getText();
-        }
-      ).then(function(actualOptions) {
-        expect(actualOptions).toEqual(expectedOptions);
-      });
+    expectOptionsToBe: async function(expectedOptions) {
+      await elem.element(by.css('.select2-container')).click();
+      var actualOptions = await element(by.css('.select2-dropdown')).all(
+        by.tagName('li')).map((optionElem) => optionElem.getText());
+      expect(actualOptions).toEqual(expectedOptions);
       // Re-close the dropdown.
-      element(by.css('.select2-dropdown')).element(
+      await element(by.css('.select2-dropdown')).element(
         by.css('.select2-search input')).sendKeys('\n');
     }
   };
@@ -543,11 +542,11 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
 // representation of a 'rich text object'. This is because we are more
 // interested in the process of interacting with the page than in the
 // information thereby conveyed.
-var toRichText = function(text) {
+var toRichText = async function(text) {
   // The 'handler' should be either a RichTextEditor or RichTextChecker
-  return function(handler) {
+  return async function(handler) {
     if (handler.hasOwnProperty('setPlainText')) {
-      handler.setPlainText(text);
+      await handler.setPlainText(text);
     } else {
       handler.readPlainText(text);
     }

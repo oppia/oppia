@@ -29,34 +29,33 @@ var scrollToTop = function() {
 var CONSOLE_LOG_THRESHOLD = 900;
 var CONSOLE_ERRORS_TO_IGNORE = [];
 
-var checkForConsoleErrors = function(errorsToIgnore) {
+var checkForConsoleErrors = async function(errorsToIgnore) {
   var irrelevantErrors = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
-  browser.manage().logs().get('browser').then(function(browserLogs) {
-    var fatalErrors = [];
-    // The mobile tests run on the latest version of Chrome.
-    // The newer versions report 'Slow Network' as a console error.
-    // This causes the tests to fail, therefore, we remove such logs.
-    if (browser.isMobile) {
-      browserLogs = browserLogs.filter(function(browserLog) {
-        return !(browserLog.message.includes(' Slow network is detected.'));
-      });
-    }
+  var browserLogs = await browser.manage().logs().get('browser');
+  var fatalErrors = [];
+  // The mobile tests run on the latest version of Chrome.
+  // The newer versions report 'Slow Network' as a console error.
+  // This causes the tests to fail, therefore, we remove such logs.
+  if (browser.isMobile) {
+    browserLogs = browserLogs.filter(function(browserLog) {
+      return !(browserLog.message.includes(' Slow network is detected.'));
+    });
+  }
 
-    for (var i = 0; i < browserLogs.length; i++) {
-      if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
-        var errorFatal = true;
-        for (var j = 0; j < irrelevantErrors.length; j++) {
-          if (browserLogs[i].message.match(irrelevantErrors[j])) {
-            errorFatal = false;
-          }
-        }
-        if (errorFatal) {
-          fatalErrors.push(browserLogs[i]);
+  for (var i = 0; i < browserLogs.length; i++) {
+    if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
+      var errorFatal = true;
+      for (var j = 0; j < irrelevantErrors.length; j++) {
+        if (browserLogs[i].message.match(irrelevantErrors[j])) {
+          errorFatal = false;
         }
       }
+      if (errorFatal) {
+        fatalErrors.push(browserLogs[i]);
+      }
     }
-    expect(fatalErrors).toEqual([]);
-  });
+  }
+  expect(fatalErrors).toEqual([]);
 };
 
 var isInDevMode = function() {
