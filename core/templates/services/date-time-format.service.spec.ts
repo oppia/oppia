@@ -46,6 +46,8 @@ describe('datetimeformatter', () => {
       } else {
         return new OldDate(millisSinceEpoch);
       }
+    // Need as any here because DateContructor has some properties on the
+    // function and this function doesn't really have those properties.
     } as any as MockDateContructorType;
 
     // Mock Date() to give a time of NOW_MILLIS in GMT. (Unfortunately, there
