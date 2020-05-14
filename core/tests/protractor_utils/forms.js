@@ -114,20 +114,19 @@ var GraphEditor = function(graphInputContainer) {
 
 var ListEditor = function(elem) {
   // NOTE: this returns a promise, not an integer.
-  var _getLength = function() {
-    return elem.all(by.repeater('item in localValue track by $index'))
-      .then(function(items) {
-        return items.length;
-      });
+  var _getLength = async function() {
+    var items = (
+      await elem.all(by.repeater('item in localValue track by $index')));
+    return items.length;
   };
   // If objectType is specified this returns an editor for objects of that type
   // which can be used to make changes to the newly-added item (for example
   // by calling setValue() on it). Clients should ensure the given objectType
   // corresponds to the type of elements in the list.
   // If objectType is not specified, this function returns nothing.
-  var addItem = function(objectType = null) {
-    var listLength = _getLength();
-    elem.element(by.css('.protractor-test-add-list-entry')).click();
+  var addItem = async function(objectType = null) {
+    var listLength = await _getLength();
+    await elem.element(by.css('.protractor-test-add-list-entry')).click();
     if (objectType !== null) {
       return getEditor(objectType)(
         elem.element(
@@ -278,9 +277,9 @@ var SetOfHtmlStringEditor = function(elem) {
 
 var UnicodeEditor = function(elem) {
   return {
-    setValue: function(text) {
-      elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(text);
+    setValue: async function(text) {
+      await elem.element(by.tagName('input')).clear();
+      await elem.element(by.tagName('input')).sendKeys(text);
     }
   };
 };
@@ -347,61 +346,64 @@ var AutocompleteMultiDropdownEditor = function(elem) {
 var MultiSelectEditor = function(elem) {
   // This function checks that the options corresponding to the given texts
   // have the expected class name, and then toggles those options accordingly.
-  var _toggleElementStatusesAndVerifyExpectedClass = function(
+  var _toggleElementStatusesAndVerifyExpectedClass = async function(
       texts, expectedClassBeforeToggle) {
     // Open the dropdown menu.
-    elem.element(by.css('.protractor-test-search-bar-dropdown-toggle')).click();
+    await elem.element(by.css(
+      '.protractor-test-search-bar-dropdown-toggle')).click();
 
-    elem.element(by.css('.protractor-test-search-bar-dropdown-menu'))
-      .all(by.tagName('span')).filter(function(choiceElem) {
-        return choiceElem.getText().then(function(choiceText) {
-          return texts.indexOf(choiceText) !== -1;
-        });
-      }).then(function(filteredElements) {
-        if (filteredElements.length !== texts.length) {
-          throw (
-            'Could not toggle element selection. Values requested: ' + texts +
-          '. Found ' + filteredElements.length + ' matching elements.');
-        }
+    var filteredElements = (
+      await elem.element(
+        by.css('.protractor-test-search-bar-dropdown-menu')).all(
+        by.tagName('span')).filter(async function(choiceElem) {
+        var choiceText = await choiceElem.getText();
+        return texts.indexOf(choiceText) !== -1;
+      }));
+    if (filteredElements.length !== texts.length) {
+      throw (
+        'Could not toggle element selection. Values requested: ' + texts +
+      '. Found ' + filteredElements.length + ' matching elements.');
+    }
 
-        for (var i = 0; i < filteredElements.length; i++) {
-        // Check that, before toggling, the element is in the correct state.
-          expect(filteredElements[i].getAttribute('class')).toMatch(
-            expectedClassBeforeToggle);
-          filteredElements[i].click();
-        }
+    for (var i = 0; i < filteredElements.length; i++) {
+    // Check that, before toggling, the element is in the correct state.
+      expect(await filteredElements[i].getAttribute('class')).toMatch(
+        expectedClassBeforeToggle);
+      await filteredElements[i].click();
+    }
 
-        // Close the dropdown menu at the end.
-        elem.element(by.css(
-          '.protractor-test-search-bar-dropdown-toggle')).click();
-      });
+    // Close the dropdown menu at the end.
+    await elem.element(by.css(
+      '.protractor-test-search-bar-dropdown-toggle')).click();
   };
 
   return {
-    selectValues: function(texts) {
-      _toggleElementStatusesAndVerifyExpectedClass(
+    selectValues: async function(texts) {
+      await _toggleElementStatusesAndVerifyExpectedClass(
         texts, 'protractor-test-deselected');
     },
-    deselectValues: function(texts) {
-      _toggleElementStatusesAndVerifyExpectedClass(
+    deselectValues: async function(texts) {
+      await _toggleElementStatusesAndVerifyExpectedClass(
         texts, 'protractor-test-selected');
     },
-    expectCurrentSelectionToBe: function(expectedCurrentSelection) {
+    expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
       // Open the dropdown menu.
-      elem.element(by.css(
+      await elem.element(by.css(
         '.protractor-test-search-bar-dropdown-toggle')).click();
 
       // Find the selected elements.
-      elem.element(by.css('.protractor-test-search-bar-dropdown-menu'))
-        .all(by.css('.protractor-test-selected')).map(function(selectedElem) {
-          return selectedElem.getText();
-        }).then(function(actualSelection) {
-          expect(actualSelection).toEqual(expectedCurrentSelection);
+      var actualSelection = (
+        await elem.element(
+          by.css('.protractor-test-search-bar-dropdown-menu')).all(
+          by.css('.protractor-test-selected')).map(
+          async function(selectedElem) {
+            return await selectedElem.getText();
+          }));
+      expect(actualSelection).toEqual(expectedCurrentSelection);
 
-          // Close the dropdown menu at the end.
-          elem.element(by.css(
-            '.protractor-test-search-bar-dropdown-toggle')).click();
-        });
+      // Close the dropdown menu at the end.
+      await elem.element(by.css(
+        '.protractor-test-search-bar-dropdown-toggle')).click();
     }
   };
 };

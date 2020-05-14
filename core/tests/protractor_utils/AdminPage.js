@@ -106,27 +106,26 @@ var AdminPage = function() {
     };
   }
 
-  var saveConfigProperty = function(
+  var saveConfigProperty = async function(
       configProperty, propertyName, objectType, editingInstructions) {
-    return configProperty.element(by.css('.protractor-test-config-title'))
-      .getText()
-      .then(function(title) {
-        if (title.match(propertyName)) {
-          editingInstructions(forms.getEditor(objectType)(configProperty));
-          saveAllConfigs.click();
-          general.acceptAlert();
-          // Waiting for success message.
-          waitFor.textToBePresentInElement(
-            statusMessage, 'saved successfully',
-            'New config could not be saved');
-          return true;
-        }
-      });
+    var title = await configProperty.element(
+      by.css('.protractor-test-config-title')).getText();
+    if (title.match(propertyName)) {
+      await editingInstructions(
+        await forms.getEditor(objectType)(configProperty));
+      await saveAllConfigs.click();
+      await general.acceptAlert();
+      // Waiting for success message.
+      await waitFor.textToBePresentInElement(
+        statusMessage, 'saved successfully',
+        'New config could not be saved');
+      return true;
+    }
   };
 
-  this.get = function() {
-    browser.get(ADMIN_URL_SUFFIX);
-    return waitFor.pageToFullyLoad();
+  this.get = async function() {
+    await browser.get(ADMIN_URL_SUFFIX);
+    await waitFor.pageToFullyLoad();
   };
 
   this.getJobsTab = function() {
@@ -134,23 +133,22 @@ var AdminPage = function() {
     return waitFor.pageToFullyLoad();
   };
 
-  this.editConfigProperty = function(
+  this.editConfigProperty = async function(
       propertyName, objectType, editingInstructions) {
-    this.get();
-    configTab.click();
-    waitFor.elementToBeClickable(saveAllConfigs);
-    configProperties.map(function(x) {
-      return saveConfigProperty(
+    await this.get();
+    await configTab.click();
+    await waitFor.elementToBeClickable(saveAllConfigs);
+    var results = await configProperties.map(async function(x) {
+      return await saveConfigProperty(
         x, propertyName, objectType, editingInstructions);
-    }).then(function(results) {
-      var success = null;
-      for (var i = 0; i < results.length; i++) {
-        success = success || results[i];
-      }
-      if (!success) {
-        throw new Error('Could not find config property: ' + propertyName);
-      }
     });
+    var success = null;
+    for (var i = 0; i < results.length; i++) {
+      success = success || results[i];
+    }
+    if (!success) {
+      throw new Error('Could not find config property: ' + propertyName);
+    }
   };
 
   this.startOneOffJob = function(jobName) {
@@ -208,20 +206,22 @@ var AdminPage = function() {
     });
   };
 
-  this.updateRole = function(name, newRole) {
-    waitFor.elementToBeClickable(
+  this.updateRole = async function(name, newRole) {
+    await waitFor.elementToBeClickable(
       adminRolesTab, 'Admin Roles tab is not clickable');
-    adminRolesTab.click();
+    await adminRolesTab.click();
 
     // Change values for "update role" form, and submit it.
-    waitFor.visibilityOf(updateFormName, 'Update Form Name is not visible');
-    updateFormName.sendKeys(name);
+    await waitFor.visibilityOf(
+      updateFormName, 'Update Form Name is not visible');
+    await updateFormName.sendKeys(name);
     var roleOption = roleSelect.element(
       by.cssContainingText('option', newRole));
-    roleOption.click();
-    updateFormSubmit.click();
-    waitFor.visibilityOf(statusMessage, 'Confirmation message not visible');
-    waitFor.textToBePresentInElement(
+    await roleOption.click();
+    await updateFormSubmit.click();
+    await waitFor.visibilityOf(
+      statusMessage, 'Confirmation message not visible');
+    await waitFor.textToBePresentInElement(
       statusMessage, 'successfully updated to',
       'Could not set role successfully');
   };

@@ -24,7 +24,7 @@ describe('Oppia static pages tour', function() {
   var thanksPage = null;
 
   beforeEach(async function() {
-    await browser.driver.get("about:blank");
+    await browser.driver.get('about:blank');
     await browser.get(general.SERVER_URL_PREFIX);
     await waitFor.pageToFullyLoad();
   });
@@ -57,7 +57,7 @@ describe('Oppia static pages tour', function() {
   });
 
   it('visits the terms page', async function() {
-    browser.ignoresynchronisation = true
+    browser.ignoresynchronisation = true;
     await element(by.css('.protractor-test-terms-link')).click();
     await waitFor.pageToFullyLoad();
   });

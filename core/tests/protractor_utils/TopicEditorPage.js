@@ -116,8 +116,8 @@ var TopicEditorPage = function() {
     return workflow.getImageSource(subtopicThumbnailImageElement);
   };
 
-  this.submitTopicThumbnail = function(imgPath) {
-    return workflow.submitImage(
+  this.submitTopicThumbnail = async function(imgPath) {
+    return await workflow.submitImage(
       topicThumbnailButton, thumbnailContainer, imgPath);
   };
 
@@ -126,9 +126,9 @@ var TopicEditorPage = function() {
       subtopicThumbnailButton, thumbnailContainer, imgPath);
   };
 
-  this.publishTopic = function() {
-    publishTopicButton.click();
-    return waitFor.invisibilityOf(
+  this.publishTopic = async function() {
+    await publishTopicButton.click();
+    await waitFor.invisibilityOf(
       publishTopicButton, 'Topic is taking too long to publish.');
   };
 
@@ -331,18 +331,18 @@ var TopicEditorPage = function() {
     expect(topicDescriptionField.getAttribute('value')).toEqual(description);
   };
 
-  this.saveTopic = function(commitMessage) {
-    waitFor.elementToBeClickable(
+  this.saveTopic = async function(commitMessage) {
+    await waitFor.elementToBeClickable(
       saveTopicButton,
       'Save topic button takes too long to be clickable');
-    saveTopicButton.click();
-    commitMessageField.sendKeys(commitMessage);
+    await saveTopicButton.click();
+    await commitMessageField.sendKeys(commitMessage);
 
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       closeSaveModalButton,
       'Close save modal button takes too long to be clickable');
-    closeSaveModalButton.click();
-    waitFor.pageToFullyLoad();
+    await closeSaveModalButton.click();
+    await waitFor.pageToFullyLoad();
   };
 };
 

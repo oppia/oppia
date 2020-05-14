@@ -57,7 +57,8 @@ var _completeSignup = async function(username) {
   var agreeToTermsCheckbox = element(
     by.css('.protractor-test-agree-to-terms-checkbox'));
   var registerUser = element(by.css('.protractor-test-register-user'));
-  await waitFor.visibilityOf(usernameInput, 'No username input field was displayed');
+  await waitFor.visibilityOf(
+    usernameInput, 'No username input field was displayed');
   await usernameInput.sendKeys(username);
   await agreeToTermsCheckbox.click();
   await registerUser.click();
@@ -90,8 +91,8 @@ var createAdmin = async function(email, username) {
 var createAndLoginAdminUser = async function(email, username) {
   await login(email, true);
   await _completeSignup(username);
-  adminPage.get();
-  adminPage.updateRole(username, 'admin');
+  await adminPage.get();
+  await adminPage.updateRole(username, 'admin');
 };
 
 var createAdminMobile = async function(email, username) {

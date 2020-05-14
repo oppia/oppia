@@ -87,9 +87,9 @@ var TopicsAndSkillsDashboardPage = function() {
     });
   };
 
-  this.get = function() {
-    browser.get(DASHBOARD_URL);
-    waitFor.pageToFullyLoad();
+  this.get = async function() {
+    await browser.get(DASHBOARD_URL);
+    await waitFor.pageToFullyLoad();
   };
 
   this.mergeSkillWithIndexToSkillWithIndex = (
@@ -103,10 +103,9 @@ var TopicsAndSkillsDashboardPage = function() {
       });
     });
 
-  this.navigateToTopicWithIndex = function(index) {
-    topicsListItems.then(function(elems) {
-      elems[index].click();
-    });
+  this.navigateToTopicWithIndex = async function(index) {
+    var elems = await topicsListItems;
+    await elems[index].click();
   };
 
   this.assignSkillWithIndexToTopic = function(index, topicIndex) {
@@ -138,34 +137,31 @@ var TopicsAndSkillsDashboardPage = function() {
     });
   };
 
-  this.createTopic = function(topicName, shouldCloseTopicEditor) {
+  this.createTopic = async function(topicName, shouldCloseTopicEditor) {
     var initialHandles = [];
-    return browser.getAllWindowHandles().then(function(handles) {
-      initialHandles = handles;
-      return browser.getWindowHandle();
-    }).then(function(parentHandle) {
-      waitFor.elementToBeClickable(
-        createTopicButton,
-        'Create Topic button takes too long to be clickable');
-      createTopicButton.click();
+    var handles = await browser.getAllWindowHandles();
+    initialHandles = handles;
+    var parentHandle = await browser.getWindowHandle();
+    await waitFor.elementToBeClickable(
+      createTopicButton,
+      'Create Topic button takes too long to be clickable');
+    await createTopicButton.click();
 
-      topicNameField.sendKeys(topicName);
-      confirmTopicCreationButton.click();
+    await topicNameField.sendKeys(topicName);
+    await confirmTopicCreationButton.click();
 
-      waitFor.newTabToBeCreated(
-        'Creating topic takes too long', '/topic_editor/');
-      return browser.getAllWindowHandles().then(function(handles) {
-        var newHandle = handles.filter(
-          handle => initialHandles.indexOf(handle) === -1)[0];
-        browser.switchTo().window(newHandle).then(function() {
-          if (shouldCloseTopicEditor) {
-            browser.driver.close();
-            return browser.switchTo().window(parentHandle);
-          }
-          return waitFor.pageToFullyLoad();
-        });
-      });
-    });
+    await waitFor.newTabToBeCreated(
+      'Creating topic takes too long', '/topic_editor/');
+    handles = await browser.getAllWindowHandles();
+
+    var newHandle = handles.filter(
+      handle => initialHandles.indexOf(handle) === -1)[0];
+    await browser.switchTo().window(newHandle);
+    if (shouldCloseTopicEditor) {
+      await browser.driver.close();
+      return await browser.switchTo().window(parentHandle);
+    }
+    return await waitFor.pageToFullyLoad();
   };
 
   this.deleteTopicWithIndex = function(index) {

@@ -142,14 +142,14 @@ var ensurePageHasNoTranslationIds = function() {
     });
 };
 
-var acceptAlert = function() {
-  waitFor.alertToBePresent();
-  browser.switchTo().alert().accept();
-  waitFor.pageToFullyLoad();
+var acceptAlert = async function() {
+  await waitFor.alertToBePresent();
+  await browser.switchTo().alert().accept();
+  await waitFor.pageToFullyLoad();
 };
 
 var closeCurrentTabAndSwitchTo = async function(destHandle) {
-  browser.driver.close();
+  await browser.driver.close();
   await browser.switchTo().window(destHandle);
 };
 
