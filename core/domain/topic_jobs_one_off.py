@@ -28,8 +28,10 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.platform import models
 import feconf
+import python_utils
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(skill_models, topic_models) = models.Registry.import_models(
+    [models.NAMES.skill, models.NAMES.topic])
 
 
 class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -69,7 +71,6 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         # Write the new topic into the datastore if it's different from
         # the old version.
-        #
         if (item.subtopic_schema_version <=
                 feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
             commit_cmds = [topic_domain.TopicChange({
@@ -95,38 +96,72 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class TopicSummaryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    _DESCRIPTION_ADDED = 'description_added'
-    _DESCRIPTION_PRESENT = 'description_present'
+class RemoveDeletedSkillsFromTopicOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to remove deleted uncategorized skills linked to a topic."""
+
+    _DELETED_KEY = 'topic_deleted'
+    _PROCESSED_KEY = 'topic_processed'
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [topic_models.TopicSummaryModel]
+        return [topic_models.TopicModel]
 
     @staticmethod
     def map(item):
-        topic = topic_fetchers.get_topic_by_id(item.id)
-        topic_summary_model = topic_models.TopicSummaryModel.get_by_id(item.id)
-        topic_summary = topic_services.get_topic_summary_from_model(topic_summary_model).to_dict()
+        if item.deleted:
+            yield (RemoveDeletedSkillsFromTopicOneOffJob._DELETED_KEY, 1)
+            return
 
-        if 'description' in topic_summary and topic_summary['description']:
-            print 'present'
-            yield (TopicSummaryMigrationOneOffJob._DESCRIPTION_PRESENT, 1)
-        else:
-            commit_cmds = [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,  # pylint: disable=line-too-long
-                'property_name': 'description',
-                'old_value': '',
-                'new_value': topic.description
-            })]
-            commit_message = 'Adding description to topics'
+        # Note: the read will bring the topic up to the newest version.
+        topic = topic_fetchers.get_topic_by_id(item.id)
+        skill_ids_to_be_removed_from_subtopic = []
+        all_skill_ids_to_be_removed = []
+        commit_cmds = []
+
+        # This block of code removes deleted skills from subtopics, but keeps
+        # them in the topic.
+        for subtopic in topic.get_all_subtopics():
+            subtopic_skill_models = skill_models.SkillModel.get_multi(
+                subtopic['skill_ids'])
+            for skill_id, skill_model in python_utils.ZIP(
+                    subtopic['skill_ids'], subtopic_skill_models):
+                if skill_model is None:
+                    commit_cmds.append(topic_domain.TopicChange({
+                        'cmd': topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
+                        'skill_id': skill_id,
+                        'subtopic_id': subtopic['id']
+                    }))
+                    skill_ids_to_be_removed_from_subtopic.append(skill_id)
+
+        all_skill_models = skill_models.SkillModel.get_multi(
+            topic.get_all_skill_ids())
+
+        # This block of code removes all deleted skills from topics.
+        for skill_id, skill_model in python_utils.ZIP(
+                topic.get_all_skill_ids(), all_skill_models):
+            if skill_model is None:
+                commit_cmds.append(topic_domain.TopicChange({
+                    'cmd': topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
+                    'uncategorized_skill_id': skill_id
+                }))
+                all_skill_ids_to_be_removed.append(skill_id)
+        if commit_cmds:
             topic_services.update_topic_and_subtopic_pages(
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
-                commit_message
-            )
-            print topic.description
-            yield (TopicSummaryMigrationOneOffJob._DESCRIPTION_ADDED, 1)
+                'Remove deleted skill id.')
+            yield (
+                'Skill IDs deleted for topic %s:' % item.id,
+                all_skill_ids_to_be_removed)
+        yield (RemoveDeletedSkillsFromTopicOneOffJob._PROCESSED_KEY, 1)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        if key == RemoveDeletedSkillsFromTopicOneOffJob._DELETED_KEY:
+            yield (key, ['Encountered %d deleted topics.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        elif key == RemoveDeletedSkillsFromTopicOneOffJob._PROCESSED_KEY:
+            yield (key, ['Processed %d topics.' % (
+                sum(ast.literal_eval(v) for v in values))])
+        else:
+            yield (key, values)

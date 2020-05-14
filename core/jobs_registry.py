@@ -73,6 +73,7 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.StatisticsAuditV2,
     stats_jobs_one_off.StatisticsAudit,
     story_jobs_one_off.StoryMigrationOneOffJob,
+    topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
     user_id_migration.GaeIdNotInModelsVerificationJob,
     user_id_migration.ModelsUserIdsHaveUserSettingsExplorationsVerificationJob,
