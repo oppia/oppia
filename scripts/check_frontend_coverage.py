@@ -245,7 +245,7 @@ FULLY_COVERED_FILENAMES = [
     'nested-directives-recursion-timeout-prevention.service.ts',
     'normalize-whitespace.filter.ts',
     'normalize-whitespace.pipe.ts',
-    'notifications-dashboard-page.controller.ts',
+    'notifications-dashboard-page.component.ts',
     'number-attempts.service.ts',
     'number-with-units-rules.service.ts',
     'NumberWithUnits.ts',
