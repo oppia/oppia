@@ -32,7 +32,7 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # Please keep the list in alphabetical order.
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @marianazangrossi first.
-BLACKLIST = [
+NOT_FULLY_COVERED_FILENAMES = [
     'about-page.module.ts',
     'activity-tiles-infinity-grid.directive.ts',
     'admin-config-tab.directive.ts',
@@ -569,11 +569,11 @@ def get_stanzas_from_lcov_file():
 
 
 def check_fully_covered_filenames_list_is_sorted():
-    """Check if BLACKLIST list is in alphabetical order."""
-    if BLACKLIST != sorted(
-            BLACKLIST, key=lambda s: s.lower()):
+    """Check if NOT_FULLY_COVERED_FILENAMES list is in alphabetical order."""
+    if NOT_FULLY_COVERED_FILENAMES != sorted(
+            NOT_FULLY_COVERED_FILENAMES, key=lambda s: s.lower()):
         sys.exit(
-            'The \033[1mBLACKLIST\033[0m list must be'
+            'The \033[1mNOT_FULLY_COVERED_FILENAMES\033[0m list must be'
             ' kept in alphabetical order.')
 
 
@@ -592,7 +592,7 @@ def check_coverage_changes():
             ' file does not exist.'.format(LCOV_FILE_PATH))
 
     stanzas = get_stanzas_from_lcov_file()
-    blacklist_list = list(BLACKLIST)
+    remaining_blacklisted_files = list(NOT_FULLY_COVERED_FILENAMES)
     errors = ''
 
     for stanza in stanzas:
@@ -600,7 +600,7 @@ def check_coverage_changes():
         total_lines = stanza.total_lines
         covered_lines = stanza.covered_lines
 
-        if file_name not in blacklist_list:
+        if file_name not in remaining_blacklisted_files:
             if total_lines != covered_lines:
                 errors += (
                     '\033[1m{}\033[0m seems to be not completely tested.'
@@ -618,10 +618,10 @@ def check_coverage_changes():
                     ' https://github.com/oppia/oppia/wiki/Frontend'
                     '-unit-tests-guide#rules\n'.format(file_name))
 
-            blacklist_list.remove(file_name)
+            remaining_blacklisted_files.remove(file_name)
 
-    if blacklist_list:
-        for test_name in blacklist_list:
+    if remaining_blacklisted_files:
+        for test_name in remaining_blacklisted_files:
             errors += (
                 '\033[1m{}\033[0m is in the frontend test coverage'
                 ' blacklist but it doesn\'t exist anymore. If you have'
