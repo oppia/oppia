@@ -14323,3 +14323,18 @@ class PseudonymizedUserModelValidatorTests(test_utils.GenericTestBase):
             db.DateTimeProperty, 'data_type', MockDatetime13Hours):
             update_datastore_types_for_mock_datetime()
             run_job_and_check_output(self, expected_output)
+
+    def test_model_not_same_id_as_user(self):
+        user_models.UserSettingsModel(
+            id=self.model_instance.id,
+            gae_id='224169184123',
+            email='email@email.com',
+            username='username').put()
+
+        expected_output = [(
+            '[u\'failed validation check for deleted user settings of '
+            'PseudonymizedUserModel\', '
+            '[u\'Entity id %s: User settings model exists\']]'
+        ) % self.model_instance.id]
+
+        run_job_and_check_output(self, expected_output)

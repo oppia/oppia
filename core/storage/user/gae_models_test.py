@@ -2268,3 +2268,15 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel
             .get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
+
+    def test_create_raises_error_when_many_id_collisions_occur(self):
+        # Swap dependent method get_by_id to simulate collision every time.
+        get_by_id_swap = self.swap(
+            user_models.PseudonymizedUserModel, 'get_by_id', types.MethodType(
+                lambda _, __: True, user_models.PseudonymizedUserModel))
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'New id generator is producing too many collisions.')
+
+        with assert_raises_regexp_context_manager, get_by_id_swap:
+            user_models.PseudonymizedUserModel.get_new_id('exploration')
