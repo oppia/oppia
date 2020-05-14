@@ -37,7 +37,7 @@ describe('Library index page', function() {
   var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     libraryPage = new LibraryPage.LibraryPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -45,7 +45,7 @@ describe('Library index page', function() {
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
 
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       'superUser@publicationAndLibrary.com', 'superUser');
     // TODO(#7569): Change this test to work with the improvements tab.
     adminPage.editConfigProperty(
@@ -54,10 +54,10 @@ describe('Library index page', function() {
       function(elem) {
         elem.setValue(false);
       });
-    users.logout();
+    await users.logout();
   });
 
-  it('should display private and published explorations', function() {
+  it('should display private and published explorations', async function() {
     var EXPLORATION_SILMARILS = 'silmarils';
     var EXPLORATION_VINGILOT = 'Vingilot';
     var CATEGORY_ARCHITECTURE = 'Architecture';
@@ -66,27 +66,27 @@ describe('Library index page', function() {
     var LANGUAGE_FRANCAIS = 'français';
     var LANGUAGE_DEUTSCH = 'Deutsch';
 
-    users.createModerator(
+    await users.createModerator(
       'varda@publicationAndLibrary.com', 'vardaPublicationAndLibrary');
-    users.createUser(
+    await users.createUser(
       'feanor@publicationAndLibrary.com', 'feanorPublicationAndLibrary');
-    users.createUser(
+    await users.createUser(
       'celebrimor@publicationAndLibrary.com', 'celebriorPublicationAndLibrary');
-    users.createUser(
+    await users.createUser(
       'earendil@publicationAndLibrary.com', 'earendilPublicationAndLibrary');
 
-    users.login('feanor@publicationAndLibrary.com');
+    await users.login('feanor@publicationAndLibrary.com');
     workflow.createAndPublishExploration(
       EXPLORATION_SILMARILS, CATEGORY_ARCHITECTURE,
       'hold the light of the two trees', LANGUAGE_DEUTSCH);
-    users.logout();
+    await users.logout();
 
-    users.login('earendil@publicationAndLibrary.com');
+    await users.login('earendil@publicationAndLibrary.com');
     workflow.createAndPublishExploration(
       EXPLORATION_VINGILOT, CATEGORY_BUSINESS, 'seek the aid of the Valar');
-    users.logout();
+    await users.logout();
 
-    users.login('varda@publicationAndLibrary.com');
+    await users.login('varda@publicationAndLibrary.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_VINGILOT);
     libraryPage.playExploration(EXPLORATION_VINGILOT);
@@ -95,10 +95,10 @@ describe('Library index page', function() {
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.setLanguage(LANGUAGE_FRANCAIS);
     explorationEditorPage.saveChanges('change language');
-    users.logout();
+    await users.logout();
 
-    users.login('celebrimor@publicationAndLibrary.com');
-    workflow.createExploration();
+    await users.login('celebrimor@publicationAndLibrary.com');
+    await workflow.createExploration();
     explorationEditorMainTab.setContent(
       forms.toRichText('Celebrimbor wrote this'));
     explorationEditorMainTab.setInteraction('EndExploration');
@@ -146,7 +146,7 @@ describe('Library index page', function() {
     }];
 
     // We now check explorations are visible under the right conditions.
-    browser.get('/search/find?q=&language_code=("en")');
+    await browser.get('/search/find?q=&language_code=("en")');
     // The initial language selection should be just English.
     libraryPage.expectCurrentLanguageSelectionToBe([LANGUAGE_ENGLISH]);
     // At the start, no categories are selected.
@@ -182,24 +182,24 @@ describe('Library index page', function() {
     libraryPage.playExploration(EXPLORATION_SILMARILS);
     explorationPlayerPage.expectExplorationNameToBe('silmarils');
 
-    users.logout();
+    await users.logout();
   });
 
-  it('should not have any non translated strings', function() {
+  it('should not have any non translated strings', async function() {
     var EXPLORATION_SILMARILS = 'silmarils';
     var EXPLORATION_VINGILOT = 'Vingilot';
     var CATEGORY_ENVIRONMENT = 'Environment';
     var CATEGORY_BUSINESS = 'Business';
     var LANGUAGE_FRANCAIS = 'français';
-    users.createUser('aule@example.com', 'Aule');
+    await users.createUser('aule@example.com', 'Aule');
 
-    users.login('aule@example.com');
+    await users.login('aule@example.com');
     workflow.createAndPublishExploration(
       EXPLORATION_SILMARILS, CATEGORY_BUSINESS,
       'hold the light of the two trees', LANGUAGE_FRANCAIS);
     workflow.createAndPublishExploration(
       EXPLORATION_VINGILOT, CATEGORY_ENVIRONMENT, 'seek the aid of the Valar');
-    users.logout();
+    await users.logout();
 
     libraryPage.get();
     libraryPage.expectMainHeaderTextToBe(
@@ -231,60 +231,60 @@ describe('Permissions for private explorations', function() {
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
+
   it('should not be changeable if title is not given to exploration',
-    function() {
-      users.createUser('checkFor@title.com', 'Thanos');
-      users.login('checkFor@title.com');
-      workflow.createExploration();
+    async function() {
+      await users.createUser('checkFor@title.com', 'Thanos');
+      await users.login('checkFor@title.com');
+      await workflow.createExploration();
       explorationEditorPage.navigateToSettingsTab();
 
-      workflow.openEditRolesForm();
-      expect(workflow.canAddRolesToUsers()).toBe(false);
-      expect(workflow.checkForAddTitleWarning()).toBe(true);
+      await workflow.openEditRolesForm();
+      expect(await workflow.canAddRolesToUsers()).toBe(false);
+      expect(await workflow.checkForAddTitleWarning()).toBe(true);
       explorationEditorSettingsTab.setTitle('Pass');
-      workflow.triggerTitleOnBlurEvent();
-      expect(workflow.canAddRolesToUsers()).toBe(true);
-      expect(workflow.checkForAddTitleWarning()).toBe(false);
+      await workflow.triggerTitleOnBlurEvent();
+      expect(await workflow.canAddRolesToUsers()).toBe(true);
+      expect(await workflow.checkForAddTitleWarning()).toBe(false);
     }
   );
 
-  it('should be correct for collaborators', function() {
-    users.createUser('alice@privileges.com', 'alicePrivileges');
-    users.createUser('bob@privileges.com', 'bobPrivileges');
-    users.createUser('eve@privileges.com', 'evePrivileges');
+  it('should be correct for collaborators', async function() {
+    await users.createUser('alice@privileges.com', 'alicePrivileges');
+    await users.createUser('bob@privileges.com', 'bobPrivileges');
+    await users.createUser('eve@privileges.com', 'evePrivileges');
 
-    users.login('alice@privileges.com');
-    workflow.createExploration();
+    await users.login('alice@privileges.com');
+    await workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.setTitle('CollaboratorPermissions');
     workflow.addExplorationCollaborator('bobPrivileges');
     expect(workflow.getExplorationManagers()).toEqual(['alicePrivileges']);
     expect(workflow.getExplorationCollaborators()).toEqual(['bobPrivileges']);
     expect(workflow.getExplorationPlaytesters()).toEqual([]);
-    general.getExplorationIdFromEditor().then(function(explorationId) {
-      users.logout();
+    var explorationId = await general.getExplorationIdFromEditor();
+    await users.logout();
 
-      users.login('bob@privileges.com');
-      general.openEditor(explorationId);
-      explorationEditorMainTab.setContent(forms.toRichText('I love you'));
-      explorationEditorMainTab.setInteraction('TextInput');
-      explorationEditorPage.saveChanges();
-      users.logout();
+    await users.login('bob@privileges.com');
+    general.openEditor(explorationId);
+    explorationEditorMainTab.setContent(forms.toRichText('I love you'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorPage.saveChanges();
+    await users.logout();
 
-      users.login('eve@privileges.com');
-      general.openEditor(explorationId);
-      general.expect404Error();
-      users.logout();
-    });
+    await users.login('eve@privileges.com');
+    general.openEditor(explorationId);
+    general.expect404Error();
+    await users.logout();
   });
 
-  it('should be correct for voice artists', function() {
-    users.createUser('expOwner@oppia.tests', 'expOwner');
-    users.createUser('voiceArtist@oppia.tests', 'voiceArtist');
-    users.createUser('guestUser@oppia.tests', 'guestUser');
+  it('should be correct for voice artists', async function() {
+    await users.createUser('expOwner@oppia.tests', 'expOwner');
+    await users.createUser('voiceArtist@oppia.tests', 'voiceArtist');
+    await users.createUser('guestUser@oppia.tests', 'guestUser');
 
-    users.login('expOwner@oppia.tests');
-    workflow.createExploration();
+    await users.login('expOwner@oppia.tests');
+    await workflow.createExploration();
     explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
     explorationEditorPage.saveChanges('Added content to first card.');
     explorationEditorPage.navigateToSettingsTab();
@@ -294,21 +294,21 @@ describe('Permissions for private explorations', function() {
     expect(workflow.getExplorationCollaborators()).toEqual([]);
     expect(workflow.getExplorationVoiceArtists()).toEqual(['voiceArtist']);
     expect(workflow.getExplorationPlaytesters()).toEqual([]);
-    general.getExplorationIdFromEditor().then(function(explorationId) {
-      users.logout();
+    general.getExplorationIdFromEditor().then(async function(explorationId) {
+      await users.logout();
 
-      users.login('voiceArtist@oppia.tests');
+      await users.login('voiceArtist@oppia.tests');
       general.openEditor(explorationId);
       explorationEditorMainTab.expectContentToMatch(
         forms.toRichText('this is card 1'));
       expect(element(by.css(
         '.protractor-test-save-changes')).isPresent()).toBeTruthy();
-      users.logout();
+      await users.logout();
 
-      users.login('guestUser@oppia.tests');
+      await users.login('guestUser@oppia.tests');
       general.openEditor(explorationId);
       general.expect404Error();
-      users.logout();
+      await users.logout();
     });
   });
 

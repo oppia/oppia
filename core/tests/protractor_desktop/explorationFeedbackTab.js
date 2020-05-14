@@ -46,7 +46,7 @@ describe('ExplorationFeedback', function() {
   var libraryPage = null;
   var explorationPlayerPage = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
@@ -54,35 +54,35 @@ describe('ExplorationFeedback', function() {
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
 
-    users.createUser(
+    await users.createUser(
       'user1@ExplorationFeedback.com',
       'creatorExplorationFeedback');
-    users.createUser(
+    await users.createUser(
       'user2@ExplorationFeedback.com',
       'learnerExplorationFeedback');
-    users.createUser(
+    await users.createUser(
       'user3@ExplorationFeedback.com',
       'creatorExplorationFeedbackStatusChange');
-    users.createUser(
+    await users.createUser(
       'user4@ExplorationFeedback.com',
       'learnerExplorationFeedbackStatusChange');
-    users.createUser(
+    await users.createUser(
       'user5@ExplorationFeedback.com',
       'creatorFeedback');
-    users.createUser(
+    await users.createUser(
       'user6@ExplorationFeedback.com',
       'learnerFeedback');
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       'user7@ExplorationFeedback.com',
       'superUserExplorationFeedback');
   });
 
-  it('should add feedback to an exploration', function() {
+  it('should add feedback to an exploration', async function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
 
     // Creator creates and publishes an exploration.
-    users.login('user1@ExplorationFeedback.com');
+    await users.login('user1@ExplorationFeedback.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE_1,
       EXPLORATION_CATEGORY,
@@ -92,18 +92,18 @@ describe('ExplorationFeedback', function() {
     expect(
       creatorDashboardPage.getNumberOfFeedbackMessages()
     ).toEqual(0);
-    users.logout();
+    await users.logout();
 
     // Learner plays the exploration and submits a feedback.
-    users.login('user2@ExplorationFeedback.com');
+    await users.login('user2@ExplorationFeedback.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE_1);
     libraryPage.playExploration(EXPLORATION_TITLE_1);
     explorationPlayerPage.submitFeedback(feedback);
-    users.logout();
+    await users.logout();
 
     // Creator reads the feedback and responds.
-    users.login('user1@ExplorationFeedback.com');
+    await users.login('user1@ExplorationFeedback.com');
     creatorDashboardPage.get();
     expect(
       creatorDashboardPage.getNumberOfFeedbackMessages()
@@ -119,15 +119,15 @@ describe('ExplorationFeedback', function() {
       });
     explorationEditorPage.navigateToFeedbackTab();
     explorationEditorFeedbackTab.sendResponseToLatestFeedback(feedbackResponse);
-    users.logout();
+    await users.logout();
   });
 
-  it('should change status of feedback thread', function() {
+  it('should change status of feedback thread', async function() {
     var feedback = 'Hey! This exploration looks awesome';
     var feedbackResponse = 'Thanks for the feedback!';
 
     // Creator creates and publishes an exploration.
-    users.login('user3@ExplorationFeedback.com');
+    await users.login('user3@ExplorationFeedback.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE_2,
       EXPLORATION_CATEGORY,
@@ -137,18 +137,18 @@ describe('ExplorationFeedback', function() {
     expect(
       creatorDashboardPage.getNumberOfFeedbackMessages()
     ).toEqual(0);
-    users.logout();
+    await users.logout();
 
     // Learner plays the exploration and submits a feedback.
-    users.login('user4@ExplorationFeedback.com');
+    await users.login('user4@ExplorationFeedback.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE_2);
     libraryPage.playExploration(EXPLORATION_TITLE_2);
     explorationPlayerPage.submitFeedback(feedback);
-    users.logout();
+    await users.logout();
 
     // Creator reads the feedback and responds.
-    users.login('user3@ExplorationFeedback.com');
+    await users.login('user3@ExplorationFeedback.com');
     creatorDashboardPage.get();
     expect(
       creatorDashboardPage.getNumberOfFeedbackMessages()
@@ -174,15 +174,15 @@ describe('ExplorationFeedback', function() {
       'Open', feedbackResponse);
     explorationEditorFeedbackTab.expectFeedbackStatusNameToBe('Open');
 
-    users.logout();
+    await users.logout();
   });
 
-  it('should send message to feedback thread', function() {
+  it('should send message to feedback thread', async function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
 
     // Creator creates and publishes an exploration.
-    users.login('user5@ExplorationFeedback.com');
+    await users.login('user5@ExplorationFeedback.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE_3,
       EXPLORATION_CATEGORY,
@@ -192,18 +192,18 @@ describe('ExplorationFeedback', function() {
     expect(
       creatorDashboardPage.getNumberOfFeedbackMessages()
     ).toEqual(0);
-    users.logout();
+    await users.logout();
 
     // Learner plays the exploration and submits a feedback.
-    users.login('user6@ExplorationFeedback.com');
+    await users.login('user6@ExplorationFeedback.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE_3);
     libraryPage.playExploration(EXPLORATION_TITLE_3);
     explorationPlayerPage.submitFeedback(feedback);
-    users.logout();
+    await users.logout();
 
     // Creator reads the feedback and responds.
-    users.login('user5@ExplorationFeedback.com');
+    await users.login('user5@ExplorationFeedback.com');
     creatorDashboardPage.get();
     expect(
       creatorDashboardPage.getNumberOfFeedbackMessages()
@@ -234,7 +234,7 @@ describe('ExplorationFeedback', function() {
         expect(messages[0].getText()).toEqual(feedback);
         expect(messages[1].getText()).toEqual(feedbackResponse);
       });
-    users.logout();
+    await users.logout();
   });
 
   afterEach(function() {
@@ -254,7 +254,7 @@ describe('Suggestions on Explorations', function() {
   var explorationEditorFeedbackTab = null;
   var explorationPlayerPage = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
@@ -262,74 +262,75 @@ describe('Suggestions on Explorations', function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
 
-    users.createUser(
+    await users.createUser(
       'user1@ExplorationSuggestions.com',
       'authorExplorationSuggestions');
-    users.createUser(
+    await users.createUser(
       'user2@ExplorationSuggestions.com',
       'suggesterExplorationSuggestions');
-    users.createUser(
+    await users.createUser(
       'user3@ExplorationSuggestions.com',
       'studentExplorationSuggestions');
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       'user4@ExplorationSuggestions.com',
       'configExplorationSuggestions');
   });
 
-  it('accepts & rejects a suggestion on a published exploration', function() {
-    users.login('user1@ExplorationSuggestions.com');
-    workflow.createAndPublishExploration(
-      EXPLORATION_TITLE,
-      EXPLORATION_CATEGORY,
-      EXPLORATION_OBJECTIVE,
-      EXPLORATION_LANGUAGE);
-    users.logout();
+  it('accepts & rejects a suggestion on a published exploration',
+    async function() {
+      await users.login('user1@ExplorationSuggestions.com');
+      workflow.createAndPublishExploration(
+        EXPLORATION_TITLE,
+        EXPLORATION_CATEGORY,
+        EXPLORATION_OBJECTIVE,
+        EXPLORATION_LANGUAGE);
+      await users.logout();
 
-    // Suggester plays the exploration and suggests a change.
-    users.login('user2@ExplorationSuggestions.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE);
-    libraryPage.playExploration(EXPLORATION_TITLE);
+      // Suggester plays the exploration and suggests a change.
+      await users.login('user2@ExplorationSuggestions.com');
+      libraryPage.get();
+      libraryPage.findExploration(EXPLORATION_TITLE);
+      libraryPage.playExploration(EXPLORATION_TITLE);
 
-    var suggestion1 = 'New Exploration';
-    var suggestionDescription1 = 'Uppercased the first letter';
-    var suggestion2 = 'New exploration';
-    var suggestionDescription2 = 'Changed';
+      var suggestion1 = 'New Exploration';
+      var suggestionDescription1 = 'Uppercased the first letter';
+      var suggestion2 = 'New exploration';
+      var suggestionDescription2 = 'Changed';
 
-    explorationPlayerPage.submitSuggestion(
-      suggestion1, suggestionDescription1);
-    explorationPlayerPage.clickOnCloseSuggestionModalButton();
-    explorationPlayerPage.submitSuggestion(
-      suggestion2, suggestionDescription2);
-    users.logout();
+      explorationPlayerPage.submitSuggestion(
+        suggestion1, suggestionDescription1);
+      explorationPlayerPage.clickOnCloseSuggestionModalButton();
+      explorationPlayerPage.submitSuggestion(
+        suggestion2, suggestionDescription2);
+      await users.logout();
 
-    // Exploration author reviews the suggestion and accepts it.
-    users.login('user1@ExplorationSuggestions.com');
-    creatorDashboardPage.get();
-    creatorDashboardPage.navigateToExplorationEditor();
+      // Exploration author reviews the suggestion and accepts it.
+      await users.login('user1@ExplorationSuggestions.com');
+      creatorDashboardPage.get();
+      creatorDashboardPage.navigateToExplorationEditor();
 
-    explorationEditorPage.navigateToFeedbackTab();
-    explorationEditorFeedbackTab.getSuggestionThreads().then(
-      function(threads) {
-        expect(threads.length).toEqual(2);
-        expect(threads[0]).toMatch(suggestionDescription2);
-      });
-    explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription1);
-    explorationEditorFeedbackTab.goBackToAllFeedbacks();
-    explorationEditorFeedbackTab.rejectSuggestion(suggestionDescription2);
+      explorationEditorPage.navigateToFeedbackTab();
+      explorationEditorFeedbackTab.getSuggestionThreads().then(
+        function(threads) {
+          expect(threads.length).toEqual(2);
+          expect(threads[0]).toMatch(suggestionDescription2);
+        });
+      explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription1);
+      explorationEditorFeedbackTab.goBackToAllFeedbacks();
+      explorationEditorFeedbackTab.rejectSuggestion(suggestionDescription2);
 
-    explorationEditorPage.navigateToPreviewTab();
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
-    users.logout();
+      explorationEditorPage.navigateToPreviewTab();
+      explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
+      await users.logout();
 
-    // Student logs in and plays the exploration, finds the updated content.
-    users.login('user3@ExplorationSuggestions.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE);
-    libraryPage.playExploration(EXPLORATION_TITLE);
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
-    users.logout();
-  });
+      // Student logs in and plays the exploration, finds the updated content.
+      await users.login('user3@ExplorationSuggestions.com');
+      libraryPage.get();
+      libraryPage.findExploration(EXPLORATION_TITLE);
+      libraryPage.playExploration(EXPLORATION_TITLE);
+      explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
+      await users.logout();
+    });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);

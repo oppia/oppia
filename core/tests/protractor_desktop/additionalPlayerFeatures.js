@@ -48,7 +48,7 @@ describe('Full exploration editor', function() {
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -59,32 +59,33 @@ describe('Full exploration editor', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
 
-    users.createAndLoginAdminUser('superUser@stateEditor.com', 'superUser');
+    await users.createAndLoginAdminUser(
+      'superUser@stateEditor.com', 'superUser');
     // TODO(#7569): Change this test to work with the improvements tab.
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor',
       'Boolean', (elem) => elem.setValue(false));
-    users.logout();
+    await users.logout();
   });
 
   it('should walk through the tutorial when user repeatedly clicks Next',
-    function() {
-      users.createUser(
+    async function() {
+      await users.createUser(
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
-      users.login('userTutorial@stateEditor.com');
+      await users.login('userTutorial@stateEditor.com');
 
       workflow.createExplorationAndStartTutorial();
       explorationEditorMainTab.startTutorial();
       explorationEditorMainTab.playTutorial();
       explorationEditorMainTab.finishTutorial();
-      users.logout();
+      await users.logout();
     }
   );
 
   it('should reflect skills and goal in exploration editor settings',
-    function() {
-      users.createUser('user@editorAndPlayer.com', 'userEditorAndPlayer');
-      users.login('user@editorAndPlayer.com');
+    async function() {
+      await users.createUser('user@editorAndPlayer.com', 'userEditorAndPlayer');
+      await users.login('user@editorAndPlayer.com');
       const EXPLORATION_OBJECTIVE =
       'Let us learn how to add fractions in an amazing way';
       const EXPLORATION_TITLE = 'Fractions';
@@ -105,48 +106,50 @@ describe('Full exploration editor', function() {
         EXPLORATION_LANGUAGE,
         EXPLORATION_TAGS
       );
-      users.logout();
+      await users.logout();
     });
 
-  it('should report an exploration to moderators', function() {
+  it('should report an exploration to moderators', async function() {
     var EXPLORATION_OBJECTIVE = 'Let us learn how to add fractions';
-    users.createUser('creator@editorAndPlayer.com', 'creatorEditorAndPlayer');
-    users.login('creator@editorAndPlayer.com');
+    await users.createUser(
+      'creator@editorAndPlayer.com', 'creatorEditorAndPlayer');
+    await users.login('creator@editorAndPlayer.com');
     workflow.createAndPublishExploration(
       'Fractions',
       'Mathematics',
       EXPLORATION_OBJECTIVE,
       'English');
-    users.logout();
-    users.createUser('learner@editorAndPlayer.com', 'learner');
-    users.login('learner@editorAndPlayer.com');
+    await users.logout();
+    await users.createUser('learner@editorAndPlayer.com', 'learner');
+    await users.login('learner@editorAndPlayer.com');
     libraryPage.get();
     libraryPage.clickExplorationObjective();
     explorationPlayerPage.reportExploration();
   });
 
-  it('should let learners suggest changes to an exploration', function() {
-    users.createUser('creator2@editorAndPlayer.com', 'creator2EditorAndPlayer');
-    users.login('creator2@editorAndPlayer.com');
+  it('should let learners suggest changes to an exploration', async function() {
+    await users.createUser(
+      'creator2@editorAndPlayer.com', 'creator2EditorAndPlayer');
+    await users.login('creator2@editorAndPlayer.com');
     workflow.createAndPublishExploration('Adding Fractions', 'Mathematics',
       'Let us learn how to add fractions', 'English');
-    users.logout();
+    await users.logout();
 
-    users.createUser('learner2@editorAndPlayer.com', 'learner2');
-    users.login('learner2@editorAndPlayer.com');
+    await users.createUser('learner2@editorAndPlayer.com', 'learner2');
+    await users.login('learner2@editorAndPlayer.com');
     libraryPage.get();
     libraryPage.findExploration('Adding Fractions');
     libraryPage.playExploration('Adding Fractions');
     explorationPlayerPage.clickSuggestChangesButton();
     explorationPlayerPage.fillAndSubmitSuggestion(
       'Lets test the suggestion feature', 'Oh wow, It works!');
-    users.logout();
+    await users.logout();
   });
 
-  it('should prevent going back when help card is shown', function() {
-    users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
-    users.login('user2@editorAndPlayer.com');
-    workflow.createExploration();
+  it('should prevent going back when help card is shown', async function() {
+    await users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
+    await users.login('user2@editorAndPlayer.com');
+    await workflow.createExploration();
     explorationEditorMainTab.setStateName('card 1');
     explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
     explorationEditorMainTab.setInteraction('Continue');
@@ -181,70 +184,55 @@ describe('Full exploration editor', function() {
 
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToBeOver();
-    users.logout();
+    await users.logout();
   });
 
   it('should redirect back to parent exploration correctly when parent id is' +
-      ' given as query parameter', function() {
-    users.createUser('user1@editorAndPlayer.com', 'user1EditorAndPlayer');
-    users.login('user1@editorAndPlayer.com');
+      ' given as query parameter', async function() {
+    await users.createUser('user1@editorAndPlayer.com', 'user1EditorAndPlayer');
+    await users.login('user1@editorAndPlayer.com');
 
     workflow.createAndPublishExploration(
       'Parent Exploration 1',
       'Algebra',
       'This is the topmost parent exploration.');
-    general.getExplorationIdFromEditor().then(function(explorationId) {
-      var parentId1 = explorationId;
+    var parentId1 = await general.getExplorationIdFromEditor();
 
-      workflow.createAndPublishExploration(
-        'Parent Exploration 2',
-        'Algebra',
-        'This is the second parent exploration to which refresher ' +
-        'exploration redirects.');
-      general.getExplorationIdFromEditor().then(function(explorationId) {
-        var parentId2 = explorationId;
+    workflow.createAndPublishExploration(
+      'Parent Exploration 2',
+      'Algebra',
+      'This is the second parent exploration to which refresher ' +
+      'exploration redirects.');
+    var parentId2 = await general.getExplorationIdFromEditor();
 
-        workflow.createAndPublishExploration(
-          'Refresher Exploration',
-          'Algebra',
-          'This is the most basic refresher exploration');
-        general.getExplorationIdFromEditor().then(function(explorationId) {
-          var refresherExplorationId = explorationId;
+    workflow.createAndPublishExploration(
+      'Refresher Exploration',
+      'Algebra',
+      'This is the most basic refresher exploration');
 
-          browser.get('/explore/' + refresherExplorationId + '?parent=' +
-            parentId1 + '&parent=' + parentId2);
-          waitFor.pageToFullyLoad();
+    var refresherExplorationId = await general.getExplorationIdFromEditor();
 
-          explorationPlayerPage.clickOnReturnToParentButton();
+    await browser.get(
+      '/explore/' + refresherExplorationId + '?parent=' + parentId1 +
+      '&parent=' + parentId2);
+    waitFor.pageToFullyLoad();
 
-          browser.getCurrentUrl().then(function(url) {
-            var currentExplorationId = url.split('/')[4].split('?')[0];
-            expect(currentExplorationId).toBe(parentId2);
+    explorationPlayerPage.clickOnReturnToParentButton();
 
-            explorationPlayerPage.clickOnReturnToParentButton();
+    var url = await browser.getCurrentUrl();
+    var currentExplorationId = url.split('/')[4].split('?')[0];
+    expect(currentExplorationId).toBe(parentId2);
+    explorationPlayerPage.clickOnReturnToParentButton();
 
-            browser.getCurrentUrl().then(function(url) {
-              currentExplorationId = url.split('/')[4];
-              expect(currentExplorationId).toBe(parentId1);
-              users.logout();
-            }, function() {
-              // Note to developers:
-              // Promise is returned by getCurrentUrl which is handled here.
-              // No further action is needed.
-            });
-          }, function() {
-            // Note to developers:
-            // Promise is returned by getCurrentUrl which is handled here.
-            // No further action is needed.
-          });
-        });
-      });
-    });
+    url = await browser.getCurrentUrl();
+    currentExplorationId = url.split('/')[4];
+    expect(currentExplorationId).toBe(parentId1);
+    await users.logout();
   });
 
   it('should give option for redirection when author has specified ' +
-      'a refresher exploration Id', function() {
-    users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
+      'a refresher exploration Id', async function() {
+    await users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
 
     // Create Parent Exploration not added to collection.
     creatorDashboardPage.get();
@@ -314,20 +302,19 @@ describe('Full exploration editor', function() {
     explorationEditorPage.saveChanges();
     workflow.publishExploration();
     // Add refresher exploration's Id to both parent explorations.
-    general.getExplorationIdFromEditor().then(function(refresherExplorationId) {
-      creatorDashboardPage.get();
-      creatorDashboardPage.editExploration('Parent Exploration in collection');
-      responseEditor = explorationEditorMainTab.getResponseEditor('default');
-      responseEditor.setDestination(null, false, refresherExplorationId);
-      explorationEditorPage.saveChanges('Add Refresher Exploration Id');
+    var refresherExplorationId = await general.getExplorationIdFromEditor();
+    creatorDashboardPage.get();
+    creatorDashboardPage.editExploration('Parent Exploration in collection');
+    responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setDestination(null, false, refresherExplorationId);
+    explorationEditorPage.saveChanges('Add Refresher Exploration Id');
 
-      creatorDashboardPage.get();
-      creatorDashboardPage.editExploration(
-        'Parent Exploration not in collection');
-      responseEditor = explorationEditorMainTab.getResponseEditor('default');
-      responseEditor.setDestination(null, false, refresherExplorationId);
-      explorationEditorPage.saveChanges('Add Refresher Exploration Id');
-    });
+    creatorDashboardPage.get();
+    creatorDashboardPage.editExploration(
+      'Parent Exploration not in collection');
+    responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setDestination(null, false, refresherExplorationId);
+    explorationEditorPage.saveChanges('Add Refresher Exploration Id');
 
     // Create collection and add created exploration.
     creatorDashboardPage.get();
@@ -362,79 +349,76 @@ describe('Full exploration editor', function() {
     libraryPage.findCollection('Test Collection');
     libraryPage.playCollection('Test Collection');
     // Click first exploration in collection.
-    element.all(by.css(
+    await element.all(by.css(
       '.protractor-test-collection-exploration')).first().click();
     explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
     explorationPlayerPage.clickConfirmRedirectionButton();
     // Check the current url to see if collection_id is present in it.
-    browser.getCurrentUrl().then(function(url) {
-      var pathname = url.split('/');
-      expect(
-        pathname[4].split('?')[1].split('=')[0]).toEqual('collection_id');
-      users.logout();
-    }, function() {
-      // Note to developers:
-      // Promise is returned by getCurrentUrl which is handled here.
-      // No further action is needed.
+    var url = await browser.getCurrentUrl();
+    var pathname = url.split('/');
+    expect(
+      pathname[4].split('?')[1].split('=')[0]).toEqual('collection_id');
+    await users.logout();
+  });
+
+  it('should navigate multiple states correctly, with parameters',
+    async function() {
+      await users.createUser(
+        'user4@editorAndPlayer.com', 'user4EditorAndPlayer');
+      await users.login('user4@editorAndPlayer.com');
+
+      await workflow.createExploration();
+      explorationEditorMainTab.setStateName('card 1');
+      explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
+      explorationEditorMainTab.setInteraction('NumericInput');
+      explorationEditorMainTab.addResponse(
+        'NumericInput', null, 'final card', true, 'Equals', 21);
+      explorationEditorMainTab.getResponseEditor(0).setDestination(
+        'card 2', true, null);
+
+      explorationEditorMainTab.moveToState('card 2');
+      explorationEditorMainTab.setContent(forms.toRichText(
+        'this is card 2 with previous answer {{answer}}'));
+      explorationEditorMainTab.setInteraction(
+        'MultipleChoiceInput',
+        [forms.toRichText('return'), forms.toRichText('complete')]);
+      explorationEditorMainTab.addResponse(
+        'MultipleChoiceInput', null, 'card 1', false,
+        'Equals', 'return');
+      explorationEditorMainTab.getResponseEditor('default').setDestination(
+        'final card', false, null);
+      // Setup a terminating state.
+      explorationEditorMainTab.moveToState('final card');
+      explorationEditorMainTab.setInteraction('EndExploration');
+      explorationEditorPage.saveChanges();
+
+      general.moveToPlayer();
+      explorationPlayerPage.expectContentToMatch(
+        forms.toRichText('this is card 1'));
+      explorationPlayerPage.submitAnswer('NumericInput', 19);
+      explorationPlayerPage.submitAnswer('NumericInput', 21);
+      explorationPlayerPage.expectContentToMatch(forms.toRichText(
+        'this is card 2 with previous answer 21'));
+      explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'return');
+      explorationPlayerPage.expectContentToMatch(forms.toRichText(
+        'this is card 1'));
+      explorationPlayerPage.submitAnswer('NumericInput', 21);
+      explorationPlayerPage.expectContentToMatch(forms.toRichText(
+        'this is card 2 with previous answer 21'));
+      explorationPlayerPage.expectExplorationToNotBeOver();
+      explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'complete');
+      explorationPlayerPage.expectExplorationToBeOver();
+      await users.logout();
     });
-  });
 
-  it('should navigate multiple states correctly, with parameters', function() {
-    users.createUser('user4@editorAndPlayer.com', 'user4EditorAndPlayer');
-    users.login('user4@editorAndPlayer.com');
-
-    workflow.createExploration();
-    explorationEditorMainTab.setStateName('card 1');
-    explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
-    explorationEditorMainTab.setInteraction('NumericInput');
-    explorationEditorMainTab.addResponse(
-      'NumericInput', null, 'final card', true, 'Equals', 21);
-    explorationEditorMainTab.getResponseEditor(0).setDestination(
-      'card 2', true, null);
-
-    explorationEditorMainTab.moveToState('card 2');
-    explorationEditorMainTab.setContent(forms.toRichText(
-      'this is card 2 with previous answer {{answer}}'));
-    explorationEditorMainTab.setInteraction(
-      'MultipleChoiceInput',
-      [forms.toRichText('return'), forms.toRichText('complete')]);
-    explorationEditorMainTab.addResponse(
-      'MultipleChoiceInput', null, 'card 1', false,
-      'Equals', 'return');
-    explorationEditorMainTab.getResponseEditor('default').setDestination(
-      'final card', false, null);
-    // Setup a terminating state.
-    explorationEditorMainTab.moveToState('final card');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
-
-    general.moveToPlayer();
-    explorationPlayerPage.expectContentToMatch(
-      forms.toRichText('this is card 1'));
-    explorationPlayerPage.submitAnswer('NumericInput', 19);
-    explorationPlayerPage.submitAnswer('NumericInput', 21);
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(
-      'this is card 2 with previous answer 21'));
-    explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'return');
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(
-      'this is card 1'));
-    explorationPlayerPage.submitAnswer('NumericInput', 21);
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(
-      'this is card 2 with previous answer 21'));
-    explorationPlayerPage.expectExplorationToNotBeOver();
-    explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'complete');
-    explorationPlayerPage.expectExplorationToBeOver();
-    users.logout();
-  });
-
-  it('uses hints and solutions in an exploration', function() {
+  it('uses hints and solutions in an exploration', async function() {
     var explorationPlayerPage = (
       new ExplorationPlayerPage.ExplorationPlayerPage());
-    users.createUser('user1@hintsAndSolutions.com', 'hintsAndSolutions');
+    await users.createUser('user1@hintsAndSolutions.com', 'hintsAndSolutions');
 
     // Creator creates and publishes an exploration.
-    users.login('user1@hintsAndSolutions.com');
-    workflow.createExploration();
+    await users.login('user1@hintsAndSolutions.com');
+    await workflow.createExploration();
 
     explorationEditorMainTab.setStateName('Introduction');
     explorationEditorMainTab.setContent(
@@ -465,16 +449,16 @@ describe('Full exploration editor', function() {
     explorationPlayerPage.submitAnswer('TextInput', 'Finnish');
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToBeOver();
-    users.logout();
+    await users.logout();
   });
 
-  it('should play the recommended exploration successfully', function() {
-    users.createUser('user9@editorAndPlayer.com', 'user9editorAndPlayer');
-    users.createUser('user10@editorAndPlayer.com',
+  it('should play the recommended exploration successfully', async function() {
+    await users.createUser('user9@editorAndPlayer.com', 'user9editorAndPlayer');
+    await users.createUser('user10@editorAndPlayer.com',
       'user10editorAndPlayer');
-    users.login('user9@editorAndPlayer.com');
+    await users.login('user9@editorAndPlayer.com');
     // Publish new exploration.
-    workflow.createExploration();
+    await workflow.createExploration();
     explorationEditorMainTab.setContent(
       forms.toRichText('You should recommend this exploration'));
     explorationEditorMainTab.setInteraction('EndExploration');
@@ -486,31 +470,29 @@ describe('Full exploration editor', function() {
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.saveChanges();
     workflow.publishExploration();
-    users.logout();
+    await users.logout();
 
-    users.login('user10@editorAndPlayer.com');
+    await users.login('user10@editorAndPlayer.com');
     libraryPage.get();
     libraryPage.findExploration('Recommended Exploration 1');
     libraryPage.playExploration('Recommended Exploration 1');
     // Using the Id from Player and create a new exploration
     // and add the Id as suggestion.
-    general.getExplorationIdFromPlayer()
-      .then(function(recommendedExplorationId) {
-        workflow.createExploration();
-        explorationEditorMainTab.setContent(
-          forms.toRichText('I want to recommend an exploration at the end'));
-        explorationEditorMainTab.setInteraction(
-          'EndExploration', [recommendedExplorationId]);
-        explorationEditorPage.navigateToSettingsTab();
-        explorationEditorSettingsTab.setTitle(
-          'Exploration with Recommendation');
-        explorationEditorSettingsTab.setCategory('Algorithm');
-        explorationEditorSettingsTab.setObjective(
-          'To display recommended exploration');
-        explorationEditorPage.navigateToMainTab();
-        explorationEditorPage.saveChanges();
-        workflow.publishExploration();
-      });
+    var recommendedExplorationId = await general.getExplorationIdFromPlayer();
+    await workflow.createExploration();
+    explorationEditorMainTab.setContent(
+      forms.toRichText('I want to recommend an exploration at the end'));
+    explorationEditorMainTab.setInteraction(
+      'EndExploration', [recommendedExplorationId]);
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle(
+      'Exploration with Recommendation');
+    explorationEditorSettingsTab.setCategory('Algorithm');
+    explorationEditorSettingsTab.setObjective(
+      'To display recommended exploration');
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorPage.saveChanges();
+    workflow.publishExploration();
 
     // Play-test the exploration and visit the recommended exploration
     libraryPage.get();
@@ -520,10 +502,10 @@ describe('Full exploration editor', function() {
       by.css('.protractor-test-exp-summary-tile-title'));
     expect(recommendedExplorationTile.getText())
       .toEqual('Recommended Exploration 1');
-    recommendedExplorationTile.click();
+    await recommendedExplorationTile.click();
     explorationPlayerPage.expectExplorationNameToBe(
       'Recommended Exploration 1');
-    users.logout();
+    await users.logout();
   });
 
   afterEach(function() {

@@ -238,9 +238,9 @@ var ExplorationPlayerPage = function() {
     ).toMatch(richTextInstructions);
   };
 
-  this.expectExplorationNameToBe = function(name) {
+  this.expectExplorationNameToBe = async function(name) {
     expect(
-      explorationHeader.getText()
+      await explorationHeader.getText()
     ).toBe(name);
   };
 
@@ -251,19 +251,17 @@ var ExplorationPlayerPage = function() {
     });
   };
 
-  this.rateExploration = function(ratingValue) {
-    ratingStars.then(function(elements) {
-      waitFor.elementToBeClickable(
-        elements[ratingValue - 1],
-        'Rating Star takes too long to be clickable');
-      elements[ratingValue - 1].click();
-      waitFor.elementToBeClickable(
-        feedbackCloseButton, 'Close Feedback button is not clickable');
-      feedbackCloseButton.click();
-
-      waitFor.invisibilityOf(
-        feedbackCloseButton, 'Close Feedback button does not disappear');
-    });
+  this.rateExploration = async function(ratingValue) {
+    var elements = await ratingStars;
+    await waitFor.elementToBeClickable(
+      elements[ratingValue - 1],
+      'Rating Star takes too long to be clickable');
+    await elements[ratingValue - 1].click();
+    await waitFor.elementToBeClickable(
+      feedbackCloseButton, 'Close Feedback button is not clickable');
+    await feedbackCloseButton.click();
+    await waitFor.invisibilityOf(
+      feedbackCloseButton, 'Close Feedback button does not disappear');
   };
 
   // `answerData` is a variable that is passed to the
@@ -286,16 +284,16 @@ var ExplorationPlayerPage = function() {
     answerDetailsSubmitButton.click();
   };
 
-  this.submitFeedback = function(feedback) {
-    waitFor.elementToBeClickable(
+  this.submitFeedback = async function(feedback) {
+    await waitFor.elementToBeClickable(
       feedbackPopupLink, 'Feedback Popup link takes too long to be clickable');
-    feedbackPopupLink.click();
-    feedbackTextArea.sendKeys(feedback);
-    waitFor.elementToBeClickable(
+    await feedbackPopupLink.click();
+    await feedbackTextArea.sendKeys(feedback);
+    await waitFor.elementToBeClickable(
       feedbackSubmitButton,
       'Feedback Submit button takes too long to be clickable');
-    feedbackSubmitButton.click();
-    waitFor.invisibilityOf(
+    await feedbackSubmitButton.click();
+    await waitFor.invisibilityOf(
       feedbackSubmitButton, 'Feedback popup takes too long to disappear');
   };
 

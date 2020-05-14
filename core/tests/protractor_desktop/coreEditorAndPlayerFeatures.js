@@ -63,12 +63,12 @@ describe('Enable correctness feedback and set correctness', function() {
     explorationPlayerPage.expectExplorationToBeOver();
   };
 
-  beforeAll(function() {
-    users.createUser('user@markCorrect.com', 'userMarkCorrect');
-    users.login('user@markCorrect.com');
+  beforeAll(async function() {
+    await users.createUser('user@markCorrect.com', 'userMarkCorrect');
+    await users.login('user@markCorrect.com');
   });
 
-  beforeEach(function() {
+  beforeEach(async function() {
     explorationTitle = EXPLORATION_TITLE + String(currentExplorationIndex);
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
@@ -76,7 +76,7 @@ describe('Enable correctness feedback and set correctness', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    workflow.createExploration();
+    await workflow.createExploration();
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.setTitle(explorationTitle);
     explorationEditorSettingsTab.setCategory('Algorithm');
@@ -150,7 +150,7 @@ describe('Enable correctness feedback and set correctness', function() {
   });
 
   it('should allow selecting correct feedback from the default response editor',
-    function() {
+    async function() {
       // Turn on correctness feedback first.
       enableCorrectnessFeedbackSetting();
 
@@ -175,7 +175,7 @@ describe('Enable correctness feedback and set correctness', function() {
       testEnableCorrectnessInPlayerPage();
     });
 
-  it('should show Learn Again button correctly', function() {
+  it('should show Learn Again button correctly', async function() {
     // Turn on correctness feedback first.
     enableCorrectnessFeedbackSetting();
 
@@ -264,21 +264,21 @@ describe('Core exploration functionality', function() {
   var explorationEditorSettingsTab = null;
   var userNumber = 1;
 
-  beforeEach(function() {
+  beforeEach(async function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
 
-    users.createUser(
+    await users.createUser(
       `user${userNumber}@stateEditor.com`, `user${userNumber}StateEditor`);
-    users.login(`user${userNumber}@stateEditor.com`);
-    workflow.createExploration();
+    await users.login(`user${userNumber}@stateEditor.com`);
+    await workflow.createExploration();
 
     userNumber++;
   });
 
-  it('should display plain text content', function() {
+  it('should display plain text content', async function() {
     explorationEditorMainTab.setContent(forms.toRichText('plain text'));
     explorationEditorMainTab.setInteraction('Continue', 'click here');
     explorationEditorMainTab.getResponseEditor('default')
@@ -297,75 +297,77 @@ describe('Core exploration functionality', function() {
     explorationPlayerPage.expectExplorationToBeOver();
   });
 
-  it('should create content and multiple choice interactions', function() {
-    explorationEditorMainTab.setContent(function(richTextEditor) {
-      richTextEditor.appendBoldText('bold text');
-      richTextEditor.appendPlainText(' ');
-      richTextEditor.appendItalicText('italic text');
-      richTextEditor.appendPlainText(' ');
-      richTextEditor.appendPlainText(' ');
-      richTextEditor.appendOrderedList(['entry 1', 'entry 2']);
-      richTextEditor.appendUnorderedList(['an entry', 'another entry']);
-    });
-    explorationEditorMainTab.setInteraction(
-      'MultipleChoiceInput',
-      [forms.toRichText('option A'), forms.toRichText('option B')]);
-    explorationEditorMainTab.getResponseEditor('default').setDestination(
-      'final card', true, null);
-
-    // Setup a terminating state.
-    explorationEditorMainTab.moveToState('final card');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
-
-    general.moveToPlayer();
-    explorationPlayerPage.expectExplorationToNotBeOver();
-    explorationPlayerPage.expectInteractionToMatch(
-      'MultipleChoiceInput', ['option A', 'option B']);
-    explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'option B');
-    explorationPlayerPage.expectExplorationToBeOver();
-  });
-
-  it('should obey numeric interaction rules and display feedback', function() {
-    explorationEditorMainTab.setContent(forms.toRichText('some content'));
-    explorationEditorMainTab.setInteraction('NumericInput');
-    explorationEditorMainTab.addResponse('NumericInput',
-      function(richTextEditor) {
-        richTextEditor.appendBoldText('correct');
-      }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
-    explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
-      'NumericInput', 'IsInclusivelyBetween', [-1, 3]);
-    explorationEditorMainTab.getResponseEditor(0)
-      .expectFeedbackInstructionToBe('correct');
-    explorationEditorMainTab.getResponseEditor('default').setFeedback(
-      forms.toRichText('out of bounds'));
-    explorationEditorMainTab.getResponseEditor('default')
-      .expectFeedbackInstructionToBe('out of bounds');
-    explorationEditorMainTab.getResponseEditor('default').setDestination(
-      null, false, null);
-
-    // Setup a terminating state.
-
-    explorationEditorMainTab.moveToState('final card');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
-
-    general.moveToPlayer();
-    explorationPlayerPage.submitAnswer('NumericInput', 5);
-    explorationPlayerPage.expectLatestFeedbackToMatch(
-      forms.toRichText('out of bounds')
-    );
-    explorationPlayerPage.expectExplorationToNotBeOver();
-    // It's important to test the value 0 in order to ensure that it would
-    // still get submitted even though it is a falsy value in JavaScript.
-    explorationPlayerPage.submitAnswer('NumericInput', 0);
-    explorationPlayerPage.expectLatestFeedbackToMatch(
-      function(richTextChecker) {
-        richTextChecker.readBoldText('correct');
+  it('should create content and multiple choice interactions',
+    async function() {
+      explorationEditorMainTab.setContent(function(richTextEditor) {
+        richTextEditor.appendBoldText('bold text');
+        richTextEditor.appendPlainText(' ');
+        richTextEditor.appendItalicText('italic text');
+        richTextEditor.appendPlainText(' ');
+        richTextEditor.appendPlainText(' ');
+        richTextEditor.appendOrderedList(['entry 1', 'entry 2']);
+        richTextEditor.appendUnorderedList(['an entry', 'another entry']);
       });
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.expectExplorationToBeOver();
-  });
+      explorationEditorMainTab.setInteraction(
+        'MultipleChoiceInput',
+        [forms.toRichText('option A'), forms.toRichText('option B')]);
+      explorationEditorMainTab.getResponseEditor('default').setDestination(
+        'final card', true, null);
+
+      // Setup a terminating state.
+      explorationEditorMainTab.moveToState('final card');
+      explorationEditorMainTab.setInteraction('EndExploration');
+      explorationEditorPage.saveChanges();
+
+      general.moveToPlayer();
+      explorationPlayerPage.expectExplorationToNotBeOver();
+      explorationPlayerPage.expectInteractionToMatch(
+        'MultipleChoiceInput', ['option A', 'option B']);
+      explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'option B');
+      explorationPlayerPage.expectExplorationToBeOver();
+    });
+
+  it('should obey numeric interaction rules and display feedback',
+    async function() {
+      explorationEditorMainTab.setContent(forms.toRichText('some content'));
+      explorationEditorMainTab.setInteraction('NumericInput');
+      explorationEditorMainTab.addResponse('NumericInput',
+        function(richTextEditor) {
+          richTextEditor.appendBoldText('correct');
+        }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
+      explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
+        'NumericInput', 'IsInclusivelyBetween', [-1, 3]);
+      explorationEditorMainTab.getResponseEditor(0)
+        .expectFeedbackInstructionToBe('correct');
+      explorationEditorMainTab.getResponseEditor('default').setFeedback(
+        forms.toRichText('out of bounds'));
+      explorationEditorMainTab.getResponseEditor('default')
+        .expectFeedbackInstructionToBe('out of bounds');
+      explorationEditorMainTab.getResponseEditor('default').setDestination(
+        null, false, null);
+
+      // Setup a terminating state.
+
+      explorationEditorMainTab.moveToState('final card');
+      explorationEditorMainTab.setInteraction('EndExploration');
+      explorationEditorPage.saveChanges();
+
+      general.moveToPlayer();
+      explorationPlayerPage.submitAnswer('NumericInput', 5);
+      explorationPlayerPage.expectLatestFeedbackToMatch(
+        forms.toRichText('out of bounds')
+      );
+      explorationPlayerPage.expectExplorationToNotBeOver();
+      // It's important to test the value 0 in order to ensure that it would
+      // still get submitted even though it is a falsy value in JavaScript.
+      explorationPlayerPage.submitAnswer('NumericInput', 0);
+      explorationPlayerPage.expectLatestFeedbackToMatch(
+        function(richTextChecker) {
+          richTextChecker.readBoldText('correct');
+        });
+      explorationPlayerPage.clickThroughToNextCard();
+      explorationPlayerPage.expectExplorationToBeOver();
+    });
 
   it('should skip the customization modal for interactions having no ' +
       'customization options', function() {
@@ -381,7 +383,7 @@ describe('Core exploration functionality', function() {
   });
 
   it('should open appropriate modal on re-clicking an interaction to ' +
-     'customize it', function() {
+     'customize it', async function() {
     explorationEditorMainTab.setContent(forms.toRichText('some content'));
 
     // Numeric input does not have any customization arguments. Therefore, on
@@ -389,11 +391,11 @@ describe('Core exploration functionality', function() {
     // does not have any customization options. To dismiss this modal, user
     // clicks 'Okay' implying that he/she has got the message.
     explorationEditorMainTab.setInteraction('NumericInput');
-    element(by.css('.protractor-test-interaction')).click();
+    await element(by.css('.protractor-test-interaction')).click();
     var okayBtn = element(
       by.css('.protractor-test-close-no-customization-modal'));
     expect(okayBtn.isPresent()).toBe(true);
-    okayBtn.click();
+    await okayBtn.click();
 
     // Continue input has customization options. Therefore, on re-clicking, a
     // modal opens up containing the customization arguments for this input.
@@ -401,15 +403,15 @@ describe('Core exploration functionality', function() {
     // button.
     explorationEditorMainTab.deleteInteraction();
     explorationEditorMainTab.setInteraction('Continue');
-    element(by.css('.protractor-test-interaction')).click();
+    await element(by.css('.protractor-test-interaction')).click();
     var saveInteractionBtn = element(
       by.css('.protractor-test-save-interaction'));
     expect(saveInteractionBtn.isPresent()).toBe(true);
-    saveInteractionBtn.click();
+    await saveInteractionBtn.click();
   });
 
   it('should correctly display contents, rule parameters, feedback' +
-  ' instructions and newly created state', function() {
+    ' instructions and newly created state', function() {
     // Verify exploration's text content.
     explorationEditorMainTab.setContent(forms.toRichText('Happiness Checker'));
     explorationEditorMainTab.expectContentToMatch(
@@ -440,7 +442,7 @@ describe('Core exploration functionality', function() {
     explorationEditorPage.saveChanges();
   });
 
-  it('should be able to edit title', function() {
+  it('should be able to edit title', async function() {
     explorationEditorPage.navigateToSettingsTab();
 
     explorationEditorSettingsTab.expectTitleToBe('');
@@ -450,7 +452,7 @@ describe('Core exploration functionality', function() {
     explorationEditorSettingsTab.expectTitleToBe('title1');
   });
 
-  it('should be able to edit goal', function() {
+  it('should be able to edit goal', async function() {
     explorationEditorPage.navigateToSettingsTab();
 
     explorationEditorSettingsTab.expectObjectiveToBe('');
@@ -460,7 +462,7 @@ describe('Core exploration functionality', function() {
     explorationEditorSettingsTab.expectObjectiveToBe('It is just a test.');
   });
 
-  it('should show warnings when the length of goal < 15', function() {
+  it('should show warnings when the length of goal < 15', async function() {
     explorationEditorPage.navigateToSettingsTab();
 
     // Color grey when there is no warning, red when there is a warning
@@ -471,15 +473,16 @@ describe('Core exploration functionality', function() {
       'rgba(169, 68, 66, 1)');
   });
 
-  it('should be able to select category from the dropdown menu', function() {
-    explorationEditorPage.navigateToSettingsTab();
+  it('should be able to select category from the dropdown menu',
+    async function() {
+      explorationEditorPage.navigateToSettingsTab();
 
-    explorationEditorSettingsTab.expectCategoryToBe('');
-    explorationEditorSettingsTab.setCategory('Biology');
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.expectCategoryToBe('Biology');
-  });
+      explorationEditorSettingsTab.expectCategoryToBe('');
+      explorationEditorSettingsTab.setCategory('Biology');
+      explorationEditorPage.navigateToMainTab();
+      explorationEditorPage.navigateToSettingsTab();
+      explorationEditorSettingsTab.expectCategoryToBe('Biology');
+    });
 
   it('should be able to create new category which is not' +
   ' in the dropdown menu', function() {
@@ -492,17 +495,18 @@ describe('Core exploration functionality', function() {
     explorationEditorSettingsTab.expectCategoryToBe('New');
   });
 
-  it('should be able to select language from the dropdown menu', function() {
-    explorationEditorPage.navigateToSettingsTab();
+  it('should be able to select language from the dropdown menu',
+    async function() {
+      explorationEditorPage.navigateToSettingsTab();
 
-    explorationEditorSettingsTab.expectLanguageToBe('English');
-    explorationEditorSettingsTab.setLanguage('italiano (Italian)');
-    explorationEditorPage.navigateToMainTab();
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.expectLanguageToBe('italiano (Italian)');
-  });
+      explorationEditorSettingsTab.expectLanguageToBe('English');
+      explorationEditorSettingsTab.setLanguage('italiano (Italian)');
+      explorationEditorPage.navigateToMainTab();
+      explorationEditorPage.navigateToSettingsTab();
+      explorationEditorSettingsTab.expectLanguageToBe('italiano (Italian)');
+    });
 
-  it('should change the first card of the exploration', function() {
+  it('should change the first card of the exploration', async function() {
     explorationEditorMainTab.setStateName('card 1');
     explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
     explorationEditorMainTab.setInteraction('Continue');
@@ -517,8 +521,8 @@ describe('Core exploration functionality', function() {
     explorationEditorSettingsTab.expectFirstStateToBe('card 2');
   });
 
-  afterEach(function() {
+  afterEach(async function() {
     general.checkForConsoleErrors([]);
-    users.logout();
+    await users.logout();
   });
 });

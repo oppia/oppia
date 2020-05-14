@@ -106,7 +106,7 @@ describe('Embedding', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('should display and play embedded explorations', function() {
+  it('should display and play embedded explorations', async function() {
     var TEST_PAGES = [{
       filename: 'embedding_tests_dev_0.0.1.min.html',
       isVersion1: true
@@ -138,123 +138,121 @@ describe('Embedding', function() {
       'Exploration completed'
     ];
 
-    users.createUser('user1@embedding.com', 'user1Embedding');
-    users.login('user1@embedding.com', true);
+    await users.createUser('user1@embedding.com', 'user1Embedding');
+    await users.login('user1@embedding.com', true);
 
     // Create exploration.
     // Version 1 is creation of the exploration.
-    workflow.createExploration();
-    general.getExplorationIdFromEditor().then(function(expId) {
-      var explorationId = expId;
-      // Create Version 2 of the exploration.
-      createCountingExploration();
+    await workflow.createExploration();
+    var explorationId = await general.getExplorationIdFromEditor();
+    // Create Version 2 of the exploration.
+    createCountingExploration();
 
-      general.openEditor(explorationId);
-      explorationEditorMainTab.setContent(forms.toRichText('Version 3'));
-      explorationEditorPage.saveChanges('demonstration edit');
+    general.openEditor(explorationId);
+    explorationEditorMainTab.setContent(forms.toRichText('Version 3'));
+    explorationEditorPage.saveChanges('demonstration edit');
 
-      for (var i = 0; i < TEST_PAGES.length; i++) {
-        // This is necessary as the pages are non-angular.
-        var driver = browser.driver;
-        driver.get(
-          general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
-          TEST_PAGES[i].filename);
-
-        driver.findElement(by.css(
-          '.protractor-test-exploration-id-input-field')
-        ).sendKeys(explorationId);
-
-        driver.findElement(by.css(
-          '.protractor-test-exploration-id-submit-button')
-        ).click();
-
-        // Test of standard loading (new and old versions).
-        browser.switchTo().frame(
-          driver.findElement(
-            by.css('.protractor-test-standard > iframe')));
-        playCountingExploration(3);
-        browser.switchTo().defaultContent();
-
-        if (TEST_PAGES[i].isVersion1) {
-          // Test of deferred loading (old version).
-          driver.findElement(
-            by.css('.protractor-test-old-version > oppia > div > button')
-          ).click();
-        }
-
-        browser.switchTo().frame(
-          driver.findElement(
-            by.css('.protractor-test-old-version > iframe')));
-        playCountingExploration(2);
-        browser.switchTo().defaultContent();
-      }
-
-      // Certain events in the exploration playthroughs should trigger hook
-      // functions in the outer page; these send logs to the console which we
-      // now check to ensure that the hooks work correctly.
-      browser.manage().logs().get('browser').then(function(browserLogs) {
-        var embeddingLogs = [];
-        for (var i = 0; i < browserLogs.length; i++) {
-          // We ignore all logs that are not of the desired form.
-          try {
-            var message = browserLogs[i].message;
-            var EMBEDDING_PREFIX = 'Embedding test: ';
-            if (message.indexOf(EMBEDDING_PREFIX) !== -1) {
-              var index = message.indexOf(EMBEDDING_PREFIX);
-              // The "-1" in substring() removes the trailing quotation mark.
-              embeddingLogs.push(message.substring(
-                index + EMBEDDING_PREFIX.length, message.length - 1));
-            }
-          } catch (err) {}
-        }
-
-        // We played the exploration twice for each test page.
-        var expectedLogs = [];
-        for (var i = 0; i < TEST_PAGES.length; i++) {
-          if (TEST_PAGES[i].isVersion1) {
-            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS);
-            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS);
-          } else {
-            // The two loading events are fired first ...
-            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[0]);
-            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[0]);
-            // ... followed by the rest of the events, as each playthrough
-            // occurs.
-            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[1]);
-            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[2]);
-            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[3]);
-            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[1]);
-            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[2]);
-            expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[3]);
-          }
-        }
-        expect(embeddingLogs).toEqual(expectedLogs);
-      });
-
-      users.logout();
-      general.checkForConsoleErrors([]);
-    });
-  });
-
-  it('should use the exploration language as site language.', function() {
-    // Opens the test file and checks the placeholder in the exploration is
-    // correct.
-    var explorationId = null;
-    var checkPlaceholder = function(expectedPlaceholder) {
+    for (var i = 0; i < TEST_PAGES.length; i++) {
+      // This is necessary as the pages are non-angular.
       var driver = browser.driver;
-      driver.get(
+      await driver.get(
         general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
-        'embedding_tests_dev_i18n_0.0.1.html');
+        TEST_PAGES[i].filename);
 
-      driver.findElement(by.css(
+      await driver.findElement(by.css(
         '.protractor-test-exploration-id-input-field')
       ).sendKeys(explorationId);
 
-      driver.findElement(by.css(
+      await driver.findElement(by.css(
         '.protractor-test-exploration-id-submit-button')
       ).click();
 
-      browser.switchTo().frame(driver.findElement(
+      // Test of standard loading (new and old versions).
+      await browser.switchTo().frame(
+        driver.findElement(
+          by.css('.protractor-test-standard > iframe')));
+      playCountingExploration(3);
+      browser.switchTo().defaultContent();
+
+      if (TEST_PAGES[i].isVersion1) {
+        // Test of deferred loading (old version).
+        await driver.findElement(
+          by.css('.protractor-test-old-version > oppia > div > button')
+        ).click();
+      }
+
+      browser.switchTo().frame(
+        driver.findElement(
+          by.css('.protractor-test-old-version > iframe')));
+      playCountingExploration(2);
+      await browser.switchTo().defaultContent();
+    }
+
+    // Certain events in the exploration playthroughs should trigger hook
+    // functions in the outer page; these send logs to the console which we
+    // now check to ensure that the hooks work correctly.
+    browser.manage().logs().get('browser').then(function(browserLogs) {
+      var embeddingLogs = [];
+      for (var i = 0; i < browserLogs.length; i++) {
+        // We ignore all logs that are not of the desired form.
+        try {
+          var message = browserLogs[i].message;
+          var EMBEDDING_PREFIX = 'Embedding test: ';
+          if (message.indexOf(EMBEDDING_PREFIX) !== -1) {
+            var index = message.indexOf(EMBEDDING_PREFIX);
+            // The "-1" in substring() removes the trailing quotation mark.
+            embeddingLogs.push(message.substring(
+              index + EMBEDDING_PREFIX.length, message.length - 1));
+          }
+        } catch (err) {}
+      }
+
+      // We played the exploration twice for each test page.
+      var expectedLogs = [];
+      for (var i = 0; i < TEST_PAGES.length; i++) {
+        if (TEST_PAGES[i].isVersion1) {
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS);
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS);
+        } else {
+          // The two loading events are fired first ...
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[0]);
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[0]);
+          // ... followed by the rest of the events, as each playthrough
+          // occurs.
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[1]);
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[2]);
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[3]);
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[1]);
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[2]);
+          expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS[3]);
+        }
+      }
+      expect(embeddingLogs).toEqual(expectedLogs);
+    });
+
+    await users.logout();
+    general.checkForConsoleErrors([]);
+  });
+
+  it('should use the exploration language as site language.', async function() {
+    // Opens the test file and checks the placeholder in the exploration is
+    // correct.
+    var explorationId = null;
+    var checkPlaceholder = async function(expectedPlaceholder) {
+      var driver = browser.driver;
+      await driver.get(
+        general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
+        'embedding_tests_dev_i18n_0.0.1.html');
+
+      await driver.findElement(by.css(
+        '.protractor-test-exploration-id-input-field')
+      ).sendKeys(explorationId);
+
+      await driver.findElement(by.css(
+        '.protractor-test-exploration-id-submit-button')
+      ).click();
+
+      await browser.switchTo().frame(driver.findElement(
         by.css('.protractor-test-embedded-exploration > iframe')));
       waitFor.pageToFullyLoad();
 
@@ -269,68 +267,66 @@ describe('Embedding', function() {
       browser.switchTo().defaultContent();
     };
 
-    users.createUser('embedder2@example.com', 'Embedder2');
-    users.login('embedder2@example.com', true);
+    await users.createUser('embedder2@example.com', 'Embedder2');
+    await users.login('embedder2@example.com', true);
 
     // Create an exploration.
-    workflow.createExploration();
-    general.getExplorationIdFromEditor().then(function(expId) {
-      explorationId = expId;
+    await workflow.createExploration();
+    explorationId = await general.getExplorationIdFromEditor();
 
-      explorationEditorMainTab.setContent(forms.toRichText('Language Test'));
-      explorationEditorMainTab.setInteraction('NumericInput');
-      explorationEditorMainTab.addResponse(
-        'NumericInput', forms.toRichText('Nice!!'),
-        'END', true, 'IsLessThanOrEqualTo', 0);
-      explorationEditorMainTab.getResponseEditor('default').setFeedback(
-        forms.toRichText('Ok!!'));
-      explorationEditorMainTab.getResponseEditor('default').setDestination(
-        '(try again)', null, false);
-      // editor.setDefaultOutcome(forms.toRichText('Ok!!'), null, false);
+    explorationEditorMainTab.setContent(forms.toRichText('Language Test'));
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse(
+      'NumericInput', forms.toRichText('Nice!!'),
+      'END', true, 'IsLessThanOrEqualTo', 0);
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Ok!!'));
+    explorationEditorMainTab.getResponseEditor('default').setDestination(
+      '(try again)', null, false);
+    // editor.setDefaultOutcome(forms.toRichText('Ok!!'), null, false);
 
-      explorationEditorMainTab.moveToState('END');
-      explorationEditorMainTab.setContent(forms.toRichText('END'));
-      explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorMainTab.moveToState('END');
+    explorationEditorMainTab.setContent(forms.toRichText('END'));
+    explorationEditorMainTab.setInteraction('EndExploration');
 
-      // Save changes.
-      var title = 'Language Test';
-      var category = 'Languages';
-      var objective = 'This is a Language Test for valid and invalid.';
-      explorationEditorPage.navigateToSettingsTab();
-      explorationEditorSettingsTab.setTitle(title);
-      explorationEditorSettingsTab.setCategory(category);
-      explorationEditorSettingsTab.setObjective(objective);
-      explorationEditorPage.saveChanges('Done!');
+    // Save changes.
+    var title = 'Language Test';
+    var category = 'Languages';
+    var objective = 'This is a Language Test for valid and invalid.';
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle(title);
+    explorationEditorSettingsTab.setCategory(category);
+    explorationEditorSettingsTab.setObjective(objective);
+    explorationEditorPage.saveChanges('Done!');
 
-      // Publish changes.
-      workflow.publishExploration();
+    // Publish changes.
+    workflow.publishExploration();
 
-      // Change language to Thai, which is not a supported site language.
-      general.openEditor(explorationId);
-      explorationEditorPage.navigateToSettingsTab();
-      explorationEditorSettingsTab.setLanguage('ภาษาไทย');
-      explorationEditorPage.saveChanges(
-        'Changing the language to a not supported one.');
-      // We expect the default language, English.
-      checkPlaceholder('Type a number');
+    // Change language to Thai, which is not a supported site language.
+    general.openEditor(explorationId);
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setLanguage('ภาษาไทย');
+    explorationEditorPage.saveChanges(
+      'Changing the language to a not supported one.');
+    // We expect the default language, English.
+    await checkPlaceholder('Type a number');
 
-      // Change language to Spanish, which is a supported site language.
-      general.openEditor(explorationId);
-      explorationEditorPage.navigateToSettingsTab();
-      explorationEditorSettingsTab.setLanguage('español');
-      explorationEditorPage.saveChanges(
-        'Changing the language to a supported one.');
-      checkPlaceholder('Ingresa un número');
+    // Change language to Spanish, which is a supported site language.
+    general.openEditor(explorationId);
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setLanguage('español');
+    explorationEditorPage.saveChanges(
+      'Changing the language to a supported one.');
+    await checkPlaceholder('Ingresa un número');
 
-      users.logout();
+    await users.logout();
 
-      // This error is to be ignored as 'idToBeReplaced' is not a valid
-      // exploration id. It appears just after the page loads.
-      var errorToIgnore = 'http:\/\/localhost:9001\/assets\/' +
-        'scripts\/embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
-        '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
-        'locale=en#version=0.0.1&secret=';
-      general.checkForConsoleErrors([errorToIgnore]);
-    });
+    // This error is to be ignored as 'idToBeReplaced' is not a valid
+    // exploration id. It appears just after the page loads.
+    var errorToIgnore = 'http:\/\/localhost:9001\/assets\/' +
+      'scripts\/embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
+      '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
+      'locale=en#version=0.0.1&secret=';
+    general.checkForConsoleErrors([errorToIgnore]);
   });
 });

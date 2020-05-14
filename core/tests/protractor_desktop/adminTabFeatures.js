@@ -27,11 +27,13 @@ describe('Admin Page', function() {
     adminPage = new AdminPage.AdminPage();
   });
 
-  it('should allow assigning roles and show them', function() {
-    users.createUser('moderator1@adminTab.com', 'moderator1');
-    users.createUser('moderator2@adminTab.com', 'moderator2');
-    users.createUser('collectionEdtior1@adminTab.com', 'collectionEditor1');
-    users.createAndLoginAdminUser('management@adminTab.com', 'management');
+  it('should allow assigning roles and show them', async function() {
+    await users.createUser('moderator1@adminTab.com', 'moderator1');
+    await users.createUser('moderator2@adminTab.com', 'moderator2');
+    await users.createUser(
+      'collectionEdtior1@adminTab.com', 'collectionEditor1');
+    await users.createAndLoginAdminUser(
+      'management@adminTab.com', 'management');
     adminPage.get();
     adminPage.updateRole('moderator1', 'moderator');
     adminPage.viewRolesbyUsername('moderator1');
@@ -49,11 +51,11 @@ describe('Admin Page', function() {
     adminPage.updateRole('collectionEditor1', 'collection editor');
     adminPage.getUsersAsssignedToRole('collection editor');
     adminPage.expectUsernamesToMatch(['collectionEditor1']);
-    users.logout();
+    await users.logout();
   });
 
-  it('should run,verify and stop one-off jobs', function() {
-    users.createAndLoginAdminUser('adminA@adminTab.com', 'alphaMan');
+  it('should run,verify and stop one-off jobs', async function() {
+    await users.createAndLoginAdminUser('adminA@adminTab.com', 'alphaMan');
     adminPage.getJobsTab();
 
     // The following jobs are selected arbitrarily.

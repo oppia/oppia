@@ -53,23 +53,23 @@ describe('Creator dashboard functionality', function() {
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
-  it('should display correct stats on dashboard', function() {
+  it('should display correct stats on dashboard', async function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
-    // Create required users.
-    users.createUser(
+    // Create required await users.
+    await users.createUser(
       'user1@creatorDashboard.com',
       'creatorDashboardOwner');
-    users.createUser(
+    await users.createUser(
       'user2@creatorDashboard.com',
       'learner2');
-    users.createUser(
+    await users.createUser(
       'user3@creatorDashboard.com',
       'learner3');
-    users.createUser(
+    await users.createUser(
       'user4@creatorDashboard.com',
       'learner4');
 
-    users.login('user1@creatorDashboard.com');
+    await users.login('user1@creatorDashboard.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE_1,
       EXPLORATION_CATEGORY,
@@ -83,7 +83,7 @@ describe('Creator dashboard functionality', function() {
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
 
-    users.login('user2@creatorDashboard.com');
+    await users.login('user2@creatorDashboard.com');
     subscriptionDashboardPage.navigateToUserSubscriptionPage(
       'creatorDashboardOwner');
     subscriptionDashboardPage.navigateToSubscriptionButton();
@@ -91,25 +91,25 @@ describe('Creator dashboard functionality', function() {
     libraryPage.findExploration(EXPLORATION_TITLE_1);
     libraryPage.playExploration(EXPLORATION_TITLE_1);
     explorationPlayerPage.rateExploration(3);
-    users.logout();
+    await users.logout();
 
-    users.login('user3@creatorDashboard.com');
+    await users.login('user3@creatorDashboard.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE_1);
     libraryPage.playExploration(EXPLORATION_TITLE_1);
     explorationPlayerPage.rateExploration(5);
     explorationPlayerPage.submitFeedback(feedback);
-    users.logout();
+    await users.logout();
 
-    users.login('user1@creatorDashboard.com');
+    await users.login('user1@creatorDashboard.com');
     creatorDashboardPage.get();
     expect(creatorDashboardPage.getAverageRating()).toEqual('4');
     expect(creatorDashboardPage.getTotalPlays()).toEqual('2');
     expect(creatorDashboardPage.getOpenFeedbacks()).toEqual('1');
     expect(creatorDashboardPage.getSubscribers()).toEqual('1');
-    users.logout();
+    await users.logout();
 
-    users.login('user4@creatorDashboard.com');
+    await users.login('user4@creatorDashboard.com');
     subscriptionDashboardPage.navigateToUserSubscriptionPage(
       'creatorDashboardOwner');
     subscriptionDashboardPage.navigateToSubscriptionButton();
@@ -118,31 +118,31 @@ describe('Creator dashboard functionality', function() {
     libraryPage.playExploration(EXPLORATION_TITLE_2);
     explorationPlayerPage.rateExploration(4);
     explorationPlayerPage.submitFeedback(feedback);
-    users.logout();
+    await users.logout();
 
-    users.login('user1@creatorDashboard.com');
+    await users.login('user1@creatorDashboard.com');
     creatorDashboardPage.get();
     expect(creatorDashboardPage.getAverageRating()).toEqual('4');
     expect(creatorDashboardPage.getTotalPlays()).toEqual('3');
     expect(creatorDashboardPage.getOpenFeedbacks()).toEqual('2');
     expect(creatorDashboardPage.getSubscribers()).toEqual('2');
-    users.logout();
+    await users.logout();
   });
 
-  it('should work fine in grid view', function() {
+  it('should work fine in grid view', async function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
-    // Create required users.
-    users.createUser(
+    // Create required await users.
+    await users.createUser(
       'user5@creatorDashboard.com',
       'creatorDashboard');
-    users.createUser(
+    await users.createUser(
       'user6@creatorDashboard.com',
       'learner6');
-    users.createUser(
+    await users.createUser(
       'user7@creatorDashboard.com',
       'learner7');
 
-    users.login('user5@creatorDashboard.com');
+    await users.login('user5@creatorDashboard.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE_3,
       EXPLORATION_CATEGORY,
@@ -155,23 +155,23 @@ describe('Creator dashboard functionality', function() {
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
-    users.logout();
-    users.login('user6@creatorDashboard.com');
+    await users.logout();
+    await users.login('user6@creatorDashboard.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE_3);
     libraryPage.playExploration(EXPLORATION_TITLE_3);
     explorationPlayerPage.rateExploration(3);
-    users.logout();
+    await users.logout();
 
-    users.login('user7@creatorDashboard.com');
+    await users.login('user7@creatorDashboard.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE_4);
     libraryPage.playExploration(EXPLORATION_TITLE_4);
     explorationPlayerPage.rateExploration(5);
     explorationPlayerPage.submitFeedback(feedback);
-    users.logout();
+    await users.logout();
 
-    users.login('user5@creatorDashboard.com');
+    await users.login('user5@creatorDashboard.com');
     creatorDashboardPage.get();
     creatorDashboardPage.getExpSummaryTileTitles().
       then(function(titles) {
@@ -197,23 +197,23 @@ describe('Creator dashboard functionality', function() {
         expect(views[0].getText()).toEqual('1');
         expect(views[1].getText()).toEqual('1');
       });
-    users.logout();
+    await users.logout();
   });
 
-  it('should work fine in list view', function() {
+  it('should work fine in list view', async function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
-    // Create required users.
-    users.createUser(
+    // Create required await users.
+    await users.createUser(
       'user8@creatorDashboard.com',
       'newCreatorDashboard');
-    users.createUser(
+    await users.createUser(
       'user9@creatorDashboard.com',
       'learner9');
-    users.createUser(
+    await users.createUser(
       'user10@creatorDashboard.com',
       'learner10');
 
-    users.login('user8@creatorDashboard.com');
+    await users.login('user8@creatorDashboard.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE_5,
       EXPLORATION_CATEGORY,
@@ -226,23 +226,23 @@ describe('Creator dashboard functionality', function() {
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
-    users.logout();
-    users.login('user9@creatorDashboard.com');
+    await users.logout();
+    await users.login('user9@creatorDashboard.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE_5);
     libraryPage.playExploration(EXPLORATION_TITLE_5);
     explorationPlayerPage.rateExploration(3);
-    users.logout();
+    await users.logout();
 
-    users.login('user10@creatorDashboard.com');
+    await users.login('user10@creatorDashboard.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE_6);
     libraryPage.playExploration(EXPLORATION_TITLE_6);
     explorationPlayerPage.rateExploration(5);
     explorationPlayerPage.submitFeedback(feedback);
-    users.logout();
+    await users.logout();
 
-    users.login('user8@creatorDashboard.com');
+    await users.login('user8@creatorDashboard.com');
     creatorDashboardPage.get();
 
     creatorDashboardPage.getListView();
@@ -271,7 +271,7 @@ describe('Creator dashboard functionality', function() {
         expect(views[0].getText()).toEqual('1');
         expect(views[1].getText()).toEqual('1');
       });
-    users.logout();
+    await users.logout();
   });
 
   afterEach(function() {

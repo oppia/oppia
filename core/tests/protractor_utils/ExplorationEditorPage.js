@@ -185,24 +185,23 @@ var ExplorationEditorPage = function() {
     });
   };
 
-  this.saveChanges = function(commitMessage) {
+  this.saveChanges = async function(commitMessage) {
     var toastSuccessElement = element(by.css('.toast-success'));
-    expect(saveChangesButton.isDisplayed()).toBe(true);
-    saveChangesButton.click().then(function() {
-      if (commitMessage) {
-        commitMessageInput.sendKeys(commitMessage);
-      }
-      waitFor.elementToBeClickable(
-        saveDraftButton, 'Save Draft button is not clickable');
-      saveDraftButton.click();
+    expect(await saveChangesButton.isDisplayed()).toBe(true);
+    await saveChangesButton.click();
+    if (commitMessage) {
+      await commitMessageInput.sendKeys(commitMessage);
+    }
+    await waitFor.elementToBeClickable(
+      saveDraftButton, 'Save Draft button is not clickable');
+    await saveDraftButton.click();
 
-      // This is necessary to give the page time to record the changes,
-      // so that it does not attempt to stop the user leaving.
-      waitFor.invisibilityOf(
-        toastSuccessElement,
-        'Toast message taking too long to disappear after saving changes');
-      expect(toastSuccessElement.isPresent()).toBe(false);
-    });
+    // This is necessary to give the page time to record the changes,
+    // so that it does not attempt to stop the user leaving.
+    await waitFor.invisibilityOf(
+      toastSuccessElement,
+      'Toast message taking too long to disappear after saving changes');
+    expect(await toastSuccessElement.isPresent()).toBe(false);
   };
 
   this.discardChanges = function() {
@@ -247,10 +246,10 @@ var ExplorationEditorPage = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.navigateToSettingsTab = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToSettingsTab = async function() {
+    await waitFor.elementToBeClickable(
       navigateToSettingsTabButton, 'Settings tab is not clickable');
-    navigateToSettingsTabButton.click();
+    await navigateToSettingsTabButton.click();
   };
 
   this.navigateToStatsTab = function() {

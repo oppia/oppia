@@ -15,6 +15,7 @@
 /**
  * @fileoverview End-to-end tests for user management.
  */
+
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
@@ -32,9 +33,9 @@ var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-var _selectLanguage = function(language) {
-  element(by.css('.protractor-test-i18n-language-selector')).
-    element(by.cssContainingText('option', language)).click();
+var _selectLanguage = async function(language) {
+  await element(by.css('.protractor-test-i18n-language-selector'))
+    .element(by.cssContainingText('option', language)).click();
   // Wait for the language-change request to reach the backend.
   waitFor.pageToFullyLoad();
 };
@@ -44,42 +45,43 @@ describe('Basic user journeys', function() {
   describe('Account creation', function() {
     var libraryPage = null;
 
-    beforeEach(function() {
+    beforeEach(async function() {
       libraryPage = new LibraryPage.LibraryPage();
     });
 
-    it('should create users', function() {
-      users.createUser(
+    it('should create users', async function() {
+      await users.createUser(
         'ordinaryuser@userManagement.com', 'ordinaryUserManagement');
 
-      users.login('ordinaryuser@userManagement.com');
+      await users.login('ordinaryuser@userManagement.com');
       libraryPage.get();
       general.checkForConsoleErrors([]);
 
-      browser.get(general.MODERATOR_URL_SUFFIX);
+      await browser.get(general.MODERATOR_URL_SUFFIX);
       general.checkForConsoleErrors([
         'Failed to load resource: the server responded with a status of 401']);
-      users.logout();
+      await users.logout();
     });
 
-    it('should create moderators', function() {
-      users.createModerator(
+    it('should create moderators', async function() {
+      await users.createModerator(
         'mod@userManagement.com', 'moderatorUserManagement');
 
-      users.login('mod@userManagement.com');
-      browser.get(general.MODERATOR_URL_SUFFIX);
+      await users.login('mod@userManagement.com');
+      await browser.get(general.MODERATOR_URL_SUFFIX);
       var profileDropdown = element(
         by.css('.protractor-test-profile-dropdown'));
       waitFor.elementToBeClickable(
         profileDropdown, 'Could not click profile dropdown');
-      profileDropdown.click();
-      users.logout();
+      await profileDropdown.click();
+      await users.logout();
       general.checkForConsoleErrors([]);
     });
 
     // Usernames containing "admin" are not permitted.
-    it('should create admins', function() {
-      users.createAdmin('admin@userManagement.com', 'adm1nUserManagement');
+    it('should create admins', async function() {
+      await users.createAdmin(
+        'admin@userManagement.com', 'adm1nUserManagement');
       general.checkForConsoleErrors([]);
     });
   });
@@ -97,7 +99,7 @@ describe('Site language', function() {
   var libraryPage = null;
   var preferencesPage = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
@@ -110,82 +112,76 @@ describe('Site language', function() {
     var CREATOR_USERNAME = 'langCreatorExplorations';
     var EDITOR_USERNAME = 'langCollections';
 
-    users.createUser('lang@collections.com', EDITOR_USERNAME);
-    users.createUser('langCreator@explorations.com', CREATOR_USERNAME);
-    users.createAndLoginAdminUser('testlangadm@collections.com', 'testlangadm');
+    await users.createUser('lang@collections.com', EDITOR_USERNAME);
+    await users.createUser('langCreator@explorations.com', CREATOR_USERNAME);
+    await users.createAndLoginAdminUser(
+      'testlangadm@collections.com', 'testlangadm');
     adminPage.get();
     adminPage.updateRole(EDITOR_USERNAME, 'collection editor');
-    users.logout();
+    await users.logout();
 
-    users.login('langCreator@explorations.com');
-    workflow.createExploration();
-    general.getExplorationIdFromEditor().then(function(expId) {
-      firstExplorationId = expId;
-      explorationEditorMainTab.setContent(forms.toRichText('Language Test'));
-      explorationEditorMainTab.setInteraction('NumericInput');
-      explorationEditorMainTab.addResponse(
-        'NumericInput', forms.toRichText('Nice!!'),
-        'END', true, 'IsLessThanOrEqualTo', 0);
-      explorationEditorMainTab.getResponseEditor('default').setFeedback(
-        forms.toRichText('Ok!!'));
-      explorationEditorMainTab.moveToState('END');
-      explorationEditorMainTab.setContent(forms.toRichText('END'));
-      explorationEditorMainTab.setInteraction('EndExploration');
+    await users.login('langCreator@explorations.com');
+    await workflow.createExploration();
+    firstExplorationId = await general.getExplorationIdFromEditor();
+    explorationEditorMainTab.setContent(forms.toRichText('Language Test'));
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse(
+      'NumericInput', forms.toRichText('Nice!!'),
+      'END', true, 'IsLessThanOrEqualTo', 0);
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Ok!!'));
+    explorationEditorMainTab.moveToState('END');
+    explorationEditorMainTab.setContent(forms.toRichText('END'));
+    explorationEditorMainTab.setInteraction('EndExploration');
 
-      // Save changes.
-      var title = 'Language Test';
-      var category = 'Languages';
-      var objective = 'To test site language.';
-      explorationEditorPage.navigateToSettingsTab();
-      explorationEditorSettingsTab.setTitle(title);
-      explorationEditorSettingsTab.setCategory(category);
-      explorationEditorSettingsTab.setObjective(objective);
-      explorationEditorPage.saveChanges('Done!');
+    // Save changes.
+    var title = 'Language Test';
+    var category = 'Languages';
+    var objective = 'To test site language.';
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle(title);
+    explorationEditorSettingsTab.setCategory(category);
+    explorationEditorSettingsTab.setObjective(objective);
+    explorationEditorPage.saveChanges('Done!');
 
-      // Publish changes.
-      workflow.publishExploration();
-      users.logout();
+    // Publish changes.
+    workflow.publishExploration();
+    await users.logout();
 
-      users.login('lang@collections.com');
-      creatorDashboardPage.get();
-      creatorDashboardPage.clickCreateActivityButton();
-      creatorDashboardPage.clickCreateCollectionButton();
-      browser.getCurrentUrl().then(function(url) {
-        var pathname = url.split('/');
-        // in the url a # is added at the end that is not part of collection ID
-        collectionId = pathname[5].slice(0, -1);
-      }, function() {
-        // Note to developers:
-        // Promise is returned by getCurrentUrl which is handled here.
-        // No further action is needed.
-      });
-      // Add existing explorations.
-      collectionEditorPage.addExistingExploration(firstExplorationId);
-      collectionEditorPage.saveDraft();
-      collectionEditorPage.closeSaveModal();
-      collectionEditorPage.publishCollection();
-      collectionEditorPage.setTitle('Test Collection');
-      collectionEditorPage.setObjective('This is the test collection.');
-      collectionEditorPage.setCategory('Algebra');
-      collectionEditorPage.saveChanges();
-      users.logout();
-    });
+    await users.login('lang@collections.com');
+    creatorDashboardPage.get();
+    creatorDashboardPage.clickCreateActivityButton();
+    creatorDashboardPage.clickCreateCollectionButton();
+    var url = await browser.getCurrentUrl();
+    var pathname = url.split('/');
+    // in the url a # is added at the end that is not part of collection ID
+    collectionId = pathname[5].slice(0, -1);
+    // Add existing explorations.
+    collectionEditorPage.addExistingExploration(firstExplorationId);
+    collectionEditorPage.saveDraft();
+    collectionEditorPage.closeSaveModal();
+    collectionEditorPage.publishCollection();
+    collectionEditorPage.setTitle('Test Collection');
+    collectionEditorPage.setObjective('This is the test collection.');
+    collectionEditorPage.setCategory('Algebra');
+    collectionEditorPage.saveChanges();
+    await users.logout();
   });
 
-  beforeEach(function() {
+  beforeEach(async function() {
     // Starting language is English
-    browser.get('/about');
+    await browser.get('/about');
     waitFor.pageToFullyLoad();
-    _selectLanguage('English');
+    await _selectLanguage('English');
     libraryPage.get();
     libraryPage.expectMainHeaderTextToBe(
       'Imagine what you could learn today...');
   });
 
-  it('should change after selecting a different language', function() {
-    browser.get('/about');
+  it('should change after selecting a different language', async function() {
+    await browser.get('/about');
     waitFor.pageToFullyLoad();
-    _selectLanguage('Español');
+    await _selectLanguage('Español');
 
     libraryPage.get();
     libraryPage.expectMainHeaderTextToBe(
@@ -193,20 +189,20 @@ describe('Site language', function() {
     general.ensurePageHasNoTranslationIds();
   });
 
-  it('should use language selected in the Preferences page.', function() {
-    users.createUser('varda@example.com', 'Varda');
-    users.login('varda@example.com');
+  it('should use language selected in the Preferences page.', async function() {
+    await users.createUser('varda@example.com', 'Varda');
+    await users.login('varda@example.com');
     preferencesPage.get();
     preferencesPage.selectSystemLanguage('Español');
     preferencesPage.expectPageHeaderToBe('Preferencias');
     general.ensurePageHasNoTranslationIds();
-    users.logout();
+    await users.logout();
   });
 
   it('should set preferred audio language selected in the Preferences page.',
-    function() {
-      users.createUser('audioPlayer@example.com', 'audioPlayer');
-      users.login('audioPlayer@example.com');
+    async function() {
+      await users.createUser('audioPlayer@example.com', 'audioPlayer');
+      await users.login('audioPlayer@example.com');
       preferencesPage.get();
       preferencesPage.expectPreferredAudioLanguageNotToBe('Chinese');
       preferencesPage.selectPreferredAudioLanguage('Chinese');
@@ -215,16 +211,16 @@ describe('Site language', function() {
       // we will finalize a way to upload an audio file in e2e test.
       preferencesPage.expectPreferredAudioLanguageToBe('Chinese');
       general.ensurePageHasNoTranslationIds();
-      users.logout();
+      await users.logout();
     });
 
   it('should save the language selected in the footer into the preferences.',
-    function() {
-      users.createUser('feanor@example.com', 'Feanor');
-      users.login('feanor@example.com');
-      browser.get('/about');
+    async function() {
+      await users.createUser('feanor@example.com', 'Feanor');
+      await users.login('feanor@example.com');
+      await browser.get('/about');
       waitFor.pageToFullyLoad();
-      _selectLanguage('Español');
+      await _selectLanguage('Español');
       libraryPage.get();
       libraryPage.expectMainHeaderTextToBe(
         'Imagina lo que podrías aprender hoy...');
@@ -233,15 +229,15 @@ describe('Site language', function() {
       preferencesPage.get();
       preferencesPage.expectPreferredSiteLanguageToBe('Español');
       general.ensurePageHasNoTranslationIds();
-      users.logout();
+      await users.logout();
     }
   );
 
-  it('should not change in an exploration', function() {
-    users.login('langCreator@explorations.com', true);
-    browser.get('/about');
+  it('should not change in an exploration', async function() {
+    await users.login('langCreator@explorations.com', true);
+    await browser.get('/about');
     waitFor.pageToFullyLoad();
-    _selectLanguage('Español');
+    await _selectLanguage('Español');
 
     general.openEditor(firstExplorationId);
 
@@ -250,24 +246,24 @@ describe('Site language', function() {
       .getAttribute('placeholder');
     expect(placeholder).toEqual('Ingresa un número');
     general.ensurePageHasNoTranslationIds();
-    users.logout();
+    await users.logout();
   });
 
   it('should not change in exploration and collection player for guest users',
-    function() {
-      browser.get('/about');
+    async function() {
+      await browser.get('/about');
       waitFor.pageToFullyLoad();
-      _selectLanguage('Español');
+      await _selectLanguage('Español');
 
       // Checking collection player page.
-      browser.get('/collection/' + collectionId);
+      await browser.get('/collection/' + collectionId);
       waitFor.pageToFullyLoad();
       expect(element(by.css('.oppia-share-collection-footer')).getText())
         .toEqual('COMPARTIR ESTA COLECCIÓN');
       general.ensurePageHasNoTranslationIds();
 
       // Checking exploration player page.
-      browser.get('/explore/' + firstExplorationId);
+      await browser.get('/explore/' + firstExplorationId);
       waitFor.pageToFullyLoad();
       expect(element(by.css('.author-profile-text')).getText())
         .toEqual('PERFILES DE AUTORES');
@@ -275,11 +271,11 @@ describe('Site language', function() {
     }
   );
 
-  afterEach(function() {
+  afterEach(async function() {
     // Reset language back to English
-    browser.get('/about');
+    await browser.get('/about');
     waitFor.pageToFullyLoad();
-    _selectLanguage('English');
+    await _selectLanguage('English');
     general.checkForConsoleErrors([]);
   });
 });

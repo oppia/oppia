@@ -62,7 +62,7 @@ var LibraryPage = function() {
     );
   };
 
-  var _submitSearchQuery = function(searchQuery) {
+  var _submitSearchQuery = async function(searchQuery) {
     // The library page has two search bar input elements.
     // The first search bar input element is visible only in a desktop
     // browser and is invisible in case of a mobile browser.
@@ -72,26 +72,26 @@ var LibraryPage = function() {
     // get function is a zero-based index.
     var searchInput = (
       browser.isMobile ? searchInputs.get(1) : searchInputs.first());
-    searchInput.clear();
-    searchInput.sendKeys(searchQuery);
+    await searchInput.clear();
+    await searchInput.sendKeys(searchQuery);
   };
 
-  this.get = function() {
-    browser.get(LIBRARY_URL_SUFFIX);
-    return waitFor.pageToFullyLoad();
+  this.get = async function() {
+    await browser.get(LIBRARY_URL_SUFFIX);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.addSelectedExplorationToPlaylist = function() {
+  this.addSelectedExplorationToPlaylist = async function() {
     var addToPlaylistButton = element(by.css(
       '.protractor-test-add-to-playlist-btn')
     );
 
-    browser.actions().mouseMove(element(by.css(
+    await browser.actions().mouseMove(element(by.css(
       '.protractor-test-exp-summary-tile-title'))).perform();
 
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       addToPlaylistButton, 'Add to playlist Icon taking too long to load');
-    addToPlaylistButton.click();
+    await addToPlaylistButton.click();
   };
 
   this.selectLanguages = function(languages) {
@@ -146,16 +146,16 @@ var LibraryPage = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.playExploration = function(explorationName) {
-    waitFor.pageToFullyLoad();
-    waitFor.visibilityOf(
+  this.playExploration = async function(explorationName) {
+    await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(
       allExplorationSummaryTile.first(),
       'Library Page does not have any explorations');
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       allExplorationsTitled(explorationName).first(),
       'Unable to find exploration ' + explorationName);
-    allExplorationsTitled(explorationName).first().click();
-    waitFor.pageToFullyLoad();
+    await allExplorationsTitled(explorationName).first().click();
+    await waitFor.pageToFullyLoad();
   };
 
   this.getExplorationObjective = function(name) {
@@ -189,9 +189,9 @@ var LibraryPage = function() {
     explorationObjective.click();
   };
 
-  this.findExploration = function(explorationTitle) {
-    waitFor.pageToFullyLoad();
-    _submitSearchQuery(explorationTitle);
+  this.findExploration = async function(explorationTitle) {
+    await waitFor.pageToFullyLoad();
+    await _submitSearchQuery(explorationTitle);
   };
 
   this.findCollection = function(collectionTitle) {

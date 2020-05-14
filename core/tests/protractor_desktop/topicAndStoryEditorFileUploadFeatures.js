@@ -35,7 +35,7 @@ describe('Topic editor functionality', function() {
   var topicEditorPage = null;
   var explorationEditorPage = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
@@ -43,13 +43,13 @@ describe('Topic editor functionality', function() {
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
-    users.logout();
+    await users.logout();
   });
 
-  beforeEach(function() {
-    users.login('creator@topicEditor.com');
+  beforeEach(async function() {
+    await users.login('creator@topicEditor.com');
     topicsAndSkillsDashboardPage.get();
   });
 
@@ -165,9 +165,9 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
   });
 
-  afterEach(function() {
+  afterEach(async function() {
     general.checkForConsoleErrors([]);
-    users.logout();
+    await users.logout();
   });
 });
 

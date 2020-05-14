@@ -29,34 +29,33 @@ var scrollToTop = function() {
 var CONSOLE_LOG_THRESHOLD = 900;
 var CONSOLE_ERRORS_TO_IGNORE = [];
 
-var checkForConsoleErrors = function(errorsToIgnore) {
+var checkForConsoleErrors = async function(errorsToIgnore) {
   var irrelevantErrors = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
-  browser.manage().logs().get('browser').then(function(browserLogs) {
-    var fatalErrors = [];
-    // The mobile tests run on the latest version of Chrome.
-    // The newer versions report 'Slow Network' as a console error.
-    // This causes the tests to fail, therefore, we remove such logs.
-    if (browser.isMobile) {
-      browserLogs = browserLogs.filter(function(browserLog) {
-        return !(browserLog.message.includes(' Slow network is detected.'));
-      });
-    }
+  var browserLogs = await browser.manage().logs().get('browser');
+  var fatalErrors = [];
+  // The mobile tests run on the latest version of Chrome.
+  // The newer versions report 'Slow Network' as a console error.
+  // This causes the tests to fail, therefore, we remove such logs.
+  if (browser.isMobile) {
+    browserLogs = browserLogs.filter(function(browserLog) {
+      return !(browserLog.message.includes(' Slow network is detected.'));
+    });
+  }
 
-    for (var i = 0; i < browserLogs.length; i++) {
-      if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
-        var errorFatal = true;
-        for (var j = 0; j < irrelevantErrors.length; j++) {
-          if (browserLogs[i].message.match(irrelevantErrors[j])) {
-            errorFatal = false;
-          }
-        }
-        if (errorFatal) {
-          fatalErrors.push(browserLogs[i]);
+  for (var i = 0; i < browserLogs.length; i++) {
+    if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
+      var errorFatal = true;
+      for (var j = 0; j < irrelevantErrors.length; j++) {
+        if (browserLogs[i].message.match(irrelevantErrors[j])) {
+          errorFatal = false;
         }
       }
+      if (errorFatal) {
+        fatalErrors.push(browserLogs[i]);
+      }
     }
-    expect(fatalErrors).toEqual([]);
-  });
+  }
+  expect(fatalErrors).toEqual([]);
 };
 
 var isInDevMode = function() {
@@ -75,33 +74,24 @@ var EXPLORATION_ID_LENGTH = 12;
 
 var FIRST_STATE_DEFAULT_NAME = 'Introduction';
 
-var _getExplorationId = function(currentUrlPrefix) {
-  return {
-    then: function(callbackFunction) {
-      browser.getCurrentUrl().then(function(url) {
-        expect(url.slice(0, currentUrlPrefix.length)).toBe(currentUrlPrefix);
-        var explorationId = url.slice(
-          currentUrlPrefix.length,
-          currentUrlPrefix.length + EXPLORATION_ID_LENGTH);
-        return callbackFunction(explorationId);
-      }, function() {
-        // Note to developers:
-        // Promise is returned by getCurrentUrl which is handled here.
-        // No further action is needed.
-      });
-    }
-  };
+var _getExplorationId = async function(currentUrlPrefix) {
+  var url = await browser.getCurrentUrl();
+  expect(url.slice(0, currentUrlPrefix.length)).toBe(currentUrlPrefix);
+  var explorationId = url.slice(
+    currentUrlPrefix.length,
+    currentUrlPrefix.length + EXPLORATION_ID_LENGTH);
+  return explorationId;
 };
 
 // If we are currently in the editor, this will return a promise with the
 // exploration ID.
-var getExplorationIdFromEditor = function() {
-  return _getExplorationId(SERVER_URL_PREFIX + EDITOR_URL_SLICE);
+var getExplorationIdFromEditor = async function() {
+  return await _getExplorationId(SERVER_URL_PREFIX + EDITOR_URL_SLICE);
 };
 
 // Likewise for the player
-var getExplorationIdFromPlayer = function() {
-  return _getExplorationId(SERVER_URL_PREFIX + PLAYER_URL_SLICE);
+var getExplorationIdFromPlayer = async function() {
+  return await _getExplorationId(SERVER_URL_PREFIX + PLAYER_URL_SLICE);
 };
 
 // The explorationId here should be a string, not a promise.
@@ -194,10 +184,10 @@ var checkConsoleErrorsExist = function(expectedErrors) {
   });
 };
 
-var goToHomePage = function() {
+var goToHomePage = async function() {
   var oppiaMainLogo = element(by.css('.protractor-test-oppia-main-logo'));
-  oppiaMainLogo.click();
-  return waitFor.pageToFullyLoad();
+  await oppiaMainLogo.click();
+  return await waitFor.pageToFullyLoad();
 };
 
 exports.acceptAlert = acceptAlert;

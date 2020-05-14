@@ -41,17 +41,17 @@ describe('Exploration history', function() {
   var COLOR_UNCHANGED = 'rgb(245, 245, 220)';
   var COLOR_RENAMED_UNCHANGED = 'rgb(255, 215, 0)';
 
-  beforeEach(function() {
+  beforeEach(async function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorHistoryTab = explorationEditorPage.getHistoryTab();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('should display the history', function() {
-    users.createUser('user@historyTab.com', 'userHistoryTab');
-    users.login('user@historyTab.com');
-    workflow.createExploration();
+  it('should display the history', async function() {
+    await users.createUser('user@historyTab.com', 'userHistoryTab');
+    await users.login('user@historyTab.com');
+    await workflow.createExploration();
 
     // Check renaming state, editing text, editing interactions and adding
     // state.
@@ -537,13 +537,13 @@ describe('Exploration history', function() {
     historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
 
-    users.logout();
+    await users.logout();
   });
 
-  it('should revert to old exploration commit', function() {
-    users.createUser('user2@historyTab.com', 'user2HistoryTab');
-    users.login('user2@historyTab.com');
-    workflow.createExploration();
+  it('should revert to old exploration commit', async function() {
+    await users.createUser('user2@historyTab.com', 'user2HistoryTab');
+    await users.login('user2@historyTab.com');
+    await workflow.createExploration();
 
     // Make changes for second commit.
     // First card.
@@ -624,7 +624,7 @@ describe('Exploration history', function() {
     historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
 
-    users.logout();
+    await users.logout();
   });
 
   afterEach(function() {

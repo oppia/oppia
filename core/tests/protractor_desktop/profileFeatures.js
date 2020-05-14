@@ -39,26 +39,26 @@ describe('Un-customized profile page', function() {
 
   var profilePage = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     profilePage = new ProfilePage.ProfilePage();
-    users.createUser(TEST_EMAIL, TEST_USERNAME);
+    await users.createUser(TEST_EMAIL, TEST_USERNAME);
   });
 
   it('displays photo, default bio, and interest placeholder when logged in',
-    function() {
-      users.login(TEST_EMAIL);
+    async function() {
+      await users.login(TEST_EMAIL);
       profilePage.get(TEST_USERNAME);
       profilePage.expectCurrUserToHaveProfilePhoto();
       profilePage.expectUserToHaveBio(DEFAULT_BIO);
       profilePage.expectUserToHaveNoInterests();
       profilePage.expectUserToHaveInterestPlaceholder(
         PLACEHOLDER_INTEREST_TEXT);
-      users.logout();
+      await users.logout();
     }
   );
 
   it('displays default photo, default bio, and no interests when logged out',
-    function() {
+    async function() {
       profilePage.get(TEST_USERNAME);
       profilePage.expectOtherUserToHaveProfilePhoto();
       profilePage.expectUserToHaveBio(DEFAULT_BIO);
@@ -81,30 +81,31 @@ describe('Customized profile page for current user', function() {
 
   var profilePage = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     profilePage = new ProfilePage.ProfilePage();
     var preferencesPage = new PreferencesPage.PreferencesPage();
-    users.createUser(TEST_EMAIL, TEST_USERNAME);
-    users.login(TEST_EMAIL);
+    await users.createUser(TEST_EMAIL, TEST_USERNAME);
+    await users.login(TEST_EMAIL);
     preferencesPage.get();
     preferencesPage.setUserBio(TEST_BIO);
     preferencesPage.get();
     preferencesPage.setUserInterests(TEST_INTERESTS);
-    users.logout();
+    await users.logout();
   });
 
-  it('displays photo, custom bio, and interests when logged in', function() {
-    users.login(TEST_EMAIL);
-    profilePage.get(TEST_USERNAME);
-    profilePage.expectCurrUserToHaveProfilePhoto();
-    profilePage.expectUserToHaveBio(TEST_BIO);
-    profilePage.expectUserToHaveInterests(TEST_INTERESTS);
-    profilePage.expectUserToNotHaveInterestPlaceholder();
-    users.logout();
-  });
+  it('displays photo, custom bio, and interests when logged in',
+    async function() {
+      await users.login(TEST_EMAIL);
+      profilePage.get(TEST_USERNAME);
+      profilePage.expectCurrUserToHaveProfilePhoto();
+      profilePage.expectUserToHaveBio(TEST_BIO);
+      profilePage.expectUserToHaveInterests(TEST_INTERESTS);
+      profilePage.expectUserToNotHaveInterestPlaceholder();
+      await users.logout();
+    });
 
   it('displays default photo, custom bio, and interests when logged out',
-    function() {
+    async function() {
       profilePage.get(TEST_USERNAME);
       profilePage.expectOtherUserToHaveProfilePhoto();
       profilePage.expectUserToHaveBio(TEST_BIO);
@@ -135,12 +136,12 @@ describe('Visiting user profile page', function() {
     language: 'English'
   };
 
-  beforeAll(function() {
+  beforeAll(async function() {
     profilePage = new ProfilePage.ProfilePage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
 
-    users.createUser(ANOTHER_EMAIL, ANOTHER_USERNAME);
-    users.login(ANOTHER_EMAIL);
+    await users.createUser(ANOTHER_EMAIL, ANOTHER_USERNAME);
+    await users.login(ANOTHER_EMAIL);
 
     workflow.createAndPublishTwoCardExploration(
       EXPLORATION.title,
@@ -151,27 +152,27 @@ describe('Visiting user profile page', function() {
 
     creatorDashboardPage.get();
     creatorDashboardPage.expectToHaveExplorationCard(EXPLORATION.title);
-    users.logout();
+    await users.logout();
   });
 
-  it('should show the explorations created by the user', function() {
-    users.createUser(TEST_EMAIL, TEST_USERNAME);
-    users.login(TEST_EMAIL);
+  it('should show the explorations created by the user', async function() {
+    await users.createUser(TEST_EMAIL, TEST_USERNAME);
+    await users.login(TEST_EMAIL);
 
     profilePage.get(ANOTHER_USERNAME);
     profilePage.expectToHaveExplorationCards();
     profilePage.expectToHaveExplorationCardByName(EXPLORATION.title);
   });
 
-  it('should show created exploration stats for user', function() {
-    users.login(TEST_EMAIL);
+  it('should show created exploration stats for user', async function() {
+    await users.login(TEST_EMAIL);
 
     profilePage.get(ANOTHER_USERNAME);
     profilePage.expectToHaveCreatedExplorationStat('1');
   });
 
-  afterEach(function() {
-    users.logout();
+  afterEach(async function() {
+    await users.logout();
     general.checkForConsoleErrors([]);
   });
 });
@@ -194,43 +195,44 @@ describe('Playing the exploration', function() {
     language: 'English'
   };
 
-  beforeAll(function() {
-    users.createUser(TEST_EMAIL, TEST_USERNAME);
-    users.login(TEST_EMAIL);
+  beforeAll(async function() {
+    await users.createUser(TEST_EMAIL, TEST_USERNAME);
+    await users.login(TEST_EMAIL);
   });
 
-  it('should change the cards on clicking next and back buttons', function() {
-    libraryPage = new LibraryPage.LibraryPage();
-    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  it('should change the cards on clicking next and back buttons',
+    async function() {
+      libraryPage = new LibraryPage.LibraryPage();
+      explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
 
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION.title);
-    libraryPage.playExploration(EXPLORATION.title);
+      libraryPage.get();
+      libraryPage.findExploration(EXPLORATION.title);
+      libraryPage.playExploration(EXPLORATION.title);
 
-    explorationPlayerPage.expectExplorationNameToBe(EXPLORATION.title);
-    explorationPlayerPage.expectContentToMatch(forms.toRichText('card 1'));
+      explorationPlayerPage.expectExplorationNameToBe(EXPLORATION.title);
+      explorationPlayerPage.expectContentToMatch(forms.toRichText('card 1'));
 
-    // Test continue button
-    waitFor.elementToBeClickable(
-      continueButton, 'Continue button taking too long to be clickable');
-    continueButton.click();
-    waitFor.pageToFullyLoad();
-    explorationPlayerPage.expectContentToMatch(forms.toRichText('card 2'));
+      // Test continue button
+      waitFor.elementToBeClickable(
+        continueButton, 'Continue button taking too long to be clickable');
+      await continueButton.click();
+      waitFor.pageToFullyLoad();
+      explorationPlayerPage.expectContentToMatch(forms.toRichText('card 2'));
 
-    // Test back button
-    waitFor.elementToBeClickable(
-      backButton, 'Back button taking too long to be clickable');
-    backButton.click();
-    waitFor.pageToFullyLoad();
-    explorationPlayerPage.expectContentToMatch(forms.toRichText('card 1'));
+      // Test back button
+      waitFor.elementToBeClickable(
+        backButton, 'Back button taking too long to be clickable');
+      await backButton.click();
+      waitFor.pageToFullyLoad();
+      explorationPlayerPage.expectContentToMatch(forms.toRichText('card 1'));
 
-    // Test next button
-    waitFor.elementToBeClickable(
-      nextButton, 'Next button taking too long to be clickable');
-    nextButton.click();
-    waitFor.pageToFullyLoad();
-    explorationPlayerPage.expectContentToMatch(forms.toRichText('card 2'));
-  });
+      // Test next button
+      waitFor.elementToBeClickable(
+        nextButton, 'Next button taking too long to be clickable');
+      await nextButton.click();
+      waitFor.pageToFullyLoad();
+      explorationPlayerPage.expectContentToMatch(forms.toRichText('card 2'));
+    });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);

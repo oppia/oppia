@@ -25,12 +25,12 @@ describe('Community dashboard page', function() {
   var communityDashboardPage = null;
   var communityDashboardTranslateTextTab = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     communityDashboardPage = (
       new CommunityDashboardPage.CommunityDashboardPage());
     communityDashboardTranslateTextTab = (
       communityDashboardPage.getTranslateTextTab());
-    browser.get('/community_dashboard');
+    await browser.get('/community_dashboard');
   });
 
   it('should allow user to switch to translate text tab', function() {

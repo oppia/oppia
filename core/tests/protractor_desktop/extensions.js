@@ -34,17 +34,18 @@ describe('rich-text components', function() {
   var explorationEditorMainTab = null;
   var explorationPlayerPage = null;
 
-  beforeEach(function() {
+  beforeEach(async function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('should display correctly', function() {
-    users.createUser('user@richTextComponents.com', 'userRichTextComponents');
-    users.login('user@richTextComponents.com');
+  it('should display correctly', async function() {
+    await users.createUser(
+      'user@richTextComponents.com', 'userRichTextComponents');
+    await users.login('user@richTextComponents.com');
 
-    workflow.createExploration();
+    await workflow.createExploration();
 
     explorationEditorMainTab.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold');
@@ -86,7 +87,7 @@ describe('rich-text components', function() {
     });
 
     explorationEditorPage.discardChanges();
-    users.logout();
+    await users.logout();
   });
 
   // TODO(Jacob): Add in a test for the use of rich text inside collapsibles
@@ -118,10 +119,10 @@ describe('Interactions', function() {
     libraryPage = new LibraryPage.LibraryPage();
   });
 
-  it('should pass their own test suites', function() {
-    users.createUser('user@interactions.com', 'userInteractions');
-    users.login('user@interactions.com');
-    workflow.createExploration();
+  it('should pass their own test suites', async function() {
+    await users.createUser('user@interactions.com', 'userInteractions');
+    await users.login('user@interactions.com');
+    await workflow.createExploration();
     explorationEditorMainTab.setStateName('first');
     explorationEditorMainTab.setContent(forms.toRichText('some content'));
 
@@ -142,12 +143,10 @@ describe('Interactions', function() {
           '.protractor-test-delete-response'));
         var confirmDeleteResponseButton = element(by.css(
           '.protractor-test-confirm-delete-response'));
-        deleteResponseButton.isPresent().then(function(isPresent) {
-          if (isPresent) {
-            deleteResponseButton.click();
-            confirmDeleteResponseButton.click();
-          }
-        });
+        if (await deleteResponseButton.isPresent()) {
+          await deleteResponseButton.click();
+          await confirmDeleteResponseButton.click();
+        }
 
         explorationEditorMainTab.addResponse.apply(explorationEditorMainTab, [
           interactionId, forms.toRichText('yes'), null, false
@@ -192,16 +191,16 @@ describe('Interactions', function() {
       }
     }
     explorationEditorPage.discardChanges();
-    users.logout();
+    await users.logout();
   });
 
-  it('publish and play exploration successfully', function() {
+  it('publish and play exploration successfully', async function() {
     /*
      * This suite should be expanded as new interaction's e2e utility is added.
      */
-    users.createAndLoginUser(
+    await users.createAndLoginUser(
       'explorationEditor@interactions.com', 'explorationEditor');
-    workflow.createExploration();
+    await workflow.createExploration();
 
     explorationEditorMainTab.setStateName('Graph');
     explorationEditorMainTab.setContent(forms.toRichText(
@@ -250,9 +249,10 @@ describe('Interactions', function() {
     explorationEditorSettingsTab.setCategory('Logic');
     explorationEditorPage.saveChanges();
     workflow.publishExploration();
-    users.logout();
+    await users.logout();
 
-    users.createAndLoginUser('graphLearner@interactions.com', 'graphLearner');
+    await users.createAndLoginUser(
+      'graphLearner@interactions.com', 'graphLearner');
     libraryPage.get();
     libraryPage.findExploration('Regression Test Exploration');
     libraryPage.playExploration('Regression Test Exploration');
@@ -277,7 +277,7 @@ describe('Interactions', function() {
     explorationPlayerPage.clickThroughToNextCard();
 
     explorationPlayerPage.expectExplorationToBeOver();
-    users.logout();
+    await users.logout();
   });
 
   afterEach(function() {

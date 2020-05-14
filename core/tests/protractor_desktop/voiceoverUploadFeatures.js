@@ -35,7 +35,7 @@ describe('Voiceover upload features', function() {
   var explorationEditorTranslationTab = null;
   var explorationEditorSettingsTab = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -43,9 +43,9 @@ describe('Voiceover upload features', function() {
       explorationEditorPage.getTranslationTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
 
-    users.createUser(TEST_EMAIL, TEST_USERNAME);
-    users.login(TEST_EMAIL);
-    workflow.createExploration();
+    await users.createUser(TEST_EMAIL, TEST_USERNAME);
+    await users.login(TEST_EMAIL);
+    await workflow.createExploration();
 
     explorationEditorMainTab.setStateName('Uploading translation file');
     explorationEditorMainTab.setContent(forms.toRichText(
@@ -54,12 +54,12 @@ describe('Voiceover upload features', function() {
     explorationEditorMainTab.setInteraction('EndExploration');
   });
 
-  beforeEach(function() {
+  beforeEach(async function() {
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.exitTutorial();
   });
 
-  it('should upload an audio file', function() {
+  it('should upload an audio file', async function() {
     explorationEditorTranslationTab.openUploadAudioModal();
     explorationEditorTranslationTab.uploadAudio(
       '../data/cafe.mp3');
@@ -75,7 +75,7 @@ describe('Voiceover upload features', function() {
       });
   });
 
-  it('should not let upload a non audio file', function() {
+  it('should not let upload a non audio file', async function() {
     explorationEditorTranslationTab.openUploadAudioModal();
     explorationEditorTranslationTab.expectWrongFileType(
       '../data/img.png');
@@ -83,7 +83,7 @@ describe('Voiceover upload features', function() {
     explorationEditorTranslationTab.closeUploadAudioModal();
   });
 
-  it('should not let upload a five minutes longer audio', function() {
+  it('should not let upload a five minutes longer audio', async function() {
     explorationEditorTranslationTab.openUploadAudioModal();
     explorationEditorTranslationTab.expectAudioOverFiveMinutes(
       '../data/cafe-over-five-minutes.mp3');
@@ -92,47 +92,50 @@ describe('Voiceover upload features', function() {
     explorationEditorTranslationTab.deleteAudioRecord();
   });
 
-  it('should upload recorded audio and play after logging out', function() {
-    explorationEditorTranslationTab.addAudioRecord();
-    explorationEditorTranslationTab.stopAudioRecord();
-    explorationEditorTranslationTab.confirmAudioRecord();
-    explorationEditorTranslationTab.playAudioRecord();
-    browser.refresh();
-    explorationEditorTranslationTab.playAudioRecord();
+  it('should upload recorded audio and play after logging out',
+    async function() {
+      explorationEditorTranslationTab.addAudioRecord();
+      explorationEditorTranslationTab.stopAudioRecord();
+      explorationEditorTranslationTab.confirmAudioRecord();
+      explorationEditorTranslationTab.playAudioRecord();
+      browser.refresh();
+      explorationEditorTranslationTab.playAudioRecord();
 
-    // Try after logging out
-    users.logout();
-    users.login(TEST_EMAIL);
-    creatorDashboardPage.get();
-    creatorDashboardPage.editExploration('Untitled');
-    explorationEditorMainTab.exitTutorial();
+      // Try after logging out
+      await users.logout();
+      await users.login(TEST_EMAIL);
+      creatorDashboardPage.get();
+      creatorDashboardPage.editExploration('Untitled');
+      explorationEditorMainTab.exitTutorial();
 
-    explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab.playAudioRecord();
-    explorationEditorTranslationTab.deleteAudioRecord();
-  });
+      explorationEditorPage.navigateToTranslationTab();
+      explorationEditorTranslationTab.playAudioRecord();
+      explorationEditorTranslationTab.deleteAudioRecord();
+    });
 
-  it('should upload audio file from path and play after logout', function() {
-    explorationEditorTranslationTab.uploadAudioRecord(
-      '../../../data/explorations/audio_test/assets/audio/test_audio_1_en.mp3');
-    explorationEditorTranslationTab.saveAudioRecord();
-    explorationEditorTranslationTab.playAudioRecord();
-    browser.refresh();
-    explorationEditorTranslationTab.playAudioRecord();
+  it('should upload audio file from path and play after logout',
+    async function() {
+      explorationEditorTranslationTab.uploadAudioRecord(
+        '../../../data/explorations/audio_test/assets/audio/' +
+        'test_audio_1_en.mp3');
+      explorationEditorTranslationTab.saveAudioRecord();
+      explorationEditorTranslationTab.playAudioRecord();
+      browser.refresh();
+      explorationEditorTranslationTab.playAudioRecord();
 
-    // Try after logging out
-    users.logout();
-    users.login(TEST_EMAIL);
-    creatorDashboardPage.get();
-    creatorDashboardPage.editExploration('Untitled');
-    explorationEditorMainTab.exitTutorial();
+      // Try after logging out
+      await users.logout();
+      await users.login(TEST_EMAIL);
+      creatorDashboardPage.get();
+      creatorDashboardPage.editExploration('Untitled');
+      explorationEditorMainTab.exitTutorial();
 
-    explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab.playAudioRecord();
-    explorationEditorTranslationTab.deleteAudioRecord();
-  });
+      explorationEditorPage.navigateToTranslationTab();
+      explorationEditorTranslationTab.playAudioRecord();
+      explorationEditorTranslationTab.deleteAudioRecord();
+    });
 
-  afterAll(function() {
+  afterAll(async function() {
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.setTitle('Upload audio file');
     explorationEditorSettingsTab.setCategory('Languages');
@@ -143,7 +146,7 @@ describe('Voiceover upload features', function() {
     workflow.publishExploration();
   });
 
-  afterEach(function() {
+  afterEach(async function() {
     general.checkForConsoleErrors([
       'Failed to load resource: the server responded with a status of 400' +
       '(Bad Request)', {status_code: 400,

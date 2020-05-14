@@ -48,7 +48,7 @@ describe('Issues visualization', function() {
   var adminPage = null;
   var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
 
-  beforeAll(function() {
+  beforeAll(async function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorStatsTab = explorationEditorPage.getStatsTab();
@@ -59,10 +59,10 @@ describe('Issues visualization', function() {
     libraryPage = new LibraryPage.LibraryPage();
     adminPage = new AdminPage.AdminPage();
 
-    users.createUser(
+    await users.createUser(
       'user2@ExplorationIssues.com',
       'learnerExplorationIssues');
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       'user1@ExplorationIssues.com',
       'authorExplorationIssues');
 
@@ -70,13 +70,8 @@ describe('Issues visualization', function() {
     explorationEditorMainTab.exitTutorial();
 
     var expId;
-    browser.getCurrentUrl().then(function(url) {
-      expId = url.split('/')[4].slice(0, -1);
-    }, function() {
-      // Note to developers:
-      // Promise is returned by getCurrentUrl which is handled here.
-      // No further action is needed.
-    });
+    var url = await browser.getCurrentUrl();
+    expId = url.split('/')[4].slice(0, -1);
 
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
@@ -143,8 +138,8 @@ describe('Issues visualization', function() {
       });
   });
 
-  it('records early quit issue.', function() {
-    users.login('user2@ExplorationIssues.com');
+  it('records early quit issue.', async function() {
+    await users.login('user2@ExplorationIssues.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
@@ -153,11 +148,11 @@ describe('Issues visualization', function() {
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToNotBeOver();
 
-    oppiaLogo.click();
+    await oppiaLogo.click();
     general.acceptAlert();
-    users.logout();
+    await users.logout();
 
-    users.login('user1@ExplorationIssues.com');
+    await users.login('user1@ExplorationIssues.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
@@ -168,11 +163,11 @@ describe('Issues visualization', function() {
     explorationEditorStatsTab.expectIssueTitleToBe(
       'Several learners exited the exploration in less than a minute.');
     explorationEditorStatsTab.markResolved();
-    users.logout();
+    await users.logout();
   });
 
-  it('records multiple incorrect issue.', function() {
-    users.login('user2@ExplorationIssues.com');
+  it('records multiple incorrect issue.', async function() {
+    await users.login('user2@ExplorationIssues.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
@@ -188,11 +183,11 @@ describe('Issues visualization', function() {
       forms.toRichText('Try again'));
     explorationPlayerPage.expectExplorationToNotBeOver();
 
-    oppiaLogo.click();
+    await oppiaLogo.click();
     general.acceptAlert();
-    users.logout();
+    await users.logout();
 
-    users.login('user1@ExplorationIssues.com');
+    await users.login('user1@ExplorationIssues.com');
     creatorDashboardPage.get();
     creatorDashboardPage.editExploration(EXPLORATION_TITLE);
     explorationEditorPage.navigateToStatsTab();
@@ -201,11 +196,11 @@ describe('Issues visualization', function() {
       'Several learners submitted answers to card "One" several times, ' +
       'then gave up and quit.');
     explorationEditorStatsTab.markResolved();
-    users.logout();
+    await users.logout();
   });
 
-  it('records cyclic transitions issue.', function() {
-    users.login('user2@ExplorationIssues.com');
+  it('records cyclic transitions issue.', async function() {
+    await users.login('user2@ExplorationIssues.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
@@ -238,11 +233,11 @@ describe('Issues visualization', function() {
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToNotBeOver();
 
-    oppiaLogo.click();
+    await oppiaLogo.click();
     general.acceptAlert();
-    users.logout();
+    await users.logout();
 
-    users.login('user1@ExplorationIssues.com');
+    await users.login('user1@ExplorationIssues.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
@@ -254,7 +249,7 @@ describe('Issues visualization', function() {
       'Several learners ended up in a cyclic loop revisiting card ' +
       '"Two" many times.');
     explorationEditorStatsTab.markResolved();
-    users.logout();
+    await users.logout();
   });
 
   afterEach(function() {
@@ -268,23 +263,23 @@ describe('Statistics tab', function() {
   var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
 
-  beforeEach(function() {
+  beforeEach(async function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('checks statistics tab for an exploration', function() {
+  it('checks statistics tab for an exploration', async function() {
     var EXPLORATION_TITLE = 'Exploration for stats testing';
     var EXPLORATION_OBJECTIVE = 'To explore something';
     var EXPLORATION_CATEGORY = 'Algorithms';
     var EXPLORATION_LANGUAGE = 'English';
-    users.createUser(
+    await users.createUser(
       'user1@statisticsTab.com', 'statisticsTabCreator');
-    users.createUser(
+    await users.createUser(
       'user2@statisticsTab.com', 'statisticsTabLearner1');
-    users.createUser(
+    await users.createUser(
       'user3@statisticsTab.com', 'statisticsTabLearner2');
     var libraryPage = new LibraryPage.LibraryPage();
     var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -293,8 +288,8 @@ describe('Statistics tab', function() {
     var explorationStatsTab = explorationEditorPage.getStatsTab();
 
     // Creator creates and publishes an exploration.
-    users.login('user1@statisticsTab.com');
-    workflow.createExploration();
+    await users.login('user1@statisticsTab.com');
+    await workflow.createExploration();
 
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
@@ -342,10 +337,10 @@ describe('Statistics tab', function() {
     explorationEditorPage.saveChanges();
     workflow.publishExploration();
 
-    users.logout();
+    await users.logout();
 
     // Learner 1 completes the exploration.
-    users.login('user2@statisticsTab.com');
+    await users.login('user2@statisticsTab.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
@@ -363,20 +358,20 @@ describe('Statistics tab', function() {
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToBeOver();
 
-    users.logout();
+    await users.logout();
 
     // Learner 2 starts the exploration and immediately quits it.
-    users.login('user3@statisticsTab.com');
+    await users.login('user3@statisticsTab.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
 
     explorationPlayerPage.expectExplorationToNotBeOver();
 
-    users.logout();
+    await users.logout();
 
     // Creator visits the statistics tab.
-    users.login('user1@statisticsTab.com');
+    await users.login('user1@statisticsTab.com');
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToStatsTab();
@@ -385,6 +380,6 @@ describe('Statistics tab', function() {
     // 3 quit at the first state.
     explorationStatsTab.expectNumPassersbyToBe('1');
 
-    users.logout();
+    await users.logout();
   });
 });

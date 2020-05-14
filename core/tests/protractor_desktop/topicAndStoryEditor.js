@@ -42,7 +42,7 @@ describe('Topic editor functionality', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
@@ -50,28 +50,22 @@ describe('Topic editor functionality', function() {
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
-    browser.getWindowHandle().then(function(handle) {
-      topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.createTopic('Topic 1', false);
-      browser.getCurrentUrl().then(function(url) {
-        topicId = url.split('/')[4];
-        general.closeCurrentTabAndSwitchTo(handle);
-      }, function() {
-        // Note to developers:
-        // Promise is returned by getCurrentUrl which is handled here.
-        // No further action is needed.
-      });
-    });
+    var handle = await browser.getWindowHandle();
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createTopic('Topic 1', false);
+    var url = await browser.getCurrentUrl();
+    topicId = url.split('/')[4];
+    general.closeCurrentTabAndSwitchTo(handle);
   });
 
-  beforeEach(function() {
-    users.login('creator@topicEditor.com');
+  beforeEach(async function() {
+    await users.login('creator@topicEditor.com');
     topicEditorPage.get(topicId);
   });
 
-  it('should add and delete subtopics correctly', function() {
+  it('should add and delete subtopics correctly', async function() {
     topicEditorPage.moveToSubtopicsTab();
     topicEditorPage.addSubtopic('Subtopic 1');
     topicEditorPage.expectNumberOfSubtopicsToBe(1);
@@ -84,52 +78,46 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectNumberOfSubtopicsToBe(0);
   });
 
-  it('should create a question for a skill in the topic', function() {
+  it('should create a question for a skill in the topic', async function() {
     var skillId = null;
-    browser.getWindowHandle().then(function(handle) {
-      topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-        'Skill 1', 'Concept card explanation', false);
-      browser.getCurrentUrl().then(function(url) {
-        skillId = url.split('/')[4];
-        general.closeCurrentTabAndSwitchTo(handle);
-        topicsAndSkillsDashboardPage.get();
-        topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-        topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+    var handle = await browser.getWindowHandle();
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill 1', 'Concept card explanation', false);
+    var url = await browser.getCurrentUrl();
+    skillId = url.split('/')[4];
+    general.closeCurrentTabAndSwitchTo(handle);
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+    topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
 
-        topicEditorPage.get(topicId);
-        topicEditorPage.moveToQuestionsTab();
-        topicEditorPage.createQuestionForSkillWithIndex(0);
-        explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
-        explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
-        explorationEditorMainTab.addResponse(
-          'TextInput', forms.toRichText('Correct Answer'), null, false,
-          'FuzzyEquals', 'correct');
-        explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
-        explorationEditorMainTab.addHint('Hint 1');
-        explorationEditorMainTab.addSolution('TextInput', {
-          correctAnswer: 'correct',
-          explanation: 'It is correct'
-        });
-        topicEditorPage.saveQuestion();
-
-        topicEditorPage.get(topicId);
-        topicEditorPage.moveToQuestionsTab();
-        topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
-          1, 'Skill 1');
-
-        skillEditorPage.get(skillId);
-        skillEditorPage.moveToQuestionsTab();
-        skillEditorPage.expectNumberOfQuestionsToBe(1);
-      }, function() {
-        // Note to developers:
-        // Promise is returned by getCurrentUrl which is handled here.
-        // No further action is needed.
-      });
+    topicEditorPage.get(topicId);
+    topicEditorPage.moveToQuestionsTab();
+    topicEditorPage.createQuestionForSkillWithIndex(0);
+    explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
+    explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Correct Answer'), null, false,
+      'FuzzyEquals', 'correct');
+    explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
+    explorationEditorMainTab.addHint('Hint 1');
+    explorationEditorMainTab.addSolution('TextInput', {
+      correctAnswer: 'correct',
+      explanation: 'It is correct'
     });
+    topicEditorPage.saveQuestion();
+
+    topicEditorPage.get(topicId);
+    topicEditorPage.moveToQuestionsTab();
+    topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
+      1, 'Skill 1');
+
+    skillEditorPage.get(skillId);
+    skillEditorPage.moveToQuestionsTab();
+    skillEditorPage.expectNumberOfQuestionsToBe(1);
   });
 
-  it('should add a canonical story to topic correctly', function() {
+  it('should add a canonical story to topic correctly', async function() {
     topicEditorPage.expectNumberOfStoriesToBe(0);
     topicEditorPage.createStory('Story Title');
     storyEditorPage.returnToTopic();
@@ -137,23 +125,24 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectNumberOfStoriesToBe(1);
   });
 
-  it('should edit story title, description and notes correctly', function() {
-    topicEditorPage.navigateToStoryWithIndex(0);
-    storyEditorPage.changeStoryNotes(forms.toRichText('Story notes'));
-    storyEditorPage.changeStoryTitle('Story Title Edited');
-    storyEditorPage.changeStoryDescription('Story Description');
-    storyEditorPage.saveStory('Changed story title, description and notes');
+  it('should edit story title, description and notes correctly',
+    async function() {
+      topicEditorPage.navigateToStoryWithIndex(0);
+      storyEditorPage.changeStoryNotes(forms.toRichText('Story notes'));
+      storyEditorPage.changeStoryTitle('Story Title Edited');
+      storyEditorPage.changeStoryDescription('Story Description');
+      storyEditorPage.saveStory('Changed story title, description and notes');
 
-    storyEditorPage.returnToTopic();
-    topicEditorPage.expectStoryTitleToBe('Story Title Edited', 0);
-    topicEditorPage.navigateToStoryWithIndex(0);
+      storyEditorPage.returnToTopic();
+      topicEditorPage.expectStoryTitleToBe('Story Title Edited', 0);
+      topicEditorPage.navigateToStoryWithIndex(0);
 
-    storyEditorPage.expectTitleToBe('Story Title Edited');
-    storyEditorPage.expectDescriptionToBe('Story Description');
-    storyEditorPage.expectNotesToBe(forms.toRichText('Story notes'));
-  });
+      storyEditorPage.expectTitleToBe('Story Title Edited');
+      storyEditorPage.expectDescriptionToBe('Story Description');
+      storyEditorPage.expectNotesToBe(forms.toRichText('Story notes'));
+    });
 
-  it('should add and remove nodes (chapters) from a story', function() {
+  it('should add and remove nodes (chapters) from a story', async function() {
     topicEditorPage.navigateToStoryWithIndex(0);
     storyEditorPage.expectNumberOfChaptersToBe(0);
     storyEditorPage.createInitialChapter('Chapter 1');
@@ -165,7 +154,21 @@ describe('Topic editor functionality', function() {
     storyEditorPage.expectNumberOfChaptersToBe(1);
   });
 
-  it('should assign a skill to, between, and from subtopics', function() {
+  it('should publish and unpublish a story correctly', async function() {
+    topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
+    topicEditorPage.navigateToStoryWithIndex(0);
+    storyEditorPage.publishStory();
+    storyEditorPage.returnToTopic();
+
+    topicEditorPage.expectStoryPublicationStatusToBe('Yes', 0);
+    topicEditorPage.navigateToStoryWithIndex(0);
+    storyEditorPage.unpublishStory();
+    storyEditorPage.returnToTopic();
+
+    topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
+  });
+
+  it('should assign a skill to, between, and from subtopics', async function() {
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill 2', 'Concept card explanation', true);
@@ -200,9 +203,9 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectSubtopicToHaveSkills(1, []);
   });
 
-  afterEach(function() {
+  afterEach(async function() {
     general.checkForConsoleErrors([]);
-    users.logout();
+    await users.logout();
   });
 });
 
@@ -220,16 +223,15 @@ describe('Chapter editor functionality', function() {
   var topicName = 'Topic 0';
   var userEmail = 'creator@chapterTest.com';
 
-  var createDummyExplorations = function(numExplorations) {
+  var createDummyExplorations = async function(numExplorations) {
     var ids = [];
     for (var i = 0; i < numExplorations; i++) {
       var info = dummyExplorationInfo.slice();
       info[0] += i.toString();
       workflow.createAndPublishExploration.apply(workflow, info);
-      browser.getCurrentUrl().then(function(url) {
-        var id = url.split('/')[4].replace('#', '');
-        ids.push(id);
-      });
+      var url = await browser.getCurrentUrl();
+      var id = url.split('/')[4].replace('#', '');
+      ids.push(id);
     }
     return ids;
   };
@@ -245,7 +247,7 @@ describe('Chapter editor functionality', function() {
     return skills;
   };
 
-  beforeAll(function() {
+  beforeAll(async function() {
     topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
@@ -254,27 +256,25 @@ describe('Chapter editor functionality', function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       userEmail, 'creatorChapterTest');
-    browser.getWindowHandle().then(function(handle) {
-      dummyExplorationIds = createDummyExplorations(3);
-      topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.createTopic(topicName, false);
-      topicEditorPage.createStory('Story 0');
-      browser.getCurrentUrl().then(function(url) {
-        storyId = url.split('/')[4];
-        general.closeCurrentTabAndSwitchTo(handle);
-        dummySkills = createDummySkills(2);
-      });
-    });
+    var handle = await browser.getWindowHandle();
+    dummyExplorationIds = await createDummyExplorations(3);
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createTopic(topicName, false);
+    topicEditorPage.createStory('Story 0');
+    var url = await browser.getCurrentUrl();
+    storyId = url.split('/')[4];
+    general.closeCurrentTabAndSwitchTo(handle);
+    dummySkills = createDummySkills(2);
   });
 
-  beforeEach(function() {
-    users.login(userEmail);
+  beforeEach(async function() {
+    await users.login(userEmail);
     storyEditorPage.get(storyId);
   });
 
-  it('should create a basic chapter.', function() {
+  it('should create a basic chapter.', async function() {
     storyEditorPage.createInitialChapter('Chapter 1');
     storyEditorPage.changeNodeDescription('Chapter description 1');
     storyEditorPage.setChapterExplorationId(dummyExplorationIds[0]);
@@ -290,8 +290,8 @@ describe('Chapter editor functionality', function() {
 
   it(
     'should check presence of skillreview RTE element in exploration ' +
-    'linked to story', function() {
-      browser.get('/create/' + dummyExplorationIds[0]);
+    'linked to story', async function() {
+      await browser.get('/create/' + dummyExplorationIds[0]);
       waitFor.pageToFullyLoad();
       explorationEditorMainTab.setContent(function(richTextEditor) {
         richTextEditor.addRteComponent(
@@ -304,7 +304,7 @@ describe('Chapter editor functionality', function() {
       });
     });
 
-  it('should add one more chapter to the story', function() {
+  it('should add one more chapter to the story', async function() {
     storyEditorPage.createNewDestinationChapter('Chapter 2');
     storyEditorPage.navigateToChapterByIndex(1);
     storyEditorPage.changeNodeDescription('Chapter description 2');
@@ -321,7 +321,7 @@ describe('Chapter editor functionality', function() {
   });
 
   it('should fail to add one more chapter with existing exploration',
-    function() {
+    async function() {
       storyEditorPage.navigateToChapterByIndex(1);
       storyEditorPage.createNewDestinationChapter('Chapter 3');
       storyEditorPage.navigateToChapterByIndex(2);
@@ -332,7 +332,7 @@ describe('Chapter editor functionality', function() {
   );
 
   it('should add one more chapter and change the chapters sequences',
-    function() {
+    async function() {
       storyEditorPage.navigateToChapterByIndex(1);
       storyEditorPage.createNewDestinationChapter('Chapter 3');
       storyEditorPage.navigateToChapterByIndex(2);
@@ -353,18 +353,19 @@ describe('Chapter editor functionality', function() {
     }
   );
 
-  it('should add one prerequisite and acquired skill to chapter 1', function() {
-    storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
-    storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
-    storyEditorPage.addAcquiredSkill(dummySkills[0]);
-    storyEditorPage.expectAcquiredSkillDescriptionCardCount(1);
-    storyEditorPage.addPrerequisiteSkill(dummySkills[1]);
-    storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(1);
-    storyEditorPage.saveStory('Save');
-  });
+  it('should add one prerequisite and acquired skill to chapter 1',
+    async function() {
+      storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
+      storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(0);
+      storyEditorPage.addAcquiredSkill(dummySkills[0]);
+      storyEditorPage.expectAcquiredSkillDescriptionCardCount(1);
+      storyEditorPage.addPrerequisiteSkill(dummySkills[1]);
+      storyEditorPage.expectPrerequisiteSkillDescriptionCardCount(1);
+      storyEditorPage.saveStory('Save');
+    });
 
   it('should fail to add one prerequisite skill which is already added as' +
-    ' acquired skill', function() {
+    ' acquired skill', async function() {
     storyEditorPage.addAcquiredSkill(dummySkills[1]);
     storyEditorPage.expectSaveStoryDisabled();
     var warningRegex = new RegExp(
@@ -374,7 +375,7 @@ describe('Chapter editor functionality', function() {
     storyEditorPage.expectWarningInIndicator(warningRegex);
   });
 
-  it('should delete prerequisite skill and acquired skill', function() {
+  it('should delete prerequisite skill and acquired skill', async function() {
     storyEditorPage.deleteAcquiredSkillByIndex(0);
     storyEditorPage.expectAcquiredSkillDescriptionCardCount(0);
     storyEditorPage.deletePrerequisiteSkillByIndex(0);
@@ -382,12 +383,12 @@ describe('Chapter editor functionality', function() {
   });
 
   it('should select the "Chapter 2" as initial chapter and get unreachable' +
-    ' error', function() {
+    ' error', async function() {
     storyEditorPage.selectInitialChapterByName('Chapter 2');
     storyEditorPage.expectDisplayUnreachableChapterWarning();
   });
 
-  it('should delete one chapter and save', function() {
+  it('should delete one chapter and save', async function() {
     storyEditorPage.expectNumberOfChaptersToBe(2);
     storyEditorPage.deleteChapterWithIndex(1);
     storyEditorPage.expectNumberOfChaptersToBe(1);
@@ -401,7 +402,7 @@ describe('Chapter editor functionality', function() {
     }
   });
 
-  afterAll(function() {
-    users.logout();
+  afterAll(async function() {
+    await users.logout();
   });
 });

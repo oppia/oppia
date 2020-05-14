@@ -33,7 +33,7 @@ describe('Classroom page functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     classroomPage = new ClassroomPage.ClassroomPage();
     libraryPage = new LibraryPage.LibraryPage();
@@ -42,41 +42,40 @@ describe('Classroom page functionality', function() {
     topicEditorPage =
       new TopicEditorPage.TopicEditorPage();
 
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
   });
 
-  beforeEach(function() {
-    users.login('creator@classroomPage.com');
+  beforeEach(async function() {
+    await users.login('creator@classroomPage.com');
   });
 
-  it('should add a new published topic to the Math classroom', function() {
-    browser.getWindowHandle().then(function(handle) {
+  it('should add a new published topic to the Math classroom',
+    async function() {
+      var handle = await browser.getWindowHandle();
       topicsAndSkillsDashboardPage.get();
       topicsAndSkillsDashboardPage.createTopic('Topic 1', false);
       topicEditorPage.submitTopicThumbnail('../data/test_svg.svg');
       topicEditorPage.saveTopic('Added thumbnail.');
-      browser.getCurrentUrl().then(function(url) {
-        var topicId = url.split('/')[4].slice(0, -1);
-        general.closeCurrentTabAndSwitchTo(handle);
-        adminPage.editConfigProperty(
-          'The set of topic IDs for each classroom page.',
-          'List',
-          function(elem) {
-            elem.editItem(0, 'Dictionary').editEntry(1, 'List').addItem(
-              'Unicode').setValue(topicId);
-          });
-        classroomPage.get('math');
-        classroomPage.expectNumberOfTopicsToBe(0);
-        topicsAndSkillsDashboardPage.get();
-        topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
-        topicEditorPage.publishTopic();
-        classroomPage.get('math');
-        classroomPage.expectNumberOfTopicsToBe(1);
-        users.logout();
-      });
+      var url = await browser.getCurrentUrl();
+      var topicId = url.split('/')[4].slice(0, -1);
+      general.closeCurrentTabAndSwitchTo(handle);
+      adminPage.editConfigProperty(
+        'The set of topic IDs for each classroom page.',
+        'List',
+        function(elem) {
+          elem.editItem(0, 'Dictionary').editEntry(1, 'List').addItem(
+            'Unicode').setValue(topicId);
+        });
+      classroomPage.get('math');
+      classroomPage.expectNumberOfTopicsToBe(0);
+      topicsAndSkillsDashboardPage.get();
+      topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+      topicEditorPage.publishTopic();
+      classroomPage.get('math');
+      classroomPage.expectNumberOfTopicsToBe(1);
+      await users.logout();
     });
-  });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);

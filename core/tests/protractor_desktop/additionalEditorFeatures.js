@@ -47,7 +47,7 @@ describe('Full exploration editor', function() {
   var creatorDashboardPage = null;
   var libraryPage = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
@@ -57,34 +57,34 @@ describe('Full exploration editor', function() {
     libraryPage = new LibraryPage.LibraryPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
 
-    users.createAndLoginAdminUser('superUser@test.com', 'superUser');
+    await users.createAndLoginAdminUser('superUser@test.com', 'superUser');
     // TODO(#7569): Change this test to work with the improvements tab.
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor',
       'Boolean', (elem) => elem.setValue(false));
-    users.logout();
+    await users.logout();
   });
 
   it('should walk through the tutorial when user repeatedly clicks Next',
-    function() {
-      users.createUser(
+    async function() {
+      await users.createUser(
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
-      users.login('userTutorial@stateEditor.com');
+      await users.login('userTutorial@stateEditor.com');
 
-      workflow.createExplorationAndStartTutorial();
+      await workflow.createExplorationAndStartTutorial();
       explorationEditorMainTab.startTutorial();
       explorationEditorMainTab.playTutorial();
       explorationEditorMainTab.finishTutorial();
-      users.logout();
+      await users.logout();
     }
   );
 
   it('should generate warning message if card height limit is exceeded ',
-    function() {
-      users.createUser('user@heightWarning.com', 'userHeightWarning');
-      users.login('user@heightWarning.com');
+    async function() {
+      await users.createUser('user@heightWarning.com', 'userHeightWarning');
+      await users.login('user@heightWarning.com');
 
-      workflow.createExploration();
+      await workflow.createExploration();
 
       var postTutorialPopover = element(by.css('.popover-content'));
       var stateEditContent = element(by.css('.protractor-test-edit-content'));
@@ -93,7 +93,7 @@ describe('Full exploration editor', function() {
       waitFor.elementToBeClickable(
         stateEditContent,
         'stateEditContent taking too long to appear to set content');
-      stateEditContent.click();
+      await stateEditContent.click();
       var stateEditorTag = element(by.tagName('state-content-editor'));
       var stateContentEditor = stateEditorTag.element(
         by.css('.protractor-test-state-content-editor'));
@@ -120,19 +120,19 @@ describe('Full exploration editor', function() {
       waitFor.visibilityOf(
         heightMessage, 'Card height limit message not displayed');
 
-      element(by.css('.oppia-hide-card-height-warning-icon')).click();
+      await element(by.css('.oppia-hide-card-height-warning-icon')).click();
       expect(heightMessage.isPresent()).toBe(false);
 
-      users.logout();
+      await users.logout();
     });
 
   it('should handle discarding changes, navigation, deleting states, ' +
       'changing the first state, displaying content, deleting responses and ' +
-      'switching to preview mode', function() {
-    users.createUser('user5@editorAndPlayer.com', 'user5EditorAndPlayer');
-    users.login('user5@editorAndPlayer.com');
+      'switching to preview mode', async function() {
+    await users.createUser('user5@editorAndPlayer.com', 'user5EditorAndPlayer');
+    await users.login('user5@editorAndPlayer.com');
 
-    workflow.createExploration();
+    await workflow.createExploration();
     explorationEditorMainTab.setStateName('card1');
     explorationEditorMainTab.expectCurrentStateToBe('card1');
     explorationEditorMainTab.setContent(forms.toRichText('card1 content'));
@@ -181,22 +181,21 @@ describe('Full exploration editor', function() {
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.setObjective('do some stuff here');
     explorationEditorPage.navigateToMainTab();
-    general.getExplorationIdFromEditor().then(function(explorationId) {
-      expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
-        explorationId + '#/gui/second');
-      browser.navigate().back();
-      expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
-        explorationId + '#/settings');
-      browser.navigate().back();
-      expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
-        explorationId + '#/gui/second');
-    });
+    var explorationId = await general.getExplorationIdFromEditor();
+    expect(await browser.getCurrentUrl()).toEqual(
+      general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
+      explorationId + '#/gui/second');
+    await browser.navigate().back();
+    expect(await browser.getCurrentUrl()).toEqual(
+      general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
+      explorationId + '#/settings');
+    await browser.navigate().back();
+    expect(await browser.getCurrentUrl()).toEqual(
+      general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
+      explorationId + '#/gui/second');
 
     // Refreshing to prevent stale elements after backing from previous page.
-    browser.driver.navigate().refresh();
+    await browser.driver.navigate().refresh();
     explorationEditorMainTab.setContent(function(richTextEditor) {
       richTextEditor.appendItalicText('Welcome');
     });
@@ -243,15 +242,15 @@ describe('Full exploration editor', function() {
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToBeOver();
     explorationEditorPage.discardChanges();
-    users.logout();
+    await users.logout();
   });
 
   it('should handle multiple rules in an answer group and also disallow ' +
-      'editing of a read-only exploration', function() {
-    users.createUser('user6@editorAndPlayer.com', 'user6EditorAndPlayer');
-    users.createUser('user7@editorAndPlayer.com', 'user7EditorAndPlayer');
-    users.login('user6@editorAndPlayer.com');
-    workflow.createExploration();
+      'editing of a read-only exploration', async function() {
+    await users.createUser('user6@editorAndPlayer.com', 'user6EditorAndPlayer');
+    await users.createUser('user7@editorAndPlayer.com', 'user7EditorAndPlayer');
+    await users.login('user6@editorAndPlayer.com');
+    await workflow.createExploration();
 
     // Create an exploration with multiple groups.
     explorationEditorMainTab.setStateName('first card');
@@ -292,17 +291,16 @@ describe('Full exploration editor', function() {
 
     // Login as another user and verify that the exploration editor does not
     // allow the second user to modify the exploration.
-    users.logout();
-    users.login('user7@editorAndPlayer.com');
+    await users.logout();
+    await users.login('user7@editorAndPlayer.com');
     // 2nd user finds an exploration, plays it and then try to access
     // its editor via /create/explorationId.
     libraryPage.get();
     libraryPage.findExploration('Testing multiple rules');
     libraryPage.playExploration('Testing multiple rules');
-    general.getExplorationIdFromPlayer().then(function(explorationId) {
-      browser.get(general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
-          explorationId);
-    });
+    var explorationId = await general.getExplorationIdFromPlayer();
+    await browser.get(general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
+        explorationId);
     explorationEditorMainTab.exitTutorial();
 
     // Verify nothing can change with this user.
@@ -354,13 +352,13 @@ describe('Full exploration editor', function() {
       forms.toRichText('Okay, now this is just becoming annoying.'));
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToBeOver();
-    users.logout();
+    await users.logout();
   });
 
-  it('should delete interactions cleanly', function() {
-    users.createUser('user8@editorAndPlayer.com', 'user8EditorAndPlayer');
-    users.login('user8@editorAndPlayer.com');
-    workflow.createExploration();
+  it('should delete interactions cleanly', async function() {
+    await users.createUser('user8@editorAndPlayer.com', 'user8EditorAndPlayer');
+    await users.login('user8@editorAndPlayer.com');
+    await workflow.createExploration();
     explorationEditorMainTab.setContent(forms.toRichText(
       'How are you feeling?'));
     explorationEditorMainTab.setInteraction('EndExploration');
@@ -376,7 +374,7 @@ describe('Full exploration editor', function() {
     explorationEditorMainTab.deleteInteraction();
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorMainTab.expectInteractionToMatch('EndExploration');
-    users.logout();
+    await users.logout();
   });
 
   afterEach(function() {

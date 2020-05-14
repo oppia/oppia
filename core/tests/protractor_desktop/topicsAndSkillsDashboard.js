@@ -37,7 +37,7 @@ describe('Topics and skills dashboard functionality', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
     skillEditorPage =
@@ -46,16 +46,16 @@ describe('Topics and skills dashboard functionality', function() {
       new TopicEditorPage.TopicEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    users.createAdmin('creator@topicsAndSkillsDashboard.com',
+    await users.createAdmin('creator@topicsAndSkillsDashboard.com',
       'creatorTopicsAndSkillsDashboard');
   });
 
-  beforeEach(function() {
-    users.login('creator@topicsAndSkillsDashboard.com');
+  beforeEach(async function() {
+    await users.login('creator@topicsAndSkillsDashboard.com');
     topicsAndSkillsDashboardPage.get();
   });
 
-  it('should add a new topic to list', function() {
+  it('should add a new topic to list', async function() {
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     topicsAndSkillsDashboardPage.createTopic('Topic 1', true);
 
@@ -63,7 +63,7 @@ describe('Topics and skills dashboard functionality', function() {
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
   });
 
-  it('should move published skill to unused skills section', function() {
+  it('should move published skill to unused skills section', async function() {
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill 2', 'Concept card explanation', true);
     topicsAndSkillsDashboardPage.get();
@@ -71,7 +71,7 @@ describe('Topics and skills dashboard functionality', function() {
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
   });
 
-  it('should move skill to a topic', function() {
+  it('should move skill to a topic', async function() {
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
     topicsAndSkillsDashboardPage.get();
@@ -80,37 +80,36 @@ describe('Topics and skills dashboard functionality', function() {
     topicEditorPage.expectNumberOfUncategorizedSkillsToBe(1);
   });
 
-  it('should merge an outside skill with one in a topic', function() {
-    browser.getWindowHandle().then(function(handle) {
-      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-        'Skill to be merged', 'Concept card explanation', false);
-      skillEditorPage.moveToQuestionsTab();
-      skillEditorPage.clickCreateQuestionButton();
-      skillEditorPage.confirmSkillDifficulty();
-      explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
-      explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
-      explorationEditorMainTab.addResponse(
-        'TextInput', forms.toRichText('Correct Answer'), null, false,
-        'FuzzyEquals', 'correct');
-      explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
-      explorationEditorMainTab.addHint('Hint 1');
-      explorationEditorMainTab.addSolution('TextInput', {
-        correctAnswer: 'correct',
-        explanation: 'It is correct'
-      });
-      skillEditorPage.saveQuestion();
-      general.closeCurrentTabAndSwitchTo(handle);
-      topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-      topicsAndSkillsDashboardPage.mergeSkillWithIndexToSkillWithIndex(0, 0);
-      topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
-      topicEditorPage.moveToQuestionsTab();
-      topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
-        1, 'Skill 2');
+  it('should merge an outside skill with one in a topic', async function() {
+    var handle = await browser.getWindowHandle();
+    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill to be merged', 'Concept card explanation', false);
+    skillEditorPage.moveToQuestionsTab();
+    skillEditorPage.clickCreateQuestionButton();
+    skillEditorPage.confirmSkillDifficulty();
+    explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
+    explorationEditorMainTab.setInteraction('TextInput', 'Placeholder', 5);
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('Correct Answer'), null, false,
+      'FuzzyEquals', 'correct');
+    explorationEditorMainTab.getResponseEditor(0).markAsCorrect();
+    explorationEditorMainTab.addHint('Hint 1');
+    explorationEditorMainTab.addSolution('TextInput', {
+      correctAnswer: 'correct',
+      explanation: 'It is correct'
     });
+    skillEditorPage.saveQuestion();
+    general.closeCurrentTabAndSwitchTo(handle);
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+    topicsAndSkillsDashboardPage.mergeSkillWithIndexToSkillWithIndex(0, 0);
+    topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    topicEditorPage.moveToQuestionsTab();
+    topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
+      1, 'Skill 2');
   });
 
-  it('should remove a skill from list once deleted', function() {
+  it('should remove a skill from list once deleted', async function() {
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill to be deleted', 'Concept card explanation', true);
     topicsAndSkillsDashboardPage.get();
@@ -123,7 +122,7 @@ describe('Topics and skills dashboard functionality', function() {
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
   });
 
-  it('should remove a topic from list once deleted', function() {
+  it('should remove a topic from list once deleted', async function() {
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
     topicsAndSkillsDashboardPage.deleteTopicWithIndex(0);
 
@@ -131,8 +130,8 @@ describe('Topics and skills dashboard functionality', function() {
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
   });
 
-  afterEach(function() {
+  afterEach(async function() {
     general.checkForConsoleErrors([]);
-    users.logout();
+    await users.logout();
   });
 });

@@ -37,36 +37,30 @@ describe('Skill Editor functionality', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
 
-  beforeAll(function() {
+  beforeAll(async function() {
     topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
     skillEditorPage =
       new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    users.createAndLoginAdminUser(
+    await users.createAndLoginAdminUser(
       'creator@skillEditor.com', 'creatorSkillEditor');
     topicsAndSkillsDashboardPage.get();
-    browser.getWindowHandle().then(function(handle) {
-      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-        'Skill 1', 'Concept card explanation', false);
-      browser.getCurrentUrl().then(function(url) {
-        skillId = url.split('/')[4];
-        general.closeCurrentTabAndSwitchTo(handle);
-      }, function() {
-        // Note to developers:
-        // Promise is returned by getCurrentUrl which is handled here.
-        // No further action is needed.
-      });
-    });
+    var handle = await browser.getWindowHandle();
+    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill 1', 'Concept card explanation', false);
+    var url = await browser.getCurrentUrl();
+    skillId = url.split('/')[4];
+    general.closeCurrentTabAndSwitchTo(handle);
   });
 
-  beforeEach(function() {
-    users.login('creator@skillEditor.com');
+  beforeEach(async function() {
+    await users.login('creator@skillEditor.com');
     skillEditorPage.get(skillId);
   });
 
-  it('should edit description and concept card explanation', function() {
+  it('should edit description and concept card explanation', async function() {
     skillEditorPage.changeSkillDescription('Skill 1 edited');
     skillEditorPage.editConceptCard('Test concept card explanation');
     skillEditorPage.saveOrPublishSkill(
@@ -82,7 +76,7 @@ describe('Skill Editor functionality', function() {
       'Test concept card explanation');
   });
 
-  it('should create and delete worked examples', function() {
+  it('should create and delete worked examples', async function() {
     skillEditorPage.addWorkedExample(
       'Example Question 1', 'Example Explanation 1');
     skillEditorPage.addWorkedExample(
@@ -104,7 +98,7 @@ describe('Skill Editor functionality', function() {
     );
   });
 
-  it('should edit rubrics for the skill', function() {
+  it('should edit rubrics for the skill', async function() {
     skillEditorPage.expectRubricExplanationsToMatch(
       'Easy', ['Explanation for easy difficulty']);
     skillEditorPage.expectRubricExplanationsToMatch(
@@ -144,7 +138,7 @@ describe('Skill Editor functionality', function() {
       'Hard', ['Hard explanation 1 edited', 'Hard explanation 2 edited']);
   });
 
-  it('should create a question for the skill', function() {
+  it('should create a question for the skill', async function() {
     skillEditorPage.moveToQuestionsTab();
     skillEditorPage.clickCreateQuestionButton();
     skillEditorPage.confirmSkillDifficulty();
@@ -166,7 +160,7 @@ describe('Skill Editor functionality', function() {
     skillEditorPage.expectNumberOfQuestionsToBe(1);
   });
 
-  it('should create and delete misconceptions', function() {
+  it('should create and delete misconceptions', async function() {
     skillEditorPage.addMisconception(
       'Misconception 1', 'Notes 1', 'Feedback 1');
     skillEditorPage.addMisconception(
@@ -183,8 +177,8 @@ describe('Skill Editor functionality', function() {
     skillEditorPage.expectNumberOfMisconceptionsToBe(1);
   });
 
-  afterEach(function() {
+  afterEach(async function() {
     general.checkForConsoleErrors([]);
-    users.logout();
+    await users.logout();
   });
 });

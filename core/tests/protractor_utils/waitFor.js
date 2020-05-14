@@ -44,21 +44,21 @@ var elementToBeClickable = function(element, errorMessage) {
  *                           have height or width.
  * @param {string} errorMessage - Error message when element is still visible.
  */
-var invisibilityOf = function(element, errorMessage) {
-  return browser.wait(
+var invisibilityOf = async function(element, errorMessage) {
+  return await browser.wait(
     until.invisibilityOf(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
 /**
  * Consider adding this method after each browser.get() call.
  */
-var pageToFullyLoad = function() {
+var pageToFullyLoad = async function() {
   // Completely wait for page to load to avoid XMLHTTPReq error on page refresh:
   // https://github.com/angular/angular.js/issues/14219#issuecomment-251605766
   // and browser.waitForAngular's flakiness
   // https://github.com/angular/protractor/issues/2954.
   var loadingMessage = element(by.css('[ng-show="loadingMessage"]'));
-  return browser.driver.wait(until.invisibilityOf(loadingMessage), 15000,
+  return await browser.driver.wait(until.invisibilityOf(loadingMessage), 15000,
     'Page takes more than 15 secs to load');
 };
 
@@ -79,8 +79,8 @@ var textToBePresentInElement = function(element, text, errorMessage) {
  *                           height and width that is greater than 0.
  * @param {string} errorMessage - Error message when element is invisible.
  */
-var visibilityOf = function(element, errorMessage) {
-  return browser.wait(
+var visibilityOf = async function(element, errorMessage) {
+  return await browser.wait(
     until.visibilityOf(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 

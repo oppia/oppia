@@ -53,7 +53,8 @@ describe('Navigation features on mobile', function() {
         aboutLink, 'Could not click about link');
       await aboutLink.click();
       await waitFor.pageToFullyLoad();
-      expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/about');
+      expect(await browser.getCurrentUrl()).toEqual(
+        'http://localhost:9001/about');
     });
 
   it('should navigate to Get Started page using the sidebar menu',
@@ -85,7 +86,8 @@ describe('Navigation features on mobile', function() {
         teachLink, 'Could not click teach link');
       await teachLink.click();
       await waitFor.pageToFullyLoad();
-      expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/teach');
+      expect(await browser.getCurrentUrl()).toEqual(
+        'http://localhost:9001/teach');
     });
 
   it('should navigate to Donate page using the sidebar menu',
@@ -101,7 +103,8 @@ describe('Navigation features on mobile', function() {
         donateLink, 'Could not click donate link');
       await donateLink.click();
       await waitFor.pageToFullyLoad();
-      expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/donate');
+      expect(await browser.getCurrentUrl()).toEqual(
+        'http://localhost:9001/donate');
     });
 
   it('should navigate to Contact page using the sidebar menu',
@@ -117,7 +120,8 @@ describe('Navigation features on mobile', function() {
         contactLink, 'Could not click contact link');
       await contactLink.click();
       await waitFor.pageToFullyLoad();
-      expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/contact');
+      expect(await browser.getCurrentUrl()).toEqual(
+        'http://localhost:9001/contact');
     });
 
   it('should navigate to Library page using the sidebar menu',
@@ -132,7 +136,8 @@ describe('Navigation features on mobile', function() {
         libraryLink, 'Could not click library link');
       await libraryLink.click();
       await waitFor.pageToFullyLoad();
-      expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/library');
+      expect(await browser.getCurrentUrl()).toEqual(
+        'http://localhost:9001/library');
     });
 
   it('should navigate to Home page by clicking on the Oppia logo',

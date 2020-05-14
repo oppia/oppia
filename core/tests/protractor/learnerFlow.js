@@ -47,10 +47,10 @@ describe('Learner dashboard functionality', function() {
   var learnerDashboardPage = null;
   var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
   var continueButton = element(by.css('.protractor-test-continue-button'));
-  var clickContinueButton = function() {
+  var clickContinueButton = async function() {
     waitFor.elementToBeClickable(
       continueButton, 'Could not click continue button');
-    continueButton.click();
+    await continueButton.click();
     waitFor.pageToFullyLoad();
   };
 
@@ -108,10 +108,10 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('visits the exploration player and plays the correct exploration',
-    function() {
-      users.createUser('expCreator@learnerDashboard.com',
+    async function() {
+      await users.createUser('expCreator@learnerDashboard.com',
         'expCreator');
-      users.login('expCreator@learnerDashboard.com', true);
+      await users.login('expCreator@learnerDashboard.com', true);
       // Create or load an exploration named 'Exploration Player Test'.
       if (browser.isMobile) {
         adminPage.reloadExploration('exploration_player_test.yaml');
@@ -123,9 +123,9 @@ describe('Learner dashboard functionality', function() {
           'English'
         );
       }
-      users.logout();
+      await users.logout();
       var PLAYER_USERNAME = 'expPlayerDesktopAndMobile';
-      users.createAndLoginUser(
+      await users.createAndLoginUser(
         'expPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
       libraryPage.get();
       libraryPage.findExploration('Exploration Player Test');
@@ -133,10 +133,10 @@ describe('Learner dashboard functionality', function() {
     });
 
   it('visits the collection player and plays the correct collection',
-    function() {
-      users.createUser('expOfCollectionCreator@learnerDashboard.com',
+    async function() {
+      await users.createUser('expOfCollectionCreator@learnerDashboard.com',
         'expOfCollectionCreator');
-      users.login('expOfCollectionCreator@learnerDashboard.com', true);
+      await users.login('expOfCollectionCreator@learnerDashboard.com', true);
       // Create or load a collection named
       // 'Introduction to Collections in Oppia'.
       if (browser.isMobile) {
@@ -164,19 +164,19 @@ describe('Learner dashboard functionality', function() {
         collectionEditorPage.setCategory('Algebra');
         collectionEditorPage.saveChanges();
       }
-      users.logout();
+      await users.logout();
       var PLAYER_USERNAME = 'collectionPlayerDesktopAndMobile';
-      users.createAndLoginUser(
+      await users.createAndLoginUser(
         'collectionPlayerDesktopAndMobile@learnerFlow.com', PLAYER_USERNAME);
       libraryPage.get();
       libraryPage.findCollection('Introduction to Collections in Oppia');
       libraryPage.playCollection('Introduction to Collections in Oppia');
     });
 
-  it('displays incomplete and completed explorations', function() {
-    users.createUser('originalCreator@learnerDashboard.com',
+  it('displays incomplete and completed explorations', async function() {
+    await users.createUser('originalCreator@learnerDashboard.com',
       'originalCreator');
-    users.login('originalCreator@learnerDashboard.com', true);
+    await users.login('originalCreator@learnerDashboard.com', true);
     // Create or load explorations.
     if (browser.isMobile) {
       adminPage.reloadExploration('learner_flow_test.yaml');
@@ -192,8 +192,8 @@ describe('Learner dashboard functionality', function() {
         'English'
       );
     }
-    users.logout();
-    users.createAndLoginUser('learner@learnerDashboard.com',
+    await users.logout();
+    await users.createAndLoginUser('learner@learnerDashboard.com',
       'learnerlearnerDashboard');
     // Go to 'Dummy Exploration'.
     libraryPage.get();
@@ -202,7 +202,7 @@ describe('Learner dashboard functionality', function() {
     waitFor.pageToFullyLoad();
     // Leave this exploration incomplete.
     if (browser.isMobile) {
-      clickContinueButton();
+      await clickContinueButton();
     } else {
       // The exploration header is only visible in desktop browsers.
       explorationPlayerPage.expectExplorationNameToBe('Dummy Exploration');
@@ -210,7 +210,7 @@ describe('Learner dashboard functionality', function() {
       explorationPlayerPage.expectExplorationToNotBeOver();
     }
     // User clicks on Oppia logo to leave exploration.
-    oppiaLogo.click();
+    await oppiaLogo.click();
     general.acceptAlert();
 
     // Go to 'Test Exploration'.
@@ -218,7 +218,7 @@ describe('Learner dashboard functionality', function() {
     libraryPage.findExploration('Test Exploration');
     libraryPage.playExploration('Test Exploration');
     waitFor.pageToFullyLoad();
-    oppiaLogo.click();
+    await oppiaLogo.click();
     waitFor.pageToFullyLoad();
     // Learner Dashboard should display 'Dummy Exploration'
     // as incomplete.
@@ -233,9 +233,9 @@ describe('Learner dashboard functionality', function() {
     waitFor.pageToFullyLoad();
     // Now complete the 'Dummmy Exploration'.
     if (browser.isMobile) {
-      clickContinueButton();
+      await clickContinueButton();
       // Navigate to the second page.
-      clickContinueButton();
+      await clickContinueButton();
     } else {
       explorationPlayerPage.expectExplorationNameToBe('Dummy Exploration');
       explorationPlayerPage.submitAnswer('Continue', null);
@@ -246,29 +246,28 @@ describe('Learner dashboard functionality', function() {
     learnerDashboardPage.get();
     learnerDashboardPage.checkCompleteExplorationSection('Dummy Exploration');
     learnerDashboardPage.checkCompleteExplorationSection('Test Exploration');
-    users.logout();
+    await users.logout();
 
     // For desktop, go to the exploration editor page and
     // delete 'Dummy Exploration'.
     if (!browser.isMobile) {
       // Login as Admin and delete exploration 'Dummy Exploration'.
-      users.createAndLoginAdminUser('inspector@learnerDashboard.com',
+      await users.createAndLoginAdminUser('inspector@learnerDashboard.com',
         'inspector');
       libraryPage.get();
       libraryPage.findExploration('Dummy Exploration');
       libraryPage.playExploration('Dummy Exploration');
       // Wait for player page to completely load
       waitFor.pageToFullyLoad();
-      general.getExplorationIdFromPlayer().then(function(explorationId) {
-        general.openEditor(explorationId);
-      });
+      var explorationId = await general.getExplorationIdFromPlayer();
+      general.openEditor(explorationId);
       explorationEditorPage.navigateToSettingsTab();
       explorationEditorSettingsTab.deleteExploration();
-      users.logout();
+      await users.logout();
 
       // Verify exploration 'Dummy Exploration' is deleted
       // from learner dashboard.
-      users.login('learner@learnerDashboard.com');
+      await users.login('learner@learnerDashboard.com');
       learnerDashboardPage.get();
       learnerDashboardPage.navigateToCompletedSection();
       learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
@@ -278,10 +277,10 @@ describe('Learner dashboard functionality', function() {
     }
   });
 
-  it('displays incomplete and completed collections', function() {
-    users.createUser('explorationCreator@learnerDashboard.com',
+  it('displays incomplete and completed collections', async function() {
+    await users.createUser('explorationCreator@learnerDashboard.com',
       'explorationCreator');
-    users.login('explorationCreator@learnerDashboard.com', true);
+    await users.login('explorationCreator@learnerDashboard.com', true);
     // Create or load a collection.
     if (browser.isMobile) {
       adminPage.reloadCollection(1);
@@ -312,8 +311,8 @@ describe('Learner dashboard functionality', function() {
       collectionEditorPage.setCategory('Algebra');
       collectionEditorPage.saveChanges();
     }
-    users.logout();
-    users.createAndLoginUser(
+    await users.logout();
+    await users.createAndLoginUser(
       'learner4@learnerDashboard.com', 'learner4learnerDashboard');
 
     // Go to 'Test Collection' and play it.
@@ -330,7 +329,7 @@ describe('Learner dashboard functionality', function() {
     // Click first exploration in collection.
     waitFor.elementToBeClickable(
       firstExploration, 'Could not click first exploration in collection');
-    firstExploration.click();
+    await firstExploration.click();
     waitFor.pageToFullyLoad();
     // Leave this collection incomplete.
     if (browser.isMobile) {
@@ -340,15 +339,15 @@ describe('Learner dashboard functionality', function() {
         by.css('.protractor-test-play-exploration-button'));
       waitFor.elementToBeClickable(
         playExploration, 'Could not click play exploration button');
-      playExploration.click();
+      await playExploration.click();
       waitFor.pageToFullyLoad();
-      clickContinueButton();
+      await clickContinueButton();
     } else {
       explorationPlayerPage.submitAnswer('Continue', null);
       explorationPlayerPage.expectExplorationToNotBeOver();
     }
     // User clicks on Oppia logo to leave collection.
-    oppiaLogo.click();
+    await oppiaLogo.click();
     general.acceptAlert();
 
     // Learner Dashboard should display
@@ -368,18 +367,18 @@ describe('Learner dashboard functionality', function() {
     // Click first exploration in collection.
     waitFor.elementToBeClickable(
       firstExploration, 'Could not click first exploration in collection');
-    firstExploration.click();
+    await firstExploration.click();
     waitFor.pageToFullyLoad();
     if (browser.isMobile) {
       var playExploration = element(
         by.css('.protractor-test-play-exploration-button'));
       waitFor.elementToBeClickable(
         playExploration, 'Could not click play exploration button');
-      playExploration.click();
+      await playExploration.click();
       waitFor.pageToFullyLoad();
-      clickContinueButton();
+      await clickContinueButton();
       waitFor.pageToFullyLoad();
-      clickContinueButton();
+      await clickContinueButton();
       waitFor.pageToFullyLoad();
     } else {
       explorationPlayerPage.expectExplorationNameToBe('Dummy Exploration');
@@ -391,7 +390,7 @@ describe('Learner dashboard functionality', function() {
     // 'Test Collection' as complete.
     learnerDashboardPage.get();
     learnerDashboardPage.checkCompleteCollectionSection('Test Collection');
-    users.logout();
+    await users.logout();
 
     // This part of the test is desktop-only for the following reasons:
     // 1. A user can only add an existing exploration to a collection it has
@@ -409,29 +408,29 @@ describe('Learner dashboard functionality', function() {
     if (!browser.isMobile) {
       // Add exploration 'Collection Exploration' to 'Test Collection'
       // and publish it.
-      users.login('explorationCreator@learnerDashboard.com');
+      await users.login('explorationCreator@learnerDashboard.com');
       creatorDashboardPage.get();
       waitFor.pageToFullyLoad();
       // Click on 'Collections' tab.
       var collectionsTab = element(by.css('.protractor-test-collections-tab'));
-      collectionsTab.click();
+      await collectionsTab.click();
       creatorDashboardPage.navigateToCollectionEditor();
       collectionEditorPage.searchForAndAddExistingExploration(
         'Collection Exploration');
       collectionEditorPage.saveDraft();
       collectionEditorPage.setCommitMessage('Add Collection Exploration');
       collectionEditorPage.closeSaveModal();
-      users.logout();
+      await users.logout();
 
       // Verify 'Test Collection' is now in the incomplete section.
-      users.login('learner4@learnerDashboard.com');
+      await users.login('learner4@learnerDashboard.com');
       learnerDashboardPage.get();
       learnerDashboardPage.checkIncompleteCollectionSection('Test Collection');
     }
   });
 
-  afterEach(function() {
+  afterEach(async function() {
     general.checkForConsoleErrors([]);
-    users.logout();
+    await users.logout();
   });
 });

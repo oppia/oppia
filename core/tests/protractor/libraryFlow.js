@@ -42,15 +42,15 @@ describe('Library pages tour', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  var visitRecentlyPublishedPage = function() {
-    browser.get('library/recently_published');
+  var visitRecentlyPublishedPage = async function() {
+    await browser.get('library/recently_published');
     waitFor.pageToFullyLoad();
   };
 
-  var rateExploration = function() {
+  var rateExploration = async function() {
     var adminPage = new AdminPage.AdminPage();
-    users.createUser('random@gmail.com', 'random');
-    users.login('random@gmail.com', true);
+    await users.createUser('random@gmail.com', 'random');
+    await users.login('random@gmail.com', true);
     // We need an exploration to rate here.
     if (browser.isMobile) {
       adminPage.reloadExploration('protractor_mobile_test_exploration.yaml');
@@ -66,32 +66,33 @@ describe('Library pages tour', function() {
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
     explorationPlayerPage.rateExploration(EXPLORATION_RATING);
-    users.logout();
+    await users.logout();
   };
 
-  it('visits the search page', function() {
+  it('visits the search page', async function() {
     libraryPage.get();
     libraryPage.findExploration(SEARCH_TERM);
-    expect(browser.getCurrentUrl()).toContain('search/find?q=python');
+    expect(await browser.getCurrentUrl()).toContain('search/find?q=python');
   });
 
-  it('visits the library index page', function() {
+  it('visits the library index page', async function() {
     libraryPage.get();
   });
 
-  it('visits the top rated page', function() {
+  it('visits the top rated page', async function() {
     // To visit the top rated page, at least one
     // exploration has to be rated by the user.
-    rateExploration();
+    await rateExploration();
     libraryPage.get();
-    element(by.css('.protractor-test-library-top-rated')).click();
+    await element(by.css('.protractor-test-library-top-rated')).click();
     waitFor.pageToFullyLoad();
-    expect(browser.getCurrentUrl()).toContain('library/top_rated');
+    expect(await browser.getCurrentUrl()).toContain('library/top_rated');
   });
 
-  it('visits the recent explorations page', function() {
-    visitRecentlyPublishedPage();
-    expect(browser.getCurrentUrl()).toContain('library/recently_published');
+  it('visits the recent explorations page', async function() {
+    await visitRecentlyPublishedPage();
+    expect(await browser.getCurrentUrl()).toContain(
+      'library/recently_published');
   });
 
   afterEach(function() {
@@ -114,9 +115,10 @@ describe('Rating', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  var addRating = function(userEmail, userName, explorationName, ratingValue) {
-    users.createUser(userEmail, userName);
-    users.login(userEmail);
+  var addRating = async function(
+      userEmail, userName, explorationName, ratingValue) {
+    await users.createUser(userEmail, userName);
+    await users.login(userEmail);
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_RATINGTEST);
     libraryPage.playExploration(EXPLORATION_RATINGTEST);
@@ -126,14 +128,14 @@ describe('Rating', function() {
       explorationPlayerPage.expectExplorationNameToBe(explorationName);
     }
     explorationPlayerPage.rateExploration(ratingValue);
-    users.logout();
+    await users.logout();
   };
 
   it('should display ratings on exploration when minimum ratings have been ' +
-     'submitted', function() {
-    users.createUser('user11@explorationRating.com', 'user11Rating');
+     'submitted', async function() {
+    await users.createUser('user11@explorationRating.com', 'user11Rating');
     // Create a test exploration.
-    users.login('user11@explorationRating.com', true);
+    await users.login('user11@explorationRating.com', true);
 
     // We need a test exploration here.
     if (browser.isMobile) {
@@ -146,13 +148,13 @@ describe('Rating', function() {
         EXPLORATION_RATINGTEST, CATEGORY_BUSINESS,
         'this is an objective', LANGUAGE_ENGLISH);
     }
-    users.logout();
+    await users.logout();
 
     // Create test users, play exploration and review them after completion.
     for (var i = 0; i < MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS - 1; i++) {
       var userEmail = 'NoDisplay' + i + '@explorationRating.com';
       var username = 'NoDisplay' + i;
-      addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
+      await addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
     }
 
     libraryPage.get();
@@ -161,7 +163,7 @@ describe('Rating', function() {
 
     var userEmail = 'Display@explorationRating.com';
     var username = 'Display';
-    addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
+    await addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
 
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_RATINGTEST);

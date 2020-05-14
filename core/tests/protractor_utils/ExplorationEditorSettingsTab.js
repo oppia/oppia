@@ -133,8 +133,8 @@ var ExplorationEditorSettingsTab = function() {
     expect((explorationSummaryTile.isPresent())).toBeFalsy();
   };
 
-  this.setCategory = function(category) {
-    forms.AutocompleteDropdownEditor(explorationCategoryInput).setValue(
+  this.setCategory = async function(category) {
+    await forms.AutocompleteDropdownEditor(explorationCategoryInput).setValue(
       category);
   };
 
@@ -142,19 +142,19 @@ var ExplorationEditorSettingsTab = function() {
     initialStateSelectOption(stateName).click();
   };
 
-  this.setLanguage = function(language) {
-    element(by.css('.protractor-test-exploration-language-select')).
+  this.setLanguage = async function(language) {
+    await element(by.css('.protractor-test-exploration-language-select')).
       element(by.cssContainingText('option', language)).click();
   };
 
-  this.setObjective = function(objective) {
-    explorationObjectiveInput.clear();
-    explorationObjectiveInput.sendKeys(objective);
+  this.setObjective = async function(objective) {
+    await explorationObjectiveInput.clear();
+    await explorationObjectiveInput.sendKeys(objective);
   };
 
-  this.setTitle = function(title) {
-    explorationTitleInput.clear();
-    explorationTitleInput.sendKeys(title);
+  this.setTitle = async function(title) {
+    await explorationTitleInput.clear();
+    await explorationTitleInput.sendKeys(title);
   };
 
   this.expectCategoryToBe = function(category) {

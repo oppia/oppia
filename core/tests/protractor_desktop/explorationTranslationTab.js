@@ -39,7 +39,7 @@ describe('Exploration translation and voiceover tab', function() {
   var GREEN_STATE_PROGRESS_COLOR = 'rgb(22, 167, 101)';
   var RED_STATE_PROGRESS_COLOR = 'rgb(209, 72, 54)';
 
-  beforeAll(function() {
+  beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -48,15 +48,16 @@ describe('Exploration translation and voiceover tab', function() {
     explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
     explorationPreviewTab = explorationEditorPage.getPreviewTab();
 
-    users.createUser('voiceArtist@translationTab.com', 'userVoiceArtist');
-    users.createUser('user@editorTab.com', 'userEditor');
-    users.createAndLoginAdminUser('superUser@translationTab.com', 'superUser');
+    await users.createUser('voiceArtist@translationTab.com', 'userVoiceArtist');
+    await users.createUser('user@editorTab.com', 'userEditor');
+    await users.createAndLoginAdminUser(
+      'superUser@translationTab.com', 'superUser');
     // TODO(#7569): Change this test to work with the improvements tab.
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor',
       'Boolean', (elem) => elem.setValue(false));
-    users.login('user@editorTab.com');
-    workflow.createExploration();
+    await users.login('user@editorTab.com');
+    await workflow.createExploration();
 
     explorationEditorMainTab.setStateName('first');
     explorationEditorMainTab.setContent(forms.toRichText(
@@ -95,17 +96,17 @@ describe('Exploration translation and voiceover tab', function() {
   });
 
   it('should walkthrough translation tutorial when user clicks next',
-    function() {
-      users.login('user@editorTab.com');
+    async function() {
+      await users.login('user@editorTab.com');
       creatorDashboardPage.get();
       creatorDashboardPage.editExploration('Test Exploration');
       explorationEditorPage.navigateToTranslationTab();
       explorationEditorTranslationTab.startTutorial();
       explorationEditorTranslationTab.playTutorial();
       explorationEditorTranslationTab.finishTutorial();
-      users.logout();
+      await users.logout();
 
-      users.login('voiceArtist@translationTab.com');
+      await users.login('voiceArtist@translationTab.com');
       creatorDashboardPage.get();
       creatorDashboardPage.editExploration('Test Exploration');
       explorationEditorMainTab.exitTutorial();
@@ -113,12 +114,12 @@ describe('Exploration translation and voiceover tab', function() {
       explorationEditorTranslationTab.startTutorial();
       explorationEditorTranslationTab.playTutorial();
       explorationEditorTranslationTab.finishTutorial();
-      users.logout();
+      await users.logout();
     });
 
   it('should cache the selected language for translation and voiceover',
-    function() {
-      users.login('voiceArtist@translationTab.com');
+    async function() {
+      await users.login('voiceArtist@translationTab.com');
       creatorDashboardPage.get();
       creatorDashboardPage.editExploration('Test Exploration');
       explorationEditorMainTab.exitTutorial();
@@ -129,20 +130,20 @@ describe('Exploration translation and voiceover tab', function() {
       explorationEditorTranslationTab.expectSelectedLanguageToBe('Hindi');
     });
 
-  it('should have voiceover as a default mode', function() {
-    users.login('voiceArtist@translationTab.com');
+  it('should have voiceover as a default mode', async function() {
+    await users.login('voiceArtist@translationTab.com');
     creatorDashboardPage.get();
     creatorDashboardPage.editExploration('Test Exploration');
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.changeLanguage('Hindi');
     explorationEditorTranslationTab.exitTutorial();
     explorationEditorTranslationTab.expectToBeInVoiceoverMode();
-    users.logout();
+    await users.logout();
   });
 
   it('should have all the state contents for voiceover in exploration language',
-    function() {
-      users.login('voiceArtist@translationTab.com');
+    async function() {
+      await users.login('voiceArtist@translationTab.com');
       creatorDashboardPage.get();
       creatorDashboardPage.editExploration('Test Exploration');
       explorationEditorPage.navigateToTranslationTab();
@@ -155,11 +156,11 @@ describe('Exploration translation and voiceover tab', function() {
         'This is solution.');
       explorationEditorTranslationTab.expectHintsTabContentsToMatch(
         ['This is hint1.', 'This is hint2.']);
-      users.logout();
+      await users.logout();
     });
 
-  it('should contain accessibility elements', function() {
-    users.login('voiceArtist@translationTab.com');
+  it('should contain accessibility elements', async function() {
+    await users.login('voiceArtist@translationTab.com');
     creatorDashboardPage.get();
     creatorDashboardPage.editExploration('Test Exploration');
     explorationEditorPage.navigateToTranslationTab();
@@ -180,13 +181,13 @@ describe('Exploration translation and voiceover tab', function() {
       'Upload voiceovered file');
     explorationEditorTranslationTab.expectPlayRecordingAccessibilityToMatch(
       'Play recorded audio');
-    users.logout();
+    await users.logout();
   });
 
   it(
     'should maintain its active sub-tab on saving draft and publishing changes',
-    function() {
-      users.login('user@editorTab.com');
+    async function() {
+      await users.login('user@editorTab.com');
       creatorDashboardPage.get();
       creatorDashboardPage.editExploration('Test Exploration');
       explorationEditorPage.navigateToTranslationTab();
@@ -200,22 +201,22 @@ describe('Exploration translation and voiceover tab', function() {
       explorationEditorTranslationTab.expectFeedbackTabToBeActive();
       workflow.publishExploration();
       explorationEditorTranslationTab.expectFeedbackTabToBeActive();
-      users.logout();
+      await users.logout();
     });
 
 
-  it('should change translation language correctly', function() {
-    users.login('voiceArtist@translationTab.com');
+  it('should change translation language correctly', async function() {
+    await users.login('voiceArtist@translationTab.com');
     creatorDashboardPage.get();
     creatorDashboardPage.editExploration('Test Exploration');
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.changeLanguage('Hindi');
     explorationEditorTranslationTab.expectSelectedLanguageToBe('Hindi');
-    users.logout();
+    await users.logout();
   });
 
-  it('should correctly switch to different modes', function() {
-    users.login('voiceArtist@translationTab.com');
+  it('should correctly switch to different modes', async function() {
+    await users.login('voiceArtist@translationTab.com');
     creatorDashboardPage.get();
     creatorDashboardPage.editExploration('Test Exploration');
     explorationEditorPage.navigateToTranslationTab();
@@ -227,72 +228,73 @@ describe('Exploration translation and voiceover tab', function() {
 
     explorationEditorTranslationTab.switchToVoiceoverMode();
     explorationEditorTranslationTab.expectToBeInVoiceoverMode();
-    users.logout();
+    await users.logout();
   });
 
-  it('should allow adding translation and reflect the progress', function() {
-    users.login('user@editorTab.com');
-    creatorDashboardPage.get();
-    creatorDashboardPage.editExploration('Test Exploration');
-    explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab.exitTutorial();
-    explorationEditorTranslationTab.changeLanguage('Hindi');
-    explorationEditorTranslationTab.switchToTranslationMode();
+  it('should allow adding translation and reflect the progress',
+    async function() {
+      await users.login('user@editorTab.com');
+      creatorDashboardPage.get();
+      creatorDashboardPage.editExploration('Test Exploration');
+      explorationEditorPage.navigateToTranslationTab();
+      explorationEditorTranslationTab.exitTutorial();
+      explorationEditorTranslationTab.changeLanguage('Hindi');
+      explorationEditorTranslationTab.switchToTranslationMode();
 
-    explorationEditorTranslationTab.expectCorrectStatusColor(
-      'first', YELLOW_STATE_PROGRESS_COLOR);
-    explorationEditorTranslationTab.expectCorrectStatusColor(
-      'second', RED_STATE_PROGRESS_COLOR);
-    explorationEditorTranslationTab.expectCorrectStatusColor(
-      'final card', RED_STATE_PROGRESS_COLOR);
-    explorationEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
-      '1 item translated out of 8 items');
+      explorationEditorTranslationTab.expectCorrectStatusColor(
+        'first', YELLOW_STATE_PROGRESS_COLOR);
+      explorationEditorTranslationTab.expectCorrectStatusColor(
+        'second', RED_STATE_PROGRESS_COLOR);
+      explorationEditorTranslationTab.expectCorrectStatusColor(
+        'final card', RED_STATE_PROGRESS_COLOR);
+      explorationEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
+        '1 item translated out of 8 items');
 
-    explorationEditorTranslationTab.moveToState('first');
-    explorationEditorTranslationTab.expectContentTabContentToMatch(
-      'This is first card.');
-    explorationEditorTranslationTab.setTranslation(forms.toRichText(
-      'Yeh pehla panna hain.'));
-    explorationEditorTranslationTab.navigateToFeedbackTab();
-    explorationEditorTranslationTab.setTranslation(forms.toRichText(
-      'Yeh hindi main vishleshad hain.'));
-    explorationEditorTranslationTab.moveToState('final card');
-    explorationEditorTranslationTab.expectContentTabContentToMatch(
-      'This is final card.');
-    explorationEditorTranslationTab.setTranslation(forms.toRichText(
-      'Yeh aakhri panna hain.'));
+      explorationEditorTranslationTab.moveToState('first');
+      explorationEditorTranslationTab.expectContentTabContentToMatch(
+        'This is first card.');
+      explorationEditorTranslationTab.setTranslation(forms.toRichText(
+        'Yeh pehla panna hain.'));
+      explorationEditorTranslationTab.navigateToFeedbackTab();
+      explorationEditorTranslationTab.setTranslation(forms.toRichText(
+        'Yeh hindi main vishleshad hain.'));
+      explorationEditorTranslationTab.moveToState('final card');
+      explorationEditorTranslationTab.expectContentTabContentToMatch(
+        'This is final card.');
+      explorationEditorTranslationTab.setTranslation(forms.toRichText(
+        'Yeh aakhri panna hain.'));
 
-    explorationEditorTranslationTab.moveToState('first');
-    explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
-      'Yeh pehla panna hain.'));
-    explorationEditorTranslationTab.navigateToFeedbackTab();
-    explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
-      'Yeh hindi main vishleshad hain.'));
-    explorationEditorTranslationTab.moveToState('final card');
-    explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
-      'Yeh aakhri panna hain.'));
+      explorationEditorTranslationTab.moveToState('first');
+      explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
+        'Yeh pehla panna hain.'));
+      explorationEditorTranslationTab.navigateToFeedbackTab();
+      explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
+        'Yeh hindi main vishleshad hain.'));
+      explorationEditorTranslationTab.moveToState('final card');
+      explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
+        'Yeh aakhri panna hain.'));
 
-    explorationEditorTranslationTab.switchToVoiceoverMode();
-    explorationEditorTranslationTab.switchToTranslationMode();
-    explorationEditorTranslationTab.moveToState('first');
-    explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
-      'Yeh pehla panna hain.'));
-    explorationEditorTranslationTab.navigateToFeedbackTab();
-    explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
-      'Yeh hindi main vishleshad hain.'));
-    explorationEditorTranslationTab.moveToState('final card');
-    explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
-      'Yeh aakhri panna hain.'));
-    explorationEditorTranslationTab.expectCorrectStatusColor(
-      'first', YELLOW_STATE_PROGRESS_COLOR);
-    explorationEditorTranslationTab.expectCorrectStatusColor(
-      'second', RED_STATE_PROGRESS_COLOR);
-    explorationEditorTranslationTab.expectCorrectStatusColor(
-      'final card', GREEN_STATE_PROGRESS_COLOR);
-    explorationEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
-      '3 items translated out of 8 items');
-    users.logout();
-  });
+      explorationEditorTranslationTab.switchToVoiceoverMode();
+      explorationEditorTranslationTab.switchToTranslationMode();
+      explorationEditorTranslationTab.moveToState('first');
+      explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
+        'Yeh pehla panna hain.'));
+      explorationEditorTranslationTab.navigateToFeedbackTab();
+      explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
+        'Yeh hindi main vishleshad hain.'));
+      explorationEditorTranslationTab.moveToState('final card');
+      explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
+        'Yeh aakhri panna hain.'));
+      explorationEditorTranslationTab.expectCorrectStatusColor(
+        'first', YELLOW_STATE_PROGRESS_COLOR);
+      explorationEditorTranslationTab.expectCorrectStatusColor(
+        'second', RED_STATE_PROGRESS_COLOR);
+      explorationEditorTranslationTab.expectCorrectStatusColor(
+        'final card', GREEN_STATE_PROGRESS_COLOR);
+      explorationEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
+        '3 items translated out of 8 items');
+      await users.logout();
+    });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
