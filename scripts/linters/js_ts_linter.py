@@ -721,12 +721,15 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 # required since the check cannot proceed if the AngularJS
                 # constants file is not provided before the Angular constants
                 # file.
+                is_corresponding_angularjs_filepath = False
                 if filepath.endswith('.constants.ts'):
                     filename_without_extension = filepath[:-3]
                     corresponding_angularjs_filepath = (
                         filename_without_extension + '.ajs.ts')
                     with linter_utils.temp_dir(parent=os.getcwd()) as temp_dir:
-                        if os.path.isfile(corresponding_angularjs_filepath):
+                        is_corresponding_angularjs_filepath = (
+                            os.path.isfile(corresponding_angularjs_filepath))
+                        if is_corresponding_angularjs_filepath:
                             compiled_js_filepath = self._compile_ts_file(
                                 corresponding_angularjs_filepath, temp_dir)
                             file_content = self.file_cache.read(
@@ -830,11 +833,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
                 # Checks that the *.constants.ts and the corresponding
                 # *.constants.ajs.ts file are in sync.
-                if filepath.endswith('.constants.ts'):
+                if filepath.endswith('.constants.ts') and (
+                        is_corresponding_angularjs_filepath):
                     # Ignore if file contains only type definitions for
                     # constants.
-                    if len(parsed_nodes) == 1:
-                        continue
                     angular_constants_nodes = (
                         parsed_nodes[1].declarations[0].init.callee.body.body)
                     for angular_constant_node in angular_constants_nodes:
