@@ -20,6 +20,9 @@ require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 
 require('domain/collection/collection-rights-backend-api.service.ts');
@@ -114,27 +117,22 @@ angular.module('oppia').directive('collectionEditorNavbar', [
 
           ctrl.saveChanges = function() {
             var isPrivate = ctrl.collectionRights.isPrivate();
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/collection-editor-page/templates/' +
                 'collection-editor-save-modal.directive.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$controller', '$scope', '$uibModalInstance',
+                function($controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
                   $scope.isCollectionPrivate = isPrivate;
-
-                  $scope.save = function(commitMessage) {
-                    $uibModalInstance.close(commitMessage);
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
                 }
               ]
-            });
-
-            modalInstance.result.then(function(commitMessage) {
+            }).result.then(function(commitMessage) {
               CollectionEditorStateService.saveCollection(commitMessage);
             }, function() {
               // Note to developers:
@@ -158,11 +156,17 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                 backdrop: true,
                 controllerAs: '$ctrl',
                 controller: [
-                  '$uibModalInstance', 'CollectionEditorStateService',
-                  'CollectionUpdateService', 'ALL_CATEGORIES',
+                  '$controller', '$uibModalInstance',
+                  'CollectionEditorStateService', 'CollectionUpdateService',
+                  'ALL_CATEGORIES',
                   function(
-                      $uibModalInstance, CollectionEditorStateService,
-                      CollectionUpdateService, ALL_CATEGORIES) {
+                      $controller, $uibModalInstance,
+                      CollectionEditorStateService, CollectionUpdateService,
+                      ALL_CATEGORIES) {
+                    $controller('ConfirmOrCancelModalController', {
+                      $scope: $scope,
+                      $uibModalInstance: $uibModalInstance
+                    });
                     var ctrl = this;
                     var collection = (
                       CollectionEditorStateService.getCollection());
@@ -223,10 +227,6 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                       }
 
                       $uibModalInstance.close(metadataList);
-                    };
-
-                    ctrl.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
                     };
                   }
                 ]
