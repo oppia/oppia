@@ -19,7 +19,7 @@ namespace CodeMirror {
 interface Window {
     CodeMirror?: typeof CodeMirror;
     HTMLElement?: HTMLElement;
-    __fixtures__?: any;
+    __fixtures__?: KarmaFixtures;
     decodeURIComponent?: (encodedURIComponent: string) => string;
     encodeURIComponent?: (decodedURIComponent: string) => string;
     ga?: Function;
