@@ -37,14 +37,14 @@
   </div>
   <div class="modal-footer" ng-switch="skillSummaries.length > 0">
     <div ng-switch-when="true">
-      <button class="btn btn-secondary" ng-click="cancelModal()"> Cancel </button>
+      <button class="btn btn-secondary" ng-click="cancel()"> Cancel </button>
       <button class="btn btn-success protractor-test-confirm-skill-button"
               ng-disabled="selectedSkillIds.length === 0"
               ng-click="goToNextStep()"> Next
       </button>
     </div>
     <div ng-switch-when="false">
-      <button class="btn btn-secondary" ng-click="closeModal()"> Ok </button>
+      <button class="btn btn-secondary" ng-click="cancel()"> Ok </button>
     </div>
   </div>
 </div>
@@ -73,7 +73,7 @@
   </div>
   <div class="modal-footer" ng-switch="linkedSkillsWithDifficulty.length > 0">
     <div ng-switch-when="true">
-      <button class="btn btn-secondary" ng-click="cancelModal()"> Cancel </button>
+      <button class="btn btn-secondary" ng-click="cancel()"> Cancel </button>
       <button class="btn btn-success protractor-test-confirm-skill-difficulty-button"
               ng-disabled="linkedSkillsWithDifficulty.length === 0"
               ng-click="startQuestionCreation()"> Done
