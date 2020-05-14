@@ -1,12 +1,16 @@
 <span ng-model="$ctrl.localValue" ui-validate="'$ctrl.validate($value)'">
   <span ng-form="$ctrl.floatForm">
     <span ng-if="!expressionMode">
-      <input type="number" step="any" ng-model="$ctrl.localValue" class="form-control protractor-test-float-form-input"
-             name="floatValue" ng-attr-placeholder="<['I18N_FORMS_TYPE_NUMBER' | translate]>" ng-disabled="$ctrl.isDisabled()"
-             require-is-float apply-validation validators="$ctrl.validators()"
+      <input step="any" ng-model="$ctrl.localValue" class="form-control protractor-test-float-form-input"
+             name="floatValue" ng-attr-placeholder="<['I18N_FORMS_TYPE_NUMBER' | translate]>"
              focus-on="<[$ctrl.labelForFocusTarget()]>" ng-keypress="$ctrl.onKeypress($event)"
-             ng-blur="$ctrl.onBlur()" ng-focus="$ctrl.onFocus()" style="display: inline;">
+             apply-validation validators="$ctrl.validators()"
+             ng-blur="$ctrl.onBlur()" ng-focus="$ctrl.onFocus()" style="display: inline;"
+             ng-change="$ctrl.generateErrors()">
 
+      <span class="oppia-form-error oppia-numeric-input-error" ng-if="$ctrl.errorString">
+        <[$ctrl.errorString]>
+      </span>
       <span ng-if="$ctrl.hasLoaded && !$ctrl.isUserCurrentlyTyping && $ctrl.hasFocusedAtLeastOnce"
             style="font-size: 0.85em; position: absolute;"
             tabindex="-1" focus-on="<[$ctrl.labelForErrorFocusTarget]>">
@@ -21,3 +25,9 @@
     </span>
   </span>
 </span>
+
+<style>
+  .oppia-numeric-input-error {
+    margin-top: 10px;
+  }
+</style>
