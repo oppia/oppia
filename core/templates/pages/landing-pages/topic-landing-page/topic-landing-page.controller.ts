@@ -99,7 +99,7 @@ angular.module('oppia').directive('topicLandingPage', [
 
           ctrl.onClickExploreLessonsButton = function() {
             $timeout(function() {
-              WindowRef.nativeWindow.location = '/library';
+              WindowRef.nativeWindow.location = '/community-library';
             }, 150);
           };
           ctrl.$onInit = function() {

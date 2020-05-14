@@ -28,9 +28,9 @@ export class LibraryPageConstants {
   };
 
   public static LIBRARY_PATHS_TO_MODES = {
-    '/library': 'index',
-    '/library/top_rated': 'group',
-    '/library/recently_published': 'group',
+    '/community-library': 'index',
+    '/community-library/top_rated': 'group',
+    '/community-library/recently_published': 'group',
     '/search/find': 'search'
   };
 

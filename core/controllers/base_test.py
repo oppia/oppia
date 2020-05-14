@@ -170,10 +170,10 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         """Tests request without csrf_token results in 401 error."""
 
         self.post_json(
-            '/library/any', payload={}, expected_status_int=401)
+            '/community-library/any', payload={}, expected_status_int=401)
 
         self.put_json(
-            '/library/any', payload={}, expected_status_int=401)
+            '/community-library/any', payload={}, expected_status_int=401)
 
     def test_requests_for_invalid_paths(self):
         """Test that requests for invalid paths result in a 404 error."""
@@ -181,20 +181,20 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
         self.get_html_response(
-            '/library/extra', expected_status_int=404)
+            '/community-library/extra', expected_status_int=404)
 
         self.get_html_response(
-            '/library/data/extra', expected_status_int=404)
+            '/community-library/data/extra', expected_status_int=404)
 
         self.post_json(
-            '/library/extra', payload={}, csrf_token=csrf_token,
+            '/community-library/extra', payload={}, csrf_token=csrf_token,
             expected_status_int=404)
 
         self.put_json(
-            '/library/extra', payload={}, csrf_token=csrf_token,
+            '/community-library/extra', payload={}, csrf_token=csrf_token,
             expected_status_int=404)
 
-        self.delete_json('/library/data', expected_status_int=404)
+        self.delete_json('/community-library/data', expected_status_int=404)
 
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
@@ -1113,7 +1113,7 @@ class SignUpTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token,
         )
 
-        self.get_html_response('/library')
+        self.get_html_response('/community-library')
 
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):

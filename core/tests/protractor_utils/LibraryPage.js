@@ -21,7 +21,7 @@ var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
 var LibraryPage = function() {
-  var LIBRARY_URL_SUFFIX = '/library';
+  var LIBRARY_URL_SUFFIX = '/community-library';
   var allCollectionSummaryTile = element.all(
     by.css('.protractor-test-collection-summary-tile'));
   var allExplorationSummaryTile = element.all(

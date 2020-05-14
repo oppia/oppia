@@ -132,7 +132,7 @@ describe('Navigation features on mobile', function() {
         libraryLink, 'Could not click library link');
       libraryLink.click();
       waitFor.pageToFullyLoad();
-      expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/library');
+      expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/community-library');
     });
 
   it('should navigate to Home page by clicking on the Oppia logo',

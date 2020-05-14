@@ -242,7 +242,7 @@ class LibraryRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect('/library')
+        self.redirect('/community-library')
 
 
 class ExplorationSummariesHandler(base.BaseHandler):

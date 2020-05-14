@@ -213,7 +213,7 @@ angular.module('oppia').directive('libraryPage', [
               Math.floor(Math.random() * possibleBannerFilenames.length)];
 
             ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
-              '/library/' + ctrl.bannerImageFilename);
+              '/community-library/' + ctrl.bannerImageFilename);
 
             ctrl.activeGroupIndex = null;
 
