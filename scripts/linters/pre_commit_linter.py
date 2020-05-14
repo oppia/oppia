@@ -149,6 +149,7 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
+_LINTER_TYPES = ['custom', 'third_party']
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
 _TARGET_STDOUT = python_utils.string_io()
@@ -325,11 +326,10 @@ def _get_linter_type(linter_type):
     Returns:
         list(str). The list of all linter types.
     """
-    linter_types = ['custom', 'third_party']
     if linter_type:
         return [linter_type]
 
-    return linter_types
+    return _LINTER_TYPES
 
 
 def _get_file_extensions(file_extensions_to_lint):
