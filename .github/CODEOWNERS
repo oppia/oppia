@@ -184,6 +184,7 @@
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/background-banner.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/background-banner.directive.html @ankita240796
+/core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @marianazangrossi
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/loading-dots.directive.ts @ankita240796
