@@ -5282,7 +5282,8 @@ export = {
   // Used to disable account data export until it is fully implemented.
   "ENABLE_ACCOUNT_EXPORT": false,
 
-  // Used to hide the callout to classroom until it is ready.
+  // Used to hide the classroom components (page, callout and navbar button)
+  // until the classroom page is ready.
   "SHOW_CLASSROOM": false,
 
   "DEV_MODE": true
