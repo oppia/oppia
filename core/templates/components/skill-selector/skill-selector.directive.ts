@@ -154,6 +154,18 @@ angular.module('oppia').directive('selectSkill', [
               // the main skills list.
               $scope.updateSkillsListOnSubtopicFilterChange();
             };
+            $scope.clearAllFilters = function() {
+              for (var i = 0; i < $scope.topicFilterList.length; i++) {
+                $scope.topicFilterList[i].checked = false;
+              }
+              for (var topicName in $scope.subTopicFilterDict) {
+                var length = $scope.subTopicFilterDict[topicName].length;
+                for (var j = 0; j < length; j++) {
+                  $scope.subTopicFilterDict[topicName][j].checked = false;
+                }
+              }
+              $scope.updateSkillsListOnTopicFilterChange();
+            };
           };
         }
       ]
