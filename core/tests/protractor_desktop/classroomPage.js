@@ -38,28 +38,29 @@ describe('Classroom page functionality', function() {
   });
 
   beforeEach(async function() {
+    await browser.driver.get('about:blank');
     await users.login('creator@classroomPage.com');
   });
 
   it('should search for explorations from classroom page', async function() {
-    workflow.createAndPublishExploration(
+    await workflow.createAndPublishExploration(
       'Exploration Title',
       'Algorithms',
       'This is the objective.',
       'English');
-    classroomPage.get('math');
-    libraryPage.findExploration('Title');
-    libraryPage.expectExplorationToBeVisible('Exploration Title');
+    await classroomPage.get('math');
+    await libraryPage.findExploration('Title');
+    await libraryPage.expectExplorationToBeVisible('Exploration Title');
 
-    libraryPage.selectLanguages(['English']);
-    libraryPage.expectCurrentLanguageSelectionToBe(['English']);
+    await libraryPage.selectLanguages(['English']);
+    await libraryPage.expectCurrentLanguageSelectionToBe(['English']);
 
-    libraryPage.selectCategories(['Algorithms']);
-    libraryPage.expectCurrentCategorySelectionToBe(['Algorithms']);
+    await libraryPage.selectCategories(['Algorithms']);
+    await libraryPage.expectCurrentCategorySelectionToBe(['Algorithms']);
     await users.logout();
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });

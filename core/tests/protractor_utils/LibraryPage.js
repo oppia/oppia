@@ -51,13 +51,12 @@ var LibraryPage = function() {
   var mainHeader = element(by.css('.protractor-test-library-main-header'));
 
   // Returns a promise of all explorations with the given name.
-  var _getExplorationElements = function(name) {
+  var _getExplorationElements = async function(name) {
     return element.all(by.css('.protractor-test-exp-summary-tile')).filter(
-      function(tile) {
-        return tile.element(by.css('.protractor-test-exp-summary-tile-title')).
-          getText().then(function(tileTitle) {
-            return (tileTitle === name);
-          });
+      async function(tile) {
+        var tileTitle = await tile.element(
+          by.css('.protractor-test-exp-summary-tile-title')).getText();
+        return (tileTitle === name);
       }
     );
   };
@@ -94,38 +93,38 @@ var LibraryPage = function() {
     await addToPlaylistButton.click();
   };
 
-  this.selectLanguages = function(languages) {
-    languageSelector.selectValues(languages);
+  this.selectLanguages = async function(languages) {
+    await languageSelector.selectValues(languages);
   };
 
   this.deselectLanguages = function(languages) {
     languageSelector.deselectValues(languages);
   };
 
-  this.expectCurrentLanguageSelectionToBe = function(expectedLanguages) {
-    languageSelector.expectCurrentSelectionToBe(expectedLanguages);
+  this.expectCurrentLanguageSelectionToBe = async function(expectedLanguages) {
+    await languageSelector.expectCurrentSelectionToBe(expectedLanguages);
   };
 
-  this.selectCategories = function(categories) {
-    categorySelector.selectValues(categories);
+  this.selectCategories = async function(categories) {
+    await categorySelector.selectValues(categories);
   };
 
   this.deselectCategories = function(categories) {
     categorySelector.deselectValues(categories);
   };
 
-  this.expectCurrentCategorySelectionToBe = function(expectedCategories) {
-    categorySelector.expectCurrentSelectionToBe(expectedCategories);
+  this.expectCurrentCategorySelectionToBe = async function(
+      expectedCategories) {
+    await categorySelector.expectCurrentSelectionToBe(expectedCategories);
   };
 
   this.expectMainHeaderTextToBe = function(expectedHeaderText) {
     expect(mainHeader.getText()).toEqual(expectedHeaderText);
   };
 
-  this.expectExplorationToBeVisible = function(name) {
-    _getExplorationElements(name).then(function(elems) {
-      expect(elems.length).not.toBe(0);
-    });
+  this.expectExplorationToBeVisible = async function(name) {
+    var elems = await _getExplorationElements(name);
+    expect(elems.length).not.toBe(0);
   };
 
   this.expectExplorationToBeHidden = function(name) {
