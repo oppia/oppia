@@ -26,7 +26,7 @@ describe('InteractionSpecsService', () => {
     this.interactionSpecsService = TestBed.get(InteractionSpecsService);
   });
 
-  describe('.isInteractionTrainable', () => {
+  describe('checking whether an interaction can be trained with ML', () => {
     it('should throw an error when interaction does not exist.', () => {
       expect(() => this.interactionSpecsService.isInteractionTrainable('Fake'))
         .toThrowError('Fake is not a valid interaction id');

@@ -36,7 +36,7 @@ import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 
-describe('AnswerClassificationService', () => {
+describe('Answer Classification Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
 

@@ -21,12 +21,12 @@ import { TestBed } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
 import { AppService } from 'services/app.service';
 
-describe('AppService', () => {
+describe('App Service', () => {
   beforeEach(() => {
     this.appService = TestBed.get(AppService);
   });
 
-  describe('.isMachineLearningClassificationEnabled', () => {
+  describe('querying the app for Machine Learning classifiers', () => {
     beforeEach(() => {
       this.initialValue = AppConstants.ENABLE_ML_CLASSIFIERS;
     });
