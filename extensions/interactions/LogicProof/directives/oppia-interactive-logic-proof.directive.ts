@@ -16,6 +16,9 @@
  * @fileoverview Directive for the LogicProof Interaction.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('interactions/codemirrorRequires.ts');
 
 require('interactions/LogicProof/directives/logic-proof-rules.service.ts');
@@ -221,14 +224,7 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
             $uibModal.open({
               template: require('./logic-proof-help-modal.directive.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.close = function() {
-                    $uibModalInstance.close();
-                  };
-                }
-              ]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {}, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
