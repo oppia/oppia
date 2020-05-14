@@ -97,13 +97,13 @@ angular.module('oppia').config([
       'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
       'ExpressionParserService', 'ExtensionTagAssemblerService',
       'ExtractImageFilenamesFromStateService',
-      'HtmlEscaperService', 'IdGenerationService', 'InteractionObjectFactory',
-      'LoaderService', 'LoggerService', 'MetaTagCustomizationService',
+      'HtmlEscaperService', 'IdGenerationService', 'InteractionObjectFactory','LanguageUtilService',
+      'LoaderService', 'LocalStorageService', 'LoggerService', 'MetaTagCustomizationService',
       'NormalizeWhitespacePipe', 'PencilCodeEditorRulesService',
       'SidebarStatusService', 'SiteAnalyticsService', 'SkillObjectFactory',
       'SolutionObjectFactory', 'StateCardObjectFactory',
       'StateImprovementSuggestionService', 'StateObjectFactory',
-      'StatesObjectFactory', 'TextInputRulesService', 'UrlInterpolationService',
+      'StatesObjectFactory', 'TextInputRulesService', 'TranslationLanguageService', 'UrlInterpolationService',
       'UrlService', 'UserInfoObjectFactory', 'UtilsService',
       'ValidatorsService', 'WindowDimensionsService', 'WindowRef'];
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
