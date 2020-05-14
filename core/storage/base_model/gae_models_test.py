@@ -437,6 +437,13 @@ class VersionedModelTests(test_utils.GenericTestBase):
         self.assertEqual(version_model.version, 2)
 
         version_model = (
+            TestVersionedModel.get_version('nonexistent_id1', 4, strict=False))
+        self.assertIsNone(version_model)
+
+        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+            TestVersionedModel.get_version('nonexistent_id1', 4, strict=True)
+
+        version_model = (
             TestVersionedModel.get_version('model_id1', 4, strict=False))
         self.assertIsNone(version_model)
 
