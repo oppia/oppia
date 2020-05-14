@@ -28,7 +28,6 @@ require('pages/creator-dashboard-page/creator-dashboard-page.component.ts');
 describe('Creator dashboard controller', () => {
   var ctrl;
   var $httpBackend;
-  var $componentController;
   var AlertsService;
   var CreatorDashboardBackendApiService;
 
