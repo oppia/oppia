@@ -91,7 +91,7 @@ angular.module('oppia').config([
     var servicesToProvide = [
       'AlertsService', 'BackgroundMaskService', 'BrowserCheckerService',
       'CodeReplRulesService', 'CollectionCreationBackendService',
-      'ContextService', 'CsrfTokenService',
+      'ContextService', 'CreatorDashboardBackendApiService', 'CsrfTokenService',
       'DateTimeFormatService', 'DebouncerService', 'DeviceInfoService',
       'DocumentAttributeCustomizationService',
       'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
@@ -99,11 +99,11 @@ angular.module('oppia').config([
       'ExtractImageFilenamesFromStateService',
       'HtmlEscaperService', 'IdGenerationService', 'InteractionObjectFactory','LanguageUtilService',
       'LoaderService', 'LocalStorageService', 'LoggerService', 'MetaTagCustomizationService',
-      'NormalizeWhitespacePipe', 'PencilCodeEditorRulesService',
+      'NormalizeWhitespacePipe', 'PencilCodeEditorRulesService', 'RatingComputationService',
       'SidebarStatusService', 'SiteAnalyticsService', 'SkillObjectFactory',
       'SolutionObjectFactory', 'StateCardObjectFactory',
       'StateImprovementSuggestionService', 'StateObjectFactory',
-      'StatesObjectFactory', 'TextInputRulesService', 'TranslationLanguageService', 'UrlInterpolationService',
+      'StatesObjectFactory', 'SuggestionsService', 'SuggestionThreadObjectFactory', 'TextInputRulesService', 'ThreadMessageObjectFactory', 'ThreadStatusDisplayService', 'TranslationLanguageService', 'UrlInterpolationService',
       'UrlService', 'UserInfoObjectFactory', 'UtilsService',
       'ValidatorsService', 'WindowDimensionsService', 'WindowRef'];
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
