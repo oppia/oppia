@@ -38,12 +38,19 @@ class ClassroomPageTests(BaseClassroomControllerTests):
 
     def test_any_user_can_access_classroom_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            response = self.get_html_response('/math')
-            self.assertIn('<classroom-page></classroom-page>', response)
+            with self.swap(constants, 'SHOW_CLASSROOM', True):
+                response = self.get_html_response('/math')
+                self.assertIn('<classroom-page></classroom-page>', response)
 
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            self.get_html_response('/math', expected_status_int=404)
+            with self.swap(constants, 'SHOW_CLASSROOM', True):
+                self.get_html_response('/math', expected_status_int=404)
+
+    def test_get_fails_when_show_classroom_not_enabled(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            with self.swap(constants, 'SHOW_CLASSROOM', False):
+                self.get_html_response('/math', expected_status_int=404)
 
 
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):

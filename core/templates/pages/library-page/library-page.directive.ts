@@ -54,7 +54,7 @@ angular.module('oppia').directive('libraryPage', [
         'UrlInterpolationService', 'UrlService', 'UserService',
         'WindowDimensionsService', 'ALL_CATEGORIES',
         'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES',
-        'LIBRARY_TILE_WIDTH_PX', 'SHOW_CLASSROOM_CALLOUT',
+        'LIBRARY_TILE_WIDTH_PX', 'SHOW_CLASSROOM',
         function(
             $http, $log, $rootScope, $scope, $timeout, $uibModal,
             $window, AlertsService, LearnerDashboardActivityIdsObjectFactory,
@@ -63,7 +63,7 @@ angular.module('oppia').directive('libraryPage', [
             UrlInterpolationService, UrlService, UserService,
             WindowDimensionsService, ALL_CATEGORIES,
             LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES,
-            LIBRARY_TILE_WIDTH_PX, SHOW_CLASSROOM_CALLOUT) {
+            LIBRARY_TILE_WIDTH_PX, SHOW_CLASSROOM) {
           var ctrl = this;
           var possibleBannerFilenames = [
             'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
@@ -207,7 +207,7 @@ angular.module('oppia').directive('libraryPage', [
             }
           };
           ctrl.$onInit = function() {
-            $scope.SHOW_CLASSROOM_CALLOUT = (SHOW_CLASSROOM_CALLOUT);
+            $scope.SHOW_CLASSROOM = (SHOW_CLASSROOM);
             LoaderService.showLoadingScreen('I18N_LIBRARY_LOADING');
             ctrl.bannerImageFilename = possibleBannerFilenames[
               Math.floor(Math.random() * possibleBannerFilenames.length)];

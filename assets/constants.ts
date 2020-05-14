@@ -5283,7 +5283,7 @@ export = {
   "ENABLE_ACCOUNT_EXPORT": false,
 
   // Used to hide the callout to classroom until it is ready.
-  "SHOW_CLASSROOM_CALLOUT": false,
+  "SHOW_CLASSROOM": false,
 
   "DEV_MODE": true
 };
