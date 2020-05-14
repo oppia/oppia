@@ -32,10 +32,8 @@ class ClassroomPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
-
-        if not constants.SHOW_CLASSROOM:
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS or not (
+                constants.SHOW_CLASSROOM):
             raise self.PageNotFoundException
 
         self.render_template('classroom-page.mainpage.html')
