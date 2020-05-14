@@ -90,8 +90,8 @@ var createAdmin = async function(email, username) {
 var createAndLoginAdminUser = async function(email, username) {
   await login(email, true);
   await _completeSignup(username);
-  adminPage.get();
-  adminPage.updateRole(username, 'admin');
+  await adminPage.get();
+  await adminPage.updateRole(username, 'admin');
 };
 
 var createAdminMobile = async function(email, username) {
