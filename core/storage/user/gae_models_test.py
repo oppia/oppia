@@ -2236,7 +2236,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.PendingDeletionRequestModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            base_models.DELETION_POLICY.KEEP)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -2256,12 +2256,12 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
 
 
 class PseudonymizedUserModelTests(test_utils.GenericTestBase):
-    """Tests for PendingDeletionRequestModel."""
+    """Tests for PseudonymizedUserModel."""
 
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.PendingDeletionRequestModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            base_models.DELETION_POLICY.KEEP)
 
     def test_get_user_id_migration_policy(self):
         self.assertEqual(

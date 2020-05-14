@@ -14285,7 +14285,8 @@ class PseudonymizedUserModelValidatorTests(test_utils.GenericTestBase):
 
         self.model_instance = (
             user_models.PseudonymizedUserModel(
-                user_models.PseudonymizedUserModel))
+                id=user_models.PseudonymizedUserModel.get_new_id('')))
+        self.model_instance.put()
 
         self.job_class = (
             prod_validation_jobs_one_off.PseudonymizedUserModelAuditOneOffJob)
@@ -14313,7 +14314,7 @@ class PseudonymizedUserModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
-            'PendingDeletionRequestModel\', '
+            'PseudonymizedUserModel\', '
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
@@ -14322,71 +14323,3 @@ class PseudonymizedUserModelValidatorTests(test_utils.GenericTestBase):
             db.DateTimeProperty, 'data_type', MockDatetime13Hours):
             update_datastore_types_for_mock_datetime()
             run_job_and_check_output(self, expected_output)
-
-    def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for deleted '
-                'user settings of PendingDeletionRequestModel\', '
-                '[u\'Entity id %s: User settings model '
-                'is not marked as deleted\']]') % (self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
-
-    def test_user_settings_model_not_marked_deleted_failure(self):
-        user_model = user_models.UserSettingsModel.get_by_id(self.user_id)
-        user_model.deleted = False
-        user_model.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for deleted '
-                'user settings of PendingDeletionRequestModel\', '
-                '[u\'Entity id %s: User settings model '
-                'is not marked as deleted\']]') % (self.model_instance.id)]
-        run_job_and_check_output(self, expected_output)
-
-    def test_exploration_not_marked_deleted_failure(self):
-        exp = exp_models.ExplorationModel.get_by_id('exp_id')
-        exp.deleted = False
-        exp_models.ExplorationModel.put_multi([exp])
-        expected_output = [
-            (
-                u'[u\'failed validation check for deleted exploration check '
-                'of PendingDeletionRequestModel\', '
-                '[u"Entity id %s: Explorations with ids [u\'exp_id\'] are '
-                'not marked as deleted"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
-
-    def test_collection_not_marked_deleted_failure(self):
-        col = collection_models.CollectionModel.get_by_id('col_id')
-        col.deleted = False
-        collection_models.CollectionModel.put_multi([col])
-        expected_output = [
-            (
-                u'[u\'failed validation check for deleted collection check '
-                'of PendingDeletionRequestModel\', '
-                '[u"Entity id %s: Collections with ids [u\'col_id\'] are '
-                'not marked as deleted"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
-
-    def test_exploration_deleted_failure(self):
-        exp = exp_models.ExplorationModel.get_by_id('exp_id')
-        exp.delete(self.user_id, '', force_deletion=True)
-        expected_output = [
-            (
-                u'[u\'failed validation check for deleted exploration check '
-                'of PendingDeletionRequestModel\', '
-                '[u"Entity id %s: Explorations with ids [u\'exp_id\'] are '
-                'not marked as deleted"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)
-
-    def test_collection_deleted_failure(self):
-        col = collection_models.CollectionModel.get_by_id('col_id')
-        col.delete(self.user_id, '', force_deletion=True)
-        expected_output = [
-            (
-                u'[u\'failed validation check for deleted collection check '
-                'of PendingDeletionRequestModel\', '
-                '[u"Entity id %s: Collections with ids [u\'col_id\'] are '
-                'not marked as deleted"]]') % self.user_id]
-        run_job_and_check_output(self, expected_output)

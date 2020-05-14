@@ -133,14 +133,22 @@ class VerifyUserDeletionOneOffJobTests(test_utils.GenericTestBase):
         self.assertIn(['NOT DELETED', [self.user_1_id]], output)
 
     def test_deleted_success(self):
-        wipeout_service.delete_user(
+        pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
+        wipeout_service.delete_user(pending_deletion_model)
+        pending_deletion_model.deletion_complete = True
+        pending_deletion_model.put()
+
         output = self._run_one_off_job()
         self.assertIn(['SUCCESS', [self.user_1_id]], output)
 
     def test_deleted_failure(self):
-        wipeout_service.delete_user(
+        pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
+        wipeout_service.delete_user(pending_deletion_model)
+        pending_deletion_model.deletion_complete = True
+        pending_deletion_model.put()
+
         user_models.CompletedActivitiesModel(
             id=self.user_1_id, exploration_ids=[], collection_ids=[]
         ).put()

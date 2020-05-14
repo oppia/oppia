@@ -4882,6 +4882,10 @@ class PseudonymizedUserModelValidator(BaseUserModelValidator):
     """Class for validating PseudonymizedUserModels."""
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return r'^pid_[a-z]{32}$'
+
+    @classmethod
     def _get_external_id_relationships(cls, item):
         return {}
 

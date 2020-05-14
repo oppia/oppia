@@ -768,11 +768,11 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
 
 class GaeIdNotInModelsVerificationJobTests(test_utils.GenericTestBase):
     """Tests for GaeIdNotInModelsVerificationJob."""
-    USER_1_USER_ID = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    USER_1_USER_ID = 'uid_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     USER_1_GAE_ID = 'gae_id_1'
-    USER_2_USER_ID = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
+    USER_2_USER_ID = 'uid_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
     USER_2_GAE_ID = 'gae_id_2'
-    USER_3_USER_ID = 'cccccccccccccccccccccccccccccccc'
+    USER_3_USER_ID = 'uid_cccccccccccccccccccccccccccccccc'
     USER_3_GAE_ID = 'gae_id_3'
 
     def _run_one_off_job(self):
@@ -819,6 +819,24 @@ class GaeIdNotInModelsVerificationJobTests(test_utils.GenericTestBase):
             email='some.different@email.cz',
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
+
+    def test_verify_user_id_correct(self):
+        self.assertTrue(
+            user_id_migration.GaeIdNotInModelsVerificationJob
+            .verify_user_id_correct('uid_' + 'a' * 32)
+        )
+        self.assertFalse(
+            user_id_migration.GaeIdNotInModelsVerificationJob
+            .verify_user_id_correct('uid_' + 'a' * 31 + 'A')
+        )
+        self.assertFalse(
+            user_id_migration.GaeIdNotInModelsVerificationJob
+            .verify_user_id_correct('uid_' + 'a' * 31)
+        )
+        self.assertFalse(
+            user_id_migration.GaeIdNotInModelsVerificationJob
+            .verify_user_id_correct('a' * 36)
+        )
 
     def test_wrong_user_ids(self):
         user_models.UserSettingsModel(
