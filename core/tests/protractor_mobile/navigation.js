@@ -177,7 +177,7 @@ describe('Navigation features on mobile', function() {
       browser.ignoreSynchronization = false;
     });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });
