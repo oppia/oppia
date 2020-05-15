@@ -119,7 +119,7 @@ FULLY_COVERED_FILENAMES = [
     'editor-domain.constants.ts',
     'editor-first-time-events.service.ts',
     'email-dashboard-page.component.ts',
-    'email-dashboard-result.controller.ts',
+    'email-dashboard-result.component.ts',
     'end-exploration-rules.service.ts',
     'end-exploration-validation.service.ts',
     'EndExploration.ts',
