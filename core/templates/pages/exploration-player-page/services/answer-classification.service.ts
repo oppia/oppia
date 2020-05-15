@@ -66,12 +66,11 @@ export class AnswerClassificationService {
       interactionRulesService): AnswerClassificationResult {
     // Find the first group that contains a rule which returns true
     // TODO(bhenning): Implement training data classification.
-    for (var i = 0; i < answerGroups.length; i++) {
-      for (var j = 0; j < answerGroups[i].rules.length; j++) {
-        var rule = answerGroups[i].rules[j];
+    for (const answerGroup of answerGroups) {
+      for const rule of answerGroup.rules) {
         if (interactionRulesService[rule.type](answer, rule.inputs)) {
           return this.answerClassificationResultObjectFactory.createNew(
-            answerGroups[i].outcome, i, j,
+            answerGroup.outcome, i, j,
             ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION);
         }
       }
@@ -106,10 +105,10 @@ export class AnswerClassificationService {
   getMatchingClassificationResult(
       stateName: string, interactionInOldState: Interaction, answer: object,
       interactionRulesService): AnswerClassificationResult {
-    var answerClassificationResult = null;
+    const answerClassificationResult = null;
 
-    var answerGroups = interactionInOldState.answerGroups;
-    var defaultOutcome = interactionInOldState.defaultOutcome;
+    const answerGroups = interactionInOldState.answerGroups;
+    const defaultOutcome = interactionInOldState.defaultOutcome;
     if (interactionRulesService) {
       answerClassificationResult = this.classifyAnswer(
         answer, answerGroups, defaultOutcome, interactionRulesService);
@@ -121,36 +120,37 @@ export class AnswerClassificationService {
         'No interactionRulesService was available to classify the answer.');
     }
 
-    var ruleBasedOutcomeIsDefault = (
+    const ruleBasedOutcomeIsDefault = (
       answerClassificationResult.outcome === defaultOutcome);
-    var interactionIsTrainable =
+    const interactionIsTrainable =
       this.interactionSpecsService.isInteractionTrainable(
         interactionInOldState.id);
 
     if (ruleBasedOutcomeIsDefault && interactionIsTrainable) {
-      for (var i = 0; i < answerGroups.length; i++) {
-        if (answerGroups[i].trainingData) {
-          for (var j = 0; j < answerGroups[i].trainingData.length; j++) {
-            if (angular.equals(answer, answerGroups[i].trainingData[j])) {
-              return this.answerClassificationResultObjectFactory.createNew(
-                answerGroups[i].outcome, i, null,
-                ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION);
-            }
+      for (const answerGroup of answerGroups) {
+        if (!answerGroup.trainingData) {
+          continue;
+        }
+        for (const trainingDatum of answerGroup.trainingData) {
+          if (angular.equals(answer, trainingDatum)) {
+            return this.answerClassificationResultObjectFactory.createNew(
+              answerGroup.outcome, i, null,
+              ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION);
           }
         }
       }
       if (this.appService.isMachineLearningClassificationEnabled()) {
-        var classifier = this.stateClassifierMappingService.getClassifier(
-          stateName);
+        const classifier = (
+          this.stateClassifierMappingService.getClassifier(stateName));
         if (classifier && classifier.classifierData &&
             classifier.algorithmId && classifier.dataSchemaVersion) {
-          var predictionService = (
+          const predictionService = (
             this.predictionAlgorithmRegistryService.getPredictionService(
               classifier.algorithmId, classifier.dataSchemaVersion));
           // If prediction service exists, we run classifier. We return the
           // default outcome otherwise.
           if (predictionService) {
-            var predictedAnswerGroupIndex = predictionService.predict(
+            const predictedAnswerGroupIndex = predictionService.predict(
               classifier.classifierData, answer);
             if (predictedAnswerGroupIndex === -1) {
               answerClassificationResult = (
@@ -174,7 +174,7 @@ export class AnswerClassificationService {
   isClassifiedExplicitlyOrGoesToNewState(
       stateName: string, state: State, answer: object,
       interactionRulesService): boolean {
-    var result = this.getMatchingClassificationResult(
+    const result = this.getMatchingClassificationResult(
       stateName, state.interaction, answer, interactionRulesService);
     return (
       result.outcome.dest !== state.name ||

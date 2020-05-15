@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the answer classification service
+ * @fileoverview Unit tests for the app service.
  */
 
 import { TestBed } from '@angular/core/testing';

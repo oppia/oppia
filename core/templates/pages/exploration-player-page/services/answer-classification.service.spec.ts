@@ -54,7 +54,7 @@ describe('Answer Classification Service', () => {
       Equals: (answer, inputs) => inputs.x === answer,
       NotEquals: (answer, inputs) => inputs.x !== answer,
       Contains: (answer, inputs) => (
-        answer.toLowerCase().indexOf(inputs.x.toLowerCase()) !== -1)
+        answer.toLowerCase().includes(inputs.x.toLowerCase()))
     };
 
     this.createStateFromBackendDict = (
