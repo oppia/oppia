@@ -90,7 +90,7 @@ def _check_all_tasks(tasks):
             ))
 
         if task.exception:
-            ALL_ERRORS.append(task.exception)
+            ALL_ERRORS.append(task.stacktrace)
 
     if running_tasks_data:
         log('----------------------------------------')
