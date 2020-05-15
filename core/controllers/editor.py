@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import imghdr
 import logging
 
 from constants import constants
@@ -623,7 +622,6 @@ class ImageUploadHandler(EditorHandler):
     # to the end of 'assets/').
     _FILENAME_PREFIX = 'image'
     _decorator = None
-    HUNDRED_KB_IN_BYTES = 100 * 1024
 
     @acl_decorators.can_edit_entity
     def post(self, entity_type, entity_id):
@@ -634,53 +632,9 @@ class ImageUploadHandler(EditorHandler):
         filename_prefix = self.payload.get('filename_prefix')
         if filename_prefix is None:
             filename_prefix = self._FILENAME_PREFIX
-        if not raw:
-            raise self.InvalidInputException('No image supplied')
-        if len(raw) > self.HUNDRED_KB_IN_BYTES:
-            raise self.InvalidInputException(
-                'Image exceeds file size limit of 100 KB.')
-        allowed_formats = ', '.join(
-            list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
-        if html_validation_service.is_parsable_as_xml(raw):
-            file_format = 'svg'
-            invalid_tags, invalid_attrs = (
-                html_validation_service.get_invalid_svg_tags_and_attrs(raw))
-            if invalid_tags or invalid_attrs:
-                invalid_tags_message = (
-                    'tags: %s' % invalid_tags if invalid_tags else '')
-                invalid_attrs_message = (
-                    'attributes: %s' % invalid_attrs if invalid_attrs else '')
-                raise self.InvalidInputException(
-                    'Unsupported tags/attributes found in the SVG:\n%s\n%s' % (
-                        invalid_tags_message, invalid_attrs_message))
-        else:
-            # Verify that the data is recognized as an image.
-            file_format = imghdr.what(None, h=raw)
-            if file_format not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
-                raise self.InvalidInputException('Image not recognized')
 
-        # Verify that the file type matches the supplied extension.
-        if not filename:
-            raise self.InvalidInputException('No filename supplied')
-        if filename.rfind('.') == 0:
-            raise self.InvalidInputException('Invalid filename')
-        if '/' in filename or '..' in filename:
-            raise self.InvalidInputException(
-                'Filenames should not include slashes (/) or consecutive '
-                'dot characters.')
-        if '.' not in filename:
-            raise self.InvalidInputException(
-                'Image filename with no extension: it should have '
-                'one of the following extensions: %s.' % allowed_formats)
-
-        dot_index = filename.rfind('.')
-        extension = filename[dot_index + 1:].lower()
-        if (extension not in
-                feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
-            raise self.InvalidInputException(
-                'Expected a filename ending in .%s, received %s' %
-                (file_format, filename))
-
+        file_format = html_validation_service.validate_image_and_filename(
+            raw, filename)
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             entity_type, entity_id))

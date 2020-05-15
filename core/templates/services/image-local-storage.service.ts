@@ -16,14 +16,10 @@
  * @fileoverview Service for managing images in localStorage.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/csrf-token.service.ts');
 require('services/image-upload-helper.service.ts');
 
 angular.module('oppia').factory('ImageLocalStorageService', [
-  'CsrfTokenService', 'ImageUploadHelperService', 'UrlInterpolationService',
-  function(
-      CsrfTokenService, ImageUploadHelperService, UrlInterpolationService) {
+  'ImageUploadHelperService', function(ImageUploadHelperService) {
     var imagesStored = [];
 
     return {
@@ -45,42 +41,16 @@ angular.module('oppia').factory('ImageLocalStorageService', [
         imagesStored.splice(index, 1);
       },
 
-      postImagesToServer: function(entityType, entityId) {
-        var forms = [];
-        var imageUploadUrlTemplate = '/createhandler/imageupload/' +
-          '<entity_type>/<entity_id>';
-        CsrfTokenService.getTokenAsync().then(function(token) {
-          for (var idx in imagesStored) {
-            var form = new FormData();
-            var imageBlob = (
-              ImageUploadHelperService.convertImageDataToImageFile(
-                window.localStorage.getItem(imagesStored[idx])));
-            form.append('image', imageBlob);
-            form.append('payload', JSON.stringify({
-              filename: imagesStored[idx]
-            }));
-            form.append('csrf_token', token);
-            $.ajax({
-              url: UrlInterpolationService.interpolateUrl(
-                imageUploadUrlTemplate, {
-                  entity_type: entityType,
-                  entity_id: entityId
-                }
-              ),
-              data: form,
-              processData: false,
-              contentType: false,
-              type: 'POST',
-              dataFilter: function(data) {
-                // Remove the XSSI prefix.
-                var transformedData = data.substring(5);
-                return JSON.parse(transformedData);
-              },
-              dataType: 'text'
-            });
-          }
-          imagesStored.length = 0;
-        });
+      getStoredImagesData: function() {
+        var returnData = [];
+        for (var idx in imagesStored) {
+          returnData.push({
+            filename: imagesStored[idx],
+            imageBlob: ImageUploadHelperService.convertImageDataToImageFile(
+              window.localStorage.getItem(imagesStored[idx]))
+          });
+        }
+        return returnData;
       }
     };
   }

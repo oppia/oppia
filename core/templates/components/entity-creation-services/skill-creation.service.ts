@@ -28,14 +28,12 @@ require(
 angular.module('oppia').factory('SkillCreationService', [
   '$rootScope', '$timeout', '$window', 'AlertsService',
   'ImageLocalStorageService', 'SkillCreationBackendApiService',
-  'UrlInterpolationService', 'ENTITY_TYPE',
-  'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+  'UrlInterpolationService', 'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
   'SKILL_DESCRIPTION_STATUS_VALUES',
   function(
       $rootScope, $timeout, $window, AlertsService,
       ImageLocalStorageService, SkillCreationBackendApiService,
-      UrlInterpolationService, ENTITY_TYPE,
-      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
+      UrlInterpolationService, EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
       SKILL_DESCRIPTION_STATUS_VALUES) {
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
       '/skill_editor/<skill_id>');
@@ -80,15 +78,14 @@ angular.module('oppia').factory('SkillCreationService', [
         // as soon as the user clicks the 'Create' button and filled with URL
         // once the details are fetched from the backend.
         var newTab = $window.open();
+        var imagesData = ImageLocalStorageService.getStoredImagesData();
         SkillCreationBackendApiService.createSkill(
-          description, rubrics, explanation, linkedTopicIds)
+          description, rubrics, explanation, linkedTopicIds, imagesData)
           .then(function(response) {
             $timeout(function() {
               $rootScope.$broadcast(
                 EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, true);
               skillCreationInProgress = false;
-              ImageLocalStorageService.postImagesToServer(
-                ENTITY_TYPE.SKILL, response.skillId);
               newTab.location.href = UrlInterpolationService.interpolateUrl(
                 CREATE_NEW_SKILL_URL_TEMPLATE, {
                   skill_id: response.skillId

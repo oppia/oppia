@@ -21,6 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import fs_services
+from core.domain import html_validation_service
 from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_domain
@@ -141,6 +143,7 @@ class NewSkillHandler(base.BaseHandler):
         linked_topic_ids = self.payload.get('linked_topic_ids')
         explanation_dict = self.payload.get('explanation_dict')
         rubrics = self.payload.get('rubrics')
+        filenames = self.payload.get('filenames')
 
         if not isinstance(rubrics, list):
             raise self.InvalidInputException('Rubrics should be a list.')
@@ -173,6 +176,16 @@ class NewSkillHandler(base.BaseHandler):
         skill.update_explanation(
             state_domain.SubtitledHtml.from_dict(explanation_dict))
         skill_services.save_new_skill(self.user_id, skill)
+
+        for filename in filenames:
+            image = self.request.get(filename)
+            file_format = html_validation_service.validate_image_and_filename(
+                image, filename)
+            image_is_compressible = (
+                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+            fs_services.save_original_and_compressed_versions_of_image(
+                filename, feconf.ENTITY_TYPE_SKILL, skill.id, image,
+                'image', image_is_compressible)
 
         self.render_json({
             'skillId': new_skill_id
