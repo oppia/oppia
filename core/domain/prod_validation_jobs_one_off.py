@@ -792,14 +792,15 @@ class UsernameChangeAuditModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        # Valid id: [user_id].[timestamp_in_sec]
-        # user_id refers to the user that is making the change.
-        regex_string = '^%s\\.\\d+$' % item.user_id
+        # Valid id: [committer_id].[timestamp_in_sec]
+        # committer_id refers to the user that is making the change.
+        regex_string = '^%s\\.\\d+$' % item.committer_id
         return regex_string
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {'user_ids': (user_models.UserSettingsModel, [item.user_id])}
+        return {'committer_ids': (
+            user_models.UserSettingsModel, [item.committer_id])}
 
 
 class ClassifierTrainingJobModelValidator(BaseModelValidator):

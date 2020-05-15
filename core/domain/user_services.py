@@ -2004,17 +2004,17 @@ def get_community_reviewer_usernames(review_category, language_code=None):
     return get_usernames(reviewer_ids)
 
 
-def log_username_change(user_id, current_username, new_username):
+def log_username_change(committer_id, old_username, new_username):
     """Stores the query to role structure in UsernameChangeAuditModel.
 
     Args:
-        user_id: str. The unique ID of the user that is making the change.
-        current_username: str. The current username that is being changed.
+        committer_id: str. The ID of the user that is making the change.
+        old_username: str. The current username that is being changed.
         new_username: str. The new username that the current one is being
             changed to.
     """
-    model_id = '%s.%s' % (user_id, int(math.floor(time.time())))
+    model_id = '%s.%s' % (committer_id, int(math.floor(time.time())))
 
     audit_models.UsernameChangeAuditModel(
-        id=model_id, user_id=user_id, current_username=current_username,
+        id=model_id, committer_id=committer_id, old_username=old_username,
         new_username=new_username).put()

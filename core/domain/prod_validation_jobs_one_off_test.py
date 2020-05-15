@@ -495,8 +495,8 @@ class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
 
         model_id = '%s.%s' % (self.admin_id, int(math.floor(time.time())))
         self.model_instance = audit_models.UsernameChangeAuditModel(
-            id=model_id, user_id=self.admin_id,
-            current_username=USER_NAME, new_username='new')
+            id=model_id, committer_id=self.admin_id,
+            old_username=USER_NAME, new_username='new')
         self.model_instance.put()
 
         self.job_class = (
@@ -538,9 +538,9 @@ class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_non_existent_user_id(self):
         user_models.UserSettingsModel.get(self.admin_id).delete()
         expected_output = [(
-            u'[u\'failed validation check for user_ids field check of '
+            u'[u\'failed validation check for committer_ids field check of '
             'UsernameChangeAuditModel\', '
-            '[u"Entity id %s: based on field user_ids having value '
+            '[u"Entity id %s: based on field committer_ids having value '
             '%s, expect model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.admin_id, self.admin_id)]
@@ -551,8 +551,8 @@ class UsernameChangeAuditModelValidatorTests(test_utils.GenericTestBase):
         model_invalid_id = '%s.%s' % (
             int(math.floor(time.time())), self.admin_id)
         model_instance_with_invalid_id = audit_models.UsernameChangeAuditModel(
-            id=model_invalid_id, user_id=self.admin_id,
-            current_username=USER_NAME, new_username='new')
+            id=model_invalid_id, committer_id=self.admin_id,
+            old_username=USER_NAME, new_username='new')
         model_instance_with_invalid_id.put()
         expected_output = [(
             u'[u\'fully-validated UsernameChangeAuditModel\', 1]'

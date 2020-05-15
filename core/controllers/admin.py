@@ -861,31 +861,31 @@ class UpdateUsernameHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self):
-        current_username = self.payload.get('current_username', None)
+        old_username = self.payload.get('old_username', None)
         new_username = self.payload.get('new_username', None)
 
-        if current_username is None:
+        if old_username is None:
             raise self.InvalidInputException(
-                'Invalid request: The current username must be specified.')
+                'Invalid request: The old username must be specified.')
 
         if new_username is None:
             raise self.InvalidInputException(
                 'Invalid request: A new username must be specified.')
 
-        if type(current_username).__name__ != 'unicode':
+        if not isinstance(old_username, python_utils.UNICODE):
             raise self.InvalidInputException(
-                'Expected current username to be a unicode string, received %s'
-                % current_username)
+                'Expected old username to be a unicode string, received %s'
+                % old_username)
 
-        if type(new_username).__name__ != 'unicode':
+        if not isinstance(new_username, python_utils.UNICODE):
             raise self.InvalidInputException(
                 'Expected new username to be a unicode string, received %s'
                 % new_username)
 
-        user_id = user_services.get_user_id_from_username(current_username)
+        user_id = user_services.get_user_id_from_username(old_username)
         if user_id is None:
             raise self.InvalidInputException(
-                'Invalid username: %s' % current_username)
+                'Invalid username: %s' % old_username)
 
         if len(new_username) > constants.MAX_USERNAME_LENGTH:
             raise self.InvalidInputException(
@@ -897,5 +897,5 @@ class UpdateUsernameHandler(base.BaseHandler):
 
         user_services.set_username(user_id, new_username)
         user_services.log_username_change(
-            self.user_id, current_username, new_username)
+            self.user_id, old_username, new_username)
         self.render_json({})

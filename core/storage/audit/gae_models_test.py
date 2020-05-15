@@ -90,10 +90,10 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
 class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
     """Unit tests for the UsernameChangeAuditModel class."""
 
-    NONEXISTENT_USER_ID = 'id_x'
-    USER_ID = 'user_id'
-    ID = 'user_id.111.222'
-    CURRENT_USERNAME = 'current_username'
+    NONEXISTENT_COMMITTER_ID = 'id_x'
+    COMMITTER_ID = 'committer_id'
+    ID = 'committer_id.111.222'
+    OLD_USERNAME = 'old_username'
     NEW_USERNAME = 'new_username'
 
     def setUp(self):
@@ -102,8 +102,8 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
 
         audit_models.UsernameChangeAuditModel(
             id=self.ID,
-            user_id=self.USER_ID,
-            current_username=self.CURRENT_USERNAME,
+            committer_id=self.COMMITTER_ID,
+            old_username=self.OLD_USERNAME,
             new_username=self.NEW_USERNAME
         ).put()
 
@@ -115,11 +115,11 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertTrue(
             audit_models.UsernameChangeAuditModel
-            .has_reference_to_user_id(self.USER_ID)
+            .has_reference_to_user_id(self.COMMITTER_ID)
         )
         self.assertFalse(
             audit_models.UsernameChangeAuditModel
-            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+            .has_reference_to_user_id(self.NONEXISTENT_COMMITTER_ID)
         )
 
     def test_get_user_id_migration_policy(self):
@@ -135,12 +135,13 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
             python_utils.UNICODE(
                 audit_models.UsernameChangeAuditModel
                 .get_user_id_migration_field()),
-            python_utils.UNICODE(audit_models.UsernameChangeAuditModel.user_id))
+            python_utils.UNICODE(
+                audit_models.UsernameChangeAuditModel.committer_id))
 
     def test_get_model(self):
         audit_model = audit_models.UsernameChangeAuditModel.get(self.ID)
 
         self.assertEqual(audit_model.id, self.ID)
-        self.assertEqual(audit_model.user_id, self.USER_ID)
-        self.assertEqual(audit_model.current_username, self.CURRENT_USERNAME)
+        self.assertEqual(audit_model.committer_id, self.COMMITTER_ID)
+        self.assertEqual(audit_model.old_username, self.OLD_USERNAME)
         self.assertEqual(audit_model.new_username, self.NEW_USERNAME)
