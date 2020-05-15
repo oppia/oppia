@@ -339,6 +339,24 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with inplace_replace_swap:
             run_e2e_tests.update_dev_mode_in_constants_js(constant_file, False)
 
+    def test_update_show_classroom_in_constants_to_true(self):
+        constant_file = 'constant.ts'
+        inplace_replace_swap = self.inplace_replace_swap(expected_args=[(
+            constant_file, '"SHOW_CLASSROOM": .*', '"SHOW_CLASSROOM": true,'
+        )])
+        with inplace_replace_swap:
+            run_e2e_tests.update_show_classroom_in_constants(
+                constant_file, True)
+    
+    def test_update_show_classroom_in_constants_to_false(self):
+        constant_file = 'constant.ts'
+        inplace_replace_swap = self.inplace_replace_swap(expected_args=[(
+            constant_file, '"SHOW_CLASSROOM": .*', '"SHOW_CLASSROOM": false,'
+        )])
+        with inplace_replace_swap:
+            run_e2e_tests.update_show_classroom_in_constants(
+                constant_file, False)
+
     def test_run_webdriver_manager(self):
         expected_commands = [
             common.NODE_BIN_PATH, run_e2e_tests.WEBDRIVER_MANAGER_BIN_PATH,
