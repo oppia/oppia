@@ -568,7 +568,7 @@ def get_stanzas_from_lcov_file():
     return stanzas_list
 
 
-def check_fully_covered_filenames_list_is_sorted():
+def check_not_fully_covered_filenames_list_is_sorted():
     """Check if NOT_FULLY_COVERED_FILENAMES list is in alphabetical order."""
     if NOT_FULLY_COVERED_FILENAMES != sorted(
             NOT_FULLY_COVERED_FILENAMES, key=lambda s: s.lower()):
@@ -578,8 +578,8 @@ def check_fully_covered_filenames_list_is_sorted():
 
 
 def check_coverage_changes():
-    """Checks if the blacklist for fully covered files needs to be changed by:
-    - New file insertion
+    """Checks if the blacklist for not fully covered files needs to be changed
+    by:
     - File renaming
     - File deletion
 
@@ -640,7 +640,7 @@ def check_coverage_changes():
         python_utils.PRINT('All Frontend Coverage Checks Passed.')
         python_utils.PRINT('------------------------------------')
 
-    check_fully_covered_filenames_list_is_sorted()
+    check_not_fully_covered_filenames_list_is_sorted()
 
 
 def main():
