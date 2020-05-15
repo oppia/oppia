@@ -13,8 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the wavesurfer library.
+ * @fileoverview Controller for simple modal with only two actions: close or
+ * dismiss.
  */
 
-module.exports = require(
-  'static/wave-surfer-js-2.2.1/wavesurfer.min.js');
+angular.module('oppia').controller('ConfirmOrCancelModalController', [
+  '$scope', '$uibModalInstance',
+  function($scope, $uibModalInstance) {
+    $scope.confirm = function(value) {
+      $uibModalInstance.close(value);
+    };
+
+    $scope.cancel = function(value) {
+      var dismissValue = value || 'cancel';
+      $uibModalInstance.dismiss(dismissValue);
+    };
+  }
+]);

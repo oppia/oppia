@@ -16,6 +16,10 @@
  * @fileoverview Controller for the navbar breadcrumb of the story editor.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
@@ -45,19 +49,12 @@ angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
           $scope.returnToTopicEditorPage = function() {
             if (UndoRedoService.getChangeCount() > 0) {
-              var modalInstance = $uibModal.open({
+              $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/story-editor-page/modal-templates/' +
                   'story-save-pending-changes-modal.template.html'),
                 backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
+                controller: 'ConfirmOrCancelModalController'
               }).result.then(function() {}, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
