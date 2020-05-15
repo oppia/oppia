@@ -19,18 +19,18 @@ workflows:
 
     jobs:
       - setup
-      # - lint_tests:
-      #     requires:
-      #       - setup
+      - lint_tests:
+          requires:
+            - setup
       - frontend_tests:
           requires:
             - setup
       - typescript_tests:
           requires:
             - frontend_tests
-      # - backend_tests:
-      #     requires:
-      #       - frontend_tests
+      - backend_tests:
+          requires:
+            - frontend_tests
       - e2e_file_upload_features:
           requires:
             - typescript_tests
@@ -43,25 +43,10 @@ workflows:
       - e2e_topic_and_story_editor:
           requires:
             - e2e_file_upload_features
-      - e2e_accessibility_and_extensions:
-          requires:
-            - e2e_navigation_and_admin
       - e2e_library_and_collections:
           requires:
             - e2e_navigation_and_admin
-      - e2e_dashboards:
-          requires:
-              - e2e_navigation_and_admin
-      - e2e_exploration_tabs:
-          requires:
-              - e2e_navigation_and_admin
-      - e2e_exploration_features:
-          requires:
-              - e2e_navigation_and_admin
       - e2e_users:
-          requires:
-              - e2e_navigation_and_admin
-      - e2e_new_structure:
           requires:
               - e2e_navigation_and_admin
 
@@ -125,21 +110,21 @@ jobs:
             - oppia/third_party/
             - oppia_tools/
 
-  # lint_tests:
-  #   <<: *job_defaults
-  #   steps:
-  #     - checkout
-  #     - merge_target_branch
-  #     - attach_workspace:
-  #         at: /home/circleci/
-  #     - run:
-  #         name: Run lint tests
-  #         # All the python scripts should behave as modules. Files like the
-  #         # pre_commit_linter and third_party_size_check need to import other
-  #         # Python files and that is only possible if we treat it as a module.
-  #         command: |
-  #           python -m scripts.third_party_size_check
-  #           python -m scripts.linters.pre_commit_linter --path=. --verbose
+  lint_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - merge_target_branch
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run lint tests
+          # All the python scripts should behave as modules. Files like the
+          # pre_commit_linter and third_party_size_check need to import other
+          # Python files and that is only possible if we treat it as a module.
+          command: |
+            python -m scripts.third_party_size_check
+            python -m scripts.linters.pre_commit_linter --path=. --verbose
 
   typescript_tests:
     <<: *job_defaults
@@ -171,17 +156,17 @@ jobs:
             codecov --file ../karma_coverage_reports/lcov.info -F frontend
           when: on_success
 
-  # backend_tests:
-  #   <<: *job_defaults
-  #   steps:
-  #     - checkout
-  #     - merge_target_branch
-  #     - attach_workspace:
-  #         at: /home/circleci/
-  #     - run:
-  #         name: Run backend tests
-  #         command: |
-  #           python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
+  backend_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - merge_target_branch
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run backend tests
+          command: |
+            python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
 
   # Production environment e2e tests
   # The following e2e tests are run in the production environment. Tests that require uploading files
@@ -210,25 +195,6 @@ jobs:
             - oppia/build/
             - oppia/third_party/generated/
 
-  e2e_accessibility_and_extensions:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run e2e accessibility test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
-      - run:
-          name: Run e2e embedding test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env
-      - run:
-          name: Run e2e extensions test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="extensions" --prod_env
-
   e2e_library_and_collections:
     <<: *job_defaults
     steps:
@@ -251,71 +217,6 @@ jobs:
           name: Run e2e collections test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env
-
-  e2e_dashboards:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run e2e creator dashboard test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="creatorDashboard" --prod_env
-      - run:
-          name: Run e2e learnerDashboard test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="learnerDashboard" --prod_env
-      - run:
-          name: Run e2e learner test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="learner" --prod_env
-      - run:
-          name: Run e2e community dashboard test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="communityDashboard" --prod_env
-
-  e2e_exploration_tabs:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run e2e exploration translation tab test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationTranslationTab" --prod_env
-      - run:
-          name: Run e2e exploration history tab test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationHistoryTab" --prod_env
-      - run:
-          name: Run e2e exploration feedback tab test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationFeedbackTab" --prod_env
-      - run:
-          name: Run e2e explorationStatisticsTab test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="explorationStatisticsTab" --prod_env
-
-  e2e_exploration_features:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run e2e coreEditorAndPlayerFeatures test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="coreEditorAndPlayerFeatures" --prod_env
-      - run:
-          name: Run e2e additionalPlayerFeatures test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="additionalPlayerFeatures" --prod_env
-      - run:
-          name: Run e2e additionalEditorFeatures test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="additionalEditorFeatures" --prod_env
 
   e2e_users:
     <<: *job_defaults
@@ -343,25 +244,6 @@ jobs:
           name: Run e2e profileFeatures test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
-
-  e2e_new_structure:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Run e2e topicsAndSkillsDashboard test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --prod_env
-      - run:
-          name: Run e2e topicAndStoryEditor test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor" --prod_env
-      - run:
-          name: Run e2e skillEditor test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="skillEditor" --prod_env
 
   # Non-prod e2e Tests
   # The following tests must be run in a non-production environment because they are uploading files.
