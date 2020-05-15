@@ -20,7 +20,7 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
-fdescribe('Preferences', function() {
+describe('Preferences', function() {
   var preferencesPage = null;
 
   beforeEach(function() {
@@ -50,8 +50,8 @@ fdescribe('Preferences', function() {
     await waitFor.pageToFullyLoad();
     await preferencesPage.uploadProfilePhoto(
       '../data/dummyLargeImage.jpg')
-      .then(function() {
-        preferencesPage.expectUploadError();
+      .then(async function() {
+        await preferencesPage.expectUploadError();
       });
   });
 
@@ -163,7 +163,7 @@ fdescribe('Preferences', function() {
     });
 
   afterEach(async function() {
-    general.checkForConsoleErrors([]);
+    await general.checkForConsoleErrors([]);
     await users.logout();
   });
 });
