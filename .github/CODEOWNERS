@@ -118,6 +118,7 @@
 /scripts/install_prerequisites.sh @DubeySandeep
 /scripts/typescript_checks*.py @ankita240796 @DubeySandeep
 /scripts/linters/ @DubeySandeep @Hudda
+/scripts/linters/excluded_any_type_files.json @nishantwrp
 /ubuntu_dockerfile @ezl-13 @kevinlee12
 
 
@@ -497,7 +498,7 @@
 
 
 # Typings.
-/typings @ankita240796
+/typings @ankita240796 @nishantwrp
 
 
 # User Data Takeout.

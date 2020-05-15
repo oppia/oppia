@@ -20,6 +20,17 @@ require('third-party-imports/ckeditor.import.ts');
 require('services/context.service.ts');
 require('services/rte-helper.service.ts');
 
+interface UiConfig {
+  (): UiConfig;
+  // eslint-disable-next-line camelcase
+  hide_complex_extensions: boolean;
+  startupFocusEnabled?: boolean;
+}
+
+interface CkeditorCustomScope extends ng.IScope {
+  uiConfig: UiConfig;
+}
+
 angular.module('oppia').directive('ckEditor4Rte', [
   'ContextService', 'RteHelperService',
   function(ContextService, RteHelperService) {
@@ -34,7 +45,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
                 '</div></div>',
       require: '?ngModel',
 
-      link: function(scope: ICustomScope, el, attr, ngModel) {
+      link: function(scope: CkeditorCustomScope, el, attr, ngModel) {
         var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
         var names = [];
         var icons = [];

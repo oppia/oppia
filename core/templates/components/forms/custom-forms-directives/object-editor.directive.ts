@@ -18,6 +18,16 @@
 
 // Individual object editor directives are in extensions/objects/templates.
 
+interface ObjectEditorCustomScope extends ng.IScope {
+  objType?: string;
+  initArgs?: Object;
+  getInitArgs?: (() => Object);
+  alwaysEditable?: boolean;
+  isEditable?: boolean;
+  getAlwaysEditable?: (() => boolean);
+  getIsEditable?: (() => boolean);
+}
+
 angular.module('oppia').directive('objectEditor', [
   '$compile', '$log', function($compile, $log) {
     return {
@@ -28,7 +38,7 @@ angular.module('oppia').directive('objectEditor', [
         objType: '@',
         value: '='
       },
-      link: function(scope: ICustomScope, element) {
+      link: function(scope: ObjectEditorCustomScope, element) {
         // Converts a camel-cased string to a lower-case hyphen-separated
         // string.
         var directiveName = scope.objType.replace(
