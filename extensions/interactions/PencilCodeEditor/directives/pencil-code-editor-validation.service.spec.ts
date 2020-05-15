@@ -72,7 +72,7 @@ describe('Pencil Code Editor Validation Service', () => {
       stateName, customizationArgs, answerGroups, Outcome);
     let MessageOne = 'Please specify what ' +
     'Oppia should do in answer group 1.';
-    let MessageTwo = 'Please add feedback for the user' +
+    let MessageTwo = 'Please add feedback for the user ' +
     'in the [All other answers] rule.';
     expect(output[0].message).toBe(MessageOne);
     expect(output[1].message).toBe(MessageTwo);
