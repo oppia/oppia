@@ -178,9 +178,9 @@ var ExplorationEditorMainTab = function() {
 
     // Otherwise, if the editor tutorial shows up, exit it.
     var buttons = element.all(by.css('.skipBtn'));
-    if (buttons.count() === 1) {
+    if (await buttons.count() === 1) {
       await buttons.get(0).click();
-    } else if (buttons.count() !== 0) {
+    } else if (await buttons.count() !== 0) {
       throw new Error(
         'Expected to find at most one \'exit tutorial\' button');
     }
