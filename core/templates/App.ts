@@ -97,15 +97,22 @@ angular.module('oppia').config([
       'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
       'ExpressionParserService', 'ExtensionTagAssemblerService',
       'ExtractImageFilenamesFromStateService',
-      'HtmlEscaperService', 'IdGenerationService', 'InteractionObjectFactory','LanguageUtilService',
-      'LoaderService', 'LocalStorageService', 'LoggerService', 'MetaTagCustomizationService',
-      'NormalizeWhitespacePipe', 'PageTitleService', 'PencilCodeEditorRulesService', 'RatingComputationService', 'SchemaDefaultValueService', 'SchemaUndefinedLastElementService',
+      'HtmlEscaperService', 'IdGenerationService', 'InteractionObjectFactory',
+      'LanguageUtilService', 'LoaderService', 'LocalStorageService',
+      'LoggerService', 'MetaTagCustomizationService',
+      'NormalizeWhitespacePipe', 'PageTitleService',
+      'PencilCodeEditorRulesService', 'RatingComputationService',
+      'SchemaDefaultValueService', 'SchemaUndefinedLastElementService',
       'SidebarStatusService', 'SiteAnalyticsService', 'SkillObjectFactory',
       'SolutionObjectFactory', 'StateCardObjectFactory',
       'StateImprovementSuggestionService', 'StateObjectFactory',
-      'StatesObjectFactory', 'SuggestionsService', 'SuggestionThreadObjectFactory', 'TextInputRulesService', 'ThreadMessageObjectFactory', 'ThreadMessageSummaryObjectFactory', 'ThreadStatusDisplayService', 'TranslationLanguageService', 'UrlInterpolationService',
-      'UrlService', 'UserInfoObjectFactory', 'UtilsService',
-      'ValidatorsService', 'WindowDimensionsService', 'WindowRef'];
+      'StatesObjectFactory', 'SuggestionsService',
+      'SuggestionThreadObjectFactory', 'TextInputRulesService',
+      'ThreadMessageObjectFactory', 'ThreadMessageSummaryObjectFactory',
+      'ThreadStatusDisplayService', 'TranslationLanguageService',
+      'UrlInterpolationService', 'UrlService', 'UserInfoObjectFactory',
+      'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
+      'WindowRef'];
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       if (servicesToProvide.includes(key)) {
         $provide.value(key, value);

@@ -29,7 +29,7 @@ require('domain/utilities/url-interpolation.service.ts');
 angular.module('oppia').component('deleteAccountPage', {
   template: require('./delete-account-page.component.html'),
   controller: ['$http', '$uibModal', '$window', 'UrlInterpolationService',
-    function($http, $uibModal, $window, UrlInterpolationService,) {
+    function($http, $uibModal, $window, UrlInterpolationService) {
       var ctrl = this;
       ctrl.deleteAccount = function() {
         $uibModal.open({
