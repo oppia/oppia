@@ -165,34 +165,34 @@ describe('Answer Classification Service', () => {
         'No interactionRulesService was available to classify the answer.');
     });
 
-    it('should return the first matching answer group and first matching rule ' +
-        'spec', () => {
-        const state = this.createStateFromBackendDict();
+    it('should return the first matching answer group and first matching ' +
+        'rule spec', () => {
+      const state = this.createStateFromBackendDict();
 
-        expect(
-          this.acs.getMatchingClassificationResult(
-            state.name, state.interaction, 10, this.rules)
-        ).toEqual(
-          this.acrof.createNew(
-            this.oof.createNew('outcome 1', 'feedback_1', '', []), 0, 0,
-            ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
+      expect(
+        this.acs.getMatchingClassificationResult(
+          state.name, state.interaction, 10, this.rules)
+      ).toEqual(
+        this.acrof.createNew(
+          this.oof.createNew('outcome 1', 'feedback_1', '', []), 0, 0,
+          ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
 
-        expect(
-          this.acs.getMatchingClassificationResult(
-            state.name, state.interaction, 5, this.rules)
-        ).toEqual(
-          this.acrof.createNew(
-            this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 0,
-            ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
+      expect(
+        this.acs.getMatchingClassificationResult(
+          state.name, state.interaction, 5, this.rules)
+      ).toEqual(
+        this.acrof.createNew(
+          this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 0,
+          ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
 
-        expect(
-          this.acs.getMatchingClassificationResult(
-            state.name, state.interaction, 6, this.rules)
-        ).toEqual(
-          this.acrof.createNew(
-            this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 1,
-            ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
-      });
+      expect(
+        this.acs.getMatchingClassificationResult(
+          state.name, state.interaction, 6, this.rules)
+      ).toEqual(
+        this.acrof.createNew(
+          this.oof.createNew('outcome 2', 'feedback_2', '', []), 1, 1,
+          ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION));
+    });
 
     it('should return the default rule if no answer group matches', () => {
       const state = this.createStateFromBackendDict();

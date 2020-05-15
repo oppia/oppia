@@ -67,7 +67,7 @@ export class AnswerClassificationService {
     // Find the first group that contains a rule which returns true
     // TODO(bhenning): Implement training data classification.
     for (const answerGroup of answerGroups) {
-      for const rule of answerGroup.rules) {
+      for (const rule of answerGroup.rules) {
         if (interactionRulesService[rule.type](answer, rule.inputs)) {
           return this.answerClassificationResultObjectFactory.createNew(
             answerGroup.outcome, i, j,
@@ -105,7 +105,7 @@ export class AnswerClassificationService {
   getMatchingClassificationResult(
       stateName: string, interactionInOldState: Interaction, answer: object,
       interactionRulesService): AnswerClassificationResult {
-    const answerClassificationResult = null;
+    var answerClassificationResult = null;
 
     const answerGroups = interactionInOldState.answerGroups;
     const defaultOutcome = interactionInOldState.defaultOutcome;
