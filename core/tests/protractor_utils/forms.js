@@ -297,13 +297,12 @@ var AutocompleteDropdownEditor = function(elem) {
     },
     expectOptionsToBe: async function(expectedOptions) {
       await elem.element(by.css('.select2-container')).click();
-      var actualOptions = await Promise.all(
-        element(by.css('.select2-dropdown')).all(by.tagName('li')).map(
+      var actualOptions = await element(by.css('.select2-dropdown'))
+        .all(by.tagName('li')).map(
           async function(optionElem) {
             return await optionElem.getText();
           }
-        )
-      );
+        );
       expect(actualOptions).toEqual(expectedOptions);
       // Re-close the dropdown.
       await element(by.css('.select2-dropdown')).element(
@@ -316,13 +315,12 @@ var AutocompleteMultiDropdownEditor = function(elem) {
   return {
     setValues: async function(texts) {
       // Clear all existing choices.
-      var deleteButtons = await Promise.all(
-        elem.element(by.css('.select2-selection__rendered'))
-          .all(by.tagName('li')).map(function(choiceElem) {
-            return choiceElem.element(
-              by.css('.select2-selection__choice__remove'));
-          })
-      );
+      var deleteButtons = await elem.element(
+        by.css('.select2-selection__rendered')
+      ).all(by.tagName('li')).map(function(choiceElem) {
+        return choiceElem.element(
+          by.css('.select2-selection__choice__remove'));
+      });
       // We iterate in descending order, because clicking on a delete button
       // removes the element from the DOM. We also omit the last element
       // because it is the field for new input.
@@ -337,12 +335,11 @@ var AutocompleteMultiDropdownEditor = function(elem) {
       }
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
-      actualSelection = await Promise.all(
-        elem.element(by.css('.select2-selection__rendered'))
-          .all(by.tagName('li')).map(async function(choiceElem) {
-            return await choiceElem.getText();
-          })
-      );
+      actualSelection = await elem.element(
+        by.css('.select2-selection__rendered')
+      ).all(by.tagName('li')).map(async function(choiceElem) {
+        return await choiceElem.getText();
+      });
       // Remove the element corresponding to the last <li>, which actually
       // corresponds to the field for new input.
       actualSelection.pop();
@@ -400,13 +397,12 @@ var MultiSelectEditor = function(elem) {
         '.protractor-test-search-bar-dropdown-toggle')).click();
 
       // Find the selected elements.
-      var actualSelection = await Promise.all(
-        elem.element(by.css('.protractor-test-search-bar-dropdown-menu'))
-          .all(by.css('.protractor-test-selected'))
-          .map(async function(selectedElem) {
-            return await selectedElem.getText();
-          })
-      );
+      var actualSelection = await elem.element(
+        by.css('.protractor-test-search-bar-dropdown-menu')
+      ).all(by.css('.protractor-test-selected'))
+        .map(async function(selectedElem) {
+          return await selectedElem.getText();
+        });
       expect(actualSelection).toEqual(expectedCurrentSelection);
 
       // Close the dropdown menu at the end.
@@ -437,8 +433,8 @@ var expectRichText = function(elem) {
     // surround, e.g., <i> tags, so we can't just ignore the <p> elements
     // altogether.)
     var XPATH_SELECTOR = './p/*|./*[not(self::p)]';
-    var arrayOfTexts = await Promise.all(
-      elem.all(by.xpath(XPATH_SELECTOR)).map(async function(entry) {
+    var arrayOfTexts = await elem.all(by.xpath(XPATH_SELECTOR))
+      .map(async function(entry) {
         // It is necessary to obtain the texts of the elements in advance since
         // applying .getText() while the RichTextChecker is running would be
         // asynchronous and so not allow us to update the textPointer
@@ -446,8 +442,7 @@ var expectRichText = function(elem) {
         return await entry.getText(function(text) {
           return text;
         });
-      })
-    );
+      });
     // We re-derive the array of elements as we need it too.
     var arrayOfElements = await elem.all(by.xpath(XPATH_SELECTOR));
     var fullText = await elem.getText();
@@ -599,7 +594,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     await browser.executeScript(
       '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
       '().scrollTop(' + String(scrollTo) + ');');
-    var lineNumbers = await Promise.all(elem.all(by.xpath('./div')).map(
+    var lineNumbers = await elem.all(by.xpath('./div')).map(
       async function(lineElement) {
         var lineNumber = await lineElement.element(
           by.css('.CodeMirror-linenumber')).getText();
@@ -620,7 +615,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         compareDict[lineNumber].checked = true;
         return lineNumber;
       }
-    ));
+    );
     var largestLineNumber = lineNumbers[lineNumbers.length - 1];
     if (largestLineNumber !== currentLineNumber) {
       await _compareTextAndHighlightingFromLine(
