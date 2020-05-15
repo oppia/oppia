@@ -58,6 +58,11 @@ THIRD_PARTY_LIBS = [
         'name': 'Wavesurfer',
         'package.json': 'wavesurfer.js',
         'type_defs_file_name': 'wavesurfer-defs-'
+    },
+    {
+        'name': 'Nerdamer',
+        'package.json': 'nerdamer',
+        'type_defs_file_name': 'nerdamer-defs-'
     }
 ]
 
