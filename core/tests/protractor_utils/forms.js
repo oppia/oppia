@@ -130,7 +130,7 @@ var ListEditor = function(elem) {
     var listLength = await _getLength();
     await elem.element(by.css('.protractor-test-add-list-entry')).click();
     if (objectType !== null) {
-      return await _getEditor(objectType)(
+      return await getEditor(objectType)(
         elem.element(
           await by.repeater(
             'item in localValue track by $index').row(listLength)));
