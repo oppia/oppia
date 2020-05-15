@@ -19,13 +19,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import re
-import shutil
 
 from scripts import common
 from scripts import install_third_party_libs
 from scripts import setup
 from scripts import setup_gae
 
+import shutil
 import subprocess
 import sys
 import time
