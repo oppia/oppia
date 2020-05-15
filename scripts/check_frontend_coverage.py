@@ -357,7 +357,7 @@ FULLY_COVERED_FILENAMES = [
     'StateObjectFactory.ts',
     'statistics-domain.constants.ajs.ts',
     'statistics-domain.constants.ts',
-    'stewards-landing-page.controller.ts',
+    'stewards-landing-page.component.ts',
     'StopwatchObjectFactory.ts',
     'story-domain.constants.ajs.ts',
     'story-domain.constants.ts',
