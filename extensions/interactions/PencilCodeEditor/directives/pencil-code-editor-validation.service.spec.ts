@@ -33,7 +33,7 @@ describe('Pencil Code Editor Validation Service', () => {
   let pcevs: PencilCodeEditorValidationService = null;
   let outcomeObjectFactory : OutcomeObjectFactory = null;
   let ruleObjectFactory : RuleObjectFactory = null;
-  let answerGroupObjectFactory : AnswerGroupObjectFactory= null;
+  let answerGroupObjectFactory : AnswerGroupObjectFactory = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -64,21 +64,25 @@ describe('Pencil Code Editor Validation Service', () => {
     };
     let id = 'default_outcome';
     let html = '';
-    let Outcome = outcomeObjectFactory.createNew(stateName,id,html,array);
+    let Outcome = outcomeObjectFactory.createNew(stateName, id, html, array);
     let Rule = ruleObjectFactory.createNew('CodeEquals',{x:'hello'});
-    let answer =answerGroupObjectFactory.createNew([Rule],Outcome,[],null);
+    let answer = answerGroupObjectFactory.createNew([Rule], Outcome, [], null);
     let answerGroups = [answer];
-    let output = pcevs.getAllWarnings(stateName,customizationArgs,answerGroups,Outcome);
-    let message_one = 'Please specify what Oppia should do in answer group 1.';
-    let message_two = 'Please add feedback for the user in the [All other answers] rule.';
-    expect(output[0].message).toBe(message_one);
-    expect(output[1].message).toBe(message_two);
+    let output = pcevs.getAllWarnings(
+      stateName, customizationArgs, answerGroups, Outcome);
+    let MessageOne = 'Please specify what ' +  
+    'Oppia should do in answer group 1.';
+    let MessageTwo = 'Please add feedback for the user' + 
+    'in the [All other answers] rule.';
+    expect(output[0].message).toBe(MessageOne);
+    expect(output[1].message).toBe(MessageTwo);
     html = '<p>wrongs</p>'
     Outcome = outcomeObjectFactory.createNew(stateName,id,html,array);
-    Rule = ruleObjectFactory.createNew('CodeEquals',{x:'hello'});
-    answer = answerGroupObjectFactory.createNew([Rule],Outcome,[],null);
+    Rule = ruleObjectFactory.createNew('CodeEquals',{ x:'hello'});
+    answer = answerGroupObjectFactory.createNew([Rule], Outcome, [], null);
     answerGroups = [answer];
-    output = pcevs.getAllWarnings(stateName,customizationArgs,answerGroups,Outcome);
+    output = pcevs.getAllWarnings(
+      stateName, customizationArgs, answerGroups, Outcome);
     expect(pcevs.getAllWarnings(
       stateName, customizationArgs, answerGroups,
       Outcome)).toEqual(array);

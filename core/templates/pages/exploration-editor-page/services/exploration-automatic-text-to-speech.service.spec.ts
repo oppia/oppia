@@ -43,7 +43,7 @@ describe('Exploration Automatic Text To Speech Service', function() {
     expect(eattss._isValid(true)).toBe(true);
     expect(eattss._isValid(false)).toBe(true);
   });
-  
+
   it('should enable and disable Automatic Text-to-speech', function() {
     eattss.savedMemento = true;
     expect(eattss.isAutomaticTextToSpeechEnabled()).toBe(true);
