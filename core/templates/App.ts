@@ -93,7 +93,7 @@ angular.module('oppia').config([
       'CodeReplRulesService', 'CollectionCreationBackendService',
       'ContextService', 'CreatorDashboardBackendApiService', 'CsrfTokenService',
       'DateTimeFormatService', 'DebouncerService', 'DeviceInfoService',
-      'DocumentAttributeCustomizationService',
+      'DocumentAttributeCustomizationService', 'EmailDashboardDataService',
       'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
       'ExpressionParserService', 'ExtensionTagAssemblerService',
       'ExtractImageFilenamesFromStateService',

@@ -118,7 +118,7 @@ FULLY_COVERED_FILENAMES = [
     'editor-domain.constants.ajs.ts',
     'editor-domain.constants.ts',
     'editor-first-time-events.service.ts',
-    'email-dashboard-page.controller.ts',
+    'email-dashboard-page.component.ts',
     'email-dashboard-result.controller.ts',
     'end-exploration-rules.service.ts',
     'end-exploration-validation.service.ts',
