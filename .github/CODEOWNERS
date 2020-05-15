@@ -184,6 +184,7 @@
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/background-banner.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/background-banner.directive.html @ankita240796
+/core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @marianazangrossi
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/loading-dots.directive.ts @ankita240796
@@ -380,14 +381,11 @@
 /core/templates/pages/interaction-specs.constants.ts @bansalnitish
 /core/templates/I18nFooter.ts @nithusha21
 /core/templates/i18n-footer.directive.html @nithusha21
-/core/templates/services/app.service.ts @ankita240796
-/core/templates/services/app.service.spec.ts @ankita240796
+/core/templates/services/app.service*.ts @ankita240796
 /core/templates/services/contextual/document-attribute-customization.service*.ts @bansalnitish
 /core/templates/services/contextual/meta-tag-customization.service*.ts @bansalnitish
-/core/templates/services/interaction-rules-registry.service.ts @bansalnitish
-/core/templates/services/interaction-rules-registry.service.spec.ts @bansalnitish
-/core/templates/services/interaction-specs.service.ts @bansalnitish
-/core/templates/services/interaction-specs.service.spec.ts @bansalnitish
+/core/templates/services/interaction-rules-registry.service*.ts @bansalnitish
+/core/templates/services/interaction-specs.service*.ts @bansalnitish
 /core/templates/services/translation-file-hash-loader.service.ts @nithusha21
 /release_constants.py @ankita240796 @nithusha21 @DubeySandeep
 
