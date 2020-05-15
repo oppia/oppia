@@ -34,7 +34,7 @@ describe('State interaction id service', () => {
     siis = TestBed.get(StateInteractionIdService);
   });
 
-  it('should test the setterMethodKey property.', () => {
+  it('should has a default value in setterMethodKey', () => {
     expect(siis.setterMethodKey).toBe('saveInteractionId');
   });
 });
