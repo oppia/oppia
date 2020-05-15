@@ -194,8 +194,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                 with self.assertRaisesRegexp(
                     SystemExit,
                     r'\033\[1mfile.ts\033\[0m seems to be not completely'
-                    ' tested. Make sure it\'s fully covered before pushing'
-                    ' your changes.\n'):
+                    ' tested. Make sure it\'s fully covered.\n'):
                     check_frontend_coverage.check_coverage_changes()
 
     def test_check_coverage_changes_remove_file(self):
@@ -245,8 +244,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                 with self.assertRaisesRegexp(
                     SystemExit,
                     r'\033\[1mnewfilename.ts\033\[0m seems to be not completely'
-                    ' tested. Make sure it\'s fully covered before pushing'
-                    ' your changes.\n'
+                    ' tested. Make sure it\'s fully covered.\n'
                     r'\033\[1mfile.ts\033\[0m is in the frontend test coverage'
                     ' blacklist but it doesn\'t exist anymore. If you have'
                     ' renamed it, please make sure to remove the old file name'

@@ -604,8 +604,7 @@ def check_coverage_changes():
             if total_lines != covered_lines:
                 errors += (
                     '\033[1m{}\033[0m seems to be not completely tested.'
-                    ' Make sure it\'s fully covered before pushing'
-                    ' your changes.\n'.format(file_name))
+                    ' Make sure it\'s fully covered.\n'.format(file_name))
         else:
             if total_lines == covered_lines:
                 errors += (
