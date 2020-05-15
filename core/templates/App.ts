@@ -99,7 +99,7 @@ angular.module('oppia').config([
       'ExtractImageFilenamesFromStateService',
       'HtmlEscaperService', 'IdGenerationService', 'InteractionObjectFactory','LanguageUtilService',
       'LoaderService', 'LocalStorageService', 'LoggerService', 'MetaTagCustomizationService',
-      'NormalizeWhitespacePipe', 'PencilCodeEditorRulesService', 'RatingComputationService', 'SchemaDefaultValueService', 'SchemaUndefinedLastElementService',
+      'NormalizeWhitespacePipe', 'PageTitleService', 'PencilCodeEditorRulesService', 'RatingComputationService', 'SchemaDefaultValueService', 'SchemaUndefinedLastElementService',
       'SidebarStatusService', 'SiteAnalyticsService', 'SkillObjectFactory',
       'SolutionObjectFactory', 'StateCardObjectFactory',
       'StateImprovementSuggestionService', 'StateObjectFactory',
