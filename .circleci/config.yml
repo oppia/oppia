@@ -248,7 +248,7 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
 
-    e2e_accessibility_and_embedding:
+  e2e_accessibility_and_embedding:
     <<: *job_defaults
     steps:
       - checkout
