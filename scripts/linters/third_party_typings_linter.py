@@ -71,13 +71,11 @@ def check_third_party_libs_type_defs(verbose_mode_enabled):
     """Checks the type definitions for third party libs
     are up to date.
     """
-    stdout = sys.stdout
     if verbose_mode_enabled:
         python_utils.PRINT('Starting type defs check')
         python_utils.PRINT('----------------------------------------')
 
-
-    with linter_utils.redirect_stdout(stdout):
+    with linter_utils.redirect_stdout(sys.stdout):
         failed = False
         summary_messages = []
 
