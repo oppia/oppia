@@ -28,7 +28,7 @@ import { NormalizeWhitespacePunctuationAndCasePipe } from
 import { ContextService } from 'services/context.service';
 import { StateRulesStatsService } from 'services/state-rules-stats.service.ts';
 
-describe('StateRulesStatsService', () => {
+describe('State Rules Stats Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -71,23 +71,21 @@ describe('StateRulesStatsService', () => {
     };
   });
 
-  describe('.stateSupportsImprovementsOverview', () => {
-    it('should return true for states with text-input interactions', () => {
-      this.mockState.interaction.id = 'TextInput';
+  it('should support improvements overview for states with text-input', () => {
+    this.mockState.interaction.id = 'TextInput';
 
-      expect(
-        this.stateRulesStatsService.stateSupportsImprovementsOverview(
-          this.mockState)
-      ).toBeTrue();
-    });
+    expect(
+      this.stateRulesStatsService.stateSupportsImprovementsOverview(
+        this.mockState)
+    ).toBeTrue();
   });
 
-  describe('.computeStateRulesStats', () => {
+  describe('when gathering stats from the backend', () => {
     beforeEach(() => {
       spyOn(this.contextService, 'getExplorationId').and.returnValue('expid');
     });
 
-    it('should respond with answer frequencies', fakeAsync(() => {
+    it('should include answer frequencies in the response', fakeAsync(() => {
       this.onSuccess = jasmine.createSpy('success');
       this.onFailure = jasmine.createSpy('failure');
 
@@ -120,83 +118,88 @@ describe('StateRulesStatsService', () => {
       expect(this.onFailure).not.toHaveBeenCalled();
     }));
 
-    it('should handle addressed info for TextInput', fakeAsync(() => {
-      this.onSuccess = jasmine.createSpy('success');
-      this.onFailure = jasmine.createSpy('failure');
+    it(
+      'should determine whether TextInput answers are addressed explicitly',
+      fakeAsync(() => {
+        this.onSuccess = jasmine.createSpy('success');
+        this.onFailure = jasmine.createSpy('failure');
 
-      this.stateRulesStatsService.computeStateRulesStats(this.mockState)
-        .then(this.onSuccess, this.onFailure);
+        this.stateRulesStatsService.computeStateRulesStats(this.mockState)
+          .then(this.onSuccess, this.onFailure);
 
-      const req = this.httpTestingController.expectOne(
-        '/createhandler/state_rules_stats/expid/Hola');
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        visualizations_info: [{
-          data: [{answer: 'Ni Hao'}, {answer: 'Aloha'}, {answer: 'Hola'}],
-          addressed_info_is_supported: true
-        }]
-      });
-      flushMicrotasks();
+        const req = this.httpTestingController.expectOne(
+          '/createhandler/state_rules_stats/expid/Hola');
+        expect(req.request.method).toEqual('GET');
+        req.flush({
+          visualizations_info: [{
+            data: [{answer: 'Ni Hao'}, {answer: 'Aloha'}, {answer: 'Hola'}],
+            addressed_info_is_supported: true
+          }]
+        });
+        flushMicrotasks();
 
-      expect(this.onSuccess).toHaveBeenCalledWith(jasmine.objectContaining({
-        visualizations_info: [jasmine.objectContaining({
-          data: [
-            jasmine.objectContaining({answer: 'Ni Hao', is_addressed: false}),
-            jasmine.objectContaining({answer: 'Aloha', is_addressed: false}),
-            jasmine.objectContaining({answer: 'Hola', is_addressed: true})
-          ]
-        })]
-      }));
-      expect(this.onFailure).not.toHaveBeenCalled();
-    }));
-
-    it('should convert FractionInput into readable strings', fakeAsync(() => {
-      this.onSuccess = jasmine.createSpy('success');
-      this.onFailure = jasmine.createSpy('failure');
-
-      this.stateRulesStatsService.computeStateRulesStats({
-        name: 'Fraction', interaction: {id: 'FractionInput'}
-      }).then(this.onSuccess, this.onFailure);
-
-      const req = this.httpTestingController.expectOne(
-        '/createhandler/state_rules_stats/expid/Fraction');
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        visualizations_info: [
-          {
+        expect(this.onSuccess).toHaveBeenCalledWith(jasmine.objectContaining({
+          visualizations_info: [jasmine.objectContaining({
             data: [
-              {
-                answer: {
-                  isNegative: false,
-                  wholeNumber: 0,
-                  numerator: 1,
-                  denominator: 2
-                },
-                frequency: 3
-              },
-              {
-                answer: {
-                  isNegative: false,
-                  wholeNumber: 0,
-                  numerator: 0,
-                  denominator: 1
-                },
-                frequency: 5
-              }
+              jasmine.objectContaining({answer: 'Ni Hao', is_addressed: false}),
+              jasmine.objectContaining({answer: 'Aloha', is_addressed: false}),
+              jasmine.objectContaining({answer: 'Hola', is_addressed: true})
             ]
-          }
-        ]
-      });
-      flushMicrotasks();
-
-      expect(this.onSuccess).toHaveBeenCalledWith(jasmine.objectContaining({
-        visualizations_info: [jasmine.objectContaining({
-          data: [
-            jasmine.objectContaining({ answer: '1/2' }),
-            jasmine.objectContaining({ answer: '0' })
-          ]
-        })]
+          })]
+        }));
+        expect(this.onFailure).not.toHaveBeenCalled();
       }));
-    }));
+
+    it(
+      'should return FractionInput answers as readable strings',
+      fakeAsync(() => {
+        this.onSuccess = jasmine.createSpy('success');
+        this.onFailure = jasmine.createSpy('failure');
+
+        this.stateRulesStatsService.computeStateRulesStats({
+          name: 'Fraction', interaction: {id: 'FractionInput'}
+        }).then(this.onSuccess, this.onFailure);
+
+        const req = this.httpTestingController.expectOne(
+          '/createhandler/state_rules_stats/expid/Fraction');
+        expect(req.request.method).toEqual('GET');
+        req.flush({
+          visualizations_info: [
+            {
+              data: [
+                {
+                  answer: {
+                    isNegative: false,
+                    wholeNumber: 0,
+                    numerator: 1,
+                    denominator: 2
+                  },
+                  frequency: 3
+                },
+                {
+                  answer: {
+                    isNegative: false,
+                    wholeNumber: 0,
+                    numerator: 0,
+                    denominator: 1
+                  },
+                  frequency: 5
+                }
+              ]
+            }
+          ]
+        });
+        flushMicrotasks();
+
+        expect(this.onSuccess).toHaveBeenCalledWith(jasmine.objectContaining({
+          visualizations_info: [jasmine.objectContaining({
+            data: [
+              jasmine.objectContaining({ answer: '1/2' }),
+              jasmine.objectContaining({ answer: '0' })
+            ]
+          })]
+        }));
+      }
+    ));
   });
 });

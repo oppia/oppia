@@ -35,7 +35,7 @@ import { UrlInterpolationService } from
 
 export interface IAnswerData {
   /* eslint-disable camelcase */
-  answer; // Type dependant on interaction id.
+  answer; // Type depends on interaction id.
   frequency: number;
   is_addressed?: boolean;
   /* eslint-enable camelcase */
@@ -83,39 +83,39 @@ export class StateRulesStatsService {
    */
   computeStateRulesStats(state: State): Promise<IStateRulesStatsBackendDict> {
     const explorationId = this.contextService.getExplorationId();
-    const interactionRulesService =
+    const interactionRulesService = (
       this.interactionRulesRegistryService.getRulesServiceByInteractionId(
-        state.interaction.id);
+        state.interaction.id));
     return this.http.get<IStateRulesStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         '/createhandler/state_rules_stats/<exploration_id>/<state_name>', {
           exploration_id: encodeURIComponent(explorationId),
           state_name: encodeURIComponent(state.name)
         })
-    ).toPromise().then(response => {
-      return {
-        state_name: state.name,
-        exploration_id: explorationId,
-        visualizations_info: response.visualizations_info.map(info => {
-          info = angular.copy(info);
-          info.data.forEach(datum => {
-            // If data is a FractionInput, need to change data so that
-            // visualization displays the input in a readable manner.
+    ).toPromise().then(response => <IStateRulesStatsBackendDict>{
+      state_name: state.name,
+      exploration_id: explorationId,
+      visualizations_info: (
+        response.visualizations_info.map(info => <IVisualizationInfo>{
+          addressed_info_is_supported: info.addressed_info_is_supported,
+          data: info.data.map(datum => {
             if (state.interaction.id === 'FractionInput') {
-              datum.answer = this.fractionObjectFactory.fromDict(
-                <IFractionDict> datum.answer).toString();
+              // If data is a FractionInput, need to change data so that
+              // visualization displays the input in a readable manner.
+              const fractionDict: IFractionDict = datum.answer;
+              datum.answer = (
+                this.fractionObjectFactory.fromDict(fractionDict).toString());
             }
             if (info.addressed_info_is_supported) {
-              datum.is_addressed =
+              datum.is_addressed = (
                 this.answerClassificationService
                   .isClassifiedExplicitlyOrGoesToNewState(
-                    state.name, state, datum.answer,
-                    interactionRulesService);
+                    state.name, state, datum.answer, interactionRulesService));
             }
-          });
-          return info;
-        })
-      };
+            return datum;
+          }),
+          options: info.options
+        })),
     });
   }
 }

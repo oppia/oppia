@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for InteractionRulesRegistryService.
+ * @fileoverview Unit tests for interaction rules registry service.
  */
 
 import { TestBed } from '@angular/core/testing';
@@ -69,7 +69,7 @@ import { SetInputRulesService } from
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 
-describe('InteractionRulesRegistryService', () => {
+describe('Interaction Rules Registry Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -82,8 +82,8 @@ describe('InteractionRulesRegistryService', () => {
 
     this.codeReplRulesService = TestBed.get(CodeReplRulesService);
     this.continueRulesService = TestBed.get(ContinueRulesService);
-    this.dragAndDropSortInputRulesService =
-      TestBed.get(DragAndDropSortInputRulesService);
+    this.dragAndDropSortInputRulesService = (
+      TestBed.get(DragAndDropSortInputRulesService));
     this.endExplorationRulesService = TestBed.get(EndExplorationRulesService);
     this.fractionInputRulesService = TestBed.get(FractionInputRulesService);
     this.graphInputRulesService = TestBed.get(GraphInputRulesService);
