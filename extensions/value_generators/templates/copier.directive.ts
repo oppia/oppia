@@ -20,9 +20,14 @@
 // generators framework).
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
 
+interface CopierCustomScope extends ng.IScope {
+  generatorId?: string;
+  getTemplateUrl?: (() => string);
+}
+
 angular.module('oppia').directive('copier', ['$compile', function($compile) {
   return {
-    link: function(scope: ICustomScope, element) {
+    link: function(scope: CopierCustomScope, element) {
       scope.getTemplateUrl = function() {
         return '/value_generator_handler/' + scope.generatorId;
       };
