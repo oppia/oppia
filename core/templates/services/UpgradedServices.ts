@@ -191,6 +191,10 @@ import { PredictionResultObjectFactory } from
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service.ts';
+import { QuestionSummaryForOneSkillObjectFactory } from
+  'domain/question/QuestionSummaryForOneSkillObjectFactory';
+import { QuestionSummaryObjectFactory } from
+  'domain/question/QuestionSummaryObjectFactory';
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
 import { ReadOnlyStoryNodeObjectFactory } from
@@ -210,6 +214,10 @@ import { SchemaUndefinedLastElementService } from
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { SkillRightsBackendApiService } from
+  'domain/skill/skill-rights-backend-api.service';
+import { SkillRightsObjectFactory } from
+  'domain/skill/SkillRightsObjectFactory';
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
 import { SolutionObjectFactory } from
@@ -402,6 +410,8 @@ export class UpgradedServices {
       new PlaythroughIssueObjectFactory();
     upgradedServices['PredictionResultObjectFactory'] =
       new PredictionResultObjectFactory();
+    upgradedServices['QuestionSummaryObjectFactory'] =
+      new QuestionSummaryObjectFactory();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
     upgradedServices['ReadOnlyStoryNodeObjectFactory'] =
@@ -411,6 +421,8 @@ export class UpgradedServices {
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
     upgradedServices['SchemaUndefinedLastElementService'] =
       new SchemaUndefinedLastElementService();
+    upgradedServices['SkillRightsObjectFactory'] =
+      new SkillRightsObjectFactory();
     upgradedServices['SkillSummaryObjectFactory'] =
       new SkillSummaryObjectFactory();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
@@ -505,6 +517,9 @@ export class UpgradedServices {
       upgradedServices['LearnerActionObjectFactory']);
     upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
       upgradedServices['LoggerService']);
+    upgradedServices['QuestionSummaryForOneSkillObjectFactory'] =
+      new QuestionSummaryForOneSkillObjectFactory(
+        upgradedServices['QuestionSummaryObjectFactory']);
     upgradedServices['RecordedVoiceoversObjectFactory'] =
       new RecordedVoiceoversObjectFactory(
         upgradedServices['VoiceoverObjectFactory']);
@@ -673,6 +688,10 @@ export class UpgradedServices {
         upgradedServices['MisconceptionObjectFactory'],
         upgradedServices['RubricObjectFactory'],
         upgradedServices['ValidatorsService']);
+    upgradedServices['SkillRightsBackendApiService'] =
+      new SkillRightsBackendApiService(
+      upgradedServices['HttpClient'],
+      upgradedServices['UrlInterpolationService']);
     upgradedServices['StateCardObjectFactory'] =
       new StateCardObjectFactory(
         upgradedServices['AudioTranslationLanguageService']);
