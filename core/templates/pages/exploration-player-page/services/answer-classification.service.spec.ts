@@ -165,10 +165,8 @@ describe('Answer Classification Service', () => {
         'No interactionRulesService was available to classify the answer.');
     });
 
-    it(
-      'should return the first matching answer group and first matching rule ' +
-        'spec',
-      () => {
+    it('should return the first matching answer group and first matching rule ' +
+        'spec', () => {
         const state = this.createStateFromBackendDict();
 
         expect(
