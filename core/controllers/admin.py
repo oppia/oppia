@@ -856,15 +856,19 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
             raise self.InvalidInputException('This app cannot send emails.')
 
 
-class InteractionsByExplorationId(base.BaseHandler):
-    """Handler to retrive the list of interaction id's for a exploration id."""
+class InteractionsByExplorationIdHandler(base.BaseHandler):
+    """Handler to retrive the list of interactions used in an exploration."""
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_admin_page
     def get(self):
         exploration_id = self.request.get('exploration_id', None)
         if exploration_id is None:
-            raise self.InvalidInputException('Exploration id must be a string.')
+            raise self.InvalidInputException('Exploration id must be a string, '
+                                             'received None')
+        elif type(exploration_id).__name__ != 'unicode':
+            raise self.InvalidInputException('Exploration id must be a string, '
+                                             'received %s' % exploration_id)
         exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False)
         if exploration is None:

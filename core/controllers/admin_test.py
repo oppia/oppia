@@ -1766,13 +1766,14 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(
             '/interactionsbyexplorationid', params=payload)
         interactions_list = response['interactions']
-        self.assertEqual(interactions_list, ['EndExploration', 'TextInput'])
+        self.assertEqual(sorted(interactions_list),
+                         ['EndExploration', 'TextInput'])
 
-    def test_interaction_id_handler_with_invalid_id(self):
+    def test_handler_with_invalid_exploration_id_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         payload = {
-            'exploration_id': 'invalid_exp'
+            'exploration_id': 'invalid'
         }
 
         response = self.get_json(
@@ -1780,9 +1781,21 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             expected_status_int=400)
         self.assertEqual(response['error'], 'Exploration does not exist.')
 
-    def test_interaction_id_handler_with_no_id(self):
+    def test_handler_with_without_exploration_id_in_payload_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
             '/interactionsbyexplorationid', params={},
             expected_status_int=400)
-        self.assertEqual(response['error'], 'Exploration id must be a string.')
+        self.assertEqual(
+            response['error'], 'Exploration id must be a string, received None')
+
+    def test_handler_with_non_string_exploration_id_raise_error(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        payload = {
+            'exploration_id': 0
+        }
+        response = self.get_json(
+            '/interactionsbyexplorationid', params=payload,
+            expected_status_int=400)
+        self.assertEqual(response['error'], 'Exploration does not exist.')
