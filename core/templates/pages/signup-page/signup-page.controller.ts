@@ -50,6 +50,7 @@ angular.module('oppia').directive('signupPage', [
             DASHBOARD_TYPE_LEARNER, SITE_NAME, MAX_USERNAME_LENGTH) {
           var ctrl = this;
           var _SIGNUP_DATA_URL = '/signuphandler/data';
+          ctrl.MAX_USERNAME_LENGTH = MAX_USERNAME_LENGTH;
           ctrl.isFormValid = function() {
             return (
               ctrl.hasAgreedToLatestTerms &&
@@ -110,8 +111,8 @@ angular.module('oppia').directive('signupPage', [
               ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_NO_USERNAME';
             } else if (username.indexOf(' ') !== -1) {
               ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES';
-            } else if (username.length > MAX_USERNAME_LENGTH) {
-              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_MORE_30_CHARS';
+            } else if (username.length > ctrl.MAX_USERNAME_LENGTH) {
+              ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TOO_LONG';
             } else if (!alphanumeric.test(username)) {
               ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM';
             } else if (admin.test(username)) {
