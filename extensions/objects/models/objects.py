@@ -314,7 +314,22 @@ class MathLatexString(BaseObject):
 
     description = 'A LaTeX string.'
 
-    SCHEMA = UnicodeString.SCHEMA
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'raw_latex',
+            'description': 'Latex value',
+            'schema': {
+                'type': 'unicode'
+            }
+        }, {
+            'name': 'svg_filename',
+            'description': 'SVG file',
+            'schema': {
+                'type': 'unicode'
+            }
+        }]
+    }
 
 
 class SanitizedUrl(BaseObject):

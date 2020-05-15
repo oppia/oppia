@@ -120,12 +120,18 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
     def test_math_validation(self):
         """Tests collapsible component validation."""
         valid_items = [{
-            'raw_latex-with-value': '123456789'
+            'math_content-with-value': {
+                u'raw_latex': u'123456',
+                u'svg_filename': u''
+            }
         }, {
-            'raw_latex-with-value': '\\frac{x}{y}'
+            'math_content-with-value': {
+                u'raw_latex': u'\\frac{x}{y}',
+                u'svg_filename': u''
+            }
         }]
         invalid_items = [{
-            'raw_latex-with-value': False
+            'math_content-with-value': False
         }, {
             'url-with-value': 'http://link.com'
         }]

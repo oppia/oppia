@@ -40,7 +40,7 @@ angular.module('oppia').directive('mathLatexStringEditor', [
           // part of an editable list).
           $scope.$watch('$ctrl.value', function() {
             ctrl.localValue = {
-              label: ctrl.value || ''
+              label: ctrl.value.raw_latex || ''
             };
           }, true);
           $scope.$on('externalSave', function() {
@@ -56,7 +56,7 @@ angular.module('oppia').directive('mathLatexStringEditor', [
 
           if (ctrl.alwaysEditable) {
             $scope.$watch('$ctrl.localValue.label', function(newValue) {
-              ctrl.value = newValue;
+              ctrl.value.raw_latex = newValue;
             });
           } else {
             ctrl.openEditor = function() {
@@ -71,7 +71,7 @@ angular.module('oppia').directive('mathLatexStringEditor', [
               ctrl.localValue = {
                 label: newValue
               };
-              ctrl.value = newValue;
+              ctrl.value.raw_latex = newValue;
               ctrl.closeEditor();
             };
 

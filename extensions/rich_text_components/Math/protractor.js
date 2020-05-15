@@ -25,9 +25,21 @@ var customizeComponent = function(modal, rawLatex) {
   ).setValue(rawLatex);
 };
 
+var escapedJsonToObj = function(json) {
+  return (
+    JSON.parse((json.toString())
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, '\'')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')));
+};
+
 var expectComponentDetailsToMatch = function(elem, rawLatex) {
   // TODO(Jacob): Check that the actual latex being displayed is correct.
-  expect(elem.getAttribute('raw_latex-with-value')).toMatch(rawLatex);
+  elem.getAttribute('math_content-with-value').then(function(value) {
+    expect(escapedJsonToObj(value).raw_latex).toMatch(rawLatex);
+  });
 };
 
 exports.customizeComponent = customizeComponent;

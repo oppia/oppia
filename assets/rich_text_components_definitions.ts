@@ -124,13 +124,16 @@ export = {
     "is_lesson_related": false,
     "is_block_element": false,
     "customization_arg_specs": [{
-      "name": "raw_latex",
+      "name": "math_content",
       "description": "The raw string to be displayed as LaTeX.",
       "schema": {
         "type": "custom",
         "obj_type": "MathLatexString"
       },
-      "default_value": ""
+      "default_value": {
+        "raw_latex": "",
+        "svg_filename": ""
+      }
     }]
   },
   "Skillreview": {

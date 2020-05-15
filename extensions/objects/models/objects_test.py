@@ -212,9 +212,13 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
     def test_math_latex_string_validation(self):
         """Tests objects of type MathLatexString."""
-        mappings = [
-            ('123456789', u'123456789'), (u'x \\times y', u'x \\times y'),
-        ]
+        mappings = [(
+            {'raw_latex': '123456789', 'svg_filename': ''},
+            {'raw_latex': u'123456789', 'svg_filename': u''}
+        ), (
+            {'raw_latex': u'x \\times y', 'svg_filename': u''},
+            {'raw_latex': u'x \\times y', 'svg_filename': u''}
+        )]
         invalid_vals = [3.0, {'a': 1}, [1, 2, 1], None]
 
         self.check_normalization(
