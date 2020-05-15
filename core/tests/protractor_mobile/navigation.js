@@ -27,32 +27,32 @@ describe('Navigation features on mobile', function() {
 
   beforeEach(async function() {
     libraryPage = new LibraryPage.LibraryPage();
-    libraryPage.get();
+    await libraryPage.get();
   });
 
   it('should open the sidebar menu by clicking on the hamburger button',
     async function() {
       var navbarButton = element(
         by.css('.protractor-mobile-test-navbar-button'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         navbarButton, 'Could not click navbar button');
       await navbarButton.click();
       var sidebarMenuOpen = element(by.css('.oppia-sidebar-menu-open'));
-      expect(sidebarMenuOpen).not.toBeNull();
+      expect(await sidebarMenuOpen).not.toBeNull();
     });
 
   it('should navigate to About page using the sidebar menu',
     async function() {
       var navbarButton = element(
         by.css('.protractor-mobile-test-navbar-button'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         navbarButton, 'Could not click navbar button');
       await navbarButton.click();
       var aboutLink = element(by.css('.protractor-mobile-test-about-link'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         aboutLink, 'Could not click about link');
       await aboutLink.click();
-      waitFor.pageToFullyLoad();
+      await waitFor.pageToFullyLoad();
       expect(await browser.getCurrentUrl()).toEqual(
         'http://localhost:9001/about');
     });
@@ -61,32 +61,31 @@ describe('Navigation features on mobile', function() {
     async function() {
       var navbarButton = element(
         by.css('.protractor-mobile-test-navbar-button'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         navbarButton, 'Could not click navbar button');
       await navbarButton.click();
       var getStartedLink = element(
         by.css('.protractor-mobile-test-get-started-link'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         getStartedLink, 'Could not click get started link');
       await getStartedLink.click();
-      waitFor.pageToFullyLoad();
-      expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/get_started');
+      await waitFor.pageToFullyLoad();
+      expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/get_started');
     });
 
   it('should navigate to Teach with Oppia page using the sidebar menu',
     async function() {
       var navbarButton = element(
         by.css('.protractor-mobile-test-navbar-button'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         navbarButton, 'Could not click navbar button');
       await navbarButton.click();
       var teachLink = element(
         by.css('.protractor-mobile-test-teach-link'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         teachLink, 'Could not click teach link');
       await teachLink.click();
-      waitFor.pageToFullyLoad();
+      await waitFor.pageToFullyLoad();
       expect(await browser.getCurrentUrl()).toEqual(
         'http://localhost:9001/teach');
     });
@@ -95,15 +94,15 @@ describe('Navigation features on mobile', function() {
     async function() {
       var navbarButton = element(
         by.css('.protractor-mobile-test-navbar-button'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         navbarButton, 'Could not click navbar button');
       await navbarButton.click();
       var donateLink = element(
         by.css('.protractor-mobile-test-donate-link'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         donateLink, 'Could not click donate link');
       await donateLink.click();
-      waitFor.pageToFullyLoad();
+      await waitFor.pageToFullyLoad();
       expect(await browser.getCurrentUrl()).toEqual(
         'http://localhost:9001/donate');
     });
@@ -112,15 +111,15 @@ describe('Navigation features on mobile', function() {
     async function() {
       var navbarButton = element(
         by.css('.protractor-mobile-test-navbar-button'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         navbarButton, 'Could not click navbar button');
       await navbarButton.click();
       var contactLink = element(
         by.css('.protractor-mobile-test-contact-link'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         contactLink, 'Could not click contact link');
       await contactLink.click();
-      waitFor.pageToFullyLoad();
+      await waitFor.pageToFullyLoad();
       expect(await browser.getCurrentUrl()).toEqual(
         'http://localhost:9001/contact');
     });
@@ -129,24 +128,25 @@ describe('Navigation features on mobile', function() {
     async function() {
       var navbarButton = element(
         by.css('.protractor-mobile-test-navbar-button'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         navbarButton, 'Could not click navbar button');
       await navbarButton.click();
       var libraryLink = element(by.css('.protractor-mobile-test-library-link'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         libraryLink, 'Could not click library link');
       await libraryLink.click();
-      waitFor.pageToFullyLoad();
-      expect(browser.getCurrentUrl()).toEqual('http://localhost:9001/library');
+      await waitFor.pageToFullyLoad();
+      expect(await browser.getCurrentUrl()).toEqual(
+        'http://localhost:9001/library');
     });
 
   it('should navigate to Home page by clicking on the Oppia logo',
     async function() {
       var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         oppiaLogo, 'Could not click oppia logo');
       await oppiaLogo.click();
-      waitFor.pageToFullyLoad();
+      await waitFor.pageToFullyLoad();
       expect(await browser.getCurrentUrl()).toEqual('http://localhost:9001/');
     });
 
@@ -154,7 +154,7 @@ describe('Navigation features on mobile', function() {
     async function() {
       var signInButton = element(
         by.css('.protractor-mobile-test-login'));
-      waitFor.elementToBeClickable(
+      await waitFor.elementToBeClickable(
         signInButton, 'Could not click sign in button');
       // For the rationale behind this statement, see
       // https://github.com/angular/protractor/issues/2643#issuecomment-213257116
@@ -177,7 +177,7 @@ describe('Navigation features on mobile', function() {
       browser.ignoreSynchronization = false;
     });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });
