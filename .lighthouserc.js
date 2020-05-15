@@ -47,22 +47,17 @@
             assertions: {
               // Performance Audits
               // maxNumericValue unit is in miliseconds
-              'first-contentful-paint': ['warn', {maxNumericValue: 12300}],
-              'first-meaningful-paint': ['warn', {maxNumericValue: 12800}],
-              'first-cpu-idle': ['warn', {maxNumericValue: 14600}],
-              'speed-index': ['warn', {maxNumericValue: 12300}],
-              'interactive': ['warn', {maxNumericValue: 15400}],
-              'max-potential-fid': ["warn", {maxNumericValue: 1300}],
+              'first-contentful-paint': ['warn', {maxNumericValue: 1230000}],
+              'first-meaningful-paint': ['warn', {maxNumericValue: 1280000}],
+              'first-cpu-idle': ['warn', {maxNumericValue: 1460000}],
+              'speed-index': ['warn', {maxNumericValue: 1230000}],
+              'interactive': ['warn', {maxNumericValue: 1540000}],
+              'max-potential-fid': ["warn", {maxNumericValue: 130000}],
               // Performance Opportunities
-              // 'render-blocking-resources': ['warn', {minScore: 1}], // failing
               'uses-responsive-images': ['warn', {minScore: 1}],
               'offscreen-images': ['warn', {minScore: 1}],
-              // 'unminified-css': ['warn', {minScore: 1}], // failing 
-              // 'unminified-javascript': ['warn', {minScore: 1}], // failing
-              // 'unused-css-rules': ['warn', {minScore: 1}], // failing
               'uses-optimized-images': ['warn', {minScore: 1}],
               'uses-webp-images': ['warn', {minScore: 1}],
-              // 'uses-text-compression': ['warn', {minScore: 1}], // failing
               'uses-rel-preconnect': ['warn', {minScore: 1}],
               'time-to-first-byte': ['warn', {minScore: 1}],
               'redirects': ['warn', {minScore: 1}],
@@ -71,7 +66,6 @@
               // Best Practice Audits
               'appcache-manifest': ['error', {minScore: 1}],
               'is-on-https': ['error', {minScore: 1}],
-              // 'uses-http2': ['warn', {minScore: 1}], // failing
               'uses-passive-event-listeners': ['error', {minScore: 1}],
               'no-document-write': ['error', {minScore: 1}],
               'external-anchors-use-rel-noopener': ['error', {minScore: 1}],
@@ -82,7 +76,6 @@
               'notification-on-start': ['error', {minScore: 1}],
               'deprecations': ['error', {minScore: 1}],
               'password-inputs-can-be-pasted-into': ['error', {minScore: 1}],
-              // 'errors-in-console': ['warn', {minScore: 1}], //failing
               'image-aspect-ratio': ['error', {minScore: 1}]
             }
           },

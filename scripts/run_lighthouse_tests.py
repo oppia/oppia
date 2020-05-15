@@ -19,15 +19,17 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import re
+import shutil
+
+from scripts import common
+from scripts import install_third_party_libs
+from scripts import setup
+from scripts import setup_gae
+
 import subprocess
 import sys
 import time
 import python_utils
-
-from . import common
-from . import install_third_party_libs
-from . import setup
-from . import setup_gae
 
 OPPIA_SERVER_PORT = 8181
 COMPY_SERVER_PORT = 9999
@@ -45,7 +47,6 @@ MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
 
 def setup_and_install_dependencies():
     """Run the setup and installation scripts."""
-
     install_third_party_libs.main()
     setup.main(args=[])
     setup_gae.main(args=[])
@@ -95,7 +96,6 @@ def download_and_install_go():
 
 def download_and_install_compy():
     """Download and install the compy proxy server."""
-
     subprocess.check_call([GO_BINARY, 'get', 'github.com/barnacs/compy'])
     with common.CD(COMPY_DOWNLOAD_PATH):
         subprocess.check_call([GO_BINARY, 'install'])
@@ -118,10 +118,10 @@ def cleanup():
 
 
 def delete_reports():
-    """"Delete the reports that are stored in the lighthouse ci folder."""
-    bash_command = 'rm -r .lighthouseci'
-    process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
-    process.communicate()
+    """manually delete lighthouse reports to handle
+    lighthouse ci bug where html reports aren't deleted
+    """
+    shutil.rmtree('.lighthouseci')
 
 
 def start_proxy_server():
@@ -152,18 +152,20 @@ def wait_for_port_to_be_open(port_number):
 
 def run_lighthouse_checks():
     """Runs the lighthouserc.js config with bash command lhci autorun."""
-    bash_command = 'lhci autorun'
-    process = subprocess.Popen(bash_command, shell=True, stdout=subprocess.PIPE)
+    node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
+    lhci_path = os.path.join(
+        'node_modules', '@lhci', 'cli', 'src', 'cli.js')
+    bash_command = [node_path, lhci_path, 'autorun']
+    python_utils.PRINT(bash_command, 'lhci autorun')
+    process = subprocess.Popen(bash_command, stdout=subprocess.PIPE)
 
     for line in iter(process.stdout.readline, ''):
         python_utils.PRINT(line[:-1])
 
-    process.wait()
-
 
 def main():
     """Runs lighthouse checks and deletes reports."""
-    setup_and_install_dependencies()
+    # setup_and_install_dependencies()
     run_lighthouse_checks()
     delete_reports()
 
