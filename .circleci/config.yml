@@ -34,7 +34,7 @@ workflows:
       - e2e_file_upload_features:
           requires:
             - typescript_tests
-      - e2e_navigation:
+      - e2e_navigation_and_admin:
           requires:
             - typescript_tests
       - e2e_classroom_page:
