@@ -37,13 +37,13 @@ export class EditableTopicBackendApiService {
 
   private _fetchTopic(topicId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+      errorCallback: (reason?) => void): void {
     let topicDataUrl = this.urlInterpolation.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
         topic_id: topicId
       });
 
-    this.http.get(topicDataUrl).toPromise().then((response: any) => {
+    this.http.get(topicDataUrl).toPromise().then((response) => {
       if (successCallback) {
         // The response is passed as a dict with 2 fields and not as 2
         // parameters, because the successCallback is called as the resolve
@@ -69,13 +69,13 @@ export class EditableTopicBackendApiService {
 
   private _fetchStories(topicId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+      errorCallback: (reason?) => void): void {
     let storiesDataUrl = this.urlInterpolation.interpolateUrl(
       TopicDomainConstants.TOPIC_EDITOR_STORY_URL_TEMPLATE, {
         topic_id: topicId
       });
 
-    this.http.get(storiesDataUrl).toPromise().then((response: any) => {
+    this.http.get(storiesDataUrl).toPromise().then((response) => {
       let canonicalStorySummaries = cloneDeep(
         response.canonical_story_summary_dicts);
       if (successCallback) {
@@ -91,14 +91,14 @@ export class EditableTopicBackendApiService {
   private _fetchSubtopicPage(
       topicId: string, subtopicId: number,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+      errorCallback: (reason?) => void): void {
     let subtopicPageDataUrl = this.urlInterpolation.interpolateUrl(
       AppConstants.SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, {
         topic_id: topicId,
         subtopic_id: subtopicId.toString()
       });
 
-    this.http.get(subtopicPageDataUrl).toPromise().then((response: any) => {
+    this.http.get(subtopicPageDataUrl).toPromise().then((response) => {
       let topic = cloneDeep(response.subtopic_page);
       if (successCallback) {
         successCallback(topic);
@@ -112,12 +112,12 @@ export class EditableTopicBackendApiService {
 
   private _deleteTopic(topicId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+      errorCallback: (reason?) => void): void {
     let topicDataUrl = this.urlInterpolation.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
         topic_id: topicId
       });
-    this.http['delete'](topicDataUrl).toPromise().then((response: any) => {
+    this.http['delete'](topicDataUrl).toPromise().then((response) => {
       if (successCallback) {
         successCallback(200);
       }
@@ -132,7 +132,7 @@ export class EditableTopicBackendApiService {
       topicId: string, topicVersion: string, commitMessage: string,
       changeList: Array<Object>,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
-      errorCallback: (reason?: any) => void): void {
+      errorCallback: (reason?) => void): void {
     let editableTopicDataUrl = this.urlInterpolation.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
         topic_id: topicId
@@ -144,7 +144,7 @@ export class EditableTopicBackendApiService {
       topic_and_subtopic_page_change_dicts: changeList
     };
     this.http.put(editableTopicDataUrl, putData).toPromise().then(
-      (response: any) => {
+      (response) => {
         if (successCallback) {
         // Here also, a dict with 2 fields are passed instead of just 2
         // parameters, due to the same reason as written for _fetchTopic().
