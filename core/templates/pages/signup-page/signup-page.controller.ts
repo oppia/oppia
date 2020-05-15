@@ -179,7 +179,7 @@ angular.module('oppia').directive('signupPage', [
 
             ctrl.submissionInProcess = true;
             $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
-              window.location = window.decodeURIComponent(
+              window.location.href = window.decodeURIComponent(
                 UrlService.getUrlParams().return_url);
             }, function(rejection) {
               if (

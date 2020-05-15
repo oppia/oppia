@@ -18,6 +18,19 @@
 
 import { DateTimeFormatService } from 'services/date-time-format.service';
 
+// Needed because MockDateContructor should be of same type as
+// DateConstructor to be used in callFake
+interface MockDateContructorType {
+  parse: (s: string) => number;
+  UTC: (
+    year: number, month: number, date?: number, hours?: number,
+    minutes?: number, seconds?: number, ms?: number) => number;
+  now: () => number;
+
+  (millisSinceEpoch?: number): string;
+  new(): Date;
+}
+
 describe('datetimeformatter', () => {
   // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
   let NOW_MILLIS = 1416563100000;
@@ -27,15 +40,19 @@ describe('datetimeformatter', () => {
   beforeEach(() => {
     df = new DateTimeFormatService();
 
-    // Mock Date() to give a time of NOW_MILLIS in GMT. (Unfortunately, there
-    // doesn't seem to be a good way to set the timezone locale directly.)
-    spyOn(window, 'Date').and.callFake(function(millisSinceEpoch = 0) {
+    let MockDateContructor = function(millisSinceEpoch = 0) {
       if (millisSinceEpoch === 0) {
         return new OldDate(NOW_MILLIS);
       } else {
         return new OldDate(millisSinceEpoch);
       }
-    });
+    // Need as any here because DateContructor has some properties on the
+    // function and this function doesn't really have those properties.
+    } as any as MockDateContructorType;
+
+    // Mock Date() to give a time of NOW_MILLIS in GMT. (Unfortunately, there
+    // doesn't seem to be a good way to set the timezone locale directly.)
+    spyOn(window, 'Date').and.callFake(MockDateContructor);
   });
 
   it('should correctly indicate recency', () => {
