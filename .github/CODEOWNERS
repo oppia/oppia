@@ -489,7 +489,7 @@
 /core/templates/third-party-imports/ @nishantwrp @vojtechjelinek
 /jinja_utils*.py @jameesjohn @vojtechjelinek
 /.lighthouserc.js @jimbyo @jameesjohn
-/scripts/lighthouse_checks.py @jameesjohn @jimbyo
+/scripts/run_lighthouse_tests.py @jameesjohn @jimbyo
 /webpack.common.config.ts @jameesjohn @vojtechjelinek
 /webpack.common.macros.ts @jameesjohn @vojtechjelinek
 /webpack.dev.config.ts @jameesjohn @vojtechjelinek
