@@ -23,6 +23,9 @@ import { Injectable } from '@angular/core';
 
 import { ExplorationOpportunitySummary, ITranslationCountsDict } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+import { IFetchedExplorationOpportunitiesSuccessCallbackParams,
+  IFetchedSkillOpportunitiesSuccessCallbackParams } from
+  './contribution-opportunities.service';
 import { SkillOpportunity } from
   'domain/opportunity/SkillOpportunityObjectFactory';
 import { UrlInterpolationService } from
@@ -38,12 +41,6 @@ type ContributionOpportunityParams = {
   // eslint-disable-next-line camelcase
   language_code?: string;
 };
-
-export interface IFetchedOpportunitiesSuccessCallbackParams {
-  opportunities: IOpportunityDict[],
-  nextCursor: string,
-  more: boolean
-}
 
 export interface IOpportunityDict {
   id: string
@@ -69,7 +66,7 @@ export interface IOpportunityDict {
 export class ContributionOpportunitiesBackendApiService {
   urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
   constructor(private urlInterpolationService: UrlInterpolationService,
-              private http: HttpClient) {}
+    private http: HttpClient) { }
 
   // TODO(#7165): Replace any with exact type.
   private _getOpportunityFromDict(
@@ -95,7 +92,8 @@ export class ContributionOpportunitiesBackendApiService {
       opportunityType: ContributionOpportunityCategoryType,
       params: ContributionOpportunityParams,
       successCallback:
-      (value: IFetchedOpportunitiesSuccessCallbackParams) => void,
+        (value: IFetchedExplorationOpportunitiesSuccessCallbackParams |
+          IFetchedSkillOpportunitiesSuccessCallbackParams) => void,
       errorCallback: (reason?: any) => void): void {
     this.http.get(this.urlInterpolationService.interpolateUrl(
       this.urlTemplate, { opportunityType }
