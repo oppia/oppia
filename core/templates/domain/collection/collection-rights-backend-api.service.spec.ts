@@ -21,15 +21,12 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { CollectionRightsBackendApiService } from
-  './collection-rights-backend-api.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
-
+  'domain/collection/collection-rights-backend-api.service';
 
 describe('Collection rights backend API service', function() {
   let collectionRightsBackendApiService: CollectionRightsBackendApiService;
   let httpTestingController: HttpTestingController;
   let sampleDataResults: Array<object>;
-  let csrfService: CsrfTokenService = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -39,13 +36,6 @@ describe('Collection rights backend API service', function() {
     httpTestingController = TestBed.get(HttpTestingController);
     collectionRightsBackendApiService =
       TestBed.get(CollectionRightsBackendApiService);
-    csrfService = TestBed.get(CsrfTokenService);
-
-    // spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
-    //   return new Promise((resolve) => {
-    //     resolve('sample-csrf-token');
-    //   });
-    // });
   });
 
   beforeEach(() => {
