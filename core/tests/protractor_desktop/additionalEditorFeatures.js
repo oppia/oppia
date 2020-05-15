@@ -59,9 +59,12 @@ describe('Full exploration editor', function() {
 
     await users.createAndLoginAdminUser('superUser@test.com', 'superUser');
     // TODO(#7569): Change this test to work with the improvements tab.
-    adminPage.editConfigProperty(
+    await adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor',
-      'Boolean', (elem) => elem.setValue(false));
+      'Boolean', async function(elem) {
+        await elem.setValue(false);
+      }
+    );
     await users.logout();
   });
 
@@ -70,11 +73,10 @@ describe('Full exploration editor', function() {
       await users.createUser(
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
       await users.login('userTutorial@stateEditor.com');
-
       await workflow.createExplorationAndStartTutorial();
-      explorationEditorMainTab.startTutorial();
-      explorationEditorMainTab.playTutorial();
-      explorationEditorMainTab.finishTutorial();
+      await explorationEditorMainTab.startTutorial();
+      await explorationEditorMainTab.playTutorial();
+      await explorationEditorMainTab.finishTutorial();
       await users.logout();
     }
   );
@@ -377,7 +379,7 @@ describe('Full exploration editor', function() {
     await users.logout();
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });

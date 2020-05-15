@@ -28,8 +28,9 @@ var objects = require('../../../extensions/objects/protractor.js');
 var DictionaryEditor = function(elem) {
   return {
     editEntry: async function(index, objectType) {
-      var entry = elem.element(await by.repeater('property in propertySchemas()').
-        row(index));
+      var entry = elem.element(
+        await by.repeater('property in propertySchemas()').
+          row(index));
       var editor = getEditor(objectType);
       return await editor(entry);
     }
@@ -73,14 +74,14 @@ var GraphEditor = function(graphInputContainer) {
       if (nodeCoordinatesList) {
         expect(nodeCoordinatesList.length).toBeGreaterThan(0);
         // Assume x-coord is at index 0.
-        nodeCoordinatesList.forEach(function(coordinateElement) {
+        for (coordinateElement of nodeCoordinatesList) {
           await createVertex(coordinateElement[0], coordinateElement[1]);
-        });
+        }
       }
       if (edgesList) {
-        edgesList.forEach(function(edgeElement) {
+        for (edgeElement of edgesList) {
           await createEdge(edgeElement[0], edgeElement[1]);
-        });
+        }
       }
     },
     clearDefaultGraph: async function() {
@@ -98,9 +99,9 @@ var GraphEditor = function(graphInputContainer) {
       if (nodeCoordinatesList) {
         // Expecting total no. of vertices on the graph matches with the given
         // dict's vertices.
-        nodeCoordinatesList.forEach(function(node, index) {
-          expect(await vertexElement(index).isDisplayed()).toBe(true);
-        });
+        for (var i = 0; i < nodeCoordinatesList.count(); i++) {
+          expect(await vertexElement(i).isDisplayed()).toBe(true);
+        }
       }
       if (edgesList) {
         // Expecting total no. of edges on the graph matches with the given
@@ -131,7 +132,8 @@ var ListEditor = function(elem) {
     if (objectType !== null) {
       return await _getEditor(objectType)(
         elem.element(
-          await by.repeater('item in localValue track by $index').row(listLength)));
+          await by.repeater(
+            'item in localValue track by $index').row(listLength)));
     }
   };
   var deleteItem = async function(index) {
@@ -230,7 +232,8 @@ var RichTextEditor = async function(elem) {
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
     addRteComponent: async function(componentName) {
-      await _clickToolbarButton('cke_button__oppia' + componentName.toLowerCase());
+      await _clickToolbarButton(
+        'cke_button__oppia' + componentName.toLowerCase());
 
       // The currently active modal is the last in the DOM
       var modal = await element.all(by.css('.modal-dialog')).last();
@@ -241,15 +244,16 @@ var RichTextEditor = async function(elem) {
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      await richTextComponents.getComponent(componentName).customizeComponent.apply(
-        null, args);
+      await richTextComponents.getComponent(componentName)
+        .customizeComponent.apply(null, args);
       await modal.element(
         by.css('.protractor-test-close-rich-text-component-editor')).click();
 
       // Ensure that focus is not on added component once it is added so that
       // the component is not overwritten by some other element.
       if (['Video', 'Image', 'Collapsible', 'Tabs'].includes(componentName)) {
-        await elem.all(by.css('.oppia-rte')).first().sendKeys(protractor.Key.DOWN);
+        await elem.all(
+          by.css('.oppia-rte')).first().sendKeys(protractor.Key.DOWN);
       }
 
       // Ensure that the cursor is at the end of the RTE.
@@ -264,8 +268,8 @@ var RichTextEditor = async function(elem) {
 var SetOfHtmlStringEditor = function(elem) {
   return {
     editEntry: async function(index, objectType) {
-      var entry = elem.element(await by.repeater('property in propertySchemas()').
-        row(index));
+      var entry = elem.element(
+        await by.repeater('property in propertySchemas()').row(index));
       var editor = getEditor(objectType);
       return await editor(entry);
     }
@@ -295,7 +299,7 @@ var AutocompleteDropdownEditor = function(elem) {
       await elem.element(by.css('.select2-container')).click();
       var actualOptions = await Promise.all(
         element(by.css('.select2-dropdown')).all(by.tagName('li')).map(
-          function(optionElem) {
+          async function(optionElem) {
             return await optionElem.getText();
           }
         )
@@ -314,10 +318,10 @@ var AutocompleteMultiDropdownEditor = function(elem) {
       // Clear all existing choices.
       var deleteButtons = await Promise.all(
         elem.element(by.css('.select2-selection__rendered'))
-        .all(by.tagName('li')).map(function(choiceElem) {
-          return choiceElem.element(
-            by.css('.select2-selection__choice__remove'));
-        })
+          .all(by.tagName('li')).map(function(choiceElem) {
+            return choiceElem.element(
+              by.css('.select2-selection__choice__remove'));
+          })
       );
       // We iterate in descending order, because clicking on a delete button
       // removes the element from the DOM. We also omit the last element
@@ -335,9 +339,9 @@ var AutocompleteMultiDropdownEditor = function(elem) {
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
       actualSelection = await Promise.all(
         elem.element(by.css('.select2-selection__rendered'))
-        .all(by.tagName('li')).map(function(choiceElem) {
-          return await choiceElem.getText();
-        })
+          .all(by.tagName('li')).map(async function(choiceElem) {
+            return await choiceElem.getText();
+          })
       );
       // Remove the element corresponding to the last <li>, which actually
       // corresponds to the field for new input.
