@@ -3,7 +3,7 @@
     Enter Story Title
   </h3>
 </div>
-<form ng-submit="save(storyTitle)">
+<form ng-submit="confirm(storyTitle)">
   <div class="modal-body new-story-title-editor" ng-class="{'has-error': isStoryTitleEmpty(storyTitle)}">
     Enter the title: &nbsp;
     <input class="form-group protractor-test-new-story-title-field" ng-model="storyTitle" maxlength="<[MAX_CHARS_IN_STORY_TITLE]>" autofocus>
