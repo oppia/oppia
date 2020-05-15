@@ -177,7 +177,6 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                 r' available at [A-Za-z\._/]+, but the file does not exist.'):
                 check_frontend_coverage.check_coverage_changes()
 
-
     def test_check_coverage_changes_for_covered_files(self):
         self.lcov_items_list = (
             'SF:/opensource/oppia/file.ts\n'
@@ -198,7 +197,6 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                     ' tested. Make sure it\'s fully covered before pushing'
                     ' your changes.\n'):
                     check_frontend_coverage.check_coverage_changes()
-
 
     def test_check_coverage_changes_remove_file(self):
         self.lcov_items_list = (
@@ -228,7 +226,6 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                     '-tests-guide#rules\n'):
                     check_frontend_coverage.check_coverage_changes()
 
-
     def test_check_coverage_changes_when_renaming_file(self):
         self.lcov_items_list = (
             'SF:/opensource/oppia/newfilename.ts\n'
@@ -256,7 +253,6 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                     ' and add the new file name in the blacklist in the file'
                     ' scripts/check_frontend_test_coverage.py.\n'):
                     check_frontend_coverage.check_coverage_changes()
-
 
     def test_fully_covered_filenames_is_sorted(self):
         self.lcov_items_list = (
