@@ -240,6 +240,20 @@ def update_dev_mode_in_constants_js(constant_file, dev_mode_setting):
     common.inplace_replace_file(constant_file, pattern, replace)
 
 
+def update_show_classroom_in_constants(constant_file, show_classroom_setting):
+    """Toggle SHOW_CLASSROOM constant while running the e2e tests.
+
+    Args:
+        constant_file: str. File path to the constant file.
+        show_classroom_setting: bool. The new value that the SHOW_CLASSROOM
+            constant needs to be set to.
+    """
+    pattern = '"SHOW_CLASSROOM": .*'
+    replace = '"SHOW_CLASSROOM": %s,' % (
+        'true' if show_classroom_setting else 'false')
+    common.inplace_replace_file(constant_file, pattern, replace)
+
+
 def run_webdriver_manager(parameters):
     """Run commands of webdriver manager.
 
@@ -439,6 +453,10 @@ def main(args=None):
 
     atexit.register(cleanup)
 
+    # The classroom page is hidden behind a flag which needs to be toggled
+    # before running the e2e tests.
+    update_show_classroom_in_constants(CONSTANT_FILE_PATH, True)
+
     dev_mode = not parsed_args.prod_env
     if not parsed_args.skip_build:
         build_js_files(
@@ -459,6 +477,7 @@ def main(args=None):
 
     p = subprocess.Popen(commands)
     p.communicate()
+    update_show_classroom_in_constants(CONSTANT_FILE_PATH, False)
     sys.exit(p.returncode)
 
 
