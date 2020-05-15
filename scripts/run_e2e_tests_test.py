@@ -347,7 +347,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with inplace_replace_swap:
             run_e2e_tests.update_show_classroom_in_constants(
                 constant_file, True)
-    
+
     def test_update_show_classroom_in_constants_to_false(self):
         constant_file = 'constant.ts'
         inplace_replace_swap = self.inplace_replace_swap(expected_args=[(
