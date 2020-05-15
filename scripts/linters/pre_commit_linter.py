@@ -44,8 +44,9 @@ CUSTOMIZATION OPTIONS
         python -m scripts.linters.pre_commit_linter
             --only-check-file-extensions py js
 
-6. To run a specific type of linter (third_party, custom)
-        python -m scripts.linters.pre_commit_linter --linter-type=custom
+6. To run a specific type of linter (third_party, custom) run the following
+        command. By default both third party and custom linter will be used.
+            python -m scripts.linters.pre_commit_linter --linter-type=custom
 
 Note that the root folder MUST be named 'oppia'.
  """
@@ -76,6 +77,8 @@ from .. import install_third_party_libs
 
 install_third_party_libs.main()
 
+_LINTER_TYPE_CUSTOM = 'custom'
+_LINTER_TYPE_THIRD_PARTY = 'third_party'
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
 _EXCLUSIVE_GROUP.add_argument(
@@ -100,8 +103,9 @@ _PARSER.add_argument(
     action='store_true')
 _PARSER.add_argument(
     '--linter-type',
-    choices=['third_party', 'custom'],
-    help='type of linter to be used',
+    choices=[_LINTER_TYPE_CUSTOM, _LINTER_TYPE_THIRD_PARTY],
+    help='type of linter to be used. By default both third party and custom '
+         'linter will be used.',
     action='store')
 
 if not os.getcwd().endswith('oppia'):
@@ -149,7 +153,6 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
-_LINTER_TYPES = ['custom', 'third_party']
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
 _TARGET_STDOUT = python_utils.string_io()
@@ -317,21 +320,6 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     return files_in_directory
 
 
-def _get_linter_type(linter_type):
-    """This function is used to return the type of linters to be used.
-
-    Args:
-        linter_type: str. Type of linter.
-
-    Returns:
-        list(str). The list of all linter types.
-    """
-    if linter_type:
-        return [linter_type]
-
-    return _LINTER_TYPES
-
-
 def _get_file_extensions(file_extensions_to_lint):
     """This function is used to return the file extensions which need to be
     linted and checked.
@@ -476,8 +464,12 @@ def main(args=None):
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
-    linter_type_used = _get_linter_type(parsed_args.linter_type)
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
+
+    # Setting default value for linters to use.
+    linter_types_to_use = [_LINTER_TYPE_CUSTOM, _LINTER_TYPE_THIRD_PARTY]
+    if parsed_args.linter_type is not None:
+        linter_types_to_use = [parsed_args.linter_type]
 
     python_utils.PRINT('Starting Linter....')
 
@@ -514,14 +506,14 @@ def main(args=None):
     tasks_custom = []
     tasks_third_party = []
 
-    if 'custom' in linter_type_used:
+    if _LINTER_TYPE_CUSTOM in linter_types_to_use:
         for linter in custom_linters:
             task_custom = concurrent_task_utils.create_task(
                 linter.perform_all_lint_checks, verbose_mode_enabled,
                 custom_semaphore, name='custom')
             tasks_custom.append(task_custom)
 
-    if 'third_party' in linter_type_used:
+    if _LINTER_TYPE_THIRD_PARTY in linter_types_to_use:
         for linter in third_party_linters:
             task_third_party = concurrent_task_utils.create_task(
                 linter.perform_all_lint_checks, verbose_mode_enabled,
@@ -536,10 +528,10 @@ def main(args=None):
     # (ie. might parallelize on their own)
 
     # Concurrency limit: 25.
-    if 'custom' in linter_type_used:
+    if _LINTER_TYPE_CUSTOM in linter_types_to_use:
         concurrent_task_utils.execute_tasks(tasks_custom, custom_semaphore)
     # Concurrency limit: 2.
-    if 'third_party' in linter_type_used:
+    if _LINTER_TYPE_THIRD_PARTY in linter_types_to_use:
         concurrent_task_utils.execute_tasks(
             tasks_third_party, third_party_semaphore)
 
@@ -548,12 +540,12 @@ def main(args=None):
     # Prepare semaphore for locking mechanism.
     semaphore = threading.Semaphore(1)
 
-    if 'custom' in linter_type_used:
+    if _LINTER_TYPE_CUSTOM in linter_types_to_use:
         for task in tasks_custom:
             semaphore.acquire()
             _get_task_output(all_messages, task, semaphore)
 
-    if 'third_party' in linter_type_used:
+    if _LINTER_TYPE_THIRD_PARTY in linter_types_to_use:
         for task in tasks_third_party:
             semaphore.acquire()
             _get_task_output(all_messages, task, semaphore)

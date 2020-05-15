@@ -135,7 +135,6 @@ jobs:
           # pre_commit_linter and third_party_size_check need to import other
           # Python files and that is only possible if we treat it as a module.
           command: |
-            python -m scripts.third_party_size_check
             python -m scripts.linters.pre_commit_linter --path=. --linter-type=custom --verbose
 
   third_party_lint_tests:
