@@ -864,9 +864,9 @@ class InteractionsByExplorationIdHandler(base.BaseHandler):
     def get(self):
         exploration_id = self.request.get('exploration_id', None)
         if exploration_id is None:
-            raise self.InvalidInputException('Exploration id must be a string, '
-                                             'received None')
-        elif type(exploration_id).__name__ != 'unicode':
+            raise self.InvalidInputException(
+                'Exploration id must be a string, received None')
+        elif not isinstance(exploration_id, python_utils.UNICODE):
             raise self.InvalidInputException('Exploration id must be a string, '
                                              'received %s' % exploration_id)
         exploration = exp_fetchers.get_exploration_by_id(
