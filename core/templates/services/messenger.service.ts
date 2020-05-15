@@ -48,21 +48,20 @@ interface IExplorationCompletedData {
 }
 
 interface IMessageValidatorsType {
-  heightChange: ((payload: IHeightChangeData) => boolean);
-  explorationLoaded: (() => boolean);
-  stateTransition: (
-    (payload: IStateTransitionData) => boolean);
-  explorationReset: ((payload: {stateName: string}) => boolean);
-  explorationCompleted: (() => boolean);
+  heightChange(payload: IHeightChangeData): boolean;
+  explorationLoaded(): boolean;
+  stateTransition(payload: IStateTransitionData): boolean;
+  explorationReset(payload: {stateName: string}): boolean;
+  explorationCompleted(): boolean;
 }
 
 interface GetPayloadType {
-  heightChange: ((data: IHeightChangeData) => IHeightChangeData);
-  explorationLoaded: ((data: IExplorationLoadedData) => IExplorationLoadedData);
-  stateTransition: ((data: IStateTransitionData) => IStateTransitionData);
-  explorationCompleted: (
-    (data: IExplorationCompletedData) => IExplorationCompletedData);
-  explorationReset: ((data: string) => {stateName: string});
+  heightChange(data: IHeightChangeData): IHeightChangeData;
+  explorationLoaded(data: IExplorationLoadedData): IExplorationLoadedData;
+  stateTransition(data: IStateTransitionData): IStateTransitionData;
+  explorationCompleted(
+    data: IExplorationCompletedData): IExplorationCompletedData;
+  explorationReset(data: string): {stateName: string};
 }
 
 @Injectable({
@@ -83,7 +82,7 @@ export class MessengerService {
     new Set(['0.0.0', '0.0.1', '0.0.2', '0.0.3']));
 
   MESSAGE_VALIDATORS: IMessageValidatorsType = {
-    heightChange: (payload: IHeightChangeData): boolean => {
+    heightChange(payload: IHeightChangeData): boolean {
       const {height, scroll} = payload;
       return (
         Number.isInteger(height) && height > 0 && typeof scroll === 'boolean');
@@ -103,19 +102,19 @@ export class MessengerService {
   };
 
   getPayload: GetPayloadType = {
-    heightChange(data: IHeightChangeData) {
+    heightChange(data: IHeightChangeData): IHeightChangeData {
       return {
         height: data.height,
         scroll: data.scroll
       };
     },
-    explorationLoaded(data: IExplorationLoadedData) {
+    explorationLoaded(data: IExplorationLoadedData): IExplorationLoadedData {
       return {
         explorationVersion: data.explorationVersion,
         explorationTitle: data.explorationTitle
       };
     },
-    stateTransition(data: IStateTransitionData) {
+    stateTransition(data: IStateTransitionData): IStateTransitionData {
       return {
         explorationVersion: data.explorationVersion,
         oldStateName: data.oldStateName,
@@ -123,13 +122,14 @@ export class MessengerService {
         newStateName: data.newStateName
       };
     },
-    explorationCompleted(data: IExplorationCompletedData) {
+    explorationCompleted(
+        data: IExplorationCompletedData): IExplorationCompletedData {
       return {
         explorationVersion: data.explorationVersion
       };
     },
     // DEPRECATED
-    explorationReset(data: string) {
+    explorationReset(data: string): {stateName: string} {
       return {
         stateName: data
       };

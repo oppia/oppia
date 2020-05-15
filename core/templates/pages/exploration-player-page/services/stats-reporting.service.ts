@@ -162,8 +162,9 @@ export class StatsReportingService {
   }
 
   initSession(
-      newExplorationId, newExplorationTitle, newExplorationVersion,
-      newSessionId, collectionId): void {
+      newExplorationId: string, newExplorationTitle: string,
+      newExplorationVersion: number, newSessionId: string,
+      collectionId: string): void {
     this.explorationId = newExplorationId;
     this.explorationTitle = newExplorationTitle;
     this.explorationVersion = newExplorationVersion;
