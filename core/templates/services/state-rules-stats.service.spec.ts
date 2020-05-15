@@ -199,7 +199,6 @@ describe('State Rules Stats Service', () => {
             ]
           })]
         }));
-      }
-    ));
+      }));
   });
 });
