@@ -15,10 +15,11 @@
 /core/domain/android_validation_constants*.py @BenHenning
 
 # Angular Migration team
+/core/templates/services/loader.service*.ts @bansalnitish
 /core/templates/services/contextual/logger.service.ts @bansalnitish
 /core/templates/services/contextual/logger.service.spec.ts @bansalnitish
 /core/templates/services/UpgradedServices.ts @bansalnitish
-/core/templates/services/request-interceptor.service.ts @bansalnitish
+/core/templates/services/request-interceptor.service*.ts @bansalnitish
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
 
@@ -117,6 +118,7 @@
 /scripts/install_prerequisites.sh @DubeySandeep
 /scripts/typescript_checks*.py @ankita240796 @DubeySandeep
 /scripts/linters/ @DubeySandeep @Hudda
+/scripts/linters/excluded_any_type_files.json @nishantwrp
 /ubuntu_dockerfile @ezl-13 @kevinlee12
 
 
@@ -183,6 +185,7 @@
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/background-banner.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/background-banner.directive.html @ankita240796
+/core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @marianazangrossi
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/loading-dots.directive.ts @ankita240796
@@ -251,7 +254,6 @@
 /core/templates/domain/statistics/ @brianrodri
 /core/templates/pages/exploration-editor-page/improvements-tab/ @brianrodri
 /core/templates/pages/exploration-editor-page/statistics-tab/ @brianrodri
-/core/templates/services/improvement-task.service*.ts @brianrodri
 /core/templates/services/improvements.service*.ts @brianrodri
 /core/templates/services/messenger.service.ts @brianrodri
 /core/templates/services/playthrough*.ts @brianrodri
@@ -496,7 +498,7 @@
 
 
 # Typings.
-/typings @ankita240796
+/typings @ankita240796 @nishantwrp
 
 
 # User Data Takeout.

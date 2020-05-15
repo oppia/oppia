@@ -4699,6 +4699,9 @@ export = {
     "code": "ar",
     "description": "العربية (Arabic)"
   }, {
+    "code": "sq",
+    "description": "shqip (Albanian)"
+  }, {
     "code": "bg",
     "description": "български (Bulgarian)"
   }, {
@@ -4864,6 +4867,10 @@ export = {
     "id": "ak",
     "description": "Akan",
     "relatedLanguages": ["ak"]
+  }, {
+    "id": "sq",
+    "description": "Albanian",
+    "relatedLanguages": ["sq"]
   }, {
     "id": "ar",
     "description": "Arabic",
@@ -5058,7 +5065,8 @@ export = {
       "ImageClickInput",
       "ItemSelectionInput",
       "MultipleChoiceInput",
-      "TextInput"
+      "TextInput",
+      "DragAndDropSortInput"
     ]
   }, {
     "name": "Math",
@@ -5192,9 +5200,11 @@ export = {
   "MAX_CHARS_IN_TOPIC_NAME": 39,
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
-  "MAX_CHARS_IN_SKILL_DESCRIPTION": 64,
+  "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
   "MAX_CHARS_IN_STORY_TITLE": 39,
   "MAX_CHARS_IN_CHAPTER_TITLE": 36,
+  "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
+  "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,

@@ -120,9 +120,6 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
-import { ImprovementsDisplayService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/improvements-tab/services/improvements-display.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
@@ -140,6 +137,7 @@ import { LearnerDashboardActivityIdsObjectFactory } from
 import { LearnerParamsService } from
   'pages/exploration-player-page/services/learner-params.service';
 import { LocalStorageService } from 'services/local-storage.service';
+import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
@@ -180,6 +178,10 @@ import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
+import { PlaythroughService } from 'services/playthrough.service';
+import { PredictionAlgorithmRegistryService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
@@ -268,6 +270,7 @@ import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
+import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 import { TextInputValidationService } from
   'interactions/TextInput/directives/text-input-validation.service';
 import { ThreadMessageObjectFactory } from
@@ -360,8 +363,6 @@ export class UpgradedServices {
     upgradedServices['IdGenerationService'] = new IdGenerationService();
     upgradedServices['ImprovementActionButtonObjectFactory'] =
       new ImprovementActionButtonObjectFactory();
-    upgradedServices['ImprovementsDisplayService'] =
-      new ImprovementsDisplayService();
     upgradedServices['ImprovementsService'] = new ImprovementsService();
     upgradedServices['LearnerActionObjectFactory'] =
       new LearnerActionObjectFactory();
@@ -372,6 +373,7 @@ export class UpgradedServices {
     upgradedServices['LearnerDashboardActivityIdsObjectFactory'] =
       new LearnerDashboardActivityIdsObjectFactory();
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
+    upgradedServices['LoaderService'] = new LoaderService();
     upgradedServices['LoggerService'] = new LoggerService();
     upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
       new UtilsService);
@@ -410,10 +412,12 @@ export class UpgradedServices {
       new SubtitledHtmlObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
     upgradedServices['SuggestionsService'] = new SuggestionsService();
+    upgradedServices['TextInputTokenizer'] = new TextInputTokenizer();
     upgradedServices['ThreadMessageSummaryObjectFactory'] =
       new ThreadMessageSummaryObjectFactory();
     upgradedServices['ThreadStatusDisplayService'] =
       new ThreadStatusDisplayService();
+    upgradedServices['Title'] = new Title({});
     upgradedServices['TopicRightsObjectFactory'] =
       new TopicRightsObjectFactory();
     upgradedServices['TopicSummaryObjectFactory'] =
@@ -432,16 +436,15 @@ export class UpgradedServices {
       new baseInteractionValidationService();
     upgradedServices['ɵangular_packages_common_http_http_d'] =
       new ɵangular_packages_common_http_http_d();
-    upgradedServices['Title'] = new Title({});
 
     // Topological level: 1.
     upgradedServices['AlertsService'] = new AlertsService(
       upgradedServices['LoggerService']);
     upgradedServices['BrowserCheckerService'] = new BrowserCheckerService(
       upgradedServices['WindowRef']);
-    // eslint-disable-next-line max-len
-    upgradedServices['ContinueValidationService'] = new ContinueValidationService(
-      upgradedServices['baseInteractionValidationService']);
+    upgradedServices['ContinueValidationService'] =
+      new ContinueValidationService(
+        upgradedServices['baseInteractionValidationService']);
     upgradedServices['DeviceInfoService'] = new DeviceInfoService(
       upgradedServices['WindowRef']);
     upgradedServices['DocumentAttributeCustomizationService'] =
@@ -659,12 +662,21 @@ export class UpgradedServices {
     upgradedServices['StateCardObjectFactory'] =
       new StateCardObjectFactory(
         upgradedServices['AudioTranslationLanguageService']);
+    upgradedServices['TextInputPredictionService'] =
+      new TextInputPredictionService(
+        upgradedServices['CountVectorizerService'],
+        upgradedServices['SVMPredictionService'],
+        upgradedServices['TextInputTokenizer']);
     upgradedServices['TopicObjectFactory'] = new TopicObjectFactory(
       upgradedServices['SubtopicObjectFactory'],
       upgradedServices['StoryReferenceObjectFactory'],
       upgradedServices['SkillSummaryObjectFactory']);
 
     // Topological level: 4.
+    upgradedServices['PredictionAlgorithmRegistryService'] =
+      new PredictionAlgorithmRegistryService(
+        upgradedServices['CodeReplPredictionService'],
+        upgradedServices['TextInputPredictionService']);
     upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['ExplorationHtmlFormatterService']);
@@ -679,6 +691,14 @@ export class UpgradedServices {
       upgradedServices['OutcomeObjectFactory']);
 
     // Topological level: 6.
+    upgradedServices['PlaythroughService'] =
+      new PlaythroughService(
+        upgradedServices['HttpClient'],
+        upgradedServices['ExplorationFeaturesService'],
+        upgradedServices['LearnerActionObjectFactory'],
+        upgradedServices['PlaythroughObjectFactory'],
+        upgradedServices['StopwatchObjectFactory'],
+        upgradedServices['UrlInterpolationService']);
     upgradedServices['StateObjectFactory'] = new StateObjectFactory(
       upgradedServices['InteractionObjectFactory'],
       upgradedServices['ParamChangesObjectFactory'],

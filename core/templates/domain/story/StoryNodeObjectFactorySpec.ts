@@ -31,6 +31,7 @@ describe('Story node object factory', () => {
       id: 'node_1',
       thumbnail_filename: 'image.png',
       title: 'Title 1',
+      description: 'Description 1',
       prerequisite_skill_ids: ['skill_1'],
       acquired_skill_ids: ['skill_2'],
       destination_node_ids: ['node_2'],
@@ -48,6 +49,7 @@ describe('Story node object factory', () => {
     expect(storyNode.getId()).toEqual('node_1');
     expect(storyNode.getThumbnailFilename()).toEqual(null);
     expect(storyNode.getTitle()).toEqual('Title 1');
+    expect(storyNode.getDescription()).toEqual('');
     expect(storyNode.getDestinationNodeIds()).toEqual([]);
     expect(storyNode.getPrerequisiteSkillIds()).toEqual([]);
     expect(storyNode.getAcquiredSkillIds()).toEqual([]);

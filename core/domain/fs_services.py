@@ -69,6 +69,8 @@ def save_original_and_compressed_versions_of_image(
         compressed_image_content = original_image_content
         micro_image_content = original_image_content
 
+    mimetype = (
+        'image/svg+xml' if filetype == 'svg' else 'image/%s' % filetype)
     # Because in case of CreateVersionsOfImageJob, the original image is
     # already there. Also, even if the compressed, micro versions for some
     # image exists, then this would prevent from creating another copy of
@@ -76,17 +78,17 @@ def save_original_and_compressed_versions_of_image(
     if not fs.isfile(filepath.encode('utf-8')):
         fs.commit(
             filepath.encode('utf-8'), original_image_content,
-            mimetype='image/%s' % filetype)
+            mimetype=mimetype)
 
     if not fs.isfile(compressed_image_filepath.encode('utf-8')):
         fs.commit(
             compressed_image_filepath.encode('utf-8'),
-            compressed_image_content, mimetype='image/%s' % filetype)
+            compressed_image_content, mimetype=mimetype)
 
     if not fs.isfile(micro_image_filepath.encode('utf-8')):
         fs.commit(
             micro_image_filepath.encode('utf-8'),
-            micro_image_content, mimetype='image/%s' % filetype)
+            micro_image_content, mimetype=mimetype)
 
 
 def save_classifier_data(exp_id, job_id, classifier_data):
