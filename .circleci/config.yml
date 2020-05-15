@@ -49,6 +49,9 @@ workflows:
       - e2e_users:
           requires:
               - e2e_navigation_and_admin
+      - e2e_accessibility_and_embedding:
+          requires:
+              - e2e_navigation_and_admin
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
@@ -244,6 +247,21 @@ jobs:
           name: Run e2e profileFeatures test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
+
+    e2e_accessibility_and_embedding:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run e2e accessibility test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
+      - run:
+          name: Run e2e embedding test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="embedding" --prod_env
 
   # Non-prod e2e Tests
   # The following tests must be run in a non-production environment because they are uploading files.
