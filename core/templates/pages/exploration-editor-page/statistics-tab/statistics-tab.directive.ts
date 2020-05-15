@@ -17,6 +17,10 @@
  * exploration editor.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -161,15 +165,19 @@ angular.module('oppia').directive('statisticsTab', [
                   }
                 },
                 controller: [
-                  '$scope', '$uibModalInstance', '$filter', '$injector',
-                  'stateName', 'stateStats', 'improvementType',
+                  '$controller', '$scope', '$uibModalInstance', '$filter',
+                  '$injector', 'stateName', 'stateStats', 'improvementType',
                   'visualizationsInfo', 'HtmlEscaperService',
                   'AngularNameService', 'AnswerClassificationService',
                   function(
-                      $scope, $uibModalInstance, $filter, $injector,
-                      stateName, stateStats, improvementType,
+                      $controller, $scope, $uibModalInstance, $filter,
+                      $injector, stateName, stateStats, improvementType,
                       visualizationsInfo, HtmlEscaperService,
                       AngularNameService, AnswerClassificationService) {
+                    $controller('ConfirmOrCancelModalController', {
+                      $scope: $scope,
+                      $uibModalInstance: $uibModalInstance
+                    });
                     var COMPLETION_RATE_PIE_CHART_OPTIONS = {
                       left: 20,
                       pieHole: 0.6,
@@ -243,11 +251,6 @@ angular.module('oppia').directive('statisticsTab', [
 
                     $scope.visualizationsHtml = _getVisualizationsHtml();
 
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                      AlertsService.clearWarnings();
-                    };
-
                     $scope.$on('$destroy', function() {
                       stateStatsModalIsOpen = false;
                     });
@@ -259,8 +262,7 @@ angular.module('oppia').directive('statisticsTab', [
                   }
                 ]
               }).result.then(function() {}, function() {
-                // This callback is triggered when the Cancel button is
-                // clicked. No further action is needed.
+                AlertsService.clearWarnings();
               });
             });
           };
