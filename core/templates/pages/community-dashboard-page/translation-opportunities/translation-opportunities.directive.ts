@@ -19,6 +19,9 @@
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
@@ -119,9 +122,16 @@ angular.module('oppia').directive(
                 }
               },
               controller: [
-                '$scope', '$uibModalInstance', 'opportunity', 'userIsLoggedIn',
+                '$controller', '$scope', '$uibModalInstance', 'opportunity',
+                'userIsLoggedIn',
                 function(
-                    $scope, $uibModalInstance, opportunity, userIsLoggedIn) {
+                    $controller, $scope, $uibModalInstance, opportunity,
+                    userIsLoggedIn) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
+
                   $scope.userIsLoggedIn = userIsLoggedIn;
                   $scope.uploadingTranslation = false;
                   $scope.activeWrittenTranslation = {};
@@ -181,12 +191,12 @@ angular.module('oppia').directive(
                       $uibModalInstance.close();
                     }
                   };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.close();
-                  };
                 }
               ]
+            }).result.then(function() {}, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
           ctrl.$onInit = function() {
