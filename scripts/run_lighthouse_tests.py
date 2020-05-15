@@ -19,17 +19,16 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import re
-
-from scripts import common
-from scripts import install_third_party_libs
-from scripts import setup
-from scripts import setup_gae
-
 import shutil
 import subprocess
 import sys
 import time
+
 import python_utils
+from scripts import common
+from scripts import install_third_party_libs
+from scripts import setup
+from scripts import setup_gae
 
 OPPIA_SERVER_PORT = 8181
 COMPY_SERVER_PORT = 9999
