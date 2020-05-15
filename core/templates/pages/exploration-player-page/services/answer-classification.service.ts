@@ -66,8 +66,10 @@ export class AnswerClassificationService {
       interactionRulesService): AnswerClassificationResult {
     // Find the first group that contains a rule which returns true
     // TODO(bhenning): Implement training data classification.
-    for (const answerGroup of answerGroups) {
-      for (const rule of answerGroup.rules) {
+    for (var i = 0; i < answerGroups.length; ++i) {
+      const answerGroup = answerGroups[i];
+      for (var j = 0; j < answerGroup.rules.length; ++j) {
+        const rule = answerGroup.rules[j];
         if (interactionRulesService[rule.type](answer, rule.inputs)) {
           return this.answerClassificationResultObjectFactory.createNew(
             answerGroup.outcome, i, j,
@@ -127,7 +129,8 @@ export class AnswerClassificationService {
         interactionInOldState.id);
 
     if (ruleBasedOutcomeIsDefault && interactionIsTrainable) {
-      for (const answerGroup of answerGroups) {
+      for (var i = 0; i < answerGroups.length; ++i) {
+        const answerGroup = answerGroups[i];
         if (!answerGroup.trainingData) {
           continue;
         }
