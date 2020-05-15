@@ -118,7 +118,7 @@ def cleanup():
 
 def delete_reports():
     """manually delete lighthouse reports to handle
-    lighthouse ci bug where html reports aren't deleted
+    lighthouse ci bug where html reports aren't deleted.
     """
     shutil.rmtree('.lighthouseci')
 
