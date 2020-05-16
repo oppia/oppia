@@ -165,6 +165,18 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
+    def test_post_with_incorrect_version_returns_400(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        question_dict = self.question.to_dict()
+        question_dict['version'] = 1
+        self.post_json(
+            feconf.NEW_QUESTION_URL, {
+                'question_dict': question_dict,
+                'skill_ids': [self.skill_id]
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
     def test_post_with_wrong_skill_difficulty_length_returns_400(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
