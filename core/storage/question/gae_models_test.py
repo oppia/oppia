@@ -410,10 +410,23 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.create(
                 'question_id5', 'skill_id1', 0.6)
             )
+        questionskilllink_model6 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id6', 'skill_id1', 0.6)
+            )
+        questionskilllink_model7 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id7', 'skill_id1', 0.6)
+            )
+        questionskilllink_model8 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id8', 'skill_id1', 0.6)
+            )
         question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3, questionskilllink_model4,
-             questionskilllink_model5])
+             questionskilllink_model5, questionskilllink_model6,
+             questionskilllink_model7, questionskilllink_model8])
         utils.random.seed(1)
         question_skill_links_1 = (
             question_models.QuestionSkillLinkModel.
@@ -432,12 +445,12 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(question_skill_links_2), 3)
         self.assertEqual(
             question_skill_links_1,
-            [questionskilllink_model1, questionskilllink_model3,
-             questionskilllink_model4])
+            [questionskilllink_model2, questionskilllink_model4,
+             questionskilllink_model6])
         self.assertEqual(
             question_skill_links_2,
-            [questionskilllink_model1, questionskilllink_model4,
-             questionskilllink_model5])
+            [questionskilllink_model2, questionskilllink_model6,
+             questionskilllink_model7])
         self.assertNotEqual(question_skill_links_1, question_skill_links_2)
 
     def test_request_too_many_skills_raises_error_when_fetch_by_difficulty(
@@ -565,10 +578,23 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.create(
                 'question_id5', 'skill_id1', 0.6)
             )
+        questionskilllink_model6 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id6', 'skill_id1', 0.6)
+            )
+        questionskilllink_model7 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id7', 'skill_id1', 0.6)
+            )
+        questionskilllink_model8 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id8', 'skill_id1', 0.6)
+            )
         question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3, questionskilllink_model4,
-             questionskilllink_model5])
+             questionskilllink_model5, questionskilllink_model6,
+             questionskilllink_model7, questionskilllink_model8])
         utils.random.seed(1)
         question_skill_links_1 = (
             question_models.QuestionSkillLinkModel.
@@ -587,12 +613,12 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(question_skill_links_2), 3)
         self.assertEqual(
             question_skill_links_1,
-            [questionskilllink_model1, questionskilllink_model4,
-             questionskilllink_model3])
+            [questionskilllink_model6, questionskilllink_model4,
+             questionskilllink_model2])
         self.assertEqual(
             question_skill_links_2,
-            [questionskilllink_model2, questionskilllink_model3,
-             questionskilllink_model5])
+            [questionskilllink_model4, questionskilllink_model2,
+             questionskilllink_model3])
         self.assertNotEqual(question_skill_links_1, question_skill_links_2)
 
     def test_request_too_many_skills_raises_error(self):

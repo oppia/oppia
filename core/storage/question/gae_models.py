@@ -354,15 +354,26 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         question_skill_link_mapping = {}
 
+        def get_offset(query):
+            """Helper function to get the offset."""
+            question_count = query.count()
+            if question_count > 2 * question_count_per_skill:
+                return utils.get_random_int(
+                    question_count - (question_count_per_skill * 2))
+            return 0
+
         for skill_id in skill_ids:
-            query = cls.query(cls.skill_id == skill_id)
+            query = cls.gql("WHERE skill_id = '" + skill_id + "'") # pylint: disable=invalid-string-quote
 
             equal_questions_query = query.filter(
-                cls.skill_difficulty == difficulty_requested)
+                ndb.FloatProperty('skill_difficulty') == difficulty_requested)
+
             # We fetch more questions here in order to try and ensure that the
             # eventual number of returned questions is sufficient to meet the
             # number requested, even after deduplication.
-            new_question_skill_link_models = equal_questions_query.fetch()
+            new_question_skill_link_models = equal_questions_query.fetch(
+                limit=question_count_per_skill * 2,
+                offset=get_offset(equal_questions_query))
             for model in new_question_skill_link_models:
                 if model.question_id in question_skill_link_mapping:
                     new_question_skill_link_models.remove(model)
@@ -374,9 +385,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 # Fetch QuestionSkillLinkModels with difficulty smaller than
                 # requested difficulty and sort them by decreasing difficulty.
                 easier_questions_query = query.filter(
-                    cls.skill_difficulty < difficulty_requested)
+                    (ndb.FloatProperty('skill_difficulty') <
+                     difficulty_requested))
                 easier_question_skill_link_models = (
-                    easier_questions_query.fetch())
+                    easier_questions_query.fetch(
+                        limit=question_count_per_skill * 2,
+                        offset=get_offset(easier_questions_query)))
                 for model in easier_question_skill_link_models:
                     if model.question_id in question_skill_link_mapping:
                         easier_question_skill_link_models.remove(model)
@@ -399,7 +413,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                     new_question_skill_link_models.extend(
                         easier_question_skill_link_models)
                     harder_questions_query = query.filter(
-                        cls.skill_difficulty > difficulty_requested)
+                        (ndb.FloatProperty('skill_difficulty') >
+                         difficulty_requested))
+                    harder_question_skill_link_models = (
+                        harder_questions_query.fetch(
+                            limit=question_count_per_skill * 2,
+                            offset=get_offset(harder_questions_query)))
                     harder_question_skill_link_models = (
                         harder_questions_query.fetch())
                     for model in harder_question_skill_link_models:
@@ -457,12 +476,23 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         question_skill_link_models = []
         existing_question_ids = []
 
+        def get_offset(query):
+            """Helper function to get the offset."""
+            question_count = query.count()
+            if question_count > 2 * question_count_per_skill:
+                return utils.get_random_int(
+                    question_count - (question_count_per_skill * 2))
+            return 0
+
         for skill_id in skill_ids:
-            query = cls.query(cls.skill_id == skill_id)
+            query = cls.gql("WHERE skill_id = '" + skill_id + "'") # pylint: disable=invalid-string-quote
+
             # We fetch more questions here in order to try and ensure that the
             # eventual number of returned questions is sufficient to meet the
             # number requested, even after deduplication.
-            new_question_skill_link_models = query.fetch()
+            new_question_skill_link_models = query.fetch(
+                limit=question_count_per_skill * 2,
+                offset=get_offset(query))
 
             # Deduplicate if the same question is linked to multiple skills.
             for model in new_question_skill_link_models:
