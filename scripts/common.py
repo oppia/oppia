@@ -30,25 +30,36 @@ import sys
 import python_utils
 import release_constants
 
-PSUTIL_VERSION = '5.6.7'
 
 CURRENT_PYTHON_BIN = sys.executable
-NODE_VERSION = '10.18.0'
-PYLINT_VERSION = '1.9.4'
+
+# Versions of libraries used in devflow.
+COVERAGE_VERSION = '5.1'
+ESPRIMA_VERSION = '4.0.1'
+ISORT_VERSION = '4.3.21'
 PYCODESTYLE_VERSION = '2.5.0'
+PSUTIL_VERSION = '5.7.0'
+PYLINT_VERSION = '1.9.5'
 PYLINT_QUOTES_VERSION = '0.1.8'
+PYGITHUB_VERSION = '1.45'
+WEBTEST_VERSION = '2.0.35'
+
+# Node version.
+NODE_VERSION = '12.16.2'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
-YARN_VERSION = '1.22.0'
+YARN_VERSION = '1.22.4'
 
-COVERAGE_VERSION = '4.5.4'
+# Versions of libraries used in backend.
+PILLOW_VERSION = '6.2.2'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
+OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 GOOGLE_APP_ENGINE_HOME = os.path.join(
-    OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine')
+    OPPIA_TOOLS_DIR_ABS_PATH, 'google_appengine_1.9.67', 'google_appengine')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0', 'google-cloud-sdk')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)

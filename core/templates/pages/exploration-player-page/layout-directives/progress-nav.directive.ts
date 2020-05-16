@@ -126,7 +126,7 @@ angular.module('oppia').directive('progressNav', [
                 PlayerPositionService.getCurrentStateName());
               $rootScope.$broadcast('currentQuestionChanged', index);
             } else {
-              throw Error('Target card index out of bounds.');
+              throw new Error('Target card index out of bounds.');
             }
           };
 

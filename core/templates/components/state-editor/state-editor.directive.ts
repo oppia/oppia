@@ -111,7 +111,8 @@ angular.module('oppia').directive('stateEditor', [
 
             $scope.$on('stateEditorInitialized', function(evt, stateData) {
               if (stateData === undefined || $.isEmptyObject(stateData)) {
-                throw new Error('Expected stateData to be defined but ' +
+                throw new Error(
+                  'Expected stateData to be defined but ' +
                   'received ' + stateData);
               }
               $scope.stateData = stateData;

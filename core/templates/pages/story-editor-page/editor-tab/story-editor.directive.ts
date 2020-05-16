@@ -17,6 +17,11 @@
  */
 
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
+  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('pages/story-editor-page/editor-tab/story-node-editor.directive.ts');
 
@@ -26,6 +31,10 @@ require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
+
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+const storyConstants = require('constants.ts');
 
 angular.module('oppia').directive('storyEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -61,6 +70,8 @@ angular.module('oppia').directive('storyEditor', [
             $scope.disconnectedNodes = [];
             $scope.linearNodesList = [];
             $scope.nodes = [];
+            $scope.allowedBgColors = (
+              storyConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
             if ($scope.storyContents &&
                 $scope.storyContents.getNodes().length > 0) {
               $scope.nodes = $scope.storyContents.getNodes();
@@ -119,25 +130,13 @@ angular.module('oppia').directive('storyEditor', [
                 'Cannot delete the first chapter of a story.', 3000);
               return;
             }
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/story-editor-page/modal-templates/' +
                 'delete-chapter-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.confirmDeletion = function() {
-                    $uibModalInstance.close();
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            });
-
-            modalInstance.result.then(function() {
+              controller: 'ConfirmOrCancelModalController'
+            }).result.then(function() {
               StoryUpdateService.deleteStoryNode($scope.story, nodeId);
               _initEditor();
               $scope.$broadcast('recalculateAvailableNodes');
@@ -152,14 +151,19 @@ angular.module('oppia').directive('storyEditor', [
             var nodeTitles = $scope.linearNodesList.map(function(node) {
               return node.getTitle();
             });
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/story-editor-page/modal-templates/' +
                 'new-chapter-title-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$controller', '$scope', '$uibModalInstance',
+                function($controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
+
                   $scope.nodeTitle = '';
                   $scope.nodeTitles = nodeTitles;
                   $scope.errorMsg = null;
@@ -180,14 +184,9 @@ angular.module('oppia').directive('storyEditor', [
                     }
                     $uibModalInstance.close(title);
                   };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
                 }
               ]
-            });
-
-            modalInstance.result.then(function(title) {
+            }).result.then(function(title) {
               StoryUpdateService.addStoryNode($scope.story, title);
               _initEditor();
               // If the first node is added, open it just after creation.
@@ -196,6 +195,10 @@ angular.module('oppia').directive('storyEditor', [
                   $scope.story.getStoryContents().getInitialNodeId());
               }
               $scope.$broadcast('recalculateAvailableNodes');
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -217,6 +220,24 @@ angular.module('oppia').directive('storyEditor', [
               return;
             }
             StoryUpdateService.setStoryTitle($scope.story, newTitle);
+          };
+
+          $scope.updateStoryThumbnailFilename = function(
+              newThumbnailFilename) {
+            if (newThumbnailFilename === $scope.story.getThumbnailFilename()) {
+              return;
+            }
+            StoryUpdateService.setThumbnailFilename(
+              $scope.story, newThumbnailFilename);
+          };
+
+          $scope.updateStoryThumbnailBgColor = function(
+              newThumbnailBgColor) {
+            if (newThumbnailBgColor === $scope.story.getThumbnailBgColor()) {
+              return;
+            }
+            StoryUpdateService.setThumbnailBgColor(
+              $scope.story, newThumbnailBgColor);
           };
 
           $scope.updateStoryDescription = function(newDescription) {

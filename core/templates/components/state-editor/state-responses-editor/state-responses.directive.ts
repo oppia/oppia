@@ -15,6 +15,10 @@
 /**
  * @fileoverview Directive for managing the state responses in the state editor.
  */
+
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require(
   'components/state-directives/answer-group-editor/' +
   'answer-group-editor.directive.ts');
@@ -128,6 +132,10 @@ angular.module('oppia').directive('stateResponses', [
               existingContentIds.push(contentId);
             });
             return existingContentIds;
+          };
+
+          $scope.isInQuestionMode = function() {
+            return StateEditorService.isInQuestionMode();
           };
 
           $scope.suppressDefaultAnswerGroupWarnings = function() {
@@ -396,19 +404,7 @@ angular.module('oppia').directive('stateResponses', [
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-answer-group-modal.template.html'),
               backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance', function(
-                    $scope, $uibModalInstance) {
-                  $scope.reallyDelete = function() {
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
+              controller: 'ConfirmOrCancelModalController'
             }).result.then(function() {
               ResponsesService.deleteAnswerGroup(
                 index, function(newAnswerGroups) {
@@ -416,9 +412,7 @@ angular.module('oppia').directive('stateResponses', [
                   $scope.refreshWarnings()();
                 });
             }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
+              AlertsService.clearWarnings();
             });
           };
 

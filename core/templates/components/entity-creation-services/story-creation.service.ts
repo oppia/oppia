@@ -16,16 +16,19 @@
  * @fileoverview Modal and functionality for the create story button.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').factory('StoryCreationService', [
-  '$http', '$rootScope', '$uibModal', '$window', 'AlertsService',
+  '$http', '$uibModal', '$window', 'AlertsService', 'LoaderService',
   'TopicEditorStateService', 'UrlInterpolationService',
   'MAX_CHARS_IN_STORY_TITLE',
   function(
-      $http, $rootScope, $uibModal, $window, AlertsService,
+      $http, $uibModal, $window, AlertsService, LoaderService,
       TopicEditorStateService, UrlInterpolationService,
       MAX_CHARS_IN_STORY_TITLE) {
     var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
@@ -37,37 +40,33 @@ angular.module('oppia').factory('StoryCreationService', [
         if (storyCreationInProgress) {
           return;
         }
-        var modalInstance = $uibModal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topic-editor-page/modal-templates/' +
             'new-story-title-editor.template.html'),
           backdrop: true,
           controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
+            '$controller', '$scope', '$uibModalInstance',
+            function($controller, $scope, $uibModalInstance) {
+              $controller('ConfirmOrCancelModalController', {
+                $scope: $scope,
+                $uibModalInstance: $uibModalInstance
+              });
               $scope.storyTitle = '';
               $scope.MAX_CHARS_IN_STORY_TITLE = MAX_CHARS_IN_STORY_TITLE;
               $scope.isStoryTitleEmpty = function(storyTitle) {
                 return (storyTitle === '');
               };
-              $scope.save = function(storyTitle) {
-                $uibModalInstance.close(storyTitle);
-              };
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-              };
             }
           ]
-        });
-
-        modalInstance.result.then(function(storyTitle) {
+        }).result.then(function(storyTitle) {
           if (storyTitle === '') {
-            throw Error('Story title cannot be empty');
+            throw new Error('Story title cannot be empty');
           }
           storyCreationInProgress = true;
           AlertsService.clearWarnings();
           var topic = TopicEditorStateService.getTopic();
-          $rootScope.loadingMessage = 'Creating story';
+          LoaderService.showLoadingScreen('Creating story');
           var createStoryUrl = UrlInterpolationService.interpolateUrl(
             STORY_CREATOR_URL_TEMPLATE, {
               topic_id: topic.getId()
@@ -81,7 +80,7 @@ angular.module('oppia').factory('StoryCreationService', [
                 }
               );
             }, function() {
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
             });
         }, function() {
           // Note to developers:

@@ -84,22 +84,6 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectNumberOfSubtopicsToBe(0);
   });
 
-  it('should edit subtopic page contents correctly', function() {
-    topicEditorPage.moveToSubtopicsTab();
-    topicEditorPage.editSubtopicWithIndex(0);
-    topicEditorPage.changeSubtopicTitle('Modified Title');
-    topicEditorPage.changeSubtopicPageContents(
-      forms.toRichText('Subtopic Contents'));
-    topicEditorPage.saveSubtopic();
-    topicEditorPage.saveTopic('Edited subtopic.');
-
-    topicEditorPage.get(topicId);
-    topicEditorPage.moveToSubtopicsTab();
-    topicEditorPage.expectTitleOfSubtopicWithIndexToMatch('Modified Title', 0);
-    topicEditorPage.editSubtopicWithIndex(0);
-    topicEditorPage.expectSubtopicPageContentsToMatch('Subtopic Contents');
-  });
-
   it('should create a question for a skill in the topic', function() {
     var skillId = null;
     browser.getWindowHandle().then(function(handle) {
@@ -181,30 +165,20 @@ describe('Topic editor functionality', function() {
     storyEditorPage.expectNumberOfChaptersToBe(1);
   });
 
-  it('should publish and unpublish a story correctly', function() {
-    topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
-    topicEditorPage.navigateToStoryWithIndex(0);
-    storyEditorPage.publishStory();
-    storyEditorPage.returnToTopic();
-
-    topicEditorPage.expectStoryPublicationStatusToBe('Yes', 0);
-    topicEditorPage.navigateToStoryWithIndex(0);
-    storyEditorPage.unpublishStory();
-    storyEditorPage.returnToTopic();
-
-    topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
-  });
-
   it('should assign a skill to, between, and from subtopics', function() {
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill 2', 'Concept card explanation', true);
-
+    var TOPIC_NAME = 'TASE2';
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.createTopic(TOPIC_NAME, false);
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-    topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+    topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
+      0, TOPIC_NAME);
 
-    topicEditorPage.get(topicId);
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
     topicEditorPage.moveToSubtopicsTab();
     topicEditorPage.addSubtopic('Subtopic 1');
     topicEditorPage.addSubtopic('Subtopic 2');
@@ -213,7 +187,7 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectSubtopicToHaveSkills(0, []);
     topicEditorPage.expectSubtopicToHaveSkills(1, []);
 
-    topicEditorPage.dragSkillToSubtopic(1, 0);
+    topicEditorPage.dragSkillToSubtopic(0, 0);
     topicEditorPage.expectSubtopicToHaveSkills(0, ['Skill 2']);
     topicEditorPage.expectSubtopicToHaveSkills(1, []);
 
@@ -302,9 +276,16 @@ describe('Chapter editor functionality', function() {
 
   it('should create a basic chapter.', function() {
     storyEditorPage.createInitialChapter('Chapter 1');
+    storyEditorPage.changeNodeDescription('Chapter description 1');
     storyEditorPage.setChapterExplorationId(dummyExplorationIds[0]);
     storyEditorPage.changeNodeOutline(forms.toRichText('First outline'));
     storyEditorPage.saveStory('First save');
+    users.logout();
+    users.login(userEmail);
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    topicEditorPage.navigateToStoryWithIndex(0);
+    storyEditorPage.expectNodeDescription('Chapter description 1');
   });
 
   it(
@@ -326,9 +307,17 @@ describe('Chapter editor functionality', function() {
   it('should add one more chapter to the story', function() {
     storyEditorPage.createNewDestinationChapter('Chapter 2');
     storyEditorPage.navigateToChapterByIndex(1);
+    storyEditorPage.changeNodeDescription('Chapter description 2');
     storyEditorPage.changeNodeOutline(forms.toRichText('Second outline'));
     storyEditorPage.setChapterExplorationId(dummyExplorationIds[1]);
     storyEditorPage.saveStory('Second save');
+    users.logout();
+    users.login(userEmail);
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    topicEditorPage.navigateToStoryWithIndex(0);
+    storyEditorPage.navigateToChapterByIndex(1);
+    storyEditorPage.expectNodeDescription('Chapter description 2');
   });
 
   it('should fail to add one more chapter with existing exploration',

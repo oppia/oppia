@@ -56,7 +56,7 @@ export = {
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "filepath",
-      "description": "The image (Allowed extensions: gif, jpeg, jpg, png)",
+      "description": "The image (Allowed extensions: gif, jpeg, jpg, png, svg)",
       "schema": {
         "type": "custom",
         "obj_type": "Filepath"

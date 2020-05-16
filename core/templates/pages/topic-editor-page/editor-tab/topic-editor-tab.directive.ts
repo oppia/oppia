@@ -17,19 +17,26 @@
  */
 
 require(
-  'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
-
-require('components/entity-creation-services/story-creation.service.ts');
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+
+require('components/entity-creation-services/story-creation.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
+require(
+  'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/image-upload-helper.service.ts');
+
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+const topicConstants = require('constants.ts');
 
 angular.module('oppia').directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -65,19 +72,8 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.editableName = $scope.topic.getName();
             $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
             $scope.editableDescription = $scope.topic.getDescription();
-            var placeholderImageUrl = '/icons/story-image-icon.png';
-            if (!$scope.topic.getThumbnailFilename()) {
-              $scope.editableThumbnailDataUrl = (
-                UrlInterpolationService.getStaticImageUrl(
-                  placeholderImageUrl));
-            } else {
-              $scope.editableThumbnailDataUrl = (
-                ImageUploadHelperService
-                  .getTrustedResourceUrlForThumbnailFilename(
-                    $scope.topic.getThumbnailFilename(),
-                    ContextService.getEntityType(),
-                    ContextService.getEntityId()));
-            }
+            $scope.allowedBgColors = (
+              topicConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic);
 
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
@@ -100,14 +96,7 @@ angular.module('oppia').directive('topicEditorTab', [
                   '/pages/topic-editor-page/modal-templates/' +
                   'topic-save-pending-changes-modal.template.html'),
                 backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
+                controller: 'ConfirmOrCancelModalController'
               }).result.then(function() {}, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
@@ -144,8 +133,16 @@ angular.module('oppia').directive('topicEditorTab', [
             if (newThumbnailFilename === $scope.topic.getThumbnailFilename()) {
               return;
             }
-            TopicUpdateService.setThumbnailFilename(
+            TopicUpdateService.setTopicThumbnailFilename(
               $scope.topic, newThumbnailFilename);
+          };
+
+          $scope.updateTopicThumbnailBgColor = function(newThumbnailBgColor) {
+            if (newThumbnailBgColor === $scope.topic.getThumbnailBgColor()) {
+              return;
+            }
+            TopicUpdateService.setTopicThumbnailBgColor(
+              $scope.topic, newThumbnailBgColor);
           };
 
           $scope.updateTopicDescription = function(newDescription) {

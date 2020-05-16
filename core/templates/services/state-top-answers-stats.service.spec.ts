@@ -279,7 +279,7 @@ describe('StateTopAnswersStatsService', function() {
     it('throws when fetching stats about non-existent states', function() {
       expect(function() {
         StateTopAnswersStatsService.getStateStats('Me Llamo');
-      }).toThrow();
+      }).toThrowError('Me Llamo does not exist.');
     });
 
     it('registers handlers to ExplorationStatesService', function() {
@@ -381,10 +381,9 @@ describe('StateTopAnswersStatsService', function() {
         spyOn(ChangeListService, 'addState');
         expect(function() {
           StateTopAnswersStatsService.getStateStats('Me Llamo');
-        }).toThrow();
+        }).toThrowError('Me Llamo does not exist.');
 
         ExplorationStatesService.addState('Me Llamo');
-
         expect(StateTopAnswersStatsService.getStateStats('Me Llamo'))
           .toEqual([]);
       });
@@ -400,7 +399,7 @@ describe('StateTopAnswersStatsService', function() {
         ExplorationStatesService.deleteState('Hola').then(function() {
           expect(function() {
             StateTopAnswersStatsService.getStateStats('Hola');
-          }).toThrow();
+          }).toThrowError('Hola does not exist.');
         }).then(done, done.fail);
         $rootScope.$digest();
       });
@@ -418,7 +417,7 @@ describe('StateTopAnswersStatsService', function() {
 
         expect(function() {
           StateTopAnswersStatsService.getStateStats('Hola');
-        }).toThrow();
+        }).toThrowError('Hola does not exist.');
       });
     });
 

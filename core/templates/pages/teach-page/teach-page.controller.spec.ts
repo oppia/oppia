@@ -51,119 +51,53 @@ describe('Teach Page', function() {
   });
 
   it('should click on teach tab', function(done) {
-    var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
-    var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
-    var addClassSpyCalls = addClassSpy.calls;
-    var removeClassSpyCalls = removeClassSpy.calls;
-
     ctrl.$onInit();
-    expect(addClassSpy).toHaveBeenCalledTimes(0);
-    expect(removeClassSpy).toHaveBeenCalledTimes(0);
+    expect(ctrl.activeTabName).toBe('teach');
 
     ctrl.onTabClick('teach');
-    expect(addClassSpy).toHaveBeenCalledTimes(2);
-    expect(addClassSpyCalls.all()[0].args[0]).toEqual(
-      'oppia-about-tabs-active');
-    expect(addClassSpyCalls.all()[1].args[0]).toEqual(
-      'oppia-about-visible-content');
-
-    expect(removeClassSpy).toHaveBeenCalledTimes(2);
-    expect(removeClassSpyCalls.all()[0].args[0]).toEqual(
-      'oppia-about-tabs-active');
-    expect(removeClassSpyCalls.all()[1].args[0]).toEqual(
-      'oppia-about-visible-content');
 
     // setTimeout is being used here in order to wait onhashchange event to
     // finish. setTimeout is executed only after call stack is empty.
     // Ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop
     setTimeout(function() {
       expect(windowRef.nativeWindow.location.hash).toBe('#teach');
-      // 2 calls for activeTab calls on onTabClick and 2 calls for
-      // activeTab calls on $onInit.
-      expect(addClassSpy).toHaveBeenCalledTimes(4);
-      expect(addClassSpyCalls.all()[2].args[0]).toEqual(
-        'oppia-about-tabs-active');
-      expect(addClassSpyCalls.all()[3].args[0]).toEqual(
-        'oppia-about-visible-content');
-      // 2 calls for activeTab calls on onTabClick and 2 calls for
-      // activeTab calls on $onInit.
-      expect(removeClassSpy).toHaveBeenCalledTimes(4);
-      expect(removeClassSpyCalls.all()[2].args[0]).toEqual(
-        'oppia-about-tabs-active');
-      expect(removeClassSpyCalls.all()[3].args[0]).toEqual(
-        'oppia-about-visible-content');
+      expect(ctrl.activeTabName).toBe('teach');
       done();
     });
   });
 
   it('should click on playbook tab', function(done) {
-    var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
-    var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
-    var addClassSpyCalls = addClassSpy.calls;
-    var removeClassSpyCalls = removeClassSpy.calls;
-
     ctrl.$onInit();
-    expect(addClassSpy).toHaveBeenCalledTimes(0);
-    expect(removeClassSpy).toHaveBeenCalledTimes(0);
+    expect(ctrl.activeTabName).toBe('teach');
 
     ctrl.onTabClick('playbook');
-    expect(addClassSpy).toHaveBeenCalledTimes(2);
-    expect(addClassSpyCalls.all()[0].args[0]).toEqual(
-      'oppia-about-tabs-active');
-    expect(addClassSpyCalls.all()[1].args[0]).toEqual(
-      'oppia-about-visible-content');
-
-    expect(removeClassSpy).toHaveBeenCalledTimes(2);
-    expect(removeClassSpyCalls.all()[0].args[0]).toEqual(
-      'oppia-about-tabs-active');
-    expect(removeClassSpyCalls.all()[1].args[0]).toEqual(
-      'oppia-about-visible-content');
 
     // setTimeout is being used here in order to wait onhashchange event to
     // finish. setTimeout is executed only after call stack is empty.
     // Ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop
     setTimeout(function() {
       expect(windowRef.nativeWindow.location.hash).toBe('#playbook');
-      // 2 calls for activeTab calls on onTabClick and 2 calls for
-      // activeTab calls on $onInit.
-      expect(addClassSpy).toHaveBeenCalledTimes(4);
-      expect(addClassSpyCalls.all()[2].args[0]).toEqual(
-        'oppia-about-tabs-active');
-      expect(addClassSpyCalls.all()[3].args[0]).toEqual(
-        'oppia-about-visible-content');
-      // 2 calls for activeTab calls on onTabClick and 2 calls for
-      // activeTab calls on $onInit.
-      expect(removeClassSpy).toHaveBeenCalledTimes(4);
-      expect(removeClassSpyCalls.all()[2].args[0]).toEqual(
-        'oppia-about-tabs-active');
-      expect(removeClassSpyCalls.all()[3].args[0]).toEqual(
-        'oppia-about-visible-content');
+      expect(ctrl.activeTabName).toBe('playbook');
       done();
     });
   });
 
   it('should activate teach tab on init', function() {
     windowRef.nativeWindow.location.hash = '#teach';
-    var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
-    var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
 
     ctrl.$onInit();
 
     expect(windowRef.nativeWindow.location.hash).toBe('#teach');
-    expect(addClassSpy).toHaveBeenCalledTimes(2);
-    expect(removeClassSpy).toHaveBeenCalledTimes(2);
+    expect(ctrl.activeTabName).toBe('teach');
   });
 
   it('should activate playbook tab on init', function() {
     windowRef.nativeWindow.location.hash = '#playbook';
-    var addClassSpy = spyOn($.fn, 'addClass').and.callThrough();
-    var removeClassSpy = spyOn($.fn, 'removeClass').and.callThrough();
 
     ctrl.$onInit();
 
     expect(windowRef.nativeWindow.location.hash).toBe('#playbook');
-    expect(addClassSpy).toHaveBeenCalledTimes(2);
-    expect(removeClassSpy).toHaveBeenCalledTimes(2);
+    expect(ctrl.activeTabName).toBe('playbook');
   });
 
   it('should get static image url', function() {
