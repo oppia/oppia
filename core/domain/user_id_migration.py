@@ -44,17 +44,18 @@ SEPARATE_MODEL_CLASSES = [
     exp_models.ExplorationSnapshotMetadataModel]
 
 
-def replace_gae_ids(gae_ids):
-    """Replace GAE IDs with user IDs in list.
+def get_user_ids_corresponding_to_gae_ids(gae_ids):
+    """Get user IDs corresponding to GAE IDs.
 
     Args:
         gae_ids: list(str). GAE IDs which should be replaced.
 
     Returns:
-        list(str). New user IDs.
+        list(str). User IDs corresponding to given GAE IDs.
 
     Raises:
-        MissingUserException: UserSettingsModel with GAE ID doesn't exist.
+        MissingUserException: No UserSettingsModel exists for at least one of
+            the given GAE IDs.
     """
     new_ids = []
     for gae_id in gae_ids:
@@ -70,23 +71,24 @@ def replace_gae_ids(gae_ids):
     return new_ids
 
 
-def replace_gae_id(gae_id):
-    """Replace GAE ID with user ID.
+def get_user_id_corresponding_to_gae_id(gae_id):
+    """Get user ID corresponding to GAE ID.
 
     Args:
         gae_id: str. GAE ID which should be replaced.
 
     Returns:
-        str. New user ID.
+        str. User ID corresponding to given GAE ID.
 
     Raises:
-        MissingUserException: UserSettingsModel with GAE ID doesn't exist.
+        MissingUserException: UserSettingsModel with the given GAE ID doesn't
+            exist.
     """
-    return replace_gae_ids([gae_id])[0]
+    return get_user_ids_corresponding_to_gae_ids([gae_id])[0]
 
 
 def are_commit_cmds_role_change(commit_cmds):
-    """Check if commit_cmds are of role_change type.
+    """Check if commit_cmds are of a role change type and there just one commit.
 
     Args:
         commit_cmds: list(dict(str, str)). List of commit commands.
@@ -326,13 +328,17 @@ class SnapshotsContentUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         reconstituted_rights_model = (
             collection_models.CollectionRightsModel(**content_dict))
         reconstituted_rights_model.owner_ids = (
-            replace_gae_ids(reconstituted_rights_model.owner_ids))
+            get_user_ids_corresponding_to_gae_ids(
+                reconstituted_rights_model.owner_ids))
         reconstituted_rights_model.editor_ids = (
-            replace_gae_ids(reconstituted_rights_model.editor_ids))
+            get_user_ids_corresponding_to_gae_ids(
+                reconstituted_rights_model.editor_ids))
         reconstituted_rights_model.voice_artist_ids = (
-            replace_gae_ids(reconstituted_rights_model.voice_artist_ids))
+            get_user_ids_corresponding_to_gae_ids(
+                reconstituted_rights_model.voice_artist_ids))
         reconstituted_rights_model.viewer_ids = (
-            replace_gae_ids(reconstituted_rights_model.viewer_ids))
+            get_user_ids_corresponding_to_gae_ids(
+                reconstituted_rights_model.viewer_ids))
 
         rights_snapshot_model.content = reconstituted_rights_model.to_dict()
         rights_snapshot_model.put(update_last_updated_time=False)
@@ -353,13 +359,17 @@ class SnapshotsContentUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             exp_models.ExplorationRightsModel(**content_dict))
 
         reconstituted_rights_model.owner_ids = (
-            replace_gae_ids(reconstituted_rights_model.owner_ids))
+            get_user_ids_corresponding_to_gae_ids(
+                reconstituted_rights_model.owner_ids))
         reconstituted_rights_model.editor_ids = (
-            replace_gae_ids(reconstituted_rights_model.editor_ids))
+            get_user_ids_corresponding_to_gae_ids(
+                reconstituted_rights_model.editor_ids))
         reconstituted_rights_model.voice_artist_ids = (
-            replace_gae_ids(reconstituted_rights_model.voice_artist_ids))
+            get_user_ids_corresponding_to_gae_ids(
+                reconstituted_rights_model.voice_artist_ids))
         reconstituted_rights_model.viewer_ids = (
-            replace_gae_ids(reconstituted_rights_model.viewer_ids))
+            get_user_ids_corresponding_to_gae_ids(
+                reconstituted_rights_model.viewer_ids))
 
         rights_snapshot_model.content = reconstituted_rights_model.to_dict()
         rights_snapshot_model.put(update_last_updated_time=False)
@@ -376,7 +386,8 @@ class SnapshotsContentUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         reconstituted_rights_model = topic_models.TopicRightsModel(
             **rights_snapshot_model.content)
         reconstituted_rights_model.manager_ids = (
-            replace_gae_ids(reconstituted_rights_model.manager_ids))
+            get_user_ids_corresponding_to_gae_ids(
+                reconstituted_rights_model.manager_ids))
         rights_snapshot_model.content = reconstituted_rights_model.to_dict()
         rights_snapshot_model.put(update_last_updated_time=False)
 
@@ -435,55 +446,28 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     """
 
     @staticmethod
-    def _migrate_collection(snapshot_model):
+    def _migrate_model(snapshot_model, commit_model_type):
         """Migrate CollectionRightsSnapshotMetadataModel to use the new user ID
         in the commit_cmds.
 
         Args:
             snapshot_model: CollectionRightsSnapshotMetadataModel. The model
                 that contains the old user IDs.
+            commit_model_type: ndb.Model. The type of the commit log model.
         """
         if are_commit_cmds_role_change(snapshot_model.commit_cmds):
-            commit_cmd = snapshot_model.commit_cmds[0]
-            commit_cmd['assignee_id'] = (
-                replace_gae_id(commit_cmd['assignee_id']))
-            commit_log_model = (
-                collection_models.CollectionCommitLogEntryModel.get_by_id(
-                    'rights-%s-%s' % (
-                        snapshot_model.get_unversioned_instance_id(),
-                        snapshot_model.get_version_string())))
-            commit_cmd = commit_log_model.commit_cmds[0]
-            commit_cmd['assignee_id'] = (
-                replace_gae_id(commit_cmd['assignee_id']))
-
-            def _put_both_models():
-                """Put both models into the datastore together."""
-                snapshot_model.put(update_last_updated_time=False)
-                commit_log_model.put(update_last_updated_time=False)
-
-            transaction_services.run_in_transaction(_put_both_models)
-
-    @staticmethod
-    def _migrate_exploration(snapshot_model):
-        """Migrate ExplorationRightsSnapshotMetadataModel to use the new user ID
-        in the commit_cmds.
-
-        Args:
-            snapshot_model: ExplorationRightsSnapshotMetadataModel. The model
-                that contains the old user IDs.
-        """
-        if are_commit_cmds_role_change(snapshot_model.commit_cmds):
-            commit_cmd = snapshot_model.commit_cmds[0]
-            commit_cmd['assignee_id'] = (
-                replace_gae_id(commit_cmd['assignee_id']))
-            commit_log_model = (
-                exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                    'rights-%s-%s' % (
-                        snapshot_model.get_unversioned_instance_id(),
-                        snapshot_model.get_version_string())))
-            commit_cmd = commit_log_model.commit_cmds[0]
-            commit_cmd['assignee_id'] = (
-                replace_gae_id(commit_cmd['assignee_id']))
+            snapshot_commit_cmd = snapshot_model.commit_cmds[0]
+            snapshot_commit_cmd['assignee_id'] = (
+                get_user_id_corresponding_to_gae_id(
+                    snapshot_commit_cmd['assignee_id']))
+            commit_log_model = commit_model_type.get_by_id(
+                'rights-%s-%s' % (
+                    snapshot_model.get_unversioned_instance_id(),
+                    snapshot_model.get_version_string()))
+            commit_log_commit_cmd = commit_log_model.commit_cmds[0]
+            commit_log_commit_cmd['assignee_id'] = (
+                get_user_id_corresponding_to_gae_id(
+                    commit_log_commit_cmd['assignee_id']))
 
             def _put_both_models():
                 """Put both models into the datastore together."""
@@ -505,10 +489,12 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             commit_cmd = snapshot_model.commit_cmds[0]
             if commit_cmd['cmd'] == topic_domain.CMD_CHANGE_ROLE:
                 commit_cmd['assignee_id'] = (
-                    replace_gae_id(commit_cmd['assignee_id']))
+                    get_user_id_corresponding_to_gae_id(
+                        commit_cmd['assignee_id']))
             elif commit_cmd['cmd'] == topic_domain.CMD_REMOVE_MANAGER_ROLE:
                 commit_cmd['removed_user_id'] = (
-                    replace_gae_id(commit_cmd['removed_user_id']))
+                    get_user_id_corresponding_to_gae_id(
+                        commit_cmd['removed_user_id']))
             commit_log_model = (
                 topic_models.TopicCommitLogEntryModel.get_by_id(
                     'rights-%s-%s' % (
@@ -517,10 +503,12 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             commit_cmd = commit_log_model.commit_cmds[0]
             if commit_cmd['cmd'] == topic_domain.CMD_CHANGE_ROLE:
                 commit_cmd['assignee_id'] = (
-                    replace_gae_id(commit_cmd['assignee_id']))
+                    get_user_id_corresponding_to_gae_id(
+                        commit_cmd['assignee_id']))
             elif commit_cmd['cmd'] == topic_domain.CMD_REMOVE_MANAGER_ROLE:
                 commit_cmd['removed_user_id'] = (
-                    replace_gae_id(commit_cmd['removed_user_id']))
+                    get_user_id_corresponding_to_gae_id(
+                        commit_cmd['removed_user_id']))
 
             def _put_both_models():
                 """Put both models into the datastore together."""
@@ -551,13 +539,15 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             if isinstance(
                     snapshot_model,
                     collection_models.CollectionRightsSnapshotMetadataModel):
-                SnapshotsMetadataUserIdMigrationJob._migrate_collection(
-                    snapshot_model)
+                SnapshotsMetadataUserIdMigrationJob._migrate_model(
+                    snapshot_model,
+                    collection_models.CollectionCommitLogEntryModel)
             elif isinstance(
                     snapshot_model,
                     exp_models.ExplorationRightsSnapshotMetadataModel):
-                SnapshotsMetadataUserIdMigrationJob._migrate_exploration(
-                    snapshot_model)
+                SnapshotsMetadataUserIdMigrationJob._migrate_model(
+                    snapshot_model,
+                    exp_models.ExplorationCommitLogEntryModel)
             elif isinstance(
                     snapshot_model,
                     topic_models.TopicRightsSnapshotMetadataModel):

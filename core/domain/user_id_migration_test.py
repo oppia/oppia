@@ -72,30 +72,33 @@ class HelperFunctionsTests(test_utils.GenericTestBase):
 
     def test_replace_gae_ids(self):
         self.assertEqual(
-            user_id_migration.replace_gae_ids(
+            user_id_migration.get_user_ids_corresponding_to_gae_ids(
                 [self.USER_1_GAE_ID, self.USER_2_GAE_ID, self.USER_3_GAE_ID]),
             [self.USER_1_USER_ID, self.USER_2_USER_ID, self.USER_3_USER_ID]
         )
         with self.assertRaises(user_id_migration.MissingUserException):
-            user_id_migration.replace_gae_ids(
+            user_id_migration.get_user_ids_corresponding_to_gae_ids(
                 [self.USER_1_GAE_ID, 'nonexistent_gae_id'])
 
         self.assertEqual(
-            user_id_migration.replace_gae_ids(
+            user_id_migration.get_user_ids_corresponding_to_gae_ids(
                 [self.USER_1_GAE_ID, feconf.SYSTEM_COMMITTER_ID]),
             [self.USER_1_USER_ID, feconf.SYSTEM_COMMITTER_ID]
         )
 
     def test_replace_gae_id(self):
         self.assertEqual(
-            user_id_migration.replace_gae_id(self.USER_1_GAE_ID),
+            user_id_migration.get_user_id_corresponding_to_gae_id(
+                self.USER_1_GAE_ID),
             self.USER_1_USER_ID
         )
         with self.assertRaises(user_id_migration.MissingUserException):
-            user_id_migration.replace_gae_id('nonexistent_gae_id')
+            user_id_migration.get_user_id_corresponding_to_gae_id(
+                'nonexistent_gae_id')
 
         self.assertEqual(
-            user_id_migration.replace_gae_id(feconf.SYSTEM_COMMITTER_ID),
+            user_id_migration.get_user_id_corresponding_to_gae_id(
+                feconf.SYSTEM_COMMITTER_ID),
             feconf.SYSTEM_COMMITTER_ID
         )
 
@@ -2679,7 +2682,7 @@ class AddAllUserIdsSnapshotMetadataVerificationJobTests(
             exp_models.ExplorationRightsAllUsersModel.get_by_id(self.EXP_1_ID)
             .all_user_ids)
 
-    def test_one_topic_rights_cahnge_role(self):
+    def test_one_topic_rights_change_role(self):
         topic_model = topic_models.TopicRightsModel(
             id=self.TOP_1_ID,
             manager_ids=[self.USER_1_ID])
