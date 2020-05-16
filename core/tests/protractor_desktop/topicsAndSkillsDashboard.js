@@ -118,6 +118,7 @@ describe('Topics and skills dashboard functionality', function() {
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
     topicsAndSkillsDashboardPage.deleteSkillWithIndex(0);
+
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
@@ -126,6 +127,7 @@ describe('Topics and skills dashboard functionality', function() {
   it('should remove a topic from list once deleted', function() {
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
     topicsAndSkillsDashboardPage.deleteTopicWithIndex(0);
+      
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
   });
