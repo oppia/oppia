@@ -36,12 +36,17 @@ angular.module('oppia').directive('oppiaNoninteractiveMath', [
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
         ctrl.$onInit = function() {
-          ctrl.mathExpressionsContent = HtmlEscaperService.escapedJsonToObj(
-            $attrs.mathContentWithValue);
+          // Before we extract the latex value We need to make sure that that
+          // the customizationArg mathContentWithValue passed to the directive
+          // is not empty or undefined.
           if (
-            ctrl.mathExpressionsContent !== undefined &&
-            ctrl.mathExpressionsContent.hasOwnProperty('raw_latex')) {
-            ctrl.rawLatex = ctrl.mathExpressionsContent.raw_latex;
+            $attrs.mathContentWithValue !== undefined &&
+            $attrs.mathContentWithValue !== '') {
+            var mathExpressionContent = HtmlEscaperService.escapedJsonToObj(
+              $attrs.mathContentWithValue);
+            ctrl.rawLatex = mathExpressionContent.raw_latex;
+          } else {
+            ctrl.rawLatex = '';
           }
         };
       }]

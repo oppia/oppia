@@ -26,8 +26,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { ServicesConstants } from 'services/services.constants.ts';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { ServicesConstants } from 'services/services.constants.ts';
 
 @Injectable({
   providedIn: 'root'
@@ -186,6 +186,12 @@ export class SpeechSynthesisChunkerService {
       });
 
     var _this = this;
+    interface MathContent {
+      // eslint-disable-next-line camelcase
+      raw_latex: String,
+      // eslint-disable-next-line camelcase
+      svg_filename: String
+    }
     // Convert LaTeX to speakable text.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Math)
       .replaceWith(function() {
@@ -194,7 +200,7 @@ export class SpeechSynthesisChunkerService {
           var mathContent = _this.htmlEscaper.escapedJsonToObj(
             element.attributes['math_content-with-value'].textContent);
           const latexSpeakableText = _this._formatLatexToSpeakableText(
-            (mathContent as any).raw_latex);
+            (mathContent as MathContent).raw_latex);
           return latexSpeakableText.length > 0 ? latexSpeakableText + ' ' : '';
         }
       });

@@ -144,7 +144,7 @@ describe('Rte Helper Service', function() {
         description: 'The raw string to be displayed as LaTeX.',
         schema: {
           type: 'custom',
-          obj_type: 'MathLatexString'
+          obj_type: 'MathExpressionContent'
         },
         default_value: {
           raw_latex: '',

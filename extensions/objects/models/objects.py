@@ -309,10 +309,17 @@ class SetOfNormalizedString(BaseObject):
     }
 
 
-class MathLatexString(BaseObject):
-    """Math LaTeX string class."""
+class MathExpressionContent(BaseObject):
+    """Math Expression Content class."""
 
-    description = 'A LaTeX string.'
+    description = ('Math Expression Content dict.This is in form of a dict '
+                   'having two properties, raw_latex and svg_filename. Both '
+                   'of these properties are used to display the Math rich text '
+                   'component.')
+    default_value = {
+        'raw_latex': '',
+        'svg_filename': ''
+    }
 
     SCHEMA = {
         'type': 'dict',
