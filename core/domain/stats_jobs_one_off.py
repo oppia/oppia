@@ -1378,6 +1378,13 @@ class RegenerateMissingV2StatsModelsOneOffJob(
 class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job for finding explorations that are missing stats models."""
 
+    STATS_DELETED_KEY = 'deleted'
+    STATS_MISSING_KEY = 'missing'
+    STATS_PRESENT_KEY = 'present'
+
+    JOB_RESULT_EXPECTED = 'EXPECTED'
+    JOB_RESULT_UNEXPECTED = 'UNEXPECTED'
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]
@@ -1397,17 +1404,25 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
         for exp_stats_model, exp_version in python_utils.ZIP(
                 exp_stats_models, exp_versions):
             if exp_stats_model is None:
-                yield ('missing', (exp.id, exp_version))
+                yield (
+                    ExplorationMissingStatsAudit.STATS_MISSING_KEY,
+                    (exp.id, exp_version))
             elif exp_stats_model.deleted:
-                yield ('deleted', (exp.id, exp_version))
+                yield (
+                    ExplorationMissingStatsAudit.STATS_DELETED_KEY,
+                    (exp.id, exp_version))
             else:
-                yield ('present', (exp.id, exp_version))
+                yield (
+                    ExplorationMissingStatsAudit.STATS_PRESENT_KEY,
+                    (exp.id, exp_version))
 
     @staticmethod
     def reduce(stats_model_status, exp_id_version_pair_strs):
-        if stats_model_status == 'present':
-            yield '%d ExplorationStats model(s) present as expected' % (
-                len(exp_id_version_pair_strs))
+        if stats_model_status == ExplorationMissingStatsAudit.STATS_PRESENT_KEY:
+            yield (
+                ExplorationMissingStatsAudit.JOB_RESULT_EXPECTED,
+                '%d ExplorationStats model(s) present' % (
+                    len(exp_id_version_pair_strs)))
             return
 
         exp_versions_without_stats_models = collections.defaultdict(list)
@@ -1416,8 +1431,9 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
             exp_versions_without_stats_models[exp_id].append(exp_version)
 
         for exp_id, exp_versions in exp_versions_without_stats_models.items():
-            sorted_exp_versions = [
+            sorted_version_strs = [
                 python_utils.UNICODE(v) for v in sorted(exp_versions)]
             yield (
+                ExplorationMissingStatsAudit.JOB_RESULT_UNEXPECTED,
                 'ExplorationStats for Exploration "%s" %s at version(s): %s' %
-                (exp_id, stats_model_status, ', '.join(sorted_exp_versions)))
+                (exp_id, stats_model_status, ', '.join(sorted_version_strs)))

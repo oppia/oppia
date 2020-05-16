@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
 import datetime
 
 from core.domain import config_domain
@@ -1625,6 +1626,11 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
 class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.ExplorationMissingStatsAudit
 
+    def run_one_off_job(self):
+        output = super(
+            ExplorationMissingStatsAuditOneOffJobTests, self).run_one_off_job()
+        return [ast.literal_eval(o) for o in output]
+
     def _do_not_create_stats_models(self):
         """Returns a context manager which does not create new stats models."""
         return self.swap(stats_services, 'create_stats_model', lambda _: None)
@@ -1636,7 +1642,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         self.save_new_default_exploration('ID', 'owner_id')
 
         self.assertItemsEqual(self.run_one_off_job(), [
-            '1 ExplorationStats model(s) present as expected',
+            ['EXPECTED', '1 ExplorationStats model(s) present'],
         ])
 
     def test_success_when_several_stats_model_exists(self):
@@ -1645,7 +1651,7 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         self.save_new_default_exploration('ID3', 'owner_id')
 
         self.assertItemsEqual(self.run_one_off_job(), [
-            '3 ExplorationStats model(s) present as expected',
+            ['EXPECTED', '3 ExplorationStats model(s) present'],
         ])
 
     def test_error_when_stats_model_is_missing(self):
@@ -1653,7 +1659,8 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
             self.save_new_default_exploration('ID', 'owner_id')
 
         self.assertItemsEqual(self.run_one_off_job(), [
-            'ExplorationStats for Exploration "ID" missing at version(s): 1',
+            ['UNEXPECTED', 'ExplorationStats for Exploration "ID" missing at ' +
+             'version(s): 1'],
         ])
 
     def test_error_when_stats_model_is_deleted(self):
@@ -1664,7 +1671,8 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         stats.put()
 
         self.assertItemsEqual(self.run_one_off_job(), [
-            'ExplorationStats for Exploration "ID" deleted at version(s): 1',
+            ['UNEXPECTED', 'ExplorationStats for Exploration "ID" deleted at ' +
+             'version(s): 1'],
         ])
 
     def test_error_when_stats_model_is_missing_at_disjoint_versions(self):
@@ -1677,8 +1685,9 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
             exp_services.update_exploration('owner_id', 'ID', None, 'noop')
 
         self.assertItemsEqual(self.run_one_off_job(), [
-            '1 ExplorationStats model(s) present as expected',
-            'ExplorationStats for Exploration "ID" missing at version(s): 1, 3',
+            ['EXPECTED', '1 ExplorationStats model(s) present'],
+            ['UNEXPECTED', 'ExplorationStats for Exploration "ID" missing at ' +
+             'version(s): 1, 3'],
         ])
 
     def test_error_when_stats_model_is_deleted_at_disjoint_versions(self):
@@ -1692,8 +1701,9 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
             stats.put()
 
         self.assertItemsEqual(self.run_one_off_job(), [
-            '1 ExplorationStats model(s) present as expected',
-            'ExplorationStats for Exploration "ID" deleted at version(s): 1, 3',
+            ['EXPECTED', '1 ExplorationStats model(s) present'],
+            ['UNEXPECTED', 'ExplorationStats for Exploration "ID" deleted at ' +
+             'version(s): 1, 3'],
         ])
 
     def test_no_error_when_exploration_is_missing(self):
