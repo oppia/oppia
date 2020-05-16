@@ -106,7 +106,7 @@ angular.module('oppia').config([
       'SidebarStatusService', 'SiteAnalyticsService', 'SkillObjectFactory', 'SkillRightsBackendApiService', 'SkillRightsObjectFactory',
       'SolutionObjectFactory', 'StateCardObjectFactory',
       'StateImprovementSuggestionService', 'StateObjectFactory',
-      'StatesObjectFactory', 'StorySummaryObjectFactory', 'SubtopicPageContentsObjectFactory', 'SubtopicPageObjectFactory', 'SuggestionsService',
+      'StatesObjectFactory', 'StoryContentsObjectFactory', 'StoryObjectFactory', 'StorySummaryObjectFactory', 'SubtopicPageContentsObjectFactory', 'SubtopicPageObjectFactory', 'SuggestionsService',
       'SuggestionThreadObjectFactory', 'TextInputRulesService',
       'ThreadMessageObjectFactory', 'ThreadMessageSummaryObjectFactory',
       'ThreadStatusDisplayService', 'TopicObjectFactory', 'TopicRightsObjectFactory', 'TranslationLanguageService',

@@ -267,6 +267,8 @@ import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
 import { StoryNodeObjectFactory } from
   'domain/story/StoryNodeObjectFactory';
+import { StoryContentsObjectFactory } from 'domain/story/StoryContentsObjectFactory';
+import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { StoryPlaythroughObjectFactory } from
   'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { StoryReferenceObjectFactory } from
@@ -434,6 +436,11 @@ export class UpgradedServices {
       new StateImprovementSuggestionService();
     upgradedServices['StopwatchObjectFactory'] = new StopwatchObjectFactory();
     upgradedServices['StoryNodeObjectFactory'] = new StoryNodeObjectFactory();
+    upgradedServices['StoryContentsObjectFactory'] =
+      new StoryContentsObjectFactory(
+        upgradedServices['StoryNodeObjectFactory']);
+    upgradedServices['StoryObjectFactory'] = new StoryObjectFactory(
+      upgradedServices['StoryContentsObjectFactory']);
     upgradedServices['StoryReferenceObjectFactory'] =
       new StoryReferenceObjectFactory();
     upgradedServices['StorySummaryObjectFactory'] =
