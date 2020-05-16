@@ -751,8 +751,16 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                     # constants file consistency check.
                                     angularjs_constants_name = (
                                         expression.arguments[0].value)
-                                    angularjs_constants_value = (
-                                        expression.arguments[1].property.name)
+                                    constants_arguments = (
+                                        expression.arguments[1])
+                                    # Check if const is declared outside the
+                                    # class.
+                                    if constants_arguments.property:
+                                        angularjs_constants_value = (
+                                            constants_arguments.property.name)
+                                    else:
+                                        angularjs_constants_value = (
+                                            constants_arguments.name)
                                     if angularjs_constants_value != (
                                             angularjs_constants_name):
                                         failed = True
@@ -837,8 +845,16 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         is_corresponding_angularjs_filepath):
                     # Ignore if file contains only type definitions for
                     # constants.
-                    angular_constants_nodes = (
-                        parsed_nodes[1].declarations[0].init.callee.body.body)
+
+                    # Check if const is declared outside the class.
+                    if parsed_nodes[1].declarations[0].init.callee.body:
+                        nodes = parsed_nodes[1]
+                        angular_constants_nodes = (
+                            nodes.declarations[0].init.callee.body.body)
+                    else:
+                        nodes = parsed_nodes[2]
+                        angular_constants_nodes = (
+                            nodes.declarations[0].init.callee.body.body)
                     for angular_constant_node in angular_constants_nodes:
                         if not angular_constant_node.expression:
                             continue
