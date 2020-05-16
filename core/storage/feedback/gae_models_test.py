@@ -26,6 +26,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
+import utils
 
 (base_models, feedback_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.feedback])
@@ -143,7 +144,8 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
                 'has_suggestion': self.HAS_SUGGESTION,
                 'summary': self.SUMMARY,
                 'message_count': self.MESSAGE_COUNT,
-                'last_updated': self.feedback_thread_model.last_updated
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    self.feedback_thread_model.last_updated)
             }
         }
         self.assertEqual(user_data, test_data)

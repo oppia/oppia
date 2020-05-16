@@ -143,7 +143,8 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
                 'has_suggestion': feedback_model.has_suggestion,
                 'summary': feedback_model.summary,
                 'message_count': feedback_model.message_count,
-                'last_updated': feedback_model.last_updated
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    feedback_model.last_updated)
             }
 
         return user_data
