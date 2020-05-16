@@ -118,6 +118,7 @@
 /scripts/install_prerequisites.sh @DubeySandeep
 /scripts/typescript_checks*.py @ankita240796 @DubeySandeep
 /scripts/linters/ @DubeySandeep @Hudda
+/scripts/linters/excluded_any_type_files.json @nishantwrp
 /ubuntu_dockerfile @ezl-13 @kevinlee12
 
 
@@ -184,6 +185,7 @@
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/background-banner.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/background-banner.directive.html @ankita240796
+/core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @marianazangrossi
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.directive.html @ankita240796
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.directive.ts @ankita240796
 /core/templates/components/common-layout-directives/common-elements/loading-dots.directive.ts @ankita240796
@@ -496,7 +498,7 @@
 
 
 # Typings.
-/typings @ankita240796
+/typings @ankita240796 @nishantwrp
 
 
 # User Data Takeout.
