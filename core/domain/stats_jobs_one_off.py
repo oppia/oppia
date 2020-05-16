@@ -1376,16 +1376,7 @@ class RegenerateMissingV2StatsModelsOneOffJob(
 
 
 class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job for finding explorations that are missing stats models.
-
-    If this job outputs any explorations, then the following two jobs should be
-    run in succession (note: only _missing_ models are created by these jobs):
-        - RegenerateMissingV1StatsModelsOneOffJob
-        - RegenerateMissingV2StatsModelsOneOffJob
-
-    Otherwise, an empty output signals that each exploration has a corresponding
-    stats model.
-    """
+    """A one-off job for finding explorations that are missing stats models."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
