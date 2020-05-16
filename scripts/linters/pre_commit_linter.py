@@ -71,8 +71,6 @@ from .. import common
 from .. import concurrent_task_utils
 from .. import install_third_party_libs
 
-install_third_party_libs.main()
-
 _PARSER = argparse.ArgumentParser()
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
 _EXCLUSIVE_GROUP.add_argument(
@@ -454,6 +452,8 @@ def main(args=None):
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
+
+    install_third_party_libs.main()
 
     python_utils.PRINT('Starting Linter....')
 

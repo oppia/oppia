@@ -27,6 +27,7 @@ import python_utils
 
 from . import codeowner_linter
 from . import pre_commit_linter
+from .. import install_third_party_libs
 
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'linter_tests')
 
@@ -166,6 +167,11 @@ def mock_perform_all_lint_checks(unused_self):
     return []
 
 
+def mock_install_third_party_libs_main():
+    """Mock for install_third_party_libs."""
+    return
+
+
 def all_checks_passed(linter_stdout):
     """Helper function to check if all checks have passed.
 
@@ -221,6 +227,9 @@ class LintTests(test_utils.GenericTestBase):
                 ' '.join(python_utils.UNICODE(arg) for arg in args))
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
         self.sys_swap = self.swap(sys, 'exit', mock_exit)
+        self.install_swap = self.swap_with_checks(
+            install_third_party_libs, 'main',
+            mock_install_third_party_libs_main)
 
 
 class HTMLLintTests(LintTests):
@@ -231,15 +240,16 @@ class HTMLLintTests(LintTests):
             codeowner_linter, 'check_codeowner_file', mock_check_codeowner_file)
 
     def test_valid_html_file(self):
-        with self.print_swap, self.check_codeowner_swap:
+        with self.print_swap, self.check_codeowner_swap, self.install_swap:
             pre_commit_linter.main(args=['--path=%s' % VALID_HTML_FILEPATH])
         self.assertTrue(all_checks_passed(self.linter_stdout))
         self.assertTrue('SUCCESS   HTML linting passed' in self.linter_stdout)
 
     def test_invalid_indentation(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_INDENTATION_HTML_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_INDENTATION_HTML_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -248,8 +258,8 @@ class HTMLLintTests(LintTests):
                 self.linter_stdout))
 
     def test_invalid_ng_template(self):
-        with self.print_swap, self.sys_swap:
-            with self.check_codeowner_swap:
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            with self.install_swap:
                 pre_commit_linter.main(
                     args=['--path=%s' % INVALID_NG_TEMPLATE_HTML_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
@@ -260,8 +270,10 @@ class HTMLLintTests(LintTests):
 
     def test_invalid_trailing_whitespace(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_TRAILING_WHITESPACE_HTML_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % (
+                        INVALID_TRAILING_WHITESPACE_HTML_FILEPATH)])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -270,8 +282,9 @@ class HTMLLintTests(LintTests):
 
     def test_invalid_parent(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_PARENT_HTML_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_PARENT_HTML_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -288,8 +301,9 @@ class CSSLintTests(LintTests):
             codeowner_linter, 'check_codeowner_file', mock_check_codeowner_file)
 
     def test_valid_css_file(self):
-        with self.print_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % VALID_CSS_FILEPATH])
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            with self.install_swap:
+                pre_commit_linter.main(args=['--path=%s' % VALID_CSS_FILEPATH])
         self.assertTrue(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -297,7 +311,9 @@ class CSSLintTests(LintTests):
 
     def test_invalid_css_file(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_CSS_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_CSS_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -314,8 +330,9 @@ class JsTsLintTests(LintTests):
             codeowner_linter, 'check_codeowner_file', mock_check_codeowner_file)
 
     def test_valid_js_file(self):
-        with self.print_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % VALID_JS_FILEPATH])
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            with self.install_swap:
+                pre_commit_linter.main(args=['--path=%s' % VALID_JS_FILEPATH])
         self.assertTrue(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -324,8 +341,9 @@ class JsTsLintTests(LintTests):
             )
 
     def test_valid_ts_file(self):
-        with self.print_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % VALID_TS_FILEPATH])
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            with self.install_swap:
+                pre_commit_linter.main(args=['--path=%s' % VALID_TS_FILEPATH])
         self.assertTrue(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -334,8 +352,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_browser_explore(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_EXPLORE_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_EXPLORE_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -344,7 +363,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_browser_pause(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_PAUSE_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_PAUSE_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -353,7 +374,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_browser_sleep(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_SLEEP_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_SLEEP_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -362,8 +385,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_browser_wait_for_angular(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_WAIT_FOR_ANGULAR_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_WAIT_FOR_ANGULAR_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -373,8 +397,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_fdescribe_ddescribe(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_FDESCRIBE_DDESCRIBE_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_FDESCRIBE_DDESCRIBE_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -387,8 +412,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_iit_fit(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_IIT_FIT_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_IIT_FIT_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -401,7 +427,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_inject(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_INJECT_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_INJECT_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -410,8 +438,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_template_url(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_TEMPLATE_URL_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_TEMPLATE_URL_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -420,7 +449,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_parent(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_PARENT_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_PARENT_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -430,8 +461,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_relative_import(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_RELATIVE_IMPORT_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_RELATIVE_IMPORT_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -440,8 +472,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_inner_html(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_INNER_HTML_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_INNER_HTML_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -450,8 +483,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_constant_file(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_CONSTANT_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_CONSTANT_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -467,8 +501,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_constant_in_ts_file(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_CONSTANT_IN_TS_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_CONSTANT_IN_TS_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -478,9 +513,11 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_line_break_in_controller_dependencies(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % (
-                    INVALID_LINE_BREAK_IN_CONTROLLER_DEPENDENCIES_FILEPATH)])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % (
+                        INVALID_LINE_BREAK_IN_CONTROLLER_DEPENDENCIES_FILEPATH)]
+                    )
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -495,8 +532,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_scope_is_set_to_true(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_SCOPE_TRUE_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_SCOPE_TRUE_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -506,8 +544,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_scope(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_SCOPE_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_SCOPE_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -517,8 +556,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_component(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_COMPONENT_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_COMPONENT_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -528,8 +568,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_sorted_dependencies(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_SORTED_DEPENDENCIES_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_SORTED_DEPENDENCIES_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -541,8 +582,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_any_type(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_ANY_TYPE_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_ANY_TYPE_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -557,8 +599,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_to_throw(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_TO_THROW_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_TO_THROW_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -567,7 +610,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_throw(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_THROW_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_THROW_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -576,8 +621,9 @@ class JsTsLintTests(LintTests):
 
     def test_invalid_throw_with_string(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_THROW_WITH_STRING_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_THROW_WITH_STRING_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -594,8 +640,9 @@ class PythonLintTests(LintTests):
             codeowner_linter, 'check_codeowner_file', mock_check_codeowner_file)
 
     def test_valid_py_file(self):
-        with self.print_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % VALID_PY_FILEPATH])
+        with self.print_swap, self.sys_swap, self.check_codeowner_swap:
+            with self.install_swap:
+                pre_commit_linter.main(args=['--path=%s' % VALID_PY_FILEPATH])
         self.assertTrue(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -605,7 +652,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_import_order(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_IMPORT_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_IMPORT_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -615,8 +664,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_author(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_AUTHOR_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_AUTHOR_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -625,8 +675,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_datetime_now(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_DATETIME_NOW_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_DATETIME_NOW_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -636,8 +687,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_print(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_PRINT_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_PRINT_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -646,8 +698,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_pylint_id(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_PYLINT_ID_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_PYLINT_ID_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -659,8 +712,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_assert_equals(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_ASSERT_EQUALS_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_ASSERT_EQUALS_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -671,7 +725,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_open(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_OPEN_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_OPEN_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -681,8 +737,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_stringio(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_STRINGIO_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_STRINGIO_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -692,7 +749,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_quote(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_QUOTE_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_QUOTE_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -701,8 +760,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_unquote_plus(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_UNQUOTE_PLUS_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_UNQUOTE_PLUS_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -711,8 +771,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_urlencode(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_URLENCODE_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_URLENCODE_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -721,8 +782,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_urlretrieve(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_URLRETRIEVE_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_URLRETRIEVE_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -731,8 +793,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_urlopen(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_URLOPEN_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_URLOPEN_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -741,8 +804,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_urlsplit(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_URLSPLIT_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_URLSPLIT_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -751,8 +815,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_urlparse(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_URLPARSE_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_URLPARSE_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -761,8 +826,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_url_unsplit(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_URL_UNSPLIT_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_URL_UNSPLIT_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -771,8 +837,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_parse_qs(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_PARSE_QS_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_PARSE_QS_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -781,8 +848,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_unquote(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_UNQUOTE_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_UNQUOTE_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -791,8 +859,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_urljoin(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_URLJOIN_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_URLJOIN_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -801,8 +870,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_request(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_REQUEST_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_REQUEST_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -811,7 +881,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_input(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_INPUT_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_INPUT_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -820,7 +892,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_map(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_MAP_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_MAP_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -829,7 +903,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_next(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_NEXT_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_NEXT_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -838,7 +914,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_object(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_OBJECT_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_OBJECT_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -847,7 +925,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_range(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_RANGE_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_RANGE_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -856,7 +936,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_round(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_ROUND_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_ROUND_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -865,7 +947,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_str(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_STR_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_STR_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -878,7 +962,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_zip(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_ZIP_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_ZIP_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -887,8 +973,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_basestring(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_BASESTRING_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_BASESTRING_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -897,8 +984,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_metaclass(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_METACLASS_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_METACLASS_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -907,8 +995,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_iteritems(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_ITERITEMS_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_ITERITEMS_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -917,8 +1006,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_itervalues(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_ITERVALUES_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_ITERVALUES_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -927,8 +1017,9 @@ class PythonLintTests(LintTests):
 
     def test_invalid_iterkeys(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_ITERKEY_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_ITERKEY_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -945,7 +1036,9 @@ class GeneralLintTests(LintTests):
 
     def test_invalid_tabs(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_TABS_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_TABS_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -954,8 +1047,9 @@ class GeneralLintTests(LintTests):
 
     def test_invalid_merge_conflict(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_MERGE_CONFLICT_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_MERGE_CONFLICT_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -965,8 +1059,9 @@ class GeneralLintTests(LintTests):
 
     def test_invalid_glyphicon(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_GLYPHICON_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_GLYPHICON_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -975,7 +1070,9 @@ class GeneralLintTests(LintTests):
 
     def test_invalid_todo(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(args=['--path=%s' % INVALID_TODO_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_TODO_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -985,8 +1082,9 @@ class GeneralLintTests(LintTests):
 
     def test_invalid_copyright(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_COPYRIGHT_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_COPYRIGHT_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -996,8 +1094,9 @@ class GeneralLintTests(LintTests):
 
     def test_invalid_unicode_literal(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_UNICODE_LITERAL_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_UNICODE_LITERAL_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
@@ -1007,8 +1106,9 @@ class GeneralLintTests(LintTests):
 
     def test_invalid_fileoverview(self):
         with self.print_swap, self.sys_swap, self.check_codeowner_swap:
-            pre_commit_linter.main(
-                args=['--path=%s' % INVALID_FILEOVERVIEW_FILEPATH])
+            with self.install_swap:
+                pre_commit_linter.main(
+                    args=['--path=%s' % INVALID_FILEOVERVIEW_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assertTrue(
             appears_in_linter_stdout(
