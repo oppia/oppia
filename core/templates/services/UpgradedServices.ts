@@ -276,6 +276,10 @@ import { StorySummaryObjectFactory } from
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
+import { SubtopicPageContentsObjectFactory } from
+  'domain/topic/SubtopicPageContentsObjectFactory';
+import { SubtopicPageObjectFactory } from
+  'domain/topic/SubtopicPageObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
@@ -628,6 +632,12 @@ export class UpgradedServices {
     upgradedServices['StateWrittenTranslationsService'] =
       new StateWrittenTranslationsService(
         upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['SubtopicPageContentsObjectFactory'] =
+      new SubtopicPageContentsObjectFactory(
+        upgradedServices['RecordedVoiceoversObjectFactory'],
+        upgradedServices['SubtitledHtmlObjectFactory']);
+    upgradedServices['SubtopicPageObjectFactory'] = new SubtopicPageObjectFactory(
+      upgradedServices['SubtopicPageContentsObjectFactory']);
     upgradedServices['SuggestionThreadObjectFactory'] =
       new SuggestionThreadObjectFactory(
         upgradedServices['SuggestionObjectFactory'],

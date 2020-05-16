@@ -38,41 +38,32 @@ require('services/page-title.service.ts');
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
-angular.module('oppia').directive('topicEditorPage', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic-editor-page/topic-editor-page.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$scope', 'ContextService', 'PageTitleService',
-        'TopicEditorRoutingService', 'TopicEditorStateService', 'UrlService',
-        'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
-        function($scope, ContextService, PageTitleService,
-            TopicEditorRoutingService, TopicEditorStateService, UrlService,
-            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
-          var ctrl = this;
-          ctrl.getActiveTabName = function() {
-            return TopicEditorRoutingService.getActiveTabName();
-          };
-          ctrl.getEntityType = function() {
-            return ContextService.getEntityType();
-          };
+angular.module('oppia').component('topicEditorPage', {
+  template: require('./topic-editor-page.component.html'),
+  controller: [
+    '$scope', 'ContextService', 'PageTitleService',
+    'TopicEditorRoutingService', 'TopicEditorStateService', 'UrlService',
+    'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
+    function($scope, ContextService, PageTitleService,
+        TopicEditorRoutingService, TopicEditorStateService, UrlService,
+        EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
+      var ctrl = this;
+      ctrl.getActiveTabName = function() {
+        return TopicEditorRoutingService.getActiveTabName();
+      };
+      ctrl.getEntityType = function() {
+        return ContextService.getEntityType();
+      };
 
-          var setPageTitle = function() {
-            PageTitleService.setPageTitle(
-              TopicEditorStateService.getTopic().getName() + ' - Oppia');
-          };
-          ctrl.$onInit = function() {
-            TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
-            $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
-            $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
-          };
-        }
-      ]
-    };
-  }]);
+      var setPageTitle = function() {
+        PageTitleService.setPageTitle(
+          TopicEditorStateService.getTopic().getName() + ' - Oppia');
+      };
+      ctrl.$onInit = function() {
+        TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
+        $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
+        $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
+      };
+    }
+  ]
+});
