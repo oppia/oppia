@@ -169,7 +169,12 @@ export class SpeechSynthesisChunkerService {
         this.RTE_COMPONENT_NAMES[componentSpec] =
         ServicesConstants.RTE_COMPONENT_SPECS[componentSpec].frontend_id;
       });
-
+    interface MathExpressionContent {
+      // eslint-disable-next-line camelcase
+      raw_latex: String,
+      // eslint-disable-next-line camelcase
+      svg_filename: String
+    }
     var elt = $('<div>' + html + '</div>');
     // Convert links into speakable text by extracting the readable value.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Link)
@@ -186,12 +191,6 @@ export class SpeechSynthesisChunkerService {
       });
 
     var _this = this;
-    interface MathContent {
-      // eslint-disable-next-line camelcase
-      raw_latex: String,
-      // eslint-disable-next-line camelcase
-      svg_filename: String
-    }
     // Convert LaTeX to speakable text.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Math)
       .replaceWith(function() {
@@ -200,7 +199,7 @@ export class SpeechSynthesisChunkerService {
           var mathContent = _this.htmlEscaper.escapedJsonToObj(
             element.attributes['math_content-with-value'].textContent);
           const latexSpeakableText = _this._formatLatexToSpeakableText(
-            (mathContent as MathContent).raw_latex);
+            (mathContent as MathExpressionContent).raw_latex);
           return latexSpeakableText.length > 0 ? latexSpeakableText + ' ' : '';
         }
       });

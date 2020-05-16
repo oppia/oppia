@@ -331,7 +331,7 @@ class MathExpressionContent(BaseObject):
             }
         }, {
             'name': 'svg_filename',
-            'description': 'SVG file',
+            'description': 'SVG filename',
             'schema': {
                 'type': 'unicode'
             }
