@@ -27,24 +27,22 @@ describe('App Service', () => {
   });
 
   describe('querying the app for Machine Learning classifiers', () => {
-    beforeEach(() => {
+    beforeAll(() => {
       this.initialValue = AppConstants.ENABLE_ML_CLASSIFIERS;
     });
 
-    afterEach(() => {
+    afterAll(() => {
       AppConstants.ENABLE_ML_CLASSIFIERS = this.initialValue;
     });
 
-    it(
-      'should return true if AppConstants.ENABLE_ML_CLASSIFIERS is true',
+    it('should return true if AppConstants.ENABLE_ML_CLASSIFIERS is true',
       () => {
         AppConstants.ENABLE_ML_CLASSIFIERS = true;
         expect(this.appService.isMachineLearningClassificationEnabled())
           .toBeTrue();
       });
 
-    it(
-      'should return false if AppConstants.ENABLE_ML_CLASSIFIERS is false',
+    it('should return false if AppConstants.ENABLE_ML_CLASSIFIERS is false',
       () => {
         AppConstants.ENABLE_ML_CLASSIFIERS = false;
         expect(this.appService.isMachineLearningClassificationEnabled())
