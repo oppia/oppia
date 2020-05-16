@@ -1625,119 +1625,74 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
 class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
     ONE_OFF_JOB_CLASS = stats_jobs_one_off.ExplorationMissingStatsAudit
 
-    def _save_new_exploration(self, exp_id, deleted=False):
-        """Creates and commits an exploration model directly to storage,
-        bypassing checks because these tests are only concerned with the deleted
-        field.
-
-        Args:
-            exp_id: str. The ID of the exploration being created.
-            deleted: boolean. Whether the model should be marked as deleted.
-        """
-        exp = exp_domain.Exploration.create_default_exploration(exp_id)
-        states = {name: state.to_dict() for name, state in exp.states.items()}
-        model = exp_models.ExplorationModel(
-            id=exp.id,
-            version=1,
-            deleted=deleted,
-            category=exp.category,
-            title=exp.title,
-            objective=exp.objective,
-            language_code=exp.language_code,
-            tags=exp.tags,
-            blurb=exp.blurb,
-            author_notes=exp.author_notes,
-            states_schema_version=exp.states_schema_version,
-            init_state_name=exp.init_state_name,
-            states=states,
-            param_specs=exp.param_specs_dict,
-            param_changes=exp.param_change_dicts,
-            auto_tts_enabled=exp.auto_tts_enabled,
-            correctness_feedback_enabled=exp.correctness_feedback_enabled)
-        super( # pylint: disable=bad-super-call
-            base_models.VersionedModel, model).put()
-
-    def _save_new_exploration_stats(self, exp_id, deleted=False):
-        """Creates and commits an exploration stats model directly to storage,
-        bypassing checks because these tests are only concerned with the deleted
-        field.
-
-        Args:
-            exp_id: str. The ID of the exploration being created.
-            deleted: boolean. Whether the model should be marked as deleted.
-        """
-        exp_stats_id = (
-            stats_models.ExplorationStatsModel.get_entity_id(exp_id, 1))
-        model = stats_models.ExplorationStatsModel(
-            id=exp_stats_id,
-            deleted=deleted,
-            exp_id=exp_id,
-            exp_version=1,
-            num_starts_v1=0,
-            num_starts_v2=0,
-            num_actual_starts_v1=0,
-            num_actual_starts_v2=0,
-            num_completions_v1=0,
-            num_completions_v2=0,
-            state_stats_mapping={
-                feconf.DEFAULT_INIT_STATE_NAME: (
-                    stats_domain.StateStats.create_default().to_dict())
-            })
-        model.put()
+    def _do_not_create_stats_models(self):
+        """Returns a context manager which does not create new stats models."""
+        return self.swap(stats_services, 'create_stats_model', lambda _: None)
 
     def test_success_when_there_are_no_models(self):
-        output = self.run_one_off_job()
+        self.assertEqual(self.run_one_off_job(), [])
 
-        self.assertEqual(output, [])
+    def test_success_when_stats_model_exists(self):
+        self.save_new_default_exploration('ID', 'owner_id')
 
-    def test_success_when_exploration_exists_and_stats_model_exists(self):
-        self._save_new_exploration('id')
-        self._save_new_exploration_stats('id')
+        self.assertEqual(self.run_one_off_job(), [])
 
-        output = self.run_one_off_job()
+    def test_error_when_stats_model_is_missing(self):
+        with self._do_not_create_stats_models():
+            self.save_new_default_exploration('ID', 'owner_id')
 
-        self.assertEqual(output, [])
+        self.assertEqual(
+            self.run_one_off_job(),
+            ['ExplorationStats for Exploration ID is missing at version(s): 1'])
 
-    def test_error_when_exploration_exists_but_stats_model_is_missing(self):
-        self._save_new_exploration('id')
-        # Do not create exploration stats model.
+    def test_error_when_stats_model_is_deleted(self):
+        exp = self.save_new_default_exploration('ID', 'owner_id')
 
-        output = self.run_one_off_job()
+        stats = stats_models.ExplorationStatsModel.get_model('ID', exp.version)
+        stats.deleted = True
+        stats.put()
 
-        self.assertEqual(len(output), 1)
-        self.assertIn('ERROR', output[0])
-        self.assertIn('ExplorationStats id.1 missing', output[0])
-        self.assertIn('corresponding Exploration exists', output[0])
+        self.assertEqual(
+            self.run_one_off_job(),
+            ['ExplorationStats for Exploration ID is deleted at version(s): 1'])
 
-    def test_error_when_exploration_exists_but_stats_model_is_deleted(self):
-        self._save_new_exploration('id')
-        self._save_new_exploration_stats('id', deleted=True)
+    def test_error_when_stats_model_is_missing_at_disjoint_versions(self):
+        with self._do_not_create_stats_models():
+            self.save_new_default_exploration('ID', 'owner_id')
 
-        output = self.run_one_off_job()
+        exp_services.update_exploration('owner_id', 'ID', None, 'noop')
 
-        self.assertEqual(len(output), 1)
-        self.assertIn('ERROR', output[0])
-        self.assertIn('ExplorationStats id.1 deleted', output[0])
-        self.assertIn('corresponding Exploration exists', output[0])
+        with self._do_not_create_stats_models():
+            exp_services.update_exploration('owner_id', 'ID', None, 'noop')
 
-    def test_warning_when_exploration_is_missing_but_stats_model_exists(self):
-        # Do not create exploration model.
-        self._save_new_exploration_stats('id')
+        self.assertEqual(self.run_one_off_job(), [
+            'ExplorationStats for Exploration ID is missing at version(s): 1, 3'
+        ])
 
-        output = self.run_one_off_job()
+    def test_error_when_stats_model_is_deleted_at_disjoint_versions(self):
+        self.save_new_default_exploration('ID', 'owner_id') # v1
+        exp_services.update_exploration('owner_id', 'ID', None, 'noop') # v2
+        exp_services.update_exploration('owner_id', 'ID', None, 'noop') # v3
 
-        self.assertEqual(len(output), 1)
-        self.assertIn('WARNING', output[0])
-        self.assertIn('Exploration id.1 missing', output[0])
-        self.assertIn('corresponding ExplorationStats exists', output[0])
+        for stats in stats_models.ExplorationStatsModel.get_multi_versions(
+                'ID', [1, 3]):
+            stats.deleted = True
+            stats.put()
 
-    def test_warning_when_exploration_is_deleted_but_stats_model_exists(self):
-        self._save_new_exploration('id', deleted=True)
-        self._save_new_exploration_stats('id')
+        self.assertEqual(self.run_one_off_job(), [
+            'ExplorationStats for Exploration ID is deleted at version(s): 1, 3'
+        ])
 
-        output = self.run_one_off_job()
+    def test_no_error_when_exploration_is_missing(self):
+        stats_domain.ExplorationStats.create_default('ID', 1, {})
 
-        self.assertEqual(len(output), 1)
-        self.assertIn('WARNING', output[0])
-        self.assertIn('Exploration id.1 deleted', output[0])
-        self.assertIn('corresponding ExplorationStats exists', output[0])
+        self.assertEqual(self.run_one_off_job(), [])
+
+    def test_no_error_when_exploration_is_deleted(self):
+        with self._do_not_create_stats_models():
+            self.save_new_default_exploration('ID', 'owner_id')
+
+        exp_models.ExplorationModel.get('ID').delete(
+            'owner_id', feconf.COMMIT_MESSAGE_EXPLORATION_DELETED)
+
+        self.assertEqual(self.run_one_off_job(), [])

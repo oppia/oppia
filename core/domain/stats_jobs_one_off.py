@@ -1378,47 +1378,48 @@ class RegenerateMissingV2StatsModelsOneOffJob(
 class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job for finding explorations that are missing stats models.
 
-    If this job outputs any explorations, then the following two jobs need to be
-    run in succession:
+    If this job outputs any explorations, then the following two jobs should be
+    run in succession (note: only _missing_ models are created by these jobs):
         - RegenerateMissingV1StatsModelsOneOffJob
         - RegenerateMissingV2StatsModelsOneOffJob
 
-    Otherwise, an empty output signals that all explorations have stats.
+    Otherwise, an empty output signals that each exploration has a corresponding
+    stats model.
     """
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel, stats_models.ExplorationStatsModel]
+        return [exp_models.ExplorationModel]
 
     @staticmethod
-    def map(model):
-        if isinstance(model, stats_models.ExplorationStatsModel):
-            key = '%s.%s' % (model.exp_id, model.exp_version)
-            value = 'ExplorationStatsModel'
-        else: # exp_models.ExplorationModel
-            key = '%s.%s' % (model.id, model.version)
-            value = 'ExplorationModel'
-        if model.deleted:
-            value = 'Deleted%s' % value
-        yield (key, value)
+    def map(exp):
+        if exp.deleted:
+            return
+
+        exp_versions = list(python_utils.RANGE(1, exp.version + 1))
+        exp_stats_model_ids = (
+            stats_models.ExplorationStatsModel.get_entity_id(exp.id, version)
+            for version in exp_versions)
+        exp_stats_models = stats_models.ExplorationStatsModel.get_multi(
+            exp_stats_model_ids, include_deleted=True)
+
+        for exp_stats_model, exp_version in python_utils.ZIP(
+                exp_stats_models, exp_versions):
+            if exp_stats_model is None:
+                yield ('missing', (exp.id, exp_version))
+            elif exp_stats_model.deleted:
+                yield ('deleted', (exp.id, exp_version))
 
     @staticmethod
-    def reduce(key, values):
-        exp_exists = 'ExplorationModel' in values
-        exp_stats_exists = 'ExplorationStatsModel' in values
+    def reduce(stats_model_status, exp_id_version_pair_strs):
+        exp_versions_without_stats_models = collections.defaultdict(list)
+        for exp_id, exp_version in (
+                ast.literal_eval(s) for s in exp_id_version_pair_strs):
+            exp_versions_without_stats_models[exp_id].append(exp_version)
 
-        if exp_exists and not exp_stats_exists:
-            status = (
-                'deleted' if 'DeletedExplorationStatsModel' in values else
-                'missing')
+        for exp_id, exp_versions in exp_versions_without_stats_models.items():
+            sorted_exp_versions = [
+                python_utils.UNICODE(v) for v in sorted(exp_versions)]
             yield (
-                'ERROR',
-                'ExplorationStats %s %s, but corresponding Exploration exists' %
-                (key, status))
-        elif not exp_exists and exp_stats_exists:
-            status = (
-                'deleted' if 'DeletedExplorationModel' in values else 'missing')
-            yield (
-                'WARNING',
-                'Exploration %s %s, but corresponding ExplorationStats exists' %
-                (key, status))
+                'ExplorationStats for Exploration %s is %s at version(s): %s' %
+                (exp_id, stats_model_status, ', '.join(sorted_exp_versions)))
