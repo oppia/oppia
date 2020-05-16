@@ -1630,19 +1630,30 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         return self.swap(stats_services, 'create_stats_model', lambda _: None)
 
     def test_success_when_there_are_no_models(self):
-        self.assertEqual(self.run_one_off_job(), [])
+        self.assertItemsEqual(self.run_one_off_job(), [])
 
     def test_success_when_stats_model_exists(self):
         self.save_new_default_exploration('ID', 'owner_id')
 
-        self.assertEqual(self.run_one_off_job(), [])
+        self.assertItemsEqual(self.run_one_off_job(), [
+            '1 ExplorationStats model(s) present as expected',
+        ])
+
+    def test_success_when_several_stats_model_exists(self):
+        self.save_new_default_exploration('ID1', 'owner_id')
+        self.save_new_default_exploration('ID2', 'owner_id')
+        self.save_new_default_exploration('ID3', 'owner_id')
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            '3 ExplorationStats model(s) present as expected',
+        ])
 
     def test_error_when_stats_model_is_missing(self):
         with self._do_not_create_stats_models():
             self.save_new_default_exploration('ID', 'owner_id')
 
-        self.assertEqual(self.run_one_off_job(), [
-            'ExplorationStats for Exploration ID is missing at version(s): 1'
+        self.assertItemsEqual(self.run_one_off_job(), [
+            'ExplorationStats for Exploration "ID" missing at version(s): 1',
         ])
 
     def test_error_when_stats_model_is_deleted(self):
@@ -1652,8 +1663,8 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         stats.deleted = True
         stats.put()
 
-        self.assertEqual(self.run_one_off_job(), [
-            'ExplorationStats for Exploration ID is deleted at version(s): 1'
+        self.assertItemsEqual(self.run_one_off_job(), [
+            'ExplorationStats for Exploration "ID" deleted at version(s): 1',
         ])
 
     def test_error_when_stats_model_is_missing_at_disjoint_versions(self):
@@ -1665,8 +1676,9 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         with self._do_not_create_stats_models():
             exp_services.update_exploration('owner_id', 'ID', None, 'noop')
 
-        self.assertEqual(self.run_one_off_job(), [
-            'ExplorationStats for Exploration ID is missing at version(s): 1, 3'
+        self.assertItemsEqual(self.run_one_off_job(), [
+            '1 ExplorationStats model(s) present as expected',
+            'ExplorationStats for Exploration "ID" missing at version(s): 1, 3',
         ])
 
     def test_error_when_stats_model_is_deleted_at_disjoint_versions(self):
@@ -1679,14 +1691,15 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
             stats.deleted = True
             stats.put()
 
-        self.assertEqual(self.run_one_off_job(), [
-            'ExplorationStats for Exploration ID is deleted at version(s): 1, 3'
+        self.assertItemsEqual(self.run_one_off_job(), [
+            '1 ExplorationStats model(s) present as expected',
+            'ExplorationStats for Exploration "ID" deleted at version(s): 1, 3',
         ])
 
     def test_no_error_when_exploration_is_missing(self):
         stats_domain.ExplorationStats.create_default('ID', 1, {})
 
-        self.assertEqual(self.run_one_off_job(), [])
+        self.assertItemsEqual(self.run_one_off_job(), [])
 
     def test_no_error_when_exploration_is_deleted(self):
         with self._do_not_create_stats_models():
@@ -1695,4 +1708,4 @@ class ExplorationMissingStatsAuditOneOffJobTests(OneOffJobTestBase):
         exp_models.ExplorationModel.get('ID').delete(
             'owner_id', feconf.COMMIT_MESSAGE_EXPLORATION_DELETED)
 
-        self.assertEqual(self.run_one_off_job(), [])
+        self.assertItemsEqual(self.run_one_off_job(), [])

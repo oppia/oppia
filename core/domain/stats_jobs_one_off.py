@@ -1409,9 +1409,16 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
                 yield ('missing', (exp.id, exp_version))
             elif exp_stats_model.deleted:
                 yield ('deleted', (exp.id, exp_version))
+            else:
+                yield ('present', (exp.id, exp_version))
 
     @staticmethod
     def reduce(stats_model_status, exp_id_version_pair_strs):
+        if stats_model_status == 'present':
+            yield '%d ExplorationStats model(s) present as expected' % (
+                len(exp_id_version_pair_strs))
+            return
+
         exp_versions_without_stats_models = collections.defaultdict(list)
         for exp_id, exp_version in (
                 ast.literal_eval(s) for s in exp_id_version_pair_strs):
@@ -1421,5 +1428,5 @@ class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
             sorted_exp_versions = [
                 python_utils.UNICODE(v) for v in sorted(exp_versions)]
             yield (
-                'ExplorationStats for Exploration %s is %s at version(s): %s' %
+                'ExplorationStats for Exploration "%s" %s at version(s): %s' %
                 (exp_id, stats_model_status, ', '.join(sorted_exp_versions)))
