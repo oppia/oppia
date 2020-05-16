@@ -219,7 +219,12 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             {'raw_latex': u'x \\times y', 'svg_filename': u''},
             {'raw_latex': u'x \\times y', 'svg_filename': u''}
         )]
-        invalid_vals = [3.0, {'a': 1}, [1, 2, 1], None]
+        invalid_vals = [
+            3.0, {'a': 1}, [1, 2, 1], None,
+            {'raw_latex': 1, 'svg_filename': 2},
+            {'raw_latex': ['x^2'], 'svg_filename':{}},
+            {'raw_latex': ('x', 'y'), 'svg_filename': ''},
+        ]
 
         self.check_normalization(
             objects.MathExpressionContent, mappings, invalid_vals)
