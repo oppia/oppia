@@ -141,7 +141,12 @@ export class LostChange {
   providedIn: 'root'
 })
 export class LostChangeObjectFactory {
-  constructor(private utilsService: UtilsService) {}
+  constructor(private utilsService: UtilsService) {
+    // createNew function needs to be binded because it's used a lot in
+    // calbacks and then `this` would refer to window instead of the service
+    // itself.
+    this.createNew = this.createNew.bind(this);
+  }
 
   /**
    * @param {String} lostChangeDict - the name of the type to fetch.

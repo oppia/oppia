@@ -107,6 +107,10 @@ var TIME_HEIGHT_CHANGE_MSEC = 500;
 var TIME_FADEIN_MSEC = 100;
 var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
+interface ConversationSkinCustomScope extends ng.IScope {
+  directiveTemplate?: string;
+}
+
 angular.module('oppia').animation(
   '.conversation-skin-animate-tutor-card-on-narrow', function() {
     var tutorCardLeft, tutorCardWidth, tutorCardHeight, oppiaAvatarLeft;
@@ -326,7 +330,7 @@ angular.module('oppia').directive('conversationSkin', [
       scope: {
         getQuestionPlayerConfig: '&questionPlayerConfig',
       },
-      link: function(scope: ICustomScope) {
+      link: function(scope: ConversationSkinCustomScope) {
         var isIframed = UrlService.isIframed();
         scope.directiveTemplate = isIframed ?
           UrlInterpolationService.getDirectiveTemplateUrl(
@@ -348,7 +352,7 @@ angular.module('oppia').directive('conversationSkin', [
         'ExplorationRecommendationsService',
         'FatigueDetectionService', 'FocusManagerService',
         'GuestCollectionProgressService', 'HintsAndSolutionManagerService',
-        'ImagePreloaderService', 'LearnerAnswerInfoService',
+        'ImagePreloaderService', 'LearnerAnswerInfoService', 'LoaderService',
         'LearnerParamsService', 'LearnerViewRatingService', 'MessengerService',
         'NumberAttemptsService', 'PlayerCorrectnessFeedbackEnabledService',
         'PlayerPositionService', 'PlayerTranscriptService',
@@ -385,7 +389,7 @@ angular.module('oppia').directive('conversationSkin', [
             ExplorationRecommendationsService,
             FatigueDetectionService, FocusManagerService,
             GuestCollectionProgressService, HintsAndSolutionManagerService,
-            ImagePreloaderService, LearnerAnswerInfoService,
+            ImagePreloaderService, LearnerAnswerInfoService, LoaderService,
             LearnerParamsService, LearnerViewRatingService, MessengerService,
             NumberAttemptsService, PlayerCorrectnessFeedbackEnabledService,
             PlayerPositionService, PlayerTranscriptService,
@@ -784,7 +788,7 @@ angular.module('oppia').directive('conversationSkin', [
             $rootScope.$broadcast(
               'playerStateChange', $scope.nextCard.getStateName());
             FocusManagerService.setFocusIfOnDesktop(focusLabel);
-            $rootScope.loadingMessage = '';
+            LoaderService.hideLoadingScreen();
             $scope.hasFullyLoaded = true;
 
             // If the exploration is embedded, use the exploration language
@@ -1249,7 +1253,7 @@ angular.module('oppia').directive('conversationSkin', [
             $scope.explorationId = ExplorationEngineService.getExplorationId();
             $scope.isInPreviewMode = ExplorationEngineService.isInPreviewMode();
             $scope.isIframed = UrlService.isIframed();
-            $rootScope.loadingMessage = 'Loading';
+            LoaderService.showLoadingScreen('Loading');
             $scope.hasFullyLoaded = false;
             $scope.recommendedExplorationSummaries = null;
             $scope.answerIsCorrect = false;
