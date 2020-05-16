@@ -141,7 +141,7 @@ describe('Rte Helper Service', function() {
       backendId: 'Math',
       customizationArgSpecs: [{
         name: 'math_content',
-        description: 'The raw string to be displayed as LaTeX.',
+        description: 'The Math Expression be displayed.',
         schema: {
           type: 'custom',
           obj_type: 'MathExpressionContent'
