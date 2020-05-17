@@ -18,6 +18,9 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
+import math
+import time
+import python_utils
 
 from constants import constants
 from core import jobs
@@ -1246,6 +1249,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
     def test_update_username_creates_audit_model(self):
         user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
+        time_of_query = time.time()
 
         self.put_json(
             '/updateusernamehandler',
@@ -1257,6 +1261,17 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         self.assertTrue(
             audit_models.UsernameChangeAuditModel.has_reference_to_user_id(
                 user_id))
+
+        model_id = '%s.%s' % (user_id, int(math.floor(time_of_query)))
+
+        username_change_audit_model = (
+            audit_models.UsernameChangeAuditModel.get(model_id))
+
+        self.assertEqual(username_change_audit_model.committer_id, user_id)
+        self.assertEqual(
+            username_change_audit_model.old_username, self.OLD_USERNAME)
+        self.assertEqual(
+            username_change_audit_model.new_username, self.NEW_USERNAME)
 
 
 class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
