@@ -134,7 +134,7 @@ describe('Pretest question backend API service', function() {
     })
   );
 
-    it('should call successHandler with [] when storyId is empty',
+  it('should call successHandler with [] when storyId is empty',
     fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
@@ -144,6 +144,7 @@ describe('Pretest question backend API service', function() {
       var req = httpTestingController.verify();
 
       flushMicrotasks();
+
       expect(successHandler).toHaveBeenCalledWith([]);
       expect(failHandler).not.toHaveBeenCalled();
     })
