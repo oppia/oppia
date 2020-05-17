@@ -355,7 +355,7 @@ describe('Full exploration editor', function() {
     await users.logout();
   });
 
-  fit('should delete interactions cleanly', async function() {
+  it('should delete interactions cleanly', async function() {
     await users.createUser('user8@editorAndPlayer.com', 'user8EditorAndPlayer');
     await users.login('user8@editorAndPlayer.com');
     await workflow.createExploration();
