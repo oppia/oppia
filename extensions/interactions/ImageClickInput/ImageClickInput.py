@@ -62,9 +62,7 @@ class ImageClickInput(base.BaseInteraction):
     _answer_visualization_specs = [{
         # Bar chart with answer counts.
         'id': 'ClickHexbins',
-        'options': {
-            'image_path': '{{imageAndRegions.value.imagePath}}',
-        },
+        'options': {},
         'calculation_id': 'AnswerFrequencies',
         # Adding addressed info for hexbins needs more design work, but
         # conceptually should be possible by highlighting which hexagons are
