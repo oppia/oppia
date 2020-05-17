@@ -151,7 +151,7 @@ angular.module('oppia').factory('QuestionObjectFactory', [
         question_state_data: this._stateData.toBackendDict(),
         language_code: this._languageCode,
         linked_skill_ids: this._linkedSkillIds,
-        version: 1,
+        version: 0,
       };
       if (!isNewQuestion) {
         questionBackendDict.id = this._id;

@@ -134,6 +134,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = 'abc123456789'
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -146,6 +147,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         del question_dict['question_state_data']['content']
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -158,6 +160,19 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
+        self.post_json(
+            feconf.NEW_QUESTION_URL, {
+                'question_dict': question_dict,
+                'skill_ids': [self.skill_id]
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_post_with_incorrect_version_returns_400(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        question_dict = self.question.to_dict()
+        question_dict['version'] = 1
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -170,6 +185,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -183,6 +199,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -196,6 +213,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -209,6 +227,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -228,6 +247,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -248,6 +268,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         question_dict = self.question.to_dict()
         question_dict['id'] = None
         question_dict['question_state_data'] = 'invalid_question_state_data'
+        question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
