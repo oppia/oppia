@@ -528,10 +528,11 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # Go through each exploration state to find voiceover recordings.
         # For batching them as commits per explorations.
         commit_cmds = []
-        states_changed_count = 0
-        unchanged_count = 0
-        failed_count = 0
+        exploration_states_changed_count = 0
+        exploration_states_unchanged_count = 0
+        exploration_states_failed_count = 0
         for state, state_value in item.states.items():
+            states_changed_count = 0
             voiceovers_mapping = (state_value['recorded_voiceovers']
                                   ['voiceovers_mapping'])
             language_codes_to_audio_metadata = voiceovers_mapping.values()
@@ -560,6 +561,7 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             audio_metadata['duration_secs'] = (
                                 audio.info.length)
                             states_changed_count += 1
+                            exploration_states_changed_count += 1
                         except Exception as e:
                             logging.error(
                                 'MP3 audio file exception for file %s ,'
@@ -567,11 +569,12 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                                 'STATE_NAME: %s,'
                                 'REASON: %s' %
                                 (filename, item.id, state, e))
-                            failed_count += 1
+                            exploration_states_failed_count += 1
                     else:
-                        unchanged_count += 1
+                        exploration_states_unchanged_count += 1
             if states_changed_count > 0:
                 # Create commits to update the exploration.
+                # Only when the state is changed.
                 commit_cmds.append(exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
@@ -588,14 +591,15 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'in the exploration.')
             yield ('SUCCESS_AUDIO_CHANGED', 'EXP_ID: %s, '
                    'AUDIO_DURATIONS_CHANGED: %s' %
-                   (item.id, states_changed_count))
-        if unchanged_count > 0:
+                   (item.id, exploration_states_changed_count))
+        if exploration_states_unchanged_count > 0:
             yield ('SUCCESS_NO_CHANGE', 'EXP_ID: %s, '
                    'NO_DURATIONS_CHANGED: %s' %
-                   (item.id, unchanged_count))
-        if failed_count > 0:
+                   (item.id, exploration_states_unchanged_count))
+        if exploration_states_failed_count > 0:
             yield ('FAILED_NO_CHANGE', 'EXP_ID: %s, '
-                   'FAILED_DURATION_CHANGE: %s' % (item.id, failed_count))
+                   'FAILED_DURATION_CHANGE: %s' %
+                   (item.id, exploration_states_failed_count))
 
     @staticmethod
     def reduce(key, values):
