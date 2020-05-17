@@ -58,7 +58,7 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
               return;
             }
             d3.select('#click-hexbin-chart-tooltip')
-              .style('visibility', 'visible')
+              .style('visibility', 'visible');
           };
 
           const hideTooltip = datum => {
@@ -109,18 +109,18 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
               .attr('height', `${containerHeight}px`);
 
             // Draw an overlay over the image to help distinguish the hexagons.
-            svg.append("rect")
+            svg.append('rect')
               .attr('x', 0).attr('y', 0)
               .attr('width', containerWidth).attr('height', containerHeight)
               .style('fill', 'rgba(0,0,0,0.35)');
 
             // Draw the mesh of hexagons to help distinguish groups of hexbins.
-            svg.append('clipPath')
-                .attr('id', 'clip')
-              .append('rect')
-                .attr('class', 'mesh')
-                .attr('width', containerWidth)
-                .attr('height', containerHeight);
+            const clipPath = svg.append('clipPath');
+            clipPath.attr('id', 'clip');
+            clipPath.append('rect')
+              .attr('class', 'mesh')
+              .attr('width', containerWidth)
+              .attr('height', containerHeight);
             svg.append('svg:path')
               .attr('clip-path', 'url(#clip)')
               .attr('d', hexbin.mesh())
@@ -130,16 +130,16 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
               .style('fill', 'none');
 
             // Draw each individual hexbin with non-zero points.
-            svg.append('g')
-                .selectAll('path')
-                .data(bins).enter()
-              .append('path')
-                .attr('transform', d => `translate(${d.x}, ${d.y})`)
-                .attr('fill', d => color(d.length))
-                .attr('d', hexbin.hexagon())
-                .on('mouseover', showTooltip)
-                .on('mousemove', moveTooltip)
-                .on('mouseout', hideTooltip);
+            const graph = svg.append('g')
+              .selectAll('path')
+              .data(bins).enter();
+            graph.append('path')
+              .attr('transform', d => `translate(${d.x}, ${d.y})`)
+              .attr('fill', d => color(d.length))
+              .attr('d', hexbin.hexagon())
+              .on('mouseover', showTooltip)
+              .on('mousemove', moveTooltip)
+              .on('mouseout', hideTooltip);
           };
         }
       ]
