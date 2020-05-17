@@ -61,10 +61,10 @@ class QuestionCreationHandler(base.BaseHandler):
                 (question_dict['id'] is not None) or
                 ('question_state_data' not in question_dict) or
                 ('language_code' not in question_dict) or
-                (question_dict['version'] != 1)):
+                (question_dict['version'] != 0)):
             raise self.InvalidInputException(
                 'Question Data should contain id, state data, language code, ' +
-                'and its version should be set as 1')
+                'and its version should be set as 0')
 
         question_dict['question_state_data_schema_version'] = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
