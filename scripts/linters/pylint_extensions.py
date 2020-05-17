@@ -1507,14 +1507,17 @@ class IndentMultilineDocstringDefinitionChecker(checkers.BaseChecker):
                 continue
 
             if is_docstring_def:
-                if ((line.lstrip().startswith(b'"""') or
+                if ("tuple." in line or (line.lstrip().startswith(b'"""') or
                         len(line.lstrip()) == 0) or ((len(prev_line) -
                             len(prev_line.lstrip())) -
                                 (len(line) - len(line.lstrip())) == 4)):
                     is_docstring_def = False
                     is_multiline = False
                     continue
-                elif not is_multiline and b': ' in line:
+                elif (not is_multiline and b': ' in line and
+                        (file_content[line_num-1].strip().endswith(b'.') or
+                            file_content[line_num-1].strip().startswith(b'Args:') or
+                               file_content[line_num-1].strip().startswith(b'Returns:'))):
                     prev_line = file_content[line_num]
                     is_multiline = True
                     continue

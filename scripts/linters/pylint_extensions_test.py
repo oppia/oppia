@@ -2233,27 +2233,14 @@ class IndentMultilineDocstringDefinitionCheckerTests(unittest.TestCase):
                                 It is properly indented.
 
                         Returns:
-                            - The first element is the list of dicts of
-                                ExplorationStats. Each dict contains the
-                                pairs:
-                                - num_starts_v1: int. Number of learners
-                                exploration.
-                                - num_starts_v2: int. As above, but for events
-                                - num_actual_starts_v1: int. Number of learners
-                                    attempted the exploration. These are the
-                                    completed the initial state of the
-                                    to the next state.
-                                - num_actual_starts_v2: int. As above, but for
-                                    version 2.
-                                - num_completions_v1: int. Number of learners
-                                    exploration.
-                                - num_completions_v2: int. As above, but for
-                                    version 2.
-                                - state_stats_mapping: dict. A dictionary
-                                    names of an exploration to the
-                                    dicts of the states.
-                            - The second element is the list of class
-                                instances of the corrupted statistics models.
+                            filepath: str. Path of the file.
+                            Error in this line.
+                            file_content: str. Contents of the file.
+                            pattern: dict. (regexp(regex pattern) : pattern,
+                                message(str) : message to show if pattern mats,
+                                excluded_files(tuple(str)) : files to be,
+                                excluded_dirs(tuple(str)) : directories to be
+                                    matching).
                         \"\"\"
                         Something
                 """)
@@ -2265,7 +2252,7 @@ class IndentMultilineDocstringDefinitionCheckerTests(unittest.TestCase):
 
         message = testutils.Message(
             msg_id='missing-indent-docstring-definition',
-            line=15)
+            line=12)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2290,12 +2277,12 @@ class IndentMultilineDocstringDefinitionCheckerTests(unittest.TestCase):
                                     each item is expected to be normalized to.
                                 invalid_items: a list of values. Each of these
                                     an AssertionError when normalized.
-                                param3: This is the param3 defintion.
+                                param3: This is the param3 definition.
                                 This is not properly indented.
 
                             Returns:
                                 An empty string if the URL does not start
-                                except when the string is empty. Otherwise,
+                                except: when the string is empty. Otherwise,
                                 URL.
                             \"\"\"
                             Something
