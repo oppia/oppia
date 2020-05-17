@@ -70,9 +70,10 @@ angular.module('oppia').directive('topNavigationBar', [
 
           ctrl.updateShowClassroom = function() {
             ClassroomBackendApiService.fetchClassroomData('math').then(
-              function (classroomData) {
-                ctrl.CLASSROOM_PAGE_IS_SHOWN = classroomData.classroom_page_is_shown;
-              }, function (errorResponse) {
+              function(classroomData) {
+                ctrl.CLASSROOM_PAGE_IS_SHOWN = (
+                  classroomData.classroom_page_is_shown);
+              }, function(errorResponse) {
                 ctrl.CLASSROOM_PAGE_IS_SHOWN = false;
               });
           };
