@@ -88,7 +88,8 @@ def get_user_id_corresponding_to_gae_id(gae_id):
 
 
 def are_commit_cmds_role_change(commit_cmds):
-    """Check if commit_cmds are of a role change type and there just one commit.
+    """Check if commit_cmds are of a role change type and there is just one
+    commit.
 
     Args:
         commit_cmds: list(dict(str, str)). List of commit commands.
@@ -446,21 +447,21 @@ class SnapshotsMetadataUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     """
 
     @staticmethod
-    def _migrate_model(snapshot_model, commit_model_type):
+    def _migrate_model(snapshot_model, commit_model_class):
         """Migrate CollectionRightsSnapshotMetadataModel to use the new user ID
         in the commit_cmds.
 
         Args:
             snapshot_model: CollectionRightsSnapshotMetadataModel. The model
                 that contains the old user IDs.
-            commit_model_type: ndb.Model. The type of the commit log model.
+            commit_model_class: class. The type of the commit log model.
         """
         if are_commit_cmds_role_change(snapshot_model.commit_cmds):
             snapshot_commit_cmd = snapshot_model.commit_cmds[0]
             snapshot_commit_cmd['assignee_id'] = (
                 get_user_id_corresponding_to_gae_id(
                     snapshot_commit_cmd['assignee_id']))
-            commit_log_model = commit_model_type.get_by_id(
+            commit_log_model = commit_model_class.get_by_id(
                 'rights-%s-%s' % (
                     snapshot_model.get_unversioned_instance_id(),
                     snapshot_model.get_version_string()))
@@ -705,6 +706,8 @@ class BaseModelsUserIdsHaveUserSettingsVerificationJob(
                 yield ('FAILURE - %s' % model_class.__name__, model.id)
         elif (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD):
+            if model.user_id is None:
+                yield ('FAILURE_NONE - %s' % model_class.__name__, model.id)
             if (BaseModelsUserIdsHaveUserSettingsVerificationJob
                     ._check_id_and_user_id_exist(model.id, model.user_id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
