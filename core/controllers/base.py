@@ -70,7 +70,7 @@ def _clear_login_cookies(response_headers):
         response_headers.add_header(*cookie.output().split(b': ', 1))
 
 
-@backports.functools_lru_cache.lru_cache(maxsize=32)
+@backports.functools_lru_cache.lru_cache(maxsize=128)
 def load_template(filename):
     """Return the HTML file contents at filepath.
 

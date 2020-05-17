@@ -63,7 +63,7 @@ def _exploration_exists(exploration_id, version, collection_id):
         collection_id: str. ID of the collection.
 
     Returns:
-        True if the exploration exists False otherwise.
+        bool. True if the exploration exists False otherwise.
     """
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, strict=False, version=version)
