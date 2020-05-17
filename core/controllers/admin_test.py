@@ -20,7 +20,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 import math
 import time
-import python_utils
 
 from constants import constants
 from core import jobs
