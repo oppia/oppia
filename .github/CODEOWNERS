@@ -257,7 +257,7 @@
 /core/templates/services/improvements.service*.ts @brianrodri
 /core/templates/services/messenger.service.ts @brianrodri
 /core/templates/services/playthrough*.ts @brianrodri
-/core/templates/services/state-interaction-rules-stats.service*.ts @brianrodri
+/core/templates/services/state-interaction-stats.service*.ts @brianrodri
 /core/templates/services/state-top-answers-stats*.ts @brianrodri
 /extensions/actions/ @brianrodri
 /extensions/answer_summarizers/ @brianrodri
