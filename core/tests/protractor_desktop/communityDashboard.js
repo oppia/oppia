@@ -35,10 +35,10 @@ describe('Community dashboard page', function() {
   const TOPIC_NAMES = [
     'Topic 0 for contribution', 'Topic 1 for contribution'];
   const SKILL_DESCRIPTIONS = [
-    'Skill 0 for question suggestion', 'Skill 1 for question suggestion'];
+    'Skill 0 for suggestion', 'Skill 1 for suggestion'];
   const REVIEW_MATERIALS = [
-    'Review Material 0 for question suggestion',
-    'Review Material 1 for question suggestion'];
+    'Review Material 0',
+    'Review Material 1'];
   const ADMIN_EMAIL = 'management@community.com';
   const USER_EMAILS = ['user0@community.com', 'user1@community.com'];
   const HINDI_LANGUAGE = 'Hindi';
@@ -197,7 +197,7 @@ describe('Community dashboard page', function() {
     users.logout();
 
     // Validate the contribution status changed.
-    users.login(user1Email);
+    users.login(USER_EMAILS[0]);
     communityDashboardPage.get();
     communityDashboardPage.waitForOpportunitiesToLoad();
     communityDashboardPage.expectNumberOfOpportunitiesToBe(4);
@@ -239,7 +239,7 @@ describe('Community dashboard page', function() {
   });
 });
 
-fdescribe('Admin page community reviewer form', function() {
+describe('Admin page community reviewer form', function() {
   var HINDI_LANGUAGE = 'Hindi';
   var adminPage = null;
   var communityDashboardPage = null;
@@ -249,7 +249,7 @@ fdescribe('Admin page community reviewer form', function() {
   var voiceoverReviewerEmail = 'voiceartist@community.com';
   var questionReviewerUsername = 'questionreviewer';
   var questionReviewerEmail = 'questionreviewer@community.com';
-  var ADMIN_EMAIL = 'management@adminTab.com';
+  var ADMIN_EMAIL = 'adminToAssignReviewer@adminTab.com';
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
@@ -258,7 +258,7 @@ fdescribe('Admin page community reviewer form', function() {
     users.createUser(translationReviewerEmail, translationReviewerUsername);
     users.createUser(voiceoverReviewerEmail, voiceoverReviewerUsername);
     users.createUser(questionReviewerEmail, questionReviewerUsername);
-    users.createUser(ADMIN_EMAIL, 'management');
+    users.createUser(ADMIN_EMAIL, 'assignReviewer');
   });
 
   beforeEach(function() {
@@ -279,7 +279,7 @@ fdescribe('Admin page community reviewer form', function() {
     users.logout();
   });
 
-  fit('should allow admin to add voiceover reviewer', function() {
+  it('should allow admin to add voiceover reviewer', function() {
     adminPage.get();
     adminPage.assignVoiceoverReviewer(
       voiceoverReviewerUsername, HINDI_LANGUAGE);

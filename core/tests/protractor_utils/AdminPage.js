@@ -346,7 +346,7 @@ var AdminPage = function() {
       'Could not add translation reviewer successfully');
   };
 
-  var _getUserReviewRights = function(username) {
+  var _getUserReviewRightsElement = function(username, reviewCategory) {
     _switchToRolesTab();
 
     waitFor.visibilityOf(
@@ -374,36 +374,13 @@ var AdminPage = function() {
       statusMessage, 'Success',
       'Could not view reviewer rights successfully');
 
-    var reviewRightsTable = viewReviewerForm.element(userReviewRightsTable);
-
-    var translationReviewRightsLanguages = element.all(
-      userTranslationReviewerLanguageCss);
-
-    var voiceoverReviewRightsLanguages = element.all(
-      userVoiceoverReviewerLanguageCss);
-
-    var questionRevieweRights = element(userQuestionReviewerCss).getText();
-
-    var reviewRights = {
-      [REVIEW_CATEGORY_TRANSLATION]: [],
-      [REVIEW_CATEGORY_VOICEOVER]: [],
-      [REVIEW_CATEGORY_QUESTION]: false
-    };
-
-    if (questionRevieweRights === 'Allowed') {
-      reviewRights[REVIEW_CATEGORY_QUESTION] = true;
+    if (reviewCategory === REVIEW_CATEGORY_TRANSLATION) {
+      return element.all(userTranslationReviewerLanguageCss);
+    } else if (reviewCategory === REVIEW_CATEGORY_VOICEOVER) {
+      return element.all(userVoiceoverReviewerLanguageCss);
+    } else if (reviewCategory === REVIEW_CATEGORY_QUESTION) {
+      return element(userQuestionReviewerCss);
     }
-
-    reviewRights[REVIEW_CATEGORY_TRANSLATION] = (
-      translationReviewRightsLanguages.map(async function(languageElement) {
-        return await languageElement.getText();
-      }));
-
-    reviewRights[REVIEW_CATEGORY_VOICEOVER] = (
-      voiceoverReviewRightsLanguages.map(async function(languageElement) {
-        return await languageElement.getText();
-      }));
-    return reviewRights;
   };
 
   this.assignTranslationReviewer = function(username, languageDescription) {
@@ -420,21 +397,30 @@ var AdminPage = function() {
 
   this.expectUserToBeTranslationReviewer = function(
       username, languageDescription) {
-    var reviewRights = _getUserReviewRights(username);
-    expect(reviewRights[REVIEW_CATEGORY_TRANSLATION]).toContain(
-      languageDescription);
+    _getUserReviewRightsElement(username, REVIEW_CATEGORY_TRANSLATION).map(
+      function(languageElem) {
+        return languageElem.getText();
+      }).then(function(languages) {
+      expect(languages).toContain(languageDescription);
+    });
   };
 
   this.expectUserToBeVoiceoverReviewer = function(
       username, languageDescription) {
-    var reviewRights = _getUserReviewRights(username);
-    expect(reviewRights[REVIEW_CATEGORY_VOICEOVER]).toContain(
-      languageDescription);
+    _getUserReviewRightsElement(username, REVIEW_CATEGORY_VOICEOVER).map(
+      function(languageElem) {
+        return languageElem.getText();
+      }).then(function(languages) {
+      expect(languages).toContain(languageDescription);
+    });
   };
 
   this.expectUserToBeQuestionReviewer = function(username) {
-    var reviewRights = _getUserReviewRights(username);
-    expect(reviewRights[REVIEW_CATEGORY_QUESTION]).toBeTrue();
+    _getUserReviewRightsElement(
+      username, REVIEW_CATEGORY_QUESTION).getText().then(
+      function(reviewRights) {
+        expect(reviewRights).toBe('Allowed');
+      });
   };
 };
 
