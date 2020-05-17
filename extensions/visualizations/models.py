@@ -95,7 +95,9 @@ class BarChart(BaseVisualization):
 
 
 class ClickHexbins(BaseVisualization):
-    """A visualization representing a two-column table with answer counts."""
+    """A visualization which overlays an image with a hexagonal grouping of
+    clicks.
+    """
 
     _OPTIONS_SPECS = []
 
