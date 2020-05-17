@@ -43,16 +43,22 @@ export interface IAnswerData {
 
 export interface IVisualizationInfo {
   /* eslint-disable camelcase */
+  addressed_info_is_supported: boolean;
   data: IAnswerData[];
   options: {[name: string]: object};
-  addressed_info_is_supported: boolean;
   /* eslint-enable camelcase */
 }
 
 export interface IStateRulesStatsBackendDict {
   /* eslint-disable camelcase */
-  state_name: string;
+  visualizations_info: IVisualizationInfo[];
+  /* eslint-enable camelcase */
+}
+
+export interface IStateRulesStats {
+  /* eslint-disable camelcase */
   exploration_id: string;
+  state_name: string;
   visualizations_info: IVisualizationInfo[];
   /* eslint-enable camelcase */
 }
@@ -65,8 +71,7 @@ export class StateRulesStatsService {
       private contextService: ContextService,
       private fractionObjectFactory: FractionObjectFactory,
       private http: HttpClient,
-      private interactionRulesRegistryService:
-        InteractionRulesRegistryService,
+      private interactionRulesRegistryService: InteractionRulesRegistryService,
       private urlInterpolationService: UrlInterpolationService) {}
 
   /**
@@ -77,11 +82,18 @@ export class StateRulesStatsService {
     return state.interaction.id === 'TextInput';
   }
 
+  private getReadableAnswerString(state: State, answer): string {
+    if (state.interaction.id === 'FractionInput') {
+      this.fractionObjectFactory.fromDict(<IFractionDict> answer).toString();
+    }
+    return answer.toString();
+  }
+
   /**
    * Returns a promise which will provide details of the given state's
    * answer-statistics.
    */
-  computeStateRulesStats(state: State): Promise<IStateRulesStatsBackendDict> {
+  computeStateRulesStats(state: State): Promise<IStateRulesStats> {
     const explorationId = this.contextService.getExplorationId();
     const interactionRulesService = (
       this.interactionRulesRegistryService.getRulesServiceByInteractionId(
@@ -89,34 +101,25 @@ export class StateRulesStatsService {
     return this.http.get<IStateRulesStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         '/createhandler/state_rules_stats/<exploration_id>/<state_name>', {
-          exploration_id: encodeURIComponent(explorationId),
-          state_name: encodeURIComponent(state.name)
-        })
-    ).toPromise().then(response => <IStateRulesStatsBackendDict>{
-      state_name: state.name,
-      exploration_id: explorationId,
-      visualizations_info: (
-        response.visualizations_info.map(info => <IVisualizationInfo>{
+          exploration_id: explorationId,
+          state_name: state.name,
+        }))
+      .toPromise().then(response => <IStateRulesStats>{
+        exploration_id: explorationId,
+        state_name: state.name,
+        visualizations_info: response.visualizations_info.map(info => ({
           addressed_info_is_supported: info.addressed_info_is_supported,
-          data: info.data.map(datum => {
-            if (state.interaction.id === 'FractionInput') {
-              // If data is a FractionInput, need to change data so that
-              // visualization displays the input in a readable manner.
-              const fractionDict: IFractionDict = datum.answer;
-              datum.answer = (
-                this.fractionObjectFactory.fromDict(fractionDict).toString());
-            }
-            if (info.addressed_info_is_supported) {
-              datum.is_addressed = (
-                this.answerClassificationService
-                  .isClassifiedExplicitlyOrGoesToNewState(
-                    state.name, state, datum.answer, interactionRulesService));
-            }
-            return datum;
+          data: info.data.map(datum => <IAnswerData>{
+            answer: this.getReadableAnswerString(state, datum.answer),
+            frequency: datum.frequency,
+            is_addressed: (
+              this.answerClassificationService
+                .isClassifiedExplicitlyOrGoesToNewState(
+                  state.name, state, datum.answer, interactionRulesService)),
           }),
-          options: info.options
+          options: info.options,
         })),
-    });
+      });
   }
 }
 

@@ -89,18 +89,18 @@ describe('Interaction Rules Registry Service', () => {
     this.graphInputRulesService = TestBed.get(GraphInputRulesService);
     this.imageClickInputRulesService = TestBed.get(ImageClickInputRulesService);
     this.interactiveMapRulesService = TestBed.get(InteractiveMapRulesService);
-    this.itemSelectionInputRulesService = TestBed.get(
-      ItemSelectionInputRulesService);
+    this.itemSelectionInputRulesService = (
+      TestBed.get(ItemSelectionInputRulesService));
     this.logicProofRulesService = TestBed.get(LogicProofRulesService);
-    this.mathExpressionInputRulesService = TestBed.get(
-      MathExpressionInputRulesService);
-    this.multipleChoiceInputRulesService = TestBed.get(
-      MultipleChoiceInputRulesService);
+    this.mathExpressionInputRulesService = (
+      TestBed.get(MathExpressionInputRulesService));
+    this.multipleChoiceInputRulesService = (
+      TestBed.get(MultipleChoiceInputRulesService));
     this.musicNotesInputRulesService = TestBed.get(MusicNotesInputRulesService);
     this.numberWithUnitsRulesService = TestBed.get(NumberWithUnitsRulesService);
     this.numericInputRulesService = TestBed.get(NumericInputRulesService);
-    this.pencilCodeEditorRulesService = TestBed.get(
-      PencilCodeEditorRulesService);
+    this.pencilCodeEditorRulesService = (
+      TestBed.get(PencilCodeEditorRulesService));
     this.setInputRulesService = TestBed.get(SetInputRulesService);
     this.textInputRulesService = TestBed.get(TextInputRulesService);
   });
