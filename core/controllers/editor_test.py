@@ -887,10 +887,10 @@ class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class StateInteractionRulesStatsHandlerTests(test_utils.GenericTestBase):
+class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(StateInteractionRulesStatsHandlerTests, self).setUp()
+        super(StateInteractionStatsHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
     def test_get_with_invalid_exploration_id_raises_error(self):
