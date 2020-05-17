@@ -947,11 +947,11 @@ class WrittenTranslations(python_utils.OBJECT):
 
         Args:
             expected_content_id_list: A list of content id which are expected to
-            be inside they WrittenTranslations.
+                be inside they WrittenTranslations.
 
         Raises:
             ValidationError: One or more attributes of the WrittenTranslations
-            are invalid.
+                are invalid.
         """
         if expected_content_id_list is not None:
             if not set(self.translations_mapping.keys()) == (
@@ -1142,11 +1142,11 @@ class RecordedVoiceovers(python_utils.OBJECT):
 
         Args:
             expected_content_id_list: A list of content id which are expected to
-            be inside they RecordedVoiceovers.
+                be inside they RecordedVoiceovers.
 
         Raises:
             ValidationError: One or more attributes of the RecordedVoiceovers
-            are invalid.
+                are invalid.
         """
         if expected_content_id_list is not None:
             if not set(self.voiceovers_mapping.keys()) == (
@@ -1736,7 +1736,7 @@ class State(python_utils.OBJECT):
 
         Args:
             param_changes: list(ParamChange). List of param_change domain
-            objects that represents ParamChange domain object.
+                objects that represents ParamChange domain object.
         """
         self.param_changes = param_changes
 

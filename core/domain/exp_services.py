@@ -795,9 +795,9 @@ def get_exploration_snapshots_metadata(exploration_id, allow_deleted=False):
     Returns:
         list(dict). List of dicts, each representing a recent snapshot. Each
         dict has the following keys: committer_id, commit_message, commit_cmds,
-        commit_type, created_on_ms, version_number. The version numbers are
-        consecutive and in ascending order. There are exploration.version_number
-        items in the returned list.
+            commit_type, created_on_ms, version_number. The version numbers are
+            consecutive and in ascending order. There are
+            exploration.version_number items in the returned list.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     current_version = exploration.version
@@ -1192,7 +1192,7 @@ def get_demo_exploration_components(demo_path):
     Args:
         demo_path: str. The file or folder path for the content of an
             exploration in SAMPLE_EXPLORATIONS_DIR. E.g.: 'adventure.yaml' or
-            'tar/'.
+                'tar/'.
 
     Returns:
         tuple. A 2-tuple, the first element of which is a yaml string, and the

@@ -101,16 +101,16 @@ class ClassifierTrainingJob(python_utils.OBJECT):
             the classifier. This is populated lazily when the job request is
             picked up by the VM. The list contains dicts where each dict
             represents a single training data group, for example:
-            training_data = [
-                {
-                    'answer_group_index': 1,
-                    'answers': ['a1', 'a2']
-                },
-                {
-                    'answer_group_index': 2,
-                    'answers': ['a2', 'a3']
-                }
-            ]
+                training_data = [
+                    {
+                        'answer_group_index': 1,
+                        'answers': ['a1', 'a2']
+                    },
+                    {
+                        'answer_group_index': 2,
+                        'answers': ['a2', 'a3']
+                    }
+                ]
         classifier_data: dict. The actual classifier model used for
             classification purpose.
         data_schema_version: int. Schema version of the data used by the
@@ -216,16 +216,16 @@ class ClassifierTrainingJob(python_utils.OBJECT):
             classifier. This is populated lazily when the job request is
             picked up by the VM. The list contains dicts where each dict
             represents a single training data group, for example:
-            training_data = [
-                {
-                    'answer_group_index': 1,
-                    'answers': ['a1', 'a2']
-                },
-                {
-                    'answer_group_index': 2,
-                    'answers': ['a2', 'a3']
-                }
-            ]
+                training_data = [
+                    {
+                        'answer_group_index': 1,
+                        'answers': ['a1', 'a2']
+                    },
+                    {
+                        'answer_group_index': 2,
+                        'answers': ['a2', 'a3']
+                    }
+                ]
         """
         return self._training_data
 

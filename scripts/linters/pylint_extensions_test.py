@@ -2209,7 +2209,7 @@ class IndentMultilineDocstringDefinitionCheckerTests(unittest.TestCase):
 
         message = testutils.Message(
             msg_id='missing-indent-docstring-definition',
-            line=6)
+            line=7)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2265,7 +2265,7 @@ class IndentMultilineDocstringDefinitionCheckerTests(unittest.TestCase):
 
         message = testutils.Message(
             msg_id='missing-indent-docstring-definition',
-            line=14)
+            line=15)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2308,7 +2308,7 @@ class IndentMultilineDocstringDefinitionCheckerTests(unittest.TestCase):
 
         message = testutils.Message(
             msg_id='missing-indent-docstring-definition',
-            line=12)
+            line=13)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
