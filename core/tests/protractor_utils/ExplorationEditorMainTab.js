@@ -256,17 +256,17 @@ var ExplorationEditorMainTab = function() {
    * @param {string} ruleName - The name of the rule, e.g. IsGreaterThan, must
    *                            match with interaction type.
    */
-  this.addResponse = function(
+  this.addResponse = async function(
       interactionId, feedbackInstructions, destStateName,
       createNewState, ruleName) {
     // Open the "Add Response" modal if it is not already open.
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       addResponseButton, 'Response Editor button is not clickable');
-    addResponseButton.click();
-    this.setResponse.apply(null, arguments);
+    await addResponseButton.click();
+    await this.setResponse.apply(null, arguments);
   };
 
-  this.setResponse = function(
+  this.setResponse = async function(
       interactionId, feedbackInstructions, destStateName,
       createNewState, ruleName) {
     // Set the rule description.
@@ -274,60 +274,58 @@ var ExplorationEditorMainTab = function() {
     for (var i = 5; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
-    expect(addResponseDetails.isDisplayed()).toBe(true);
-    _selectRule(addResponseDetails, interactionId, ruleName);
-    _setRuleParameters.apply(null, args);
+    expect(await addResponseDetails.isDisplayed()).toBe(true);
+    await _selectRule(addResponseDetails, interactionId, ruleName);
+    await _setRuleParameters.apply(null, args);
     // Open the feedback entry form if it is not already open.
-    feedbackEditor.isPresent().then(function(isVisible) {
-      if (isVisible) {
-        feedbackEditor.click();
-      }
-    });
+    var isVisible = await feedbackEditor.isPresent();
+    if (isVisible) {
+      await feedbackEditor.click();
+    }
 
     if (feedbackInstructions) {
       // Set feedback contents.
-      _setOutcomeFeedback(feedbackInstructions);
+      await _setOutcomeFeedback(feedbackInstructions);
     }
     // If the destination is being changed, open the corresponding editor.
     if (destStateName || destStateName !== '(try again)') {
     // Set destination contents.
       if (destStateName !== null) {
-        _setOutcomeDest(
+        await _setOutcomeDest(
           destStateName, createNewState, null);
       }
     }
 
     // Close new response modal.
-    expect(addNewResponseButton.isDisplayed()).toBe(true);
-    addNewResponseButton.click();
-    waitFor.invisibilityOf(
+    expect(await addNewResponseButton.isDisplayed()).toBe(true);
+    await addNewResponseButton.click();
+    await waitFor.invisibilityOf(
       addNewResponseButton, 'Add New Response Modal is not closed');
   };
 
   // Rules are zero-indexed; 'default' denotes the default outcome.
   // 'pop' denotes the currently opened one.
-  this.getResponseEditor = function(responseNum) {
+  this.getResponseEditor = async function(responseNum) {
     var headerElem;
     if (responseNum !== 'pop') {
       if (responseNum === 'default') {
         headerElem = defaultResponseTab;
       } else {
-        waitFor.visibilityOf(responseTab.first());
+        await waitFor.visibilityOf(responseTab.first());
         headerElem = responseTab.get(
           responseNum);
       }
 
-      responseBody(responseNum).isPresent().then(function(isVisible) {
-        if (!isVisible) {
-          expect(headerElem.isDisplayed()).toBe(true);
-          waitFor.elementToBeClickable(
-            headerElem, 'Response Editor header is not clickable');
-          headerElem.click();
-        }
-      });
+      var isVisible = await responseBody(responseNum).isPresent();
+      if (!isVisible) {
+        expect(await headerElem.isDisplayed()).toBe(true);
+        await waitFor.elementToBeClickable(
+          headerElem, 'Response Editor header is not clickable');
+        await headerElem.click();
+      }
     } else {
       headerElem = addResponseHeader;
-      expect(headerElem.isDisplayed()).toBe(true);
+      expect(await headerElem.isDisplayed()).toBe(true);
     }
     return {
       /**
@@ -336,7 +334,8 @@ var ExplorationEditorMainTab = function() {
        * @param {string} [ruleName] - Appropriate rule of provided interaction.
        * @param {string[]} [feedbackTextArray] - Exact feedback text to match.
        */
-      expectRuleToBe: function(interactionId, ruleName, feedbackTextArray) {
+      expectRuleToBe: async function(
+          interactionId, ruleName, feedbackTextArray) {
         var ruleDescription = _getRuleDescription(interactionId, ruleName);
         // Replace selectors with feedbackTextArray's elements.
         ruleDescription = _replaceRuleInputPlaceholders(
@@ -344,55 +343,55 @@ var ExplorationEditorMainTab = function() {
         ruleDescription += '...';
         // Adding "..." to end of string.
         var answerTab = element(by.css('.protractor-test-answer-tab'));
-        expect(answerTab.getText()).toEqual(ruleDescription);
+        expect(await answerTab.getText()).toEqual(ruleDescription);
       },
       /**
        * Check for correct learner's feedback.
        * @param {string} [feedbackInstructionText] - Exact feedback to match.
        */
-      expectFeedbackInstructionToBe: function(feedbackInstructionsText) {
+      expectFeedbackInstructionToBe: async function(feedbackInstructionsText) {
         // The first rule block's RTE.
         var feedbackRTE = responseBody(responseNum).
           element(by.className('oppia-rte-editor'));
-        expect(feedbackRTE.getText()).toEqual(
+        expect(await feedbackRTE.getText()).toEqual(
           feedbackInstructionsText);
       },
-      setFeedback: function(richTextInstructions) {
+      setFeedback: async function(richTextInstructions) {
       // Begin editing feedback.
-        openOutcomeFeedBackEditor.click();
+        await openOutcomeFeedBackEditor.click();
 
         // Set feedback contents.
-        _setOutcomeFeedback(richTextInstructions);
+        await _setOutcomeFeedback(richTextInstructions);
 
         // Save feedback.
-        saveOutcomeFeedbackButton.click();
+        await saveOutcomeFeedbackButton.click();
       },
       // This saves the rule after the destination is selected.
       //  - destinationName: The name of the state to move to, or null to stay
       //    on the same state.
       //  - createNewState: whether the destination state is new and must be
       //    created at this point.
-      setDestination: function(
+      setDestination: async function(
           destinationName, createNewState, refresherExplorationId) {
       // Begin editing destination.
-        expect(openOutcomeDestEditor.isDisplayed()).toBe(true);
-        openOutcomeDestEditor.click();
+        expect(await openOutcomeDestEditor.isDisplayed()).toBe(true);
+        await openOutcomeDestEditor.click();
 
         // Set destination contents.
-        _setOutcomeDest(
+        await _setOutcomeDest(
           destinationName, createNewState, refresherExplorationId);
 
         // Save destination.
-        expect(saveOutcomeDestButton.isDisplayed()).toBe(true);
-        saveOutcomeDestButton.click();
+        expect(await saveOutcomeDestButton.isDisplayed()).toBe(true);
+        await saveOutcomeDestButton.click();
       },
-      markAsCorrect: function() {
-        answerCorrectnessToggle.click();
+      markAsCorrect: async function() {
+        await answerCorrectnessToggle.click();
       },
       // The current state name must be at the front of the list.
-      expectAvailableDestinationsToBe: function(stateNames) {
+      expectAvailableDestinationsToBe: async function(stateNames) {
       // Begin editing destination.
-        openOutcomeDestEditor.click();
+        await openOutcomeDestEditor.click();
 
         var expectedOptionTexts = [_CURRENT_STATE_OPTION].concat(
           stateNames.slice(1));
@@ -400,21 +399,20 @@ var ExplorationEditorMainTab = function() {
         // Create new option always at the end of the list.
         expectedOptionTexts.push(_NEW_STATE_OPTION);
 
-        editOutcomeDestBubble.all(by.tagName('option')).map(
-          function(optionElem) {
-            return optionElem.getText();
-          }).then(function(actualOptionTexts) {
-          expect(actualOptionTexts).toEqual(expectedOptionTexts);
-        });
+        var actualOptionTexts = await editOutcomeDestBubble.all(
+            by.tagName('option')).map(async function(optionElem) {
+              return await optionElem.getText();
+            });
+        expect(actualOptionTexts).toEqual(expectedOptionTexts);
 
         // Cancel editing the destination.
-        cancelOutcomeDestButton.click();
+        await cancelOutcomeDestButton.click();
       },
-      addRule: function(interactionId, ruleName) {
+      addRule: async function(interactionId, ruleName) {
         // Additional parameters may be provided after ruleName.
 
         // Add the rule.
-        addAnswerButton.click();
+        await addAnswerButton.click();
 
         // Set the rule description.
         var ruleDetails = element(by.css('.protractor-test-rule-details'));
@@ -422,32 +420,32 @@ var ExplorationEditorMainTab = function() {
         for (var i = 2; i < arguments.length; i++) {
           args.push(arguments[i]);
         }
-        _selectRule(ruleDetails, interactionId, ruleName);
-        _setRuleParameters.apply(null, args);
+        await _selectRule(ruleDetails, interactionId, ruleName);
+        await _setRuleParameters.apply(null, args);
 
         // Save the new rule.
-        saveAnswerButton.click();
+        await saveAnswerButton.click();
       },
-      deleteResponse: function() {
-        deleteResponseButton.click();
-        confirmDeleteResponseButton.click();
+      deleteResponse: async function() {
+        await deleteResponseButton.click();
+        await confirmDeleteResponseButton.click();
       },
-      expectCannotSetFeedback: function() {
-        expect(openOutcomeFeedBackEditor.isPresent()).toBeFalsy();
+      expectCannotSetFeedback: async function() {
+        expect(await openOutcomeFeedBackEditor.isPresent()).toBeFalsy();
       },
-      expectCannotSetDestination: function() {
+      expectCannotSetDestination: async function() {
         var destEditorElem = openOutcomeDestEditor;
-        expect(destEditorElem.isPresent()).toBeFalsy();
+        expect(await destEditorElem.isPresent()).toBeFalsy();
       },
-      expectCannotAddRule: function() {
-        expect(addAnswerButton.isPresent()).toBeFalsy();
+      expectCannotAddRule: async function() {
+        expect(await addAnswerButton.isPresent()).toBeFalsy();
       },
-      expectCannotDeleteRule: function(ruleNum) {
+      expectCannotDeleteRule: async function(ruleNum) {
         var ruleElem = ruleBlock.get(ruleNum);
-        expect(deleteAnswerButton.isPresent()).toBeFalsy();
+        expect(await deleteAnswerButton.isPresent()).toBeFalsy();
       },
-      expectCannotDeleteResponse: function() {
-        expect(deleteResponseButton.isPresent()).toBeFalsy();
+      expectCannotDeleteResponse: async function() {
+        expect(await deleteResponseButton.isPresent()).toBeFalsy();
       }
     };
   };
@@ -456,11 +454,11 @@ var ExplorationEditorMainTab = function() {
     expect(addResponseButton.isPresent()).toBeFalsy();
   };
 
-  this.expectTickMarkIsDisplayed = function() {
-    expect(correctAnswerTickMark.isDisplayed()).toBe(true);
+  this.expectTickMarkIsDisplayed = async function() {
+    expect(await correctAnswerTickMark.isDisplayed()).toBe(true);
   };
 
-  var _setOutcomeDest = function(
+  var _setOutcomeDest = async function(
       destName, createNewDest, refresherExplorationId) {
     expect(destName === null && createNewDest).toBe(false);
 
@@ -472,17 +470,17 @@ var ExplorationEditorMainTab = function() {
     } else {
       targetOption = destName;
     }
-    waitFor.visibilityOf(
-      editOutcomeDestDropdownOptions(targetOption),
+    await waitFor.visibilityOf(
+      await editOutcomeDestDropdownOptions(targetOption),
       'editOutcomeDestDropdownOptions taking too long to appear');
-    expect(editOutcomeDestDropdownOptions(targetOption).isDisplayed())
+    expect(await editOutcomeDestDropdownOptions(targetOption).isDisplayed())
       .toBe(true);
-    editOutcomeDestDropdownOptions(targetOption).click();
+    await editOutcomeDestDropdownOptions(targetOption).click();
 
     if (createNewDest) {
-      editOutcomeDestStateInput.sendKeys(destName);
+      await editOutcomeDestStateInput.sendKeys(destName);
     } else if (refresherExplorationId) {
-      editOutcomeDestAddExplorationId.sendKeys(refresherExplorationId);
+      await editOutcomeDestAddExplorationId.sendKeys(refresherExplorationId);
     }
   };
 
@@ -616,18 +614,18 @@ var ExplorationEditorMainTab = function() {
 
   // INTERACTIONS
 
-  this.deleteInteraction = function() {
-    waitFor.elementToBeClickable(
+  this.deleteInteraction = async function() {
+    await waitFor.elementToBeClickable(
       deleteInteractionButton, 'Delete Interaction button is not clickable');
-    deleteInteractionButton.click();
+    await deleteInteractionButton.click();
 
     // Click through the "are you sure?" warning.
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       confirmDeleteInteractionButton,
       'Confirm Delete Interaction button takes too long to be clickable');
-    confirmDeleteInteractionButton.click();
+    await confirmDeleteInteractionButton.click();
 
-    waitFor.invisibilityOf(
+    await waitFor.invisibilityOf(
       confirmDeleteInteractionButton,
       'Delete Interaction modal takes too long to close');
   };
@@ -637,7 +635,7 @@ var ExplorationEditorMainTab = function() {
   // and they will be passed on to the relevant interaction editor.
   this.setInteraction = async function(interactionId) {
     await createNewInteraction(interactionId);
-    customizeInteraction.apply(null, arguments);
+    await customizeInteraction.apply(null, arguments);
     await closeAddResponseModal();
     await waitFor.invisibilityOf(
       addResponseHeader, 'Add Response modal takes too long to close');
@@ -645,9 +643,9 @@ var ExplorationEditorMainTab = function() {
       interaction, 'interaction takes too long to appear');
   };
 
-  this.setInteractionWithoutCloseAddResponse = function(interactionId) {
-    createNewInteraction(interactionId);
-    customizeInteraction.apply(null, arguments);
+  this.setInteractionWithoutCloseAddResponse = async function(interactionId) {
+    await createNewInteraction(interactionId);
+    await customizeInteraction.apply(null, arguments);
   };
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
@@ -701,25 +699,24 @@ var ExplorationEditorMainTab = function() {
 
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
-  var customizeInteraction = function(interactionId) {
+  var customizeInteraction = async function(interactionId) {
     if (arguments.length > 1) {
       var elem = interactionEditor;
       var customizationArgs = [elem];
       for (var i = 1; i < arguments.length; i++) {
         customizationArgs.push(arguments[i]);
       }
-      interactions.getInteraction(interactionId).customizeInteraction.apply(
+      await interactions.getInteraction(interactionId).customizeInteraction.apply(
         null, customizationArgs);
     }
 
     // The save interaction button doesn't appear for interactions having no
     // options to customize.
-    saveInteractionButton.isPresent().then(function(result) {
-      if (result) {
-        saveInteractionButton.click();
-      }
-    });
-    waitFor.invisibilityOf(
+    var result = await saveInteractionButton.isPresent();
+    if (result) {
+      await saveInteractionButton.click();
+    }
+    await waitFor.invisibilityOf(
       saveInteractionButton,
       'Customize Interaction modal taking too long to close');
   };
@@ -753,11 +750,11 @@ var ExplorationEditorMainTab = function() {
     expect((deleteInteractionButton).isPresent()).toBeFalsy();
   };
 
-  var _setOutcomeFeedback = function(richTextInstructions) {
-    var feedbackEditor = forms.RichTextEditor(
+  var _setOutcomeFeedback = async function(richTextInstructions) {
+    var feedbackEditor = await forms.RichTextEditor(
       feedbackBubble);
-    feedbackEditor.clear();
-    richTextInstructions(feedbackEditor);
+    await feedbackEditor.clear();
+    await richTextInstructions(feedbackEditor);
   };
 
   // PARAMETERS
@@ -874,7 +871,7 @@ var ExplorationEditorMainTab = function() {
   // after the ruleName. For example, the call
   //   _selectRuleParameters(ruleElement, 'NumericInput', 'Equals', 24)
   // will result in a rule that checks whether the learner's answer equals 24.
-  var _setRuleParameters = function(ruleElement, interactionId, ruleName) {
+  var _setRuleParameters = async function(ruleElement, interactionId, ruleName) {
     var parameterValues = [];
     for (var i = 3; i < arguments.length; i++) {
       parameterValues.push(arguments[i]);
@@ -890,16 +887,16 @@ var ExplorationEditorMainTab = function() {
 
       if (interactionId === 'MultipleChoiceInput') {
       // This is a special case as it uses a dropdown to set a NonnegativeInt.
-        parameterElement.element(by.tagName('button')).click();
-        multipleChoiceAnswerOptions(parameterValues[i])
+        await parameterElement.element(by.tagName('button')).click();
+        await multipleChoiceAnswerOptions(parameterValues[i])
           .click();
       } else if (interactionId === 'ItemSelectionInput') {
         var answerArray = Array.from(parameterValues[i]);
         for (var j = 0; j < answerArray.length; j++) {
-          itemSelectionAnswerOptions(answerArray[j]).click();
+          await itemSelectionAnswerOptions(answerArray[j]).click();
         }
       } else {
-        parameterEditor.setValue(parameterValues[i]);
+        await parameterEditor.setValue(parameterValues[i]);
       }
     }
   };
@@ -940,20 +937,20 @@ var ExplorationEditorMainTab = function() {
 
   // This function selects a rule from the dropdown,
   // but does not set any of its input parameters.
-  var _selectRule = function(ruleElem, interactionId, ruleName) {
+  var _selectRule = async function(ruleElem, interactionId, ruleName) {
     var ruleDescription = _getRuleDescription(interactionId, ruleName);
     // Replace selectors with "...".
     ruleDescription = _replaceRuleInputPlaceholders(ruleDescription, ['...']);
     var ruleDescriptionInDropdown = ruleDescription;
     var answerDescription = element(
       by.css('.protractor-test-answer-description'));
-    expect(answerDescription.isDisplayed()).toBe(true);
-    answerDescription.click();
-    var ruleDropdownElement = element.all(by.cssContainingText(
+    expect(await answerDescription.isDisplayed()).toBe(true);
+    await answerDescription.click();
+    var ruleDropdownElement = await element.all(by.cssContainingText(
       '.select2-results__option', ruleDescriptionInDropdown)).first();
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       ruleDropdownElement, 'Rule dropdown element takes too long to appear');
-    ruleDropdownElement.click();
+    await ruleDropdownElement.click();
   };
 
   // STATE GRAPH
@@ -984,52 +981,51 @@ var ExplorationEditorMainTab = function() {
 
   // NOTE: if the state is not visible in the state graph this function will
   // fail.
-  this.moveToState = function(targetName) {
-    general.scrollToTop();
-    stateNodes.map(function(stateElement) {
-      return stateNodeLabel(stateElement).getText();
-    }).then(function(listOfNames) {
-      var matched = false;
-      for (var i = 0; i < listOfNames.length; i++) {
-        if (listOfNames[i] === targetName) {
-          stateNodes.get(i).click();
-          matched = true;
-          // Wait to re-load the entire state editor.
-        }
-      }
-      if (!matched) {
-        throw new Error(
-          'State ' + targetName + ' not found by editorMainTab.moveToState.');
-      }
+  this.moveToState = async function(targetName) {
+    await general.scrollToTop();
+    var listOfNames = await stateNodes.map(async function(stateElement) {
+      return await stateNodeLabel(stateElement).getText();
     });
+    var matched = false;
+    for (var i = 0; i < listOfNames.length; i++) {
+      if (listOfNames[i] === targetName) {
+        await stateNodes.get(i).click();
+        matched = true;
+        // Wait to re-load the entire state editor.
+      }
+    }
+    if (!matched) {
+      throw new Error(
+        'State ' + targetName + ' not found by editorMainTab.moveToState.');
+    }
 
     var errorMessage = (
       'Current state name is:' +
-      stateNameContainer.getAttribute('textContent') +
+      await stateNameContainer.getAttribute('textContent') +
       'instead of expected ' + targetName);
-    waitFor.textToBePresentInElement(
+    await waitFor.textToBePresentInElement(
       stateNameContainer, targetName, errorMessage);
   };
 
-  this.setStateName = function(name) {
-    waitFor.invisibilityOf(
+  this.setStateName = async function(name) {
+    await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover takes too long to disappear');
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       stateNameContainer, 'State Name Container takes too long to appear');
-    stateNameContainer.click();
-    stateNameInput.clear();
-    stateNameInput.sendKeys(name);
+    await stateNameContainer.click();
+    await stateNameInput.clear();
+    await stateNameInput.sendKeys(name);
 
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       stateNameSubmitButton,
       'State Name Submit button takes too long to be clickable');
-    stateNameSubmitButton.click();
+    await stateNameSubmitButton.click();
 
     // Wait for state name container to completely disappear
     // and re-appear again.
-    waitFor.textToBePresentInElement(
+    await waitFor.textToBePresentInElement(
       stateNameContainer, name,
-      'Current state name is:' + stateNameContainer.getAttribute(
+      'Current state name is:' + await stateNameContainer.getAttribute(
         'textContent') + 'instead of expected ' + name);
   };
 

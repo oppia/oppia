@@ -21,25 +21,25 @@ var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
-var customizeInteraction = function(elem, buttonText) {
+var customizeInteraction = async function(elem, buttonText) {
   if (buttonText) {
-    objects.UnicodeStringEditor(
+    await objects.UnicodeStringEditor(
       elem.element(by.tagName('schema-based-unicode-editor'))
     ).setValue(buttonText);
   }
 };
 
-var expectInteractionDetailsToMatch = function(elem, buttonText) {
+var expectInteractionDetailsToMatch = async function(elem, buttonText) {
   expect(
-    element(by.css('.protractor-test-continue-button')).getText()
+    await element(by.css('.protractor-test-continue-button')).getText()
   ).toBe(buttonText.toUpperCase());
 };
 
-var submitAnswer = function() {
+var submitAnswer = async function() {
   var continueButton = element(by.css('.protractor-test-continue-button'));
-  waitFor.elementToBeClickable(
+  await waitFor.elementToBeClickable(
     continueButton, 'Continue button is not clickable');
-  continueButton.click();
+  await continueButton.click();
 };
 
 var testSuite = [];

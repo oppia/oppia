@@ -21,8 +21,8 @@ var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var waitFor = require('./waitFor.js');
 
-var scrollToTop = function() {
-  browser.executeScript('window.scrollTo(0,0);');
+var scrollToTop = async function() {
+  await browser.executeScript('window.scrollTo(0,0);');
 };
 
 // We will report all console logs of level greater than this.
@@ -103,15 +103,16 @@ var openEditor = function(explorationId) {
   explorationEditorMainTab.exitTutorial();
 };
 
-var openPlayer = function(explorationId) {
-  browser.get(PLAYER_URL_SLICE + explorationId);
-  waitFor.pageToFullyLoad();
+var openPlayer = async function(explorationId) {
+  await browser.get(PLAYER_URL_SLICE + explorationId);
+  await waitFor.pageToFullyLoad();
 };
 
 // Takes the user from an exploration editor to its player.
 // NOTE: we do not use the preview button because that will open a new window.
-var moveToPlayer = function() {
-  getExplorationIdFromEditor().then(openPlayer);
+var moveToPlayer = async function() {
+  var explorationId = await getExplorationIdFromEditor();
+  await openPlayer(explorationId);
 };
 
 // Takes the user from the exploration player to its editor.

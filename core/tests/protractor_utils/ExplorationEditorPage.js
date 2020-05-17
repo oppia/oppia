@@ -232,11 +232,11 @@ var ExplorationEditorPage = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.navigateToMainTab = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToMainTab = async function() {
+    await waitFor.elementToBeClickable(
       navigateToMainTabButton, 'Main tab is not clickable');
-    navigateToMainTabButton.click();
-    neutralElement.click();
+    await navigateToMainTabButton.click();
+    await neutralElement.click();
   };
 
   this.navigateToPreviewTab = function() {
