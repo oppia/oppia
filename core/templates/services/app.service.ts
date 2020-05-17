@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,12 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Loads scripts needed for ui-codemirror.
+ * @fileoverview Service for querying the shared constants of the Oppia module.
  */
 
-window.CodeMirror = require('static/code-mirror-5.17.0/lib/codemirror.js');
-require('static/code-mirror-5.17.0/mode/javascript/javascript.js');
-require('static/code-mirror-5.17.0/mode/python/python.js');
-require('static/code-mirror-5.17.0/mode/yaml/yaml.js');
-require('static/ui-codemirror-5d04fa/src/ui-codemirror.js');
-require('static/diff-match-patch-1.0.0/diff_match_patch.js');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import { AppConstants } from 'app.constants';
+
+@Injectable({providedIn: 'root'})
+export class AppService {
+  isMachineLearningClassificationEnabled(): boolean {
+    return AppConstants.ENABLE_ML_CLASSIFIERS;
+  }
+}
+
+angular.module('oppia').factory('AppService', downgradeInjectable(AppService));
