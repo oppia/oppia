@@ -38,7 +38,7 @@ class ClassroomPageTests(BaseClassroomControllerTests):
 
     def test_any_user_can_access_classroom_page(self):
         config_property = config_domain.Registry.get_config_property(
-            'show_classroom')
+            'classroom_page_is_shown')
         config_property.set_value('committer_id', True)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             response = self.get_html_response('/math')
@@ -47,13 +47,13 @@ class ClassroomPageTests(BaseClassroomControllerTests):
 
     def test_get_fails_when_new_structures_not_enabled(self):
         config_property = config_domain.Registry.get_config_property(
-            'show_classroom')
+            'classroom_page_is_shown')
         config_property.set_value('committer_id', True)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.get_html_response('/math', expected_status_int=404)
         config_property.set_value('committer_id', False)
 
-    def test_get_fails_when_show_classroom_not_enabled(self):
+    def test_get_fails_when_classroom_page_is_shown_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response('/math', expected_status_int=404)
 

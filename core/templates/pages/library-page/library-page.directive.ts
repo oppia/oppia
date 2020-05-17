@@ -74,12 +74,14 @@ angular.module('oppia').directive('libraryPage', [
           var MAX_NUM_TILES_PER_ROW = 4;
           var isAnyCarouselCurrentlyScrolling = false;
 
-          ctrl.showClassroom = function() {
+          ctrl.CLASSROOM_PAGE_IS_SHOWN = false;
+
+          var updateShowClassroom = function() {
             ClassroomBackendApiService.fetchClassroomData('math').then(
               function(classroomData) {
-                return classroomData.show_classroom;
+                ctrl.CLASSROOM_PAGE_IS_SHOWN = classroomData.classroom_page_is_shown;
               }, function(errorResponse) {
-                return false;
+                ctrl.CLASSROOM_PAGE_IS_SHOWN = false;
               });
           };
 
@@ -222,6 +224,8 @@ angular.module('oppia').directive('libraryPage', [
 
             ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
               '/library/' + ctrl.bannerImageFilename);
+
+            updateShowClassroom();
 
             ctrl.activeGroupIndex = null;
 

@@ -25,7 +25,7 @@ import { ClassroomBackendApiService } from
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 
-describe('Classroom backend API service', function() {
+fdescribe('Classroom backend API service', function() {
   let classroomBackendApiService:
     ClassroomBackendApiService = null;
   let httpTestingController: HttpTestingController;
@@ -61,12 +61,13 @@ describe('Classroom backend API service', function() {
 
     // Sample topic object returnable from the backend
     sampleDataResultsObjects = {
-      topic_summary_dicts: [
+      topicSummaryObjects: [
         topicSummaryObjectFactory.createFromBackendDict(
           responseDictionaries.topic_summary_dicts[0]),
         topicSummaryObjectFactory.createFromBackendDict(
           responseDictionaries.topic_summary_dicts[1])
-      ]
+      ],
+      classroom_page_is_shown: undefined
     };
   });
 
@@ -79,11 +80,11 @@ describe('Classroom backend API service', function() {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.fetchClassroomData('0').then(
+      classroomBackendApiService.fetchClassroomData('math').then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        '/classroom_data_handler/0');
+        '/classroom_data_handler/math');
       expect(req.request.method).toEqual('GET');
       req.flush(responseDictionaries);
 

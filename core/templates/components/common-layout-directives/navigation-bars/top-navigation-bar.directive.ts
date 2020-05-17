@@ -66,12 +66,14 @@ angular.module('oppia').directive('topNavigationBar', [
           var truncateNavbarDebounced =
             DebouncerService.debounce(truncateNavbar, 500);
 
-          ctrl.showClassroom = function() {
+          ctrl.CLASSROOM_PAGE_IS_SHOWN = false;
+
+          ctrl.updateShowClassroom = function() {
             ClassroomBackendApiService.fetchClassroomData('math').then(
-              function(classroomData) {
-                return classroomData.show_classroom;
-              }, function(errorResponse) {
-                return false;
+              function (classroomData) {
+                ctrl.CLASSROOM_PAGE_IS_SHOWN = classroomData.classroom_page_is_shown;
+              }, function (errorResponse) {
+                ctrl.CLASSROOM_PAGE_IS_SHOWN = false;
               });
           };
 

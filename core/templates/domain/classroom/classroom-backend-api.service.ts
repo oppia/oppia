@@ -51,14 +51,17 @@ export class ClassroomBackendApiService {
       });
 
     this.http.get(classroomDataUrl).toPromise().then((data: any) => {
-      data.topic_summary_dicts = data.topic_summary_dicts.map(
+      this.topicSummaryObjects = data.topic_summary_dicts.map(
         (summaryDict) => {
           return this.topicSummaryObjectFactory.createFromBackendDict(
             summaryDict);
         }
       );
       if (successCallback) {
-        successCallback(data);
+        successCallback({
+          topicSummaryObjects: this.topicSummaryObjects,
+          classroom_page_is_shown: data.classroom_page_is_shown
+        });
       }
     }, (error: any) => {
       if (errorCallback) {
