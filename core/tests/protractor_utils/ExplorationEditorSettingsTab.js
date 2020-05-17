@@ -114,32 +114,33 @@ var ExplorationEditorSettingsTab = function() {
     enableCorrectnessFeedbackButton.click();
   };
 
-  this.expectAvailableFirstStatesToBe = function(names) {
-    initialStateSelect.all(by.tagName('option')).map(function(elem) {
-      return elem.getText();
-    }).then(function(options) {
-      expect(options.sort()).toEqual(names.sort());
-    });
+  this.expectAvailableFirstStatesToBe = async function(names) {
+    var options = await initialStateSelect.all(by.tagName('option'))
+      .map(async function(elem) {
+        return await elem.getText();
+      });
+    expect(options.sort()).toEqual(names.sort());
   };
 
-  this.openAndClosePreviewSummaryTile = function() {
-    openPreviewSummaryButton.click();
-    waitFor.visibilityOf(explorationSummaryTile,
+  this.openAndClosePreviewSummaryTile = async function() {
+    await openPreviewSummaryButton.click();
+    await waitFor.visibilityOf(explorationSummaryTile,
       'Summary Tile takes too long to appear');
-    expect(explorationSummaryTile.isPresent()).toBeTruthy();
-    closePreviewSummaryButton.click();
-    waitFor.invisibilityOf(explorationSummaryTile,
+    expect(await explorationSummaryTile.isPresent()).toBeTruthy();
+    await closePreviewSummaryButton.click();
+    await waitFor.invisibilityOf(explorationSummaryTile,
       'Summary Tile takes too long to disappear');
-    expect((explorationSummaryTile.isPresent())).toBeFalsy();
+    expect(await explorationSummaryTile.isPresent()).toBeFalsy();
   };
 
   this.setCategory = async function(category) {
-    await forms.AutocompleteDropdownEditor(explorationCategoryInput).setValue(
-      category);
+    await (
+      await forms.AutocompleteDropdownEditor(explorationCategoryInput)
+    ).setValue(category);
   };
 
-  this.setFirstState = function(stateName) {
-    initialStateSelectOption(stateName).click();
+  this.setFirstState = async function(stateName) {
+    await initialStateSelectOption(stateName).click();
   };
 
   this.setLanguage = async function(language) {

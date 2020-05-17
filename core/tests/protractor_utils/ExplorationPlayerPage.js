@@ -80,10 +80,10 @@ var ExplorationPlayerPage = function() {
   var suggestionPopupLink =
     element(by.css('.protractor-test-exploration-suggestion-popup-link'));
 
-  this.clickThroughToNextCard = function() {
-    waitFor.elementToBeClickable(
+  this.clickThroughToNextCard = async function() {
+    await waitFor.elementToBeClickable(
       nextCardButton, '"Next Card" button takes too long to be clickable');
-    nextCardButton.click();
+    await nextCardButton.click();
   };
 
   this.clickSuggestChangesButton = function() {
@@ -200,41 +200,41 @@ var ExplorationPlayerPage = function() {
   // sent a handler (as given in forms.RichTextChecker) to which calls such as
   //   handler.readItalicText('slanted');
   // can then be sent.
-  this.expectContentToMatch = function(richTextInstructions) {
-    forms.expectRichText(
-      conversationContent.last()
+  this.expectContentToMatch = async function(richTextInstructions) {
+    await forms.expectRichText(
+      await conversationContent.last()
     ).toMatch(richTextInstructions);
   };
 
-  this.expectExplorationToBeOver = function() {
+  this.expectExplorationToBeOver = async function() {
     expect(
-      conversationContent.last().getText()
+      await conversationContent.last().getText()
     ).toEqual('Congratulations, you have finished!');
   };
 
-  this.expectExplorationToNotBeOver = function() {
+  this.expectExplorationToNotBeOver = async function() {
     expect(
-      conversationContent.last().getText()
+      await conversationContent.last().getText()
     ).not.toEqual('Congratulations, you have finished!');
   };
 
   // Additional arguments may be sent to this function, and they will be
   // passed on to the relevant interaction's detail checker.
-  this.expectInteractionToMatch = function(interactionId) {
+  this.expectInteractionToMatch = async function(interactionId) {
     // Convert additional arguments to an array to send on.
     var args = [conversationInput];
     for (var i = 1; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
-    interactions.getInteraction(interactionId).
+    await interactions.getInteraction(interactionId).
       expectInteractionDetailsToMatch.apply(null, args);
   };
 
   // Note that the 'latest' feedback may be on either the current or a
   // previous card.
-  this.expectLatestFeedbackToMatch = function(richTextInstructions) {
-    forms.expectRichText(
-      conversationFeedback.last()
+  this.expectLatestFeedbackToMatch = async function(richTextInstructions) {
+    await forms.expectRichText(
+      await conversationFeedback.last()
     ).toMatch(richTextInstructions);
   };
 
@@ -267,12 +267,12 @@ var ExplorationPlayerPage = function() {
   // `answerData` is a variable that is passed to the
   // corresponding interaction's protractor utilities.
   // Its definition and type are interaction-specific.
-  this.submitAnswer = function(interactionId, answerData) {
+  this.submitAnswer = async function(interactionId, answerData) {
     // The .first() targets the inline interaction, if it exists. Otherwise,
     // it will get the supplemental interaction.
-    interactions.getInteraction(interactionId).submitAnswer(
+    await interactions.getInteraction(interactionId).submitAnswer(
       conversationInput, answerData);
-    waitFor.invisibilityOf(
+    await waitFor.invisibilityOf(
       waitingForResponseElem, 'Response takes too long to appear');
   };
 

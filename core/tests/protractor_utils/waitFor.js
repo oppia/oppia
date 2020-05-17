@@ -45,7 +45,7 @@ var elementToBeClickable = async function(element, errorMessage) {
  * @param {string} errorMessage - Error message when element is still visible.
  */
 var invisibilityOf = async function(element, errorMessage) {
-  return await browser.wait(
+  await browser.wait(
     until.invisibilityOf(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
@@ -58,7 +58,7 @@ var pageToFullyLoad = async function() {
   // and browser.waitForAngular's flakiness
   // https://github.com/angular/protractor/issues/2954.
   var loadingMessage = element(by.css('[ng-show="loadingMessage"]'));
-  return await browser.driver.wait(until.invisibilityOf(loadingMessage), 15000,
+  await browser.driver.wait(until.invisibilityOf(loadingMessage), 15000,
     'Page takes more than 15 secs to load');
 };
 
@@ -80,7 +80,7 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
  * @param {string} errorMessage - Error message when element is invisible.
  */
 var visibilityOf = async function(element, errorMessage) {
-  return await browser.wait(
+  await browser.wait(
     until.visibilityOf(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
@@ -90,7 +90,7 @@ var visibilityOf = async function(element, errorMessage) {
 var newTabToBeCreated = async function(errorMessage, urlToMatch) {
   var currentHandles = [];
 
-  return await browser.wait(function() {
+  await browser.wait(function() {
     return browser.driver.getAllWindowHandles().then(async function(handles) {
       await browser.waitForAngularEnabled(false);
       return await browser.switchTo().window(await handles.pop()).then(async function() {

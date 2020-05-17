@@ -204,16 +204,16 @@ var ExplorationEditorPage = function() {
     expect(await toastSuccessElement.isPresent()).toBe(false);
   };
 
-  this.discardChanges = function() {
-    saveDiscardToggleButton.click();
-    discardChangesButton.click();
-    confirmDiscardChangesButton.click();
+  this.discardChanges = async function() {
+    await saveDiscardToggleButton.click();
+    await discardChangesButton.click();
+    await confirmDiscardChangesButton.click();
     // Expect editor page to completely reload.
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.expectCannotSaveChanges = function() {
-    expect(saveChangesButton.isPresent()).toBeFalsy();
+  this.expectCannotSaveChanges = async function() {
+    expect(await saveChangesButton.isPresent()).toBeFalsy();
   };
 
   // NAVIGATION
@@ -232,18 +232,18 @@ var ExplorationEditorPage = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.navigateToMainTab = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToMainTab = async function() {
+    await waitFor.elementToBeClickable(
       navigateToMainTabButton, 'Main tab is not clickable');
-    navigateToMainTabButton.click();
-    neutralElement.click();
+    await navigateToMainTabButton.click();
+    await neutralElement.click();
   };
 
-  this.navigateToPreviewTab = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToPreviewTab = async function() {
+    await waitFor.elementToBeClickable(
       navigateToPreviewTabButton, 'Preview tab is not clickable');
-    navigateToPreviewTabButton.click();
-    waitFor.pageToFullyLoad();
+    await navigateToPreviewTabButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
   this.navigateToSettingsTab = async function() {

@@ -18,11 +18,11 @@
 
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 
-var customizeInteraction = function(elem, placeholderText, heightOfBox) {
-  objects.UnicodeStringEditor(
+var customizeInteraction = async function(elem, placeholderText, heightOfBox) {
+  await objects.UnicodeStringEditor(
     elem.element(by.tagName('schema-based-unicode-editor'))
   ).setValue(placeholderText);
-  objects.IntEditor(
+  await objects.IntEditor(
     elem.element(by.tagName('schema-based-int-editor'))
   ).setValue(heightOfBox);
 };
@@ -43,30 +43,26 @@ var expectInteractionDetailsToMatch = function(
   ).toBe(true);
 };
 
-var submitAnswer = function(elem, answer) {
+var submitAnswer = async function(elem, answer) {
   // Try to get the text area element. If it doesn't exist, try input instead.
   // They are different depending on the height of the box.
   var textInputElem = elem.element(by.tagName('oppia-interactive-text-input'));
   var textAreaElem = textInputElem.element(by.tagName('textarea'));
   var inputElem = textInputElem.element(by.tagName('input'));
-  textAreaElem.isPresent().then(function(present) {
-    if (present) {
-      textAreaElem.sendKeys(answer);
-      element(by.css('.protractor-test-submit-answer-button')).click();
-    } else {
-      // This must be chained in here due to the textInputElem possibly being
-      // invisible after the longer text area submits, causing the instantiation
-      // of this promise object to throw a validation error due to it referring
-      // to an element which does not exist.
-      inputElem.isPresent().then(function(present) {
-        if (present) {
-          inputElem.clear();
-          inputElem.sendKeys(answer);
-          element(by.css('.protractor-test-submit-answer-button')).click();
-        }
-      });
+  if (await textAreaElem.isPresent()) {
+    await textAreaElem.sendKeys(answer);
+    await element(by.css('.protractor-test-submit-answer-button')).click();
+  } else {
+    // This must be chained in here due to the textInputElem possibly being
+    // invisible after the longer text area submits, causing the instantiation
+    // of this promise object to throw a validation error due to it referring
+    // to an element which does not exist.
+    if (await inputElem.isPresent()) {
+      await inputElem.clear();
+      await inputElem.sendKeys(answer);
+      await element(by.css('.protractor-test-submit-answer-button')).click();
     }
-  });
+  }
 };
 
 var answerObjectType = 'NormalizedString';

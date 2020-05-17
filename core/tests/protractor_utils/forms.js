@@ -439,17 +439,15 @@ var expectRichText = function(elem) {
         // applying .getText() while the RichTextChecker is running would be
         // asynchronous and so not allow us to update the textPointer
         // synchronously.
-        return await entry.getText(function(text) {
-          return text;
-        });
+        return await entry.getText();
       });
     // We re-derive the array of elements as we need it too.
-    var arrayOfElements = await elem.all(by.xpath(XPATH_SELECTOR));
+    var arrayOfElements = elem.all(by.xpath(XPATH_SELECTOR));
     var fullText = await elem.getText();
-    var checker = RichTextChecker(
+    var checker = await RichTextChecker(
       arrayOfElements, arrayOfTexts, fullText);
     await richTextInstructions(checker);
-    checker.expectEnd();
+    await checker.expectEnd();
   };
   return {
     toMatch: toMatch,
@@ -470,8 +468,8 @@ var expectRichText = function(elem) {
 // 'fullText': a string consisting of all the visible text in the rich text
 //   area (including both element and text nodes, so more than just the
 //   concatenation of arrayOfTexts), e.g. 'textbold'.
-var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
-  expect(arrayOfElems.length).toEqual(arrayOfTexts.length);
+var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
+  expect(await arrayOfElems.count()).toEqual(arrayOfTexts.length);
   // These are shared by the returned functions, and records how far through
   // the child elements and text of the rich text area checking has gone. The
   // arrayPointer traverses both arrays simultaneously.
@@ -532,8 +530,8 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
       arrayPointer = arrayPointer + 1;
       justPassedRteComponent = true;
     },
-    expectEnd: function() {
-      expect(arrayPointer).toBe(arrayOfElems.length);
+    expectEnd: async function() {
+      expect(arrayPointer).toBe(await arrayOfElems.count());
     }
   };
 };

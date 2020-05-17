@@ -70,7 +70,7 @@ var LibraryPage = function() {
 
     // get function is a zero-based index.
     var searchInput = (
-      browser.isMobile ? searchInputs.get(1) : searchInputs.first());
+      browser.isMobile ? await searchInputs.get(1) : await searchInputs.first());
     await searchInput.clear();
     await searchInput.sendKeys(searchQuery);
   };
