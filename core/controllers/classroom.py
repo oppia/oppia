@@ -71,6 +71,7 @@ class ClassroomDataHandler(base.BaseHandler):
 
         self.values.update({
             'topic_summary_dicts': topic_summary_dicts,
-            'classroom_page_is_shown': config_domain.CLASSROOM_PAGE_IS_SHOWN.value
+            'classroom_page_is_shown': (
+                config_domain.CLASSROOM_PAGE_IS_SHOWN.value)
         })
         self.render_json(self.values)

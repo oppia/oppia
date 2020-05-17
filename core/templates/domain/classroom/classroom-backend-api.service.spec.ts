@@ -25,7 +25,7 @@ import { ClassroomBackendApiService } from
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 
-fdescribe('Classroom backend API service', function() {
+describe('Classroom backend API service', function() {
   let classroomBackendApiService:
     ClassroomBackendApiService = null;
   let httpTestingController: HttpTestingController;
