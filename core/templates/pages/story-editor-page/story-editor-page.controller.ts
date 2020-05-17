@@ -20,6 +20,9 @@ require('objects/objectComponentsRequires.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
 require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 require(
@@ -59,19 +62,16 @@ angular.module('oppia').directive('storyEditorPage', [
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
           ctrl.returnToTopicEditorPage = function() {
             if (UndoRedoService.getChangeCount() > 0) {
-              var modalInstance = $uibModal.open({
+              $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/story-editor-page/modal-templates/' +
                   'story-save-pending-changes-modal.template.html'),
                 backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
+                controller: 'ConfirmOrCancelModalController'
+              }).result.then(function() {}, function() {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
             } else {
               $window.open(
