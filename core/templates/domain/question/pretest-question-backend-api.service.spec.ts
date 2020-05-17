@@ -134,7 +134,7 @@ describe('Pretest question backend API service', function() {
     })
   );
 
-  it('should call successHandler with [] when storyId is empty',
+  fit('should call successHandler with [] when storyId is empty',
     fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
