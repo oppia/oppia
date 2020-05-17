@@ -45,6 +45,7 @@ export interface IVisualizationInfo {
   /* eslint-disable camelcase */
   addressed_info_is_supported: boolean;
   data: IAnswerData[];
+  id: string;
   options: {[name: string]: object};
   /* eslint-enable camelcase */
 }
@@ -125,6 +126,7 @@ export class StateInteractionStatsService {
                     state.name, state, datum.answer, interactionRulesService) :
                 undefined),
           }),
+          id: info.id,
           options: info.options,
         })),
       });
