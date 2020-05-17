@@ -206,7 +206,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'maintenance-page.controller.ts',
     'math-expression-input-rules.service.ts',
     'math-expression-input-validation.service.ts',
-    'math-latex-string-editor.directive.ts',
+    'math-expression-content-editor.directive.ts',
     'mathjax-bind.directive.ts',
     'messenger.service.ts',
     'misconception-editor.directive.ts',
