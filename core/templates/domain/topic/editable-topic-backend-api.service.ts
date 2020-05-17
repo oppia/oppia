@@ -45,27 +45,27 @@ export class EditableTopicBackendApiService {
 
     this.http.get(topicDataUrl).toPromise().then(
       (response: {[key: string]: string}) => {
-      if (successCallback) {
-        // The response is passed as a dict with 2 fields and not as 2
-        // parameters, because the successCallback is called as the resolve
-        // callback function in $q in fetchTopic(), and according to its
-        // documentation (https://docs.angularjs.org/api/ng/service/$q),
-        // resolve or reject can have only a single parameter.
+        if (successCallback) {
+          // The response is passed as a dict with 2 fields and not as 2
+          // parameters, because the successCallback is called as the resolve
+          // callback function in $q in fetchTopic(), and according to its
+          // documentation (https://docs.angularjs.org/api/ng/service/$q),
+          // resolve or reject can have only a single parameter.
 
-        successCallback({
-          topicDict: cloneDeep(response.topic_dict),
-          groupedSkillSummaries: cloneDeep(
-            response.grouped_skill_summary_dicts),
-          skillIdToDescriptionDict: cloneDeep(
-            response.skill_id_to_description_dict),
-          skillIdToRubricsDict: cloneDeep(response.skill_id_to_rubrics_dict)
-        });
-      }
-    }, (errorResponse) => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error);
-      }
-    });
+          successCallback({
+            topicDict: cloneDeep(response.topic_dict),
+            groupedSkillSummaries: cloneDeep(
+              response.grouped_skill_summary_dicts),
+            skillIdToDescriptionDict: cloneDeep(
+              response.skill_id_to_description_dict),
+            skillIdToRubricsDict: cloneDeep(response.skill_id_to_rubrics_dict)
+          });
+        }
+      }, (errorResponse) => {
+        if (errorCallback) {
+          errorCallback(errorResponse.error);
+        }
+      });
   }
 
   private _fetchStories(topicId: string,
@@ -78,16 +78,16 @@ export class EditableTopicBackendApiService {
 
     this.http.get(storiesDataUrl).toPromise().then(
       (response: {[key: string]: string}) => {
-      let canonicalStorySummaries = cloneDeep(
-        response.canonical_story_summary_dicts);
-      if (successCallback) {
-        successCallback(canonicalStorySummaries);
-      }
-    }, (errorResponse) => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error);
-      }
-    });
+        let canonicalStorySummaries = cloneDeep(
+          response.canonical_story_summary_dicts);
+        if (successCallback) {
+          successCallback(canonicalStorySummaries);
+        }
+      }, (errorResponse) => {
+        if (errorCallback) {
+          errorCallback(errorResponse.error);
+        }
+      });
   }
 
   private _fetchSubtopicPage(
@@ -102,15 +102,15 @@ export class EditableTopicBackendApiService {
 
     this.http.get(subtopicPageDataUrl).toPromise().then(
       (response: {[key: string]: string}) => {
-      let topic = cloneDeep(response.subtopic_page);
-      if (successCallback) {
-        successCallback(topic);
-      }
-    }, (errorResponse) => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error);
-      }
-    });
+        let topic = cloneDeep(response.subtopic_page);
+        if (successCallback) {
+          successCallback(topic);
+        }
+      }, (errorResponse) => {
+        if (errorCallback) {
+          errorCallback(errorResponse.error);
+        }
+      });
   }
 
   private _deleteTopic(topicId: string,
