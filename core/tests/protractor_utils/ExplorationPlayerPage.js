@@ -201,6 +201,8 @@ var ExplorationPlayerPage = function() {
   //   handler.readItalicText('slanted');
   // can then be sent.
   this.expectContentToMatch = async function(richTextInstructions) {
+    await waitFor.visibilityOf(
+      await conversationContent.first(), 'Conversation not visible');
     await forms.expectRichText(
       await conversationContent.last()
     ).toMatch(richTextInstructions);
@@ -208,13 +210,13 @@ var ExplorationPlayerPage = function() {
 
   this.expectExplorationToBeOver = async function() {
     expect(
-      await conversationContent.last().getText()
+      await (await conversationContent.last()).getText()
     ).toEqual('Congratulations, you have finished!');
   };
 
   this.expectExplorationToNotBeOver = async function() {
     expect(
-      await conversationContent.last().getText()
+      await (await conversationContent.last()).getText()
     ).not.toEqual('Congratulations, you have finished!');
   };
 

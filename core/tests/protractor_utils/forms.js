@@ -177,18 +177,19 @@ var RealEditor = function(elem) {
 
 var RichTextEditor = async function(elem) {
   // Set focus in the RTE.
-  await elem.all(by.css('.oppia-rte')).first().click();
+  await (await elem.all(by.css('.oppia-rte')).first()).click();
 
   var _appendContentText = async function(text) {
-    await elem.all(by.css('.oppia-rte')).first().sendKeys(text);
+    await (await elem.all(by.css('.oppia-rte')).first()).sendKeys(text);
   };
   var _clickToolbarButton = async function(buttonName) {
     await elem.element(by.css('.' + buttonName)).click();
   };
   var _clearContent = async function() {
-    expect(await elem.all(by.css('.oppia-rte')).first().isPresent()).toBe(
-      true);
-    await elem.all(by.css('.oppia-rte')).first().clear();
+    expect(
+      await (await elem.all(by.css('.oppia-rte')).first()).isPresent()
+    ).toBe(true);
+    await (await elem.all(by.css('.oppia-rte')).first()).clear();
   };
 
   return {
@@ -482,10 +483,10 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
 
   var _readFormattedText = async function(text, tagName) {
     expect(
-      await arrayOfElems[arrayPointer].getTagName()
+      await (await arrayOfElems.get(arrayPointer)).getTagName()
     ).toBe(tagName);
     expect(
-      await arrayOfElems[arrayPointer].getAttribute('innerHTML')
+      await (await arrayOfElems.get(arrayPointer)).getAttribute('innerHTML')
     ).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
