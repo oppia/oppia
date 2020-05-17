@@ -910,6 +910,27 @@ class Skill(python_utils.OBJECT):
 
         versioned_rubrics['rubrics'] = updated_rubrics
 
+    def get_all_image_filenames_during_creation(self):
+        """Returns the filenames for all images in the skill as present during
+        creation i.e from the skill explanation and rubrics.
+
+        Returns:
+            list(str). The list of filenames.
+        """
+        all_rte_components = html_cleaner.get_rte_components(
+            self.skill_contents.explanation.html)
+
+        for rubric in self.rubrics:
+            for explanation in rubric.explanations:
+                all_rte_components.extend(
+                    html_cleaner.get_rte_components(explanation))
+
+        filenames = [
+            component['customization_args']['filepath-with-value']
+            for component in all_rte_components
+            if component and component['id'] == 'oppia-noninteractive-image']
+        return filenames
+
     def update_description(self, description):
         """Updates the description of the skill.
 

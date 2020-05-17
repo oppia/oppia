@@ -45,6 +45,22 @@ export interface IImageData {
 export class SkillCreationBackendApiService {
   constructor(private csrfTokenService: CsrfTokenService) {}
 
+  /**
+   * Sends POST request to create skill.
+   * @param {Promise} successCallback - Callback invoked on successful creation
+   *  of skill.
+   * @param {Promise} errorCallback - Callback invoked when skill creation
+   *  fails.
+   * @param {string} description - Description of the new skill.
+   * @param {Object[]} rubrics - Rubrics for the new skill.
+   * @param {string} rubric.difficulty - Difficulty of the rubric.
+   * @param {string[]} rubric.explanations - Explanations for the difficulty.
+   * @param {string} explanation - Explanation of the skill.
+   * @param {string[]} linkedTopicIds - Topic ids linked to the new skill.
+   * @param {Object[]} imagesData - Represents the images added to the skill.
+   * @param {string} imageData.filename - Filename of the image.
+   * @param {Blob} imageData.imageBlob - Image data represented as a Blob.
+   */
   _createSkill(
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback:(reason?: any) => void,

@@ -16,11 +16,16 @@
  * @fileoverview Service for managing images in localStorage.
  */
 
+require('services/alerts.service.ts');
 require('services/image-upload-helper.service.ts');
 
 angular.module('oppia').factory('ImageLocalStorageService', [
-  'ImageUploadHelperService', function(ImageUploadHelperService) {
+  'AlertsService', 'ImageUploadHelperService', function(
+      AlertsService, ImageUploadHelperService) {
     var imagesStored = [];
+    // According to https://en.wikipedia.org/wiki/Web_storage, 5MB is the
+    // minimum limit, for all browsers, that can be stored in localStorage.
+    var imageStorageLimit = 5 * 1024 / 100;
 
     return {
       getObjectUrlForImage: function(filename) {
@@ -30,8 +35,22 @@ angular.module('oppia').factory('ImageLocalStorageService', [
         return urlCreator.createObjectURL(imageBlob);
       },
 
-      saveImage: function(filename, imageData) {
-        window.localStorage.setItem(filename, imageData);
+      /**
+       * Saves the image data in localStorage.
+       * @param {string} filename - Filename of the image.
+       * @param {string} rawImage - Raw base64/URLEncoded data of the image.
+       */
+      saveImage: function(filename, rawImage) {
+        if (imagesStored.length + 1 > imageStorageLimit) {
+          // Since the service is going to be used in the create modal for
+          // entities, more images can be added after entity creation, when
+          // local storage would no longer be used.
+          AlertsService.addInfoMessage(
+            'Image storage limit reached. More images can be added after ' +
+            'creation.');
+          return;
+        }
+        window.localStorage.setItem(filename, rawImage);
         imagesStored.push(filename);
       },
 
@@ -41,7 +60,7 @@ angular.module('oppia').factory('ImageLocalStorageService', [
         imagesStored.splice(index, 1);
       },
 
-      getStoredImagesData: function() {
+      getAndFlushStoredImagesData: function() {
         var returnData = [];
         for (var idx in imagesStored) {
           returnData.push({
@@ -50,6 +69,7 @@ angular.module('oppia').factory('ImageLocalStorageService', [
               window.localStorage.getItem(imagesStored[idx]))
           });
         }
+        imagesStored.length = 0;
         return returnData;
       }
     };

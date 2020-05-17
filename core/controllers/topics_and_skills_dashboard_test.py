@@ -209,7 +209,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
                 'rubrics': rubrics,
                 'explanation_dict': state_domain.SubtitledHtml(
                     '1', '<p>Explanation</p>').to_dict(),
-                'thumbnail_filename': 'image.svg'
+                'thumbnail_filename': 'image.svg',
+                'filenames': []
             },
             csrf_token=csrf_token,
             upload_files=((
@@ -229,7 +230,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'rubrics': [],
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>').to_dict(),
-            'thumbnail_filename': 'image.svg'
+            'thumbnail_filename': 'image.svg',
+            'filenames': []
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -239,6 +241,140 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(json_response['status_code'], 400)
         self.logout()
 
+    def test_skill_creation_with_invalid_images(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        filename = 'img.png'
+        explanation_html = (
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;"></oppia-noninteractive-image>'
+        )
+        rubrics = [{
+            'difficulty': constants.SKILL_DIFFICULTIES[0],
+            'explanations': ['Explanation 1']
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[1],
+            'explanations': ['Explanation 2']
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[2],
+            'explanations': ['Explanation 3']
+        }]
+        post_data = {
+            'description': 'Skill Description',
+            'rubrics': rubrics,
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', explanation_html).to_dict(),
+            'thumbnail_filename': 'image.svg',
+            'filenames': [filename]
+        }
+
+        response_dict = self.post_json(
+            self.url, post_data,
+            csrf_token=csrf_token,
+            expected_status_int=400)
+
+        self.assertEqual(response_dict['error'], 'No image supplied')
+        self.logout()
+
+    def test_skill_creation_with_valid_images(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        filename = 'img.png'
+        filename_2 = 'img_2.png'
+        explanation_html = (
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;"></oppia-noninteractive-image>'
+        )
+        explanation_html_2 = (
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img_2.png&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image 2&quot;"></oppia-noninteractive-image>'
+        )
+        rubrics = [{
+            'difficulty': constants.SKILL_DIFFICULTIES[0],
+            'explanations': ['Explanation 1', explanation_html_2]
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[1],
+            'explanations': ['Explanation 2']
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[2],
+            'explanations': ['Explanation 3']
+        }]
+        post_data = {
+            'description': 'Skill Description',
+            'rubrics': rubrics,
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', explanation_html).to_dict(),
+            'thumbnail_filename': 'image.svg',
+            'filenames': [filename, filename_2]
+        }
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            mode='rb', encoding=None) as f:
+            raw_image = f.read()
+
+        self.post_json(
+            self.url, post_data,
+            csrf_token=csrf_token,
+            upload_files=(
+                (filename, filename, raw_image),
+                (filename_2, filename_2, raw_image),)
+        )
+
+        self.logout()
+
+    def test_skill_creation_with_invalid_filenames_list(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        filename = 'img.png'
+        explanation_html = (
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image&quot;"></oppia-noninteractive-image>'
+        )
+        explanation_html_2 = (
+            '<oppia-noninteractive-image filepath-with-value='
+            '"&quot;img_2.png&quot;" caption-with-value="&quot;&quot;" '
+            'alt-with-value="&quot;Image 2&quot;"></oppia-noninteractive-image>'
+        )
+        rubrics = [{
+            'difficulty': constants.SKILL_DIFFICULTIES[0],
+            'explanations': ['Explanation 1', explanation_html_2]
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[1],
+            'explanations': ['Explanation 2']
+        }, {
+            'difficulty': constants.SKILL_DIFFICULTIES[2],
+            'explanations': ['Explanation 3']
+        }]
+        post_data = {
+            'description': 'Skill Description',
+            'rubrics': rubrics,
+            'explanation_dict': state_domain.SubtitledHtml(
+                '1', explanation_html).to_dict(),
+            'thumbnail_filename': 'image.svg',
+            'filenames': [filename]
+        }
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            mode='rb', encoding=None) as f:
+            raw_image = f.read()
+
+        response_dict = self.post_json(
+            self.url, post_data,
+            csrf_token=csrf_token,
+            upload_files=((filename, filename, raw_image),),
+            expected_status_int=400)
+
+        self.assertEqual(
+            response_dict['error'],
+            'The filenames sent don\'t match the images in the skill.')
+        self.logout()
+
     def test_skill_creation_in_invalid_rubrics(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -246,7 +382,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
             'rubrics': 'invalid',
-            'thumbnail_filename': 'image.svg'
+            'thumbnail_filename': 'image.svg',
+            'filenames': []
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -264,7 +401,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'linked_topic_ids': [self.topic_id],
             'rubrics': [],
             'explanation_dict': 'explanation',
-            'thumbnail_filename': 'image.svg'
+            'thumbnail_filename': 'image.svg',
+            'filenames': []
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -280,7 +418,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'explanation_dict': {
                 'explanation': 'Explanation'
             },
-            'thumbnail_filename': 'image.svg'
+            'thumbnail_filename': 'image.svg',
+            'filenames': []
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -307,7 +446,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>').to_dict(),
-            'thumbnail_filename': 'image.svg'
+            'thumbnail_filename': 'image.svg',
+            'filenames': []
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,

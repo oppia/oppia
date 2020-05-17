@@ -262,6 +262,9 @@ export class ContextService {
     return (allowedPageContext.includes(currentPageContext));
   }
 
+  // Sets the current context to save images in local storage. Depending on this
+  // value, new images can be either saved in the localStorage or uploaded
+  // directly to the datastore.
   setSaveImagesToLocalStorageContext(): void {
     this.saveImagesToLocalStorage = true;
   }

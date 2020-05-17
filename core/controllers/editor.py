@@ -31,7 +31,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import fs_services
-from core.domain import html_validation_service
+from core.domain import image_validation_service
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import search_services
@@ -633,8 +633,12 @@ class ImageUploadHandler(EditorHandler):
         if filename_prefix is None:
             filename_prefix = self._FILENAME_PREFIX
 
-        file_format = html_validation_service.validate_image_and_filename(
-            raw, filename)
+        try:
+            file_format = image_validation_service.validate_image_and_filename(
+                raw, filename)
+        except Exception as e:
+            raise self.InvalidInputException(e)
+
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             entity_type, entity_id))

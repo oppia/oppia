@@ -22,7 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_services
-from core.domain import html_validation_service
+from core.domain import image_validation_service
 from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_domain
@@ -175,12 +175,21 @@ class NewSkillHandler(base.BaseHandler):
 
         skill.update_explanation(
             state_domain.SubtitledHtml.from_dict(explanation_dict))
+
+        filenames_in_skill = skill.get_all_image_filenames_during_creation()
+        if filenames != filenames_in_skill:
+            raise self.InvalidInputException(
+                'The filenames sent don\'t match the images in the skill.')
         skill_services.save_new_skill(self.user_id, skill)
 
         for filename in filenames:
             image = self.request.get(filename)
-            file_format = html_validation_service.validate_image_and_filename(
-                image, filename)
+            try:
+                file_format = (
+                    image_validation_service.validate_image_and_filename(
+                        image, filename))
+            except Exception as e:
+                raise self.InvalidInputException(e)
             image_is_compressible = (
                 file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
             fs_services.save_original_and_compressed_versions_of_image(

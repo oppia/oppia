@@ -78,7 +78,7 @@ angular.module('oppia').factory('SkillCreationService', [
         // as soon as the user clicks the 'Create' button and filled with URL
         // once the details are fetched from the backend.
         var newTab = $window.open();
-        var imagesData = ImageLocalStorageService.getStoredImagesData();
+        var imagesData = ImageLocalStorageService.getAndFlushStoredImagesData();
         SkillCreationBackendApiService.createSkill(
           description, rubrics, explanation, linkedTopicIds, imagesData)
           .then(function(response) {
