@@ -52,13 +52,13 @@
       <div ng-if="$ctrl.showClassroom()">
         <li ng-class="{'open' : $ctrl.activeMenuName === 'classroomMenu'}" uib-dropdown ng-show="$ctrl.navElementsVisibilityStatus.I18N_TOPNAV_CLASSROOM" aria-hidden="false" class="nav-item  oppia-navbar-clickable-dropdown protractor-test-classroom-oppia-list-item">
           <a ng-keydown="$ctrl.onMenuKeypress($event, 'classroomMenu', {shiftTab: $ctrl.ACTION_CLOSE, enter: $ctrl.ACTION_OPEN})" class="nav-link oppia-navbar-tab dropdown-toggle"
-            role="menuitem"
-            aria-haspopup="true"
-            aria-expanded="false"
-            aria-hidden="false"
-            tabindex="0"
-            ng-mouseover="$ctrl.openSubmenu($event, 'classroomMenu')"
-            ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
+             role="menuitem"
+             aria-haspopup="true"
+             aria-expanded="false"
+             aria-hidden="false"
+             tabindex="0"
+             ng-mouseover="$ctrl.openSubmenu($event, 'classroomMenu')"
+             ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
             <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_CLASSROOM"></span>
           </a>
           <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown"

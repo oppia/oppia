@@ -74,14 +74,14 @@ angular.module('oppia').directive('libraryPage', [
           var MAX_NUM_TILES_PER_ROW = 4;
           var isAnyCarouselCurrentlyScrolling = false;
 
-          ctrl.showClassroom = function () {
+          ctrl.showClassroom = function() {
             ClassroomBackendApiService.fetchClassroomData('math').then(
-              function (classroomData) {
+              function(classroomData) {
                 return classroomData.show_classroom;
-              }, function (errorResponse) {
+              }, function(errorResponse) {
                 return false;
               });
-          }
+          };
 
           ctrl.setActiveGroup = function(groupIndex) {
             ctrl.activeGroupIndex = groupIndex;

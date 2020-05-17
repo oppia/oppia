@@ -36,7 +36,8 @@ angular.module('oppia').directive('topNavigationBar', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/navigation-bars/top-navigation-bar.directive.html'),
+        '/components/common-layout-directives/navigation-bars/top-navigation' +
+        '-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$http', '$window', '$timeout', '$translate',
@@ -67,12 +68,12 @@ angular.module('oppia').directive('topNavigationBar', [
 
           ctrl.showClassroom = function() {
             ClassroomBackendApiService.fetchClassroomData('math').then(
-              function (classroomData) {
+              function(classroomData) {
                 return classroomData.show_classroom;
-              }, function (errorResponse) {
+              }, function(errorResponse) {
                 return false;
-            });
-          }
+              });
+          };
 
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
