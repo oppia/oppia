@@ -35,9 +35,12 @@ angular.module('oppia').factory('TopicUpdateService', [
   'CMD_REMOVE_UNCATEGORIZED_SKILL_ID', 'CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY',
   'CMD_UPDATE_SUBTOPIC_PROPERTY', 'CMD_UPDATE_TOPIC_PROPERTY',
   'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO',
-  'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML', 'SUBTOPIC_PROPERTY_TITLE',
+  'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML',
+  'SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR',
+  'SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME', 'SUBTOPIC_PROPERTY_TITLE',
   'TOPIC_PROPERTY_ABBREVIATED_NAME', 'TOPIC_PROPERTY_DESCRIPTION',
   'TOPIC_PROPERTY_LANGUAGE_CODE', 'TOPIC_PROPERTY_NAME',
+  'TOPIC_PROPERTY_THUMBNAIL_BG_COLOR',
   'TOPIC_PROPERTY_THUMBNAIL_FILENAME', function(
       ChangeObjectFactory, UndoRedoService,
       CMD_ADD_SUBTOPIC, CMD_DELETE_ADDITIONAL_STORY,
@@ -46,9 +49,12 @@ angular.module('oppia').factory('TopicUpdateService', [
       CMD_REMOVE_UNCATEGORIZED_SKILL_ID, CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
       CMD_UPDATE_SUBTOPIC_PROPERTY, CMD_UPDATE_TOPIC_PROPERTY,
       SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO,
-      SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML, SUBTOPIC_PROPERTY_TITLE,
+      SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML,
+      SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
+      SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME, SUBTOPIC_PROPERTY_TITLE,
       TOPIC_PROPERTY_ABBREVIATED_NAME, TOPIC_PROPERTY_DESCRIPTION,
       TOPIC_PROPERTY_LANGUAGE_CODE, TOPIC_PROPERTY_NAME,
+      TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
       TOPIC_PROPERTY_THUMBNAIL_FILENAME) {
     // Creates a change using an apply function, reverse function, a change
     // command and related parameters. The change is applied to a given
@@ -149,7 +155,7 @@ angular.module('oppia').factory('TopicUpdateService', [
        * Changes the thumbnail filename of a topic and records the change in the
        * undo/redo service.
        */
-      setThumbnailFilename: function(topic, thumbnailFilename) {
+      setTopicThumbnailFilename: function(topic, thumbnailFilename) {
         var oldThumbnailFilename = angular.copy(topic.getThumbnailFilename());
         _applyTopicPropertyChange(
           topic, TOPIC_PROPERTY_THUMBNAIL_FILENAME,
@@ -162,6 +168,26 @@ angular.module('oppia').factory('TopicUpdateService', [
           }, function(changeDict, topic) {
             // Undo.
             topic.setThumbnailFilename(oldThumbnailFilename);
+          });
+      },
+
+      /**
+       * Changes the thumbnail background color of a topic and records the
+       * change in the undo/redo service.
+       */
+      setTopicThumbnailBgColor: function(topic, thumbnailBgColor) {
+        var oldThumbnailBgColor = angular.copy(topic.getThumbnailBgColor());
+        _applyTopicPropertyChange(
+          topic, TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
+          thumbnailBgColor, oldThumbnailBgColor,
+          function(changeDict, topic) {
+            // Apply
+            var thumbnailBgColor = (
+              _getNewPropertyValueFromChangeDict(changeDict));
+            topic.setThumbnailBgColor(thumbnailBgColor);
+          }, function(changeDict, topic) {
+            // Undo.
+            topic.setThumbnailBgColor(oldThumbnailBgColor);
           });
       },
 
@@ -228,7 +254,7 @@ angular.module('oppia').factory('TopicUpdateService', [
       deleteSubtopic: function(topic, subtopicId) {
         var subtopic = topic.getSubtopicById(subtopicId);
         if (!subtopic) {
-          throw Error('Subtopic doesn\'t exist');
+          throw new Error('Subtopic doesn\'t exist');
         }
         var newlyCreated = false;
         var changeList = UndoRedoService.getCommittableChangeList();
@@ -333,7 +359,7 @@ angular.module('oppia').factory('TopicUpdateService', [
           topic.deleteSubtopic(subtopicId, newlyCreated);
         }, function(changeDict, topic) {
           // Undo.
-          throw Error('A deleted subtopic cannot be restored');
+          throw new Error('A deleted subtopic cannot be restored');
         });
       },
 
@@ -344,7 +370,7 @@ angular.module('oppia').factory('TopicUpdateService', [
       moveSkillToSubtopic: function(
           topic, oldSubtopicId, newSubtopicId, skillSummary) {
         if (newSubtopicId === null) {
-          throw Error('New subtopic cannot be null');
+          throw new Error('New subtopic cannot be null');
         }
         if (oldSubtopicId !== null) {
           var oldSubtopic = topic.getSubtopicById(oldSubtopicId);
@@ -401,13 +427,65 @@ angular.module('oppia').factory('TopicUpdateService', [
       },
 
       /**
+       * Changes the thumbnail filename of a subtopic and records the change in
+       * the undo/redo service.
+       */
+      setSubtopicThumbnailFilename: function(
+          topic, subtopicId, thumbnailFilename) {
+        var subtopic = topic.getSubtopicById(subtopicId);
+        if (!subtopic) {
+          throw new Error('Subtopic doesn\'t exist');
+        }
+        var oldThumbnailFilename = angular.copy(
+          subtopic.getThumbnailFilename());
+        _applySubtopicPropertyChange(
+          topic, SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME, subtopicId,
+          thumbnailFilename, oldThumbnailFilename,
+          function(changeDict, topic) {
+            // Apply
+            var thumbnailFilename = (
+              _getNewPropertyValueFromChangeDict(changeDict));
+            subtopic.setThumbnailFilename(thumbnailFilename);
+          }, function(changeDict, subtopic) {
+            // Undo.
+            subtopic.setThumbnailFilename(oldThumbnailFilename);
+          });
+      },
+
+      /**
+       * Changes the thumbnail background color of a subtopic and records
+       * the change in the undo/redo service.
+       */
+      setSubtopicThumbnailBgColor: function(
+          topic, subtopicId, thumbnailBgColor) {
+        var subtopic = topic.getSubtopicById(subtopicId);
+        if (!subtopic) {
+          throw new Error('Subtopic doesn\'t exist');
+        }
+        var oldThumbnailBgColor = angular.copy(
+          subtopic.getThumbnailBgColor());
+        _applySubtopicPropertyChange(
+          topic, SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR, subtopicId,
+          thumbnailBgColor, oldThumbnailBgColor,
+          function(changeDict, topic) {
+            // Apply
+            var thumbnailBgColor = (
+              _getNewPropertyValueFromChangeDict(changeDict));
+            subtopic.setThumbnailBgColor(thumbnailBgColor);
+          }, function(changeDict, subtopic) {
+            // Undo.
+            subtopic.setThumbnailBgColor(oldThumbnailBgColor);
+          });
+      },
+
+      /**
        * Changes the title of a subtopic and records the change in
        * the undo/redo service.
        */
       setSubtopicTitle: function(topic, subtopicId, title) {
         var subtopic = topic.getSubtopicById(subtopicId);
         if (!subtopic) {
-          throw Error('Subtopic doesn\'t exist');
+          throw new Error('Subtopic doesn\'t exist');
         }
         var oldTitle = angular.copy(subtopic.getTitle());
         _applySubtopicPropertyChange(

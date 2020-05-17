@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import json
 
 from constants import constants
 from core.domain import exp_domain
@@ -58,6 +59,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     USER_1_EMAIL = 'user1@example.com'
     GENERIC_USERNAME = 'user'
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
+    GENERIC_EPOCH = utils.get_time_in_millisecs(GENERIC_DATE)
     GENERIC_IMAGE_URL = 'www.example.com/example.png'
     GENERIC_USER_BIO = 'I am a user of Oppia!'
     GENERIC_SUBJECT_INTERESTS = ['Math', 'Science']
@@ -527,7 +529,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_exploration_rights_sm = {}
         expected_exploration_sm = {}
 
-        expected_export = {
+        expected_data = {
             'user_stats_data': stats_data,
             'user_settings_data': settings_data,
             'user_subscriptions_data': subscriptions_data,
@@ -574,13 +576,15 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
 
         # Perform export and compare.
-        exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
-        self.assertEqual(expected_export, exported_data)
+        observed_data = takeout_service.export_data_for_user(self.USER_ID_1)
+        self.assertEqual(expected_data, observed_data)
+        observed_json = json.dumps(observed_data)
+        expected_json = json.dumps(expected_data)
+        self.assertEqual(json.loads(expected_json), json.loads(observed_json))
 
     def test_export_data_nontrivial(self):
         """Nontrivial test of export_data functionality."""
         self.set_up_non_trivial()
-
         # We set up the feedback_thread_model here so that we can easily
         # access it when computing the expected data later.
         feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
@@ -613,9 +617,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         expected_exploration_data = {
             self.EXPLORATION_IDS[0]: {
                 'rating': 2,
-                'rated_on': self.GENERIC_DATE,
+                'rated_on': self.GENERIC_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': self.GENERIC_DATE,
+                'draft_change_list_last_updated': self.GENERIC_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -671,7 +675,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 'has_suggestion': self.THREAD_HAS_SUGGESTION,
                 'summary': self.THREAD_SUMMARY,
                 'message_count': self.THREAD_MESSAGE_COUNT,
-                'last_updated': feedback_thread_model.last_updated
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    feedback_thread_model.last_updated)
             },
             thread_id: {
                 'entity_type': self.THREAD_ENTITY_TYPE,
@@ -681,9 +686,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 'has_suggestion': False,
                 'summary': None,
                 'message_count': 2,
-                'last_updated': (feedback_models.
-                                 GeneralFeedbackThreadModel.
-                                 get(thread_id).last_updated)
+                'last_updated_msec': utils.get_time_in_millisecs(
+                    feedback_models.
+                    GeneralFeedbackThreadModel.
+                    get_by_id(thread_id).last_updated)
             }
         }
         expected_general_feedback_thread_user_data = {
@@ -741,11 +747,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
-            'last_agreed_to_terms': self.GENERIC_DATE,
-            'last_started_state_editor_tutorial': self.GENERIC_DATE,
-            'last_started_state_translation_tutorial': self.GENERIC_DATE,
-            'last_logged_in': self.GENERIC_DATE,
-            'last_edited_an_exploration': self.GENERIC_DATE,
+            'last_agreed_to_terms': self.GENERIC_EPOCH,
+            'last_started_state_editor_tutorial': self.GENERIC_EPOCH,
+            'last_started_state_translation_tutorial': self.GENERIC_EPOCH,
+            'last_logged_in': self.GENERIC_EPOCH,
+            'last_edited_an_exploration': self.GENERIC_EPOCH,
             'profile_picture_data_url': self.GENERIC_IMAGE_URL,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
@@ -909,7 +915,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        expected_export = {
+        expected_data = {
             'user_stats_data': expected_stats_data,
             'user_settings_data': expected_settings_data,
             'user_subscriptions_data': expected_subscriptions_data,
@@ -957,5 +963,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata_data': expected_exploration_sm,
         }
-        exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
-        self.assertEqual(exported_data, expected_export)
+        observed_data = takeout_service.export_data_for_user(self.USER_ID_1)
+        self.assertEqual(observed_data, expected_data)
+        observed_json = json.dumps(observed_data)
+        expected_json = json.dumps(expected_data)
+        self.assertEqual(json.loads(observed_json), json.loads(expected_json))

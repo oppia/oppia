@@ -58,7 +58,6 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
@@ -67,6 +66,11 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
             'subtopic_id': 1
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': 1,
+            'skill_id': self.skill_id
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')
@@ -91,7 +95,6 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
         self.save_new_topic(
             topic_id, self.admin_id, name='New name',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='New description',
             canonical_story_ids=[canonical_story_id],
             additional_story_ids=[additional_story_id],
@@ -542,7 +545,6 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         topic_id_1 = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id_1, self.admin_id, name='Name 1',
-            abbreviated_name='abbrev', thumbnail_filename=None,
             description='Description 1', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id],

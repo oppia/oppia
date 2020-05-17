@@ -246,7 +246,7 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
                 if (Sk.builtinFiles.files[name] === undefined) {
                   // If corresponding module is not present then,
                   // removal of this block also results in failure of import.
-                  throw 'module ' + name + ' not found';
+                  throw new Error('module ' + name + ' not found');
                 }
                 return Sk.builtinFiles.files[name];
               },

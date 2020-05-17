@@ -108,7 +108,14 @@ class HomePageRedirectPage(base.BaseHandler):
             else:
                 self.redirect(feconf.LEARNER_DASHBOARD_URL)
         else:
-            self.redirect(feconf.SPLASH_URL)
+            self.render_template('splash-page.mainpage.html')
+
+
+class SplashRedirectPage(base.BaseHandler):
+    """Redirect the old splash URL, '/splash' to the new one, '/'."""
+    @acl_decorators.open_access
+    def get(self):
+        self.redirect('/')
 
 
 def get_redirect_route(regex_route, handler, defaults=None):
@@ -189,6 +196,7 @@ mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/_ah/warmup', WarmupPage),
     get_redirect_route(r'/', HomePageRedirectPage),
+    get_redirect_route(r'/splash', SplashRedirectPage),
 
     get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
@@ -292,9 +300,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<topic_name>' % feconf.TOPIC_DATA_HANDLER,
         topic_viewer.TopicPageDataHandler),
     get_redirect_route(
-        r'%s/<classroom_name>' % feconf.CLASSROOM_URL_PREFIX,
-        classroom.ClassroomPage),
-    get_redirect_route(
         r'%s/<classroom_name>' % feconf.CLASSROOM_DATA_HANDLER,
         classroom.ClassroomDataHandler),
     get_redirect_route(
@@ -348,8 +353,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
         custom_landing_pages.FractionLandingRedirectPage),
     get_redirect_route(
-        r'%s' % feconf.TOPIC_LANDING_PAGE_URL,
-        custom_landing_pages.TopicLandingPage),
+        r'/learn/maths/<topic>', custom_landing_pages.TopicLandingRedirectPage),
     get_redirect_route(
         r'%s' % feconf.CUSTOM_PARENTS_LANDING_PAGE_URL,
         custom_landing_pages.StewardsLandingPage),
@@ -408,6 +412,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(feconf.DELETE_ACCOUNT_URL, profile.DeleteAccountPage),
     get_redirect_route(
         feconf.DELETE_ACCOUNT_HANDLER_URL, profile.DeleteAccountHandler),
+    get_redirect_route(
+        feconf.EXPORT_ACCOUNT_HANDLER_URL, profile.ExportAccountHandler),
     get_redirect_route(
         feconf.PENDING_ACCOUNT_DELETION_URL,
         profile.PendingAccountDeletionPage),
@@ -734,10 +740,23 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
-
-    # 404 error handler.
-    get_redirect_route(r'/<:.*>', base.Error404Handler),
 ]
+
+# Adding redirects for classroom pages.
+for classroom_name in feconf.CLASSROOM_PAGES:
+    URLS.append(
+        get_redirect_route(r'/%s' % classroom_name, classroom.ClassroomPage))
+
+# Adding redirects for topic landing pages.
+for subject in feconf.AVAILABLE_LANDING_PAGES:
+    for topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
+        URLS.append(
+            get_redirect_route(
+                r'/%s/%s' % (subject, topic),
+                custom_landing_pages.TopicLandingPage))
+
+# 404 error handler (Needs to be at the end of the URLS list).
+URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 
 URLS_TO_SERVE = []
 

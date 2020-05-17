@@ -24,7 +24,6 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage =
@@ -322,8 +321,7 @@ describe('Core exploration functionality', function() {
     general.moveToPlayer();
     explorationPlayerPage.expectExplorationToNotBeOver();
     explorationPlayerPage.expectInteractionToMatch(
-      'MultipleChoiceInput',
-      [forms.toRichText('option A'), forms.toRichText('option B')]);
+      'MultipleChoiceInput', ['option A', 'option B']);
     explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'option B');
     explorationPlayerPage.expectExplorationToBeOver();
   });

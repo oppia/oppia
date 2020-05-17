@@ -21,12 +21,15 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import logging
+import xml
 
 import bs4
+from constants import constants
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import rte_component_registry
 from core.platform import models
+
 import feconf
 import python_utils
 
@@ -875,3 +878,50 @@ def get_filename_with_dimensions(old_filename, exp_id):
     new_filename = regenerate_image_filename_using_dimensions(
         old_filename, height, width)
     return new_filename
+
+
+def get_invalid_svg_tags_and_attrs(svg_string):
+    """Returns a set of all invalid tags and attributes for the provided SVG.
+
+    Args:
+        svg_string: str. The SVG string.
+
+    Returns:
+        tuple(list(str), list(str)). A 2-tuple, the first element of which
+        is a list of invalid tags, and the second element of which is a
+        list of invalid tag-specific attributes.
+        The format for the second element is <tag>:<attribute>, where the
+        <tag> represents the SVG tag for which the attribute is invalid
+        and <attribute> represents the invalid attribute.
+        eg. (['invalid-tag1', 'invalid-tag2'], ['path:invalid-attr'])
+    """
+    soup = bs4.BeautifulSoup(svg_string.encode('utf-8'), 'html.parser')
+    invalid_elements = []
+    invalid_attrs = []
+    for element in soup.find_all():
+        if element.name.lower() in constants.SVG_ATTRS_WHITELIST:
+            for attr in element.attrs:
+                if attr.lower() not in (
+                        constants.SVG_ATTRS_WHITELIST[element.name.lower()]):
+                    invalid_attrs.append('%s:%s' % (element.name, attr))
+        else:
+            invalid_elements.append(element.name)
+    return (invalid_elements, invalid_attrs)
+
+
+def is_parsable_as_xml(xml_string):
+    """Checks if input string is parsable as XML.
+
+    Args:
+        xml_string: str. The XML string.
+
+    Returns:
+        bool. Whether xml_string is parsable as XML or not.
+    """
+    if not isinstance(xml_string, python_utils.BASESTRING):
+        return False
+    try:
+        xml.etree.ElementTree.fromstring(xml_string)
+        return True
+    except xml.etree.ElementTree.ParseError:
+        return False

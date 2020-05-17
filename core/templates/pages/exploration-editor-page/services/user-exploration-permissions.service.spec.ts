@@ -74,6 +74,6 @@ describe('User Exploration Permissions Service', function() {
       200, {canEdit: true, canVoiceOver: false});
     ueps.getPermissionsAsync();
 
-    expect($httpBackend.flush).toThrow();
+    expect($httpBackend.flush).toThrowError('No pending request to flush !');
   });
 });

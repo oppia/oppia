@@ -17,6 +17,7 @@
  * text components.
  */
 
+require('third-party-imports/ckeditor.import.ts');
 require('rich_text_components/richTextComponentsRequires.ts');
 require('services/html-escaper.service.ts');
 require('services/rte-helper.service.ts');
