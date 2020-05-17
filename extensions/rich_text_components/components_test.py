@@ -134,6 +134,16 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
             'math_content-with-value': False
         }, {
             'url-with-value': 'http://link.com'
+        }, {
+            'math_content-with-value': {
+                u'raw_latex': True,
+                u'svg_filename': False
+            }
+        }, {
+            'math_content-with-value': {
+                u'raw_latex': 123,
+                u'svg_filename': 11
+            }
         }]
 
         self.check_validation(

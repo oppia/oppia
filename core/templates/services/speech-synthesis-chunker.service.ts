@@ -169,7 +169,7 @@ export class SpeechSynthesisChunkerService {
         this.RTE_COMPONENT_NAMES[componentSpec] =
         ServicesConstants.RTE_COMPONENT_SPECS[componentSpec].frontend_id;
       });
-    interface MathExpressionContent {
+    interface IMathExpressionContent {
       // eslint-disable-next-line camelcase
       raw_latex: String,
       // eslint-disable-next-line camelcase
@@ -196,10 +196,11 @@ export class SpeechSynthesisChunkerService {
       .replaceWith(function() {
         var element = <HTMLElement><any> this;
         if (element.attributes['math_content-with-value'] !== undefined) {
-          var mathContent = _this.htmlEscaper.escapedJsonToObj(
-            element.attributes['math_content-with-value'].textContent);
+          var mathContent = <IMathExpressionContent>(
+            _this.htmlEscaper.escapedJsonToObj(
+              element.attributes['math_content-with-value'].textContent));
           const latexSpeakableText = _this._formatLatexToSpeakableText(
-            (mathContent as MathExpressionContent).raw_latex);
+            (mathContent).raw_latex);
           return latexSpeakableText.length > 0 ? latexSpeakableText + ' ' : '';
         }
       });

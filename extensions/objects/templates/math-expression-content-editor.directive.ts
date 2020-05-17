@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for math latex string editor.
+ * @fileoverview Directive for math expression content editor.
  */
 
 require('directives/mathjax-bind.directive.ts');

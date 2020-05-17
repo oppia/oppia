@@ -312,10 +312,7 @@ class SetOfNormalizedString(BaseObject):
 class MathExpressionContent(BaseObject):
     """Math Expression Content class."""
 
-    description = ('Math Expression Content dict.This is in form of a dict '
-                   'having two properties, raw_latex and svg_filename. Both '
-                   'of these properties are used to display the Math rich text '
-                   'component.')
+    description = 'The Math Expression be displayed.'
     default_value = {
         'raw_latex': '',
         'svg_filename': ''
