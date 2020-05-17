@@ -22,6 +22,8 @@ import { LearnerDashboardActivityIdsObjectFactory } from
   'domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
+import { ClassroomBackendApiService } from
+  'domain/classroom/classroom-backend-api.service';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
@@ -65,6 +67,7 @@ describe('Library controller', function() {
       $provide.value('WindowDimensionsService', new WindowDimensionsService(
         new WindowRef()
       ));
+      $provide.value('ClassroomBackendApiService', ClassroomBackendApiService);
       $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
       $provide.value('PageTitleService', {
         setPageTitle(title) {

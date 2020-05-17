@@ -22,7 +22,7 @@ require(
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
 require('pages/library-page/search-results/search-results.directive.ts');
-
+require('domain/classroom/classroom-backend-api.service');
 require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts');
 require(
   'domain/learner_dashboard/learner-dashboard-ids-backend-api.service.ts');
@@ -54,7 +54,7 @@ angular.module('oppia').directive('libraryPage', [
         'UrlInterpolationService', 'UrlService', 'UserService',
         'WindowDimensionsService', 'ALL_CATEGORIES',
         'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES',
-        'LIBRARY_TILE_WIDTH_PX', 'SHOW_CLASSROOM',
+        'LIBRARY_TILE_WIDTH_PX', 'ClassroomBackendApiService',
         function(
             $http, $log, $rootScope, $scope, $timeout, $uibModal,
             $window, AlertsService, LearnerDashboardActivityIdsObjectFactory,
@@ -63,7 +63,7 @@ angular.module('oppia').directive('libraryPage', [
             UrlInterpolationService, UrlService, UserService,
             WindowDimensionsService, ALL_CATEGORIES,
             LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES,
-            LIBRARY_TILE_WIDTH_PX, SHOW_CLASSROOM) {
+            LIBRARY_TILE_WIDTH_PX, ClassroomBackendApiService) {
           var ctrl = this;
           var possibleBannerFilenames = [
             'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
@@ -73,6 +73,15 @@ angular.module('oppia').directive('libraryPage', [
           // - .oppia-library-carousel: max-width
           var MAX_NUM_TILES_PER_ROW = 4;
           var isAnyCarouselCurrentlyScrolling = false;
+
+          ctrl.showClassroom = function () {
+            ClassroomBackendApiService.fetchClassroomData('math').then(
+              function (classroomData) {
+                return classroomData.show_classroom;
+              }, function (errorResponse) {
+                return false;
+              });
+          }
 
           ctrl.setActiveGroup = function(groupIndex) {
             ctrl.activeGroupIndex = groupIndex;
@@ -207,7 +216,6 @@ angular.module('oppia').directive('libraryPage', [
             }
           };
           ctrl.$onInit = function() {
-            $scope.SHOW_CLASSROOM = (SHOW_CLASSROOM);
             LoaderService.showLoadingScreen('I18N_LIBRARY_LOADING');
             ctrl.bannerImageFilename = possibleBannerFilenames[
               Math.floor(Math.random() * possibleBannerFilenames.length)];

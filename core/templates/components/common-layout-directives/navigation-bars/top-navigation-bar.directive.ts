@@ -18,6 +18,7 @@
  * the editor pages).
  */
 
+require('domain/classroom/classroom-backend-api.service');
 require('domain/sidebar/sidebar-status.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/debouncer.service.ts');
@@ -34,21 +35,21 @@ angular.module('oppia').directive('topNavigationBar', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      template: require('./top-navigation-bar.directive.html'),
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/common-layout-directives/navigation-bars/top-navigation-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
         'SiteAnalyticsService', 'NavigationService', 'WindowDimensionsService',
         'DebouncerService', 'DeviceInfoService', 'LOGOUT_URL',
-        'SHOW_CLASSROOM',
+        'ClassroomBackendApiService',
         function(
             $scope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
             SiteAnalyticsService, NavigationService, WindowDimensionsService,
             DebouncerService, DeviceInfoService, LOGOUT_URL,
-            SHOW_CLASSROOM) {
-          $scope.SHOW_CLASSROOM = SHOW_CLASSROOM;
+            ClassroomBackendApiService) {
           var ctrl = this;
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
@@ -63,6 +64,15 @@ angular.module('oppia').directive('topNavigationBar', [
             'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
           var truncateNavbarDebounced =
             DebouncerService.debounce(truncateNavbar, 500);
+
+          ctrl.showClassroom = function() {
+            ClassroomBackendApiService.fetchClassroomData('math').then(
+              function (classroomData) {
+                return classroomData.show_classroom;
+              }, function (errorResponse) {
+                return false;
+            });
+          }
 
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);

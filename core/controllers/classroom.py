@@ -33,7 +33,7 @@ class ClassroomPage(base.BaseHandler):
         """Handles GET requests."""
 
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS or not (
-                constants.SHOW_CLASSROOM):
+                config_domain.SHOW_CLASSROOM.value):
             raise self.PageNotFoundException
 
         self.render_template('classroom-page.mainpage.html')
@@ -70,6 +70,7 @@ class ClassroomDataHandler(base.BaseHandler):
         ]
 
         self.values.update({
-            'topic_summary_dicts': topic_summary_dicts
+            'topic_summary_dicts': topic_summary_dicts,
+            'show_classroom': config_domain.SHOW_CLASSROOM.value
         })
         self.render_json(self.values)

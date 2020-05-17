@@ -51,14 +51,14 @@ export class ClassroomBackendApiService {
       });
 
     this.http.get(classroomDataUrl).toPromise().then((data: any) => {
-      this.topicSummaryObjects = data.topic_summary_dicts.map(
+      data.topic_summary_dicts = data.topic_summary_dicts.map(
         (summaryDict) => {
           return this.topicSummaryObjectFactory.createFromBackendDict(
             summaryDict);
         }
       );
       if (successCallback) {
-        successCallback(this.topicSummaryObjects);
+        successCallback(data);
       }
     }, (error: any) => {
       if (errorCallback) {

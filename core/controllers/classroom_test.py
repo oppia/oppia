@@ -37,20 +37,25 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
 class ClassroomPageTests(BaseClassroomControllerTests):
 
     def test_any_user_can_access_classroom_page(self):
+        config_property = config_domain.Registry.get_config_property(
+            'show_classroom')
+        config_property.set_value('committer_id', True)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            with self.swap(constants, 'SHOW_CLASSROOM', True):
-                response = self.get_html_response('/math')
-                self.assertIn('<classroom-page></classroom-page>', response)
+            response = self.get_html_response('/math')
+            self.assertIn('<classroom-page></classroom-page>', response)
+        config_property.set_value('committer_id', False)
 
     def test_get_fails_when_new_structures_not_enabled(self):
+        config_property = config_domain.Registry.get_config_property(
+            'show_classroom')
+        config_property.set_value('committer_id', True)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
-            with self.swap(constants, 'SHOW_CLASSROOM', True):
-                self.get_html_response('/math', expected_status_int=404)
+            self.get_html_response('/math', expected_status_int=404)
+        config_property.set_value('committer_id', False)
 
     def test_get_fails_when_show_classroom_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
-            with self.swap(constants, 'SHOW_CLASSROOM', False):
-                self.get_html_response('/math', expected_status_int=404)
+            self.get_html_response('/math', expected_status_int=404)
 
 
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):

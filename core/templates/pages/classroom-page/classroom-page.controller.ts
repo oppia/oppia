@@ -64,8 +64,8 @@ angular.module('oppia').directive('classroomPage', [
 
             LoaderService.showLoadingScreen('Loading');
             ClassroomBackendApiService.fetchClassroomData(
-              classroomName).then(function(topicSummaryObjects) {
-              ctrl.topicSummaries = topicSummaryObjects;
+              classroomName).then(function(classroomData) {
+              ctrl.topicSummaries = classroomData.topic_summary_dicts;
               LoaderService.hideLoadingScreen();
               $rootScope.$broadcast('initializeTranslation');
             },

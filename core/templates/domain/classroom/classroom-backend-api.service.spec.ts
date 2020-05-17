@@ -61,7 +61,7 @@ describe('Classroom backend API service', function() {
 
     // Sample topic object returnable from the backend
     sampleDataResultsObjects = {
-      topic_summary_objects: [
+      topic_summary_dicts: [
         topicSummaryObjectFactory.createFromBackendDict(
           responseDictionaries.topic_summary_dicts[0]),
         topicSummaryObjectFactory.createFromBackendDict(
@@ -90,7 +90,7 @@ describe('Classroom backend API service', function() {
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
-        sampleDataResultsObjects.topic_summary_objects);
+        sampleDataResultsObjects);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
@@ -131,7 +131,7 @@ describe('Classroom backend API service', function() {
       req.flush(responseDictionaries);
       flushMicrotasks();
       expect(successHandler).toHaveBeenCalledWith(
-        sampleDataResultsObjects.topic_summary_objects);
+        sampleDataResultsObjects);
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
