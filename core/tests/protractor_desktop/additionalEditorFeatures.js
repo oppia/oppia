@@ -56,16 +56,6 @@ describe('Full exploration editor', function() {
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     libraryPage = new LibraryPage.LibraryPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-
-    await users.createAndLoginAdminUser('superUser@test.com', 'superUser');
-    // TODO(#7569): Change this test to work with the improvements tab.
-    await adminPage.editConfigProperty(
-      'Exposes the Improvements Tab for creators in the exploration editor',
-      'Boolean', async function(elem) {
-        await elem.setValue(false);
-      }
-    );
-    await users.logout();
   });
 
   it('should walk through the tutorial when user repeatedly clicks Next',
