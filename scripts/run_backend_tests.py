@@ -58,9 +58,7 @@ import python_utils
 
 from . import common
 from . import concurrent_task_utils
-from . import setup
-from . import setup_gae
-
+from . import install_third_party_libs
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.OPPIA_TOOLS_DIR, 'pylint-1.9.4'),
@@ -75,19 +73,20 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(
         common.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common.PYGITHUB_VERSION),
     common.CURR_DIR,
-    os.path.join(common.THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.5'),
-    os.path.join(common.THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'bleach-3.1.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.6.1'),
+    os.path.join(common.THIRD_PARTY_DIR, 'beautifulsoup4-4.9.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'bleach-3.1.5'),
     os.path.join(common.THIRD_PARTY_DIR, 'callbacks-0.3.0'),
     os.path.join(common.THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
     os.path.join(common.THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
     os.path.join(common.THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
     os.path.join(common.THIRD_PARTY_DIR, 'graphy-1.0.0'),
     os.path.join(common.THIRD_PARTY_DIR, 'html5lib-python-1.0.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'mutagen-1.42.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'simplejson-3.16.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'mutagen-1.43.0'),
+    os.path.join(common.THIRD_PARTY_DIR, 'packaging-20.3'),
+    os.path.join(common.THIRD_PARTY_DIR, 'simplejson-3.17.0'),
     os.path.join(common.THIRD_PARTY_DIR, 'six-1.12.0'),
-    os.path.join(common.THIRD_PARTY_DIR, 'soupsieve-1.9.1'),
+    os.path.join(common.THIRD_PARTY_DIR, 'soupsieve-1.9.5'),
     os.path.join(common.THIRD_PARTY_DIR, 'webencodings-0.5.1'),
 ]
 
@@ -241,8 +240,9 @@ def main(args=None):
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    setup.main(args=[])
-    setup_gae.main(args=[])
+    # Make sure that third-party libraries are up-to-date before running tests,
+    # otherwise import errors may result.
+    install_third_party_libs.main()
 
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
