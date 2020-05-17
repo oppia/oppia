@@ -334,7 +334,8 @@ var ExplorationEditorMainTab = function() {
        * @param {string} [ruleName] - Appropriate rule of provided interaction.
        * @param {string[]} [feedbackTextArray] - Exact feedback text to match.
        */
-      expectRuleToBe: async function(interactionId, ruleName, feedbackTextArray) {
+      expectRuleToBe: async function(
+          interactionId, ruleName, feedbackTextArray) {
         var ruleDescription = _getRuleDescription(interactionId, ruleName);
         // Replace selectors with feedbackTextArray's elements.
         ruleDescription = _replaceRuleInputPlaceholders(
@@ -399,12 +400,9 @@ var ExplorationEditorMainTab = function() {
         expectedOptionTexts.push(_NEW_STATE_OPTION);
 
         var actualOptionTexts = await editOutcomeDestBubble.all(
-          by.tagName('option')
-        ).map(
-          async function(optionElem) {
-            return await optionElem.getText();
-          }
-        );
+            by.tagName('option')).map(async function(optionElem) {
+              return await optionElem.getText();
+            });
         expect(actualOptionTexts).toEqual(expectedOptionTexts);
 
         // Cancel editing the destination.
@@ -456,8 +454,8 @@ var ExplorationEditorMainTab = function() {
     expect(await addResponseButton.isPresent()).toBeFalsy();
   };
 
-  this.expectTickMarkIsDisplayed = function() {
-    expect(correctAnswerTickMark.isDisplayed()).toBe(true);
+  this.expectTickMarkIsDisplayed = async function() {
+    expect(await correctAnswerTickMark.isDisplayed()).toBe(true);
   };
 
   var _setOutcomeDest = async function(
@@ -473,7 +471,7 @@ var ExplorationEditorMainTab = function() {
       targetOption = destName;
     }
     await waitFor.visibilityOf(
-      editOutcomeDestDropdownOptions(targetOption),
+      await editOutcomeDestDropdownOptions(targetOption),
       'editOutcomeDestDropdownOptions taking too long to appear');
     expect(await editOutcomeDestDropdownOptions(targetOption).isDisplayed())
       .toBe(true);
@@ -645,9 +643,9 @@ var ExplorationEditorMainTab = function() {
       interaction, 'interaction takes too long to appear');
   };
 
-  this.setInteractionWithoutCloseAddResponse = function(interactionId) {
-    createNewInteraction(interactionId);
-    customizeInteraction.apply(null, arguments);
+  this.setInteractionWithoutCloseAddResponse = async function(interactionId) {
+    await createNewInteraction(interactionId);
+    await customizeInteraction.apply(null, arguments);
   };
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.

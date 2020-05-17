@@ -21,9 +21,10 @@ var customizeInteraction = function() {
   // There are no customizations.
 };
 
-var expectInteractionDetailsToMatch = function(elem) {
+var expectInteractionDetailsToMatch = async function(elem) {
   expect(
-    elem.element(by.tagName('oppia-interactive-numeric-input')).isPresent()
+    await elem.element(by.tagName(
+      'oppia-interactive-numeric-input')).isPresent()
   ).toBe(true);
 };
 

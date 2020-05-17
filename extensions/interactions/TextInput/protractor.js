@@ -27,19 +27,19 @@ var customizeInteraction = async function(elem, placeholderText, heightOfBox) {
   ).setValue(heightOfBox);
 };
 
-var expectInteractionDetailsToMatch = function(
+var expectInteractionDetailsToMatch = async function(
     elem, placeholderText, heightOfBox) {
   if (placeholderText) {
-    expect((element(by.tagName('oppia-interactive-text-input'))
+    expect((await element(by.tagName('oppia-interactive-text-input'))
       .getAttribute('placeholder-with-value')))
       .toEqual('&quot;' + placeholderText + '&quot;');
   }
   if (heightOfBox) {
-    expect((element(by.tagName('oppia-interactive-text-input'))
+    expect((await element(by.tagName('oppia-interactive-text-input'))
       .getAttribute('rows-with-value'))).toEqual(heightOfBox.toString());
   }
   expect(
-    elem.element(by.tagName('oppia-interactive-text-input')).isPresent()
+    await elem.element(by.tagName('oppia-interactive-text-input')).isPresent()
   ).toBe(true);
 };
 

@@ -23,7 +23,8 @@ var objects = require(process.cwd() + '/extensions/objects/protractor.js');
  * @param {Object} elem - The Customize Exploration modal for End Exploration.
  * @param {string[]} recommendedExplorationIdArray - Exploration Id array.
  */
-var customizeInteraction = async function(elem, recommendedExplorationIdArray) {
+var customizeInteraction = async function(
+    elem, recommendedExplorationIdArray) {
   if (recommendedExplorationIdArray) {
     if (Array.isArray(recommendedExplorationIdArray) === false) {
       throw new Error ('Please use array to add recommendation Ids');
@@ -41,7 +42,8 @@ var customizeInteraction = async function(elem, recommendedExplorationIdArray) {
 
 var expectInteractionDetailsToMatch = async function(elem) {
   expect(
-    await elem.element(by.tagName('oppia-interactive-end-exploration')).isPresent()
+    await elem.element(by.tagName(
+      'oppia-interactive-end-exploration')).isPresent()
   ).toBe(true);
 };
 

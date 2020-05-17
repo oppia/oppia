@@ -92,8 +92,8 @@ var ExplorationPlayerPage = function() {
     suggestionPopupLink.click();
   };
 
-  this.expectNextCardButtonTextToBe = function(text) {
-    var buttonText = nextCardButton.getText();
+  this.expectNextCardButtonTextToBe = async function(text) {
+    var buttonText = await nextCardButton.getText();
     expect(buttonText).toMatch(text);
   };
 
@@ -228,8 +228,8 @@ var ExplorationPlayerPage = function() {
     for (var i = 1; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
-    await interactions.getInteraction(interactionId).
-      expectInteractionDetailsToMatch.apply(null, args);
+    var interaction = await interactions.getInteraction(interactionId);
+    await interaction.expectInteractionDetailsToMatch.apply(null, args);
   };
 
   // Note that the 'latest' feedback may be on either the current or a
@@ -313,8 +313,8 @@ var ExplorationPlayerPage = function() {
       suggestionSubmitButton, 'Suggestion popup takes too long to disappear');
   };
 
-  this.expectCorrectFeedback = function() {
-    waitFor.visibilityOf(
+  this.expectCorrectFeedback = async function() {
+    await waitFor.visibilityOf(
       correctFeedbackElement,
       'Correct feedback footer takes too long to appear');
   };

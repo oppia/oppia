@@ -30,40 +30,38 @@ var waitFor = require(
 //    handler.appendUnderlineText('emphasised');
 // 'maxSelectionAllowed' is the maximum number of selections to be allowed in
 // this item selection interaction.
-var customizeInteraction = function(
+var customizeInteraction = async function(
     elem, richTextInstructionsArray, maxSelectionAllowed) {
-  objects.IntEditor(
+  await objects.IntEditor(
     elem.all(by.repeater(
       'customizationArgSpec in customizationArgSpecs track by $index'))
-      .filter(function(elem, index) {
-        return elem.getText().then(function(text) {
-          return text === 'Maximum number of selections permitted';
-        });
+      .filter(async function(elem, index) {
+        var text = await elem.getText();
+        return text === 'Maximum number of selections permitted';
       }).first()
   ).setValue(maxSelectionAllowed);
 
-  forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
+  await forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
   for (var i = 0; i < richTextInstructionsArray.length; i++) {
-    var richTextEditor = forms.ListEditor(elem).editItem(i, 'RichText');
-    richTextEditor.clear();
-    richTextInstructionsArray[i](richTextEditor);
+    var richTextEditor = await forms.ListEditor(elem).editItem(i, 'RichText');
+    await richTextEditor.clear();
+    await richTextInstructionsArray[i](richTextEditor);
   }
 };
 
 // 'richTextInstructionsArray' is an array of functions, each of which describe
 // how to check the expected details of one of the options (an example member
 // function would be readPlainText).
-var expectInteractionDetailsToMatch = function(
+var expectInteractionDetailsToMatch = async function(
     elem, richTextInstructionsArray) {
-  elem.all(by.repeater('choice in $ctrl.choices track by $index'))
-    .then(function(optionElements) {
-      expect(optionElements.length).toEqual(richTextInstructionsArray.length);
-      for (var i = 0; i < optionElements.length; i++) {
-        forms.expectRichText(optionElements[i].element(by.css(
-          '.protractor-test-item-selection-option'
-        ))).toMatch(richTextInstructionsArray[i]);
-      }
-    });
+  var optionElements = await elem.all(
+    by.repeater('choice in $ctrl.choices track by $index'));
+  expect(optionElements.length).toEqual(richTextInstructionsArray.length);
+  for (var i = 0; i < optionElements.length; i++) {
+    await forms.expectRichText(optionElements[i].element(by.css(
+      '.protractor-test-item-selection-option'
+    ))).toMatch(richTextInstructionsArray[i]);
+  }
 };
 
 // type of object returned by interaction
@@ -71,12 +69,12 @@ var answerObjectType = 'SetOfHtmlString';
 
 // 'elem' is the HTML element containing the form to submit the answer to.
 // 'answer' is the array of item selection answer options to submit.
-var submitAnswer = function(elem, answer) {
+var submitAnswer = async function(elem, answer) {
   var answerArray = Array.from(answer);
 
   for (var i = 0; i < answerArray.length; i++) {
     var desiredAnswer = answerArray[i];
-    elem.element(by.cssContainingText(
+    await elem.element(by.cssContainingText(
       '.protractor-test-item-selection-input-item', desiredAnswer))
       .element(by.css(
         '.protractor-test-item-selection-input-checkbox')).click();
@@ -84,9 +82,9 @@ var submitAnswer = function(elem, answer) {
 
   var submitAnswerButton = element(by.css(
     '.protractor-test-submit-answer-button'));
-  waitFor.elementToBeClickable(submitAnswerButton,
+  await waitFor.elementToBeClickable(submitAnswerButton,
     'Submit Answer button is not clickable');
-  submitAnswerButton.click();
+  await submitAnswerButton.click();
 };
 
 var interactionArgumentsArray = [

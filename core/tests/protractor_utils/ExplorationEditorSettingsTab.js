@@ -107,11 +107,11 @@ var ExplorationEditorSettingsTab = function() {
     enableParametersSwitch.click();
   };
 
-  this.enableCorrectnessFeedback = function() {
-    expect(enableCorrectnessFeedbackButton.isDisplayed()).toBe(true);
-    waitFor.elementToBeClickable(enableCorrectnessFeedbackButton,
+  this.enableCorrectnessFeedback = async function() {
+    expect(await enableCorrectnessFeedbackButton.isDisplayed()).toBe(true);
+    await waitFor.elementToBeClickable(enableCorrectnessFeedbackButton,
       'Enable correctness feedback button is not clickable.');
-    enableCorrectnessFeedbackButton.click();
+    await enableCorrectnessFeedbackButton.click();
   };
 
   this.expectAvailableFirstStatesToBe = async function(names) {
@@ -158,33 +158,33 @@ var ExplorationEditorSettingsTab = function() {
     await explorationTitleInput.sendKeys(title);
   };
 
-  this.expectCategoryToBe = function(category) {
-    expect(explorationCategoryInput.$('option:checked').getText()).
+  this.expectCategoryToBe = async function(category) {
+    expect(await explorationCategoryInput.$('option:checked').getText()).
       toEqual(category);
   };
 
-  this.expectFirstStateToBe = function(firstState) {
-    expect(initialStateSelect.$('option:checked').getText()).
+  this.expectFirstStateToBe = async function(firstState) {
+    expect(await initialStateSelect.$('option:checked').getText()).
       toEqual(firstState);
   };
 
-  this.expectLanguageToBe = function(language) {
-    expect(explorationLanguageInput.$('option:checked').getText()).
+  this.expectLanguageToBe = async function(language) {
+    expect(await explorationLanguageInput.$('option:checked').getText()).
       toEqual(language);
   };
 
-  this.expectObjectiveToBe = function(objective) {
-    expect(explorationObjectiveInput.getAttribute('value')).
+  this.expectObjectiveToBe = async function(objective) {
+    expect(await explorationObjectiveInput.getAttribute('value')).
       toEqual(objective);
   };
 
-  this.expectTitleToBe = function(title) {
-    expect(explorationTitleInput.getAttribute('value')).
+  this.expectTitleToBe = async function(title) {
+    expect(await explorationTitleInput.getAttribute('value')).
       toEqual(title);
   };
 
-  this.expectWarningsColorToBe = function(color) {
-    expect(explorationObjectiveWarning.getCssValue('color')).
+  this.expectWarningsColorToBe = async function(color) {
+    expect(await explorationObjectiveWarning.getCssValue('color')).
       toEqual(color);
   };
 };
