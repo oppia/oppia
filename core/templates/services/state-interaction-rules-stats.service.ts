@@ -88,7 +88,8 @@ export class StateInteractionRulesStatsService {
 
   private getReadableAnswerString(state: State, answer: object): string {
     if (state.interaction.id === 'FractionInput') {
-      this.fractionObjectFactory.fromDict(<IFractionDict> answer).toString();
+      return (
+        this.fractionObjectFactory.fromDict(<IFractionDict> answer).toString());
     }
     return answer.toString();
   }
