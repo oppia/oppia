@@ -363,10 +363,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             return 0
 
         for skill_id in skill_ids:
-            query = cls.gql("WHERE skill_id = '" + skill_id + "'") # pylint: disable=invalid-string-quote
+            query = cls.query(cls.skill_id == skill_id)
 
             equal_questions_query = query.filter(
-                ndb.FloatProperty('skill_difficulty') == difficulty_requested)
+                cls.skill_difficulty == difficulty_requested)
 
             # We fetch more questions here in order to try and ensure that the
             # eventual number of returned questions is sufficient to meet the
@@ -385,8 +385,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 # Fetch QuestionSkillLinkModels with difficulty smaller than
                 # requested difficulty and sort them by decreasing difficulty.
                 easier_questions_query = query.filter(
-                    (ndb.FloatProperty('skill_difficulty') <
-                     difficulty_requested))
+                    cls.skill_difficulty < difficulty_requested)
                 easier_question_skill_link_models = (
                     easier_questions_query.fetch(
                         limit=question_count_per_skill * 2,
@@ -413,8 +412,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                     new_question_skill_link_models.extend(
                         easier_question_skill_link_models)
                     harder_questions_query = query.filter(
-                        (ndb.FloatProperty('skill_difficulty') >
-                         difficulty_requested))
+                        cls.skill_difficulty > difficulty_requested)
                     harder_question_skill_link_models = (
                         harder_questions_query.fetch(
                             limit=question_count_per_skill * 2,
@@ -485,7 +483,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             return 0
 
         for skill_id in skill_ids:
-            query = cls.gql("WHERE skill_id = '" + skill_id + "'") # pylint: disable=invalid-string-quote
+            query = cls.query(cls.skill_id == skill_id)
 
             # We fetch more questions here in order to try and ensure that the
             # eventual number of returned questions is sufficient to meet the
