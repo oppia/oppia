@@ -18,6 +18,9 @@
  * keeps no mementos.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
@@ -426,19 +429,15 @@ angular.module('oppia').factory('ExplorationStatesService', [
             'modal-templates/confirm-delete-state-modal.template.html'),
           backdrop: true,
           controller: [
-            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+            '$controller', '$scope', '$uibModalInstance',
+            function($controller, $scope, $uibModalInstance) {
+              $controller('ConfirmOrCancelModalController', {
+                $scope: $scope,
+                $uibModalInstance: $uibModalInstance
+              });
               $scope.deleteStateWarningText = (
                 'Are you sure you want to delete the card "' +
                 deleteStateName + '"?');
-
-              $scope.reallyDelete = function() {
-                $uibModalInstance.close();
-              };
-
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss();
-                AlertsService.clearWarnings();
-              };
             }
           ]
         }).result.then(function() {
@@ -460,9 +459,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
           // state, they get updated in the view.
           $rootScope.$broadcast('refreshStateEditor');
         }, function() {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
+          AlertsService.clearWarnings();
         });
       },
       renameState: function(oldStateName, newStateName) {

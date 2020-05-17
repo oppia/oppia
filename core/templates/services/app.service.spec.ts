@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the answer classification service
+ * @fileoverview Unit tests for the app service.
  */
 
 import { TestBed } from '@angular/core/testing';
@@ -21,30 +21,32 @@ import { TestBed } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
 import { AppService } from 'services/app.service';
 
-describe('AppService', () => {
+describe('App Service', () => {
   beforeEach(() => {
     this.appService = TestBed.get(AppService);
   });
 
-  describe('.isMachineLearningClassificationEnabled', () => {
-    beforeEach(() => {
+  describe('querying the app for Machine Learning classifiers', () => {
+    beforeAll(() => {
       this.initialValue = AppConstants.ENABLE_ML_CLASSIFIERS;
     });
 
-    afterEach(() => {
+    afterAll(() => {
       AppConstants.ENABLE_ML_CLASSIFIERS = this.initialValue;
     });
 
-    it('returns true if AppConstants.ENABLE_ML_CLASSIFIERS is true', () => {
-      AppConstants.ENABLE_ML_CLASSIFIERS = true;
-      expect(this.appService.isMachineLearningClassificationEnabled())
-        .toBeTrue();
-    });
+    it('should return true if AppConstants.ENABLE_ML_CLASSIFIERS is true',
+      () => {
+        AppConstants.ENABLE_ML_CLASSIFIERS = true;
+        expect(this.appService.isMachineLearningClassificationEnabled())
+          .toBeTrue();
+      });
 
-    it('returns false if AppConstants.ENABLE_ML_CLASSIFIERS is false', () => {
-      AppConstants.ENABLE_ML_CLASSIFIERS = false;
-      expect(this.appService.isMachineLearningClassificationEnabled())
-        .toBeFalse();
-    });
+    it('should return false if AppConstants.ENABLE_ML_CLASSIFIERS is false',
+      () => {
+        AppConstants.ENABLE_ML_CLASSIFIERS = false;
+        expect(this.appService.isMachineLearningClassificationEnabled())
+          .toBeFalse();
+      });
   });
 });

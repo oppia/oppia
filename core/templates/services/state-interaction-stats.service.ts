@@ -35,7 +35,7 @@ import { UrlInterpolationService } from
 
 export interface IAnswerData {
   /* eslint-disable camelcase */
-  answer; // Type dependant on interaction id.
+  answer; // Type depends on interaction id.
   frequency: number;
   is_addressed?: boolean;
   /* eslint-enable camelcase */
@@ -43,30 +43,39 @@ export interface IAnswerData {
 
 export interface IVisualizationInfo {
   /* eslint-disable camelcase */
+  addressed_info_is_supported: boolean;
   data: IAnswerData[];
   options: {[name: string]: object};
-  addressed_info_is_supported: boolean;
   /* eslint-enable camelcase */
 }
 
 export interface IStateRulesStatsBackendDict {
   /* eslint-disable camelcase */
-  state_name: string;
-  exploration_id: string;
   visualizations_info: IVisualizationInfo[];
   /* eslint-enable camelcase */
 }
 
+export interface IStateRulesStats {
+  /* eslint-disable camelcase */
+  exploration_id: string;
+  state_name: string;
+  visualizations_info: IVisualizationInfo[];
+  /* eslint-enable camelcase */
+}
+
+// TODO(#8038): Move this constant into a backend-api.service module.
+const STATE_INTERACTION_STATS_URL_TEMPLATE: string = (
+  '/createhandler/state_interaction_stats/<exploration_id>/<state_name>');
+
 @Injectable({providedIn: 'root'})
-export class StateRulesStatsService {
+export class StateInteractionStatsService {
   constructor(
       private angularNameService: AngularNameService,
       private answerClassificationService: AnswerClassificationService,
       private contextService: ContextService,
       private fractionObjectFactory: FractionObjectFactory,
       private http: HttpClient,
-      private interactionRulesRegistryService:
-        InteractionRulesRegistryService,
+      private interactionRulesRegistryService: InteractionRulesRegistryService,
       private urlInterpolationService: UrlInterpolationService) {}
 
   /**
@@ -77,48 +86,51 @@ export class StateRulesStatsService {
     return state.interaction.id === 'TextInput';
   }
 
+  private getReadableAnswerString(state: State, answer: object): string {
+    if (state.interaction.id === 'FractionInput') {
+      return (
+        this.fractionObjectFactory.fromDict(<IFractionDict> answer).toString());
+    }
+    return answer.toString();
+  }
+
   /**
    * Returns a promise which will provide details of the given state's
    * answer-statistics.
    */
-  computeStateRulesStats(state: State): Promise<IStateRulesStatsBackendDict> {
+  computeStats(state: State): Promise<IStateRulesStats> {
     const explorationId = this.contextService.getExplorationId();
-    const interactionRulesService =
+    const interactionRulesService = (
       this.interactionRulesRegistryService.getRulesServiceByInteractionId(
-        state.interaction.id);
+        state.interaction.id));
+    // TODO(#8038): Move this HTTP call into a backend-api.service module.
     return this.http.get<IStateRulesStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
-        '/createhandler/state_rules_stats/<exploration_id>/<state_name>', {
-          exploration_id: encodeURIComponent(explorationId),
-          state_name: encodeURIComponent(state.name)
-        })
-    ).toPromise().then(response => {
-      return {
-        state_name: state.name,
+        STATE_INTERACTION_STATS_URL_TEMPLATE, {
+          exploration_id: explorationId,
+          state_name: state.name,
+        }))
+      .toPromise().then(response => <IStateRulesStats>{
         exploration_id: explorationId,
-        visualizations_info: response.visualizations_info.map(info => {
-          info = angular.copy(info);
-          info.data.forEach(datum => {
-            // If data is a FractionInput, need to change data so that
-            // visualization displays the input in a readable manner.
-            if (state.interaction.id === 'FractionInput') {
-              datum.answer = this.fractionObjectFactory.fromDict(
-                <IFractionDict> datum.answer).toString();
-            }
-            if (info.addressed_info_is_supported) {
-              datum.is_addressed =
+        state_name: state.name,
+        visualizations_info: response.visualizations_info.map(info => ({
+          addressed_info_is_supported: info.addressed_info_is_supported,
+          data: info.data.map(datum => <IAnswerData>{
+            answer: this.getReadableAnswerString(state, datum.answer),
+            frequency: datum.frequency,
+            is_addressed: (
+              info.addressed_info_is_supported ?
                 this.answerClassificationService
                   .isClassifiedExplicitlyOrGoesToNewState(
-                    state.name, state, datum.answer,
-                    interactionRulesService);
-            }
-          });
-          return info;
-        })
-      };
-    });
+                    state.name, state, datum.answer, interactionRulesService) :
+                undefined),
+          }),
+          options: info.options,
+        })),
+      });
   }
 }
 
 angular.module('oppia').factory(
-  'StateRulesStatsService', downgradeInjectable(StateRulesStatsService));
+  'StateInteractionStatsService',
+  downgradeInjectable(StateInteractionStatsService));

@@ -30,7 +30,7 @@ require('services/html-escaper.service.ts');
 require('services/interaction-rules-registry.service');
 require('services/translation-file-hash-loader.service.ts');
 require('services/rte-helper.service.ts');
-require('services/state-rules-stats.service.ts');
+require('services/state-interaction-stats.service.ts');
 require('services/construct-translation-ids.service.ts');
 require('services/user.service.ts');
 require('services/promo-bar.service.ts');
@@ -105,10 +105,10 @@ angular.module('oppia').config([
       'PencilCodeEditorRulesService', 'SidebarStatusService',
       'SiteAnalyticsService', 'SkillObjectFactory', 'SolutionObjectFactory',
       'StateCardObjectFactory', 'StateImprovementSuggestionService',
-      'StateObjectFactory', 'StateRulesStatsService', 'StatesObjectFactory',
-      'TextInputRulesService', 'UrlInterpolationService', 'UrlService',
-      'UserInfoObjectFactory', 'UtilsService', 'ValidatorsService',
-      'WindowDimensionsService', 'WindowRef'
+      'StateInteractionStatsService', 'StateObjectFactory',
+      'StatesObjectFactory', 'TextInputRulesService', 'UrlInterpolationService',
+      'UrlService', 'UserInfoObjectFactory', 'UtilsService',
+      'ValidatorsService', 'WindowDimensionsService', 'WindowRef'
     ];
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       if (servicesToProvide.includes(key)) {

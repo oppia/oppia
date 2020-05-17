@@ -18,6 +18,9 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 
 require('domain/classroom/classroom-domain.constants.ajs.ts');
@@ -91,25 +94,13 @@ angular.module('oppia').directive('topicEditorNavbar', [
 
           $scope.publishTopic = function() {
             if (!$scope.topicRights.canPublishTopic()) {
-              var modalInstance = $uibModal.open({
+              $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/topic-editor-page/modal-templates/' +
                   'topic-editor-send-mail-modal.template.html'),
                 backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
-                    $scope.sendMail = function() {
-                      $uibModalInstance.close();
-                    };
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
-              });
-
-              modalInstance.result.then(function() {
+                controller: 'ConfirmOrCancelModalController'
+              }).result.then(function() {
                 TopicRightsBackendApiService.sendMail(
                   $scope.topicId, $scope.topicName).then(function() {
                   var successToast = 'Mail Sent.';
@@ -174,29 +165,24 @@ angular.module('oppia').directive('topicEditorNavbar', [
 
           $scope.saveChanges = function() {
             var topicIsPublished = $scope.topicRights.isPublished();
-            var modalInstance = $uibModal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
                 'topic-editor-save-modal.template.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
+                '$controller', '$scope', '$uibModalInstance',
+                function($controller, $scope, $uibModalInstance) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
                   $scope.isTopicPublished = topicIsPublished;
-
-                  $scope.save = function(commitMessage) {
-                    $uibModalInstance.close(commitMessage);
-                  };
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
                 }
               ]
-            });
-
-            modalInstance.result.then(function(commitMessage) {
+            }).result.then(function(commitMessage) {
               TopicEditorStateService.saveTopic(commitMessage);
-            }).then(function() {
+            }, function() {}).then(function() {
               var successToast = 'Changes saved.';
               AlertsService.addSuccessMessage(
                 successToast, 1000);

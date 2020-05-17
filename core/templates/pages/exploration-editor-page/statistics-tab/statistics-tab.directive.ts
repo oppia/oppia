@@ -17,6 +17,10 @@
  * exploration editor.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -32,7 +36,7 @@ require('services/alerts.service.ts');
 require('services/compute-graph.service.ts');
 require('services/date-time-format.service.ts');
 require('services/exploration-features.service.ts');
-require('services/state-rules-stats.service.ts');
+require('services/state-interaction-stats.service.ts');
 require('visualizations/oppia-visualization-bar-chart.directive.ts');
 require('visualizations/oppia-visualization-click-hexbins.directive.ts');
 require(
@@ -57,17 +61,17 @@ angular.module('oppia').directive('statisticsTab', [
         'DateTimeFormatService', 'ExplorationDataService',
         'ExplorationFeaturesService', 'ExplorationStatesService',
         'ReadOnlyExplorationBackendApiService', 'RouterService',
-        'StateImprovementSuggestionService', 'StateRulesStatsService',
-        'StatesObjectFactory', 'UrlInterpolationService',
-        'IMPROVE_TYPE_INCOMPLETE',
+        'StateImprovementSuggestionService',
+        'StateInteractionStatsService', 'StatesObjectFactory',
+        'UrlInterpolationService', 'IMPROVE_TYPE_INCOMPLETE',
         function(
             $http, $scope, $uibModal, AlertsService, ComputeGraphService,
             DateTimeFormatService, ExplorationDataService,
             ExplorationFeaturesService, ExplorationStatesService,
             ReadOnlyExplorationBackendApiService, RouterService,
-            StateImprovementSuggestionService, StateRulesStatsService,
-            StatesObjectFactory, UrlInterpolationService,
-            IMPROVE_TYPE_INCOMPLETE) {
+            StateImprovementSuggestionService,
+            StateInteractionStatsService, StatesObjectFactory,
+            UrlInterpolationService, IMPROVE_TYPE_INCOMPLETE) {
           var ctrl = this;
           var _EXPLORATION_STATS_VERSION_ALL = 'all';
           var stateStatsModalIsOpen = false;
@@ -143,9 +147,9 @@ angular.module('oppia').directive('statisticsTab', [
           ctrl.showStateStatsModal = function(stateName, improvementType) {
             AlertsService.clearWarnings();
 
-            StateRulesStatsService.computeStateRulesStats(
+            StateInteractionStatsService.computeStats(
               ExplorationStatesService.getState(stateName)
-            ).then(function(stateRulesStats) {
+            ).then(stats => {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/exploration-editor-page/statistics-tab/templates/' +
@@ -159,18 +163,22 @@ angular.module('oppia').directive('statisticsTab', [
                     return Object.entries(state.interaction.customizationArgs);
                   }),
                   improvementType: () => improvementType,
-                  visualizationsInfo: () => stateRulesStats.visualizations_info,
+                  visualizationsInfo: () => stats.visualizations_info,
                 },
                 controller: [
-                  '$scope', '$uibModalInstance', '$filter', '$injector',
+                  '$controller', '$scope', '$uibModalInstance', '$filter',
                   'customizationArgs', 'stateName', 'stateStats',
                   'improvementType', 'visualizationsInfo', 'HtmlEscaperService',
                   'AngularNameService', 'AnswerClassificationService',
                   function(
-                      $scope, $uibModalInstance, $filter, $injector,
+                      $controller, $scope, $uibModalInstance, $filter,
                       customizationArgs, stateName, stateStats,
                       improvementType, visualizationsInfo, HtmlEscaperService,
                       AngularNameService, AnswerClassificationService) {
+                    $controller('ConfirmOrCancelModalController', {
+                      $scope: $scope,
+                      $uibModalInstance: $uibModalInstance
+                    });
                     var COMPLETION_RATE_PIE_CHART_OPTIONS = {
                       left: 20,
                       pieHole: 0.6,
@@ -250,11 +258,6 @@ angular.module('oppia').directive('statisticsTab', [
 
                     $scope.visualizationsHtml = _getVisualizationsHtml();
 
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                      AlertsService.clearWarnings();
-                    };
-
                     $scope.$on('$destroy', function() {
                       stateStatsModalIsOpen = false;
                     });
@@ -266,8 +269,7 @@ angular.module('oppia').directive('statisticsTab', [
                   }
                 ]
               }).result.then(function() {}, function() {
-                // This callback is triggered when the Cancel button is
-                // clicked. No further action is needed.
+                AlertsService.clearWarnings();
               });
             });
           };

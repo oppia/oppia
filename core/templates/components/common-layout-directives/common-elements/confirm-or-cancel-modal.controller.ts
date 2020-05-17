@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,12 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Loads scripts needed for ui-codemirror.
+ * @fileoverview Controller for simple modal with only two actions: close or
+ * dismiss.
  */
 
-window.CodeMirror = require('static/code-mirror-5.17.0/lib/codemirror.js');
-require('static/code-mirror-5.17.0/mode/javascript/javascript.js');
-require('static/code-mirror-5.17.0/mode/python/python.js');
-require('static/code-mirror-5.17.0/mode/yaml/yaml.js');
-require('static/ui-codemirror-5d04fa/src/ui-codemirror.js');
-require('static/diff-match-patch-1.0.0/diff_match_patch.js');
+angular.module('oppia').controller('ConfirmOrCancelModalController', [
+  '$scope', '$uibModalInstance',
+  function($scope, $uibModalInstance) {
+    $scope.confirm = function(value) {
+      $uibModalInstance.close(value);
+    };
+
+    $scope.cancel = function(value) {
+      var dismissValue = value || 'cancel';
+      $uibModalInstance.dismiss(dismissValue);
+    };
+  }
+]);
