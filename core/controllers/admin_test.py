@@ -47,8 +47,10 @@ from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
-(exp_models, job_models, opportunity_models,) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.job, models.NAMES.opportunity])
+(exp_models, job_models, opportunity_models, audit_models) = (
+    models.Registry.import_models(
+        [models.NAMES.exploration, models.NAMES.job, models.NAMES.opportunity,
+         models.NAMES.audit]))
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
@@ -1240,6 +1242,21 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token)
         self.assertEqual(user_services.get_username(user_id), self.NEW_USERNAME)
+
+    def test_update_username_creates_audit_model(self):
+        user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        self.put_json(
+            '/updateusernamehandler',
+            payload={
+                'old_username': self.OLD_USERNAME,
+                'new_username': self.NEW_USERNAME},
+            csrf_token=csrf_token)
+
+        self.assertTrue(
+            audit_models.UsernameChangeAuditModel.has_reference_to_user_id(
+                user_id))
 
 
 class AddCommunityReviewerHandlerTest(test_utils.GenericTestBase):
