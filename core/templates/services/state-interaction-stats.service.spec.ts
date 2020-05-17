@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for state interaction rules stats service.
+ * @fileoverview Unit tests for state interaction stats service.
  */
 
 import { TestBed, flushMicrotasks, fakeAsync } from '@angular/core/testing';
@@ -26,10 +26,10 @@ import { NormalizeWhitespacePunctuationAndCasePipe } from
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 
 import { ContextService } from 'services/context.service';
-import { StateInteractionRulesStatsService } from
-  'services/state-interaction-rules-stats.service';
+import { StateInteractionStatsService } from
+  'services/state-interaction-stats.service';
 
-describe('State Interaction Rules Stats Service', () => {
+describe('State Interaction Stats Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -44,8 +44,8 @@ describe('State Interaction Rules Stats Service', () => {
     this.joC = jasmine.objectContaining;
     this.contextService = TestBed.get(ContextService);
     this.httpTestingController = TestBed.get(HttpTestingController);
-    this.stateInteractionRulesStatsService = (
-      TestBed.get(StateInteractionRulesStatsService));
+    this.stateInteractionStatsService = (
+      TestBed.get(StateInteractionStatsService));
   });
 
   afterEach(() => this.httpTestingController.verify());
@@ -76,7 +76,7 @@ describe('State Interaction Rules Stats Service', () => {
 
   it('should support improvements overview for states with text-input', () => {
     expect(
-      this.stateInteractionRulesStatsService.stateSupportsImprovementsOverview(
+      this.stateInteractionStatsService.stateSupportsImprovementsOverview(
         this.mockState)
     ).toBeTrue();
   });
@@ -90,12 +90,12 @@ describe('State Interaction Rules Stats Service', () => {
       this.onSuccess = jasmine.createSpy('success');
       this.onFailure = jasmine.createSpy('failure');
 
-      this.stateInteractionRulesStatsService.computeStats(
+      this.stateInteractionStatsService.computeStats(
         this.mockState
       ).then(this.onSuccess, this.onFailure);
 
       const req = this.httpTestingController.expectOne(
-        '/createhandler/state_interaction_rules_stats/expid/Hola');
+        '/createhandler/state_interaction_stats/expid/Hola');
       expect(req.request.method).toEqual('GET');
       req.flush({
         visualizations_info: [{
@@ -126,12 +126,12 @@ describe('State Interaction Rules Stats Service', () => {
         this.onSuccess = jasmine.createSpy('success');
         this.onFailure = jasmine.createSpy('failure');
 
-        this.stateInteractionRulesStatsService.computeStats(
+        this.stateInteractionStatsService.computeStats(
           this.mockState
         ).then(this.onSuccess, this.onFailure);
 
         const req = this.httpTestingController.expectOne(
-          '/createhandler/state_interaction_rules_stats/expid/Hola');
+          '/createhandler/state_interaction_stats/expid/Hola');
         expect(req.request.method).toEqual('GET');
         req.flush({
           visualizations_info: [{
@@ -159,12 +159,12 @@ describe('State Interaction Rules Stats Service', () => {
         this.onSuccess = jasmine.createSpy('success');
         this.onFailure = jasmine.createSpy('failure');
 
-        this.stateInteractionRulesStatsService.computeStats({
+        this.stateInteractionStatsService.computeStats({
           name: 'Fraction', interaction: {id: 'FractionInput'}
         }).then(this.onSuccess, this.onFailure);
 
         const req = this.httpTestingController.expectOne(
-          '/createhandler/state_interaction_rules_stats/expid/Fraction');
+          '/createhandler/state_interaction_stats/expid/Fraction');
         expect(req.request.method).toEqual('GET');
         req.flush({
           visualizations_info: [

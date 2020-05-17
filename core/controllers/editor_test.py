@@ -897,7 +897,7 @@ class StateInteractionRulesStatsHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         self.get_json(
-            '/createhandler/state_interaction_rules_stats/%s/%s' % (
+            '/createhandler/state_interaction_stats/%s/%s' % (
                 'invalid_exp_id', 'state_name'),
             expected_status_int=404)
 
@@ -921,7 +921,7 @@ class StateInteractionRulesStatsHandlerTests(test_utils.GenericTestBase):
 
         with logging_swap:
             self.get_json(
-                '/createhandler/state_interaction_rules_stats/%s/%s' % (
+                '/createhandler/state_interaction_stats/%s/%s' % (
                     exp_id, 'invalid_state_name'),
                 expected_status_int=404)
 
@@ -943,7 +943,7 @@ class StateInteractionRulesStatsHandlerTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(exp_id, owner_id)
 
         response = self.get_json(
-            '/createhandler/state_interaction_rules_stats/%s/%s' % (
+            '/createhandler/state_interaction_stats/%s/%s' % (
                 exp_id, exploration.init_state_name))
 
         visualizations_info = stats_services.get_visualizations_info(
@@ -960,7 +960,7 @@ class StateInteractionRulesStatsHandlerTests(test_utils.GenericTestBase):
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
         response = self.get_json(
-            '/createhandler/state_interaction_rules_stats/%s/%s' % (
+            '/createhandler/state_interaction_stats/%s/%s' % (
                 exp_id, exploration.init_state_name))
 
         visualizations_info = stats_services.get_visualizations_info(

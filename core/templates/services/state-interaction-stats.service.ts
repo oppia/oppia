@@ -64,11 +64,11 @@ export interface IStateRulesStats {
 }
 
 // TODO(#8038): Move this constant into a backend-api.service module.
-const STATE_INTERACTION_RULES_STATS_URL_TEMPLATE: string = (
-  '/createhandler/state_interaction_rules_stats/<exploration_id>/<state_name>');
+const STATE_INTERACTION_STATS_URL_TEMPLATE: string = (
+  '/createhandler/state_interaction_stats/<exploration_id>/<state_name>');
 
 @Injectable({providedIn: 'root'})
-export class StateInteractionRulesStatsService {
+export class StateInteractionStatsService {
   constructor(
       private angularNameService: AngularNameService,
       private answerClassificationService: AnswerClassificationService,
@@ -106,7 +106,7 @@ export class StateInteractionRulesStatsService {
     // TODO(#8038): Move this HTTP call into a backend-api.service module.
     return this.http.get<IStateRulesStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
-        STATE_INTERACTION_RULES_STATS_URL_TEMPLATE, {
+        STATE_INTERACTION_STATS_URL_TEMPLATE, {
           exploration_id: explorationId,
           state_name: state.name,
         }))
@@ -132,5 +132,5 @@ export class StateInteractionRulesStatsService {
 }
 
 angular.module('oppia').factory(
-  'StateInteractionRulesStatsService',
-  downgradeInjectable(StateInteractionRulesStatsService));
+  'StateInteractionStatsService',
+  downgradeInjectable(StateInteractionStatsService));

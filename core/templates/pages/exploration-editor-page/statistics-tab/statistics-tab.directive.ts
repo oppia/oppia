@@ -36,7 +36,7 @@ require('services/alerts.service.ts');
 require('services/compute-graph.service.ts');
 require('services/date-time-format.service.ts');
 require('services/exploration-features.service.ts');
-require('services/state-interaction-rules-stats.service.ts');
+require('services/state-interaction-stats.service.ts');
 require('visualizations/oppia-visualization-bar-chart.directive.ts');
 require(
   'visualizations/oppia-visualization-enumerated-frequency-table.directive.ts');
@@ -61,7 +61,7 @@ angular.module('oppia').directive('statisticsTab', [
         'ExplorationFeaturesService', 'ExplorationStatesService',
         'ReadOnlyExplorationBackendApiService', 'RouterService',
         'StateImprovementSuggestionService',
-        'StateInteractionRulesStatsService', 'StatesObjectFactory',
+        'StateInteractionStatsService', 'StatesObjectFactory',
         'UrlInterpolationService', 'IMPROVE_TYPE_INCOMPLETE',
         function(
             $http, $scope, $uibModal, AlertsService, ComputeGraphService,
@@ -69,7 +69,7 @@ angular.module('oppia').directive('statisticsTab', [
             ExplorationFeaturesService, ExplorationStatesService,
             ReadOnlyExplorationBackendApiService, RouterService,
             StateImprovementSuggestionService,
-            StateInteractionRulesStatsService, StatesObjectFactory,
+            StateInteractionStatsService, StatesObjectFactory,
             UrlInterpolationService, IMPROVE_TYPE_INCOMPLETE) {
           var ctrl = this;
           var _EXPLORATION_STATS_VERSION_ALL = 'all';
@@ -142,7 +142,7 @@ angular.module('oppia').directive('statisticsTab', [
           ctrl.showStateStatsModal = function(stateName, improvementType) {
             AlertsService.clearWarnings();
 
-            StateInteractionRulesStatsService.computeStats(
+            StateInteractionStatsService.computeStats(
               ExplorationStatesService.getState(stateName)
             ).then(stats => {
               $uibModal.open({

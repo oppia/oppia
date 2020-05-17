@@ -29,7 +29,7 @@ require('services/id-generation.service.ts');
 require('services/html-escaper.service.ts');
 require('services/translation-file-hash-loader.service.ts');
 require('services/rte-helper.service.ts');
-require('services/state-interaction-rules-stats.service.ts');
+require('services/state-interaction-stats.service.ts');
 require('services/construct-translation-ids.service.ts');
 require('services/user.service.ts');
 require('services/promo-bar.service.ts');
@@ -105,7 +105,7 @@ angular.module('oppia').config([
       'PencilCodeEditorRulesService', 'SidebarStatusService',
       'SiteAnalyticsService', 'SkillObjectFactory', 'SolutionObjectFactory',
       'StateCardObjectFactory', 'StateImprovementSuggestionService',
-      'StateInteractionRulesStatsService', 'StateObjectFactory',
+      'StateInteractionStatsService', 'StateObjectFactory',
       'StatesObjectFactory', 'TextInputRulesService', 'UrlInterpolationService',
       'UrlService', 'UserInfoObjectFactory', 'UtilsService',
       'ValidatorsService', 'WindowDimensionsService', 'WindowRef'

@@ -234,8 +234,8 @@ import { StateImprovementSuggestionService } from
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { StateInteractionRulesStatsService } from
-  'services/state-interaction-rules-stats.service';
+import { StateInteractionStatsService } from
+  'services/state-interaction-stats.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StatePropertyService } from
   // eslint-disable-next-line max-len
@@ -737,8 +737,8 @@ export class UpgradedServices {
       upgradedServices['RecordedVoiceoversObjectFactory'],
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['WrittenTranslationsObjectFactory']);
-    upgradedServices['StateInteractionRulesStatsService'] =
-      new StateInteractionRulesStatsService(
+    upgradedServices['StateInteractionStatsService'] =
+      new StateInteractionStatsService(
         upgradedServices['AngularNameService'],
         upgradedServices['AnswerClassificationService'],
         upgradedServices['ContextService'],
