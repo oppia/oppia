@@ -125,15 +125,20 @@ describe('Topic editor functionality', function() {
         topicEditorPage.moveToQuestionsTab();
         topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
           1, 'Skill1TopicAndStoryEditor');
+        waitFor.promiseToResolve(
+          topicEditorPage.openQuestionEditor('Question 1')
+          , 'question Editor too long to open');
         topicEditorPage.editQuestionContents(
-          0, 'Question 2', 'Edited the question content.');
+          'Question 2', 'Edited the question content.');
         topicsAndSkillsDashboardPage.get();
         topicsAndSkillsDashboardPage.editTopic('Topic1TopicAndStoryEditor');
         topicEditorPage.moveToQuestionsTab();
         // Confirm that the content of the question has changed.
         topicEditorPage.selectSkillWithDescriptionFromDropDown(
           'Skill1TopicAndStoryEditor');
-        topicEditorPage.openQuestionEditor(0);
+        waitFor.promiseToResolve(
+          topicEditorPage.openQuestionEditor('Question 2')
+          , 'question Editor too long to open');
         explorationEditorMainTab.expectContentToMatch(
           forms.toRichText('Question 2'));
 
@@ -166,6 +171,9 @@ describe('Topic editor functionality', function() {
       topicEditorPage.moveToQuestionsTab();
       topicEditorPage.selectSkillWithDescriptionFromDropDown(
         'Skill1TopicAndStoryEditor');
+      waitFor.promiseToResolve(
+        topicEditorPage.openQuestionEditor('Question 2')
+        , 'question Editor too long to open');
       waitFor.promiseToResolve(
         topicEditorPage.linkSkillWithDescriptionToQuestion(
           'Skill2TopicAndStoryEditor')

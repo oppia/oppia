@@ -107,7 +107,10 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-thumbnail-container'));
   var linkAnotherSkillButton = element(
     by.css('.protractor-test-link-skill'));
-
+  var stateContentDisplay = element(
+    by.css('.protractor-test-state-content-display'));
+  var closeQuestionEditorButton = element(
+    by.css('.protractor-test-question-cancel-button'));
   var dragAndDrop = function(fromElement, toElement) {
     browser.executeScript(dragAndDropScript, fromElement, toElement);
   };
@@ -163,15 +166,18 @@ var TopicEditorPage = function() {
     element(by.css('option[label="' + skillDescription + '"]')).click();
   };
 
-  this.openQuestionEditor = function(index) {
-    waitFor.visibilityOf(
-      questionItem, 'Question takes too long to appear');
-    questionItems.then(function(questions) {
-      waitFor.elementToBeClickable(
-        questions[index], 'Question takes too long to be clickable');
-      questions[index].click();
-      waitFor.visibilityOf(
-        saveQuestionButton, 'Question editor takes too long to open');
+  this.openQuestionEditor = async function(questionContent) {
+    var questionItemsLength = await questionItems.count();
+    for (var i = 0; i < questionItemsLength; i++) {
+      await questionItems.get(i).click();
+      var contentText = await stateContentDisplay.getText();
+      if (questionContent === contentText) {
+        break;
+      }
+      await closeQuestionEditorButton.click();
+    }
+    return new Promise(function(resolve, reject) {
+      resolve('done');
     });
   };
 
@@ -203,7 +209,6 @@ var TopicEditorPage = function() {
   };
 
   this.linkSkillWithDescriptionToQuestion = async function(skillDescription) {
-    await questionItems.get(0).click();
     await linkAnotherSkillButton.click();
     var skillsLength = await skillListItems.count();
     for (var i = 0; i < skillsLength; i++) {
@@ -222,25 +227,21 @@ var TopicEditorPage = function() {
     });
   };
 
-  this.editQuestionContents = function(index, newContent, commitMessage) {
+  this.editQuestionContents = function(newContent, commitMessage) {
     var explorationEditorPage =
                      new ExplorationEditorPage.ExplorationEditorPage();
     var explorationEditorMainTab = explorationEditorPage.getMainTab();
-    questionItems.then(
-      function(questions) {
-        questions[index].click();
-        explorationEditorMainTab.setContent(forms.toRichText(newContent));
-        waitFor.elementToBeClickable(
-          saveQuestionButton,
-          'Save Question button takes too long to be clickable');
-        saveQuestionButton.click();
-        // Confirm the edit by adding a commit message.
-        commitMessageField.sendKeys(commitMessage);
-        waitFor.elementToBeClickable(
-          closeSaveModalButton,
-          'Save commit button taking to long to be clickable');
-        closeSaveModalButton.click();
-      });
+    explorationEditorMainTab.setContent(forms.toRichText(newContent));
+    waitFor.elementToBeClickable(
+      saveQuestionButton,
+      'Save Question button takes too long to be clickable');
+    saveQuestionButton.click();
+    // Confirm the edit by adding a commit message.
+    commitMessageField.sendKeys(commitMessage);
+    waitFor.elementToBeClickable(
+      closeSaveModalButton,
+      'Save commit button taking to long to be clickable');
+    closeSaveModalButton.click();
   };
 
   this.moveToQuestionsTab = function() {
