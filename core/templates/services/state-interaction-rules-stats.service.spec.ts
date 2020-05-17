@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for state rules stats service.
+ * @fileoverview Unit tests for state interaction rules stats service.
  */
 
 import { TestBed, flushMicrotasks, fakeAsync } from '@angular/core/testing';
@@ -26,9 +26,10 @@ import { NormalizeWhitespacePunctuationAndCasePipe } from
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 
 import { ContextService } from 'services/context.service';
-import { StateRulesStatsService } from 'services/state-rules-stats.service.ts';
+import { StateInteractionRulesStatsService } from
+  'services/state-interaction-rules-stats.service';
 
-describe('State Rules Stats Service', () => {
+describe('State Interaction Rules Stats Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -40,9 +41,11 @@ describe('State Rules Stats Service', () => {
       ],
     });
 
+    this.joC = jasmine.objectContaining;
     this.contextService = TestBed.get(ContextService);
     this.httpTestingController = TestBed.get(HttpTestingController);
-    this.stateRulesStatsService = TestBed.get(StateRulesStatsService);
+    this.stateInteractionRulesStatsService = (
+      TestBed.get(StateInteractionRulesStatsService));
   });
 
   afterEach(() => this.httpTestingController.verify());
@@ -72,10 +75,8 @@ describe('State Rules Stats Service', () => {
   });
 
   it('should support improvements overview for states with text-input', () => {
-    this.mockState.interaction.id = 'TextInput';
-
     expect(
-      this.stateRulesStatsService.stateSupportsImprovementsOverview(
+      this.stateInteractionRulesStatsService.stateSupportsImprovementsOverview(
         this.mockState)
     ).toBeTrue();
   });
@@ -89,11 +90,12 @@ describe('State Rules Stats Service', () => {
       this.onSuccess = jasmine.createSpy('success');
       this.onFailure = jasmine.createSpy('failure');
 
-      this.stateRulesStatsService.computeStateRulesStats(this.mockState)
-        .then(this.onSuccess, this.onFailure);
+      this.stateInteractionRulesStatsService.computeStats(
+        this.mockState
+      ).then(this.onSuccess, this.onFailure);
 
       const req = this.httpTestingController.expectOne(
-        '/createhandler/state_rules_stats/expid/Hola');
+        '/createhandler/state_interaction_rules_stats/expid/Hola');
       expect(req.request.method).toEqual('GET');
       req.flush({
         visualizations_info: [{
@@ -106,12 +108,12 @@ describe('State Rules Stats Service', () => {
       });
       flushMicrotasks();
 
-      expect(this.onSuccess).toHaveBeenCalledWith(jasmine.objectContaining({
-        visualizations_info: [jasmine.objectContaining({
+      expect(this.onSuccess).toHaveBeenCalledWith(this.joC({
+        visualizations_info: [this.joC({
           data: [
-            {answer: 'Ni Hao', frequency: 5},
-            {answer: 'Aloha', frequency: 3},
-            {answer: 'Hola', frequency: 1}
+            this.joC({answer: 'Ni Hao', frequency: 5}),
+            this.joC({answer: 'Aloha', frequency: 3}),
+            this.joC({answer: 'Hola', frequency: 1})
           ]
         })]
       }));
@@ -124,11 +126,12 @@ describe('State Rules Stats Service', () => {
         this.onSuccess = jasmine.createSpy('success');
         this.onFailure = jasmine.createSpy('failure');
 
-        this.stateRulesStatsService.computeStateRulesStats(this.mockState)
-          .then(this.onSuccess, this.onFailure);
+        this.stateInteractionRulesStatsService.computeStats(
+          this.mockState
+        ).then(this.onSuccess, this.onFailure);
 
         const req = this.httpTestingController.expectOne(
-          '/createhandler/state_rules_stats/expid/Hola');
+          '/createhandler/state_interaction_rules_stats/expid/Hola');
         expect(req.request.method).toEqual('GET');
         req.flush({
           visualizations_info: [{
@@ -138,12 +141,12 @@ describe('State Rules Stats Service', () => {
         });
         flushMicrotasks();
 
-        expect(this.onSuccess).toHaveBeenCalledWith(jasmine.objectContaining({
-          visualizations_info: [jasmine.objectContaining({
+        expect(this.onSuccess).toHaveBeenCalledWith(this.joC({
+          visualizations_info: [this.joC({
             data: [
-              jasmine.objectContaining({answer: 'Ni Hao', is_addressed: false}),
-              jasmine.objectContaining({answer: 'Aloha', is_addressed: false}),
-              jasmine.objectContaining({answer: 'Hola', is_addressed: true})
+              this.joC({answer: 'Ni Hao', is_addressed: false}),
+              this.joC({answer: 'Aloha', is_addressed: false}),
+              this.joC({answer: 'Hola', is_addressed: true})
             ]
           })]
         }));
@@ -156,12 +159,12 @@ describe('State Rules Stats Service', () => {
         this.onSuccess = jasmine.createSpy('success');
         this.onFailure = jasmine.createSpy('failure');
 
-        this.stateRulesStatsService.computeStateRulesStats({
+        this.stateInteractionRulesStatsService.computeStats({
           name: 'Fraction', interaction: {id: 'FractionInput'}
         }).then(this.onSuccess, this.onFailure);
 
         const req = this.httpTestingController.expectOne(
-          '/createhandler/state_rules_stats/expid/Fraction');
+          '/createhandler/state_interaction_rules_stats/expid/Fraction');
         expect(req.request.method).toEqual('GET');
         req.flush({
           visualizations_info: [
@@ -191,11 +194,11 @@ describe('State Rules Stats Service', () => {
         });
         flushMicrotasks();
 
-        expect(this.onSuccess).toHaveBeenCalledWith(jasmine.objectContaining({
-          visualizations_info: [jasmine.objectContaining({
+        expect(this.onSuccess).toHaveBeenCalledWith(this.joC({
+          visualizations_info: [this.joC({
             data: [
-              jasmine.objectContaining({ answer: '1/2' }),
-              jasmine.objectContaining({ answer: '0' })
+              this.joC({ answer: '1/2' }),
+              this.joC({ answer: '0' })
             ]
           })]
         }));

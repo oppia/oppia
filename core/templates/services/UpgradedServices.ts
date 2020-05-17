@@ -234,6 +234,8 @@ import { StateImprovementSuggestionService } from
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { StateInteractionRulesStatsService } from
+  'services/state-interaction-rules-stats.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StatePropertyService } from
   // eslint-disable-next-line max-len
@@ -241,7 +243,6 @@ import { StatePropertyService } from
 import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import { StateRulesStatsService } from 'services/state-rules-stats.service';
 import { StateSolicitAnswerDetailsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solicit-answer-details.service';
@@ -736,14 +737,15 @@ export class UpgradedServices {
       upgradedServices['RecordedVoiceoversObjectFactory'],
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['WrittenTranslationsObjectFactory']);
-    upgradedServices['StateRulesStatsService'] = new StateRulesStatsService(
-      upgradedServices['AngularNameService'],
-      upgradedServices['AnswerClassificationService'],
-      upgradedServices['ContextService'],
-      upgradedServices['FractionObjectFactory'],
-      upgradedServices['HttpClient'],
-      upgradedServices['InteractionRulesRegistryService'],
-      upgradedServices['UrlInterpolationService']);
+    upgradedServices['StateInteractionRulesStatsService'] =
+      new StateInteractionRulesStatsService(
+        upgradedServices['AngularNameService'],
+        upgradedServices['AnswerClassificationService'],
+        upgradedServices['ContextService'],
+        upgradedServices['FractionObjectFactory'],
+        upgradedServices['HttpClient'],
+        upgradedServices['InteractionRulesRegistryService'],
+        upgradedServices['UrlInterpolationService']);
 
     // Topological level: 7.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(

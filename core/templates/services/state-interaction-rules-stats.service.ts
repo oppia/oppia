@@ -63,8 +63,12 @@ export interface IStateRulesStats {
   /* eslint-enable camelcase */
 }
 
+// TODO(#8038): Move this constant into a backend-api.service module.
+const STATE_INTERACTION_RULES_STATS_URL_TEMPLATE: string = (
+  '/createhandler/state_interaction_rules_stats/<exploration_id>/<state_name>');
+
 @Injectable({providedIn: 'root'})
-export class StateRulesStatsService {
+export class StateInteractionRulesStatsService {
   constructor(
       private angularNameService: AngularNameService,
       private answerClassificationService: AnswerClassificationService,
@@ -82,7 +86,7 @@ export class StateRulesStatsService {
     return state.interaction.id === 'TextInput';
   }
 
-  private getReadableAnswerString(state: State, answer): string {
+  private getReadableAnswerString(state: State, answer: object): string {
     if (state.interaction.id === 'FractionInput') {
       this.fractionObjectFactory.fromDict(<IFractionDict> answer).toString();
     }
@@ -93,14 +97,15 @@ export class StateRulesStatsService {
    * Returns a promise which will provide details of the given state's
    * answer-statistics.
    */
-  computeStateRulesStats(state: State): Promise<IStateRulesStats> {
+  computeStats(state: State): Promise<IStateRulesStats> {
     const explorationId = this.contextService.getExplorationId();
     const interactionRulesService = (
       this.interactionRulesRegistryService.getRulesServiceByInteractionId(
         state.interaction.id));
+    // TODO(#8038): Move this HTTP call into a backend-api.service module.
     return this.http.get<IStateRulesStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
-        '/createhandler/state_rules_stats/<exploration_id>/<state_name>', {
+        STATE_INTERACTION_RULES_STATS_URL_TEMPLATE, {
           exploration_id: explorationId,
           state_name: state.name,
         }))
@@ -113,9 +118,11 @@ export class StateRulesStatsService {
             answer: this.getReadableAnswerString(state, datum.answer),
             frequency: datum.frequency,
             is_addressed: (
-              this.answerClassificationService
-                .isClassifiedExplicitlyOrGoesToNewState(
-                  state.name, state, datum.answer, interactionRulesService)),
+              info.addressed_info_is_supported ?
+                this.answerClassificationService
+                  .isClassifiedExplicitlyOrGoesToNewState(
+                    state.name, state, datum.answer, interactionRulesService) :
+                undefined),
           }),
           options: info.options,
         })),
@@ -124,4 +131,5 @@ export class StateRulesStatsService {
 }
 
 angular.module('oppia').factory(
-  'StateRulesStatsService', downgradeInjectable(StateRulesStatsService));
+  'StateInteractionRulesStatsService',
+  downgradeInjectable(StateInteractionRulesStatsService));
