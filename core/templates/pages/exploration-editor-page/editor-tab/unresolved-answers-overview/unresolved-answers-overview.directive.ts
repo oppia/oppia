@@ -17,6 +17,9 @@
  */
 require(
   'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
@@ -101,25 +104,29 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
                 'modal-templates/teach-oppia-modal.template.html'),
               backdrop: true,
               controller: [
-                '$filter', '$http', '$injector', '$log', '$scope',
-                '$uibModalInstance', 'AlertsService', 'AngularNameService',
-                'AnswerClassificationService', 'ContextService',
-                'ExplorationHtmlFormatterService', 'ExplorationStatesService',
-                'StateCustomizationArgsService', 'StateEditorService',
-                'StateInteractionIdService', 'TrainingDataService',
-                'TrainingModalService', 'UrlInterpolationService',
-                'DEFAULT_OUTCOME_CLASSIFICATION', 'EXPLICIT_CLASSIFICATION',
-                'TRAINING_DATA_CLASSIFICATION',
+                '$controller', '$filter', '$http', '$injector', '$log',
+                '$scope', '$uibModalInstance', 'AlertsService',
+                'AngularNameService', 'AnswerClassificationService',
+                'ContextService', 'ExplorationHtmlFormatterService',
+                'ExplorationStatesService', 'StateCustomizationArgsService',
+                'StateEditorService', 'StateInteractionIdService',
+                'TrainingDataService', 'TrainingModalService',
+                'UrlInterpolationService', 'DEFAULT_OUTCOME_CLASSIFICATION',
+                'EXPLICIT_CLASSIFICATION', 'TRAINING_DATA_CLASSIFICATION',
                 function(
-                    $filter, $http, $injector, $log, $scope,
-                    $uibModalInstance, AlertsService, AngularNameService,
-                    AnswerClassificationService, ContextService,
-                    ExplorationHtmlFormatterService, ExplorationStatesService,
-                    StateCustomizationArgsService, StateEditorService,
-                    StateInteractionIdService, TrainingDataService,
-                    TrainingModalService, UrlInterpolationService,
-                    DEFAULT_OUTCOME_CLASSIFICATION, EXPLICIT_CLASSIFICATION,
-                    TRAINING_DATA_CLASSIFICATION) {
+                    $controller, $filter, $http, $injector, $log,
+                    $scope, $uibModalInstance, AlertsService,
+                    AngularNameService, AnswerClassificationService,
+                    ContextService, ExplorationHtmlFormatterService,
+                    ExplorationStatesService, StateCustomizationArgsService,
+                    StateEditorService, StateInteractionIdService,
+                    TrainingDataService, TrainingModalService,
+                    UrlInterpolationService, DEFAULT_OUTCOME_CLASSIFICATION,
+                    EXPLICIT_CLASSIFICATION, TRAINING_DATA_CLASSIFICATION) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
                   var _explorationId = (
                     ContextService.getExplorationId());
                   var _stateName = StateEditorService.getActiveStateName();
@@ -241,10 +248,6 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
                         AlertsService.addSuccessMessage(
                           successToast, TOAST_TIMEOUT);
                       });
-                  };
-
-                  $scope.finishTeaching = function(reopen) {
-                    $uibModalInstance.dismiss();
                   };
 
                   $scope.loadingDotsAreShown = true;
