@@ -43,7 +43,8 @@ export class EditableTopicBackendApiService {
         topic_id: topicId
       });
 
-    this.http.get(topicDataUrl).toPromise().then((response) => {
+    this.http.get(topicDataUrl).toPromise().then(
+      (response: {[key: string]: string}) => {
       if (successCallback) {
         // The response is passed as a dict with 2 fields and not as 2
         // parameters, because the successCallback is called as the resolve
@@ -75,7 +76,8 @@ export class EditableTopicBackendApiService {
         topic_id: topicId
       });
 
-    this.http.get(storiesDataUrl).toPromise().then((response) => {
+    this.http.get(storiesDataUrl).toPromise().then(
+      (response: {[key: string]: string}) => {
       let canonicalStorySummaries = cloneDeep(
         response.canonical_story_summary_dicts);
       if (successCallback) {
@@ -98,7 +100,8 @@ export class EditableTopicBackendApiService {
         subtopic_id: subtopicId.toString()
       });
 
-    this.http.get(subtopicPageDataUrl).toPromise().then((response) => {
+    this.http.get(subtopicPageDataUrl).toPromise().then(
+      (response: {[key: string]: string}) => {
       let topic = cloneDeep(response.subtopic_page);
       if (successCallback) {
         successCallback(topic);
@@ -144,7 +147,7 @@ export class EditableTopicBackendApiService {
       topic_and_subtopic_page_change_dicts: changeList
     };
     this.http.put(editableTopicDataUrl, putData).toPromise().then(
-      (response) => {
+      (response: {[key: string]: string}) => {
         if (successCallback) {
         // Here also, a dict with 2 fields are passed instead of just 2
         // parameters, due to the same reason as written for _fetchTopic().
