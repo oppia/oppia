@@ -144,7 +144,6 @@ describe('Pretest question backend API service', function() {
       var req = httpTestingController.verify();
 
       flushMicrotasks();
-
       expect(successHandler).toHaveBeenCalledWith([]);
       expect(failHandler).not.toHaveBeenCalled();
     })
