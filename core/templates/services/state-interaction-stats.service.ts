@@ -87,12 +87,12 @@ export class StateInteractionStatsService {
     return state.interaction.id === 'TextInput';
   }
 
-  private getReadableAnswerString(state: State, answer: object): string {
+  private getReadableAnswerString(state: State, answer): string {
     if (state.interaction.id === 'FractionInput') {
       return (
         this.fractionObjectFactory.fromDict(<IFractionDict> answer).toString());
     }
-    return answer.toString();
+    return answer;
   }
 
   /**
