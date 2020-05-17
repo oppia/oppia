@@ -144,4 +144,5 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
         }
       ]
     };
-}]);
+  }
+]);
