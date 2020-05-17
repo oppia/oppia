@@ -441,16 +441,18 @@ def _get_task_output(lint_messages, task, semaphore):
     semaphore.release()
 
 
-def _print_error_messages(error_messages):
-    """Print error messages (if any) during linter execution.
+def _print_errors_stacktrace(errors_stacktrace):
+    """Print errors stacktrace caught during linter execution.
+
     Args:
-        error_messages: list(str). List of summary messages of linter output.
+        errors_stacktrace: list(str). List of error stacktrace of linter output.
     """
     python_utils.PRINT('')
-    python_utils.PRINT('Please fix the errors below:')
+    python_utils.PRINT('Unable to run the complete lint test, please check '
+                       'the following stack trace and fix the errors:')
     python_utils.PRINT('+--------------------------+')
-    for message in error_messages:
-        python_utils.PRINT(message)
+    for stacktrace in errors_stacktrace:
+        python_utils.PRINT(stacktrace)
         python_utils.PRINT('--------------------------------------------------')
         python_utils.PRINT('')
     python_utils.PRINT('--------------------------------------------------')
@@ -551,12 +553,12 @@ def main(args=None):
 
     _print_complete_summary_of_lint_messages(lint_messages)
 
-    error_messages = concurrent_task_utils.ALL_ERRORS
-    if len(error_messages) != 0:
-        _print_error_messages(error_messages)
+    errors_stacktrace = concurrent_task_utils.ALL_ERRORS
+    if len(errors_stacktrace) != 0:
+        _print_errors_stacktrace(errors_stacktrace)
 
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
-            lint_messages]) or len(error_messages) != 0:
+            lint_messages]) or len(errors_stacktrace) != 0:
         python_utils.PRINT('---------------------------')
         python_utils.PRINT('Checks Not Passed.')
         python_utils.PRINT('---------------------------')
