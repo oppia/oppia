@@ -43,13 +43,13 @@ angular.module('oppia').directive('topNavigationBar', [
         '$http', '$scope', '$timeout', '$translate', '$window',
         'ClassroomBackendApiService', 'DebouncerService', 'DeviceInfoService',
         'NavigationService', 'SidebarStatusService', 'SiteAnalyticsService',
-        'WindowDimensionsService', 'UserService',
+        'UserService', 'WindowDimensionsService',
         'LABEL_FOR_CLEARING_FOCUS', 'LOGOUT_URL',
         function(
             $http, $scope, $timeout, $translate, $window,
             ClassroomBackendApiService, DebouncerService, DeviceInfoService,
             NavigationService, SidebarStatusService, SiteAnalyticsService,
-            WindowDimensionsService, UserService,
+            UserService, WindowDimensionsService,
             LABEL_FOR_CLEARING_FOCUS, LOGOUT_URL) {
           var ctrl = this;
           var NAV_MODE_SIGNUP = 'signup';
@@ -225,7 +225,7 @@ angular.module('oppia').directive('topNavigationBar', [
             ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
             ctrl.navElementsVisibilityStatus = {};
 
-            ClassroomBackendApiService.fetchClassroomIsShownStatus().then(
+            ClassroomBackendApiService.fetchClassroomPageIsShownStatus().then(
               function(classroomIsShown) {
                 ctrl.CLASSROOM_PAGE_IS_SHOWN = classroomIsShown;
               });

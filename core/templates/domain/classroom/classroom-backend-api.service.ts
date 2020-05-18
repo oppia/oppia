@@ -67,7 +67,7 @@ export class ClassroomBackendApiService {
     });
   }
 
-  _fetchClassroomIsShownStatus(
+  _fetchClassroomPageIsShownStatus(
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
     const classroomStatusHandlerUrl = '/classroom_page_status_handler';
@@ -89,9 +89,9 @@ export class ClassroomBackendApiService {
     });
   }
 
-  fetchClassroomIsShownStatus(): Promise<Object> {
+  fetchClassroomPageIsShownStatus(): Promise<Object> {
     return new Promise((resolve, reject) => {
-      this._fetchClassroomIsShownStatus(resolve, reject);
+      this._fetchClassroomPageIsShownStatus(resolve, reject);
     });
   }
 }

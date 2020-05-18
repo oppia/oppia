@@ -219,7 +219,7 @@ angular.module('oppia').directive('libraryPage', [
             ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
               '/library/' + ctrl.bannerImageFilename);
 
-            ClassroomBackendApiService.fetchClassroomIsShownStatus().then(
+            ClassroomBackendApiService.fetchClassroomPageIsShownStatus().then(
               function(classroomIsShown) {
                 ctrl.CLASSROOM_PAGE_IS_SHOWN = classroomIsShown;
               });

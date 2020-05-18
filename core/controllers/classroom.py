@@ -83,7 +83,6 @@ class ClassroomPageStatusHandler(base.BaseHandler):
     # during user registration.
     REDIRECT_UNFINISHED_SIGNUPS = False
 
-
     @acl_decorators.open_access
     def get(self):
         self.render_json({
