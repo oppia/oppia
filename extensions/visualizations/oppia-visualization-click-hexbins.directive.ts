@@ -48,7 +48,7 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
           const imageAndRegions = HtmlEscaperService.escapedJsonToObj(
             $attrs.imageAndRegionsWithValue);
 
-          function showTooltip(hexBin: IHexBin): void {
+          const showTooltip = (hexBin: IHexBin) => {
             if (hexBin.length === 0) {
               return;
             }
@@ -59,7 +59,7 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
               .text(`${hexBin.length} click${hexBin.length > 1 ? 's' : ''}`);
           };
 
-          function moveTooltip(hexBin: IHexBin): void {
+          const moveTooltip = (hexBin: IHexBin) => {
             if (hexBin.length === 0) {
               return;
             }
@@ -67,7 +67,7 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
               .style('visibility', 'visible');
           };
 
-          function hideTooltip(hexBin: IHexBin): void {
+          const hideTooltip = (hexBin: IHexBin) => {
             d3.select('#click-hexbin-chart-tooltip')
               .style('visibility', 'hidden');
           };
@@ -103,7 +103,7 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
 
             // Construct and add the SVG element for holding the hexbin graph.
             const svg = d3.select('#click-hexbin-chart').append('svg')
-                .attr('viewBox', `0 0 ${containerWidth} ${containerHeight}`);
+              .attr('viewBox', `0 0 ${containerWidth} ${containerHeight}`);
 
             // Draw the image in which the clicks happened.
             svg.append('image')

@@ -233,7 +233,7 @@ angular.module('oppia').directive('statisticsTab', [
                           const key = $filter('camelCaseToHyphens')(key);
                           const val = HtmlEscaperService.objToEscapedJson(val);
                           el.attr(key, val);
-                        }
+                        };
 
                         setElAttr('escapedData', vizInfo.data);
                         setElAttr('escapedOptions', vizInfo.options);
