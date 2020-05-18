@@ -242,8 +242,8 @@ def check_codeowner_file(verbose_mode_enabled):
                     # be changed to './' for glob patterns to match
                     # correctly.
                     line_in_concern = line_in_concern.replace('/', './', 1)
-                    # THe check won't happen if the path is getting all the
-                    # frontend spec files.
+                    # The checking for path existence won't happen if the path
+                    # is getting all the frontend spec files.
                     if not _is_path_contains_frontend_specs(line_in_concern):
                         if not glob.glob(line_in_concern):
                             python_utils.PRINT(
