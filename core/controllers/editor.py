@@ -502,7 +502,7 @@ class ExplorationStatisticsHandler(EditorHandler):
             exploration_id, current_exploration.version).to_frontend_dict())
 
 
-class StateRulesStatsHandler(EditorHandler):
+class StateInteractionStatsHandler(EditorHandler):
     """Returns detailed learner answer statistics for a state."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
