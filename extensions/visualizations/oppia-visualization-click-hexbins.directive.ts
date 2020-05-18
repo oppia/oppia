@@ -97,9 +97,15 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
 
             // Define the color of hexbins, using the number of grouped clicks
             // to change their opacity.
+            const rgbaScaleEndPoints = [
+              'rgba(255,255,255,0.25)',
+              'rgba(255,255,255,0.75)'
+            ];
             const color = d3.scaleLinear()
               .domain([0, d3.max(bins, (b: IHexBin) => b.length)])
-              .range(['rgba(255,255,255,0.25)', 'rgba(208,2,27,0.75)']);
+              // NOTE TO DEVELOPERS: the range type is wrong; rgba string-values
+              // are supported.
+              .range(rgbaScaleEndPoints); // @ts-ignore 
 
             // Construct and add the SVG element for holding the hexbin graph.
             const svg = d3.select('#click-hexbin-chart').append('svg')
