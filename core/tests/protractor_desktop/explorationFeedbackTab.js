@@ -83,42 +83,41 @@ describe('ExplorationFeedback', function() {
 
     // Creator creates and publishes an exploration.
     await users.login('user1@ExplorationFeedback.com');
-    workflow.createAndPublishExploration(
+    await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_1,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
-    creatorDashboardPage.get();
+    await creatorDashboardPage.get();
     expect(
-      creatorDashboardPage.getNumberOfFeedbackMessages()
+      await creatorDashboardPage.getNumberOfFeedbackMessages()
     ).toEqual(0);
     await users.logout();
 
     // Learner plays the exploration and submits a feedback.
     await users.login('user2@ExplorationFeedback.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE_1);
-    libraryPage.playExploration(EXPLORATION_TITLE_1);
-    explorationPlayerPage.submitFeedback(feedback);
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_TITLE_1);
+    await libraryPage.playExploration(EXPLORATION_TITLE_1);
+    await explorationPlayerPage.submitFeedback(feedback);
     await users.logout();
 
     // Creator reads the feedback and responds.
     await users.login('user1@ExplorationFeedback.com');
-    creatorDashboardPage.get();
+    await creatorDashboardPage.get();
     expect(
-      creatorDashboardPage.getNumberOfFeedbackMessages()
+      await creatorDashboardPage.getNumberOfFeedbackMessages()
     ).toEqual(1);
-    creatorDashboardPage.navigateToExplorationEditor();
+    await creatorDashboardPage.navigateToExplorationEditor();
 
-    explorationEditorPage.navigateToFeedbackTab();
-    explorationEditorFeedbackTab.expectToHaveFeedbackThread();
-    explorationEditorFeedbackTab.readFeedbackMessages()
-      .then(function(messages) {
-        expect(messages.length).toEqual(1);
-        expect(messages[0]).toEqual(feedback);
-      });
-    explorationEditorPage.navigateToFeedbackTab();
-    explorationEditorFeedbackTab.sendResponseToLatestFeedback(feedbackResponse);
+    await explorationEditorPage.navigateToFeedbackTab();
+    await explorationEditorFeedbackTab.expectToHaveFeedbackThread();
+    var messages = await explorationEditorFeedbackTab.readFeedbackMessages();
+    expect(messages.length).toEqual(1);
+    expect(messages[0]).toEqual(feedback);
+    await explorationEditorPage.navigateToFeedbackTab();
+    await explorationEditorFeedbackTab.sendResponseToLatestFeedback(
+      feedbackResponse);
     await users.logout();
   });
 
@@ -128,51 +127,49 @@ describe('ExplorationFeedback', function() {
 
     // Creator creates and publishes an exploration.
     await users.login('user3@ExplorationFeedback.com');
-    workflow.createAndPublishExploration(
+    await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_2,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
-    creatorDashboardPage.get();
+    await creatorDashboardPage.get();
     expect(
-      creatorDashboardPage.getNumberOfFeedbackMessages()
+      await creatorDashboardPage.getNumberOfFeedbackMessages()
     ).toEqual(0);
     await users.logout();
 
     // Learner plays the exploration and submits a feedback.
     await users.login('user4@ExplorationFeedback.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE_2);
-    libraryPage.playExploration(EXPLORATION_TITLE_2);
-    explorationPlayerPage.submitFeedback(feedback);
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_TITLE_2);
+    await libraryPage.playExploration(EXPLORATION_TITLE_2);
+    await explorationPlayerPage.submitFeedback(feedback);
     await users.logout();
 
     // Creator reads the feedback and responds.
     await users.login('user3@ExplorationFeedback.com');
-    creatorDashboardPage.get();
+    await creatorDashboardPage.get();
     expect(
-      creatorDashboardPage.getNumberOfFeedbackMessages()
+      await creatorDashboardPage.getNumberOfFeedbackMessages()
     ).toEqual(1);
-    creatorDashboardPage.navigateToExplorationEditor();
+    await creatorDashboardPage.navigateToExplorationEditor();
 
-    explorationEditorPage.navigateToFeedbackTab();
-    explorationEditorFeedbackTab.expectToHaveFeedbackThread();
-    explorationEditorFeedbackTab.readFeedbackMessages()
-      .then(function(messages) {
-        expect(messages.length).toEqual(1);
-        expect(messages[0]).toEqual(feedback);
-      });
-    explorationEditorFeedbackTab.selectLatestFeedbackThread();
-    explorationEditorFeedbackTab.expectFeedbackStatusNameToBe('Open');
-    explorationEditorFeedbackTab.changeFeedbackStatus(
+    await explorationEditorPage.navigateToFeedbackTab();
+    await explorationEditorFeedbackTab.expectToHaveFeedbackThread();
+    var messages = await explorationEditorFeedbackTab.readFeedbackMessages();
+    expect(messages.length).toEqual(1);
+    expect(messages[0]).toEqual(feedback);
+    await explorationEditorFeedbackTab.selectLatestFeedbackThread();
+    await explorationEditorFeedbackTab.expectFeedbackStatusNameToBe('Open');
+    await explorationEditorFeedbackTab.changeFeedbackStatus(
       'Fixed', feedbackResponse);
-    explorationEditorFeedbackTab.expectFeedbackStatusNameToBe('Fixed');
-    browser.refresh();
-    explorationEditorFeedbackTab.selectLatestFeedbackThread();
-    explorationEditorFeedbackTab.expectFeedbackStatusNameToBe('Fixed');
-    explorationEditorFeedbackTab.changeFeedbackStatus(
+    await explorationEditorFeedbackTab.expectFeedbackStatusNameToBe('Fixed');
+    await browser.refresh();
+    await explorationEditorFeedbackTab.selectLatestFeedbackThread();
+    await explorationEditorFeedbackTab.expectFeedbackStatusNameToBe('Fixed');
+    await explorationEditorFeedbackTab.changeFeedbackStatus(
       'Open', feedbackResponse);
-    explorationEditorFeedbackTab.expectFeedbackStatusNameToBe('Open');
+    await explorationEditorFeedbackTab.expectFeedbackStatusNameToBe('Open');
 
     await users.logout();
   });
@@ -183,62 +180,58 @@ describe('ExplorationFeedback', function() {
 
     // Creator creates and publishes an exploration.
     await users.login('user5@ExplorationFeedback.com');
-    workflow.createAndPublishExploration(
+    await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_3,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
-    creatorDashboardPage.get();
+    await creatorDashboardPage.get();
     expect(
-      creatorDashboardPage.getNumberOfFeedbackMessages()
+      await creatorDashboardPage.getNumberOfFeedbackMessages()
     ).toEqual(0);
     await users.logout();
 
     // Learner plays the exploration and submits a feedback.
     await users.login('user6@ExplorationFeedback.com');
-    libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_TITLE_3);
-    libraryPage.playExploration(EXPLORATION_TITLE_3);
-    explorationPlayerPage.submitFeedback(feedback);
+    await libraryPage.get();
+    await libraryPage.findExploration(EXPLORATION_TITLE_3);
+    await libraryPage.playExploration(EXPLORATION_TITLE_3);
+    await explorationPlayerPage.submitFeedback(feedback);
     await users.logout();
 
     // Creator reads the feedback and responds.
     await users.login('user5@ExplorationFeedback.com');
-    creatorDashboardPage.get();
+    await creatorDashboardPage.get();
     expect(
-      creatorDashboardPage.getNumberOfFeedbackMessages()
+      await creatorDashboardPage.getNumberOfFeedbackMessages()
     ).toEqual(1);
-    creatorDashboardPage.navigateToExplorationEditor();
+    await creatorDashboardPage.navigateToExplorationEditor();
 
-    explorationEditorPage.navigateToFeedbackTab();
-    explorationEditorFeedbackTab.expectToHaveFeedbackThread();
-    explorationEditorFeedbackTab.readFeedbackMessages()
-      .then(function(messages) {
-        expect(messages.length).toEqual(1);
-        expect(messages[0]).toEqual(feedback);
-      });
-    explorationEditorPage.navigateToFeedbackTab();
-    explorationEditorFeedbackTab.sendResponseToLatestFeedback(
+    await explorationEditorPage.navigateToFeedbackTab();
+    await explorationEditorFeedbackTab.expectToHaveFeedbackThread();
+    var messages = await explorationEditorFeedbackTab.readFeedbackMessages();
+    expect(messages.length).toEqual(1);
+    expect(messages[0]).toEqual(feedback);
+    await explorationEditorPage.navigateToFeedbackTab();
+    await explorationEditorFeedbackTab.sendResponseToLatestFeedback(
       feedbackResponse);
-    explorationEditorFeedbackTab.readFeedbackMessagesFromThread()
-      .then(function(messages) {
-        expect(messages.length).toEqual(2);
-        expect(messages[0].getText()).toEqual(feedback);
-        expect(messages[1].getText()).toEqual(feedbackResponse);
-      });
-    browser.refresh();
-    explorationEditorFeedbackTab.selectLatestFeedbackThread();
-    explorationEditorFeedbackTab.readFeedbackMessagesFromThread()
-      .then(function(messages) {
-        expect(messages.length).toEqual(2);
-        expect(messages[0].getText()).toEqual(feedback);
-        expect(messages[1].getText()).toEqual(feedbackResponse);
-      });
+    messages = (
+      await explorationEditorFeedbackTab.readFeedbackMessagesFromThread());
+    expect(messages.length).toEqual(2);
+    expect(await messages[0].getText()).toEqual(feedback);
+    expect(await messages[1].getText()).toEqual(feedbackResponse);
+    await browser.refresh();
+    await explorationEditorFeedbackTab.selectLatestFeedbackThread();
+    messages = (
+      await explorationEditorFeedbackTab.readFeedbackMessagesFromThread());
+    expect(messages.length).toEqual(2);
+    expect(await messages[0].getText()).toEqual(feedback);
+    expect(await messages[1].getText()).toEqual(feedbackResponse);
     await users.logout();
   });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });
 
@@ -279,7 +272,7 @@ describe('Suggestions on Explorations', function() {
   it('accepts & rejects a suggestion on a published exploration',
     async function() {
       await users.login('user1@ExplorationSuggestions.com');
-      workflow.createAndPublishExploration(
+      await workflow.createAndPublishExploration(
         EXPLORATION_TITLE,
         EXPLORATION_CATEGORY,
         EXPLORATION_OBJECTIVE,
@@ -288,51 +281,53 @@ describe('Suggestions on Explorations', function() {
 
       // Suggester plays the exploration and suggests a change.
       await users.login('user2@ExplorationSuggestions.com');
-      libraryPage.get();
-      libraryPage.findExploration(EXPLORATION_TITLE);
-      libraryPage.playExploration(EXPLORATION_TITLE);
+      await libraryPage.get();
+      await libraryPage.findExploration(EXPLORATION_TITLE);
+      await libraryPage.playExploration(EXPLORATION_TITLE);
 
       var suggestion1 = 'New Exploration';
       var suggestionDescription1 = 'Uppercased the first letter';
       var suggestion2 = 'New exploration';
       var suggestionDescription2 = 'Changed';
 
-      explorationPlayerPage.submitSuggestion(
+      await explorationPlayerPage.submitSuggestion(
         suggestion1, suggestionDescription1);
-      explorationPlayerPage.clickOnCloseSuggestionModalButton();
-      explorationPlayerPage.submitSuggestion(
+      await explorationPlayerPage.clickOnCloseSuggestionModalButton();
+      await explorationPlayerPage.submitSuggestion(
         suggestion2, suggestionDescription2);
       await users.logout();
 
       // Exploration author reviews the suggestion and accepts it.
       await users.login('user1@ExplorationSuggestions.com');
-      creatorDashboardPage.get();
-      creatorDashboardPage.navigateToExplorationEditor();
+      await creatorDashboardPage.get();
+      await creatorDashboardPage.navigateToExplorationEditor();
 
-      explorationEditorPage.navigateToFeedbackTab();
-      explorationEditorFeedbackTab.getSuggestionThreads().then(
-        function(threads) {
-          expect(threads.length).toEqual(2);
-          expect(threads[0]).toMatch(suggestionDescription2);
-        });
-      explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription1);
-      explorationEditorFeedbackTab.goBackToAllFeedbacks();
-      explorationEditorFeedbackTab.rejectSuggestion(suggestionDescription2);
+      await explorationEditorPage.navigateToFeedbackTab();
+      var threads = await explorationEditorFeedbackTab.getSuggestionThreads();
+      expect(threads.length).toEqual(2);
+      expect(threads[0]).toMatch(suggestionDescription2);
+      await explorationEditorFeedbackTab.acceptSuggestion(
+        suggestionDescription1);
+      await explorationEditorFeedbackTab.goBackToAllFeedbacks();
+      await explorationEditorFeedbackTab.rejectSuggestion(
+        suggestionDescription2);
 
-      explorationEditorPage.navigateToPreviewTab();
-      explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
+      await explorationEditorPage.navigateToPreviewTab();
+      await explorationPlayerPage.expectContentToMatch(
+        await forms.toRichText(suggestion1));
       await users.logout();
 
       // Student logs in and plays the exploration, finds the updated content.
       await users.login('user3@ExplorationSuggestions.com');
-      libraryPage.get();
-      libraryPage.findExploration(EXPLORATION_TITLE);
-      libraryPage.playExploration(EXPLORATION_TITLE);
-      explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
+      await libraryPage.get();
+      await libraryPage.findExploration(EXPLORATION_TITLE);
+      await libraryPage.playExploration(EXPLORATION_TITLE);
+      await explorationPlayerPage.expectContentToMatch(
+        await forms.toRichText(suggestion1));
       await users.logout();
     });
 
-  afterEach(function() {
-    general.checkForConsoleErrors([]);
+  afterEach(async function() {
+    await general.checkForConsoleErrors([]);
   });
 });

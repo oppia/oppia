@@ -68,15 +68,14 @@ var CreatorDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.getNumberOfFeedbackMessages = function() {
-    return explorationFeedbackCount.getText().then(function(text) {
-      return parseInt(text);
-    });
+  this.getNumberOfFeedbackMessages = async function() {
+    var feedbackCount = await explorationFeedbackCount.getText();
+    return parseInt(feedbackCount);
   };
 
   this.navigateToExplorationEditor = async function() {
     await waitFor.elementToBeClickable(explorationDashboardCard);
-    explorationDashboardCard.click();
+    await explorationDashboardCard.click();
     await waitFor.pageToFullyLoad();
   };
 

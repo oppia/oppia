@@ -218,18 +218,18 @@ var ExplorationEditorPage = function() {
 
   // NAVIGATION
 
-  this.navigateToHistoryTab = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToHistoryTab = async function() {
+    await waitFor.elementToBeClickable(
       navigateToHistoryTabButton, 'History tab is not clickable');
-    navigateToHistoryTabButton.click();
-    waitFor.pageToFullyLoad();
+    await navigateToHistoryTabButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToFeedbackTab = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToFeedbackTab = async function() {
+    await waitFor.elementToBeClickable(
       navigateToFeedbackTabButton, 'Feedback tab is not clickable');
-    navigateToFeedbackTabButton.click();
-    waitFor.pageToFullyLoad();
+    await navigateToFeedbackTabButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
   this.navigateToMainTab = async function() {

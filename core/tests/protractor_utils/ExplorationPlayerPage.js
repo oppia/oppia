@@ -187,12 +187,12 @@ var ExplorationPlayerPage = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.clickOnCloseSuggestionModalButton = function() {
-    waitFor.elementToBeClickable(
+  this.clickOnCloseSuggestionModalButton = async function() {
+    await waitFor.elementToBeClickable(
       closeSuggestionModalButton,
       '"Close suggestion modal" button takes too long to be clickable');
-    closeSuggestionModalButton.click();
-    waitFor.pageToFullyLoad();
+    await closeSuggestionModalButton.click();
+    await waitFor.pageToFullyLoad();
   };
 
   // This verifies the question just asked, including formatting and
@@ -299,17 +299,18 @@ var ExplorationPlayerPage = function() {
       feedbackSubmitButton, 'Feedback popup takes too long to disappear');
   };
 
-  this.submitSuggestion = function(suggestion, description) {
-    waitFor.elementToBeClickable(
+  this.submitSuggestion = async function(suggestion, description) {
+    await waitFor.elementToBeClickable(
       suggestionPopupLink, 'Suggestion Popup link takes too long to appear');
-    suggestionPopupLink.click();
-    forms.RichTextEditor(explorationSuggestionModal).setPlainText(suggestion);
-    suggestionDescriptionInput.sendKeys(description);
-    waitFor.elementToBeClickable(
+    await suggestionPopupLink.click();
+    var editor = await forms.RichTextEditor(explorationSuggestionModal);
+    await editor.setPlainText(suggestion);
+    await suggestionDescriptionInput.sendKeys(description);
+    await waitFor.elementToBeClickable(
       suggestionSubmitButton,
       'Suggestion Submit button takes too long to be clickable');
-    suggestionSubmitButton.click();
-    waitFor.invisibilityOf(
+    await suggestionSubmitButton.click();
+    await waitFor.invisibilityOf(
       suggestionSubmitButton, 'Suggestion popup takes too long to disappear');
   };
 

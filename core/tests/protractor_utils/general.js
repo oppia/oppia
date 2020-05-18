@@ -95,12 +95,12 @@ var getExplorationIdFromPlayer = async function() {
 };
 
 // The explorationId here should be a string, not a promise.
-var openEditor = function(explorationId) {
-  browser.get(EDITOR_URL_SLICE + explorationId);
-  waitFor.pageToFullyLoad();
+var openEditor = async function(explorationId) {
+  await browser.get(EDITOR_URL_SLICE + explorationId);
+  await waitFor.pageToFullyLoad();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  explorationEditorMainTab.exitTutorial();
+  await explorationEditorMainTab.exitTutorial();
 };
 
 var openPlayer = async function(explorationId) {
