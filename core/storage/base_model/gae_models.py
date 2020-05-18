@@ -85,8 +85,7 @@ class BaseModel(ndb.Model):
 
     # When this entity was first created. This can be overwritten and
     # set explicitly.
-    created_on = ndb.DateTimeProperty(
-        auto_now_add=True, indexed=True, required=True)
+    created_on = ndb.DateTimeProperty(indexed=True, required=True)
     # When this entity was last updated. This cannot be set directly.
     last_updated = ndb.DateTimeProperty(indexed=True, required=True)
     # Whether the current version of the model instance is deleted.
@@ -247,6 +246,9 @@ class BaseModel(ndb.Model):
         Returns:
             Model. The entity that was stored.
         """
+        if self.created_on is None:
+            self.created_on = datetime.datetime.utcnow()
+
         if update_last_updated_time or self.last_updated is None:
             self.last_updated = datetime.datetime.utcnow()
 
@@ -261,6 +263,9 @@ class BaseModel(ndb.Model):
             update_last_updated_time: bool. Whether to update the
                 last_updated_field of the entities.
         """
+        if entity.created_on is None:
+                entity.created_on = datetime.datetime.utcnow()
+
         for entity in entities:
             if update_last_updated_time or entity.last_updated is None:
                 entity.last_updated = datetime.datetime.utcnow()
