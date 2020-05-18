@@ -517,7 +517,7 @@
 	"I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION": "Oppia é uma plataforma de aprendizagem gratuita e de código aberto cheia de atividades interativas chamadas 'explorações'. Infelizmente, Oppia requer que o JavaScript esteja ativo em seu navegador web para funcionar corretamente e seu navegador está com o JavaScript desativado. Se precisar de ajuda para habilitar o JavaScript, <a href=\"<[hrefUrl]>\">clique aqui</a>.",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_THANKS": "Muito obrigado.",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_TITLE": "Precisamos de JavaScript em seu navegador",
-	"I18N_SPLASH_PAGE_TITLE": "Oppia: Ensine, Aprenda, Explore",
+	"I18N_SPLASH_PAGE_TITLE": "Oppia | Aulas gratuitas, on-line e interativas para qualquer pessoa",
 	"I18N_SPLASH_SECOND_EXPLORATION_DESCRIPTION": "Explorações são fáceis de criar. Elas são facilmente adaptáveis com base no feedback de cada estudante e em tendências na experiência de estudantes do mundo todo.",
 	"I18N_SPLASH_SITE_FEEDBACK": "Deixe sua opinião sobre o site",
 	"I18N_SPLASH_SUBTITLE": "Oppia facilita a criação de aulas interativas que educam e engajam.",
