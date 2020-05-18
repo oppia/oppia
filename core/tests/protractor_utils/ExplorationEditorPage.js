@@ -252,10 +252,10 @@ var ExplorationEditorPage = function() {
     await navigateToSettingsTabButton.click();
   };
 
-  this.navigateToStatsTab = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToStatsTab = async function() {
+    await waitFor.elementToBeClickable(
       navigateToStatsTabButton, 'Stats tab is not clickable');
-    navigateToStatsTabButton.click();
+    await navigateToStatsTabButton.click();
   };
   this.navigateToTranslationTab = function() {
     waitFor.elementToBeClickable(

@@ -137,31 +137,31 @@ var ExplorationPlayerPage = function() {
       'Your report has been forwarded to the moderators for review.');
   };
 
-  this.viewHint = function() {
+  this.viewHint = async function() {
     // We need to wait some time for the solution to activate.
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       viewHintButton, '"View Hint" button takes too long to be clickable');
-    viewHintButton.click();
-    clickGotItButton();
+    await viewHintButton.click();
+    await clickGotItButton();
   };
 
-  this.viewSolution = function() {
+  this.viewSolution = async function() {
     // We need to wait some time for the solution to activate.
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       viewSolutionButton,
       '"View Solution" button takes too long to be clickable');
-    viewSolutionButton.click();
-    waitFor.elementToBeClickable(
+    await viewSolutionButton.click();
+    await waitFor.elementToBeClickable(
       continueToSolutionButton,
       '"Continue Solution" button takes too long to be clickable');
-    continueToSolutionButton.click();
-    clickGotItButton();
+    await continueToSolutionButton.click();
+    await clickGotItButton();
   };
 
-  var clickGotItButton = function() {
-    waitFor.elementToBeClickable(
+  var clickGotItButton = async function() {
+    await waitFor.elementToBeClickable(
       gotItButton, '"Got It" button takes too long to be clickable');
-    gotItButton.click();
+    await gotItButton.click();
   };
 
   this.clickConfirmRedirectionButton = function() {

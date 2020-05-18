@@ -533,21 +533,21 @@ var ExplorationEditorMainTab = function() {
 
   // HINT
 
-  this.addHint = function(hint) {
-    addHintButton.click();
+  this.addHint = async function(hint) {
+    await addHintButton.click();
     var addHintModal = element(
       by.cssContainingText('.protractor-test-hint-modal', 'Add Hint'));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       addHintModal, 'Add hint modal takes too long to appear');
-    element(by.css('.protractor-test-hint-text')).all(by.tagName('p'))
+    await element(by.css('.protractor-test-hint-text')).all(by.tagName('p'))
       .last().click();
-    browser.switchTo().activeElement().sendKeys(hint);
+    await browser.switchTo().activeElement().sendKeys(hint);
 
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       saveHintButton,
       'Save Hint button takes too long to be clickable');
-    saveHintButton.click();
-    waitFor.invisibilityOf(
+    await saveHintButton.click();
+    await waitFor.invisibilityOf(
       addHintModal, 'Add Hint modal takes too long to close');
   };
 
@@ -590,26 +590,27 @@ var ExplorationEditorMainTab = function() {
     };
   };
 
-  this.addSolution = function(interactionId, solution) {
-    addSolutionButton.click();
+  this.addSolution = async function(interactionId, solution) {
+    await addSolutionButton.click();
     var addOrUpdateSolutionModal = element(
       by.css('.protractor-test-add-or-update-solution-modal'));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       addOrUpdateSolutionModal,
       'Add/Update Solution modal takes to long to appear');
-    interactions.getInteraction(interactionId).submitAnswer(
+    var interaction = await interactions.getInteraction(interactionId);
+    await interaction.submitAnswer(
       element(by.css('.protractor-test-interaction-html')),
       solution.correctAnswer);
-    element(by.css('.protractor-test-explanation-textarea'))
+    await element(by.css('.protractor-test-explanation-textarea'))
       .all(by.tagName('p')).first().click();
-    browser.switchTo().activeElement().sendKeys(solution.explanation);
+    await browser.switchTo().activeElement().sendKeys(solution.explanation);
     var submitSolutionButton = element(
       by.css('.protractor-test-submit-solution-button'));
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       submitSolutionButton,
       'Submit Solution button takes too long to be clickable');
-    submitSolutionButton.click();
-    waitFor.invisibilityOf(
+    await submitSolutionButton.click();
+    await waitFor.invisibilityOf(
       addOrUpdateSolutionModal,
       'Add/Update Solution modal takes too long to close');
   };

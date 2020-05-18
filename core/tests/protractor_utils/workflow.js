@@ -103,15 +103,15 @@ var createCollectionAsAdmin = function() {
 /**
  * Creating exploration for Admin await users.
  */
-var createExplorationAsAdmin = function() {
+var createExplorationAsAdmin = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
-  creatorDashboardPage.get();
-  creatorDashboardPage.clickCreateActivityButton();
+  await creatorDashboardPage.get();
+  await creatorDashboardPage.clickCreateActivityButton();
   var activityCreationModal = element(
     by.css('.protractor-test-creation-modal'));
-  waitFor.visibilityOf(
+  await waitFor.visibilityOf(
     activityCreationModal, 'Activity Creation modal takes too long to appear');
-  creatorDashboardPage.clickCreateExplorationButton();
+  await creatorDashboardPage.clickCreateExplorationButton();
 };
 
 // This will only work if all changes have been saved and there are no

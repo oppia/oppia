@@ -50,16 +50,14 @@ var CreatorDashboardPage = function() {
       element(by.css('.protractor-test-exploration-dashboard-card')));
     var allExplorationDashboardCard = element.all(
       by.css('.protractor-test-exploration-dashboard-card'));
-    return allExplorationDashboardCard.then(function(tiles) {
-      return tiles.filter(function(tile) {
-        return tile.getText().then(function(text) {
-          // Tile text contains title, possibly followed by newline and text
-          return (
-            text.startsWith(explorationTitle + '\n') ||
-            text === explorationTitle
-          );
-        });
-      });
+    var tiles = await allExplorationDashboardCard;
+    return await tiles.filter(async function(tile) {
+      var text = await tile.getText();
+      // Tile text contains title, possibly followed by newline and text
+      return (
+        text.startsWith(explorationTitle + '\n') ||
+        text === explorationTitle
+      );
     });
   };
 
@@ -101,7 +99,7 @@ var CreatorDashboardPage = function() {
     await waitFor.elementToBeClickable(
       createExplorationButton,
       'Create Exploration button takes too long to be clickable');
-    createExplorationButton.click();
+    await createExplorationButton.click();
     await waitFor.pageToFullyLoad();
   };
 
@@ -131,19 +129,18 @@ var CreatorDashboardPage = function() {
   };
 
   this.editExploration = async function(explorationTitle) {
-    _getExplorationElements(explorationTitle).then(function(elems) {
-      if (elems.length === 0) {
-        throw new Error(
-          'Could not find exploration tile with name ' + explorationTitle);
-      }
-      var explorationElement = elems[0].element(
-        by.css('.protractor-test-title-mask'));
-      waitFor.elementToBeClickable(
-        explorationElement,
-        'Unable to click on exploration: ' + explorationTitle);
-      explorationElement.click();
-      waitFor.pageToFullyLoad();
-    });
+    var elems = await _getExplorationElements(explorationTitle);
+    if (elems.length === 0) {
+      throw new Error(
+        'Could not find exploration tile with name ' + explorationTitle);
+    }
+    var explorationElement = elems[0].element(
+      by.css('.protractor-test-title-mask'));
+    await waitFor.elementToBeClickable(
+      explorationElement,
+      'Unable to click on exploration: ' + explorationTitle);
+    await explorationElement.click();
+    await waitFor.pageToFullyLoad();
   };
 
   this.getAverageRating = async function() {
