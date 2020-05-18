@@ -24,4 +24,4 @@ require('App.ts');
 require(
   'pages/subtopic-viewer-page/navbar-breadcrumb/' +
   'subtopic-viewer-navbar-breadcrumb.directive.ts');
-require('pages/subtopic-viewer-page/subtopic-viewer-page.controller.ts');
+require('pages/subtopic-viewer-page/subtopic-viewer-page.component.ts');

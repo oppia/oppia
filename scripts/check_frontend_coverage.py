@@ -434,7 +434,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'student.ts',
     'subtopic-summary-tile.directive.ts',
     'subtopic-viewer-navbar-breadcrumb.directive.ts',
-    'subtopic-viewer-page.controller.ts',
+    'subtopic-viewer-page.component.ts',
     'SubtopicObjectFactory.ts',
     'SubtopicPageObjectFactory.ts',
     'subtopics-list-tab.directive.ts',

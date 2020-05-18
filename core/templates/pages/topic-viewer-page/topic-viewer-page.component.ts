@@ -42,7 +42,6 @@ angular.module('oppia').component('topicViewerPage', {
         $rootScope, AlertsService, LoaderService,
         PageTitleService, TopicViewerBackendApiService,
         UrlService, WindowDimensionsService, FATAL_ERROR_CODES) {
-      console.log('eba');
       var ctrl = this;
       ctrl.setActiveTab = function(newActiveTabName) {
         ctrl.activeTab = newActiveTabName;

@@ -199,6 +199,8 @@ import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
 import { ReadOnlyStoryNodeObjectFactory } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
+import { ReadOnlySubtopicPageObjectFactory } from
+  'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 import { ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { RecordedVoiceoversObjectFactory } from
@@ -282,6 +284,8 @@ import { SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory';
 import { SubtopicPageObjectFactory } from
   'domain/topic/SubtopicPageObjectFactory';
+import { SubtopicViewerBackendApiService } from
+  'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
@@ -697,6 +701,9 @@ export class UpgradedServices {
       new QuestionBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['ReadOnlySubtopicPageObjectFactory'] =
+      new ReadOnlySubtopicPageObjectFactory(
+        upgradedServices['SubtopicPageContentsObjectFactory']);
     upgradedServices['ReadOnlyTopicObjectFactory'] =
       new ReadOnlyTopicObjectFactory(
         upgradedServices['SubtopicObjectFactory'],
@@ -738,6 +745,11 @@ export class UpgradedServices {
       upgradedServices['ExplorationHtmlFormatterService']);
     upgradedServices['StateCardObjectFactory'] = new StateCardObjectFactory(
       upgradedServices['AudioTranslationLanguageService']);
+    upgradedServices['SubtopicViewerBackendApiService'] =
+      new SubtopicViewerBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['ReadOnlySubtopicPageObjectFactory'],
+        upgradedServices['UrlInterpolationService']);
 
     // Topological level: 5.
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
