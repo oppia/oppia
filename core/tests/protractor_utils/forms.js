@@ -620,8 +620,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       await _compareTextAndHighlightingFromLine(
         largestLineNumber,
         scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
-        compareDicti
-      );
+        compareDict);
     } else {
       for (var lineNumber in compareDict) {
         if (compareDict[lineNumber].checked !== true) {

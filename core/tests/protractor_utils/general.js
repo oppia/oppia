@@ -116,8 +116,9 @@ var moveToPlayer = async function() {
 };
 
 // Takes the user from the exploration player to its editor.
-var moveToEditor = function() {
-  getExplorationIdFromPlayer().then(openEditor);
+var moveToEditor = async function() {
+  var explorationId = await getExplorationIdFromPlayer();
+  await openEditor(explorationId);
 };
 
 var expect404Error = function() {
