@@ -263,10 +263,10 @@ class BaseModel(ndb.Model):
             update_last_updated_time: bool. Whether to update the
                 last_updated_field of the entities.
         """
-        if entity.created_on is None:
+        for entity in entities:
+            if entity.created_on is None:
                 entity.created_on = datetime.datetime.utcnow()
 
-        for entity in entities:
             if update_last_updated_time or entity.last_updated is None:
                 entity.last_updated = datetime.datetime.utcnow()
 
