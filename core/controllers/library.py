@@ -71,6 +71,15 @@ def get_matching_activity_dicts(query_string, search_cursor):
     return activity_list, new_search_cursor
 
 
+class OldLibraryUrlHandler(base.BaseHandler):
+    """Redirects the old library URL to the new one."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.LIBRARY_INDEX_URL)
+
+
 class LibraryPage(base.BaseHandler):
     """The main library page. Used for both the default list of categories and
     for search results.

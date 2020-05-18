@@ -370,6 +370,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL,
         custom_landing_pages.StewardsLandingPage),
 
+    get_redirect_route('/library', library.OldLibraryUrlHandler),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
     get_redirect_route(
