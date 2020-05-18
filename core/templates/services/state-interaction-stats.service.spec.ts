@@ -19,13 +19,13 @@
 import { TestBed, flushMicrotasks, fakeAsync } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
+
+import { ContextService } from 'services/context.service';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 import { NormalizeWhitespacePunctuationAndCasePipe } from
   // eslint-disable-next-line max-len
   'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
-
-import { ContextService } from 'services/context.service';
 import { StateInteractionStatsService } from
   'services/state-interaction-stats.service';
 

@@ -18,12 +18,6 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { NormalizeWhitespacePipe } from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
-import { NormalizeWhitespacePunctuationAndCasePipe } from
-  // eslint-disable-next-line max-len
-  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
-
 import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
 import { ContinueRulesService } from
@@ -58,6 +52,11 @@ import { MultipleChoiceInputRulesService } from
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { MusicNotesInputRulesService } from
   'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
+import { NormalizeWhitespacePunctuationAndCasePipe } from
+  // eslint-disable-next-line max-len
+  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
 import { NumberWithUnitsRulesService } from
   'interactions/NumberWithUnits/directives/number-with-units-rules.service';
 import { NumericInputRulesService } from
