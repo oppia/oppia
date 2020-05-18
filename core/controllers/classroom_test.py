@@ -118,3 +118,22 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             self.get_json(
                 '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'),
                 expected_status_int=404)
+
+
+class ClassroomPageStatusHandlerTests(BaseClassroomControllerTests):
+    """Unit test for ClassroomPageStatusHandler."""
+    def test_get_request_returns_correct_status(self):
+        self.set_config_property(config_domain.CLASSROOM_PAGE_IS_SHOWN, False)
+
+        response = self.get_json('/classroom_page_status_handler')
+        self.assertEqual(
+            response, {
+                'classroom_page_is_shown': False
+            })
+
+        self.set_config_property(config_domain.CLASSROOM_PAGE_IS_SHOWN, True)
+        response = self.get_json('/classroom_page_status_handler')
+        self.assertEqual(
+            response, {
+                'classroom_page_is_shown': True,
+            })

@@ -40,17 +40,17 @@ angular.module('oppia').directive('topNavigationBar', [
         '-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$http', '$window', '$timeout', '$translate',
-        'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
-        'SiteAnalyticsService', 'NavigationService', 'WindowDimensionsService',
-        'DebouncerService', 'DeviceInfoService', 'LOGOUT_URL',
-        'ClassroomBackendApiService',
+        '$http', '$scope', '$timeout', '$translate', '$window',
+        'ClassroomBackendApiService', 'DebouncerService', 'DeviceInfoService',
+        'NavigationService', 'SidebarStatusService', 'SiteAnalyticsService',
+        'WindowDimensionsService', 'UserService',
+        'LABEL_FOR_CLEARING_FOCUS', 'LOGOUT_URL',
         function(
-            $scope, $http, $window, $timeout, $translate,
-            SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
-            SiteAnalyticsService, NavigationService, WindowDimensionsService,
-            DebouncerService, DeviceInfoService, LOGOUT_URL,
-            ClassroomBackendApiService) {
+            $http, $scope, $timeout, $translate, $window,
+            ClassroomBackendApiService, DebouncerService, DeviceInfoService,
+            NavigationService, SidebarStatusService, SiteAnalyticsService,
+            WindowDimensionsService, UserService,
+            LABEL_FOR_CLEARING_FOCUS, LOGOUT_URL) {
           var ctrl = this;
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
@@ -67,16 +67,6 @@ angular.module('oppia').directive('topNavigationBar', [
             DebouncerService.debounce(truncateNavbar, 500);
 
           ctrl.CLASSROOM_PAGE_IS_SHOWN = false;
-
-          ctrl.updateShowClassroom = function() {
-            ClassroomBackendApiService.fetchClassroomData('math').then(
-              function(classroomData) {
-                ctrl.CLASSROOM_PAGE_IS_SHOWN = (
-                  classroomData.classroom_page_is_shown);
-              }, function(errorResponse) {
-                ctrl.CLASSROOM_PAGE_IS_SHOWN = false;
-              });
-          };
 
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -234,6 +224,11 @@ angular.module('oppia').directive('topNavigationBar', [
             NavigationService.KEYBOARD_EVENT_TO_KEY_CODES;
             ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
             ctrl.navElementsVisibilityStatus = {};
+
+            ClassroomBackendApiService.fetchClassroomIsShownStatus().then(
+              function(classroomIsShown) {
+                ctrl.CLASSROOM_PAGE_IS_SHOWN = classroomIsShown;
+              });
 
             // Close the submenu if focus or click occurs anywhere outside of
             // the menu or outside of its parent (which opens submenu on hover).

@@ -58,10 +58,23 @@ export class ClassroomBackendApiService {
         }
       );
       if (successCallback) {
-        successCallback({
-          topicSummaryObjects: this.topicSummaryObjects,
-          classroom_page_is_shown: data.classroom_page_is_shown
-        });
+        successCallback(this.topicSummaryObjects);
+      }
+    }, (error: any) => {
+      if (errorCallback) {
+        errorCallback(error);
+      }
+    });
+  }
+
+  _fetchClassroomIsShownStatus(
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
+    const classroomStatusHandlerUrl = '/classroom_page_status_handler';
+
+    this.http.get(classroomStatusHandlerUrl).toPromise().then((data: any) => {
+      if (successCallback) {
+        successCallback(data.classroom_page_is_shown);
       }
     }, (error: any) => {
       if (errorCallback) {
@@ -73,6 +86,12 @@ export class ClassroomBackendApiService {
   fetchClassroomData(classroomName: string): Promise<Object> {
     return new Promise((resolve, reject) => {
       this._fetchClassroomData(classroomName, resolve, reject);
+    });
+  }
+
+  fetchClassroomIsShownStatus(): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._fetchClassroomIsShownStatus(resolve, reject);
     });
   }
 }

@@ -22,6 +22,7 @@ require(
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
 require('pages/library-page/search-results/search-results.directive.ts');
+
 require('domain/classroom/classroom-backend-api.service');
 require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts');
 require(
@@ -48,22 +49,24 @@ angular.module('oppia').directive('libraryPage', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal',
-        '$window', 'AlertsService', 'LearnerDashboardActivityIdsObjectFactory',
+        '$window', 'AlertsService', 'ClassroomBackendApiService',
+        'LearnerDashboardActivityIdsObjectFactory',
         'LearnerDashboardIdsBackendApiService', 'LearnerPlaylistService',
         'LoaderService', 'PageTitleService', 'SearchService',
         'UrlInterpolationService', 'UrlService', 'UserService',
         'WindowDimensionsService', 'ALL_CATEGORIES',
         'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES',
-        'LIBRARY_TILE_WIDTH_PX', 'ClassroomBackendApiService',
+        'LIBRARY_TILE_WIDTH_PX',
         function(
             $http, $log, $rootScope, $scope, $timeout, $uibModal,
-            $window, AlertsService, LearnerDashboardActivityIdsObjectFactory,
+            $window, AlertsService, ClassroomBackendApiService,
+            LearnerDashboardActivityIdsObjectFactory,
             LearnerDashboardIdsBackendApiService, LearnerPlaylistService,
             LoaderService, PageTitleService, SearchService,
             UrlInterpolationService, UrlService, UserService,
             WindowDimensionsService, ALL_CATEGORIES,
             LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES,
-            LIBRARY_TILE_WIDTH_PX, ClassroomBackendApiService) {
+            LIBRARY_TILE_WIDTH_PX) {
           var ctrl = this;
           var possibleBannerFilenames = [
             'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
@@ -75,16 +78,6 @@ angular.module('oppia').directive('libraryPage', [
           var isAnyCarouselCurrentlyScrolling = false;
 
           ctrl.CLASSROOM_PAGE_IS_SHOWN = false;
-
-          var updateShowClassroom = function() {
-            ClassroomBackendApiService.fetchClassroomData('math').then(
-              function(classroomData) {
-                ctrl.CLASSROOM_PAGE_IS_SHOWN = (
-                  classroomData.classroom_page_is_shown);
-              }, function(errorResponse) {
-                ctrl.CLASSROOM_PAGE_IS_SHOWN = false;
-              });
-          };
 
           ctrl.setActiveGroup = function(groupIndex) {
             ctrl.activeGroupIndex = groupIndex;
@@ -226,7 +219,10 @@ angular.module('oppia').directive('libraryPage', [
             ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
               '/library/' + ctrl.bannerImageFilename);
 
-            updateShowClassroom();
+            ClassroomBackendApiService.fetchClassroomIsShownStatus().then(
+              function(classroomIsShown) {
+                ctrl.CLASSROOM_PAGE_IS_SHOWN = classroomIsShown;
+              });
 
             ctrl.activeGroupIndex = null;
 
