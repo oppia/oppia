@@ -152,7 +152,7 @@ describe('Question object factory', () => {
     var newQuestionBackendDict = sampleQuestion.toBackendDict(true);
     expect(newQuestionBackendDict.id).toEqual(null);
     expect(newQuestionBackendDict.linked_skill_ids).not.toBeDefined();
-    expect(newQuestionBackendDict.version).toEqual(0);
+    expect(newQuestionBackendDict.version).toEqual(1);
     expect(sampleQuestion.toBackendDict(false).id).toEqual('question_id');
   });
 
