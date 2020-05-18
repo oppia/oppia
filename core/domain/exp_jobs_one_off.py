@@ -532,7 +532,7 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         exploration_states_unchanged_count = 0
         exploration_states_failed_count = 0
         for state, state_value in item.states.items():
-            states_changed_count = 0
+            is_state_changed = False
             voiceovers_mapping = (state_value['recorded_voiceovers']
                                   ['voiceovers_mapping'])
             language_codes_to_audio_metadata = voiceovers_mapping.values()
@@ -542,13 +542,11 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     filename = audio_metadata['filename']
                     if audio_metadata['duration_secs'] == 0.0:
                         try:
-                            fs = (fs_domain.AbstractFileSystem(
+                            fs = fs_domain.AbstractFileSystem(
                                 fs_domain.GcsFileSystem(
-                                    AUDIO_ENTITY_TYPE,
-                                    item.id)))
-                            raw = (
-                                fs.get('%s/%s' % (AUDIO_FILE_PREFIX,
-                                                  filename)))
+                                    AUDIO_ENTITY_TYPE, item.id))
+                            raw = fs.get('%s/%s' % (
+                                AUDIO_FILE_PREFIX, filename))
                             # Get the audio-duration from file with Mutagen.
                             tempbuffer = python_utils.string_io()
                             tempbuffer.write(raw)
@@ -560,7 +558,7 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             # metadata.
                             audio_metadata['duration_secs'] = (
                                 audio.info.length)
-                            states_changed_count += 1
+                            is_state_changed = True
                             exploration_states_changed_count += 1
                         except Exception as e:
                             logging.error(
@@ -572,7 +570,7 @@ class VoiceoverDurationSecondsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             exploration_states_failed_count += 1
                     else:
                         exploration_states_unchanged_count += 1
-            if states_changed_count > 0:
+            if is_state_changed:
                 # Create commits to update the exploration.
                 # Only when the state is changed.
                 commit_cmds.append(exp_domain.ExplorationChange({

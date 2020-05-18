@@ -2051,7 +2051,6 @@ class VoiceoverDurationSecondsOneOffJobTests(test_utils.GenericTestBase):
                             'AUDIO_DURATIONS_CHANGED: 2\']]')]
         self.assertEqual(actual_output, expected_output)
 
-
         updated_exploration = (
             exp_fetchers.get_exploration_by_id(self.VALID_EXP_ID).to_dict())
         expected_updated_value = {
