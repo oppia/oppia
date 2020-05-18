@@ -66,7 +66,7 @@ var PreferencesPage = function() {
 
   this.submitProfilePhoto = async function(imgPath) {
     return await workflow.submitImage(
-     profilePhotoClickable, profilePhotoCropper, imgPath);
+      profilePhotoClickable, profilePhotoCropper, imgPath);
   };
 
   this.getProfilePhotoSource = async function() {
@@ -81,7 +81,7 @@ var PreferencesPage = function() {
 
   this.get = async function() {
     await browser.get(USER_PREFERENCES_URL);
-    //return await waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   };
 
   this.toggleEditorRoleEmailsCheckbox = async function() {

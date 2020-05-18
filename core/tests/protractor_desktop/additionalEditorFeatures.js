@@ -126,7 +126,8 @@ describe('Full exploration editor', function() {
     await workflow.createExploration();
     await explorationEditorMainTab.setStateName('card1');
     await explorationEditorMainTab.expectCurrentStateToBe('card1');
-    await explorationEditorMainTab.setContent(await forms.toRichText('card1 content'));
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('card1 content'));
     await explorationEditorMainTab.setInteraction('TextInput');
     await (
       await explorationEditorMainTab.getResponseEditor('default')
@@ -171,7 +172,8 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.moveToState('first');
     await explorationEditorMainTab.deleteState('first');
     await explorationEditorMainTab.expectCurrentStateToBe('second');
-    await explorationEditorMainTab.expectStateNamesToBe(['final card', 'second']);
+    await explorationEditorMainTab.expectStateNamesToBe([
+      'final card', 'second']);
 
     // Check behaviour of the back button
     await explorationEditorPage.navigateToSettingsTab();
@@ -195,20 +197,25 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
       await richTextEditor.appendItalicText('Welcome');
     });
-    await explorationEditorMainTab.expectContentToMatch(async function(richTextChecker) {
-      await richTextChecker.readItalicText('Welcome');
-    });
+    await explorationEditorMainTab.expectContentToMatch(
+      async function(richTextChecker) {
+        await richTextChecker.readItalicText('Welcome');
+      }
+    );
     await explorationEditorMainTab.setInteraction('NumericInput');
     // Check display of content & interaction in the editor
     await explorationEditorMainTab.expectInteractionToMatch('NumericInput');
 
     // Check deletion of groups
-    var responseEditor = await explorationEditorMainTab.getResponseEditor('default');
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
     await responseEditor.setFeedback(await forms.toRichText('Farewell'));
     await responseEditor.setDestination(null, false, null);
-    await responseEditor.expectAvailableDestinationsToBe(['second', 'final card']);
+    await responseEditor.expectAvailableDestinationsToBe([
+      'second', 'final card']);
     await responseEditor.setDestination('final card', false, null);
-    await responseEditor.expectAvailableDestinationsToBe(['second', 'final card']);
+    await responseEditor.expectAvailableDestinationsToBe([
+      'second', 'final card']);
     await explorationEditorMainTab.addResponse(
       'NumericInput', null, 'final card', false,
       'IsGreaterThan', 2);
@@ -229,9 +236,11 @@ describe('Full exploration editor', function() {
 
     // Check editor preview tab.
     await explorationEditorPage.navigateToPreviewTab();
-    await explorationPlayerPage.expectContentToMatch(async function(richTextEditor) {
-      await richTextEditor.readItalicText('Welcome');
-    });
+    await explorationPlayerPage.expectContentToMatch(
+      async function(richTextEditor) {
+        await richTextEditor.readItalicText('Welcome');
+      }
+    );
     await explorationPlayerPage.expectInteractionToMatch('NumericInput');
     await explorationPlayerPage.submitAnswer('NumericInput', 6);
     // This checks the previously-deleted group no longer applies.
@@ -261,7 +270,8 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.addResponse('TextInput',
       await forms.toRichText('No being sad!'),
       null, false, 'Contains', 'sad');
-    var responseEditor = await explorationEditorMainTab.getResponseEditor('default');
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
     await responseEditor.setFeedback(await forms.toRichText(
       'Okay, now this is just becoming annoying.'));
     await responseEditor.setDestination('final card', true, null);
@@ -327,7 +337,8 @@ describe('Full exploration editor', function() {
     await responseEditor.expectCannotDeleteRule(0);
 
     // Check default outcome.
-    responseEditor = await explorationEditorMainTab.getResponseEditor('default');
+    responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
     await responseEditor.expectCannotSetFeedback();
     await responseEditor.expectCannotSetDestination();
 
@@ -337,7 +348,8 @@ describe('Full exploration editor', function() {
       await forms.toRichText('How are you feeling?'));
     await explorationPlayerPage.expectInteractionToMatch('TextInput');
 
-    await explorationPlayerPage.submitAnswer('TextInput', 'Fine...I\'m doing okay');
+    await explorationPlayerPage.submitAnswer(
+      'TextInput', 'Fine...I\'m doing okay');
     await explorationPlayerPage.expectLatestFeedbackToMatch(
       await forms.toRichText('You must be happy!'));
 

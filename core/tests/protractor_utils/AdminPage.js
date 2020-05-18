@@ -212,13 +212,15 @@ var AdminPage = function() {
     await adminRolesTab.click();
 
     // Change values for "update role" form, and submit it.
-    await waitFor.visibilityOf(updateFormName, 'Update Form Name is not visible');
+    await waitFor.visibilityOf(
+      updateFormName, 'Update Form Name is not visible');
     await updateFormName.sendKeys(name);
     var roleOption = roleSelect.element(
       by.cssContainingText('option', newRole));
     await roleOption.click();
     await updateFormSubmit.click();
-    await waitFor.visibilityOf(statusMessage, 'Confirmation message not visible');
+    await waitFor.visibilityOf(
+      statusMessage, 'Confirmation message not visible');
     await waitFor.textToBePresentInElement(
       statusMessage, 'successfully updated to',
       'Could not set role successfully');

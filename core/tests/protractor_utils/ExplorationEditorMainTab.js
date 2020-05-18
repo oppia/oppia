@@ -400,9 +400,9 @@ var ExplorationEditorMainTab = function() {
         expectedOptionTexts.push(_NEW_STATE_OPTION);
 
         var actualOptionTexts = await editOutcomeDestBubble.all(
-            by.tagName('option')).map(async function(optionElem) {
-              return await optionElem.getText();
-            });
+          by.tagName('option')).map(async function(optionElem) {
+            return await optionElem.getText();
+          });
         expect(actualOptionTexts).toEqual(expectedOptionTexts);
 
         // Cancel editing the destination.
@@ -526,7 +526,8 @@ var ExplorationEditorMainTab = function() {
   // possible to click on them to view their contents, as clicks instead open
   // the rich text editor.
   this.expectContentToMatch = async function(richTextInstructions) {
-    await forms.expectRichText(stateContentDisplay).toMatch(richTextInstructions);
+    await forms.expectRichText(stateContentDisplay).toMatch(
+      richTextInstructions);
   };
 
   // HINT
@@ -872,7 +873,8 @@ var ExplorationEditorMainTab = function() {
   // after the ruleName. For example, the call
   //   _selectRuleParameters(ruleElement, 'NumericInput', 'Equals', 24)
   // will result in a rule that checks whether the learner's answer equals 24.
-  var _setRuleParameters = async function(ruleElement, interactionId, ruleName) {
+  var _setRuleParameters = async function(
+      ruleElement, interactionId, ruleName) {
     var parameterValues = [];
     for (var i = 3; i < arguments.length; i++) {
       parameterValues.push(arguments[i]);

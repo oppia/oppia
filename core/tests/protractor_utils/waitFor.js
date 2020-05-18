@@ -93,12 +93,14 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
   await browser.wait(function() {
     return browser.driver.getAllWindowHandles().then(async function(handles) {
       await browser.waitForAngularEnabled(false);
-      return await browser.switchTo().window(await handles.pop()).then(async function() {
-        return await browser.getCurrentUrl().then(async function(url) {
-          await browser.waitForAngularEnabled(true);
-          return await url.match(urlToMatch);
-        });
-      });
+      return await browser.switchTo().window(await handles.pop()).then(
+        async function() {
+          return await browser.getCurrentUrl().then(async function(url) {
+            await browser.waitForAngularEnabled(true);
+            return await url.match(urlToMatch);
+          });
+        }
+      );
     });
   }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };

@@ -99,7 +99,8 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationEditorMainTab.addResponse(
       'MultipleChoiceInput', await forms.toRichText('Good!'),
       'End', true, 'Equals', 'Correct!');
-    responseEditor = await explorationEditorMainTab.getResponseEditor('default');
+    responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
     await responseEditor.setFeedback(await forms.toRichText('Wrong!'));
     await explorationEditorMainTab.moveToState('End');
     await explorationEditorMainTab.setInteraction('EndExploration');
@@ -299,15 +300,15 @@ describe('Core exploration functionality', function() {
     await explorationPlayerPage.expectContentToMatch(
       await forms.toRichText('plain text'));
     await explorationPlayerPage.expectExplorationToNotBeOver();
-    await explorationPlayerPage.expectInteractionToMatch('Continue', 'click here');
+    await explorationPlayerPage.expectInteractionToMatch(
+      'Continue', 'click here');
     await explorationPlayerPage.submitAnswer('Continue', null);
     await explorationPlayerPage.expectExplorationToBeOver();
   });
 
   it('should create content and multiple choice interactions',
     async function() {
-      await explorationEditorMainTab.setContent(async function(
-          richTextEditor) {
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendBoldText('bold text');
         await richTextEditor.appendPlainText(' ');
         await richTextEditor.appendItalicText('italic text');
@@ -316,11 +317,11 @@ describe('Core exploration functionality', function() {
         await richTextEditor.appendOrderedList(['entry 1', 'entry 2']);
         await richTextEditor.appendUnorderedList(['an entry', 'another entry']);
       });
-      await explorationEditorMainTab.setInteraction(
-        'MultipleChoiceInput',
-        [await forms.toRichText('option A'), await forms.toRichText('option B')
+      await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
+        await forms.toRichText('option A'), await forms.toRichText('option B')
       ]);
-      var responseEditor = await explorationEditorMainTab.getResponseEditor('default');
+      var responseEditor = await explorationEditorMainTab.getResponseEditor(
+        'default');
       await responseEditor.setDestination('final card', true, null);
 
       // Setup a terminating state.
@@ -332,7 +333,8 @@ describe('Core exploration functionality', function() {
       await explorationPlayerPage.expectExplorationToNotBeOver();
       await explorationPlayerPage.expectInteractionToMatch(
         'MultipleChoiceInput', ['option A', 'option B']);
-      await explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'option B');
+      await explorationPlayerPage.submitAnswer(
+        'MultipleChoiceInput', 'option B');
       await explorationPlayerPage.expectExplorationToBeOver();
     });
 
@@ -350,7 +352,8 @@ describe('Core exploration functionality', function() {
         'NumericInput', 'IsInclusivelyBetween', [-1, 3]);
       responseEditor = await explorationEditorMainTab.getResponseEditor(0);
       await responseEditor.expectFeedbackInstructionToBe('correct');
-      responseEditor = await explorationEditorMainTab.getResponseEditor('default');
+      responseEditor = await explorationEditorMainTab.getResponseEditor(
+        'default');
       await responseEditor.setFeedback(
         await forms.toRichText('out of bounds'));
       responseEditor = await explorationEditorMainTab.getResponseEditor(
@@ -478,7 +481,8 @@ describe('Core exploration functionality', function() {
     await explorationEditorSettingsTab.setObjective('It is just a test.');
     await explorationEditorPage.navigateToMainTab();
     await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.expectObjectiveToBe('It is just a test.');
+    await explorationEditorSettingsTab.expectObjectiveToBe(
+      'It is just a test.');
   });
 
   it('should show warnings when the length of goal < 15', async function() {
@@ -517,12 +521,12 @@ describe('Core exploration functionality', function() {
   it('should be able to select language from the dropdown menu',
     async function() {
       await explorationEditorPage.navigateToSettingsTab();
-
       await explorationEditorSettingsTab.expectLanguageToBe('English');
       await explorationEditorSettingsTab.setLanguage('italiano (Italian)');
       await explorationEditorPage.navigateToMainTab();
       await explorationEditorPage.navigateToSettingsTab();
-      await explorationEditorSettingsTab.expectLanguageToBe('italiano (Italian)');
+      await explorationEditorSettingsTab.expectLanguageToBe(
+        'italiano (Italian)');
     });
 
   it('should change the first card of the exploration', async function() {
