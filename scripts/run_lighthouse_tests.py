@@ -24,11 +24,13 @@ import subprocess
 import python_utils
 from scripts import common
 
+
 def delete_reports():
     """manually delete lighthouse reports to handle
     lighthouse ci bug where html reports aren't deleted.
     """
     shutil.rmtree('.lighthouseci')
+
 
 def run_lighthouse_checks():
     """Runs the lighthouserc.js config with bash command lhci autorun."""
