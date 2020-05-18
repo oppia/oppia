@@ -400,9 +400,10 @@ var ExplorationEditorMainTab = function() {
         expectedOptionTexts.push(_NEW_STATE_OPTION);
 
         var actualOptionTexts = await editOutcomeDestBubble.all(
-          by.tagName('option')).map(async function(optionElem) {
-            return await optionElem.getText();
-          });
+          by.tagName('option')
+        ).map(async function(optionElem) {
+          return await optionElem.getText();
+        });
         expect(actualOptionTexts).toEqual(expectedOptionTexts);
 
         // Cancel editing the destination.
