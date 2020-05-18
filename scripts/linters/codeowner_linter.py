@@ -209,11 +209,12 @@ def check_codeowner_file(verbose_mode_enabled):
                     # CODEOWNERS syntax but not the glob in Python 2.
                     # The following condition checks this.
                     if '**' in line_in_concern:
-                        python_utils.PRINT(
-                            '%s --> Pattern on line %s is invalid. '
-                            '\'**\' wildcard not allowed' % (
-                                CODEOWNER_FILEPATH, line_num + 1))
-                        failed = True
+                        if '/*.spec.ts' not in line_in_concern:
+                            python_utils.PRINT(
+                                '%s --> Pattern on line %s is invalid. '
+                                '\'**\' wildcard not allowed' % (
+                                    CODEOWNER_FILEPATH, line_num + 1))
+                            failed = True
                     # Adjustments to the dir paths in CODEOWNERS syntax
                     # for glob-style patterns to match correctly.
                     if line_in_concern.endswith('/'):

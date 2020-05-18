@@ -518,6 +518,9 @@
 /core/templates/services/services.constants.ajs.ts @vojtechjelinek
 /core/templates/services/services.constants.ts @vojtechjelinek
 
+# Frontend unit tests
+/core/templates/**/*.spec.ts @marianazangrossi
+/extensions/**/*.spec.ts @marianazangrossi
 
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @DubeySandeep
