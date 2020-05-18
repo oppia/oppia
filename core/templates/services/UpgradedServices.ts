@@ -307,6 +307,8 @@ import { TopicRightsObjectFactory } from
   'domain/topic/TopicRightsObjectFactory';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
+import { TopicViewerBackendApiService } from
+  'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -721,6 +723,10 @@ export class UpgradedServices {
       upgradedServices['SubtopicObjectFactory'],
       upgradedServices['StoryReferenceObjectFactory'],
       upgradedServices['SkillSummaryObjectFactory']);
+    upgradedServices['TopicViewerBackendApiService'] =
+      new TopicViewerBackendApiService(
+        upgradedServices['HttpClient'],
+        upgradedServices['UrlInterpolationService']);
 
     // Topological level: 4.
     upgradedServices['PredictionAlgorithmRegistryService'] =
