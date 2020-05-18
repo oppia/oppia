@@ -45,8 +45,8 @@ var CreatorDashboardPage = function() {
   var subscribers = element(by.css('.protractor-test-oppia-total-subscribers'));
 
   // Returns a promise of all explorations with the given name.
-  var _getExplorationElements = function(explorationTitle) {
-    waitFor.visibilityOf(
+  var _getExplorationElements = async function(explorationTitle) {
+    await waitFor.visibilityOf(
       element(by.css('.protractor-test-exploration-dashboard-card')));
     var allExplorationDashboardCard = element.all(
       by.css('.protractor-test-exploration-dashboard-card'));
@@ -74,10 +74,10 @@ var CreatorDashboardPage = function() {
     });
   };
 
-  this.navigateToExplorationEditor = function() {
-    waitFor.elementToBeClickable(explorationDashboardCard);
+  this.navigateToExplorationEditor = async function() {
+    await waitFor.elementToBeClickable(explorationDashboardCard);
     explorationDashboardCard.click();
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   };
 
   this.clickCreateActivityButton = async function() {
@@ -98,40 +98,40 @@ var CreatorDashboardPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
-  this.clickCreateExplorationButton = function() {
-    waitFor.elementToBeClickable(
+  this.clickCreateExplorationButton = async function() {
+    await waitFor.elementToBeClickable(
       createExplorationButton,
       'Create Exploration button takes too long to be clickable');
     createExplorationButton.click();
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.clickCreateNewExplorationButton = function() {
-    waitFor.elementToBeClickable(
+  this.clickCreateNewExplorationButton = async function() {
+    await waitFor.elementToBeClickable(
       createNewExplorationButton,
       'Create Exploration button on the creator' +
       'dashboard page takes too long to be clickable');
     createNewExplorationButton.click();
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToCollectionEditor = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToCollectionEditor = async function() {
+    await waitFor.elementToBeClickable(
       collectionCard,
       'Collection Card tab takes too long to be clickable');
     collectionCard.click();
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToSubscriptionDashboard = function() {
-    waitFor.elementToBeClickable(
+  this.navigateToSubscriptionDashboard = async function() {
+    await waitFor.elementToBeClickable(
       subscriptionTab,
       'Subscription Dashboard tab takes too long to be clickable');
     subscriptionTab.click();
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.editExploration = function(explorationTitle) {
+  this.editExploration = async function(explorationTitle) {
     _getExplorationElements(explorationTitle).then(function(elems) {
       if (elems.length === 0) {
         throw new Error(
@@ -147,109 +147,109 @@ var CreatorDashboardPage = function() {
     });
   };
 
-  this.getAverageRating = function() {
-    waitFor.visibilityOf(
+  this.getAverageRating = async function() {
+    await waitFor.visibilityOf(
       averageRating, 'Unable to find average rating');
     return averageRating.getText();
   };
 
-  this.getTotalPlays = function() {
-    waitFor.visibilityOf(
+  this.getTotalPlays = async function() {
+    await waitFor.visibilityOf(
       totalPlays, 'Unable to find total plays');
     return totalPlays.getText();
   };
 
-  this.getOpenFeedbacks = function() {
-    waitFor.visibilityOf(
+  this.getOpenFeedbacks = async function() {
+    await waitFor.visibilityOf(
       openFeedbacks, 'Unable to find open feedbacks count');
     return openFeedbacks.getText();
   };
 
-  this.getSubscribers = function() {
-    waitFor.visibilityOf(
+  this.getSubscribers = async function() {
+    await waitFor.visibilityOf(
       subscribers, 'Unable to find subscribers count');
     return subscribers.getText();
   };
 
-  this.getListView = function() {
-    waitFor.visibilityOf(
+  this.getListView = async function() {
+    await waitFor.visibilityOf(
       listViewButton, 'Unable to find list view button');
     listViewButton.click();
   };
 
   // Returns titles of each explorations in grid view.
-  this.getExpSummaryTileTitles = function() {
+  this.getExpSummaryTileTitles = async function() {
     var expSummaryTileTitleElements = element.all(
       by.css('.protractor-test-exp-summary-tile-title'));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       expSummaryTileTitleElements.first(), 'Unable to find exploration titles');
     return expSummaryTileTitleElements;
   };
 
   // Returns ratings of each explorations in grid view.
-  this.getExpSummaryTileRatings = function() {
+  this.getExpSummaryTileRatings = async function() {
     var expSummaryTileRatingElements = element.all(
       by.css('.protractor-test-exp-summary-tile-rating'));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       expSummaryTileRatingElements.first(),
       'Unable to find exploration ratings');
     return expSummaryTileRatingElements;
   };
 
   // Returns open feedback count of each exploration in grid view.
-  this.getExpSummaryTileOpenFeedbackCount = function() {
+  this.getExpSummaryTileOpenFeedbackCount = async function() {
     var expSummaryTileFeedbackElements = element.all(
       by.css('.protractor-test-exp-summary-tile-open-feedback'));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       expSummaryTileFeedbackElements.first(),
       'Unable to find exploration feedbacks');
     return expSummaryTileFeedbackElements;
   };
 
   // Returns total views count of each exploration in grid view.
-  this.getExpSummaryTileViewsCount = function() {
+  this.getExpSummaryTileViewsCount = async function() {
     var expSummaryTileViewsElements = element.all(
       by.css('.protractor-test-exp-summary-tile-num-views'));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       expSummaryTileViewsElements.first(),
       'Unable to find exploration views');
     return expSummaryTileViewsElements;
   };
 
   // Returns titles of each explorations in list view.
-  this.getExpSummaryRowTitles = function() {
+  this.getExpSummaryRowTitles = async function() {
     var expSummaryRowTitleElements = element.all(
       by.css('.protractor-test-exp-summary-row-title'));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       expSummaryRowTitleElements.first(), 'Unable to find exploration titles');
     return expSummaryRowTitleElements;
   };
 
   // Returns ratings of each explorations in list view.
-  this.getExpSummaryRowRatings = function() {
+  this.getExpSummaryRowRatings = async function() {
     var expSummaryRowRatingElements = element.all(
       by.css('.protractor-test-exp-summary-row-rating'));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       expSummaryRowRatingElements.first(),
       'Unable to find exploration ratings');
     return expSummaryRowRatingElements;
   };
 
   // Returns open feedback count of each exploration in list view.
-  this.getExpSummaryRowOpenFeedbackCount = function() {
+  this.getExpSummaryRowOpenFeedbackCount = async function() {
     var expSummaryRowFeedbackElements = element.all(
       by.css('.protractor-test-exp-summary-row-open-feedback'));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       expSummaryRowFeedbackElements.first(),
       'Unable to find exploration feedbacks');
     return expSummaryRowFeedbackElements;
   };
 
   // Returns total views count of each exploration in list view.
-  this.getExpSummaryRowViewsCount = function() {
+  this.getExpSummaryRowViewsCount = async function() {
     var expSummaryRowViewsElements = element.all(
       by.css('.protractor-test-exp-summary-row-num-views'));
-    waitFor.visibilityOf(
+    await waitFor.visibilityOf(
       expSummaryRowViewsElements.first(),
       'Unable to find exploration views');
     return expSummaryRowViewsElements;
