@@ -24,45 +24,48 @@ import os
 import sys
 
 import python_utils
-
 from . import linter_utils
-
-_MESSAGE_TYPE_SUCCESS = 'SUCCESS'
-_MESSAGE_TYPE_FAILED = 'FAILED'
 
 _MANIFEST_JSON_FILE_PATH = os.path.join(os.getcwd(), 'manifest.json')
 _PACKAGE_JSON_FILE_PATH = os.path.join(os.getcwd(), 'package.json')
+_TYPE_DEFS_FILE_EXTENSION_LENGTH = len('.d.ts')
 
 THIRD_PARTY_LIBS = [
     {
         'name': 'Guppy',
-        'manifest.json': 'guppy',
-        'type_defs_file_name': 'guppy-defs-'
+        'dependency_key': 'guppy',
+        'dependency_source': 'manifest.json',
+        'type_defs_filename_prefix': 'guppy-defs-'
     },
     {
         'name': 'Skulpt',
-        'manifest.json': 'skulpt-dist',
-        'type_defs_file_name': 'skulpt-defs-'
+        'dependency_key': 'skulpt-dist',
+        'dependency_source': 'manifest.json',
+        'type_defs_filename_prefix': 'skulpt-defs-'
     },
     {
         'name': 'Math Expressions',
-        'manifest.json': 'mathExpressions',
-        'type_defs_file_name': 'math-expressions-defs-'
+        'dependency_key': 'mathExpressions',
+        'dependency_source': 'manifest.json',
+        'type_defs_filename_prefix': 'math-expressions-defs-'
     },
     {
         'name': 'MIDI',
-        'manifest.json': 'midiJs',
-        'type_defs_file_name': 'midi-defs-'
+        'dependency_key': 'midiJs',
+        'dependency_source': 'manifest.json',
+        'type_defs_filename_prefix': 'midi-defs-'
     },
     {
         'name': 'Wavesurfer',
-        'package.json': 'wavesurfer.js',
-        'type_defs_file_name': 'wavesurfer-defs-'
+        'dependency_key': 'wavesurfer.js',
+        'dependency_source': 'package.json',
+        'type_defs_filename_prefix': 'wavesurfer-defs-'
     },
     {
         'name': 'Nerdamer',
-        'package.json': 'nerdamer',
-        'type_defs_file_name': 'nerdamer-defs-'
+        'dependency_key': 'nerdamer',
+        'dependency_source': 'package.json',
+        'type_defs_filename_prefix': 'nerdamer-defs-'
     }
 ]
 
@@ -85,28 +88,31 @@ def check_third_party_libs_type_defs(verbose_mode_enabled):
         with python_utils.open_file(_PACKAGE_JSON_FILE_PATH, 'r') as f:
             package = json.load(f)['dependencies']
 
-        for third_party_lib in THIRD_PARTY_LIBS:
-            if 'manifest.json' in third_party_lib:
-                lib_version = (
-                    manifest[third_party_lib['manifest.json']]['version'])
+        files_in_typings_dir = os.listdir(
+            os.path.join(os.getcwd(), 'typings')
+        )
 
-            if 'package.json' in third_party_lib:
-                lib_version = package[third_party_lib['package.json']]
+        for third_party_lib in THIRD_PARTY_LIBS:
+            lib_dependency_source = third_party_lib['dependency_source']
+
+            if lib_dependency_source == 'manifest.json':
+                lib_version = (
+                    manifest[third_party_lib['dependency_key']]['version'])
+
+            elif lib_dependency_source == 'package.json':
+                lib_version = package[third_party_lib['dependency_key']]
 
                 if lib_version[0] == '^':
                     lib_version = lib_version[1:]
 
-            files_in_typings_dir = os.listdir(
-                os.path.join(os.getcwd(), 'typings')
-            )
-
-            prefix_name = third_party_lib['type_defs_file_name']
+            prefix_name = third_party_lib['type_defs_filename_prefix']
 
             files_with_prefix_name = []
 
-            for file_name in files_in_typings_dir:
-                if file_name.startswith(prefix_name):
-                    files_with_prefix_name.append(file_name)
+            files_with_prefix_name = [
+                file_name for file_name in files_in_typings_dir
+                if file_name.startswith(prefix_name)
+            ]
 
             if len(files_with_prefix_name) > 1:
                 python_utils.PRINT(
@@ -123,9 +129,10 @@ def check_third_party_libs_type_defs(verbose_mode_enabled):
                 python_utils.PRINT('')
                 failed = True
             else:
-                type_defs_file_name = files_with_prefix_name[0]
+                type_defs_filename = files_with_prefix_name[0]
 
-                type_defs_version = type_defs_file_name[len(prefix_name): -5]
+                type_defs_version = type_defs_filename[
+                    len(prefix_name): -_TYPE_DEFS_FILE_EXTENSION_LENGTH]
 
                 if lib_version != type_defs_version:
                     python_utils.PRINT(
@@ -140,10 +147,10 @@ def check_third_party_libs_type_defs(verbose_mode_enabled):
         if failed:
             summary_message = (
                 '%s  Third party type defs check failed, see messages '
-                'above for more detail.' % _MESSAGE_TYPE_FAILED)
+                'above for more detail.' % linter_utils.MESSAGE_TYPE_FAILED)
         else:
             summary_message = '%s  Third party type defs check passed' % (
-                _MESSAGE_TYPE_SUCCESS)
+                linter_utils.MESSAGE_TYPE_SUCCESS)
             python_utils.PRINT(summary_message)
 
         summary_messages.append(summary_message)
