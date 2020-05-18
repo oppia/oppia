@@ -188,7 +188,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.is_super_admin = (
             current_user_services.is_current_user_super_admin())
 
-        self.values['iframed'] = False
+        self.iframed = False
         self.values['is_moderator'] = user_services.is_at_least_moderator(
             self.user_id)
         self.values['is_admin'] = user_services.is_admin(self.user_id)
@@ -363,13 +363,11 @@ class BaseHandler(webapp2.RequestHandler):
 
         method = self.request.environ['REQUEST_METHOD']
 
-        if return_type == feconf.HANDLER_TYPE_HTML and (
-                method == 'GET'):
+        if return_type == feconf.HANDLER_TYPE_HTML and method == 'GET':
             self.values.update(values)
-            if 'iframed' in self.values and self.values['iframed']:
+            if self.iframed:
                 self.render_template(
-                    'error-iframed.mainpage.html',
-                    iframe_restriction=None)
+                    'error-iframed.mainpage.html', iframe_restriction=None)
             else:
                 self.render_template(
                     'error-page-%s.mainpage.html' % values['status_code'])

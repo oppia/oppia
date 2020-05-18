@@ -613,22 +613,17 @@ class VersionedModel(BaseModel):
         self.populate(**snapshot_dict)
         return self
 
-    def _reconstitute_from_snapshot_id(self, snapshot_id, strict=True):
+    def _reconstitute_from_snapshot_id(self, snapshot_id):
         """Gets a reconstituted instance of this model class, based on the given
         snapshot id.
 
         Args:
             snapshot_id: str.
-            strict: bool. Whether to fail noisily if no entity with the given id
-                exists in the datastore. Default is True.
 
         Returns:
             VersionedModel. Reconstituted instance.
         """
-        snapshot_model = self.SNAPSHOT_CONTENT_CLASS.get(
-            snapshot_id, strict=strict)
-        if snapshot_model is None:
-            return None
+        snapshot_model = self.SNAPSHOT_CONTENT_CLASS.get(snapshot_id)
         snapshot_dict = snapshot_model.content
         reconstituted_model = self._reconstitute(snapshot_dict)
         # TODO(sll): The 'created_on' and 'last_updated' values here will be
@@ -941,10 +936,15 @@ class VersionedModel(BaseModel):
 
         snapshot_id = cls.get_snapshot_id(entity_id, version_number)
 
-        return cls(
-            id=entity_id,
-            version=version_number
-        )._reconstitute_from_snapshot_id(snapshot_id, strict=strict)
+        try:
+            return cls(
+                id=entity_id,
+                version=version_number
+            )._reconstitute_from_snapshot_id(snapshot_id)
+        except cls.EntityNotFoundError as e:
+            if not strict:
+                return None
+            raise e
         # pylint: enable=protected-access
 
     @classmethod

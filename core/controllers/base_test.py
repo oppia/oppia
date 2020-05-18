@@ -113,7 +113,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
     class MockHandlerForTestingErrorPageWithIframed(base.BaseHandler):
         def get(self):
-            self.values['iframed'] = True
+            self.iframed = True
             self.render_template('invalid_page.html')
 
     class MockHandlerForTestingUiAccessWrapper(base.BaseHandler):
