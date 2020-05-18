@@ -35,8 +35,8 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
         '/visualizations/oppia-visualization-click-hexbins.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', '$element', 'AssetsBackendApiService',
-        'ContextService', 'HtmlEscaperService', 'ImagePreloaderService',
+        '$attrs', '$element', 'AssetsBackendApiService', 'ContextService',
+        'HtmlEscaperService', 'ImagePreloaderService',
         function(
             $attrs, $element, AssetsBackendApiService, ContextService,
             HtmlEscaperService, ImagePreloaderService) {

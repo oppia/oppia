@@ -229,20 +229,20 @@ angular.module('oppia').directive('statisticsTab', [
                         const el = $(
                           '<oppia-visualization-' +
                           $filter('camelCaseToHyphens')(vizInfo.id) + '/>');
-
-                        function injectAttr(key, val) {
+                        const setElAttr = (key, val) => {
                           const key = $filter('camelCaseToHyphens')(key);
                           const val = HtmlEscaperService.objToEscapedJson(val);
                           el.attr(key, val);
                         }
 
-                        injectAttr('escapedData', vizInfo.data);
-                        injectAttr('escapedOptions', vizInfo.options);
-                        injectAttr('addressedInfoIsSupported',
-                                   vizInfo.addressed_info_is_supported);
+                        setElAttr('escapedData', vizInfo.data);
+                        setElAttr('escapedOptions', vizInfo.options);
+                        setElAttr(
+                          'addressedInfoIsSupported',
+                          vizInfo.addressed_info_is_supported);
 
                         for (const [argName, arg] of customizationArgs) {
-                          injectAttr(argName + 'WithValue', arg.value);
+                          setElAttr(argName + 'WithValue', arg.value);
                         }
 
                         return el.get(0).outerHTML;
