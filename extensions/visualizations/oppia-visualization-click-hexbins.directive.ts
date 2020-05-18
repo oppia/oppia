@@ -15,6 +15,12 @@
 import * as d3 from 'd3';
 import * as d3Hexbin from 'd3-hexbin';
 
+interface IHexBin {
+  x: number; // X-coordinate of the bin.
+  y: number; // Y-coordinate of the bin.
+  length: number; // Number of clicks grouped into this bin.
+}
+
 /**
  * @fileoverview Visualization for click statistics providing a hexbin-heatmap.
  */
@@ -29,12 +35,12 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
         '/visualizations/oppia-visualization-click-hexbins.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', '$element', 'AssetsBackendApiService', 'ContextService',
-        'HtmlEscaperService', 'ImagePreloaderService',
+        '$attrs', '$element', 'AssetsBackendApiService',
+        'ContextService', 'HtmlEscaperService', 'ImagePreloaderService',
         function(
             $attrs, $element, AssetsBackendApiService, ContextService,
             HtmlEscaperService, ImagePreloaderService) {
-          var ctrl = this;
+          const ctrl = this;
           const data = HtmlEscaperService.escapedJsonToObj(
             $attrs.escapedData);
           const options = HtmlEscaperService.escapedJsonToObj(
@@ -42,26 +48,26 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
           const imageAndRegions = HtmlEscaperService.escapedJsonToObj(
             $attrs.imageAndRegionsWithValue);
 
-          const showTooltip = datum => {
-            if (datum.length === 0) {
+          function showTooltip(hexBin: IHexBin): void {
+            if (hexBin.length === 0) {
               return;
             }
             d3.select('#click-hexbin-chart-tooltip')
               .style('visibility', 'visible')
-              .style('left', `${datum.x}px`)
-              .style('top', `${datum.y + 16}px`)
-              .text(`${datum.length} click${datum.length > 1 ? 's' : ''}`);
+              .style('left', `${hexBin.x}px`)
+              .style('top', `${hexBin.y + 16}px`)
+              .text(`${hexBin.length} click${hexBin.length > 1 ? 's' : ''}`);
           };
 
-          const moveTooltip = datum => {
-            if (datum.length === 0) {
+          function moveTooltip(hexBin: IHexBin): void {
+            if (hexBin.length === 0) {
               return;
             }
             d3.select('#click-hexbin-chart-tooltip')
               .style('visibility', 'visible');
           };
 
-          const hideTooltip = datum => {
+          function hideTooltip(hexBin: IHexBin): void {
             d3.select('#click-hexbin-chart-tooltip')
               .style('visibility', 'hidden');
           };
@@ -71,13 +77,11 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
             imageAndRegions.imagePath);
           const imageDimensions = ImagePreloaderService.getDimensionsOfImage(
             imageAndRegions.imagePath);
+          const imageAspectRatio = (
+            imageDimensions.height / imageDimensions.width);
 
           const containerWidth = $('#click-hexbin-chart').width();
-
-          const widthScale = imageDimensions.width / containerWidth;
-          const heightScale = imageDimensions.height / imageDimensions.width;
-
-          const containerHeight = Math.round(containerWidth * heightScale);
+          const containerHeight = Math.round(containerWidth * imageAspectRatio);
 
           ctrl.$onInit = function() {
             d3.select('#click-hexbin-chart-tooltip')
@@ -94,12 +98,11 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
             // Define the color of hexbins, using the number of grouped clicks
             // to change their opacity.
             const color = d3.scaleLinear()
-              .domain([0, d3.max(bins, d => d.length)])
-              .range(['rgba(255,255,255,0.15)', 'rgba(255,255,255,0.65)']);
+              .domain([0, d3.max(bins, (b: IHexBin) => b.length)])
+              .range(['rgba(255,255,255,0.25)', 'rgba(208,2,27,0.75)']);
 
             // Construct and add the SVG element for holding the hexbin graph.
-            const svg =
-              d3.select('#click-hexbin-chart').append('svg')
+            const svg = d3.select('#click-hexbin-chart').append('svg')
                 .attr('viewBox', `0 0 ${containerWidth} ${containerHeight}`);
 
             // Draw the image in which the clicks happened.
@@ -114,13 +117,13 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
               .attr('width', containerWidth).attr('height', containerHeight)
               .style('fill', 'rgba(0,0,0,0.35)');
 
-            // Draw the mesh of hexagons to help distinguish groups of hexbins.
-            const clipPath = svg.append('clipPath');
-            clipPath.attr('id', 'clip');
+            // Draw the mesh of hexagons to help distinguish each group.
+            const clipPath = svg.append('clipPath').attr('id', 'clip');
             clipPath.append('rect')
               .attr('class', 'mesh')
               .attr('width', containerWidth)
               .attr('height', containerHeight);
+
             svg.append('svg:path')
               .attr('clip-path', 'url(#clip)')
               .attr('d', hexbin.mesh())
@@ -129,13 +132,13 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
               .style('stroke-opacity', 0.12)
               .style('fill', 'none');
 
-            // Draw each individual hexbin with non-zero points.
+            // Draw the individual hexbins with non-zero points.
             const graph = svg.append('g')
               .selectAll('path')
               .data(bins).enter();
             graph.append('path')
-              .attr('transform', d => `translate(${d.x}, ${d.y})`)
-              .attr('fill', d => color(d.length))
+              .attr('transform', (b: IHexBin) => `translate(${b.x}, ${b.y})`)
+              .attr('fill', (b: IHexBin) => color(b.length))
               .attr('d', hexbin.hexagon())
               .on('mouseover', showTooltip)
               .on('mousemove', moveTooltip)
