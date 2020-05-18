@@ -105,7 +105,8 @@ angular.module('oppia').directive('oppiaVisualizationClickHexbins', [
               .domain([0, d3.max(bins, (b: IHexBin) => b.length)])
               // NOTE TO DEVELOPERS: the range type is wrong; rgba string-values
               // are supported.
-              .range(rgbaScaleEndPoints); // @ts-ignore 
+              // @ts-ignore 
+              .range(rgbaScaleEndPoints);
 
             // Construct and add the SVG element for holding the hexbin graph.
             const svg = d3.select('#click-hexbin-chart').append('svg')
