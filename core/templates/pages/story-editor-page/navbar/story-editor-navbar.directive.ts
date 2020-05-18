@@ -122,6 +122,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
                 ).then(function(validationIssues) {
                   $scope.explorationValidationIssues =
                     $scope.explorationValidationIssues.concat(validationIssues);
+                  $rootScope.$apply();
                 });
               }
             }

@@ -37,7 +37,9 @@ export class EditableStoryBackendApiService {
 
   private storyDataDict = null;
   private _fetchStory(
-      storyId: string, successCallback: any, errorCallback: any): any {
+      storyId: string,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
     var editableStoryDataUrl = this.urlInterpolation.interpolateUrl(
       StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
         story_id: storyId
@@ -45,12 +47,12 @@ export class EditableStoryBackendApiService {
 
     this.http.get(
       editableStoryDataUrl, { observe: 'response' }).toPromise().then(
-      (response: any) => {
+      (response) => {
         this.storyDataDict = cloneDeep(response.body);
         if (successCallback) {
           successCallback(this.storyDataDict);
         }
-      }, (errorResponse: any) => {
+      }, (errorResponse) => {
         if (errorCallback) {
           errorCallback(errorResponse.error);
         }
@@ -59,7 +61,9 @@ export class EditableStoryBackendApiService {
 
     private _updateStory = function(
         storyId: string, storyVersion: string, commitMessage: string,
-        changeList: string[], successCallback: any, errorCallback: any) {
+        changeList: string[],
+        successCallback: (value?: Object | PromiseLike<Object>) => void,
+        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
       var editableStoryDataUrl = this.urlInterpolation.interpolateUrl(
         StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
           story_id: storyId
@@ -73,14 +77,14 @@ export class EditableStoryBackendApiService {
 
       this.http.put(
         editableStoryDataUrl, putData).toPromise().then(
-        (response: any) => {
+        (response) => {
         // The returned data is an updated story dict.
           var story = cloneDeep(response.story);
 
           if (successCallback) {
             successCallback(story);
           }
-        }, function(errorResponse: any) {
+        }, function(errorResponse) {
           if (errorCallback) {
             errorCallback(errorResponse.error);
           }
@@ -89,7 +93,8 @@ export class EditableStoryBackendApiService {
 
     private _changeStoryPublicationStatus = function(
         storyId: string, newStoryStatusIsPublic: boolean,
-        successCallback: any, errorCallback: any) {
+        successCallback: (value?: Object | PromiseLike<Object>) => void,
+        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
       var storyPublishUrl = this.urlInterpolation.interpolateUrl(
         StoryDomainConstants.STORY_PUBLISH_URL_TEMPLATE, {
           story_id: storyId
@@ -100,11 +105,11 @@ export class EditableStoryBackendApiService {
       };
       this.http.put(
         storyPublishUrl, putData).toPromise().then(
-        (response: any) => {
+        (response) => {
           if (successCallback) {
             successCallback(response.status);
           }
-        }, function(errorResponse: any) {
+        }, function(errorResponse) {
           if (errorCallback) {
             errorCallback(errorResponse.error);
           }
@@ -112,18 +117,20 @@ export class EditableStoryBackendApiService {
     };
 
     private _deleteStory = function(
-        storyId: string, successCallback: any, errorCallback: any) {
+        storyId: string,
+        successCallback: (value?: Object | PromiseLike<Object>) => void,
+        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
       var storyDataUrl = this.urlInterpolation.interpolateUrl(
         StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
           story_id: storyId
         });
       this.http.request('delete',
         storyDataUrl).toPromise().then(
-        (response: any) => {
+        (response) => {
           if (successCallback) {
             successCallback(response.status);
           }
-        }, function(errorResponse: any) {
+        }, function(errorResponse) {
           if (errorCallback) {
             errorCallback(errorResponse.error);
           }
@@ -131,8 +138,9 @@ export class EditableStoryBackendApiService {
     };
 
     private _validateExplorations = function(
-        storyId: string, expIds: string[], successCallback: any,
-        errorCallback: any) {
+        storyId: string, expIds: string[],
+        successCallback: (value?: Object | PromiseLike<Object>) => void,
+        errorCallback: (reason?: Object | PromiseLike<Object>) => void): void {
       var validateExplorationsUrl = this.urlInterpolation.interpolateUrl(
         StoryDomainConstants.VALIDATE_EXPLORATIONS_URL_TEMPLATE, {
           story_id: storyId
@@ -144,11 +152,11 @@ export class EditableStoryBackendApiService {
             comma_separated_exp_ids: expIds.join(',')
           }
         }).toPromise().then(
-        (response: any) => {
+        (response) => {
           if (successCallback) {
             successCallback(response.status);
           }
-        }, function(errorResponse: any) {
+        }, function(errorResponse) {
           if (errorCallback) {
             errorCallback(errorResponse.error);
           }
