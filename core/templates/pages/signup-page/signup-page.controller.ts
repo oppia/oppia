@@ -17,7 +17,9 @@
  */
 
 require('base-components/base-content.directive.ts');
-
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/id-generation.service.ts');
@@ -36,13 +38,13 @@ angular.module('oppia').directive('signupPage', [
         '/pages/signup-page/signup-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$rootScope', '$timeout', '$uibModal', 'AlertsService',
-        'FocusManagerService', 'SiteAnalyticsService',
+        '$http', '$timeout', '$uibModal', 'AlertsService',
+        'FocusManagerService', 'LoaderService', 'SiteAnalyticsService',
         'UrlInterpolationService', 'UrlService', 'DASHBOARD_TYPE_CREATOR',
         'DASHBOARD_TYPE_LEARNER', 'SITE_NAME',
         function(
-            $http, $rootScope, $timeout, $uibModal, AlertsService,
-            FocusManagerService, SiteAnalyticsService,
+            $http, $timeout, $uibModal, AlertsService,
+            FocusManagerService, LoaderService, SiteAnalyticsService,
             UrlInterpolationService, UrlService, DASHBOARD_TYPE_CREATOR,
             DASHBOARD_TYPE_LEARNER, SITE_NAME) {
           var ctrl = this;
@@ -62,14 +64,19 @@ angular.module('oppia').directive('signupPage', [
               backdrop: true,
               resolve: {},
               controller: [
-                '$scope', '$uibModalInstance', 'SITE_NAME',
-                function($scope, $uibModalInstance, SITE_NAME) {
+                '$controller', '$scope', '$uibModalInstance', 'SITE_NAME',
+                function($controller, $scope, $uibModalInstance, SITE_NAME) {
+                  $controller('ConfirmOrCancelModalController', {
+                    $scope: $scope,
+                    $uibModalInstance: $uibModalInstance
+                  });
                   $scope.siteName = SITE_NAME;
-                  $scope.close = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
                 }
               ]
+            }).result.then(function() {}, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -172,7 +179,7 @@ angular.module('oppia').directive('signupPage', [
 
             ctrl.submissionInProcess = true;
             $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
-              window.location = window.decodeURIComponent(
+              window.location.href = window.decodeURIComponent(
                 UrlService.getUrlParams().return_url);
             }, function(rejection) {
               if (
@@ -215,14 +222,14 @@ angular.module('oppia').directive('signupPage', [
             });
           };
           ctrl.$onInit = function() {
-            $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
+            LoaderService.showLoadingScreen('I18N_SIGNUP_LOADING');
             ctrl.warningI18nCode = '';
             ctrl.siteName = SITE_NAME;
             ctrl.submissionInProcess = false;
 
             $http.get(_SIGNUP_DATA_URL).then(function(response) {
               var data = response.data;
-              $rootScope.loadingMessage = '';
+              LoaderService.hideLoadingScreen();
               ctrl.username = data.username;
               ctrl.hasEverRegistered = data.has_ever_registered;
               ctrl.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;

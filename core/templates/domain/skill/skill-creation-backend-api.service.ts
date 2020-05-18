@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 
 export interface IRubricBackend {
   difficulty: string,
-  explanation: string
+  explanations: Array<string>
 }
 
 export interface ISkillCreationBackend {
@@ -75,4 +75,3 @@ export class SkillCreationBackendApiService {
 
 angular.module('oppia').factory('SkillCreationBackendApiService',
   downgradeInjectable(SkillCreationBackendApiService));
-

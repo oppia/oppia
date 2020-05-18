@@ -23,10 +23,11 @@ const webpack = require('webpack');
 const macros = require('./webpack.common.macros.ts');
 
 var htmlMinifyConfig = {
-  ignoreCustomFragments: [
-    /\{\{[\s\S]*?\}\}/,
-    /<\{%[\s\S]*?%\}/,
-    /<\[[\s\S]*?\]>/]
+  ignoreCustomFragments: [/<\[[\s\S]*?\]>/],
+  removeAttributeQuotes: false,
+  caseSensitive: true,
+  customAttrSurround: [[/#/, /(?:)/], [/\*/, /(?:)/], [/\[?\(?/, /(?:)/]],
+  customAttrAssign: [/\)?\]?=/]
 };
 var commonPrefix = './core/templates';
 var defaultMeta = {
@@ -683,13 +684,17 @@ module.exports = {
     {
       test: {
         include: /.html$/,
-        exclude: /directive\.html$/
+        exclude: /(directive|component)\.html$/
       },
       loader: 'underscore-template-loader'
     },
     {
-      test: /directive\.html$/,
-      loader: 'html-loader'
+      test: /(directive|component)\.html$/,
+      loader: 'html-loader',
+      options: {
+        attributes: false,
+        minimize: htmlMinifyConfig,
+      },
     },
     {
       test: /\.css$/,

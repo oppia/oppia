@@ -1373,3 +1373,70 @@ class RegenerateMissingV2StatsModelsOneOffJob(
             yield (key, len(items))
         else:
             yield (key, items)
+
+
+class ExplorationMissingStatsAudit(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for finding explorations that are missing stats models."""
+
+    STATS_DELETED_KEY = 'deleted'
+    STATS_MISSING_KEY = 'missing'
+    STATS_PRESENT_KEY = 'present'
+
+    JOB_RESULT_EXPECTED = 'EXPECTED'
+    JOB_RESULT_UNEXPECTED = 'UNEXPECTED'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exp):
+        if exp.deleted:
+            return
+
+        exp_versions = list(python_utils.RANGE(1, exp.version + 1))
+        exp_stats_model_ids = (
+            stats_models.ExplorationStatsModel.get_entity_id(exp.id, version)
+            for version in exp_versions)
+        exp_stats_models = stats_models.ExplorationStatsModel.get_multi(
+            exp_stats_model_ids, include_deleted=True)
+
+        for exp_stats_model, exp_version in python_utils.ZIP(
+                exp_stats_models, exp_versions):
+            if exp_stats_model is None:
+                yield (
+                    ExplorationMissingStatsAudit.STATS_MISSING_KEY,
+                    (exp.id, exp_version))
+            elif exp_stats_model.deleted:
+                yield (
+                    ExplorationMissingStatsAudit.STATS_DELETED_KEY,
+                    (exp.id, exp_version))
+            else:
+                yield (
+                    ExplorationMissingStatsAudit.STATS_PRESENT_KEY,
+                    (exp.id, exp_version))
+
+    @staticmethod
+    def reduce(stats_model_status, exp_id_version_pair_strs):
+        if stats_model_status == ExplorationMissingStatsAudit.STATS_PRESENT_KEY:
+            yield (
+                ExplorationMissingStatsAudit.JOB_RESULT_EXPECTED,
+                '%d ExplorationStats %s present' % (
+                    len(exp_id_version_pair_strs),
+                    'models' if len(exp_id_version_pair_strs) > 1 else 'model'))
+            return
+
+        exp_versions_without_stats_models = collections.defaultdict(list)
+        for exp_id, exp_version in (
+                ast.literal_eval(s) for s in exp_id_version_pair_strs):
+            exp_versions_without_stats_models[exp_id].append(exp_version)
+
+        for exp_id, exp_versions in exp_versions_without_stats_models.items():
+            sorted_version_strs = [
+                python_utils.UNICODE(v) for v in sorted(exp_versions)]
+            yield (
+                ExplorationMissingStatsAudit.JOB_RESULT_UNEXPECTED,
+                'ExplorationStats for Exploration "%s" %s at %s: %s' % (
+                    exp_id, stats_model_status,
+                    'versions' if len(sorted_version_strs) > 1 else 'version',
+                    ', '.join(sorted_version_strs)))

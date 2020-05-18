@@ -240,13 +240,13 @@ describe('Topic editor state service', function() {
       skillIdToRubricsDict: {
         skill_1: [{
           difficulty: 'Easy',
-          explanation: 'Easy explanation'
+          explanations: ['Easy explanation']
         }, {
           difficulty: 'Medium',
-          explanation: 'Medium explanation'
+          explanations: ['Medium explanation']
         }, {
           difficulty: 'Hard',
-          explanation: 'Hard explanation'
+          explanations: ['Hard explanation']
         }]
       }
     };

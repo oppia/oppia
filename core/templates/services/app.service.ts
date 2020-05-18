@@ -13,8 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the wavesurfer library.
+ * @fileoverview Service for querying the shared constants of the Oppia module.
  */
 
-module.exports = require(
-  'static/wave-surfer-js-2.2.1/wavesurfer.min.js');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import { AppConstants } from 'app.constants';
+
+@Injectable({providedIn: 'root'})
+export class AppService {
+  isMachineLearningClassificationEnabled(): boolean {
+    return AppConstants.ENABLE_ML_CLASSIFIERS;
+  }
+}
+
+angular.module('oppia').factory('AppService', downgradeInjectable(AppService));

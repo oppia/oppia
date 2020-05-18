@@ -68,6 +68,9 @@ require('I18nFooter.ts');
 
 require('Polyfills.ts');
 
+// Default to passive event listeners.
+require('default-passive-events');
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -95,14 +98,14 @@ angular.module('oppia').config([
       'ExpressionParserService', 'ExtensionTagAssemblerService',
       'ExtractImageFilenamesFromStateService',
       'HtmlEscaperService', 'IdGenerationService', 'InteractionObjectFactory',
-      'LoggerService', 'MetaTagCustomizationService', 'NormalizeWhitespacePipe',
-      'PencilCodeEditorRulesService', 'SidebarStatusService',
-      'SiteAnalyticsService', 'SkillObjectFactory', 'SolutionObjectFactory',
-      'StateCardObjectFactory', 'StateImprovementSuggestionService',
-      'StateObjectFactory', 'StatesObjectFactory', 'TextInputRulesService',
-      'UrlInterpolationService', 'UrlService', 'UserInfoObjectFactory',
-      'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
-      'WindowRef'];
+      'LoaderService', 'LoggerService', 'MetaTagCustomizationService',
+      'NormalizeWhitespacePipe', 'PencilCodeEditorRulesService',
+      'SidebarStatusService', 'SiteAnalyticsService', 'SkillObjectFactory',
+      'SolutionObjectFactory', 'StateCardObjectFactory',
+      'StateImprovementSuggestionService', 'StateObjectFactory',
+      'StatesObjectFactory', 'TextInputRulesService', 'UrlInterpolationService',
+      'UrlService', 'UserInfoObjectFactory', 'UtilsService',
+      'ValidatorsService', 'WindowDimensionsService', 'WindowRef'];
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       if (servicesToProvide.includes(key)) {
         $provide.value(key, value);
