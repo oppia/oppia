@@ -182,11 +182,11 @@ var LibraryPage = function() {
     waitFor.pageToFullyLoad();
   };
 
-  this.clickExplorationObjective = function() {
-    waitFor.elementToBeClickable(
+  this.clickExplorationObjective = async function() {
+    await waitFor.elementToBeClickable(
       explorationObjective,
       'Exploration Objective takes too long to be clickable');
-    explorationObjective.click();
+    await explorationObjective.click();
   };
 
   this.findExploration = async function(explorationTitle) {

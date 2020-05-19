@@ -167,10 +167,11 @@ var createAddExpDetailsAndPublishExp = async function(
   await createExploration();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  explorationEditorMainTab.setContent(forms.toRichText('new exploration'));
-  explorationEditorMainTab.setInteraction('EndExploration');
-  explorationEditorPage.saveChanges('Save the changes');
-  explorationEditorPage.publishCardExploration(
+  await explorationEditorMainTab.setContent(
+    await forms.toRichText('new exploration'));
+  await explorationEditorMainTab.setInteraction('EndExploration');
+  await explorationEditorPage.saveChanges('Save the changes');
+  await explorationEditorPage.publishCardExploration(
     title, objective, category, language, tags);
 };
 

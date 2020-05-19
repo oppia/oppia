@@ -86,10 +86,10 @@ var ExplorationPlayerPage = function() {
     await nextCardButton.click();
   };
 
-  this.clickSuggestChangesButton = function() {
-    waitFor.elementToBeClickable(suggestionPopupLink,
+  this.clickSuggestChangesButton = async function() {
+    await waitFor.elementToBeClickable(suggestionPopupLink,
       'Suggest changes button taking too long to appear');
-    suggestionPopupLink.click();
+    await suggestionPopupLink.click();
   };
 
   this.expectNextCardButtonTextToBe = async function(text) {
@@ -97,42 +97,43 @@ var ExplorationPlayerPage = function() {
     expect(buttonText).toMatch(text);
   };
 
-  this.fillAndSubmitSuggestion = function(
+  this.fillAndSubmitSuggestion = async function(
       suggestionTitle, suggestionDescription) {
     var suggestionModal = element(
       by.css('.protractor-test-exploration-suggestion-modal'));
-    waitFor.visibilityOf(suggestionModal,
+    await waitFor.visibilityOf(suggestionModal,
       'Suggestion Modal is taking too long to appear.');
     var suggestionHeader = element(by.css('.oppia-rte'));
-    suggestionHeader.click();
-    suggestionHeader.sendKeys(suggestionTitle);
+    await suggestionHeader.click();
+    await suggestionHeader.sendKeys(suggestionTitle);
     var suggestionModalDescription = element(
       by.css('.protractor-test-suggestion-description-input'));
-    suggestionModalDescription.click();
-    suggestionModalDescription.sendKeys(suggestionDescription);
+    await suggestionModalDescription.click();
+    await suggestionModalDescription.sendKeys(suggestionDescription);
     var submitSuggestionBtn = element(
       by.css('.protractor-test-suggestion-submit-btn'));
 
-    submitSuggestionBtn.click();
+    await submitSuggestionBtn.click();
     var AFTER_SUBMIT_RESPONSE_STRING =
         'Your suggestion has been forwarded to the ' +
         'exploration author for review.';
-    var afterSubmitModalText = element(by.tagName('p')).getText();
+    var afterSubmitModalText = await element(by.tagName('p')).getText();
     expect(afterSubmitModalText).toMatch(AFTER_SUBMIT_RESPONSE_STRING);
   };
 
-  this.reportExploration = function() {
-    waitFor.elementToBeClickable(reportExplorationButton,
+  this.reportExploration = async function() {
+    await waitFor.elementToBeClickable(reportExplorationButton,
       'Report Exploration Button takes too long to be clickable');
-    reportExplorationButton.click();
-    let radioButton = element.all(by.tagName('input')).get(0);
-    waitFor.visibilityOf(radioButton, 'Radio Buttons takes too long to appear');
-    radioButton.click();
+    await reportExplorationButton.click();
+    let radioButton = await element.all(by.tagName('input')).get(0);
+    await waitFor.visibilityOf(
+      radioButton, 'Radio Buttons takes too long to appear');
+    await radioButton.click();
     let textArea = element(by.tagName('textarea'));
-    textArea.sendKeys('Reporting this exploration');
-    let submitButton = element.all(by.tagName('button')).get(1);
-    submitButton.click();
-    let afterSubmitText = element(by.tagName('p')).getText();
+    await textArea.sendKeys('Reporting this exploration');
+    let submitButton = await element.all(by.tagName('button')).get(1);
+    await submitButton.click();
+    let afterSubmitText = await element(by.tagName('p')).getText();
     expect(afterSubmitText).toMatch(
       'Your report has been forwarded to the moderators for review.');
   };

@@ -58,14 +58,6 @@ describe('Full exploration editor', function() {
 
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-
-    await users.createAndLoginAdminUser(
-      'superUser@stateEditor.com', 'superUser');
-    // TODO(#7569): Change this test to work with the improvements tab.
-    adminPage.editConfigProperty(
-      'Exposes the Improvements Tab for creators in the exploration editor',
-      'Boolean', (elem) => elem.setValue(false));
-    await users.logout();
   });
 
   it('should walk through the tutorial when user repeatedly clicks Next',
@@ -74,10 +66,10 @@ describe('Full exploration editor', function() {
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
       await users.login('userTutorial@stateEditor.com');
 
-      workflow.createExplorationAndStartTutorial();
-      explorationEditorMainTab.startTutorial();
-      explorationEditorMainTab.playTutorial();
-      explorationEditorMainTab.finishTutorial();
+      await workflow.createExplorationAndStartTutorial();
+      await explorationEditorMainTab.startTutorial();
+      await explorationEditorMainTab.playTutorial();
+      await explorationEditorMainTab.finishTutorial();
       await users.logout();
     }
   );
@@ -92,14 +84,14 @@ describe('Full exploration editor', function() {
       const EXPLORATION_CATEGORY = 'Mathematics';
       const EXPLORATION_LANGUAGE = 'Deutsch';
       const EXPLORATION_TAGS = ['maths', 'english', 'fractions', 'addition'];
-      workflow.createAddExpDetailsAndPublishExp(
+      await workflow.createAddExpDetailsAndPublishExp(
         EXPLORATION_TITLE,
         EXPLORATION_CATEGORY,
         EXPLORATION_OBJECTIVE,
         EXPLORATION_LANGUAGE,
         EXPLORATION_TAGS);
-      explorationEditorPage.navigateToSettingsTab();
-      explorationEditorPage.verifyExplorationSettingFields(
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorPage.verifyExplorationSettingFields(
         EXPLORATION_TITLE,
         EXPLORATION_CATEGORY,
         EXPLORATION_OBJECTIVE,
@@ -114,7 +106,7 @@ describe('Full exploration editor', function() {
     await users.createUser(
       'creator@editorAndPlayer.com', 'creatorEditorAndPlayer');
     await users.login('creator@editorAndPlayer.com');
-    workflow.createAndPublishExploration(
+    await workflow.createAndPublishExploration(
       'Fractions',
       'Mathematics',
       EXPLORATION_OBJECTIVE,
@@ -122,26 +114,26 @@ describe('Full exploration editor', function() {
     await users.logout();
     await users.createUser('learner@editorAndPlayer.com', 'learner');
     await users.login('learner@editorAndPlayer.com');
-    libraryPage.get();
-    libraryPage.clickExplorationObjective();
-    explorationPlayerPage.reportExploration();
+    await libraryPage.get();
+    await libraryPage.clickExplorationObjective();
+    await explorationPlayerPage.reportExploration();
   });
 
   it('should let learners suggest changes to an exploration', async function() {
     await users.createUser(
       'creator2@editorAndPlayer.com', 'creator2EditorAndPlayer');
     await users.login('creator2@editorAndPlayer.com');
-    workflow.createAndPublishExploration('Adding Fractions', 'Mathematics',
-      'Let us learn how to add fractions', 'English');
+    await workflow.createAndPublishExploration('Adding Fractions',
+      'Mathematics', 'Let us learn how to add fractions', 'English');
     await users.logout();
 
     await users.createUser('learner2@editorAndPlayer.com', 'learner2');
     await users.login('learner2@editorAndPlayer.com');
-    libraryPage.get();
-    libraryPage.findExploration('Adding Fractions');
-    libraryPage.playExploration('Adding Fractions');
-    explorationPlayerPage.clickSuggestChangesButton();
-    explorationPlayerPage.fillAndSubmitSuggestion(
+    await libraryPage.get();
+    await libraryPage.findExploration('Adding Fractions');
+    await libraryPage.playExploration('Adding Fractions');
+    await explorationPlayerPage.clickSuggestChangesButton();
+    await explorationPlayerPage.fillAndSubmitSuggestion(
       'Lets test the suggestion feature', 'Oh wow, It works!');
     await users.logout();
   });
@@ -150,40 +142,38 @@ describe('Full exploration editor', function() {
     await users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
     await users.login('user2@editorAndPlayer.com');
     await workflow.createExploration();
-    explorationEditorMainTab.setStateName('card 1');
-    explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
-    explorationEditorMainTab.setInteraction('Continue');
-    explorationEditorMainTab.getResponseEditor('default').setDestination(
-      'card 2', true, null);
+    await explorationEditorMainTab.setStateName('card 1');
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('this is card 1'));
+    await explorationEditorMainTab.setInteraction('Continue');
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setDestination('card 2', true, null);
 
-    explorationEditorMainTab.moveToState('card 2');
-    explorationEditorMainTab.setContent(forms.toRichText(
+    await explorationEditorMainTab.moveToState('card 2');
+    await explorationEditorMainTab.setContent(await forms.toRichText(
       'this is card 2 with non-inline interaction'));
-    explorationEditorMainTab.setInteraction(
+    await explorationEditorMainTab.setInteraction(
       'LogicProof',
       '', '', 'from p we have p');
-    explorationEditorMainTab.addResponse(
-      'LogicProof', forms.toRichText('Great'), 'final card', true, 'Correct');
+    await explorationEditorMainTab.addResponse(
+      'LogicProof', await forms.toRichText('Great'),
+      'final card', true, 'Correct');
 
     // Setup a terminating state.
-    explorationEditorMainTab.moveToState('final card');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.saveChanges();
+    await explorationEditorMainTab.moveToState('final card');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorPage.saveChanges();
 
-    general.moveToPlayer();
-    explorationPlayerPage.submitAnswer('Continue');
-    element.all(
-      by.css('.protractor-test-back-button')).then(function(buttons) {
-      expect(buttons.length).toBe(1);
-    });
-    explorationPlayerPage.submitAnswer('LogicProof');
-    element.all(
-      by.css('.protractor-test-back-button')).then(function(buttons) {
-      expect(buttons.length).toBe(0);
-    });
+    await general.moveToPlayer();
+    await explorationPlayerPage.submitAnswer('Continue');
+    var buttons = element.all(by.css('.protractor-test-back-button'));
+    expect(await buttons.count()).toBe(1);
+    await explorationPlayerPage.submitAnswer('LogicProof');
+    expect(await buttons.count()).toBe(0);
 
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.expectExplorationToBeOver();
+    await explorationPlayerPage.clickThroughToNextCard();
+    await explorationPlayerPage.expectExplorationToBeOver();
     await users.logout();
   });
 
