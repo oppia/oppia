@@ -225,26 +225,26 @@ angular.module('oppia').directive('statisticsTab', [
                     ];
 
                     $scope.visualizationsHtml = visualizationsInfo.map(info => {
-                        const visualizationElement = $(
-                          '<oppia-visualization-' +
-                          $filter('camelCaseToHyphens')(info.id) + '/>');
+                      const visualizationElement = $(
+                        '<oppia-visualization-' +
+                        $filter('camelCaseToHyphens')(info.id) + '/>');
 
-                        const addAttr = (key, val) => visualizationElement.attr(
-                          $filter('camelCaseToHyphens')(key),
-                          HtmlEscaperService.objToEscapedJson(val));
+                      const addAttr = (key, val) => visualizationElement.attr(
+                        $filter('camelCaseToHyphens')(key),
+                        HtmlEscaperService.objToEscapedJson(val));
 
-                        addAttr('escapedData', info.data);
-                        addAttr('escapedOptions', info.options);
-                        addAttr(
-                          'addressedInfoIsSupported',
-                          info.addressed_info_is_supported);
-                        customizationArgs.forEach(argDefinition => {
-                          const [name, arg] = argDefinition;
-                          addAttr(name + 'WithValue', arg.value);
-                        });
+                      addAttr('escapedData', info.data);
+                      addAttr('escapedOptions', info.options);
+                      addAttr(
+                        'addressedInfoIsSupported',
+                        info.addressed_info_is_supported);
+                      customizationArgs.forEach(argDefinition => {
+                        const [name, arg] = argDefinition;
+                        addAttr(name + 'WithValue', arg.value);
+                      });
 
-                        return visualizationElement.get(0).outerHTML;
-                      }).join('');
+                      return visualizationElement.get(0).outerHTML;
+                    }).join('');
 
                     $scope.navigateToStateEditor = () => {
                       $scope.cancel();
